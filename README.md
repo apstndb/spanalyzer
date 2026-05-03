@@ -204,6 +204,24 @@ The public API is intentionally split into composable steps:
 - `Analyzer` remains a convenience wrapper that wires these components together
   for the CLI-style row type use case.
 
+## License
+
+This project is licensed under the Apache License 2.0.
+
+The source distribution does not vendor `github.com/goccy/go-googlesql` or its
+embedded `googlesql.wasm` artifact. Binary distributions built from this
+project do include that dependency transitively, so distributors should include
+the relevant third-party license notices for at least:
+
+- `github.com/goccy/go-googlesql` and `github.com/goccy/googlesql-wasm`, which
+  are MIT licensed.
+- `github.com/google/googlesql`, the GoogleSQL frontend embedded in that WASM
+  artifact, which is Apache-2.0 licensed.
+
+If future releases vendor dependencies or attach compiled binaries, add the
+corresponding third-party license and NOTICE material to those release
+artifacts.
+
 ## Limitations
 
 - `PROTO BUNDLE` support requires descriptor set files. DDL alone is not enough
