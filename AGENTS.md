@@ -37,8 +37,12 @@ complete.
 
 - `Catalog` is the source of truth for parsed schema objects. Add DDL support
   there before wiring objects into the GoogleSQL catalog.
-- `Analyzer` registers tables, views, property graphs, and type information into
-  `go-googlesql` objects.
+- `GoogleSQLCatalog` registers tables, views, property graphs, functions,
+  models, and type information into `go-googlesql` objects.
+- `GoogleSQLHelper` owns parse/analyze/unparse/resolved-AST helper calls against
+  a GoogleSQL catalog.
+- Result conversion from GoogleSQL analyzer output to Spanner protobuf metadata
+  lives in `resultconv.go`; keep it separate from catalog construction.
 - Regular indexes and vector indexes are intentionally ignored because they do
   not affect logical query result row types.
 - Property graph support currently records graph IR and registers graph names,

@@ -7,137 +7,137 @@ import (
 	googlesql "github.com/goccy/go-googlesql"
 )
 
-func (a *Analyzer) addSpannerFunctionsToGoogleSQLCatalog() error {
-	timestampType, err := a.typeFactory.GetTimestamp()
+func (c *GoogleSQLCatalog) addSpannerFunctions() error {
+	timestampType, err := c.TypeFactory.GetTimestamp()
 	if err != nil {
 		return err
 	}
-	if err := a.addScalarFunction("PENDING_COMMIT_TIMESTAMP", timestampType, functionArgs()); err != nil {
+	if err := c.addScalarFunction("PENDING_COMMIT_TIMESTAMP", timestampType, functionArgs()); err != nil {
 		return err
 	}
 
-	int64Type, err := a.typeFactory.GetInt64()
+	int64Type, err := c.TypeFactory.GetInt64()
 	if err != nil {
 		return err
 	}
 
-	boolType, err := a.typeFactory.GetBool()
+	boolType, err := c.TypeFactory.GetBool()
 	if err != nil {
 		return err
 	}
-	floatType, err := a.typeFactory.GetFloat()
+	floatType, err := c.TypeFactory.GetFloat()
 	if err != nil {
 		return err
 	}
-	doubleType, err := a.typeFactory.GetDouble()
+	doubleType, err := c.TypeFactory.GetDouble()
 	if err != nil {
 		return err
 	}
-	stringType, err := a.typeFactory.GetString()
+	stringType, err := c.TypeFactory.GetString()
 	if err != nil {
 		return err
 	}
-	bytesType, err := a.typeFactory.GetBytes()
+	bytesType, err := c.TypeFactory.GetBytes()
 	if err != nil {
 		return err
 	}
-	jsonType, err := a.typeFactory.GetJson()
+	jsonType, err := c.TypeFactory.GetJson()
 	if err != nil {
 		return err
 	}
-	tokenlistType, err := a.typeFactory.GetTokenlist()
+	tokenlistType, err := c.TypeFactory.GetTokenlist()
 	if err != nil {
 		return err
 	}
-	boolArrayType, err := a.typeFactory.MakeArrayType2(boolType)
+	boolArrayType, err := c.TypeFactory.MakeArrayType2(boolType)
 	if err != nil {
 		return err
 	}
-	int64ArrayType, err := a.typeFactory.MakeArrayType2(int64Type)
+	int64ArrayType, err := c.TypeFactory.MakeArrayType2(int64Type)
 	if err != nil {
 		return err
 	}
-	floatArrayType, err := a.typeFactory.MakeArrayType2(floatType)
+	floatArrayType, err := c.TypeFactory.MakeArrayType2(floatType)
 	if err != nil {
 		return err
 	}
-	doubleArrayType, err := a.typeFactory.MakeArrayType2(doubleType)
+	doubleArrayType, err := c.TypeFactory.MakeArrayType2(doubleType)
 	if err != nil {
 		return err
 	}
-	stringArrayType, err := a.typeFactory.MakeArrayType2(stringType)
+	stringArrayType, err := c.TypeFactory.MakeArrayType2(stringType)
 	if err != nil {
 		return err
 	}
-	bytesArrayType, err := a.typeFactory.MakeArrayType2(bytesType)
+	bytesArrayType, err := c.TypeFactory.MakeArrayType2(bytesType)
 	if err != nil {
 		return err
 	}
-	tokenlistArrayType, err := a.typeFactory.MakeArrayType2(tokenlistType)
+	tokenlistArrayType, err := c.TypeFactory.MakeArrayType2(tokenlistType)
 	if err != nil {
 		return err
 	}
-	categoryStructType, err := a.typeFactory.MakeStructType2([]*googlesql.StructField{
+	categoryStructType, err := c.TypeFactory.MakeStructType2([]*googlesql.StructField{
 		{Type_: stringType},
 		{Type_: stringType},
 	})
 	if err != nil {
 		return err
 	}
-	namedCategoryStructType, err := a.typeFactory.MakeStructType2([]*googlesql.StructField{
+	namedCategoryStructType, err := c.TypeFactory.MakeStructType2([]*googlesql.StructField{
 		{Name: "label", Type_: stringType},
 		{Name: "description", Type_: stringType},
 	})
 	if err != nil {
 		return err
 	}
-	categoryStructArrayType, err := a.typeFactory.MakeArrayType2(categoryStructType)
+	categoryStructArrayType, err := c.TypeFactory.MakeArrayType2(categoryStructType)
 	if err != nil {
 		return err
 	}
-	namedCategoryStructArrayType, err := a.typeFactory.MakeArrayType2(namedCategoryStructType)
+	namedCategoryStructArrayType, err := c.TypeFactory.MakeArrayType2(namedCategoryStructType)
 	if err != nil {
 		return err
 	}
 
-	if err := a.addScalarFunction("BIT_REVERSE", int64Type,
+	if err := c.addScalarFunction("BIT_REVERSE", int64Type,
 		functionArgs(int64Type),
 		functionArgs(int64Type, boolType),
 	); err != nil {
 		return err
 	}
-	if err := a.addScalarFunction("GET_NEXT_SEQUENCE_VALUE", int64Type,
+	if err := c.addScalarFunction("GET_NEXT_SEQUENCE_VALUE", int64Type,
 		[]functionArgSpec{{sequence: true}},
 		functionArgs(stringType),
 	); err != nil {
 		return err
 	}
-	if err := a.addScalarFunction("GET_INTERNAL_SEQUENCE_STATE", int64Type,
+	if err := c.addScalarFunction("GET_INTERNAL_SEQUENCE_STATE", int64Type,
 		[]functionArgSpec{{sequence: true}},
 		functionArgs(stringType),
 	); err != nil {
 		return err
 	}
-	if err := a.addScalarFunction("GET_TABLE_COLUMN_IDENTITY_STATE", int64Type, functionArgs(stringType)); err != nil {
+	if err := c.addScalarFunction("GET_TABLE_COLUMN_IDENTITY_STATE", int64Type, functionArgs(stringType)); err != nil {
 		return err
 	}
-	if err := a.addScalarFunction("AI_CLASSIFY", stringType,
+	if err := c.addScalarFunction("AI_CLASSIFY", stringType,
 		functionArgs(stringType, stringArrayType),
 		functionArgs(stringType, categoryStructArrayType),
 		functionArgs(stringType, namedCategoryStructArrayType),
 	); err != nil {
 		return err
 	}
-	if err := a.addScalarFunction("AI_IF", boolType, functionArgs(stringType)); err != nil {
+	if err := c.addScalarFunction("AI_IF", boolType, functionArgs(stringType)); err != nil {
 		return err
 	}
-	if err := a.addScalarFunction("AI_SCORE", doubleType, functionArgs(stringType)); err != nil {
+	if err := c.addScalarFunction("AI_SCORE", doubleType, functionArgs(stringType)); err != nil {
 		return err
 	}
-	if err := a.addScalarFunction("DEBUG_TOKENLIST", stringType, functionArgs(tokenlistType)); err != nil {
+	if err := c.addScalarFunction("DEBUG_TOKENLIST", stringType, functionArgs(tokenlistType)); err != nil {
 		return err
 	}
-	if err := a.addScalarFunction("SCORE", doubleType,
+	if err := c.addScalarFunction("SCORE", doubleType,
 		functionArgs(tokenlistType, stringType),
 		functionArgs(tokenlistType, stringType, stringType),
 		functionArgs(tokenlistType, stringType, stringType, stringType),
@@ -147,7 +147,7 @@ func (a *Analyzer) addSpannerFunctionsToGoogleSQLCatalog() error {
 	); err != nil {
 		return err
 	}
-	if err := a.addScalarFunction("SCORE_NGRAMS", doubleType,
+	if err := c.addScalarFunction("SCORE_NGRAMS", doubleType,
 		functionArgs(tokenlistType, stringType),
 		functionArgs(tokenlistType, stringType, stringType),
 		functionArgs(tokenlistType, stringType, stringType, stringType),
@@ -155,7 +155,7 @@ func (a *Analyzer) addSpannerFunctionsToGoogleSQLCatalog() error {
 	); err != nil {
 		return err
 	}
-	if err := a.addScalarFunction("SEARCH", boolType,
+	if err := c.addScalarFunction("SEARCH", boolType,
 		functionArgs(tokenlistType, stringType),
 		functionArgs(tokenlistType, stringType, stringType),
 		functionArgs(tokenlistType, stringType, stringType, stringType),
@@ -164,7 +164,7 @@ func (a *Analyzer) addSpannerFunctionsToGoogleSQLCatalog() error {
 	); err != nil {
 		return err
 	}
-	if err := a.addScalarFunction("SEARCH_NGRAMS", boolType,
+	if err := c.addScalarFunction("SEARCH_NGRAMS", boolType,
 		functionArgs(tokenlistType, stringType),
 		functionArgs(tokenlistType, stringType, stringType),
 		functionArgs(tokenlistType, stringType, stringType, int64Type),
@@ -172,14 +172,14 @@ func (a *Analyzer) addSpannerFunctionsToGoogleSQLCatalog() error {
 	); err != nil {
 		return err
 	}
-	if err := a.addScalarFunction("SEARCH_SUBSTRING", boolType,
+	if err := c.addScalarFunction("SEARCH_SUBSTRING", boolType,
 		functionArgs(tokenlistType, stringType),
 		functionArgs(tokenlistType, stringType, stringType),
 		functionArgs(tokenlistType, stringType, stringType, stringType),
 	); err != nil {
 		return err
 	}
-	if err := a.addScalarFunction("SNIPPET", jsonType,
+	if err := c.addScalarFunction("SNIPPET", jsonType,
 		functionArgs(stringType, stringType),
 		functionArgs(stringType, stringType, stringType),
 		functionArgs(stringType, stringType, stringType, boolType),
@@ -191,7 +191,7 @@ func (a *Analyzer) addSpannerFunctionsToGoogleSQLCatalog() error {
 		return err
 	}
 
-	if err := a.addScalarFunction("TOKEN", tokenlistType,
+	if err := c.addScalarFunction("TOKEN", tokenlistType,
 		functionArgs(bytesType),
 		functionArgs(bytesArrayType),
 		functionArgs(stringType),
@@ -199,13 +199,13 @@ func (a *Analyzer) addSpannerFunctionsToGoogleSQLCatalog() error {
 	); err != nil {
 		return err
 	}
-	if err := a.addScalarFunction("TOKENIZE_BOOL", tokenlistType,
+	if err := c.addScalarFunction("TOKENIZE_BOOL", tokenlistType,
 		functionArgs(boolType),
 		functionArgs(boolArrayType),
 	); err != nil {
 		return err
 	}
-	if err := a.addScalarFunction("TOKENIZE_FULLTEXT", tokenlistType,
+	if err := c.addScalarFunction("TOKENIZE_FULLTEXT", tokenlistType,
 		functionArgs(stringType),
 		functionArgs(stringArrayType),
 		functionArgs(stringType, stringType),
@@ -219,10 +219,10 @@ func (a *Analyzer) addSpannerFunctionsToGoogleSQLCatalog() error {
 	); err != nil {
 		return err
 	}
-	if err := a.addScalarFunction("TOKENIZE_JSON", tokenlistType, functionArgs(jsonType)); err != nil {
+	if err := c.addScalarFunction("TOKENIZE_JSON", tokenlistType, functionArgs(jsonType)); err != nil {
 		return err
 	}
-	if err := a.addScalarFunction("TOKENIZE_NGRAMS", tokenlistType,
+	if err := c.addScalarFunction("TOKENIZE_NGRAMS", tokenlistType,
 		functionArgs(stringType),
 		functionArgs(stringArrayType),
 		functionArgs(stringType, int64Type),
@@ -237,10 +237,10 @@ func (a *Analyzer) addSpannerFunctionsToGoogleSQLCatalog() error {
 	tokenizeNumberOverloads := tokenizeNumberFunctionArgs(int64Type, int64ArrayType, stringType, int64Type)
 	tokenizeNumberOverloads = append(tokenizeNumberOverloads, tokenizeNumberFunctionArgs(floatType, floatArrayType, stringType, int64Type)...)
 	tokenizeNumberOverloads = append(tokenizeNumberOverloads, tokenizeNumberFunctionArgs(doubleType, doubleArrayType, stringType, int64Type)...)
-	if err := a.addScalarFunction("TOKENIZE_NUMBER", tokenlistType, tokenizeNumberOverloads...); err != nil {
+	if err := c.addScalarFunction("TOKENIZE_NUMBER", tokenlistType, tokenizeNumberOverloads...); err != nil {
 		return err
 	}
-	if err := a.addScalarFunction("TOKENIZE_SUBSTRING", tokenlistType,
+	if err := c.addScalarFunction("TOKENIZE_SUBSTRING", tokenlistType,
 		functionArgs(stringType),
 		functionArgs(stringArrayType),
 		functionArgs(stringType, stringType),
@@ -260,7 +260,7 @@ func (a *Analyzer) addSpannerFunctionsToGoogleSQLCatalog() error {
 	); err != nil {
 		return err
 	}
-	if err := a.addScalarFunction("TOKENLIST_CONCAT", tokenlistType,
+	if err := c.addScalarFunction("TOKENLIST_CONCAT", tokenlistType,
 		functionArgs(tokenlistArrayType),
 		functionArgs(tokenlistType),
 		functionArgs(tokenlistType, tokenlistType),
@@ -284,11 +284,11 @@ func functionArgs(types ...googlesql.Googlesql_TypeNode) []functionArgSpec {
 	return args
 }
 
-func (a *Analyzer) addScalarFunction(name string, resultType googlesql.Googlesql_TypeNode, overloads ...[]functionArgSpec) error {
-	return a.addScalarFunctionAtPath([]string{name}, resultType, overloads...)
+func (c *GoogleSQLCatalog) addScalarFunction(name string, resultType googlesql.Googlesql_TypeNode, overloads ...[]functionArgSpec) error {
+	return c.addScalarFunctionAtPath([]string{name}, resultType, overloads...)
 }
 
-func (a *Analyzer) addScalarFunctionAtPath(namePath []string, resultType googlesql.Googlesql_TypeNode, overloads ...[]functionArgSpec) error {
+func (c *GoogleSQLCatalog) addScalarFunctionAtPath(namePath []string, resultType googlesql.Googlesql_TypeNode, overloads ...[]functionArgSpec) error {
 	name := strings.Join(namePath, ".")
 	resultArg, err := newFunctionArgumentType(resultType)
 	if err != nil {
@@ -319,7 +319,7 @@ func (a *Analyzer) addScalarFunctionAtPath(namePath []string, resultType googles
 	if err != nil {
 		return fmt.Errorf("function %s: %w", name, err)
 	}
-	return a.gsCatalog.AddFunction(fn)
+	return c.SimpleCatalog.AddFunction(fn)
 }
 
 func newFunctionArgumentType(typ googlesql.Googlesql_TypeNode) (*googlesql.FunctionArgumentType, error) {

@@ -11,10 +11,6 @@ func typeSpecToGoogleSQLType(tf *googlesql.TypeFactory, spec *TypeSpec) (googles
 	return typeSpecToGoogleSQLTypeWithProto(tf, spec, nil)
 }
 
-func (a *Analyzer) typeSpecToGoogleSQLType(spec *TypeSpec) (googlesql.Googlesql_TypeNode, error) {
-	return typeSpecToGoogleSQLTypeWithProto(a.typeFactory, spec, a.catalog)
-}
-
 func typeSpecToGoogleSQLTypeWithProto(tf *googlesql.TypeFactory, spec *TypeSpec, catalog *Catalog) (googlesql.Googlesql_TypeNode, error) {
 	if spec == nil {
 		return nil, fmt.Errorf("nil type spec")
@@ -83,6 +79,10 @@ func typeSpecToGoogleSQLTypeWithProto(tf *googlesql.TypeFactory, spec *TypeSpec,
 }
 
 func googleSQLTypeToSpannerPB(t googlesql.Googlesql_TypeNode) (*spannerpb.Type, error) {
+	return SpannerTypeFromGoogleSQLType(t)
+}
+
+func SpannerTypeFromGoogleSQLType(t googlesql.Googlesql_TypeNode) (*spannerpb.Type, error) {
 	if t == nil {
 		return nil, fmt.Errorf("nil GoogleSQL type")
 	}
@@ -126,7 +126,7 @@ func googleSQLTypeToSpannerPB(t googlesql.Googlesql_TypeNode) (*spannerpb.Type, 
 		if err != nil {
 			return nil, err
 		}
-		elemPB, err := googleSQLTypeToSpannerPB(elemType)
+		elemPB, err := SpannerTypeFromGoogleSQLType(elemType)
 		if err != nil {
 			return nil, err
 		}
@@ -142,7 +142,7 @@ func googleSQLTypeToSpannerPB(t googlesql.Googlesql_TypeNode) (*spannerpb.Type, 
 		}
 		pbFields := make([]*spannerpb.StructType_Field, 0, len(fields))
 		for _, field := range fields {
-			fieldPB, err := googleSQLTypeToSpannerPB(field.Type_)
+			fieldPB, err := SpannerTypeFromGoogleSQLType(field.Type_)
 			if err != nil {
 				return nil, err
 			}

@@ -31,6 +31,45 @@ CREATE TABLE Singers (
 	assertField(t, rowType.Fields[2], "Active", spannerpb.TypeCode_BOOL)
 }
 
+func TestComposableGoogleSQLCatalogHelperAndResultConversion(t *testing.T) {
+	const ddl = `
+CREATE TABLE Singers (
+  SingerId INT64 NOT NULL,
+  FirstName STRING(MAX),
+) PRIMARY KEY (SingerId);
+`
+	googleSQLCatalog, err := BuildGoogleSQLCatalogFromDDL("schema.sql", ddl, nil)
+	if err != nil {
+		t.Fatalf("BuildGoogleSQLCatalogFromDDL() error = %v", err)
+	}
+	helper := googleSQLCatalog.Helper()
+	out, err := helper.AnalyzeStatement("SELECT COUNT(*) AS singer_count, MIN(FirstName) AS first_name FROM Singers")
+	if err != nil {
+		t.Fatalf("AnalyzeStatement() error = %v", err)
+	}
+	rowType, err := RowTypeFromAnalyzerOutput(out, googleSQLCatalog.SpannerCatalog)
+	if err != nil {
+		t.Fatalf("RowTypeFromAnalyzerOutput() error = %v", err)
+	}
+	if got, want := len(rowType.Fields), 2; got != want {
+		t.Fatalf("len(rowType.Fields) = %d, want %d", got, want)
+	}
+	assertField(t, rowType.Fields[0], "singer_count", spannerpb.TypeCode_INT64)
+	assertField(t, rowType.Fields[1], "first_name", spannerpb.TypeCode_STRING)
+
+	exprOut, err := helper.AnalyzeExpression("ARRAY_FIRST([1, 2, 3])")
+	if err != nil {
+		t.Fatalf("AnalyzeExpression() error = %v", err)
+	}
+	typ, err := TypeFromAnalyzerOutput(exprOut)
+	if err != nil {
+		t.Fatalf("TypeFromAnalyzerOutput() error = %v", err)
+	}
+	if got, want := typ.Code, spannerpb.TypeCode_INT64; got != want {
+		t.Fatalf("typ.Code = %s, want %s", got, want)
+	}
+}
+
 func TestAnalyzerRowTypeForView(t *testing.T) {
 	const ddl = `
 CREATE TABLE Singers (

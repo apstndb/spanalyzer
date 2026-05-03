@@ -7,9 +7,9 @@ import (
 	googlesql "github.com/goccy/go-googlesql"
 )
 
-func (a *Analyzer) addModelsToGoogleSQLCatalog() error {
-	for _, model := range a.catalog.Models {
-		impl, err := a.newGoogleSQLModel(model)
+func (c *GoogleSQLCatalog) addModels() error {
+	for _, model := range c.SpannerCatalog.Models {
+		impl, err := c.newGoogleSQLModel(model)
 		if err != nil {
 			return err
 		}
@@ -17,29 +17,29 @@ func (a *Analyzer) addModelsToGoogleSQLCatalog() error {
 		if err != nil {
 			return fmt.Errorf("model %s: %w", model.Name, err)
 		}
-		if err := a.gsCatalog.AddModel(gsModel); err != nil {
+		if err := c.SimpleCatalog.AddModel(gsModel); err != nil {
 			return fmt.Errorf("model %s: %w", model.Name, err)
 		}
 	}
 	return nil
 }
 
-func (a *Analyzer) newGoogleSQLModel(model *Model) (*googleSQLModel, error) {
-	inputs, err := a.modelColumns(model.Name, model.Inputs)
+func (c *GoogleSQLCatalog) newGoogleSQLModel(model *Model) (*googleSQLModel, error) {
+	inputs, err := c.modelColumns(model.Name, model.Inputs)
 	if err != nil {
 		return nil, err
 	}
-	outputs, err := a.modelColumns(model.Name, model.Outputs)
+	outputs, err := c.modelColumns(model.Name, model.Outputs)
 	if err != nil {
 		return nil, err
 	}
 	return &googleSQLModel{name: model.Name, inputs: inputs, outputs: outputs}, nil
 }
 
-func (a *Analyzer) modelColumns(modelName string, columns []*ModelColumn) ([]googlesql.Googlesql_ColumnNode, error) {
+func (c *GoogleSQLCatalog) modelColumns(modelName string, columns []*ModelColumn) ([]googlesql.Googlesql_ColumnNode, error) {
 	out := make([]googlesql.Googlesql_ColumnNode, 0, len(columns))
 	for _, column := range columns {
-		typ, err := a.typeSpecToGoogleSQLType(column.Type)
+		typ, err := c.TypeSpecToGoogleSQLType(column.Type)
 		if err != nil {
 			return nil, fmt.Errorf("model %s column %s: %w", modelName, column.Name, err)
 		}

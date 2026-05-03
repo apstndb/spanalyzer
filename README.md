@@ -187,6 +187,23 @@ GoogleSQL is initialized with wazero compiler mode and an on-disk compilation
 cache. Set `SPANNER_ANALYZER_GOOGLESQL_CACHE_DIR` to override the cache
 directory.
 
+## Library components
+
+The public API is intentionally split into composable steps:
+
+- `BuildSchemaCatalog` parses Spanner DDL into this project's Spanner schema
+  catalog.
+- `BuildGoogleSQLCatalogFromSpannerCatalog` and `BuildGoogleSQLCatalogFromDDL`
+  convert that schema into a GoogleSQL frontend catalog, analyzer options, and
+  type factory.
+- `GoogleSQLHelper` wraps parse, analyze, unparse, and resolved AST debug
+  operations against that catalog.
+- `RowTypeFromAnalyzerOutput`, `RowTypeFromResolvedQuery`, and
+  `TypeFromAnalyzerOutput` convert GoogleSQL analyzer results into Cloud
+  Spanner protobuf metadata.
+- `Analyzer` remains a convenience wrapper that wires these components together
+  for the CLI-style row type use case.
+
 ## Limitations
 
 - `PROTO BUNDLE` support requires descriptor set files. DDL alone is not enough
