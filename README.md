@@ -53,6 +53,70 @@ go run ./cmd/spanner-analyzer \
   --param id=INT64
 ```
 
+More complex queries can mix aggregate functions, conditional expressions, and
+proto field access. The output is still the Cloud Spanner result row type, not
+query data.
+
+```sh
+go run ./cmd/spanner-analyzer \
+  --ddl testdata/order-proto-schema.sql \
+  --proto-descriptors-file testdata/protos/order_descriptors.pb \
+  --sql '
+    SELECT
+      COUNT(*) AS order_count,
+      SUM(Id) AS id_sum,
+      AVG(Id) AS avg_id,
+      IF(COUNT(*) > 0, "nonempty", "empty") AS status,
+      CASE WHEN MAX(Id) >= 100 THEN "large" ELSE "small" END AS id_bucket,
+      COALESCE(MIN(OrderInfo.order_number), "none") AS first_order_number
+    FROM Orders'
+```
+
+Output:
+
+```json
+{
+  "fields": [
+    {
+      "name": "order_count",
+      "type": {
+        "code": "INT64"
+      }
+    },
+    {
+      "name": "id_sum",
+      "type": {
+        "code": "INT64"
+      }
+    },
+    {
+      "name": "avg_id",
+      "type": {
+        "code": "FLOAT64"
+      }
+    },
+    {
+      "name": "status",
+      "type": {
+        "code": "STRING"
+      }
+    },
+    {
+      "name": "id_bucket",
+      "type": {
+        "code": "STRING"
+      }
+    },
+    {
+      "name": "first_order_number",
+      "type": {
+        "code": "STRING"
+      }
+    }
+  ]
+}
+```
+
 `--sql-mode expression` analyzes a single GoogleSQL expression and returns a
 single Spanner `Type` instead of a query result row type.
 
@@ -70,6 +134,40 @@ Output:
 ```json
 {
   "code": "FLOAT64"
+}
+```
+
+Polymorphic functions resolve their return type from the argument type.
+
+```sh
+go run ./cmd/spanner-analyzer \
+  --ddl testdata/order-proto-schema.sql \
+  --proto-descriptors-file testdata/protos/order_descriptors.pb \
+  --sql-mode expression \
+  --sql 'ARRAY_FIRST([1, 2, 3])'
+```
+
+Output:
+
+```json
+{
+  "code": "INT64"
+}
+```
+
+```sh
+go run ./cmd/spanner-analyzer \
+  --ddl testdata/order-proto-schema.sql \
+  --proto-descriptors-file testdata/protos/order_descriptors.pb \
+  --sql-mode expression \
+  --sql 'ARRAY_FIRST(["a", "b"])'
+```
+
+Output:
+
+```json
+{
+  "code": "STRING"
 }
 ```
 
