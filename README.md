@@ -16,8 +16,23 @@ API names or repositories that still use them.
 ```sh
 go run ./cmd/spanner-analyzer \
   --ddl testdata/order-proto-schema.sql \
-  --proto-descriptors-file /path/to/descriptors.pb \
+  --proto-descriptors-file testdata/protos/order_descriptors.pb \
   --sql 'SELECT OrderInfo.order_number FROM Orders'
+```
+
+Output:
+
+```json
+{
+  "fields": [
+    {
+      "name": "order_number",
+      "type": {
+        "code": "STRING"
+      }
+    }
+  ]
+}
 ```
 
 `--proto-descriptors-file` accepts a Protocol Buffers `FileDescriptorSet` used
@@ -43,10 +58,19 @@ single Spanner `Type` instead of a query result row type.
 
 ```sh
 go run ./cmd/spanner-analyzer \
-  --ddl schema.sql \
+  --ddl testdata/order-proto-schema.sql \
+  --proto-descriptors-file testdata/protos/order_descriptors.pb \
   --sql-mode expression \
   --sql 'AI.SCORE(@prompt)' \
   --param 'prompt=STRING(MAX)'
+```
+
+Output:
+
+```json
+{
+  "code": "FLOAT64"
+}
 ```
 
 The CLI also exposes selected GoogleSQL analyzer options from
