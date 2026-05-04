@@ -1,5 +1,7 @@
 # go-googlesql-spanner-poc
 
+[![Go Reference](https://pkg.go.dev/badge/github.com/apstndb/go-googlesql-spanner-poc.svg)](https://pkg.go.dev/github.com/apstndb/go-googlesql-spanner-poc)
+
 `go-googlesql-spanner-poc` is an experimental Go library and CLI for deriving
 Cloud Spanner GoogleSQL query result row types from Spanner DDL.
 
