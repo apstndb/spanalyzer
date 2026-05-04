@@ -17,22 +17,17 @@ API names or repositories that still use them.
 go run ./cmd/spanner-analyzer \
   --ddl testdata/order-proto-schema.sql \
   --proto-descriptors-file testdata/protos/order_descriptors.pb \
-  --sql 'SELECT OrderInfo.order_number FROM Orders'
+  --sql 'SELECT OrderInfo.order_number FROM Orders' \
+  --output yaml
 ```
 
 Output:
 
-```json
-{
-  "fields": [
-    {
-      "name": "order_number",
-      "type": {
-        "code": "STRING"
-      }
-    }
-  ]
-}
+```yaml
+fields:
+- name: order_number
+  type:
+    code: STRING
 ```
 
 `--proto-descriptors-file` accepts a Protocol Buffers `FileDescriptorSet` used
@@ -88,52 +83,32 @@ go run ./cmd/spanner-analyzer \
       IF(COUNT(*) > 0, "nonempty", "empty") AS status,
       CASE WHEN MAX(Id) >= 100 THEN "large" ELSE "small" END AS id_bucket,
       COALESCE(MIN(OrderInfo.order_number), "none") AS first_order_number
-    FROM Orders'
+    FROM Orders' \
+  --output yaml
 ```
 
 Output:
 
-```json
-{
-  "fields": [
-    {
-      "name": "order_count",
-      "type": {
-        "code": "INT64"
-      }
-    },
-    {
-      "name": "id_sum",
-      "type": {
-        "code": "INT64"
-      }
-    },
-    {
-      "name": "avg_id",
-      "type": {
-        "code": "FLOAT64"
-      }
-    },
-    {
-      "name": "status",
-      "type": {
-        "code": "STRING"
-      }
-    },
-    {
-      "name": "id_bucket",
-      "type": {
-        "code": "STRING"
-      }
-    },
-    {
-      "name": "first_order_number",
-      "type": {
-        "code": "STRING"
-      }
-    }
-  ]
-}
+```yaml
+fields:
+- name: order_count
+  type:
+    code: INT64
+- name: id_sum
+  type:
+    code: INT64
+- name: avg_id
+  type:
+    code: FLOAT64
+- name: status
+  type:
+    code: STRING
+- name: id_bucket
+  type:
+    code: STRING
+- name: first_order_number
+  type:
+    code: STRING
 ```
 
 `--sql-mode expression` analyzes a single GoogleSQL expression and returns a
@@ -145,15 +120,14 @@ go run ./cmd/spanner-analyzer \
   --proto-descriptors-file testdata/protos/order_descriptors.pb \
   --sql-mode expression \
   --sql 'AI.SCORE(@prompt)' \
-  --param 'prompt=STRING(MAX)'
+  --param 'prompt=STRING(MAX)' \
+  --output yaml
 ```
 
 Output:
 
-```json
-{
-  "code": "FLOAT64"
-}
+```yaml
+code: FLOAT64
 ```
 
 Polymorphic functions resolve their return type from the argument type.
@@ -163,15 +137,14 @@ go run ./cmd/spanner-analyzer \
   --ddl testdata/order-proto-schema.sql \
   --proto-descriptors-file testdata/protos/order_descriptors.pb \
   --sql-mode expression \
-  --sql 'ARRAY_FIRST([1, 2, 3])'
+  --sql 'ARRAY_FIRST([1, 2, 3])' \
+  --output yaml
 ```
 
 Output:
 
-```json
-{
-  "code": "INT64"
-}
+```yaml
+code: INT64
 ```
 
 ```sh
@@ -179,15 +152,14 @@ go run ./cmd/spanner-analyzer \
   --ddl testdata/order-proto-schema.sql \
   --proto-descriptors-file testdata/protos/order_descriptors.pb \
   --sql-mode expression \
-  --sql 'ARRAY_FIRST(["a", "b"])'
+  --sql 'ARRAY_FIRST(["a", "b"])' \
+  --output yaml
 ```
 
 Output:
 
-```json
-{
-  "code": "STRING"
-}
+```yaml
+code: STRING
 ```
 
 Cloud Spanner `INFORMATION_SCHEMA` tables are registered as built-in catalog
@@ -258,6 +230,23 @@ Output:
 
 ```yaml
 code: INT64
+```
+
+JSON output is still available:
+
+```sh
+go run ./cmd/spanner-analyzer \
+  --sql-mode expression \
+  --sql '1' \
+  --output json
+```
+
+Output:
+
+```json
+{
+  "code": "INT64"
+}
 ```
 
 `--mode` is inspired by GoogleSQL `execute_query` modes. The default
