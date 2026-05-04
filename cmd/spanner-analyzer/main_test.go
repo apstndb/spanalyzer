@@ -60,6 +60,39 @@ func TestRunModesDefaultReturnsSpannerType(t *testing.T) {
 	}
 }
 
+func TestRunBigQueryModesDefaultReturnsBigQueryType(t *testing.T) {
+	analyzer, err := spanalyzer.NewBigQueryAnalyzerFromDDL("schema.sql", "")
+	if err != nil {
+		t.Fatalf("NewBigQueryAnalyzerFromDDL() error = %v", err)
+	}
+
+	out, err := runBigQueryModes(analyzer, nil, "query", "SELECT 1 AS n", defaultOutputFormat)
+	if err != nil {
+		t.Fatalf("runBigQueryModes() error = %v", err)
+	}
+	if strings.Contains(out, "{") {
+		t.Fatalf("runBigQueryModes() output looks like JSON, want default YAML:\n%s", out)
+	}
+	if !strings.Contains(out, `name: "n"`) || !strings.Contains(out, "type: INTEGER") {
+		t.Fatalf("runBigQueryModes() output = %q, want BigQuery TableSchema YAML", out)
+	}
+}
+
+func TestRunBigQueryModeJSON(t *testing.T) {
+	analyzer, err := spanalyzer.NewBigQueryAnalyzerFromDDL("schema.sql", "")
+	if err != nil {
+		t.Fatalf("NewBigQueryAnalyzerFromDDL() error = %v", err)
+	}
+
+	out, err := runBigQueryMode(analyzer, "bigquery_type", "expression", "IF(TRUE, 1, 2)", "json")
+	if err != nil {
+		t.Fatalf("runBigQueryMode() error = %v", err)
+	}
+	if !strings.Contains(out, `"type": "INTEGER"`) {
+		t.Fatalf("runBigQueryMode() output = %q, want JSON containing INTEGER type", out)
+	}
+}
+
 func TestRunModeSpannerTypeYAML(t *testing.T) {
 	analyzer, err := spanalyzer.NewAnalyzerFromDDL("schema.sql", "")
 	if err != nil {

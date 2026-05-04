@@ -44,7 +44,7 @@ func BuildGoogleSQLCatalogFromSpannerCatalog(schema *Catalog, options ...Analyze
 	if err != nil {
 		return nil, err
 	}
-	simpleCatalog, opts, err := newGoogleSQLAnalyzerObjects(tf, config)
+	simpleCatalog, opts, err := newGoogleSQLAnalyzerObjects("spanner", tf, config)
 	if err != nil {
 		return nil, err
 	}
@@ -84,8 +84,8 @@ func (c *GoogleSQLCatalog) Helper() *GoogleSQLHelper {
 	}
 }
 
-func newGoogleSQLAnalyzerObjects(tf *googlesql.TypeFactory, config analyzerConfig) (*googlesql.SimpleCatalog, *googlesql.AnalyzerOptions, error) {
-	catalog, err := googlesql.NewSimpleCatalog("spanner", tf)
+func newGoogleSQLAnalyzerObjects(rootName string, tf *googlesql.TypeFactory, config analyzerConfig) (*googlesql.SimpleCatalog, *googlesql.AnalyzerOptions, error) {
+	catalog, err := googlesql.NewSimpleCatalog(rootName, tf)
 	if err != nil {
 		return nil, nil, err
 	}
