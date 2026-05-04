@@ -14,7 +14,7 @@ import (
 func main() {
 	ddlPath := flag.String("ddl", "", "path to a Spanner GoogleSQL DDL file")
 	verbose := flag.Bool("verbose", true, "include function signatures")
-	productMode := flag.String("product-mode", "", "GoogleSQL product mode: internal or external")
+	productMode := flag.String("product-mode", "external", "GoogleSQL product mode: internal or external")
 	strictNameResolution := flag.Bool("strict-name-resolution", false, "enable strict name resolution")
 	var protoDescriptorFiles repeatedStringFlag
 	flag.Var(&protoDescriptorFiles, "proto-descriptors-file", "path to a FileDescriptorSet used by CREATE/ALTER PROTO BUNDLE; repeatable")

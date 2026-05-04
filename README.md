@@ -207,10 +207,11 @@ go run ./cmd/spanner-analyzer \
 The CLI also exposes selected GoogleSQL analyzer options from
 `execute_query_tool`, including `--product-mode`, `--strict-name-resolution`,
 `--fold-literal-cast`, `--prune-unused-columns`, and
-`--parse-location-record-type`. `--mode=spanner_type` emits the Cloud Spanner
-type protobuf as YAML by default. YAML output is produced by converting the
-`protojson` result with `github.com/goccy/go-yaml`. Use `--output json` or
-`--output textproto` to emit another protobuf format.
+`--parse-location-record-type`. The default `--product-mode` is `external`,
+matching Cloud Spanner's public GoogleSQL dialect. `--mode=spanner_type` emits
+the Cloud Spanner type protobuf as YAML by default. YAML output is produced by
+converting the `protojson` result with `github.com/goccy/go-yaml`. Use
+`--output json` or `--output textproto` to emit another protobuf format.
 
 ```sh
 go run ./cmd/spanner-analyzer \

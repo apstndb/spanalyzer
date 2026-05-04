@@ -13,7 +13,10 @@ type analyzerConfig struct {
 }
 
 func defaultAnalyzerConfig() analyzerConfig {
-	return analyzerConfig{}
+	productMode := googlesql.ProductModeProductExternal
+	return analyzerConfig{
+		productMode: &productMode,
+	}
 }
 
 func WithProductMode(mode googlesql.ProductMode) AnalyzerOption {
