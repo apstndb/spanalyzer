@@ -16,6 +16,7 @@ func main() {
 	verbose := flag.Bool("verbose", true, "include function signatures")
 	productMode := flag.String("product-mode", "external", "GoogleSQL product mode: internal or external")
 	strictNameResolution := flag.Bool("strict-name-resolution", false, "enable strict name resolution")
+	enableMaximumDevelopmentLanguageFeatures := flag.Bool("enable-maximum-development-language-features", false, "use raw GoogleSQL EnableMaximumLanguageFeaturesForDevelopment without the dialect feature blacklist")
 	var protoDescriptorFiles repeatedStringFlag
 	flag.Var(&protoDescriptorFiles, "proto-descriptors-file", "path to a FileDescriptorSet used by CREATE/ALTER PROTO BUNDLE; repeatable")
 	flag.Parse()
@@ -32,7 +33,7 @@ func main() {
 		ddlPathForAnalyzer = "schema.sql"
 	}
 
-	options, err := analyzerOptionsFromFlags(*productMode, *strictNameResolution)
+	options, err := analyzerOptionsFromFlags(*productMode, *strictNameResolution, *enableMaximumDevelopmentLanguageFeatures)
 	if err != nil {
 		exitErr(err)
 	}
@@ -47,9 +48,10 @@ func main() {
 	fmt.Print(dump)
 }
 
-func analyzerOptionsFromFlags(productMode string, strictNameResolution bool) ([]spanalyzer.AnalyzerOption, error) {
+func analyzerOptionsFromFlags(productMode string, strictNameResolution, enableMaximumDevelopmentLanguageFeatures bool) ([]spanalyzer.AnalyzerOption, error) {
 	options := []spanalyzer.AnalyzerOption{
 		spanalyzer.WithStrictNameResolution(strictNameResolution),
+		spanalyzer.WithMaximumDevelopmentLanguageFeatures(enableMaximumDevelopmentLanguageFeatures),
 	}
 	if productMode != "" {
 		mode, err := parseProductMode(productMode)

@@ -79,6 +79,37 @@ func TestBigQueryAnalyzerTableSchemaForExpression(t *testing.T) {
 	assertBigQueryField(t, schema.Fields[0], "expression", "INTEGER", "NULLABLE")
 }
 
+func TestBigQueryAnalyzerTableSchemaForPipeSyntax(t *testing.T) {
+	const ddl = `
+CREATE SCHEMA mydataset;
+
+CREATE TABLE mydataset.produce (
+  item STRING,
+  sales INT64,
+  category STRING
+);
+`
+	analyzer, err := NewBigQueryAnalyzerFromDDL("schema.sql", ddl)
+	if err != nil {
+		t.Fatalf("NewBigQueryAnalyzerFromDDL() error = %v", err)
+	}
+	schema, err := analyzer.TableSchemaForStatement(`
+FROM mydataset.produce
+|> WHERE category = 'fruit'
+|> AGGREGATE COUNT(*) AS num_items, SUM(sales) AS total_sales
+   GROUP BY item
+|> ORDER BY item`)
+	if err != nil {
+		t.Fatalf("TableSchemaForStatement() error = %v", err)
+	}
+	if got, want := len(schema.Fields), 3; got != want {
+		t.Fatalf("len(schema.Fields) = %d, want %d", got, want)
+	}
+	assertBigQueryField(t, schema.Fields[0], "item", "STRING", "NULLABLE")
+	assertBigQueryField(t, schema.Fields[1], "num_items", "INTEGER", "NULLABLE")
+	assertBigQueryField(t, schema.Fields[2], "total_sales", "INTEGER", "NULLABLE")
+}
+
 func TestBigQueryAnalyzerExternalQueryRewrite(t *testing.T) {
 	const bigQueryDDL = `
 CREATE TABLE mydataset.customers (

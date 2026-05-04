@@ -274,6 +274,37 @@ fields:
   mode: REPEATED
 ```
 
+BigQuery and Spanner use different GoogleSQL feature sets. For example,
+BigQuery mode accepts pipe query syntax, while the default Spanner mode rejects
+it.
+
+```sh
+go run ./cmd/spanner-analyzer \
+  --dialect bigquery \
+  --sql 'FROM UNNEST([STRUCT("apples" AS item, 2 AS sales, "fruit" AS category),
+                      STRUCT("carrots", 8, "vegetable"),
+                      STRUCT("apples", 7, "fruit")]) AS produce
+         |> WHERE category = "fruit"
+         |> AGGREGATE COUNT(*) AS num_items, SUM(sales) AS total_sales
+            GROUP BY item
+         |> ORDER BY item'
+```
+
+Output:
+
+```yaml
+fields:
+- name: item
+  type: STRING
+  mode: NULLABLE
+- name: num_items
+  type: INTEGER
+  mode: NULLABLE
+- name: total_sales
+  type: INTEGER
+  mode: NULLABLE
+```
+
 BigQuery DDL is analyzed by the GoogleSQL frontend, so BigQuery table schemas
 can use nested `STRUCT`, repeated `ARRAY`, `JSON`, `BIGNUMERIC`, and
 `RANGE<DATE|DATETIME|TIMESTAMP>` types.
@@ -349,6 +380,13 @@ GoogleSQL is initialized with
 [wazero](https://github.com/tetratelabs/wazero) compiler mode and an on-disk
 compilation cache. Set `SPANNER_ANALYZER_GOOGLESQL_CACHE_DIR` to override the
 cache directory.
+
+Dialect feature presets start from GoogleSQL
+`EnableMaximumLanguageFeaturesForDevelopment()` and then disable features that
+are not available in the selected dialect. Use
+`--enable-maximum-development-language-features` to skip that blacklist and try
+raw development features, for example when validating a newly released Spanner
+feature before this project has updated its preset.
 
 ## Library components
 

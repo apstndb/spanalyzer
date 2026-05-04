@@ -5,11 +5,12 @@ import googlesql "github.com/goccy/go-googlesql"
 type AnalyzerOption func(*analyzerConfig)
 
 type analyzerConfig struct {
-	productMode             *googlesql.ProductMode
-	strictNameResolution    bool
-	foldLiteralCast         *bool
-	pruneUnusedColumns      *bool
-	parseLocationRecordType *googlesql.ParseLocationRecordType
+	productMode                           *googlesql.ProductMode
+	strictNameResolution                  bool
+	foldLiteralCast                       *bool
+	pruneUnusedColumns                    *bool
+	parseLocationRecordType               *googlesql.ParseLocationRecordType
+	rawMaximumDevelopmentLanguageFeatures bool
 }
 
 func defaultAnalyzerConfig() analyzerConfig {
@@ -46,5 +47,11 @@ func WithPruneUnusedColumns(enabled bool) AnalyzerOption {
 func WithParseLocationRecordType(recordType googlesql.ParseLocationRecordType) AnalyzerOption {
 	return func(config *analyzerConfig) {
 		config.parseLocationRecordType = &recordType
+	}
+}
+
+func WithMaximumDevelopmentLanguageFeatures(enabled bool) AnalyzerOption {
+	return func(config *analyzerConfig) {
+		config.rawMaximumDevelopmentLanguageFeatures = enabled
 	}
 }

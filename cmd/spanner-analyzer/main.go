@@ -27,6 +27,7 @@ func main() {
 	foldLiteralCast := flag.Bool("fold-literal-cast", true, "set AnalyzerOptions fold_literal_cast")
 	pruneUnusedColumns := flag.Bool("prune-unused-columns", true, "set AnalyzerOptions prune_unused_columns")
 	parseLocationRecordType := flag.String("parse-location-record-type", "none", "parse location recording: none, full_node_scope, or code_search")
+	enableMaximumDevelopmentLanguageFeatures := flag.Bool("enable-maximum-development-language-features", false, "use raw GoogleSQL EnableMaximumLanguageFeaturesForDevelopment without the dialect feature blacklist")
 	var protoDescriptorFiles repeatedStringFlag
 	var externalDDLs repeatedStringFlag
 	var externalProtoDescriptorFiles repeatedStringFlag
@@ -52,7 +53,7 @@ func main() {
 	if err != nil {
 		exitErr(err)
 	}
-	options, err := analyzerOptionsFromFlags(*productMode, *strictNameResolution, *foldLiteralCast, *pruneUnusedColumns, *parseLocationRecordType)
+	options, err := analyzerOptionsFromFlags(*productMode, *strictNameResolution, *foldLiteralCast, *pruneUnusedColumns, *parseLocationRecordType, *enableMaximumDevelopmentLanguageFeatures)
 	if err != nil {
 		exitErr(err)
 	}
@@ -386,11 +387,12 @@ func splitModes(value string) []string {
 	return modes
 }
 
-func analyzerOptionsFromFlags(productMode string, strictNameResolution, foldLiteralCast, pruneUnusedColumns bool, parseLocationRecordType string) ([]spanalyzer.AnalyzerOption, error) {
+func analyzerOptionsFromFlags(productMode string, strictNameResolution, foldLiteralCast, pruneUnusedColumns bool, parseLocationRecordType string, enableMaximumDevelopmentLanguageFeatures bool) ([]spanalyzer.AnalyzerOption, error) {
 	options := []spanalyzer.AnalyzerOption{
 		spanalyzer.WithStrictNameResolution(strictNameResolution),
 		spanalyzer.WithFoldLiteralCast(foldLiteralCast),
 		spanalyzer.WithPruneUnusedColumns(pruneUnusedColumns),
+		spanalyzer.WithMaximumDevelopmentLanguageFeatures(enableMaximumDevelopmentLanguageFeatures),
 	}
 	if productMode != "" {
 		mode, err := parseProductMode(productMode)

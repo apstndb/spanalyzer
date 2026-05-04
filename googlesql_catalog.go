@@ -96,6 +96,11 @@ func newGoogleSQLAnalyzerObjects(rootName string, tf *googlesql.TypeFactory, con
 	if err := lang.EnableMaximumLanguageFeaturesForDevelopment(); err != nil {
 		return nil, nil, err
 	}
+	if !config.rawMaximumDevelopmentLanguageFeatures {
+		if err := applyDialectLanguageFeaturePreset(rootName, lang); err != nil {
+			return nil, nil, err
+		}
+	}
 	if err := lang.SetSupportsAllStatementKinds(); err != nil {
 		return nil, nil, err
 	}
@@ -135,6 +140,44 @@ func newGoogleSQLAnalyzerObjects(rootName string, tf *googlesql.TypeFactory, con
 		}
 	}
 	return catalog, opts, nil
+}
+
+func applyDialectLanguageFeaturePreset(dialect string, lang *googlesql.LanguageOptions) error {
+	switch dialect {
+	case "spanner":
+		return disableLanguageFeatures(lang, pipeLanguageFeatures())
+	case "bigquery":
+		return nil
+	default:
+		return fmt.Errorf("unknown GoogleSQL dialect preset %q", dialect)
+	}
+}
+
+func disableLanguageFeatures(lang *googlesql.LanguageOptions, features []googlesql.LanguageFeature) error {
+	for _, feature := range features {
+		if err := lang.DisableLanguageFeature(feature); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func pipeLanguageFeatures() []googlesql.LanguageFeature {
+	return []googlesql.LanguageFeature{
+		googlesql.LanguageFeatureFeaturePipes,
+		googlesql.LanguageFeatureFeaturePipeStaticDescribe,
+		googlesql.LanguageFeatureFeaturePipeAssert,
+		googlesql.LanguageFeatureFeaturePipeLog,
+		googlesql.LanguageFeatureFeaturePipeIf,
+		googlesql.LanguageFeatureFeaturePipeFork,
+		googlesql.LanguageFeatureFeaturePipeExportData,
+		googlesql.LanguageFeatureFeaturePipeCreateTable,
+		googlesql.LanguageFeatureFeaturePipeTee,
+		googlesql.LanguageFeatureFeaturePipeInsert,
+		googlesql.LanguageFeatureFeaturePipeWith,
+		googlesql.LanguageFeatureFeaturePipeAggregateWithDifferentialPrivacy,
+		googlesql.LanguageFeatureFeatureStatementWithPipeOperators,
+	}
 }
 
 func (c *GoogleSQLCatalog) TypeSpecToGoogleSQLType(spec *TypeSpec) (googlesql.Googlesql_TypeNode, error) {
