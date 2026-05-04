@@ -185,8 +185,8 @@ go run ./cmd/spanner-analyzer \
 ```sh
 go run ./cmd/spanner-analyzer \
   --sql 'SELECT
-           SPANNER_SYS.DISTRIBUTION_PERCENTILE(LATENCY_DISTRIBUTION, 99.0) AS p99
-         FROM SPANNER_SYS.QUERY_STATS_TOP_MINUTE'
+           SPANNER_SYS.DISTRIBUTION_PERCENTILE(LATENCY_DISTRIBUTION[OFFSET(0)], 99.0) AS p99
+         FROM SPANNER_SYS.QUERY_STATS_TOTAL_10MINUTE'
 ```
 
 The Spanner lock statistics documentation uses a join between transaction and

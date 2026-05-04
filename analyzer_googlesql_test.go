@@ -308,16 +308,26 @@ func TestAnalyzerRowTypeForSpannerSysDistributionPercentile(t *testing.T) {
 		t.Fatalf("NewAnalyzerFromDDL() error = %v", err)
 	}
 	rowType, err := analyzer.RowTypeForStatement(`
-SELECT SPANNER_SYS.DISTRIBUTION_PERCENTILE(LATENCY_DISTRIBUTION, 99.0) AS p99
-FROM SPANNER_SYS.QUERY_STATS_TOP_MINUTE
+SELECT
+  INTERVAL_END,
+  AVG_LATENCY_SECONDS,
+  SPANNER_SYS.DISTRIBUTION_PERCENTILE(LATENCY_DISTRIBUTION[OFFSET(0)], 99.0) AS percentile_latency
+FROM SPANNER_SYS.QUERY_STATS_TOTAL_10MINUTE
+WHERE INTERVAL_END = (
+  SELECT MAX(INTERVAL_END)
+  FROM SPANNER_SYS.QUERY_STATS_TOTAL_10MINUTE
+)
+ORDER BY INTERVAL_END
 `)
 	if err != nil {
 		t.Fatalf("RowTypeForStatement() error = %v", err)
 	}
-	if got, want := len(rowType.Fields), 1; got != want {
+	if got, want := len(rowType.Fields), 3; got != want {
 		t.Fatalf("len(rowType.Fields) = %d, want %d", got, want)
 	}
-	assertField(t, rowType.Fields[0], "p99", spannerpb.TypeCode_FLOAT64)
+	assertField(t, rowType.Fields[0], "INTERVAL_END", spannerpb.TypeCode_TIMESTAMP)
+	assertField(t, rowType.Fields[1], "AVG_LATENCY_SECONDS", spannerpb.TypeCode_FLOAT64)
+	assertField(t, rowType.Fields[2], "percentile_latency", spannerpb.TypeCode_FLOAT64)
 }
 
 func TestAnalyzerRowTypeForSpannerSearchFunctions(t *testing.T) {

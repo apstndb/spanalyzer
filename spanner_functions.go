@@ -138,6 +138,7 @@ func (c *GoogleSQLCatalog) addSpannerFunctions() error {
 		return err
 	}
 	if err := c.addScalarFunctionAtPath([]string{"SPANNER_SYS", "DISTRIBUTION_PERCENTILE"}, doubleType,
+		functionArgs(distributionStructType, doubleType),
 		functionArgs(distributionArrayType, doubleType),
 		functionArgs(stringType, doubleType),
 	); err != nil {
