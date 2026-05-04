@@ -15,7 +15,7 @@ import (
 )
 
 func main() {
-	ddlPath := flag.String("ddl", "", "path to a Spanner GoogleSQL DDL file")
+	ddlPath := flag.String("ddl", "", "optional path to a Spanner GoogleSQL DDL file")
 	sql := flag.String("sql", "", "SQL query or expression to analyze")
 	mode := flag.String("mode", "spanner_type", "comma-separated modes: spanner_type, parse, analyze, unparse")
 	sqlMode := flag.String("sql-mode", "query", "how to interpret --sql: query or expression")
@@ -33,12 +33,12 @@ func main() {
 	flag.Var(&positionalParams, "positional-param", "positional query parameter TYPE; repeatable")
 	flag.Parse()
 
-	if *ddlPath == "" || *sql == "" {
+	if *sql == "" {
 		flag.Usage()
 		os.Exit(2)
 	}
 
-	ddl, err := os.ReadFile(*ddlPath)
+	ddlPathForAnalyzer, ddl, err := readDDL(*ddlPath)
 	if err != nil {
 		exitErr(err)
 	}
@@ -46,7 +46,7 @@ func main() {
 	if err != nil {
 		exitErr(err)
 	}
-	analyzer, err := spanalyzer.NewAnalyzerFromDDLWithProtoDescriptorFilesAndOptions(*ddlPath, string(ddl), protoDescriptorFiles, options...)
+	analyzer, err := spanalyzer.NewAnalyzerFromDDLWithProtoDescriptorFilesAndOptions(ddlPathForAnalyzer, ddl, protoDescriptorFiles, options...)
 	if err != nil {
 		exitErr(err)
 	}
@@ -58,6 +58,17 @@ func main() {
 		exitErr(err)
 	}
 	fmt.Print(result)
+}
+
+func readDDL(path string) (string, string, error) {
+	if path == "" {
+		return "schema.sql", "", nil
+	}
+	ddl, err := os.ReadFile(path)
+	if err != nil {
+		return "", "", err
+	}
+	return path, string(ddl), nil
 }
 
 type anyProto interface {

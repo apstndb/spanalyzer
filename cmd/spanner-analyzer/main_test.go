@@ -1,6 +1,8 @@
 package main
 
 import (
+	"os"
+	"path/filepath"
 	"strings"
 	"testing"
 
@@ -65,5 +67,37 @@ func TestRunModeAnalyzeReturnsResolvedAST(t *testing.T) {
 	}
 	if !strings.Contains(out, "QueryStmt") {
 		t.Fatalf("runMode() output = %q, want resolved AST debug string containing QueryStmt", out)
+	}
+}
+
+func TestReadDDLEmptyPath(t *testing.T) {
+	path, ddl, err := readDDL("")
+	if err != nil {
+		t.Fatalf("readDDL() error = %v", err)
+	}
+	if path == "" {
+		t.Fatal("readDDL() path is empty, want synthetic path")
+	}
+	if ddl != "" {
+		t.Fatalf("readDDL() ddl = %q, want empty", ddl)
+	}
+}
+
+func TestReadDDLFile(t *testing.T) {
+	ddlPath := filepath.Join(t.TempDir(), "schema.sql")
+	const ddl = "CREATE TABLE T (Id INT64 NOT NULL) PRIMARY KEY(Id);"
+	if err := os.WriteFile(ddlPath, []byte(ddl), 0o600); err != nil {
+		t.Fatalf("WriteFile() error = %v", err)
+	}
+
+	path, gotDDL, err := readDDL(ddlPath)
+	if err != nil {
+		t.Fatalf("readDDL() error = %v", err)
+	}
+	if path != ddlPath {
+		t.Fatalf("readDDL() path = %q, want %q", path, ddlPath)
+	}
+	if gotDDL != ddl {
+		t.Fatalf("readDDL() ddl = %q, want %q", gotDDL, ddl)
 	}
 }

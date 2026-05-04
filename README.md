@@ -39,6 +39,14 @@ Output:
 to resolve types named by `CREATE PROTO BUNDLE` or `ALTER PROTO BUNDLE`. The
 flag is repeatable.
 
+`--ddl` is optional. Queries that only use built-in functions, parameters, or
+`INFORMATION_SCHEMA` can be analyzed without a schema file:
+
+```sh
+go run ./cmd/spanner-analyzer \
+  --sql 'SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES'
+```
+
 Registered GoogleSQL frontend and Spanner function signatures can be dumped
 with the dedicated function catalog command:
 
