@@ -27,16 +27,58 @@ go run ./tools/spanner-query-plan-shape \
   --output reference \
   --continue-on-error \
   --timeout=5m \
-  --sql '@{OPTIMIZER_VERSION=1} SELECT SingerId, AlbumId, TrackId FROM Songs WHERE REGEXP_CONTAINS(SongName, "^A.*")' \
-  --sql '@{OPTIMIZER_VERSION=2} SELECT SingerId, AlbumId, TrackId FROM Songs WHERE REGEXP_CONTAINS(SongName, "^A.*")' \
+  --sql '@{OPTIMIZER_VERSION=1}
+SELECT SingerId, AlbumId, TrackId
+FROM Songs
+WHERE REGEXP_CONTAINS(SongName, "^A.*")' \
+  --sql '@{OPTIMIZER_VERSION=2}
+SELECT SingerId, AlbumId, TrackId
+FROM Songs
+WHERE REGEXP_CONTAINS(SongName, "^A.*")' \
   --sql '@{OPTIMIZER_VERSION=2} SELECT s.SongGenre FROM Songs AS s ORDER BY SongGenre' \
   --sql '@{OPTIMIZER_VERSION=3} SELECT s.SongGenre FROM Songs AS s ORDER BY SongGenre' \
-  --sql '@{OPTIMIZER_VERSION=2} SELECT t.ConcertDate, (SELECT COUNT(*) FROM UNNEST(t.TicketPrices) AS p WHERE p > 10) AS expensive_tickets, u.VenueName FROM Concerts AS t JOIN Venues AS u ON t.VenueId = u.VenueId ORDER BY expensive_tickets LIMIT 2' \
-  --sql '@{OPTIMIZER_VERSION=3} SELECT t.ConcertDate, (SELECT COUNT(*) FROM UNNEST(t.TicketPrices) AS p WHERE p > 10) AS expensive_tickets, u.VenueName FROM Concerts AS t JOIN Venues AS u ON t.VenueId = u.VenueId ORDER BY expensive_tickets LIMIT 2' \
+  --sql '@{OPTIMIZER_VERSION=2}
+SELECT
+  t.ConcertDate,
+  (
+    SELECT COUNT(*)
+    FROM UNNEST(t.TicketPrices) AS p
+    WHERE p > 10
+  ) AS expensive_tickets,
+  u.VenueName
+FROM Concerts AS t
+JOIN Venues AS u ON t.VenueId = u.VenueId
+ORDER BY expensive_tickets
+LIMIT 2' \
+  --sql '@{OPTIMIZER_VERSION=3}
+SELECT
+  t.ConcertDate,
+  (
+    SELECT COUNT(*)
+    FROM UNNEST(t.TicketPrices) AS p
+    WHERE p > 10
+  ) AS expensive_tickets,
+  u.VenueName
+FROM Concerts AS t
+JOIN Venues AS u ON t.VenueId = u.VenueId
+ORDER BY expensive_tickets
+LIMIT 2' \
   --sql '@{OPTIMIZER_VERSION=4} SELECT AlbumTitle FROM Songs JOIN Albums ON Albums.AlbumId = Songs.AlbumId' \
   --sql '@{OPTIMIZER_VERSION=5} SELECT AlbumTitle FROM Songs JOIN Albums ON Albums.AlbumId = Songs.AlbumId' \
-  --sql '@{OPTIMIZER_VERSION=5} SELECT a.SingerId, a.AlbumTitle, s.SongName FROM Albums AS a FULL OUTER JOIN Songs AS s ON a.SingerId = s.SingerId AND a.AlbumId = s.AlbumId WHERE a.ReleaseDate >= DATE "2020-01-01" OR s.Duration > 180 LIMIT 10' \
-  --sql '@{OPTIMIZER_VERSION=6} SELECT a.SingerId, a.AlbumTitle, s.SongName FROM Albums AS a FULL OUTER JOIN Songs AS s ON a.SingerId = s.SingerId AND a.AlbumId = s.AlbumId WHERE a.ReleaseDate >= DATE "2020-01-01" OR s.Duration > 180 LIMIT 10' \
+  --sql '@{OPTIMIZER_VERSION=5}
+SELECT a.SingerId, a.AlbumTitle, s.SongName
+FROM Albums AS a
+FULL OUTER JOIN Songs AS s
+  ON a.SingerId = s.SingerId AND a.AlbumId = s.AlbumId
+WHERE a.ReleaseDate >= DATE "2020-01-01" OR s.Duration > 180
+LIMIT 10' \
+  --sql '@{OPTIMIZER_VERSION=6}
+SELECT a.SingerId, a.AlbumTitle, s.SongName
+FROM Albums AS a
+FULL OUTER JOIN Songs AS s
+  ON a.SingerId = s.SingerId AND a.AlbumId = s.AlbumId
+WHERE a.ReleaseDate >= DATE "2020-01-01" OR s.Duration > 180
+LIMIT 10' \
   --sql '@{OPTIMIZER_VERSION=6} SELECT s.SingerId FROM Singers AS s WHERE s.FirstName = "Alice" OR s.LastName = "Smith"' \
   --sql '@{OPTIMIZER_VERSION=7} SELECT s.SingerId FROM Singers AS s WHERE s.FirstName = "Alice" OR s.LastName = "Smith"' \
   --sql '@{OPTIMIZER_VERSION=7, USE_UNENFORCED_FOREIGN_KEY=TRUE} SELECT o.CustomerId FROM FKOrders AS o JOIN FKCustomers AS c ON c.CustomerId = o.CustomerId' \
@@ -66,7 +108,10 @@ certain circumstances. This example shows a prefix regexp becoming a seekable
 range.
 
 ```text
-@{OPTIMIZER_VERSION=1} SELECT SingerId, AlbumId, TrackId FROM Songs WHERE REGEXP_CONTAINS(SongName, "^A.*")
+@{OPTIMIZER_VERSION=1}
+SELECT SingerId, AlbumId, TrackId
+FROM Songs
+WHERE REGEXP_CONTAINS(SongName, "^A.*")
 +----+----------------------------------------------------------------------------------------------------+
 | ID | Operator                                                                                           |
 +----+----------------------------------------------------------------------------------------------------+
@@ -81,7 +126,10 @@ Predicates(identified by ID):
  3: Residual Condition: REGEXP_CONTAINS($SongName, '^A.*')
 
 
-@{OPTIMIZER_VERSION=2} SELECT SingerId, AlbumId, TrackId FROM Songs WHERE REGEXP_CONTAINS(SongName, "^A.*")
+@{OPTIMIZER_VERSION=2}
+SELECT SingerId, AlbumId, TrackId
+FROM Songs
+WHERE REGEXP_CONTAINS(SongName, "^A.*")
 +----+--------------------------------------------------------------------+
 | ID | Operator                                                           |
 +----+--------------------------------------------------------------------+
@@ -103,7 +151,10 @@ shape is a `Distributed Union` with `preserve_subquery_order: true`, not a
 separate `display_name` named `Distributed Merge Union`.
 
 ```text
-@{OPTIMIZER_VERSION=2} SELECT s.SongGenre FROM Songs AS s ORDER BY SongGenre
+@{OPTIMIZER_VERSION=2}
+SELECT s.SongGenre
+FROM Songs AS s
+ORDER BY SongGenre
 +----+---------------------------------------------------------------------------+
 | ID | Operator                                                                  |
 +----+---------------------------------------------------------------------------+
@@ -115,7 +166,10 @@ separate `display_name` named `Distributed Merge Union`.
 +----+---------------------------------------------------------------------------+
 
 
-@{OPTIMIZER_VERSION=3} SELECT s.SongGenre FROM Songs AS s ORDER BY SongGenre
+@{OPTIMIZER_VERSION=3}
+SELECT s.SongGenre
+FROM Songs AS s
+ORDER BY SongGenre
 +----+---------------------------------------------------------------------------+
 | ID | Operator                                                                  |
 +----+---------------------------------------------------------------------------+
@@ -135,7 +189,19 @@ pattern. The local fixture keeps `Venues` minimal; the JSON-oriented columns in
 the linked Spanner JSON examples are irrelevant to this plan boundary.
 
 ```text
-@{OPTIMIZER_VERSION=2} SELECT t.ConcertDate, (SELECT COUNT(*) FROM UNNEST(t.TicketPrices) AS p WHERE p > 10) AS expensive_tickets, u.VenueName FROM Concerts AS t JOIN Venues AS u ON t.VenueId = u.VenueId ORDER BY expensive_tickets LIMIT 2
+@{OPTIMIZER_VERSION=2}
+SELECT
+  t.ConcertDate,
+  (
+    SELECT COUNT(*)
+    FROM UNNEST(t.TicketPrices) AS p
+    WHERE p > 10
+  ) AS expensive_tickets,
+  u.VenueName
+FROM Concerts AS t
+JOIN Venues AS u ON t.VenueId = u.VenueId
+ORDER BY expensive_tickets
+LIMIT 2
 +-----+---------------------------------------------------------------------------------------------+
 | ID  | Operator                                                                                    |
 +-----+---------------------------------------------------------------------------------------------+
@@ -165,7 +231,19 @@ Predicates(identified by ID):
  36: Condition: ($p > 10)
 
 
-@{OPTIMIZER_VERSION=3} SELECT t.ConcertDate, (SELECT COUNT(*) FROM UNNEST(t.TicketPrices) AS p WHERE p > 10) AS expensive_tickets, u.VenueName FROM Concerts AS t JOIN Venues AS u ON t.VenueId = u.VenueId ORDER BY expensive_tickets LIMIT 2
+@{OPTIMIZER_VERSION=3}
+SELECT
+  t.ConcertDate,
+  (
+    SELECT COUNT(*)
+    FROM UNNEST(t.TicketPrices) AS p
+    WHERE p > 10
+  ) AS expensive_tickets,
+  u.VenueName
+FROM Concerts AS t
+JOIN Venues AS u ON t.VenueId = u.VenueId
+ORDER BY expensive_tickets
+LIMIT 2
 +-----+-----------------------------------------------------------------------------------------------------+
 | ID  | Operator                                                                                            |
 +-----+-----------------------------------------------------------------------------------------------------+
@@ -204,7 +282,10 @@ join. This empty-schema probe is still useful because the unhinted shape changes
 from distributed apply to hash join at the v4/v5 boundary.
 
 ```text
-@{OPTIMIZER_VERSION=4} SELECT AlbumTitle FROM Songs JOIN Albums ON Albums.AlbumId = Songs.AlbumId
+@{OPTIMIZER_VERSION=4}
+SELECT AlbumTitle
+FROM Songs
+JOIN Albums ON Albums.AlbumId = Songs.AlbumId
 +-----+-------------------------------------------------------------------------------------------------------+
 | ID  | Operator                                                                                              |
 +-----+-------------------------------------------------------------------------------------------------------+
@@ -227,7 +308,10 @@ Predicates(identified by ID):
  15: Residual Condition: ($AlbumId_1 = $batched_AlbumId')
 
 
-@{OPTIMIZER_VERSION=5} SELECT AlbumTitle FROM Songs JOIN Albums ON Albums.AlbumId = Songs.AlbumId
+@{OPTIMIZER_VERSION=5}
+SELECT AlbumTitle
+FROM Songs
+JOIN Albums ON Albums.AlbumId = Songs.AlbumId
 +-----+-------------------------------------------------------------------------------------------------------+
 | ID  | Operator                                                                                              |
 +-----+-------------------------------------------------------------------------------------------------------+
@@ -254,7 +338,13 @@ joins. The visible change here is from local `Outer Apply` over the base table
 to `Distributed Outer Apply` over `AlbumsByReleaseDateTitleDesc`.
 
 ```text
-@{OPTIMIZER_VERSION=5} SELECT a.SingerId, a.AlbumTitle, s.SongName FROM Albums AS a FULL OUTER JOIN Songs AS s ON a.SingerId = s.SingerId AND a.AlbumId = s.AlbumId WHERE a.ReleaseDate >= DATE "2020-01-01" OR s.Duration > 180 LIMIT 10
+@{OPTIMIZER_VERSION=5}
+SELECT a.SingerId, a.AlbumTitle, s.SongName
+FROM Albums AS a
+FULL OUTER JOIN Songs AS s
+  ON a.SingerId = s.SingerId AND a.AlbumId = s.AlbumId
+WHERE a.ReleaseDate >= DATE "2020-01-01" OR s.Duration > 180
+LIMIT 10
 +-----+---------------------------------------------------------------------------------------+
 | ID  | Operator                                                                              |
 +-----+---------------------------------------------------------------------------------------+
@@ -275,7 +365,13 @@ Predicates(identified by ID):
  14: Seek Condition: (($SingerId_1 = $SingerId) AND ($AlbumId_1 = $AlbumId))
 
 
-@{OPTIMIZER_VERSION=6} SELECT a.SingerId, a.AlbumTitle, s.SongName FROM Albums AS a FULL OUTER JOIN Songs AS s ON a.SingerId = s.SingerId AND a.AlbumId = s.AlbumId WHERE a.ReleaseDate >= DATE "2020-01-01" OR s.Duration > 180 LIMIT 10
+@{OPTIMIZER_VERSION=6}
+SELECT a.SingerId, a.AlbumTitle, s.SongName
+FROM Albums AS a
+FULL OUTER JOIN Songs AS s
+  ON a.SingerId = s.SingerId AND a.AlbumId = s.AlbumId
+WHERE a.ReleaseDate >= DATE "2020-01-01" OR s.Duration > 180
+LIMIT 10
 +-----+-----------------------------------------------------------------------------------------------------------+
 | ID  | Operator                                                                                                  |
 +-----+-----------------------------------------------------------------------------------------------------------+
@@ -309,7 +405,10 @@ changes from a single index-scan shape in v6 to a union of two index-scan
 branches in v7.
 
 ```text
-@{OPTIMIZER_VERSION=6} SELECT s.SingerId FROM Singers AS s WHERE s.FirstName = "Alice" OR s.LastName = "Smith"
+@{OPTIMIZER_VERSION=6}
+SELECT s.SingerId
+FROM Singers AS s
+WHERE s.FirstName = "Alice" OR s.LastName = "Smith"
 +----+---------------------------------------------------------------------------+
 | ID | Operator                                                                  |
 +----+---------------------------------------------------------------------------+
@@ -324,7 +423,10 @@ Predicates(identified by ID):
  4: Seek Condition: (($FirstName = 'Alice') OR ($LastName = 'Smith'))
 
 
-@{OPTIMIZER_VERSION=7} SELECT s.SingerId FROM Singers AS s WHERE s.FirstName = "Alice" OR s.LastName = "Smith"
+@{OPTIMIZER_VERSION=7}
+SELECT s.SingerId
+FROM Singers AS s
+WHERE s.FirstName = "Alice" OR s.LastName = "Smith"
 +-----+------------------------------------------------------------------------------------------+
 | ID  | Operator                                                                                 |
 +-----+------------------------------------------------------------------------------------------+
@@ -356,7 +458,10 @@ Version 8 documents other improvements including foreign-key handling. With
 v8 removes that join and scans only the referencing table.
 
 ```text
-@{OPTIMIZER_VERSION=7, USE_UNENFORCED_FOREIGN_KEY=TRUE} SELECT o.CustomerId FROM FKOrders AS o JOIN FKCustomers AS c ON c.CustomerId = o.CustomerId
+@{OPTIMIZER_VERSION=7, USE_UNENFORCED_FOREIGN_KEY=TRUE}
+SELECT o.CustomerId
+FROM FKOrders AS o
+JOIN FKCustomers AS c ON c.CustomerId = o.CustomerId
 +-----+---------------------------------------------------------------------------------+
 | ID  | Operator                                                                        |
 +-----+---------------------------------------------------------------------------------+
@@ -380,7 +485,10 @@ Predicates(identified by ID):
  17: Seek Condition: ($CustomerId_1 = $batched_CustomerId')
 
 
-@{OPTIMIZER_VERSION=8, USE_UNENFORCED_FOREIGN_KEY=TRUE} SELECT o.CustomerId FROM FKOrders AS o JOIN FKCustomers AS c ON c.CustomerId = o.CustomerId
+@{OPTIMIZER_VERSION=8, USE_UNENFORCED_FOREIGN_KEY=TRUE}
+SELECT o.CustomerId
+FROM FKOrders AS o
+JOIN FKCustomers AS c ON c.CustomerId = o.CustomerId
 +----+---------------------------------------------------------------------------+
 | ID | Operator                                                                  |
 +----+---------------------------------------------------------------------------+

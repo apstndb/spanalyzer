@@ -465,6 +465,10 @@ Notable observations:
   required to observe the `Timestamp Condition` plan predicate in this probe.
   The same `Timestamp Condition` was also observed with an inferred timestamp
   query parameter, for example `WHERE s.ModificationTime > @updatedAt`.
+  This can change index-design decisions for recent-data reads: a plan may
+  still display `Full scan: true`, but `Timestamp Condition` is a separate
+  storage-pruning signal. Use PROFILE or Query Stats to validate rows-scanned
+  reduction when that distinction matters.
 - `INDEX_STRATEGY=FORCE_INDEX_UNION` produced a `Union All` over index-scan
   branches.
 - `SEEKABLE_KEY_SIZE=0/1/2` is paired with `FORCE_INDEX` as required by
@@ -472,6 +476,16 @@ Notable observations:
   table primary key is exactly `(SingerId, AlbumId)`. `SEEKABLE_KEY_SIZE=3`
   was checked separately and returned `InvalidArgument`, as expected for a
   value larger than the base table key length.
+- `LOCK_SCANNED_RANGES=shared/exclusive` was first covered by read-only
+  statement-hint probes, where it is effectively a no-op. A dedicated
+  `lock_hints` case now also captures read-write `AnalyzeQuery` output for the
+  same point-read query. Raw YAML for both read-only and read-write probes
+  showed identical `Scan` metadata and no visible requested lock-mode field.
+  This is consistent with an execution model where read-only and read-write
+  executions share the same logical plan cache and locking is applied below the
+  cached plan. The requested lock mode is not currently a PLAN-contract surface
+  in the observed Spanner Omni build, even though actual lock conflicts remain
+  verifiable through `SPANNER_SYS.LOCK_STATS*`.
 - Graph hints are accepted on match, traversal, element, and group positions.
   A graph traversal `JOIN_METHOD=HASH_JOIN` produced a regular `Hash Join`,
   while several other graph join-hint placements retained apply-style shapes.

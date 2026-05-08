@@ -539,7 +539,7 @@ func planReportContractEvaluationJSONSchema() map[string]interface{} {
 
 func planReportContractRuleResultJSONSchema() map[string]interface{} {
 	schema := objectSchema([]interface{}{"rule", "source", "status"}, map[string]interface{}{
-		"rule":                     enumSchema([]interface{}{"forbid_operator_family", "forbid_blocking_operator_under_limit", "forbid_full_scan", "cel"}, "Rule kind."),
+		"rule":                     enumSchema([]interface{}{"forbid_operator_family", "forbid_blocking_operator_under_limit", "forbid_full_scan", "forbid_full_scan_without_timestamp_condition", "require_timestamp_condition", "cel"}, "Rule kind."),
 		"source":                   patternStringSchema(planContractRuleResultSourcePattern(), "Original contract source that produced this result, such as use/no_hash_join, forbid[0], or cel."),
 		"predefined":               enumSchema(planContractPredefinedValues(), "Predefined contract name when this result was expanded from use."),
 		"expression":               stringSchema("CEL expression for cel rules."),
@@ -600,6 +600,32 @@ func planReportContractRuleResultJSONSchema() map[string]interface{} {
 			"then": map[string]interface{}{
 				"properties": map[string]interface{}{
 					"source": map[string]interface{}{"const": "use/no_full_scan"},
+				},
+				"required": []interface{}{"predefined", "observed_count", "max_count", "matched_operator_indexes"},
+				"not":      anyRequired("expression", "operator_family", "diagnostic_id"),
+			},
+		},
+		map[string]interface{}{
+			"if": map[string]interface{}{
+				"properties": map[string]interface{}{"rule": map[string]interface{}{"const": "forbid_full_scan_without_timestamp_condition"}},
+				"required":   []interface{}{"rule"},
+			},
+			"then": map[string]interface{}{
+				"properties": map[string]interface{}{
+					"source": map[string]interface{}{"const": "use/no_full_scan_without_timestamp_condition"},
+				},
+				"required": []interface{}{"predefined", "observed_count", "max_count", "matched_operator_indexes"},
+				"not":      anyRequired("expression", "operator_family", "diagnostic_id"),
+			},
+		},
+		map[string]interface{}{
+			"if": map[string]interface{}{
+				"properties": map[string]interface{}{"rule": map[string]interface{}{"const": "require_timestamp_condition"}},
+				"required":   []interface{}{"rule"},
+			},
+			"then": map[string]interface{}{
+				"properties": map[string]interface{}{
+					"source": map[string]interface{}{"const": "use/require_timestamp_condition"},
 				},
 				"required": []interface{}{"predefined", "observed_count", "max_count", "matched_operator_indexes"},
 				"not":      anyRequired("expression", "operator_family", "diagnostic_id"),
@@ -1119,7 +1145,7 @@ func planContractRuleResultForbidSourcePattern() string {
 func planContractForbidOperatorFamilyPredefinedNames() []string {
 	var names []string
 	for _, name := range planContractPredefinedNames() {
-		if name == "no_blocking_operator_under_limit" || name == "no_full_scan" {
+		if name == "no_blocking_operator_under_limit" || name == "no_full_scan" || name == "no_full_scan_without_timestamp_condition" || name == "require_timestamp_condition" {
 			continue
 		}
 		names = append(names, name)

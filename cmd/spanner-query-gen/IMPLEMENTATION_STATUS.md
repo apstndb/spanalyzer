@@ -61,6 +61,13 @@ deliberate deferrals.
 - `no_full_scan` is implemented as a metadata rule rather than an operator
   family rule; its result uses `rule: forbid_full_scan` and reports matching
   scan operator indexes.
+- `no_full_scan_without_timestamp_condition` is implemented as the practical
+  recent-data variant: it fails only full-scan operators that do not have a
+  `Timestamp Condition` child link.
+- `require_timestamp_condition` is implemented as a child-link rule over
+  `operator_edges[].type == "Timestamp Condition"`; it is intended for
+  recent-data commit timestamp reads where storage-level timestamp pruning is
+  expected even if the scan still reports `full_scan: true`.
 - CEL rule failures use `failure_kind: violation`; `classification_unknown`
   remains reserved for predefined or direct `forbid_operator_family` rules.
 - CEL contracts that read metadata-derived normalized fields, such as

@@ -564,6 +564,34 @@ var tvfQueries = []queryCase{
 	},
 }
 
+var lockHintQueries = []queryCase{
+	{
+		Label:    "lock-hints/read-only/shared-point-read",
+		SQL:      `@{LOCK_SCANNED_RANGES=shared} SELECT FirstName FROM Singers WHERE SingerId = 1`,
+		PlanMode: planModeReadOnly,
+	},
+	{
+		Label:    "lock-hints/read-only/exclusive-point-read",
+		SQL:      `@{LOCK_SCANNED_RANGES=exclusive} SELECT FirstName FROM Singers WHERE SingerId = 1`,
+		PlanMode: planModeReadOnly,
+	},
+	{
+		Label:    "lock-hints/read-write/shared-point-read",
+		SQL:      `@{LOCK_SCANNED_RANGES=shared} SELECT FirstName FROM Singers WHERE SingerId = 1`,
+		PlanMode: planModeReadWrite,
+	},
+	{
+		Label:    "lock-hints/read-write/exclusive-point-read",
+		SQL:      `@{LOCK_SCANNED_RANGES=exclusive} SELECT FirstName FROM Singers WHERE SingerId = 1`,
+		PlanMode: planModeReadWrite,
+	},
+	{
+		Label:    "lock-hints/read-write/exclusive-full-scan",
+		SQL:      `@{LOCK_SCANNED_RANGES=exclusive} SELECT FirstName FROM Singers`,
+		PlanMode: planModeReadWrite,
+	},
+}
+
 var dmlQueries = []queryCase{
 	dmlCase(
 		"dml/insert-values",

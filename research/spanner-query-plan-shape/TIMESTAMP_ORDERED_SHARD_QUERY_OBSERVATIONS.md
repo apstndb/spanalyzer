@@ -10,6 +10,8 @@ Source:
 - <https://github.com/apstndb/zenn-contents/blob/main/articles/spanner-query-optimizing-guide.md>
 - <https://github.com/gcpug/nouhau/pull/135>
 - <https://raw.githubusercontent.com/gcpug/nouhau/spanner/shard/spanner/note/shard/README.md>
+- <https://docs.cloud.google.com/spanner/docs/commit-timestamp#optimize>
+- <https://medium.com/google-cloud/cloud-spanner-evaluating-commit-timestamp-optimization-for-recent-data-queries-9291cddd85d5>
 
 Observed on 2026-05-08 with Spanner Omni through `spanemuboost` and rendered
 with `spannerplan` reference output.
@@ -83,10 +85,48 @@ CREATE INDEX OrderIndex ON Foo(shard_id, timestamp_order);
   the execution-plan-level full scan shape. A query may read many rows because
   an access predicate is weak or not fully seekable without literally being a
   full scan in the plan.
+- Newer Spanner plans can expose `Timestamp Condition` on a scan. This changes
+  the old decision tree for some recent-data queries: a plan-level full table
+  scan on an `allow_commit_timestamp=true` column can still receive
+  storage-level timestamp pruning, so a secondary timestamp index is no longer
+  automatically required just because the timestamp predicate is not a
+  key seek.
 
 These are plan-shape observations only. They do not prove row-scan counts
 because the local probe uses an empty synthetic database and `PLAN`, not
 `PROFILE`.
+
+## Timestamp Condition Update
+
+The official commit timestamp documentation now describes a recent-data
+optimization for `allow_commit_timestamp=true` columns. The qualifying shape is
+a `>` or `>=` comparison against a constant expression; additional `AND`
+predicates are allowed, while `OR` disqualifies the optimization.
+
+The Medium probe is useful because it shows the visible plan signal. A
+non-commit-timestamp column keeps the timestamp filter as only a
+`Residual Condition`, while the commit timestamp column adds a
+`Timestamp Condition` child link on the table scan. The relational operator
+shape can still show `Table Scan (Full scan: true)`, but `PROFILE` rows scanned
+and query stats can improve substantially for recent data. The same article
+also shows that old data may still scan the full table even with
+`Timestamp Condition`.
+
+This means `Timestamp Condition` should be interpreted as a separate storage
+pruning signal, not as a replacement for index seekability:
+
+- If the access pattern is "recent rows by commit timestamp" and global
+  ordering by timestamp is not required,
+  `no_full_scan_without_timestamp_condition` is often a better broad guardrail
+  than plain `no_full_scan`; it still rejects unpruned full scans while
+  allowing full scans that carry the `Timestamp Condition` storage-pruning
+  signal.
+- If the access pattern needs ordered pagination or top-N by timestamp, the
+  secondary index / sharded index reasoning in the rest of this note still
+  applies because `Timestamp Condition` does not provide index order.
+- If the query must be efficient for older data as well, the Medium result
+  suggests `Timestamp Condition` alone is not enough; a secondary index,
+  partitioning strategy, or workload-specific telemetry remains necessary.
 
 ## Contract Implications
 
@@ -98,7 +138,14 @@ Directly expressible today:
 - `no_full_scan`: rejects plan-level full scans. This catches the guide's
   "Full Scan on OLTP data is an early warning" case, but it does not prove row
   count. A scan with `seekable_key_size=1` can still read too much if the
-  timestamp predicate is residual.
+  timestamp predicate is residual, while a scan with `Timestamp Condition` can
+  read fewer rows despite still reporting `full_scan: true`.
+- `no_full_scan_without_timestamp_condition`: rejects full scans unless the
+  scan has a `Timestamp Condition` child link. This is the practical default
+  when recent-data commit timestamp reads are an allowed exception.
+- `require_timestamp_condition`: requires a `Timestamp Condition` child link.
+  This is the correct structural contract for recent-data commit timestamp
+  reads where storage-level pruning is expected.
 - `no_full_sort` / `no_explicit_sort`: rejects global/full sort shapes. For
   timestamp-ordered top-N lookups, this is useful when the desired shape should
   stream from index order.
@@ -109,6 +156,23 @@ Directly expressible today:
   aggregation can stream from ordered index input.
 
 Useful CEL for current reports:
+
+```cel
+operator_edges.exists(e, e.type == "Timestamp Condition")
+```
+
+This is equivalent to `require_timestamp_condition`. It confirms that the plan
+has the storage-pruning signal, but it does not prove rows-scanned reduction.
+
+```cel
+operators.all(o,
+  !(o.family == "scan" && o.full_scan) ||
+  operator_edges.exists(e,
+    e.parent_index == o.index &&
+    e.type == "Timestamp Condition"))
+```
+
+This is equivalent to `no_full_scan_without_timestamp_condition`.
 
 ```cel
 operators.exists(o,

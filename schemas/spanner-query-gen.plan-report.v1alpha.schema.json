@@ -590,6 +590,94 @@
           "if": {
             "properties": {
               "rule": {
+                "const": "forbid_full_scan_without_timestamp_condition"
+              }
+            },
+            "required": [
+              "rule"
+            ]
+          },
+          "then": {
+            "not": {
+              "anyOf": [
+                {
+                  "required": [
+                    "expression"
+                  ]
+                },
+                {
+                  "required": [
+                    "operator_family"
+                  ]
+                },
+                {
+                  "required": [
+                    "diagnostic_id"
+                  ]
+                }
+              ]
+            },
+            "properties": {
+              "source": {
+                "const": "use/no_full_scan_without_timestamp_condition"
+              }
+            },
+            "required": [
+              "predefined",
+              "observed_count",
+              "max_count",
+              "matched_operator_indexes"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "rule": {
+                "const": "require_timestamp_condition"
+              }
+            },
+            "required": [
+              "rule"
+            ]
+          },
+          "then": {
+            "not": {
+              "anyOf": [
+                {
+                  "required": [
+                    "expression"
+                  ]
+                },
+                {
+                  "required": [
+                    "operator_family"
+                  ]
+                },
+                {
+                  "required": [
+                    "diagnostic_id"
+                  ]
+                }
+              ]
+            },
+            "properties": {
+              "source": {
+                "const": "use/require_timestamp_condition"
+              }
+            },
+            "required": [
+              "predefined",
+              "observed_count",
+              "max_count",
+              "matched_operator_indexes"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "rule": {
                 "const": "cel"
               },
               "status": {
@@ -813,6 +901,8 @@
             "no_hash_aggregate",
             "no_stream_aggregate",
             "no_full_scan",
+            "no_full_scan_without_timestamp_condition",
+            "require_timestamp_condition",
             "no_blocking_operator_under_limit"
           ]
         },
@@ -829,13 +919,15 @@
             "forbid_operator_family",
             "forbid_blocking_operator_under_limit",
             "forbid_full_scan",
+            "forbid_full_scan_without_timestamp_condition",
+            "require_timestamp_condition",
             "cel"
           ]
         },
         "source": {
           "description": "Original contract source that produced this result, such as use/no_hash_join, forbid[0], or cel.",
           "minLength": 1,
-          "pattern": "^(use/(no_explicit_sort|no_full_sort|no_minor_sort|no_hash_join|no_standalone_hash_join|no_push_broadcast_hash_join|no_apply_join|no_standalone_apply_join|no_distributed_cross_apply|no_merge_join|no_hash_aggregate|no_stream_aggregate|no_full_scan|no_blocking_operator_under_limit)|forbid\\[[0-9]+\\]|cel)$",
+          "pattern": "^(use/(no_explicit_sort|no_full_sort|no_minor_sort|no_hash_join|no_standalone_hash_join|no_push_broadcast_hash_join|no_apply_join|no_standalone_apply_join|no_distributed_cross_apply|no_merge_join|no_hash_aggregate|no_stream_aggregate|no_full_scan|no_full_scan_without_timestamp_condition|require_timestamp_condition|no_blocking_operator_under_limit)|forbid\\[[0-9]+\\]|cel)$",
           "type": "string"
         },
         "status": {

@@ -93,7 +93,7 @@ func run(args []string, stdout io.Writer) error {
 	fs.Var(&ddlFiles, "ddl", "Spanner DDL file to load; may be repeated. Defaults to built-in Singers/Albums DDL")
 	fs.Var(&sqlTexts, "sql", "SQL text to analyze; may be repeated. Overrides --case built-ins when present")
 	fs.Var(&sqlFiles, "sql-file", "SQL file to analyze; may be repeated. Overrides --case built-ins when present")
-	builtinCase := fs.String("case", "all", "built-in query case when --sql/--sql-file is omitted: all, docs, optimizer_gaps, optimizer_unhinted_candidates, cte, dml, tvf, full_text_search, function_hint, hint_matrix, statement_hint_query_matrix, join_matrix, subquery_join_hint_matrix, push_broadcast_hash_join, or hash_join")
+	builtinCase := fs.String("case", "all", "built-in query case when --sql/--sql-file is omitted: all, docs, optimizer_gaps, optimizer_unhinted_candidates, cte, dml, tvf, lock_hints, full_text_search, function_hint, hint_matrix, statement_hint_query_matrix, join_matrix, subquery_join_hint_matrix, push_broadcast_hash_join, or hash_join")
 	output := fs.String("output", "nodes", "output format: compact-dfs, compact-dfs-metadata, compact-tree, compact-tree-metadata, json, nodes, reference, summary, yaml, or legacy aliases compact/compact-metadata")
 	compactTreeIndexes := fs.Bool("compact-tree-indexes", false, "include PlanNode indexes in compact-tree and compact-tree-metadata output")
 	optimizerVersionMatrix := fs.Bool("optimizer-version-matrix", false, "expand each query with OPTIMIZER_VERSION statement hints for versions 1 through 8")
@@ -203,6 +203,9 @@ func loadDDLs(builtinCase string, paths []string) ([]string, error) {
 		if strings.EqualFold(strings.TrimSpace(builtinCase), "tvf") {
 			return parseBuiltInDDLs("tvf-schema.sql", changeStreamTVFDDL)
 		}
+		if strings.EqualFold(strings.TrimSpace(builtinCase), "lock_hints") {
+			return parseBuiltInDDLs("lock-hints-schema.sql", docsDDL)
+		}
 		if strings.EqualFold(strings.TrimSpace(builtinCase), "full_text_search") {
 			return parseBuiltInDDLs("full-text-search-schema.sql", fullTextSearchDDL)
 		}
@@ -290,6 +293,8 @@ func loadQueries(builtinCase string, sqlTexts, sqlFiles []string) ([]queryCase, 
 		return dmlQueries, nil
 	case "tvf":
 		return tvfQueries, nil
+	case "lock_hints":
+		return lockHintQueries, nil
 	case "full_text_search":
 		return fullTextSearchQueries, nil
 	case "function_hint":
@@ -307,7 +312,7 @@ func loadQueries(builtinCase string, sqlTexts, sqlFiles []string) ([]queryCase, 
 	case "hash_join":
 		return []queryCase{{Label: "HASH_JOIN", SQL: hashSQL}}, nil
 	default:
-		return nil, fmt.Errorf("unsupported --case %q; use all, docs, optimizer_gaps, optimizer_unhinted_candidates, cte, dml, tvf, full_text_search, function_hint, hint_matrix, statement_hint_query_matrix, join_matrix, subquery_join_hint_matrix, push_broadcast_hash_join, or hash_join", builtinCase)
+		return nil, fmt.Errorf("unsupported --case %q; use all, docs, optimizer_gaps, optimizer_unhinted_candidates, cte, dml, tvf, lock_hints, full_text_search, function_hint, hint_matrix, statement_hint_query_matrix, join_matrix, subquery_join_hint_matrix, push_broadcast_hash_join, or hash_join", builtinCase)
 	}
 }
 

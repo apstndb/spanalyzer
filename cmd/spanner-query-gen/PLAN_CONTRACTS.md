@@ -7,6 +7,12 @@ SQL, DTOs, and write helpers.
 
 Plan contracts target structural PLAN output only. They do not use PROFILE
 runtime statistics such as rows scanned, rows returned, latency, or CPU. The
+research note
+[`Optimizer Decision Control And Plan Observability`](../../research/spanner-query-plan-shape/OPTIMIZER_DECISION_CONTROL_AND_OBSERVABILITY.md)
+tracks which optimizer-version differences and hints are visible enough to be
+PLAN-contract candidates.
+
+The
 Spanner Omni execution-plan feature is a Preview / Pre-GA feature in the
 official Spanner Omni documentation, and is described as suitable for
 development, testing, prototyping, and demonstration. In the operator work done
@@ -222,15 +228,20 @@ The v1alpha predefined set is intentionally small:
 | `no_hash_aggregate` | `hash_aggregate` | Reject hash aggregate operators. |
 | `no_stream_aggregate` | `stream_aggregate` | Reject stream aggregate operators. |
 | `no_full_scan` | metadata rule | Reject scan operators whose metadata says `Full scan: true`. |
+| `no_full_scan_without_timestamp_condition` | metadata plus child-link rule | Reject full scan operators unless they have a `Timestamp Condition` child link. |
+| `require_timestamp_condition` | child-link rule | Require at least one scan operator with a `Timestamp Condition` child link. |
 | `no_blocking_operator_under_limit` | topology rule | Reject stream-blocking descendants below `Limit` or `Sort Limit`. `Minor Sort Limit` is not treated as blocking by this rule. |
 
 The table above is the public predefined vocabulary. Conceptually, each
 operator-family predefined contract expands to direct `forbid.operator_family`
-rules like the following. `no_full_scan` and
+rules like the following. `no_full_scan`,
+`no_full_scan_without_timestamp_condition`, `require_timestamp_condition`, and
 `no_blocking_operator_under_limit` are different: `no_full_scan` reads
-normalized scan metadata, while `no_blocking_operator_under_limit` uses a
-topology-aware rule because it depends on ancestor/descendant relationships,
-not only whole-plan counts.
+normalized scan metadata, `no_full_scan_without_timestamp_condition` combines
+scan metadata with child links, `require_timestamp_condition` reads normalized
+child links, and `no_blocking_operator_under_limit` uses a topology-aware rule
+because it depends on ancestor/descendant relationships, not only whole-plan
+counts.
 
 ```yaml
 contracts:
@@ -306,6 +317,16 @@ contracts:
   target: query/Target
   use:
   - no_full_scan
+
+- name: NoFullScanWithoutTimestampCondition
+  target: query/Target
+  use:
+  - no_full_scan_without_timestamp_condition
+
+- name: RequireTimestampCondition
+  target: query/Target
+  use:
+  - require_timestamp_condition
 
 - name: NoBlockingOperatorUnderLimit
   target: query/Target
@@ -395,6 +416,19 @@ contracts:
   target: query/Target
   cel: operators.all(o, !(o.family == "scan" && o.full_scan))
 
+- name: NoFullScanWithoutTimestampConditionCEL
+  target: query/Target
+  cel: |
+    operators.all(o,
+      !(o.family == "scan" && o.full_scan) ||
+      operator_edges.exists(e,
+        e.parent_index == o.index &&
+        e.type == "Timestamp Condition"))
+
+- name: RequireTimestampConditionCEL
+  target: query/Target
+  cel: operator_edges.exists(e, e.type == "Timestamp Condition")
+
 - name: NoBlockingOperatorUnderLimitCEL
   target: query/Target
   cel: |
@@ -465,6 +499,10 @@ requires `source: use/<operator-family-predefined-name>` or
 `source: forbid[n]`, and `rule: forbid_blocking_operator_under_limit` requires
 `source: use/no_blocking_operator_under_limit`. `rule: forbid_full_scan`
 requires `source: use/no_full_scan`.
+`rule: forbid_full_scan_without_timestamp_condition` requires
+`source: use/no_full_scan_without_timestamp_condition`.
+`rule: require_timestamp_condition` requires
+`source: use/require_timestamp_condition`.
 Direct `forbid` entries must not repeat the same `operator_family` within one
 contract. Runtime validation rejects duplicates with
 `plan_contract.duplicate_forbid_operator_family` rather than merging ambiguous
@@ -472,11 +510,13 @@ rules.
 Contract names must also be unique within one contract file; duplicate names
 are rejected with `plan_contract.duplicate_contract_name`.
 
-For `forbid_operator_family`, `forbid_full_scan`, and
-`forbid_blocking_operator_under_limit` rules, `matched_operator_indexes` is
-always present: it is `[]` when `observed_count == 0`, otherwise it contains
-every matching `normalized_operators[].index` in ascending order. CEL rules do
-not emit `matched_operator_indexes` in v1alpha.
+For `forbid_operator_family`, `forbid_full_scan`,
+`forbid_full_scan_without_timestamp_condition`,
+`require_timestamp_condition`, and `forbid_blocking_operator_under_limit`
+rules, `matched_operator_indexes` is always present: it is `[]` when
+`observed_count == 0`, otherwise it contains every matching
+`normalized_operators[].index` in ascending order. CEL rules do not emit
+`matched_operator_indexes` in v1alpha.
 
 For concrete families, matching means `operator.family == operator_family`.
 For derived umbrella families, `matched_operator_indexes` contains indexes of
@@ -496,6 +536,19 @@ operators whose normalized metadata has `full_scan: true`. This rule is a
 PLAN-level early warning only: it does not prove how many rows are scanned, and
 a non-full scan can still read too many rows if important predicates remain as
 residual conditions.
+
+For `forbid_full_scan_without_timestamp_condition` rules,
+`matched_operator_indexes` contains full-scan operator indexes that do not have
+a `Timestamp Condition` child link. This is the preferred broad OLTP guardrail
+when recent-data commit timestamp reads are allowed to rely on storage-level
+timestamp pruning.
+
+For `require_timestamp_condition` rules, `matched_operator_indexes` contains
+the parent scan operator indexes that have a `Timestamp Condition` child link.
+This rule is for recent-data commit timestamp reads where storage-level
+timestamp pruning is expected. It intentionally does not require the absence of
+`full_scan: true`: current Spanner plans can still report a full table scan
+while a `Timestamp Condition` reduces I/O below the scan operator.
 
 The plan-contract and plan-report `operator_family` schema enums are generated
 from the same normalizer registry used by `plan-report`; the two schema enums

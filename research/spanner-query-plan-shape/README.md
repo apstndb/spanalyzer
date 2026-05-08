@@ -13,6 +13,9 @@ stable CLI contract.
 - [`SPANNER_OPTIMIZER_AND_HINTS.md`](SPANNER_OPTIMIZER_AND_HINTS.md):
   official optimizer-version and hint inventory, mapped to local verification
   summaries and detailed evidence links.
+- [`OPTIMIZER_DECISION_CONTROL_AND_OBSERVABILITY.md`](OPTIMIZER_DECISION_CONTROL_AND_OBSERVABILITY.md):
+  interpretation layer for optimizer-version boundaries, hint controllability,
+  and whether each decision is visible enough to become a PLAN contract.
 - [`QUERY_EXECUTION_OPERATORS_OBSERVATIONS.md`](QUERY_EXECUTION_OPERATORS_OBSERVATIONS.md):
   observed Spanner query-plan operator vocabulary, normalization impact, and
   probe environment notes.
@@ -31,5 +34,3 @@ stable CLI contract.
 - [`spanner-hacks-optimizer-version-feedback-ja.md`](spanner-hacks-optimizer-version-feedback-ja.md):
   candidate optimizer-version before/after examples for Spanner Unofficial
   Hacks, with `spannerplan` reference output.
-- [`spannerplan-feedback-ja.md`](spannerplan-feedback-ja.md):
-  feedback candidates for `apstndb/spannerplan` based on compact tree work.

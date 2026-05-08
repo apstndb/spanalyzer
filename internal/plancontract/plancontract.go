@@ -83,7 +83,11 @@ const (
 	ruleForbidOperatorFamily               = "forbid_operator_family"
 	ruleForbidBlockingOperatorUnderLimit   = "forbid_blocking_operator_under_limit"
 	ruleForbidFullScan                     = "forbid_full_scan"
+	ruleForbidFullScanWithoutTimestamp     = "forbid_full_scan_without_timestamp_condition"
+	ruleRequireTimestampCondition          = "require_timestamp_condition"
 	predefinedNoFullScan                   = "no_full_scan"
+	predefinedNoFullScanWithoutTimestamp   = "no_full_scan_without_timestamp_condition"
+	predefinedRequireTimestampCondition    = "require_timestamp_condition"
 	predefinedNoBlockingOperatorUnderLimit = "no_blocking_operator_under_limit"
 )
 
@@ -462,6 +466,40 @@ func evaluatePredicate(query Query, predicate resolvedPredicate) (RuleResult, er
 			result.Remediation = fullScanRemediation()
 		}
 		return result, nil
+	case ruleForbidFullScanWithoutTimestamp:
+		matchedOperatorIndexes := fullScanWithoutTimestampConditionOperatorIndexes(query)
+		result := RuleResult{
+			Rule:                   ruleForbidFullScanWithoutTimestamp,
+			Source:                 predicate.Source,
+			Predefined:             predicate.Predefined,
+			Status:                 StatusPass,
+			ObservedCount:          len(matchedOperatorIndexes),
+			MaxCount:               0,
+			MatchedOperatorIndexes: &matchedOperatorIndexes,
+		}
+		if len(matchedOperatorIndexes) > 0 {
+			result.Status = StatusFail
+			result.FailureKind = FailureKindViolation
+			result.Remediation = fullScanWithoutTimestampConditionRemediation()
+		}
+		return result, nil
+	case ruleRequireTimestampCondition:
+		matchedOperatorIndexes := timestampConditionOperatorIndexes(query)
+		result := RuleResult{
+			Rule:                   ruleRequireTimestampCondition,
+			Source:                 predicate.Source,
+			Predefined:             predicate.Predefined,
+			Status:                 StatusPass,
+			ObservedCount:          len(matchedOperatorIndexes),
+			MaxCount:               0,
+			MatchedOperatorIndexes: &matchedOperatorIndexes,
+		}
+		if len(matchedOperatorIndexes) == 0 {
+			result.Status = StatusFail
+			result.FailureKind = FailureKindViolation
+			result.Remediation = timestampConditionRemediation()
+		}
+		return result, nil
 	default:
 		return RuleResult{}, fmt.Errorf("unsupported plan contract rule %q", rule)
 	}
@@ -724,6 +762,10 @@ func predicates(contract Contract) ([]resolvedPredicate, error) {
 			appendPredefined("stream_aggregate")
 		case predefinedNoFullScan:
 			appendPredefinedRule(ruleForbidFullScan)
+		case predefinedNoFullScanWithoutTimestamp:
+			appendPredefinedRule(ruleForbidFullScanWithoutTimestamp)
+		case predefinedRequireTimestampCondition:
+			appendPredefinedRule(ruleRequireTimestampCondition)
 		case predefinedNoBlockingOperatorUnderLimit:
 			appendPredefinedRule(ruleForbidBlockingOperatorUnderLimit)
 		default:
@@ -1009,6 +1051,38 @@ func fullScanOperatorIndexes(query Query) []int32 {
 	return indexes
 }
 
+func fullScanWithoutTimestampConditionOperatorIndexes(query Query) []int32 {
+	timestampConditionParents := map[int32]bool{}
+	for _, edge := range query.OperatorEdges {
+		if edge.Type == "Timestamp Condition" {
+			timestampConditionParents[edge.ParentIndex] = true
+		}
+	}
+	indexes := []int32{}
+	for _, operator := range query.NormalizedOperators {
+		if operator.Family == "scan" && operator.FullScan && !timestampConditionParents[operator.Index] {
+			indexes = append(indexes, operator.Index)
+		}
+	}
+	sort.Slice(indexes, func(i, j int) bool { return indexes[i] < indexes[j] })
+	return indexes
+}
+
+func timestampConditionOperatorIndexes(query Query) []int32 {
+	seen := map[int32]bool{}
+	for _, edge := range query.OperatorEdges {
+		if edge.Type == "Timestamp Condition" {
+			seen[edge.ParentIndex] = true
+		}
+	}
+	indexes := make([]int32, 0, len(seen))
+	for index := range seen {
+		indexes = append(indexes, index)
+	}
+	sort.Slice(indexes, func(i, j int) bool { return indexes[i] < indexes[j] })
+	return indexes
+}
+
 func limitOrSortLimitOperator(operator Operator) bool {
 	if operator.Family == "limit" {
 		return true
@@ -1278,7 +1352,41 @@ func fullScanRemediation() []Remediation {
 			Kind:       "query_shape",
 			AppliesTo:  "sql",
 			Confidence: "medium",
-			Message:    "Check whether important filters are residual conditions; for sharded timestamp queries, prefer equality probes per shard when timestamp range seekability matters.",
+			Message:    "Check whether important filters are residual conditions; for sharded timestamp queries, prefer equality probes per shard when timestamp range seekability matters. For recent-data commit timestamp reads, a full scan with Timestamp Condition can still be intentional; consider require_timestamp_condition instead of no_full_scan for that case.",
+		},
+	}
+}
+
+func fullScanWithoutTimestampConditionRemediation() []Remediation {
+	return []Remediation{
+		{
+			Kind:       "index_design",
+			AppliesTo:  "ddl",
+			Confidence: "medium",
+			Message:    "Review whether a table or secondary index key can satisfy the query predicates as Seek Conditions, or whether this query should intentionally rely on commit timestamp predicate pushdown.",
+		},
+		{
+			Kind:       "query_shape",
+			AppliesTo:  "sql",
+			Confidence: "medium",
+			Message:    "If this is a recent-data commit timestamp read, make sure the predicate qualifies for Timestamp Condition; otherwise treat the full scan as unpruned.",
+		},
+	}
+}
+
+func timestampConditionRemediation() []Remediation {
+	return []Remediation{
+		{
+			Kind:       "query_shape",
+			AppliesTo:  "sql",
+			Confidence: "medium",
+			Message:    "Use a > or >= predicate on an allow_commit_timestamp column with a constant expression, and avoid OR in the qualifying predicate.",
+		},
+		{
+			Kind:       "contract",
+			AppliesTo:  "contract",
+			Confidence: "medium",
+			Message:    "Use this contract only for queries where commit timestamp predicate pushdown is expected; older-data or non-commit-timestamp filters may legitimately lack Timestamp Condition.",
 		},
 	}
 }
@@ -1542,6 +1650,8 @@ func PredefinedNames() []string {
 		"no_hash_aggregate",
 		"no_stream_aggregate",
 		predefinedNoFullScan,
+		predefinedNoFullScanWithoutTimestamp,
+		predefinedRequireTimestampCondition,
 		predefinedNoBlockingOperatorUnderLimit,
 	}
 }

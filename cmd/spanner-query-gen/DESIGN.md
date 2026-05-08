@@ -395,7 +395,8 @@ The current experimental set covers `no_explicit_sort`, `no_full_sort`,
 `no_minor_sort`, `no_hash_join`, `no_standalone_hash_join`,
 `no_push_broadcast_hash_join`, `no_apply_join`, `no_standalone_apply_join`,
 `no_distributed_cross_apply`, `no_merge_join`, `no_hash_aggregate`, and
-`no_stream_aggregate`, plus metadata/topology rules `no_full_scan` and
+`no_stream_aggregate`, plus metadata/child-link/topology rules `no_full_scan`,
+`no_full_scan_without_timestamp_condition`, `require_timestamp_condition`, and
 `no_blocking_operator_under_limit`.
 
 Contract matching should use semantic predicates over a normalized operator

@@ -25,6 +25,7 @@ Spanner plans remain the source of truth.
 
 Related local evidence:
 
+- [Optimizer decision control and observability](OPTIMIZER_DECISION_CONTROL_AND_OBSERVABILITY.md)
 - [Query execution operator observations](QUERY_EXECUTION_OPERATORS_OBSERVATIONS.md)
 - [Optimizer-version matrix observations](OPTIMIZER_VERSION_MATRIX_OBSERVATIONS.md)
 - [Optimizer-version rendered examples](OPTIMIZER_VERSION_RENDERED_EXAMPLES.md)
@@ -146,9 +147,12 @@ Local verification summary:
 Local verification summary:
 
 - `HASH_JOIN_EXECUTION=MULTI_PASS/ONE_PASS` is included in the join-hint matrix
-  and subquery join-hint matrix. The current probe records plan shapes but does
-  not use `PROFILE`, so it does not verify one-pass runtime behavior such as
-  disk spilling or probe-side scan count.
+  and subquery join-hint matrix. The rendered plans and a raw YAML recheck show
+  identical `Hash Join` nodes for both values; the observed `PlanNode` metadata
+  contains `execution_method` and `join_type`, but not the requested
+  `HASH_JOIN_EXECUTION` value. The current probe is PLAN-only and therefore can
+  verify hash join selection, but not one-pass versus multi-pass intent or
+  runtime behavior such as disk spilling or probe-side scan count.
 - `SEEKABLE_KEY_SIZE` is included in table-hint probes as noted under version 7.
 - An interleaved secondary-index join probe planned successfully across v1-v8
   but did not isolate a v4 boundary in the empty synthetic schema.
@@ -275,11 +279,11 @@ Hints section, plus graph hints and function hints as separate official pages.
 | `OPTIMIZER_VERSION` | `1` to `N`, `latest_version`, `default_version` | `1..8` are exercised by `--optimizer-version-matrix`; `default_version` and `latest_version` are included in statement-hint probes. |
 | `OPTIMIZER_STATISTICS_PACKAGE` | `package_name`, `latest` | `latest` is included in statement-hint probes. Custom package names are not covered because the synthetic Omni database has no named statistics package setup. |
 | `ALLOW_DISTRIBUTED_MERGE` | `TRUE` default, `FALSE` | Cross-checked across versions. Default and `TRUE` matched. `FALSE` changed only sort or sorted-merge cases in the observed matrix. |
-| `LOCK_SCANNED_RANGES` | `exclusive`, `shared` default | Included in statement-hint probes. The probe checks acceptance and plan shape only; it does not validate lock behavior or contention. |
+| `LOCK_SCANNED_RANGES` | `exclusive`, `shared` default | Included in statement-hint probes. Read-only PLAN checks are effectively no-op for this hint, and a dedicated read-write `AnalyzeQuery` recheck still showed identical `Scan` metadata for `shared` and `exclusive` in the observed Spanner Omni build. This is natural if read-only and read-write executions share the same logical plan cache and locking is applied below the cached plan. A visible requested lock mode would be contractable if Spanner exposed it, but actual lock conflicts should still be validated with `SPANNER_SYS.LOCK_STATS*`. In principle, the scan condition determines the locked range, so a full scan puts the whole table or index range in scope. `exclusive` is useful mainly for write-after-read contention patterns where earlier waiting can be preferable to repeated abort/retry cycles. |
 | `SCAN_METHOD` | `AUTO` default, `BATCH`, `ROW`, `COLUMNAR`, `NO_COLUMNAR` | `BATCH`, `ROW`, `COLUMNAR`, `NO_COLUMNAR` are included. `AUTO` is the absence of the hint and cannot be manually set according to docs. Scan/execution method interaction is summarized separately. |
 | `EXECUTION_METHOD` | `DEFAULT`, `BATCH`, `ROW` | `BATCH` and `ROW` are included. `DEFAULT` is the absence of the hint according to docs. `EXECUTION_METHOD=ROW` can remove `RowToDataBlock` / `DataBlockToRow` in observed apply/back-join shapes where `SCAN_METHOD=ROW` alone did not. |
 | `USE_UNENFORCED_FOREIGN_KEY` | `TRUE` default, `FALSE` | Included in statement-hint probes against a join shape. The synthetic schema does not model informational foreign-key consistency, so only acceptance/shape is checked. |
-| `ALLOW_TIMESTAMP_PREDICATE_PUSHDOWN` | `TRUE`, `FALSE` default | Verified with an `allow_commit_timestamp=true` column. `TRUE` adds a `Timestamp Condition` child link on the scan; `FALSE` leaves only the residual condition in the checked shape. |
+| `ALLOW_TIMESTAMP_PREDICATE_PUSHDOWN` | `TRUE`, `FALSE` default | Verified with an `allow_commit_timestamp=true` column. `TRUE` adds a `Timestamp Condition` child link on the scan; `FALSE` leaves only the residual condition in the checked shape. This is a storage-pruning signal that can matter even when the relational plan still reports `Full scan: true`. |
 
 Details:
 
@@ -307,11 +311,11 @@ Details:
 
 | Hint | Official values | Local verification summary |
 | --- | --- | --- |
-| `FORCE_JOIN_ORDER` | `TRUE`, `FALSE` default | Included in join-hint matrix and statement-position broad probes. Current evidence is acceptance/shape oriented. |
+| `FORCE_JOIN_ORDER` | `TRUE`, `FALSE` default | Included in join-hint matrix and statement-position broad probes. Useful when optimizer-version changes come from join reordering or commutativity; it can constrain the join tree/input order, but not every distributed wrapper or back-join placement detail. |
 | `JOIN_METHOD` | `HASH_JOIN`, `APPLY_JOIN`, `MERGE_JOIN`, `PUSH_BROADCAST_HASH_JOIN` | Checked across direct `INNER`, `LEFT`, `RIGHT` joins and subquery predicates (`IN`, `EXISTS`, `NOT IN`, `NOT EXISTS`) through statement hints. Push broadcast is rejected in optimizer versions 1 and 2, accepted from version 3. |
-| `HASH_JOIN_BUILD_SIDE` | `BUILD_LEFT`, `BUILD_RIGHT`; only with `JOIN_METHOD=HASH_JOIN` | Included in join and subquery matrices. |
+| `HASH_JOIN_BUILD_SIDE` | `BUILD_LEFT`, `BUILD_RIGHT`; only with `JOIN_METHOD=HASH_JOIN` | Included in join and subquery matrices. This can fix build/probe orientation for hash joins when `JOIN_METHOD=HASH_JOIN` is already selected. |
 | `BATCH_MODE` | `TRUE` default, `FALSE`; only with `JOIN_METHOD=APPLY_JOIN` | `TRUE` produces distributed apply forms for several join/subquery shapes. `FALSE` keeps row-at-a-time apply forms in checked shapes. Some broad statement-position combinations returned `Hint batch_mode results in no plan.` |
-| `HASH_JOIN_EXECUTION` | `MULTI_PASS` default, `ONE_PASS`; only with `JOIN_METHOD=HASH_JOIN` | Included in join and subquery matrices. The probe is PLAN-only and does not validate runtime spill or scan-count behavior. |
+| `HASH_JOIN_EXECUTION` | `MULTI_PASS` default, `ONE_PASS`; only with `JOIN_METHOD=HASH_JOIN` | Included in join and subquery matrices. The observed `PlanNode` metadata does not distinguish `MULTI_PASS` from `ONE_PASS`, so PLAN can verify only that a hash join was selected. It cannot verify the requested value or runtime spill/scan-count behavior. |
 
 Details:
 
@@ -319,6 +323,26 @@ Details:
 - [Subquery Predicate Statement-Hint Matrix](QUERY_EXECUTION_OPERATORS_OBSERVATIONS.md#subquery-predicate-statement-hint-matrix)
 - [Rendered join matrix](spanner-hacks-operators-feedback/join-matrix-ja.md)
 - [Rendered subquery join matrix](spanner-hacks-operators-feedback/subquery-join-matrix-ja.md)
+
+Join-related optimizer-version changes are often more controllable than a
+single `JOIN_METHOD` hint suggests. In particular, v5-style cost-based join
+selection can often be decomposed into:
+
+- algorithm choice: `JOIN_METHOD`;
+- input/join tree choice: `FORCE_JOIN_ORDER`;
+- hash build/probe orientation: `HASH_JOIN_BUILD_SIDE`;
+- apply batching and distributed apply shape: `BATCH_MODE`;
+- hash runtime strategy intent: `HASH_JOIN_EXECUTION`;
+- access path of each input: table hints such as `FORCE_INDEX` and
+  `SEEKABLE_KEY_SIZE`.
+
+The practical limit is that these hints still do not expose every physical
+decision independently. Distributed wrapper placement, internal implementation
+nodes, back-join placement, and some cost/statistics-sensitive choices can
+still vary. See
+[Optimizer Decision Control And Plan Observability](OPTIMIZER_DECISION_CONTROL_AND_OBSERVABILITY.md)
+for the cross-cutting classification of which join decisions are controllable,
+visible, and contractable.
 
 ### Group Hints
 
@@ -373,6 +397,12 @@ Details:
   `spanner-query-gen` plan contracts. Runtime behavior mentioned in official
   docs, such as lock contention or hash-join spill behavior, is not verified by
   the PLAN-only probes.
+- Lack of a controlling hint and lack of plan observability are separate gaps.
+  Even if a user cannot force a specific optimizer rewrite, any behavior fixed
+  when the plan is produced should ideally be visible through QueryPlan
+  operators, child links, scalar predicates, or metadata. Fully runtime-only
+  effects such as actual spill, contention, latency, CPU, and rows scanned are
+  expected to require PROFILE, Query Stats, or production telemetry.
 - Cost-based optimizer improvements can depend on data distribution,
   statistics packages, schema size, and live service behavior. Stable shape in
   the synthetic matrix does not imply the optimizer version has no effect in

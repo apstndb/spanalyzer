@@ -243,6 +243,24 @@ Representative reference output:
 +----+---------------------------------------------------------------------------+
 ```
 
+## Control And Observability
+
+Optimizer-version differences are not all equal. Some are plan-time decisions
+that can be reproduced with hints or SQL rewrites; some are visible in
+`QueryPlan` but have no complete hint surface; others affect runtime behavior
+without a stable structural PLAN signal.
+
+The maintained interpretation layer is now:
+
+- [Optimizer Decision Control And Plan Observability](OPTIMIZER_DECISION_CONTROL_AND_OBSERVABILITY.md)
+
+That note asks two additional questions for every version boundary listed here:
+
+- Can the earlier or later shape be forced while using the opposite optimizer
+  version?
+- Is the optimizer-version or hint-induced decision visible in `QueryPlan`
+  strongly enough to support a PLAN contract?
+
 ## Changed Cases
 
 The table below groups compact-tree-metadata changes and notes the most likely

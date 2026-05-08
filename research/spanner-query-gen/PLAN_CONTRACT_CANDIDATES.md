@@ -72,6 +72,13 @@ alias for forbidding one or more normalized operator families.
 - `no_full_scan`: rejects scan operators whose normalized metadata has
   `full_scan: true`. This is a PLAN-level early warning, not a proof of rows
   scanned.
+- `no_full_scan_without_timestamp_condition`: rejects full-scan operators only
+  when they do not have a `Timestamp Condition` child link. This is usually a
+  better broad guardrail when recent-data commit timestamp scans are allowed.
+- `require_timestamp_condition`: requires at least one scan operator with a
+  `Timestamp Condition` child link. This is intended for recent-data commit
+  timestamp reads where timestamp pruning is expected even if the scan still
+  reports `full_scan: true`.
 - `no_blocking_operator_under_limit`: rejects stream-blocking descendants below
   `Limit` or `Sort Limit`. This is topology-aware rather than a plain
   operator-family count; it is intended for cases where a limiting operator is
@@ -341,7 +348,9 @@ operators.all(o, !o.full_scan)
 Remaining follow-up:
 
 - Add allowlists because small/static master tables and intended full index
-  scans are legitimate.
+  scans are legitimate. Recent-data commit timestamp reads with
+  `Timestamp Condition` are another legitimate case where a plan-level full
+  scan can still have reduced storage I/O.
 - Consider a direct scan predicate shape such as:
 
 ```yaml
@@ -351,6 +360,64 @@ forbid:
     except_targets:
     - SmallMaster
 ```
+
+### Promoted: `no_full_scan_without_timestamp_condition`
+
+`no_full_scan_without_timestamp_condition` is now implemented as a predefined
+metadata plus child-link rule. It fails only full-scan operators that do not
+have a `Timestamp Condition` child link.
+
+Why it matters: this captures the practical guardrail suggested by recent
+commit timestamp optimization work. Plain `no_full_scan` is still useful for
+strict lookup contracts, but it is too blunt when a recent-data path is allowed
+to rely on storage-level timestamp pruning.
+
+Current CEL equivalent:
+
+```cel
+operators.all(o,
+  !(o.family == "scan" && o.full_scan) ||
+  operator_edges.exists(e,
+    e.parent_index == o.index &&
+    e.type == "Timestamp Condition"))
+```
+
+Limitations:
+
+- Like `require_timestamp_condition`, this is PLAN-only and does not prove
+  rows-scanned reduction.
+- It allows every full scan with `Timestamp Condition`; if only specific
+  queries or tables should use this exception, use a narrower CEL contract
+  until scan-target allowlists are added.
+
+### Promoted: `require_timestamp_condition`
+
+`require_timestamp_condition` is now implemented as a predefined child-link
+rule. It checks `operator_edges[].type == "Timestamp Condition"` and reports
+the parent scan operator indexes.
+
+Why it matters: commit timestamp predicate pushdown can change the
+index-design decision. A query that previously would have needed a secondary
+timestamp index for recent-data filtering might be acceptable as a table scan
+with a `Timestamp Condition`, avoiding index storage, write amplification, and
+timestamp-index hotspot risk.
+
+Current CEL equivalent:
+
+```cel
+operator_edges.exists(e, e.type == "Timestamp Condition")
+```
+
+Limitations:
+
+- This is a structural PLAN signal. It confirms the optimizer produced the
+  timestamp-pruning predicate, but it does not prove the actual rows-scanned
+  reduction. That still needs PROFILE or Query Stats.
+- It does not validate that the predicate is on the intended column. A future
+  normalized scalar summary could expose the condition expression or referenced
+  column more directly.
+- It should normally be used instead of, not together with, `no_full_scan` for
+  recent-data commit timestamp read paths.
 
 ### `require_scan_target`
 
@@ -595,6 +662,9 @@ Recommended next normalized additions:
 - extracted `order_keys` and `aggregate_keys` from `Key`, `MajorKey`, and
   `MinorKey` child links.
 - normalized `has_residual_condition` or residual child-link summaries.
+- normalized `has_timestamp_condition` or timestamp-condition child-link
+  summaries, ideally with the referenced commit timestamp column when that can
+  be extracted safely.
 - `scan_target_kind`: `table`, `index`, `batch`, or `unknown`.
 - `base_table`: for table scans this is the table itself; for index scans this
   is resolved from the schema catalog.

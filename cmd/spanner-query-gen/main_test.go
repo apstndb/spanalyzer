@@ -857,7 +857,7 @@ func TestPlanReportSchemaContractConditionals(t *testing.T) {
 		t.Fatalf("contract_evaluation allOf length = %d, want %d", got, want)
 	}
 	result := defs["contract_rule_result"].(map[string]interface{})
-	if got, want := len(result["allOf"].([]interface{})), 11; got != want {
+	if got, want := len(result["allOf"].([]interface{})), 13; got != want {
 		t.Fatalf("contract_rule_result allOf length = %d, want %d", got, want)
 	}
 	resultProperties := result["properties"].(map[string]interface{})
@@ -936,7 +936,41 @@ func TestPlanReportSchemaContractConditionals(t *testing.T) {
 	if got, want := strings.Join(fullScanForbidden, ","), "expression,operator_family,diagnostic_id"; got != want {
 		t.Fatalf("full-scan forbidden fields = %q, want %q", got, want)
 	}
-	celFailClause := result["allOf"].([]interface{})[4].(map[string]interface{})
+	fullScanWithoutTimestampClause := result["allOf"].([]interface{})[4].(map[string]interface{})
+	fullScanWithoutTimestampThen := fullScanWithoutTimestampClause["then"].(map[string]interface{})
+	fullScanWithoutTimestampThenProperties := fullScanWithoutTimestampThen["properties"].(map[string]interface{})
+	fullScanWithoutTimestampThenSource := fullScanWithoutTimestampThenProperties["source"].(map[string]interface{})
+	if got, want := fullScanWithoutTimestampThenSource["const"], "use/no_full_scan_without_timestamp_condition"; got != want {
+		t.Fatalf("full-scan-without-timestamp source const = %v, want %v", got, want)
+	}
+	fullScanWithoutTimestampRequired := interfaceStrings(fullScanWithoutTimestampThen["required"].([]interface{}))
+	for _, want := range []string{"predefined", "observed_count", "max_count", "matched_operator_indexes"} {
+		if !slices.Contains(fullScanWithoutTimestampRequired, want) {
+			t.Fatalf("full-scan-without-timestamp required fields = %v, want %q", fullScanWithoutTimestampRequired, want)
+		}
+	}
+	fullScanWithoutTimestampForbidden := anyOfRequiredFields(fullScanWithoutTimestampThen["not"].(map[string]interface{}))
+	if got, want := strings.Join(fullScanWithoutTimestampForbidden, ","), "expression,operator_family,diagnostic_id"; got != want {
+		t.Fatalf("full-scan-without-timestamp forbidden fields = %q, want %q", got, want)
+	}
+	timestampConditionClause := result["allOf"].([]interface{})[5].(map[string]interface{})
+	timestampConditionThen := timestampConditionClause["then"].(map[string]interface{})
+	timestampConditionThenProperties := timestampConditionThen["properties"].(map[string]interface{})
+	timestampConditionThenSource := timestampConditionThenProperties["source"].(map[string]interface{})
+	if got, want := timestampConditionThenSource["const"], "use/require_timestamp_condition"; got != want {
+		t.Fatalf("timestamp-condition source const = %v, want %v", got, want)
+	}
+	timestampConditionRequired := interfaceStrings(timestampConditionThen["required"].([]interface{}))
+	for _, want := range []string{"predefined", "observed_count", "max_count", "matched_operator_indexes"} {
+		if !slices.Contains(timestampConditionRequired, want) {
+			t.Fatalf("timestamp-condition required fields = %v, want %q", timestampConditionRequired, want)
+		}
+	}
+	timestampConditionForbidden := anyOfRequiredFields(timestampConditionThen["not"].(map[string]interface{}))
+	if got, want := strings.Join(timestampConditionForbidden, ","), "expression,operator_family,diagnostic_id"; got != want {
+		t.Fatalf("timestamp-condition forbidden fields = %q, want %q", got, want)
+	}
+	celFailClause := result["allOf"].([]interface{})[6].(map[string]interface{})
 	celFailThen := celFailClause["then"].(map[string]interface{})
 	celFailThenProperties := celFailThen["properties"].(map[string]interface{})
 	celFailKind := celFailThenProperties["failure_kind"].(map[string]interface{})
@@ -2507,6 +2541,157 @@ func TestPlanReportFullScanContract(t *testing.T) {
 	}
 	if got := planContractMatchedOperatorIndexes(passing.Results[0]); !reflect.DeepEqual(got, []int32{}) {
 		t.Fatalf("seek scan matched operator indexes = %v, want []", got)
+	}
+	if got, want := report.ContractSummary.Failed, 1; got != want {
+		t.Fatalf("contract summary failed = %d, want %d", got, want)
+	}
+}
+
+func TestPlanReportTimestampConditionContract(t *testing.T) {
+	report := planReport{
+		Status:  "ok",
+		Backend: "omni",
+		Queries: []planReportQuery{
+			{
+				Name:   "CommitTimestampRecentRead",
+				Scope:  "query",
+				Status: "ok",
+				NormalizedOperators: []planReportOperator{
+					{Index: 4, DisplayName: "Table Scan on Foo", Family: "scan", ScanType: "table_scan", ScanTarget: "Foo", FullScan: true},
+				},
+				OperatorEdges: []planReportOperatorEdge{
+					{ParentIndex: 4, ChildIndex: 10, Type: "Timestamp Condition"},
+				},
+			},
+			{
+				Name:   "RegularTimestampRead",
+				Scope:  "query",
+				Status: "ok",
+				NormalizedOperators: []planReportOperator{
+					{Index: 5, DisplayName: "Table Scan on Foo", Family: "scan", ScanType: "table_scan", ScanTarget: "Foo", FullScan: true},
+				},
+				OperatorEdges: []planReportOperatorEdge{
+					{ParentIndex: 3, ChildIndex: 11, Type: "Residual Condition"},
+				},
+			},
+		},
+	}
+	contracts := planContractsFile{
+		Version: planContractFileVersionV1Alpha,
+		Contracts: []planContract{
+			{Name: "RequiresTimestampConditionPass", Target: "query/CommitTimestampRecentRead", Use: []string{"require_timestamp_condition"}},
+			{Name: "RequiresTimestampConditionFail", Target: "query/RegularTimestampRead", Use: []string{"require_timestamp_condition"}},
+		},
+	}
+	if err := applyPlanContracts(&report, contracts); err != nil {
+		t.Fatalf("applyPlanContracts() error = %v", err)
+	}
+	passing := report.ContractEvaluations[0]
+	if got, want := passing.Status, planContractStatusPass; got != want {
+		t.Fatalf("timestamp condition pass status = %q, want %q", got, want)
+	}
+	passResult := passing.Results[0]
+	if got, want := passResult.Rule, "require_timestamp_condition"; got != want {
+		t.Fatalf("timestamp condition pass rule = %q, want %q", got, want)
+	}
+	if got, want := passResult.Source, "use/require_timestamp_condition"; got != want {
+		t.Fatalf("timestamp condition pass source = %q, want %q", got, want)
+	}
+	if got, want := passResult.Predefined, "require_timestamp_condition"; got != want {
+		t.Fatalf("timestamp condition pass predefined = %q, want %q", got, want)
+	}
+	if got := planContractMatchedOperatorIndexes(passResult); !reflect.DeepEqual(got, []int32{4}) {
+		t.Fatalf("timestamp condition matched operator indexes = %v, want [4]", got)
+	}
+	failing := report.ContractEvaluations[1]
+	if got, want := failing.Status, planContractStatusFail; got != want {
+		t.Fatalf("timestamp condition fail status = %q, want %q", got, want)
+	}
+	failResult := failing.Results[0]
+	if got := planContractMatchedOperatorIndexes(failResult); !reflect.DeepEqual(got, []int32{}) {
+		t.Fatalf("timestamp condition fail matched operator indexes = %v, want []", got)
+	}
+	if got, want := report.ContractSummary.Failed, 1; got != want {
+		t.Fatalf("contract summary failed = %d, want %d", got, want)
+	}
+}
+
+func TestPlanReportFullScanWithoutTimestampConditionContract(t *testing.T) {
+	report := planReport{
+		Status:  "ok",
+		Backend: "omni",
+		Queries: []planReportQuery{
+			{
+				Name:   "UnprunedFullScan",
+				Scope:  "query",
+				Status: "ok",
+				NormalizedOperators: []planReportOperator{
+					{Index: 5, DisplayName: "Table Scan on Foo", Family: "scan", ScanType: "table_scan", ScanTarget: "Foo", FullScan: true},
+				},
+				OperatorEdges: []planReportOperatorEdge{
+					{ParentIndex: 3, ChildIndex: 11, Type: "Residual Condition"},
+				},
+			},
+			{
+				Name:   "TimestampPrunedFullScan",
+				Scope:  "query",
+				Status: "ok",
+				NormalizedOperators: []planReportOperator{
+					{Index: 6, DisplayName: "Table Scan on Foo", Family: "scan", ScanType: "table_scan", ScanTarget: "Foo", FullScan: true},
+				},
+				OperatorEdges: []planReportOperatorEdge{
+					{ParentIndex: 6, ChildIndex: 12, Type: "Timestamp Condition"},
+				},
+			},
+			{
+				Name:   "SeekScan",
+				Scope:  "query",
+				Status: "ok",
+				NormalizedOperators: []planReportOperator{
+					{Index: 7, DisplayName: "Index Scan on FooByUpdatedAt", Family: "scan", ScanType: "index_scan", ScanTarget: "FooByUpdatedAt", SeekableKeySize: "1"},
+				},
+			},
+		},
+	}
+	contracts := planContractsFile{
+		Version: planContractFileVersionV1Alpha,
+		Contracts: []planContract{
+			{Name: "RejectUnprunedFullScan", Target: "query/UnprunedFullScan", Use: []string{"no_full_scan_without_timestamp_condition"}},
+			{Name: "AllowTimestampPrunedFullScan", Target: "query/TimestampPrunedFullScan", Use: []string{"no_full_scan_without_timestamp_condition"}},
+			{Name: "AllowSeekScan", Target: "query/SeekScan", Use: []string{"no_full_scan_without_timestamp_condition"}},
+		},
+	}
+	if err := applyPlanContracts(&report, contracts); err != nil {
+		t.Fatalf("applyPlanContracts() error = %v", err)
+	}
+	failing := report.ContractEvaluations[0]
+	if got, want := failing.Status, planContractStatusFail; got != want {
+		t.Fatalf("unpruned full scan status = %q, want %q", got, want)
+	}
+	result := failing.Results[0]
+	if got, want := result.Rule, "forbid_full_scan_without_timestamp_condition"; got != want {
+		t.Fatalf("unpruned full scan rule = %q, want %q", got, want)
+	}
+	if got, want := result.Source, "use/no_full_scan_without_timestamp_condition"; got != want {
+		t.Fatalf("unpruned full scan source = %q, want %q", got, want)
+	}
+	if got, want := result.Predefined, "no_full_scan_without_timestamp_condition"; got != want {
+		t.Fatalf("unpruned full scan predefined = %q, want %q", got, want)
+	}
+	if got := planContractMatchedOperatorIndexes(result); !reflect.DeepEqual(got, []int32{5}) {
+		t.Fatalf("unpruned full scan matched operator indexes = %v, want [5]", got)
+	}
+	for i, wantName := range []string{"AllowTimestampPrunedFullScan", "AllowSeekScan"} {
+		evaluation := report.ContractEvaluations[i+1]
+		if got, want := evaluation.Name, wantName; got != want {
+			t.Fatalf("evaluation[%d] name = %q, want %q", i+1, got, want)
+		}
+		if got, want := evaluation.Status, planContractStatusPass; got != want {
+			t.Fatalf("%s status = %q, want %q", wantName, got, want)
+		}
+		if got := planContractMatchedOperatorIndexes(evaluation.Results[0]); !reflect.DeepEqual(got, []int32{}) {
+			t.Fatalf("%s matched operator indexes = %v, want []", wantName, got)
+		}
 	}
 	if got, want := report.ContractSummary.Failed, 1; got != want {
 		t.Fatalf("contract summary failed = %d, want %d", got, want)
