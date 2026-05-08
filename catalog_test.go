@@ -126,6 +126,184 @@ DROP SEQUENCE Seq;
 	}
 }
 
+func TestBuildSchemaCatalogCreateModelEmulatorCompatibility(t *testing.T) {
+	tests := []struct {
+		name       string
+		ddl        string
+		wantModels []string
+		wantErr    bool
+		check      func(t *testing.T, catalog *Catalog)
+	}{
+		{
+			name: "basic",
+			ddl: `
+CREATE MODEL m
+INPUT (feature INT64)
+OUTPUT (label STRING(MAX))
+REMOTE OPTIONS (
+  endpoint = '//aiplatform.googleapis.com/projects/aaa/locations/bbb/endpoints/ccc'
+);
+`,
+			wantModels: []string{"m"},
+			check: func(t *testing.T, catalog *Catalog) {
+				model := catalog.Models["m"]
+				if got, want := model.Inputs[0].Name, "feature"; got != want {
+					t.Fatalf("input name = %q, want %q", got, want)
+				}
+				if got, want := model.Inputs[0].Type.Code, spannerpb.TypeCode_INT64; got != want {
+					t.Fatalf("input type = %s, want %s", got, want)
+				}
+				if got, want := model.Outputs[0].Name, "label"; got != want {
+					t.Fatalf("output name = %q, want %q", got, want)
+				}
+				if got, want := model.Outputs[0].Type.Code, spannerpb.TypeCode_STRING; got != want {
+					t.Fatalf("output type = %s, want %s", got, want)
+				}
+			},
+		},
+		{
+			name: "array and struct columns",
+			ddl: `
+CREATE MODEL m
+INPUT (feature ARRAY<INT64>)
+OUTPUT (label STRUCT<l STRING>)
+REMOTE OPTIONS (
+  endpoints = [
+    '//aiplatform.googleapis.com/projects/aaa/locations/bbb/endpoints/ccc',
+    '//aiplatform.googleapis.com/projects/aaa/locations/ddd/endpoints/eee'
+  ],
+  default_batch_size = 10
+);
+`,
+			wantModels: []string{"m"},
+			check: func(t *testing.T, catalog *Catalog) {
+				model := catalog.Models["m"]
+				if got, want := model.Inputs[0].Type.Code, spannerpb.TypeCode_ARRAY; got != want {
+					t.Fatalf("input type = %s, want %s", got, want)
+				}
+				if got, want := model.Inputs[0].Type.ArrayElement.Code, spannerpb.TypeCode_INT64; got != want {
+					t.Fatalf("input array element = %s, want %s", got, want)
+				}
+				if got, want := model.Outputs[0].Type.Code, spannerpb.TypeCode_STRUCT; got != want {
+					t.Fatalf("output type = %s, want %s", got, want)
+				}
+				if got, want := model.Outputs[0].Type.StructFields[0].Name, "l"; got != want {
+					t.Fatalf("output struct field = %q, want %q", got, want)
+				}
+			},
+		},
+		{
+			name: "or replace",
+			ddl: `
+CREATE MODEL m
+INPUT (feature INT64)
+OUTPUT (label STRING(MAX))
+REMOTE OPTIONS (endpoint = '//aiplatform.googleapis.com/projects/aaa/locations/bbb/endpoints/ccc');
+CREATE OR REPLACE MODEL m
+INPUT (f INT64)
+OUTPUT (l STRING(MAX))
+REMOTE OPTIONS (endpoint = '//aiplatform.googleapis.com/projects/aaa/locations/bbb/endpoints/ccc');
+`,
+			wantModels: []string{"m"},
+			check: func(t *testing.T, catalog *Catalog) {
+				model := catalog.Models["m"]
+				if got, want := model.Inputs[0].Name, "f"; got != want {
+					t.Fatalf("input name = %q, want %q", got, want)
+				}
+				if got, want := model.Outputs[0].Name, "l"; got != want {
+					t.Fatalf("output name = %q, want %q", got, want)
+				}
+			},
+		},
+		{
+			name: "if not exists emulator syntax unsupported by memefish",
+			ddl: `
+CREATE MODEL m
+INPUT (feature INT64)
+OUTPUT (label STRING(MAX))
+REMOTE OPTIONS (endpoint = '//aiplatform.googleapis.com/projects/aaa/locations/bbb/endpoints/ccc');
+CREATE MODEL IF NOT EXISTS m
+INPUT (f INT64)
+OUTPUT (l STRING(MAX))
+REMOTE OPTIONS (endpoint = '//aiplatform.googleapis.com/projects/aaa/locations/bbb/endpoints/ccc');
+`,
+			wantErr: true,
+		},
+		{
+			name: "drop and recreate",
+			ddl: `
+CREATE MODEL m
+INPUT (feature INT64)
+OUTPUT (label STRING(MAX))
+REMOTE OPTIONS (endpoint = '//aiplatform.googleapis.com/projects/aaa/locations/bbb/endpoints/ccc');
+DROP MODEL m;
+CREATE MODEL m
+INPUT (f INT64)
+OUTPUT (l STRING(MAX))
+REMOTE OPTIONS (endpoint = '//aiplatform.googleapis.com/projects/aaa/locations/bbb/endpoints/ccc');
+`,
+			wantModels: []string{"m"},
+			check: func(t *testing.T, catalog *Catalog) {
+				model := catalog.Models["m"]
+				if got, want := model.Inputs[0].Name, "f"; got != want {
+					t.Fatalf("input name = %q, want %q", got, want)
+				}
+				if got, want := model.Outputs[0].Name, "l"; got != want {
+					t.Fatalf("output name = %q, want %q", got, want)
+				}
+			},
+		},
+		{
+			name: "multiple statements",
+			ddl: `
+CREATE MODEL m1
+INPUT (feature INT64)
+OUTPUT (label STRING(MAX))
+REMOTE OPTIONS (endpoint = '//aiplatform.googleapis.com/projects/p1/locations/l1/endpoints/e1');
+CREATE MODEL m2
+INPUT (feature INT64)
+OUTPUT (label STRING(MAX))
+REMOTE OPTIONS (endpoint = '//aiplatform.googleapis.com/projects/p2/locations/l2/endpoints/e2');
+CREATE MODEL m3
+INPUT (feature INT64)
+OUTPUT (label STRING(MAX))
+REMOTE OPTIONS (endpoint = '//aiplatform.googleapis.com/projects/p3/locations/l3/endpoints/e3');
+DROP MODEL m1;
+ALTER MODEL m2 SET OPTIONS (
+  endpoint = '//aiplatform.googleapis.com/projects/p2/locations/l2/endpoints/e2'
+);
+`,
+			wantModels: []string{"m2", "m3"},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			catalog, err := BuildSchemaCatalog("schema.sql", tt.ddl)
+			if tt.wantErr {
+				if err == nil {
+					t.Fatalf("BuildSchemaCatalog() succeeded, want error")
+				}
+				return
+			}
+			if err != nil {
+				t.Fatalf("BuildSchemaCatalog() error = %v", err)
+			}
+			if got, want := len(catalog.Models), len(tt.wantModels); got != want {
+				t.Fatalf("len(catalog.Models) = %d, want %d; models = %#v", got, want, catalog.Models)
+			}
+			for _, name := range tt.wantModels {
+				if catalog.Models[name] == nil {
+					t.Fatalf("model %s was not created", name)
+				}
+			}
+			if tt.check != nil {
+				tt.check(t, catalog)
+			}
+		})
+	}
+}
+
 func TestBuildSchemaCatalogDropColumnTableAndView(t *testing.T) {
 	const ddl = `
 CREATE TABLE Albums (

@@ -594,6 +594,61 @@ LEFT JOIN EXTERNAL_QUERY(
 	assertBigQueryField(t, schema.Fields[2], "first_order_date", "DATE", "NULLABLE")
 }
 
+func TestBigQueryAnalyzerExternalQueryTVFDirectAnalyze(t *testing.T) {
+	spannerAnalyzer, err := NewAnalyzerFromDDL("spanner.sql", `
+CREATE TABLE Orders (
+  CustomerId INT64 NOT NULL,
+  OrderDate DATE
+) PRIMARY KEY (CustomerId);
+`)
+	if err != nil {
+		t.Fatalf("NewAnalyzerFromDDL() error = %v", err)
+	}
+	bigQueryAnalyzer, err := NewBigQueryAnalyzerFromDDL("bigquery.sql", "")
+	if err != nil {
+		t.Fatalf("NewBigQueryAnalyzerFromDDL() error = %v", err)
+	}
+	if !bigQueryAnalyzer.googleSQL.externalQueryTVFRegistered {
+		t.Fatalf("EXTERNAL_QUERY TVF is not registered")
+	}
+	bigQueryAnalyzer.SetExternalQueryAnalyzers(map[string]*Analyzer{
+		"my-project.us.example-db": spannerAnalyzer,
+	})
+
+	sql := `
+SELECT customer_id, first_order_date
+FROM EXTERNAL_QUERY(
+  'my-project.us.example-db',
+  '''SELECT CustomerId AS customer_id, MIN(OrderDate) AS first_order_date
+     FROM Orders
+     GROUP BY CustomerId''')`
+	if err := bigQueryAnalyzer.prepareExternalQueryTVFCalls(sql); err != nil {
+		t.Fatalf("prepareExternalQueryTVFCalls() error = %v", err)
+	}
+	defer bigQueryAnalyzer.googleSQL.clearExternalQueryTVFCalls()
+	out, err := bigQueryAnalyzer.helper.AnalyzeStatement(sql)
+	if err != nil {
+		t.Fatalf("AnalyzeStatement() error = %v", err)
+	}
+	schema, err := BigQueryTableSchemaFromAnalyzerOutput(out)
+	if err != nil {
+		t.Fatalf("BigQueryTableSchemaFromAnalyzerOutput() error = %v", err)
+	}
+	if got, want := len(schema.Fields), 2; got != want {
+		t.Fatalf("len(schema.Fields) = %d, want %d", got, want)
+	}
+	assertBigQueryField(t, schema.Fields[0], "customer_id", "INTEGER", "NULLABLE")
+	assertBigQueryField(t, schema.Fields[1], "first_order_date", "DATE", "NULLABLE")
+
+	debug, err := bigQueryAnalyzer.ResolvedASTDebugString("query", sql)
+	if err != nil {
+		t.Fatalf("ResolvedASTDebugString() error = %v", err)
+	}
+	if !strings.Contains(debug, "EXTERNAL_QUERY") {
+		t.Fatalf("ResolvedASTDebugString() = %s, want EXTERNAL_QUERY TVF in resolved AST", debug)
+	}
+}
+
 func TestBigQueryAnalyzerExternalQueryConnectionsUseDifferentSpannerSchemas(t *testing.T) {
 	spannerAnalyzerA, err := NewAnalyzerFromDDL("a.sql", `
 CREATE TABLE Orders (

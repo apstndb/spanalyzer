@@ -7,7 +7,7 @@ import (
 	googlesql "github.com/goccy/go-googlesql"
 )
 
-func typeSpecToGoogleSQLTypeWithProto(tf *googlesql.TypeFactory, spec *TypeSpec, catalog *Catalog) (googlesql.Googlesql_TypeNode, error) {
+func typeSpecToGoogleSQLTypeWithProto(tf *googlesql.TypeFactory, spec *TypeSpec, catalog *Catalog, descriptorPool *googlesql.DescriptorPool) (googlesql.Googlesql_TypeNode, error) {
 	if spec == nil {
 		return nil, fmt.Errorf("nil type spec")
 	}
@@ -40,7 +40,7 @@ func typeSpecToGoogleSQLTypeWithProto(tf *googlesql.TypeFactory, spec *TypeSpec,
 	case spannerpb.TypeCode_UUID:
 		return tf.GetUuid()
 	case spannerpb.TypeCode_ARRAY:
-		elem, err := typeSpecToGoogleSQLTypeWithProto(tf, spec.ArrayElement, catalog)
+		elem, err := typeSpecToGoogleSQLTypeWithProto(tf, spec.ArrayElement, catalog, descriptorPool)
 		if err != nil {
 			return nil, err
 		}
@@ -48,7 +48,7 @@ func typeSpecToGoogleSQLTypeWithProto(tf *googlesql.TypeFactory, spec *TypeSpec,
 	case spannerpb.TypeCode_STRUCT:
 		fields := make([]*googlesql.StructField, 0, len(spec.StructFields))
 		for _, field := range spec.StructFields {
-			fieldType, err := typeSpecToGoogleSQLTypeWithProto(tf, field.Type, catalog)
+			fieldType, err := typeSpecToGoogleSQLTypeWithProto(tf, field.Type, catalog, descriptorPool)
 			if err != nil {
 				return nil, err
 			}
@@ -56,6 +56,16 @@ func typeSpecToGoogleSQLTypeWithProto(tf *googlesql.TypeFactory, spec *TypeSpec,
 		}
 		return tf.MakeStructType2(fields)
 	case spannerpb.TypeCode_PROTO:
+		if descriptorPool != nil {
+			desc, err := descriptorPool.FindMessageTypeByName(spec.ProtoTypeFQN)
+			if err != nil {
+				return nil, err
+			}
+			if desc == nil {
+				return nil, fmt.Errorf("proto message %s not found in GoogleSQL descriptor pool", spec.ProtoTypeFQN)
+			}
+			return tf.MakeProtoType2(desc, nil)
+		}
 		if catalog == nil {
 			return nil, fmt.Errorf("proto type %s requires a proto descriptor set", spec.ProtoTypeFQN)
 		}
@@ -63,12 +73,21 @@ func typeSpecToGoogleSQLTypeWithProto(tf *googlesql.TypeFactory, spec *TypeSpec,
 		if err != nil {
 			return nil, err
 		}
-		return typeSpecToGoogleSQLTypeWithProto(tf, shadow, catalog)
+		return typeSpecToGoogleSQLTypeWithProto(tf, shadow, catalog, descriptorPool)
 	case spannerpb.TypeCode_ENUM:
-		// go-googlesql v0.2.0 exposes enum type construction, but descriptor set
-		// bytes cannot yet be loaded into its WASM-side descriptor pool here.
-		// INT64 keeps expressions analyzable; direct enum column outputs are
-		// mapped back to Spanner ENUM row metadata after analysis.
+		if descriptorPool != nil {
+			desc, err := descriptorPool.FindEnumTypeByName(spec.ProtoTypeFQN)
+			if err != nil {
+				return nil, err
+			}
+			if desc == nil {
+				return nil, fmt.Errorf("proto enum %s not found in GoogleSQL descriptor pool", spec.ProtoTypeFQN)
+			}
+			return tf.MakeEnumType2(desc, nil)
+		}
+		// Without a GoogleSQL descriptor pool, INT64 keeps expressions analyzable;
+		// direct enum column outputs are mapped back to Spanner ENUM row metadata
+		// after analysis.
 		return tf.GetInt64()
 	default:
 		return nil, fmt.Errorf("unsupported Spanner type code %s", spec.Code)
@@ -154,7 +173,7 @@ func SpannerTypeFromGoogleSQLType(t googlesql.Googlesql_TypeNode) (*spannerpb.Ty
 		if err != nil {
 			return nil, err
 		}
-		return &spannerpb.Type{Code: spannerpb.TypeCode_PROTO, ProtoTypeFqn: fqn}, nil
+		return &spannerpb.Type{Code: spannerpb.TypeCode_PROTO, ProtoTypeFqn: normalizeProtoTypeName(fqn)}, nil
 	case googlesql.TypeKindTypeEnum:
 		enumType, err := t.AsEnum()
 		if err != nil {
@@ -164,7 +183,7 @@ func SpannerTypeFromGoogleSQLType(t googlesql.Googlesql_TypeNode) (*spannerpb.Ty
 		if err != nil {
 			return nil, err
 		}
-		return &spannerpb.Type{Code: spannerpb.TypeCode_ENUM, ProtoTypeFqn: fqn}, nil
+		return &spannerpb.Type{Code: spannerpb.TypeCode_ENUM, ProtoTypeFqn: normalizeProtoTypeName(fqn)}, nil
 	default:
 		debug, _ := t.DebugString(false)
 		return nil, fmt.Errorf("unsupported GoogleSQL type kind %s (%s)", kind, debug)

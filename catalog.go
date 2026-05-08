@@ -652,7 +652,7 @@ func schemaTypeToTypeSpec(t ast.SchemaType) (*TypeSpec, error) {
 	case *ast.StructType:
 		fields := make([]StructField, 0, len(t.Fields))
 		for _, field := range t.Fields {
-			spec, err := schemaTypeToTypeSpec(field.Type.(ast.SchemaType))
+			spec, err := astTypeToTypeSpec(field.Type)
 			if err != nil {
 				return nil, err
 			}
@@ -665,6 +665,17 @@ func schemaTypeToTypeSpec(t ast.SchemaType) (*TypeSpec, error) {
 		return &TypeSpec{Code: spannerpb.TypeCode_STRUCT, StructFields: fields}, nil
 	case *ast.NamedType:
 		return &TypeSpec{Code: spannerpb.TypeCode_PROTO, ProtoTypeFQN: normalizeProtoTypeName(identPathString(t.Path))}, nil
+	default:
+		return nil, fmt.Errorf("unsupported schema type %T", t)
+	}
+}
+
+func astTypeToTypeSpec(t any) (*TypeSpec, error) {
+	switch t := t.(type) {
+	case ast.SchemaType:
+		return schemaTypeToTypeSpec(t)
+	case ast.Type:
+		return typeToTypeSpec(t)
 	default:
 		return nil, fmt.Errorf("unsupported schema type %T", t)
 	}

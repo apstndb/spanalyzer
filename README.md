@@ -518,14 +518,11 @@ artifacts.
 - Cloud Spanner and the
   [Cloud Spanner emulator](https://github.com/GoogleCloudPlatform/cloud-spanner-emulator)
   use the GoogleSQL frontend's native `MakeProtoType` and `MakeEnumType` APIs
-  with descriptors from the active proto bundle. `go-googlesql` v0.2.0 exposes
-  those constructors, but this project still uses STRUCT and INT64 shadows
-  because the binding does not yet expose a documented way to load external
-  descriptor set bytes into the WASM-side descriptor pool.
-- Direct top-level proto or enum column outputs are mapped back to Spanner row
-  metadata when possible, but nested proto-derived expressions may reflect the
-  internal shadow representation instead of native Spanner `PROTO` or `ENUM`
-  types.
+  with descriptors from the active proto bundle. This project now loads the
+  supplied descriptor set into the GoogleSQL frontend descriptor pool and uses
+  those native proto and enum types when building the analyzer catalog.
+- Proto and enum query outputs are converted back to Spanner row metadata when
+  possible, including nested proto fields selected as values.
 - Property graph DDL registers node and edge tables, labels, and direct column
   property definitions through the `go-googlesql` v0.2.0 `SimpleGraph*`
   constructors. More advanced Spanner graph metadata, including arbitrary
@@ -534,10 +531,10 @@ artifacts.
   included in the default `go-googlesql` builtin function set. This
   includes commit timestamp, sequence, search, TOKENLIST, and AI helper
   functions needed for query analysis.
-- `ML.PREDICT` is not supported yet. It is a table-valued function whose output
-  schema depends on the referenced model and input relation. `go-googlesql`
-  v0.2.0 exposes table-valued function callbacks, but this project has not yet
-  modeled Spanner's dynamic `Resolve` behavior.
+- `ML.PREDICT` is registered as an analyzer-only table-valued function. Its
+  result schema is modeled as the referenced model's output columns followed by
+  the input relation columns. This is schema analysis only; it does not execute
+  predictions.
 - `TOKENLIST` is supported as an internal analysis type for search expressions,
   but Cloud Spanner result sets cannot return `TOKENLIST`, so the Cloud Spanner
   protobuf API has no `TypeCode` for it.

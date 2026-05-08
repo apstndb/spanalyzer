@@ -20,6 +20,10 @@ func (c *GoogleSQLCatalog) addModels() error {
 		if err := c.SimpleCatalog.AddOwnedModel(gsModel); err != nil {
 			return fmt.Errorf("model %s: %w", model.Name, err)
 		}
+		c.models[strings.ToLower(model.Name)] = &registeredGoogleSQLModel{
+			model: model,
+			node:  gsModel,
+		}
 	}
 	return nil
 }
@@ -58,6 +62,11 @@ type googleSQLModel struct {
 	name    string
 	inputs  []googlesql.Googlesql_ColumnNode
 	outputs []googlesql.Googlesql_ColumnNode
+}
+
+type registeredGoogleSQLModel struct {
+	model *Model
+	node  googlesql.ModelNode
 }
 
 func (m *googleSQLModel) Name() (string, error) {

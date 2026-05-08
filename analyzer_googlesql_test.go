@@ -493,6 +493,147 @@ REMOTE OPTIONS (endpoint = '//aiplatform.googleapis.com/projects/p/locations/us-
 	}
 }
 
+func TestAnalyzerRowTypeForMLPredictGeminiPro(t *testing.T) {
+	const ddl = `
+CREATE MODEL GeminiPro
+INPUT (prompt STRING(MAX))
+OUTPUT (content STRING(MAX))
+REMOTE OPTIONS (
+  endpoint = '//aiplatform.googleapis.com/projects/p/locations/us-central1/publishers/google/models/gemini-pro',
+  default_batch_size = 1
+);
+`
+	analyzer, err := NewAnalyzerFromDDL("schema.sql", ddl)
+	if err != nil {
+		t.Fatalf("NewAnalyzerFromDDL() error = %v", err)
+	}
+	rowType, err := analyzer.RowTypeForStatement(`
+SELECT content
+FROM ML.PREDICT(
+  MODEL GeminiPro,
+  (SELECT "Is 7 a prime number?" AS prompt),
+  STRUCT(256 AS maxOutputTokens, 0.2 AS temperature, 40 AS topK, 0.95 AS topP)
+)
+`)
+	if err != nil {
+		t.Fatalf("RowTypeForStatement(content) error = %v", err)
+	}
+	if got, want := len(rowType.Fields), 1; got != want {
+		t.Fatalf("len(rowType.Fields) = %d, want %d", got, want)
+	}
+	assertField(t, rowType.Fields[0], "content", spannerpb.TypeCode_STRING)
+
+	rowType, err = analyzer.RowTypeForStatement(`
+SELECT *
+FROM ML.PREDICT(
+  MODEL GeminiPro,
+  (SELECT "Is 7 a prime number?" AS prompt),
+  STRUCT(256 AS maxOutputTokens, 0.2 AS temperature, 40 AS topK, 0.95 AS topP)
+)
+`)
+	if err != nil {
+		t.Fatalf("RowTypeForStatement(*) error = %v", err)
+	}
+	if got, want := len(rowType.Fields), 2; got != want {
+		t.Fatalf("len(rowType.Fields) = %d, want %d", got, want)
+	}
+	assertField(t, rowType.Fields[0], "content", spannerpb.TypeCode_STRING)
+	assertField(t, rowType.Fields[1], "prompt", spannerpb.TypeCode_STRING)
+}
+
+func TestAnalyzerRowTypeForMLPredictEmulatorCompatibility(t *testing.T) {
+	const ddl = `
+CREATE MODEL FraudDetection
+INPUT (Amount INT64, Name STRING(MAX))
+OUTPUT (Outcome BOOL)
+REMOTE OPTIONS (
+  endpoint = '//aiplatform.googleapis.com/projects/p/locations/us-central1/endpoints/e'
+);
+`
+	tests := []struct {
+		name       string
+		sql        string
+		wantFields []struct {
+			name string
+			code spannerpb.TypeCode
+		}
+	}{
+		{
+			name: "model outputs followed by pass-through input columns",
+			sql: `
+SELECT *
+FROM ML.PREDICT(
+  MODEL FraudDetection,
+  (SELECT 1000 AS Amount, "John Smith" AS Name)
+)
+`,
+			wantFields: []struct {
+				name string
+				code spannerpb.TypeCode
+			}{
+				{name: "Outcome", code: spannerpb.TypeCode_BOOL},
+				{name: "Amount", code: spannerpb.TypeCode_INT64},
+				{name: "Name", code: spannerpb.TypeCode_STRING},
+			},
+		},
+		{
+			name: "safe namespace",
+			sql: `
+SELECT *
+FROM SAFE.ML.PREDICT(
+  MODEL FraudDetection,
+  (SELECT 1000 AS Amount, "John Smith" AS Name)
+)
+`,
+			wantFields: []struct {
+				name string
+				code spannerpb.TypeCode
+			}{
+				{name: "Outcome", code: spannerpb.TypeCode_BOOL},
+				{name: "Amount", code: spannerpb.TypeCode_INT64},
+				{name: "Name", code: spannerpb.TypeCode_STRING},
+			},
+		},
+		{
+			name: "input column matching model output is not duplicated",
+			sql: `
+SELECT *
+FROM ML.PREDICT(
+  MODEL FraudDetection,
+  (SELECT TRUE AS Outcome, 1000 AS Amount, "John Smith" AS Name)
+)
+`,
+			wantFields: []struct {
+				name string
+				code spannerpb.TypeCode
+			}{
+				{name: "Outcome", code: spannerpb.TypeCode_BOOL},
+				{name: "Amount", code: spannerpb.TypeCode_INT64},
+				{name: "Name", code: spannerpb.TypeCode_STRING},
+			},
+		},
+	}
+
+	analyzer, err := NewAnalyzerFromDDL("schema.sql", ddl)
+	if err != nil {
+		t.Fatalf("NewAnalyzerFromDDL() error = %v", err)
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			rowType, err := analyzer.RowTypeForStatement(tt.sql)
+			if err != nil {
+				t.Fatalf("RowTypeForStatement() error = %v", err)
+			}
+			if got, want := len(rowType.Fields), len(tt.wantFields); got != want {
+				t.Fatalf("len(rowType.Fields) = %d, want %d", got, want)
+			}
+			for i, want := range tt.wantFields {
+				assertField(t, rowType.Fields[i], want.name, want.code)
+			}
+		})
+	}
+}
+
 func TestAnalyzerRowTypeForPropertyGraph(t *testing.T) {
 	const ddl = `
 CREATE TABLE Person (
@@ -563,15 +704,16 @@ CREATE TABLE Orders (
 	if err != nil {
 		t.Fatalf("NewAnalyzerFromDDLWithProtoDescriptorFiles() error = %v", err)
 	}
-	rowType, err := analyzer.RowTypeForStatement("SELECT OrderInfo.order_number, OrderInfo.shipping_address.country FROM Orders")
+	rowType, err := analyzer.RowTypeForStatement("SELECT OrderInfo.order_number, OrderInfo.shipping_address.country, OrderInfo.shipping_address FROM Orders")
 	if err != nil {
 		t.Fatalf("RowTypeForStatement() error = %v", err)
 	}
-	if got, want := len(rowType.Fields), 2; got != want {
+	if got, want := len(rowType.Fields), 3; got != want {
 		t.Fatalf("len(rowType.Fields) = %d, want %d", got, want)
 	}
 	assertField(t, rowType.Fields[0], "order_number", spannerpb.TypeCode_STRING)
 	assertField(t, rowType.Fields[1], "country", spannerpb.TypeCode_STRING)
+	assertProtoField(t, rowType.Fields[2], "shipping_address", "examples.shipping.Order.Address")
 }
 
 func TestAnalyzerRowTypeForProtoColumn(t *testing.T) {

@@ -19,6 +19,10 @@ type BigQueryGoogleSQLCatalog struct {
 	SimpleCatalog                  *googlesql.SimpleCatalog
 	simpleCatalogs                 map[string]*googlesql.SimpleCatalog
 	spannerExternalDatasetBindings []BigQuerySpannerExternalDatasetBinding
+	externalQueryAnalyzers         map[string]*Analyzer
+	externalQueryTVFRegistered     bool
+	externalQueryPendingRowTypes   []*spannerpb.StructType
+	externalQueryPendingIndex      int
 	AnalyzerOptions                *googlesql.AnalyzerOptions
 	TypeFactory                    *googlesql.TypeFactory
 }
@@ -119,23 +123,30 @@ func NewBigQueryAnalyzerFromGoogleSQLCatalog(catalog *BigQueryGoogleSQLCatalog) 
 	if catalog == nil {
 		return nil, fmt.Errorf("nil BigQuery GoogleSQL catalog")
 	}
-	return &BigQueryAnalyzer{
+	analyzer := &BigQueryAnalyzer{
 		googleSQL: catalog,
 		helper:    catalog.Helper(),
-	}, nil
+	}
+	if err := catalog.addExternalQueryTVF(); err != nil {
+		return nil, err
+	}
+	return analyzer, nil
 }
 
 // SetExternalQueryAnalyzers sets Spanner analyzers keyed by BigQuery
 // connection ID for EXTERNAL_QUERY result schema inference.
 func (a *BigQueryAnalyzer) SetExternalQueryAnalyzers(analyzers map[string]*Analyzer) {
 	a.externalQueryAnalyzers = analyzers
+	if a != nil && a.googleSQL != nil {
+		a.googleSQL.externalQueryAnalyzers = analyzers
+	}
 }
 
 func (a *BigQueryAnalyzer) AddQueryParameter(name string, spec *TypeSpec) error {
 	if a == nil || a.googleSQL == nil {
 		return fmt.Errorf("nil BigQuery analyzer")
 	}
-	typ, err := typeSpecToGoogleSQLTypeWithProto(a.googleSQL.TypeFactory, spec, nil)
+	typ, err := typeSpecToGoogleSQLTypeWithProto(a.googleSQL.TypeFactory, spec, nil, nil)
 	if err != nil {
 		return err
 	}
@@ -1267,46 +1278,43 @@ func (a *BigQueryAnalyzer) TableSchemaForExpression(sql string) (*BigQueryTableS
 
 // ParseDebugString returns the parser AST debug string.
 func (a *BigQueryAnalyzer) ParseDebugString(sqlMode, sql string) (string, error) {
-	if sqlMode == "query" {
-		var err error
-		sql, err = a.rewriteExternalQueries(sql)
-		if err != nil {
-			return "", err
-		}
-	}
 	return a.helper.ParseDebugString(sqlMode, sql)
 }
 
 // Unparse returns SQL generated from the parser AST.
 func (a *BigQueryAnalyzer) Unparse(sqlMode, sql string) (string, error) {
-	if sqlMode == "query" {
-		var err error
-		sql, err = a.rewriteExternalQueries(sql)
-		if err != nil {
-			return "", err
-		}
-	}
 	return a.helper.Unparse(sqlMode, sql)
 }
 
 // ResolvedASTDebugString returns the resolved AST debug string.
 func (a *BigQueryAnalyzer) ResolvedASTDebugString(sqlMode, sql string) (string, error) {
-	if sqlMode == "query" {
-		var err error
-		sql, err = a.rewriteExternalQueries(sql)
-		if err != nil {
-			return "", err
-		}
+	if sqlMode != "query" {
+		return a.helper.ResolvedASTDebugString(sqlMode, sql)
 	}
-	return a.helper.ResolvedASTDebugString(sqlMode, sql)
+	out, err := a.analyzeStatement(sql)
+	if err != nil {
+		return "", err
+	}
+	node, err := out.ResolvedNode()
+	if err != nil {
+		return "", err
+	}
+	return node.DebugString()
 }
 
 func (a *BigQueryAnalyzer) analyzeStatement(sql string) (*googlesql.AnalyzerOutput, error) {
-	rewritten, err := a.rewriteExternalQueries(sql)
-	if err != nil {
+	if err := validateSpannerExternalDatasetRelationRoles(sql, a.googleSQL.spannerExternalDatasetBindings); err != nil {
 		return nil, err
 	}
-	if err := validateSpannerExternalDatasetRelationRoles(rewritten, a.googleSQL.spannerExternalDatasetBindings); err != nil {
+	if a.googleSQL.externalQueryTVFRegistered {
+		if err := a.prepareExternalQueryTVFCalls(sql); err != nil {
+			return nil, err
+		}
+		defer a.googleSQL.clearExternalQueryTVFCalls()
+		return a.helper.AnalyzeStatement(sql)
+	}
+	rewritten, err := a.rewriteExternalQueries(sql)
+	if err != nil {
 		return nil, err
 	}
 	return a.helper.AnalyzeStatement(rewritten)
@@ -1338,25 +1346,59 @@ func (a *BigQueryAnalyzer) rewriteExternalQueries(sql string) (string, error) {
 	return b.String(), nil
 }
 
-func (a *BigQueryAnalyzer) externalQueryReplacement(args []string) (string, error) {
+func (a *BigQueryAnalyzer) prepareExternalQueryTVFCalls(sql string) error {
+	calls, err := findExternalQueryCalls(sql)
+	if err != nil {
+		return err
+	}
+	// The GoogleSQL frontend callback API currently exposes TVF scalar argument
+	// types reliably, but not their literal string values. Keep the original SQL
+	// intact for analysis and feed the callback with row types decoded from the
+	// same EXTERNAL_QUERY calls in source order.
+	a.googleSQL.externalQueryPendingRowTypes = a.googleSQL.externalQueryPendingRowTypes[:0]
+	a.googleSQL.externalQueryPendingIndex = 0
+	for _, call := range calls {
+		rowType, err := a.externalQueryRowType(call.args)
+		if err != nil {
+			return err
+		}
+		a.googleSQL.externalQueryPendingRowTypes = append(a.googleSQL.externalQueryPendingRowTypes, rowType)
+	}
+	return nil
+}
+
+func (c *BigQueryGoogleSQLCatalog) clearExternalQueryTVFCalls() {
+	c.externalQueryPendingRowTypes = nil
+	c.externalQueryPendingIndex = 0
+}
+
+func (a *BigQueryAnalyzer) externalQueryRowType(args []string) (*spannerpb.StructType, error) {
 	if len(args) < 2 || len(args) > 3 {
-		return "", fmt.Errorf("EXTERNAL_QUERY requires 2 or 3 arguments, got %d", len(args))
+		return nil, fmt.Errorf("EXTERNAL_QUERY requires 2 or 3 arguments, got %d", len(args))
 	}
 	connectionID, err := decodeGoogleSQLStringLiteral(strings.TrimSpace(args[0]))
 	if err != nil {
-		return "", fmt.Errorf("EXTERNAL_QUERY connection argument: %w", err)
+		return nil, fmt.Errorf("EXTERNAL_QUERY connection argument: %w", err)
 	}
 	spannerSQL, err := decodeGoogleSQLStringLiteral(strings.TrimSpace(args[1]))
 	if err != nil {
-		return "", fmt.Errorf("EXTERNAL_QUERY SQL argument: %w", err)
+		return nil, fmt.Errorf("EXTERNAL_QUERY SQL argument: %w", err)
 	}
 	analyzer, err := a.externalQueryAnalyzerForConnection(connectionID)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 	rowType, err := analyzer.RowTypeForStatement(spannerSQL)
 	if err != nil {
-		return "", fmt.Errorf("EXTERNAL_QUERY Spanner SQL: %w", err)
+		return nil, fmt.Errorf("EXTERNAL_QUERY Spanner SQL: %w", err)
+	}
+	return rowType, nil
+}
+
+func (a *BigQueryAnalyzer) externalQueryReplacement(args []string) (string, error) {
+	rowType, err := a.externalQueryRowType(args)
+	if err != nil {
+		return "", err
 	}
 	return bigQueryTypedEmptySubquery(rowType)
 }
@@ -1364,6 +1406,11 @@ func (a *BigQueryAnalyzer) externalQueryReplacement(args []string) (string, erro
 func (a *BigQueryAnalyzer) externalQueryAnalyzerForConnection(connectionID string) (*Analyzer, error) {
 	if analyzer := a.externalQueryAnalyzers[connectionID]; analyzer != nil {
 		return analyzer, nil
+	}
+	if a.googleSQL != nil {
+		if analyzer := a.googleSQL.externalQueryAnalyzers[connectionID]; analyzer != nil {
+			return analyzer, nil
+		}
 	}
 	return nil, fmt.Errorf("no Spanner schema configured for EXTERNAL_QUERY connection %q", connectionID)
 }

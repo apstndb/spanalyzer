@@ -15,6 +15,7 @@ import (
 
 type ProtoDescriptorSet struct {
 	files    *protoregistry.Files
+	fileSet  *descriptorpb.FileDescriptorSet
 	messages map[string]protoreflect.MessageDescriptor
 	enums    map[string]protoreflect.EnumDescriptor
 }
@@ -38,6 +39,7 @@ func LoadProtoDescriptorSetFiles(paths []string) (*ProtoDescriptorSet, error) {
 	}
 	out := &ProtoDescriptorSet{
 		files:    files,
+		fileSet:  merged,
 		messages: map[string]protoreflect.MessageDescriptor{},
 		enums:    map[string]protoreflect.EnumDescriptor{},
 	}
@@ -177,5 +179,5 @@ func (c *Catalog) protoSingularFieldType(field protoreflect.FieldDescriptor) (*T
 }
 
 func normalizeProtoTypeName(name string) string {
-	return strings.TrimPrefix(name, ".")
+	return strings.Trim(strings.TrimPrefix(name, "."), "`")
 }

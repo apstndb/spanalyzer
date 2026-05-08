@@ -56,10 +56,9 @@ complete.
   labels/properties, remains limited.
 - Proto bundle support follows Spanner's input shape: DDL names active proto
   bundle types, while descriptor set files provide Protocol Buffers metadata.
-  `go-googlesql v0.2.0` exposes `MakeProtoType` and `MakeEnumType`, but this
-  project still uses STRUCT and INT64 shadows until descriptor set bytes can be
-  loaded into the WASM-side descriptor pool. Direct top-level proto column
-  outputs are mapped back to Spanner `PROTO` row metadata.
+  The supplied descriptor set is loaded into the GoogleSQL frontend descriptor
+  pool so active proto and enum types can be registered as native analyzer
+  types and converted back to Spanner row metadata.
 
 ## Testing Guidelines
 

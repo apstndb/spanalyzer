@@ -13,8 +13,10 @@ type GoogleSQLCatalog struct {
 	SimpleCatalog   *googlesql.SimpleCatalog
 	simpleCatalogs  map[string]*googlesql.SimpleCatalog
 	tables          map[string]*googlesql.SimpleTable
+	models          map[string]*registeredGoogleSQLModel
 	AnalyzerOptions *googlesql.AnalyzerOptions
 	TypeFactory     *googlesql.TypeFactory
+	DescriptorPool  *googlesql.DescriptorPool
 }
 
 func BuildGoogleSQLCatalogFromDDL(path, ddlSQL string, protoDescriptorPaths []string, options ...AnalyzerOption) (*GoogleSQLCatalog, error) {
@@ -49,13 +51,24 @@ func BuildGoogleSQLCatalogFromSpannerCatalog(schema *Catalog, options ...Analyze
 	if err != nil {
 		return nil, err
 	}
+	descriptorPool, err := buildGoogleSQLDescriptorPool(schema.ProtoDescriptors)
+	if err != nil {
+		return nil, err
+	}
+	if descriptorPool != nil {
+		if err := simpleCatalog.SetDescriptorPool(descriptorPool); err != nil {
+			return nil, err
+		}
+	}
 	out := &GoogleSQLCatalog{
 		SpannerCatalog:  schema,
 		SimpleCatalog:   simpleCatalog,
 		simpleCatalogs:  map[string]*googlesql.SimpleCatalog{"": simpleCatalog},
 		tables:          map[string]*googlesql.SimpleTable{},
+		models:          map[string]*registeredGoogleSQLModel{},
 		AnalyzerOptions: opts,
 		TypeFactory:     tf,
+		DescriptorPool:  descriptorPool,
 	}
 	if err := out.addTables(); err != nil {
 		return nil, err
@@ -64,6 +77,9 @@ func BuildGoogleSQLCatalogFromSpannerCatalog(schema *Catalog, options ...Analyze
 		return nil, err
 	}
 	if err := out.addModels(); err != nil {
+		return nil, err
+	}
+	if err := out.addMLPredict(); err != nil {
 		return nil, err
 	}
 	if err := out.addSpannerFunctions(); err != nil {
@@ -183,7 +199,7 @@ func pipeLanguageFeatures() []googlesql.LanguageFeature {
 }
 
 func (c *GoogleSQLCatalog) TypeSpecToGoogleSQLType(spec *TypeSpec) (googlesql.Googlesql_TypeNode, error) {
-	return typeSpecToGoogleSQLTypeWithProto(c.TypeFactory, spec, c.SpannerCatalog)
+	return typeSpecToGoogleSQLTypeWithProto(c.TypeFactory, spec, c.SpannerCatalog, c.DescriptorPool)
 }
 
 func (c *GoogleSQLCatalog) addTables() error {
