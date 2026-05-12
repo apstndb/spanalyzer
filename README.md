@@ -395,9 +395,9 @@ go run ./cmd/spanner-analyzer \
 For
 [BigQuery-to-Spanner federated queries](https://cloud.google.com/bigquery/docs/spanner-federated-queries)
 that use `EXTERNAL_QUERY`, pass BigQuery DDL and Spanner DDL for each BigQuery
-connection ID. The analyzer rewrites literal `EXTERNAL_QUERY` calls to
-equivalent empty BigQuery subqueries using the inner Spanner query's analyzed
-row type.
+connection ID. The analyzer provides a `EXTERNAL_QUERY` table-valued function
+that returns the row type inferred from the inner Spanner query using the
+connection-specific Spanner catalog.
 
 ```sh
 go run ./cmd/spanner-analyzer \
@@ -531,10 +531,10 @@ artifacts.
   included in the default `go-googlesql` builtin function set. This
   includes commit timestamp, sequence, search, TOKENLIST, and AI helper
   functions needed for query analysis.
-- `ML.PREDICT` is registered as an analyzer-only table-valued function. Its
-  result schema is modeled as the referenced model's output columns followed by
-  the input relation columns. This is schema analysis only; it does not execute
-  predictions.
+- `ML.PREDICT` is registered as an analyzer-only table-valued function. It
+  models schema only, returns model output columns followed by non-duplicated
+  input relation columns, and does not execute prediction logic. It supports
+  `ML.PREDICT`, `PREDICT`, and `SAFE.ML.PREDICT` names.
 - `TOKENLIST` is supported as an internal analysis type for search expressions,
   but Cloud Spanner result sets cannot return `TOKENLIST`, so the Cloud Spanner
   protobuf API has no `TypeCode` for it.
@@ -549,9 +549,8 @@ artifacts.
   can represent repeated and nested fields, but query result nullability is not
   tracked, so non-repeated query output fields are emitted as `NULLABLE`.
 - BigQuery-to-Spanner federated queries use the `EXTERNAL_QUERY` table-valued
-  function. The current implementation supports `EXTERNAL_QUERY` only when the
-  connection and Spanner SQL arguments are string literals and the connection
-  has a matching `--external-ddl`. It rewrites the call before analysis to an
-  equivalent empty BigQuery subquery with the same inferred columns. It does not
-  evaluate connection options, permissions, PostgreSQL-dialect Spanner SQL, or
-  non-literal dynamic SQL expressions.
+  function. The current implementation identifies `EXTERNAL_QUERY` calls by
+  literal connection and SQL arguments and delegates row type inference to the
+  matching Spanner analyzer. It does not evaluate connection options,
+  permissions, PostgreSQL-dialect Spanner SQL, or non-literal dynamic SQL
+  expressions.

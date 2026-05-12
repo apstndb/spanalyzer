@@ -238,17 +238,17 @@ type planReportTargetSummary struct {
 }
 
 type planReportExcludedTarget struct {
-	ID     string `json:"id" yaml:"id"`
-	Query  string `json:"query" yaml:"query"`
-	Source string `json:"source,omitempty" yaml:"source,omitempty"`
-	Scope  string `json:"scope" yaml:"scope"`
-	Reason string `json:"reason" yaml:"reason"`
+	ID      string `json:"id" yaml:"id"`
+	Query   string `json:"query" yaml:"query"`
+	Catalog string `json:"catalog,omitempty" yaml:"catalog,omitempty"`
+	Scope   string `json:"scope" yaml:"scope"`
+	Reason  string `json:"reason" yaml:"reason"`
 }
 
 type planReportQuery struct {
 	TargetID             string                   `json:"target_id" yaml:"target_id"`
 	Name                 string                   `json:"name" yaml:"name"`
-	Source               string                   `json:"source" yaml:"source"`
+	Catalog              string                   `json:"catalog" yaml:"catalog"`
 	Scope                string                   `json:"scope,omitempty" yaml:"scope,omitempty"`
 	Kind                 string                   `json:"kind" yaml:"kind"`
 	Status               string                   `json:"status" yaml:"status"`
@@ -271,7 +271,7 @@ type planReportQuery struct {
 type serializedPlanReportQuery struct {
 	TargetID             string                 `json:"target_id" yaml:"target_id"`
 	Name                 string                 `json:"name" yaml:"name"`
-	Source               string                 `json:"source" yaml:"source"`
+	Catalog              string                 `json:"catalog" yaml:"catalog"`
 	Scope                string                 `json:"scope,omitempty" yaml:"scope,omitempty"`
 	Kind                 string                 `json:"kind" yaml:"kind"`
 	Status               string                 `json:"status" yaml:"status"`
@@ -310,7 +310,7 @@ func (q planReportQuery) serialized() serializedPlanReportQuery {
 	return serializedPlanReportQuery{
 		TargetID:             q.TargetID,
 		Name:                 q.Name,
-		Source:               q.Source,
+		Catalog:              q.Catalog,
 		Scope:                q.Scope,
 		Kind:                 q.Kind,
 		Status:               q.Status,
@@ -387,7 +387,7 @@ func buildPlanReportWithRuntime(ctx context.Context, config querygen.QueryCodege
 	targets := 0
 	for _, query := range plan.Queries {
 		configQuery := configQueries[query.Name]
-		source := query.Source
+		source := query.Catalog
 		sql := query.SQL
 		params := query.Params
 		scope := "query"
@@ -400,7 +400,7 @@ func buildPlanReportWithRuntime(ctx context.Context, config querygen.QueryCodege
 		reportQuery := planReportQuery{
 			TargetID:  planReportTargetID(query.Name, scope),
 			Name:      query.Name,
-			Source:    source,
+			Catalog:   source,
 			Scope:     scope,
 			Kind:      query.Kind,
 			Status:    "pending",
@@ -1471,7 +1471,7 @@ func planContractReport(report planReport) plancontract.Report {
 		queries = append(queries, plancontract.Query{
 			TargetID:             planReportQueryTargetID(query),
 			Name:                 query.Name,
-			Source:               query.Source,
+			Catalog:              query.Catalog,
 			Scope:                query.Scope,
 			Kind:                 query.Kind,
 			Status:               query.Status,
@@ -1765,7 +1765,7 @@ func writePlanReportMarkdown(w io.Writer, report planReport) error {
 	for _, query := range report.Queries {
 		fmt.Fprintf(&b, "## %s\n\n", query.Name)
 		fmt.Fprintf(&b, "- Target ID: `%s`\n", planReportQueryTargetID(query))
-		fmt.Fprintf(&b, "- Source: `%s`\n", query.Source)
+		fmt.Fprintf(&b, "- Catalog: `%s`\n", query.Catalog)
 		if query.Scope != "" {
 			fmt.Fprintf(&b, "- Scope: `%s`\n", query.Scope)
 		}

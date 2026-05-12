@@ -1570,7 +1570,7 @@ queries:
 		t.Fatalf("run explain-plan summary error = %v, stderr = %s", err, stderr.String())
 	}
 	for _, want := range []string{
-		"Query: GetLiteral (sql, result: one, source: app)",
+		"Query: GetLiteral (sql, result: one, catalog: app)",
 		"SQL: SELECT 1 AS value",
 		"value: INT64 nullable",
 	} {
@@ -1733,7 +1733,7 @@ func TestWritePlanReportOutputs(t *testing.T) {
 			{
 				TargetID:           "query/ListSingers",
 				Name:               "ListSingers",
-				Source:             "app",
+				Catalog:            "app",
 				Scope:              "query",
 				Kind:               "table",
 				Status:             "ok",
@@ -2049,7 +2049,7 @@ func newPlanReportInvariantTestReport(t testing.TB) planReport {
 		Queries: []planReportQuery{{
 			TargetID:             "query/ListSingers",
 			Name:                 "ListSingers",
-			Source:               "app",
+			Catalog:              "app",
 			Scope:                "query",
 			Kind:                 "sql",
 			Status:               "ok",
@@ -3846,12 +3846,12 @@ func TestPlanReportContractRejectsSkippedTarget(t *testing.T) {
 		Status:  "no_targets",
 		Backend: "omni",
 		Queries: []planReportQuery{{
-			Name:   "BigQueryOnly",
-			Source: "analytics",
-			Scope:  "query",
-			Kind:   "sql",
-			Status: "skipped",
-			Error:  "source catalog \"analytics\" has dialect \"bigquery\"; plan-report currently supports Spanner GoogleSQL catalogs",
+			Name:    "BigQueryOnly",
+			Catalog: "analytics",
+			Scope:   "query",
+			Kind:    "sql",
+			Status:  "skipped",
+			Error:   "source catalog \"analytics\" has dialect \"bigquery\"; plan-report currently supports Spanner GoogleSQL catalogs",
 		}},
 	}
 	contracts := planContractsFile{
@@ -4175,10 +4175,10 @@ func TestBuildPlanReportNoTargets(t *testing.T) {
 	plan := &querygen.QueryCodegenPlan{
 		Queries: []querygen.QueryCodegenPlanQuery{
 			{
-				Name:   "BigQueryOnly",
-				Source: "analytics",
-				Kind:   "sql",
-				SQL:    "SELECT 1 AS value",
+				Name:    "BigQueryOnly",
+				Catalog: "analytics",
+				Kind:    "sql",
+				SQL:     "SELECT 1 AS value",
 			},
 		},
 	}
@@ -4292,10 +4292,10 @@ func TestBuildPlanReportTargetSummaryCountsPlanErrors(t *testing.T) {
 	plan := &querygen.QueryCodegenPlan{
 		Queries: []querygen.QueryCodegenPlanQuery{
 			{
-				Name:   "ListSingers",
-				Source: "app_spanner",
-				Kind:   "sql",
-				SQL:    "SELECT SingerId FROM Singers",
+				Name:    "ListSingers",
+				Catalog: "app_spanner",
+				Kind:    "sql",
+				SQL:     "SELECT SingerId FROM Singers",
 			},
 		},
 	}
@@ -4558,7 +4558,7 @@ func TestRunExplainPlanSummaryIncludesCatalogBindingWarnings(t *testing.T) {
 		"Execution: data_boost=forced, writable=false",
 		"analytics_spanner.Singers from Singers (BigQuery key metadata hidden)",
 		"Relations:",
-		"analytics_spanner.Singers: source=spanner_external_dataset_projection, role=select_source, allowed=true, projection_loss=true",
+		"analytics_spanner.Singers: catalog=spanner_external_dataset_projection, role=select_source, allowed=true, projection_loss=true",
 		"[warning] external-dataset-data-boost-permission-note",
 		"[info] external-dataset-hidden-column",
 	} {

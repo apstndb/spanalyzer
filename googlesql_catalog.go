@@ -163,9 +163,18 @@ func newGoogleSQLAnalyzerObjects(rootName string, tf *googlesql.TypeFactory, con
 func applyDialectLanguageFeaturePreset(dialect string, lang *googlesql.LanguageOptions) error {
 	switch dialect {
 	case "spanner":
-		return disableLanguageFeatures(lang, pipeLanguageFeatures())
+		if err := lang.EnableLanguageFeature(googlesql.LanguageFeatureFeatureStatementWithPipeOperators); err != nil {
+			return err
+		}
+		if err := lang.EnableLanguageFeature(googlesql.LanguageFeatureFeatureDmlReturning); err != nil {
+			return err
+		}
+		return disableLanguageFeatures(lang, []googlesql.LanguageFeature{
+			googlesql.LanguageFeatureFeatureBignumericType,
+			googlesql.LanguageFeatureFeatureGeography,
+		})
 	case "bigquery":
-		return nil
+		return disableLanguageFeatures(lang, nil)
 	default:
 		return fmt.Errorf("unknown GoogleSQL dialect preset %q", dialect)
 	}
@@ -178,24 +187,6 @@ func disableLanguageFeatures(lang *googlesql.LanguageOptions, features []googles
 		}
 	}
 	return nil
-}
-
-func pipeLanguageFeatures() []googlesql.LanguageFeature {
-	return []googlesql.LanguageFeature{
-		googlesql.LanguageFeatureFeaturePipes,
-		googlesql.LanguageFeatureFeaturePipeStaticDescribe,
-		googlesql.LanguageFeatureFeaturePipeAssert,
-		googlesql.LanguageFeatureFeaturePipeLog,
-		googlesql.LanguageFeatureFeaturePipeIf,
-		googlesql.LanguageFeatureFeaturePipeFork,
-		googlesql.LanguageFeatureFeaturePipeExportData,
-		googlesql.LanguageFeatureFeaturePipeCreateTable,
-		googlesql.LanguageFeatureFeaturePipeTee,
-		googlesql.LanguageFeatureFeaturePipeInsert,
-		googlesql.LanguageFeatureFeaturePipeWith,
-		googlesql.LanguageFeatureFeaturePipeAggregateWithDifferentialPrivacy,
-		googlesql.LanguageFeatureFeatureStatementWithPipeOperators,
-	}
 }
 
 func (c *GoogleSQLCatalog) TypeSpecToGoogleSQLType(spec *TypeSpec) (googlesql.Googlesql_TypeNode, error) {
@@ -238,7 +229,7 @@ func (c *GoogleSQLCatalog) addTable(table *Table) error {
 		if err != nil {
 			return fmt.Errorf("column %s.%s: %w", tableName, col.Name, err)
 		}
-		gsCol, err := googlesql.NewSimpleColumn(tableName, col.Name, gsType, col.Hidden, false)
+		gsCol, err := googlesql.NewSimpleColumn(tableName, col.Name, gsType, col.Hidden, col.GeneratedSQL == "")
 		if err != nil {
 			return err
 		}
@@ -606,14 +597,20 @@ func (s *propertyGraphBuildState) propertyBindings(table *Table, props *GraphPro
 	bindings := make([]graphPropertyBinding, 0, len(props.DerivedProperties))
 	for _, prop := range props.DerivedProperties {
 		col, _ := table.Column(prop.SQL)
-		if col == nil {
-			return nil, fmt.Errorf("derived property %s uses expression %q; only direct column-derived properties are currently supported", prop.Name, prop.SQL)
+		if col != nil {
+			typ, err := s.catalog.TypeSpecToGoogleSQLType(col.Type)
+			if err != nil {
+				return nil, fmt.Errorf("property %s: %w", prop.Name, err)
+			}
+			bindings = append(bindings, graphPropertyBinding{name: prop.Name, expr: prop.SQL, typ: typ})
+		} else {
+			// Arbitrary expressions result in JSON properties in Spanner.
+			typ, err := s.catalog.TypeFactory.GetJson()
+			if err != nil {
+				return nil, err
+			}
+			bindings = append(bindings, graphPropertyBinding{name: prop.Name, expr: prop.SQL, typ: typ})
 		}
-		typ, err := s.catalog.TypeSpecToGoogleSQLType(col.Type)
-		if err != nil {
-			return nil, fmt.Errorf("property %s: %w", prop.Name, err)
-		}
-		bindings = append(bindings, graphPropertyBinding{name: prop.Name, expr: prop.SQL, typ: typ})
 	}
 	return bindings, nil
 }

@@ -61,14 +61,14 @@ writes:
 	if got, want := config.Schemas[0].Name, "app"; got != want {
 		t.Fatalf("schema name = %q, want %q", got, want)
 	}
-	if got, want := config.Queries[0].Source, "app"; got != want {
-		t.Fatalf("query source = %q, want %q", got, want)
+	if got, want := config.Queries[0].Catalog, "app"; got != want {
+		t.Fatalf("query catalog = %q, want %q", got, want)
 	}
 	if got, want := config.Queries[0].ResultStruct, "SingerRow"; got != want {
 		t.Fatalf("query result struct = %q, want %q", got, want)
 	}
-	if got, want := strings.Join(config.Writes[0].UpdateMask, ","), "FirstName,LastName"; got != want {
-		t.Fatalf("write update mask = %q, want %q", got, want)
+	if got, want := strings.Join(config.Writes[0].Update.Columns, ","), "FirstName,LastName"; got != want {
+		t.Fatalf("write update columns = %q, want %q", got, want)
 	}
 	code, err := GenerateQueryCode(config, dir)
 	if err != nil {
@@ -1475,14 +1475,14 @@ CREATE TABLE Singers (
 		Queries: []QueryCodegenQuery{
 			{
 				Name:         "ListSingerIDs",
-				Schema:       "spanner",
+				Catalog:      "spanner",
 				SQL:          "SELECT SingerId FROM Singers",
 				ResultStruct: "SingerRow",
 				Required:     []string{"SingerId"},
 			},
 			{
 				Name:         "ListSingerNames",
-				Schema:       "spanner",
+				Catalog:      "spanner",
 				SQL:          "SELECT SingerId, FirstName FROM Singers",
 				ResultStruct: "SingerRow",
 				Required:     []string{"SingerId"},
@@ -1524,7 +1524,7 @@ CREATE TABLE Singers (
 		Schemas: []QueryCodegenSchema{{Name: "spanner", Dialect: "spanner", DDL: "schema.sql"}},
 		Queries: []QueryCodegenQuery{{
 			Name:         "ListSingers",
-			Source:       "spanner",
+			Catalog:      "spanner",
 			Table:        "Singers",
 			ResultStruct: "SingerRow",
 		}},
@@ -1564,7 +1564,7 @@ CREATE INDEX AlbumsByTitle ON Albums(AlbumTitle, SingerId) STORING (MarketingBud
 		Schemas: []QueryCodegenSchema{{Name: "spanner", Dialect: "spanner", DDL: "schema.sql"}},
 		Queries: []QueryCodegenQuery{{
 			Name:         "FindAlbumsByTitle",
-			Source:       "spanner",
+			Catalog:      "spanner",
 			Index:        "AlbumsByTitle",
 			KeyPrefix:    []string{"AlbumTitle"},
 			ResultStruct: "AlbumIndexRow",
@@ -1604,7 +1604,7 @@ CREATE NULL_FILTERED INDEX SingersByFirstLastRating ON Singers(FirstName, LastNa
 		Schemas: []QueryCodegenSchema{{Name: "spanner", Dialect: "spanner", DDL: "schema.sql"}},
 		Queries: []QueryCodegenQuery{{
 			Name:         "FindSingersByFirstName",
-			Source:       "spanner",
+			Catalog:      "spanner",
 			Index:        "SingersByFirstLastRating",
 			KeyPrefix:    []string{"FirstName"},
 			ResultStruct: "SingerIndexRow",
@@ -1640,7 +1640,7 @@ CREATE TABLE Singers (
 		Schemas: []QueryCodegenSchema{{Name: "spanner", Dialect: "spanner", DDL: "schema.sql"}},
 		Queries: []QueryCodegenQuery{{
 			Name:         "ListSingers",
-			Source:       "spanner",
+			Catalog:      "spanner",
 			Table:        "Singers",
 			OrderBy:      "none",
 			ResultStruct: "SingerRow",
@@ -1668,7 +1668,7 @@ CREATE TABLE Singers (
 		Schemas: []QueryCodegenSchema{{Name: "spanner", Dialect: "spanner", DDL: "schema.sql"}},
 		Queries: []QueryCodegenQuery{{
 			Name:         "ListSingers",
-			Source:       "spanner",
+			Catalog:      "spanner",
 			Table:        "Singers",
 			OrderBy:      "primary_key",
 			ResultStruct: "SingerRow",
@@ -1696,7 +1696,7 @@ CREATE INDEX AlbumsByTitle ON Albums(AlbumTitle);
 		Schemas: []QueryCodegenSchema{{Name: "spanner", Dialect: "spanner", DDL: "schema.sql"}},
 		Queries: []QueryCodegenQuery{{
 			Name:         "FindAlbumsByTitle",
-			Source:       "spanner",
+			Catalog:      "spanner",
 			Index:        "AlbumsByTitle",
 			KeyPrefix:    []string{"AlbumTitle"},
 			ResultStruct: "AlbumIndexRow",
@@ -1733,14 +1733,14 @@ CREATE INDEX AlbumsByTitle ON Albums(AlbumTitle, SingerId) STORING (MarketingBud
 		Queries: []QueryCodegenQuery{
 			{
 				Name:         "ListAlbums",
-				Source:       "spanner",
+				Catalog:      "spanner",
 				Table:        "Albums",
 				ResultStruct: "AlbumRow",
 				Required:     []string{"AlbumId"},
 			},
 			{
 				Name:         "FindAlbumsByTitle",
-				Source:       "spanner",
+				Catalog:      "spanner",
 				Index:        "AlbumsByTitle",
 				KeyPrefix:    []string{"AlbumTitle"},
 				ResultStruct: "AlbumRow",
@@ -1783,24 +1783,24 @@ CREATE TABLE Singers (
 		Writes: []QueryCodegenWrite{
 			{
 				Name:        "SaveSinger",
-				Source:      "spanner",
+				Catalog:     "spanner",
 				Table:       "Singers",
 				Operation:   "insert_or_update",
 				InputStruct: "SingerWrite",
-				UpdateMask:  []string{"FirstName"},
+				Update:      QueryCodegenWriteUpdate{Columns: []string{"FirstName"}},
 			},
 			{
 				Name:        "UpdateSingerName",
-				Source:      "spanner",
+				Catalog:     "spanner",
 				Table:       "Singers",
 				Operation:   "update",
 				InputStruct: "SingerNameUpdate",
-				UpdateMask:  []string{"FirstName", "LastName"},
+				Update:      QueryCodegenWriteUpdate{Columns: []string{"FirstName", "LastName"}},
 				Methods:     []string{"mutation", "dml"},
 			},
 			{
 				Name:        "DeleteSinger",
-				Source:      "spanner",
+				Catalog:     "spanner",
 				Table:       "Singers",
 				Operation:   "delete",
 				InputStruct: "SingerDelete",
@@ -1849,13 +1849,13 @@ CREATE TABLE Singers (
 		Schemas: []QueryCodegenSchema{{Name: "spanner", Dialect: "spanner", DDL: "schema.sql"}},
 		Writes: []QueryCodegenWrite{{
 			Name:      "UpdateSinger",
-			Source:    "spanner",
+			Catalog:   "spanner",
 			Table:     "Singers",
 			Operation: "update",
 		}},
 	}, dir)
-	if err == nil || !strings.Contains(err.Error(), "update_mask is required for operation update") {
-		t.Fatalf("GenerateQueryCode() error = %v, want required update_mask error", err)
+	if err == nil || !strings.Contains(err.Error(), "update.columns is required for operation update") {
+		t.Fatalf("GenerateQueryCode() error = %v, want required update.columns error", err)
 	}
 
 	_, err = GenerateQueryCode(QueryCodegenConfig{
@@ -1863,10 +1863,10 @@ CREATE TABLE Singers (
 		Schemas: []QueryCodegenSchema{{Name: "spanner", Dialect: "spanner", DDL: "schema.sql"}},
 		Writes: []QueryCodegenWrite{{
 			Name:      "UpdateSinger",
-			Source:    "spanner",
+			Catalog:   "spanner",
 			Table:     "Singers",
 			Operation: "update",
-			Columns:   []string{"FirstName"},
+			Insert:    QueryCodegenWriteInsert{Columns: []string{"FirstName"}},
 		}},
 	}, dir)
 	if err == nil || !strings.Contains(err.Error(), "columns is only valid for insert and replace") {
@@ -1888,11 +1888,11 @@ CREATE TABLE Singers (
 		Schemas: []QueryCodegenSchema{{Name: "spanner", Dialect: "spanner", DDL: "schema.sql"}},
 		Writes: []QueryCodegenWrite{{
 			Name:        "UpdateSinger",
-			Source:      "spanner",
+			Catalog:     "spanner",
 			Table:       "Singers",
 			Operation:   "update",
 			InputStruct: "SingerUpdate",
-			UpdateMask:  []string{autoAllNonKeyColumns},
+			Update:      QueryCodegenWriteUpdate{Columns: []string{autoAllNonKeyColumns}},
 		}},
 	}, dir)
 	if err != nil {
@@ -1922,11 +1922,11 @@ CREATE TABLE Singers (
 		Schemas: []QueryCodegenSchema{{Name: "spanner", Dialect: "spanner", DDL: "schema.sql"}},
 		Writes: []QueryCodegenWrite{{
 			Name:        "SaveSinger",
-			Source:      "spanner",
+			Catalog:     "spanner",
 			Table:       "Singers",
 			Operation:   "insert_or_update",
 			InputStruct: "SingerWrite",
-			UpdateMask:  []string{"FirstName"},
+			Update:      QueryCodegenWriteUpdate{Columns: []string{"FirstName"}},
 		}},
 	}, dir)
 	if err == nil || !strings.Contains(err.Error(), "insert_or_update requires insert value for NOT NULL column LastName") {
@@ -1948,11 +1948,11 @@ CREATE TABLE Singers (
 		Schemas: []QueryCodegenSchema{{Name: "spanner", Dialect: "spanner", DDL: "schema.sql"}},
 		Writes: []QueryCodegenWrite{{
 			Name:        "UpdateSinger",
-			Source:      "spanner",
+			Catalog:     "spanner",
 			Table:       "Singers",
 			Operation:   "update",
 			InputStruct: "SingerWrite",
-			UpdateMask:  []string{"FullName"},
+			Update:      QueryCodegenWriteUpdate{Columns: []string{"FullName"}},
 		}},
 	}, dir)
 	if err == nil || !strings.Contains(err.Error(), "column FullName is not updatable") {
@@ -1976,11 +1976,11 @@ CREATE TABLE Singers (
 		Schemas: []QueryCodegenSchema{{Name: "spanner", Dialect: "spanner", DDL: "schema.sql"}},
 		Writes: []QueryCodegenWrite{{
 			Name:        "UpdateSinger",
-			Source:      "spanner",
+			Catalog:     "spanner",
 			Table:       "Singers",
 			Operation:   "update",
 			InputStruct: "SingerWrite",
-			UpdateMask:  []string{"FirstName"},
+			Update:      QueryCodegenWriteUpdate{Columns: []string{"FirstName"}},
 		}},
 	}, dir)
 	if err != nil {
@@ -2022,11 +2022,11 @@ CREATE TABLE Singers (
 		Schemas: []QueryCodegenSchema{{Name: "spanner", Dialect: "spanner", DDL: "schema.sql"}},
 		Writes: []QueryCodegenWrite{{
 			Name:        "ReplaceSinger",
-			Source:      "spanner",
+			Catalog:     "spanner",
 			Table:       "Singers",
 			Operation:   "replace",
 			InputStruct: "SingerWrite",
-			Columns:     []string{"SingerId", "FirstName"},
+			Insert:      QueryCodegenWriteInsert{Columns: []string{"SingerId", "FirstName"}},
 		}},
 	}, dir)
 	if err != nil {
@@ -2051,11 +2051,11 @@ CREATE TABLE Singers (
 		Schemas: []QueryCodegenSchema{{Name: "spanner", Dialect: "spanner", DDL: "schema.sql"}},
 		Writes: []QueryCodegenWrite{{
 			Name:        "ReplaceSinger",
-			Source:      "spanner",
+			Catalog:     "spanner",
 			Table:       "Singers",
 			Operation:   "replace",
 			InputStruct: "SingerWrite",
-			Columns:     []string{"SingerId", "FirstName"},
+			Insert:      QueryCodegenWriteInsert{Columns: []string{"SingerId", "FirstName"}},
 			Methods:     []string{"dml"},
 		}},
 	}, dir)
@@ -2079,17 +2079,17 @@ CREATE TABLE Singers (
 		Schemas: []QueryCodegenSchema{{Name: "spanner", Dialect: "spanner", DDL: "schema.sql"}},
 		Queries: []QueryCodegenQuery{{
 			Name:         "ListSingers",
-			Source:       "spanner",
+			Catalog:      "spanner",
 			Table:        "Singers",
 			ResultStruct: "SingerRow",
 		}},
 		Writes: []QueryCodegenWrite{{
 			Name:        "UpdateSingerName",
-			Source:      "spanner",
+			Catalog:     "spanner",
 			Table:       "Singers",
 			Operation:   "update",
 			InputStruct: "SingerRow",
-			UpdateMask:  []string{"FirstName"},
+			Update:      QueryCodegenWriteUpdate{Columns: []string{"FirstName"}},
 			Methods:     []string{"mutation", "dml"},
 		}},
 	}, dir)
@@ -2130,17 +2130,17 @@ CREATE TABLE Singers (
 		Schemas: []QueryCodegenSchema{{Name: "spanner", Dialect: "spanner", DDL: "schema.sql"}},
 		Queries: []QueryCodegenQuery{{
 			Name:         "ListSingerNames",
-			Source:       "spanner",
+			Catalog:      "spanner",
 			SQL:          "SELECT SingerId, FirstName FROM Singers",
 			ResultStruct: "SingerRow",
 		}},
 		Writes: []QueryCodegenWrite{{
 			Name:        "UpdateSingerStatus",
-			Source:      "spanner",
+			Catalog:     "spanner",
 			Table:       "Singers",
 			Operation:   "update",
 			InputStruct: "SingerRow",
-			UpdateMask:  []string{"Status"},
+			Update:      QueryCodegenWriteUpdate{Columns: []string{"Status"}},
 			Methods:     []string{"mutation"},
 		}},
 	}, dir)
@@ -2163,17 +2163,17 @@ CREATE TABLE Singers (
 		Schemas: []QueryCodegenSchema{{Name: "spanner", Dialect: "spanner", DDL: "schema.sql"}},
 		Queries: []QueryCodegenQuery{{
 			Name:         "ListSingers",
-			Source:       "spanner",
+			Catalog:      "spanner",
 			Table:        "Singers",
 			ResultStruct: "singer-row",
 		}},
 		Writes: []QueryCodegenWrite{{
 			Name:        "UpdateSingerName",
-			Source:      "spanner",
+			Catalog:     "spanner",
 			Table:       "Singers",
 			Operation:   "update",
 			InputStruct: "singer-row",
-			UpdateMask:  []string{"FirstName"},
+			Update:      QueryCodegenWriteUpdate{Columns: []string{"FirstName"}},
 			Methods:     []string{"mutation"},
 		}},
 	}, dir)
@@ -2200,14 +2200,14 @@ CREATE TABLE Singers (
 		Package: "db",
 		Schemas: []QueryCodegenSchema{{Name: "spanner", Dialect: "spanner", DDL: "schema.sql"}},
 		Writes: []QueryCodegenWrite{{
-			Name:       "UpdateSinger",
-			Source:     "spanner",
-			Table:      "Singers",
-			Operation:  "update",
-			UpdateMask: []string{"SingerId"},
+			Name:      "UpdateSinger",
+			Catalog:   "spanner",
+			Table:     "Singers",
+			Operation: "update",
+			Update:    QueryCodegenWriteUpdate{Columns: []string{"SingerId"}},
 		}},
 	}, dir)
-	if err == nil || !strings.Contains(err.Error(), "primary key column SingerId cannot be in update_mask") {
+	if err == nil || !strings.Contains(err.Error(), "primary key column SingerId cannot be in update_columns") {
 		t.Fatalf("GenerateQueryCode() error = %v, want primary key update_mask error", err)
 	}
 }
@@ -2236,7 +2236,7 @@ CREATE TABLE Singers (
 		},
 		Queries: []QueryCodegenQuery{{
 			Name:         "ExternalSingerIDs",
-			Source:       "bigquery",
+			Catalog:      "bigquery",
 			SQL:          "SELECT * FROM EXTERNAL_QUERY('example-project.us.example-connection', '''SELECT SingerId FROM Singers''')",
 			ResultStruct: "SingerRow",
 		}},
@@ -2272,8 +2272,8 @@ CREATE TABLE Singers (
 			},
 		},
 		Queries: []QueryCodegenQuery{{
-			Name:   "ExternalSingerIDs",
-			Source: "bigquery",
+			Name:    "ExternalSingerIDs",
+			Catalog: "bigquery",
 			Federated: QueryCodegenFederatedQuery{
 				Connection:    "example-project.us.example-connection",
 				SpannerSource: "spanner",
@@ -2320,8 +2320,8 @@ CREATE TABLE Singers (
 			},
 		},
 		Queries: []QueryCodegenQuery{{
-			Name:   "ExternalSingerIDs",
-			Source: "bigquery",
+			Name:    "ExternalSingerIDs",
+			Catalog: "bigquery",
 			Federated: QueryCodegenFederatedQuery{
 				Connection: "example-project.us.example-connection",
 				InnerSQL:   "SELECT SingerId FROM Singers",
@@ -2378,7 +2378,7 @@ CREATE TABLE Singers (
 		},
 		Queries: []QueryCodegenQuery{{
 			Name:         "ExternalDatasetSingers",
-			Source:       "bigquery",
+			Catalog:      "bigquery",
 			SQL:          "SELECT * FROM analytics_spanner.Singers",
 			ResultStruct: "SingerRow",
 		}},
@@ -2472,7 +2472,7 @@ CREATE TABLE Singers (
 	}
 	relation := plan.Queries[0].Relations[0]
 	if relation.SQLPath != "example-project.analytics_spanner.Singers" ||
-		relation.Source != "spanner_external_dataset_projection" ||
+		relation.Catalog != "spanner_external_dataset_projection" ||
 		relation.Role != "select_source" ||
 		!relation.Allowed ||
 		!relation.ProjectionLoss {
@@ -2517,7 +2517,7 @@ CREATE TABLE Singers (
 		},
 		Queries: []QueryCodegenQuery{{
 			Name:         "ExternalDatasetSingerNames",
-			Source:       "bigquery",
+			Catalog:      "bigquery",
 			SQL:          "SELECT SingerId, FirstName FROM analytics_spanner.Singers",
 			ResultStruct: "SingerRow",
 		}},
@@ -2567,7 +2567,7 @@ CREATE TABLE Singers (
 		},
 		Queries: []QueryCodegenQuery{{
 			Name:         "ExternalDatasetSingerNames",
-			Source:       "bigquery",
+			Catalog:      "bigquery",
 			SQL:          "SELECT SingerId FROM analytics_spanner.Singers",
 			ResultStruct: "SingerRow",
 		}},
@@ -2606,7 +2606,7 @@ CREATE TABLE Singers (
 		},
 		Queries: []QueryCodegenQuery{{
 			Name:         "ExternalDatasetSingerNames",
-			Source:       "bigquery",
+			Catalog:      "bigquery",
 			SQL:          "SELECT SingerId FROM analytics_spanner.Singers",
 			ResultStruct: "SingerRow",
 		}},
@@ -2640,8 +2640,8 @@ CREATE TABLE Singers (
 			},
 		},
 		Queries: []QueryCodegenQuery{{
-			Name:   "ExternalDatasetNameLiteral",
-			Source: "bigquery",
+			Name:    "ExternalDatasetNameLiteral",
+			Catalog: "bigquery",
 			SQL: `SELECT 'analytics_spanner.Singers' AS literal_value
 -- analytics_spanner.Singers in a comment is not a relation
 `,
@@ -2678,7 +2678,7 @@ CREATE TABLE Singers (
 		},
 		Queries: []QueryCodegenQuery{{
 			Name:         "InsertExternalDatasetSinger",
-			Source:       "bigquery",
+			Catalog:      "bigquery",
 			SQL:          "INSERT INTO analytics_spanner.Singers (SingerId) VALUES (1)",
 			Result:       "many",
 			ResultStruct: "SingerRow",
@@ -2711,7 +2711,7 @@ CREATE TABLE Singers (
 		},
 		Queries: []QueryCodegenQuery{{
 			Name:         "CreateExternalDatasetTable",
-			Source:       "bigquery",
+			Catalog:      "bigquery",
 			SQL:          "CREATE TABLE analytics_spanner.NewTable (SingerId INT64)",
 			Result:       "many",
 			ResultStruct: "SingerRow",
@@ -2745,7 +2745,7 @@ CREATE TABLE Singers (
 		},
 		Queries: []QueryCodegenQuery{{
 			Name:         "ExternalDatasetSingers",
-			Source:       "bigquery",
+			Catalog:      "bigquery",
 			SQL:          "SELECT SingerId FROM analytics_spanner.Singers",
 			ResultStruct: "SingerRow",
 		}},
@@ -2773,7 +2773,7 @@ CREATE TABLE Singers (
 		},
 		Queries: []QueryCodegenQuery{{
 			Name:         "ExternalDatasetSingers",
-			Source:       "bigquery",
+			Catalog:      "bigquery",
 			SQL:          "SELECT SingerId FROM analytics_spanner.Singers",
 			ResultStruct: "SingerRow",
 		}},
@@ -2915,7 +2915,7 @@ CREATE TABLE Singers (
 		},
 		Queries: []QueryCodegenQuery{{
 			Name:         "ExternalDatasetSingerNames",
-			Source:       "bigquery",
+			Catalog:      "bigquery",
 			SQL:          "SELECT SingerId FROM analytics_spanner.Singers",
 			ResultStruct: "SingerRow",
 		}},
@@ -3007,8 +3007,8 @@ CREATE TABLE Events (
 			},
 		},
 		Queries: []QueryCodegenQuery{{
-			Name:   "ExternalEventTimes",
-			Source: "bigquery",
+			Name:    "ExternalEventTimes",
+			Catalog: "bigquery",
 			Federated: QueryCodegenFederatedQuery{
 				Connection: "example-project.us.example-connection",
 				InnerSQL:   "SELECT EventTimestamp FROM Events",
@@ -3052,8 +3052,8 @@ CREATE TABLE Singers (
 			},
 		},
 		Queries: []QueryCodegenQuery{{
-			Name:   "ExternalSingerNames",
-			Source: "bigquery",
+			Name:    "ExternalSingerNames",
+			Catalog: "bigquery",
 			Federated: QueryCodegenFederatedQuery{
 				Connection:    "example-project.us.example-connection",
 				SpannerSource: "spanner",
@@ -3094,8 +3094,8 @@ CREATE TABLE Singers (
 			},
 		},
 		Queries: []QueryCodegenQuery{{
-			Name:   "ExternalSingerIDs",
-			Source: "bigquery",
+			Name:    "ExternalSingerIDs",
+			Catalog: "bigquery",
 			Federated: QueryCodegenFederatedQuery{
 				Connection: "example-project.us.example-connection",
 				InnerSQL:   "SELECT SingerId FROM Singers",
@@ -3140,8 +3140,8 @@ CREATE TABLE Singers (
 			},
 		},
 		Queries: []QueryCodegenQuery{{
-			Name:   "ExternalSingerIDs",
-			Source: "bigquery",
+			Name:    "ExternalSingerIDs",
+			Catalog: "bigquery",
 			Federated: QueryCodegenFederatedQuery{
 				Connection: "example-project.us.example-connection",
 				InnerSQL:   "SELECT SingerId FROM Singers",
@@ -3177,8 +3177,8 @@ CREATE TABLE Singers (
 			},
 		},
 		Queries: []QueryCodegenQuery{{
-			Name:   "ExternalSingerIDs",
-			Source: "bigquery",
+			Name:    "ExternalSingerIDs",
+			Catalog: "bigquery",
 			Federated: QueryCodegenFederatedQuery{
 				Connection: "example-project.us.example-connection",
 				InnerSQL:   "SELECT SingerId FROM Singers",
@@ -3220,8 +3220,8 @@ CREATE TABLE Singers (
 			},
 		},
 		Queries: []QueryCodegenQuery{{
-			Name:   "ExternalSingerIDs",
-			Source: "bigquery",
+			Name:    "ExternalSingerIDs",
+			Catalog: "bigquery",
 			Federated: QueryCodegenFederatedQuery{
 				Connection: "example-project.us.example-connection",
 				InnerSQL:   "SELECT SingerId FROM Singers ORDER BY SingerId",
@@ -3264,8 +3264,8 @@ CREATE TABLE Singers (
 			},
 		},
 		Queries: []QueryCodegenQuery{{
-			Name:   "ExternalSingerIDs",
-			Source: "bigquery",
+			Name:    "ExternalSingerIDs",
+			Catalog: "bigquery",
 			Federated: QueryCodegenFederatedQuery{
 				Connection: "example-project.us.example-connection",
 				InnerSQL:   "SELECT SingerId FROM Singers ORDER BY SingerId LIMIT 1",
@@ -3296,18 +3296,18 @@ CREATE TABLE Singers (
 		Schemas: []QueryCodegenSchema{{Name: "spanner", Dialect: "spanner", DDL: "schema.sql"}},
 		Queries: []QueryCodegenQuery{{
 			Name:         "ListSingers",
-			Source:       "spanner",
+			Catalog:      "spanner",
 			Table:        "Singers",
 			Result:       "many",
 			ResultStruct: "SingerRow",
 		}},
 		Writes: []QueryCodegenWrite{{
 			Name:        "UpdateSingerName",
-			Source:      "spanner",
+			Catalog:     "spanner",
 			Table:       "Singers",
 			Operation:   "update",
 			InputStruct: "SingerRow",
-			UpdateMask:  []string{"FirstName"},
+			Update:      QueryCodegenWriteUpdate{Columns: []string{"FirstName"}},
 			Methods:     []string{"mutation"},
 			Vet: QueryCodegenVetConfig{Disable: []QueryCodegenVetDisable{{
 				Rule:    "single-transaction-write-surface",
@@ -3337,7 +3337,7 @@ CREATE TABLE Singers (
 		t.Fatalf("len(plan.Writes) = %d, want %d", got, want)
 	}
 	write := plan.Writes[0]
-	if strings.Join(write.Keys, ",") != "SingerId" || strings.Join(write.Columns, ",") != "FirstName" {
+	if strings.Join(write.Keys, ",") != "SingerId" || strings.Join(write.InsertColumns, ",") != "SingerId" {
 		t.Fatalf("unexpected write plan: %+v", write)
 	}
 	if got, want := len(write.VetSuppressions), 1; got != want {
@@ -3465,8 +3465,8 @@ CREATE TABLE Singers (
 			},
 		},
 		Queries: []QueryCodegenQuery{{
-			Name:   "ExternalSingerIDs",
-			Source: "bigquery",
+			Name:    "ExternalSingerIDs",
+			Catalog: "bigquery",
 			Federated: QueryCodegenFederatedQuery{
 				Connection: "example-project.us.example-connection",
 				InnerSQL:   "SELECT SingerId FROM Singers WHERE SingerId = @SingerId",
@@ -3496,7 +3496,7 @@ func TestBuildQueryCodegenPlanBigQueryParam(t *testing.T) {
 		}},
 		Queries: []QueryCodegenQuery{{
 			Name:         "GetValue",
-			Source:       "bigquery",
+			Catalog:      "bigquery",
 			SQL:          "SELECT @Value AS Value",
 			ResultStruct: "ValueRow",
 			Params: []QueryCodegenParam{{
@@ -3534,8 +3534,8 @@ CREATE TABLE Singers (
 			},
 		},
 		Queries: []QueryCodegenQuery{{
-			Name:   "ExternalSingerIDs",
-			Source: "bigquery",
+			Name:    "ExternalSingerIDs",
+			Catalog: "bigquery",
 			Federated: QueryCodegenFederatedQuery{
 				Connection: "example-project.us.example-connection",
 				InnerSQL:   "SELECT SingerId FROM Singers",
@@ -3578,8 +3578,8 @@ CREATE TABLE Singers (
 			},
 		},
 		Queries: []QueryCodegenQuery{{
-			Name:   "ExternalSingerIDs",
-			Source: "bigquery",
+			Name:    "ExternalSingerIDs",
+			Catalog: "bigquery",
 			Federated: QueryCodegenFederatedQuery{
 				Connection: "example-project.us.example-connection",
 				InnerSQL:   "SELECT SingerId FROM Singers WHERE SingerId = @SingerId",
@@ -3629,12 +3629,12 @@ CREATE TABLE SingerAlbums (
 		Package: "db",
 		Schemas: []QueryCodegenSchema{{Name: "spanner", Dialect: "spanner", DDL: "schema.sql"}},
 		Writes: []QueryCodegenWrite{{
-			Name:       "UpdateAlbum",
-			Source:     "spanner",
-			Table:      "SingerAlbums",
-			Operation:  "update",
-			Keys:       []string{"SingerId"},
-			UpdateMask: []string{"Title"},
+			Name:      "UpdateAlbum",
+			Catalog:   "spanner",
+			Table:     "SingerAlbums",
+			Operation: "update",
+			Keys:      []string{"SingerId"},
+			Update:    QueryCodegenWriteUpdate{Columns: []string{"Title"}},
 		}},
 	}, dir)
 	if err == nil || !strings.Contains(err.Error(), "key must equal the table primary key set") {

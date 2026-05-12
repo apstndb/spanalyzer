@@ -12,11 +12,68 @@ func RowTypeFromAnalyzerOutput(out *googlesql.AnalyzerOutput, schema *Catalog) (
 	if err != nil {
 		return nil, err
 	}
-	query, ok := stmt.(*googlesql.ResolvedQueryStmt)
-	if !ok {
+	switch s := stmt.(type) {
+	case *googlesql.ResolvedQueryStmt:
+		return RowTypeFromResolvedQuery(s, schema)
+	case *googlesql.ResolvedInsertStmt:
+		returning, err := s.Returning()
+		if err != nil || returning == nil {
+			return nil, ErrStatementHasNoRowType
+		}
+		return rowTypeFromReturningClause(returning, schema)
+	case *googlesql.ResolvedUpdateStmt:
+		returning, err := s.Returning()
+		if err != nil || returning == nil {
+			return nil, ErrStatementHasNoRowType
+		}
+		return rowTypeFromReturningClause(returning, schema)
+	case *googlesql.ResolvedDeleteStmt:
+		returning, err := s.Returning()
+		if err != nil || returning == nil {
+			return nil, ErrStatementHasNoRowType
+		}
+		return rowTypeFromReturningClause(returning, schema)
+	default:
 		return nil, ErrStatementHasNoRowType
 	}
-	return RowTypeFromResolvedQuery(query, schema)
+}
+
+func rowTypeFromReturningClause(returning *googlesql.ResolvedReturningClause, schema *Catalog) (*spannerpb.StructType, error) {
+	n, err := returning.OutputColumnListSize()
+	if err != nil {
+		return nil, err
+	}
+	fields := make([]*spannerpb.StructType_Field, 0, n)
+	for i := int32(0); i < n; i++ {
+		outCol, err := returning.OutputColumnList2(i)
+		if err != nil {
+			return nil, err
+		}
+		name, err := outCol.Name()
+		if err != nil {
+			return nil, err
+		}
+		resolvedCol, err := outCol.Column()
+		if err != nil {
+			return nil, err
+		}
+		gsType, err := resolvedCol.Type()
+		if err != nil {
+			return nil, err
+		}
+		pbType, ok, err := directProtoColumnType(schema, resolvedCol)
+		if err != nil {
+			return nil, err
+		}
+		if !ok {
+			pbType, err = SpannerTypeFromGoogleSQLType(gsType)
+		}
+		if err != nil {
+			return nil, err
+		}
+		fields = append(fields, &spannerpb.StructType_Field{Name: name, Type: pbType})
+	}
+	return &spannerpb.StructType{Fields: fields}, nil
 }
 
 func RowTypeFromResolvedQuery(query *googlesql.ResolvedQueryStmt, schema *Catalog) (*spannerpb.StructType, error) {

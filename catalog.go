@@ -244,6 +244,15 @@ func (c *Catalog) ApplyDDL(ddl ast.DDL) error {
 		// Schemas only scope object names; individual objects carry their full
 		// paths in this catalog.
 		return nil
+	case *ast.CreateChangeStream, *ast.AlterChangeStream, *ast.DropChangeStream:
+		// Change streams are not visible to ordinary queries.
+		return nil
+	case *ast.AlterDatabase:
+		// Database options do not affect query row types.
+		return nil
+	case *ast.CreateRole, *ast.DropRole, *ast.Grant, *ast.Revoke:
+		// IAM objects and permissions are out of scope for schema analysis.
+		return nil
 	case *ast.RenameTable:
 		return c.applyRenameTable(ddl)
 	default:

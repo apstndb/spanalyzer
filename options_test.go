@@ -27,13 +27,13 @@ func TestWithProductModeOverridesDefault(t *testing.T) {
 	assertProductMode(t, catalog, googlesql.ProductModeProductInternal)
 }
 
-func TestSpannerAnalyzerDisablesPipeSyntaxFeature(t *testing.T) {
+func TestSpannerAnalyzerEnablesPipeSyntaxFeatureByDefault(t *testing.T) {
 	catalog, err := BuildGoogleSQLCatalogFromDDL("schema.sql", "", nil)
 	if err != nil {
 		t.Fatalf("BuildGoogleSQLCatalogFromDDL() error = %v", err)
 	}
-	assertLanguageFeature(t, catalog.AnalyzerOptions, googlesql.LanguageFeatureFeaturePipes, false)
-	assertLanguageFeature(t, catalog.AnalyzerOptions, googlesql.LanguageFeatureFeatureStatementWithPipeOperators, false)
+	assertLanguageFeature(t, catalog.AnalyzerOptions, googlesql.LanguageFeatureFeaturePipes, true)
+	assertLanguageFeature(t, catalog.AnalyzerOptions, googlesql.LanguageFeatureFeatureStatementWithPipeOperators, true)
 }
 
 func TestBigQueryAnalyzerEnablesPipeSyntaxFeature(t *testing.T) {
@@ -44,13 +44,13 @@ func TestBigQueryAnalyzerEnablesPipeSyntaxFeature(t *testing.T) {
 	assertLanguageFeature(t, catalog.AnalyzerOptions, googlesql.LanguageFeatureFeaturePipes, true)
 }
 
-func TestSpannerAnalyzerRejectsPipeSyntax(t *testing.T) {
+func TestSpannerAnalyzerAcceptsPipeSyntax(t *testing.T) {
 	analyzer, err := NewAnalyzerFromDDL("schema.sql", "")
 	if err != nil {
 		t.Fatalf("NewAnalyzerFromDDL() error = %v", err)
 	}
-	if _, err := analyzer.RowTypeForStatement("SELECT 1 AS n |> SELECT n"); err == nil {
-		t.Fatalf("RowTypeForStatement() error = nil, want pipe syntax error")
+	if _, err := analyzer.RowTypeForStatement("SELECT 1 AS n |> SELECT n"); err != nil {
+		t.Fatalf("RowTypeForStatement() error = %v, want nil", err)
 	}
 }
 

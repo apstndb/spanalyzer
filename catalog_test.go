@@ -516,3 +516,21 @@ func sameStrings(a, b []string) bool {
 	}
 	return true
 }
+
+func TestBuildSchemaCatalog_IgnoredObjects(t *testing.T) {
+	const ddl = `
+CREATE CHANGE STREAM MyChangeStream FOR ALL;
+ALTER DATABASE MyDatabase SET OPTIONS (
+  version_retention_period = '7d'
+);
+CREATE ROLE MyRole;
+GRANT SELECT ON TABLE MyTable TO ROLE MyRole;
+`
+	// BuildSchemaCatalog should not fail on these, even if they are not fully modeled
+	// because memefish supports them.
+	// Note: memefish might not support all of these, let's verify.
+	_, err := BuildSchemaCatalog("ignored.sql", ddl)
+	if err != nil {
+		t.Fatalf("BuildSchemaCatalog() error = %v", err)
+	}
+}

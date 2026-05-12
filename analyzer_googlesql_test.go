@@ -716,6 +716,103 @@ CREATE TABLE Orders (
 	assertProtoField(t, rowType.Fields[2], "shipping_address", "examples.shipping.Order.Address")
 }
 
+func TestAnalyzerRowTypeForPropertyGraphWithExpressions(t *testing.T) {
+	const ddl = `
+CREATE TABLE Singers (
+  SingerId INT64 NOT NULL,
+  FirstName STRING(MAX),
+  LastName STRING(MAX),
+) PRIMARY KEY (SingerId);
+
+CREATE PROPERTY GRAPH MyGraph
+  NODE TABLES (
+    Singers
+      LABEL Singer
+      PROPERTIES (
+        SingerId,
+        CONCAT(FirstName, ' ', LastName) AS FullName
+      )
+  );
+`
+	analyzer, err := NewAnalyzerFromDDL("graph_expr.sql", ddl)
+	if err != nil {
+		t.Fatalf("NewAnalyzerFromDDL() error = %v", err)
+	}
+
+	sql := "GRAPH MyGraph MATCH (n:Singer) RETURN n.SingerId, n.FullName"
+	rowType, err := analyzer.RowTypeForStatement(sql)
+	if err != nil {
+		t.Fatalf("RowTypeForStatement() error = %v", err)
+	}
+	if got, want := len(rowType.Fields), 2; got != want {
+		t.Fatalf("len(rowType.Fields) = %d, want %d", got, want)
+	}
+	assertField(t, rowType.Fields[0], "SingerId", spannerpb.TypeCode_INT64)
+	// Derived properties are JSON.
+	assertField(t, rowType.Fields[1], "FullName", spannerpb.TypeCode_JSON)
+}
+
+func TestAnalyzerRowTypeForDMLReturning(t *testing.T) {
+	const ddl = `
+CREATE TABLE Singers (
+  SingerId INT64 NOT NULL,
+  FirstName STRING(MAX)
+) PRIMARY KEY (SingerId);
+`
+	analyzer, err := NewAnalyzerFromDDL("dml_returning.sql", ddl)
+	if err != nil {
+		t.Fatalf("NewAnalyzerFromDDL() error = %v", err)
+	}
+
+	sql := "DELETE FROM Singers WHERE SingerId = 1 THEN RETURN SingerId, FirstName"
+	rowType, err := analyzer.RowTypeForStatement(sql)
+	if err != nil {
+		t.Fatalf("RowTypeForStatement() error = %v", err)
+	}
+	if got, want := len(rowType.Fields), 2; got != want {
+		t.Fatalf("len(rowType.Fields) = %d, want %d", got, want)
+	}
+	assertField(t, rowType.Fields[0], "SingerId", spannerpb.TypeCode_INT64)
+	assertField(t, rowType.Fields[1], "FirstName", spannerpb.TypeCode_STRING)
+}
+
+func TestAnalyzerRowTypeForComplexProtoBundle(t *testing.T) {
+	const ddl = `
+CREATE PROTO BUNDLE (
+  examples.user.User,
+  examples.order.OrderExt,
+);
+CREATE TABLE Orders (
+  OrderId STRING(MAX) NOT NULL,
+  OrderInfo examples.order.OrderExt,
+) PRIMARY KEY (OrderId);
+`
+	analyzer, err := NewAnalyzerFromDDLWithProtoDescriptorFiles("complex_proto.sql", ddl, []string{"testdata/protos/complex/complex_descriptors.pb"})
+	if err != nil {
+		t.Fatalf("NewAnalyzerFromDDLWithProtoDescriptorFiles() error = %v", err)
+	}
+
+	sql := "SELECT OrderInfo.order_id, OrderInfo.customer.name, OrderInfo.customer.type FROM Orders"
+	rowType, err := analyzer.RowTypeForStatement(sql)
+	if err != nil {
+		t.Fatalf("RowTypeForStatement() error = %v", err)
+	}
+	if got, want := len(rowType.Fields), 3; got != want {
+		t.Fatalf("len(rowType.Fields) = %d, want %d", got, want)
+	}
+	assertField(t, rowType.Fields[0], "order_id", spannerpb.TypeCode_STRING)
+	assertField(t, rowType.Fields[1], "name", spannerpb.TypeCode_STRING)
+	// Native MakeEnumType results in ENUM type.
+	assertEnumField(t, rowType.Fields[2], "type", "examples.user.User.UserType")
+}
+
+func assertEnumField(t *testing.T, field *spannerpb.StructType_Field, name, fqn string) {
+	t.Helper()
+	if field.Name != name || field.Type.GetCode() != spannerpb.TypeCode_ENUM || field.Type.GetProtoTypeFqn() != fqn {
+		t.Fatalf("field = (%q, %s, %q), want (%q, ENUM, %q)", field.Name, field.Type.GetCode(), field.Type.GetProtoTypeFqn(), name, fqn)
+	}
+}
+
 func TestAnalyzerRowTypeForProtoColumn(t *testing.T) {
 	const protoDescriptorPath = "testdata/protos/order_descriptors.pb"
 	const ddl = `

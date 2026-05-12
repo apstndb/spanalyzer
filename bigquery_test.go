@@ -622,17 +622,9 @@ FROM EXTERNAL_QUERY(
   '''SELECT CustomerId AS customer_id, MIN(OrderDate) AS first_order_date
      FROM Orders
      GROUP BY CustomerId''')`
-	if err := bigQueryAnalyzer.prepareExternalQueryTVFCalls(sql); err != nil {
-		t.Fatalf("prepareExternalQueryTVFCalls() error = %v", err)
-	}
-	defer bigQueryAnalyzer.googleSQL.clearExternalQueryTVFCalls()
-	out, err := bigQueryAnalyzer.helper.AnalyzeStatement(sql)
+	schema, err := bigQueryAnalyzer.TableSchemaForStatement(sql)
 	if err != nil {
-		t.Fatalf("AnalyzeStatement() error = %v", err)
-	}
-	schema, err := BigQueryTableSchemaFromAnalyzerOutput(out)
-	if err != nil {
-		t.Fatalf("BigQueryTableSchemaFromAnalyzerOutput() error = %v", err)
+		t.Fatalf("TableSchemaForStatement() error = %v", err)
 	}
 	if got, want := len(schema.Fields), 2; got != want {
 		t.Fatalf("len(schema.Fields) = %d, want %d", got, want)
@@ -749,7 +741,7 @@ SELECT q.singer
 FROM EXTERNAL_QUERY(
   'spanner-conn',
   '''SELECT STRUCT(SingerId AS SingerId, FirstName AS FirstName) AS singer FROM Singers''') AS q`)
-	if err == nil || !strings.Contains(err.Error(), "STRUCT is unsupported for BigQuery Spanner federated query output") {
+	if err == nil || !strings.Contains(err.Error(), "STRUCT is unsupported for Spanner federated query output") {
 		t.Fatalf("TableSchemaForStatement() error = %v, want STRUCT rejection", err)
 	}
 }
@@ -777,4 +769,208 @@ func warningsContainRule(warnings []QueryCodegenPlanWarning, rule string) bool {
 		}
 	}
 	return false
+}
+
+func TestBigQueryAnalyzerExternalQueryOptionsArgument(t *testing.T) {
+	analyzer, err := NewBigQueryAnalyzerFromDDL("bigquery.sql", "")
+	if err != nil {
+		t.Fatalf("NewBigQueryAnalyzerFromDDL() error = %v", err)
+	}
+
+	_, err = analyzer.TableSchemaForStatement(`
+SELECT * FROM EXTERNAL_QUERY('conn', 'SELECT 1 AS x', '{"options": true}')`)
+	if err == nil || !strings.Contains(err.Error(), "EXTERNAL_QUERY options argument is currently not supported for static analysis") {
+		t.Fatalf("TableSchemaForStatement() error = %v, want options argument error", err)
+	}
+}
+
+func TestBigQueryAnalyzerExternalQueryNestedCalls(t *testing.T) {
+	spannerAnalyzerOuter, err := NewAnalyzerFromDDL("a.sql", `
+CREATE TABLE Orders (
+  Id INT64 NOT NULL,
+  Value STRING(MAX)
+) PRIMARY KEY (Id);
+`)
+	if err != nil {
+		t.Fatalf("NewAnalyzerFromDDL(a) error = %v", err)
+	}
+	spannerAnalyzerInner, err := NewAnalyzerFromDDL("b.sql", `
+CREATE TABLE Customers (
+  Id INT64 NOT NULL,
+  Name STRING(MAX)
+) PRIMARY KEY (Id);
+`)
+	if err != nil {
+		t.Fatalf("NewAnalyzerFromDDL(b) error = %v", err)
+	}
+	bigQueryAnalyzer, err := NewBigQueryAnalyzerFromDDL("bigquery.sql", "")
+	if err != nil {
+		t.Fatalf("NewBigQueryAnalyzerFromDDL() error = %v", err)
+	}
+	bigQueryAnalyzer.SetExternalQueryAnalyzers(map[string]*Analyzer{
+		"outer-conn": spannerAnalyzerOuter,
+		"inner-conn": spannerAnalyzerInner,
+	})
+
+	// The inner call is in a scalar subquery.
+	schema, err := bigQueryAnalyzer.TableSchemaForStatement(`
+SELECT o.value, (SELECT c.Name FROM EXTERNAL_QUERY('inner-conn', '''SELECT Name FROM Customers''') AS c LIMIT 1) AS inner_val
+FROM EXTERNAL_QUERY('outer-conn', '''SELECT Value AS value FROM Orders''') AS o`)
+	if err != nil {
+		t.Fatalf("TableSchemaForStatement() error = %v", err)
+	}
+	if got, want := len(schema.Fields), 2; got != want {
+		t.Fatalf("len(schema.Fields) = %d, want %d", got, want)
+	}
+	if schema.Fields[0].Name != "value" || schema.Fields[1].Name != "inner_val" {
+		t.Fatalf("fields: %+v", schema.Fields)
+	}
+}
+
+func TestBigQueryAnalyzerParseDebugStringExternalQuery(t *testing.T) {
+	analyzer, err := NewBigQueryAnalyzerFromDDL("bq.sql", "")
+	if err != nil {
+		t.Fatalf("NewBigQueryAnalyzerFromDDL() error = %v", err)
+	}
+
+	// Non-literal connection ID. Parser should accept it, but analysis would fail.
+	sql := "SELECT * FROM EXTERNAL_QUERY(CONCAT('a', 'b'), 'SELECT 1')"
+	debug, err := analyzer.ParseDebugString("query", sql)
+	if err != nil {
+		t.Errorf("ParseDebugString() error = %v, want nil", err)
+	}
+	if !strings.Contains(debug, "TVF") {
+		t.Errorf("ParseDebugString() output does not contain TVF: %s", debug)
+	}
+
+	// Unparse should also work.
+	unparsed, err := analyzer.Unparse("query", sql)
+	if err != nil {
+		t.Errorf("Unparse() error = %v, want nil", err)
+	}
+	if !strings.Contains(unparsed, "EXTERNAL_QUERY") {
+		t.Errorf("Unparse() output does not contain EXTERNAL_QUERY: %s", unparsed)
+	}
+}
+
+func TestBigQueryAnalyzerDialectFeatures(t *testing.T) {
+	analyzer, err := NewBigQueryAnalyzerFromDDL("bq.sql", "")
+	if err != nil {
+		t.Fatalf("NewBigQueryAnalyzerFromDDL() error = %v", err)
+	}
+
+	tests := []struct {
+		name    string
+		sql     string
+		wantErr string
+	}{
+		{
+			name: "Pipe syntax is supported in BigQuery",
+			sql:  "SELECT 1 AS x |> SELECT x + 1",
+		},
+		{
+			name: "QUALIFY with analytic function is supported in BigQuery",
+			sql:  "SELECT 1 AS x FROM (SELECT 1) QUALIFY ROW_NUMBER() OVER() > 0",
+		},
+		{
+			name: "JSON subscript/path navigation is supported in BigQuery",
+			sql:  "SELECT JSON '{\"a\": 1}'.a",
+		},
+		{
+			name: "BigQuery specific functions (e.g. GENERATE_UUID) are supported",
+			sql:  "SELECT GENERATE_UUID()",
+		},
+		{
+			name: "BIGNUMERIC is supported in BigQuery",
+			sql:  "SELECT BIGNUMERIC '123'",
+		},
+		{
+			name: "GEOGRAPHY is supported in BigQuery",
+			sql:  "SELECT ST_GEOGPOINT(1, 2)",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			_, err := analyzer.TableSchemaForStatement(tt.sql)
+			if tt.wantErr == "" {
+				if err != nil {
+					t.Errorf("TableSchemaForStatement() error = %v, want nil", err)
+				}
+			} else {
+				if err == nil || !strings.Contains(err.Error(), tt.wantErr) {
+					t.Errorf("TableSchemaForStatement() error = %v, want error containing %q", err, tt.wantErr)
+				}
+			}
+		})
+	}
+}
+
+func TestSpannerAnalyzerDialectFeatures(t *testing.T) {
+	analyzer, err := NewAnalyzerFromDDL("spanner.sql", "")
+	if err != nil {
+		t.Fatalf("NewAnalyzerFromDDL() error = %v", err)
+	}
+
+	tests := []struct {
+		name    string
+		sql     string
+		wantErr string
+	}{
+		{
+			name: "Pipe syntax is supported in Spanner",
+			sql:  "SELECT 1 AS x |> SELECT x + 1",
+		},
+		{
+			name: "QUALIFY is supported in Spanner",
+			sql:  "SELECT 1 AS x FROM (SELECT 1) QUALIFY ROW_NUMBER() OVER() > 0",
+		},
+		{
+			name: "JSON subscript/path navigation IS supported in Spanner",
+			sql:  "SELECT JSON '{\"a\": 1}'.a",
+		},
+		{
+			name:    "BIGNUMERIC is NOT supported in Spanner",
+			sql:     "SELECT BIGNUMERIC '123'",
+			wantErr: "BIGNUMERIC literals are not supported",
+		},
+		{
+			name:    "GEOGRAPHY is NOT supported in Spanner",
+			sql:     "SELECT ST_GEOGPOINT(1, 2)",
+			wantErr: "Function not found: ST_GEOGPOINT",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			_, err := analyzer.RowTypeForStatement(tt.sql)
+			if tt.wantErr == "" {
+				if err != nil {
+					t.Errorf("RowTypeForStatement() error = %v, want nil", err)
+				}
+			} else {
+				if err == nil || !strings.Contains(err.Error(), tt.wantErr) {
+					t.Errorf("RowTypeForStatement() error = %v, want error containing %q", err, tt.wantErr)
+				}
+			}
+		})
+	}
+}
+
+func TestBuildBigQueryGoogleSQLCatalogFromDDL_ExpandedSupport(t *testing.T) {
+	const ddl = `
+CREATE SCHEMA mydataset;
+CREATE TABLE mydataset.mytable (x INT64);
+CREATE VIEW mydataset.myview AS SELECT * FROM mydataset.mytable;
+CREATE INDEX myindex ON mydataset.mytable(x);
+DROP TABLE mydataset.mytable;
+CREATE TABLE mydataset.mytable2 (y STRING);
+CREATE TABLE FUNCTION mydataset.myfunc(p INT64) AS SELECT p AS val;
+CREATE PROCEDURE mydataset.myproc() BEGIN SELECT 1; END;
+EXPORT DATA OPTIONS(uri='gs://bucket/file') AS SELECT 1;
+`
+	_, err := BuildBigQueryGoogleSQLCatalogFromDDL("bigquery.sql", ddl)
+	if err != nil {
+		t.Fatalf("BuildBigQueryGoogleSQLCatalogFromDDL() error = %v", err)
+	}
 }

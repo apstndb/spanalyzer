@@ -129,7 +129,7 @@ type OptimizerEffective struct {
 type Query struct {
 	TargetID             string
 	Name                 string
-	Source               string
+	Catalog              string
 	Scope                string
 	Kind                 string
 	Status               string
@@ -870,7 +870,7 @@ func celQuery(query Query) map[string]interface{} {
 	return map[string]interface{}{
 		"target_id":               queryTargetID(query),
 		"name":                    query.Name,
-		"source":                  query.Source,
+		"catalog":                 query.Catalog,
 		"scope":                   query.Scope,
 		"kind":                    query.Kind,
 		"status":                  query.Status,

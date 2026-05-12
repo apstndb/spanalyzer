@@ -501,7 +501,7 @@ func (q QueryCodegenV1AlphaQuery) normalize(connections map[string]QueryCodegenV
 	query := QueryCodegenQuery{
 		Name:           q.Name,
 		Kind:           strings.ToLower(strings.TrimSpace(q.Kind)),
-		Source:         q.Catalog,
+		Catalog:        q.Catalog,
 		Result:         q.Result.Cardinality,
 		ResultStruct:   q.Result.Struct,
 		Required:       append([]string(nil), q.Result.Required.Fields...),
@@ -648,7 +648,7 @@ func (w QueryCodegenV1AlphaWrite) normalize(globalEmit QueryCodegenV1AlphaSpanne
 	}
 	write := QueryCodegenWrite{
 		Name:         w.Name,
-		Source:       w.Catalog,
+		Catalog:      w.Catalog,
 		Table:        w.Table,
 		Operation:    operation,
 		InputStruct:  w.Input.Struct,
@@ -658,10 +658,11 @@ func (w QueryCodegenV1AlphaWrite) normalize(globalEmit QueryCodegenV1AlphaSpanne
 	}
 	switch operation {
 	case "insert", "replace":
-		write.Columns = append([]string(nil), w.Insert.Columns...)
+		write.Insert.Columns = append([]string(nil), w.Insert.Columns...)
 	case "update", "insert_or_update":
-		write.UpdateMask = updateColumns
+		write.Update.Columns = updateColumns
 		if operation == "insert_or_update" {
+			write.Insert.Columns = append([]string(nil), w.Insert.Columns...)
 			if err := validateV1AlphaUpsertInsertColumns(w); err != nil {
 				return QueryCodegenWrite{}, err
 			}
@@ -1083,7 +1084,7 @@ func rejectV1AlphaUnknownQueryKeys(value interface{}) error {
 				return err
 			}
 		}
-		if err := rejectV1AlphaUnknownArrayObjectKeys(query["params"], scope+".params", stringSet("name", "type", "scope")); err != nil {
+		if err := rejectV1AlphaUnknownArrayObjectKeys(query["params"], scope+".params", stringSet("name", "type", "scope", "optional", "choices", "default")); err != nil {
 			return err
 		}
 	}

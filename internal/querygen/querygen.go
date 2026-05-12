@@ -95,11 +95,10 @@ func (a *QueryCodegenSpannerExternalDatasetAccess) UnmarshalYAML(unmarshal func(
 type QueryCodegenQuery struct {
 	Name           string                     `json:"name" yaml:"name"`
 	Kind           string                     `json:"kind,omitempty" yaml:"kind,omitempty"`
-	Source         string                     `json:"source" yaml:"source"`
-	Schema         string                     `json:"schema" yaml:"schema"`
-	SQL            string                     `json:"sql" yaml:"sql"`
-	Table          string                     `json:"table" yaml:"table"`
-	Index          string                     `json:"index" yaml:"index"`
+	Catalog        string                     `json:"catalog" yaml:"catalog"`
+	SQL            string                     `json:"sql,omitempty" yaml:"sql,omitempty"`
+	Table          string                     `json:"table,omitempty" yaml:"table,omitempty"`
+	Index          string                     `json:"index,omitempty" yaml:"index,omitempty"`
 	Federated      QueryCodegenFederatedQuery `json:"federated" yaml:"federated"`
 	KeyPrefix      []string                   `json:"key_prefix" yaml:"key_prefix"`
 	OrderBy        string                     `json:"order_by,omitempty" yaml:"order_by,omitempty"`
@@ -122,6 +121,20 @@ type QueryCodegenParam struct {
 	Name  string `json:"name" yaml:"name"`
 	Type  string `json:"type" yaml:"type"`
 	Scope string `json:"scope,omitempty" yaml:"scope,omitempty"`
+	// Optional selects how this parameter shapes the generated SQL. The
+	// empty string is equivalent to "required" (current behavior). See
+	// internal/optparam for the full data model.
+	//
+	// Supported values: "required", "null_is_null", "omit_when_null",
+	// "omit_when_empty", "orderby_choice".
+	Optional string `json:"optional,omitempty" yaml:"optional,omitempty"`
+	// Choices is the allowlist of ORDER BY clauses for an
+	// orderby_choice param, keyed by the runtime choice key.
+	Choices map[string]string `json:"choices,omitempty" yaml:"choices,omitempty"`
+	// Default is the choice key used when the runtime caller does not
+	// specify one. Required for orderby_choice; must match a key in
+	// Choices.
+	Default string `json:"default,omitempty" yaml:"default,omitempty"`
 }
 
 type QueryCodegenVetConfig struct {
@@ -136,18 +149,31 @@ type QueryCodegenVetDisable struct {
 }
 
 type QueryCodegenWrite struct {
-	Name         string                `json:"name" yaml:"name"`
-	Source       string                `json:"source" yaml:"source"`
-	Schema       string                `json:"schema" yaml:"schema"`
-	Table        string                `json:"table" yaml:"table"`
-	Operation    string                `json:"operation" yaml:"operation"`
-	InputStruct  string                `json:"input_struct" yaml:"input_struct"`
-	Columns      []string              `json:"columns" yaml:"columns"`
-	UpdateMask   []string              `json:"update_mask" yaml:"update_mask"`
-	Keys         []string              `json:"keys" yaml:"keys"`
-	Methods      []string              `json:"methods" yaml:"methods"`
-	EmitExplicit bool                  `json:"-" yaml:"-"`
-	Vet          QueryCodegenVetConfig `json:"vet" yaml:"vet"`
+	Name         string                    `json:"name" yaml:"name"`
+	Catalog      string                    `json:"catalog" yaml:"catalog"`
+	Table        string                    `json:"table" yaml:"table"`
+	Operation    string                    `json:"operation" yaml:"operation"`
+	InputStruct  string                    `json:"input_struct" yaml:"input_struct"`
+	Keys         []string                  `json:"keys" yaml:"keys"`
+	Insert       QueryCodegenWriteInsert   `json:"insert,omitempty" yaml:"insert,omitempty"`
+	Update       QueryCodegenWriteUpdate   `json:"update,omitempty" yaml:"update,omitempty"`
+	Conflict     QueryCodegenWriteConflict `json:"conflict,omitempty" yaml:"conflict,omitempty"`
+	Methods      []string                  `json:"methods" yaml:"methods"`
+	EmitExplicit bool                      `json:"-" yaml:"-"`
+	Vet          QueryCodegenVetConfig     `json:"vet" yaml:"vet"`
+}
+
+type QueryCodegenWriteInsert struct {
+	Columns []string `json:"columns,omitempty" yaml:"columns,omitempty"`
+}
+
+type QueryCodegenWriteUpdate struct {
+	Columns []string `json:"columns,omitempty" yaml:"columns,omitempty"`
+}
+
+type QueryCodegenWriteConflict struct {
+	Target   []string `json:"target,omitempty" yaml:"target,omitempty"`
+	Strategy string   `json:"strategy,omitempty" yaml:"strategy,omitempty"`
 }
 
 const autoAllNonKeyColumns = "auto_all_non_key_columns"
@@ -171,15 +197,15 @@ type QueryCodegenPlanGenerator struct {
 }
 
 type QueryCodegenPlanDigest struct {
-	Source string `json:"source" yaml:"source"`
-	Kind   string `json:"kind" yaml:"kind"`
-	Path   string `json:"path,omitempty" yaml:"path,omitempty"`
-	SHA256 string `json:"sha256" yaml:"sha256"`
+	Catalog string `json:"catalog" yaml:"catalog"`
+	Kind    string `json:"kind" yaml:"kind"`
+	Path    string `json:"path,omitempty" yaml:"path,omitempty"`
+	SHA256  string `json:"sha256" yaml:"sha256"`
 }
 
 type QueryCodegenPlanQuery struct {
 	Name            string                           `json:"name" yaml:"name"`
-	Source          string                           `json:"source" yaml:"source"`
+	Catalog         string                           `json:"catalog" yaml:"catalog"`
 	Kind            string                           `json:"kind" yaml:"kind"`
 	Result          string                           `json:"result" yaml:"result"`
 	OrderBy         string                           `json:"order_by,omitempty" yaml:"order_by,omitempty"`
@@ -193,10 +219,28 @@ type QueryCodegenPlanQuery struct {
 	VetSuppressions []QueryCodegenPlanVetSuppression `json:"vet_suppressions,omitempty" yaml:"vet_suppressions,omitempty"`
 	Warnings        []QueryCodegenPlanWarning        `json:"warnings,omitempty" yaml:"warnings,omitempty"`
 	Fields          []QueryCodegenPlanField          `json:"fields,omitempty" yaml:"fields,omitempty"`
+	// Variants is the per-shape plan-contract entry produced by
+	// optparam.BuildPlanVariants. It is populated only for queries
+	// that use one or more optional markers. The top-level SQL /
+	// SQLSHA256 fields stay populated with the all-on variant so
+	// existing consumers continue to work.
+	Variants []QueryCodegenPlanQueryVariant `json:"variants,omitempty" yaml:"variants,omitempty"`
+}
+
+// QueryCodegenPlanQueryVariant is one row of the per-variant plan
+// contract for a query with optional markers. The shape mirrors
+// internal/optparam.PlanQueryVariant.
+type QueryCodegenPlanQueryVariant struct {
+	Label             string            `json:"label" yaml:"label"`
+	SQL               string            `json:"sql" yaml:"sql"`
+	SQLSHA256         string            `json:"sql_sha256" yaml:"sql_sha256"`
+	PresentParams     []string          `json:"present_params,omitempty" yaml:"present_params,omitempty"`
+	AbsentParams      []string          `json:"absent_params,omitempty" yaml:"absent_params,omitempty"`
+	ChoiceAssignments map[string]string `json:"choice_assignments,omitempty" yaml:"choice_assignments,omitempty"`
 }
 
 type QueryCodegenPlanStarExpansion struct {
-	Source         string                     `json:"source" yaml:"source"`
+	Catalog        string                     `json:"catalog" yaml:"catalog"`
 	ProjectionLoss bool                       `json:"projection_loss" yaml:"projection_loss"`
 	OmittedColumns []string                   `json:"omitted_columns,omitempty" yaml:"omitted_columns,omitempty"`
 	Projection     QueryCodegenPlanProjection `json:"projection" yaml:"projection"`
@@ -204,7 +248,7 @@ type QueryCodegenPlanStarExpansion struct {
 
 type QueryCodegenPlanRelation struct {
 	SQLPath        string                     `json:"sql_path" yaml:"sql_path"`
-	Source         string                     `json:"source" yaml:"source"`
+	Catalog        string                     `json:"catalog" yaml:"catalog"`
 	Role           string                     `json:"role" yaml:"role"`
 	Allowed        bool                       `json:"allowed" yaml:"allowed"`
 	WritableTarget bool                       `json:"writable_target" yaml:"writable_target"`
@@ -227,12 +271,13 @@ type QueryCodegenPlanConstant struct {
 
 type QueryCodegenPlanWrite struct {
 	Name                    string                             `json:"name" yaml:"name"`
-	Source                  string                             `json:"source" yaml:"source"`
+	Catalog                 string                             `json:"catalog" yaml:"catalog"`
 	Table                   string                             `json:"table" yaml:"table"`
 	Operation               string                             `json:"operation" yaml:"operation"`
 	InputStruct             string                             `json:"input_struct" yaml:"input_struct"`
 	Keys                    []string                           `json:"keys,omitempty" yaml:"keys,omitempty"`
-	Columns                 []string                           `json:"columns,omitempty" yaml:"columns,omitempty"`
+	InsertColumns           []string                           `json:"insert_columns,omitempty" yaml:"insert_columns,omitempty"`
+	UpdateColumns           []string                           `json:"update_columns,omitempty" yaml:"update_columns,omitempty"`
 	Methods                 []string                           `json:"methods,omitempty" yaml:"methods,omitempty"`
 	ColumnCapabilities      []QueryCodegenPlanColumnCapability `json:"column_capabilities,omitempty" yaml:"column_capabilities,omitempty"`
 	ServerSideUpdateEffects []QueryCodegenPlanServerSideEffect `json:"server_side_update_effects,omitempty" yaml:"server_side_update_effects,omitempty"`
@@ -291,6 +336,7 @@ func GenerateQueryCode(config QueryCodegenConfig, baseDir string) (string, error
 	}
 	structs := map[string][]goResultField{}
 	constants := make([]generatedGoConst, 0, len(config.Queries))
+	var querySpecs []resolvedQuerySpec
 	for _, query := range config.Queries {
 		if query.Name == "" {
 			return "", fmt.Errorf("query name is required")
@@ -305,7 +351,7 @@ func GenerateQueryCode(config QueryCodegenConfig, baseDir string) (string, error
 		if err := validateQueryCodegenParams(query); err != nil {
 			return "", err
 		}
-		fields, err := analyzeCodegenQuery(schemas, query, baseDir)
+		fields, _, err := analyzeCodegenQuery(schemas, query, baseDir)
 		if err != nil {
 			return "", err
 		}
@@ -320,11 +366,32 @@ func GenerateQueryCode(config QueryCodegenConfig, baseDir string) (string, error
 		}
 		structs[structName] = merged
 		constants = append(constants, queryGoConstants(query)...)
+		sourceName, _ := querySourceName(schemas, query)
+		querySpecs = append(querySpecs, resolvedQuerySpec{
+			Name:         query.Name,
+			MethodPrefix: exportedIdentifier(query.Name, "Query"),
+			ResultStruct: structName,
+			ResultMode:   queryResultMode(query),
+			Params:       query.Params,
+			Dialect:      emptyDefault(schemas[sourceName].Dialect, "spanner"),
+		})
 	}
 	writeImports, writeCode, err := generateWriteCode(schemas, config.Writes, baseDir, structs)
 	if err != nil {
 		return "", err
 	}
+	var queryMethods bytes.Buffer
+	methodImports := map[string]struct{}{}
+	for _, spec := range querySpecs {
+		queryMethods.WriteByte('\n')
+		writeQueryMethods(&queryMethods, spec, methodImports)
+	}
+	allImports := make([]string, 0, len(writeImports)+len(methodImports))
+	allImports = append(allImports, writeImports...)
+	for imp := range methodImports {
+		allImports = append(allImports, imp)
+	}
+
 	names := make([]string, 0, len(structs))
 	for name := range structs {
 		names = append(names, name)
@@ -334,7 +401,160 @@ func GenerateQueryCode(config QueryCodegenConfig, baseDir string) (string, error
 	for _, name := range names {
 		namedStructs = append(namedStructs, namedGoStruct{Name: name, Fields: structs[name]})
 	}
-	return generateGoStructsWithExtra(namedStructs, options, constants, writeImports, writeCode)
+	return generateGoStructsWithExtra(namedStructs, options, constants, allImports, writeCode+queryMethods.String())
+}
+
+type resolvedQuerySpec struct {
+	Name         string
+	MethodPrefix string
+	ResultStruct string
+	ResultMode   string
+	Params       []QueryCodegenParam
+	Dialect      string
+}
+
+func writeQueryMethods(b *bytes.Buffer, spec resolvedQuerySpec, imports map[string]struct{}) {
+	switch strings.ToLower(spec.Dialect) {
+	case "bigquery":
+		writeBigQueryMethods(b, spec, imports)
+	default:
+		writeSpannerMethods(b, spec, imports)
+	}
+}
+
+func writeSpannerMethods(b *bytes.Buffer, spec resolvedQuerySpec, imports map[string]struct{}) {
+	imports["context"] = struct{}{}
+	imports["cloud.google.com/go/spanner"] = struct{}{}
+	constName := spec.MethodPrefix + "SQL"
+	switch spec.ResultMode {
+	case "many":
+		fmt.Fprintf(b, "// %s returns a Cloud Spanner row iterator.\n", spec.MethodPrefix)
+		fmt.Fprintf(b, "func %s(ctx context.Context, tx spanner.ReadOnlyTransaction, params map[string]interface{}) *spanner.RowIterator {\n", spec.MethodPrefix)
+		fmt.Fprintf(b, "\treturn tx.Query(ctx, spanner.Statement{SQL: %s, Params: params})\n", constName)
+		b.WriteString("}\n")
+		fmt.Fprintf(b, "// %sAll returns all Cloud Spanner rows as a slice.\n", spec.MethodPrefix)
+		fmt.Fprintf(b, "func %sAll(ctx context.Context, tx spanner.ReadOnlyTransaction, params map[string]interface{}) ([]*%s, error) {\n", spec.MethodPrefix, spec.ResultStruct)
+		fmt.Fprintf(b, "\tit := %s(ctx, tx, params)\n", spec.MethodPrefix)
+		b.WriteString("\tdefer it.Stop()\n")
+		fmt.Fprintf(b, "\tvar out []*%s\n", spec.ResultStruct)
+		b.WriteString("\tfor {\n")
+		b.WriteString("\t\trow, err := it.Next()\n")
+		b.WriteString("\t\tif err == iterator.Done {\n")
+		b.WriteString("\t\t\treturn out, nil\n")
+		b.WriteString("\t\t}\n")
+		b.WriteString("\t\tif err != nil {\n")
+		b.WriteString("\t\t\treturn nil, err\n")
+		b.WriteString("\t\t}\n")
+		fmt.Fprintf(b, "\t\tvar r %s\n", spec.ResultStruct)
+		b.WriteString("\t\tif err := row.ToStruct(&r); err != nil {\n")
+		b.WriteString("\t\t\treturn nil, err\n")
+		b.WriteString("\t\t}\n")
+		b.WriteString("\t\tout = append(out, &r)\n")
+		b.WriteString("\t}\n")
+		b.WriteString("}\n")
+	case "one", "maybe_one":
+		imports["google.golang.org/api/iterator"] = struct{}{}
+		fmt.Fprintf(b, "// %s returns a single Cloud Spanner row.\n", spec.MethodPrefix)
+		fmt.Fprintf(b, "func %s(ctx context.Context, tx spanner.ReadOnlyTransaction, params map[string]interface{}) (*%s, error) {\n", spec.MethodPrefix, spec.ResultStruct)
+		fmt.Fprintf(b, "\tit := tx.Query(ctx, spanner.Statement{SQL: %s, Params: params})\n", constName)
+		b.WriteString("\tdefer it.Stop()\n")
+		b.WriteString("\trow, err := it.Next()\n")
+		b.WriteString("\tif err != nil {\n")
+		if spec.ResultMode == "one" {
+			b.WriteString("\t\treturn nil, err\n")
+		} else {
+			b.WriteString("\t\tif err == iterator.Done {\n")
+			b.WriteString("\t\t\treturn nil, nil\n")
+			b.WriteString("\t\t}\n")
+			b.WriteString("\t\treturn nil, err\n")
+		}
+		b.WriteString("\t}\n")
+		b.WriteString("\tif _, err := it.Next(); err != iterator.Done {\n")
+		b.WriteString("\t\tif err == nil {\n")
+		fmt.Fprintf(b, "\t\t\treturn nil, fmt.Errorf(\"query %%s: expected at most one row, but got multiple\", %q)\n", spec.Name)
+		b.WriteString("\t\t}\n")
+		b.WriteString("\t\treturn nil, err\n")
+		b.WriteString("\t}\n")
+		fmt.Fprintf(b, "\tvar r %s\n", spec.ResultStruct)
+		b.WriteString("\tif err := row.ToStruct(&r); err != nil {\n")
+		b.WriteString("\t\treturn nil, err\n")
+		b.WriteString("\t}\n")
+		b.WriteString("\treturn &r, nil\n")
+		b.WriteString("}\n")
+	case "row_count":
+		fmt.Fprintf(b, "// %s executes a Cloud Spanner DML statement and returns the row count.\n", spec.MethodPrefix)
+		fmt.Fprintf(b, "func %s(ctx context.Context, tx spanner.ReadWriteTransaction, params map[string]interface{}) (int64, error) {\n", spec.MethodPrefix)
+		fmt.Fprintf(b, "\treturn tx.Update(ctx, spanner.Statement{SQL: %s, Params: params})\n", constName)
+		b.WriteString("}\n")
+	case "row_set":
+		fmt.Fprintf(b, "// %s executes a Cloud Spanner DML statement with THEN RETURN and returns a row iterator.\n", spec.MethodPrefix)
+		fmt.Fprintf(b, "func %s(ctx context.Context, tx spanner.ReadWriteTransaction, params map[string]interface{}) *spanner.RowIterator {\n", spec.MethodPrefix)
+		fmt.Fprintf(b, "\treturn tx.Query(ctx, spanner.Statement{SQL: %s, Params: params})\n", constName)
+		b.WriteString("}\n")
+	}
+}
+
+func writeBigQueryMethods(b *bytes.Buffer, spec resolvedQuerySpec, imports map[string]struct{}) {
+	imports["context"] = struct{}{}
+	imports["cloud.google.com/go/bigquery"] = struct{}{}
+	constName := spec.MethodPrefix + "SQL"
+	switch spec.ResultMode {
+	case "many":
+		imports["google.golang.org/api/iterator"] = struct{}{}
+		fmt.Fprintf(b, "// %s returns a BigQuery row iterator.\n", spec.MethodPrefix)
+		fmt.Fprintf(b, "func %s(ctx context.Context, client *bigquery.Client, params []bigquery.QueryParameter) (*bigquery.RowIterator, error) {\n", spec.MethodPrefix)
+		fmt.Fprintf(b, "\tq := client.Query(%s)\n", constName)
+		b.WriteString("\tq.Parameters = params\n")
+		b.WriteString("\treturn q.Read(ctx)\n")
+		b.WriteString("}\n")
+		fmt.Fprintf(b, "// %sAll returns all BigQuery rows as a slice.\n", spec.MethodPrefix)
+		fmt.Fprintf(b, "func %sAll(ctx context.Context, client *bigquery.Client, params []bigquery.QueryParameter) ([]*%s, error) {\n", spec.MethodPrefix, spec.ResultStruct)
+		fmt.Fprintf(b, "\tit, err := %s(ctx, client, params)\n", spec.MethodPrefix)
+		b.WriteString("\tif err != nil {\n")
+		b.WriteString("\t\treturn nil, err\n")
+		b.WriteString("\t}\n")
+		fmt.Fprintf(b, "\tvar out []*%s\n", spec.ResultStruct)
+		b.WriteString("\tfor {\n")
+		fmt.Fprintf(b, "\t\tvar r %s\n", spec.ResultStruct)
+		b.WriteString("\t\terr := it.Next(&r)\n")
+		b.WriteString("\t\tif err == iterator.Done {\n")
+		b.WriteString("\t\t\treturn out, nil\n")
+		b.WriteString("\t\t}\n")
+		b.WriteString("\t\tif err != nil {\n")
+		b.WriteString("\t\t\treturn nil, err\n")
+		b.WriteString("\t\t}\n")
+		b.WriteString("\t\tout = append(out, &r)\n")
+		b.WriteString("\t}\n")
+		b.WriteString("}\n")
+	case "one", "maybe_one":
+		imports["google.golang.org/api/iterator"] = struct{}{}
+		fmt.Fprintf(b, "// %s returns a single BigQuery row.\n", spec.MethodPrefix)
+		fmt.Fprintf(b, "func %s(ctx context.Context, client *bigquery.Client, params []bigquery.QueryParameter) (*%s, error) {\n", spec.MethodPrefix, spec.ResultStruct)
+		fmt.Fprintf(b, "\tit, err := %s(ctx, client, params)\n", spec.MethodPrefix)
+		b.WriteString("\tif err != nil {\n")
+		b.WriteString("\t\treturn nil, err\n")
+		b.WriteString("\t}\n")
+		fmt.Fprintf(b, "\tvar r %s\n", spec.ResultStruct)
+		b.WriteString("\terr = it.Next(&r)\n")
+		b.WriteString("\tif err != nil {\n")
+		if spec.ResultMode == "one" {
+			b.WriteString("\t\treturn nil, err\n")
+		} else {
+			b.WriteString("\t\tif err == iterator.Done {\n")
+			b.WriteString("\t\t\treturn nil, nil\n")
+			b.WriteString("\t\t}\n")
+			b.WriteString("\t\treturn nil, err\n")
+		}
+		b.WriteString("\t}\n")
+		b.WriteString("\tif err := it.Next(&r); err != iterator.Done {\n")
+		b.WriteString("\t\tif err == nil {\n")
+		fmt.Fprintf(b, "\t\t\treturn nil, fmt.Errorf(\"query %%s: expected at most one row, but got multiple\", %q)\n", spec.Name)
+		b.WriteString("\t\t}\n")
+		b.WriteString("\t\treturn nil, err\n")
+		b.WriteString("\t}\n")
+		b.WriteString("\treturn &r, nil\n")
+		b.WriteString("}\n")
+	}
 }
 
 func queryCodegenSchemas(config QueryCodegenConfig) (map[string]QueryCodegenSchema, error) {
@@ -391,10 +611,10 @@ func queryCodegenSchemaDigests(schemas map[string]QueryCodegenSchema, baseDir st
 			return nil, fmt.Errorf("schema %s: %w", name, err)
 		}
 		out = append(out, QueryCodegenPlanDigest{
-			Source: name,
-			Kind:   "ddl",
-			Path:   path,
-			SHA256: digestString(ddl),
+			Catalog: name,
+			Kind:    "ddl",
+			Path:    path,
+			SHA256:  digestString(ddl),
 		})
 		for _, descriptorPath := range schema.ProtoDescriptorFiles {
 			path := resolveCodegenPath(baseDir, descriptorPath)
@@ -403,10 +623,10 @@ func queryCodegenSchemaDigests(schemas map[string]QueryCodegenSchema, baseDir st
 				return nil, fmt.Errorf("schema %s proto descriptor %s: %w", name, descriptorPath, err)
 			}
 			out = append(out, QueryCodegenPlanDigest{
-				Source: name,
-				Kind:   "proto_descriptor",
-				Path:   path,
-				SHA256: digestBytes(data),
+				Catalog: name,
+				Kind:    "proto_descriptor",
+				Path:    path,
+				SHA256:  digestBytes(data),
 			})
 		}
 	}
@@ -491,7 +711,7 @@ func BuildQueryCodegenPlan(config QueryCodegenConfig, baseDir string) (*QueryCod
 		if err := validateQueryCodegenParams(query); err != nil {
 			return nil, err
 		}
-		fields, err := analyzeCodegenQuery(schemas, query, baseDir)
+		fields, variants, err := analyzeCodegenQuery(schemas, query, baseDir)
 		if err != nil {
 			return nil, err
 		}
@@ -514,17 +734,26 @@ func BuildQueryCodegenPlan(config QueryCodegenConfig, baseDir string) (*QueryCod
 			return nil, err
 		}
 		applyWarningSeverityOverrides(warnings, config.RuleSeverity)
+		topSQL, topSHA := query.SQL, digestString(query.SQL)
+		if len(variants) > 0 {
+			// Use the all-on (most-fields-present) variant as the
+			// canonical SQL so existing single-SQL consumers see the
+			// fully-expanded shape.
+			top := pickCanonicalVariant(variants)
+			topSQL, topSHA = top.SQL, top.SQLSHA256
+		}
 		plan.Queries = append(plan.Queries, QueryCodegenPlanQuery{
 			Name:            query.Name,
-			Source:          sourceName,
+			Catalog:         sourceName,
 			Kind:            queryKind(query),
 			Result:          queryResultMode(query),
 			OrderBy:         queryPlanOrderByMode(schemas[sourceName], query),
-			SQL:             query.SQL,
-			SQLSHA256:       digestString(query.SQL),
+			SQL:             topSQL,
+			SQLSHA256:       topSHA,
 			ResultStruct:    structName,
 			Constants:       planConstants(queryGoConstants(query)),
 			Params:          append([]QueryCodegenParam(nil), query.Params...),
+			Variants:        variants,
 			StarExpansion:   queryPlanStarExpansion(query, plan.CatalogBindings),
 			Relations:       queryPlanRelations(query, plan.CatalogBindings),
 			VetSuppressions: planVetSuppressions(query.Vet),
@@ -539,12 +768,13 @@ func BuildQueryCodegenPlan(config QueryCodegenConfig, baseDir string) (*QueryCod
 	for _, spec := range writeSpecs {
 		plan.Writes = append(plan.Writes, QueryCodegenPlanWrite{
 			Name:                    spec.Name,
-			Source:                  spec.Source,
+			Catalog:                 spec.Catalog,
 			Table:                   spec.Table,
 			Operation:               spec.Operation,
 			InputStruct:             spec.InputStruct,
 			Keys:                    columnNamesFromColumns(spec.Keys),
-			Columns:                 columnNamesFromColumns(spec.Columns),
+			InsertColumns:           columnNamesFromColumns(spec.InsertColumns),
+			UpdateColumns:           columnNamesFromColumns(spec.UpdateColumns),
 			Methods:                 spec.Methods,
 			ColumnCapabilities:      planColumnCapabilities(spec.AllColumns),
 			ServerSideUpdateEffects: planServerSideUpdateEffects(spec),
@@ -641,7 +871,7 @@ func queryPlanStarExpansion(query QueryCodegenQuery, bindings []BigQuerySpannerE
 	if !sqlHasStarToken(query.SQL) {
 		return nil
 	}
-	expansion := &QueryCodegenPlanStarExpansion{Source: "sql"}
+	expansion := &QueryCodegenPlanStarExpansion{Catalog: "sql"}
 	var omitted []string
 	matchedExternalDataset := false
 	for _, binding := range bindings {
@@ -650,7 +880,7 @@ func queryPlanStarExpansion(query QueryCodegenQuery, bindings []BigQuerySpannerE
 				continue
 			}
 			matchedExternalDataset = true
-			expansion.Source = "external_dataset_projection"
+			expansion.Catalog = "external_dataset_projection"
 			for _, column := range table.Columns {
 				if column.Visible {
 					continue
@@ -688,7 +918,7 @@ func spannerExternalDatasetRelations(sql string, bindings []BigQuerySpannerExter
 			}
 			relation := QueryCodegenPlanRelation{
 				SQLPath:        table.BigQueryTable,
-				Source:         "spanner_external_dataset_projection",
+				Catalog:        "spanner_external_dataset_projection",
 				Role:           role,
 				Allowed:        role == "select_source",
 				WritableTarget: false,
@@ -846,12 +1076,12 @@ func planServerSideUpdateEffects(spec resolvedWriteSpec) []QueryCodegenPlanServe
 	if spec.Operation != "update" && spec.Operation != "insert_or_update" {
 		return nil
 	}
-	if len(spec.Columns) == 0 {
+	if len(spec.UpdateColumns) == 0 {
 		return nil
 	}
 	out := []QueryCodegenPlanServerSideEffect{}
 	for _, column := range spec.AllColumns {
-		if column.OnUpdateSQL == "" || containsColumn(spec.Columns, column.Name) {
+		if column.OnUpdateSQL == "" || containsColumn(spec.UpdateColumns, column.Name) {
 			continue
 		}
 		out = append(out, QueryCodegenPlanServerSideEffect{
@@ -886,7 +1116,7 @@ func queryResultMode(query QueryCodegenQuery) string {
 
 func validateQueryCodegenQuery(query QueryCodegenQuery) error {
 	switch queryResultMode(query) {
-	case "one", "maybe_one", "many":
+	case "one", "maybe_one", "many", "row_count", "row_set":
 	default:
 		return fmt.Errorf("query %s: unsupported result %q", query.Name, query.Result)
 	}
@@ -980,8 +1210,46 @@ func validateQueryCodegenParams(query QueryCodegenQuery) error {
 			}
 			seenScoped[nameKey] = true
 		}
+		if err := validateQueryCodegenOptionalParam(query.Name, param); err != nil {
+			return err
+		}
 	}
 	return nil
+}
+
+func validateQueryCodegenOptionalParam(queryName string, param QueryCodegenParam) error {
+	mode := strings.ToLower(strings.TrimSpace(param.Optional))
+	switch mode {
+	case "", "required":
+		if len(param.Choices) > 0 {
+			return fmt.Errorf("query %s param %s: choices is only valid for optional: orderby_choice", queryName, param.Name)
+		}
+		if param.Default != "" {
+			return fmt.Errorf("query %s param %s: default is only valid for optional: orderby_choice", queryName, param.Name)
+		}
+		return nil
+	case "null_is_null", "omit_when_null", "omit_when_empty":
+		if len(param.Choices) > 0 {
+			return fmt.Errorf("query %s param %s: choices is only valid for optional: orderby_choice", queryName, param.Name)
+		}
+		if param.Default != "" {
+			return fmt.Errorf("query %s param %s: default is only valid for optional: orderby_choice", queryName, param.Name)
+		}
+		return nil
+	case "orderby_choice":
+		if len(param.Choices) == 0 {
+			return fmt.Errorf("query %s param %s: optional: orderby_choice requires choices", queryName, param.Name)
+		}
+		if param.Default == "" {
+			return fmt.Errorf("query %s param %s: optional: orderby_choice requires default", queryName, param.Name)
+		}
+		if _, ok := param.Choices[param.Default]; !ok {
+			return fmt.Errorf("query %s param %s: default %q must be one of choices", queryName, param.Name, param.Default)
+		}
+		return nil
+	default:
+		return fmt.Errorf("query %s param %s: unsupported optional %q; use required, null_is_null, omit_when_null, omit_when_empty, or orderby_choice", queryName, param.Name, param.Optional)
+	}
 }
 
 func addSpannerQueryParameter(analyzer *Analyzer, queryName string, param QueryCodegenParam) error {
@@ -1145,71 +1413,99 @@ func federatedTypeWarnings(path string, typ *spannerpb.Type) []QueryCodegenPlanW
 	}
 }
 
-func analyzeCodegenQuery(schemas map[string]QueryCodegenSchema, query QueryCodegenQuery, baseDir string) ([]goResultField, error) {
+func analyzeCodegenQuery(schemas map[string]QueryCodegenSchema, query QueryCodegenQuery, baseDir string) ([]goResultField, []QueryCodegenPlanQueryVariant, error) {
 	if query.Name == "" {
-		return nil, fmt.Errorf("query name is required")
+		return nil, nil, fmt.Errorf("query name is required")
 	}
 	schemaName, err := querySourceName(schemas, query)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	schema, ok := schemas[schemaName]
 	if !ok {
-		return nil, fmt.Errorf("query %s: unknown schema %q", query.Name, schemaName)
+		return nil, nil, fmt.Errorf("query %s: unknown schema %q", query.Name, schemaName)
 	}
 	ddlPath, ddl, err := readCodegenDDL(schema, baseDir)
 	if err != nil {
-		return nil, fmt.Errorf("query %s schema %s: %w", query.Name, schemaName, err)
+		return nil, nil, fmt.Errorf("query %s schema %s: %w", query.Name, schemaName, err)
 	}
 	switch strings.ToLower(emptyDefault(schema.Dialect, "spanner")) {
 	case "spanner":
+		if queryHasOptionalMarkers(query) {
+			if queryResultMode(query) == "row_count" {
+				return nil, nil, fmt.Errorf("query %s: optional markers are not supported on DML row_count queries yet", query.Name)
+			}
+			fields, variants, err := analyzeCodegenQuerySpannerVariants(ddlPath, ddl, schema, query, baseDir)
+			if err != nil {
+				return nil, nil, fmt.Errorf("query %s: %w", query.Name, err)
+			}
+			return fields, variants, nil
+		}
 		protoPaths := resolveCodegenPaths(baseDir, schema.ProtoDescriptorFiles)
 		analyzer, err := NewAnalyzerFromDDLWithProtoDescriptorFiles(ddlPath, ddl, protoPaths)
 		if err != nil {
-			return nil, fmt.Errorf("query %s: %w", query.Name, err)
+			return nil, nil, fmt.Errorf("query %s: %w", query.Name, err)
 		}
 		for _, param := range query.Params {
 			if err := addSpannerQueryParameter(analyzer, query.Name, param); err != nil {
-				return nil, err
+				return nil, nil, err
 			}
+		}
+		if queryResultMode(query) == "row_count" {
+			return nil, nil, nil
 		}
 		rowType, err := analyzer.RowTypeForStatement(query.SQL)
 		if err != nil {
-			return nil, fmt.Errorf("query %s: %w", query.Name, err)
+			return nil, nil, fmt.Errorf("query %s: %w", query.Name, err)
 		}
 		fields := make([]goResultField, 0, len(rowType.Fields))
 		for _, field := range rowType.Fields {
 			fields = append(fields, goResultFieldFromSpanner(field.Name, field.Type))
 		}
-		return fields, nil
+		return fields, nil, nil
 	case "bigquery":
+		if queryHasOptionalMarkers(query) {
+			return nil, nil, fmt.Errorf("query %s: optional markers are not supported on bigquery dialect yet", query.Name)
+		}
 		analyzer, err := NewBigQueryAnalyzerFromDDL(ddlPath, ddl)
 		if err != nil {
-			return nil, fmt.Errorf("query %s: %w", query.Name, err)
+			return nil, nil, fmt.Errorf("query %s: %w", query.Name, err)
 		}
 		if _, err := addCodegenSpannerExternalDatasets(analyzer, schemas, schema, baseDir); err != nil {
-			return nil, fmt.Errorf("query %s: %w", query.Name, err)
+			return nil, nil, fmt.Errorf("query %s: %w", query.Name, err)
 		}
 		externalAnalyzers, err := buildCodegenExternalAnalyzers(schemas, schema, baseDir)
 		if err != nil {
-			return nil, fmt.Errorf("query %s: %w", query.Name, err)
+			return nil, nil, fmt.Errorf("query %s: %w", query.Name, err)
 		}
 		if err := addBigQueryScopedQueryParams(analyzer, externalAnalyzers, query); err != nil {
-			return nil, err
+			return nil, nil, err
 		}
 		analyzer.SetExternalQueryAnalyzers(externalAnalyzers)
 		tableSchema, err := analyzer.TableSchemaForStatement(query.SQL)
 		if err != nil {
-			return nil, fmt.Errorf("query %s: %w", query.Name, err)
+			return nil, nil, fmt.Errorf("query %s: %w", query.Name, err)
 		}
 		fields := make([]goResultField, 0, len(tableSchema.Fields))
 		for _, field := range tableSchema.Fields {
 			fields = append(fields, goResultFieldFromBigQuery(field))
 		}
-		return fields, nil
+		return fields, nil, nil
 	default:
-		return nil, fmt.Errorf("query %s: unsupported schema dialect %q", query.Name, schema.Dialect)
+		return nil, nil, fmt.Errorf("query %s: unsupported schema dialect %q", query.Name, schema.Dialect)
 	}
+}
+
+// queryHasOptionalMarkers reports whether any param triggers the
+// per-variant analyzer path.
+func queryHasOptionalMarkers(query QueryCodegenQuery) bool {
+	for _, p := range query.Params {
+		switch strings.ToLower(strings.TrimSpace(p.Optional)) {
+		case "null_is_null", "omit_when_null", "omit_when_empty", "orderby_choice":
+			return true
+		}
+	}
+	return false
 }
 
 func buildCodegenExternalAnalyzers(schemas map[string]QueryCodegenSchema, schema QueryCodegenSchema, baseDir string) (map[string]*Analyzer, error) {
@@ -1379,10 +1675,7 @@ func isZeroQueryCodegenVerification(verification QueryCodegenSpannerExternalData
 }
 
 func querySourceName(schemas map[string]QueryCodegenSchema, query QueryCodegenQuery) (string, error) {
-	schemaName := query.Source
-	if schemaName == "" {
-		schemaName = query.Schema
-	}
+	schemaName := query.Catalog
 	if schemaName == "" {
 		if _, ok := schemas["default"]; ok {
 			schemaName = "default"
@@ -1391,11 +1684,11 @@ func querySourceName(schemas map[string]QueryCodegenSchema, query QueryCodegenQu
 				schemaName = name
 			}
 		} else {
-			return "", fmt.Errorf("query %s: schema is required when multiple schemas are configured", query.Name)
+			return "", fmt.Errorf("query %s: catalog is required when multiple catalogs are configured", query.Name)
 		}
 	}
 	if _, ok := schemas[schemaName]; !ok {
-		return "", fmt.Errorf("query %s: unknown schema %q", query.Name, schemaName)
+		return "", fmt.Errorf("query %s: unknown catalog %q", query.Name, schemaName)
 	}
 	return schemaName, nil
 }
@@ -1809,7 +2102,7 @@ func validateSharedWriteInputFields(spec resolvedWriteSpec, fields []goResultFie
 	for _, field := range fields {
 		fieldNames[columnKey(field.Name)] = true
 	}
-	for _, column := range appendMissingColumns(spec.Columns, spec.Keys) {
+	for _, column := range spec.InputColumns {
 		if !fieldNames[columnKey(column.Name)] {
 			return fmt.Errorf("write %s input_struct %s is shared with query results but has no field for column %s", spec.Name, spec.InputStruct, column.Name)
 		}
@@ -1820,12 +2113,14 @@ func validateSharedWriteInputFields(spec resolvedWriteSpec, fields []goResultFie
 type resolvedWriteSpec struct {
 	Name            string
 	MethodPrefix    string
-	Source          string
+	Catalog         string
 	Table           string
 	Operation       string
 	InputStruct     string
 	AllColumns      []*Column
-	Columns         []*Column
+	InsertColumns   []*Column
+	UpdateColumns   []*Column
+	InputColumns    []*Column
 	Keys            []*Column
 	Fields          []goResultField
 	Methods         []string
@@ -1848,10 +2143,7 @@ func resolveWriteSpec(schemas map[string]QueryCodegenSchema, write QueryCodegenW
 	if err := validateWriteOperation(operation); err != nil {
 		return resolvedWriteSpec{}, fmt.Errorf("write %s: %w", write.Name, err)
 	}
-	sourceName := write.Source
-	if sourceName == "" {
-		sourceName = write.Schema
-	}
+	sourceName := write.Catalog
 	if sourceName == "" && len(schemas) == 1 {
 		for name := range schemas {
 			sourceName = name
@@ -1880,14 +2172,37 @@ func resolveWriteSpec(schemas map[string]QueryCodegenSchema, write QueryCodegenW
 	if err := validateWriteKeysArePrimaryKeySet(write, keyColumns, primaryKeyNames); err != nil {
 		return resolvedWriteSpec{}, fmt.Errorf("write %s keys: %w", write.Name, err)
 	}
-	valueColumns, err := resolveWriteValueColumns(table, operation, write.Columns, write.UpdateMask, keyColumns)
+
+	if (operation == "update" || operation == "delete") && len(write.Insert.Columns) > 0 {
+		return resolvedWriteSpec{}, fmt.Errorf("write %s: columns is only valid for insert and replace", write.Name)
+	}
+
+	updateColumnsRaw := write.Update.Columns
+	if operation == "update" && len(updateColumnsRaw) == 0 {
+		return resolvedWriteSpec{}, fmt.Errorf("write %s: update.columns is required for operation update", write.Name)
+	}
+	if len(updateColumnsRaw) == 1 && updateColumnsRaw[0] == autoAllNonKeyColumns {
+		updateColumnsRaw = nonKeyColumnNames(selectableColumnNames(table), keyColumns)
+	}
+
+	insertColumns, err := resolveWriteColumns(table, write.Insert.Columns, primaryKeyNames)
 	if err != nil {
+		return resolvedWriteSpec{}, fmt.Errorf("write %s insert columns: %w", write.Name, err)
+	}
+	updateColumns, err := resolveWriteColumns(table, updateColumnsRaw, nil)
+	if err != nil {
+		return resolvedWriteSpec{}, fmt.Errorf("write %s update columns: %w", write.Name, err)
+	}
+	if operation == "insert_or_update" && len(write.Insert.Columns) == 0 {
+		insertColumns = appendMissingColumns(keyColumns, updateColumns)
+	}
+	if err := validateResolvedWriteColumns(table, operation, insertColumns, updateColumns, keyColumns); err != nil {
 		return resolvedWriteSpec{}, fmt.Errorf("write %s columns: %w", write.Name, err)
 	}
-	if err := validateResolvedWriteColumns(table, operation, valueColumns, keyColumns); err != nil {
-		return resolvedWriteSpec{}, fmt.Errorf("write %s columns: %w", write.Name, err)
+	inputColumns := insertColumns
+	if operation == "update" {
+		inputColumns = updateColumns
 	}
-	inputColumns := valueColumns
 	if operation == "update" || operation == "insert_or_update" || operation == "delete" {
 		inputColumns = appendMissingColumns(inputColumns, keyColumns)
 	}
@@ -1906,12 +2221,14 @@ func resolveWriteSpec(schemas map[string]QueryCodegenSchema, write QueryCodegenW
 	return resolvedWriteSpec{
 		Name:            write.Name,
 		MethodPrefix:    exportedIdentifier(write.Name, "Write"),
-		Source:          sourceName,
+		Catalog:         sourceName,
 		Table:           table.Name.String(),
 		Operation:       operation,
 		InputStruct:     writeInputStructName(write),
 		AllColumns:      append([]*Column(nil), table.Columns...),
-		Columns:         valueColumns,
+		InsertColumns:   insertColumns,
+		UpdateColumns:   updateColumns,
+		InputColumns:    inputColumns,
 		Keys:            keyColumns,
 		Fields:          fields,
 		Methods:         methods,
@@ -1992,13 +2309,12 @@ func attachWriteSpecNames(specs []resolvedWriteSpec, writeStructFields, sharedSt
 	for i := range out {
 		spec := &out[i]
 		spec.FieldNames = fieldNamesByStruct[spec.InputStruct]
-		writeColumns := appendMissingColumns(spec.Columns, spec.Keys)
-		for _, column := range writeColumns {
+		for _, column := range spec.InputColumns {
 			if spec.FieldNames[columnKey(column.Name)] == "" {
 				return nil, fmt.Errorf("write %s input_struct %s has no field for column %s", spec.Name, spec.InputStruct, column.Name)
 			}
 		}
-		spec.ParamNames = writeParamNameMap(writeColumns)
+		spec.ParamNames = writeParamNameMap(spec.InputColumns)
 		for _, symbol := range writeSymbols(*spec) {
 			if previous := usedSymbols[symbol]; previous != "" {
 				return nil, fmt.Errorf("write %s generates duplicate symbol %s already used by write %s", spec.Name, symbol, previous)
@@ -2078,13 +2394,13 @@ func writeMutationMethod(b *bytes.Buffer, spec resolvedWriteSpec) {
 		fmt.Fprintf(b, "\treturn spanner.Delete(%q, spanner.Key{%s})\n", spec.Table, writeFieldAccessList(spec, spec.Keys))
 		b.WriteString("}\n")
 	case "insert":
-		writeStructMutationMethod(b, spec, "Insert", spec.Columns)
+		writeStructMutationMethod(b, spec, "Insert", spec.InsertColumns)
 	case "update":
-		writeStructMutationMethod(b, spec, "Update", appendMissingColumns(spec.Keys, spec.Columns))
+		writeStructMutationMethod(b, spec, "Update", appendMissingColumns(spec.Keys, spec.UpdateColumns))
 	case "insert_or_update":
-		writeStructMutationMethod(b, spec, "InsertOrUpdate", appendMissingColumns(spec.Keys, spec.Columns))
+		writeStructMutationMethod(b, spec, "InsertOrUpdate", spec.InsertColumns)
 	case "replace":
-		writeStructMutationMethod(b, spec, "Replace", spec.Columns)
+		writeStructMutationMethod(b, spec, "Replace", spec.InsertColumns)
 	}
 }
 
@@ -2109,7 +2425,7 @@ func writeDMLMethod(b *bytes.Buffer, spec resolvedWriteSpec) {
 	b.WriteString("\treturn spanner.Statement{\n")
 	fmt.Fprintf(b, "\t\tSQL: %s,\n", constName)
 	b.WriteString("\t\tParams: map[string]interface{}{\n")
-	for _, column := range appendMissingColumns(spec.Columns, spec.Keys) {
+	for _, column := range spec.InputColumns {
 		fmt.Fprintf(b, "\t\t\t%q: w.%s,\n", writeParamName(spec, column), writeFieldName(spec, column))
 	}
 	b.WriteString("\t\t},\n")
@@ -2124,10 +2440,7 @@ func writeDMLSQL(spec resolvedWriteSpec) string {
 		if spec.Operation == "insert_or_update" {
 			verb = "INSERT OR UPDATE INTO"
 		}
-		columns := spec.Columns
-		if spec.Operation == "insert_or_update" {
-			columns = appendMissingColumns(spec.Keys, spec.Columns)
-		}
+		columns := spec.InsertColumns
 		columnSQL := quoteColumnNames(columns)
 		params := make([]string, 0, len(columns))
 		for _, column := range columns {
@@ -2135,11 +2448,9 @@ func writeDMLSQL(spec resolvedWriteSpec) string {
 		}
 		return verb + " " + quoteGoogleSQLPath(spec.Table) + " (" + strings.Join(columnSQL, ", ") + ") VALUES (" + strings.Join(params, ", ") + ")"
 	case "update":
-		setSQL := make([]string, 0, len(spec.Columns))
-		for _, column := range spec.Columns {
-			if !containsColumn(spec.Keys, column.Name) {
-				setSQL = append(setSQL, quoteGoogleSQLIdent(column.Name)+" = @"+writeParamName(spec, column))
-			}
+		setSQL := make([]string, 0, len(spec.UpdateColumns))
+		for _, column := range spec.UpdateColumns {
+			setSQL = append(setSQL, quoteGoogleSQLIdent(column.Name)+" = @"+writeParamName(spec, column))
 		}
 		return "UPDATE " + quoteGoogleSQLPath(spec.Table) + " SET " + strings.Join(setSQL, ", ") + " WHERE " + writeWhereSQL(spec, spec.Keys)
 	case "delete":
@@ -2227,66 +2538,40 @@ func resolveWriteColumns(table *Table, names []string, defaultNames []string) ([
 	return columns, nil
 }
 
-func resolveWriteValueColumns(table *Table, operation string, columns, updateMask []string, keys []*Column) ([]*Column, error) {
-	switch operation {
-	case "delete":
-		if len(columns) > 0 || len(updateMask) > 0 {
-			return nil, fmt.Errorf("delete does not accept columns or update_mask")
-		}
-		return resolveWriteColumns(table, nil, columnNamesFromColumns(keys))
-	case "update", "insert_or_update":
-		if len(columns) > 0 {
-			return nil, fmt.Errorf("operation %s uses update_mask; columns is only valid for insert and replace", operation)
-		}
-		maskNames, err := resolveUpdateMaskNames(table, operation, updateMask, keys)
-		if err != nil {
-			return nil, err
-		}
-		valueColumns, err := resolveWriteColumns(table, maskNames, nil)
-		if err != nil {
-			return nil, err
-		}
-		if key, ok := firstMatchingColumn(valueColumns, keys); ok {
-			return nil, fmt.Errorf("primary key column %s cannot be in update_mask", key.Name)
-		}
-		return valueColumns, nil
-	default:
-		if len(updateMask) > 0 {
-			return nil, fmt.Errorf("operation %s does not accept update_mask", operation)
-		}
-		return resolveWriteColumns(table, columns, selectableColumnNames(table))
-	}
-}
-
-func validateResolvedWriteColumns(table *Table, operation string, valueColumns, keyColumns []*Column) error {
+func validateResolvedWriteColumns(table *Table, operation string, insertColumns, updateColumns, keyColumns []*Column) error {
 	switch operation {
 	case "insert", "replace":
-		for _, column := range valueColumns {
-			if !columnInsertable(column) {
-				return fmt.Errorf("column %s is not insertable", column.Name)
-			}
-		}
-	case "update":
-		for _, column := range valueColumns {
-			if !columnUpdatable(column) {
-				return fmt.Errorf("column %s is not updatable", column.Name)
-			}
-		}
-	case "insert_or_update":
-		insertColumns := appendMissingColumns(keyColumns, valueColumns)
 		for _, column := range insertColumns {
 			if !columnInsertable(column) {
 				return fmt.Errorf("column %s is not insertable", column.Name)
 			}
 		}
-		for _, column := range valueColumns {
+	case "update":
+		for _, column := range updateColumns {
+			if column.PrimaryKey {
+				return fmt.Errorf("primary key column %s cannot be in update_columns", column.Name)
+			}
+			if !columnUpdatable(column) {
+				return fmt.Errorf("column %s is not updatable", column.Name)
+			}
+		}
+	case "insert_or_update":
+		for _, column := range insertColumns {
+			if !columnInsertable(column) {
+				return fmt.Errorf("column %s is not insertable", column.Name)
+			}
+		}
+		for _, column := range updateColumns {
+			if column.PrimaryKey {
+				return fmt.Errorf("primary key column %s cannot be in update_columns", column.Name)
+			}
 			if !columnUpdatable(column) {
 				return fmt.Errorf("column %s is not updatable", column.Name)
 			}
 		}
 		for _, column := range requiredInsertColumns(table, keyColumns) {
 			if !containsColumn(insertColumns, column.Name) {
-				return fmt.Errorf("insert_or_update requires insert value for NOT NULL column %s; include it in update_mask or use the future structured insert.columns/update.mask config", column.Name)
+				return fmt.Errorf("insert_or_update requires insert value for NOT NULL column %s", column.Name)
 			}
 		}
 	}

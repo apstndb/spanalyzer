@@ -21,8 +21,7 @@ type BigQueryGoogleSQLCatalog struct {
 	spannerExternalDatasetBindings []BigQuerySpannerExternalDatasetBinding
 	externalQueryAnalyzers         map[string]*Analyzer
 	externalQueryTVFRegistered     bool
-	externalQueryPendingRowTypes   []*spannerpb.StructType
-	externalQueryPendingIndex      int
+	externalQueryRowTypes          map[string]map[string]*spannerpb.StructType
 	AnalyzerOptions                *googlesql.AnalyzerOptions
 	TypeFactory                    *googlesql.TypeFactory
 }
@@ -380,6 +379,20 @@ func (c *BigQueryGoogleSQLCatalog) applyDDLAnalyzerOutput(out *googlesql.Analyze
 		return c.addResolvedTable(stmt)
 	case *googlesql.ResolvedCreateViewStmt:
 		return c.addResolvedView(stmt)
+	case *googlesql.ResolvedCreateSnapshotTableStmt:
+		// Snapshot tables inherit schema from the source table. For now, we
+		// can just ignore the DDL if it doesn't break analysis.
+		return nil
+	case *googlesql.ResolvedCreateTableFunctionStmt:
+		// Table functions are not yet modeled as TVFs in the catalog, but we
+		// can at least ignore the DDL if it doesn't break analysis.
+		return nil
+	case *googlesql.ResolvedExportDataStmt:
+		// EXPORT DATA does not create a persistent table.
+		return nil
+	case *googlesql.ResolvedCreateProcedureStmt, *googlesql.ResolvedExecuteImmediateStmt:
+		// Procedural statements are out of scope for schema analysis.
+		return nil
 	case *googlesql.ResolvedCreateSchemaStmt:
 		return nil
 	case *googlesql.ResolvedCreateIndexStmt:
@@ -1351,30 +1364,34 @@ func (a *BigQueryAnalyzer) prepareExternalQueryTVFCalls(sql string) error {
 	if err != nil {
 		return err
 	}
-	// The GoogleSQL frontend callback API currently exposes TVF scalar argument
-	// types reliably, but not their literal string values. Keep the original SQL
-	// intact for analysis and feed the callback with row types decoded from the
-	// same EXTERNAL_QUERY calls in source order.
-	a.googleSQL.externalQueryPendingRowTypes = a.googleSQL.externalQueryPendingRowTypes[:0]
-	a.googleSQL.externalQueryPendingIndex = 0
+	if a.googleSQL.externalQueryRowTypes == nil {
+		a.googleSQL.externalQueryRowTypes = make(map[string]map[string]*spannerpb.StructType)
+	}
 	for _, call := range calls {
 		rowType, err := a.externalQueryRowType(call.args)
 		if err != nil {
 			return err
 		}
-		a.googleSQL.externalQueryPendingRowTypes = append(a.googleSQL.externalQueryPendingRowTypes, rowType)
+		connectionID, _ := decodeGoogleSQLStringLiteral(strings.TrimSpace(call.args[0]))
+		spannerSQL, _ := decodeGoogleSQLStringLiteral(strings.TrimSpace(call.args[1]))
+		if a.googleSQL.externalQueryRowTypes[connectionID] == nil {
+			a.googleSQL.externalQueryRowTypes[connectionID] = make(map[string]*spannerpb.StructType)
+		}
+		a.googleSQL.externalQueryRowTypes[connectionID][spannerSQL] = rowType
 	}
 	return nil
 }
 
 func (c *BigQueryGoogleSQLCatalog) clearExternalQueryTVFCalls() {
-	c.externalQueryPendingRowTypes = nil
-	c.externalQueryPendingIndex = 0
+	c.externalQueryRowTypes = nil
 }
 
 func (a *BigQueryAnalyzer) externalQueryRowType(args []string) (*spannerpb.StructType, error) {
 	if len(args) < 2 || len(args) > 3 {
 		return nil, fmt.Errorf("EXTERNAL_QUERY requires 2 or 3 arguments, got %d", len(args))
+	}
+	if len(args) == 3 {
+		return nil, fmt.Errorf("EXTERNAL_QUERY options argument is currently not supported for static analysis")
 	}
 	connectionID, err := decodeGoogleSQLStringLiteral(strings.TrimSpace(args[0]))
 	if err != nil {
@@ -1814,41 +1831,6 @@ func bigQueryTypedEmptySubquery(rowType *spannerpb.StructType) (string, error) {
 	return "(SELECT " + strings.Join(cols, ", ") + " LIMIT 0)", nil
 }
 
-func bigQuerySQLTypeFromSpannerType(t *spannerpb.Type) (string, error) {
-	if t == nil {
-		return "", fmt.Errorf("nil Spanner type")
-	}
-	switch t.Code {
-	case spannerpb.TypeCode_BOOL:
-		return "BOOL", nil
-	case spannerpb.TypeCode_INT64:
-		return "INT64", nil
-	case spannerpb.TypeCode_FLOAT32, spannerpb.TypeCode_FLOAT64:
-		return "FLOAT64", nil
-	case spannerpb.TypeCode_TIMESTAMP:
-		return "TIMESTAMP", nil
-	case spannerpb.TypeCode_DATE:
-		return "DATE", nil
-	case spannerpb.TypeCode_STRING:
-		return "STRING", nil
-	case spannerpb.TypeCode_BYTES:
-		return "BYTES", nil
-	case spannerpb.TypeCode_NUMERIC:
-		return "NUMERIC", nil
-	case spannerpb.TypeCode_JSON:
-		return "JSON", nil
-	case spannerpb.TypeCode_ARRAY:
-		elem, err := bigQuerySQLTypeFromSpannerType(t.ArrayElementType)
-		if err != nil {
-			return "", err
-		}
-		return "ARRAY<" + elem + ">", nil
-	case spannerpb.TypeCode_STRUCT:
-		return "", fmt.Errorf("STRUCT is unsupported for BigQuery Spanner federated query output")
-	default:
-		return "", fmt.Errorf("unsupported Spanner type %s for BigQuery EXTERNAL_QUERY rewrite", t.Code)
-	}
-}
 
 var simpleBigQueryIdentifier = regexp.MustCompile(`^[A-Za-z_][A-Za-z0-9_]*$`)
 

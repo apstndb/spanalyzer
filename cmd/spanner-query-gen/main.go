@@ -245,7 +245,7 @@ type explainCatalogBindingProjection struct {
 
 type explainPlanQuery struct {
 	Name            string                                    `json:"name" yaml:"name"`
-	Source          string                                    `json:"source" yaml:"source"`
+	Catalog         string                                    `json:"catalog" yaml:"catalog"`
 	Kind            string                                    `json:"kind" yaml:"kind"`
 	Result          string                                    `json:"result" yaml:"result"`
 	OrderBy         string                                    `json:"order_by,omitempty" yaml:"order_by,omitempty"`
@@ -262,13 +262,13 @@ type explainPlanQuery struct {
 }
 
 type explainPlanStarExpansion struct {
-	Source     string                              `json:"source" yaml:"source"`
+	Catalog    string                              `json:"catalog" yaml:"catalog"`
 	Projection querygen.QueryCodegenPlanProjection `json:"projection" yaml:"projection"`
 }
 
 type explainPlanRelation struct {
 	SQLPath        string                              `json:"sql_path" yaml:"sql_path"`
-	Source         string                              `json:"source" yaml:"source"`
+	Catalog        string                              `json:"catalog" yaml:"catalog"`
 	Role           string                              `json:"role" yaml:"role"`
 	Allowed        bool                                `json:"allowed" yaml:"allowed"`
 	WritableTarget bool                                `json:"writable_target" yaml:"writable_target"`
@@ -352,7 +352,7 @@ func newExplainCatalogBinding(binding spanalyzer.BigQuerySpannerExternalDatasetB
 func newExplainPlanQuery(query querygen.QueryCodegenPlanQuery) explainPlanQuery {
 	out := explainPlanQuery{
 		Name:            query.Name,
-		Source:          query.Source,
+		Catalog:         query.Catalog,
 		Kind:            query.Kind,
 		Result:          query.Result,
 		OrderBy:         query.OrderBy,
@@ -367,14 +367,14 @@ func newExplainPlanQuery(query querygen.QueryCodegenPlanQuery) explainPlanQuery 
 	}
 	if query.StarExpansion != nil {
 		out.StarExpansion = &explainPlanStarExpansion{
-			Source:     query.StarExpansion.Source,
+			Catalog:    query.StarExpansion.Catalog,
 			Projection: query.StarExpansion.Projection,
 		}
 	}
 	for _, relation := range query.Relations {
 		out.Relations = append(out.Relations, explainPlanRelation{
 			SQLPath:        relation.SQLPath,
-			Source:         relation.Source,
+			Catalog:        relation.Catalog,
 			Role:           relation.Role,
 			Allowed:        relation.Allowed,
 			WritableTarget: relation.WritableTarget,
@@ -454,7 +454,7 @@ func writePlanSummary(w io.Writer, plan *querygen.QueryCodegenPlan) error {
 		if i > 0 {
 			b.WriteByte('\n')
 		}
-		appendSummaryf(&b, "Query: %s (%s, result: %s, source: %s)\n", query.Name, query.Kind, query.Result, query.Source)
+		appendSummaryf(&b, "Query: %s (%s, result: %s, catalog: %s)\n", query.Name, query.Kind, query.Result, query.Catalog)
 		appendSummaryf(&b, "  SQL: %s\n", query.SQL)
 		if len(query.Params) > 0 {
 			b.WriteString("  Params:\n")
@@ -463,7 +463,7 @@ func writePlanSummary(w io.Writer, plan *querygen.QueryCodegenPlan) error {
 			}
 		}
 		if query.StarExpansion != nil {
-			appendSummaryf(&b, "  Star expansion: source=%s, projection_loss=%t\n", query.StarExpansion.Source, query.StarExpansion.ProjectionLoss)
+			appendSummaryf(&b, "  Star expansion: catalog=%s, projection_loss=%t\n", query.StarExpansion.Catalog, query.StarExpansion.ProjectionLoss)
 			for _, column := range query.StarExpansion.OmittedColumns {
 				appendSummaryf(&b, "  - omitted: %s\n", column)
 			}
@@ -471,7 +471,7 @@ func writePlanSummary(w io.Writer, plan *querygen.QueryCodegenPlan) error {
 		if len(query.Relations) > 0 {
 			b.WriteString("  Relations:\n")
 			for _, relation := range query.Relations {
-				appendSummaryf(&b, "  - %s: source=%s, role=%s, allowed=%t, projection_loss=%t\n", relation.SQLPath, relation.Source, relation.Role, relation.Allowed, relation.ProjectionLoss)
+				appendSummaryf(&b, "  - %s: catalog=%s, role=%s, allowed=%t, projection_loss=%t\n", relation.SQLPath, relation.Catalog, relation.Role, relation.Allowed, relation.ProjectionLoss)
 				if relation.Diagnostic != "" {
 					appendSummaryf(&b, "    diagnostic: %s\n", relation.Diagnostic)
 				}
@@ -500,13 +500,16 @@ func writePlanSummary(w io.Writer, plan *querygen.QueryCodegenPlan) error {
 		if len(plan.Queries) > 0 {
 			b.WriteByte('\n')
 		}
-		appendSummaryf(&b, "Write: %s (%s, source: %s)\n", write.Name, write.Operation, write.Source)
+		appendSummaryf(&b, "Write: %s (%s, catalog: %s)\n", write.Name, write.Operation, write.Catalog)
 		appendSummaryf(&b, "  Table: %s\n", write.Table)
 		if len(write.Keys) > 0 {
 			appendSummaryf(&b, "  Keys: %s\n", strings.Join(write.Keys, ", "))
 		}
-		if len(write.Columns) > 0 {
-			appendSummaryf(&b, "  Columns: %s\n", strings.Join(write.Columns, ", "))
+		if len(write.InsertColumns) > 0 {
+			appendSummaryf(&b, "  Insert Columns: %s\n", strings.Join(write.InsertColumns, ", "))
+		}
+		if len(write.UpdateColumns) > 0 {
+			appendSummaryf(&b, "  Update Columns: %s\n", strings.Join(write.UpdateColumns, ", "))
 		}
 		if len(write.Methods) > 0 {
 			appendSummaryf(&b, "  Methods: %s\n", strings.Join(write.Methods, ", "))
