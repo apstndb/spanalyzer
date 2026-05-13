@@ -17,25 +17,36 @@ func RowTypeFromAnalyzerOutput(out *googlesql.AnalyzerOutput, schema *Catalog) (
 		return RowTypeFromResolvedQuery(s, schema)
 	case *googlesql.ResolvedInsertStmt:
 		returning, err := s.Returning()
-		if err != nil || returning == nil {
-			return nil, ErrStatementHasNoRowType
+		if err != nil {
+			return nil, fmt.Errorf("insert returning clause: %w", err)
 		}
-		return rowTypeFromReturningClause(returning, schema)
+		return rowTypeFromOptionalReturningClause("insert", returning, schema)
 	case *googlesql.ResolvedUpdateStmt:
 		returning, err := s.Returning()
-		if err != nil || returning == nil {
-			return nil, ErrStatementHasNoRowType
+		if err != nil {
+			return nil, fmt.Errorf("update returning clause: %w", err)
 		}
-		return rowTypeFromReturningClause(returning, schema)
+		return rowTypeFromOptionalReturningClause("update", returning, schema)
 	case *googlesql.ResolvedDeleteStmt:
 		returning, err := s.Returning()
-		if err != nil || returning == nil {
-			return nil, ErrStatementHasNoRowType
+		if err != nil {
+			return nil, fmt.Errorf("delete returning clause: %w", err)
 		}
-		return rowTypeFromReturningClause(returning, schema)
+		return rowTypeFromOptionalReturningClause("delete", returning, schema)
 	default:
 		return nil, ErrStatementHasNoRowType
 	}
+}
+
+func rowTypeFromOptionalReturningClause(stmtKind string, returning *googlesql.ResolvedReturningClause, schema *Catalog) (*spannerpb.StructType, error) {
+	if returning == nil {
+		return nil, ErrStatementHasNoRowType
+	}
+	rowType, err := rowTypeFromReturningClause(returning, schema)
+	if err != nil {
+		return nil, fmt.Errorf("%s returning clause: %w", stmtKind, err)
+	}
+	return rowType, nil
 }
 
 func rowTypeFromReturningClause(returning *googlesql.ResolvedReturningClause, schema *Catalog) (*spannerpb.StructType, error) {

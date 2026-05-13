@@ -1,0 +1,10 @@
+syntax = "proto2";
+package examples.order;
+
+import "testdata/protos/complex/user.proto";
+
+message OrderExt {
+  optional string order_id = 1;
+  optional examples.user.User customer = 2;
+  repeated string tags = 3;
+}

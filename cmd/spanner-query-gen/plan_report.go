@@ -387,12 +387,12 @@ func buildPlanReportWithRuntime(ctx context.Context, config querygen.QueryCodege
 	targets := 0
 	for _, query := range plan.Queries {
 		configQuery := configQueries[query.Name]
-		source := query.Catalog
+		catalog := query.Catalog
 		sql := query.SQL
 		params := query.Params
 		scope := "query"
 		if !planReportFederatedQueryIsZero(configQuery.Federated) {
-			source = configQuery.Federated.SpannerSource
+			catalog = configQuery.Federated.SpannerSource
 			sql = configQuery.Federated.InnerSQL
 			params = planReportScopedParams(params, "inner")
 			scope = "external_query.inner"
@@ -400,7 +400,7 @@ func buildPlanReportWithRuntime(ctx context.Context, config querygen.QueryCodege
 		reportQuery := planReportQuery{
 			TargetID:  planReportTargetID(query.Name, scope),
 			Name:      query.Name,
-			Catalog:   source,
+			Catalog:   catalog,
 			Scope:     scope,
 			Kind:      query.Kind,
 			Status:    "pending",
@@ -408,17 +408,17 @@ func buildPlanReportWithRuntime(ctx context.Context, config querygen.QueryCodege
 			SQLSHA256: planReportDigest(sql),
 		}
 		report.TargetSummary.IncludedCount++
-		schema, ok := schemas[source]
+		schema, ok := schemas[catalog]
 		if !ok {
 			reportQuery.Status = "skipped"
-			reportQuery.Error = fmt.Sprintf("source catalog %q not found", source)
+			reportQuery.Error = fmt.Sprintf("source catalog %q not found", catalog)
 			report.TargetSummary.Skipped++
 			report.Queries = append(report.Queries, reportQuery)
 			continue
 		}
 		if schema.Dialect != "spanner" {
 			reportQuery.Status = "skipped"
-			reportQuery.Error = fmt.Sprintf("source catalog %q has dialect %q; plan-report currently supports Spanner GoogleSQL catalogs", source, schema.Dialect)
+			reportQuery.Error = fmt.Sprintf("source catalog %q has dialect %q; plan-report currently supports Spanner GoogleSQL catalogs", catalog, schema.Dialect)
 			report.TargetSummary.Skipped++
 			report.Queries = append(report.Queries, reportQuery)
 			continue
@@ -437,14 +437,14 @@ func buildPlanReportWithRuntime(ctx context.Context, config querygen.QueryCodege
 		if reportQuery.OptimizerNotPinned {
 			reportQuery.PlanEnvironmentNotes = append(reportQuery.PlanEnvironmentNotes, "plan environment uses default Omni optimizer settings; optimizer version/statistics package are not pinned")
 		}
-		clients, ok := clientsBySource[source]
+		clients, ok := clientsBySource[catalog]
 		if !ok {
 			started, err := openPlanReportClients(ctx, runtime, schema, baseDir, report.Optimizer)
 			if err != nil {
-				return report, fmt.Errorf("open Omni database for catalog %s: %w", source, err)
+				return report, fmt.Errorf("open Omni database for catalog %s: %w", catalog, err)
 			}
 			clients = started
-			clientsBySource[source] = clients
+			clientsBySource[catalog] = clients
 		}
 		stmt := spanner.NewStatement(sql)
 		values, err := planReportParamValues(params)

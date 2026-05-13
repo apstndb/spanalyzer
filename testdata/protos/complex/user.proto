@@ -1,0 +1,12 @@
+syntax = "proto2";
+package examples.user;
+
+message User {
+  optional int64 user_id = 1;
+  optional string name = 2;
+  enum UserType {
+    REGULAR = 1;
+    ADMIN = 2;
+  }
+  optional UserType type = 3;
+}

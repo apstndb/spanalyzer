@@ -336,6 +336,8 @@ func GenerateQueryCode(config QueryCodegenConfig, baseDir string) (string, error
 	}
 	structs := map[string][]goResultField{}
 	constants := make([]generatedGoConst, 0, len(config.Queries))
+	var builderCode bytes.Buffer
+	var builderImports []string
 	var querySpecs []resolvedQuerySpec
 	for _, query := range config.Queries {
 		if query.Name == "" {
@@ -365,15 +367,33 @@ func GenerateQueryCode(config QueryCodegenConfig, baseDir string) (string, error
 			return "", fmt.Errorf("query %s result_struct %s: %w", query.Name, structName, err)
 		}
 		structs[structName] = merged
-		constants = append(constants, queryGoConstants(query)...)
 		sourceName, _ := querySourceName(schemas, query)
+		methodPrefix := exportedIdentifier(query.Name, "Query")
+		var builderFunc, paramsType string
+		if queryHasOptionalMarkers(query) {
+			builderFunc = "Build" + methodPrefix + "SQL"
+			paramsType = methodPrefix + "Params"
+			code, imports, err := emitQueryGoBuilder(query, builderFunc, paramsType)
+			if err != nil {
+				return "", fmt.Errorf("query %s: %w", query.Name, err)
+			}
+			if builderCode.Len() > 0 {
+				builderCode.WriteByte('\n')
+			}
+			builderCode.WriteString(code)
+			builderImports = append(builderImports, imports...)
+		} else {
+			constants = append(constants, queryGoConstants(query)...)
+		}
 		querySpecs = append(querySpecs, resolvedQuerySpec{
 			Name:         query.Name,
-			MethodPrefix: exportedIdentifier(query.Name, "Query"),
+			MethodPrefix: methodPrefix,
 			ResultStruct: structName,
 			ResultMode:   queryResultMode(query),
 			Params:       query.Params,
 			Dialect:      emptyDefault(schemas[sourceName].Dialect, "spanner"),
+			BuilderFunc:  builderFunc,
+			ParamsType:   paramsType,
 		})
 	}
 	writeImports, writeCode, err := generateWriteCode(schemas, config.Writes, baseDir, structs)
@@ -391,6 +411,7 @@ func GenerateQueryCode(config QueryCodegenConfig, baseDir string) (string, error
 	for imp := range methodImports {
 		allImports = append(allImports, imp)
 	}
+	allImports = append(allImports, builderImports...)
 
 	names := make([]string, 0, len(structs))
 	for name := range structs {
@@ -401,7 +422,7 @@ func GenerateQueryCode(config QueryCodegenConfig, baseDir string) (string, error
 	for _, name := range names {
 		namedStructs = append(namedStructs, namedGoStruct{Name: name, Fields: structs[name]})
 	}
-	return generateGoStructsWithExtra(namedStructs, options, constants, allImports, writeCode+queryMethods.String())
+	return generateGoStructsWithExtra(namedStructs, options, constants, allImports, writeCode+builderCode.String()+queryMethods.String())
 }
 
 type resolvedQuerySpec struct {
@@ -411,6 +432,8 @@ type resolvedQuerySpec struct {
 	ResultMode   string
 	Params       []QueryCodegenParam
 	Dialect      string
+	BuilderFunc  string
+	ParamsType   string
 }
 
 func writeQueryMethods(b *bytes.Buffer, spec resolvedQuerySpec, imports map[string]struct{}) {
@@ -422,18 +445,41 @@ func writeQueryMethods(b *bytes.Buffer, spec resolvedQuerySpec, imports map[stri
 	}
 }
 
+func spannerMethodParams(spec resolvedQuerySpec) string {
+	if spec.BuilderFunc != "" {
+		return spec.ParamsType
+	}
+	return "map[string]interface{}"
+}
+
+func writeSpannerStatementSetup(b *bytes.Buffer, spec resolvedQuerySpec) {
+	if spec.BuilderFunc != "" {
+		fmt.Fprintf(b, "\tsql, args, _ := %s(params)\n", spec.BuilderFunc)
+	}
+}
+
+func spannerStatementExpr(spec resolvedQuerySpec, constName string) string {
+	if spec.BuilderFunc != "" {
+		return "spanner.Statement{SQL: sql, Params: args}"
+	}
+	return "spanner.Statement{SQL: " + constName + ", Params: params}"
+}
+
 func writeSpannerMethods(b *bytes.Buffer, spec resolvedQuerySpec, imports map[string]struct{}) {
 	imports["context"] = struct{}{}
 	imports["cloud.google.com/go/spanner"] = struct{}{}
 	constName := spec.MethodPrefix + "SQL"
+	paramsType := spannerMethodParams(spec)
 	switch spec.ResultMode {
 	case "many":
+		imports["google.golang.org/api/iterator"] = struct{}{}
 		fmt.Fprintf(b, "// %s returns a Cloud Spanner row iterator.\n", spec.MethodPrefix)
-		fmt.Fprintf(b, "func %s(ctx context.Context, tx spanner.ReadOnlyTransaction, params map[string]interface{}) *spanner.RowIterator {\n", spec.MethodPrefix)
-		fmt.Fprintf(b, "\treturn tx.Query(ctx, spanner.Statement{SQL: %s, Params: params})\n", constName)
+		fmt.Fprintf(b, "func %s(ctx context.Context, tx spanner.ReadOnlyTransaction, params %s) *spanner.RowIterator {\n", spec.MethodPrefix, paramsType)
+		writeSpannerStatementSetup(b, spec)
+		fmt.Fprintf(b, "\treturn tx.Query(ctx, %s)\n", spannerStatementExpr(spec, constName))
 		b.WriteString("}\n")
 		fmt.Fprintf(b, "// %sAll returns all Cloud Spanner rows as a slice.\n", spec.MethodPrefix)
-		fmt.Fprintf(b, "func %sAll(ctx context.Context, tx spanner.ReadOnlyTransaction, params map[string]interface{}) ([]*%s, error) {\n", spec.MethodPrefix, spec.ResultStruct)
+		fmt.Fprintf(b, "func %sAll(ctx context.Context, tx spanner.ReadOnlyTransaction, params %s) ([]*%s, error) {\n", spec.MethodPrefix, paramsType, spec.ResultStruct)
 		fmt.Fprintf(b, "\tit := %s(ctx, tx, params)\n", spec.MethodPrefix)
 		b.WriteString("\tdefer it.Stop()\n")
 		fmt.Fprintf(b, "\tvar out []*%s\n", spec.ResultStruct)
@@ -453,10 +499,12 @@ func writeSpannerMethods(b *bytes.Buffer, spec resolvedQuerySpec, imports map[st
 		b.WriteString("\t}\n")
 		b.WriteString("}\n")
 	case "one", "maybe_one":
+		imports["fmt"] = struct{}{}
 		imports["google.golang.org/api/iterator"] = struct{}{}
 		fmt.Fprintf(b, "// %s returns a single Cloud Spanner row.\n", spec.MethodPrefix)
-		fmt.Fprintf(b, "func %s(ctx context.Context, tx spanner.ReadOnlyTransaction, params map[string]interface{}) (*%s, error) {\n", spec.MethodPrefix, spec.ResultStruct)
-		fmt.Fprintf(b, "\tit := tx.Query(ctx, spanner.Statement{SQL: %s, Params: params})\n", constName)
+		fmt.Fprintf(b, "func %s(ctx context.Context, tx spanner.ReadOnlyTransaction, params %s) (*%s, error) {\n", spec.MethodPrefix, paramsType, spec.ResultStruct)
+		writeSpannerStatementSetup(b, spec)
+		fmt.Fprintf(b, "\tit := tx.Query(ctx, %s)\n", spannerStatementExpr(spec, constName))
 		b.WriteString("\tdefer it.Stop()\n")
 		b.WriteString("\trow, err := it.Next()\n")
 		b.WriteString("\tif err != nil {\n")
@@ -483,13 +531,15 @@ func writeSpannerMethods(b *bytes.Buffer, spec resolvedQuerySpec, imports map[st
 		b.WriteString("}\n")
 	case "row_count":
 		fmt.Fprintf(b, "// %s executes a Cloud Spanner DML statement and returns the row count.\n", spec.MethodPrefix)
-		fmt.Fprintf(b, "func %s(ctx context.Context, tx spanner.ReadWriteTransaction, params map[string]interface{}) (int64, error) {\n", spec.MethodPrefix)
-		fmt.Fprintf(b, "\treturn tx.Update(ctx, spanner.Statement{SQL: %s, Params: params})\n", constName)
+		fmt.Fprintf(b, "func %s(ctx context.Context, tx spanner.ReadWriteTransaction, params %s) (int64, error) {\n", spec.MethodPrefix, paramsType)
+		writeSpannerStatementSetup(b, spec)
+		fmt.Fprintf(b, "\treturn tx.Update(ctx, %s)\n", spannerStatementExpr(spec, constName))
 		b.WriteString("}\n")
 	case "row_set":
 		fmt.Fprintf(b, "// %s executes a Cloud Spanner DML statement with THEN RETURN and returns a row iterator.\n", spec.MethodPrefix)
-		fmt.Fprintf(b, "func %s(ctx context.Context, tx spanner.ReadWriteTransaction, params map[string]interface{}) *spanner.RowIterator {\n", spec.MethodPrefix)
-		fmt.Fprintf(b, "\treturn tx.Query(ctx, spanner.Statement{SQL: %s, Params: params})\n", constName)
+		fmt.Fprintf(b, "func %s(ctx context.Context, tx spanner.ReadWriteTransaction, params %s) *spanner.RowIterator {\n", spec.MethodPrefix, paramsType)
+		writeSpannerStatementSetup(b, spec)
+		fmt.Fprintf(b, "\treturn tx.Query(ctx, %s)\n", spannerStatementExpr(spec, constName))
 		b.WriteString("}\n")
 	}
 }
@@ -527,6 +577,7 @@ func writeBigQueryMethods(b *bytes.Buffer, spec resolvedQuerySpec, imports map[s
 		b.WriteString("\t}\n")
 		b.WriteString("}\n")
 	case "one", "maybe_one":
+		imports["fmt"] = struct{}{}
 		imports["google.golang.org/api/iterator"] = struct{}{}
 		fmt.Fprintf(b, "// %s returns a single BigQuery row.\n", spec.MethodPrefix)
 		fmt.Fprintf(b, "func %s(ctx context.Context, client *bigquery.Client, params []bigquery.QueryParameter) (*%s, error) {\n", spec.MethodPrefix, spec.ResultStruct)
@@ -1261,6 +1312,14 @@ func validateQueryCodegenOptionalParam(queryName string, param QueryCodegenParam
 		if param.Default == "" {
 			return fmt.Errorf("query %s param %s: optional: orderby_choice requires default", queryName, param.Name)
 		}
+		for key := range param.Choices {
+			if !optionalChoiceKeyPattern.MatchString(key) {
+				return fmt.Errorf("query %s param %s: choice key %q must match ^[A-Za-z_][A-Za-z0-9_]*$", queryName, param.Name, key)
+			}
+		}
+		if !optionalChoiceKeyPattern.MatchString(param.Default) {
+			return fmt.Errorf("query %s param %s: default %q must match ^[A-Za-z_][A-Za-z0-9_]*$", queryName, param.Name, param.Default)
+		}
 		if _, ok := param.Choices[param.Default]; !ok {
 			return fmt.Errorf("query %s param %s: default %q must be one of choices", queryName, param.Name, param.Default)
 		}
@@ -1398,8 +1457,9 @@ func queryPlanWarnings(schemas map[string]QueryCodegenSchema, query QueryCodegen
 }
 
 var (
-	sqlOrderByPattern  = regexp.MustCompile(`(?is)\border\s+by\b`)
-	sqlLimitOnePattern = regexp.MustCompile(`(?is)\blimit\s+1\b`)
+	sqlOrderByPattern        = regexp.MustCompile(`(?is)\border\s+by\b`)
+	sqlLimitOnePattern       = regexp.MustCompile(`(?is)\blimit\s+1\b`)
+	optionalChoiceKeyPattern = regexp.MustCompile(`^[A-Za-z_][A-Za-z0-9_]*$`)
 )
 
 func federatedInnerOrderByIgnored(query QueryCodegenFederatedQuery) bool {
@@ -2726,6 +2786,7 @@ func containsColumn(columns []*Column, name string) bool {
 }
 
 func codegenTableQuerySQL(schema QueryCodegenSchema, tableName string, keyPrefix []string, orderBy, baseDir string, userParams []QueryCodegenParam) (string, []QueryCodegenParam, error) {
+	orderByChoice := findOrderByChoiceParam(userParams)
 	if strings.ToLower(emptyDefault(schema.Dialect, "spanner")) != "spanner" {
 		if len(keyPrefix) > 0 {
 			return "", nil, fmt.Errorf("key_prefix is only supported for Spanner table queries")
@@ -2833,7 +2894,16 @@ func codegenTableQuerySQL(schema QueryCodegenSchema, tableName string, keyPrefix
 		}
 	}
 
-	if orderMode != "none" {
+	if orderByChoice.Name != "" {
+		if orderMode == "none" {
+			return "", nil, fmt.Errorf("param %s: optional: orderby_choice cannot be combined with order_by: none", orderByChoice.Name)
+		}
+		defaultSQL, ok := orderByChoice.Choices[orderByChoice.Default]
+		if !ok {
+			return "", nil, fmt.Errorf("param %s: default %q is not in choices", orderByChoice.Name, orderByChoice.Default)
+		}
+		sql += " /*?orderby:" + orderByChoice.Name + "*/ " + defaultSQL + " /*?end*/"
+	} else if orderMode != "none" {
 		sql = appendOrderBy(sql, primaryKeyColumnNames(table))
 	}
 	return sql, params, nil

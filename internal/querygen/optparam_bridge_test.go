@@ -67,10 +67,10 @@ queries:
 		t.Fatalf("variants = %d, want %d", got, want)
 	}
 	wantKeys := map[string]bool{
-		"(none)":             true,
-		"first_name":         true,
-		"first_name+status":  true,
-		"status":             true,
+		"(none)":            true,
+		"first_name":        true,
+		"first_name+status": true,
+		"status":            true,
 	}
 	for _, v := range q.Variants {
 		if !wantKeys[v.Label] {
@@ -418,6 +418,64 @@ queries:
 	}
 }
 
+func TestBuildQueryCodegenPlan_TableKindOrderByChoice(t *testing.T) {
+	dir := t.TempDir()
+	writeTestFile(t, filepath.Join(dir, "spanner.sql"), `
+CREATE TABLE Singers (
+  SingerId  INT64 NOT NULL,
+  FirstName STRING(MAX),
+  LastName  STRING(MAX),
+) PRIMARY KEY (SingerId);
+`)
+	config, err := ParseQueryCodegenConfigYAML([]byte(`
+version: v1alpha
+go:
+  package: db
+emit:
+  spanner:
+    mutations: true
+catalogs:
+- name: app
+  kind: spanner
+  ddl: spanner.sql
+queries:
+- name: ListSingers
+  catalog: app
+  kind: table
+  table: Singers
+  params:
+  - name: sort
+    optional: orderby_choice
+    default: id_asc
+    choices:
+      id_asc: "ORDER BY SingerId ASC"
+      name_asc: "ORDER BY LastName ASC, FirstName ASC"
+  result:
+    cardinality: many
+    struct: SingerRow
+`))
+	if err != nil {
+		t.Fatalf("ParseQueryCodegenConfigYAML: %v", err)
+	}
+	plan, err := BuildQueryCodegenPlan(config, dir)
+	if err != nil {
+		t.Fatalf("BuildQueryCodegenPlan: %v", err)
+	}
+	q := plan.Queries[0]
+	if got, want := len(q.Variants), 2; got != want {
+		t.Fatalf("variants = %d, want %d", got, want)
+	}
+	wantKeys := map[string]bool{"sort=id_asc": true, "sort=name_asc": true}
+	for _, v := range q.Variants {
+		if !wantKeys[v.Label] {
+			t.Errorf("unexpected variant label %q", v.Label)
+		}
+		if !strings.Contains(v.SQL, "ORDER BY") {
+			t.Errorf("variant %s missing ORDER BY: %q", v.Label, v.SQL)
+		}
+	}
+}
+
 func TestBuildQueryCodegenPlan_TableKindOmitWhenNull(t *testing.T) {
 	dir := t.TempDir()
 	writeTestFile(t, filepath.Join(dir, "spanner.sql"), `
@@ -466,6 +524,160 @@ queries:
 		if !wantKeys[v.Label] {
 			t.Errorf("unexpected variant label %q", v.Label)
 		}
+	}
+}
+
+func TestGenerateQueryCodeOptionalTableUsesBuilder(t *testing.T) {
+	dir := t.TempDir()
+	writeTestFile(t, filepath.Join(dir, "spanner.sql"), `
+CREATE TABLE Singers (
+  SingerId INT64 NOT NULL,
+  FirstName STRING(MAX),
+) PRIMARY KEY (SingerId);
+`)
+	config, err := ParseQueryCodegenConfigYAML([]byte(`
+version: v1alpha
+go:
+  package: db
+emit:
+  spanner:
+    mutations: true
+catalogs:
+- name: app
+  kind: spanner
+  ddl: spanner.sql
+queries:
+- name: ListMaybeById
+  catalog: app
+  kind: table
+  table: Singers
+  key_prefix: [SingerId]
+  params:
+  - name: SingerId
+    optional: omit_when_null
+  result:
+    cardinality: many
+    struct: SingerRow
+`))
+	if err != nil {
+		t.Fatalf("ParseQueryCodegenConfigYAML: %v", err)
+	}
+	code, err := GenerateQueryCode(config, dir)
+	if err != nil {
+		t.Fatalf("GenerateQueryCode: %v", err)
+	}
+	for _, want := range []string{
+		"type ListMaybeByIdParams struct {",
+		"SingerId *int64",
+		"func BuildListMaybeByIdSQL(p ListMaybeByIdParams)",
+		"func ListMaybeById(ctx context.Context, tx spanner.ReadOnlyTransaction, params ListMaybeByIdParams)",
+		"return tx.Query(ctx, spanner.Statement{SQL: sql, Params: args})",
+	} {
+		if !strings.Contains(code, want) {
+			t.Fatalf("generated code missing %q:\n%s", want, code)
+		}
+	}
+	if strings.Contains(code, "\tListMaybeByIdSQL = ") {
+		t.Fatalf("optional query should use a builder instead of a single SQL constant:\n%s", code)
+	}
+}
+
+func TestGenerateQueryCodeOptionalSQLBuilderIncludesRequiredParams(t *testing.T) {
+	dir := t.TempDir()
+	writeTestFile(t, filepath.Join(dir, "spanner.sql"), `
+CREATE TABLE Singers (
+  SingerId INT64 NOT NULL,
+  Status STRING(MAX),
+) PRIMARY KEY (SingerId);
+`)
+	config, err := ParseQueryCodegenConfigYAML([]byte(`
+version: v1alpha
+go:
+  package: db
+emit:
+  spanner:
+    mutations: true
+catalogs:
+- name: app
+  kind: spanner
+  ddl: spanner.sql
+queries:
+- name: ListByStatus
+  catalog: app
+  kind: sql
+  sql: |
+    SELECT SingerId, Status FROM Singers
+    WHERE Status = @status
+    /*?optional:SingerId*/ AND SingerId = @SingerId /*?end*/
+  params:
+  - name: status
+    type: STRING
+  - name: SingerId
+    type: INT64
+    optional: omit_when_null
+  result:
+    cardinality: many
+    struct: SingerRow
+`))
+	if err != nil {
+		t.Fatalf("ParseQueryCodegenConfigYAML: %v", err)
+	}
+	code, err := GenerateQueryCode(config, dir)
+	if err != nil {
+		t.Fatalf("GenerateQueryCode: %v", err)
+	}
+	for _, want := range []string{
+		"type ListByStatusParams struct {",
+		"Status   string",
+		"SingerId *int64",
+		`args["status"] = p.Status`,
+		`args["SingerId"] = *p.SingerId`,
+	} {
+		if !strings.Contains(code, want) {
+			t.Fatalf("generated code missing %q:\n%s", want, code)
+		}
+	}
+}
+
+func TestBuildQueryCodegenPlanRejectsInvalidOrderByChoiceKey(t *testing.T) {
+	dir := t.TempDir()
+	writeTestFile(t, filepath.Join(dir, "spanner.sql"), `
+CREATE TABLE Singers (
+  SingerId INT64 NOT NULL,
+) PRIMARY KEY (SingerId);
+`)
+	config, err := ParseQueryCodegenConfigYAML([]byte(`
+version: v1alpha
+go:
+  package: db
+emit:
+  spanner:
+    mutations: true
+catalogs:
+- name: app
+  kind: spanner
+  ddl: spanner.sql
+queries:
+- name: ListSingers
+  catalog: app
+  kind: table
+  table: Singers
+  params:
+  - name: sort
+    optional: orderby_choice
+    default: name-asc
+    choices:
+      name-asc: "ORDER BY SingerId"
+  result:
+    cardinality: many
+    struct: SingerRow
+`))
+	if err != nil {
+		t.Fatalf("ParseQueryCodegenConfigYAML: %v", err)
+	}
+	_, err = BuildQueryCodegenPlan(config, dir)
+	if err == nil || !strings.Contains(err.Error(), `choice key "name-asc" must match`) {
+		t.Fatalf("expected invalid choice key error, got %v", err)
 	}
 }
 

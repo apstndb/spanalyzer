@@ -78,6 +78,33 @@ func analyzeCodegenQuerySpannerVariants(ddlPath, ddl string, schema QueryCodegen
 	return fields, toPlanQueryVariants(variants), nil
 }
 
+func emitQueryGoBuilder(query QueryCodegenQuery, builderFunc, paramsType string) (string, []string, error) {
+	opParams, err := toOptParamParams(query.Params)
+	if err != nil {
+		return "", nil, err
+	}
+	segments, err := optparam.SegmentTemplate(query.SQL, opParams)
+	if err != nil {
+		return "", nil, err
+	}
+	code, err := optparam.EmitGoBuilder(segments, opParams, optparam.BuilderOptions{
+		FuncName:       builderFunc,
+		ParamsTypeName: paramsType,
+		Fragment:       true,
+	})
+	if err != nil {
+		return "", nil, err
+	}
+	imports := []string{"sort", "strings"}
+	for _, p := range opParams {
+		if p.Mode == optparam.ModeNullIsNull {
+			imports = append(imports, "cloud.google.com/go/spanner")
+			break
+		}
+	}
+	return code, imports, nil
+}
+
 func toOptParamParams(params []QueryCodegenParam) ([]optparam.Param, error) {
 	out := make([]optparam.Param, 0, len(params))
 	for _, p := range params {

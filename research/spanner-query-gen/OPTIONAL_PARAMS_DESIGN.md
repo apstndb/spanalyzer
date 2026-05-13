@@ -1,7 +1,9 @@
 # Optional Query Parameters: Design Notes
 
-Status: non-normative design discussion captured for the
-`internal/optparam` PoC on branch `worktree-optional-params-poc`.
+Status: non-normative design notes for the v1alpha optional-parameter
+implementation. The original `internal/optparam` PoC has been merged into
+`internal/querygen`; this document still records the design rationale and
+remaining follow-up work.
 
 Scope: how `spanner-query-gen` could support optional query parameters that
 drive dynamic SQL generation at codegen time, plus the design questions that
@@ -270,29 +272,43 @@ the PoC can be reviewed without committing to memefish / go-googlesql
 predicate rewriting. An AST-based detector can replace it later without
 changing the data model.
 
-## Minimum-viable scope for v1
+## Minimum-viable v1alpha scope
 
-1. `params[].optional: required | null_is_null | omit_when_null` (default
-   `required`).
-2. Marker syntax `/*?optional:NAME*/ ... /*?end*/` for omit blocks.
-3. Per-variant analysis with a hard row-type-equality check.
-4. Per-variant plan-contract entries.
-5. Generated Go params struct mapping the three modes to `T`, `Null*`,
-   and `*T` field types respectively.
-6. Runtime composition is generated from the segment list (not from a
-   2^k table of SQL constants); `VerifyBuilderRoundTrip` runs at codegen
-   time to enforce byte-equality with the verified variants.
+The v1alpha implementation currently supports:
 
-## Prototype status
+1. `params[].optional: required | null_is_null | omit_when_null |
+   omit_when_empty | orderby_choice` (default `required`).
+2. Marker syntax for hand-written SQL:
+   - `/*?null_is_null:NAME*/ ... = @NAME ... /*?end*/`
+   - `/*?optional:NAME*/ ... /*?end*/`
+   - `/*?empty:NAME*/ ... /*?end*/`
+   - `/*?orderby:NAME*/ <default ORDER BY> /*?end*/`
+3. Generated `kind: table` and `kind: index` query support for key-prefix
+   `null_is_null` / `omit_when_null`, plus `orderby_choice` ORDER BY
+   allowlists.
+4. Per-variant analysis with a hard row-type-equality check.
+5. Per-variant plan-contract entries under `QueryCodegenPlanQuery.Variants`.
+6. Generated Go params structs and runtime SQL builders. Optional queries no
+   longer emit a single SQL constant; generated methods accept typed
+   `<QueryName>Params` values and call a `Build<QueryName>SQL` helper that
+   returns the selected SQL, bind args, and variant label.
 
-The PoC now covers, in addition to the original three modes, the
-following items from the "other directions" table:
+The remaining MVP gap is downstream consumption: `tools/spanner-query-plan-shape`
+does not yet expand plan-contract variants automatically.
 
-- Empty-array handling for `IN UNNEST(@arr)` (`omit_when_empty`).
+## Implementation status
+
+The integrated implementation covers, in addition to the original three
+modes, the following items from the "other directions" table:
+
+- Empty-array handling for `IN UNNEST(@arr)` (`omit_when_empty`) in
+  hand-written SQL.
 - Range pairs as two independent `omit_when_null` params.
 - Optional `LIMIT` / `OFFSET` via `omit_when_null INT64`.
 - ORDER BY allowlist (`orderby_choice`) with N choices folded into the
   variant Cartesian product.
+- `kind: index` and `kind: table` generated SQL hooks for key-prefix optional
+  predicates and ORDER BY choice markers.
 
 ## Explicitly deferred
 
