@@ -33,8 +33,8 @@ the generator emit:
 
 ## Core Axis: per-parameter `optional` mode
 
-The proposed minimum scope adds a new field on each parameter and a small
-marker grammar inside the SQL template. The PoC prototypes four kinds of
+The v1alpha scope adds a new field on each parameter and a small marker grammar
+inside the SQL template. The current implementation supports four kinds of
 markers, each backed by a per-parameter mode:
 
 ```yaml
@@ -103,13 +103,13 @@ That invariant — "predicate omission must not change the result row type"
 variant. Features that violate the invariant (runtime projection, runtime
 ORDER BY changing the result shape) belong to a separate RFC.
 
-In the `internal/optparam` PoC the verifier runs the analyzer per variant
+In the current `internal/optparam` implementation the verifier runs the analyzer per variant
 (2^k times) and proves equality directly via `proto.Equal` on the
 `spannerpb.StructType`. The cost is modest because:
 
 - 2 optional params → 4 analyses → ~2 s wall (warm WASM compile cache).
-- The analyzer can be reused across variants if we promote the API; for
-  the PoC each variant rebuilt the analyzer for isolation.
+- The analyzer can be reused across variants in future if needed; the current
+  bridge rebuilds it per variant for isolation.
 
 ### 2. What does the Go-side API look like?
 
@@ -131,7 +131,7 @@ has multiple variants. Two options:
 
 - **Per-variant entries**: `PlanQueryVariant{label, sql, sql_sha256, ...}`
   carried under `QueryCodegenPlanQuery.Variants`. Each variant gets its
-  own plan in the plan-shape probe. This is what the PoC's
+  own plan in the plan-shape probe. This is what the current
   `BuildPlanVariants` already produces.
 - **Composite hash**: keep one entry per query but hash
   `(template, sorted-set-of-present-predicates)`. Simpler but loses the
@@ -147,7 +147,7 @@ plan-contract recording only**. The generated runtime code does not
 embed all 2^k SQL strings; it embeds the template's segment list and
 composes one SQL string per call by walking the segments linearly.
 
-This is the hybrid invariant the PoC enforces:
+This is the hybrid invariant the implementation enforces:
 
 ```text
 ComposeVariant(segments, presence_set) == EnumerateVariants(sql, params)[label_for(presence_set)].SQL
@@ -186,10 +186,11 @@ Constraints the implementation must hold:
    (`spanner.NullString{Valid: false}` instead of a `*T` that is nil).
    `required` is unchanged.
 
-## PoC results (`internal/optparam`)
+## Implementation Results (`internal/optparam`)
 
-The PoC lives in `internal/optparam/` and is intentionally decoupled from
-`internal/querygen` so the data model can be validated independently.
+The marker grammar and variant machinery live in `internal/optparam/` and are
+intentionally decoupled from `internal/querygen` so the data model remains
+independently testable.
 
 Build-time pipeline:
 
@@ -243,14 +244,14 @@ Test fixtures cover the four marker kinds plus two derived patterns
 - **Range pair (`since` / `until`)** — two independent
   `omit_when_null TIMESTAMP` predicates. Four variants, all identical
   row type. (Go emitter not exercised: TIMESTAMP needs a wrapper type
-  the PoC has not mapped yet.)
+  the emitter has not mapped yet.)
 - **Optional `LIMIT`** — `INT64` with `omit_when_null` mode. Two
   variants, same row type. Emitter produces `Limit *int64` and the
   conditional `LIMIT @limit` segment.
 - **Divergent SELECT list** — negative test placing markers across the
   SELECT list. The cross-check catches the divergence.
 
-### Marker convention chosen for the PoC
+### Marker Convention
 
 ```sql
 SELECT SingerId, FirstName FROM Singers
@@ -267,10 +268,10 @@ WHERE TRUE
 - `WHERE TRUE` is the standard idiom for keeping the WHERE clause valid
   when every optional block is dropped.
 
-This convention is deliberately ASCII-marker-based, not AST-driven, so
-the PoC can be reviewed without committing to memefish / go-googlesql
-predicate rewriting. An AST-based detector can replace it later without
-changing the data model.
+This convention is deliberately ASCII-marker-based, not AST-driven, so the
+runtime builder and plan-contract machinery can stay independent from memefish
+or go-googlesql predicate rewriting. An AST-based detector can replace it later
+without changing the data model.
 
 ## Minimum-viable v1alpha scope
 

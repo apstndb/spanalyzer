@@ -297,9 +297,8 @@ func goSliceType(p Param) (string, error) {
 	}
 }
 
-// goNullableType emits a Spanner-style nullable wrapper for null_is_null.
-// For the PoC we use the cloud.google.com/go/spanner Null* types only by
-// name; the caller's module is expected to import them.
+// goNullableType emits a Spanner-style nullable wrapper for null_is_null. The
+// returned type names assume the caller imports cloud.google.com/go/spanner.
 func goNullableType(p Param) (string, error) {
 	switch strings.ToUpper(strings.TrimSpace(p.Type)) {
 	case "STRING":

@@ -220,7 +220,7 @@ WHERE TRUE
 		{Name: "since", Type: "TIMESTAMP", Mode: ModeOmitWhenNull},
 		{Name: "until", Type: "TIMESTAMP", Mode: ModeOmitWhenNull},
 	}
-	// TIMESTAMP has no Go pointer mapping in the PoC, so we exercise
+	// TIMESTAMP has no Go pointer mapping yet, so we exercise
 	// only the analyzer + variant layer (not the Go emitter).
 	result, err := VerifyVariants("albums.sql", albumsDDL, sql, params)
 	if err != nil {

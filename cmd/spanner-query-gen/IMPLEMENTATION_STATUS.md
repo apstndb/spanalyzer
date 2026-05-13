@@ -12,6 +12,10 @@ deliberate deferrals.
   `plan-report-schema`, and `plan-contract-schema` subcommands.
 - Query result DTO and SQL constant generation for Spanner, BigQuery, and
   reviewable `external_query` declarations.
+- Basic runtime query free functions for Spanner and BigQuery query
+  cardinalities (`one`, `maybe_one`, `many`) plus row-set DML
+  `THEN RETURN`. Optional Spanner queries emit typed params structs and
+  `Build<Name>SQL` helpers instead of a single SQL constant.
 - Spanner `table` and `index` shorthand query generation with deterministic
   `order_by: key` by default and opt-out `order_by: none`.
 - Spanner write helper generation for mutation and DML surfaces, including
@@ -88,13 +92,13 @@ deliberate deferrals.
 
 ## Design-Only Or Partial Work
 
-- Generated query methods that call Cloud Spanner or BigQuery clients are
-  reserved and rejected in v1alpha. Current output is DTOs, SQL constants, and
-  write helper primitives.
-- Runtime method generation for query cardinality (`one`, `maybe_one`, `many`)
-  is planned but not implemented.
-- Row-count-only DML execution, DML `THEN RETURN`, and custom command entries
-  are future work and are intentionally not modeled as `queries` today.
+- `emit.spanner.query_methods` and `emit.bigquery.query_methods` are still
+  reserved and rejected as explicit config gates. Current query methods are the
+  built-in v1alpha free-function surface and are not controlled by those flags.
+- A richer generated client wrapper, stable query error taxonomy, and
+  pointer/value result-policy configuration remain design work.
+- Custom command entries remain future work. Current row-count DML and DML
+  `THEN RETURN` support is modeled through `queries` result modes.
 - BigQuery external dataset support is analyzer/config modeling only. Live
   BigQuery or Terraform evidence collection remains outside the generator.
 - Plan reports separate `optimizer.requested` from `optimizer.effective`.

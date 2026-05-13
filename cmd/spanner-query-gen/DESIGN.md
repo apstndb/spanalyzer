@@ -816,12 +816,16 @@ The old `client: both` setting mixed several concepts:
 v1alpha uses `emit` to declare which generated API surfaces should exist.
 This gives users a way to generate shared DTOs without promising BigQuery query
 methods, or to generate Spanner mutations without BigQuery tags.
-`emit.*.query_methods` is reserved for future work and is rejected in v1alpha.
+`emit.*.query_methods` is reserved for a future client-wrapper method surface
+and is rejected in v1alpha. Basic query free functions are currently emitted
+from `queries[]` without using those flags.
 
-Query DTOs and SQL constants are the baseline output for declared queries.
-`emit` controls additional runtime helper surfaces such as Spanner mutations
-and DML statements; it does not gate whether query DTOs or SQL constants are
-rendered.
+Query DTOs, SQL constants, and basic query free functions are the baseline
+output for declared queries. Optional Spanner queries emit typed params structs
+and SQL builder helpers instead of a single SQL constant. `emit` controls
+additional runtime helper surfaces such as Spanner mutations and DML statements;
+it does not gate whether query DTOs, SQL constants, or basic query free
+functions are rendered.
 
 Global `emit` gates generated write helpers. v1alpha has no write-level `emit`;
 operation-specific incompatibility is applied after the global setting. For
@@ -1058,13 +1062,14 @@ can participate in both BigQuery loading and Spanner decoding or encoding.
 
 ### Query Client Methods
 
-Query methods should be optional at first, then become the main UX:
+The current v1alpha implementation emits basic package-level query free
+functions. A richer generated client wrapper remains design work:
 
 - `result: one` means exactly one row; zero rows and more than one row are
   errors.
 - `result: maybe_one` allows zero rows but still errors on more than one row.
-- `result: many` returns `([]*T, error)` or `([]T, error)` depending on config.
-- Method receivers should use a generated client wrapper that can hold a
+- `result: many` returns an iterator plus an `All` helper that loads `[]*T`.
+- Future method receivers should use a generated client wrapper that can hold a
   Spanner client or a transaction-aware Spanner interface.
 
 The generated error taxonomy should be stable enough for callers to branch on:
@@ -1094,19 +1099,18 @@ generic planning-error ID whenever the generator can classify the failure:
 `planning-error` remains only as a fallback category for unclassified planning
 failures.
 
-`maybe_one` should return `(*T, nil)` or `(T, bool, error)` based on the chosen
-pointer/value result policy; the choice should be global config, not inferred
-per query.
+`maybe_one` currently returns `(*T, error)`, using `nil, nil` for no rows.
+A future pointer/value result policy could switch this to `(T, bool, error)`;
+that choice should be global config, not inferred per query.
 
-The first implementation should generate Spanner query methods only. BigQuery
-method generation should wait until DTO loading and TableSchema metadata are
-robust enough, and it should remain a separate runtime surface rather than being
-forced through the Spanner method abstraction.
+The current implementation includes both Spanner and BigQuery free functions.
+The future generated client-wrapper method surface should still keep BigQuery
+and Spanner runtime abstractions separate.
 
-Custom DML should be modeled by a future `commands` surface instead of
-`queries[].result.cardinality: exec`. Row-count-only DML belongs under
-`commands[].result.mode: row_count`; DML `THEN RETURN` belongs under
-`commands[].returning.cardinality: one|maybe_one|many`.
+Custom command entries remain future work. Current row-count DML and DML
+`THEN RETURN` support is modeled through `queries` result modes; a future
+`commands` surface may replace or refine that shape after the query runtime API
+settles.
 
 Parameter structs should be inferred from analyzer output when possible. Config
 `params` entries are overrides or disambiguation, not the primary source of

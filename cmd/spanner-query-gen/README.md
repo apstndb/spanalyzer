@@ -83,10 +83,13 @@ If neither config `go.out` nor `--out` is set, generated Go code is written to
 stdout. Use `--out -` to force stdout. `check` is equivalent to
 `generate --check`.
 
-Query DTOs and SQL constants are the baseline generated output for declared
-queries. `emit` controls additional runtime helper surfaces such as Cloud
-Spanner mutations and DML statements. Query method surfaces are reserved and
-rejected in v1alpha.
+Query DTOs, SQL constants, and basic runtime query free functions are the
+baseline generated output for declared queries. Optional Spanner queries emit a
+typed `<Name>Params` struct plus `Build<Name>SQL` helper instead of a single SQL
+constant. `emit` controls additional runtime helper surfaces such as Cloud
+Spanner mutations and DML statements. The explicit
+`emit.*.query_methods` config flags are reserved for a future richer method
+surface and are rejected in v1alpha.
 
 `explain-plan` prints the resolved generation plan as YAML, JSON, or a human
 summary. The default machine-readable plan omits heavy audit-only projection
@@ -288,18 +291,19 @@ writes:
 GoogleSQL; only non-default dialects need `dialect`.
 
 `emit.spanner.query_methods` and `emit.bigquery.query_methods` are reserved for
-future generated query method surfaces and are rejected in v1alpha.
+future generated client-wrapper method surfaces and are rejected in v1alpha.
+Basic query free functions are generated from `queries[]` without those flags.
 
 Query entries use `kind` as a discriminated union. Supported query kinds are
 `sql`, `table`, `index`, and `external_query`. Raw BigQuery SQL containing
 `EXTERNAL_QUERY(...)` is rejected in v1alpha config; use
 `kind: external_query` so the inner SQL and connection mapping remain
-reviewable. `result.cardinality` defaults to `many`; it is recorded in the
-resolved plan for review and future query method surfaces. v1alpha generated
-query output remains DTOs and SQL constants. v1alpha query cardinality is
-limited to row-returning results: `one`, `maybe_one`, or `many`. Row-count-only DML
-execution and DML `THEN RETURN` are future `commands` work, not
-`queries[].result.cardinality: exec`.
+reviewable. `result.cardinality` defaults to `many` and drives generated query
+free functions. v1alpha query cardinality supports row-returning `one`,
+`maybe_one`, and `many`, plus DML-oriented row count and row-set modes used by
+the current generated runtime surface. A future `commands` surface may replace
+or refine the DML shape, but it is not required for the current v1alpha
+implementation.
 
 Use `queries[].params` when the analyzer needs explicit parameter types, such
 as ambiguous parameters, ARRAY/STRUCT parameters, or separated BigQuery outer

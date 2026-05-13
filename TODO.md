@@ -5,27 +5,17 @@ that is known from the current implementation and documentation.
 
 ## Current Coordination Notes
 
-- Other-agent progress was observed on 2026-05-09 in the uncommitted working
-  tree. Several items below are marked done because code/docs were added, but
-  they should still be treated as unmerged progress until tests pass and the
-  changes are reviewed.
+- The 2026-05-09 other-agent progress has been committed and the build is back
+  to green as of 2026-05-14. The historical "working tree" items below are kept
+  as an audit trail, not as current blockers.
 - The previously-noted `list_features.go` blocker is no longer present in the
-  tree; remove this note once the rest of the working-tree review settles.
-- Uncommitted progress currently includes BigQuery dialect tests, direct
-  `EXTERNAL_QUERY` TVF literal extraction (now keyed by connection ID + inner
-  SQL instead of source order), README updates, the `Source` -> `Catalog`
-  rename across `querygen` plan/config types, restructured `QueryCodegenWrite`
-  with `Insert.Columns` / `Update.Columns` / `Conflict`, DML `THEN RETURN` row
-  type extraction, default-on pipe syntax for both Spanner and BigQuery, and
-  first-pass `spanner-query-gen` runtime query methods (`many` / `one` /
-  `maybe_one` / `row_count`). Check the local diff before starting overlapping
-  work.
+  tree.
 
 ## Outstanding Issues In The Working Tree (2026-05-09)
 
-These need to be fixed before the uncommitted progress can be merged or relied
-upon. Marking the corresponding "done" items above as merge-ready is premature
-until these regress.
+These were the merge blockers found in the 2026-05-09 working tree. They are
+now fixed, but the section is kept so future agents can understand why the
+cleanup happened.
 
 - [x] **Build is broken in `internal/querygen`.** Fixed by replacing the stale
   `allNonKeyColumnNames(table, keyColumns)` call with the existing

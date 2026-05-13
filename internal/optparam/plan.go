@@ -7,9 +7,8 @@ import (
 )
 
 // PlanQueryVariant is the per-variant plan-contract entry. It is shaped to be
-// emitted into QueryCodegenPlanQuery.Variants once this PoC is promoted into
-// internal/querygen so downstream tools (e.g. spanner-query-plan-shape) can
-// produce one execution plan per SQL variant.
+// emitted into QueryCodegenPlanQuery.Variants so downstream tools (e.g.
+// spanner-query-plan-shape) can produce one execution plan per SQL variant.
 type PlanQueryVariant struct {
 	// Label is a stable identifier for the variant. It is the same value as
 	// Variant.Key (alphabetized concatenation of present OmitWhenNull
@@ -52,8 +51,8 @@ func sha256Hex(s string) string {
 }
 
 // FormatPlanVariants renders a human-readable summary of the plan-contract
-// entries; useful for the PoC test output and for confirming what would land
-// in the plan contract.
+// entries; useful for test output and for confirming what lands in the plan
+// contract.
 func FormatPlanVariants(entries []PlanQueryVariant) string {
 	var s string
 	for i, e := range entries {

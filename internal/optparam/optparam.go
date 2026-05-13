@@ -1,9 +1,9 @@
-// Package optparam is a PoC for optional query parameters that drive dynamic
-// SQL generation at codegen time.
+// Package optparam models optional query parameters that drive dynamic SQL
+// generation at codegen time.
 //
-// It is intentionally isolated from internal/querygen so the data model and
-// algorithm can be validated independently before being promoted into the
-// v1alpha config and the plan contract.
+// It is intentionally isolated from internal/querygen so the marker grammar,
+// variant enumeration, and runtime builder generation remain reusable and easy
+// to test apart from the v1alpha config shape.
 //
 // Four optional shapes are modeled by per-segment markers in the SQL
 // template:
