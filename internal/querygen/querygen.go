@@ -735,12 +735,18 @@ func BuildQueryCodegenPlan(config QueryCodegenConfig, baseDir string) (*QueryCod
 		}
 		applyWarningSeverityOverrides(warnings, config.RuleSeverity)
 		topSQL, topSHA := query.SQL, digestString(query.SQL)
+		planVariants := variants
 		if len(variants) > 0 {
 			// Use the all-on (most-fields-present) variant as the
-			// canonical SQL so existing single-SQL consumers see the
-			// fully-expanded shape.
+			// canonical SQL so single-SQL consumers see the rewritten
+			// shape (eg. IS NOT DISTINCT FROM in place of = @p).
 			top := pickCanonicalVariant(variants)
 			topSQL, topSHA = top.SQL, top.SQLSHA256
+			// A single-variant slice carries no new information beyond
+			// the top-level SQL; suppress it to keep the plan tidy.
+			if len(variants) == 1 {
+				planVariants = nil
+			}
 		}
 		plan.Queries = append(plan.Queries, QueryCodegenPlanQuery{
 			Name:            query.Name,
@@ -753,7 +759,7 @@ func BuildQueryCodegenPlan(config QueryCodegenConfig, baseDir string) (*QueryCod
 			ResultStruct:    structName,
 			Constants:       planConstants(queryGoConstants(query)),
 			Params:          append([]QueryCodegenParam(nil), query.Params...),
-			Variants:        variants,
+			Variants:        planVariants,
 			StarExpansion:   queryPlanStarExpansion(query, plan.CatalogBindings),
 			Relations:       queryPlanRelations(query, plan.CatalogBindings),
 			VetSuppressions: planVetSuppressions(query.Vet),
@@ -1164,7 +1170,19 @@ func mergeQueryCodegenParams(defaults, overrides []QueryCodegenParam) ([]QueryCo
 		}
 		seenOverrides[key] = true
 		if i, ok := index[key]; ok {
-			out[i] = param
+			// Override keeps user-specified fields but falls back to
+			// the default-generated entry for unset fields. This lets
+			// a user attach optional / choices / default to an
+			// auto-generated kind: index / kind: table param without
+			// also having to repeat the type.
+			merged := param
+			if strings.TrimSpace(merged.Type) == "" {
+				merged.Type = out[i].Type
+			}
+			if strings.TrimSpace(merged.Scope) == "" {
+				merged.Scope = out[i].Scope
+			}
+			out[i] = merged
 			continue
 		}
 		index[key] = len(out)
@@ -1496,6 +1514,37 @@ func analyzeCodegenQuery(schemas map[string]QueryCodegenSchema, query QueryCodeg
 	}
 }
 
+// findOrderByChoiceParam returns the first param with mode
+// orderby_choice, or a zero-value param if none. Generated SQL for
+// kind: index uses it to emit an /*?orderby:NAME*/ marker in place of
+// the default-key ORDER BY clause.
+func findOrderByChoiceParam(params []QueryCodegenParam) QueryCodegenParam {
+	for _, p := range params {
+		if strings.EqualFold(strings.TrimSpace(p.Optional), "orderby_choice") {
+			return p
+		}
+	}
+	return QueryCodegenParam{}
+}
+
+// queryOptionalModes returns a name -> optional-mode map for the params
+// in a query. Used by codegenIndexQuerySQL to swap predicate generation
+// when a key-prefix column carries a non-default optional mode.
+func queryOptionalModes(params []QueryCodegenParam) map[string]string {
+	if len(params) == 0 {
+		return nil
+	}
+	out := make(map[string]string, len(params))
+	for _, p := range params {
+		mode := strings.ToLower(strings.TrimSpace(p.Optional))
+		if mode == "" || mode == "required" {
+			continue
+		}
+		out[p.Name] = mode
+	}
+	return out
+}
+
 // queryHasOptionalMarkers reports whether any param triggers the
 // per-variant analyzer path.
 func queryHasOptionalMarkers(query QueryCodegenQuery) bool {
@@ -1726,17 +1775,21 @@ func resolveCodegenQuerySQL(schemas map[string]QueryCodegenSchema, query QueryCo
 	}
 	switch {
 	case query.Table != "":
-		sql, err := codegenTableQuerySQL(schema, query.Table, query.OrderBy, baseDir)
+		sql, params, err := codegenTableQuerySQL(schema, query.Table, query.KeyPrefix, query.OrderBy, baseDir, query.Params)
 		if err != nil {
 			return query, fmt.Errorf("query %s table %s: %w", query.Name, query.Table, err)
 		}
 		query.SQL = sql
+		query.Params, err = mergeQueryCodegenParams(params, query.Params)
+		if err != nil {
+			return query, fmt.Errorf("query %s params: %w", query.Name, err)
+		}
 		return query, nil
 	case query.Index != "":
 		if strings.ToLower(emptyDefault(schema.Dialect, "spanner")) != "spanner" {
 			return query, fmt.Errorf("query %s: index queries are only supported for Spanner schemas", query.Name)
 		}
-		sql, params, err := codegenIndexQuerySQL(schema, query.Index, query.KeyPrefix, query.OrderBy, baseDir)
+		sql, params, err := codegenIndexQuerySQL(schema, query.Index, query.KeyPrefix, query.OrderBy, baseDir, query.Params)
 		if err != nil {
 			return query, fmt.Errorf("query %s index %s: %w", query.Name, query.Index, err)
 		}
@@ -2672,24 +2725,27 @@ func containsColumn(columns []*Column, name string) bool {
 	return false
 }
 
-func codegenTableQuerySQL(schema QueryCodegenSchema, tableName, orderBy, baseDir string) (string, error) {
+func codegenTableQuerySQL(schema QueryCodegenSchema, tableName string, keyPrefix []string, orderBy, baseDir string, userParams []QueryCodegenParam) (string, []QueryCodegenParam, error) {
 	if strings.ToLower(emptyDefault(schema.Dialect, "spanner")) != "spanner" {
-		if strings.TrimSpace(orderBy) != "" && !strings.EqualFold(strings.TrimSpace(orderBy), "none") {
-			return "", fmt.Errorf("order_by is only supported for Spanner table queries")
+		if len(keyPrefix) > 0 {
+			return "", nil, fmt.Errorf("key_prefix is only supported for Spanner table queries")
 		}
-		return "SELECT * FROM " + quoteGoogleSQLPath(tableName), nil
+		if strings.TrimSpace(orderBy) != "" && !strings.EqualFold(strings.TrimSpace(orderBy), "none") {
+			return "", nil, fmt.Errorf("order_by is only supported for Spanner table queries")
+		}
+		return "SELECT * FROM " + quoteGoogleSQLPath(tableName), nil, nil
 	}
 	orderMode, err := normalizeTableQueryOrderBy(schema, orderBy)
 	if err != nil {
-		return "", err
+		return "", nil, err
 	}
 	catalog, err := codegenSpannerCatalog(schema, baseDir)
 	if err != nil {
-		return "", err
+		return "", nil, err
 	}
 	table, err := catalogTable(catalog, tableName)
 	if err != nil {
-		return "", err
+		return "", nil, err
 	}
 	columns := make([]string, 0, len(table.Columns))
 	for _, column := range table.Columns {
@@ -2698,16 +2754,94 @@ func codegenTableQuerySQL(schema QueryCodegenSchema, tableName, orderBy, baseDir
 		}
 	}
 	if len(columns) == 0 {
-		return "", fmt.Errorf("table %s has no selectable columns", tableName)
+		return "", nil, fmt.Errorf("table %s has no selectable columns", tableName)
 	}
 	sql := "SELECT " + strings.Join(columns, ", ") + " FROM " + quoteGoogleSQLPath(table.Name.String())
+
+	// Optional WHERE-by-key filter. key_prefix must be a prefix of the
+	// table's primary-key column list, mirroring kind: index.
+	var params []QueryCodegenParam
+	if len(keyPrefix) > 0 {
+		pkNames := primaryKeyColumnNames(table)
+		if err := validateKeyPrefix(pkNames, keyPrefix); err != nil {
+			return "", nil, err
+		}
+		optionalModes := queryOptionalModes(userParams)
+		paramNames := queryParamNameMap(keyPrefix)
+		// Same contiguous-prefix rule as kind: index.
+		keyModes := make([]string, len(keyPrefix))
+		anyOmittable := false
+		for i, key := range keyPrefix {
+			keyModes[i] = strings.ToLower(strings.TrimSpace(optionalModes[paramNames[columnKey(key)]]))
+			switch keyModes[i] {
+			case "omit_when_null", "omit_when_empty":
+				anyOmittable = true
+			}
+		}
+		for i := range keyModes {
+			switch keyModes[i] {
+			case "omit_when_null", "omit_when_empty":
+				for j := i + 1; j < len(keyModes); j++ {
+					switch keyModes[j] {
+					case "omit_when_null", "omit_when_empty":
+					default:
+						return "", nil, fmt.Errorf("key column %s is %s but column %s (later in the key prefix) is required; primary-key seeks need contiguous predicates, so trailing key columns must also be optional",
+							keyPrefix[i], keyModes[i], keyPrefix[j])
+					}
+				}
+				break
+			}
+		}
+		whereSQL := make([]string, 0, len(keyPrefix))
+		params = make([]QueryCodegenParam, 0, len(keyPrefix))
+		for i, key := range keyPrefix {
+			column, _ := table.Column(key)
+			if column == nil {
+				return "", nil, fmt.Errorf("key column %s does not exist on table %s", key, table.Name)
+			}
+			typeSQL, err := typeSpecSQL(column.Type)
+			if err != nil {
+				return "", nil, fmt.Errorf("key column %s: %w", key, err)
+			}
+			paramName := paramNames[columnKey(key)]
+			predicate := quoteGoogleSQLIdent(key) + " = @" + paramName
+			switch keyModes[i] {
+			case "", "required":
+			case "null_is_null":
+				predicate = quoteGoogleSQLIdent(key) + " IS NOT DISTINCT FROM @" + paramName
+			case "omit_when_null":
+				predicate = "/*?optional:" + paramName + "*/ AND " + quoteGoogleSQLIdent(key) + " = @" + paramName + " /*?end*/"
+			case "omit_when_empty":
+				return "", nil, fmt.Errorf("key column %s param %s: optional: omit_when_empty is not supported on kind: table (key columns are scalar; use omit_when_null instead)", key, paramName)
+			default:
+				return "", nil, fmt.Errorf("key column %s param %s: optional: %s is not supported on kind: table", key, paramName, keyModes[i])
+			}
+			whereSQL = append(whereSQL, predicate)
+			params = append(params, QueryCodegenParam{Name: paramName, Type: typeSQL})
+		}
+		if anyOmittable {
+			sql += " WHERE TRUE"
+			for _, predicate := range whereSQL {
+				if strings.HasPrefix(predicate, "/*?optional:") {
+					sql += " " + predicate
+				} else {
+					sql += " AND " + predicate
+				}
+			}
+		} else {
+			sql += " WHERE " + strings.Join(whereSQL, " AND ")
+		}
+	}
+
 	if orderMode != "none" {
 		sql = appendOrderBy(sql, primaryKeyColumnNames(table))
 	}
-	return sql, nil
+	return sql, params, nil
 }
 
-func codegenIndexQuerySQL(schema QueryCodegenSchema, indexName string, keyPrefix []string, orderBy string, baseDir string) (string, []QueryCodegenParam, error) {
+func codegenIndexQuerySQL(schema QueryCodegenSchema, indexName string, keyPrefix []string, orderBy string, baseDir string, userParams []QueryCodegenParam) (string, []QueryCodegenParam, error) {
+	optionalModes := queryOptionalModes(userParams)
+	orderByChoice := findOrderByChoiceParam(userParams)
 	orderMode, err := normalizeIndexQueryOrderBy(orderBy)
 	if err != nil {
 		return "", nil, err
@@ -2756,7 +2890,35 @@ func codegenIndexQuerySQL(schema QueryCodegenSchema, indexName string, keyPrefix
 	whereSQL := make([]string, 0, len(keyPrefix)+len(index.Keys))
 	params := make([]QueryCodegenParam, 0, len(keyPrefix))
 	paramNames := queryParamNameMap(keyPrefix)
-	for _, key := range keyPrefix {
+	// Walk the key prefix once to learn which columns are omittable.
+	// Spanner index seeks need a contiguous prefix, so a column may
+	// only be omittable if every column to its right is also omittable
+	// (or absent).
+	keyModes := make([]string, len(keyPrefix))
+	anyOmittable := false
+	for i, key := range keyPrefix {
+		paramName := paramNames[columnKey(key)]
+		keyModes[i] = strings.ToLower(strings.TrimSpace(optionalModes[paramName]))
+		switch keyModes[i] {
+		case "omit_when_null", "omit_when_empty":
+			anyOmittable = true
+		}
+	}
+	for i := range keyModes {
+		switch keyModes[i] {
+		case "omit_when_null", "omit_when_empty":
+			for j := i + 1; j < len(keyModes); j++ {
+				switch keyModes[j] {
+				case "omit_when_null", "omit_when_empty":
+				default:
+					return "", nil, fmt.Errorf("key column %s is %s but column %s (later in the key prefix) is required; key-prefix seeks need contiguous predicates, so trailing key columns must also be optional",
+						keyPrefix[i], keyModes[i], keyPrefix[j])
+				}
+			}
+			break
+		}
+	}
+	for i, key := range keyPrefix {
 		column, _ := table.Column(key)
 		if column == nil {
 			return "", nil, fmt.Errorf("key column %s does not exist on table %s", key, table.Name)
@@ -2766,7 +2928,20 @@ func codegenIndexQuerySQL(schema QueryCodegenSchema, indexName string, keyPrefix
 			return "", nil, fmt.Errorf("key column %s: %w", key, err)
 		}
 		paramName := paramNames[columnKey(key)]
-		whereSQL = append(whereSQL, quoteGoogleSQLIdent(key)+" = @"+paramName)
+		predicate := quoteGoogleSQLIdent(key) + " = @" + paramName
+		switch keyModes[i] {
+		case "", "required":
+			// Default: standard equality.
+		case "null_is_null":
+			predicate = quoteGoogleSQLIdent(key) + " IS NOT DISTINCT FROM @" + paramName
+		case "omit_when_null":
+			predicate = "/*?optional:" + paramName + "*/ AND " + quoteGoogleSQLIdent(key) + " = @" + paramName + " /*?end*/"
+		case "omit_when_empty":
+			return "", nil, fmt.Errorf("key column %s param %s: optional: omit_when_empty is not supported on kind: index (key columns are scalar; use omit_when_null instead)", key, paramName)
+		default:
+			return "", nil, fmt.Errorf("key column %s param %s: optional: %s is not supported on kind: index", key, paramName, keyModes[i])
+		}
+		whereSQL = append(whereSQL, predicate)
 		params = append(params, QueryCodegenParam{Name: paramName, Type: typeSQL})
 	}
 	whereSQL, err = appendNullFilteredIndexPredicates(whereSQL, table, index)
@@ -2777,9 +2952,34 @@ func codegenIndexQuerySQL(schema QueryCodegenSchema, indexName string, keyPrefix
 		" FROM " + quoteGoogleSQLPath(table.Name.String()) +
 		"@{FORCE_INDEX=" + quoteGoogleSQLIdent(index.Name.String()) + "}"
 	if len(whereSQL) > 0 {
-		sql += " WHERE " + strings.Join(whereSQL, " AND ")
+		if anyOmittable {
+			// Use `WHERE TRUE` so the SQL stays valid when every
+			// omittable predicate is dropped at runtime. Each
+			// predicate carries its own conjunctor (either `AND` for
+			// required, or `/*?optional:...*/ AND ... /*?end*/` for
+			// omit_when_null).
+			sql += " WHERE TRUE"
+			for _, predicate := range whereSQL {
+				if strings.HasPrefix(predicate, "/*?optional:") {
+					sql += " " + predicate
+				} else {
+					sql += " AND " + predicate
+				}
+			}
+		} else {
+			sql += " WHERE " + strings.Join(whereSQL, " AND ")
+		}
 	}
-	if orderMode != "none" {
+	if orderByChoice.Name != "" {
+		if orderMode == "none" {
+			return "", nil, fmt.Errorf("param %s: optional: orderby_choice cannot be combined with order_by: none", orderByChoice.Name)
+		}
+		defaultSQL, ok := orderByChoice.Choices[orderByChoice.Default]
+		if !ok {
+			return "", nil, fmt.Errorf("param %s: default %q is not in choices", orderByChoice.Name, orderByChoice.Default)
+		}
+		sql += " /*?orderby:" + orderByChoice.Name + "*/ " + defaultSQL + " /*?end*/"
+	} else if orderMode != "none" {
 		sql = appendOrderBy(sql, orderColumns)
 	}
 	return sql, params, nil

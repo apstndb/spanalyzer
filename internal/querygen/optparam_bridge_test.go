@@ -137,6 +137,338 @@ queries:
 	}
 }
 
+// TestBuildQueryCodegenPlan_IndexKindNullIsNull confirms that
+// optional: null_is_null on a kind: index query causes the generated
+// SQL to use IS NOT DISTINCT FROM and that no Variants slice is
+// emitted (single SQL, no shape multiplication).
+func TestBuildQueryCodegenPlan_IndexKindNullIsNull(t *testing.T) {
+	dir := t.TempDir()
+	writeTestFile(t, filepath.Join(dir, "spanner.sql"), `
+CREATE TABLE Singers (
+  SingerId  INT64 NOT NULL,
+  FirstName STRING(MAX),
+  LastName  STRING(MAX),
+) PRIMARY KEY (SingerId);
+
+CREATE INDEX SingersByLastName ON Singers(LastName);
+`)
+	config, err := ParseQueryCodegenConfigYAML([]byte(`
+version: v1alpha
+go:
+  package: db
+emit:
+  spanner:
+    mutations: true
+catalogs:
+- name: app
+  kind: spanner
+  ddl: spanner.sql
+queries:
+- name: FindByLastName
+  catalog: app
+  kind: index
+  index: SingersByLastName
+  params:
+  - name: LastName
+    optional: null_is_null
+  result:
+    cardinality: many
+    struct: SingerRow
+`))
+	if err != nil {
+		t.Fatalf("ParseQueryCodegenConfigYAML: %v", err)
+	}
+	plan, err := BuildQueryCodegenPlan(config, dir)
+	if err != nil {
+		t.Fatalf("BuildQueryCodegenPlan: %v", err)
+	}
+	q := plan.Queries[0]
+	if !strings.Contains(q.SQL, "IS NOT DISTINCT FROM @LastName") {
+		t.Errorf("generated SQL should use IS NOT DISTINCT FROM, got %q", q.SQL)
+	}
+	if strings.Contains(q.SQL, "LastName = @LastName") {
+		t.Errorf("generated SQL should not contain `= @LastName`: %q", q.SQL)
+	}
+	if got := len(q.Variants); got != 0 {
+		t.Errorf("Variants on single-SQL null_is_null query = %d, want 0", got)
+	}
+}
+
+// TestBuildQueryCodegenPlan_IndexKindOmitWhenNull confirms that
+// optional: omit_when_null on a kind: index key-prefix column fans
+// the generated SQL out into 2 variants without the user authoring
+// any marker.
+func TestBuildQueryCodegenPlan_IndexKindOmitWhenNull(t *testing.T) {
+	dir := t.TempDir()
+	writeTestFile(t, filepath.Join(dir, "spanner.sql"), `
+CREATE TABLE Singers (
+  SingerId  INT64 NOT NULL,
+  FirstName STRING(MAX),
+  LastName  STRING(MAX),
+) PRIMARY KEY (SingerId);
+
+CREATE INDEX SingersByLastName ON Singers(LastName);
+`)
+	config, err := ParseQueryCodegenConfigYAML([]byte(`
+version: v1alpha
+go:
+  package: db
+emit:
+  spanner:
+    mutations: true
+catalogs:
+- name: app
+  kind: spanner
+  ddl: spanner.sql
+queries:
+- name: FindByLastName
+  catalog: app
+  kind: index
+  index: SingersByLastName
+  params:
+  - name: LastName
+    optional: omit_when_null
+  result:
+    cardinality: many
+    struct: SingerRow
+`))
+	if err != nil {
+		t.Fatalf("ParseQueryCodegenConfigYAML: %v", err)
+	}
+	plan, err := BuildQueryCodegenPlan(config, dir)
+	if err != nil {
+		t.Fatalf("BuildQueryCodegenPlan: %v", err)
+	}
+	q := plan.Queries[0]
+	if got, want := len(q.Variants), 2; got != want {
+		t.Fatalf("variants = %d, want %d", got, want)
+	}
+	wantKeys := map[string]bool{"(none)": true, "LastName": true}
+	for _, v := range q.Variants {
+		if !wantKeys[v.Label] {
+			t.Errorf("unexpected variant label %q", v.Label)
+		}
+	}
+	if !strings.Contains(q.SQL, "AND `LastName` = @LastName") {
+		t.Errorf("canonical SQL should keep the LastName predicate, got %q", q.SQL)
+	}
+}
+
+// TestBuildQueryCodegenPlan_IndexKindOmitMiddleRejected confirms the
+// contiguous-prefix rule: if column N is omittable, every column to
+// its right must also be omittable.
+func TestBuildQueryCodegenPlan_IndexKindOmitMiddleRejected(t *testing.T) {
+	dir := t.TempDir()
+	writeTestFile(t, filepath.Join(dir, "spanner.sql"), `
+CREATE TABLE Singers (
+  SingerId  INT64 NOT NULL,
+  FirstName STRING(MAX),
+  LastName  STRING(MAX),
+) PRIMARY KEY (SingerId);
+
+CREATE INDEX SingersByLastFirst ON Singers(LastName, FirstName);
+`)
+	config, err := ParseQueryCodegenConfigYAML([]byte(`
+version: v1alpha
+go:
+  package: db
+emit:
+  spanner:
+    mutations: true
+catalogs:
+- name: app
+  kind: spanner
+  ddl: spanner.sql
+queries:
+- name: Find
+  catalog: app
+  kind: index
+  index: SingersByLastFirst
+  params:
+  - name: LastName
+    optional: omit_when_null
+  - name: FirstName
+    # FirstName is required → invalid because LastName (earlier) is optional
+  result:
+    cardinality: many
+    struct: SingerRow
+`))
+	if err != nil {
+		t.Fatalf("ParseQueryCodegenConfigYAML: %v", err)
+	}
+	_, err = BuildQueryCodegenPlan(config, dir)
+	if err == nil || !strings.Contains(err.Error(), "key-prefix seeks need contiguous predicates") {
+		t.Fatalf("expected contiguous-prefix error, got %v", err)
+	}
+}
+
+// TestBuildQueryCodegenPlan_IndexKindOrderByChoice confirms that
+// optional: orderby_choice on a kind: index param replaces the
+// default-key ORDER BY clause with a marker that fans out to one
+// variant per choice.
+func TestBuildQueryCodegenPlan_IndexKindOrderByChoice(t *testing.T) {
+	dir := t.TempDir()
+	writeTestFile(t, filepath.Join(dir, "spanner.sql"), `
+CREATE TABLE Singers (
+  SingerId  INT64 NOT NULL,
+  FirstName STRING(MAX),
+  LastName  STRING(MAX),
+) PRIMARY KEY (SingerId);
+
+CREATE INDEX SingersByLastName ON Singers(LastName);
+`)
+	config, err := ParseQueryCodegenConfigYAML([]byte(`
+version: v1alpha
+go:
+  package: db
+emit:
+  spanner:
+    mutations: true
+catalogs:
+- name: app
+  kind: spanner
+  ddl: spanner.sql
+queries:
+- name: ListByLastName
+  catalog: app
+  kind: index
+  index: SingersByLastName
+  params:
+  - name: sort
+    optional: orderby_choice
+    default: name_asc
+    choices:
+      name_asc: "ORDER BY LastName ASC, FirstName ASC"
+      name_desc: "ORDER BY LastName DESC, FirstName DESC"
+  result:
+    cardinality: many
+    struct: SingerRow
+`))
+	if err != nil {
+		t.Fatalf("ParseQueryCodegenConfigYAML: %v", err)
+	}
+	plan, err := BuildQueryCodegenPlan(config, dir)
+	if err != nil {
+		t.Fatalf("BuildQueryCodegenPlan: %v", err)
+	}
+	q := plan.Queries[0]
+	if got, want := len(q.Variants), 2; got != want {
+		t.Fatalf("variants = %d, want %d", got, want)
+	}
+	wantKeys := map[string]bool{"sort=name_asc": true, "sort=name_desc": true}
+	for _, v := range q.Variants {
+		if !wantKeys[v.Label] {
+			t.Errorf("unexpected variant label %q", v.Label)
+		}
+		if !strings.Contains(v.SQL, "ORDER BY") {
+			t.Errorf("variant %s missing ORDER BY: %q", v.Label, v.SQL)
+		}
+	}
+}
+
+// TestBuildQueryCodegenPlan_TableKindKeyPrefix confirms that
+// kind: table accepts a key_prefix and applies the same per-param
+// optional semantics as kind: index.
+func TestBuildQueryCodegenPlan_TableKindKeyPrefix(t *testing.T) {
+	dir := t.TempDir()
+	writeTestFile(t, filepath.Join(dir, "spanner.sql"), `
+CREATE TABLE Singers (
+  SingerId  INT64 NOT NULL,
+  FirstName STRING(MAX),
+  LastName  STRING(MAX),
+) PRIMARY KEY (SingerId);
+`)
+	config, err := ParseQueryCodegenConfigYAML([]byte(`
+version: v1alpha
+go:
+  package: db
+emit:
+  spanner:
+    mutations: true
+catalogs:
+- name: app
+  kind: spanner
+  ddl: spanner.sql
+queries:
+- name: GetById
+  catalog: app
+  kind: table
+  table: Singers
+  key_prefix: [SingerId]
+  params:
+  - name: SingerId
+    optional: null_is_null
+  result:
+    cardinality: maybe_one
+    struct: SingerRow
+`))
+	if err != nil {
+		t.Fatalf("ParseQueryCodegenConfigYAML: %v", err)
+	}
+	plan, err := BuildQueryCodegenPlan(config, dir)
+	if err != nil {
+		t.Fatalf("BuildQueryCodegenPlan: %v", err)
+	}
+	q := plan.Queries[0]
+	if !strings.Contains(q.SQL, "IS NOT DISTINCT FROM @SingerId") {
+		t.Errorf("expected IS NOT DISTINCT FROM, got %q", q.SQL)
+	}
+	if len(q.Variants) != 0 {
+		t.Errorf("Variants for null_is_null single-SQL query = %d, want 0", len(q.Variants))
+	}
+}
+
+func TestBuildQueryCodegenPlan_TableKindOmitWhenNull(t *testing.T) {
+	dir := t.TempDir()
+	writeTestFile(t, filepath.Join(dir, "spanner.sql"), `
+CREATE TABLE Singers (
+  SingerId  INT64 NOT NULL,
+  FirstName STRING(MAX),
+) PRIMARY KEY (SingerId);
+`)
+	config, err := ParseQueryCodegenConfigYAML([]byte(`
+version: v1alpha
+go:
+  package: db
+emit:
+  spanner:
+    mutations: true
+catalogs:
+- name: app
+  kind: spanner
+  ddl: spanner.sql
+queries:
+- name: ListMaybeById
+  catalog: app
+  kind: table
+  table: Singers
+  key_prefix: [SingerId]
+  params:
+  - name: SingerId
+    optional: omit_when_null
+  result:
+    cardinality: many
+    struct: SingerRow
+`))
+	if err != nil {
+		t.Fatalf("ParseQueryCodegenConfigYAML: %v", err)
+	}
+	plan, err := BuildQueryCodegenPlan(config, dir)
+	if err != nil {
+		t.Fatalf("BuildQueryCodegenPlan: %v", err)
+	}
+	q := plan.Queries[0]
+	if got, want := len(q.Variants), 2; got != want {
+		t.Fatalf("variants = %d, want %d", got, want)
+	}
+	wantKeys := map[string]bool{"(none)": true, "SingerId": true}
+	for _, v := range q.Variants {
+		if !wantKeys[v.Label] {
+			t.Errorf("unexpected variant label %q", v.Label)
+		}
+	}
+}
+
 func TestBuildQueryCodegenPlan_OrderByChoice(t *testing.T) {
 	dir := t.TempDir()
 	writeTestFile(t, filepath.Join(dir, "spanner.sql"), `

@@ -222,10 +222,18 @@ func SegmentTemplate(sql string, params []Param) ([]Segment, error) {
 
 	for _, p := range params {
 		switch p.Mode {
-		case ModeOmitWhenNull, ModeOmitWhenEmpty, ModeOrderByChoice, ModeNullIsNull:
+		case ModeOmitWhenNull, ModeOmitWhenEmpty, ModeOrderByChoice:
+			// These modes change the SQL string at codegen time, so the
+			// template must contain the marker for us to know where to
+			// gate or substitute.
 			if !seenBlock[p.Name] {
 				return nil, fmt.Errorf("param %q has mode %s but no marker was found in the SQL", p.Name, p.Mode)
 			}
+		case ModeNullIsNull:
+			// null_is_null is allowed with or without a marker. With a
+			// marker (kind: sql) the body is rewritten in place; without
+			// one (kind: index, kind: table) the rewrite was already
+			// emitted by the SQL generator.
 		}
 	}
 	return segments, nil

@@ -595,7 +595,7 @@ func validateV1AlphaQueryShape(q QueryCodegenV1AlphaQuery) error {
 		if strings.TrimSpace(q.Table) == "" {
 			return fmt.Errorf("query %s kind table: table is required", q.Name)
 		}
-		if err := checkForbidden(stringSet("sql", "index", "binding", "inner_sql", "outer_sql", "key_prefix")); err != nil {
+		if err := checkForbidden(stringSet("sql", "index", "binding", "inner_sql", "outer_sql")); err != nil {
 			return err
 		}
 	case "index":
