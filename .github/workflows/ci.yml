@@ -17,10 +17,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v6.0.2
+        uses: actions/checkout@v6.0.3
 
       - name: Setup mise
-        uses: jdx/mise-action@v4.0.1
+        uses: jdx/mise-action@v4.1.0
         with:
           cache: true
           install: true
@@ -48,10 +48,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v6.0.2
+        uses: actions/checkout@v6.0.3
 
       - name: Setup mise
-        uses: jdx/mise-action@v4.0.1
+        uses: jdx/mise-action@v4.1.0
         with:
           cache: true
           install: true
@@ -68,10 +68,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v6.0.2
+        uses: actions/checkout@v6.0.3
 
       - name: Setup mise
-        uses: jdx/mise-action@v4.0.1
+        uses: jdx/mise-action@v4.1.0
         with:
           cache: true
           install: true
@@ -85,10 +85,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v6.0.2
+        uses: actions/checkout@v6.0.3
 
       - name: Setup mise
-        uses: jdx/mise-action@v4.0.1
+        uses: jdx/mise-action@v4.1.0
         with:
           cache: true
           install: true
