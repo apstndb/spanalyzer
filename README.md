@@ -452,10 +452,7 @@ query mode, or a single Cloud Spanner type for expression mode. With
 back to SQL, and `--mode=go_struct` prints Go result struct code. Modes can be
 comma-separated, for example `--mode=parse,analyze,spanner_type`.
 
-GoogleSQL is initialized with
-[wazero](https://github.com/tetratelabs/wazero) compiler mode and an on-disk
-compilation cache. Set `SPANNER_ANALYZER_GOOGLESQL_CACHE_DIR` to override the
-cache directory.
+GoogleSQL is initialized once per process through `go-googlesql`.
 
 Dialect feature presets start from GoogleSQL
 `EnableMaximumLanguageFeaturesForDevelopment()` and then disable features that

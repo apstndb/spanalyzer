@@ -3,8 +3,6 @@ package spanalyzer
 import (
 	"bytes"
 	"fmt"
-	"os"
-	"path/filepath"
 	"sync"
 
 	googlesql "github.com/goccy/go-googlesql"
@@ -15,35 +13,9 @@ var initGoogleSQLErr error
 
 func InitGoogleSQL() error {
 	initGoogleSQLOnce.Do(func() {
-		cacheDir, err := googleSQLCompilationCacheDir()
-		if err != nil {
-			initGoogleSQLErr = err
-			return
-		}
-		initGoogleSQLErr = googlesql.Init(
-			googlesql.WithCompilationMode(googlesql.CompilationModeCompiler),
-			googlesql.WithCompilationCache(cacheDir),
-		)
+		initGoogleSQLErr = googlesql.Init()
 	})
 	return initGoogleSQLErr
-}
-
-func googleSQLCompilationCacheDir() (string, error) {
-	if dir := os.Getenv("SPANNER_ANALYZER_GOOGLESQL_CACHE_DIR"); dir != "" {
-		return dir, nil
-	}
-	const cacheSubdir = "spanner-analyzer/go-googlesql"
-	if dir, err := os.UserCacheDir(); err == nil {
-		cacheDir := filepath.Join(dir, cacheSubdir)
-		if err := os.MkdirAll(cacheDir, 0o755); err == nil {
-			return cacheDir, nil
-		}
-	}
-	cacheDir := filepath.Join(os.TempDir(), cacheSubdir)
-	if err := os.MkdirAll(cacheDir, 0o755); err != nil {
-		return "", fmt.Errorf("create GoogleSQL compilation cache: %w", err)
-	}
-	return cacheDir, nil
 }
 
 type GoogleSQLHelper struct {

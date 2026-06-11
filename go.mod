@@ -9,7 +9,7 @@ require (
 	github.com/apstndb/spannerplan v0.1.9
 	github.com/cloudspannerecosystem/memefish v0.6.3-0.20260429070454-64f857b2c61e
 	github.com/docker/docker v28.5.1+incompatible
-	github.com/goccy/go-googlesql v0.2.2
+	github.com/goccy/go-googlesql v0.2.3-0.20260527112316-88bf224c1461
 	github.com/goccy/go-yaml v1.19.2
 	github.com/google/cel-go v0.28.0
 	github.com/testcontainers/testcontainers-go v0.40.0
@@ -89,7 +89,6 @@ require (
 	github.com/spiffe/go-spiffe/v2 v2.6.0 // indirect
 	github.com/stretchr/testify v1.11.1 // indirect
 	github.com/testcontainers/testcontainers-go/modules/gcloud v0.37.0 // indirect
-	github.com/tetratelabs/wazero v1.11.0 // indirect
 	github.com/tklauser/go-sysconf v0.3.12 // indirect
 	github.com/tklauser/numcpus v0.6.1 // indirect
 	github.com/yusufpapurcu/wmi v1.2.4 // indirect
