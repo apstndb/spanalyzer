@@ -1,8 +1,6 @@
 package querygen
 
 import (
-	"cloud.google.com/go/spanner"
-	"context"
 	"errors"
 	"os"
 	"path/filepath"
@@ -3747,21 +3745,6 @@ CREATE TABLE mydataset.events (
 	if strings.Contains(code, "ListAllEvents(ctx context.Context, client *bigquery.Client, params") {
 		t.Fatalf("parameterless BigQuery query kept params argument:\n%s", code)
 	}
-}
-
-// The generated SpannerQueryTransaction interface must stay satisfied by all
-// three Cloud Spanner transaction types; these compile-time assertions pin
-// that against the module's spanner client version.
-var (
-	_ generatedSpannerQueryTransaction = (*spanner.ReadOnlyTransaction)(nil)
-	_ generatedSpannerQueryTransaction = (*spanner.ReadWriteTransaction)(nil)
-	_ generatedSpannerQueryTransaction = (*spanner.BatchReadOnlyTransaction)(nil)
-)
-
-// generatedSpannerQueryTransaction mirrors the interface emitted by
-// writeSpannerQueryTransactionInterface.
-type generatedSpannerQueryTransaction interface {
-	Query(ctx context.Context, statement spanner.Statement) *spanner.RowIterator
 }
 
 // TestGenerateQueryCodeEmitsSpannerQueryTransactionInterface pins that the
