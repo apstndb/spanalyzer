@@ -215,3 +215,47 @@ see `research/spanner-query-gen/OPTIONAL_PARAMS_DESIGN.md` for the full design.
   `null_is_null` + `omit_when_null` combined into a single `tristate` Go
   field so the caller can express match-all / match-NULL / match-value with
   one field instead of two.
+
+## Improvement Proposals From 2026-06-12 Omni Verification Session
+
+These were found while exercising the CLIs end-to-end against Spanner Omni.
+They need a design decision before implementation, so they are recorded here
+instead of being fixed inline.
+
+- [ ] **Derive query result struct nullability from DDL for `kind: table` and
+  `kind: index`.** Write input structs already use DDL `NOT NULL` to choose
+  `int64` vs `spanner.NullInt64`, but query result structs always emit the
+  `spanner.Null*` wrappers even for `NOT NULL` columns selected directly from
+  one table. Table/index shorthand queries project bare table columns, so
+  nullability is derivable from the catalog. Decide whether `kind: sql`
+  queries should stay conservative (analyzer output does not expose
+  nullability) while shorthand kinds become precise, and whether that split is
+  acceptable for DTO reuse across queries.
+- [ ] **Let generated query free functions run inside read-write
+  transactions.** They currently take `*spanner.ReadOnlyTransaction`, so the
+  same query cannot be issued from a `ReadWriteTransaction`. Consider
+  accepting a small interface such as
+  `interface { Query(context.Context, spanner.Statement) *spanner.RowIterator }`
+  that both transaction types satisfy.
+- [ ] **Drop the `params map[string]interface{}` argument for queries with no
+  parameters.** Generated functions like `ListSingers` require callers to pass
+  `nil` for a query that declares no parameters.
+- [ ] **Fan out optional-parameter Variants in `plan-report`.**
+  `plan-report` analyzes only the canonical all-on variant of an optional
+  query (verified live: a query with two `omit_when_null` params produced one
+  report target instead of four variants). `tools/optparam-plan-probe` already
+  contains the per-variant plan acquisition loop that could be ported. This
+  complements the existing "wire Variants into spanner-query-plan-shape" item
+  above.
+- [ ] **Propose a runtime image/digest API in spanemuboost for backend
+  identity.** spanemuboost v0.4.0 exposes `RuntimePlatform` but no way to read
+  the resolved container image or digest, so plan-report backend identity
+  stays `not_recorded` unless supplied manually. The fix belongs in
+  spanemuboost (for example `RuntimeImage`/`RuntimeImageDigest`), then
+  plan-report can record `source: spanemuboost` evidence automatically.
+- [ ] **Consider surfacing testcontainers Docker-host discovery failures as
+  errors instead of panics.** spanemuboost propagates the
+  `rootless Docker not found` panic from testcontainers
+  `MustExtractDockerHost`. A wrapped error with remediation hints (check
+  `DOCKER_HOST`, docker context, properties file) would be friendlier for CLI
+  users. This also belongs in spanemuboost.
