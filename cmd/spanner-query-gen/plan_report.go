@@ -1741,7 +1741,12 @@ func planReportExpectedSubtreeFamilyCounts(operator planReportOperator, operator
 	for _, index := range operator.DescendantIndexes {
 		add(index)
 	}
-	counts["explicit_sort"] += counts["full_sort"] + counts["minor_sort"]
+	// Recompute every derived umbrella family with the shared helper so the
+	// validator cannot drift from planReportSubtreeFamilyCounts. A manual
+	// explicit_sort-only recomputation here previously missed
+	// blocking_operator and rejected any report whose subtree contained a
+	// stream-blocking operator such as a hash aggregate.
+	plancontract.AddDerivedOperatorFamilyCounts(counts)
 	return counts
 }
 

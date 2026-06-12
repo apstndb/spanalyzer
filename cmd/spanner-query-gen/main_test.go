@@ -3147,6 +3147,50 @@ func TestPlanReportOperatorsClassifyScalarKindNodesAsScalar(t *testing.T) {
 	}
 }
 
+// validatePlanReportQueryTopology must accept a report whose subtree contains
+// a stream-blocking operator. The validator previously recomputed only the
+// derived explicit_sort family and rejected plans containing, for example, a
+// hash aggregate because the produced subtree_family_counts also derive
+// blocking_operator.
+func TestValidatePlanReportQueryTopologyAcceptsBlockingOperatorSubtree(t *testing.T) {
+	plan := &spannerpb.QueryPlan{PlanNodes: []*spannerpb.PlanNode{
+		{
+			Index:       0,
+			Kind:        spannerpb.PlanNode_RELATIONAL,
+			DisplayName: "Serialize Result",
+			ChildLinks:  []*spannerpb.PlanNode_ChildLink{{ChildIndex: 1}},
+		},
+		{
+			Index:       1,
+			Kind:        spannerpb.PlanNode_RELATIONAL,
+			DisplayName: "Aggregate",
+			Metadata: mustStructPB(t, map[string]interface{}{
+				"iterator_type": "Hash",
+			}),
+			ChildLinks: []*spannerpb.PlanNode_ChildLink{{ChildIndex: 2}},
+		},
+		{Index: 2, Kind: spannerpb.PlanNode_RELATIONAL, DisplayName: "Table Scan"},
+	}}
+	operators := planReportOperators(plan)
+	query := planReportQuery{
+		Name:                 "HashAggregateQuery",
+		Scope:                "query",
+		Status:               "ok",
+		NormalizedOperators:  operators,
+		OperatorEdges:        planReportOperatorEdges(plan),
+		OperatorFamilyCounts: planReportOperatorFamilyCounts(operators),
+	}
+	if got, want := query.OperatorFamilyCounts["hash_aggregate"], 1; got != want {
+		t.Fatalf("hash_aggregate count = %d, want %d", got, want)
+	}
+	if got, want := query.OperatorFamilyCounts["blocking_operator"], 1; got != want {
+		t.Fatalf("blocking_operator derived count = %d, want %d", got, want)
+	}
+	if err := validatePlanReportQueryTopology(query); err != nil {
+		t.Fatalf("validatePlanReportQueryTopology() error = %v", err)
+	}
+}
+
 func TestPlanReportOperatorsDoNotClassifyBranchedPushBroadcastMapPath(t *testing.T) {
 	plan := &spannerpb.QueryPlan{PlanNodes: []*spannerpb.PlanNode{
 		{
