@@ -402,6 +402,10 @@ func GenerateQueryCode(config QueryCodegenConfig, baseDir string) (string, error
 	}
 	var queryMethods bytes.Buffer
 	methodImports := map[string]struct{}{}
+	if specsNeedSpannerQueryTransaction(querySpecs) {
+		queryMethods.WriteByte('\n')
+		writeSpannerQueryTransactionInterface(&queryMethods, methodImports)
+	}
 	for _, spec := range querySpecs {
 		queryMethods.WriteByte('\n')
 		writeQueryMethods(&queryMethods, spec, methodImports)
@@ -461,6 +465,38 @@ func queryMethodHasParams(spec resolvedQuerySpec) bool {
 	return spec.BuilderFunc != "" || len(spec.Params) > 0
 }
 
+// specsNeedSpannerQueryTransaction reports whether any generated Spanner
+// read query function exists, requiring the SpannerQueryTransaction
+// interface declaration. DML surfaces (row_count, row_set) keep the concrete
+// *spanner.ReadWriteTransaction because they need Update or read-write
+// semantics.
+func specsNeedSpannerQueryTransaction(specs []resolvedQuerySpec) bool {
+	for _, spec := range specs {
+		if strings.ToLower(spec.Dialect) == "bigquery" {
+			continue
+		}
+		switch spec.ResultMode {
+		case "many", "one", "maybe_one":
+			return true
+		}
+	}
+	return false
+}
+
+// writeSpannerQueryTransactionInterface emits the minimal read surface used
+// by generated Spanner query functions, so they run inside read-only,
+// read-write, and batch read-only transactions alike.
+func writeSpannerQueryTransactionInterface(b *bytes.Buffer, imports map[string]struct{}) {
+	imports["context"] = struct{}{}
+	imports["cloud.google.com/go/spanner"] = struct{}{}
+	b.WriteString("// SpannerQueryTransaction is the read surface generated query functions use.\n")
+	b.WriteString("// It is satisfied by *spanner.ReadOnlyTransaction, *spanner.ReadWriteTransaction,\n")
+	b.WriteString("// and *spanner.BatchReadOnlyTransaction.\n")
+	b.WriteString("type SpannerQueryTransaction interface {\n")
+	b.WriteString("\tQuery(ctx context.Context, statement spanner.Statement) *spanner.RowIterator\n")
+	b.WriteString("}\n")
+}
+
 // spannerMethodParamsArg returns the trailing params parameter declaration
 // for generated Spanner function signatures, empty for queries without
 // parameters.
@@ -506,12 +542,12 @@ func writeSpannerMethods(b *bytes.Buffer, spec resolvedQuerySpec, imports map[st
 	case "many":
 		imports["google.golang.org/api/iterator"] = struct{}{}
 		fmt.Fprintf(b, "// %s returns a Cloud Spanner row iterator.\n", spec.MethodPrefix)
-		fmt.Fprintf(b, "func %s(ctx context.Context, tx *spanner.ReadOnlyTransaction%s) *spanner.RowIterator {\n", spec.MethodPrefix, paramsArg)
+		fmt.Fprintf(b, "func %s(ctx context.Context, tx SpannerQueryTransaction%s) *spanner.RowIterator {\n", spec.MethodPrefix, paramsArg)
 		writeSpannerStatementSetup(b, spec)
 		fmt.Fprintf(b, "\treturn tx.Query(ctx, %s)\n", spannerStatementExpr(spec, constName))
 		b.WriteString("}\n")
 		fmt.Fprintf(b, "// %sAll returns all Cloud Spanner rows as a slice.\n", spec.MethodPrefix)
-		fmt.Fprintf(b, "func %sAll(ctx context.Context, tx *spanner.ReadOnlyTransaction%s) ([]*%s, error) {\n", spec.MethodPrefix, paramsArg, spec.ResultStruct)
+		fmt.Fprintf(b, "func %sAll(ctx context.Context, tx SpannerQueryTransaction%s) ([]*%s, error) {\n", spec.MethodPrefix, paramsArg, spec.ResultStruct)
 		fmt.Fprintf(b, "\tit := %s(ctx, tx%s)\n", spec.MethodPrefix, paramsForward)
 		b.WriteString("\tdefer it.Stop()\n")
 		fmt.Fprintf(b, "\tvar out []*%s\n", spec.ResultStruct)
@@ -534,7 +570,7 @@ func writeSpannerMethods(b *bytes.Buffer, spec resolvedQuerySpec, imports map[st
 		imports["fmt"] = struct{}{}
 		imports["google.golang.org/api/iterator"] = struct{}{}
 		fmt.Fprintf(b, "// %s returns a single Cloud Spanner row.\n", spec.MethodPrefix)
-		fmt.Fprintf(b, "func %s(ctx context.Context, tx *spanner.ReadOnlyTransaction%s) (*%s, error) {\n", spec.MethodPrefix, paramsArg, spec.ResultStruct)
+		fmt.Fprintf(b, "func %s(ctx context.Context, tx SpannerQueryTransaction%s) (*%s, error) {\n", spec.MethodPrefix, paramsArg, spec.ResultStruct)
 		writeSpannerStatementSetup(b, spec)
 		fmt.Fprintf(b, "\tit := tx.Query(ctx, %s)\n", spannerStatementExpr(spec, constName))
 		b.WriteString("\tdefer it.Stop()\n")

@@ -1,6 +1,8 @@
 package querygen
 
 import (
+	"cloud.google.com/go/spanner"
+	"context"
 	"errors"
 	"os"
 	"path/filepath"
@@ -3731,10 +3733,10 @@ CREATE TABLE mydataset.events (
 		t.Fatalf("GenerateQueryCode() error = %v", err)
 	}
 	for _, want := range []string{
-		"func ListAllSingers(ctx context.Context, tx *spanner.ReadOnlyTransaction) *spanner.RowIterator {",
-		"func ListAllSingersAll(ctx context.Context, tx *spanner.ReadOnlyTransaction) ([]*SingerRow, error) {",
+		"func ListAllSingers(ctx context.Context, tx SpannerQueryTransaction) *spanner.RowIterator {",
+		"func ListAllSingersAll(ctx context.Context, tx SpannerQueryTransaction) ([]*SingerRow, error) {",
 		"spanner.Statement{SQL: ListAllSingersSQL}",
-		"func GetSinger(ctx context.Context, tx *spanner.ReadOnlyTransaction, params map[string]interface{}) (*SingerRow, error) {",
+		"func GetSinger(ctx context.Context, tx SpannerQueryTransaction, params map[string]interface{}) (*SingerRow, error) {",
 		"spanner.Statement{SQL: GetSingerSQL, Params: params}",
 		"func ListAllEvents(ctx context.Context, client *bigquery.Client) (*bigquery.RowIterator, error) {",
 	} {
@@ -3744,5 +3746,52 @@ CREATE TABLE mydataset.events (
 	}
 	if strings.Contains(code, "ListAllEvents(ctx context.Context, client *bigquery.Client, params") {
 		t.Fatalf("parameterless BigQuery query kept params argument:\n%s", code)
+	}
+}
+
+// The generated SpannerQueryTransaction interface must stay satisfied by all
+// three Cloud Spanner transaction types; these compile-time assertions pin
+// that against the module's spanner client version.
+var (
+	_ generatedSpannerQueryTransaction = (*spanner.ReadOnlyTransaction)(nil)
+	_ generatedSpannerQueryTransaction = (*spanner.ReadWriteTransaction)(nil)
+	_ generatedSpannerQueryTransaction = (*spanner.BatchReadOnlyTransaction)(nil)
+)
+
+// generatedSpannerQueryTransaction mirrors the interface emitted by
+// writeSpannerQueryTransactionInterface.
+type generatedSpannerQueryTransaction interface {
+	Query(ctx context.Context, statement spanner.Statement) *spanner.RowIterator
+}
+
+// TestGenerateQueryCodeEmitsSpannerQueryTransactionInterface pins that the
+// interface declaration is emitted exactly once for Spanner read queries and
+// not for DML-only or BigQuery-only configs.
+func TestGenerateQueryCodeEmitsSpannerQueryTransactionInterface(t *testing.T) {
+	dir := t.TempDir()
+	writeTestFile(t, filepath.Join(dir, "schema.sql"), `
+CREATE TABLE Singers (
+  SingerId INT64 NOT NULL
+) PRIMARY KEY (SingerId);
+`)
+	code, err := GenerateQueryCode(QueryCodegenConfig{
+		Package: "db",
+		Client:  GoStructTargetBoth,
+		Schemas: []QueryCodegenSchema{{Name: "spanner", Dialect: "spanner", DDL: "schema.sql"}},
+		Queries: []QueryCodegenQuery{{
+			Name:         "ListSingers",
+			Catalog:      "spanner",
+			SQL:          "SELECT SingerId FROM Singers",
+			ResultStruct: "SingerRow",
+		}},
+	}, dir)
+	if err != nil {
+		t.Fatalf("GenerateQueryCode() error = %v", err)
+	}
+	if got, want := strings.Count(code, "type SpannerQueryTransaction interface {"), 1; got != want {
+		t.Fatalf("SpannerQueryTransaction declarations = %d, want %d:\n%s", got, want, code)
+	}
+	if !strings.Contains(code, "Query(ctx context.Context, statement spanner.Statement) *spanner.RowIterator") {
+		t.Fatalf("generated interface method missing:\n%s", code)
 	}
 }

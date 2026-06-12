@@ -570,7 +570,7 @@ queries:
 		"type ListMaybeByIdParams struct {",
 		"SingerId *int64",
 		"func BuildListMaybeByIdSQL(p ListMaybeByIdParams)",
-		"func ListMaybeById(ctx context.Context, tx *spanner.ReadOnlyTransaction, params ListMaybeByIdParams)",
+		"func ListMaybeById(ctx context.Context, tx SpannerQueryTransaction, params ListMaybeByIdParams)",
 		"return tx.Query(ctx, spanner.Statement{SQL: sql, Params: args})",
 	} {
 		if !strings.Contains(code, want) {
