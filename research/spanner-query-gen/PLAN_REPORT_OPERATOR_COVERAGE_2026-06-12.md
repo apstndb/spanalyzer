@@ -36,16 +36,27 @@ This sweep was run after scalar-kind PlanNodes were reclassified into the
   otherwise-unclassified scalar-kind nodes; the sweep query reports
   `array_subquery` again. The decorrelated `(SELECT COUNT(*) ...)` query
   never contains a `Scalar Subquery` node (it compiles to
-  `apply_join` + `stream_aggregate`), so `scalar_subquery` remains unobserved
-  in this sweep.
+  `apply_join` + `stream_aggregate`).
+- Follow-up (same day): `Scalar Subquery` nodes are also kind `SCALAR` (see
+  [spanner-hacks operators.md](https://github.com/apstndb/spanner-hacks/blob/master/content/ja/operators.md):
+  the only scalar operators rendered in standard plan trees are the two
+  subquery operators, Array Subquery and Scalar Subquery). The conditional
+  pattern from that document,
+  `IF(FirstName = 'Alice', (SELECT COUNT(*) FROM Songs WHERE Duration > 300), 0)`,
+  prevents decorrelation; running it through plan-report on Omni observed
+  `scalar_subquery` with `unknown == 0` and no classification warnings,
+  confirming the display-name-first classifier covers both subquery
+  operators.
 - Families not observed by this sweep (future probe candidates):
   `minor_sort`, standalone `semi_apply` / `anti_semi_apply`,
   `bloom_filter_build` (observed separately in the `hash_join` plan-shape
-  case), `scalar_subquery`, `change_stream_tvf`, `search_*` (needs search
+  case), `change_stream_tvf`, `search_*` (needs search
   indexes), `recursive_*` (needs recursive CTE), `spool_*`, `mini_batch_*`,
   `random_id_assign`, `apply_mutations`, `row_count` (DML targets are
   excluded from plan-report), `empty_relation`, `unit_relation`,
   `verify_determinism`, and the generic `join` / `aggregate` fallbacks.
+  `scalar_subquery` was unobserved by the original 17 queries but was
+  confirmed by the conditional-subquery follow-up above.
 
 ## Join elimination on interleaved tables silently ignores JOIN_METHOD hints
 

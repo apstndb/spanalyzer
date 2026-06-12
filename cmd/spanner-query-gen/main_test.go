@@ -3113,9 +3113,10 @@ func TestPlanReportOperatorsClassifyScalarKindNodesAsScalar(t *testing.T) {
 		{Index: 1, Kind: spannerpb.PlanNode_RELATIONAL, DisplayName: "New Fancy Operator"},
 		{Index: 2, Kind: spannerpb.PlanNode_SCALAR, DisplayName: "Reference"},
 		{Index: 3, Kind: spannerpb.PlanNode_SCALAR, DisplayName: "Function"},
-		// Array Subquery nodes are kind SCALAR on Spanner Omni but still
-		// carry a concrete operator family.
+		// Array Subquery and Scalar Subquery nodes are kind SCALAR on
+		// Spanner Omni but still carry concrete operator families.
 		{Index: 4, Kind: spannerpb.PlanNode_SCALAR, DisplayName: "Array Subquery"},
+		{Index: 5, Kind: spannerpb.PlanNode_SCALAR, DisplayName: "Scalar Subquery"},
 	}}
 	operators := planReportOperators(plan)
 	byIndex := map[int32]string{}
@@ -3136,6 +3137,9 @@ func TestPlanReportOperatorsClassifyScalarKindNodesAsScalar(t *testing.T) {
 	}
 	if got, want := byIndex[4], "array_subquery"; got != want {
 		t.Fatalf("scalar-kind Array Subquery family = %q, want %q", got, want)
+	}
+	if got, want := byIndex[5], "scalar_subquery"; got != want {
+		t.Fatalf("scalar-kind Scalar Subquery family = %q, want %q", got, want)
 	}
 	counts := planReportOperatorFamilyCounts(operators)
 	if got, want := counts["scalar"], 2; got != want {
