@@ -192,12 +192,9 @@ see `research/spanner-query-gen/OPTIONAL_PARAMS_DESIGN.md` for the full design.
 
 ### Cleanup
 
-- [ ] **Remove the PoC worktree.**
-  `worktree-optional-params-poc` is fully merged into main.
-  ```
-  git worktree remove .claude/worktrees/optional-params-poc
-  git branch -d worktree-optional-params-poc
-  ```
+- [x] **Remove the PoC worktree.**
+  `worktree-optional-params-poc` is fully merged into main. Verified on
+  2026-06-12 that neither the worktree nor the branch exists anymore.
 
 - [x] **Remove stray .bak files.**
   `internal/querygen/querygen_test.go.bak{1-4}` and
