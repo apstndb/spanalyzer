@@ -94,6 +94,40 @@ config/output freeze (v1 freeze is deliberately deferred).
   applies fine — the gap is the option, not the harness. See
   `research/spanner-query-gen/PLAN_REPORT_OPERATOR_COVERAGE_2026-06-12.md`.
 
+## Schema-Aware Plan Rendering (this repo, not spannerplan)
+
+Visualization enrichment that needs inputs spannerplan deliberately does not
+have belongs here: this repository uniquely holds the DDL catalog
+(root module), the operator-family normalization (`plancontract`), and the
+plan acquisition workflows. spannerplan already covers variable resolution
+(`rendertree --resolve-vars --resolve-vars-recursive`) and spannerplanviz
+already draws distribution boundaries (dashed, SVG / mermaid.js), so those
+are out of scope.
+
+- [ ] **Seekability annotation in plan-report.** Render scan rows with
+  "seek k/N keys" by combining the plan's Seek/Residual Conditions and
+  `seekable_key_size` with the index/table key count from the catalog DDL
+  that plan-report already loads. This is the visualization of the
+  shard-range discretization finding (optimizer v7-v8 dropping from 2/2 to
+  1/2 keys) and is schema-dependent, hence out of spannerplan's scope.
+- [ ] **Operator-family annotations in rendered reports.** plan-report can
+  annotate rendered rows with normalized families (for example marking
+  blocking operators under Limit, the visual form of
+  `no_blocking_operator_under_limit`) without adding a plancontract
+  dependency to spannerplan.
+- [ ] **Normalized plan diff for optimizer comparisons.** An aligned tree
+  diff over plancontract-normalized operators (shared prefix folded,
+  differing operators expanded) to replace eyeballing
+  `--optimizer-version-diff` compact trees. The operator tree digest
+  normalization already provides the alignment vocabulary.
+- [ ] **Hidden-scalar summary in rendered trees.** Rendered IDs jump over
+  scalar-kind nodes, and classification warnings can reference nodes that
+  are invisible in the tree; a per-row summary of folded scalar children
+  (counts by display name) would make those references resolvable. Note for
+  edge labels: Recursive Union inputs (`input_0` / `input_1`) should not be
+  hard-labeled Base/Recursive because recursive CTE support could make the
+  branch count variable.
+
 ## Dependencies And Infrastructure
 
 - [ ] **Migrate the cmd/spanner-query-gen and tools modules to testcontainers
