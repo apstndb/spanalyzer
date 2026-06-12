@@ -876,15 +876,19 @@ func planReportOperatorTreeDigest(plan *spannerpb.QueryPlan) string {
 }
 
 // planReportNodeOperatorFamily classifies one PlanNode into a normalized
-// operator family. Scalar-kind PlanNodes (Reference, Function, Constant,
-// Parameter, and similar expression nodes) are not relational operators, so
-// they map to the dedicated "scalar" family instead of competing with the
-// "unknown" fallback reserved for unclassified relational operators.
+// operator family. Display-name classification runs first so scalar-kind
+// nodes with concrete operator families keep them: Array Subquery nodes are
+// kind SCALAR on Spanner Omni and must still classify as array_subquery.
+// Only otherwise-unclassified scalar-kind PlanNodes (Reference, Function,
+// Constant, Parameter, and similar expression nodes) map to the dedicated
+// "scalar" family; the "unknown" fallback stays reserved for unclassified
+// relational operators.
 func planReportNodeOperatorFamily(node *spannerpb.PlanNode, context planReportOperatorContext) string {
-	if node.GetKind() == spannerpb.PlanNode_SCALAR {
+	family := planReportOperatorFamilyWithContext(node, context)
+	if family == "unknown" && node.GetKind() == spannerpb.PlanNode_SCALAR {
 		return "scalar"
 	}
-	return planReportOperatorFamilyWithContext(node, context)
+	return family
 }
 
 type planReportOperatorContext struct {

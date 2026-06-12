@@ -185,7 +185,7 @@ contract convenience.
 | `recursive_union` | Concrete | Recursive Union operator. |
 | `row_count` | Concrete | RowCount operator. |
 | `row_to_data_block` | Concrete | RowToDataBlock operator. |
-| `scalar` | Concrete | Scalar-kind PlanNode such as Reference, Function, Constant, or Parameter. These are expression nodes, not relational operators, so they never fall back to `unknown`. |
+| `scalar` | Concrete fallback | Scalar-kind PlanNode that matches no concrete operator family, such as Reference, Function, Constant, or Parameter. Display-name families win first: an Array Subquery node is kind SCALAR but still classifies as `array_subquery`. Scalar-kind nodes never fall back to `unknown`. |
 | `scalar_subquery` | Concrete | Scalar Subquery operator. |
 | `search_predicate` | Concrete | Full Text Search predicate operator reached from a `Search Predicate` child link. |
 | `search_query_conversion_tvf` | Concrete | Full Text Search query-conversion TVF operator, displayed as `TVF` with metadata `name=Search Query Conversion`. |
@@ -561,9 +561,11 @@ fields that cannot contain derived umbrella families, namely
 ## Unknown Classification
 
 `unknown` is reserved for relational plan nodes that the normalizer cannot
-classify into a known operator family. Scalar-kind plan nodes such as
-Reference, Function, Constant, and Parameter are expression nodes, not
-relational operators; they always classify as `scalar` and never as `unknown`.
+classify into a known operator family. Scalar-kind plan nodes first get the
+same display-name classification as relational nodes, so operator-shaped
+scalar nodes such as Array Subquery keep their concrete family; expression
+nodes such as Reference, Function, Constant, and Parameter that match no
+concrete family classify as `scalar` and never as `unknown`.
 Unknown operators appear in `operator_families`,
 `operator_family_counts`, and `normalized_operators` like any other family, so
 direct `forbid` contracts can target `operator_family: unknown` when a strict
