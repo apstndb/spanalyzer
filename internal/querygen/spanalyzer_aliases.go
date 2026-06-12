@@ -1,6 +1,6 @@
 package querygen
 
-import spanalyzer "github.com/apstndb/go-googlesql-spanner-poc"
+import spanalyzer "github.com/apstndb/spanalyzer"
 
 type Analyzer = spanalyzer.Analyzer
 type BigQueryAnalyzer = spanalyzer.BigQueryAnalyzer

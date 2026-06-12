@@ -9,7 +9,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/apstndb/go-googlesql-spanner-poc/internal/querygen"
+	"github.com/apstndb/spanalyzer/internal/querygen"
 )
 
 const v1AlphaIdentifierPattern = `^[A-Za-z_][A-Za-z0-9_]*$`
@@ -113,7 +113,7 @@ func writeSchemaOutput(path string, data []byte, stdout io.Writer) error {
 func planContractJSONSchema() map[string]interface{} {
 	return map[string]interface{}{
 		"$schema":              "https://json-schema.org/draft/2020-12/schema",
-		"$id":                  "https://github.com/apstndb/go-googlesql-spanner-poc/schemas/spanner-query-gen.plan-contracts.v1alpha.schema.json",
+		"$id":                  "https://github.com/apstndb/spanalyzer/schemas/spanner-query-gen.plan-contracts.v1alpha.schema.json",
 		"title":                "spanner-query-gen plan contracts v1alpha",
 		"type":                 "object",
 		"additionalProperties": false,
@@ -172,7 +172,7 @@ func planContractJSONSchema() map[string]interface{} {
 func planReportJSONSchema() map[string]interface{} {
 	return map[string]interface{}{
 		"$schema":              "https://json-schema.org/draft/2020-12/schema",
-		"$id":                  "https://github.com/apstndb/go-googlesql-spanner-poc/schemas/spanner-query-gen.plan-report.v1alpha.schema.json",
+		"$id":                  "https://github.com/apstndb/spanalyzer/schemas/spanner-query-gen.plan-report.v1alpha.schema.json",
 		"title":                "spanner-query-gen plan-report output",
 		"type":                 "object",
 		"additionalProperties": false,
@@ -695,7 +695,7 @@ func planReportContractRuleResultJSONSchema() map[string]interface{} {
 func v1AlphaConfigJSONSchema() map[string]interface{} {
 	return map[string]interface{}{
 		"$schema":              "https://json-schema.org/draft/2020-12/schema",
-		"$id":                  "https://github.com/apstndb/go-googlesql-spanner-poc/schemas/spanner-query-gen.v1alpha.schema.json",
+		"$id":                  "https://github.com/apstndb/spanalyzer/schemas/spanner-query-gen.v1alpha.schema.json",
 		"title":                "spanner-query-gen v1alpha config",
 		"type":                 "object",
 		"additionalProperties": false,

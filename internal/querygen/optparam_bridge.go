@@ -8,7 +8,7 @@ import (
 	"google.golang.org/protobuf/encoding/prototext"
 	"google.golang.org/protobuf/proto"
 
-	"github.com/apstndb/go-googlesql-spanner-poc/internal/optparam"
+	"github.com/apstndb/spanalyzer/internal/optparam"
 )
 
 // analyzeCodegenQuerySpannerVariants enumerates SQL variants for a query

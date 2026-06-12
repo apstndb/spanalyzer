@@ -13,7 +13,7 @@ import (
 	"testing"
 
 	"cloud.google.com/go/spanner/apiv1/spannerpb"
-	"github.com/apstndb/go-googlesql-spanner-poc/internal/querygen"
+	"github.com/apstndb/spanalyzer/internal/querygen"
 	"github.com/goccy/go-yaml"
 	"google.golang.org/protobuf/encoding/protojson"
 	"google.golang.org/protobuf/types/known/structpb"

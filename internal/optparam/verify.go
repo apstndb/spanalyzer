@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"cloud.google.com/go/spanner/apiv1/spannerpb"
-	spanalyzer "github.com/apstndb/go-googlesql-spanner-poc"
+	spanalyzer "github.com/apstndb/spanalyzer"
 	"google.golang.org/protobuf/encoding/prototext"
 	"google.golang.org/protobuf/proto"
 )

@@ -1,4 +1,4 @@
-module github.com/apstndb/go-googlesql-spanner-poc
+module github.com/apstndb/spanalyzer
 
 go 1.26.2
 

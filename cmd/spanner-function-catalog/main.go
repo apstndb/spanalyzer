@@ -7,7 +7,7 @@ import (
 	"os"
 	"strings"
 
-	spanalyzer "github.com/apstndb/go-googlesql-spanner-poc"
+	spanalyzer "github.com/apstndb/spanalyzer"
 	googlesql "github.com/goccy/go-googlesql"
 )
 

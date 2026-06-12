@@ -21,7 +21,7 @@ import (
 	"github.com/apstndb/spanemuboost"
 	"github.com/apstndb/spannerplan/plantree/reference"
 
-	"github.com/apstndb/go-googlesql-spanner-poc/internal/optparam"
+	"github.com/apstndb/spanalyzer/internal/optparam"
 )
 
 // Fixture bundles a DDL + template + param config for one named probe.

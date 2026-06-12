@@ -10,7 +10,7 @@ import (
 
 	"cloud.google.com/go/spanner"
 	"cloud.google.com/go/spanner/apiv1/spannerpb"
-	"github.com/apstndb/go-googlesql-spanner-poc/internal/querygen"
+	"github.com/apstndb/spanalyzer/internal/querygen"
 	"github.com/apstndb/spanemuboost"
 	"github.com/apstndb/spannerplan/plantree/reference"
 )

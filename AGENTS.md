@@ -6,10 +6,12 @@ if omitted.
 
 ## Project Overview
 
-`go-googlesql-spanner-poc` is an experimental Go library and CLI for deriving
-Cloud Spanner GoogleSQL query result row types from Spanner DDL. It parses DDL
+`spanalyzer` (formerly `go-googlesql-spanner-poc`) is a Spanner analyzer
+framework: an experimental Go library and CLI toolkit for deriving Cloud
+Spanner GoogleSQL query result row types from Spanner DDL. It parses DDL
 with `github.com/cloudspannerecosystem/memefish` and analyzes queries with
-`github.com/goccy/go-googlesql`.
+`github.com/goccy/go-googlesql`; treat both as implementation details rather
+than part of the public contract.
 
 Use "GoogleSQL frontend" for the analyzer/catalog library formerly named
 ZetaSQL, and "Spanner GoogleSQL" for Cloud Spanner's SQL dialect. Mention

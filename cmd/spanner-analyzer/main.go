@@ -7,8 +7,8 @@ import (
 	"os"
 	"strings"
 
-	spanalyzer "github.com/apstndb/go-googlesql-spanner-poc"
-	"github.com/apstndb/go-googlesql-spanner-poc/internal/querygen"
+	spanalyzer "github.com/apstndb/spanalyzer"
+	"github.com/apstndb/spanalyzer/internal/querygen"
 	googlesql "github.com/goccy/go-googlesql"
 	"github.com/goccy/go-yaml"
 	"google.golang.org/protobuf/encoding/protojson"

@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/apstndb/go-googlesql-spanner-poc/internal/querygen"
+	"github.com/apstndb/spanalyzer/internal/querygen"
 	"github.com/apstndb/spanemuboost"
 	"github.com/apstndb/spannerplan/plantree/reference"
 )

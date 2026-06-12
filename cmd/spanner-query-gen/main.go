@@ -9,8 +9,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	spanalyzer "github.com/apstndb/go-googlesql-spanner-poc"
-	"github.com/apstndb/go-googlesql-spanner-poc/internal/querygen"
+	spanalyzer "github.com/apstndb/spanalyzer"
+	"github.com/apstndb/spanalyzer/internal/querygen"
 )
 
 func main() {
