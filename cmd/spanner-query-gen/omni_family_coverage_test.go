@@ -3,11 +3,14 @@
 package main
 
 import (
+	"context"
 	"os"
 	"path/filepath"
 	"testing"
 
+	"cloud.google.com/go/spanner"
 	"github.com/apstndb/spanalyzer/internal/querygen"
+	"github.com/apstndb/spanalyzer/plancontract"
 	"github.com/apstndb/spanemuboost"
 	"github.com/apstndb/spannerplan/plantree/reference"
 )
@@ -204,6 +207,79 @@ func TestIntegrationPlanReportOperatorFamilyCoverageOnOmni(t *testing.T) {
 			for _, family := range familyCoverageExpectedFamilies[query.Name] {
 				if !observed[family] {
 					t.Errorf("expected operator family %q was not observed; families = %v\nplan:\n%s", family, query.OperatorFamilies, query.Plan)
+				}
+			}
+		})
+	}
+}
+
+// dmlFamilyCoverageCases pin the operator families observed for DML plans on
+// Spanner Omni. DML targets are excluded from plan-report's public config,
+// so these go through ReadWriteTransaction.AnalyzeQuery directly (PLAN mode,
+// nothing is executed) and classify the raw plan with plancontract. RowCount
+// and MiniBatch* operators are intentionally not asserted: they have only
+// been observed on Cloud Spanner optimizer v5 plan shapes, not on Omni.
+var dmlFamilyCoverageCases = []struct {
+	Name     string
+	SQL      string
+	Expected []string
+}{
+	{"InsertValues", "INSERT INTO Singers (SingerId, FirstName, Rating) VALUES (1, 'A', 1)", []string{"apply_mutations", "union_all", "union_input", "unit_relation"}},
+	{"InsertThenReturn", "INSERT INTO Singers (SingerId, FirstName, Rating) VALUES (2, 'B', 1) THEN RETURN SingerId", []string{"apply_mutations", "serialize_result"}},
+	{"UpdateWhere", "UPDATE Singers SET FirstName = 'C' WHERE SingerId = 1", []string{"apply_mutations", "scan"}},
+	{"DeleteWhere", "DELETE FROM Singers WHERE SingerId = 1", []string{"apply_mutations", "scan"}},
+	{"InsertSelect", "INSERT INTO Singers (SingerId, FirstName, Rating) SELECT SingerId + 100, FirstName, Rating FROM Singers", []string{"apply_mutations", "distributed_union", "scan"}},
+}
+
+// TestIntegrationDMLOperatorFamilyCoverageOnOmni verifies on live Spanner
+// Omni that DML execution plans classify without unknown operator families
+// or classification warnings, and that Apply Mutations is observed for every
+// DML shape.
+func TestIntegrationDMLOperatorFamilyCoverageOnOmni(t *testing.T) {
+	if os.Getenv("SPANEMUBOOST_ENABLE_OMNI_TESTS") == "" {
+		t.Skip("set SPANEMUBOOST_ENABLE_OMNI_TESTS=1 to run Spanner Omni tests")
+	}
+	querygenIntegrationRequireContainerRuntime(t)
+
+	runtime := spanemuboost.NewLazyRuntime(spanemuboost.BackendOmni)
+	t.Cleanup(func() {
+		if err := runtime.Close(); err != nil {
+			t.Errorf("failed to close Spanner Omni runtime: %v", err)
+		}
+	})
+	clients := spanemuboost.SetupClients(t, runtime,
+		spanemuboost.WithRandomDatabaseID(),
+		spanemuboost.WithSetupDDLs(querygenIntegrationDDLs(t, "schema.sql", familyCoverageDDL)),
+	)
+	for _, c := range dmlFamilyCoverageCases {
+		c := c
+		t.Run(c.Name, func(t *testing.T) {
+			var operators []plancontract.Operator
+			_, err := clients.Client.ReadWriteTransaction(t.Context(), func(ctx context.Context, txn *spanner.ReadWriteTransaction) error {
+				plan, err := txn.AnalyzeQuery(ctx, spanner.NewStatement(c.SQL))
+				if err != nil {
+					return err
+				}
+				operators = plancontract.NormalizeOperators(plan)
+				return nil
+			})
+			if err != nil {
+				t.Fatalf("AnalyzeQuery(%s) error = %v", c.SQL, err)
+			}
+			counts := plancontract.OperatorFamilyCounts(operators)
+			if got := counts["unknown"]; got != 0 {
+				t.Errorf("unknown operator family count = %d, want 0", got)
+			}
+			if warnings := plancontract.ClassificationWarnings(operators); len(warnings) != 0 {
+				t.Errorf("classification warnings = %+v, want none", warnings)
+			}
+			observed := make(map[string]bool)
+			for _, family := range plancontract.ObservedOperatorFamilies(operators) {
+				observed[family] = true
+			}
+			for _, family := range c.Expected {
+				if !observed[family] {
+					t.Errorf("expected operator family %q was not observed; families = %v", family, plancontract.ObservedOperatorFamilies(operators))
 				}
 			}
 		})

@@ -80,6 +80,12 @@ This sweep was run after scalar-kind PlanNodes were reclassified into the
     `filter`, and `TABLESAMPLE RESERVOIR` pairs it with `full_sort` +
     `limit`, exactly as documented. Both queries are now pinned by
     `TestIntegrationPlanReportOperatorFamilyCoverageOnOmni`.
+  - DML plans verified via `ReadWriteTransaction.AnalyzeQuery` (PLAN mode,
+    nothing executed): INSERT VALUES / INSERT ... THEN RETURN / UPDATE /
+    DELETE / INSERT SELECT all classify warning-free with `apply_mutations`
+    observed in every shape. `row_count` and `mini_batch_*` did not appear
+    in any Omni DML plan, consistent with spanner-hacks observing them only
+    on Cloud Spanner optimizer v5 shapes.
   - `CREATE MODEL` fails on Omni with an empty-message `InvalidArgument`,
     so the documented `ML.PREDICT` TVF plan shape (query-operators-unary
     shows ML.PREDICT compiling to a `TVF` operator) is unobservable on this

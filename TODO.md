@@ -164,6 +164,20 @@ cleanup happened.
 - Grow predefined operator families only from observed plans, fixtures, or
   concrete contract use cases.
 
+## DML Plan Verification
+
+- [ ] **Extend plan-report to DML targets.** The mechanics are proven:
+  `ReadWriteTransaction.AnalyzeQuery` returns DML plans in PLAN mode without
+  executing anything, and plancontract classifies them warning-free
+  (`TestIntegrationDMLOperatorFamilyCoverageOnOmni` pins INSERT/UPDATE/
+  DELETE/THEN RETURN shapes, all containing `apply_mutations`). Remaining
+  design work is the target surface: whether `writes[]` DML helpers and/or
+  DML `queries[]` (row_count / row_set modes are currently rejected by the
+  public v1alpha config) become plan-report targets with `write/<name>`
+  style target IDs, plus README target-scope and schema updates. RowCount
+  and MiniBatch* operators are not observable on Omni (seen only on Cloud
+  Spanner optimizer v5 shapes), so contracts should not depend on them yet.
+
 ## Optional Query Parameters (optparam integration)
 
 Added 2026-05-14. `internal/optparam` is integrated into `internal/querygen`;
