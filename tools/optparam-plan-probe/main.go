@@ -188,7 +188,7 @@ const firstNameManualNullSafeTemplate = `SELECT * FROM Singers WHERE FirstName =
 
 func main() {
 	if err := run(os.Stdout); err != nil {
-		fmt.Fprintln(os.Stderr, err)
+		_, _ = fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
 }
@@ -225,8 +225,8 @@ func run(stdout io.Writer) error {
 }
 
 func runFixture(ctx context.Context, stdout io.Writer, runtime *spanemuboost.LazyRuntime, fix Fixture) error {
-	fmt.Fprintf(stdout, "\n=== fixture %s ===\n", fix.Name)
-	fmt.Fprintf(stdout, "template:\n%s\n", strings.TrimRight(fix.Template, "\n"))
+	_, _ = fmt.Fprintf(stdout, "\n=== fixture %s ===\n", fix.Name)
+	_, _ = fmt.Fprintf(stdout, "template:\n%s\n", strings.TrimRight(fix.Template, "\n"))
 
 	// Verify variants with the in-process analyzer first. This is the
 	// build-time guarantee; the probe then takes the same variants and
@@ -235,8 +235,8 @@ func runFixture(ctx context.Context, stdout io.Writer, runtime *spanemuboost.Laz
 	if err != nil {
 		return fmt.Errorf("VerifyVariants: %w", err)
 	}
-	fmt.Fprintf(stdout, "verified row type: %s\n", rowTypeString(verify.RowType))
-	fmt.Fprintf(stdout, "variants: %d\n", len(verify.Variants))
+	_, _ = fmt.Fprintf(stdout, "verified row type: %s\n", rowTypeString(verify.RowType))
+	_, _ = fmt.Fprintf(stdout, "variants: %d\n", len(verify.Variants))
 
 	// Boot the emulator with the fixture's DDL.
 	clients, err := spanemuboost.OpenClients(ctx, runtime,
@@ -257,13 +257,13 @@ func runFixture(ctx context.Context, stdout io.Writer, runtime *spanemuboost.Laz
 		if err != nil {
 			return fmt.Errorf("variant %s AnalyzeQuery: %w", v.Key(), err)
 		}
-		fmt.Fprintf(stdout, "\n--- variant %s ---\n", v.Key())
-		fmt.Fprintln(stdout, strings.TrimSpace(v.SQL))
+		_, _ = fmt.Fprintf(stdout, "\n--- variant %s ---\n", v.Key())
+		_, _ = fmt.Fprintln(stdout, strings.TrimSpace(v.SQL))
 		rendered, err := reference.RenderTreeTable(plan.GetPlanNodes(), reference.RenderModePlan, reference.FormatCurrent, 0)
 		if err != nil {
 			return fmt.Errorf("variant %s render: %w", v.Key(), err)
 		}
-		fmt.Fprintln(stdout, rendered)
+		_, _ = fmt.Fprintln(stdout, rendered)
 	}
 	return nil
 }
