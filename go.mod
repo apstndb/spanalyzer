@@ -9,7 +9,7 @@ require (
 	github.com/apstndb/spannerplan v0.1.9
 	github.com/cloudspannerecosystem/memefish v0.6.3-0.20260429070454-64f857b2c61e
 	github.com/docker/docker v28.5.1+incompatible
-	github.com/goccy/go-googlesql v0.2.3-0.20260527112316-88bf224c1461
+	github.com/goccy/go-googlesql v0.3.0
 	github.com/goccy/go-yaml v1.19.2
 	github.com/google/cel-go v0.28.0
 	github.com/testcontainers/testcontainers-go v0.40.0
@@ -55,6 +55,7 @@ require (
 	github.com/go-logr/logr v1.4.3 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/go-ole/go-ole v1.2.6 // indirect
+	github.com/goccy/googlesqlwasm2go v0.1.0 // indirect
 	github.com/google/s2a-go v0.1.9 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/googleapis/enterprise-certificate-proxy v0.3.14 // indirect
