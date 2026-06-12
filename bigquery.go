@@ -1831,7 +1831,6 @@ func bigQueryTypedEmptySubquery(rowType *spannerpb.StructType) (string, error) {
 	return "(SELECT " + strings.Join(cols, ", ") + " LIMIT 0)", nil
 }
 
-
 var simpleBigQueryIdentifier = regexp.MustCompile(`^[A-Za-z_][A-Za-z0-9_]*$`)
 
 func quoteBigQueryIdent(name string) string {
