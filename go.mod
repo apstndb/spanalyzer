@@ -4,7 +4,7 @@ go 1.26.2
 
 require (
 	cloud.google.com/go/spanner v1.91.0
-	github.com/cloudspannerecosystem/memefish v0.6.3-0.20260429070454-64f857b2c61e
+	github.com/cloudspannerecosystem/memefish v0.7.0
 	github.com/goccy/go-googlesql v0.3.0
 	github.com/goccy/go-yaml v1.19.2
 	google.golang.org/protobuf v1.36.11
