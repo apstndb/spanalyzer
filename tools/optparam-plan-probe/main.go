@@ -204,6 +204,7 @@ func run(stdout io.Writer) error {
 	runtime := spanemuboost.NewLazyRuntime(spanemuboost.BackendOmni)
 	defer func() { _ = runtime.Close() }()
 
+	ran := 0
 	for _, fix := range fixtures {
 		if *only != "" && !strings.Contains(fix.Name, *only) {
 			continue
@@ -211,6 +212,14 @@ func run(stdout io.Writer) error {
 		if err := runFixture(ctx, stdout, runtime, fix); err != nil {
 			return fmt.Errorf("fixture %s: %w", fix.Name, err)
 		}
+		ran++
+	}
+	if ran == 0 {
+		names := make([]string, 0, len(fixtures))
+		for _, fix := range fixtures {
+			names = append(names, fix.Name)
+		}
+		return fmt.Errorf("no fixture name contains %q; available fixtures: %s", *only, strings.Join(names, ", "))
 	}
 	return nil
 }
