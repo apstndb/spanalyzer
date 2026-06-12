@@ -382,6 +382,15 @@ limited index scan on the map side.
 
 ## Shard Range And Timestamp Seekability
 
+Update (2026-06-12): the seekability of the shard-range form turned out to be
+optimizer-version dependent. On Omni 2026.r1-beta, `OPTIMIZER_VERSION` 1-6
+discretize the small shard range and seek both keys (`seekable_key_size=2`,
+no residual), while versions 7-8 (the current default, observed below) seek
+only the shard range and leave the timestamp residual. Plan-level seeks are
+not a runtime performance guarantee either way; see
+[`../spanner-query-gen/PLAN_REPORT_OPERATOR_COVERAGE_2026-06-12.md`](../spanner-query-gen/PLAN_REPORT_OPERATOR_COVERAGE_2026-06-12.md)
+and the spanner-hacks seek-residual notes.
+
 The PR review discussion asked whether a query over
 `ShardCreatedAt BETWEEN 0 AND 9` and a timestamp range really "uses the index".
 The answer depends on what is meant by "uses": it can scan the selected index

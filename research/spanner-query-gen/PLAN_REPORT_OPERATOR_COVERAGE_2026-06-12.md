@@ -268,6 +268,17 @@ evaluated as replayable_from_report=true.
 
 ## Shard-pattern seekability follow-up (gcpug/nouhau#135)
 
+See also
+[`../spanner-query-plan-shape/TIMESTAMP_ORDERED_SHARD_QUERY_OBSERVATIONS.md`](../spanner-query-plan-shape/TIMESTAMP_ORDERED_SHARD_QUERY_OBSERVATIONS.md)
+(2026-05-08), which already verified the related Stack Overflow thread
+("Is it possible to have efficient timestamp ordered queries in spanner?")
+end to end on Omni: the `HAVING MIN` rewrite shape, the
+`GROUPBY_SCAN_OPTIMIZATION` hint producing no PLAN-shape difference, the
+arbitrary-limit rewrite, back-join placement, and the
+`seekable_key_size=1` shard-range observation on the default optimizer.
+The new information below is the optimizer-version dependence of that
+seekability.
+
 Re-verified the 2020 shard-note discussion (gcpug/nouhau PR #135) on Omni
 2026.r1-beta with the plan-shape probe, using
 `Order1M(ShardCreatedAt, CreatedAt DESC)`:
