@@ -81,66 +81,19 @@ Useful upstream references:
 - sqlc macros: https://docs.sqlc.dev/en/latest/reference/macros.html
 - yo documentation: https://pkg.go.dev/go.mercari.io/yo/v2
 
-## Documented v1alpha Contract and Claimed Support
+## Where Current Support Is Documented
 
-README and `config-schema` define the public YAML contract. The following list
-is the claimed working-tree support that this design expects to keep aligned
-with tests and examples; implementation details and test logs are not part of
-this document.
+This document deliberately does not maintain a claimed-support inventory.
+The public YAML contract is defined by README and `config-schema`; the
+implemented surface and its drift from this design are tracked in
+[`IMPLEMENTATION_STATUS.md`](IMPLEMENTATION_STATUS.md). An earlier revision
+duplicated that inventory here, which created a third place to keep in sync.
 
-- v1alpha YAML config with `go`, `emit`, `catalogs`, `queries`, `writes`, and
-  `rules.suppressions`.
-- Rejection of unsupported or unknown v1alpha YAML fields so config review does
-  not depend on silent parser behavior.
-- Spanner schema from DDL.
-- BigQuery schema from DDL.
-- BigQuery `EXTERNAL_QUERY` mapped to named Spanner catalogs.
-- BigQuery Spanner external dataset catalog bindings from Spanner DDL.
-- Canonical external dataset references with optional BigQuery source default
-  project metadata, projection policies, access verification status, and
-  binding-level diagnostics.
-- Query entries using `kind: sql`, `kind: table`, `kind: index`, or
-  `kind: external_query`.
-- v1alpha JSON Schema constraints for query kind syntax, write operation
-  syntax, real verification evidence, and suppression scope/date shape.
-- Spanner `table` query expansion over non-hidden columns.
-- Spanner `index` query expansion over index keys, base table primary key
-  columns, and stored columns.
-- Deterministic default ordering for generated Spanner `table` and `index`
-  queries, with `order_by: none` as an explicit optimization opt-out.
-- BigQuery `external_query` expansion from reviewable inner Spanner SQL to
-  outer `EXTERNAL_QUERY` SQL.
-- Query `result` modes in the resolved plan: `one`, `maybe_one`, and `many`;
-  omitted `result.cardinality` normalizes to `many`.
-- Result struct merging when field shapes are compatible.
-- Required result-field overrides.
-- Spanner writes for `insert`, `update`, `upsert`, `replace`, and `delete`;
-  `upsert` normalizes to Spanner `INSERT OR UPDATE` in the current renderer,
-  and `replace` is mutation-only.
-- Mutation and DML helper generation for writes, except DML `replace`.
-- Explicit `update.columns` for update-style writes, including
-  `update.all_non_key_columns` as an explicit broad-update opt-in.
-- `input` reuse of an existing result struct when the result struct already has
-  all write key and value fields.
-- Explicit `generate`, `check`, `explain-plan`, `plan-report`, `vet`, and
-  `config-schema` subcommands.
-- stdout output, file output, and stale-file checks.
-- `explain-plan` output as a human summary, YAML, or JSON.
-- `explain-plan --audit` for heavy audit-only metadata such as external dataset
-  projection matrix rows.
-- Optional `plan-report --contracts ... --check` plan-contract evaluation
-  backed by Spanner Omni, kept outside the main v1alpha YAML config.
-- `vet` validation through the same resolved plan used by rendering.
-- Central `rules.suppressions` with required reasons.
-- Plan metadata including `plan_version`, DDL and proto descriptor digests,
-  resolved SQL digests, catalog bindings, structured warnings, column
-  capabilities, external dataset projection policies, access assumptions, and
-  server-side update effects.
-
-Roadmap Phase 4.5 tracks hardening for this current external dataset surface:
-live verification, richer vet policy, and more generated method behavior. It is
-not a separate second feature that changes external datasets into
-`EXTERNAL_QUERY` shorthand.
+One framing note that belongs to the design: Roadmap Phase 4.5 tracks
+hardening for the current external dataset surface (live verification,
+richer vet policy, more generated method behavior). It is not a separate
+second feature that changes external datasets into `EXTERNAL_QUERY`
+shorthand.
 
 ## Config Version Lifecycle
 
@@ -354,6 +307,8 @@ that removing a required null-filtered-index predicate is rejected. This keeps
 the default emulator test fast while giving a stronger opt-in check for
 optimizer-sensitive generated SQL.
 
+### Plan Reports And Contracts Extend Review, Not Generation
+
 `plan-report` uses the same Omni plan source for review artifacts. It should
 start at most one Omni runtime per command invocation and create a separate
 Spanner database for each referenced Spanner catalog. Separate databases are
@@ -426,8 +381,12 @@ Digest definitions are:
 
 - `sql_sha256`: rendered/generated SQL bytes for the target query.
 - `ddl_sha256`: resolved catalog DDL bytes used to set up the target database.
-- `operator_tree_sha256`: normalized operator tree v1, excluding temporary
-  database IDs, timestamps, runtime statistics, row counts, and rendering width.
+- `operator_tree_sha256`: the normalized operator tree, excluding temporary
+  database IDs, timestamps, runtime statistics, row counts, and rendering
+  width. The report records `normalization.operator_tree_version` and
+  `normalization.operator_family_mapping_version`; while the report format is
+  pre-release these identifiers follow the same mutable `v1alpha` philosophy
+  as the config and may change in place.
 
 Operator-family normalization follows Spanner's documented query execution
 operators. `Sort` and `Sort Limit` are `full_sort`; `Minor Sort` and
@@ -450,6 +409,13 @@ separate `display_name`. The normalizer maps that metadata-bearing
 `Distributed Union` to the `distributed_merge_union` family so it remains
 reviewable as the documented operator and is not treated as an explicit sort
 violation by `explicit_sort`.
+Scalar-kind PlanNodes get display-name classification first, so subquery
+operators that are kind `SCALAR` in raw plans (Array Subquery, Scalar
+Subquery) keep their concrete families; scalar expression nodes such as
+Reference, Function, Constant, and Parameter that match no concrete family
+classify as `scalar` rather than polluting `unknown`. `unknown` stays
+reserved for unclassified relational operators so a strict
+`forbid: operator_family: unknown` policy is usable.
 `Aggregate` nodes are split into
 `hash_aggregate` and `stream_aggregate` when QueryPlan metadata exposes
 `iterator_type: Hash` or `iterator_type: Stream`; integration tests can force
@@ -1215,11 +1181,19 @@ root package remains focused on reusable analyzer, catalog, and type conversion
 APIs:
 
 ```text
-cmd/spanner-query-gen/       CLI only
-cmd/spanner-query-gen/*_test  CLI and generator integration tests
-internal/querygen            YAML config, schema/query/write planning,
-                             generated SQL shorthands, and Go rendering
-plancontract (nested module) PLAN-only normalization and contract evaluator
+cmd/spanner-query-gen/        CLI and report assembly (nested Go module so
+                              spanemuboost/testcontainers/Docker stay out of
+                              the root module); CLI and integration tests
+internal/querygen             YAML config, schema/query/write planning,
+                              generated SQL shorthands, and Go rendering
+                              (root module; imported across the module
+                              boundary by the cmd module via the path-prefix
+                              internal rule)
+plancontract/                 nested Go module: PLAN normalization (operator
+                              families, topology, digests) and contract
+                              evaluation over spannerpb.QueryPlan from any
+                              source
+tools/                        nested Go module for the Omni developer probes
 ```
 
 Public root-package helpers can remain thin convenience APIs if they are useful
@@ -1325,7 +1299,11 @@ defined.
 
 ## Roadmap
 
-### Phase 1: Stabilize the Current Generator and Plan Model
+Phase headings carry a coarse status as of 2026-06-12. "Shipped" means the
+surface exists with tests; open follow-ups stay in `TODO.md` rather than
+being re-listed here.
+
+### Phase 1: Stabilize the Current Generator and Plan Model (shipped)
 
 - Keep one-file output.
 - Keep YAML config.
@@ -1345,7 +1323,7 @@ defined.
   tests.
 - Document the design and known limitations.
 
-### Phase 2: Validation and Write Semantics
+### Phase 2: Validation and Write Semantics (shipped; rule policy layer remains)
 
 - Keep expanding the `vet` command backed by the plan model.
 - Add built-in rules for update masks, cross-dialect unknown types, duplicate
@@ -1359,7 +1337,7 @@ defined.
 - Document generated-code guidance for not mixing DML and mutations in one
   transaction.
 
-### Phase 2.5: Minimal Type and Field Overrides
+### Phase 2.5: Minimal Type and Field Overrides (not started)
 
 - Add the minimal override path needed before query methods make DTO contracts
   hard to change.
@@ -1369,7 +1347,7 @@ defined.
   runtime contracts.
 - Keep broad template customization deferred until the plan model is stable.
 
-### Phase 3: Spanner Query Methods
+### Phase 3: Spanner Query Methods (mostly shipped as free functions)
 
 - Activate `result.cardinality` semantics for generated query methods.
 - Define cardinality behavior for zero and multiple rows.
@@ -1381,7 +1359,7 @@ defined.
 - Keep BigQuery generation at DTO/TableSchema metadata level for now.
 - Decide pointer vs value result defaults.
 
-### Phase 4: External Query UX and SQL Files
+### Phase 4: External Query UX and SQL Files (external_query shipped; SQL files not started)
 
 - Harden `kind: external_query` config that separates BigQuery outer SQL from
   Spanner inner SQL.
@@ -1403,7 +1381,7 @@ defined.
 - Do not promise sqlc macro compatibility. Consider only GoogleSQL-native
   conveniences that preserve reviewable SQL.
 
-### Phase 4.5: BigQuery Spanner External Dataset Catalog Integration
+### Phase 4.5: BigQuery Spanner External Dataset Catalog Integration (binding shipped; hardening open)
 
 The basic catalog binding is in current scope. This phase is the hardening
 work that makes that binding safer for production review.
@@ -1421,7 +1399,7 @@ work that makes that binding safer for production review.
   external dataset tables read-only DML and metadata targets.
 - Do not generate BigQuery execution methods yet.
 
-### Phase 5: Broader Type and Field Overrides
+### Phase 5: Broader Type and Field Overrides (not started)
 
 - Extend type override support to proto, enum, BigQuery BIGNUMERIC, and nested
   field-specific cases.
@@ -1429,7 +1407,7 @@ work that makes that binding safer for production review.
 - Implement the documented type override resolution order.
 - Keep template customization out of scope until the plan model is stable.
 
-### Phase 6: Opt-In Spanner Model Generation
+### Phase 6: Opt-In Spanner Model Generation (not started)
 
 - Generate table model structs from Spanner DDL for explicitly included tables.
 - Generate index read helpers.
@@ -1437,7 +1415,7 @@ work that makes that binding safer for production review.
 - Add exact-name or inflection controls.
 - Add build tags.
 
-### Phase 7: Later Runtime and Customization Work
+### Phase 7: Later Runtime and Customization Work (not started)
 
 - Add BigQuery query method generation after DTO loading is robust.
 - Add schema-change verification against generated query definitions.
@@ -1451,8 +1429,8 @@ work that makes that binding safer for production review.
   or only generate DTO/schema metadata at first?
 - How much sqlc annotation compatibility is useful when GoogleSQL parameter
   syntax is already named?
-- Should DML `THEN RETURN` be generated in Phase 3 or wait until the basic
-  Spanner query method surface is stable?
+- (Answered) DML `THEN RETURN` shipped through `queries` row-set result
+  modes; a future `commands` surface may still refine the shape.
 - Should table models and query DTOs be generated into separate files once the
   generator supports multi-file output?
 - Should proto field access remain STRUCT-shadow based until go-googlesql
