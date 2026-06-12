@@ -669,6 +669,15 @@ Two refinements:
   only visible in the Seek Condition text.
 - `IN` lists count as enumerated extraction (`seekable_key_size > 0`), not as
   point seeks, even though each element is an equality.
+- Equality-prefix scans and range scans therefore report categorically
+  different values even when their physical access is similar: a 1-of-3-key
+  equality prefix reads a contiguous subtree range yet reports `0`, while
+  `BETWEEN` on the same leading key reports `1`. The metric describes how
+  the seek bounds are computed (direct point key versus interval or
+  enumeration extraction), not how wide the scan is, so `0` and `k > 0` are
+  not comparable as a narrowness measure. When a range is involved, the
+  preceding equality keys are included in the count (`= AND >` reports `2`,
+  not `1`).
 
 Reading framework for scans that are not full scans: `0` with no residual is
 a single-point prefix access that matches the query's own key semantics; `0`
