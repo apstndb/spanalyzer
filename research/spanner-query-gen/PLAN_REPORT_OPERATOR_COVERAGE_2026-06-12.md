@@ -265,3 +265,34 @@ failed with the JOIN_METHOD hint remediation; `require_timestamp_condition`
 failed for a non-commit-timestamp `TIMESTAMP` predicate with an explanatory
 remediation; a CEL contract reading `operator_family_counts["scalar"]`
 evaluated as replayable_from_report=true.
+
+## Shard-pattern seekability follow-up (gcpug/nouhau#135)
+
+Re-verified the 2020 shard-note discussion (gcpug/nouhau PR #135) on Omni
+2026.r1-beta with the plan-shape probe, using
+`Order1M(ShardCreatedAt, CreatedAt DESC)`:
+
+- `ShardCreatedAt BETWEEN 0 AND 9` + timestamp range: the interval
+  discretization documented in the Spanner SQL paper (pub46103, 4.3 Filter
+  tree) is optimizer-version dependent. Versions 1-6 discretize and seek
+  both keys (`seekable_key_size=2`, no residual); versions 7-8 (current
+  default) seek only the shard range and demote the timestamp to a
+  Residual Condition. An explicit `IN (0, ..., 9)` enumeration does not
+  help on v7-v8. Empty-database caveat applies (cost-based choice may
+  differ with statistics).
+- The per-shard rewrite (`UNNEST(GENERATE_ARRAY(0, 9))` driving a
+  correlated `ARRAY(SELECT ... WHERE ShardCreatedAt = shard ...)`)
+  produces an equality + timestamp-range two-key seek on every optimizer
+  version, with per-shard `Local Limit` pushdown under the distributed
+  union and only the final top-N hitting `Global Sort Limit`.
+- Contract-selection nuance: the naive V1 shard query
+  (`BETWEEN 0 AND 9 ORDER BY ... LIMIT`) does NOT set `Full scan: true`
+  on Omni (the seek covers the shard range, which simply spans the whole
+  index), so a `no_full_scan` contract would not flag it; the
+  `Sort Limit` it contains is caught by `no_explicit_sort` instead.
+  This matches the intent of the full-scan remediation text that
+  recommends per-shard equality probes for sharded timestamp queries.
+
+The same-day documentation update in spanner-hacks
+`seek-residual-conditions.md` records the optimizer-version dependence
+with the reproduction query.
