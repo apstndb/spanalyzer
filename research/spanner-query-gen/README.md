@@ -1,19 +1,24 @@
 # spanner-query-gen Research
 
-This directory keeps non-normative design notes and review exchanges for
-`cmd/spanner-query-gen`.
-
-Current command documentation is under
-[`cmd/spanner-query-gen/`](../../cmd/spanner-query-gen/). Generated JSON schemas
-are under [`schemas/`](../../schemas/). Those files, plus tests, are the source
-of truth for the current v1alpha behavior.
+Non-normative design notes and verification logs for
+`cmd/spanner-query-gen`. The source of truth for current v1alpha behavior is
+[`cmd/spanner-query-gen/`](../../cmd/spanner-query-gen/) documentation,
+[`schemas/`](../../schemas/), and the test suite.
 
 ## Files
 
 - [`PLAN_CONTRACT_CANDIDATES.md`](PLAN_CONTRACT_CANDIDATES.md): candidate
-  query-plan contracts and optimization-practice notes. The implemented
-  contract surface remains documented under
+  query-plan contracts derived from query-optimization practice. The
+  implemented contract surface is documented in
   [`cmd/spanner-query-gen/PLAN_CONTRACTS.md`](../../cmd/spanner-query-gen/PLAN_CONTRACTS.md).
-- [`reviews/`](reviews/): archived review prompts, review responses, and design
-  discussion notes used while iterating on the v1alpha configuration, code
-  generation, external dataset, and plan-contract design.
+- [`OPTIONAL_PARAMS_DESIGN.md`](OPTIONAL_PARAMS_DESIGN.md): design for the
+  optional query parameter support integrated into v1alpha.
+- [`OPTIONAL_PARAMS_PRIOR_ART.md`](OPTIONAL_PARAMS_PRIOR_ART.md): prior-art
+  survey behind that design.
+- [`PLAN_REPORT_OPERATOR_COVERAGE_2026-06-12.md`](PLAN_REPORT_OPERATOR_COVERAGE_2026-06-12.md):
+  the 2026-06-12 Omni verification session — operator family coverage,
+  classifier defects found and fixed, optimizer behavior observations
+  (join elimination, interval discretization, aggregate determinism), and
+  Omni platform checks.
+- [`reviews/`](reviews/): the latest active design-review exchange. Older
+  exchanges were removed on 2026-06-12 and live in git history.

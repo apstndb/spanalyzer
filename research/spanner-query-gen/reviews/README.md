@@ -1,19 +1,15 @@
-# spanner-query-gen Review Archive
+# spanner-query-gen Review Exchanges
 
-This directory is an archive of review exchanges and responses collected while
-designing `spanner-query-gen`.
+This directory keeps only the latest active review exchange for
+`spanner-query-gen` design iteration. The files are not normative; prefer the
+current documentation under `cmd/spanner-query-gen/`, `schemas/`, and the test
+suite when deciding current behavior.
 
-The files are intentionally preserved close to their original form so that old
-feedback can be audited. They are not normative documentation. Prefer the
-current files under `cmd/spanner-query-gen/`, `schemas/`, and the test suite
-when deciding current behavior.
-
-The top level keeps the latest active review exchange. Older review files whose
-role has ended are moved to `trash/` so they remain available without making the
-current review queue hard to scan.
+Historical exchanges (the former `trash/` archive of several dozen
+review/response rounds) were deleted during the 2026-06-12 documentation
+reorganization; use git history before that date to audit old feedback.
 
 Filename conventions:
 
 - `*-review-*.md`: review feedback received during design iteration.
 - `*-response-*.md`: responses prepared for those reviews.
-- `feedback*.md`: early design feedback retained for historical context.

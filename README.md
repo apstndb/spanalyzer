@@ -38,6 +38,22 @@ The repository hosts four Go modules, split along dependency weight:
 
 Development across modules uses the committed `go.work` workspace.
 
+## Documentation map
+
+- This README: positioning, module layout, analyzer usage.
+- [`AGENTS.md`](AGENTS.md): guidance for coding agents (commands, module
+  rules, testing layout).
+- [`TODO.md`](TODO.md): open follow-up work only; resolved history is
+  archived under [`research/archive/`](research/archive/).
+- [`cmd/spanner-query-gen/`](cmd/spanner-query-gen/README.md): the code
+  generator's UX ([README](cmd/spanner-query-gen/README.md)), intended
+  architecture ([DESIGN](cmd/spanner-query-gen/DESIGN.md)), drift status
+  ([IMPLEMENTATION_STATUS](cmd/spanner-query-gen/IMPLEMENTATION_STATUS.md)),
+  and the contract surface
+  ([PLAN_CONTRACTS](cmd/spanner-query-gen/PLAN_CONTRACTS.md)).
+- [`research/`](research/README.md): non-normative observation notes and
+  design background, indexed per area.
+
 ## Why plan inspection
 
 The plan tooling in this repository — `plan-report`, plan contracts, the

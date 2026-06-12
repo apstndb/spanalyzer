@@ -1,36 +1,42 @@
 # spanner-query-plan-shape Research
 
-This directory keeps long-form evidence produced by
-`tools/spanner-query-plan-shape`.
+Long-form plan-shape evidence produced with
+[`tools/spanner-query-plan-shape`](../../tools/spanner-query-plan-shape/README.md)
+and, for newer notes, the `plancontract` module fed with raw `AnalyzeQuery`
+plans. Observation logs, not a stable contract.
 
-The tool's command usage remains in
-[`tools/spanner-query-plan-shape/README.md`](../../tools/spanner-query-plan-shape/README.md).
-The files here are observation logs and upstream feedback material, not a
-stable CLI contract.
+## Operator vocabulary
 
-## Files
-
-- [`SPANNER_OPTIMIZER_AND_HINTS.md`](SPANNER_OPTIMIZER_AND_HINTS.md):
-  official optimizer-version and hint inventory, mapped to local verification
-  summaries and detailed evidence links.
-- [`OPTIMIZER_DECISION_CONTROL_AND_OBSERVABILITY.md`](OPTIMIZER_DECISION_CONTROL_AND_OBSERVABILITY.md):
-  interpretation layer for optimizer-version boundaries, hint controllability,
-  and whether each decision is visible enough to become a PLAN contract.
 - [`QUERY_EXECUTION_OPERATORS_OBSERVATIONS.md`](QUERY_EXECUTION_OPERATORS_OBSERVATIONS.md):
   observed Spanner query-plan operator vocabulary, normalization impact, and
   probe environment notes.
 - [`COMPACT_TREE_METADATA_OBSERVATIONS.md`](COMPACT_TREE_METADATA_OBSERVATIONS.md):
   regenerated `--output compact-tree-metadata` result tables for the built-in
-  verification cases referenced by the operator observations.
+  verification cases.
+- [`OPERATOR_VERIFICATION_FOLLOWUP.md`](OPERATOR_VERIFICATION_FOLLOWUP.md):
+  follow-up checks for remaining vocabulary uncertainty — normal `SpoolScan`,
+  Search Predicate mapping, Generate Relation candidates, Local Split Union,
+  MiniBatch/RowCount environment sensitivity, and `Create Batch` scalar
+  children.
+
+## Optimizer behavior
+
+- [`SPANNER_OPTIMIZER_AND_HINTS.md`](SPANNER_OPTIMIZER_AND_HINTS.md):
+  official optimizer-version and hint inventory mapped to local verification.
+- [`OPTIMIZER_DECISION_CONTROL_AND_OBSERVABILITY.md`](OPTIMIZER_DECISION_CONTROL_AND_OBSERVABILITY.md):
+  which optimizer decisions are controllable and visible enough to become
+  PLAN contracts.
 - [`OPTIMIZER_VERSION_MATRIX_OBSERVATIONS.md`](OPTIMIZER_VERSION_MATRIX_OBSERVATIONS.md):
-  optimizer-version and `ALLOW_DISTRIBUTED_MERGE` matrix observations, including
-  dedicated CTE reference-count checks.
+  optimizer-version and `ALLOW_DISTRIBUTED_MERGE` matrix observations.
 - [`OPTIMIZER_VERSION_RENDERED_EXAMPLES.md`](OPTIMIZER_VERSION_RENDERED_EXAMPLES.md):
-  representative optimizer-version before/after examples rendered with
-  `spannerplan` reference output.
+  representative optimizer-version before/after rendered examples.
+
+## Pattern studies
+
 - [`TIMESTAMP_ORDERED_SHARD_QUERY_OBSERVATIONS.md`](TIMESTAMP_ORDERED_SHARD_QUERY_OBSERVATIONS.md):
-  Stack Overflow timestamp-ordered sharded index query examples checked against
-  rendered Spanner plan output.
-- [`spanner-hacks-optimizer-version-feedback-ja.md`](spanner-hacks-optimizer-version-feedback-ja.md):
-  candidate optimizer-version before/after examples for Spanner Unofficial
-  Hacks, with `spannerplan` reference output.
+  the timestamp-ordered sharded index pattern (Stack Overflow thread,
+  gcpug/nouhau#135) verified against rendered plans, updated 2026-06-12 with
+  the optimizer-version dependence of shard-range seekability.
+
+Delivered feedback drafts for Spanner Unofficial Hacks were removed on
+2026-06-12 after upstream incorporation; see git history before that date.

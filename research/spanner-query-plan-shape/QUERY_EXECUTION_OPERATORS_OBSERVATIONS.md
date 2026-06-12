@@ -278,7 +278,7 @@ vocabulary:
 
 Full regenerated Full Text Search results are recorded in [`COMPACT_TREE_METADATA_OBSERVATIONS.md`](COMPACT_TREE_METADATA_OBSERVATIONS.md#full-text-search).
 Shareable `spannerplan/plantree/reference` output is recorded in
-[`spanner-hacks-operators-feedback/full-text-search-ja.md`](spanner-hacks-operators-feedback/full-text-search-ja.md).
+the full-text-search feedback evidence (delivered upstream; removed from this tree on 2026-06-12, see git history).
 With `spannerplan v0.1.9`, the reference renderer marks `SearchIndex Scan`
 rows and prints `Search Predicate:` annotations in the
 `Predicates(identified by ID)` section.

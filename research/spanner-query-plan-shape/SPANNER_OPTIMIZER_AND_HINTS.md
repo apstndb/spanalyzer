@@ -29,8 +29,10 @@ Related local evidence:
 - [Query execution operator observations](QUERY_EXECUTION_OPERATORS_OBSERVATIONS.md)
 - [Optimizer-version matrix observations](OPTIMIZER_VERSION_MATRIX_OBSERVATIONS.md)
 - [Optimizer-version rendered examples](OPTIMIZER_VERSION_RENDERED_EXAMPLES.md)
-- [Spanner Unofficial Hacks follow-up](spanner-hacks-operators-feedback-ja.md)
-- [Rendered plan evidence](spanner-hacks-operators-feedback/README.md)
+- Spanner Unofficial Hacks feedback drafts: delivered upstream and removed
+  from this tree on 2026-06-12 (see git history before that date for the
+  rendered-plan evidence; the upstream document is
+  <https://spanner-hacks.apstn.dev/operators/>).
 
 ## Optimizer Version History
 
@@ -305,7 +307,6 @@ Details:
 Details:
 
 - [Other Hint Matrix](QUERY_EXECUTION_OPERATORS_OBSERVATIONS.md#other-hint-matrix)
-- [Rendered best-practices evidence](spanner-hacks-operators-feedback/docs-best-practices-ja.md)
 
 ### Join Hints
 
@@ -321,8 +322,6 @@ Details:
 
 - [Join Hint Matrix](QUERY_EXECUTION_OPERATORS_OBSERVATIONS.md#join-hint-matrix)
 - [Subquery Predicate Statement-Hint Matrix](QUERY_EXECUTION_OPERATORS_OBSERVATIONS.md#subquery-predicate-statement-hint-matrix)
-- [Rendered join matrix](spanner-hacks-operators-feedback/join-matrix-ja.md)
-- [Rendered subquery join matrix](spanner-hacks-operators-feedback/subquery-join-matrix-ja.md)
 
 Join-related optimizer-version changes are often more controllable than a
 single `JOIN_METHOD` hint suggests. In particular, v5-style cost-based join
@@ -386,7 +385,6 @@ query-syntax Hints section.
 Details:
 
 - [Function Hint Shapes](QUERY_EXECUTION_OPERATORS_OBSERVATIONS.md#function-hint-shapes)
-- [Rendered TVF/function-hint evidence](spanner-hacks-operators-feedback/tvf-and-function-hints-ja.md)
 
 ## Gaps And Caveats
 
