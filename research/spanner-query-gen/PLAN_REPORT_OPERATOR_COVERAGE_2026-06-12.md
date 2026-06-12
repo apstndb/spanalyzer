@@ -285,6 +285,17 @@ Re-verified the 2020 shard-note discussion (gcpug/nouhau PR #135) on Omni
   produces an equality + timestamp-range two-key seek on every optimizer
   version, with per-shard `Local Limit` pushdown under the distributed
   union and only the final top-N hitting `Global Sort Limit`.
+- Caveat (per the paper itself and spanner-hacks
+  `seek-residual-conditions.md`): a displayed Seek Condition, including
+  `seekable_key_size=2`, is a plan-representation fact, not a runtime
+  performance guarantee. Range extraction is a runtime process (filter
+  tree over correlated self-joins), fragmented many-range seeks are known
+  to degrade and can be processed like residual filtering at runtime, and
+  the paper explicitly notes the seeks-vs-scans tradeoff can make range
+  extraction cost exceed its benefit. The v7-v8 change away from
+  discretized seeks is therefore not necessarily a regression; judging
+  the performance impact needs PROFILE statistics over real data, which
+  PLAN-only contracts intentionally do not cover.
 - Contract-selection nuance: the naive V1 shard query
   (`BETWEEN 0 AND 9 ORDER BY ... LIMIT`) does NOT set `Full scan: true`
   on Omni (the seek covers the shard range, which simply spans the whole
