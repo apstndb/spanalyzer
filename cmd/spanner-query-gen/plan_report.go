@@ -496,8 +496,12 @@ func buildPlanReportWithRuntime(ctx context.Context, config querygen.QueryCodege
 
 func defaultPlanReportNormalization() planReportNormalization {
 	return planReportNormalization{
-		OperatorTreeVersion:          "v2",
-		OperatorFamilyMappingVersion: "v2",
+		// Normalization identifiers follow the same mutable preview
+		// philosophy as the v1alpha config: they may change in place while
+		// the report format is pre-release, so they intentionally do not
+		// promise stable v1/v2 digest comparability.
+		OperatorTreeVersion:          "v1alpha",
+		OperatorFamilyMappingVersion: "v1alpha",
 		CELInputDefaults: planReportCELInputDefaults{
 			OptionalString:  "",
 			OptionalBoolean: false,

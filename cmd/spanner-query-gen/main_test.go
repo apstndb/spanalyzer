@@ -1694,10 +1694,10 @@ func TestPlanReportOptimizerPinningWarnings(t *testing.T) {
 
 func TestDefaultPlanReportNormalizationCELInputDefaults(t *testing.T) {
 	normalization := defaultPlanReportNormalization()
-	if got, want := normalization.OperatorTreeVersion, "v2"; got != want {
+	if got, want := normalization.OperatorTreeVersion, "v1alpha"; got != want {
 		t.Fatalf("operator tree version = %q, want %q", got, want)
 	}
-	if got, want := normalization.OperatorFamilyMappingVersion, "v2"; got != want {
+	if got, want := normalization.OperatorFamilyMappingVersion, "v1alpha"; got != want {
 		t.Fatalf("operator family mapping version = %q, want %q", got, want)
 	}
 	if got, want := normalization.CELInputDefaults.OptionalString, ""; got != want {
@@ -4253,7 +4253,7 @@ func TestBuildPlanReportNoTargets(t *testing.T) {
 	if got, want := report.BackendIdentity.Version, "not_recorded"; got != want {
 		t.Fatalf("plan-report backend version = %q, want %q", got, want)
 	}
-	if got, want := report.Normalization.OperatorTreeVersion, "v2"; got != want {
+	if got, want := report.Normalization.OperatorTreeVersion, "v1alpha"; got != want {
 		t.Fatalf("plan-report operator tree version = %q, want %q", got, want)
 	}
 	if got, want := report.Optimizer.Requested.Version, "8"; got != want {
