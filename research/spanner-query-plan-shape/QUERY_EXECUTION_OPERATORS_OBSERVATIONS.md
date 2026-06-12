@@ -620,3 +620,33 @@ normalization now includes these families:
 
 Full Text Search also exposed `SearchIndexScan` as `Scan.scan_type` metadata;
 the normalized metadata spelling is `search_index_scan`.
+
+## seekable_key_size Semantics (2026-06-13)
+
+Observed on 2026-06-13 with Spanner Omni 2026.r1-beta through `spanemuboost`,
+against the interleaved `Songs(SingerId, AlbumId, TrackId)` table (3 declared
+primary key columns), all queries planned with the default optimizer settings:
+
+| WHERE shape | Seek Condition | `seekable_key_size` |
+| --- | --- | --- |
+| `SingerId = 1 AND AlbumId = 2` (literal point prefix) | 2-key equality | `0` |
+| `SingerId = @sid AND AlbumId = @aid` (parameter point prefix) | 2-key equality | `0` |
+| `SingerId = 1 AND AlbumId = 2 AND TrackId = 3` (full-key point) | 3-key equality | `0` |
+| `SingerId = 1 AND AlbumId > 2` (prefix plus range) | 2 keys, range-bounded | `2` |
+| `SingerId BETWEEN 1 AND 5` (range only) | 1 key, range-bounded | `1` |
+| no usable key condition (plain full scan) | none | `0` |
+
+Conclusion: `seekable_key_size` counts the key prefix length of a
+**range-bounded** seek. Pure point seeks (all-equality key conditions, with
+literals or parameters alike) report `0`, the same value as a plain full
+scan, even though the scan node carries a complete Seek Condition. This
+matches the Spanner SQL paper's split between point lookups and range
+extraction: point keys need no interval computation, so the Filter Scan has
+no range-extraction work to describe.
+
+Practical consequence: `seekable_key_size` is not a standalone seekability
+metric. A `0` must be disambiguated by the presence of a Seek Condition
+child link (point seek) versus the `Full scan` flag or a Residual-only
+filter (actual full scan). The `--annotate seekability` rendering in
+plan-report therefore annotates `k/N` only for `k > 0` and leaves `0`
+untouched.
