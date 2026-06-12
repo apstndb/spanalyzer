@@ -38,6 +38,29 @@ The repository hosts four Go modules, split along dependency weight:
 
 Development across modules uses the committed `go.work` workspace.
 
+## Why plan inspection
+
+The plan tooling in this repository — `plan-report`, plan contracts, the
+`plancontract` module, and the `spanner-query-plan-shape` probe — exists to
+make careful execution plan inspection cheap, repeatable, and automatable.
+As [Use The Index, Luke](https://use-the-index-luke.com/sql/testing-scalability/system-load)
+puts it:
+
+> Careful execution plan inspection yields more confidence than superficial
+> benchmarks. A full stress test is still worthwhile—but the costs are high.
+
+The properties of real data are something only the application owner can
+know, and constructing meaningful test data is hard. Many plan questions —
+operator choice, seekability, join elimination, hint effects, plan
+regressions across optimizer versions — can be answered from PLAN output
+alone, even against an empty database. The tooling therefore targets
+PLAN-only structural evidence: `plan-report` turns plans into reviewable
+artifacts, plan contracts turn inspection results into repeatable regression
+checks, and the `plancontract` module applies the same normalization to
+plans obtained from any source. Performance claims beyond plan structure
+still require PROFILE statistics over real data and load testing; the tools
+intentionally stop short of those.
+
 In this document, "GoogleSQL frontend" refers to the analyzer and catalog
 library formerly named ZetaSQL. "Spanner GoogleSQL" refers to
 [Cloud Spanner's SQL dialect](https://cloud.google.com/spanner/docs/reference/standard-sql/query-syntax).

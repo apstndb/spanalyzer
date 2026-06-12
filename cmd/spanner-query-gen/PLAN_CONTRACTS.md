@@ -5,6 +5,13 @@ separate `v1alpha-plan-contracts` YAML file. Contracts are intentionally outside
 the main `spanner-query-gen.yaml` so the primary config stays focused on DDL,
 SQL, DTOs, and write helpers.
 
+Plan contracts exist to make careful execution plan inspection repeatable:
+they encode the result of a one-time plan review as a structural check that
+keeps holding (or visibly breaks) as schemas, queries, and optimizer versions
+evolve. Careful plan inspection yields more confidence than superficial
+benchmarks at a fraction of the cost of meaningful load testing, which is the
+positioning of this whole plan-tooling surface (see the repository README).
+
 Plan contracts target structural PLAN output only. They do not use PROFILE
 runtime statistics such as rows scanned, rows returned, latency, or CPU. The
 research note
