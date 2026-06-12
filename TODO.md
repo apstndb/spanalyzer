@@ -104,6 +104,14 @@ plan acquisition workflows. spannerplan already covers variable resolution
 already draws distribution boundaries (dashed, SVG / mermaid.js), so those
 are out of scope.
 
+- [ ] **Validation approach for the spannerplan extension point:** prototype
+  a per-node annotation callback (e.g. `RowAnnotator func(*spannerpb.PlanNode)
+  string` on the plantree/reference render options) in a local spannerplan
+  checkout consumed via a temporary `replace` in the cmd/spanner-query-gen
+  module; only propose it upstream after the seekability and family
+  annotations below prove useful against real Omni plans (the Order1M shard
+  schema showing `seek 2/2` on optimizer v3-v6 vs `seek 1/2` on v7-v8 is the
+  acceptance demo). Do not push spannerplan changes before that validation.
 - [ ] **Seekability annotation in plan-report.** Render scan rows with
   "seek k/N keys" by combining the plan's Seek/Residual Conditions and
   `seekable_key_size` with the index/table key count from the catalog DDL
