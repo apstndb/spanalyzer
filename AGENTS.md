@@ -22,6 +22,13 @@ code lives in the root package. `spanner-query-gen`-specific config, planning,
 and DTO rendering code lives in `internal/querygen`; keep generator-only
 dependencies out of the root package.
 
+`plancontract` is a nested Go module
+(`github.com/apstndb/spanalyzer/plancontract`) that normalizes raw
+`spannerpb.QueryPlan` values and evaluates plan contracts. It must stay
+lightweight: never add dependencies on go-googlesql, memefish, spanemuboost,
+or container tooling there. Run its tests separately with
+`(cd plancontract && go test ./...)`.
+
 ## Essential Commands
 
 Use the Go toolchain declared in `go.mod`.

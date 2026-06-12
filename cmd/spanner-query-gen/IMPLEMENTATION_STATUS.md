@@ -37,7 +37,7 @@ deliberate deferrals.
   exactly one rule mode per entry (`use`, `forbid`, or `cel`), normalized
   operator-family checks, normalized topology fields, raw QueryPlan CEL for
   advanced cases, and PLAN-only scope.
-- Plan contract evaluation lives in `internal/plancontract`, which depends on
+- Plan contract evaluation lives in `plancontract`, which depends on
   normalized plan-report data and `spannerpb.QueryPlan`, but not on
   `go-googlesql`, `memefish`, or `spanemuboost`.
 

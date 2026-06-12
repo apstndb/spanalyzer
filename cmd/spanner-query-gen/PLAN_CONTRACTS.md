@@ -23,7 +23,7 @@ receive optimizer/operator changes before a corresponding Spanner Omni release.
 Treat `plan-report` as a review workflow for a described plan environment, not
 as a production performance guarantee.
 
-The evaluator is implemented in `internal/plancontract` and only consumes an
+The evaluator is implemented in `plancontract` and only consumes an
 already-built plan-report projection plus optional raw `spannerpb.QueryPlan`.
 It does not parse DDL, invoke the GoogleSQL frontend, or start Spanner Omni.
 
@@ -132,7 +132,7 @@ family such as `hash_join`, `merge_join`, `apply_join`, or
 The authoritative machine-readable list is the `operator_family` enum generated
 in `schemas/spanner-query-gen.plan-contracts.v1alpha.schema.json` and
 `schemas/spanner-query-gen.plan-report.v1alpha.schema.json`. The implementation
-source is `internal/plancontract.KnownOperatorFamilies()`.
+source is `plancontract.KnownOperatorFamilies()`.
 
 Every family below is valid in `forbid.operator_family` and
 `operator_family_counts`. All families except `explicit_sort` and

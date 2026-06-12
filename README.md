@@ -15,6 +15,19 @@ These are implementation details of the framework, not part of its contract.
 
 This repository was previously named `go-googlesql-spanner-poc`.
 
+The repository hosts two Go modules:
+
+- `github.com/apstndb/spanalyzer` — the analyzer framework, CLIs, and code
+  generation. Depends on the GoogleSQL frontend and (for Omni-backed plan
+  workflows) container tooling.
+- [`github.com/apstndb/spanalyzer/plancontract`](plancontract) — a
+  lightweight nested module that normalizes raw `spannerpb.QueryPlan` values
+  (operator family classification, operator topology, plan digests) and
+  evaluates plan contracts against them. It works with plans obtained from
+  Cloud Spanner, the emulator, Spanner Omni, or saved artifacts, and depends
+  only on the Spanner protos, CEL, and YAML — not on the GoogleSQL frontend
+  or containers.
+
 In this document, "GoogleSQL frontend" refers to the analyzer and catalog
 library formerly named ZetaSQL. "Spanner GoogleSQL" refers to
 [Cloud Spanner's SQL dialect](https://cloud.google.com/spanner/docs/reference/standard-sql/query-syntax).

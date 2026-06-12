@@ -1219,14 +1219,14 @@ cmd/spanner-query-gen/       CLI only
 cmd/spanner-query-gen/*_test  CLI and generator integration tests
 internal/querygen            YAML config, schema/query/write planning,
                              generated SQL shorthands, and Go rendering
-internal/plancontract        PLAN-only contract evaluator over normalized plans
+plancontract (nested module) PLAN-only normalization and contract evaluator
 ```
 
 Public root-package helpers can remain thin convenience APIs if they are useful
 outside the CLI. Generator-specific dependencies, especially emulator and
 container-based integration test dependencies, should stay under
 `cmd/spanner-query-gen` or `internal/querygen` instead of being attached to the
-root analyzer package. `internal/plancontract` is intentionally kept independent
+root analyzer package. `plancontract` is intentionally kept independent
 of `go-googlesql`, `memefish`, and `spanemuboost`; callers pass an
 already-collected `spannerpb.QueryPlan` plus normalized operator metadata.
 
