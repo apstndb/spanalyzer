@@ -22,12 +22,17 @@ code lives in the root package. `spanner-query-gen`-specific config, planning,
 and DTO rendering code lives in `internal/querygen`; keep generator-only
 dependencies out of the root package.
 
-`plancontract` is a nested Go module
-(`github.com/apstndb/spanalyzer/plancontract`) that normalizes raw
-`spannerpb.QueryPlan` values and evaluates plan contracts. It must stay
-lightweight: never add dependencies on go-googlesql, memefish, spanemuboost,
-or container tooling there. Run its tests separately with
-`(cd plancontract && go test ./...)`.
+The repository is a four-module Go workspace (see `go.work`): the root
+analyzer module, `plancontract`, `cmd/spanner-query-gen`, and `tools`.
+`go test ./...` covers only the current module; run tests per module
+directory. Dependency-weight rules to preserve:
+
+- `plancontract` normalizes raw `spannerpb.QueryPlan` values and evaluates
+  plan contracts. Never add dependencies on go-googlesql, memefish,
+  spanemuboost, or container tooling there.
+- The root module must not depend on spanemuboost, testcontainers, the
+  Docker client, or spannerplan; those belong in `cmd/spanner-query-gen`
+  and `tools`.
 
 ## Essential Commands
 
@@ -35,14 +40,17 @@ Use the Go toolchain declared in `go.mod`.
 
 ```sh
 go test ./...
+(cd plancontract && go test ./...)
+(cd cmd/spanner-query-gen && go test ./...)
+(cd tools && go test ./...)
 go build ./...
 go run ./cmd/spanner-analyzer --ddl testdata/order-proto-schema.sql \
   --proto-descriptors-file testdata/protos/order_descriptors.pb \
   --sql 'SELECT OrderInfo.order_number FROM Orders'
 ```
 
-Run `gofmt` on edited Go files. Run `go test ./...` before reporting a change as
-complete.
+Run `gofmt` on edited Go files. Run the per-module tests above (at least the
+modules you touched) before reporting a change as complete.
 
 ## Implementation Notes
 

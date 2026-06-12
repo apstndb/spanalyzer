@@ -15,11 +15,12 @@ These are implementation details of the framework, not part of its contract.
 
 This repository was previously named `go-googlesql-spanner-poc`.
 
-The repository hosts two Go modules:
+The repository hosts four Go modules, split along dependency weight:
 
-- `github.com/apstndb/spanalyzer` — the analyzer framework, CLIs, and code
-  generation. Depends on the GoogleSQL frontend and (for Omni-backed plan
-  workflows) container tooling.
+- `github.com/apstndb/spanalyzer` — the analyzer framework: DDL catalog,
+  GoogleSQL analysis, type conversion, code generation planning, and the
+  lightweight CLIs (`spanner-analyzer`, `spanner-function-catalog`). Depends
+  on memefish and the GoogleSQL frontend, but not on container tooling.
 - [`github.com/apstndb/spanalyzer/plancontract`](plancontract) — a
   lightweight nested module that normalizes raw `spannerpb.QueryPlan` values
   (operator family classification, operator topology, plan digests) and
@@ -27,6 +28,15 @@ The repository hosts two Go modules:
   Cloud Spanner, the emulator, Spanner Omni, or saved artifacts, and depends
   only on the Spanner protos, CEL, and YAML — not on the GoogleSQL frontend
   or containers.
+- [`github.com/apstndb/spanalyzer/cmd/spanner-query-gen`](cmd/spanner-query-gen)
+  — the query code generation CLI, including the Omni-backed `plan-report`
+  workflow and integration tests. This is where spanemuboost,
+  testcontainers, and the Docker client enter the dependency graph.
+- [`github.com/apstndb/spanalyzer/tools`](tools) — developer-only Spanner
+  Omni probes (`spanner-query-plan-shape`, `optparam-plan-probe`), with the
+  same container-tooling dependencies.
+
+Development across modules uses the committed `go.work` workspace.
 
 In this document, "GoogleSQL frontend" refers to the analyzer and catalog
 library formerly named ZetaSQL. "Spanner GoogleSQL" refers to

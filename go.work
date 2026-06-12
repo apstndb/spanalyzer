@@ -1,0 +1,8 @@
+go 1.26.3
+
+use (
+	.
+	./cmd/spanner-query-gen
+	./plancontract
+	./tools
+)

@@ -36,7 +36,9 @@ jobs:
         run: |
           mise x -- go mod tidy
           (cd plancontract && mise x -- go mod tidy)
-          git diff --exit-code -- go.mod go.sum plancontract/go.mod plancontract/go.sum
+          (cd cmd/spanner-query-gen && mise x -- go mod tidy)
+          (cd tools && mise x -- go mod tidy)
+          git diff --exit-code -- '*.mod' '*.sum' 
 
       - name: Vet
         run: mise x -- go vet ./...
@@ -50,6 +52,22 @@ jobs:
 
       - name: Test plancontract module
         working-directory: plancontract
+        run: mise x -- go test -race -shuffle=on ./...
+
+      - name: Vet cmd/spanner-query-gen module
+        working-directory: cmd/spanner-query-gen
+        run: mise x -- go vet ./...
+
+      - name: Test cmd/spanner-query-gen module
+        working-directory: cmd/spanner-query-gen
+        run: mise x -- go test -race -shuffle=on ./...
+
+      - name: Vet tools module
+        working-directory: tools
+        run: mise x -- go vet ./...
+
+      - name: Test tools module
+        working-directory: tools
         run: mise x -- go test -race -shuffle=on ./...
 
   integration-test:
@@ -70,6 +88,7 @@ jobs:
         run: mise x -- go mod download
 
       - name: Run Spanner emulator integration tests
+        working-directory: cmd/spanner-query-gen
         run: mise x -- go test -tags=integration -run '^TestIntegration' ./...
 
   lint:
@@ -93,6 +112,14 @@ jobs:
         working-directory: plancontract
         run: mise x -- golangci-lint run --timeout=5m
 
+      - name: Run golangci-lint on cmd/spanner-query-gen module
+        working-directory: cmd/spanner-query-gen
+        run: mise x -- golangci-lint run --timeout=5m
+
+      - name: Run golangci-lint on tools module
+        working-directory: tools
+        run: mise x -- golangci-lint run --timeout=5m
+
   govulncheck:
     name: govulncheck
     runs-on: ubuntu-latest
@@ -108,12 +135,11 @@ jobs:
           install_args: go go:golang.org/x/vuln/cmd/govulncheck
 
       - name: Run govulncheck
-        run: |
-          # These packages intentionally use spanemuboost/testcontainers for
-          # Spanner emulator/Omni workflows, which currently pulls Docker
-          # client advisories without a fixed upstream version.
-          packages=$(mise x -- go list ./... | grep -vE '/(cmd/spanner-query-gen|tools/spanner-query-plan-shape)$')
-          mise x -- govulncheck $packages
+        run: mise x -- govulncheck ./...
+        # The cmd/spanner-query-gen and tools modules intentionally use
+        # spanemuboost/testcontainers for Spanner emulator/Omni workflows,
+        # which currently pull Docker client advisories without a fixed
+        # upstream version, so govulncheck is not run for those modules.
 
       - name: Run govulncheck on plancontract module
         working-directory: plancontract
