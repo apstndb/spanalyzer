@@ -240,6 +240,10 @@ func (c *Catalog) ApplyDDL(ddl ast.DDL) error {
 		// Vector indexes do not affect logical query result row types. Regular
 		// index metadata is retained for query code generation.
 		return nil
+	case *ast.CreateSearchIndex, *ast.AlterSearchIndex, *ast.DropSearchIndex:
+		// Search indexes accelerate full-text search execution and do not
+		// affect logical query result row types.
+		return nil
 	case *ast.CreateSchema, *ast.DropSchema:
 		// Schemas only scope object names; individual objects carry their full
 		// paths in this catalog.

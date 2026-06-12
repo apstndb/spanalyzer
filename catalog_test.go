@@ -525,6 +525,14 @@ ALTER DATABASE MyDatabase SET OPTIONS (
 );
 CREATE ROLE MyRole;
 GRANT SELECT ON TABLE MyTable TO ROLE MyRole;
+CREATE TABLE SearchAlbums (
+  AlbumId STRING(MAX) NOT NULL,
+  AlbumTitle STRING(MAX),
+  AlbumTitle_Tokens TOKENLIST AS (TOKENIZE_FULLTEXT(AlbumTitle)) HIDDEN
+) PRIMARY KEY(AlbumId);
+CREATE SEARCH INDEX SearchAlbumsTitleIndex ON SearchAlbums(AlbumTitle_Tokens);
+ALTER SEARCH INDEX SearchAlbumsTitleIndex ADD STORED COLUMN AlbumTitle;
+DROP SEARCH INDEX SearchAlbumsTitleIndex;
 `
 	// BuildSchemaCatalog should not fail on these, even if they are not fully modeled
 	// because memefish supports them.

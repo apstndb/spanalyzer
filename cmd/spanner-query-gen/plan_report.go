@@ -1011,7 +1011,13 @@ func planReportOperatorFamily(node *spannerpb.PlanNode) string {
 	case "recursive union":
 		return "recursive_union"
 	case "tvf":
-		if planReportNormalizeOperatorName(planReportNodeMetadataRawString(node, "name")) == "search query conversion" {
+		// Spanner Omni emits the TVF name under the capitalized "Name"
+		// metadata key; accept the lowercase spelling defensively.
+		name := planReportNodeMetadataRawString(node, "Name")
+		if name == "" {
+			name = planReportNodeMetadataRawString(node, "name")
+		}
+		if planReportNormalizeOperatorName(name) == "search query conversion" {
 			return "search_query_conversion_tvf"
 		}
 		return "unknown"

@@ -58,6 +58,53 @@ This sweep was run after scalar-kind PlanNodes were reclassified into the
   `scalar_subquery` was unobserved by the original 17 queries but was
   confirmed by the conditional-subquery follow-up above.
 
+## Family-gap probes (same day): nine more families observed, two bugs found
+
+A follow-up probe pass targeted families the 17-query sweep never produced.
+Verified shapes on Omni, now pinned by the
+`TestIntegrationPlanReportOperatorFamilyCoverageOnOmni` integration test
+(`cmd/spanner-query-gen/omni_family_coverage_test.go`):
+
+- `SELECT 1` → `unit_relation`; `WHERE FALSE` → `empty_relation`.
+- `GROUP BY ... HAVING` → `filter` (HAVING is a Filter, not Filter Scan,
+  matching spanner-hacks operators.md).
+- `ORDER BY SingerId, Title` on `Albums(SingerId, AlbumId)` → `minor_sort`
+  (prefix already key-ordered).
+- A CTE referenced twice through `UNION ALL` → `spool_build` + `spool_scan`
+  plus `union_all` / `union_input`.
+- A hinted hash join against a non-interleaved table → `hash_join` with
+  `bloom_filter_build` on the build side (the interleave-eliminated joins in
+  the original sweep never built bloom filters).
+- Colocated `EXISTS` / `NOT EXISTS` against an interleaved child keyed by the
+  full parent key → standalone `semi_apply` / `anti_semi_apply` (the
+  non-colocated forms in the original sweep were the distributed variants).
+- Full-text search (`SEARCH` over a `TOKENLIST` column with a search index)
+  → `search_predicate`, `search_query_conversion_tvf`, `verify_determinism`.
+
+Bugs found by these probes (both fixed):
+
+- The catalog rejected `CREATE SEARCH INDEX` (`unsupported DDL
+  *ast.CreateSearchIndex`), so full-text search schemas could not flow
+  through plan-report at all. Search indexes are now ignored like regular and
+  vector indexes for row-type analysis.
+- The Search Query Conversion TVF classifier read the lowercase `name`
+  metadata key, but Omni emits capitalized `Name` (verified from raw
+  PlanNodes), so the TVF always classified `unknown`. The classifier now
+  accepts both spellings.
+
+Plan-stability observation: the unhinted `GROUP BY ... HAVING` aggregate
+method flapped between Stream Aggregate and Hash Aggregate across two
+same-day runs against empty tables on the same image. Contracts that care
+about the aggregate family must pin `GROUP@{GROUP_METHOD=...}`.
+
+Families still unobservable through plan-report's public config: DML-only
+operators (`apply_mutations`, `row_count`, `random_id_assign`,
+`mini_batch_*`) because `queries[].result.cardinality` accepts only
+row-returning modes; the plan-shape `--case dml` probe covers those shapes.
+`change_stream_tvf` needs a `READ_<stream>` TVF that the GoogleSQL frontend
+catalog does not register, and `recursive_*` shapes still need a reproducible
+query (likely graph or quantified-path based).
+
 ## Join elimination on interleaved tables silently ignores JOIN_METHOD hints
 
 With `Albums` interleaved in `Singers`, the query

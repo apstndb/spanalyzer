@@ -119,8 +119,10 @@ cleanup happened.
   - **Correction Needed**: The current implementation incorrectly hardcodes arbitrary property expressions to fall back to the `JSON` type. As verified in the Cloud Spanner Emulator source (`PopulatePropertyGraph`), the property type should exactly match the analyzed type of the expression (e.g., `INT64` for `LENGTH(FirstName)`). We need to fix this to extract the correct type from the analyzer output without increasing direct dependencies on `go-zetasql`.
 - [x] Audit remaining Spanner DDL forms that can affect query semantics and add
   targeted catalog support or explicit ignored-object tests. (Audit completed: added support for ignoring change streams, database options, and IAM objects).
-- Keep regular indexes and vector indexes ignored for row-type analysis unless
-  a future feature needs index metadata for generated queries or plan reports.
+- Keep regular indexes, vector indexes, and search indexes ignored for
+  row-type analysis unless a future feature needs index metadata for generated
+  queries or plan reports. (`CREATE SEARCH INDEX` was added to the ignored set
+  on 2026-06-12 so full-text search schemas can flow through plan-report.)
 
 ## BigQuery Catalog Semantics
 

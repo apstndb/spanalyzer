@@ -4197,14 +4197,18 @@ func TestPlanReportSpoolScanDisplayNameWithSpoolNameMetadata(t *testing.T) {
 }
 
 func TestPlanReportObservedFullTextSearchTVFFamily(t *testing.T) {
-	node := &spannerpb.PlanNode{
-		DisplayName: "TVF",
-		Metadata: mustStructPB(t, map[string]interface{}{
-			"name": "Search Query Conversion",
-		}),
-	}
-	if got, want := planReportOperatorFamily(node), "search_query_conversion_tvf"; got != want {
-		t.Fatalf("planReportOperatorFamily(Search Query Conversion TVF) = %q, want %q", got, want)
+	// Spanner Omni emits the capitalized "Name" metadata key; the lowercase
+	// spelling is kept as a defensive fallback.
+	for _, key := range []string{"Name", "name"} {
+		node := &spannerpb.PlanNode{
+			DisplayName: "TVF",
+			Metadata: mustStructPB(t, map[string]interface{}{
+				key: "Search Query Conversion",
+			}),
+		}
+		if got, want := planReportOperatorFamily(node), "search_query_conversion_tvf"; got != want {
+			t.Fatalf("planReportOperatorFamily(Search Query Conversion TVF, metadata key %q) = %q, want %q", key, got, want)
+		}
 	}
 	if !planReportKnownOperatorFamily("search_query_conversion_tvf") {
 		t.Fatal("search_query_conversion_tvf is not in planReportKnownOperatorFamilies")

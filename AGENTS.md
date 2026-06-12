@@ -48,8 +48,10 @@ complete.
 - Query generation and Go DTO rendering for `cmd/spanner-query-gen` live in
   `internal/querygen`; root package additions should stay focused on reusable
   analyzer/catalog/type-conversion APIs.
-- Regular indexes and vector indexes are intentionally ignored because they do
-  not affect logical query result row types.
+- Regular indexes, vector indexes, and search indexes are intentionally
+  ignored for row-type analysis because they do not affect logical query
+  result row types. Regular index metadata is still retained for query code
+  generation (`kind: index`).
 - Property graph support registers graph node and edge tables, labels, and
   direct column property definitions in GoogleSQL. More advanced graph
   metadata, including arbitrary property expressions and dynamic
