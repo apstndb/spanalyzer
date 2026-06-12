@@ -267,6 +267,12 @@ instead of being fixed inline.
   option itself, not the harness. See
   `research/spanner-query-gen/PLAN_REPORT_OPERATOR_COVERAGE_2026-06-12.md`.
 
+- [ ] **Migrate cmd/spanner-query-gen and tools modules to testcontainers
+  v0.42+.** They pin the known-good spanemuboost v0.4.0 / testcontainers
+  v0.40.0 pair because testcontainers v0.42 moved Docker types to
+  github.com/moby/moby and breaks the WithConfigModifier callback signature
+  in integration_test.go. Coordinate with a spanemuboost upgrade.
+
 - [ ] **Consider surfacing testcontainers Docker-host discovery failures as
   errors instead of panics.** spanemuboost propagates the
   `rootless Docker not found` panic from testcontainers
