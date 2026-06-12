@@ -135,8 +135,11 @@ func NewBigQueryAnalyzerFromGoogleSQLCatalog(catalog *BigQueryGoogleSQLCatalog) 
 // SetExternalQueryAnalyzers sets Spanner analyzers keyed by BigQuery
 // connection ID for EXTERNAL_QUERY result schema inference.
 func (a *BigQueryAnalyzer) SetExternalQueryAnalyzers(analyzers map[string]*Analyzer) {
+	if a == nil {
+		return
+	}
 	a.externalQueryAnalyzers = analyzers
-	if a != nil && a.googleSQL != nil {
+	if a.googleSQL != nil {
 		a.googleSQL.externalQueryAnalyzers = analyzers
 	}
 }

@@ -2705,22 +2705,6 @@ func requiredInsertColumns(table *Table, keyColumns []*Column) []*Column {
 	return out
 }
 
-func resolveUpdateMaskNames(table *Table, operation string, updateMask []string, keys []*Column) ([]string, error) {
-	if len(updateMask) == 0 {
-		return nil, fmt.Errorf("update_mask is required for operation %s; use update_mask: [%s] to update every non-key column", operation, autoAllNonKeyColumns)
-	}
-	maskNames := updateMask
-	if len(maskNames) == 1 && strings.EqualFold(maskNames[0], autoAllNonKeyColumns) {
-		return nonKeyColumnNames(selectableColumnNames(table), keys), nil
-	}
-	for _, name := range maskNames {
-		if strings.EqualFold(name, autoAllNonKeyColumns) {
-			return nil, fmt.Errorf("%s cannot be combined with explicit update_mask columns", autoAllNonKeyColumns)
-		}
-	}
-	return maskNames, nil
-}
-
 func selectableColumnNames(table *Table) []string {
 	names := make([]string, 0, len(table.Columns))
 	for _, column := range table.Columns {
@@ -2739,15 +2723,6 @@ func nonKeyColumnNames(names []string, keys []*Column) []string {
 		}
 	}
 	return out
-}
-
-func firstMatchingColumn(columns, targets []*Column) (*Column, bool) {
-	for _, column := range columns {
-		if containsColumn(targets, column.Name) {
-			return column, true
-		}
-	}
-	return nil, false
 }
 
 func primaryKeyColumnNames(table *Table) []string {
@@ -2839,6 +2814,7 @@ func codegenTableQuerySQL(schema QueryCodegenSchema, tableName string, keyPrefix
 				anyOmittable = true
 			}
 		}
+	primaryKeyContiguityLoop:
 		for i := range keyModes {
 			switch keyModes[i] {
 			case "omit_when_null", "omit_when_empty":
@@ -2850,7 +2826,7 @@ func codegenTableQuerySQL(schema QueryCodegenSchema, tableName string, keyPrefix
 							keyPrefix[i], keyModes[i], keyPrefix[j])
 					}
 				}
-				break
+				break primaryKeyContiguityLoop
 			}
 		}
 		whereSQL := make([]string, 0, len(keyPrefix))
@@ -2974,6 +2950,7 @@ func codegenIndexQuerySQL(schema QueryCodegenSchema, indexName string, keyPrefix
 			anyOmittable = true
 		}
 	}
+keyPrefixContiguityLoop:
 	for i := range keyModes {
 		switch keyModes[i] {
 		case "omit_when_null", "omit_when_empty":
@@ -2985,7 +2962,7 @@ func codegenIndexQuerySQL(schema QueryCodegenSchema, indexName string, keyPrefix
 						keyPrefix[i], keyModes[i], keyPrefix[j])
 				}
 			}
-			break
+			break keyPrefixContiguityLoop
 		}
 	}
 	for i, key := range keyPrefix {

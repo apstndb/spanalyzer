@@ -38,7 +38,9 @@ jobs:
           (cd plancontract && mise x -- go mod tidy)
           (cd cmd/spanner-query-gen && mise x -- go mod tidy)
           (cd tools && mise x -- go mod tidy)
-          git diff --exit-code -- '*.mod' '*.sum' 
+          # go.work.sum is intentionally excluded: workspace download steps
+          # append entries to it on CI.
+          git diff --exit-code -- go.mod go.sum plancontract/go.mod plancontract/go.sum cmd/spanner-query-gen/go.mod cmd/spanner-query-gen/go.sum tools/go.mod tools/go.sum
 
       - name: Vet
         run: mise x -- go vet ./...
