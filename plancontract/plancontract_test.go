@@ -82,3 +82,29 @@ func TestValidateCELExpressionRejectsExecutionStatsIdentifiersOnly(t *testing.T)
 		t.Fatalf("validateCELExpression() succeeded for execution_stats field reference")
 	}
 }
+
+// TestDerivedOperatorFamiliesMatchesAddDerivedOperatorFamilyCounts pins the
+// per-family umbrella membership to the count derivation so the two cannot
+// drift: a family contributes to an umbrella count exactly when
+// DerivedOperatorFamilies reports that membership.
+func TestDerivedOperatorFamiliesMatchesAddDerivedOperatorFamilyCounts(t *testing.T) {
+	umbrellas := []string{"explicit_sort", "blocking_operator"}
+	for _, family := range ConcreteOperatorFamilies() {
+		counts := ZeroOperatorFamilyCounts()
+		counts[family] = 1
+		AddDerivedOperatorFamilyCounts(counts)
+		derived := DerivedOperatorFamilies(family)
+		for _, umbrella := range umbrellas {
+			gotMember := slices.Contains(derived, umbrella)
+			wantMember := counts[umbrella] == 1
+			if gotMember != wantMember {
+				t.Errorf("DerivedOperatorFamilies(%q) membership in %q = %t, want %t", family, umbrella, gotMember, wantMember)
+			}
+		}
+	}
+	for _, umbrella := range umbrellas {
+		if got := DerivedOperatorFamilies(umbrella); len(got) != 0 {
+			t.Errorf("DerivedOperatorFamilies(%q) = %v, want empty for umbrella families", umbrella, got)
+		}
+	}
+}
