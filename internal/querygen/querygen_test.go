@@ -3679,3 +3679,70 @@ func writeTestFile(t *testing.T, path, data string) {
 		t.Fatalf("WriteFile() error = %v", err)
 	}
 }
+
+// TestGenerateQueryCodeOmitsParamsArgumentForParameterlessQueries pins that
+// generated query functions drop the params argument when the query declares
+// no parameters, for both Spanner and BigQuery surfaces, while parameterized
+// queries keep it.
+func TestGenerateQueryCodeOmitsParamsArgumentForParameterlessQueries(t *testing.T) {
+	dir := t.TempDir()
+	writeTestFile(t, filepath.Join(dir, "schema.sql"), `
+CREATE TABLE Singers (
+  SingerId INT64 NOT NULL,
+  FirstName STRING(MAX)
+) PRIMARY KEY (SingerId);
+`)
+	writeTestFile(t, filepath.Join(dir, "bigquery.sql"), `
+CREATE TABLE mydataset.events (
+  event_id INT64
+);
+`)
+	code, err := GenerateQueryCode(QueryCodegenConfig{
+		Package: "db",
+		Client:  GoStructTargetBoth,
+		Schemas: []QueryCodegenSchema{
+			{Name: "spanner", Dialect: "spanner", DDL: "schema.sql"},
+			{Name: "warehouse", Dialect: "bigquery", DDL: "bigquery.sql"},
+		},
+		Queries: []QueryCodegenQuery{
+			{
+				Name:         "ListAllSingers",
+				Catalog:      "spanner",
+				SQL:          "SELECT SingerId, FirstName FROM Singers",
+				ResultStruct: "SingerRow",
+			},
+			{
+				Name:         "GetSinger",
+				Catalog:      "spanner",
+				SQL:          "SELECT SingerId, FirstName FROM Singers WHERE SingerId = @id",
+				Params:       []QueryCodegenParam{{Name: "id", Type: "INT64"}},
+				Result:       "maybe_one",
+				ResultStruct: "SingerRow",
+			},
+			{
+				Name:         "ListAllEvents",
+				Catalog:      "warehouse",
+				SQL:          "SELECT event_id FROM mydataset.events",
+				ResultStruct: "EventRow",
+			},
+		},
+	}, dir)
+	if err != nil {
+		t.Fatalf("GenerateQueryCode() error = %v", err)
+	}
+	for _, want := range []string{
+		"func ListAllSingers(ctx context.Context, tx *spanner.ReadOnlyTransaction) *spanner.RowIterator {",
+		"func ListAllSingersAll(ctx context.Context, tx *spanner.ReadOnlyTransaction) ([]*SingerRow, error) {",
+		"spanner.Statement{SQL: ListAllSingersSQL}",
+		"func GetSinger(ctx context.Context, tx *spanner.ReadOnlyTransaction, params map[string]interface{}) (*SingerRow, error) {",
+		"spanner.Statement{SQL: GetSingerSQL, Params: params}",
+		"func ListAllEvents(ctx context.Context, client *bigquery.Client) (*bigquery.RowIterator, error) {",
+	} {
+		if !strings.Contains(code, want) {
+			t.Fatalf("generated code missing %q:\n%s", want, code)
+		}
+	}
+	if strings.Contains(code, "ListAllEvents(ctx context.Context, client *bigquery.Client, params") {
+		t.Fatalf("parameterless BigQuery query kept params argument:\n%s", code)
+	}
+}

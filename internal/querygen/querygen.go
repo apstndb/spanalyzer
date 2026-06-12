@@ -452,6 +452,34 @@ func spannerMethodParams(spec resolvedQuerySpec) string {
 	return "map[string]interface{}"
 }
 
+// queryMethodHasParams reports whether generated query functions need a
+// params argument. resolveCodegenQuerySQL fills Params with the synthesized
+// key params for table/index kinds, and the analyzer rejects undeclared
+// query parameters, so an empty Params slice reliably means the SQL takes no
+// parameters.
+func queryMethodHasParams(spec resolvedQuerySpec) bool {
+	return spec.BuilderFunc != "" || len(spec.Params) > 0
+}
+
+// spannerMethodParamsArg returns the trailing params parameter declaration
+// for generated Spanner function signatures, empty for queries without
+// parameters.
+func spannerMethodParamsArg(spec resolvedQuerySpec) string {
+	if !queryMethodHasParams(spec) {
+		return ""
+	}
+	return ", params " + spannerMethodParams(spec)
+}
+
+// spannerMethodParamsForward returns the trailing argument used when one
+// generated function calls another, matching spannerMethodParamsArg.
+func spannerMethodParamsForward(spec resolvedQuerySpec) string {
+	if !queryMethodHasParams(spec) {
+		return ""
+	}
+	return ", params"
+}
+
 func writeSpannerStatementSetup(b *bytes.Buffer, spec resolvedQuerySpec) {
 	if spec.BuilderFunc != "" {
 		fmt.Fprintf(b, "\tsql, args, _ := %s(params)\n", spec.BuilderFunc)
@@ -462,6 +490,9 @@ func spannerStatementExpr(spec resolvedQuerySpec, constName string) string {
 	if spec.BuilderFunc != "" {
 		return "spanner.Statement{SQL: sql, Params: args}"
 	}
+	if !queryMethodHasParams(spec) {
+		return "spanner.Statement{SQL: " + constName + "}"
+	}
 	return "spanner.Statement{SQL: " + constName + ", Params: params}"
 }
 
@@ -469,18 +500,19 @@ func writeSpannerMethods(b *bytes.Buffer, spec resolvedQuerySpec, imports map[st
 	imports["context"] = struct{}{}
 	imports["cloud.google.com/go/spanner"] = struct{}{}
 	constName := spec.MethodPrefix + "SQL"
-	paramsType := spannerMethodParams(spec)
+	paramsArg := spannerMethodParamsArg(spec)
+	paramsForward := spannerMethodParamsForward(spec)
 	switch spec.ResultMode {
 	case "many":
 		imports["google.golang.org/api/iterator"] = struct{}{}
 		fmt.Fprintf(b, "// %s returns a Cloud Spanner row iterator.\n", spec.MethodPrefix)
-		fmt.Fprintf(b, "func %s(ctx context.Context, tx *spanner.ReadOnlyTransaction, params %s) *spanner.RowIterator {\n", spec.MethodPrefix, paramsType)
+		fmt.Fprintf(b, "func %s(ctx context.Context, tx *spanner.ReadOnlyTransaction%s) *spanner.RowIterator {\n", spec.MethodPrefix, paramsArg)
 		writeSpannerStatementSetup(b, spec)
 		fmt.Fprintf(b, "\treturn tx.Query(ctx, %s)\n", spannerStatementExpr(spec, constName))
 		b.WriteString("}\n")
 		fmt.Fprintf(b, "// %sAll returns all Cloud Spanner rows as a slice.\n", spec.MethodPrefix)
-		fmt.Fprintf(b, "func %sAll(ctx context.Context, tx *spanner.ReadOnlyTransaction, params %s) ([]*%s, error) {\n", spec.MethodPrefix, paramsType, spec.ResultStruct)
-		fmt.Fprintf(b, "\tit := %s(ctx, tx, params)\n", spec.MethodPrefix)
+		fmt.Fprintf(b, "func %sAll(ctx context.Context, tx *spanner.ReadOnlyTransaction%s) ([]*%s, error) {\n", spec.MethodPrefix, paramsArg, spec.ResultStruct)
+		fmt.Fprintf(b, "\tit := %s(ctx, tx%s)\n", spec.MethodPrefix, paramsForward)
 		b.WriteString("\tdefer it.Stop()\n")
 		fmt.Fprintf(b, "\tvar out []*%s\n", spec.ResultStruct)
 		b.WriteString("\tfor {\n")
@@ -502,7 +534,7 @@ func writeSpannerMethods(b *bytes.Buffer, spec resolvedQuerySpec, imports map[st
 		imports["fmt"] = struct{}{}
 		imports["google.golang.org/api/iterator"] = struct{}{}
 		fmt.Fprintf(b, "// %s returns a single Cloud Spanner row.\n", spec.MethodPrefix)
-		fmt.Fprintf(b, "func %s(ctx context.Context, tx *spanner.ReadOnlyTransaction, params %s) (*%s, error) {\n", spec.MethodPrefix, paramsType, spec.ResultStruct)
+		fmt.Fprintf(b, "func %s(ctx context.Context, tx *spanner.ReadOnlyTransaction%s) (*%s, error) {\n", spec.MethodPrefix, paramsArg, spec.ResultStruct)
 		writeSpannerStatementSetup(b, spec)
 		fmt.Fprintf(b, "\tit := tx.Query(ctx, %s)\n", spannerStatementExpr(spec, constName))
 		b.WriteString("\tdefer it.Stop()\n")
@@ -531,13 +563,13 @@ func writeSpannerMethods(b *bytes.Buffer, spec resolvedQuerySpec, imports map[st
 		b.WriteString("}\n")
 	case "row_count":
 		fmt.Fprintf(b, "// %s executes a Cloud Spanner DML statement and returns the row count.\n", spec.MethodPrefix)
-		fmt.Fprintf(b, "func %s(ctx context.Context, tx *spanner.ReadWriteTransaction, params %s) (int64, error) {\n", spec.MethodPrefix, paramsType)
+		fmt.Fprintf(b, "func %s(ctx context.Context, tx *spanner.ReadWriteTransaction%s) (int64, error) {\n", spec.MethodPrefix, paramsArg)
 		writeSpannerStatementSetup(b, spec)
 		fmt.Fprintf(b, "\treturn tx.Update(ctx, %s)\n", spannerStatementExpr(spec, constName))
 		b.WriteString("}\n")
 	case "row_set":
 		fmt.Fprintf(b, "// %s executes a Cloud Spanner DML statement with THEN RETURN and returns a row iterator.\n", spec.MethodPrefix)
-		fmt.Fprintf(b, "func %s(ctx context.Context, tx *spanner.ReadWriteTransaction, params %s) *spanner.RowIterator {\n", spec.MethodPrefix, paramsType)
+		fmt.Fprintf(b, "func %s(ctx context.Context, tx *spanner.ReadWriteTransaction%s) *spanner.RowIterator {\n", spec.MethodPrefix, paramsArg)
 		writeSpannerStatementSetup(b, spec)
 		fmt.Fprintf(b, "\treturn tx.Query(ctx, %s)\n", spannerStatementExpr(spec, constName))
 		b.WriteString("}\n")
@@ -548,18 +580,26 @@ func writeBigQueryMethods(b *bytes.Buffer, spec resolvedQuerySpec, imports map[s
 	imports["context"] = struct{}{}
 	imports["cloud.google.com/go/bigquery"] = struct{}{}
 	constName := spec.MethodPrefix + "SQL"
+	paramsArg := ""
+	paramsForward := ""
+	if queryMethodHasParams(spec) {
+		paramsArg = ", params []bigquery.QueryParameter"
+		paramsForward = ", params"
+	}
 	switch spec.ResultMode {
 	case "many":
 		imports["google.golang.org/api/iterator"] = struct{}{}
 		fmt.Fprintf(b, "// %s returns a BigQuery row iterator.\n", spec.MethodPrefix)
-		fmt.Fprintf(b, "func %s(ctx context.Context, client *bigquery.Client, params []bigquery.QueryParameter) (*bigquery.RowIterator, error) {\n", spec.MethodPrefix)
+		fmt.Fprintf(b, "func %s(ctx context.Context, client *bigquery.Client%s) (*bigquery.RowIterator, error) {\n", spec.MethodPrefix, paramsArg)
 		fmt.Fprintf(b, "\tq := client.Query(%s)\n", constName)
-		b.WriteString("\tq.Parameters = params\n")
+		if queryMethodHasParams(spec) {
+			b.WriteString("\tq.Parameters = params\n")
+		}
 		b.WriteString("\treturn q.Read(ctx)\n")
 		b.WriteString("}\n")
 		fmt.Fprintf(b, "// %sAll returns all BigQuery rows as a slice.\n", spec.MethodPrefix)
-		fmt.Fprintf(b, "func %sAll(ctx context.Context, client *bigquery.Client, params []bigquery.QueryParameter) ([]*%s, error) {\n", spec.MethodPrefix, spec.ResultStruct)
-		fmt.Fprintf(b, "\tit, err := %s(ctx, client, params)\n", spec.MethodPrefix)
+		fmt.Fprintf(b, "func %sAll(ctx context.Context, client *bigquery.Client%s) ([]*%s, error) {\n", spec.MethodPrefix, paramsArg, spec.ResultStruct)
+		fmt.Fprintf(b, "\tit, err := %s(ctx, client%s)\n", spec.MethodPrefix, paramsForward)
 		b.WriteString("\tif err != nil {\n")
 		b.WriteString("\t\treturn nil, err\n")
 		b.WriteString("\t}\n")
@@ -580,8 +620,8 @@ func writeBigQueryMethods(b *bytes.Buffer, spec resolvedQuerySpec, imports map[s
 		imports["fmt"] = struct{}{}
 		imports["google.golang.org/api/iterator"] = struct{}{}
 		fmt.Fprintf(b, "// %s returns a single BigQuery row.\n", spec.MethodPrefix)
-		fmt.Fprintf(b, "func %s(ctx context.Context, client *bigquery.Client, params []bigquery.QueryParameter) (*%s, error) {\n", spec.MethodPrefix, spec.ResultStruct)
-		fmt.Fprintf(b, "\tit, err := %s(ctx, client, params)\n", spec.MethodPrefix)
+		fmt.Fprintf(b, "func %s(ctx context.Context, client *bigquery.Client%s) (*%s, error) {\n", spec.MethodPrefix, paramsArg, spec.ResultStruct)
+		fmt.Fprintf(b, "\tit, err := %s(ctx, client%s)\n", spec.MethodPrefix, paramsForward)
 		b.WriteString("\tif err != nil {\n")
 		b.WriteString("\t\treturn nil, err\n")
 		b.WriteString("\t}\n")
