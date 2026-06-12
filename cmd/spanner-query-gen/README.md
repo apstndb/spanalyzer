@@ -25,6 +25,16 @@ The command rejects unsupported or unknown v1alpha YAML fields instead of
 silently ignoring them. Use `config-schema` as the reviewable contract for
 editor integration and CI validation.
 
+`cmd/spanner-query-gen` is a nested Go module
+(`github.com/apstndb/spanalyzer/cmd/spanner-query-gen`): it carries the
+spanemuboost / testcontainers / Docker dependencies for the Omni-backed
+workflows so the root analyzer module stays lightweight. Plan normalization
+and contract evaluation live in the reusable
+[`github.com/apstndb/spanalyzer/plancontract`](../../plancontract) nested
+module and are consumed by `plan-report`; that module also works against
+plans obtained outside this command. See the repository README for the
+four-module layout.
+
 ## Documentation Map
 
 - This README describes the current command UX and examples.

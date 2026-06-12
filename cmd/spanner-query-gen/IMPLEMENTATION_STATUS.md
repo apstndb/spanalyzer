@@ -37,9 +37,16 @@ deliberate deferrals.
   exactly one rule mode per entry (`use`, `forbid`, or `cel`), normalized
   operator-family checks, normalized topology fields, raw QueryPlan CEL for
   advanced cases, and PLAN-only scope.
-- Plan contract evaluation lives in `plancontract`, which depends on
-  normalized plan-report data and `spannerpb.QueryPlan`, but not on
-  `go-googlesql`, `memefish`, or `spanemuboost`.
+- Plan normalization (operator family classification, operator topology,
+  plan digests) and contract evaluation live in the
+  `github.com/apstndb/spanalyzer/plancontract` nested Go module, which
+  depends on `spannerpb.QueryPlan`, CEL, and YAML, but not on
+  `go-googlesql`, `memefish`, or container tooling. It can classify plans
+  obtained from any source; this command consumes it for plan-report.
+- `cmd/spanner-query-gen` is itself a nested Go module so that spanemuboost,
+  testcontainers, and the Docker client stay out of the root analyzer
+  module's requirements (see the repository README for the four-module
+  layout).
 
 ## Recent Design Drift Resolved
 

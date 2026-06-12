@@ -20,5 +20,3 @@ Non-normative design notes and verification logs for
   classifier defects found and fixed, optimizer behavior observations
   (join elimination, interval discretization, aggregate determinism), and
   Omni platform checks.
-- [`reviews/`](reviews/): the latest active design-review exchange. Older
-  exchanges were removed on 2026-06-12 and live in git history.

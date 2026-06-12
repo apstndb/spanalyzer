@@ -21,8 +21,8 @@ careful execution plan inspection, recorded so it does not have to be redone.
 - [`archive/`](archive/): resolved material kept for the record (for example
   the resolved-TODO snapshot). Content whose role has fully ended is deleted
   instead; git history preserves it. Removed on 2026-06-12: the
-  `spanner-query-gen/reviews/trash/` AI review-exchange archive and the
-  delivered spanner-hacks feedback drafts.
+  `spanner-query-gen/reviews/` AI review-exchange archive (its input role
+  had ended) and the delivered spanner-hacks feedback drafts.
 
 ## Conventions
 

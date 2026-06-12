@@ -602,6 +602,40 @@ contracts:
     max_count: 0
 ```
 
+## Plan-Shape Pitfalls For Contract Authors
+
+These optimizer behaviors, verified on Spanner Omni 2026.r1-beta, change what
+a contract actually asserts. Details and reproductions live in
+[`research/spanner-query-gen/PLAN_REPORT_OPERATOR_COVERAGE_2026-06-12.md`](../../research/spanner-query-gen/PLAN_REPORT_OPERATOR_COVERAGE_2026-06-12.md).
+
+- **Join elimination can make join-family contracts vacuous.** An INNER JOIN
+  backed by declared referential integrity (interleaving, an enforced
+  `FOREIGN KEY`, or a `NOT ENFORCED` foreign key) is removed entirely when
+  only the join key is referenced from the joined side, and a `JOIN_METHOD`
+  hint on an eliminated join is silently ignored. A contract requiring or
+  forbidding a specific join family can therefore pass or fail because the
+  join disappeared, not because the join method changed. Prefer contracts
+  about the shape that should exist (scans, seeks, sort absence) over
+  assumptions about hint effects.
+- **Unhinted aggregate methods follow available index orderings.** Without a
+  `GROUP@{GROUP_METHOD=...}` hint, the same query plans as a hash aggregate
+  with no index on the grouping key and as a stream aggregate once such an
+  index exists. A `hash_aggregate` / `stream_aggregate` contract on an
+  unhinted query will break when index design evolves; pin the hint when the
+  aggregate family matters.
+- **`no_full_scan` does not catch "reads the whole index through a seek".**
+  A range predicate covering all key values (for example a shard column
+  filtered with `BETWEEN 0 AND 9` when shards span 0-9) produces a Seek
+  Condition and no `Full scan: true` metadata while still reading
+  everything. In the sharded timestamp pattern the wasteful shape is caught
+  by `no_explicit_sort` (the global `Sort Limit`) rather than
+  `no_full_scan`; per-shard equality probes are the fix on the query side.
+- **A Seek Condition is a plan-representation fact, not a runtime
+  guarantee.** Range extraction happens at runtime, and fragmented
+  multi-range seeks can be processed like residual filtering. Contracts on
+  seekability assert plan structure; performance claims still need PROFILE
+  evidence, which is out of scope for plan contracts by design.
+
 ## Status Invariants
 
 `plan-report` validates these invariants before writing an artifact. A

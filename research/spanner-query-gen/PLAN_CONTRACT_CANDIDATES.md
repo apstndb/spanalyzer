@@ -14,6 +14,28 @@ This note translates Spanner query-plan review practices into possible
 contracts target PLAN output only. They intentionally do not use PROFILE
 execution statistics such as rows scanned, rows returned, latency, or CPU.
 
+## Candidate Status (2026-06-12)
+
+The implemented surface is documented in
+[`cmd/spanner-query-gen/PLAN_CONTRACTS.md`](../../cmd/spanner-query-gen/PLAN_CONTRACTS.md);
+this table tracks where each candidate below stands.
+
+| Candidate | Status |
+| --- | --- |
+| `no_full_scan` | Promoted (predefined) |
+| `no_full_scan_without_timestamp_condition` | Promoted (predefined) |
+| `require_timestamp_condition` | Promoted (predefined) |
+| `require_scan_target` | Candidate |
+| `require_seekable_scan` | Candidate (needs normalized minimum-seekable-key support) |
+| `no_residual_condition` | Candidate |
+| `no_back_join` | Blocked on index-to-base-table schema mapping |
+| `index_only_scan` | Blocked on index-to-base-table schema mapping |
+| `require_order_preserving` | Candidate |
+| `require_stream_aggregate` | Covered today via direct `forbid.operator_family: hash_aggregate` plus the aggregate classification safeguards |
+| `no_distributed_join` | Covered today via direct `forbid` rules on the distributed join families |
+| Root-partitionable CEL example | Documented as a CEL recipe in PLAN_CONTRACTS.md |
+| "Needs More Normalized Plan Shape" section | Blocked on additional normalized fields |
+
 ## Current Surface Summary
 
 This section is a non-normative summary. The current v1alpha contract grammar
@@ -251,6 +273,9 @@ therefore rejects it even though the node has `subquery_cluster_node`.
 The `operator_family_counts["unknown"] == 0` guard is intentionally strict so a
 future distributed operator that is not yet normalized cannot silently pass
 through the zero-distributed-fragment branch.
+(Since 2026-06-12, scalar expression nodes classify as `scalar` instead of
+`unknown`, so this strict guard is satisfiable on real plans; before that
+change it would have failed on every plan.)
 
 Future spool consistency checks can use the normalized `spool_build`,
 `spool_scan`, and `spool_name` fields. A repeated-CTE plan can contain a
