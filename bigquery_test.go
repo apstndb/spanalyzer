@@ -974,3 +974,57 @@ EXPORT DATA OPTIONS(uri='gs://bucket/file') AS SELECT 1;
 		t.Fatalf("BuildBigQueryGoogleSQLCatalogFromDDL() error = %v", err)
 	}
 }
+
+// TestBigQueryAnalyzerExternalQueryDuplicateIdenticalInnerSQL pins the
+// row-type map invariant: two EXTERNAL_QUERY calls with the same connection
+// and the same inner SQL collapse to a single connectionID+innerSQL map
+// entry, which is correct because their row types are identical, and both
+// call sites resolve.
+func TestBigQueryAnalyzerExternalQueryDuplicateIdenticalInnerSQL(t *testing.T) {
+	spannerAnalyzer, err := NewAnalyzerFromDDL("spanner.sql", `
+CREATE TABLE Orders (
+  CustomerId INT64 NOT NULL,
+  OrderDate DATE
+) PRIMARY KEY (CustomerId);
+`)
+	if err != nil {
+		t.Fatalf("NewAnalyzerFromDDL() error = %v", err)
+	}
+	analyzer, err := NewBigQueryAnalyzerFromDDL("bigquery.sql", "")
+	if err != nil {
+		t.Fatalf("NewBigQueryAnalyzerFromDDL() error = %v", err)
+	}
+	analyzer.SetExternalQueryAnalyzers(map[string]*Analyzer{
+		"my-project.us.example-db": spannerAnalyzer,
+	})
+
+	schema, err := analyzer.TableSchemaForStatement(`
+SELECT a.customer_id
+FROM EXTERNAL_QUERY(
+  'my-project.us.example-db',
+  '''SELECT CustomerId AS customer_id FROM Orders''') AS a
+JOIN EXTERNAL_QUERY(
+  'my-project.us.example-db',
+  '''SELECT CustomerId AS customer_id FROM Orders''') AS b
+  ON a.customer_id = b.customer_id`)
+	if err != nil {
+		t.Fatalf("TableSchemaForStatement() error = %v", err)
+	}
+	if got, want := len(schema.Fields), 1; got != want {
+		t.Fatalf("len(schema.Fields) = %d, want %d", got, want)
+	}
+	assertBigQueryField(t, schema.Fields[0], "customer_id", "INTEGER", "NULLABLE")
+
+	// The prepared map is keyed by connectionID then inner SQL, so the two
+	// identical calls above must have produced exactly one entry.
+	if err := analyzer.prepareExternalQueryTVFCalls(`
+SELECT *
+FROM EXTERNAL_QUERY('my-project.us.example-db', 'SELECT CustomerId FROM Orders') AS a,
+     EXTERNAL_QUERY('my-project.us.example-db', 'SELECT CustomerId FROM Orders') AS b`); err != nil {
+		t.Fatalf("prepareExternalQueryTVFCalls() error = %v", err)
+	}
+	defer analyzer.googleSQL.clearExternalQueryTVFCalls()
+	if got, want := len(analyzer.googleSQL.externalQueryRowTypes["my-project.us.example-db"]), 1; got != want {
+		t.Fatalf("externalQueryRowTypes entries = %d, want %d (identical inner SQL must collapse)", got, want)
+	}
+}
