@@ -650,3 +650,28 @@ child link (point seek) versus the `Full scan` flag or a Residual-only
 filter (actual full scan). The `--annotate seekability` rendering in
 plan-report therefore annotates `k/N` only for `k > 0` and leaves `0`
 untouched.
+
+Follow-up shapes (same environment, 2026-06-13):
+
+| WHERE shape | Seek Condition | Residual Condition | `seekable_key_size` |
+| --- | --- | --- | --- |
+| `SingerId = 1` (1 of 3 keys, prefix equality) | `($SingerId = 1)` | none | `0` |
+| `SingerId = 1 AND TrackId > 5` (key gap) | `($SingerId = 1)` | `($TrackId > 5)` | `0` |
+| `SingerId = 1 AND AlbumId = 2 AND TrackId > 5` | 3 keys, range-bounded | none | `3` |
+| `SingerId IN (1, 2, 3) AND AlbumId = 2` | 2 keys, IN enumeration | none | `2` |
+
+Two refinements:
+
+- `seekable_key_size = 0` with `Full scan` absent guarantees only that the
+  seek is a single point (every key condition is single-value equality). It
+  does not report the lookup depth: a 1-of-3-key prefix lookup that reads an
+  entire subtree and a complete 3-key point read both report `0`. Depth is
+  only visible in the Seek Condition text.
+- `IN` lists count as enumerated extraction (`seekable_key_size > 0`), not as
+  point seeks, even though each element is an equality.
+
+Reading framework for scans that are not full scans: `0` with no residual is
+a single-point prefix access that matches the query's own key semantics; `0`
+with a key-column residual is the gap pattern (prefix point seek plus
+post-filtering, potentially reading too much); `k > 0` means the leading `k`
+key columns participate in range or enumeration extraction.
