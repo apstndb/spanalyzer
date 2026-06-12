@@ -5,8 +5,8 @@ import (
 
 	"cloud.google.com/go/spanner/apiv1/spannerpb"
 	spanalyzer "github.com/apstndb/go-googlesql-spanner-poc"
-	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/encoding/prototext"
+	"google.golang.org/protobuf/proto"
 )
 
 // VerifyResult is what VerifyVariants returns when every variant agrees on

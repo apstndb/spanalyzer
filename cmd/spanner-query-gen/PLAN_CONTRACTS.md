@@ -185,6 +185,7 @@ contract convenience.
 | `recursive_union` | Concrete | Recursive Union operator. |
 | `row_count` | Concrete | RowCount operator. |
 | `row_to_data_block` | Concrete | RowToDataBlock operator. |
+| `scalar` | Concrete | Scalar-kind PlanNode such as Reference, Function, Constant, or Parameter. These are expression nodes, not relational operators, so they never fall back to `unknown`. |
 | `scalar_subquery` | Concrete | Scalar Subquery operator. |
 | `search_predicate` | Concrete | Full Text Search predicate operator reached from a `Search Predicate` child link. |
 | `search_query_conversion_tvf` | Concrete | Full Text Search query-conversion TVF operator, displayed as `TVF` with metadata `name=Search Query Conversion`. |
@@ -198,7 +199,7 @@ contract convenience.
 | `union_input` | Concrete | Union Input operator. |
 | `unit_relation` | Concrete | Unit Relation operator. |
 | `verify_determinism` | Concrete | Full Text Search determinism check operator displayed as `VerifyDeterminism`. |
-| `unknown` | Concrete fallback | PlanNode that did not match any known normalization rule. Use this in strict contracts when unknown operators should fail review. |
+| `unknown` | Concrete fallback | Relational PlanNode that did not match any known normalization rule. Scalar-kind PlanNodes map to `scalar` instead. Use this in strict contracts when unknown operators should fail review. |
 
 ```yaml
 contracts:
@@ -559,8 +560,11 @@ fields that cannot contain derived umbrella families, namely
 
 ## Unknown Classification
 
-`unknown` is reserved for plan nodes that the normalizer cannot classify into a
-known operator family. Unknown operators appear in `operator_families`,
+`unknown` is reserved for relational plan nodes that the normalizer cannot
+classify into a known operator family. Scalar-kind plan nodes such as
+Reference, Function, Constant, and Parameter are expression nodes, not
+relational operators; they always classify as `scalar` and never as `unknown`.
+Unknown operators appear in `operator_families`,
 `operator_family_counts`, and `normalized_operators` like any other family, so
 direct `forbid` contracts can target `operator_family: unknown` when a strict
 "no unclassified operator" policy is useful.

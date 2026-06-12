@@ -189,6 +189,7 @@
         "recursive_union",
         "row_count",
         "row_to_data_block",
+        "scalar",
         "scan",
         "scalar_subquery",
         "search_predicate",
@@ -1505,6 +1506,11 @@
               "minimum": 0,
               "type": "integer"
             },
+            "scalar": {
+              "description": "Count for normalized operator family scalar.",
+              "minimum": 0,
+              "type": "integer"
+            },
             "scalar_subquery": {
               "description": "Count for normalized operator family scalar_subquery.",
               "minimum": 0,
@@ -1619,6 +1625,7 @@
             "recursive_union",
             "row_count",
             "row_to_data_block",
+            "scalar",
             "scan",
             "scalar_subquery",
             "search_predicate",
@@ -1722,6 +1729,7 @@
         "recursive_union",
         "row_count",
         "row_to_data_block",
+        "scalar",
         "scan",
         "scalar_subquery",
         "search_predicate",
@@ -2264,6 +2272,11 @@
               "minimum": 0,
               "type": "integer"
             },
+            "scalar": {
+              "description": "Count for normalized operator family scalar.",
+              "minimum": 0,
+              "type": "integer"
+            },
             "scalar_subquery": {
               "description": "Count for normalized operator family scalar_subquery.",
               "minimum": 0,
@@ -2378,6 +2391,7 @@
             "recursive_union",
             "row_count",
             "row_to_data_block",
+            "scalar",
             "scan",
             "scalar_subquery",
             "search_predicate",

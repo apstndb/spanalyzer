@@ -496,8 +496,8 @@ func buildPlanReportWithRuntime(ctx context.Context, config querygen.QueryCodege
 
 func defaultPlanReportNormalization() planReportNormalization {
 	return planReportNormalization{
-		OperatorTreeVersion:          "v1",
-		OperatorFamilyMappingVersion: "v1",
+		OperatorTreeVersion:          "v2",
+		OperatorFamilyMappingVersion: "v2",
 		CELInputDefaults: planReportCELInputDefaults{
 			OptionalString:  "",
 			OptionalBoolean: false,
@@ -669,7 +669,7 @@ func planReportOperators(plan *spannerpb.QueryPlan) []planReportOperator {
 	childrenByIndex := planReportChildrenByIndex(plan)
 	familyByIndex := make(map[int32]string, len(plan.GetPlanNodes()))
 	for _, node := range plan.GetPlanNodes() {
-		familyByIndex[node.GetIndex()] = planReportOperatorFamilyWithContext(node, operatorContexts[node.GetIndex()])
+		familyByIndex[node.GetIndex()] = planReportNodeOperatorFamily(node, operatorContexts[node.GetIndex()])
 	}
 	out := make([]planReportOperator, 0, len(plan.GetPlanNodes()))
 	for _, node := range plan.GetPlanNodes() {
@@ -855,7 +855,7 @@ func planReportOperatorTreeDigest(plan *spannerpb.QueryPlan) string {
 	for _, node := range plan.GetPlanNodes() {
 		fmt.Fprintf(&b, "%d|%s|%s|%s|%s|%s|%s|%t",
 			node.GetIndex(),
-			planReportOperatorFamilyWithContext(node, operatorContexts[node.GetIndex()]),
+			planReportNodeOperatorFamily(node, operatorContexts[node.GetIndex()]),
 			node.GetDisplayName(),
 			planReportOperatorMetadataString(node, "execution_method"),
 			planReportOperatorMetadataString(node, "iterator_type"),
@@ -869,6 +869,18 @@ func planReportOperatorTreeDigest(plan *spannerpb.QueryPlan) string {
 		b.WriteByte('\n')
 	}
 	return planReportDigest(b.String())
+}
+
+// planReportNodeOperatorFamily classifies one PlanNode into a normalized
+// operator family. Scalar-kind PlanNodes (Reference, Function, Constant,
+// Parameter, and similar expression nodes) are not relational operators, so
+// they map to the dedicated "scalar" family instead of competing with the
+// "unknown" fallback reserved for unclassified relational operators.
+func planReportNodeOperatorFamily(node *spannerpb.PlanNode, context planReportOperatorContext) string {
+	if node.GetKind() == spannerpb.PlanNode_SCALAR {
+		return "scalar"
+	}
+	return planReportOperatorFamilyWithContext(node, context)
 }
 
 type planReportOperatorContext struct {
@@ -1781,8 +1793,8 @@ func writePlanReportMarkdown(w io.Writer, report planReport) error {
 		if len(query.OperatorFamilies) > 0 {
 			fmt.Fprintf(&b, "- Operator families: `%s`\n", strings.Join(query.OperatorFamilies, "`, `"))
 		}
-		if len(query.OperatorFamilyCounts) > 0 {
-			fmt.Fprintf(&b, "- Operator family counts: `%s`\n", planReportFormatOperatorFamilyCounts(query.OperatorFamilyCounts))
+		if counts := planReportFormatOperatorFamilyCounts(query.OperatorFamilyCounts); counts != "" {
+			fmt.Fprintf(&b, "- Operator family counts: `%s`\n", counts)
 		}
 		if len(query.ClassificationNotes) > 0 {
 			for _, warning := range query.ClassificationNotes {
@@ -1827,7 +1839,11 @@ func writePlanReportMarkdown(w io.Writer, report planReport) error {
 			}
 			fmt.Fprintf(&b, "- Stability: `%s` check_recommended=%t replayable_from_report=%t\n", evaluation.Stability.Tier, evaluation.Stability.CheckRecommended, evaluation.Stability.ReplayableFromReport)
 			for _, result := range evaluation.Results {
-				fmt.Fprintf(&b, "- `%s`: `%s` observed=%d max=%d", result.OperatorFamily, result.Status, result.ObservedCount, result.MaxCount)
+				label := result.OperatorFamily
+				if label == "" {
+					label = result.Rule
+				}
+				fmt.Fprintf(&b, "- `%s`: `%s` observed=%d max=%d", label, result.Status, result.ObservedCount, result.MaxCount)
 				if result.FailureKind != "" {
 					fmt.Fprintf(&b, " failure_kind=`%s`", result.FailureKind)
 				}
@@ -1849,10 +1865,15 @@ func writePlanReportMarkdown(w io.Writer, report planReport) error {
 	return err
 }
 
+// planReportFormatOperatorFamilyCounts renders observed (non-zero) operator
+// family counts for the human-readable Markdown report. Machine-readable
+// YAML/JSON output keeps the complete zero-filled map for CEL replay.
 func planReportFormatOperatorFamilyCounts(counts map[string]int) string {
 	families := make([]string, 0, len(counts))
 	for family := range counts {
-		families = append(families, family)
+		if counts[family] > 0 {
+			families = append(families, family)
+		}
 	}
 	sort.Strings(families)
 	parts := make([]string, 0, len(families))

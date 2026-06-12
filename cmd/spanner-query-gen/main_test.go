@@ -1694,10 +1694,10 @@ func TestPlanReportOptimizerPinningWarnings(t *testing.T) {
 
 func TestDefaultPlanReportNormalizationCELInputDefaults(t *testing.T) {
 	normalization := defaultPlanReportNormalization()
-	if got, want := normalization.OperatorTreeVersion, "v1"; got != want {
+	if got, want := normalization.OperatorTreeVersion, "v2"; got != want {
 		t.Fatalf("operator tree version = %q, want %q", got, want)
 	}
-	if got, want := normalization.OperatorFamilyMappingVersion, "v1"; got != want {
+	if got, want := normalization.OperatorFamilyMappingVersion, "v2"; got != want {
 		t.Fatalf("operator family mapping version = %q, want %q", got, want)
 	}
 	if got, want := normalization.CELInputDefaults.OptionalString, ""; got != want {
@@ -3099,6 +3099,54 @@ func TestPlanReportOperatorTopology(t *testing.T) {
 	}
 }
 
+func TestPlanReportOperatorsClassifyScalarKindNodesAsScalar(t *testing.T) {
+	plan := &spannerpb.QueryPlan{PlanNodes: []*spannerpb.PlanNode{
+		{
+			Index:       0,
+			Kind:        spannerpb.PlanNode_RELATIONAL,
+			DisplayName: "Serialize Result",
+			ChildLinks: []*spannerpb.PlanNode_ChildLink{
+				{ChildIndex: 1, Type: "Input"},
+				{ChildIndex: 2},
+			},
+		},
+		{Index: 1, Kind: spannerpb.PlanNode_RELATIONAL, DisplayName: "New Fancy Operator"},
+		{Index: 2, Kind: spannerpb.PlanNode_SCALAR, DisplayName: "Reference"},
+		{Index: 3, Kind: spannerpb.PlanNode_SCALAR, DisplayName: "Function"},
+	}}
+	operators := planReportOperators(plan)
+	byIndex := map[int32]string{}
+	for _, operator := range operators {
+		byIndex[operator.Index] = operator.Family
+	}
+	if got, want := byIndex[0], "serialize_result"; got != want {
+		t.Fatalf("relational root family = %q, want %q", got, want)
+	}
+	if got, want := byIndex[1], "unknown"; got != want {
+		t.Fatalf("unclassified relational family = %q, want %q", got, want)
+	}
+	if got, want := byIndex[2], "scalar"; got != want {
+		t.Fatalf("scalar Reference family = %q, want %q", got, want)
+	}
+	if got, want := byIndex[3], "scalar"; got != want {
+		t.Fatalf("scalar Function family = %q, want %q", got, want)
+	}
+	counts := planReportOperatorFamilyCounts(operators)
+	if got, want := counts["scalar"], 2; got != want {
+		t.Fatalf("scalar family count = %d, want %d", got, want)
+	}
+	if got, want := counts["unknown"], 1; got != want {
+		t.Fatalf("unknown family count = %d, want %d", got, want)
+	}
+	warnings := planReportClassificationWarnings(operators)
+	if got, want := len(warnings), 1; got != want {
+		t.Fatalf("classification warning count = %d, want %d: %+v", got, want, warnings)
+	}
+	if warnings[0].ID != "operator_family_unknown" || !strings.Contains(warnings[0].Message, "PlanNode 1 ") {
+		t.Fatalf("classification warning = %+v, want operator_family_unknown for PlanNode 1", warnings[0])
+	}
+}
+
 func TestPlanReportOperatorsDoNotClassifyBranchedPushBroadcastMapPath(t *testing.T) {
 	plan := &spannerpb.QueryPlan{PlanNodes: []*spannerpb.PlanNode{
 		{
@@ -4205,7 +4253,7 @@ func TestBuildPlanReportNoTargets(t *testing.T) {
 	if got, want := report.BackendIdentity.Version, "not_recorded"; got != want {
 		t.Fatalf("plan-report backend version = %q, want %q", got, want)
 	}
-	if got, want := report.Normalization.OperatorTreeVersion, "v1"; got != want {
+	if got, want := report.Normalization.OperatorTreeVersion, "v2"; got != want {
 		t.Fatalf("plan-report operator tree version = %q, want %q", got, want)
 	}
 	if got, want := report.Optimizer.Requested.Version, "8"; got != want {

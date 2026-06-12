@@ -1593,6 +1593,7 @@ func KnownOperatorFamilies() []string {
 		"recursive_union",
 		"row_count",
 		"row_to_data_block",
+		"scalar",
 		"scan",
 		"scalar_subquery",
 		"search_predicate",
