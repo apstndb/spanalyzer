@@ -57,6 +57,31 @@ This sweep was run after scalar-kind PlanNodes were reclassified into the
   `verify_determinism`, and the generic `join` / `aggregate` fallbacks.
   `scalar_subquery` was unobserved by the original 17 queries but was
   confirmed by the conditional-subquery follow-up above.
+- Follow-up (same day, via the standalone `plancontract` module fed with raw
+  `AnalyzeQuery` plans from Omni — the analyzer-independent path):
+  - `change_stream_tvf` observed and classified warning-free from
+    `SELECT ChangeRecord FROM READ_EverythingStream(start_timestamp => ...)`.
+    This stays outside plan-report because the GoogleSQL frontend catalog
+    does not register `READ_<stream>` TVFs.
+  - `recursive_union` and `recursive_spool_scan` observed and classified
+    warning-free from the spanner-hacks operators.md quantified-path graph
+    repro (`MATCH ...-[c:CollabWith]->{1,2}...`). Recursive Union introduces
+    `input_0` / `input_1` child-link types not seen elsewhere.
+  - `Local Split Union` is confirmed unobservable on Omni 2026.r1-beta:
+    `CREATE PLACEMENT` fails with `Unimplemented: Geo-partitioning is not
+    supported for this environment`, and the operator is documented to
+    appear for placement-table scans.
+  - `Generate Relation` still has no known repro;
+    `UNNEST(GENERATE_ARRAY(...))` classifies as `array_unnest`.
+- Omni behavior checks against docs.cloud.google.com/spanner-omni/develop:
+  `version_retention_period` accepts up to `30d` and rejects `31d` with
+  ``range [`1h`, `30d`]`` (DBaaS caps at 7 days);
+  `@{ALLOW_TIMESTAMP_PREDICATE_PUSHDOWN=TRUE}` still produces a
+  `Timestamp Condition` child link even though Omni has no tiered storage;
+  and `SEARCH(..., enhance_query => TRUE)` is accepted at both PLAN and
+  execution time even though the develop page documents enhanced query mode
+  as unsupported on Omni (apparently a silent no-op rather than a
+  rejection).
 
 ## Family-gap probes (same day): nine more families observed, two bugs found
 
