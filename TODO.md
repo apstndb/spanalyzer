@@ -174,9 +174,12 @@ cleanup happened.
   design work is the target surface: whether `writes[]` DML helpers and/or
   DML `queries[]` (row_count / row_set modes are currently rejected by the
   public v1alpha config) become plan-report targets with `write/<name>`
-  style target IDs, plus README target-scope and schema updates. RowCount
-  and MiniBatch* operators are not observable on Omni (seen only on Cloud
-  Spanner optimizer v5 shapes), so contracts should not depend on them yet.
+  style target IDs, plus README target-scope and schema updates. Note that
+  the RowCount / MiniBatch* operators are unrelated to DML despite the
+  row_count config-mode naming: they are undocumented SELECT back-join
+  operators seen only on Cloud Spanner optimizer v5 (see
+  research/spanner-query-plan-shape/OPERATOR_VERIFICATION_FOLLOWUP.md), so
+  DML plan support neither needs nor enables them.
 
 ## Optional Query Parameters (optparam integration)
 

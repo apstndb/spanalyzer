@@ -51,8 +51,11 @@ This sweep was run after scalar-kind PlanNodes were reclassified into the
   `minor_sort`, standalone `semi_apply` / `anti_semi_apply`,
   `bloom_filter_build` (observed separately in the `hash_join` plan-shape
   case), `change_stream_tvf`, `search_*` (needs search
-  indexes), `recursive_*` (needs recursive CTE), `spool_*`, `mini_batch_*`,
-  `random_id_assign`, `apply_mutations`, `row_count` (DML targets are
+  indexes), `recursive_*` (needs recursive CTE), `spool_*`,
+  `mini_batch_*` / `row_count` (undocumented SELECT back-join operators seen
+  only on Cloud Spanner optimizer v5; see
+  `research/spanner-query-plan-shape/OPERATOR_VERIFICATION_FOLLOWUP.md`),
+  `random_id_assign`, `apply_mutations` (DML targets are
   excluded from plan-report), `empty_relation`, `unit_relation`,
   `verify_determinism`, and the generic `join` / `aggregate` fallbacks.
   `scalar_subquery` was unobserved by the original 17 queries but was
@@ -83,9 +86,14 @@ This sweep was run after scalar-kind PlanNodes were reclassified into the
   - DML plans verified via `ReadWriteTransaction.AnalyzeQuery` (PLAN mode,
     nothing executed): INSERT VALUES / INSERT ... THEN RETURN / UPDATE /
     DELETE / INSERT SELECT all classify warning-free with `apply_mutations`
-    observed in every shape. `row_count` and `mini_batch_*` did not appear
-    in any Omni DML plan, consistent with spanner-hacks observing them only
-    on Cloud Spanner optimizer v5 shapes.
+    observed in every shape. Correction: an earlier draft implied
+    `row_count` and `mini_batch_*` were DML operators; they are not. The
+    undocumented `RowCount` / `MiniBatch*` PlanNodes appear in SELECT
+    back-join shard-optimization shapes on Cloud Spanner optimizer v5 (see
+    `OPERATOR_VERIFICATION_FOLLOWUP.md` and spanner-hacks operators.md), so
+    their absence from DML plans says nothing about them. The naming
+    collision with querygen's DML result mode `row_count` caused the
+    mix-up.
   - `CREATE MODEL` fails on Omni with an empty-message `InvalidArgument`,
     so the documented `ML.PREDICT` TVF plan shape (query-operators-unary
     shows ML.PREDICT compiling to a `TVF` operator) is unobservable on this
@@ -149,10 +157,13 @@ description. Contracts on the aggregate family should still pin
 because adding or dropping an index on the grouping key changes the
 unhinted choice.
 
-Families still unobservable through plan-report's public config: DML-only
-operators (`apply_mutations`, `row_count`, `random_id_assign`,
-`mini_batch_*`) because `queries[].result.cardinality` accepts only
-row-returning modes; the plan-shape `--case dml` probe covers those shapes.
+Families still unobservable through plan-report's public config:
+`apply_mutations` (DML-only) because `queries[].result.cardinality` accepts
+only row-returning modes; the plan-shape `--case dml` probe and
+`TestIntegrationDMLOperatorFamilyCoverageOnOmni` cover those shapes.
+(`random_id_assign` turned out to be reachable via `TABLESAMPLE`, and
+`row_count` / `mini_batch_*` are SELECT back-join operators unobserved on
+Omni regardless of statement kind.)
 `change_stream_tvf` needs a `READ_<stream>` TVF that the GoogleSQL frontend
 catalog does not register, and `recursive_*` shapes still need a reproducible
 query (likely graph or quantified-path based).

@@ -216,9 +216,10 @@ func TestIntegrationPlanReportOperatorFamilyCoverageOnOmni(t *testing.T) {
 // dmlFamilyCoverageCases pin the operator families observed for DML plans on
 // Spanner Omni. DML targets are excluded from plan-report's public config,
 // so these go through ReadWriteTransaction.AnalyzeQuery directly (PLAN mode,
-// nothing is executed) and classify the raw plan with plancontract. RowCount
-// and MiniBatch* operators are intentionally not asserted: they have only
-// been observed on Cloud Spanner optimizer v5 plan shapes, not on Omni.
+// nothing is executed) and classify the raw plan with plancontract. Note
+// that the RowCount and MiniBatch* operators are unrelated to DML despite
+// the row_count config-mode naming: they are undocumented SELECT back-join
+// operators observed only on Cloud Spanner optimizer v5, never on Omni.
 var dmlFamilyCoverageCases = []struct {
 	Name     string
 	SQL      string
