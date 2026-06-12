@@ -72,7 +72,20 @@ This sweep was run after scalar-kind PlanNodes were reclassified into the
     supported for this environment`, and the operator is documented to
     appear for placement-table scans.
   - `Generate Relation` still has no known repro;
-    `UNNEST(GENERATE_ARRAY(...))` classifies as `array_unnest`.
+    `UNNEST(GENERATE_ARRAY(...))` classifies as `array_unnest`. The official
+    query-operators-leaf page documents only generic properties for it, with
+    no example query.
+  - `random_id_assign` observed warning-free via the official
+    query-operators-unary repro: `TABLESAMPLE BERNOULLI` pairs it with
+    `filter`, and `TABLESAMPLE RESERVOIR` pairs it with `full_sort` +
+    `limit`, exactly as documented. Both queries are now pinned by
+    `TestIntegrationPlanReportOperatorFamilyCoverageOnOmni`.
+  - `CREATE MODEL` fails on Omni with an empty-message `InvalidArgument`,
+    so the documented `ML.PREDICT` TVF plan shape (query-operators-unary
+    shows ML.PREDICT compiling to a `TVF` operator) is unobservable on this
+    backend. A non-search TVF would currently classify as `unknown`, which
+    remains the correct conservative fallback until a real plan is
+    available.
 - Omni behavior checks against docs.cloud.google.com/spanner-omni/develop:
   `version_retention_period` accepts up to `30d` and rejects `31d` with
   ``range [`1h`, `30d`]`` (DBaaS caps at 7 days);

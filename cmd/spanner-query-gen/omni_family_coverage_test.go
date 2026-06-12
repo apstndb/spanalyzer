@@ -109,6 +109,16 @@ queries:
   kind: sql
   sql: SELECT AlbumId FROM SearchAlbums WHERE SEARCH(AlbumTitle_Tokens, "friday")
   result: {struct: SearchRow}
+- name: BernoulliSample
+  catalog: app
+  kind: sql
+  sql: SELECT SingerId FROM Singers TABLESAMPLE BERNOULLI (10 PERCENT)
+  result: {struct: BernoulliRow}
+- name: ReservoirSample
+  catalog: app
+  kind: sql
+  sql: SELECT SingerId FROM Singers TABLESAMPLE RESERVOIR (5 ROWS)
+  result: {struct: ReservoirRow}
 `
 
 // familyCoverageExpectedFamilies lists the operator families each query was
@@ -130,6 +140,11 @@ var familyCoverageExpectedFamilies = map[string][]string{
 	"ColocatedSemiApply":     {"semi_apply"},
 	"ColocatedAntiSemiApply": {"anti_semi_apply"},
 	"FullTextSearch":         {"search_predicate", "search_query_conversion_tvf", "verify_determinism"},
+	// TABLESAMPLE produces Random ID Assign combined with a Filter
+	// (Bernoulli) or a Sort plus Limit (Reservoir), matching the official
+	// query-operators-unary documentation.
+	"BernoulliSample": {"random_id_assign", "filter"},
+	"ReservoirSample": {"random_id_assign", "full_sort", "limit"},
 }
 
 // TestIntegrationPlanReportOperatorFamilyCoverageOnOmni verifies on a live
