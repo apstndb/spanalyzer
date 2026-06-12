@@ -118,12 +118,12 @@ queries:
 var familyCoverageExpectedFamilies = map[string][]string{
 	"UnitRelation":  {"unit_relation"},
 	"EmptyRelation": {"empty_relation"},
-	// The unhinted GROUP BY aggregate method is not stable across runs on
-	// this Omni build (observed as both stream and hash aggregate on the
-	// same day against empty tables), so only the HAVING Filter operator is
-	// asserted here. Hinted aggregate families are covered by
-	// TestIntegrationQueryCodegenGeneratedSpannerQueriesRunOnOmni.
-	"HavingFilter":           {"filter"},
+	// The unhinted GROUP BY aggregate method follows available input
+	// orderings: with no index on Rating in familyCoverageDDL the plan
+	// deterministically uses a hash aggregate (verified 3x on this Omni
+	// build); an index on the grouping key would switch it to a stream
+	// aggregate.
+	"HavingFilter":           {"filter", "hash_aggregate"},
 	"MinorSortAlbums":        {"minor_sort"},
 	"SpooledCte":             {"spool_build", "spool_scan", "union_all", "union_input"},
 	"BloomFilterHashJoin":    {"hash_join", "bloom_filter_build"},

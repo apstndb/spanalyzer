@@ -92,10 +92,18 @@ Bugs found by these probes (both fixed):
   PlanNodes), so the TVF always classified `unknown`. The classifier now
   accepts both spellings.
 
-Plan-stability observation: the unhinted `GROUP BY ... HAVING` aggregate
-method flapped between Stream Aggregate and Hash Aggregate across two
-same-day runs against empty tables on the same image. Contracts that care
-about the aggregate family must pin `GROUP@{GROUP_METHOD=...}`.
+Correction (same day): an earlier draft of this note claimed the unhinted
+`GROUP BY ... HAVING` aggregate method "flapped" between Stream and Hash
+across runs. That was a schema-difference artifact: one run's schema had
+`CREATE INDEX SingersByRating ON Singers(Rating)` and the other did not.
+A controlled re-run (3x each) showed the choice is deterministic on this
+Omni build: without an index on the GROUP BY key the plan uses Hash
+Aggregate, and with `SingersByRating` providing Rating-ordered input it
+uses Stream Aggregate, exactly matching the spanner-hacks operators.md
+description. Contracts on the aggregate family should still pin
+`GROUP@{GROUP_METHOD=...}` when the index design is expected to evolve,
+because adding or dropping an index on the grouping key changes the
+unhinted choice.
 
 Families still unobservable through plan-report's public config: DML-only
 operators (`apply_mutations`, `row_count`, `random_id_assign`,
