@@ -151,6 +151,13 @@ specifically.
   query results.
 - The eliminated interleaved shape is stable across optimizer versions 1-8
   (`--optimizer-version-diff` reported no shape change).
+- The `USE_UNENFORCED_FOREIGN_KEY` statement hint (default `TRUE`, overrides
+  the `use_unenforced_foreign_key_for_query_optimization` database option per
+  statement) controls only the informational-FK part: with
+  `@{USE_UNENFORCED_FOREIGN_KEY=FALSE}` the NOT ENFORCED FK join is no longer
+  eliminated, while enforced-FK and interleave elimination still happen. The
+  hint is statement-scope only; the join-hint position is rejected with
+  `Unsupported hint`.
 
 ## Optimizer version changes plans for 7 of 17 queries
 
