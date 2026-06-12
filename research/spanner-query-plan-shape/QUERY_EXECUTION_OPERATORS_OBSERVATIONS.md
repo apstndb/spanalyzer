@@ -679,6 +679,12 @@ Two refinements:
   preceding equality keys are included in the count (`= AND >` reports `2`,
   not `1`).
 
+The classification is independent of interleaving: an interleaved table and
+a flat table with the same 3-column primary key report identical
+`seekable_key_size` values across all seven shapes above (equality prefixes
+of every depth, equality plus range, range only, key gap, and IN
+enumeration; same environment, 2026-06-13).
+
 Reading framework for scans that are not full scans: `0` with no residual is
 a single-point prefix access that matches the query's own key semantics; `0`
 with a key-column residual is the gap pattern (prefix point seek plus
