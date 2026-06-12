@@ -107,4 +107,11 @@ func TestDerivedOperatorFamiliesMatchesAddDerivedOperatorFamilyCounts(t *testing
 			t.Errorf("DerivedOperatorFamilies(%q) = %v, want empty for umbrella families", umbrella, got)
 		}
 	}
+	// The umbrella order is defined as lexicographic, the same canonical
+	// order ObservedOperatorFamilies uses.
+	for _, family := range ConcreteOperatorFamilies() {
+		if derived := DerivedOperatorFamilies(family); !slices.IsSorted(derived) {
+			t.Errorf("DerivedOperatorFamilies(%q) = %v, want lexicographic order", family, derived)
+		}
+	}
 }

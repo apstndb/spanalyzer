@@ -1540,12 +1540,13 @@ func AddDerivedOperatorFamilyCounts(counts map[string]int) {
 }
 
 // DerivedOperatorFamilies returns the count-only umbrella families that a
-// concrete operator family contributes to, in the order explicit_sort then
-// blocking_operator. Concrete classification stays single-valued per
-// operator; umbrella membership is overlapping (full_sort belongs to both
-// umbrellas, minor_sort only to explicit_sort, hash_join only to
-// blocking_operator), so the overall family vocabulary forms a DAG rather
-// than a tree. This must stay consistent with
+// concrete operator family contributes to, in lexicographic order — the same
+// canonical order [ObservedOperatorFamilies] uses, since umbrella families
+// are mutually incomparable and have no semantic order. Concrete
+// classification stays single-valued per operator; umbrella membership is
+// overlapping (full_sort belongs to both umbrellas, minor_sort only to
+// explicit_sort, hash_join only to blocking_operator), so the overall family
+// vocabulary forms a DAG rather than a tree. This must stay consistent with
 // [AddDerivedOperatorFamilyCounts], which is pinned by a test.
 func DerivedOperatorFamilies(family string) []string {
 	var out []string
@@ -1555,6 +1556,7 @@ func DerivedOperatorFamilies(family string) []string {
 	if family != "blocking_operator" && streamBlockingOperatorFamily(family) {
 		out = append(out, "blocking_operator")
 	}
+	sort.Strings(out)
 	return out
 }
 
