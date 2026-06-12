@@ -255,6 +255,18 @@ instead of being fixed inline.
   stays `not_recorded` unless supplied manually. The fix belongs in
   spanemuboost (for example `RuntimeImage`/`RuntimeImageDigest`), then
   plan-report can record `source: spanemuboost` evidence automatically.
+- [ ] **Support applying database options in the Omni plan probes once Omni
+  accepts them.** Verifying `use_unenforced_foreign_key_for_query_optimization`
+  needs a database-option entry point in `tools/spanner-query-plan-shape` and
+  `plan-report` (for example a `--database-option key=value` flag that pins
+  the database ID and issues `ALTER DATABASE`, or rewriting the database name
+  of an `ALTER DATABASE` statement in `--ddl` input). Blocked for now: Omni
+  2026.r1-beta rejects this option via `ALTER DATABASE` (empty-message
+  InvalidArgument) and does not parse the documented `SET DATABASE OPTIONS`
+  syntax, while `version_retention_period` applies fine, so the gap is the
+  option itself, not the harness. See
+  `research/spanner-query-gen/PLAN_REPORT_OPERATOR_COVERAGE_2026-06-12.md`.
+
 - [ ] **Consider surfacing testcontainers Docker-host discovery failures as
   errors instead of panics.** spanemuboost propagates the
   `rootless Docker not found` panic from testcontainers

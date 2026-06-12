@@ -158,6 +158,20 @@ specifically.
   eliminated, while enforced-FK and interleave elimination still happen. The
   hint is statement-scope only; the join-hint position is rejected with
   `Unsupported hint`.
+- The corresponding database option could NOT be verified on Omni
+  2026.r1-beta. `ALTER DATABASE <db> SET OPTIONS
+  (use_unenforced_foreign_key_for_query_optimization = false)` fails with an
+  empty-message `InvalidArgument` (the option appears unsupported), and the
+  `SET DATABASE OPTIONS (...)` syntax shown in the official docs fails to
+  parse (`Encountered 'SET' while parsing: ddl_statement`). The ALTER
+  DATABASE mechanism itself works on Omni (`version_retention_period`
+  applied successfully via spanemuboost `WithDatabaseID` + a separate
+  `UpdateDatabaseDdl` call), so this is an option gap, not a framework gap.
+  Library-level verification is possible today once Omni supports the
+  option; the CLI probes (`spanner-query-plan-shape`, `plan-report`) would
+  additionally need a way to apply database options because they pin
+  `WithRandomDatabaseID()` and a static DDL file cannot name the random
+  database.
 
 ## Optimizer version changes plans for 7 of 17 queries
 
