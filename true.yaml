@@ -1,0 +1,148 @@
+metadata:
+    rowType:
+        fields:
+            - name: w
+              type:
+                code: STRING
+            - name: "y"
+              type:
+                code: STRING
+    transaction:
+        readTimestamp: "2026-05-06T03:40:19.307425Z"
+    undeclaredParameters:
+        fields:
+            - name: arg
+              type:
+                code: BYTES
+stats:
+    queryPlan:
+        planNodes:
+            - childLinks:
+                - childIndex: 1
+                - childIndex: 17
+                  type: Split Range
+              displayName: Distributed Union
+              kind: RELATIONAL
+              metadata:
+                distribution_table: t
+                execution_method: Row
+                split_ranges_aligned: "false"
+                subquery_cluster_node: "1"
+            - childLinks:
+                - childIndex: 2
+              displayName: Distributed Union
+              index: 1
+              kind: RELATIONAL
+              metadata:
+                call_type: Local
+                execution_method: Row
+                subquery_cluster_node: "2"
+            - childLinks:
+                - childIndex: 3
+                - childIndex: 7
+                - childIndex: 12
+              displayName: Serialize Result
+              index: 2
+              kind: RELATIONAL
+              metadata:
+                execution_method: Row
+            - childLinks:
+                - childIndex: 4
+                - childIndex: 5
+                  variable: x
+              displayName: Compute
+              index: 3
+              kind: RELATIONAL
+              metadata:
+                execution_method: Row
+            - displayName: Scan
+              index: 4
+              kind: RELATIONAL
+              metadata:
+                Full scan: "true"
+                execution_method: Row
+                scan_method: Automatic
+                scan_target: t
+                scan_type: TableScan
+            - childLinks:
+                - childIndex: 6
+              displayName: Function
+              index: 5
+              kind: SCALAR
+              shortRepresentation:
+                description: SHA512(@arg)
+            - displayName: Parameter
+              index: 6
+              kind: SCALAR
+              metadata:
+                name: arg
+                type: scalar
+              shortRepresentation:
+                description: '@arg'
+            - childLinks:
+                - childIndex: 8
+                - childIndex: 10
+                - childIndex: 11
+              displayName: Function
+              index: 7
+              kind: SCALAR
+              shortRepresentation:
+                description: SUBSTR(CAST<STRING>($x), 2, 5)
+            - childLinks:
+                - childIndex: 9
+              displayName: Function
+              index: 8
+              kind: SCALAR
+              shortRepresentation:
+                description: CAST<STRING>($x)
+            - displayName: Reference
+              index: 9
+              kind: SCALAR
+              shortRepresentation:
+                description: $x
+            - displayName: Constant
+              index: 10
+              kind: SCALAR
+              shortRepresentation:
+                description: "2"
+            - displayName: Constant
+              index: 11
+              kind: SCALAR
+              shortRepresentation:
+                description: "5"
+            - childLinks:
+                - childIndex: 13
+                - childIndex: 15
+                - childIndex: 16
+              displayName: Function
+              index: 12
+              kind: SCALAR
+              shortRepresentation:
+                description: SUBSTR(CAST<STRING>($x), 3, 7)
+            - childLinks:
+                - childIndex: 14
+              displayName: Function
+              index: 13
+              kind: SCALAR
+              shortRepresentation:
+                description: CAST<STRING>($x)
+            - displayName: Reference
+              index: 14
+              kind: SCALAR
+              shortRepresentation:
+                description: $x
+            - displayName: Constant
+              index: 15
+              kind: SCALAR
+              shortRepresentation:
+                description: "3"
+            - displayName: Constant
+              index: 16
+              kind: SCALAR
+              shortRepresentation:
+                description: "7"
+            - displayName: Constant
+              index: 17
+              kind: SCALAR
+              shortRepresentation:
+                description: "true"

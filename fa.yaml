@@ -1,0 +1,144 @@
+metadata:
+    rowType:
+        fields:
+            - name: w
+              type:
+                code: STRING
+            - name: "y"
+              type:
+                code: STRING
+    transaction:
+        readTimestamp: "2026-05-06T03:40:03.512939Z"
+    undeclaredParameters:
+        fields:
+            - name: arg
+              type:
+                code: BYTES
+stats:
+    queryPlan:
+        planNodes:
+            - childLinks:
+                - childIndex: 1
+                - childIndex: 16
+                  type: Split Range
+              displayName: Distributed Union
+              kind: RELATIONAL
+              metadata:
+                distribution_table: t
+                execution_method: Row
+                split_ranges_aligned: "false"
+                subquery_cluster_node: "1"
+            - childLinks:
+                - childIndex: 2
+              displayName: Distributed Union
+              index: 1
+              kind: RELATIONAL
+              metadata:
+                call_type: Local
+                execution_method: Row
+                subquery_cluster_node: "2"
+            - childLinks:
+                - childIndex: 3
+                - childIndex: 4
+                - childIndex: 10
+              displayName: Serialize Result
+              index: 2
+              kind: RELATIONAL
+              metadata:
+                execution_method: Row
+            - displayName: Scan
+              index: 3
+              kind: RELATIONAL
+              metadata:
+                Full scan: "true"
+                execution_method: Row
+                scan_method: Automatic
+                scan_target: t
+                scan_type: TableScan
+            - childLinks:
+                - childIndex: 5
+                - childIndex: 8
+                - childIndex: 9
+              displayName: Function
+              index: 4
+              kind: SCALAR
+              shortRepresentation:
+                description: SUBSTR(CAST<STRING>(SHA512(@arg)), 2, 5)
+            - childLinks:
+                - childIndex: 6
+              displayName: Function
+              index: 5
+              kind: SCALAR
+              shortRepresentation:
+                description: CAST<STRING>(SHA512(@arg))
+            - childLinks:
+                - childIndex: 7
+              displayName: Function
+              index: 6
+              kind: SCALAR
+              shortRepresentation:
+                description: SHA512(@arg)
+            - displayName: Parameter
+              index: 7
+              kind: SCALAR
+              metadata:
+                name: arg
+                type: scalar
+              shortRepresentation:
+                description: '@arg'
+            - displayName: Constant
+              index: 8
+              kind: SCALAR
+              shortRepresentation:
+                description: "2"
+            - displayName: Constant
+              index: 9
+              kind: SCALAR
+              shortRepresentation:
+                description: "5"
+            - childLinks:
+                - childIndex: 11
+                - childIndex: 14
+                - childIndex: 15
+              displayName: Function
+              index: 10
+              kind: SCALAR
+              shortRepresentation:
+                description: SUBSTR(CAST<STRING>(SHA512(@arg)), 3, 7)
+            - childLinks:
+                - childIndex: 12
+              displayName: Function
+              index: 11
+              kind: SCALAR
+              shortRepresentation:
+                description: CAST<STRING>(SHA512(@arg))
+            - childLinks:
+                - childIndex: 13
+              displayName: Function
+              index: 12
+              kind: SCALAR
+              shortRepresentation:
+                description: SHA512(@arg)
+            - displayName: Parameter
+              index: 13
+              kind: SCALAR
+              metadata:
+                name: arg
+                type: scalar
+              shortRepresentation:
+                description: '@arg'
+            - displayName: Constant
+              index: 14
+              kind: SCALAR
+              shortRepresentation:
+                description: "3"
+            - displayName: Constant
+              index: 15
+              kind: SCALAR
+              shortRepresentation:
+                description: "7"
+            - displayName: Constant
+              index: 16
+              kind: SCALAR
+              shortRepresentation:
+                description: "true"

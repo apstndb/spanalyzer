@@ -4,7 +4,7 @@ go 1.26.2
 
 require (
 	cloud.google.com/go/spanner v1.91.0
-	github.com/apstndb/spanalyzer v0.2.0
+	github.com/apstndb/spanalyzer v0.2.1
 	github.com/apstndb/spanemuboost v0.4.0
 	github.com/apstndb/spannerplan v0.1.11
 	github.com/cloudspannerecosystem/memefish v0.6.3-0.20260429070454-64f857b2c61e
@@ -116,5 +116,3 @@ require (
 	google.golang.org/grpc v1.80.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
-
-replace github.com/apstndb/spanalyzer => ..
