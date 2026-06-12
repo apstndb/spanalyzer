@@ -474,12 +474,12 @@ func writeSpannerMethods(b *bytes.Buffer, spec resolvedQuerySpec, imports map[st
 	case "many":
 		imports["google.golang.org/api/iterator"] = struct{}{}
 		fmt.Fprintf(b, "// %s returns a Cloud Spanner row iterator.\n", spec.MethodPrefix)
-		fmt.Fprintf(b, "func %s(ctx context.Context, tx spanner.ReadOnlyTransaction, params %s) *spanner.RowIterator {\n", spec.MethodPrefix, paramsType)
+		fmt.Fprintf(b, "func %s(ctx context.Context, tx *spanner.ReadOnlyTransaction, params %s) *spanner.RowIterator {\n", spec.MethodPrefix, paramsType)
 		writeSpannerStatementSetup(b, spec)
 		fmt.Fprintf(b, "\treturn tx.Query(ctx, %s)\n", spannerStatementExpr(spec, constName))
 		b.WriteString("}\n")
 		fmt.Fprintf(b, "// %sAll returns all Cloud Spanner rows as a slice.\n", spec.MethodPrefix)
-		fmt.Fprintf(b, "func %sAll(ctx context.Context, tx spanner.ReadOnlyTransaction, params %s) ([]*%s, error) {\n", spec.MethodPrefix, paramsType, spec.ResultStruct)
+		fmt.Fprintf(b, "func %sAll(ctx context.Context, tx *spanner.ReadOnlyTransaction, params %s) ([]*%s, error) {\n", spec.MethodPrefix, paramsType, spec.ResultStruct)
 		fmt.Fprintf(b, "\tit := %s(ctx, tx, params)\n", spec.MethodPrefix)
 		b.WriteString("\tdefer it.Stop()\n")
 		fmt.Fprintf(b, "\tvar out []*%s\n", spec.ResultStruct)
@@ -502,7 +502,7 @@ func writeSpannerMethods(b *bytes.Buffer, spec resolvedQuerySpec, imports map[st
 		imports["fmt"] = struct{}{}
 		imports["google.golang.org/api/iterator"] = struct{}{}
 		fmt.Fprintf(b, "// %s returns a single Cloud Spanner row.\n", spec.MethodPrefix)
-		fmt.Fprintf(b, "func %s(ctx context.Context, tx spanner.ReadOnlyTransaction, params %s) (*%s, error) {\n", spec.MethodPrefix, paramsType, spec.ResultStruct)
+		fmt.Fprintf(b, "func %s(ctx context.Context, tx *spanner.ReadOnlyTransaction, params %s) (*%s, error) {\n", spec.MethodPrefix, paramsType, spec.ResultStruct)
 		writeSpannerStatementSetup(b, spec)
 		fmt.Fprintf(b, "\tit := tx.Query(ctx, %s)\n", spannerStatementExpr(spec, constName))
 		b.WriteString("\tdefer it.Stop()\n")
@@ -531,13 +531,13 @@ func writeSpannerMethods(b *bytes.Buffer, spec resolvedQuerySpec, imports map[st
 		b.WriteString("}\n")
 	case "row_count":
 		fmt.Fprintf(b, "// %s executes a Cloud Spanner DML statement and returns the row count.\n", spec.MethodPrefix)
-		fmt.Fprintf(b, "func %s(ctx context.Context, tx spanner.ReadWriteTransaction, params %s) (int64, error) {\n", spec.MethodPrefix, paramsType)
+		fmt.Fprintf(b, "func %s(ctx context.Context, tx *spanner.ReadWriteTransaction, params %s) (int64, error) {\n", spec.MethodPrefix, paramsType)
 		writeSpannerStatementSetup(b, spec)
 		fmt.Fprintf(b, "\treturn tx.Update(ctx, %s)\n", spannerStatementExpr(spec, constName))
 		b.WriteString("}\n")
 	case "row_set":
 		fmt.Fprintf(b, "// %s executes a Cloud Spanner DML statement with THEN RETURN and returns a row iterator.\n", spec.MethodPrefix)
-		fmt.Fprintf(b, "func %s(ctx context.Context, tx spanner.ReadWriteTransaction, params %s) *spanner.RowIterator {\n", spec.MethodPrefix, paramsType)
+		fmt.Fprintf(b, "func %s(ctx context.Context, tx *spanner.ReadWriteTransaction, params %s) *spanner.RowIterator {\n", spec.MethodPrefix, paramsType)
 		writeSpannerStatementSetup(b, spec)
 		fmt.Fprintf(b, "\treturn tx.Query(ctx, %s)\n", spannerStatementExpr(spec, constName))
 		b.WriteString("}\n")
