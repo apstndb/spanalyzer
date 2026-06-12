@@ -133,6 +133,10 @@ Observed shapes:
 
 Conclusion: no positive `Generate Relation` reproduction was found.
 
+Update (2026-06-12): still no reproduction. The official query-operators-leaf
+page documents only generic properties for it with no example query, and
+`UNNEST(GENERATE_ARRAY(...))` classifies as `array_unnest`.
+
 ## Local Split Union
 
 The current documentation-derived query set was regenerated with:
@@ -150,6 +154,12 @@ section in the fetched page. Current evidence still points to requiring
 placement/locality-specific configuration or a non-synthetic environment.
 
 Conclusion: keep `Local Split Union` as unreproduced in the sample schema.
+
+Update (2026-06-12): now confirmed unreproducible on Omni 2026.r1-beta
+regardless of schema. The official documentation describes the operator as
+appearing for placement-table scans, and `CREATE PLACEMENT` fails on Omni
+with `Unimplemented: Geo-partitioning is not supported for this
+environment`.
 
 ## MiniBatchAssign, MiniBatchKeyOrder, and RowCount
 
