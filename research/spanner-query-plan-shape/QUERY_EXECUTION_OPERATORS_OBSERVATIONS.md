@@ -709,6 +709,14 @@ a flat table with the same 3-column primary key report identical
 of every depth, equality plus range, range only, key gap, and IN
 enumeration; same environment, 2026-06-13).
 
+It is also the same for secondary index keys, matching the official
+definition's "primary key or index key" wording. On a two-key index
+`OrderIndexDesc(shard_id, timestamp_order DESC)` forced with `FORCE_INDEX`:
+a 1-key equality prefix (`shard_id = 0`) and a 2-key equality point
+(`shard_id = 0 AND timestamp_order = ...`) both report `0` with a complete
+Seek Condition, while equality plus range (`shard_id = 0 AND
+timestamp_order > ...`) reports `2` (same environment, 2026-06-13).
+
 Reading framework for scans that are not full scans: `0` with no residual is
 a single-point prefix access that matches the query's own key semantics; `0`
 with a key-column residual is the gap pattern (prefix point seek plus
