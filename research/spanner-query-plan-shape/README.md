@@ -43,9 +43,9 @@ plans. Observation logs, not a stable contract.
 - [`SEEKABLE_KEY_SIZE_FEEDBACK_DRAFT.md`](SEEKABLE_KEY_SIZE_FEEDBACK_DRAFT.md):
   draft Google-channel feedback (not delivered) on the `seekable_key_size`
   plan-metadata field reporting `0` for all-equality point seeks, contrary to
-  the documented definitions and the `SEEKABLE_KEY_SIZE` hint. Scoped to Omni
-  2026.r1-beta; needs DBaaS confirmation before delivery. Remove after
-  delivery, as past drafts were.
+  the documented definitions and the `SEEKABLE_KEY_SIZE` hint. Reproduced on
+  both Cloud Spanner DBaaS and Omni 2026.r1-beta with a self-contained minimal
+  table. Remove after delivery, as past drafts were.
 
 Delivered feedback drafts for Spanner Unofficial Hacks were removed on
 2026-06-12 after upstream incorporation; see git history before that date.

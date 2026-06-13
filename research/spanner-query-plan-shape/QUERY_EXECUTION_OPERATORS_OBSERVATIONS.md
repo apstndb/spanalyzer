@@ -743,20 +743,49 @@ For comparison, on the equality-plus-range form
 `SEEKABLE_KEY_SIZE=0` is accepted and demotes the timestamp to a Residual
 Condition (Seek Condition shrinks to `shard_id`).
 
-Two consequences:
+The `SEEKABLE_KEY_SIZE=2` rejection above is specific to this **secondary
+index**. On a **base table** the same forced value is accepted (see the
+base-table confirmation below), so the rejection is an index-specific quirk,
+not a universal "2 is unforceable". The robust observations are:
 
-1. The hint's documented definition — "the length of the key ... used in a
-   seekable condition" — implies the all-equality 2-key point has seekable
-   length 2, yet the default reported value is `0` and the value `2` cannot
-   even be forced (it errors). So the documented quantity is not the reported
-   metadata, and the reported field is itself undocumented.
-2. The metadata value `0` is overloaded across the best case (a complete
+1. The default reported value for an all-equality point seek is `0`, even
+   though the documented definition — "the length of the key ... used in a
+   seekable condition" — and the documented seekable-condition example
+   (`Col1 = x AND Col2 = y` is seekable on both keys) would imply `2`. The
+   value `2` is achievable (it can be forced on a base table, see below), so
+   `0` is a default split choice, not a structural limit. The reported
+   plan-metadata field itself is undocumented (only the hint is).
+2. Forcing `1` or `2` on the point seek does not change the `Seek Condition`
+   (it stays the complete two-key point); only the reported number changes.
+   So for a point seek the value is a chosen split, not a description of how
+   much of the key actually locates rows.
+3. The metadata value `0` is overloaded across the best case (a complete
    point lookup) and a bad case (a plain full scan), so it cannot stand alone
    as a seek-efficiency signal — it must be disambiguated by the Seek
    Condition child link and the `Full scan` flag, as the reading framework
    above already does. This is why `plan-report --annotate seekability`
    leaves `0` unannotated.
 
+Confirmed on Cloud Spanner DBaaS (2026-06-13, `gcpug-public-spanner`, via
+`spanner-mycli EXPLAIN`), so the behaviour is not Omni-specific. Using a
+self-contained minimal base table `SeekableKeySizeDemo(k1, k2) PRIMARY KEY
+(k1, k2)` with `FORCE_INDEX=_BASE_TABLE` (since dropped):
+
+| Query / hint | Reported `seekable_key_size` |
+| --- | --- |
+| `k1 = 1 AND k2 = 2` (point) | `0` (Seek Condition both keys, no Full scan) |
+| point + `SEEKABLE_KEY_SIZE=1` | `1` (Seek Condition unchanged) |
+| point + `SEEKABLE_KEY_SIZE=2` | `2` (accepted; Seek Condition unchanged) |
+| point + `SEEKABLE_KEY_SIZE=3` | `InvalidArgument` (exceeds 2-column key length) |
+| `k1 = 1 AND k2 > 2` (eq+range) | `2` |
+| `k1 BETWEEN 1 AND 5` (range) | `1` |
+| `v = 9` (full scan) | `0` (Full scan flag, residual only, no Seek Condition) |
+
+The secondary-index `SongsBySingerIdDuration(SingerId, Duration)` reproduced
+the point `0` and `eq+range` `2`, and rejected `SEEKABLE_KEY_SIZE=2` with
+`InvalidArgument` (the index-specific quirk above; its storage key appends the
+base-table primary key, so the effective key length differs from the two
+declared index columns).
+
 This is recorded as feedback-worthy in
-[`SEEKABLE_KEY_SIZE_FEEDBACK_DRAFT.md`](SEEKABLE_KEY_SIZE_FEEDBACK_DRAFT.md)
-(scoped to Omni 2026.r1-beta; needs DBaaS confirmation before delivery).
+[`SEEKABLE_KEY_SIZE_FEEDBACK_DRAFT.md`](SEEKABLE_KEY_SIZE_FEEDBACK_DRAFT.md).
