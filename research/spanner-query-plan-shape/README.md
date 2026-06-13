@@ -38,5 +38,14 @@ plans. Observation logs, not a stable contract.
   gcpug/nouhau#135) verified against rendered plans, updated 2026-06-12 with
   the optimizer-version dependence of shard-range seekability.
 
+## Feedback drafts
+
+- [`SEEKABLE_KEY_SIZE_FEEDBACK_DRAFT.md`](SEEKABLE_KEY_SIZE_FEEDBACK_DRAFT.md):
+  draft Google-channel feedback (not delivered) on the `seekable_key_size`
+  plan-metadata field reporting `0` for all-equality point seeks, contrary to
+  the documented definitions and the `SEEKABLE_KEY_SIZE` hint. Scoped to Omni
+  2026.r1-beta; needs DBaaS confirmation before delivery. Remove after
+  delivery, as past drafts were.
+
 Delivered feedback drafts for Spanner Unofficial Hacks were removed on
 2026-06-12 after upstream incorporation; see git history before that date.
