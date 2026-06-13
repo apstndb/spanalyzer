@@ -317,6 +317,7 @@ Details:
 | `HASH_JOIN_BUILD_SIDE` | `BUILD_LEFT`, `BUILD_RIGHT`; only with `JOIN_METHOD=HASH_JOIN` | Included in join and subquery matrices. This can fix build/probe orientation for hash joins when `JOIN_METHOD=HASH_JOIN` is already selected. |
 | `BATCH_MODE` | `TRUE` default, `FALSE`; only with `JOIN_METHOD=APPLY_JOIN` | `TRUE` produces distributed apply forms for several join/subquery shapes. `FALSE` keeps row-at-a-time apply forms in checked shapes. Some broad statement-position combinations returned `Hint batch_mode results in no plan.` |
 | `HASH_JOIN_EXECUTION` | `MULTI_PASS` default, `ONE_PASS`; only with `JOIN_METHOD=HASH_JOIN` | Included in join and subquery matrices. The observed `PlanNode` metadata does not distinguish `MULTI_PASS` from `ONE_PASS`, so PLAN can verify only that a hash join was selected. It cannot verify the requested value or runtime spill/scan-count behavior. |
+| `FACTORIZED_MODE` | `FACTORIZE_LEFT`, `FACTORIZE_RIGHT`, `FACTORIZE_BOTH`; INNER JOIN with equality conditions only | Documented join hint (query-syntax Hints section, "Factorized mode") that deduplicates join-key values on one or both sides before the join; most relevant to many-to-many graph traversals. Not yet locally verified on Omni; whether PLAN-level metadata distinguishes factorized execution is unconfirmed. |
 
 Details:
 
