@@ -466,6 +466,12 @@ connection ID. The analyzer provides a `EXTERNAL_QUERY` table-valued function
 that returns the row type inferred from the inner Spanner query using the
 connection-specific Spanner catalog.
 
+Only the two-argument form `EXTERNAL_QUERY(connection, sql)` is analyzed. The
+optional third options argument is a hard error
+(`EXTERNAL_QUERY options argument is currently not supported for static
+analysis`), because the analyzer cannot evaluate connection options
+statically; remove it from the SQL under analysis.
+
 ```sh
 go run ./cmd/spanner-analyzer \
   --dialect bigquery \
