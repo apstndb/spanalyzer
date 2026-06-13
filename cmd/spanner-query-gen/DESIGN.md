@@ -1107,9 +1107,11 @@ For Spanner:
 - Update helpers always use explicit column lists.
 - Insert, update, upsert, replace, and delete should keep their branch semantics
   visible.
-- Upsert should model insert columns and update masks explicitly; future
-  conflict targets should be introduced only when Spanner `ON CONFLICT`
-  semantics are added.
+- Upsert should model insert columns and update masks explicitly; explicit
+  conflict targets should be introduced only when generator support for
+  Spanner's `ON CONFLICT` DML is added. (Spanner already documents
+  `ON CONFLICT DO UPDATE` and `ON CONFLICT DO NOTHING`; the gap here is the
+  generator emitting them, not the SQL feature existing.)
 - Replace is mutation-only unless a supported DML syntax is verified later.
 - Future `ON CONFLICT` support should be modeled with explicit conflict target
   and conflict action fields, not by overloading `operation: upsert`.
