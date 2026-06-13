@@ -651,6 +651,23 @@ matches the Spanner SQL paper's split between point lookups and range
 extraction: point keys need no interval computation, so the Filter Scan has
 no range-extraction work to describe.
 
+Reconciliation with the official definition: the `SEEKABLE_KEY_SIZE` table
+hint is documented (query-syntax Hints) as "Forces the seekable key size to
+be equal to the specified value", and defines the seekable key size as "the
+length of the key (primary key or index key) that's used in a seekable
+condition, while the rest of the key is used in a residual condition" (range
+`0` to `16`, requires `FORCE_INDEX`). Read literally, a 2-key equality point
+seek has both keys in the seek condition and would be length 2, yet the
+observed metadata reports `0`. The observations reconcile this as: the
+metadata value measures the **range-seekable** prefix only. All-equality
+prefixes are resolved as a Split Range / direct key access (visible as the
+`Split Range` predicate and the complete `Seek Condition`), leaving the
+Filter Scan with no range to extract, so its `seekable_key_size` is `0`.
+The documented value `0` for the hint ("nothing range-seekable, everything
+residual") and the observed `0` for a perfect point seek are therefore the
+same number for opposite-looking situations, which is exactly why the `0`
+value cannot stand alone as a seekability signal.
+
 Practical consequence: `seekable_key_size` is not a standalone seekability
 metric. A `0` must be disambiguated by the presence of a Seek Condition
 child link (point seek) versus the `Full scan` flag or a Residual-only
