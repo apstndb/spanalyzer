@@ -19,10 +19,6 @@ and in git history.
   README.** The options argument is intentionally a hard error
   (`TestBigQueryAnalyzerExternalQueryOptionsArgument` pins it), but the
   README only describes the connection/SQL arguments.
-- [ ] **Test `SetExternalQueryAnalyzers` with duplicate identical inner
-  SQL.** The map keyed by `connectionID + innerSQL` collapses identical
-  entries; that should be fine because the row type is identical, but the
-  invariant deserves an explicit test.
 - Continue comparing native proto/enum analyzer behavior with Cloud Spanner
   and the Cloud Spanner emulator (top-level proto outputs, nested fields,
   arrays, enum values).
@@ -44,13 +40,6 @@ config/output freeze (v1 freeze is deliberately deferred).
   Shorthand kinds project bare table columns, so nullability is derivable.
   Decide whether `kind: sql` stays conservative and whether that split is
   acceptable for DTO reuse.
-- [ ] **Let generated query free functions run inside read-write
-  transactions.** They take `*spanner.ReadOnlyTransaction`; consider a small
-  interface such as
-  `interface { Query(context.Context, spanner.Statement) *spanner.RowIterator }`
-  satisfied by both transaction types.
-- [ ] **Drop the `params map[string]interface{}` argument for queries with no
-  parameters.**
 - [ ] **omit_when_empty on kind:index.** Currently rejected (key columns are
   scalar; ARRAY keys are rare). Lift if needed.
 - [ ] **Tristate API.** Combine `null_is_null` + `omit_when_null` into a
@@ -67,6 +56,19 @@ config/output freeze (v1 freeze is deliberately deferred).
   out of scope unless a separate profile-contract surface is designed.
 - Grow predefined operator families only from observed plans, fixtures, or
   concrete contract use cases.
+- [ ] **Decide blocking_operator attribution for wrapper/implementation
+  pairs.** Found by reading family-annotated rendered output: the
+  push_broadcast_hash_join wrapper is in `streamBlockingOperatorFamily` but
+  `push_broadcast_hash_join_internal_hash_join` is not, so the node that
+  performs the actual hash build renders without the blocking_operator
+  attribute and contributes nothing to subtree blocking counts. Plan-wide
+  counts avoid double counting this way, but a subtree rooted strictly
+  between the wrapper and the implementation (for example a pushed Limit on
+  the Map side) would see zero blocking operators above a hash build. A
+  more principled attribution may be the inverse: the implementation node
+  is blocking and the distribution wrapper is not, keeping plan-wide counts
+  at one while fixing subtree scoping. Changes observable
+  operator_family_counts, so decide deliberately (v1alpha allows it).
 - [ ] **Extend plan-report to DML targets.** Mechanics proven:
   `ReadWriteTransaction.AnalyzeQuery` returns DML plans in PLAN mode without
   executing, and plancontract classifies them warning-free
@@ -104,25 +106,59 @@ plan acquisition workflows. spannerplan already covers variable resolution
 already draws distribution boundaries (dashed, SVG / mermaid.js), so those
 are out of scope.
 
-- [ ] **Validation approach for the spannerplan extension point:** prototype
-  a per-node annotation callback (e.g. `RowAnnotator func(*spannerpb.PlanNode)
-  string` on the plantree/reference render options) in a local spannerplan
-  checkout consumed via a temporary `replace` in the cmd/spanner-query-gen
-  module; only propose it upstream after the seekability and family
-  annotations below prove useful against real Omni plans (the Order1M shard
-  schema showing `seek 2/2` on optimizer v3-v6 vs `seek 1/2` on v7-v8 is the
-  acceptance demo). Do not push spannerplan changes before that validation.
-- [ ] **Seekability annotation in plan-report.** Render scan rows with
-  "seek k/N keys" by combining the plan's Seek/Residual Conditions and
-  `seekable_key_size` with the index/table key count from the catalog DDL
-  that plan-report already loads. This is the visualization of the
-  shard-range discretization finding (optimizer v7-v8 dropping from 2/2 to
-  1/2 keys) and is schema-dependent, hence out of spannerplan's scope.
-- [ ] **Operator-family annotations in rendered reports.** plan-report can
-  annotate rendered rows with normalized families (for example marking
-  blocking operators under Limit, the visual form of
-  `no_blocking_operator_under_limit`) without adding a plancontract
-  dependency to spannerplan.
+- [x] **Validation approach for the spannerplan extension point:** validated
+  on 2026-06-12. Two complementary hooks are prototyped on the local
+  `row-annotator` branch of a spannerplan checkout, consumed via an
+  uncommitted `replace` in `go.work`: value-replacing
+  `queryplan.WithMetadataValueFunc` (plus a
+  `reference.WithQueryPlanOptions` passthrough) for enriching fields the
+  plan already renders, and additive
+  `plantree.WithRowAnnotator` / `reference.WithRowAnnotator` for
+  information with no metadata counterpart. The acceptance demo passed on
+  Omni 2026.r1-beta (`TestIntegrationSeekabilityAnnotationOnOmni`:
+  shard-range query renders `seekable_key_size: 2/2` under optimizer
+  version 6 and `1/2` under version 8; the per-shard rewrite stays `2/2`
+  on both).
+- [ ] **Upstream the spannerplan RowAnnotator hook and commit the dependent
+  code.** The `--annotate` implementation in cmd/spanner-query-gen compiles
+  only against the local spannerplan branch, so it stays uncommitted until
+  the hook is merged and tagged upstream; then drop the `go.work` replace,
+  bump the spannerplan requirement, and commit the feature plus this TODO
+  update together.
+- [x] **Seekability annotation in plan-report** (uncommitted until the
+  spannerplan hooks ship, see above). `plan-report --annotate seekability`
+  replaces the rendered `seekable_key_size` value in place with `k/N`,
+  where N is the declared key column count of the scanned table or index
+  from the catalog DDL, avoiding a duplicate row suffix. Declared keys
+  only: the implicit base-table primary key suffix of secondary indexes is
+  not counted, so key-joining probes can in principle render k greater
+  than N. The ambiguous value 0 is intentionally left unannotated:
+  verified on Omni 2026.r1-beta, `seekable_key_size` counts the key prefix
+  of a range-bounded seek, so both full scans and perfect point seeks
+  (all-equality key conditions, literal or parameter) report 0 (see
+  `research/spanner-query-plan-shape/QUERY_EXECUTION_OPERATORS_OBSERVATIONS.md`).
+- [x] **Operator-family annotations in rendered reports** (uncommitted, same
+  gate). `plan-report --annotate families` renders `{<family>[: <umbrella>...]}`
+  labels per relational row from plancontract normalization (for example
+  `{full_sort: blocking_operator, explicit_sort}` — the single-valued
+  concrete family left of the colon, derived umbrella attributes right of it
+  in lexicographic order), without adding a
+  plancontract dependency to spannerplan. Braces are reserved for these
+  labels by convention. The umbrella suffixes come from the new
+  `plancontract.DerivedOperatorFamilies`, which is pinned to
+  `AddDerivedOperatorFamilyCounts` by a consistency test and is committable
+  independently of the spannerplan gate.
+- [ ] **Consider a families annotation mode that skips trivial labels.**
+  Observed on real and fixture plans: most rows render labels that merely
+  restate the display name (`Global Limit {limit}`, `Batch Scan ... {scan}`,
+  `DataBlockToRow {data_block_to_row}`), while the value concentrates where
+  the family diverges from the title (`Local Sort Limit {full_sort:
+  blocking_operator, explicit_sort}`, `Distributed Union on idx
+  {distributed_merge_union}`, `Hash Join
+  {push_broadcast_hash_join_internal_hash_join}`). A mode that labels only
+  rows whose family differs from the trivially normalized display name or
+  carries umbrella attributes would cut the noise; keep the current
+  exhaustive mode for normalization debugging.
 - [ ] **Normalized plan diff for optimizer comparisons.** An aligned tree
   diff over plancontract-normalized operators (shared prefix folded,
   differing operators expanded) to replace eyeballing
