@@ -15,10 +15,6 @@ and in git history.
   Note that `TestAnalyzerRowTypeForPropertyGraphWithExpressions` currently
   asserts the hardcoded `JSON` behaviour; fix the extraction first or mark
   the test as pinning known-wrong behaviour.
-- [ ] **Document the `EXTERNAL_QUERY` third-argument rejection in the
-  README.** The options argument is intentionally a hard error
-  (`TestBigQueryAnalyzerExternalQueryOptionsArgument` pins it), but the
-  README only describes the connection/SQL arguments.
 - Continue comparing native proto/enum analyzer behavior with Cloud Spanner
   and the Cloud Spanner emulator (top-level proto outputs, nested fields,
   arrays, enum values).
