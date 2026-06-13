@@ -722,3 +722,41 @@ a single-point prefix access that matches the query's own key semantics; `0`
 with a key-column residual is the gap pattern (prefix point seek plus
 post-filtering, potentially reading too much); `k > 0` means the leading `k`
 key columns participate in range or enumeration extraction.
+
+### The metadata value does not round-trip with the SEEKABLE_KEY_SIZE hint
+
+A decisive probe (2026-06-13, Omni 2026.r1-beta) shows the reported
+`seekable_key_size` metadata and the documented `SEEKABLE_KEY_SIZE` table
+hint do not agree for an all-equality point seek. On the two-key index
+`OrderIndexDesc(shard_id, timestamp_order DESC)`, query
+`shard_id = 0 AND timestamp_order = <ts>` (both keys equality, complete Seek
+Condition, no residual):
+
+| Hint | Result | Reported `seekable_key_size` |
+| --- | --- | --- |
+| none | ok | `0` |
+| `SEEKABLE_KEY_SIZE=1` | ok | `1` (Seek Condition still covers both keys) |
+| `SEEKABLE_KEY_SIZE=2` | **InvalidArgument** (empty message) | — |
+
+For comparison, on the equality-plus-range form
+(`shard_id = 0 AND timestamp_order > <ts>`, default `2`),
+`SEEKABLE_KEY_SIZE=0` is accepted and demotes the timestamp to a Residual
+Condition (Seek Condition shrinks to `shard_id`).
+
+Two consequences:
+
+1. The hint's documented definition — "the length of the key ... used in a
+   seekable condition" — implies the all-equality 2-key point has seekable
+   length 2, yet the default reported value is `0` and the value `2` cannot
+   even be forced (it errors). So the documented quantity is not the reported
+   metadata, and the reported field is itself undocumented.
+2. The metadata value `0` is overloaded across the best case (a complete
+   point lookup) and a bad case (a plain full scan), so it cannot stand alone
+   as a seek-efficiency signal — it must be disambiguated by the Seek
+   Condition child link and the `Full scan` flag, as the reading framework
+   above already does. This is why `plan-report --annotate seekability`
+   leaves `0` unannotated.
+
+This is recorded as feedback-worthy in
+[`SEEKABLE_KEY_SIZE_FEEDBACK_DRAFT.md`](SEEKABLE_KEY_SIZE_FEEDBACK_DRAFT.md)
+(scoped to Omni 2026.r1-beta; needs DBaaS confirmation before delivery).
