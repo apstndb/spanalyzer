@@ -162,7 +162,7 @@ contract convenience.
 | `compute` | Concrete | Compute operator. |
 | `compute_struct` | Concrete | Compute Struct operator. |
 | `create_batch` | Concrete | Create Batch operator. |
-| `data_block_to_row` | Concrete | DataBlockToRow operator. |
+| `data_block_to_row` | Concrete | DataBlockToRow operator (`DataBlockToRowAdapter` in the official docs). |
 | `distributed_anti_semi_apply` | Concrete | Distributed Anti Semi Apply wrapper. |
 | `distributed_anti_semi_apply_internal_apply` | Concrete contextual | Semi/Anti Semi Apply inside a Distributed Anti Semi Apply wrapper when it consumes a Batch Scan. |
 | `distributed_cross_apply` | Concrete | Distributed Cross Apply, Distributed Outer Apply, or Distributed Apply wrapper. |
@@ -191,7 +191,7 @@ contract convenience.
 | `recursive_spool_scan` | Concrete | Recursive Spool Scan operator. |
 | `recursive_union` | Concrete | Recursive Union operator. |
 | `row_count` | Concrete | RowCount operator. |
-| `row_to_data_block` | Concrete | RowToDataBlock operator. |
+| `row_to_data_block` | Concrete | RowToDataBlock operator (`RowToDataBlockAdapter` in the official docs). |
 | `scalar` | Concrete fallback | Scalar-kind PlanNode that matches no concrete operator family, such as Reference, Function, Constant, or Parameter. Display-name families win first: Array Subquery and Scalar Subquery nodes are kind SCALAR but still classify as `array_subquery` and `scalar_subquery`. Scalar-kind nodes never fall back to `unknown`. |
 | `scalar_subquery` | Concrete | Scalar Subquery operator. |
 | `search_predicate` | Concrete | Full Text Search predicate operator reached from a `Search Predicate` child link. |

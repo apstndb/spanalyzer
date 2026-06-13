@@ -419,6 +419,13 @@ row/batch boundary conversion operators. They can be affected by
 `EXECUTION_METHOD`, but should not be treated as directly controlled by
 `SCAN_METHOD` alone.
 
+Naming note: the raw `PlanNode.display_name` observed here is
+`RowToDataBlock` / `DataBlockToRow`, but the official operator documentation
+titles the same operators `RowToDataBlockAdapter` / `DataBlockToRowAdapter`
+(query-operators-unary). The normalized family names (`row_to_data_block`,
+`data_block_to_row`) follow the raw display name; a reader cross-referencing
+the docs should expect the longer `...Adapter` spelling there.
+
 ## Join Hint Matrix
 
 All 36 join matrix cases completed successfully on Spanner Omni. Regenerated results are recorded in [`COMPACT_TREE_METADATA_OBSERVATIONS.md`](COMPACT_TREE_METADATA_OBSERVATIONS.md#join-matrix).
