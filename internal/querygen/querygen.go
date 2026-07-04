@@ -1303,6 +1303,7 @@ func mergeQueryCodegenParams(defaults, overrides []QueryCodegenParam) ([]QueryCo
 			// auto-generated kind: index / kind: table param without
 			// also having to repeat the type.
 			merged := param
+			merged.Name = out[i].Name
 			if strings.TrimSpace(merged.Type) == "" {
 				merged.Type = out[i].Type
 			}
@@ -1663,9 +1664,10 @@ func findOrderByChoiceParam(params []QueryCodegenParam) QueryCodegenParam {
 	return QueryCodegenParam{}
 }
 
-// queryOptionalModes returns a name -> optional-mode map for the params
-// in a query. Used by codegenIndexQuerySQL to swap predicate generation
-// when a key-prefix column carries a non-default optional mode.
+// queryOptionalModes returns a normalized param-name -> optional-mode map for
+// the params in a query. Used by table/index shorthand query generation to
+// swap predicate generation when a key-prefix column carries a non-default
+// optional mode.
 func queryOptionalModes(params []QueryCodegenParam) map[string]string {
 	if len(params) == 0 {
 		return nil
@@ -1676,9 +1678,13 @@ func queryOptionalModes(params []QueryCodegenParam) map[string]string {
 		if mode == "" || mode == "required" {
 			continue
 		}
-		out[p.Name] = mode
+		out[columnKey(p.Name)] = mode
 	}
 	return out
+}
+
+func queryOptionalMode(optionalModes map[string]string, paramName string) string {
+	return strings.ToLower(strings.TrimSpace(optionalModes[columnKey(paramName)]))
 }
 
 // queryHasOptionalMarkers reports whether any param triggers the
@@ -2884,7 +2890,7 @@ func codegenTableQuerySQL(schema QueryCodegenSchema, tableName string, keyPrefix
 		keyModes := make([]string, len(keyPrefix))
 		anyOmittable := false
 		for i, key := range keyPrefix {
-			keyModes[i] = strings.ToLower(strings.TrimSpace(optionalModes[paramNames[columnKey(key)]]))
+			keyModes[i] = queryOptionalMode(optionalModes, paramNames[columnKey(key)])
 			switch keyModes[i] {
 			case "omit_when_null", "omit_when_empty":
 				anyOmittable = true
@@ -3020,7 +3026,7 @@ func codegenIndexQuerySQL(schema QueryCodegenSchema, indexName string, keyPrefix
 	anyOmittable := false
 	for i, key := range keyPrefix {
 		paramName := paramNames[columnKey(key)]
-		keyModes[i] = strings.ToLower(strings.TrimSpace(optionalModes[paramName]))
+		keyModes[i] = queryOptionalMode(optionalModes, paramName)
 		switch keyModes[i] {
 		case "omit_when_null", "omit_when_empty":
 			anyOmittable = true

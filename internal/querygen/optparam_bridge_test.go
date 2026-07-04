@@ -418,6 +418,60 @@ queries:
 	}
 }
 
+func TestBuildQueryCodegenPlan_TableKindKeyPrefixOptionalModeIsCaseInsensitive(t *testing.T) {
+	dir := t.TempDir()
+	writeTestFile(t, filepath.Join(dir, "spanner.sql"), `
+CREATE TABLE Singers (
+  SingerId  INT64 NOT NULL,
+  FirstName STRING(MAX),
+) PRIMARY KEY (SingerId);
+`)
+	config, err := ParseQueryCodegenConfigYAML([]byte(`
+version: v1alpha
+go:
+  package: db
+emit:
+  spanner:
+    mutations: true
+catalogs:
+- name: app
+  kind: spanner
+  ddl: spanner.sql
+queries:
+- name: ListMaybeById
+  catalog: app
+  kind: table
+  table: Singers
+  key_prefix: [SingerId]
+  params:
+  - name: singerId
+    optional: omit_when_null
+  result:
+    cardinality: many
+    struct: SingerRow
+`))
+	if err != nil {
+		t.Fatalf("ParseQueryCodegenConfigYAML: %v", err)
+	}
+	plan, err := BuildQueryCodegenPlan(config, dir)
+	if err != nil {
+		t.Fatalf("BuildQueryCodegenPlan: %v", err)
+	}
+	q := plan.Queries[0]
+	if got, want := len(q.Variants), 2; got != want {
+		t.Fatalf("variants = %d, want %d", got, want)
+	}
+	if got, want := q.Params[0].Name, "SingerId"; got != want {
+		t.Fatalf("merged param name = %q, want generated spelling %q", got, want)
+	}
+	wantKeys := map[string]bool{"(none)": true, "SingerId": true}
+	for _, variant := range q.Variants {
+		if !wantKeys[variant.Label] {
+			t.Fatalf("unexpected variant label %q; variants = %+v", variant.Label, q.Variants)
+		}
+	}
+}
+
 func TestBuildQueryCodegenPlan_TableKindOrderByChoice(t *testing.T) {
 	dir := t.TempDir()
 	writeTestFile(t, filepath.Join(dir, "spanner.sql"), `
