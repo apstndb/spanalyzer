@@ -13,6 +13,11 @@ with `github.com/cloudspannerecosystem/memefish` and analyzes queries with
 `github.com/goccy/go-googlesql`; treat both as implementation details rather
 than part of the public contract.
 
+The local directory name `spanner-analyzer` intentionally differs from the
+repository name `apstndb/spanalyzer`; do not propose renaming the directory.
+A v1 config freeze is deliberately deferred; `v1alpha` stays the mutable
+preview channel.
+
 Use "GoogleSQL frontend" for the analyzer/catalog library formerly named
 ZetaSQL, and "Spanner GoogleSQL" for Cloud Spanner's SQL dialect. Mention
 ZetaSQL only for historical upstream API, repository, or symbol names.
