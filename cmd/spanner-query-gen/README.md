@@ -424,14 +424,20 @@ go run ./cmd/spanner-query-gen plan-report \
 ````markdown
 # Spanner Query Plan Report
 
+- Report version: `v1alpha-plan-report-v1`
 - Status: `ok`
 - Backend: `omni`
+- Config SHA-256: `...`
+- Plan source: `analyze_query` via `spannerplan`
 - Format: `current`
 - Render mode: `plan`
+- Contract evaluation mode: `none`
+- Included targets: `1`
 
 ## GetLiteral
 
-- Source: `app`
+- Target ID: `query/GetLiteral`
+- Catalog: `app`
 - Scope: `query`
 - Kind: `sql`
 - Status: `ok`

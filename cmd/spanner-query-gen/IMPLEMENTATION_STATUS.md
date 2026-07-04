@@ -8,8 +8,9 @@ deliberate deferrals.
 ## Implemented v1alpha Surface
 
 - Strict `version: v1alpha` config parsing with unknown-field rejection.
-- `generate`, `check`, `explain-plan`, `vet`, `config-schema`,
-  `plan-report-schema`, and `plan-contract-schema` subcommands.
+- `generate`, `check`, `explain-plan`, `vet`, `plan-report`,
+  `config-schema`, `plan-report-schema`, and `plan-contract-schema`
+  subcommands.
 - Query result DTO and SQL constant generation for Spanner, BigQuery, and
   reviewable `external_query` declarations.
 - Basic runtime query free functions for Spanner and BigQuery query
