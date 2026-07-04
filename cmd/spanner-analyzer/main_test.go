@@ -168,6 +168,48 @@ func TestRunBigQueryModeGoStruct(t *testing.T) {
 	}
 }
 
+func TestRunDialectRejectsUnsupportedOutputForParseMode(t *testing.T) {
+	_, err := runDialect(
+		"spanner",
+		"schema.sql",
+		"",
+		"SELECT 1",
+		[]string{"parse"},
+		"query",
+		"xml",
+		nil,
+		nil,
+		nil,
+		nil,
+		nil,
+		defaultGoStructOptionsForTest(),
+	)
+	if err == nil || !strings.Contains(err.Error(), `unsupported --output "xml"`) {
+		t.Fatalf("runDialect() error = %v, want unsupported output", err)
+	}
+}
+
+func TestRunDialectRejectsBigQueryProtoDescriptorBeforeDDLAnalysis(t *testing.T) {
+	_, err := runDialect(
+		"bigquery",
+		"schema.sql",
+		"not valid ddl",
+		"SELECT 1",
+		[]string{"bigquery_type"},
+		"query",
+		defaultOutputFormat,
+		nil,
+		[]string{"descriptors.pb"},
+		nil,
+		nil,
+		nil,
+		defaultGoStructOptionsForTest(),
+	)
+	if err == nil || !strings.Contains(err.Error(), "--proto-descriptors-file is only supported with --dialect=spanner") {
+		t.Fatalf("runDialect() error = %v, want proto-descriptors rejection", err)
+	}
+}
+
 func defaultGoStructOptionsForTest() querygen.GoStructOptions {
 	return querygen.GoStructOptions{
 		PackageName: "main",

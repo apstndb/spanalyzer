@@ -88,6 +88,15 @@ func main() {
 
 const defaultOutputFormat = "yaml"
 
+func validateOutputFormat(output string) error {
+	switch strings.ToLower(output) {
+	case "json", "yaml", "textproto":
+		return nil
+	default:
+		return fmt.Errorf("unsupported --output %q", output)
+	}
+}
+
 func readDDL(path string) (string, string, error) {
 	if path == "" {
 		return "schema.sql", "", nil
@@ -110,6 +119,9 @@ type externalSchema struct {
 }
 
 func runDialect(dialect, ddlPath, ddl, sql string, modes []string, sqlMode, output string, externalSchemas map[string]externalSchema, protoDescriptorFiles, params, positionalParams []string, options []spanalyzer.AnalyzerOption, goStructOptions querygen.GoStructOptions) (string, error) {
+	if err := validateOutputFormat(output); err != nil {
+		return "", err
+	}
 	switch dialect {
 	case "spanner":
 		if len(externalSchemas) > 0 {
@@ -127,12 +139,12 @@ func runDialect(dialect, ddlPath, ddl, sql string, modes []string, sqlMode, outp
 		if len(params) > 0 || len(positionalParams) > 0 {
 			return "", fmt.Errorf("--param and --positional-param are not supported with --dialect=bigquery yet")
 		}
+		if len(protoDescriptorFiles) > 0 {
+			return "", fmt.Errorf("--proto-descriptors-file is only supported with --dialect=spanner; use --external-proto-descriptors-file for BigQuery EXTERNAL_QUERY connections")
+		}
 		analyzer, err := spanalyzer.NewBigQueryAnalyzerFromDDL(ddlPath, ddl, options...)
 		if err != nil {
 			return "", err
-		}
-		if len(protoDescriptorFiles) > 0 {
-			return "", fmt.Errorf("--proto-descriptors-file is only supported with --dialect=spanner; use --external-proto-descriptors-file for BigQuery EXTERNAL_QUERY connections")
 		}
 		externalAnalyzers, err := buildExternalQueryAnalyzers(externalSchemas, options)
 		if err != nil {
