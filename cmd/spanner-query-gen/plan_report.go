@@ -37,6 +37,7 @@ func runPlanReport(args []string, stdout, stderr io.Writer) error {
 	backend := fs.String("backend", "omni", "runtime backend: omni")
 	renderFormat := fs.String("format", "current", "spannerplan tree format: current, traditional, or compact")
 	wrapWidth := fs.Int("wrap-width", 0, "maximum rendered plan width; 0 disables wrapping")
+	annotate := fs.String("annotate", "", "comma-separated rendered-plan annotations: seekability, families")
 	stable := fs.Bool("stable", false, "omit volatile metadata from report output")
 	optimizerVersion := fs.String("optimizer-version", "", "Spanner optimizer version to pass to AnalyzeQuery")
 	optimizerStatisticsPackage := fs.String("optimizer-statistics-package", "", "Spanner optimizer statistics package to pass to AnalyzeQuery")
@@ -59,6 +60,10 @@ func runPlanReport(args []string, stdout, stderr io.Writer) error {
 		return fmt.Errorf("--check requires --contracts")
 	}
 	format, err := reference.ParseFormat(*renderFormat)
+	if err != nil {
+		return err
+	}
+	annotations, err := parsePlanReportAnnotations(*annotate)
 	if err != nil {
 		return err
 	}
@@ -85,6 +90,7 @@ func runPlanReport(args []string, stdout, stderr io.Writer) error {
 		Format:     format,
 		RenderMode: reference.RenderModePlan,
 		WrapWidth:  *wrapWidth,
+		Annotate:   annotations,
 		Stable:     *stable,
 		Identity:   identity,
 		Optimizer: planReportOptimizerEnvironment{
@@ -142,6 +148,7 @@ type planReportOptions struct {
 	Format     reference.Format
 	RenderMode reference.RenderMode
 	WrapWidth  int
+	Annotate   planReportAnnotateOptions
 	Stable     bool
 	Identity   planReportBackendIdentity
 	Optimizer  planReportOptimizerEnvironment
@@ -380,6 +387,7 @@ func buildPlanReportWithRuntime(ctx context.Context, config querygen.QueryCodege
 	}
 	schemas := queryCodegenSchemasByName(config.Schemas)
 	configQueries := queryCodegenQueriesByName(config.Queries)
+	keyCountsBySource := map[string]map[string]int{}
 	clientsBySource := map[string]*spanemuboost.Clients{}
 	defer func() {
 		for _, clients := range clientsBySource {
@@ -467,7 +475,33 @@ func buildPlanReportWithRuntime(ctx context.Context, config querygen.QueryCodege
 			report.Queries = append(report.Queries, reportQuery)
 			continue
 		}
-		rendered, err := reference.RenderTreeTable(queryPlan.GetPlanNodes(), opts.RenderMode, opts.Format, opts.WrapWidth)
+		// Normalized operators are computed before rendering because the
+		// rendered-row annotations reuse them; they are assigned to the
+		// report entry only on success so error targets keep no stale plan
+		// fields.
+		normalizedOperators := planReportOperators(queryPlan)
+		renderOptions := []reference.Option{reference.WithWrapWidth(opts.WrapWidth)}
+		if opts.Annotate.Any() {
+			var keyCounts map[string]int
+			if opts.Annotate.Seekability {
+				counts, ok := keyCountsBySource[catalog]
+				if !ok {
+					built, err := planReportSchemaKeyCounts(schema, baseDir)
+					if err != nil {
+						reportQuery.Status = "error"
+						reportQuery.Error = err.Error()
+						report.TargetSummary.Errors++
+						report.Queries = append(report.Queries, reportQuery)
+						continue
+					}
+					counts = built
+					keyCountsBySource[catalog] = counts
+				}
+				keyCounts = counts
+			}
+			renderOptions = append(renderOptions, planReportRenderAnnotationOptions(queryPlan, normalizedOperators, keyCounts, opts.Annotate)...)
+		}
+		rendered, err := reference.RenderTreeTableWithOptions(queryPlan.GetPlanNodes(), opts.RenderMode, opts.Format, renderOptions...)
 		if err != nil {
 			reportQuery.Status = "error"
 			reportQuery.Error = err.Error()
@@ -475,7 +509,7 @@ func buildPlanReportWithRuntime(ctx context.Context, config querygen.QueryCodege
 			report.Queries = append(report.Queries, reportQuery)
 			continue
 		}
-		reportQuery.NormalizedOperators = planReportOperators(queryPlan)
+		reportQuery.NormalizedOperators = normalizedOperators
 		reportQuery.OperatorEdges = planReportOperatorEdges(queryPlan)
 		reportQuery.OperatorFamilies = planReportOperatorFamilies(reportQuery.NormalizedOperators)
 		reportQuery.OperatorFamilyCounts = planReportOperatorFamilyCounts(reportQuery.NormalizedOperators)

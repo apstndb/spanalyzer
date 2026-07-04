@@ -222,6 +222,8 @@ Current `plan-report --help` output:
 
 ```text
 Usage of spanner-query-gen plan-report:
+  -annotate string
+        comma-separated rendered-plan annotations: seekability, families
   -backend string
         runtime backend: omni (default "omni")
   -backend-image-digest string
@@ -251,6 +253,28 @@ Usage of spanner-query-gen plan-report:
   -wrap-width int
         maximum rendered plan width; 0 disables wrapping
 ```
+
+`--annotate` enriches the rendered plan text with schema- and
+normalization-aware information the raw plan does not carry:
+
+- `seekability` replaces the rendered `seekable_key_size` value in place with
+  `k/N`, where N is the declared key column count of the scanned table or
+  index from the catalog DDL. `seekable_key_size: 1/2` on a two-key index
+  shows at a glance that a range predicate was not decomposed into fully
+  seekable probes. The value 0 is left unannotated: `seekable_key_size`
+  counts the key prefix of a range-bounded seek, so plain full scans and
+  perfect point seeks (all-equality key conditions) both report 0, and
+  `0/N` would misread a point read as seeking nothing.
+- `families` appends `{...}` labels with the plancontract operator family;
+  when the family contributes to derived umbrella families, they follow
+  after a colon in lexicographic order, for example
+  `{full_sort: blocking_operator, explicit_sort}`. The left side of the
+  colon is always the single-valued concrete classification and the right
+  side the derived cross-cutting attributes, so the two sorts are
+  distinguishable without a position convention. Braces in rendered rows are
+  reserved for these normalization labels, so no `family:` prefix is used.
+  Umbrella attributes such as `blocking_operator` are not derivable from the
+  operator name alone.
 
 ## Minimal Config
 
