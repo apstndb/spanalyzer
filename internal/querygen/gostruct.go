@@ -252,7 +252,7 @@ func generateGoStructsWithExtra(structs []namedGoStruct, options GoStructOptions
 	}
 	formatted, err := format.Source(b.Bytes())
 	if err != nil {
-		return b.String(), nil
+		return b.String(), fmt.Errorf("gofmt generated source: %w\n%s", err, b.String())
 	}
 	return string(formatted), nil
 }

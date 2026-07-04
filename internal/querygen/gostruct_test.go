@@ -72,3 +72,19 @@ func TestGenerateGoStructFromSpannerStructTypeSpanner(t *testing.T) {
 		}
 	}
 }
+
+func TestGenerateGoStructsWithExtraReportsFormatError(t *testing.T) {
+	_, err := generateGoStructsWithExtra(
+		nil,
+		GoStructOptions{PackageName: "result", StructName: "Row", Target: GoStructTargetSpanner},
+		nil,
+		nil,
+		"func broken( {\n",
+	)
+	if err == nil {
+		t.Fatal("generateGoStructsWithExtra() error = nil, want gofmt error")
+	}
+	if !strings.Contains(err.Error(), "gofmt generated source") {
+		t.Fatalf("generateGoStructsWithExtra() error = %v, want gofmt context", err)
+	}
+}
