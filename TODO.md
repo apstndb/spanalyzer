@@ -5,6 +5,79 @@ only. Completed items and historical audit trails are archived in
 [`research/archive/RESOLVED_TODO_2026-06-12.md`](research/archive/RESOLVED_TODO_2026-06-12.md)
 and in git history.
 
+## Long-Term Repository Hardening Backlog
+
+These items came from the 2026-07-03 repository review. They are deliberately
+kept as long-term planning notes rather than immediate fixes because most of
+them change public APIs, module boundaries, diagnostics, or larger internal
+architecture.
+
+- [ ] **Normalize catalog object identity before any v1 freeze.** Spanner
+  identifiers are case-insensitive, but several root catalog maps are keyed by
+  original spelling. Introduce a single normalized object-key helper that keeps
+  display spelling in values, then route table, index, view, sequence, model,
+  proto, and graph lookups through it. Fold related DDL consistency issues into
+  the same pass: table/view conflict checks, rename/drop index bookkeeping,
+  synonym overwrite handling, and raw map lookups from analyzer-returned names.
+- [ ] **Make row-type-irrelevant DDL lenient by design.** Common migration DDL
+  such as `ALTER TABLE ADD/DROP CONSTRAINT`, row deletion policies, and
+  unsupported `ALTER INDEX` alterations should not hard-fail row-type analysis
+  when the schema shape used by query analysis is unchanged. Add explicit
+  ignore paths for known irrelevant AST nodes and consider a catalog option
+  that records warnings instead of failing on unknown but likely irrelevant
+  DDL.
+- [ ] **Consolidate SQL scanning on parser-backed or shared lexical logic.**
+  The repo still contains multiple hand-rolled scanners for table-reference
+  detection, star detection, optional-parameter markers, BigQuery
+  `EXTERNAL_QUERY`, string literal unescaping, and developer probes. Replace
+  substring/prefix heuristics with memefish, GoogleSQL resolved AST data, or a
+  single quote/comment-aware scanner package with focused tests.
+- [ ] **Trim and stabilize the root public API surface.** Before freezing any
+  root API, reduce constructor proliferation around analyzer/options, document
+  or avoid catalog-constructor mutation, and move generator/report policy types
+  out of the root package. In particular, BigQuery Spanner external dataset
+  audit/remediation policy belongs with querygen/reporting unless a smaller
+  reusable projection API is intentionally designed.
+- [ ] **Harden BigQuery and external-query analyzer internals.** Delete or test
+  dead textual-rewrite paths, avoid mutable per-analyzer `EXTERNAL_QUERY`
+  prepared state where concurrent analysis can race, dedupe duplicate
+  argument validation, implement or reject the full GoogleSQL string escape
+  set, and make ambiguous `ML.PREDICT` model fallback fail loudly when multiple
+  models are registered.
+- [ ] **Unify proto descriptor and type-resolution passes.** Descriptor sets
+  loaded from multiple files should dedupe by descriptor file name before
+  building a `protodesc.Files` pool, and PROTO/ENUM fix-up should run over
+  every `TypeSpec` carrier, including model inputs/outputs and view-derived
+  types, not only table columns.
+- [ ] **Strengthen `plancontract` as an independently reliable module.** Add
+  table-driven tests for operator-family classification, topology,
+  predefined-contract expansion, YAML validation, CEL evaluation, and digest
+  behavior. Extract `Validate(File)`, call it from both `ReadFile` and
+  `Evaluate`, report per-contract CEL errors instead of aborting the whole
+  batch, prefer typed CEL inputs for normalized data, make digests deterministic
+  by sorting by node index, include scan-target identity where appropriate, and
+  emit diagnostics when a family comes from a heuristic fallback.
+- [ ] **Refactor `plan-report` around testable boundaries.** Split the large
+  command file into command, collection, rendering, and type files; replace
+  historical one-line forwarding helpers with direct plancontract calls; and
+  extract a small `planAnalyzer` interface so target iteration, skip/error
+  handling, report assembly, annotation, and invariant validation can be tested
+  without an Omni container. Catalog-open/DDL failures should become per-target
+  errors when possible instead of discarding the entire partial report.
+- [ ] **Finish querygen and optparam structural cleanup.** Share the
+  GenerateQueryCode/BuildQueryCodegenPlan resolution pipeline, dedupe table
+  and index key-prefix predicate assembly, decide nullable ARRAY element
+  policy for query results, escape GoogleSQL string literals comprehensively,
+  make missing required-field diagnostics deterministic, dedupe generated
+  optional-builder labels when one param appears in multiple segments, and make
+  marker extraction reject strings/comments/orphaned residual markers
+  intentionally.
+- [ ] **Use tooling to prevent repeat classes of bugs.** Add targeted lints or
+  tests for exhaustive `spannerpb.TypeCode` and AST-kind switches, align
+  spannerplan versions across modules once the local replace is gone, and
+  modernize developer probes such as semicolon-splitting DDL helpers so they
+  reuse existing parsers instead of ad hoc string handling.
+
 ## Analyzer And Catalog
 
 - [ ] **Property graph derived expressions still hardcode `JSON`.** As
