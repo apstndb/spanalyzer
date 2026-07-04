@@ -3312,6 +3312,8 @@ func typeSpecSQL(spec *TypeSpec) (string, error) {
 		return "JSON", nil
 	case spannerpb.TypeCode_UUID:
 		return "UUID", nil
+	case spannerpb.TypeCode_INTERVAL:
+		return "INTERVAL", nil
 	case spannerpb.TypeCode_ARRAY:
 		elem, err := typeSpecSQL(spec.ArrayElement)
 		if err != nil {

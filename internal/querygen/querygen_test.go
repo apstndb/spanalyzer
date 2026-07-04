@@ -7,6 +7,7 @@ import (
 	"strings"
 	"testing"
 
+	"cloud.google.com/go/spanner/apiv1/spannerpb"
 	"github.com/goccy/go-yaml"
 )
 
@@ -1583,6 +1584,16 @@ CREATE INDEX AlbumsByTitle ON Albums(AlbumTitle, SingerId) STORING (MarketingBud
 		if !strings.Contains(code, want) {
 			t.Fatalf("generated code missing %q:\n%s", want, code)
 		}
+	}
+}
+
+func TestTypeSpecSQLInterval(t *testing.T) {
+	got, err := typeSpecSQL(&TypeSpec{Code: spannerpb.TypeCode_INTERVAL})
+	if err != nil {
+		t.Fatalf("typeSpecSQL(INTERVAL) error = %v", err)
+	}
+	if got != "INTERVAL" {
+		t.Fatalf("typeSpecSQL(INTERVAL) = %q, want INTERVAL", got)
 	}
 }
 
