@@ -18,7 +18,7 @@ import (
 	"github.com/apstndb/spanalyzer/internal/querygen"
 	"github.com/apstndb/spanemuboost"
 	"github.com/cloudspannerecosystem/memefish"
-	dcontainer "github.com/docker/docker/api/types/container"
+	dcontainer "github.com/moby/moby/api/types/container"
 	"github.com/testcontainers/testcontainers-go"
 )
 
