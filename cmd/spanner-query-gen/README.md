@@ -371,7 +371,25 @@ Run the optional Omni check with:
 SPANEMUBOOST_ENABLE_OMNI_TESTS=1 go test -tags='integration omni' -run '^TestIntegration.*Omni' ./cmd/spanner-query-gen
 ```
 
-`plan-report` uses the same Omni plan source for review artifacts:
+To avoid booting a new Spanner Omni container on every test run, start a shared
+runtime with [`spanemuboost serve`](https://github.com/apstndb/spanemuboost) and
+point Omni integration tests at it:
+
+```sh
+spanemuboost serve omni --endpoint-file /tmp/omni-endpoint.json
+SPANEMUBOOST_ENDPOINT_FILE=/tmp/omni-endpoint.json \
+  SPANEMUBOOST_ENABLE_OMNI_TESTS=1 \
+  go test -tags='integration omni' -p=1 -parallel=1 ./cmd/spanner-query-gen
+```
+
+Omni integration tests use `querygenOmniRuntime`, which attaches to the
+published endpoint when `SPANEMUBOOST_ENDPOINT_FILE` or `SPANEMUBOOST_OMNI_URI`
+is set and otherwise falls back to testcontainers. When an Omni endpoint is
+configured, the Docker health check is skipped so tests can run without a local
+container runtime.
+
+`plan-report` uses the same Omni plan source for review artifacts. It also
+attaches to `SPANEMUBOOST_ENDPOINT_FILE` or `SPANEMUBOOST_OMNI_URI` when set:
 
 ```sh
 go run ./cmd/spanner-query-gen plan-report \

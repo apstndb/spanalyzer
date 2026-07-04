@@ -158,7 +158,7 @@ func TestIntegrationPlanReportOperatorFamilyCoverageOnOmni(t *testing.T) {
 	if os.Getenv("SPANEMUBOOST_ENABLE_OMNI_TESTS") == "" {
 		t.Skip("set SPANEMUBOOST_ENABLE_OMNI_TESTS=1 to run Spanner Omni tests")
 	}
-	querygenIntegrationRequireContainerRuntime(t)
+	querygenOmniIntegrationRequireRuntime(t)
 
 	dir := t.TempDir()
 	writeIntegrationTestFile(t, filepath.Join(dir, "schema.sql"), familyCoverageDDL)
@@ -171,12 +171,7 @@ func TestIntegrationPlanReportOperatorFamilyCoverageOnOmni(t *testing.T) {
 		t.Fatalf("BuildQueryCodegenPlan() error = %v", err)
 	}
 
-	runtime := spanemuboost.NewLazyRuntime(spanemuboost.BackendOmni)
-	t.Cleanup(func() {
-		if err := runtime.Close(); err != nil {
-			t.Errorf("failed to close Spanner Omni runtime: %v", err)
-		}
-	})
+	runtime := querygenOmniRuntime(t)
 	report, err := buildPlanReportWithRuntime(t.Context(), config, plan, dir, planReportOptions{
 		Backend:    "omni",
 		Format:     reference.FormatCurrent,
@@ -240,14 +235,9 @@ func TestIntegrationDMLOperatorFamilyCoverageOnOmni(t *testing.T) {
 	if os.Getenv("SPANEMUBOOST_ENABLE_OMNI_TESTS") == "" {
 		t.Skip("set SPANEMUBOOST_ENABLE_OMNI_TESTS=1 to run Spanner Omni tests")
 	}
-	querygenIntegrationRequireContainerRuntime(t)
+	querygenOmniIntegrationRequireRuntime(t)
 
-	runtime := spanemuboost.NewLazyRuntime(spanemuboost.BackendOmni)
-	t.Cleanup(func() {
-		if err := runtime.Close(); err != nil {
-			t.Errorf("failed to close Spanner Omni runtime: %v", err)
-		}
-	})
+	runtime := querygenOmniRuntime(t)
 	clients := spanemuboost.SetupClients(t, runtime,
 		spanemuboost.WithRandomDatabaseID(),
 		spanemuboost.WithSetupDDLs(querygenIntegrationDDLs(t, "schema.sql", familyCoverageDDL)),

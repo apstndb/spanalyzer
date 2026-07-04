@@ -19,15 +19,10 @@ func TestIntegrationQueryCodegenGeneratedSpannerQueriesRunOnOmni(t *testing.T) {
 	if os.Getenv("SPANEMUBOOST_ENABLE_OMNI_TESTS") == "" {
 		t.Skip("set SPANEMUBOOST_ENABLE_OMNI_TESTS=1 to run Spanner Omni tests")
 	}
-	querygenIntegrationRequireContainerRuntime(t)
+	querygenOmniIntegrationRequireRuntime(t)
 
 	config, plan, baseDir, ddl := querygenIntegrationBuildFixture(t)
-	runtime := spanemuboost.NewLazyRuntime(spanemuboost.BackendOmni)
-	t.Cleanup(func() {
-		if err := runtime.Close(); err != nil {
-			t.Errorf("failed to close Spanner Omni runtime: %v", err)
-		}
-	})
+	runtime := querygenOmniRuntime(t)
 	clients := spanemuboost.SetupClients(t, runtime,
 		spanemuboost.WithRandomDatabaseID(),
 		spanemuboost.WithSetupDDLs(querygenIntegrationDDLs(t, "schema.sql", ddl)),

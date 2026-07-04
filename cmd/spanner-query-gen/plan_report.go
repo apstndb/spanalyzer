@@ -338,7 +338,10 @@ type planReportOptimizerEnvironment = plancontract.OptimizerEnvironment
 type planReportOptimizerEffective = plancontract.OptimizerEffective
 
 func buildPlanReport(ctx context.Context, config querygen.QueryCodegenConfig, plan *querygen.QueryCodegenPlan, baseDir string, opts planReportOptions) (planReport, error) {
-	runtime := spanemuboost.NewLazyRuntime(spanemuboost.BackendOmni)
+	runtime, err := spanemuboost.NewLazyRuntimeFromEnvOrStart(spanemuboost.BackendOmni)
+	if err != nil {
+		return planReport{}, err
+	}
 	defer func() {
 		_ = runtime.Close()
 	}()
