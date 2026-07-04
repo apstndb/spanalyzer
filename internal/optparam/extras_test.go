@@ -42,6 +42,38 @@ WHERE TRUE
 	}
 }
 
+func TestNullIsNull_DoesNotRewriteMultiCharOperators(t *testing.T) {
+	tests := []struct {
+		name string
+		body string
+	}{
+		{name: "greater than or equal", body: "AND Score >= @score"},
+		{name: "less than or equal", body: "AND Score <= @score"},
+		{name: "not equal", body: "AND Score != @score"},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			got, err := rewriteNullIsNull(test.body, "score")
+			if err == nil {
+				t.Fatalf("rewriteNullIsNull(%q) = %q, want error", test.body, got)
+			}
+			if !strings.Contains(err.Error(), "= @score") {
+				t.Fatalf("rewriteNullIsNull(%q) error = %v, want missing equality context", test.body, err)
+			}
+		})
+	}
+}
+
+func TestNullIsNull_RewritesNoSpaceEquality(t *testing.T) {
+	got, err := rewriteNullIsNull("AND Status=@status", "status")
+	if err != nil {
+		t.Fatalf("rewriteNullIsNull() error = %v", err)
+	}
+	if want := "AND Status IS NOT DISTINCT FROM @status"; got != want {
+		t.Fatalf("rewriteNullIsNull() = %q, want %q", got, want)
+	}
+}
+
 func TestNullIsNull_AnalyzerAcceptsRewrittenSQL(t *testing.T) {
 	sql := `SELECT SingerId FROM Singers
 WHERE TRUE

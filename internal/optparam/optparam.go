@@ -260,10 +260,37 @@ func markerExpectedMode(markerKind string) (Mode, SegmentKind, error) {
 // almost certainly authored incorrectly.
 func rewriteNullIsNull(body, name string) (string, error) {
 	pattern := regexp.MustCompile(`(?i)=\s*@` + regexp.QuoteMeta(name) + `\b`)
-	if !pattern.MatchString(body) {
+	matches := pattern.FindAllStringIndex(body, -1)
+	var b strings.Builder
+	last := 0
+	replaced := false
+	for _, match := range matches {
+		start, end := match[0], match[1]
+		if start > 0 && strings.ContainsRune("<>!=", rune(body[start-1])) {
+			continue
+		}
+		b.WriteString(body[last:start])
+		if start > 0 && !isSQLSpace(body[start-1]) {
+			b.WriteByte(' ')
+		}
+		b.WriteString("IS NOT DISTINCT FROM @" + name)
+		last = end
+		replaced = true
+	}
+	if !replaced {
 		return "", fmt.Errorf("body %q does not contain `= @%s`", body, name)
 	}
-	return pattern.ReplaceAllString(body, "IS NOT DISTINCT FROM @"+name), nil
+	b.WriteString(body[last:])
+	return b.String(), nil
+}
+
+func isSQLSpace(b byte) bool {
+	switch b {
+	case ' ', '\t', '\n', '\r', '\f':
+		return true
+	default:
+		return false
+	}
 }
 
 // Presence carries the per-variant inputs to ComposeVariant.
