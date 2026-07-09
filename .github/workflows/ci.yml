@@ -89,9 +89,13 @@ jobs:
       - name: Download modules
         run: mise x -- go mod download
 
+      - name: Compile Spanner Omni integration test sources without running Omni
+        working-directory: cmd/spanner-query-gen
+        run: mise x -- go test -count=1 -tags='integration omni' -run '^$' ./...
+
       - name: Run Spanner emulator integration tests
         working-directory: cmd/spanner-query-gen
-        run: mise x -- go test -tags=integration -run '^TestIntegration' ./...
+        run: mise x -- go test -race -count=1 -tags=integration -run '^TestIntegration' ./...
 
   lint:
     name: golangci-lint
@@ -138,11 +142,15 @@ jobs:
 
       - name: Run govulncheck
         run: mise x -- govulncheck ./...
-        # The cmd/spanner-query-gen and tools modules intentionally use
-        # spanemuboost/testcontainers for Spanner emulator/Omni workflows,
-        # which currently pull Docker client advisories without a fixed
-        # upstream version, so govulncheck is not run for those modules.
 
       - name: Run govulncheck on plancontract module
         working-directory: plancontract
+        run: mise x -- govulncheck ./...
+
+      - name: Run govulncheck on cmd/spanner-query-gen module
+        working-directory: cmd/spanner-query-gen
+        run: mise x -- govulncheck ./...
+
+      - name: Run govulncheck on tools module
+        working-directory: tools
         run: mise x -- govulncheck ./...

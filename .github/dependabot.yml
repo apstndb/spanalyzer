@@ -10,6 +10,36 @@ updates:
           - minor
           - patch
 
+  - package-ecosystem: gomod
+    directory: /plancontract
+    schedule:
+      interval: weekly
+    groups:
+      go-minor-and-patch:
+        update-types:
+          - minor
+          - patch
+
+  - package-ecosystem: gomod
+    directory: /cmd/spanner-query-gen
+    schedule:
+      interval: weekly
+    groups:
+      go-minor-and-patch:
+        update-types:
+          - minor
+          - patch
+
+  - package-ecosystem: gomod
+    directory: /tools
+    schedule:
+      interval: weekly
+    groups:
+      go-minor-and-patch:
+        update-types:
+          - minor
+          - patch
+
   - package-ecosystem: github-actions
     directory: /
     schedule:
