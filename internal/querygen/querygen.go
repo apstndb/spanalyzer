@@ -361,6 +361,9 @@ func GenerateQueryCode(config QueryCodegenConfig, baseDir string) (string, error
 		if err != nil {
 			return "", fmt.Errorf("query %s: %w", query.Name, err)
 		}
+		if err := validateUniqueQueryResultFieldNames(fields); err != nil {
+			return "", fmt.Errorf("query %s: %w", query.Name, err)
+		}
 		structName := queryResultStructName(query)
 		merged, err := mergeGoResultFields(structs[structName], fields)
 		if err != nil {
@@ -844,6 +847,9 @@ func BuildQueryCodegenPlan(config QueryCodegenConfig, baseDir string) (*QueryCod
 		}
 		fields, err = applyRequiredFields(fields, query.Required, query.RequiredPolicy)
 		if err != nil {
+			return nil, fmt.Errorf("query %s: %w", query.Name, err)
+		}
+		if err := validateUniqueQueryResultFieldNames(fields); err != nil {
 			return nil, fmt.Errorf("query %s: %w", query.Name, err)
 		}
 		structName := queryResultStructName(query)
@@ -2741,6 +2747,11 @@ func validateResolvedWriteColumns(table *Table, operation string, insertColumns,
 				return fmt.Errorf("column %s is not insertable", column.Name)
 			}
 		}
+		for _, column := range requiredInsertColumns(table, keyColumns) {
+			if !containsColumn(insertColumns, column.Name) {
+				return fmt.Errorf("%s requires insert value for NOT NULL column %s", operation, column.Name)
+			}
+		}
 	case "update":
 		for _, column := range updateColumns {
 			if column.PrimaryKey {
@@ -3377,6 +3388,34 @@ func applyRequiredFields(fields []goResultField, required []string, policy strin
 		return nil, fmt.Errorf("required field %q is not present in query result", name)
 	}
 	return out, nil
+}
+
+func validateUniqueQueryResultFieldNames(fields []goResultField) error {
+	return validateUniqueQueryResultFieldNamesAtPath(fields, "")
+}
+
+func validateUniqueQueryResultFieldNamesAtPath(fields []goResultField, parentPath string) error {
+	seen := make(map[string]string, len(fields))
+	for _, field := range fields {
+		path := field.Name
+		if parentPath != "" {
+			path = parentPath + "." + field.Name
+		}
+		key := strings.ToLower(field.Name)
+		if first, ok := seen[key]; ok {
+			return fmt.Errorf(
+				"duplicate query result field %q at path %q; conflicts case-insensitively with %q at the same nesting level",
+				field.Name,
+				path,
+				first,
+			)
+		}
+		seen[key] = field.Name
+		if err := validateUniqueQueryResultFieldNamesAtPath(field.Fields, path); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func mergeGoResultFields(existing, next []goResultField) ([]goResultField, error) {

@@ -1,6 +1,9 @@
 package querygen
 
 import (
+	"os"
+	"os/exec"
+	"path/filepath"
 	"strings"
 	"testing"
 
@@ -73,6 +76,119 @@ func TestGenerateGoStructFromSpannerStructTypeSpanner(t *testing.T) {
 	}
 }
 
+func TestGenerateGoStructFromBigQueryTableSchemaBothLoadsRepeatedPrimitives(t *testing.T) {
+	code, err := GenerateGoStructFromBigQueryTableSchema(&BigQueryTableSchema{
+		Fields: []*BigQueryTableFieldSchema{
+			{Name: "numbers", Type: "INTEGER", Mode: "REPEATED"},
+			{Name: "labels", Type: "STRING", Mode: "REPEATED"},
+		},
+	}, GoStructOptions{PackageName: "result", StructName: "ArrayRow", Target: GoStructTargetBoth})
+	if err != nil {
+		t.Fatalf("GenerateGoStructFromBigQueryTableSchema() error = %v", err)
+	}
+
+	dir := t.TempDir()
+	writeGeneratedLoadTestFile(t, filepath.Join(dir, "go.mod"), `module generatedloadtest
+
+go 1.22
+
+require cloud.google.com/go/bigquery v0.0.0
+
+replace cloud.google.com/go/bigquery => ./bigquerystub
+`)
+	writeGeneratedLoadTestFile(t, filepath.Join(dir, "generated.go"), code)
+	writeGeneratedLoadTestFile(t, filepath.Join(dir, "generated_test.go"), `package result
+
+import (
+	"reflect"
+	"strings"
+	"testing"
+
+	"cloud.google.com/go/bigquery"
+)
+
+func TestArrayRowLoad(t *testing.T) {
+	schema := bigquery.Schema{
+		{Name: "numbers"},
+		{Name: "labels"},
+	}
+	var row ArrayRow
+	if err := row.Load([]bigquery.Value{
+		[]bigquery.Value{int64(1), int64(2)},
+		[]bigquery.Value{"one", "two"},
+	}, schema); err != nil {
+		t.Fatalf("Load() error = %v", err)
+	}
+	if want := []int64{1, 2}; !reflect.DeepEqual(row.Numbers, want) {
+		t.Errorf("Numbers = %#v, want %#v", row.Numbers, want)
+	}
+	if want := []string{"one", "two"}; !reflect.DeepEqual(row.Labels, want) {
+		t.Errorf("Labels = %#v, want %#v", row.Labels, want)
+	}
+
+	if err := row.Load([]bigquery.Value{
+		[]bigquery.Value{},
+		[]bigquery.Value{},
+	}, schema); err != nil {
+		t.Fatalf("Load(empty arrays) error = %v", err)
+	}
+	if row.Numbers == nil || row.Labels == nil {
+		t.Fatalf("Load(empty arrays) = %#v, want non-nil empty slices", row)
+	}
+
+	if err := row.Load([]bigquery.Value{nil, nil}, schema); err != nil {
+		t.Fatalf("Load(nil arrays) error = %v", err)
+	}
+	if row.Numbers != nil || row.Labels != nil {
+		t.Fatalf("Load(nil arrays) = %#v, want nil slices", row)
+	}
+
+	row.Numbers = []int64{42}
+	err := row.Load([]bigquery.Value{
+		[]bigquery.Value{int64(1), "bad"},
+		[]bigquery.Value{},
+	}, schema)
+	if err == nil || !strings.Contains(err.Error(), "numbers: [1]: cannot decode string") {
+		t.Fatalf("Load(bad element) error = %v, want field and element index context", err)
+	}
+	if want := []int64{42}; !reflect.DeepEqual(row.Numbers, want) {
+		t.Errorf("Numbers after failed Load = %#v, want unchanged %#v", row.Numbers, want)
+	}
+}
+`)
+	stubDir := filepath.Join(dir, "bigquerystub")
+	if err := os.Mkdir(stubDir, 0o755); err != nil {
+		t.Fatalf("Mkdir(bigquerystub) error = %v", err)
+	}
+	writeGeneratedLoadTestFile(t, filepath.Join(stubDir, "go.mod"), `module cloud.google.com/go/bigquery
+
+go 1.22
+`)
+	writeGeneratedLoadTestFile(t, filepath.Join(stubDir, "bigquery.go"), `package bigquery
+
+type Value interface{}
+
+type Schema []*FieldSchema
+
+type FieldSchema struct {
+	Name   string
+	Schema Schema
+}
+`)
+
+	cmd := exec.Command("go", "test", "./...")
+	cmd.Dir = dir
+	cmd.Env = append(os.Environ(),
+		"GOCACHE="+filepath.Join(dir, "gocache"),
+		"GOTOOLCHAIN=local",
+		"GOWORK=off",
+	)
+	output, err := cmd.CombinedOutput()
+	if err != nil {
+		t.Fatalf("go test generated loader: %v\n--- generated.go ---\n%s\n--- output ---\n%s", err, code, output)
+	}
+}
+
 func TestGenerateGoStructsWithExtraReportsFormatError(t *testing.T) {
 	_, err := generateGoStructsWithExtra(
 		nil,
@@ -86,5 +202,12 @@ func TestGenerateGoStructsWithExtraReportsFormatError(t *testing.T) {
 	}
 	if !strings.Contains(err.Error(), "gofmt generated source") {
 		t.Fatalf("generateGoStructsWithExtra() error = %v, want gofmt context", err)
+	}
+}
+
+func writeGeneratedLoadTestFile(t *testing.T, path, content string) {
+	t.Helper()
+	if err := os.WriteFile(path, []byte(content), 0o600); err != nil {
+		t.Fatalf("WriteFile(%s) error = %v", path, err)
 	}
 }

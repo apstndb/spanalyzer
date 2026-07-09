@@ -241,6 +241,10 @@ func generateGoStructsWithExtra(structs []namedGoStruct, options GoStructOptions
 		b.WriteByte('\n')
 		writeAssignBigQueryValueSupport(&b)
 	}
+	if gen.needsValueSlice {
+		b.WriteByte('\n')
+		writeBigQueryValueSliceSupport(&b)
+	}
 	if extraCode != "" {
 		if b.Len() > 0 && !strings.HasSuffix(b.String(), "\n\n") {
 			b.WriteByte('\n')
@@ -279,6 +283,7 @@ type goStructGenerator struct {
 	needsBigQueryLoad bool
 	needsNullValue    bool
 	needsAssignValue  bool
+	needsValueSlice   bool
 }
 
 func (g *goStructGenerator) buildStruct(name string, fields []goResultField) generatedStruct {
@@ -312,13 +317,18 @@ func (g *goStructGenerator) generatedFields(field goResultField, fieldName, nest
 			loadKind = "struct_slice"
 		} else if field.Repeated && strings.HasPrefix(typ.Expr, "[]NullValue[") {
 			loadKind = "nullable_slice"
+		} else if field.Repeated {
+			loadKind = "slice"
 		} else if strings.HasPrefix(typ.Expr, "NullValue[") {
 			loadKind = "nullable"
 		} else if isStructLikeGoResultField(field) {
 			loadKind = "struct"
 		}
-		if loadKind == "value" {
+		if loadKind == "value" || loadKind == "slice" {
 			g.needsAssignValue = true
+		}
+		if loadKind == "slice" {
+			g.needsValueSlice = true
 		}
 		return []generatedField{{Name: fieldName, Type: typ.Expr, Tags: map[string]string{"bigquery": field.Name, "spanner": field.Name}, SourceName: field.Name, LoadKind: loadKind, Repeated: field.Repeated}}
 	}
@@ -607,6 +617,10 @@ func writeBigQueryLoadMethod(b *bytes.Buffer, st generatedStruct) {
 			fmt.Fprintf(b, "\t\t\tif err := loadBigQueryNullValueSlice(&r.%s, values[i]); err != nil {\n", field.Name)
 			fmt.Fprintf(b, "\t\t\t\treturn fmt.Errorf(%q, err)\n", field.SourceName+": %w")
 			b.WriteString("\t\t\t}\n")
+		case "slice":
+			fmt.Fprintf(b, "\t\t\tif err := loadBigQueryValueSlice(&r.%s, values[i]); err != nil {\n", field.Name)
+			fmt.Fprintf(b, "\t\t\t\treturn fmt.Errorf(%q, err)\n", field.SourceName+": %w")
+			b.WriteString("\t\t\t}\n")
 		case "struct":
 			writeBigQueryStructLoad(b, field)
 		case "struct_slice":
@@ -739,6 +753,27 @@ func writeAssignBigQueryValueSupport(b *bytes.Buffer) {
 	b.WriteString("\t\treturn fmt.Errorf(\"cannot decode %T\", value)\n")
 	b.WriteString("\t}\n")
 	b.WriteString("\t*dst = typed\n")
+	b.WriteString("\treturn nil\n")
+	b.WriteString("}\n")
+}
+
+func writeBigQueryValueSliceSupport(b *bytes.Buffer) {
+	b.WriteString("func loadBigQueryValueSlice[T any](dst *[]T, value bigquery.Value) error {\n")
+	b.WriteString("\tif value == nil {\n")
+	b.WriteString("\t\t*dst = nil\n")
+	b.WriteString("\t\treturn nil\n")
+	b.WriteString("\t}\n")
+	b.WriteString("\tvalues, ok := value.([]bigquery.Value)\n")
+	b.WriteString("\tif !ok {\n")
+	b.WriteString("\t\treturn fmt.Errorf(\"cannot decode %T\", value)\n")
+	b.WriteString("\t}\n")
+	b.WriteString("\tout := make([]T, len(values))\n")
+	b.WriteString("\tfor i, value := range values {\n")
+	b.WriteString("\t\tif err := assignBigQueryValue(&out[i], value); err != nil {\n")
+	b.WriteString("\t\t\treturn fmt.Errorf(\"[%d]: %w\", i, err)\n")
+	b.WriteString("\t\t}\n")
+	b.WriteString("\t}\n")
+	b.WriteString("\t*dst = out\n")
 	b.WriteString("\treturn nil\n")
 	b.WriteString("}\n")
 }

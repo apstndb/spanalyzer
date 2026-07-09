@@ -1945,6 +1945,89 @@ CREATE TABLE Singers (
 	}
 }
 
+func TestGenerateQueryCodeInsertAndReplaceRequireInsertValuesForNotNullColumns(t *testing.T) {
+	tests := []struct {
+		name      string
+		operation string
+		ddl       string
+		wantErr   string
+	}{
+		{
+			name:      "insert rejects missing required column",
+			operation: "insert",
+			ddl: `
+CREATE TABLE Singers (
+  SingerId INT64 NOT NULL,
+  FirstName STRING(MAX),
+  LastName STRING(MAX) NOT NULL
+) PRIMARY KEY (SingerId);
+`,
+			wantErr: "insert requires insert value for NOT NULL column LastName",
+		},
+		{
+			name:      "replace rejects missing required column",
+			operation: "replace",
+			ddl: `
+CREATE TABLE Singers (
+  SingerId INT64 NOT NULL,
+  FirstName STRING(MAX),
+  LastName STRING(MAX) NOT NULL
+) PRIMARY KEY (SingerId);
+`,
+			wantErr: "replace requires insert value for NOT NULL column LastName",
+		},
+		{
+			name:      "insert allows missing defaulted required column",
+			operation: "insert",
+			ddl: `
+CREATE TABLE Singers (
+  SingerId INT64 NOT NULL,
+  FirstName STRING(MAX),
+  LastName STRING(MAX) NOT NULL DEFAULT ('unknown')
+) PRIMARY KEY (SingerId);
+`,
+		},
+		{
+			name:      "replace allows missing defaulted required column",
+			operation: "replace",
+			ddl: `
+CREATE TABLE Singers (
+  SingerId INT64 NOT NULL,
+  FirstName STRING(MAX),
+  LastName STRING(MAX) NOT NULL DEFAULT ('unknown')
+) PRIMARY KEY (SingerId);
+`,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			dir := t.TempDir()
+			writeTestFile(t, filepath.Join(dir, "schema.sql"), tt.ddl)
+			_, err := GenerateQueryCode(QueryCodegenConfig{
+				Package: "db",
+				Schemas: []QueryCodegenSchema{{Name: "spanner", Dialect: "spanner", DDL: "schema.sql"}},
+				Writes: []QueryCodegenWrite{{
+					Name:        "SaveSinger",
+					Catalog:     "spanner",
+					Table:       "Singers",
+					Operation:   tt.operation,
+					InputStruct: "SingerWrite",
+					Insert:      QueryCodegenWriteInsert{Columns: []string{"SingerId", "FirstName"}},
+				}},
+			}, dir)
+			if tt.wantErr == "" {
+				if err != nil {
+					t.Fatalf("GenerateQueryCode() error = %v", err)
+				}
+				return
+			}
+			if err == nil || !strings.Contains(err.Error(), tt.wantErr) {
+				t.Fatalf("GenerateQueryCode() error = %v, want %q", err, tt.wantErr)
+			}
+		})
+	}
+}
+
 func TestGenerateQueryCodeRejectsGeneratedUpdateColumn(t *testing.T) {
 	dir := t.TempDir()
 	writeTestFile(t, filepath.Join(dir, "schema.sql"), `
@@ -3664,6 +3747,67 @@ func TestGenerateQueryCodeRejectsConflictingSharedFieldTypes(t *testing.T) {
 	}, "")
 	if err == nil || !strings.Contains(err.Error(), "conflicting types") {
 		t.Fatalf("GenerateQueryCode() error = %v, want conflicting types", err)
+	}
+}
+
+func TestQueryCodegenRejectsDuplicateResultFieldNames(t *testing.T) {
+	tests := []struct {
+		name    string
+		sql     string
+		wantErr string
+	}{
+		{
+			name:    "same name",
+			sql:     "SELECT 1 AS x, 2 AS x",
+			wantErr: `duplicate query result field "x" at path "x"`,
+		},
+		{
+			name:    "case-insensitive name",
+			sql:     "SELECT 1 AS x, 2 AS X",
+			wantErr: `duplicate query result field "X" at path "X"`,
+		},
+		{
+			name:    "nested case-insensitive name",
+			sql:     "SELECT STRUCT(1 AS x, 2 AS X) AS nested",
+			wantErr: `duplicate query result field "X" at path "nested.X"`,
+		},
+	}
+	entrypoints := []struct {
+		name string
+		run  func(QueryCodegenConfig) error
+	}{
+		{
+			name: "GenerateQueryCode",
+			run: func(config QueryCodegenConfig) error {
+				_, err := GenerateQueryCode(config, "")
+				return err
+			},
+		},
+		{
+			name: "BuildQueryCodegenPlan",
+			run: func(config QueryCodegenConfig) error {
+				_, err := BuildQueryCodegenPlan(config, "")
+				return err
+			},
+		},
+	}
+	for _, tt := range tests {
+		for _, entrypoint := range entrypoints {
+			t.Run(tt.name+"/"+entrypoint.name, func(t *testing.T) {
+				err := entrypoint.run(QueryCodegenConfig{
+					Package: "db",
+					Queries: []QueryCodegenQuery{{
+						Name:         "DuplicateFields",
+						SQL:          tt.sql,
+						ResultStruct: "DuplicateRow",
+					}},
+				})
+				wantErr := "query DuplicateFields: " + tt.wantErr
+				if err == nil || !strings.Contains(err.Error(), wantErr) {
+					t.Fatalf("%s() error = %v, want %q", entrypoint.name, err, wantErr)
+				}
+			})
+		}
 	}
 }
 
