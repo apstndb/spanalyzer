@@ -11,7 +11,9 @@ The current implementation parses Spanner DDL with
 [`github.com/cloudspannerecosystem/memefish`](https://github.com/cloudspannerecosystem/memefish)
 and analyzes queries with
 [`github.com/goccy/go-googlesql`](https://github.com/goccy/go-googlesql).
-These are implementation details of the framework, not part of its contract.
+They are replaceable implementation details of the high-level `Analyzer` API.
+Experimental low-level escape hatches currently expose some of their types and
+are not a stable public contract.
 
 This repository was previously named `go-googlesql-spanner-poc`.
 
@@ -594,8 +596,8 @@ artifacts.
 - Proto and enum query outputs are converted back to Spanner row metadata when
   possible, including nested proto fields selected as values.
 - Property graph DDL registers node and edge tables, labels, and direct column
-  property definitions through the `go-googlesql` v0.2.0 `SimpleGraph*`
-  constructors. More advanced Spanner graph metadata, including arbitrary
+  property definitions through the `go-googlesql` `SimpleGraph*` constructors.
+  More advanced Spanner graph metadata, including arbitrary
   property expressions and dynamic labels/properties, is still limited.
 - Some Spanner-specific functions are registered locally because they are not
   included in the default `go-googlesql` builtin function set. This

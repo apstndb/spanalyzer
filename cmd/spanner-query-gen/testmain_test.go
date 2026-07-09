@@ -10,7 +10,7 @@ import (
 
 func TestMain(m *testing.M) {
 	// The query-gen CLI tests build many short-lived GoogleSQL frontend
-	// catalogs. go-googlesql v0.2.0 still has WASM finalizer timing issues, so
+	// catalogs. The WASM wrappers still have finalizer-timing constraints, so
 	// keep GC disabled for this test process just like the root analyzer tests.
 	oldGCPercent := debug.SetGCPercent(-1)
 	code := m.Run()

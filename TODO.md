@@ -42,8 +42,9 @@ architecture.
   dead textual-rewrite paths, avoid mutable per-analyzer `EXTERNAL_QUERY`
   prepared state where concurrent analysis can race, dedupe duplicate
   argument validation, implement or reject the full GoogleSQL string escape
-  set, and make ambiguous `ML.PREDICT` model fallback fail loudly when multiple
-  models are registered.
+  set, apply external-dataset registration atomically so a rejected schema
+  cannot leave a partially mutated live catalog, and make ambiguous
+  `ML.PREDICT` model fallback fail loudly when multiple models are registered.
 - [ ] **Unify proto descriptor and type-resolution passes.** Descriptor sets
   loaded from multiple files should dedupe by descriptor file name before
   building a `protodesc.Files` pool, and PROTO/ENUM fix-up should run over
@@ -67,16 +68,21 @@ architecture.
 - [ ] **Finish querygen and optparam structural cleanup.** Share the
   GenerateQueryCode/BuildQueryCodegenPlan resolution pipeline, dedupe table
   and index key-prefix predicate assembly, decide nullable ARRAY element
-  policy for query results, escape GoogleSQL string literals comprehensively,
-  make missing required-field diagnostics deterministic, dedupe generated
-  optional-builder labels when one param appears in multiple segments, and make
-  marker extraction reject strings/comments/orphaned residual markers
-  intentionally.
+  policy for query results, escape GoogleSQL string literals and identifiers
+  according to dialect rules, escape generated struct-tag values, introduce
+  one package-wide symbol
+  allocator for top-level and nested generated declarations, compile complete
+  generated packages in a collision/type matrix, make missing required-field
+  diagnostics deterministic, dedupe generated optional-builder labels when one
+  param appears in multiple segments, and make marker extraction reject
+  strings/comments/orphaned residual markers intentionally.
 - [ ] **Use tooling to prevent repeat classes of bugs.** Add targeted lints or
   tests for exhaustive `spannerpb.TypeCode` and AST-kind switches, align
-  spannerplan versions across modules once the local replace is gone, and
-  modernize developer probes such as semicolon-splitting DDL helpers so they
-  reuse existing parsers instead of ad hoc string handling.
+  spannerplan versions across modules once the local replace is gone, add a
+  focused GC-enabled subprocess or stress gate so suite-wide GC suppression
+  does not permanently hide WASM-wrapper lifecycle regressions, and modernize
+  developer probes such as semicolon-splitting DDL helpers so they reuse
+  existing parsers instead of ad hoc string handling.
 
 ## Analyzer And Catalog
 
@@ -177,8 +183,8 @@ are out of scope.
 
 - [x] **Validation approach for the spannerplan extension point:** validated
   on 2026-06-12. Two complementary hooks are prototyped on the local
-  `row-annotator` branch of a spannerplan checkout, consumed via an
-  uncommitted `replace` in `go.work`: value-replacing
+  `row-annotator` branch of a spannerplan checkout, consumed via a workspace
+  `replace` in `go.work`: value-replacing
   `queryplan.WithMetadataValueFunc` (plus a
   `reference.WithQueryPlanOptions` passthrough) for enriching fields the
   plan already renders, and additive
@@ -188,14 +194,18 @@ are out of scope.
   shard-range query renders `seekable_key_size: 2/2` under optimizer
   version 6 and `1/2` under version 8; the per-shard rewrite stays `2/2`
   on both).
-- [ ] **Upstream the spannerplan RowAnnotator hook and commit the dependent
-  code.** The `--annotate` implementation in cmd/spanner-query-gen compiles
-  only against the local spannerplan branch, so it stays uncommitted until
-  the hook is merged and tagged upstream; then drop the `go.work` replace,
-  bump the spannerplan requirement, and commit the feature plus this TODO
-  update together.
-- [x] **Seekability annotation in plan-report** (uncommitted until the
-  spannerplan hooks ship, see above). `plan-report --annotate seekability`
+- [ ] **Upstream the spannerplan RowAnnotator hook and restore standalone
+  module closure before publishing.** The locally committed `--annotate`
+  implementation compiles only through the sibling spannerplan `go.work`
+  replacement, and it also uses `plancontract.DerivedOperatorFamilies`, which
+  is absent from the `plancontract` version pinned by the command module.
+  Merge and tag both dependency changes, bump both command requirements, drop
+  the `go.work` replacement, and add `GOWORK=off` CI for every nested module.
+  Until then, a fresh checkout and the command module's published dependency
+  graph are not self-contained.
+- [x] **Seekability annotation in plan-report** (implemented locally;
+  publication is blocked by the dependency gate above).
+  `plan-report --annotate seekability`
   replaces the rendered `seekable_key_size` value in place with `k/N`,
   where N is the declared key column count of the scanned table or index
   from the catalog DDL, avoiding a duplicate row suffix. Declared keys
@@ -206,8 +216,9 @@ are out of scope.
   of a range-bounded seek, so both full scans and perfect point seeks
   (all-equality key conditions, literal or parameter) report 0 (see
   `research/spanner-query-plan-shape/QUERY_EXECUTION_OPERATORS_OBSERVATIONS.md`).
-- [x] **Operator-family annotations in rendered reports** (uncommitted, same
-  gate). `plan-report --annotate families` renders `{<family>[: <umbrella>...]}`
+- [x] **Operator-family annotations in rendered reports** (implemented
+  locally, same publication gate). `plan-report --annotate families` renders
+  `{<family>[: <umbrella>...]}`
   labels per relational row from plancontract normalization (for example
   `{full_sort: blocking_operator, explicit_sort}` — the single-valued
   concrete family left of the colon, derived umbrella attributes right of it
@@ -243,11 +254,11 @@ are out of scope.
 
 ## Dependencies And Infrastructure
 
-- [ ] **Migrate the cmd/spanner-query-gen and tools modules to testcontainers
-  v0.42+.** They pin the known-good spanemuboost v0.4.0 / testcontainers
-  v0.40.0 pair because v0.42 moved Docker types to github.com/moby/moby and
-  breaks the `WithConfigModifier` callback signature in
-  `integration_test.go`. Coordinate with a spanemuboost upgrade.
+- [ ] **Migrate the tools module to spanemuboost v0.4.4 and testcontainers
+  v0.42.0.** `cmd/spanner-query-gen` already uses that pair and the updated
+  `github.com/moby/moby` `WithConfigModifier` callback type. `tools` still pins
+  the known-good spanemuboost v0.4.0 / testcontainers v0.40.0 pair; coordinate
+  its migration with the developer probes that depend on it.
 - [ ] **Propose a runtime image/digest API in spanemuboost.** v0.4.0 exposes
   `RuntimePlatform` but no resolved image or digest, so plan-report backend
   identity stays `not_recorded` unless supplied manually.
