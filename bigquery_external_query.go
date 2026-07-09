@@ -144,7 +144,10 @@ func bigQueryTVFRelationFromSpannerRowType(typeFactory *googlesql.TypeFactory, r
 		return nil, fmt.Errorf("nil Spanner row type")
 	}
 	columns := make([]*googlesql.TVFSchemaColumn, 0, len(rowType.Fields))
-	for _, field := range rowType.Fields {
+	for i, field := range rowType.Fields {
+		if field == nil {
+			return nil, fmt.Errorf("row field %d is nil", i)
+		}
 		if _, err := bigQuerySQLTypeFromSpannerType(field.Type); err != nil {
 			return nil, fmt.Errorf("field %s: %w", field.Name, err)
 		}

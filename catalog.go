@@ -515,6 +515,7 @@ func (c *Catalog) renameTable(oldKey string, newName ObjectName, addSynonym *ast
 	if !ok {
 		return fmt.Errorf("table %s does not exist", oldKey)
 	}
+	oldName := table.Name
 	newKey := newName.String()
 	if oldKey != newKey {
 		if _, exists := c.Tables[newKey]; exists {
@@ -523,6 +524,11 @@ func (c *Catalog) renameTable(oldKey string, newName ObjectName, addSynonym *ast
 		delete(c.Tables, oldKey)
 		table.Name = newName
 		c.Tables[newKey] = table
+		for _, index := range c.Indexes {
+			if strings.EqualFold(index.TableName.String(), oldName.String()) {
+				index.TableName = newName
+			}
+		}
 	}
 	if addSynonym != nil {
 		table.Synonyms = []string{addSynonym.Name.Name}

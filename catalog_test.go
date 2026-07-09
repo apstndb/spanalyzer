@@ -85,6 +85,50 @@ RENAME TABLE Artists TO Performers;
 	}
 }
 
+func TestBuildSchemaCatalogRenameTableUpdatesIndexes(t *testing.T) {
+	const ddl = `
+CREATE TABLE Singers (
+  SingerId INT64 NOT NULL,
+  FirstName STRING(MAX),
+) PRIMARY KEY (SingerId);
+CREATE INDEX SingersByFirstName ON singers(FirstName);
+CREATE TABLE Albums (
+  AlbumId INT64 NOT NULL,
+  Title STRING(MAX),
+) PRIMARY KEY (AlbumId);
+CREATE INDEX AlbumsByTitle ON Albums(Title);
+ALTER TABLE Singers RENAME TO Artists;
+`
+	catalog, err := BuildSchemaCatalog("schema.sql", ddl)
+	if err != nil {
+		t.Fatalf("BuildSchemaCatalog() error = %v", err)
+	}
+	if catalog.Tables["Singers"] != nil {
+		t.Fatalf("Singers table should not remain after rename")
+	}
+	table := catalog.Tables["Artists"]
+	if table == nil {
+		t.Fatalf("Artists table was not created")
+	}
+	if got, want := table.Name.String(), "Artists"; got != want {
+		t.Fatalf("table.Name = %q, want %q", got, want)
+	}
+	index := catalog.Indexes["SingersByFirstName"]
+	if index == nil {
+		t.Fatalf("SingersByFirstName index was not created")
+	}
+	if got, want := index.TableName.String(), "Artists"; got != want {
+		t.Fatalf("index.TableName = %q, want %q", got, want)
+	}
+	unrelated := catalog.Indexes["AlbumsByTitle"]
+	if unrelated == nil {
+		t.Fatalf("AlbumsByTitle index was not created")
+	}
+	if got, want := unrelated.TableName.String(), "Albums"; got != want {
+		t.Fatalf("unrelated index.TableName = %q, want %q", got, want)
+	}
+}
+
 func TestBuildSchemaCatalogIndexes(t *testing.T) {
 	const ddl = `
 CREATE TABLE Singers (

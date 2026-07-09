@@ -963,7 +963,6 @@ CREATE SCHEMA mydataset;
 CREATE TABLE mydataset.mytable (x INT64);
 CREATE VIEW mydataset.myview AS SELECT * FROM mydataset.mytable;
 CREATE INDEX myindex ON mydataset.mytable(x);
-DROP TABLE mydataset.mytable;
 CREATE TABLE mydataset.mytable2 (y STRING);
 CREATE TABLE FUNCTION mydataset.myfunc(p INT64) AS SELECT p AS val;
 CREATE PROCEDURE mydataset.myproc() BEGIN SELECT 1; END;
@@ -972,6 +971,18 @@ EXPORT DATA OPTIONS(uri='gs://bucket/file') AS SELECT 1;
 	_, err := BuildBigQueryGoogleSQLCatalogFromDDL("bigquery.sql", ddl)
 	if err != nil {
 		t.Fatalf("BuildBigQueryGoogleSQLCatalogFromDDL() error = %v", err)
+	}
+}
+
+func TestBuildBigQueryGoogleSQLCatalogFromDDL_RejectsDrop(t *testing.T) {
+	const ddl = `
+CREATE SCHEMA mydataset;
+CREATE TABLE mydataset.mytable (x INT64);
+DROP TABLE mydataset.mytable;
+`
+	_, err := BuildBigQueryGoogleSQLCatalogFromDDL("bigquery.sql", ddl)
+	if err == nil || !strings.Contains(err.Error(), "BigQuery DROP DDL is not supported") {
+		t.Fatalf("BuildBigQueryGoogleSQLCatalogFromDDL() error = %v, want explicit DROP rejection", err)
 	}
 }
 

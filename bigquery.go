@@ -401,7 +401,11 @@ func (c *BigQueryGoogleSQLCatalog) applyDDLAnalyzerOutput(out *googlesql.Analyze
 	case *googlesql.ResolvedCreateIndexStmt:
 		return nil
 	case *googlesql.ResolvedDropStmt:
-		return nil
+		// The GoogleSQL SimpleCatalog API does not expose an atomic removal
+		// operation. Accepting DROP here would leave the previously registered
+		// table or view resolvable and make later statements analyze against a
+		// schema that no longer exists.
+		return fmt.Errorf("BigQuery DROP DDL is not supported until catalog removal is modeled")
 	default:
 		kind, _ := stmt.NodeKindString()
 		if kind == "" {

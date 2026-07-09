@@ -179,7 +179,10 @@ func TypeSpecFromSpannerPB(t *spannerpb.Type) (*TypeSpec, error) {
 		return &TypeSpec{Code: spannerpb.TypeCode_ARRAY, ArrayElement: elem}, nil
 	case spannerpb.TypeCode_STRUCT:
 		fields := make([]StructField, 0, len(t.GetStructType().GetFields()))
-		for _, field := range t.GetStructType().GetFields() {
+		for i, field := range t.GetStructType().GetFields() {
+			if field == nil {
+				return nil, fmt.Errorf("struct field %d is nil", i)
+			}
 			spec, err := TypeSpecFromSpannerPB(field.Type)
 			if err != nil {
 				return nil, err
