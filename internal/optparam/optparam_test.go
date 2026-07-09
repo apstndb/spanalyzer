@@ -1,6 +1,7 @@
 package optparam
 
 import (
+	"fmt"
 	"strings"
 	"testing"
 )
@@ -72,6 +73,22 @@ func TestEnumerateVariants_OmitWithoutMarker(t *testing.T) {
 	_, err := EnumerateVariants(sql, []Param{{Name: "p", Type: "INT64", Mode: ModeOmitWhenNull}})
 	if err == nil || !strings.Contains(err.Error(), "no marker was found") {
 		t.Fatalf("expected missing-marker error, got %v", err)
+	}
+}
+
+func TestEnumerateVariants_RejectsExcessiveProduct(t *testing.T) {
+	var sql strings.Builder
+	sql.WriteString("SELECT 1 WHERE TRUE")
+	params := make([]Param, 0, 13)
+	for i := range 13 {
+		name := fmt.Sprintf("p%d", i)
+		fmt.Fprintf(&sql, " /*?optional:%s*/ AND @%s IS NOT NULL /*?end*/", name, name)
+		params = append(params, Param{Name: name, Type: "INT64", Mode: ModeOmitWhenNull})
+	}
+
+	_, err := EnumerateVariants(sql.String(), params)
+	if err == nil || !strings.Contains(err.Error(), fmt.Sprintf("exceed limit %d", maxEnumeratedVariants)) {
+		t.Fatalf("EnumerateVariants() error = %v, want variant limit error", err)
 	}
 }
 

@@ -58,6 +58,17 @@ func TestVerifyBuilderRoundTrip_AllVariantsByteEqual(t *testing.T) {
 	}
 }
 
+func TestFormatPlanVariants_ShortDigestDoesNotPanic(t *testing.T) {
+	got := FormatPlanVariants([]PlanQueryVariant{{
+		Label:     "short",
+		SQL:       "SELECT 1",
+		SQLSHA256: "abc",
+	}})
+	if !strings.Contains(got, "sha256=abc") {
+		t.Fatalf("FormatPlanVariants() = %q, want short digest", got)
+	}
+}
+
 // TestEmitGoBuilder_CompiledOutputMatchesVariants writes the emitted Go
 // builder to a throwaway module, compiles it together with a generated
 // driver that calls the builder with every (present/absent) combination,

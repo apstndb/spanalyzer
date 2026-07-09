@@ -56,8 +56,12 @@ func sha256Hex(s string) string {
 func FormatPlanVariants(entries []PlanQueryVariant) string {
 	var s string
 	for i, e := range entries {
+		digest := e.SQLSHA256
+		if len(digest) > 12 {
+			digest = digest[:12]
+		}
 		s += fmt.Sprintf("variant[%d] %s (sha256=%s)\n  present=%v\n  absent=%v\n  sql=%q\n",
-			i, e.Label, e.SQLSHA256[:12], e.PresentParams, e.AbsentParams, e.SQL)
+			i, e.Label, digest, e.PresentParams, e.AbsentParams, e.SQL)
 	}
 	return s
 }

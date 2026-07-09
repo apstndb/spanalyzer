@@ -37,10 +37,16 @@ package optparam
 
 import (
 	"fmt"
+	"maps"
 	"regexp"
 	"sort"
 	"strings"
 )
+
+// maxEnumeratedVariants bounds the codegen-time Cartesian product. Each
+// variant is analyzed independently and retained in the generated plan, so an
+// unbounded product can exhaust memory long before integer overflow occurs.
+const maxEnumeratedVariants = 4096
 
 // Mode describes how an optional parameter shapes the generated SQL.
 type Mode int
@@ -201,7 +207,7 @@ func SegmentTemplate(sql string, params []Param) ([]Segment, error) {
 				return nil, fmt.Errorf("param %q (orderby): Default %q is not in Choices", name, p.Default)
 			}
 			seg.Text = body
-			seg.Choices = p.Choices
+			seg.Choices = maps.Clone(p.Choices)
 			seg.Default = p.Default
 		case SegFixed:
 			// null_is_null rewrites the body and merges into a fixed
@@ -359,13 +365,26 @@ func EnumerateVariants(sql string, params []Param) ([]Variant, error) {
 		choiceAxes = append(choiceAxes, choiceAxis{param: name, keys: keys})
 	}
 
-	presenceTotal := 1 << len(gateable)
+	presenceTotal := 1
+	for range gateable {
+		if presenceTotal > maxEnumeratedVariants/2 {
+			return nil, variantLimitError()
+		}
+		presenceTotal *= 2
+	}
 	choiceTotal := 1
 	for _, ax := range choiceAxes {
+		if choiceTotal > maxEnumeratedVariants/len(ax.keys) {
+			return nil, variantLimitError()
+		}
 		choiceTotal *= len(ax.keys)
 	}
+	if presenceTotal > maxEnumeratedVariants/choiceTotal {
+		return nil, variantLimitError()
+	}
+	total := presenceTotal * choiceTotal
 
-	variants := make([]Variant, 0, presenceTotal*choiceTotal)
+	variants := make([]Variant, 0, total)
 	for mask := range presenceTotal {
 		present := map[string]bool{}
 		for i, name := range gateable {
@@ -400,6 +419,10 @@ func EnumerateVariants(sql string, params []Param) ([]Variant, error) {
 		return variants[i].Key() < variants[j].Key()
 	})
 	return variants, nil
+}
+
+func variantLimitError() error {
+	return fmt.Errorf("optional parameter variants exceed limit %d; reduce optional parameters or ORDER BY choices", maxEnumeratedVariants)
 }
 
 // segmentAxes returns the sorted names of (gateable, choiceable)

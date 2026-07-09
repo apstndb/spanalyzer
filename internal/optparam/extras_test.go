@@ -201,6 +201,25 @@ func TestOrderBy_BuilderSwitch(t *testing.T) {
 	}
 }
 
+func TestSegmentTemplate_SnapshotsOrderByChoices(t *testing.T) {
+	choices := map[string]string{
+		"id_asc": "ORDER BY SingerId ASC",
+	}
+	segments, err := SegmentTemplate(
+		`SELECT SingerId FROM Singers /*?orderby:sort*/ ORDER BY SingerId /*?end*/`,
+		[]Param{{Name: "sort", Mode: ModeOrderByChoice, Choices: choices, Default: "id_asc"}},
+	)
+	if err != nil {
+		t.Fatalf("SegmentTemplate: %v", err)
+	}
+
+	choices["id_asc"] = "ORDER BY FirstName"
+	got := ComposeVariant(segments, Presence{Choices: map[string]string{"sort": "id_asc"}})
+	if !strings.Contains(got, "ORDER BY SingerId ASC") || strings.Contains(got, "ORDER BY FirstName") {
+		t.Fatalf("ComposeVariant() observed caller map mutation: %q", got)
+	}
+}
+
 // Cross-product: omit + orderby.
 
 func TestCrossProduct_OmitTimesOrderBy(t *testing.T) {
