@@ -22,18 +22,30 @@ func digest(s string) string {
 	return hex.EncodeToString(sum[:])
 }
 
+// sortedPlanNodes returns a shallow copy ordered by node index. The PlanNodes
+// slice and each node's child-link order remain unchanged.
+func sortedPlanNodes(plan *spannerpb.QueryPlan) []*spannerpb.PlanNode {
+	nodes := make([]*spannerpb.PlanNode, len(plan.GetPlanNodes()))
+	copy(nodes, plan.GetPlanNodes())
+	sort.Slice(nodes, func(i, j int) bool {
+		return nodes[i].GetIndex() < nodes[j].GetIndex()
+	})
+	return nodes
+}
+
 func NormalizeOperators(plan *spannerpb.QueryPlan) []Operator {
 	if plan == nil {
 		return nil
 	}
+	nodes := sortedPlanNodes(plan)
 	operatorContexts := operatorContexts(plan)
 	childrenByIndex := childrenByIndex(plan)
-	familyByIndex := make(map[int32]string, len(plan.GetPlanNodes()))
-	for _, node := range plan.GetPlanNodes() {
+	familyByIndex := make(map[int32]string, len(nodes))
+	for _, node := range nodes {
 		familyByIndex[node.GetIndex()] = nodeOperatorFamily(node, operatorContexts[node.GetIndex()])
 	}
-	out := make([]Operator, 0, len(plan.GetPlanNodes()))
-	for _, node := range plan.GetPlanNodes() {
+	out := make([]Operator, 0, len(nodes))
+	for _, node := range nodes {
 		childIndexes := operatorChildIndexes(node)
 		descendantIndexes := descendantIndexes(node.GetIndex(), childrenByIndex)
 		subtreeFamilyCounts := subtreeFamilyCounts(node.GetIndex(), descendantIndexes, familyByIndex)
@@ -68,7 +80,7 @@ func NormalizeOperatorEdges(plan *spannerpb.QueryPlan) []OperatorEdge {
 		return nil
 	}
 	edges := make([]OperatorEdge, 0)
-	for _, node := range plan.GetPlanNodes() {
+	for _, node := range sortedPlanNodes(plan) {
 		for _, link := range node.GetChildLinks() {
 			edges = append(edges, OperatorEdge{
 				ParentIndex: node.GetIndex(),
@@ -185,7 +197,7 @@ func OperatorTreeDigest(plan *spannerpb.QueryPlan) string {
 	}
 	operatorContexts := operatorContexts(plan)
 	var b strings.Builder
-	for _, node := range plan.GetPlanNodes() {
+	for _, node := range sortedPlanNodes(plan) {
 		fmt.Fprintf(&b, "%d|%s|%s|%s|%s|%s|%s|%t",
 			node.GetIndex(),
 			nodeOperatorFamily(node, operatorContexts[node.GetIndex()]),
