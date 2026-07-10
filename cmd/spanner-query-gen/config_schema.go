@@ -270,11 +270,11 @@ func planReportJSONSchema() map[string]interface{} {
 				"excluded":       arraySchemaAllowEmpty(map[string]interface{}{"$ref": "#/$defs/excluded_target"}),
 			}),
 			"excluded_target": objectSchema([]interface{}{"id", "query", "scope", "reason"}, map[string]interface{}{
-				"id":     targetIDSchema("Canonical target ID."),
-				"query":  stringSchema("Configured query name."),
-				"source": stringSchema("Configured or derived query source catalog."),
-				"scope":  planReportScopeSchema("Plan-report target scope."),
-				"reason": patternStringSchema(`^[a-z][a-z0-9_]*(\.[a-z0-9_]+)+$`, "Machine-readable namespaced exclusion reason."),
+				"id":      targetIDSchema("Canonical target ID."),
+				"query":   stringSchema("Configured query name."),
+				"catalog": stringSchema("Configured or derived query source catalog."),
+				"scope":   planReportScopeSchema("Plan-report target scope."),
+				"reason":  patternStringSchema(`^[a-z][a-z0-9_]*(\.[a-z0-9_]+)+$`, "Machine-readable namespaced exclusion reason."),
 			}),
 			"query": planReportQueryJSONSchema(),
 			"operator": objectSchema([]interface{}{"index", "display_name", "family", "child_indexes", "descendant_indexes", "subtree_family_counts"}, map[string]interface{}{
@@ -285,7 +285,7 @@ func planReportJSONSchema() map[string]interface{} {
 				"iterator_type":         stringSchema("Normalized iterator_type metadata."),
 				"scan_method":           stringSchema("Normalized scan_method metadata."),
 				"scan_format":           stringSchema("Normalized scan_format metadata."),
-				"scan_type":             stringSchema("Normalized scan_type metadata, for example table_scan, index_scan, batch_scan, or search_index_scan."),
+				"scan_type":             stringSchema("Normalized scan_type metadata, for example table_scan, index_scan, batch_scan, search_index_scan, or filter_scan."),
 				"scan_target":           stringSchema("Raw scan target metadata."),
 				"seekable_key_size":     stringSchema("Raw seekable key size metadata."),
 				"join_type":             stringSchema("Normalized join_type metadata."),
@@ -294,6 +294,8 @@ func planReportJSONSchema() map[string]interface{} {
 				"distribution_table":    stringSchema("Raw distribution_table metadata."),
 				"subquery_cluster_node": stringSchema("Raw subquery_cluster_node metadata."),
 				"spool_name":            stringSchema("Raw spool_name metadata for SpoolBuild and SpoolScan operators."),
+				"tvf_name":              stringSchema("Raw table-valued function name for TVF operators."),
+				"scalar_aggregate":      boolSchema("Whether a stream aggregate consumes its full input before emitting one scalar result."),
 				"full_scan":             boolSchema("Whether the PlanNode metadata marks a full scan."),
 				"child_indexes":         integerListSchema("Direct child PlanNode indexes from child_links."),
 				"descendant_indexes":    integerListSchema("Transitive child PlanNode indexes reachable through child_links."),
@@ -384,16 +386,17 @@ func planReportBackendIdentityJSONSchema() map[string]interface{} {
 }
 
 func planReportQueryJSONSchema() map[string]interface{} {
-	schema := objectSchema([]interface{}{"target_id", "name", "source", "kind", "status"}, map[string]interface{}{
+	schema := objectSchema([]interface{}{"target_id", "name", "catalog", "kind", "status"}, map[string]interface{}{
 		"target_id":               targetIDSchema("Canonical target ID, for example query/ListSingers or query/ExternalQuery#inner."),
 		"name":                    identifierSchema("Configured query name."),
-		"source":                  stringSchema("Spanner catalog used for analysis."),
+		"catalog":                 stringSchema("Spanner catalog used for analysis."),
 		"scope":                   planReportScopeSchema("Plan-report target scope."),
 		"kind":                    enumSchema([]interface{}{"sql", "table", "index", "external_query"}, "Configured query kind."),
 		"status":                  enumSchema([]interface{}{"ok", "skipped", "error"}, "Per-query analysis status. Status ok means plan fields are valid. Status error or skipped means only the input identity fields and error field are reliable; plan normalization fields must not be interpreted as a successful plan."),
 		"sql":                     stringSchema("Analyzed SQL text."),
 		"sql_sha256":              sha256Schema("SHA-256 of analyzed SQL bytes."),
 		"ddl_sha256":              sha256Schema("SHA-256 of resolved catalog DDL bytes."),
+		"proto_descriptor_sha256": sha256Schema("SHA-256 of the canonical merged proto descriptor set used for catalog setup."),
 		"operator_tree_sha256":    sha256Schema("SHA-256 of normalized operator tree digest input."),
 		"operator_families":       concreteOperatorFamilyListSchema("Concrete normalized operator families observed in normalized_operators[].family. Derived umbrella families such as explicit_sort are not listed here."),
 		"operator_family_counts":  completeOperatorFamilyIntegerMapSchema("Normalized operator family counts observed in the query plan. Contains every operator_family enum value, including derived umbrella families; absent families are represented by 0."),

@@ -173,11 +173,13 @@
         "filter",
         "filter_scan",
         "full_sort",
+        "generate_relation",
         "hash_aggregate",
         "hash_join",
         "join",
         "key_range_accumulator",
         "limit",
+        "local_split_union",
         "merge_join",
         "mini_batch_assign",
         "mini_batch_key_order",
@@ -199,6 +201,7 @@
         "spool_build",
         "spool_scan",
         "stream_aggregate",
+        "tvf",
         "union_all",
         "union_input",
         "unit_relation",
@@ -1099,6 +1102,11 @@
     "excluded_target": {
       "additionalProperties": false,
       "properties": {
+        "catalog": {
+          "description": "Configured or derived query source catalog.",
+          "minLength": 1,
+          "type": "string"
+        },
         "id": {
           "description": "Canonical target ID.",
           "minLength": 1,
@@ -1122,11 +1130,6 @@
             "query",
             "external_query.inner"
           ]
-        },
-        "source": {
-          "description": "Configured or derived query source catalog.",
-          "minLength": 1,
-          "type": "string"
         }
       },
       "required": [
@@ -1257,6 +1260,10 @@
           "minLength": 1,
           "type": "string"
         },
+        "scalar_aggregate": {
+          "description": "Whether a stream aggregate consumes its full input before emitting one scalar result.",
+          "type": "boolean"
+        },
         "scan_format": {
           "description": "Normalized scan_format metadata.",
           "minLength": 1,
@@ -1273,7 +1280,7 @@
           "type": "string"
         },
         "scan_type": {
-          "description": "Normalized scan_type metadata, for example table_scan, index_scan, batch_scan, or search_index_scan.",
+          "description": "Normalized scan_type metadata, for example table_scan, index_scan, batch_scan, search_index_scan, or filter_scan.",
           "minLength": 1,
           "type": "string"
         },
@@ -1426,6 +1433,11 @@
               "minimum": 0,
               "type": "integer"
             },
+            "generate_relation": {
+              "description": "Count for normalized operator family generate_relation.",
+              "minimum": 0,
+              "type": "integer"
+            },
             "hash_aggregate": {
               "description": "Count for normalized operator family hash_aggregate.",
               "minimum": 0,
@@ -1448,6 +1460,11 @@
             },
             "limit": {
               "description": "Count for normalized operator family limit.",
+              "minimum": 0,
+              "type": "integer"
+            },
+            "local_split_union": {
+              "description": "Count for normalized operator family local_split_union.",
               "minimum": 0,
               "type": "integer"
             },
@@ -1556,6 +1573,11 @@
               "minimum": 0,
               "type": "integer"
             },
+            "tvf": {
+              "description": "Count for normalized operator family tvf.",
+              "minimum": 0,
+              "type": "integer"
+            },
             "union_all": {
               "description": "Count for normalized operator family union_all.",
               "minimum": 0,
@@ -1609,11 +1631,13 @@
             "filter",
             "filter_scan",
             "full_sort",
+            "generate_relation",
             "hash_aggregate",
             "hash_join",
             "join",
             "key_range_accumulator",
             "limit",
+            "local_split_union",
             "merge_join",
             "mini_batch_assign",
             "mini_batch_key_order",
@@ -1635,6 +1659,7 @@
             "spool_build",
             "spool_scan",
             "stream_aggregate",
+            "tvf",
             "union_all",
             "union_input",
             "unit_relation",
@@ -1642,6 +1667,11 @@
             "unknown"
           ],
           "type": "object"
+        },
+        "tvf_name": {
+          "description": "Raw table-valued function name for TVF operators.",
+          "minLength": 1,
+          "type": "string"
         }
       },
       "required": [
@@ -1713,11 +1743,13 @@
         "filter",
         "filter_scan",
         "full_sort",
+        "generate_relation",
         "hash_aggregate",
         "hash_join",
         "join",
         "key_range_accumulator",
         "limit",
+        "local_split_union",
         "merge_join",
         "mini_batch_assign",
         "mini_batch_key_order",
@@ -1739,6 +1771,7 @@
         "spool_build",
         "spool_scan",
         "stream_aggregate",
+        "tvf",
         "union_all",
         "union_input",
         "unit_relation",
@@ -2003,6 +2036,11 @@
         }
       ],
       "properties": {
+        "catalog": {
+          "description": "Spanner catalog used for analysis.",
+          "minLength": 1,
+          "type": "string"
+        },
         "classification_warnings": {
           "items": {
             "$ref": "#/$defs/diagnostic"
@@ -2192,6 +2230,11 @@
               "minimum": 0,
               "type": "integer"
             },
+            "generate_relation": {
+              "description": "Count for normalized operator family generate_relation.",
+              "minimum": 0,
+              "type": "integer"
+            },
             "hash_aggregate": {
               "description": "Count for normalized operator family hash_aggregate.",
               "minimum": 0,
@@ -2214,6 +2257,11 @@
             },
             "limit": {
               "description": "Count for normalized operator family limit.",
+              "minimum": 0,
+              "type": "integer"
+            },
+            "local_split_union": {
+              "description": "Count for normalized operator family local_split_union.",
               "minimum": 0,
               "type": "integer"
             },
@@ -2322,6 +2370,11 @@
               "minimum": 0,
               "type": "integer"
             },
+            "tvf": {
+              "description": "Count for normalized operator family tvf.",
+              "minimum": 0,
+              "type": "integer"
+            },
             "union_all": {
               "description": "Count for normalized operator family union_all.",
               "minimum": 0,
@@ -2375,11 +2428,13 @@
             "filter",
             "filter_scan",
             "full_sort",
+            "generate_relation",
             "hash_aggregate",
             "hash_join",
             "join",
             "key_range_accumulator",
             "limit",
+            "local_split_union",
             "merge_join",
             "mini_batch_assign",
             "mini_batch_key_order",
@@ -2401,6 +2456,7 @@
             "spool_build",
             "spool_scan",
             "stream_aggregate",
+            "tvf",
             "union_all",
             "union_input",
             "unit_relation",
@@ -2433,17 +2489,18 @@
           "type": "array",
           "uniqueItems": true
         },
+        "proto_descriptor_sha256": {
+          "description": "SHA-256 of the canonical merged proto descriptor set used for catalog setup.",
+          "minLength": 1,
+          "pattern": "^[a-f0-9]{64}$",
+          "type": "string"
+        },
         "scope": {
           "description": "Plan-report target scope.",
           "enum": [
             "query",
             "external_query.inner"
           ]
-        },
-        "source": {
-          "description": "Spanner catalog used for analysis.",
-          "minLength": 1,
-          "type": "string"
         },
         "sql": {
           "description": "Analyzed SQL text.",
@@ -2474,7 +2531,7 @@
       "required": [
         "target_id",
         "name",
-        "source",
+        "catalog",
         "kind",
         "status"
       ],

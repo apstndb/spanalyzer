@@ -137,6 +137,35 @@ func TestPlanReportSeekableKeyValuesResolveTargetFromSubtree(t *testing.T) {
 	}
 }
 
+func TestPlanReportSeekableKeyValuesSkipAmbiguousMultiScanSubtree(t *testing.T) {
+	plan := &spannerpb.QueryPlan{PlanNodes: []*spannerpb.PlanNode{
+		{
+			Index:       0,
+			Kind:        spannerpb.PlanNode_RELATIONAL,
+			DisplayName: "Filter Scan",
+			Metadata: mustStructPB(t, map[string]interface{}{
+				"seekable_key_size": "1",
+			}),
+			ChildLinks: []*spannerpb.PlanNode_ChildLink{{ChildIndex: 1}, {ChildIndex: 2}},
+		},
+		{
+			Index:       1,
+			Kind:        spannerpb.PlanNode_RELATIONAL,
+			DisplayName: "Scan",
+			Metadata:    mustStructPB(t, map[string]interface{}{"scan_target": "Orders"}),
+		},
+		{
+			Index:       2,
+			Kind:        spannerpb.PlanNode_RELATIONAL,
+			DisplayName: "Scan",
+			Metadata:    mustStructPB(t, map[string]interface{}{"scan_target": "OrdersByDate"}),
+		},
+	}}
+	if got := planReportSeekableKeyValues(plan, map[string]int{"Orders": 1, "OrdersByDate": 2}); len(got) != 0 {
+		t.Fatalf("planReportSeekableKeyValues() = %v, want no annotation for an ambiguous multi-scan subtree", got)
+	}
+}
+
 // TestPlanReportSeekableKeyValuesSkipPointSeekZero pins that the ambiguous
 // seekable_key_size value 0 is not annotated: it is reported both for plain
 // full scans and for pure point seeks (all-equality key conditions), so
@@ -238,7 +267,7 @@ func TestPlanReportFamilyAnnotations(t *testing.T) {
 	plan := seekabilityTestPlan(t)
 	operators := planReportOperators(plan)
 	annotations := planReportFamilyAnnotations(operators)
-	if got, want := annotations[0], "{scan}"; got != want {
+	if got, want := annotations[0], "{filter_scan}"; got != want {
 		t.Errorf("annotations[0] = %q, want %q", got, want)
 	}
 	if got, want := annotations[1], "{scan}"; got != want {
@@ -256,12 +285,14 @@ func TestPlanReportFamilyAnnotationsIncludeUmbrellaFamilies(t *testing.T) {
 		{Index: 1, Family: "minor_sort"},
 		{Index: 2, Family: "hash_join"},
 		{Index: 3, Family: "stream_aggregate"},
+		{Index: 4, Family: "stream_aggregate", ScalarAggregate: true},
 	})
 	want := map[int32]string{
 		0: "{full_sort: blocking_operator, explicit_sort}",
 		1: "{minor_sort: explicit_sort}",
 		2: "{hash_join: blocking_operator}",
 		3: "{stream_aggregate}",
+		4: "{stream_aggregate: blocking_operator}",
 	}
 	if !reflect.DeepEqual(annotations, want) {
 		t.Errorf("planReportFamilyAnnotations() = %v, want %v", annotations, want)
@@ -291,7 +322,7 @@ func TestPlanReportRenderAnnotationOptionsRenderedRow(t *testing.T) {
 	if err != nil {
 		t.Fatalf("RenderTreeTableWithOptions() error = %v", err)
 	}
-	if want := "Filter Scan (seekable_key_size: 1/2) {scan}"; !strings.Contains(rendered, want) {
+	if want := "Filter Scan (seekable_key_size: 1/2) {filter_scan}"; !strings.Contains(rendered, want) {
 		t.Errorf("rendered output does not contain %q:\n%s", want, rendered)
 	}
 	if strings.Contains(rendered, "seekable_key_size: 1)") {

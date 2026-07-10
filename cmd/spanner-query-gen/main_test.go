@@ -1013,6 +1013,12 @@ func TestPlanReportSchemaSeparatesConcreteAndDerivedOperatorFamilies(t *testing.
 	if _, ok := operatorProperties["spool_name"]; !ok {
 		t.Fatalf("operator schema missing spool_name metadata property")
 	}
+	if _, ok := operatorProperties["scalar_aggregate"]; !ok {
+		t.Fatal("operator schema missing scalar_aggregate metadata property")
+	}
+	if _, ok := operatorProperties["tvf_name"]; !ok {
+		t.Fatal("operator schema missing tvf_name metadata property")
+	}
 	query := defs["query"].(map[string]interface{})
 	queryProperties := query["properties"].(map[string]interface{})
 	operatorFamilies := queryProperties["operator_families"].(map[string]interface{})
@@ -1027,6 +1033,15 @@ func TestPlanReportSchemaTargetIDsAndScopesAreCanonical(t *testing.T) {
 	defs := schema["$defs"].(map[string]interface{})
 	query := defs["query"].(map[string]interface{})
 	queryProperties := query["properties"].(map[string]interface{})
+	if _, ok := queryProperties["catalog"]; !ok {
+		t.Fatal("query schema missing catalog property")
+	}
+	if _, ok := queryProperties["source"]; ok {
+		t.Fatal("query schema exposes source, but serialized reports use catalog")
+	}
+	if required := interfaceStrings(query["required"].([]interface{})); !slices.Contains(required, "catalog") {
+		t.Fatalf("query required fields = %v, want catalog", required)
+	}
 	queryTargetID := queryProperties["target_id"].(map[string]interface{})
 	if got, want := queryTargetID["pattern"], planContractTargetIDPattern; got != want {
 		t.Fatalf("query.target_id pattern = %v, want %v", got, want)
@@ -1051,6 +1066,12 @@ func TestPlanReportSchemaTargetIDsAndScopesAreCanonical(t *testing.T) {
 	}
 	excluded := defs["excluded_target"].(map[string]interface{})
 	excludedProperties := excluded["properties"].(map[string]interface{})
+	if _, ok := excludedProperties["catalog"]; !ok {
+		t.Fatal("excluded_target schema missing catalog property")
+	}
+	if _, ok := excludedProperties["source"]; ok {
+		t.Fatal("excluded_target schema exposes source, but serialized reports use catalog")
+	}
 	excludedID := excludedProperties["id"].(map[string]interface{})
 	if got, want := excludedID["pattern"], planContractTargetIDPattern; got != want {
 		t.Fatalf("excluded_target.id pattern = %v, want %v", got, want)
@@ -1062,6 +1083,55 @@ func TestPlanReportSchemaTargetIDsAndScopesAreCanonical(t *testing.T) {
 	excludedReason := excludedProperties["reason"].(map[string]interface{})
 	if got, want := excludedReason["pattern"], `^[a-z][a-z0-9_]*(\.[a-z0-9_]+)+$`; got != want {
 		t.Fatalf("excluded_target.reason pattern = %v, want %v", got, want)
+	}
+}
+
+func TestPlanReportSchemaCoversSerializedQueryKeys(t *testing.T) {
+	schema := unmarshalSchemaForTest(t, planReportSchemaBytes)
+	querySchema := schema["$defs"].(map[string]interface{})["query"].(map[string]interface{})
+	properties := querySchema["properties"].(map[string]interface{})
+	query := planReportQuery{
+		TargetID:              "query/ListSingers",
+		Name:                  "ListSingers",
+		Catalog:               "app",
+		Scope:                 "query",
+		Kind:                  "sql",
+		Status:                "ok",
+		SQL:                   "SELECT SingerId FROM Singers",
+		SQLSHA256:             planReportDigest("SELECT SingerId FROM Singers"),
+		DDLSHA256:             planReportDigest("CREATE TABLE Singers"),
+		ProtoDescriptorSHA256: planReportDigest("descriptors"),
+		OperatorTreeSHA256:    planReportDigest("tree"),
+		OperatorFamilies:      []string{"scan"},
+		OperatorFamilyCounts:  planReportOperatorFamilyCounts([]planReportOperator{{Family: "scan"}}),
+		NormalizedOperators: []planReportOperator{{
+			Index:               0,
+			DisplayName:         "Scan",
+			Family:              "scan",
+			ChildIndexes:        []int32{},
+			DescendantIndexes:   []int32{},
+			SubtreeFamilyCounts: planReportOperatorFamilyCounts([]planReportOperator{{Family: "scan"}}),
+		}},
+		OperatorEdges: []planReportOperatorEdge{},
+		Plan:          "Scan",
+	}
+	data, err := json.Marshal(query)
+	if err != nil {
+		t.Fatalf("json.Marshal(planReportQuery) error = %v", err)
+	}
+	var serialized map[string]interface{}
+	if err := json.Unmarshal(data, &serialized); err != nil {
+		t.Fatalf("json.Unmarshal(planReportQuery) error = %v", err)
+	}
+	for key := range serialized {
+		if _, ok := properties[key]; !ok {
+			t.Errorf("serialized query key %q is not declared by the plan-report schema", key)
+		}
+	}
+	for _, required := range interfaceStrings(querySchema["required"].([]interface{})) {
+		if _, ok := serialized[required]; !ok {
+			t.Errorf("serialized query is missing schema-required key %q", required)
+		}
 	}
 }
 
@@ -1670,34 +1740,105 @@ queries:
 }
 
 func TestPlanReportOptimizerPinningWarnings(t *testing.T) {
-	report := planReport{
-		Optimizer: planReportOptimizer{
-			Requested: planReportOptimizerEnvironment{
+	tests := []struct {
+		name               string
+		optimizer          planReportOptimizerEnvironment
+		queryNotPinned     bool
+		wantWarningsJoined string
+	}{
+		{
+			name: "missing pins",
+			optimizer: planReportOptimizerEnvironment{
 				Version:           "not_pinned",
 				StatisticsPackage: "not_pinned",
 			},
+			queryNotPinned:     true,
+			wantWarningsJoined: "optimizer_not_pinned,statistics_package_not_pinned,query_optimizer_not_pinned",
 		},
-		Queries: []planReportQuery{{
-			Name:               "ListSingers",
-			OptimizerNotPinned: true,
-		}},
+		{
+			name: "moving aliases",
+			optimizer: planReportOptimizerEnvironment{
+				Version:           "latest_version",
+				StatisticsPackage: "latest",
+			},
+			queryNotPinned:     true,
+			wantWarningsJoined: "optimizer_not_pinned,statistics_package_not_pinned,query_optimizer_not_pinned",
+		},
+		{
+			name: "fixed values",
+			optimizer: planReportOptimizerEnvironment{
+				Version:           "8",
+				StatisticsPackage: "auto_20260701_12_00_00UTC",
+			},
+		},
 	}
-	if got, want := strings.Join(planReportOptimizerPinningWarnings(report), ","), "optimizer_not_pinned,statistics_package_not_pinned,query_optimizer_not_pinned"; got != want {
-		t.Fatalf("planReportOptimizerPinningWarnings() = %q, want %q", got, want)
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			report := planReport{
+				Optimizer: planReportOptimizer{Requested: test.optimizer},
+				Queries: []planReportQuery{{
+					Name:               "ListSingers",
+					OptimizerNotPinned: test.queryNotPinned,
+				}},
+			}
+			if got := strings.Join(planReportOptimizerPinningWarnings(report), ","); got != test.wantWarningsJoined {
+				t.Fatalf("planReportOptimizerPinningWarnings() = %q, want %q", got, test.wantWarningsJoined)
+			}
+		})
 	}
-	report.Optimizer = planReportOptimizer{Requested: planReportOptimizerEnvironment{Version: "8", StatisticsPackage: "latest"}}
-	report.Queries[0].OptimizerNotPinned = false
-	if got := planReportOptimizerPinningWarnings(report); len(got) != 0 {
-		t.Fatalf("planReportOptimizerPinningWarnings() = %q, want no warnings", got)
+}
+
+func TestPlanReportOptimizerEnvironmentPinned(t *testing.T) {
+	tests := []struct {
+		name      string
+		optimizer planReportOptimizerEnvironment
+		want      bool
+	}{
+		{
+			name: "fixed values",
+			optimizer: planReportOptimizerEnvironment{
+				Version:           "8",
+				StatisticsPackage: "auto_20260701_12_00_00UTC",
+			},
+			want: true,
+		},
+		{
+			name: "latest optimizer version",
+			optimizer: planReportOptimizerEnvironment{
+				Version:           "latest",
+				StatisticsPackage: "auto_20260701_12_00_00UTC",
+			},
+		},
+		{
+			name: "default optimizer version",
+			optimizer: planReportOptimizerEnvironment{
+				Version:           " DEFAULT_VERSION ",
+				StatisticsPackage: "auto_20260701_12_00_00UTC",
+			},
+		},
+		{
+			name: "latest statistics package",
+			optimizer: planReportOptimizerEnvironment{
+				Version:           "8",
+				StatisticsPackage: " LATEST ",
+			},
+		},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			if got := planReportOptimizerEnvironmentPinned(test.optimizer); got != test.want {
+				t.Fatalf("planReportOptimizerEnvironmentPinned(%+v) = %t, want %t", test.optimizer, got, test.want)
+			}
+		})
 	}
 }
 
 func TestDefaultPlanReportNormalizationCELInputDefaults(t *testing.T) {
 	normalization := defaultPlanReportNormalization()
-	if got, want := normalization.OperatorTreeVersion, "v1alpha"; got != want {
+	if got, want := normalization.OperatorTreeVersion, "v1alpha.2"; got != want {
 		t.Fatalf("operator tree version = %q, want %q", got, want)
 	}
-	if got, want := normalization.OperatorFamilyMappingVersion, "v1alpha"; got != want {
+	if got, want := normalization.OperatorFamilyMappingVersion, "v1alpha.2"; got != want {
 		t.Fatalf("operator family mapping version = %q, want %q", got, want)
 	}
 	if got, want := normalization.CELInputDefaults.OptionalString, ""; got != want {
@@ -2147,7 +2288,7 @@ func TestPlanReportContracts(t *testing.T) {
 	if got, want := planContractMatchedOperatorIndexes(unknown), []int32{0}; !reflect.DeepEqual(got, want) {
 		t.Fatalf("unknown aggregate matched operator indexes = %v, want %v", got, want)
 	}
-	if got, want := strings.Join(report.ContractSummary.EnvironmentWarnings, ","), "operator_classification_unknown"; got != want {
+	if got, want := strings.Join(report.ContractSummary.EnvironmentWarnings, ","), "optimizer_not_pinned,statistics_package_not_pinned,operator_classification_unknown"; got != want {
 		t.Fatalf("contract summary environment warnings = %q, want %q", got, want)
 	}
 }
@@ -2305,7 +2446,7 @@ func TestPlanReportJoinContractsFailOnUnknownClassification(t *testing.T) {
 	if generic.FailureKind != planContractFailureKindViolation || generic.DiagnosticID != "" {
 		t.Fatalf("generic join forbid result = %+v, want regular violation", generic)
 	}
-	if got, want := strings.Join(report.ContractSummary.EnvironmentWarnings, ","), "operator_classification_unknown"; got != want {
+	if got, want := strings.Join(report.ContractSummary.EnvironmentWarnings, ","), "optimizer_not_pinned,statistics_package_not_pinned,operator_classification_unknown"; got != want {
 		t.Fatalf("contract summary environment warnings = %q, want %q", got, want)
 	}
 }
@@ -2980,7 +3121,7 @@ func TestPlanContractUnknownFamilyCanBeForbiddenDirectly(t *testing.T) {
 	if got, want := planContractMatchedOperatorIndexes(result), []int32{0}; !reflect.DeepEqual(got, want) {
 		t.Fatalf("direct unknown matched operator indexes = %v, want %v", got, want)
 	}
-	if got, want := strings.Join(report.ContractSummary.EnvironmentWarnings, ","), "operator_classification_unknown"; got != want {
+	if got, want := strings.Join(report.ContractSummary.EnvironmentWarnings, ","), "optimizer_not_pinned,statistics_package_not_pinned,operator_classification_unknown"; got != want {
 		t.Fatalf("contract summary environment warnings = %q, want %q", got, want)
 	}
 }
@@ -4311,7 +4452,7 @@ func TestBuildPlanReportNoTargets(t *testing.T) {
 	if got, want := report.BackendIdentity.Version, "not_recorded"; got != want {
 		t.Fatalf("plan-report backend version = %q, want %q", got, want)
 	}
-	if got, want := report.Normalization.OperatorTreeVersion, "v1alpha"; got != want {
+	if got, want := report.Normalization.OperatorTreeVersion, "v1alpha.2"; got != want {
 		t.Fatalf("plan-report operator tree version = %q, want %q", got, want)
 	}
 	if got, want := report.Optimizer.Requested.Version, "8"; got != want {
@@ -4507,6 +4648,7 @@ func TestPlanReportParamValues(t *testing.T) {
 		{Name: "id", Type: "INT64"},
 		{Name: "amount", Type: "NUMERIC"},
 		{Name: "names", Type: "ARRAY<STRING>"},
+		{Name: "sort", Optional: "orderby_choice", Default: "name", Choices: map[string]string{"name": "ORDER BY Name"}},
 	})
 	if err != nil {
 		t.Fatalf("planReportParamValues() error = %v", err)
@@ -4526,6 +4668,24 @@ func TestPlanReportParamValues(t *testing.T) {
 	}
 	if got, want := strings.Join(names, ","), "value"; got != want {
 		t.Fatalf("names param = %q, want %q", got, want)
+	}
+	if _, ok := values["sort"]; ok {
+		t.Fatalf("orderby_choice pseudo-param was bound: %v", values)
+	}
+}
+
+func TestPlanReportParamValuesOnlyOrderByChoiceReturnsNil(t *testing.T) {
+	values, err := planReportParamValues([]querygen.QueryCodegenParam{{
+		Name:     "sort",
+		Optional: "ORDERBY_CHOICE",
+		Default:  "name",
+		Choices:  map[string]string{"name": "ORDER BY Name"},
+	}})
+	if err != nil {
+		t.Fatalf("planReportParamValues() error = %v", err)
+	}
+	if values != nil {
+		t.Fatalf("planReportParamValues() = %v, want nil", values)
 	}
 }
 

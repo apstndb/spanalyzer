@@ -27,6 +27,7 @@ import (
 	"github.com/apstndb/spanemuboost"
 	"github.com/apstndb/spannerplan/plantree/reference"
 	"github.com/cloudspannerecosystem/memefish"
+	"google.golang.org/protobuf/proto"
 )
 
 func runPlanReport(args []string, stdout, stderr io.Writer) error {
@@ -163,6 +164,8 @@ const (
 	planContractStatusNotEvaluated = plancontract.StatusNotEvaluated
 
 	planReportVersionV1Alpha        = "v1alpha-plan-report-v1"
+	planReportOperatorTreeVersion   = "v1alpha.2"
+	planReportFamilyMappingVersion  = "v1alpha.2"
 	planContractFileVersionV1Alpha  = plancontract.FileVersionV1Alpha
 	planContractEvaluatorVersionV1  = plancontract.EvaluatorVersionV1
 	planContractStabilityNormalized = plancontract.StabilityNormalized
@@ -253,48 +256,50 @@ type planReportExcludedTarget struct {
 }
 
 type planReportQuery struct {
-	TargetID             string                   `json:"target_id" yaml:"target_id"`
-	Name                 string                   `json:"name" yaml:"name"`
-	Catalog              string                   `json:"catalog" yaml:"catalog"`
-	Scope                string                   `json:"scope,omitempty" yaml:"scope,omitempty"`
-	Kind                 string                   `json:"kind" yaml:"kind"`
-	Status               string                   `json:"status" yaml:"status"`
-	SQL                  string                   `json:"sql,omitempty" yaml:"sql,omitempty"`
-	SQLSHA256            string                   `json:"sql_sha256,omitempty" yaml:"sql_sha256,omitempty"`
-	DDLSHA256            string                   `json:"ddl_sha256,omitempty" yaml:"ddl_sha256,omitempty"`
-	OperatorTreeSHA256   string                   `json:"operator_tree_sha256,omitempty" yaml:"operator_tree_sha256,omitempty"`
-	OperatorFamilies     []string                 `json:"operator_families,omitempty" yaml:"operator_families,omitempty"`
-	OperatorFamilyCounts map[string]int           `json:"operator_family_counts,omitempty" yaml:"operator_family_counts,omitempty"`
-	NormalizedOperators  []planReportOperator     `json:"normalized_operators,omitempty" yaml:"normalized_operators,omitempty"`
-	OperatorEdges        []planReportOperatorEdge `json:"operator_edges,omitempty" yaml:"operator_edges,omitempty"`
-	Plan                 string                   `json:"plan,omitempty" yaml:"plan,omitempty"`
-	Error                string                   `json:"error,omitempty" yaml:"error,omitempty"`
-	OptimizerNotPinned   bool                     `json:"optimizer_not_pinned,omitempty" yaml:"optimizer_not_pinned,omitempty"`
-	PlanEnvironmentNotes []string                 `json:"plan_environment_notes,omitempty" yaml:"plan_environment_notes,omitempty"`
-	ClassificationNotes  []planReportDiagnostic   `json:"classification_warnings,omitempty" yaml:"classification_warnings,omitempty"`
-	RawPlan              *spannerpb.QueryPlan     `json:"-" yaml:"-"`
+	TargetID              string                   `json:"target_id" yaml:"target_id"`
+	Name                  string                   `json:"name" yaml:"name"`
+	Catalog               string                   `json:"catalog" yaml:"catalog"`
+	Scope                 string                   `json:"scope,omitempty" yaml:"scope,omitempty"`
+	Kind                  string                   `json:"kind" yaml:"kind"`
+	Status                string                   `json:"status" yaml:"status"`
+	SQL                   string                   `json:"sql,omitempty" yaml:"sql,omitempty"`
+	SQLSHA256             string                   `json:"sql_sha256,omitempty" yaml:"sql_sha256,omitempty"`
+	DDLSHA256             string                   `json:"ddl_sha256,omitempty" yaml:"ddl_sha256,omitempty"`
+	ProtoDescriptorSHA256 string                   `json:"proto_descriptor_sha256,omitempty" yaml:"proto_descriptor_sha256,omitempty"`
+	OperatorTreeSHA256    string                   `json:"operator_tree_sha256,omitempty" yaml:"operator_tree_sha256,omitempty"`
+	OperatorFamilies      []string                 `json:"operator_families,omitempty" yaml:"operator_families,omitempty"`
+	OperatorFamilyCounts  map[string]int           `json:"operator_family_counts,omitempty" yaml:"operator_family_counts,omitempty"`
+	NormalizedOperators   []planReportOperator     `json:"normalized_operators,omitempty" yaml:"normalized_operators,omitempty"`
+	OperatorEdges         []planReportOperatorEdge `json:"operator_edges,omitempty" yaml:"operator_edges,omitempty"`
+	Plan                  string                   `json:"plan,omitempty" yaml:"plan,omitempty"`
+	Error                 string                   `json:"error,omitempty" yaml:"error,omitempty"`
+	OptimizerNotPinned    bool                     `json:"optimizer_not_pinned,omitempty" yaml:"optimizer_not_pinned,omitempty"`
+	PlanEnvironmentNotes  []string                 `json:"plan_environment_notes,omitempty" yaml:"plan_environment_notes,omitempty"`
+	ClassificationNotes   []planReportDiagnostic   `json:"classification_warnings,omitempty" yaml:"classification_warnings,omitempty"`
+	RawPlan               *spannerpb.QueryPlan     `json:"-" yaml:"-"`
 }
 
 type serializedPlanReportQuery struct {
-	TargetID             string                 `json:"target_id" yaml:"target_id"`
-	Name                 string                 `json:"name" yaml:"name"`
-	Catalog              string                 `json:"catalog" yaml:"catalog"`
-	Scope                string                 `json:"scope,omitempty" yaml:"scope,omitempty"`
-	Kind                 string                 `json:"kind" yaml:"kind"`
-	Status               string                 `json:"status" yaml:"status"`
-	SQL                  string                 `json:"sql,omitempty" yaml:"sql,omitempty"`
-	SQLSHA256            string                 `json:"sql_sha256,omitempty" yaml:"sql_sha256,omitempty"`
-	DDLSHA256            string                 `json:"ddl_sha256,omitempty" yaml:"ddl_sha256,omitempty"`
-	OperatorTreeSHA256   string                 `json:"operator_tree_sha256,omitempty" yaml:"operator_tree_sha256,omitempty"`
-	OperatorFamilies     []string               `json:"operator_families,omitempty" yaml:"operator_families,omitempty"`
-	OperatorFamilyCounts map[string]int         `json:"operator_family_counts,omitempty" yaml:"operator_family_counts,omitempty"`
-	NormalizedOperators  []planReportOperator   `json:"normalized_operators,omitempty" yaml:"normalized_operators,omitempty"`
-	OperatorEdges        interface{}            `json:"operator_edges,omitempty" yaml:"operator_edges,omitempty"`
-	Plan                 string                 `json:"plan,omitempty" yaml:"plan,omitempty"`
-	Error                string                 `json:"error,omitempty" yaml:"error,omitempty"`
-	OptimizerNotPinned   bool                   `json:"optimizer_not_pinned,omitempty" yaml:"optimizer_not_pinned,omitempty"`
-	PlanEnvironmentNotes []string               `json:"plan_environment_notes,omitempty" yaml:"plan_environment_notes,omitempty"`
-	ClassificationNotes  []planReportDiagnostic `json:"classification_warnings,omitempty" yaml:"classification_warnings,omitempty"`
+	TargetID              string                 `json:"target_id" yaml:"target_id"`
+	Name                  string                 `json:"name" yaml:"name"`
+	Catalog               string                 `json:"catalog" yaml:"catalog"`
+	Scope                 string                 `json:"scope,omitempty" yaml:"scope,omitempty"`
+	Kind                  string                 `json:"kind" yaml:"kind"`
+	Status                string                 `json:"status" yaml:"status"`
+	SQL                   string                 `json:"sql,omitempty" yaml:"sql,omitempty"`
+	SQLSHA256             string                 `json:"sql_sha256,omitempty" yaml:"sql_sha256,omitempty"`
+	DDLSHA256             string                 `json:"ddl_sha256,omitempty" yaml:"ddl_sha256,omitempty"`
+	ProtoDescriptorSHA256 string                 `json:"proto_descriptor_sha256,omitempty" yaml:"proto_descriptor_sha256,omitempty"`
+	OperatorTreeSHA256    string                 `json:"operator_tree_sha256,omitempty" yaml:"operator_tree_sha256,omitempty"`
+	OperatorFamilies      []string               `json:"operator_families,omitempty" yaml:"operator_families,omitempty"`
+	OperatorFamilyCounts  map[string]int         `json:"operator_family_counts,omitempty" yaml:"operator_family_counts,omitempty"`
+	NormalizedOperators   []planReportOperator   `json:"normalized_operators,omitempty" yaml:"normalized_operators,omitempty"`
+	OperatorEdges         interface{}            `json:"operator_edges,omitempty" yaml:"operator_edges,omitempty"`
+	Plan                  string                 `json:"plan,omitempty" yaml:"plan,omitempty"`
+	Error                 string                 `json:"error,omitempty" yaml:"error,omitempty"`
+	OptimizerNotPinned    bool                   `json:"optimizer_not_pinned,omitempty" yaml:"optimizer_not_pinned,omitempty"`
+	PlanEnvironmentNotes  []string               `json:"plan_environment_notes,omitempty" yaml:"plan_environment_notes,omitempty"`
+	ClassificationNotes   []planReportDiagnostic `json:"classification_warnings,omitempty" yaml:"classification_warnings,omitempty"`
 }
 
 func (q planReportQuery) MarshalJSON() ([]byte, error) {
@@ -315,25 +320,26 @@ func (q planReportQuery) serialized() serializedPlanReportQuery {
 		operatorEdges = edges
 	}
 	return serializedPlanReportQuery{
-		TargetID:             q.TargetID,
-		Name:                 q.Name,
-		Catalog:              q.Catalog,
-		Scope:                q.Scope,
-		Kind:                 q.Kind,
-		Status:               q.Status,
-		SQL:                  q.SQL,
-		SQLSHA256:            q.SQLSHA256,
-		DDLSHA256:            q.DDLSHA256,
-		OperatorTreeSHA256:   q.OperatorTreeSHA256,
-		OperatorFamilies:     q.OperatorFamilies,
-		OperatorFamilyCounts: q.OperatorFamilyCounts,
-		NormalizedOperators:  q.NormalizedOperators,
-		OperatorEdges:        operatorEdges,
-		Plan:                 q.Plan,
-		Error:                q.Error,
-		OptimizerNotPinned:   q.OptimizerNotPinned,
-		PlanEnvironmentNotes: q.PlanEnvironmentNotes,
-		ClassificationNotes:  q.ClassificationNotes,
+		TargetID:              q.TargetID,
+		Name:                  q.Name,
+		Catalog:               q.Catalog,
+		Scope:                 q.Scope,
+		Kind:                  q.Kind,
+		Status:                q.Status,
+		SQL:                   q.SQL,
+		SQLSHA256:             q.SQLSHA256,
+		DDLSHA256:             q.DDLSHA256,
+		ProtoDescriptorSHA256: q.ProtoDescriptorSHA256,
+		OperatorTreeSHA256:    q.OperatorTreeSHA256,
+		OperatorFamilies:      q.OperatorFamilies,
+		OperatorFamilyCounts:  q.OperatorFamilyCounts,
+		NormalizedOperators:   q.NormalizedOperators,
+		OperatorEdges:         operatorEdges,
+		Plan:                  q.Plan,
+		Error:                 q.Error,
+		OptimizerNotPinned:    q.OptimizerNotPinned,
+		PlanEnvironmentNotes:  q.PlanEnvironmentNotes,
+		ClassificationNotes:   q.ClassificationNotes,
 	}
 }
 
@@ -389,6 +395,8 @@ func buildPlanReportWithRuntime(ctx context.Context, config querygen.QueryCodege
 	configQueries := queryCodegenQueriesByName(config.Queries)
 	keyCountsBySource := map[string]map[string]int{}
 	clientsBySource := map[string]*spanemuboost.Clients{}
+	protoDescriptorsBySource := map[string]*spanalyzer.ProtoDescriptorSet{}
+	protoDescriptorDigestsBySource := map[string]string{}
 	defer func() {
 		for _, clients := range clientsBySource {
 			_ = clients.Close()
@@ -444,13 +452,39 @@ func buildPlanReportWithRuntime(ctx context.Context, config querygen.QueryCodege
 			continue
 		}
 		reportQuery.DDLSHA256 = ddlDigest
+		descriptors, descriptorsLoaded := protoDescriptorsBySource[catalog]
+		if !descriptorsLoaded {
+			loaded, err := planReportProtoDescriptorSet(schema, baseDir)
+			if err != nil {
+				reportQuery.Status = "error"
+				reportQuery.Error = err.Error()
+				report.TargetSummary.Errors++
+				report.Queries = append(report.Queries, reportQuery)
+				continue
+			}
+			descriptors = loaded
+			digest, err := planReportProtoDescriptorDigest(descriptors)
+			if err != nil {
+				reportQuery.Status = "error"
+				reportQuery.Error = err.Error()
+				report.TargetSummary.Errors++
+				report.Queries = append(report.Queries, reportQuery)
+				continue
+			}
+			protoDescriptorsBySource[catalog] = descriptors
+			protoDescriptorDigestsBySource[catalog] = digest
+			descriptorsLoaded = true
+		}
+		if descriptorsLoaded {
+			reportQuery.ProtoDescriptorSHA256 = protoDescriptorDigestsBySource[catalog]
+		}
 		reportQuery.OptimizerNotPinned = !planReportOptimizerEnvironmentPinned(report.Optimizer.Requested)
 		if reportQuery.OptimizerNotPinned {
-			reportQuery.PlanEnvironmentNotes = append(reportQuery.PlanEnvironmentNotes, "plan environment uses default Omni optimizer settings; optimizer version/statistics package are not pinned")
+			reportQuery.PlanEnvironmentNotes = append(reportQuery.PlanEnvironmentNotes, "plan environment does not pin both optimizer version and statistics package to fixed values")
 		}
 		clients, ok := clientsBySource[catalog]
 		if !ok {
-			started, err := openPlanReportClients(ctx, runtime, schema, baseDir, report.Optimizer)
+			started, err := openPlanReportClients(ctx, runtime, schema, baseDir, descriptors, report.Optimizer)
 			if err != nil {
 				return report, fmt.Errorf("open Omni database for catalog %s: %w", catalog, err)
 			}
@@ -533,12 +567,12 @@ func buildPlanReportWithRuntime(ctx context.Context, config querygen.QueryCodege
 
 func defaultPlanReportNormalization() planReportNormalization {
 	return planReportNormalization{
-		// Normalization identifiers follow the same mutable preview
-		// philosophy as the v1alpha config: they may change in place while
-		// the report format is pre-release, so they intentionally do not
-		// promise stable v1/v2 digest comparability.
-		OperatorTreeVersion:          "v1alpha",
-		OperatorFamilyMappingVersion: "v1alpha",
+		// Unlike the mutable report/config channel name, these identifiers are
+		// concrete compatibility markers. Bump them whenever digest inputs or
+		// operator-family semantics change so stored reports are not compared
+		// across different normalization algorithms.
+		OperatorTreeVersion:          planReportOperatorTreeVersion,
+		OperatorFamilyMappingVersion: planReportFamilyMappingVersion,
 		CELInputDefaults: planReportCELInputDefaults{
 			OptionalString:  "",
 			OptionalBoolean: false,
@@ -547,7 +581,14 @@ func defaultPlanReportNormalization() planReportNormalization {
 	}
 }
 
-func openPlanReportClients(ctx context.Context, runtime spanemuboost.RuntimeHandle, schema querygen.QueryCodegenSchema, baseDir string, optimizer planReportOptimizer) (*spanemuboost.Clients, error) {
+func openPlanReportClients(
+	ctx context.Context,
+	runtime spanemuboost.RuntimeHandle,
+	schema querygen.QueryCodegenSchema,
+	baseDir string,
+	descriptors *spanalyzer.ProtoDescriptorSet,
+	optimizer planReportOptimizer,
+) (*spanemuboost.Clients, error) {
 	ddls, err := planReportDDLs(schema, baseDir)
 	if err != nil {
 		return nil, err
@@ -555,6 +596,9 @@ func openPlanReportClients(ctx context.Context, runtime spanemuboost.RuntimeHand
 	options := []spanemuboost.Option{
 		spanemuboost.WithRandomDatabaseID(),
 		spanemuboost.WithSetupDDLs(ddls),
+	}
+	if descriptors != nil {
+		options = append(options, spanemuboost.WithSetupFileDescriptorSet(descriptors.FileDescriptorSet()))
 	}
 	if optimizer.Requested.Version != "not_pinned" || optimizer.Requested.StatisticsPackage != "not_pinned" {
 		options = append(options, spanemuboost.WithClientConfig(spanner.ClientConfig{
@@ -565,6 +609,32 @@ func openPlanReportClients(ctx context.Context, runtime spanemuboost.RuntimeHand
 		}))
 	}
 	return spanemuboost.OpenClients(ctx, runtime, options...)
+}
+
+func planReportProtoDescriptorDigest(descriptors *spanalyzer.ProtoDescriptorSet) (string, error) {
+	if descriptors == nil {
+		return "", nil
+	}
+	data, err := (proto.MarshalOptions{Deterministic: true}).Marshal(descriptors.FileDescriptorSet())
+	if err != nil {
+		return "", fmt.Errorf("marshal canonical plan-report proto descriptors: %w", err)
+	}
+	return planReportDigest(string(data)), nil
+}
+
+func planReportProtoDescriptorSet(schema querygen.QueryCodegenSchema, baseDir string) (*spanalyzer.ProtoDescriptorSet, error) {
+	if len(schema.ProtoDescriptorFiles) == 0 {
+		return nil, nil
+	}
+	paths := make([]string, 0, len(schema.ProtoDescriptorFiles))
+	for _, descriptorPath := range schema.ProtoDescriptorFiles {
+		paths = append(paths, resolveOutputPath(baseDir, descriptorPath))
+	}
+	descriptors, err := spanalyzer.LoadProtoDescriptorSetFiles(paths)
+	if err != nil {
+		return nil, fmt.Errorf("load plan-report proto descriptors: %w", err)
+	}
+	return descriptors, nil
 }
 
 func planReportResolvedOptimizer(optimizer planReportOptimizerEnvironment) planReportOptimizer {
@@ -643,7 +713,7 @@ func planReportPinnedOptimizerValue(value string) string {
 }
 
 func planReportOptimizerEnvironmentPinned(optimizer planReportOptimizerEnvironment) bool {
-	return optimizer.Version != "not_pinned" && optimizer.StatisticsPackage != "not_pinned"
+	return plancontract.OptimizerEnvironmentPinned(optimizer)
 }
 
 func planReportDDLs(schema querygen.QueryCodegenSchema, baseDir string) ([]string, error) {
@@ -710,10 +780,6 @@ func planReportOperatorFamilyCountsOrEmpty(counts map[string]int) map[string]int
 	return plancontract.OperatorFamilyCountsOrEmpty(counts)
 }
 
-func planReportZeroOperatorFamilyCounts() map[string]int {
-	return plancontract.ZeroOperatorFamilyCounts()
-}
-
 func planReportKnownOperatorFamilies() []string {
 	return plancontract.KnownOperatorFamilies()
 }
@@ -755,6 +821,11 @@ func planReportParamValues(params []querygen.QueryCodegenParam) (map[string]inte
 	}
 	values := make(map[string]interface{}, len(params))
 	for _, param := range params {
+		// orderby_choice is resolved into a literal SQL fragment during
+		// generation and never becomes a Spanner bind parameter.
+		if strings.EqualFold(strings.TrimSpace(param.Optional), "orderby_choice") {
+			continue
+		}
 		spec, err := spanalyzer.ParseTypeSpec("param", param.Type)
 		if err != nil {
 			return nil, fmt.Errorf("param %s: %w", param.Name, err)
@@ -764,6 +835,9 @@ func planReportParamValues(params []querygen.QueryCodegenParam) (map[string]inte
 			return nil, fmt.Errorf("param %s type %s: %w", param.Name, param.Type, err)
 		}
 		values[param.Name] = value
+	}
+	if len(values) == 0 {
+		return nil, nil
 	}
 	return values, nil
 }
@@ -891,24 +965,25 @@ func planContractReport(report planReport) plancontract.Report {
 	queries := make([]plancontract.Query, 0, len(report.Queries))
 	for _, query := range report.Queries {
 		queries = append(queries, plancontract.Query{
-			TargetID:             planReportQueryTargetID(query),
-			Name:                 query.Name,
-			Catalog:              query.Catalog,
-			Scope:                query.Scope,
-			Kind:                 query.Kind,
-			Status:               query.Status,
-			SQLSHA256:            query.SQLSHA256,
-			DDLSHA256:            query.DDLSHA256,
-			OperatorTreeSHA256:   query.OperatorTreeSHA256,
-			OperatorFamilies:     query.OperatorFamilies,
-			OperatorFamilyCounts: query.OperatorFamilyCounts,
-			NormalizedOperators:  query.NormalizedOperators,
-			OperatorEdges:        query.OperatorEdges,
-			Error:                query.Error,
-			OptimizerNotPinned:   query.OptimizerNotPinned,
-			PlanEnvironmentNotes: query.PlanEnvironmentNotes,
-			ClassificationNotes:  query.ClassificationNotes,
-			RawPlan:              query.RawPlan,
+			TargetID:              planReportQueryTargetID(query),
+			Name:                  query.Name,
+			Catalog:               query.Catalog,
+			Scope:                 query.Scope,
+			Kind:                  query.Kind,
+			Status:                query.Status,
+			SQLSHA256:             query.SQLSHA256,
+			DDLSHA256:             query.DDLSHA256,
+			ProtoDescriptorSHA256: query.ProtoDescriptorSHA256,
+			OperatorTreeSHA256:    query.OperatorTreeSHA256,
+			OperatorFamilies:      query.OperatorFamilies,
+			OperatorFamilyCounts:  query.OperatorFamilyCounts,
+			NormalizedOperators:   query.NormalizedOperators,
+			OperatorEdges:         query.OperatorEdges,
+			Error:                 query.Error,
+			OptimizerNotPinned:    query.OptimizerNotPinned,
+			PlanEnvironmentNotes:  query.PlanEnvironmentNotes,
+			ClassificationNotes:   query.ClassificationNotes,
+			RawPlan:               query.RawPlan,
 		})
 	}
 	return plancontract.Report{
@@ -1137,23 +1212,17 @@ func validatePlanReportQueryTopology(query planReportQuery) error {
 }
 
 func planReportExpectedSubtreeFamilyCounts(operator planReportOperator, operatorsByIndex map[int32]planReportOperator) map[string]int {
-	counts := planReportZeroOperatorFamilyCounts()
-	add := func(index int32) {
-		if subtreeOperator, ok := operatorsByIndex[index]; ok && subtreeOperator.Family != "" {
-			counts[subtreeOperator.Family]++
+	subtree := []planReportOperator{operator}
+	for _, index := range operator.DescendantIndexes {
+		if subtreeOperator, ok := operatorsByIndex[index]; ok {
+			subtree = append(subtree, subtreeOperator)
 		}
 	}
-	add(operator.Index)
-	for _, index := range operator.DescendantIndexes {
-		add(index)
-	}
-	// Recompute every derived umbrella family with the shared helper so the
-	// validator cannot drift from planReportSubtreeFamilyCounts. A manual
-	// explicit_sort-only recomputation here previously missed
-	// blocking_operator and rejected any report whose subtree contained a
-	// stream-blocking operator such as a hash aggregate.
-	plancontract.AddDerivedOperatorFamilyCounts(counts)
-	return counts
+	// Recompute concrete and metadata-aware umbrella families together. In
+	// particular, scalar stream aggregates are blocking while grouped stream
+	// aggregates are not, so a family-only derivation would reject a valid
+	// normalized report.
+	return planReportOperatorFamilyCounts(subtree)
 }
 
 func writePlanReportMarkdown(w io.Writer, report planReport) error {
@@ -1201,6 +1270,9 @@ func writePlanReportMarkdown(w io.Writer, report planReport) error {
 		fmt.Fprintf(&b, "- SQL SHA-256: `%s`\n", query.SQLSHA256)
 		if query.DDLSHA256 != "" {
 			fmt.Fprintf(&b, "- DDL SHA-256: `%s`\n", query.DDLSHA256)
+		}
+		if query.ProtoDescriptorSHA256 != "" {
+			fmt.Fprintf(&b, "- Proto descriptor SHA-256: `%s`\n", query.ProtoDescriptorSHA256)
 		}
 		if query.OperatorTreeSHA256 != "" {
 			fmt.Fprintf(&b, "- Operator tree SHA-256: `%s`\n", query.OperatorTreeSHA256)

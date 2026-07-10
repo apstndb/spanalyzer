@@ -127,24 +127,25 @@ type OptimizerEffective struct {
 
 // Query is the per-query contract evaluator input projection.
 type Query struct {
-	TargetID             string
-	Name                 string
-	Catalog              string
-	Scope                string
-	Kind                 string
-	Status               string
-	SQLSHA256            string
-	DDLSHA256            string
-	OperatorTreeSHA256   string
-	OperatorFamilies     []string
-	OperatorFamilyCounts map[string]int
-	NormalizedOperators  []Operator
-	OperatorEdges        []OperatorEdge
-	Error                string
-	OptimizerNotPinned   bool
-	PlanEnvironmentNotes []string
-	ClassificationNotes  []Diagnostic
-	RawPlan              *spannerpb.QueryPlan
+	TargetID              string
+	Name                  string
+	Catalog               string
+	Scope                 string
+	Kind                  string
+	Status                string
+	SQLSHA256             string
+	DDLSHA256             string
+	ProtoDescriptorSHA256 string
+	OperatorTreeSHA256    string
+	OperatorFamilies      []string
+	OperatorFamilyCounts  map[string]int
+	NormalizedOperators   []Operator
+	OperatorEdges         []OperatorEdge
+	Error                 string
+	OptimizerNotPinned    bool
+	PlanEnvironmentNotes  []string
+	ClassificationNotes   []Diagnostic
+	RawPlan               *spannerpb.QueryPlan
 }
 
 // Operator is the normalized operator view used by stable predefined contracts.
@@ -165,6 +166,8 @@ type Operator struct {
 	DistributionTable   string         `json:"distribution_table,omitempty" yaml:"distribution_table,omitempty"`
 	SubqueryClusterNode string         `json:"subquery_cluster_node,omitempty" yaml:"subquery_cluster_node,omitempty"`
 	SpoolName           string         `json:"spool_name,omitempty" yaml:"spool_name,omitempty"`
+	TVFName             string         `json:"tvf_name,omitempty" yaml:"tvf_name,omitempty"`
+	ScalarAggregate     bool           `json:"scalar_aggregate,omitempty" yaml:"scalar_aggregate,omitempty"`
 	FullScan            bool           `json:"full_scan,omitempty" yaml:"full_scan,omitempty"`
 	ChildIndexes        []int32        `json:"child_indexes" yaml:"child_indexes"`
 	DescendantIndexes   []int32        `json:"descendant_indexes" yaml:"descendant_indexes"`
@@ -556,9 +559,11 @@ func referencedMetadataDerivedOperatorFields(expression string, identifiers map[
 		"scan_method",
 		"scan_target",
 		"scan_type",
+		"scalar_aggregate",
 		"seekable_key_size",
 		"spool_name",
 		"subquery_cluster_node",
+		"tvf_name",
 	}
 	var out []string
 	for _, field := range fields {
@@ -876,6 +881,7 @@ func celQuery(query Query) map[string]interface{} {
 		"status":                  query.Status,
 		"sql_sha256":              query.SQLSHA256,
 		"ddl_sha256":              query.DDLSHA256,
+		"proto_descriptor_sha256": query.ProtoDescriptorSHA256,
 		"operator_tree_sha256":    query.OperatorTreeSHA256,
 		"operator_family_counts":  OperatorFamilyCountsOrEmpty(query.OperatorFamilyCounts),
 		"optimizer_not_pinned":    query.OptimizerNotPinned,
@@ -904,6 +910,8 @@ func celOperators(operators []Operator) []map[string]interface{} {
 			"distribution_table":    operator.DistributionTable,
 			"subquery_cluster_node": operator.SubqueryClusterNode,
 			"spool_name":            operator.SpoolName,
+			"tvf_name":              operator.TVFName,
+			"scalar_aggregate":      operator.ScalarAggregate,
 			"full_scan":             operator.FullScan,
 			"child_indexes":         operator.ChildIndexes,
 			"descendant_indexes":    operator.DescendantIndexes,
@@ -969,7 +977,7 @@ func queryTargetID(query Query) string {
 func operatorFamilyCount(query Query, family string) int {
 	count := 0
 	for _, operator := range query.NormalizedOperators {
-		if operatorFamilyMatches(operator.Family, family) {
+		if operatorMatchesFamily(operator, family) {
 			count++
 		}
 	}
@@ -993,22 +1001,22 @@ func predicateMatchedOperatorIndexes(query Query, family string) []int32 {
 	}
 	var indexes []int32
 	for _, operator := range query.NormalizedOperators {
-		if operatorFamilyMatches(operator.Family, family) {
+		if operatorMatchesFamily(operator, family) {
 			indexes = append(indexes, operator.Index)
 		}
 	}
 	return indexes
 }
 
-func operatorFamilyMatches(operatorFamily, want string) bool {
-	if operatorFamily == want {
+func operatorMatchesFamily(operator Operator, want string) bool {
+	if operator.Family == want {
 		return true
 	}
 	switch want {
 	case "explicit_sort":
-		return operatorFamily == "full_sort" || operatorFamily == "minor_sort"
+		return operator.Family == "full_sort" || operator.Family == "minor_sort"
 	case "blocking_operator":
-		return streamBlockingOperatorFamily(operatorFamily)
+		return blockingOperator(operator)
 	default:
 		return false
 	}
@@ -1026,7 +1034,7 @@ func blockingOperatorUnderLimitIndexes(query Query) []int32 {
 		}
 		for _, descendantIndex := range operator.DescendantIndexes {
 			descendant, ok := operatorsByIndex[descendantIndex]
-			if !ok || !streamBlockingOperatorFamily(descendant.Family) {
+			if !ok || !blockingOperator(descendant) {
 				continue
 			}
 			seen[descendant.Index] = true
@@ -1043,7 +1051,7 @@ func blockingOperatorUnderLimitIndexes(query Query) []int32 {
 func fullScanOperatorIndexes(query Query) []int32 {
 	indexes := []int32{}
 	for _, operator := range query.NormalizedOperators {
-		if operator.Family == "scan" && operator.FullScan {
+		if scanLikeOperator(operator) && operator.FullScan {
 			indexes = append(indexes, operator.Index)
 		}
 	}
@@ -1052,15 +1060,10 @@ func fullScanOperatorIndexes(query Query) []int32 {
 }
 
 func fullScanWithoutTimestampConditionOperatorIndexes(query Query) []int32 {
-	timestampConditionParents := map[int32]bool{}
-	for _, edge := range query.OperatorEdges {
-		if edge.Type == "Timestamp Condition" {
-			timestampConditionParents[edge.ParentIndex] = true
-		}
-	}
+	_, timestampConditionScans := timestampConditionIndexes(query)
 	indexes := []int32{}
 	for _, operator := range query.NormalizedOperators {
-		if operator.Family == "scan" && operator.FullScan && !timestampConditionParents[operator.Index] {
+		if scanLikeOperator(operator) && operator.FullScan && !timestampConditionScans[operator.Index] {
 			indexes = append(indexes, operator.Index)
 		}
 	}
@@ -1069,18 +1072,59 @@ func fullScanWithoutTimestampConditionOperatorIndexes(query Query) []int32 {
 }
 
 func timestampConditionOperatorIndexes(query Query) []int32 {
-	seen := map[int32]bool{}
+	indexes, _ := timestampConditionIndexes(query)
+	return indexes
+}
+
+// timestampConditionIndexes returns the scan-like PlanNodes that own a
+// Timestamp Condition edge and the underlying Scan nodes protected by those
+// conditions. Captured plan shapes can attach the condition to the Scan itself
+// or to its Filter Scan wrapper, while full_scan and scan_target normally live
+// on the Scan. Only scan-like parents count, so an unrelated operator cannot
+// satisfy require_timestamp_condition accidentally.
+func timestampConditionIndexes(query Query) ([]int32, map[int32]bool) {
+	operatorsByIndex := make(map[int32]Operator, len(query.NormalizedOperators))
+	for _, operator := range query.NormalizedOperators {
+		operatorsByIndex[operator.Index] = operator
+	}
+	owners := map[int32]bool{}
+	scans := map[int32]bool{}
 	for _, edge := range query.OperatorEdges {
-		if edge.Type == "Timestamp Condition" {
-			seen[edge.ParentIndex] = true
+		if !strings.EqualFold(strings.TrimSpace(edge.Type), "Timestamp Condition") {
+			continue
+		}
+		parent, ok := operatorsByIndex[edge.ParentIndex]
+		if !ok {
+			continue
+		}
+		switch parent.Family {
+		case "scan":
+			owners[parent.Index] = true
+			scans[parent.Index] = true
+		case "filter_scan":
+			owners[parent.Index] = true
+			scans[parent.Index] = true
+			var directScans []int32
+			for _, childIndex := range parent.ChildIndexes {
+				if child, ok := operatorsByIndex[childIndex]; ok && child.Family == "scan" {
+					directScans = append(directScans, child.Index)
+				}
+			}
+			if len(directScans) == 1 {
+				scans[directScans[0]] = true
+			}
 		}
 	}
-	indexes := make([]int32, 0, len(seen))
-	for index := range seen {
+	indexes := make([]int32, 0, len(owners))
+	for index := range owners {
 		indexes = append(indexes, index)
 	}
 	sort.Slice(indexes, func(i, j int) bool { return indexes[i] < indexes[j] })
-	return indexes
+	return indexes, scans
+}
+
+func scanLikeOperator(operator Operator) bool {
+	return operator.Family == "scan" || operator.Family == "filter_scan"
 }
 
 func limitOrSortLimitOperator(operator Operator) bool {
@@ -1105,6 +1149,11 @@ func streamBlockingOperatorFamily(family string) bool {
 	default:
 		return false
 	}
+}
+
+func blockingOperator(operator Operator) bool {
+	return streamBlockingOperatorFamily(operator.Family) ||
+		(operator.Family == "stream_aggregate" && operator.ScalarAggregate)
 }
 
 func aggregateClassificationUnknownOperatorIndexes(query Query) []int32 {
@@ -1335,7 +1384,7 @@ func blockingOperatorUnderLimitRemediation() []Remediation {
 			Kind:       "query_shape",
 			AppliesTo:  "sql",
 			Confidence: "medium",
-			Message:    "Review blocking descendants under Limit or Sort Limit; prefer an order-preserving access path, stream aggregate, merge/apply join, or remove the LIMIT/ORDER BY requirement when it is not needed.",
+			Message:    "Review blocking descendants under Limit or Sort Limit; prefer an order-preserving access path, grouped (non-scalar) stream aggregate, merge/apply join, or remove the LIMIT/ORDER BY requirement when it is not needed.",
 		},
 	}
 }
@@ -1401,10 +1450,10 @@ func EnvironmentWarnings(report Report) []string {
 			warnings = append(warnings, warning)
 		}
 	}
-	if strings.EqualFold(report.Optimizer.Requested.Version, "not_pinned") {
+	if !OptimizerVersionPinned(report.Optimizer.Requested.Version) {
 		add("optimizer_not_pinned")
 	}
-	if strings.EqualFold(report.Optimizer.Requested.StatisticsPackage, "not_pinned") {
+	if !OptimizerStatisticsPackagePinned(report.Optimizer.Requested.StatisticsPackage) {
 		add("statistics_package_not_pinned")
 	}
 	if strings.EqualFold(report.BackendIdentity.Version, "not_recorded") || strings.EqualFold(report.BackendIdentity.ImageDigest, "not_recorded") {
@@ -1419,6 +1468,35 @@ func EnvironmentWarnings(report Report) []string {
 		}
 	}
 	return warnings
+}
+
+// OptimizerEnvironmentPinned reports whether both requested optimizer values
+// identify fixed versions rather than sentinels or moving aliases.
+func OptimizerEnvironmentPinned(optimizer OptimizerEnvironment) bool {
+	return OptimizerVersionPinned(optimizer.Version) &&
+		OptimizerStatisticsPackagePinned(optimizer.StatisticsPackage)
+}
+
+// OptimizerVersionPinned reports whether value identifies a fixed optimizer
+// version. The documented aliases resolve at request time and therefore do not
+// provide reproducible plan-contract evidence.
+func OptimizerVersionPinned(value string) bool {
+	return optimizerValuePinned(value)
+}
+
+// OptimizerStatisticsPackagePinned reports whether value identifies a fixed
+// optimizer statistics package rather than a sentinel or moving alias.
+func OptimizerStatisticsPackagePinned(value string) bool {
+	return optimizerValuePinned(value)
+}
+
+func optimizerValuePinned(value string) bool {
+	switch strings.ToLower(strings.TrimSpace(value)) {
+	case "", "not_pinned", "not_recorded", "latest", "latest_version", "default_version":
+		return false
+	default:
+		return true
+	}
 }
 
 // AddCheckWarnings mutates summary with warnings that only apply to --check.
@@ -1508,9 +1586,11 @@ func OperatorFamilyCounts(operators []Operator) map[string]int {
 	for _, operator := range operators {
 		if operator.Family != "" {
 			counts[operator.Family]++
+			for _, derived := range DerivedOperatorFamiliesForOperator(operator) {
+				counts[derived]++
+			}
 		}
 	}
-	AddDerivedOperatorFamilyCounts(counts)
 	return counts
 }
 
@@ -1527,6 +1607,7 @@ func OperatorFamilyCountsOrEmpty(counts map[string]int) map[string]int {
 // AddDerivedOperatorFamilyCounts updates count-only umbrella families in counts.
 func AddDerivedOperatorFamilyCounts(counts map[string]int) {
 	counts["explicit_sort"] = counts["full_sort"] + counts["minor_sort"]
+	metadataAwareBlockingCount := counts["blocking_operator"]
 	blockingCount := 0
 	for family, count := range counts {
 		if family == "blocking_operator" {
@@ -1535,6 +1616,9 @@ func AddDerivedOperatorFamilyCounts(counts map[string]int) {
 		if streamBlockingOperatorFamily(family) {
 			blockingCount += count
 		}
+	}
+	if metadataAwareBlockingCount > blockingCount {
+		blockingCount = metadataAwareBlockingCount
 	}
 	counts["blocking_operator"] = blockingCount
 }
@@ -1549,11 +1633,21 @@ func AddDerivedOperatorFamilyCounts(counts map[string]int) {
 // vocabulary forms a DAG rather than a tree. This must stay consistent with
 // [AddDerivedOperatorFamilyCounts], which is pinned by a test.
 func DerivedOperatorFamilies(family string) []string {
+	return DerivedOperatorFamiliesForOperator(Operator{Family: family})
+}
+
+// DerivedOperatorFamiliesForOperator returns the count-only umbrella families
+// that operator contributes to. Unlike [DerivedOperatorFamilies], this helper
+// can account for normalized metadata: a scalar stream aggregate must consume
+// its complete input before producing its single output row and is therefore a
+// blocking operator even though grouped stream aggregates can emit rows as
+// their ordered groups complete.
+func DerivedOperatorFamiliesForOperator(operator Operator) []string {
 	var out []string
-	if family == "full_sort" || family == "minor_sort" {
+	if operator.Family == "full_sort" || operator.Family == "minor_sort" {
 		out = append(out, "explicit_sort")
 	}
-	if family != "blocking_operator" && streamBlockingOperatorFamily(family) {
+	if operator.Family != "blocking_operator" && blockingOperator(operator) {
 		out = append(out, "blocking_operator")
 	}
 	sort.Strings(out)
@@ -1598,11 +1692,13 @@ func KnownOperatorFamilies() []string {
 		"filter",
 		"filter_scan",
 		"full_sort",
+		"generate_relation",
 		"hash_aggregate",
 		"hash_join",
 		"join",
 		"key_range_accumulator",
 		"limit",
+		"local_split_union",
 		"merge_join",
 		"mini_batch_assign",
 		"mini_batch_key_order",
@@ -1624,6 +1720,7 @@ func KnownOperatorFamilies() []string {
 		"spool_build",
 		"spool_scan",
 		"stream_aggregate",
+		"tvf",
 		"union_all",
 		"union_input",
 		"unit_relation",

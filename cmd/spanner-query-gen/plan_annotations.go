@@ -125,7 +125,7 @@ func planReportRenderAnnotationOptions(plan *spannerpb.QueryPlan, operators []pl
 // planReportFamilyAnnotations renders "{<family>}" for every classified
 // operator, extended after a colon with the derived umbrella families the
 // operator contributes to, in the lexicographic order
-// DerivedOperatorFamilies defines (for example
+// DerivedOperatorFamiliesForOperator defines (for example
 // "{full_sort: blocking_operator, explicit_sort}"). The colon makes the
 // two-sorted structure self-describing: the left side is the single-valued
 // concrete classification, the right side is the set of derived
@@ -141,7 +141,7 @@ func planReportFamilyAnnotations(operators []planReportOperator) map[int32]strin
 			continue
 		}
 		label := operator.Family
-		if derived := plancontract.DerivedOperatorFamilies(operator.Family); len(derived) > 0 {
+		if derived := plancontract.DerivedOperatorFamiliesForOperator(operator); len(derived) > 0 {
 			label += ": " + strings.Join(derived, ", ")
 		}
 		out[operator.Index] = "{" + label + "}"
@@ -178,7 +178,7 @@ func planReportSeekableKeyValues(plan *spannerpb.QueryPlan, keyCounts map[string
 		if err != nil || sizeValue <= 0 {
 			continue
 		}
-		target := planReportScanTargetForSubtree(node, nodesByIndex, map[int32]bool{})
+		target := planReportScanTargetForSubtree(node, nodesByIndex)
 		// Synthetic targets such as $BatchPartition have no catalog entry.
 		if target == "" || strings.HasPrefix(target, "$") {
 			continue
@@ -203,29 +203,43 @@ func planReportRawMetadataString(node *spannerpb.PlanNode, key string) string {
 	if node == nil || node.GetMetadata() == nil {
 		return ""
 	}
-	value, ok := node.GetMetadata().AsMap()[key]
-	if !ok {
+	value, ok := node.GetMetadata().GetFields()[key]
+	if !ok || value == nil {
 		return ""
 	}
-	return strings.TrimSpace(fmt.Sprint(value))
+	raw := value.AsInterface()
+	if raw == nil {
+		return ""
+	}
+	return strings.TrimSpace(fmt.Sprint(raw))
 }
 
-func planReportScanTargetForSubtree(node *spannerpb.PlanNode, nodesByIndex map[int32]*spannerpb.PlanNode, visited map[int32]bool) string {
-	if node == nil || visited[node.GetIndex()] {
+func planReportScanTargetForSubtree(node *spannerpb.PlanNode, nodesByIndex map[int32]*spannerpb.PlanNode) string {
+	var targets []string
+	visited := map[int32]bool{}
+	var walk func(*spannerpb.PlanNode)
+	walk = func(current *spannerpb.PlanNode) {
+		if current == nil || visited[current.GetIndex()] {
+			return
+		}
+		visited[current.GetIndex()] = true
+		if target := planReportRawMetadataString(current, "scan_target"); target != "" {
+			targets = append(targets, target)
+		}
+		for _, link := range current.GetChildLinks() {
+			child := nodesByIndex[link.GetChildIndex()]
+			if child != nil && child.GetKind() == spannerpb.PlanNode_RELATIONAL {
+				walk(child)
+			}
+		}
+	}
+	walk(node)
+	if len(targets) != 1 {
+		// A Filter Scan normally wraps exactly one target-bearing Scan. Do not
+		// attach a key count when a future or synthetic shape contains multiple
+		// scans: choosing the first one would make a plausible but unsupported
+		// k/N claim.
 		return ""
 	}
-	visited[node.GetIndex()] = true
-	if target := planReportRawMetadataString(node, "scan_target"); target != "" {
-		return target
-	}
-	for _, link := range node.GetChildLinks() {
-		child := nodesByIndex[link.GetChildIndex()]
-		if child == nil || child.GetKind() != spannerpb.PlanNode_RELATIONAL {
-			continue
-		}
-		if target := planReportScanTargetForSubtree(child, nodesByIndex, visited); target != "" {
-			return target
-		}
-	}
-	return ""
+	return targets[0]
 }

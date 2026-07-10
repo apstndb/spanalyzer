@@ -33,6 +33,13 @@ func TestStabilityForUsesCELIdentifiersNotStringLiterals(t *testing.T) {
 			},
 		},
 		{
+			name:                 "TVF name",
+			expression:           `operators.exists(o, o.family == "tvf" && o.tvf_name == "ML.PREDICT")`,
+			wantTier:             StabilityNormalized,
+			wantCheckRecommended: true,
+			wantReason:           "contract reads metadata-derived normalized fields: tvf_name",
+		},
+		{
 			name:                 "raw nodes variable",
 			expression:           `raw_nodes.exists(n, n.display_name == "Serialize Result")`,
 			wantTier:             StabilityRawPlan,
@@ -113,5 +120,174 @@ func TestDerivedOperatorFamiliesMatchesAddDerivedOperatorFamilyCounts(t *testing
 		if derived := DerivedOperatorFamilies(family); !slices.IsSorted(derived) {
 			t.Errorf("DerivedOperatorFamilies(%q) = %v, want lexicographic order", family, derived)
 		}
+	}
+}
+
+func TestOptimizerPinningTreatsMovingAliasesAsUnpinned(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name  string
+		value string
+		want  bool
+	}{
+		{name: "fixed numeric version", value: "8", want: true},
+		{name: "fixed statistics package", value: "auto_20260709_12_34_UTC", want: true},
+		{name: "empty"},
+		{name: "not pinned", value: "not_pinned"},
+		{name: "not recorded", value: "not_recorded"},
+		{name: "latest", value: "latest"},
+		{name: "latest version", value: "latest_version"},
+		{name: "default version", value: "default_version"},
+		{name: "moving alias case and whitespace", value: "  LATEST_VERSION  "},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			if got := OptimizerVersionPinned(tt.value); got != tt.want {
+				t.Errorf("OptimizerVersionPinned(%q) = %t, want %t", tt.value, got, tt.want)
+			}
+			if got := OptimizerStatisticsPackagePinned(tt.value); got != tt.want {
+				t.Errorf("OptimizerStatisticsPackagePinned(%q) = %t, want %t", tt.value, got, tt.want)
+			}
+		})
+	}
+
+	if OptimizerEnvironmentPinned(OptimizerEnvironment{Version: "latest", StatisticsPackage: "auto_20260709_12_34_UTC"}) {
+		t.Fatal("OptimizerEnvironmentPinned() = true with a moving optimizer version")
+	}
+	if !OptimizerEnvironmentPinned(OptimizerEnvironment{Version: "8", StatisticsPackage: "auto_20260709_12_34_UTC"}) {
+		t.Fatal("OptimizerEnvironmentPinned() = false with fixed optimizer values")
+	}
+
+	warnings := EnvironmentWarnings(Report{Optimizer: Optimizer{Requested: OptimizerEnvironment{
+		Version:           "latest_version",
+		StatisticsPackage: "latest",
+	}}})
+	if want := []string{"optimizer_not_pinned", "statistics_package_not_pinned"}; !slices.Equal(warnings, want) {
+		t.Fatalf("EnvironmentWarnings() = %v, want %v", warnings, want)
+	}
+}
+
+func TestTimestampConditionAssociatesFilterScanWithItsScan(t *testing.T) {
+	t.Parallel()
+
+	query := Query{
+		NormalizedOperators: []Operator{
+			{Index: 0, Family: "filter_scan", ChildIndexes: []int32{1, 2}},
+			{Index: 1, Family: "scan", FullScan: true},
+			{Index: 2, Family: "scalar"},
+			{Index: 3, Family: "scan", FullScan: true},
+			{Index: 4, Family: "limit", ChildIndexes: []int32{5}},
+			{Index: 5, Family: "scalar"},
+		},
+		OperatorEdges: []OperatorEdge{
+			{ParentIndex: 0, ChildIndex: 2, Type: "Timestamp Condition"},
+			// A same-named edge on a non-scan operator must not satisfy the
+			// predefined timestamp-condition contracts.
+			{ParentIndex: 4, ChildIndex: 5, Type: "Timestamp Condition"},
+		},
+	}
+
+	if got, want := timestampConditionOperatorIndexes(query), []int32{0}; !slices.Equal(got, want) {
+		t.Fatalf("timestamp-condition owners = %v, want %v", got, want)
+	}
+	if got, want := fullScanWithoutTimestampConditionOperatorIndexes(query), []int32{3}; !slices.Equal(got, want) {
+		t.Fatalf("unprotected full scans = %v, want %v", got, want)
+	}
+}
+
+func TestTimestampConditionSupportsDirectScanAndRejectsAmbiguousWrapper(t *testing.T) {
+	t.Parallel()
+
+	t.Run("legacy direct scan edge", func(t *testing.T) {
+		query := Query{
+			NormalizedOperators: []Operator{
+				{Index: 0, Family: "scan", FullScan: true, ChildIndexes: []int32{1}},
+				{Index: 1, Family: "scalar"},
+			},
+			OperatorEdges: []OperatorEdge{{ParentIndex: 0, ChildIndex: 1, Type: " timestamp condition "}},
+		}
+		if got := fullScanWithoutTimestampConditionOperatorIndexes(query); len(got) != 0 {
+			t.Fatalf("unprotected full scans = %v, want none", got)
+		}
+	})
+
+	t.Run("two direct scans are ambiguous", func(t *testing.T) {
+		query := Query{
+			NormalizedOperators: []Operator{
+				{Index: 0, Family: "filter_scan", ChildIndexes: []int32{1, 2, 3}},
+				{Index: 1, Family: "scan", FullScan: true},
+				{Index: 2, Family: "scan", FullScan: true},
+				{Index: 3, Family: "scalar"},
+			},
+			OperatorEdges: []OperatorEdge{{ParentIndex: 0, ChildIndex: 3, Type: "Timestamp Condition"}},
+		}
+		if got, want := fullScanWithoutTimestampConditionOperatorIndexes(query), []int32{1, 2}; !slices.Equal(got, want) {
+			t.Fatalf("unprotected full scans = %v, want %v", got, want)
+		}
+	})
+
+	t.Run("filter scan can carry full scan metadata", func(t *testing.T) {
+		query := Query{NormalizedOperators: []Operator{{Index: 0, Family: "filter_scan", FullScan: true}}}
+		if got, want := fullScanOperatorIndexes(query), []int32{0}; !slices.Equal(got, want) {
+			t.Fatalf("full scans = %v, want %v", got, want)
+		}
+		if got, want := fullScanWithoutTimestampConditionOperatorIndexes(query), []int32{0}; !slices.Equal(got, want) {
+			t.Fatalf("unprotected full scans = %v, want %v", got, want)
+		}
+		query.OperatorEdges = []OperatorEdge{{ParentIndex: 0, Type: "Timestamp Condition"}}
+		if got := fullScanWithoutTimestampConditionOperatorIndexes(query); len(got) != 0 {
+			t.Fatalf("unprotected full scans = %v, want none", got)
+		}
+	})
+}
+
+func TestDocumentedTopologyCELRecipesCompile(t *testing.T) {
+	t.Parallel()
+
+	expressions := map[string]string{
+		"full scan without timestamp condition": `
+operators.all(o,
+  !((o.family == "scan" || o.family == "filter_scan") && o.full_scan) ||
+  operator_edges.exists(e,
+    e.type == "Timestamp Condition" &&
+    (e.parent_index == o.index ||
+     operators.exists(f,
+       f.family == "filter_scan" &&
+       e.parent_index == f.index &&
+       f.child_indexes.exists(i, i == o.index) &&
+       operators.filter(s,
+         s.family == "scan" &&
+         f.child_indexes.exists(i, i == s.index)).size() == 1))))`,
+		"require timestamp condition": `
+operator_edges.exists(e,
+  e.type == "Timestamp Condition" &&
+  operators.exists(o,
+    o.index == e.parent_index &&
+    (o.family == "scan" || o.family == "filter_scan")))`,
+		"blocking operator under limit": `
+operators.all(limit,
+  !(limit.family == "limit" || limit.display_name.endsWith("Sort Limit")) ||
+  operators.all(descendant,
+    !limit.descendant_indexes.exists(index, index == descendant.index) ||
+    descendant.family != "full_sort" &&
+    descendant.family != "hash_aggregate" &&
+    descendant.family != "hash_join" &&
+    descendant.family != "push_broadcast_hash_join" &&
+    descendant.family != "aggregate" &&
+    descendant.family != "join" &&
+    descendant.family != "bloom_filter_build" &&
+    descendant.family != "spool_build" &&
+    !(descendant.family == "stream_aggregate" &&
+      descendant.scalar_aggregate)))`,
+	}
+	for name, expression := range expressions {
+		t.Run(name, func(t *testing.T) {
+			t.Parallel()
+			if err := validateCELExpression(expression); err != nil {
+				t.Fatalf("documented CEL recipe does not compile: %v", err)
+			}
+		})
 	}
 }

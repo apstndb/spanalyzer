@@ -3,6 +3,7 @@ package plancontract
 import (
 	"crypto/sha256"
 	"encoding/hex"
+	"encoding/json"
 	"fmt"
 	"sort"
 	"strings"
@@ -41,14 +42,16 @@ func NormalizeOperators(plan *spannerpb.QueryPlan) []Operator {
 	operatorContexts := operatorContexts(plan)
 	childrenByIndex := childrenByIndex(plan)
 	familyByIndex := make(map[int32]string, len(nodes))
+	scalarAggregateByIndex := make(map[int32]bool, len(nodes))
 	for _, node := range nodes {
 		familyByIndex[node.GetIndex()] = nodeOperatorFamily(node, operatorContexts[node.GetIndex()])
+		scalarAggregateByIndex[node.GetIndex()] = nodeMetadataBool(node, "scalar_aggregate")
 	}
 	out := make([]Operator, 0, len(nodes))
 	for _, node := range nodes {
 		childIndexes := operatorChildIndexes(node)
 		descendantIndexes := descendantIndexes(node.GetIndex(), childrenByIndex)
-		subtreeFamilyCounts := subtreeFamilyCounts(node.GetIndex(), descendantIndexes, familyByIndex)
+		subtreeFamilyCounts := subtreeFamilyCounts(node.GetIndex(), descendantIndexes, familyByIndex, scalarAggregateByIndex)
 		out = append(out, Operator{
 			Index:               node.GetIndex(),
 			DisplayName:         node.GetDisplayName(),
@@ -66,6 +69,8 @@ func NormalizeOperators(plan *spannerpb.QueryPlan) []Operator {
 			DistributionTable:   nodeMetadataRawString(node, "distribution_table"),
 			SubqueryClusterNode: nodeMetadataRawString(node, "subquery_cluster_node"),
 			SpoolName:           nodeMetadataRawString(node, "spool_name"),
+			TVFName:             nodeTVFName(node),
+			ScalarAggregate:     scalarAggregateByIndex[node.GetIndex()],
 			FullScan:            nodeMetadataBool(node, "Full scan"),
 			ChildIndexes:        childIndexes,
 			DescendantIndexes:   descendantIndexes,
@@ -127,18 +132,21 @@ func descendantIndexes(root int32, childrenByIndex map[int32][]int32) []int32 {
 	return out
 }
 
-func subtreeFamilyCounts(root int32, descendantIndexes []int32, familyByIndex map[int32]string) map[string]int {
+func subtreeFamilyCounts(root int32, descendantIndexes []int32, familyByIndex map[int32]string, scalarAggregateByIndex map[int32]bool) map[string]int {
 	counts := ZeroOperatorFamilyCounts()
 	add := func(index int32) {
 		if family := familyByIndex[index]; family != "" {
 			counts[family]++
+			operator := Operator{Family: family, ScalarAggregate: scalarAggregateByIndex[index]}
+			for _, derived := range DerivedOperatorFamiliesForOperator(operator) {
+				counts[derived]++
+			}
 		}
 	}
 	add(root)
 	for _, index := range descendantIndexes {
 		add(index)
 	}
-	AddDerivedOperatorFamilyCounts(counts)
 	return counts
 }
 
@@ -196,24 +204,75 @@ func OperatorTreeDigest(plan *spannerpb.QueryPlan) string {
 		return digest("")
 	}
 	operatorContexts := operatorContexts(plan)
-	var b strings.Builder
-	for _, node := range sortedPlanNodes(plan) {
-		fmt.Fprintf(&b, "%d|%s|%s|%s|%s|%s|%s|%t",
-			node.GetIndex(),
-			nodeOperatorFamily(node, operatorContexts[node.GetIndex()]),
-			node.GetDisplayName(),
-			OperatorMetadataString(node, "execution_method"),
-			OperatorMetadataString(node, "iterator_type"),
-			OperatorMetadataString(node, "scan_method"),
-			OperatorMetadataString(node, "scan_type"),
-			nodeMetadataBool(node, "Full scan"),
-		)
-		for _, link := range node.GetChildLinks() {
-			fmt.Fprintf(&b, "|%s:%d", link.GetType(), link.GetChildIndex())
-		}
-		b.WriteByte('\n')
+	type digestChildLink struct {
+		Type       string `json:"type"`
+		Variable   string `json:"variable"`
+		ChildIndex int32  `json:"child_index"`
 	}
-	return digest(b.String())
+	type digestNode struct {
+		Index               int32             `json:"index"`
+		Family              string            `json:"family"`
+		DisplayName         string            `json:"display_name"`
+		ExecutionMethod     string            `json:"execution_method"`
+		IteratorType        string            `json:"iterator_type"`
+		ScanMethod          string            `json:"scan_method"`
+		ScanFormat          string            `json:"scan_format"`
+		ScanType            string            `json:"scan_type"`
+		ScanTarget          string            `json:"scan_target"`
+		SeekableKeySize     string            `json:"seekable_key_size"`
+		JoinType            string            `json:"join_type"`
+		JoinConfiguration   string            `json:"join_configuration"`
+		CallType            string            `json:"call_type"`
+		DistributionTable   string            `json:"distribution_table"`
+		SubqueryClusterNode string            `json:"subquery_cluster_node"`
+		SpoolName           string            `json:"spool_name"`
+		TVFName             string            `json:"tvf_name"`
+		ScalarAggregate     bool              `json:"scalar_aggregate"`
+		FullScan            bool              `json:"full_scan"`
+		ChildLinks          []digestChildLink `json:"child_links"`
+	}
+	nodes := sortedPlanNodes(plan)
+	if len(nodes) == 0 {
+		return digest("")
+	}
+	records := make([]digestNode, 0, len(nodes))
+	for _, node := range nodes {
+		record := digestNode{
+			Index:               node.GetIndex(),
+			Family:              nodeOperatorFamily(node, operatorContexts[node.GetIndex()]),
+			DisplayName:         node.GetDisplayName(),
+			ExecutionMethod:     OperatorMetadataString(node, "execution_method"),
+			IteratorType:        OperatorMetadataString(node, "iterator_type"),
+			ScanMethod:          OperatorMetadataString(node, "scan_method"),
+			ScanFormat:          OperatorMetadataString(node, "scan_format"),
+			ScanType:            OperatorMetadataString(node, "scan_type"),
+			ScanTarget:          nodeMetadataRawString(node, "scan_target"),
+			SeekableKeySize:     nodeMetadataRawString(node, "seekable_key_size"),
+			JoinType:            OperatorMetadataString(node, "join_type"),
+			JoinConfiguration:   OperatorMetadataString(node, "join_configuration"),
+			CallType:            OperatorMetadataString(node, "call_type"),
+			DistributionTable:   nodeMetadataRawString(node, "distribution_table"),
+			SubqueryClusterNode: nodeMetadataRawString(node, "subquery_cluster_node"),
+			SpoolName:           nodeMetadataRawString(node, "spool_name"),
+			TVFName:             nodeTVFName(node),
+			ScalarAggregate:     nodeMetadataBool(node, "scalar_aggregate"),
+			FullScan:            nodeMetadataBool(node, "Full scan"),
+			ChildLinks:          make([]digestChildLink, 0, len(node.GetChildLinks())),
+		}
+		for _, link := range node.GetChildLinks() {
+			record.ChildLinks = append(record.ChildLinks, digestChildLink{
+				Type:       link.GetType(),
+				Variable:   link.GetVariable(),
+				ChildIndex: link.GetChildIndex(),
+			})
+		}
+		records = append(records, record)
+	}
+	// digestNode contains only JSON-native scalar and slice fields, so Marshal
+	// cannot fail. A structured encoding also avoids delimiter ambiguity when a
+	// user-defined scan target or spool name contains punctuation.
+	data, _ := json.Marshal(records)
+	return digest(string(data))
 }
 
 // nodeOperatorFamily classifies one PlanNode into a normalized
@@ -304,7 +363,7 @@ func OperatorFamily(node *spannerpb.PlanNode) string {
 		return "compute_struct"
 	case "create batch":
 		return "create_batch"
-	case "datablocktorow":
+	case "datablocktorow", "datablocktorowadapter":
 		return "data_block_to_row"
 	case "empty relation":
 		return "empty_relation"
@@ -322,7 +381,7 @@ func OperatorFamily(node *spannerpb.PlanNode) string {
 		return "recursive_spool_scan"
 	case "rowcount":
 		return "row_count"
-	case "rowtodatablock":
+	case "rowtodatablock", "rowtodatablockadapter":
 		return "row_to_data_block"
 	case "scalar subquery":
 		return "scalar_subquery"
@@ -333,9 +392,16 @@ func OperatorFamily(node *spannerpb.PlanNode) string {
 	case "spoolscan":
 		return "spool_scan"
 	case "scan", "table scan", "index scan":
+		if OperatorMetadataString(node, "scan_type") == "filter_scan" {
+			return "filter_scan"
+		}
 		return "scan"
-	case "filter scan":
+	case "filter scan", "filterscan":
 		return "filter_scan"
+	case "generate relation":
+		return "generate_relation"
+	case "local split union":
+		return "local_split_union"
 	case "serialize result":
 		return "serialize_result"
 	case "distributed union":
@@ -354,14 +420,11 @@ func OperatorFamily(node *spannerpb.PlanNode) string {
 	case "tvf":
 		// Spanner Omni emits the TVF name under the capitalized "Name"
 		// metadata key; accept the lowercase spelling defensively.
-		name := nodeMetadataRawString(node, "Name")
-		if name == "" {
-			name = nodeMetadataRawString(node, "name")
-		}
+		name := nodeTVFName(node)
 		if normalizeOperatorName(name) == "search query conversion" {
 			return "search_query_conversion_tvf"
 		}
-		return "unknown"
+		return "tvf"
 	case "unit relation":
 		return "unit_relation"
 	case "verifydeterminism":
@@ -400,6 +463,17 @@ func OperatorFamily(node *spannerpb.PlanNode) string {
 			return "unknown"
 		}
 	}
+}
+
+func nodeTVFName(node *spannerpb.PlanNode) string {
+	if normalizeOperatorName(node.GetDisplayName()) != "tvf" {
+		return ""
+	}
+	name := nodeMetadataRawString(node, "Name")
+	if name == "" {
+		name = nodeMetadataRawString(node, "name")
+	}
+	return name
 }
 
 func operatorContexts(plan *spannerpb.QueryPlan) map[int32]operatorContext {
@@ -508,6 +582,9 @@ func findWrapperInternalOperator(nodesByIndex map[int32]*spannerpb.PlanNode, sta
 		if !ok {
 			return 0, false
 		}
+		if !isRelationalPlanNode(node) {
+			return 0, false
+		}
 		if targetNames[normalizeOperatorName(node.GetDisplayName())] {
 			return start, true
 		}
@@ -552,6 +629,8 @@ func OperatorMetadataString(node *spannerpb.PlanNode, key string) string {
 			return "batch_scan"
 		case "searchindexscan":
 			return "search_index_scan"
+		case "filterscan", "filter scan":
+			return "filter_scan"
 		}
 	case "join_configuration":
 		return strings.ToLower(strings.ReplaceAll(value, "-", "_"))
@@ -567,11 +646,15 @@ func nodeMetadataRawString(node *spannerpb.PlanNode, key string) string {
 	if node == nil || node.GetMetadata() == nil {
 		return ""
 	}
-	value, ok := node.GetMetadata().AsMap()[key]
-	if !ok {
+	value, ok := node.GetMetadata().GetFields()[key]
+	if !ok || value == nil {
 		return ""
 	}
-	return strings.TrimSpace(fmt.Sprint(value))
+	raw := value.AsInterface()
+	if raw == nil {
+		return ""
+	}
+	return strings.TrimSpace(fmt.Sprint(raw))
 }
 
 func nodeMetadataBool(node *spannerpb.PlanNode, key string) bool {
@@ -622,6 +705,21 @@ func subtreeHasBatchScan(nodesByIndex map[int32]*spannerpb.PlanNode, index int32
 }
 
 func isRelationalPlanNode(node *spannerpb.PlanNode) bool {
+	if node == nil {
+		return false
+	}
+	switch node.GetKind() {
+	case spannerpb.PlanNode_RELATIONAL:
+		return true
+	case spannerpb.PlanNode_SCALAR:
+		return false
+	case spannerpb.PlanNode_KIND_UNSPECIFIED:
+		// Older serialized fixtures may omit Kind. Fall back to the known
+		// display-name vocabulary only for those plans; a future explicit Kind
+		// value must not be guessed from its display name.
+	default:
+		return false
+	}
 	switch normalizeOperatorName(node.GetDisplayName()) {
 	case "aggregate",
 		"anti-semi apply",
@@ -632,6 +730,7 @@ func isRelationalPlanNode(node *spannerpb.PlanNode) bool {
 		"create batch",
 		"cross apply",
 		"datablocktorow",
+		"datablocktorowadapter",
 		"distributed apply",
 		"distributed cross apply",
 		"distributed merge union",
@@ -642,9 +741,12 @@ func isRelationalPlanNode(node *spannerpb.PlanNode) bool {
 		"empty relation",
 		"filter",
 		"filter scan",
+		"filterscan",
+		"generate relation",
 		"hash join",
 		"index scan",
 		"limit",
+		"local split union",
 		"merge join",
 		"outer apply",
 		"push broadcast hash join",
@@ -655,6 +757,7 @@ func isRelationalPlanNode(node *spannerpb.PlanNode) bool {
 		"random id assign",
 		"recursive union",
 		"rowtodatablock",
+		"rowtodatablockadapter",
 		"scan",
 		"serialize result",
 		"semi apply",
@@ -663,6 +766,7 @@ func isRelationalPlanNode(node *spannerpb.PlanNode) bool {
 		"spoolbuild",
 		"spoolscan",
 		"table scan",
+		"tvf",
 		"union all",
 		"unit relation":
 		return true
