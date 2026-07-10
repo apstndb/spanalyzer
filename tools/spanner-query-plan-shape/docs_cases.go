@@ -251,6 +251,20 @@ var docsQueries = []queryCase{
 		SQL:   `SELECT a.AlbumTitle, s.SongName FROM Albums AS a JOIN@{JOIN_METHOD=MERGE_JOIN} Songs AS s ON a.AlbumId = s.AlbumId`,
 	},
 	{
+		Label: "binary/hash-join-full-outer",
+		SQL: `SELECT s.FirstName, c.ConcertDate
+FROM Singers AS s
+FULL JOIN@{JOIN_METHOD=HASH_JOIN} Concerts AS c
+ON s.SingerId = c.SingerId`,
+	},
+	{
+		Label: "binary/merge-join-full-outer",
+		SQL: `SELECT s.FirstName, c.ConcertDate
+FROM Singers AS s
+FULL JOIN@{JOIN_METHOD=MERGE_JOIN} Concerts AS c
+ON s.SingerId = c.SingerId`,
+	},
+	{
 		Label: "binary/recursive-union-graph",
 		SQL:   `GRAPH MusicGraph MATCH (singer:Singers {singerId:42})-[c:CollabWith]->{1,2}(featured:Singers) RETURN singer.SingerId AS singer, featured.SingerId AS featured`,
 	},

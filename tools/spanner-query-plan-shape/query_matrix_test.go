@@ -163,6 +163,28 @@ func TestLoadDDLsDocsIncludesTimestampPushdownPrerequisites(t *testing.T) {
 	}
 }
 
+func TestLoadQueriesDocsIncludesIndependentFullOuterJoinProbes(t *testing.T) {
+	queries, err := loadQueries("docs", nil, nil)
+	if err != nil {
+		t.Fatalf("loadQueries(%q) error = %v", "docs", err)
+	}
+	seen := map[string]string{}
+	for _, query := range queries {
+		seen[query.Label] = query.SQL
+	}
+	for _, label := range []string{
+		"binary/hash-join-full-outer",
+		"binary/merge-join-full-outer",
+	} {
+		if seen[label] == "" {
+			t.Fatalf("loadQueries(\"docs\") missing %s", label)
+		}
+		if !strings.Contains(seen[label], "FULL JOIN") || !strings.Contains(seen[label], "Concerts") {
+			t.Fatalf("%s does not use the independent-table FULL JOIN shape: %s", label, seen[label])
+		}
+	}
+}
+
 func TestLoadDDLsFullTextSearchUsesDedicatedSchema(t *testing.T) {
 	ddls, err := loadDDLs("full_text_search", nil)
 	if err != nil {
@@ -184,6 +206,50 @@ func TestLoadDDLsFullTextSearchUsesDedicatedSchema(t *testing.T) {
 	}
 	if strings.Contains(joined, "MusicGraph") || strings.Contains(joined, "CREATE TABLE Singers") {
 		t.Fatalf("full_text_search schema unexpectedly includes docs schema objects:\n%s", joined)
+	}
+}
+
+func TestLoadDDLsJSONSearchUsesDedicatedSchema(t *testing.T) {
+	ddls, err := loadDDLs("json_search", nil)
+	if err != nil {
+		t.Fatalf("loadDDLs(%q) error = %v", "json_search", err)
+	}
+	joined := strings.Join(ddls, "\n")
+	for _, want := range []string{
+		"CREATE TABLE JSONSearchDocuments",
+		"TOKENIZE_JSON(Metadata)",
+		"CREATE SEARCH INDEX JSONSearchDocumentsByMetadata",
+		"CREATE SEARCH INDEX JSONSearchDocumentsByTitleMetadata",
+	} {
+		if !strings.Contains(joined, want) {
+			t.Fatalf("loadDDLs(\"json_search\") missing %q in:\n%s", want, joined)
+		}
+	}
+	if strings.Contains(joined, "MusicGraph") || strings.Contains(joined, "CREATE TABLE Singers") {
+		t.Fatalf("json_search schema unexpectedly includes docs schema objects:\n%s", joined)
+	}
+}
+
+func TestLoadDDLsVectorSearchUsesDedicatedSchema(t *testing.T) {
+	ddls, err := loadDDLs("vector_search", nil)
+	if err != nil {
+		t.Fatalf("loadDDLs(%q) error = %v", "vector_search", err)
+	}
+	joined := strings.Join(ddls, "\n")
+	for _, want := range []string{
+		"CREATE TABLE VectorDocuments",
+		"ARRAY<FLOAT32>(vector_length=>3)",
+		"CREATE VECTOR INDEX VectorDocumentsByEmbedding",
+		"ON VectorDocuments(Embedding, TenantId)",
+		"CREATE VECTOR INDEX TechVectorDocumentsByEmbedding",
+		"WHERE TechOnly IS NOT NULL",
+	} {
+		if !strings.Contains(joined, want) {
+			t.Fatalf("loadDDLs(\"vector_search\") missing %q in:\n%s", want, joined)
+		}
+	}
+	if strings.Contains(joined, "MusicGraph") || strings.Contains(joined, "CREATE TABLE Singers") {
+		t.Fatalf("vector_search schema unexpectedly includes docs schema objects:\n%s", joined)
 	}
 }
 
@@ -241,6 +307,7 @@ func TestLoadQueriesOptimizerUnhintedCandidates(t *testing.T) {
 	for _, label := range []string{
 		"optimizer-unhinted-candidates/execution-plans/index-with-back-join",
 		"optimizer-unhinted-candidates/binary/hash-join",
+		"optimizer-unhinted-candidates/binary/hash-join-full-outer",
 		"optimizer-unhinted-candidates/unary/minor-sort-stream-aggregate",
 		"optimizer-unhinted-candidates/optimizer-gaps/v2/regexp-contains-prefix-forced-index",
 		"optimizer-unhinted-candidates/optimizer-gaps/v6/dml-insert-select-filter",
@@ -350,6 +417,72 @@ func TestLoadQueriesFullTextSearch(t *testing.T) {
 	}
 	if !strings.Contains(seen["full-text-search/numeric-array-any"], "ARRAY_INCLUDES_ANY") {
 		t.Fatalf("numeric array query missing ARRAY_INCLUDES_ANY(): %s", seen["full-text-search/numeric-array-any"])
+	}
+}
+
+func TestLoadQueriesJSONSearch(t *testing.T) {
+	queries, err := loadQueries("json_search", nil, nil)
+	if err != nil {
+		t.Fatalf("loadQueries(%q) error = %v", "json_search", err)
+	}
+	seen := map[string]string{}
+	for _, query := range queries {
+		seen[query.Label] = query.SQL
+	}
+	for _, label := range []string{
+		"json-search/containment-auto-index",
+		"json-search/containment-force-index",
+		"json-search/containment-base-table",
+		"json-search/nested-array-containment",
+		"json-search/key-existence",
+		"json-search/array-path-existence",
+		"json-search/conjunction",
+		"json-search/disjunction-and-negation",
+		"json-search/mixed-full-text-json",
+		"json-search/stored-residual-filter",
+		"json-search/non-covering-back-join",
+	} {
+		if seen[label] == "" {
+			t.Fatalf("loadQueries(\"json_search\") missing %s", label)
+		}
+	}
+	if !strings.Contains(seen["json-search/containment-force-index"], "JSON_CONTAINS(") {
+		t.Fatalf("containment probe missing JSON_CONTAINS(): %s", seen["json-search/containment-force-index"])
+	}
+	if !strings.Contains(seen["json-search/mixed-full-text-json"], "SEARCH(") {
+		t.Fatalf("mixed probe missing SEARCH(): %s", seen["json-search/mixed-full-text-json"])
+	}
+}
+
+func TestLoadQueriesVectorSearch(t *testing.T) {
+	queries, err := loadQueries("vector_search", nil, nil)
+	if err != nil {
+		t.Fatalf("loadQueries(%q) error = %v", "vector_search", err)
+	}
+	seen := map[string]string{}
+	for _, query := range queries {
+		seen[query.Label] = query.SQL
+	}
+	for _, label := range []string{
+		"vector-search/exact-knn-base-table",
+		"vector-search/ann-auto-index",
+		"vector-search/ann-extra-key-filter",
+		"vector-search/ann-stored-filter",
+		"vector-search/ann-back-join",
+		"vector-search/ann-filtered-index",
+	} {
+		if seen[label] == "" {
+			t.Fatalf("loadQueries(\"vector_search\") missing %s", label)
+		}
+	}
+	if !strings.Contains(seen["vector-search/exact-knn-base-table"], "COSINE_DISTANCE(") {
+		t.Fatalf("KNN probe missing COSINE_DISTANCE(): %s", seen["vector-search/exact-knn-base-table"])
+	}
+	if !strings.Contains(seen["vector-search/ann-auto-index"], "APPROX_COSINE_DISTANCE(") {
+		t.Fatalf("ANN probe missing APPROX_COSINE_DISTANCE(): %s", seen["vector-search/ann-auto-index"])
+	}
+	if !strings.Contains(seen["vector-search/ann-back-join"], "Body") {
+		t.Fatalf("back-join probe missing non-stored Body projection: %s", seen["vector-search/ann-back-join"])
 	}
 }
 

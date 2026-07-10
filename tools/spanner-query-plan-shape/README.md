@@ -108,6 +108,36 @@ checks `SEARCH`, `SEARCH_SUBSTRING`, multi-column search, mixed text and
 non-text predicates, `SNIPPET`, `SCORE`, `TOKENLIST_CONCAT`, partitioned
 ordered search indexes, and numeric array search-index predicates.
 
+Inspect JSON search-index probes separately from Full Text Search:
+
+```sh
+go run ./tools/spanner-query-plan-shape \
+  --case json_search \
+  --output compact-tree-metadata \
+  --continue-on-error
+```
+
+The dedicated JSON schema compares `JSON_CONTAINS`, key existence, logical
+combinations, a mixed `SEARCH` plus JSON predicate, a stored projection, and a
+non-covering base-table back join. This isolates direct JSON Search Predicate
+plans from Full Text Search plans that also require the Search Query Conversion
+TVF.
+
+Inspect exact KNN and approximate nearest-neighbor vector-index probes:
+
+```sh
+go run ./tools/spanner-query-plan-shape \
+  --case vector_search \
+  --output compact-tree-metadata \
+  --continue-on-error
+```
+
+The vector case compares an exact `_BASE_TABLE` KNN query with ANN automatic
+index selection, extra-key and stored-column filters, a non-covering back join,
+and a filtered vector index. The vector index DDL is kept as an explicit raw
+statement list because the current memefish parser does not yet accept the
+documented extra key columns after the embedding column.
+
 Inspect `DISABLE_INLINE` function hint probes:
 
 ```sh
@@ -222,7 +252,9 @@ See
 [`research/spanner-query-plan-shape/QUERY_EXECUTION_OPERATORS_OBSERVATIONS.md`](../../research/spanner-query-plan-shape/QUERY_EXECUTION_OPERATORS_OBSERVATIONS.md)
 for the checked Spanner documentation examples, and
 [`research/spanner-query-plan-shape/OPTIMIZER_VERSION_MATRIX_OBSERVATIONS.md`](../../research/spanner-query-plan-shape/OPTIMIZER_VERSION_MATRIX_OBSERVATIONS.md)
-for optimizer-version compact-tree-metadata observations.
+for optimizer-version compact-tree-metadata observations. The prioritized DDL,
+data, query, and hint combinations for still-unobserved shapes are recorded in
+[`research/spanner-query-plan-shape/UNOBSERVED_PLAN_PROBE_MATRIX_2026-07-10.md`](../../research/spanner-query-plan-shape/UNOBSERVED_PLAN_PROBE_MATRIX_2026-07-10.md).
 
 Analyze custom DDL and SQL:
 
