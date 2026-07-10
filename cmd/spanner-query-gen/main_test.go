@@ -1835,7 +1835,7 @@ func TestPlanReportOptimizerEnvironmentPinned(t *testing.T) {
 
 func TestDefaultPlanReportNormalizationCELInputDefaults(t *testing.T) {
 	normalization := defaultPlanReportNormalization()
-	if got, want := normalization.OperatorTreeVersion, "v1alpha.2"; got != want {
+	if got, want := normalization.OperatorTreeVersion, "v1alpha.3"; got != want {
 		t.Fatalf("operator tree version = %q, want %q", got, want)
 	}
 	if got, want := normalization.OperatorFamilyMappingVersion, "v1alpha.2"; got != want {
@@ -2644,6 +2644,21 @@ func TestPlanReportFullScanContract(t *testing.T) {
 					{Index: 8, DisplayName: "Index Scan on FooByTimestamp", Family: "scan", ScanType: "index_scan", ScanTarget: "FooByTimestamp", SeekableKeySize: "2"},
 				},
 			},
+			{
+				Name:   "VectorANN",
+				Scope:  "query",
+				Status: "ok",
+				NormalizedOperators: []planReportOperator{
+					{
+						Index:       9,
+						DisplayName: "Scan",
+						Family:      "scan",
+						ScanType:    "vector_index_root_scan",
+						ScanTarget:  "VectorDocumentsByEmbedding",
+						FullScan:    true,
+					},
+				},
+			},
 		},
 	}
 	contracts := planContractsFile{
@@ -2651,6 +2666,7 @@ func TestPlanReportFullScanContract(t *testing.T) {
 		Contracts: []planContract{
 			{Name: "NoFullScanRejectsFullScan", Target: "query/FullScanLookup", Use: []string{"no_full_scan"}},
 			{Name: "NoFullScanAllowsSeekScan", Target: "query/SeekLookup", Use: []string{"no_full_scan"}},
+			{Name: "NoFullScanStillReportsVectorRoot", Target: "query/VectorANN", Use: []string{"no_full_scan"}},
 		},
 	}
 	if err := applyPlanContracts(&report, contracts); err != nil {
@@ -2683,7 +2699,14 @@ func TestPlanReportFullScanContract(t *testing.T) {
 	if got := planContractMatchedOperatorIndexes(passing.Results[0]); !reflect.DeepEqual(got, []int32{}) {
 		t.Fatalf("seek scan matched operator indexes = %v, want []", got)
 	}
-	if got, want := report.ContractSummary.Failed, 1; got != want {
+	vectorRoot := report.ContractEvaluations[2]
+	if got, want := vectorRoot.Status, planContractStatusFail; got != want {
+		t.Fatalf("vector root scan evaluation status = %q, want %q", got, want)
+	}
+	if got := planContractMatchedOperatorIndexes(vectorRoot.Results[0]); !reflect.DeepEqual(got, []int32{9}) {
+		t.Fatalf("vector root scan matched operator indexes = %v, want [9]", got)
+	}
+	if got, want := report.ContractSummary.Failed, 2; got != want {
 		t.Fatalf("contract summary failed = %d, want %d", got, want)
 	}
 }
@@ -4368,6 +4391,25 @@ func TestPlanReportSearchIndexScanTypeMetadataNormalized(t *testing.T) {
 	}
 }
 
+func TestPlanReportVectorIndexScanTypeMetadataNormalized(t *testing.T) {
+	for raw, want := range map[string]string{
+		"VectorIndexRootScan": "vector_index_root_scan",
+		"VectorIndexLeafScan": "vector_index_leaf_scan",
+	} {
+		t.Run(raw, func(t *testing.T) {
+			node := &spannerpb.PlanNode{
+				DisplayName: "Scan",
+				Metadata: mustStructPB(t, map[string]interface{}{
+					"scan_type": raw,
+				}),
+			}
+			if got := planReportOperatorMetadataString(node, "scan_type"); got != want {
+				t.Fatalf("planReportOperatorMetadataString(scan_type) = %q, want %q", got, want)
+			}
+		})
+	}
+}
+
 func mustStructPB(t testing.TB, fields map[string]interface{}) *structpb.Struct {
 	t.Helper()
 	value, err := structpb.NewStruct(fields)
@@ -4452,7 +4494,7 @@ func TestBuildPlanReportNoTargets(t *testing.T) {
 	if got, want := report.BackendIdentity.Version, "not_recorded"; got != want {
 		t.Fatalf("plan-report backend version = %q, want %q", got, want)
 	}
-	if got, want := report.Normalization.OperatorTreeVersion, "v1alpha.2"; got != want {
+	if got, want := report.Normalization.OperatorTreeVersion, "v1alpha.3"; got != want {
 		t.Fatalf("plan-report operator tree version = %q, want %q", got, want)
 	}
 	if got, want := report.Optimizer.Requested.Version, "8"; got != want {

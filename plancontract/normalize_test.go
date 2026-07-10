@@ -375,6 +375,18 @@ func TestOperatorFamilyDocumentedCoverage(t *testing.T) {
 		{name: "scan with filter scan metadata", displayName: "Scan", metadata: map[string]any{"scan_type": "FilterScan"}, want: "filter_scan"},
 		{name: "historical unspaced filter scan", displayName: "FilterScan", want: "filter_scan"},
 		{name: "ordinary scan remains scan", displayName: "Scan", metadata: map[string]any{"scan_type": "TableScan"}, want: "scan"},
+		{
+			name:        "vector index root scan remains scan",
+			displayName: "Scan",
+			metadata:    map[string]any{"scan_type": "VectorIndexRootScan"},
+			want:        "scan",
+		},
+		{
+			name:        "vector index leaf scan remains scan",
+			displayName: "Scan",
+			metadata:    map[string]any{"scan_type": "VectorIndexLeafScan"},
+			want:        "scan",
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -388,6 +400,23 @@ func TestOperatorFamilyDocumentedCoverage(t *testing.T) {
 			}
 			if !KnownOperatorFamily(tt.want) {
 				t.Fatalf("classified family %q is absent from KnownOperatorFamilies", tt.want)
+			}
+		})
+	}
+}
+
+func TestVectorIndexScanTypeMetadataNormalized(t *testing.T) {
+	t.Parallel()
+
+	for raw, want := range map[string]string{
+		"VectorIndexRootScan": "vector_index_root_scan",
+		"VectorIndexLeafScan": "vector_index_leaf_scan",
+	} {
+		t.Run(raw, func(t *testing.T) {
+			t.Parallel()
+			node := &spannerpb.PlanNode{Metadata: mustMetadata(t, map[string]any{"scan_type": raw})}
+			if got := OperatorMetadataString(node, "scan_type"); got != want {
+				t.Fatalf("OperatorMetadataString(scan_type) = %q, want %q", got, want)
 			}
 		})
 	}

@@ -629,6 +629,10 @@ func OperatorMetadataString(node *spannerpb.PlanNode, key string) string {
 			return "batch_scan"
 		case "searchindexscan":
 			return "search_index_scan"
+		case "vectorindexrootscan":
+			return "vector_index_root_scan"
+		case "vectorindexleafscan":
+			return "vector_index_leaf_scan"
 		case "filterscan", "filter scan":
 			return "filter_scan"
 		}

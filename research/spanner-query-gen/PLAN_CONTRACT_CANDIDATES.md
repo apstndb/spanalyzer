@@ -720,7 +720,9 @@ Recommended next normalized additions:
   exposing filter/scan indexes, target, target kind, base table, full-scan
   state, seek/residual/timestamp/search signals, nullable numeric
   `range_seekable_key_size`, declared key count, and catalog-aware index
-  coverage. Do not infer point-seek depth from `seekable_key_size=0`.
+  coverage. Do not infer point-seek depth from `seekable_key_size=0`. Treat a
+  vector root scan plus its batch-driven leaf scan as one logical ANN access
+  path, with a later base-table lookup represented separately.
 
 - `relational_children`: child indexes filtered to relational operators.
 - `order_preserving` metadata when present.
@@ -729,7 +731,8 @@ Recommended next normalized additions:
 - normalized `has_residual_condition` and `has_timestamp_condition` belong on
   each access path, ideally with the referenced commit timestamp column when
   that can be extracted safely.
-- `scan_target_kind`: `table`, `index`, `batch`, or `unknown`.
+- `scan_target_kind`: `table`, `secondary_index`, `search_index`,
+  `vector_index_root`, `vector_index_leaf`, `batch`, or `unknown`.
 - `base_table`: for table scans this is the table itself; for index scans this
   is resolved from the schema catalog.
 - index coverage metadata from the schema catalog: key columns, stored columns,

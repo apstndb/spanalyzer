@@ -1280,7 +1280,7 @@
           "type": "string"
         },
         "scan_type": {
-          "description": "Normalized scan_type metadata, for example table_scan, index_scan, batch_scan, search_index_scan, or filter_scan.",
+          "description": "Normalized scan_type metadata, for example table_scan, index_scan, batch_scan, search_index_scan, vector_index_root_scan, vector_index_leaf_scan, or filter_scan.",
           "minLength": 1,
           "type": "string"
         },

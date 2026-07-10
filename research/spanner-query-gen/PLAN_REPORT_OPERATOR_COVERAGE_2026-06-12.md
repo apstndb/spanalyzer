@@ -111,6 +111,33 @@ plans and is now a usable policy.
 - The generic `join` / `aggregate` fallbacks: only reachable when
   classification metadata is missing, which has not been observed live.
 
+### Follow-up observations (2026-07-10)
+
+The feature-driven probe matrix in
+[`../spanner-query-plan-shape/UNOBSERVED_PLAN_PROBE_MATRIX_2026-07-10.md`](../spanner-query-plan-shape/UNOBSERVED_PLAN_PROBE_MATRIX_2026-07-10.md)
+found additional metadata vocabulary without introducing unknown operator
+families:
+
+- ANN vector search emits raw `scan_type` values `VectorIndexRootScan` and
+  `VectorIndexLeafScan`. They now normalize to `vector_index_root_scan` and
+  `vector_index_leaf_scan`, remain in the `scan` family, and can be selected in
+  CEL independently from table, secondary-index, search-index, and batch
+  scans. This digest-input change bumps operator-tree normalization to
+  `v1alpha.3` without changing the family-mapping version. A stored predicate
+  adds a leaf Residual Condition; a non-stored projection adds an
+  order-preserving base-table back join.
+- JSON search uses `SearchIndexScan` plus direct Search Predicate links without
+  the Search Query Conversion TVF. A mixed Full Text Search plus JSON predicate
+  restores that TVF. On Omni `2026.r1-beta.2`, automatic JSON-index selection
+  changes between optimizer versions 4 and 5; the version-5 success conflicts
+  with the version-1-through-4 error text claiming version 6 is required, so
+  DBaaS verification remains necessary.
+- Independent-table FULL OUTER JOIN probes add `join_type=BUILD_PROBE_OUTER`
+  for Hash Join and `join_type=FULL_OUTER` for Merge Join. The direct hash
+  shape appears in optimizer versions 7 and 8, while versions 1 through 6
+  rewrite it into Union All branches; the merge metadata is stable across
+  versions 1 through 8.
+
 ## Classifier and catalog defects found and fixed
 
 All found by the probes above, all fixed the same day with regression tests:

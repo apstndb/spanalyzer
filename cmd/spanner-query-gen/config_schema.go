@@ -170,6 +170,9 @@ func planContractJSONSchema() map[string]interface{} {
 }
 
 func planReportJSONSchema() map[string]interface{} {
+	const scanTypeDescription = "Normalized scan_type metadata, for example table_scan, index_scan, batch_scan, " +
+		"search_index_scan, vector_index_root_scan, vector_index_leaf_scan, or filter_scan."
+
 	return map[string]interface{}{
 		"$schema":              "https://json-schema.org/draft/2020-12/schema",
 		"$id":                  "https://github.com/apstndb/spanalyzer/schemas/spanner-query-gen.plan-report.v1alpha.schema.json",
@@ -285,7 +288,7 @@ func planReportJSONSchema() map[string]interface{} {
 				"iterator_type":         stringSchema("Normalized iterator_type metadata."),
 				"scan_method":           stringSchema("Normalized scan_method metadata."),
 				"scan_format":           stringSchema("Normalized scan_format metadata."),
-				"scan_type":             stringSchema("Normalized scan_type metadata, for example table_scan, index_scan, batch_scan, search_index_scan, or filter_scan."),
+				"scan_type":             stringSchema(scanTypeDescription),
 				"scan_target":           stringSchema("Raw scan target metadata."),
 				"seekable_key_size":     stringSchema("Raw seekable key size metadata."),
 				"join_type":             stringSchema("Normalized join_type metadata."),

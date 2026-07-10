@@ -164,7 +164,7 @@ const (
 	planContractStatusNotEvaluated = plancontract.StatusNotEvaluated
 
 	planReportVersionV1Alpha        = "v1alpha-plan-report-v1"
-	planReportOperatorTreeVersion   = "v1alpha.2"
+	planReportOperatorTreeVersion   = "v1alpha.3"
 	planReportFamilyMappingVersion  = "v1alpha.2"
 	planContractFileVersionV1Alpha  = plancontract.FileVersionV1Alpha
 	planContractEvaluatorVersionV1  = plancontract.EvaluatorVersionV1

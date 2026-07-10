@@ -652,6 +652,13 @@ a contract actually asserts. Details and reproductions live in
   everything. In the sharded timestamp pattern the wasteful shape is caught
   by `no_explicit_sort` (the global `Sort Limit`) rather than
   `no_full_scan`; per-shard equality probes are the fix on the query side.
+- **ANN vector root scans carry `Full scan: true`.** An efficient ANN plan can
+  scan the vector index's root centroid table before probing selected leaves.
+  The predefined `no_full_scan` contract is deliberately faithful to that raw
+  metadata and therefore matches `vector_index_root_scan`. If the policy is
+  intended to forbid full base-row access rather than every raw full-scan bit,
+  use CEL to exclude that scan type and keep a separate assertion that the ANN
+  plan contains both `vector_index_root_scan` and `vector_index_leaf_scan`.
 - **A Seek Condition is a plan-representation fact, not a runtime
   guarantee.** Range extraction happens at runtime, and fragmented
   multi-range seeks can be processed like residual filtering. Contracts on
@@ -909,8 +916,9 @@ boolean metadata fields such as `scalar_aggregate` and `full_scan` default to
 `operator_edges[]`, optional string fields include `type` and `variable`.
 
 `scan_type` uses normalized spelling such as `table_scan`, `index_scan`,
-`batch_scan`, `search_index_scan`, and `filter_scan`, not raw PlanNode metadata
-values such as `TableScan`, `IndexScan`, or `FilterScan`.
+`batch_scan`, `search_index_scan`, `vector_index_root_scan`,
+`vector_index_leaf_scan`, and `filter_scan`, not raw PlanNode metadata values
+such as `TableScan`, `IndexScan`, `VectorIndexRootScan`, or `FilterScan`.
 
 `execution_stats` is explicitly rejected.
 
@@ -918,6 +926,24 @@ Useful examples:
 
 ```cel
 operators.exists(o, o.scan_target == "SingersByLastName")
+```
+
+```cel
+operators.exists(o,
+  o.scan_type == "vector_index_root_scan" &&
+  o.scan_target == "VectorDocumentsByEmbedding") &&
+operators.exists(o, o.scan_type == "vector_index_leaf_scan")
+```
+
+For a policy that permits the ANN root-centroid scan but rejects other raw
+full-scan metadata:
+
+```cel
+operators.all(o,
+  !(o.full_scan &&
+    (o.family == "filter_scan" ||
+     (o.family == "scan" &&
+      o.scan_type != "vector_index_root_scan"))))
 ```
 
 ```cel

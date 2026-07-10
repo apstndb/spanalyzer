@@ -142,7 +142,10 @@ config/output freeze (v1 freeze is deliberately deferred).
   identity, scan kind, full-scan state, Seek/Residual/Timestamp/Search signals,
   nullable range `seekable_key_size`, declared keys, and catalog-aware index
   coverage. Do not infer point-seek depth from `seekable_key_size=0`, which is
-  also reported for full scans.
+  also reported for full scans. Coalesce a `VectorIndexRootScan` plus its
+  batch-driven `VectorIndexLeafScan` into one logical ANN access path; do not
+  interpret the root centroid table's `Full scan: true` as a full base-row
+  scan. Represent any later base-table back join separately.
 - [ ] **Add non-vacuous positive plan predicates.** Start with
   `require.operator_family` plus `min_count` and matched indexes. Forbidding
   `hash_aggregate` does not prove a Stream Aggregate exists, and join
@@ -151,7 +154,10 @@ config/output freeze (v1 freeze is deliberately deferred).
   protojson/protoyaml envelopes produced by `spanner-query-plan-shape`, retain
   backend/optimizer/statistics/capture and catalog provenance, and cover
   Local Split Union, MiniBatch/RowCount, generic TVFs, join elimination,
-  historical spellings, and other operators Omni cannot produce.
+  historical spellings, and other operators Omni cannot produce. Use the
+  exact DDL/data/query/hint recipes in
+  `research/spanner-query-plan-shape/UNOBSERVED_PLAN_PROBE_MATRIX_2026-07-10.md`
+  rather than empty-schema variants for the data-dependent cases.
 - [ ] **Canonicalize operator-tree digests independently of PlanNode numbers.**
   Concrete normalization IDs now change when digest inputs or family semantics
   change; the remaining step is a canonical topology encoding that does not
