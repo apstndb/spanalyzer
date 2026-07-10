@@ -45,11 +45,12 @@ architecture.
   set, apply external-dataset registration atomically so a rejected schema
   cannot leave a partially mutated live catalog, and make ambiguous
   `ML.PREDICT` model fallback fail loudly when multiple models are registered.
-- [ ] **Unify proto descriptor and type-resolution passes.** Descriptor sets
-  loaded from multiple files should dedupe by descriptor file name before
-  building a `protodesc.Files` pool, and PROTO/ENUM fix-up should run over
-  every `TypeSpec` carrier, including model inputs/outputs and view-derived
-  types, not only table columns.
+- [ ] **Finish unifying proto descriptor and type-resolution passes.**
+  Descriptor sets loaded from multiple files now dedupe identical descriptor
+  file names and reject conflicting definitions before building a
+  `protodesc.Files` pool. PROTO/ENUM fix-up must still run over every `TypeSpec`
+  carrier, including model inputs/outputs and view-derived types, not only
+  table columns.
 - [ ] **Strengthen `plancontract` as an independently reliable module.** Add
   table-driven tests for operator-family classification, topology,
   predefined-contract expansion, YAML validation, CEL evaluation, and digest
@@ -131,6 +132,34 @@ config/output freeze (v1 freeze is deliberately deferred).
   out of scope unless a separate profile-contract surface is designed.
 - Grow predefined operator families only from observed plans, fixtures, or
   concrete contract use cases.
+- [ ] **Add live proto-bundle plan-report coverage.** Plan acquisition now
+  canonicalizes, merges, and dedupes configured descriptor sets, passes them to
+  spanemuboost database creation, and records the deterministic merged
+  descriptor digest. Add a tagged Omni case that creates a PROTO BUNDLE and
+  successfully analyzes a proto-field query end to end.
+- [ ] **Normalize logical scan access paths.** Join each Filter Scan wrapper
+  with its unique Scan child into `access_paths[]`: target and base-table
+  identity, scan kind, full-scan state, Seek/Residual/Timestamp/Search signals,
+  nullable range `seekable_key_size`, declared keys, and catalog-aware index
+  coverage. Do not infer point-seek depth from `seekable_key_size=0`, which is
+  also reported for full scans.
+- [ ] **Add non-vacuous positive plan predicates.** Start with
+  `require.operator_family` plus `min_count` and matched indexes. Forbidding
+  `hash_aggregate` does not prove a Stream Aggregate exists, and join
+  elimination can make negative join-family contracts pass vacuously.
+- [ ] **Add captured QueryPlan replay and a DBaaS fixture corpus.** Accept the
+  protojson/protoyaml envelopes produced by `spanner-query-plan-shape`, retain
+  backend/optimizer/statistics/capture and catalog provenance, and cover
+  Local Split Union, MiniBatch/RowCount, generic TVFs, join elimination,
+  historical spellings, and other operators Omni cannot produce.
+- [ ] **Canonicalize operator-tree digests independently of PlanNode numbers.**
+  Concrete normalization IDs now change when digest inputs or family semantics
+  change; the remaining step is a canonical topology encoding that does not
+  make an otherwise equivalent renumbered plan compare different.
+- [ ] **Design a separate read-only profile-report surface.** Normalize query
+  and node runtime statistics and ratios with dataset/setup/warmup/repetition
+  provenance. Keep DML out of PROFILE and keep runtime thresholds out of the
+  structural PLAN contract surface.
 - [ ] **Decide blocking_operator attribution for wrapper/implementation
   pairs.** Found by reading family-annotated rendered output: the
   push_broadcast_hash_join wrapper is in `streamBlockingOperatorFamily` but
@@ -197,8 +226,10 @@ are out of scope.
 - [ ] **Upstream the spannerplan RowAnnotator hook and restore standalone
   module closure before publishing.** The locally committed `--annotate`
   implementation compiles only through the sibling spannerplan `go.work`
-  replacement, and it also uses `plancontract.DerivedOperatorFamilies`, which
-  is absent from the `plancontract` version pinned by the command module.
+  replacement, and it also uses
+  `plancontract.DerivedOperatorFamiliesForOperator` and
+  `ProtoDescriptorSet.FileDescriptorSet`, which are absent from the root and
+  plancontract versions pinned by the command module.
   Merge and tag both dependency changes, bump both command requirements, drop
   the `go.work` replacement, and add `GOWORK=off` CI for every nested module.
   Until then, a fresh checkout and the command module's published dependency
@@ -224,10 +255,11 @@ are out of scope.
   concrete family left of the colon, derived umbrella attributes right of it
   in lexicographic order), without adding a
   plancontract dependency to spannerplan. Braces are reserved for these
-  labels by convention. The umbrella suffixes come from the new
-  `plancontract.DerivedOperatorFamilies`, which is pinned to
-  `AddDerivedOperatorFamilyCounts` by a consistency test and is committable
-  independently of the spannerplan gate.
+  labels by convention. The umbrella suffixes come from the metadata-aware
+  `plancontract.DerivedOperatorFamiliesForOperator`; the family-only
+  `DerivedOperatorFamilies` remains pinned to `AddDerivedOperatorFamilyCounts`,
+  while the operator-aware helper additionally marks scalar Stream Aggregates
+  as blocking.
 - [ ] **Consider a families annotation mode that skips trivial labels.**
   Observed on real and fixture plans: most rows render labels that merely
   restate the display name (`Global Limit {limit}`, `Batch Scan ... {scan}`,

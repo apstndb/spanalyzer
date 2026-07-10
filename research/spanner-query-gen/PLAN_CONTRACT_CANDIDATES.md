@@ -26,12 +26,12 @@ this table tracks where each candidate below stands.
 | `no_full_scan_without_timestamp_condition` | Promoted (predefined) |
 | `require_timestamp_condition` | Promoted (predefined) |
 | `require_scan_target` | Candidate |
-| `require_seekable_scan` | Candidate (needs normalized minimum-seekable-key support) |
-| `no_residual_condition` | Candidate |
+| `require_seekable_scan` | Blocked on a normalized logical `access_paths[]` view; `seekable_key_size=0` is ambiguous between full scans and point seeks |
+| `no_residual_condition` | Blocked on a normalized logical `access_paths[]` view |
 | `no_back_join` | Blocked on index-to-base-table schema mapping |
 | `index_only_scan` | Blocked on index-to-base-table schema mapping |
 | `require_order_preserving` | Candidate |
-| `require_stream_aggregate` | Covered today via direct `forbid.operator_family: hash_aggregate` plus the aggregate classification safeguards |
+| `require_stream_aggregate` | Candidate; forbidding `hash_aggregate` is insufficient because a plan with no aggregate passes vacuously. Today require at least one `stream_aggregate` and reject both `hash_aggregate` and fallback `aggregate` in CEL. |
 | `no_distributed_join` | Covered today via direct `forbid` rules on the distributed join families |
 | Root-partitionable CEL example | Documented as a CEL recipe in PLAN_CONTRACTS.md |
 | "Needs More Normalized Plan Shape" section | Blocked on additional normalized fields |
@@ -471,13 +471,24 @@ Intent: verify that filters are applied as seek conditions rather than merely
 as residual filters after scanning.
 
 Why it matters: useful seek predicates are materially different from residual
-filtering. `seekable_key_size` is the stable metadata we currently expose that
-approximates this.
+filtering. The current raw signals are split across nodes: the Filter Scan owns
+`seekable_key_size` and commonly Residual Condition, while its Scan child owns
+`scan_target`, `scan_type`, `full_scan`, and commonly Seek Condition. Captured
+versions also show condition edges on the wrapper, so normalization must merge
+signals from both nodes rather than hard-code one owner.
 
 Current CEL example:
 
 ```cel
-operators.exists(o, o.scan_target == "SingersByLastName" && o.seekable_key_size == "1")
+operators.exists(f,
+  f.family == "filter_scan" &&
+  operator_edges.exists(e,
+    e.type == "Seek Condition" &&
+    (e.parent_index == f.index ||
+     f.descendant_indexes.exists(i, i == e.parent_index))) &&
+  f.descendant_indexes.exists(i,
+    operators.exists(s,
+      s.index == i && s.scan_target == "SingersByLastName")))
 ```
 
 For sharded timestamp-order queries, the observed difference between
@@ -486,25 +497,34 @@ of signal: the range form can still use the index but only report
 `seekable_key_size == "1"` with timestamp filtering left outside the full key
 seek, while the per-shard equality probe can reach `seekable_key_size == "2"`.
 
-Potential direct rule:
+This is still only a rough topology join: a future wrapper with multiple Scan
+descendants would be ambiguous. The direct rule should therefore wait for a
+normalized access-path object rather than matching two flat operators:
 
 ```yaml
 require:
-- scan:
+- access_path:
     target: SingersByLastName
-    min_seekable_key_size: 1
+    seek: true
+    # Optional range-only constraint; point seeks legitimately report 0.
+    min_range_seekable_key_size: 1
 ```
 
 Limitations:
 
-- `seekable_key_size` alone cannot prove the seek range is semantically narrow.
+- `seekable_key_size=0` is not "no seek": both a plain full scan and a complete
+  equality point seek can report it. The field measures a range-extraction
+  prefix when that representation is used; it does not reveal point-seek depth.
+- A positive `seekable_key_size` alone cannot prove the seek range is
+  semantically narrow.
   A range such as `UserId BETWEEN min AND max` can still be too broad. That
   needs query-specific review or future SQL/parameter-aware checks.
 - It also cannot replace PROFILE when the plan shape is identical but scan-row
   count changes. `GROUPBY_SCAN_OPTIMIZATION` is a known example where the plan
   can remain structurally similar while rows scanned differ.
-- Numeric comparison should use a normalized `seekable_key_size_int` instead of
-  string comparison.
+- Numeric comparison should use a nullable normalized
+  `range_seekable_key_size` instead of string comparison. It must remain
+  separate from the boolean `has_seek_condition` signal.
 
 ### `no_residual_condition`
 
@@ -603,9 +623,15 @@ Current workaround:
 contracts:
 - name: AggregateBySingerPlan
   target: query/AggregateBySinger
-  use:
-  - no_hash_aggregate
+  cel: |
+    operator_family_counts["stream_aggregate"] > 0 &&
+    operator_family_counts["hash_aggregate"] == 0 &&
+    operator_family_counts["aggregate"] == 0
 ```
+
+The generic `aggregate` guard preserves the classification safeguard: a plan
+with one known Stream Aggregate and one metadata-ambiguous Aggregate should not
+silently satisfy an "all aggregation is streaming" expectation.
 
 Refinement candidates:
 
@@ -651,20 +677,28 @@ operators.all(o, o.scan_type != "table_scan")
 This is only a rough approximation of index-only behavior because it does not
 know whether an index belongs to the same base table as a table scan.
 
-### Require A Minimum Seekable Key Prefix
+### Require A Minimum Range-Seekable Key Prefix
 
 ```cel
-operators.exists(o, o.scan_target == "UserAccessLogByShardIdLastAccess" && o.seekable_key_size == "2")
+operators.exists(f,
+  f.family == "filter_scan" && f.seekable_key_size == "2" &&
+  f.descendant_indexes.exists(i,
+    operators.exists(s,
+      s.index == i &&
+      s.scan_target == "UserAccessLogByShardIdLastAccess")))
 ```
+
+This is a representation-specific range check, not a general seekability or
+performance check. In particular it excludes point seeks, which can report 0.
 
 ### Forbid A Residual-Only Full Scan
 
-```cel
-operators.all(o, !(o.family == "scan" && o.full_scan && o.seekable_key_size == ""))
-```
-
-This is weaker than true predicate classification because residual predicate
-labels are not yet normalized.
+There is no safe flat-operator CEL shorthand today: `full_scan` and
+`scan_target` normally live on the Scan child, while condition edges are split
+across the Filter Scan wrapper and Scan child and can vary across captured
+versions. A nested CEL topology join is possible for a known fixture shape but
+can misassociate a future multi-scan subtree. Prefer the normalized
+`access_paths[]` addition below.
 
 ## Needs More Normalized Plan Shape
 
@@ -682,20 +716,25 @@ Implemented normalized topology additions:
 
 Recommended next normalized additions:
 
+- `access_paths[]`, joining a Filter Scan wrapper to its unique Scan child and
+  exposing filter/scan indexes, target, target kind, base table, full-scan
+  state, seek/residual/timestamp/search signals, nullable numeric
+  `range_seekable_key_size`, declared key count, and catalog-aware index
+  coverage. Do not infer point-seek depth from `seekable_key_size=0`.
+
 - `relational_children`: child indexes filtered to relational operators.
 - `order_preserving` metadata when present.
 - extracted `order_keys` and `aggregate_keys` from `Key`, `MajorKey`, and
   `MinorKey` child links.
-- normalized `has_residual_condition` or residual child-link summaries.
-- normalized `has_timestamp_condition` or timestamp-condition child-link
-  summaries, ideally with the referenced commit timestamp column when that can
-  be extracted safely.
+- normalized `has_residual_condition` and `has_timestamp_condition` belong on
+  each access path, ideally with the referenced commit timestamp column when
+  that can be extracted safely.
 - `scan_target_kind`: `table`, `index`, `batch`, or `unknown`.
 - `base_table`: for table scans this is the table itself; for index scans this
   is resolved from the schema catalog.
 - index coverage metadata from the schema catalog: key columns, stored columns,
   and null-filtered/null-filtering attributes where available.
-- numeric `seekable_key_size_int` in addition to the raw string.
+- nullable numeric `range_seekable_key_size` in addition to the raw string.
 
 Adding these keeps most advanced contracts in CEL while making them readable
 and less dependent on raw `spannerpb.PlanNode` shape. It also avoids false

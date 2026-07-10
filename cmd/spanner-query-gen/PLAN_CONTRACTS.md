@@ -117,6 +117,7 @@ operators[i].subtree_family_counts["explicit_sort"]
 operator_family_counts["blocking_operator"]
   == count(full_sort, hash_aggregate, hash_join, push_broadcast_hash_join,
            aggregate, join, bloom_filter_build, spool_build)
+   + count(stream_aggregate where scalar_aggregate == true)
 ```
 
 `operator_families` lists concrete families observed in
@@ -157,7 +158,7 @@ contract convenience.
 | `array_subquery` | Concrete | Array Subquery operator. |
 | `array_unnest` | Concrete | Array Unnest operator. |
 | `bloom_filter_build` | Concrete | BloomFilterBuild operator. |
-| `blocking_operator` | Derived | Count-only umbrella for stream-blocking operators; currently `full_sort`, `hash_aggregate`, `hash_join`, `push_broadcast_hash_join`, fallback `aggregate` / `join`, `bloom_filter_build`, and `spool_build`. |
+| `blocking_operator` | Derived | Count-only umbrella for stream-blocking operator instances; currently `full_sort`, `hash_aggregate`, `hash_join`, `push_broadcast_hash_join`, fallback `aggregate` / `join`, `bloom_filter_build`, `spool_build`, and `stream_aggregate` only when `scalar_aggregate: true`. |
 | `change_stream_tvf` | Concrete | ChangeStream TVF operator. |
 | `compute` | Concrete | Compute operator. |
 | `compute_struct` | Concrete | Compute Struct operator. |
@@ -176,11 +177,13 @@ contract convenience.
 | `filter` | Concrete | Filter operator. |
 | `filter_scan` | Concrete | Filter Scan operator. |
 | `full_sort` | Concrete | Sort, Sort Limit, Local Sort, or Local Sort Limit. |
+| `generate_relation` | Concrete | Generate Relation operator. |
 | `hash_aggregate` | Concrete | Aggregate classified as hash aggregation from metadata or display/description text. |
 | `hash_join` | Concrete | Hash Join not classified as the internal hash join of Push Broadcast Hash Join. |
 | `join` | Concrete fallback | Join-like PlanNode that could not be mapped to a specific join family. |
 | `key_range_accumulator` | Concrete | KeyRangeAccumulator operator. |
 | `limit` | Concrete | Global Limit, Limit, or Local Limit operator. |
+| `local_split_union` | Concrete | Local Split Union operator. |
 | `merge_join` | Concrete | Merge Join operator. |
 | `mini_batch_assign` | Concrete | MiniBatchAssign operator. |
 | `mini_batch_key_order` | Concrete | MiniBatchKeyOrder operator. |
@@ -202,6 +205,7 @@ contract convenience.
 | `spool_build` | Concrete | SpoolBuild operator. |
 | `spool_scan` | Concrete | SpoolScan operator. |
 | `stream_aggregate` | Concrete | Aggregate classified as stream aggregation from metadata or display/description text. |
+| `tvf` | Concrete | Generic table-valued function operator that is not one of the specialized TVF families; `normalized_operators[].tvf_name` preserves its metadata identity. |
 | `union_all` | Concrete | Union All operator. |
 | `union_input` | Concrete | Union Input operator. |
 | `unit_relation` | Concrete | Unit Relation operator. |
@@ -236,8 +240,8 @@ The v1alpha predefined set is intentionally small:
 | `no_hash_aggregate` | `hash_aggregate` | Reject hash aggregate operators. |
 | `no_stream_aggregate` | `stream_aggregate` | Reject stream aggregate operators. |
 | `no_full_scan` | metadata rule | Reject scan operators whose metadata says `Full scan: true`. |
-| `no_full_scan_without_timestamp_condition` | metadata plus child-link rule | Reject full scan operators unless they have a `Timestamp Condition` child link. |
-| `require_timestamp_condition` | child-link rule | Require at least one scan operator with a `Timestamp Condition` child link. |
+| `no_full_scan_without_timestamp_condition` | metadata plus child-link rule | Reject full scan operators unless the scan itself or its unique Filter Scan wrapper has a `Timestamp Condition` child link. |
+| `require_timestamp_condition` | child-link rule | Require at least one Scan or Filter Scan operator with a `Timestamp Condition` child link. |
 | `no_blocking_operator_under_limit` | topology rule | Reject stream-blocking descendants below `Limit` or `Sort Limit`. `Minor Sort Limit` is not treated as blocking by this rule. |
 
 The table above is the public predefined vocabulary. Conceptually, each
@@ -422,20 +426,32 @@ contracts:
 
 - name: NoFullScanCEL
   target: query/Target
-  cel: operators.all(o, !(o.family == "scan" && o.full_scan))
+  cel: operators.all(o, !((o.family == "scan" || o.family == "filter_scan") && o.full_scan))
 
 - name: NoFullScanWithoutTimestampConditionCEL
   target: query/Target
   cel: |
     operators.all(o,
-      !(o.family == "scan" && o.full_scan) ||
+      !((o.family == "scan" || o.family == "filter_scan") && o.full_scan) ||
       operator_edges.exists(e,
-        e.parent_index == o.index &&
-        e.type == "Timestamp Condition"))
+        e.type == "Timestamp Condition" &&
+        (e.parent_index == o.index ||
+         operators.exists(f,
+           f.family == "filter_scan" &&
+           e.parent_index == f.index &&
+           f.child_indexes.exists(i, i == o.index) &&
+           operators.filter(s,
+             s.family == "scan" &&
+             f.child_indexes.exists(i, i == s.index)).size() == 1))))
 
 - name: RequireTimestampConditionCEL
   target: query/Target
-  cel: operator_edges.exists(e, e.type == "Timestamp Condition")
+  cel: |
+    operator_edges.exists(e,
+      e.type == "Timestamp Condition" &&
+      operators.exists(o,
+        o.index == e.parent_index &&
+        (o.family == "scan" || o.family == "filter_scan")))
 
 - name: NoBlockingOperatorUnderLimitCEL
   target: query/Target
@@ -451,7 +467,9 @@ contracts:
         descendant.family != "aggregate" &&
         descendant.family != "join" &&
         descendant.family != "bloom_filter_build" &&
-        descendant.family != "spool_build"))
+        descendant.family != "spool_build" &&
+        !(descendant.family == "stream_aggregate" &&
+          descendant.scalar_aggregate)))
 ```
 
 `no_hash_join` does not count the internal implementation Hash Join reached
@@ -536,8 +554,8 @@ For `forbid_blocking_operator_under_limit` rules,
 `matched_operator_indexes` contains blocking descendant operator indexes, not
 the `Limit` or `Sort Limit` ancestor indexes. This is useful for queries where
 a limiting operator is expected to stream early rows but a descendant full sort,
-hash aggregate, hash join, BloomFilterBuild, or SpoolBuild can force upstream
-materialization first.
+hash aggregate, scalar Stream Aggregate, hash join, BloomFilterBuild, or
+SpoolBuild can force upstream materialization first.
 
 For `forbid_full_scan` rules, `matched_operator_indexes` contains scan
 operators whose normalized metadata has `full_scan: true`. This rule is a
@@ -546,15 +564,19 @@ a non-full scan can still read too many rows if important predicates remain as
 residual conditions.
 
 For `forbid_full_scan_without_timestamp_condition` rules,
-`matched_operator_indexes` contains full-scan operator indexes that do not have
-a `Timestamp Condition` child link. This is the preferred broad OLTP guardrail
-when recent-data commit timestamp reads are allowed to rely on storage-level
-timestamp pruning.
+`matched_operator_indexes` contains full-scan operator indexes that are not
+associated with a `Timestamp Condition` child link. Captured shapes can put the
+link on the Scan itself or on a Filter Scan wrapper while `full_scan` lives on
+its unique Scan child. This is the preferred
+broad OLTP guardrail when recent-data commit timestamp reads are allowed to
+rely on storage-level timestamp pruning. An ambiguous wrapper with multiple
+direct Scan children is not accepted as evidence for any of them.
 
 For `require_timestamp_condition` rules, `matched_operator_indexes` contains
-the parent scan operator indexes that have a `Timestamp Condition` child link.
-This rule is for recent-data commit timestamp reads where storage-level
-timestamp pruning is expected. It intentionally does not require the absence of
+the Scan or Filter Scan parent indexes that own a `Timestamp Condition` child
+link. Same-named edges on unrelated operators do not satisfy the rule. This
+rule is for recent-data commit timestamp reads where storage-level timestamp
+pruning is expected. It intentionally does not require the absence of
 `full_scan: true`: current Spanner plans can still report a full table scan
 while a `Timestamp Condition` reduces I/O below the scan operator.
 
@@ -612,11 +634,11 @@ a contract actually asserts. Details and reproductions live in
   backed by declared referential integrity (interleaving, an enforced
   `FOREIGN KEY`, or a `NOT ENFORCED` foreign key) is removed entirely when
   only the join key is referenced from the joined side, and a `JOIN_METHOD`
-  hint on an eliminated join is silently ignored. A contract requiring or
-  forbidding a specific join family can therefore pass or fail because the
-  join disappeared, not because the join method changed. Prefer contracts
-  about the shape that should exist (scans, seeks, sort absence) over
-  assumptions about hint effects.
+  hint on an eliminated join is silently ignored. In particular, a contract
+  that only forbids a join family can pass vacuously because the join
+  disappeared, not because the intended alternative join method was selected.
+  Prefer contracts about the shape that should exist (scans, seeks, sort
+  absence) over assumptions about hint effects.
 - **Unhinted aggregate methods follow available index orderings.** Without a
   `GROUP@{GROUP_METHOD=...}` hint, the same query plans as a hash aggregate
   with no index on the grouping key and as a stream aggregate once such an
@@ -633,8 +655,10 @@ a contract actually asserts. Details and reproductions live in
 - **A Seek Condition is a plan-representation fact, not a runtime
   guarantee.** Range extraction happens at runtime, and fragmented
   multi-range seeks can be processed like residual filtering. Contracts on
-  seekability assert plan structure; performance claims still need PROFILE
-  evidence, which is out of scope for plan contracts by design.
+  seekability and rendered `seekable_key_size: k/N` annotations assert plan
+  structure; they do not estimate rows scanned, I/O, or latency. Performance
+  claims still need PROFILE evidence, which is out of scope for plan contracts
+  by design.
 
 ## Status Invariants
 
@@ -665,8 +689,9 @@ violation is treated as a generator bug rather than a consumer responsibility.
   operator list.
 - `queries[].status: error | skipped` means only partial input/error fields are
   reliable. Target identity and `error` are reliable; for `skipped`, `error` is
-  a skip message rather than necessarily a failure. `sql`, `sql_sha256`, and
-  `ddl_sha256` are reliable only when present. Plan normalization fields such as
+  a skip message rather than necessarily a failure. `sql`, `sql_sha256`,
+  `ddl_sha256`, and `proto_descriptor_sha256` are reliable only when present.
+  Plan normalization fields such as
   `operator_tree_sha256`, `operator_families`, `operator_family_counts`,
   `normalized_operators`, `operator_edges`, `plan`, and
   `classification_warnings` are absent and must not be interpreted as successful
@@ -877,13 +902,15 @@ field inside a string literal does not by itself change the stability tier.
 For `operators[]`, optional string metadata includes `execution_method`,
 `iterator_type`, `scan_method`, `scan_format`, `scan_type`, `scan_target`,
 `seekable_key_size`, `join_type`, `join_configuration`, `call_type`,
-`distribution_table`, `subquery_cluster_node`, and `spool_name`. Optional
-boolean metadata fields such as `full_scan` default to `false`. For
+`distribution_table`, `subquery_cluster_node`, `spool_name`, and `tvf_name`.
+Optional
+boolean metadata fields such as `scalar_aggregate` and `full_scan` default to
+`false`. For
 `operator_edges[]`, optional string fields include `type` and `variable`.
 
 `scan_type` uses normalized spelling such as `table_scan`, `index_scan`,
-`batch_scan`, and `search_index_scan`, not raw PlanNode metadata values such as
-`TableScan` or `IndexScan`.
+`batch_scan`, `search_index_scan`, and `filter_scan`, not raw PlanNode metadata
+values such as `TableScan`, `IndexScan`, or `FilterScan`.
 
 `execution_stats` is explicitly rejected.
 
@@ -1009,6 +1036,10 @@ The report separates requested and effective optimizer settings:
 settings passed to `AnalyzeQuery`. `--require-optimizer-pinning` checks the
 requested pinning state. v1alpha records effective optimizer values as
 `not_recorded`.
+Optimizer versions `latest`, `latest_version`, and `default_version`, and
+optimizer statistics package `latest`, are moving aliases rather than fixed
+environment identities. They are recorded as requested but treated as unpinned
+by warnings and `--require-optimizer-pinning`.
 This check does not infer optimizer pinning from SQL statement hints such as
 `@{OPTIMIZER_VERSION=...}` or `@{OPTIMIZER_STATISTICS_PACKAGE=...}`. If a query
 relies on statement hints for pinning, review the rendered SQL and the report

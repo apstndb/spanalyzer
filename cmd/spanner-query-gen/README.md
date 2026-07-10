@@ -118,17 +118,25 @@ queries with `AnalyzeQuery`, and renders human-readable plan trees with
 [`spannerplan`](https://github.com/apstndb/spannerplan). It writes Markdown by
 default and also supports YAML/JSON for review artifacts. `plan-report` is an
 optional Omni-backed workflow, not the primary DDL-first generation path.
+Catalog `proto_descriptors` are merged by descriptor file name and passed to
+Omni together with DDL, so CREATE/ALTER PROTO BUNDLE setup uses the same proto
+definitions as static query analysis; conflicting duplicate definitions fail
+before database creation.
 It depends on Spanner Omni execution-plan support and is intended for review,
 testing, and prototyping. Do not treat plan contracts as production performance
 guarantees; they are review contracts for a described plan environment.
 Use `--stable` for snapshot-oriented output. The current report intentionally
 omits host paths, temporary database IDs, and acquisition timestamps; `--stable`
 records that stable-output mode was requested while keeping semantic fields such
-as backend, config digest, SQL digest, DDL digest, contract file digest,
-operator tree digest, and optimizer pinning status.
+as backend, config digest, SQL digest, DDL digest, canonical proto descriptor
+digest when configured, contract file digest, operator tree digest, and
+optimizer pinning status.
 In v1alpha, `--require-optimizer-pinning` checks optimizer options requested by
 `plan-report` flags. It does not infer pinning from SQL statement hints, and
 `optimizer.effective` is reported as `not_recorded`.
+Moving aliases are not pins: optimizer versions `latest`, `latest_version`,
+and `default_version`, and optimizer statistics package `latest`, cause
+`--require-optimizer-pinning` to fail just like an omitted value.
 `--backend-version` and `--backend-image-digest` can record manually pinned
 backend identity evidence when the runtime cannot expose it directly; when they
 are omitted, version and image digest remain `not_recorded`.
@@ -264,7 +272,9 @@ normalization-aware information the raw plan does not carry:
   seekable probes. The value 0 is left unannotated: `seekable_key_size`
   counts the key prefix of a range-bounded seek, so plain full scans and
   perfect point seeks (all-equality key conditions) both report 0, and
-  `0/N` would misread a point read as seeking nothing.
+  `0/N` would misread a point read as seeking nothing. The `k/N` annotation is
+  structural PLAN evidence, not an estimate of rows scanned, I/O, or latency;
+  performance claims still require PROFILE or workload measurements.
 - `families` appends `{...}` labels with the plancontract operator family;
   when the family contributes to derived umbrella families, they follow
   after a colon in lexicographic order, for example
@@ -273,8 +283,9 @@ normalization-aware information the raw plan does not carry:
   side the derived cross-cutting attributes, so the two sorts are
   distinguishable without a position convention. Braces in rendered rows are
   reserved for these normalization labels, so no `family:` prefix is used.
-  Umbrella attributes such as `blocking_operator` are not derivable from the
-  operator name alone.
+  Umbrella attributes such as `blocking_operator` are not always derivable
+  from the operator name alone: a Stream Aggregate contributes only when its
+  normalized `scalar_aggregate` metadata is true.
 
 ## Minimal Config
 
@@ -523,16 +534,17 @@ defaults used by CEL evaluation for absent optional fields in `operators[]` and
 `stability.replayable_from_report: false` because those raw protobuf inputs are
 not serialized into the report.
 The digest inputs are semantic bytes: rendered/generated SQL, resolved catalog
-DDL, and a normalized operator tree that excludes temporary database IDs,
-timestamps, runtime stats, row counts, and rendering width.
+DDL, the canonical merged proto descriptor set when configured, and a
+normalized operator tree that excludes temporary database IDs, timestamps,
+runtime stats, row counts, and rendering width.
 `target_summary.included_count` is the sum of `planned`, `errors`, and
 `skipped`; `target_summary.excluded` is always present and is `[]` when there
 are no targets excluded from the report target set. Skipped targets appear in
 `queries[]`, are counted by `target_summary.skipped`, and are not duplicated in
 `target_summary.excluded`. For `queries[].status: error | skipped`, only
-target/input identity fields and the error message are reliable; SQL and DDL
-digests are reliable only when present, and plan normalization fields are
-absent.
+target/input identity fields and the error message are reliable; SQL, DDL, and
+proto descriptor digests are reliable only when present, and plan
+normalization fields are absent.
 
 ```yaml
 queries:

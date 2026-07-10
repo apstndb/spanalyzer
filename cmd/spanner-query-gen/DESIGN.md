@@ -357,8 +357,9 @@ The current experimental set covers `no_explicit_sort`, `no_full_sort`,
 Contract matching should use semantic predicates over a normalized operator
 family list, not full rendered-plan snapshots. The report records the rendered
 plan for humans plus stable review fields such as SQL digest, DDL digest,
-normalized operator tree digest, operator families, backend, plan mode, and
-optimizer pinning status. A contract validates that configured plan
+canonical proto descriptor digest, normalized operator tree digest, operator
+families, backend, plan mode, and optimizer pinning status. A contract validates
+that configured plan
 environment; it is not a universal production performance guarantee. Hint
 recommendations should be emitted as remediation text only and must not rewrite
 user SQL or config automatically.
@@ -381,12 +382,16 @@ Digest definitions are:
 
 - `sql_sha256`: rendered/generated SQL bytes for the target query.
 - `ddl_sha256`: resolved catalog DDL bytes used to set up the target database.
+- `proto_descriptor_sha256`: deterministic protobuf encoding of the merged
+  descriptor set, sorted by descriptor file name with SourceCodeInfo omitted;
+  absent when the catalog config has no proto descriptors.
 - `operator_tree_sha256`: the normalized operator tree, excluding temporary
   database IDs, timestamps, runtime statistics, row counts, and rendering
   width. The report records `normalization.operator_tree_version` and
-  `normalization.operator_family_mapping_version`; while the report format is
-  pre-release these identifiers follow the same mutable `v1alpha` philosophy
-  as the config and may change in place.
+  `normalization.operator_family_mapping_version`. These are concrete
+  compatibility markers even while the report format remains v1alpha; bump
+  them whenever digest inputs or family semantics change rather than changing
+  an existing identifier in place.
 
 Operator-family normalization follows Spanner's documented query execution
 operators. `Sort` and `Sort Limit` are `full_sort`; `Minor Sort` and
@@ -424,7 +429,11 @@ those shapes with `GROUP@{GROUP_METHOD=HASH_GROUP} BY` and
 unknown, the node remains the generic fallback concrete family `aggregate` and
 the report must emit `classification_warnings`. `aggregate` is not an umbrella
 family for `hash_aggregate` and `stream_aggregate`; it means only the fallback
-unclassified aggregate shape. The same vocabulary rule applies to generic
+unclassified aggregate shape. A `stream_aggregate` contributes to the derived
+`blocking_operator` family only when `scalar_aggregate: true`: it must consume
+the complete input before emitting its single row, whereas a grouped stream
+aggregate can emit each ordered group incrementally. The same vocabulary rule
+applies to generic
 `join`, which is a fallback concrete family for join-like PlanNodes that do not
 map to a more specific join family. A predefined or
 direct aggregate-family contract that depends on that unknown classification
@@ -486,7 +495,8 @@ for targets excluded from the report target set. Skipped targets remain in
 `target_summary.excluded`. For `queries[].status: error | skipped`, only
 partial input/error fields are reliable: target identity, query identity, SQL
 and SQL digest when rendering succeeded, DDL digest only after DDL resolution,
-and the error message. Plan normalization fields are absent and are not
+proto descriptor digest only after descriptor resolution, and the error
+message. Plan normalization fields are absent and are not
 successful plan evidence. Target selection is
 Spanner SQL only: generated `kind: sql`,
 `kind: table`, and `kind: index` queries with a Spanner catalog are included;
