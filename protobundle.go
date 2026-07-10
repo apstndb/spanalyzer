@@ -3,6 +3,7 @@ package spanalyzer
 import (
 	"fmt"
 	"os"
+	"sort"
 	"strings"
 
 	"cloud.google.com/go/spanner/apiv1/spannerpb"
@@ -22,6 +23,11 @@ type ProtoDescriptorSet struct {
 
 func LoadProtoDescriptorSetFiles(paths []string) (*ProtoDescriptorSet, error) {
 	merged := &descriptorpb.FileDescriptorSet{}
+	type descriptorOrigin struct {
+		file *descriptorpb.FileDescriptorProto
+		path string
+	}
+	filesByName := make(map[string]descriptorOrigin)
 	for _, path := range paths {
 		b, err := os.ReadFile(path)
 		if err != nil {
@@ -31,8 +37,25 @@ func LoadProtoDescriptorSetFiles(paths []string) (*ProtoDescriptorSet, error) {
 		if err := proto.Unmarshal(b, &set); err != nil {
 			return nil, fmt.Errorf("%s: %w", path, err)
 		}
-		merged.File = append(merged.File, set.File...)
+		for _, inputFile := range set.File {
+			file := canonicalProtoDescriptorFile(inputFile)
+			name := strings.TrimSpace(file.GetName())
+			if name == "" {
+				return nil, fmt.Errorf("%s: proto descriptor file name is required", path)
+			}
+			if existing, ok := filesByName[name]; ok {
+				if !proto.Equal(existing.file, file) {
+					return nil, fmt.Errorf("conflicting proto descriptor file %q in %s and %s", name, existing.path, path)
+				}
+				continue
+			}
+			filesByName[name] = descriptorOrigin{file: file, path: path}
+			merged.File = append(merged.File, file)
+		}
 	}
+	sort.Slice(merged.File, func(i, j int) bool {
+		return merged.File[i].GetName() < merged.File[j].GetName()
+	})
 	files, err := protodesc.NewFiles(merged)
 	if err != nil {
 		return nil, err
@@ -48,6 +71,28 @@ func LoadProtoDescriptorSetFiles(paths []string) (*ProtoDescriptorSet, error) {
 		return true
 	})
 	return out, nil
+}
+
+func canonicalProtoDescriptorFile(file *descriptorpb.FileDescriptorProto) *descriptorpb.FileDescriptorProto {
+	if file == nil {
+		return nil
+	}
+	canonical := proto.Clone(file).(*descriptorpb.FileDescriptorProto)
+	// Source locations and comments vary with protoc flags but do not change
+	// the schema made available to Spanner. Drop them for duplicate comparison,
+	// deterministic setup order, and future catalog-input hashing.
+	canonical.SourceCodeInfo = nil
+	return canonical
+}
+
+// FileDescriptorSet returns a defensive copy of the canonical merged
+// descriptor input. Files are sorted by name, SourceCodeInfo is omitted, and
+// identical files repeated across input sets are represented once.
+func (p *ProtoDescriptorSet) FileDescriptorSet() *descriptorpb.FileDescriptorSet {
+	if p == nil || p.fileSet == nil {
+		return nil
+	}
+	return proto.Clone(p.fileSet).(*descriptorpb.FileDescriptorSet)
 }
 
 func collectFileDescriptors(out *ProtoDescriptorSet, file protoreflect.FileDescriptor) {
