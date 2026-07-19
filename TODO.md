@@ -218,8 +218,7 @@ are out of scope.
 
 - [x] **Validation approach for the spannerplan extension point:** validated
   on 2026-06-12. Two complementary hooks are prototyped on the local
-  `row-annotator` branch of a spannerplan checkout, consumed via a workspace
-  `replace` in `go.work`: value-replacing
+  `row-annotator` branch of a spannerplan checkout: value-replacing
   `queryplan.WithMetadataValueFunc` (plus a
   `reference.WithQueryPlanOptions` passthrough) for enriching fields the
   plan already renders, and additive
@@ -228,21 +227,21 @@ are out of scope.
   Omni 2026.r1-beta (`TestIntegrationSeekabilityAnnotationOnOmni`:
   shard-range query renders `seekable_key_size: 2/2` under optimizer
   version 6 and `1/2` under version 8; the per-shard rewrite stays `2/2`
-  on both).
+  on both). The downstream prototype and its tests remain available in commit
+  `7b5d032`; they were removed from the active CLI on 2026-07-12 because the
+  external workspace replacement made every GitHub Actions job fail on a
+  fresh runner.
 - [ ] **Upstream the spannerplan RowAnnotator hook and restore standalone
-  module closure before publishing.** The locally committed `--annotate`
-  implementation compiles only through the sibling spannerplan `go.work`
-  replacement, and it also uses
+  module closure before restoring annotations.** First merge and tag the two
+  spannerplan hook changes. Then restore the `--annotate` prototype from
+  commit `7b5d032`; it also uses
   `plancontract.DerivedOperatorFamiliesForOperator` and
   `ProtoDescriptorSet.FileDescriptorSet`, which are absent from the root and
   plancontract versions pinned by the command module.
-  Merge and tag both dependency changes, bump both command requirements, drop
-  the `go.work` replacement, and add `GOWORK=off` CI for every nested module.
-  Until then, a fresh checkout and the command module's published dependency
-  graph are not self-contained.
-- [x] **Seekability annotation in plan-report** (implemented locally;
-  publication is blocked by the dependency gate above).
-  `plan-report --annotate seekability`
+  Tag the root and plancontract changes, bump all command requirements, and
+  add `GOWORK=off` CI for every nested module before restoring the CLI surface.
+- [ ] **Restore seekability annotation in plan-report after the dependency
+  gate above.** The validated `plan-report --annotate seekability` prototype
   replaces the rendered `seekable_key_size` value in place with `k/N`,
   where N is the declared key column count of the scanned table or index
   from the catalog DDL, avoiding a duplicate row suffix. Declared keys
@@ -253,8 +252,9 @@ are out of scope.
   of a range-bounded seek, so both full scans and perfect point seeks
   (all-equality key conditions, literal or parameter) report 0 (see
   `research/spanner-query-plan-shape/QUERY_EXECUTION_OPERATORS_OBSERVATIONS.md`).
-- [x] **Operator-family annotations in rendered reports** (implemented
-  locally, same publication gate). `plan-report --annotate families` renders
+- [ ] **Restore operator-family annotations in rendered reports after the
+  dependency gate above.** The validated `plan-report --annotate families`
+  prototype renders
   `{<family>[: <umbrella>...]}`
   labels per relational row from plancontract normalization (for example
   `{full_sort: blocking_operator, explicit_sort}` — the single-valued

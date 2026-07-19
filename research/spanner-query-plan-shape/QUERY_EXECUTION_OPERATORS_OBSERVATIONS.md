@@ -671,9 +671,9 @@ value cannot stand alone as a seekability signal.
 Practical consequence: `seekable_key_size` is not a standalone seekability
 metric. A `0` must be disambiguated by the presence of a Seek Condition
 child link (point seek) versus the `Full scan` flag or a Residual-only
-filter (actual full scan). The `--annotate seekability` rendering in
-plan-report therefore annotates `k/N` only for `k > 0` and leaves `0`
-untouched.
+filter (actual full scan). The validated seekability-annotation prototype in
+commit `7b5d032` therefore annotated `k/N` only for `k > 0` and left `0`
+untouched; restoring that CLI surface is tracked in `TODO.md`.
 
 Follow-up shapes (same environment, 2026-06-13):
 
@@ -763,8 +763,8 @@ not a universal "2 is unforceable". The robust observations are:
    point lookup) and a bad case (a plain full scan), so it cannot stand alone
    as a seek-efficiency signal — it must be disambiguated by the Seek
    Condition child link and the `Full scan` flag, as the reading framework
-   above already does. This is why `plan-report --annotate seekability`
-   leaves `0` unannotated.
+   above already does. This is why the validated annotation prototype left
+   `0` unannotated.
 
 Confirmed on Cloud Spanner DBaaS (2026-06-13, `gcpug-public-spanner`, via
 `spanner-mycli EXPLAIN`), so the behaviour is not Omni-specific. Using a
