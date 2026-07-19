@@ -246,6 +246,45 @@ func TestLoadQueriesJoinEliminationIncludesControls(t *testing.T) {
 	}
 }
 
+func TestLoadQueriesPlanVocabInferenceIncludesHypothesesAndControls(t *testing.T) {
+	t.Parallel()
+
+	queries, err := loadQueries("planvocab_inference", nil, nil)
+	if err != nil {
+		t.Fatalf("loadQueries(%q) error = %v", "planvocab_inference", err)
+	}
+	seen := map[string]string{}
+	for _, query := range queries {
+		seen[query.Label] = query.SQL
+	}
+	for _, label := range []string{
+		"planvocab-inference/dca-order/default",
+		"planvocab-inference/dca-order/no-distributed-merge",
+		"planvocab-inference/merge-right-outer",
+		"planvocab-inference/merge-left-outer-control",
+		"planvocab-inference/merge-one-to-one",
+		"planvocab-inference/merge-one-to-many-control",
+		"planvocab-inference/offset-v1",
+		"planvocab-inference/offset-v3",
+		"planvocab-inference/offset-v8",
+		"planvocab-inference/offset-control",
+		"planvocab-inference/hash-left-outer-residual-build-left",
+		"planvocab-inference/hash-left-outer-residual-build-right",
+		"planvocab-inference/hash-left-outer-control",
+		"planvocab-inference/minor-sort-values",
+		"planvocab-inference/minor-sort-limit-values",
+		"planvocab-inference/aggregate-hash-repeated-key-agg",
+		"planvocab-inference/aggregate-stream-repeated-key-agg",
+	} {
+		if seen[label] == "" {
+			t.Errorf("loadQueries(\"planvocab_inference\") missing %q", label)
+		}
+	}
+	if got, want := len(queries), len(seen); got != want {
+		t.Fatalf("planvocab inference queries include duplicate labels: queries=%d unique=%d", got, want)
+	}
+}
+
 func TestLoadDDLsFullTextSearchUsesDedicatedSchema(t *testing.T) {
 	ddls, err := loadDDLs("full_text_search", nil)
 	if err != nil {

@@ -1,0 +1,111 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/apstndb/spanalyzer/schemas/spanalyzer.planvocab.v0alpha1.schema.json",
+  "title": "spanalyzer embedded plan vocabulary catalog v0alpha1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["info", "common_metadata", "operators"],
+  "properties": {
+    "info": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "version",
+        "repository",
+        "revision",
+        "path",
+        "blob",
+        "local_evidence",
+        "compatibility",
+        "generated_by",
+        "inputs"
+      ],
+      "properties": {
+        "version": {"const": "v0alpha1"},
+        "repository": {"type": "string", "format": "uri"},
+        "revision": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "path": {"type": "string", "minLength": 1},
+        "blob": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "local_evidence": {
+          "type": "array",
+          "items": {"type": "string", "minLength": 1},
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "compatibility": {"type": "string", "minLength": 1},
+        "generated_by": {"const": "go run ./planvocab-gen"},
+        "inputs": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/input"},
+          "minItems": 1
+        }
+      }
+    },
+    "common_metadata": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/metadata"}
+    },
+    "operators": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/operator"},
+      "minItems": 1
+    }
+  },
+  "$defs": {
+    "input": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256"],
+      "properties": {
+        "path": {"type": "string", "minLength": 1},
+        "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+      }
+    },
+    "metadata": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["key"],
+      "properties": {
+        "key": {"type": "string", "minLength": 1},
+        "values": {
+          "type": "array",
+          "items": {"type": "string"},
+          "uniqueItems": true
+        }
+      }
+    },
+    "child_link": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "type", "variable"],
+      "properties": {
+        "kind": {"enum": ["RELATIONAL", "SCALAR"]},
+        "type": {"type": "string"},
+        "variable": {"enum": ["absent", "present", "any"]},
+        "multiple": {"type": "boolean", "default": false}
+      }
+    },
+    "operator": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["names", "kind", "metadata", "child_links"],
+      "properties": {
+        "names": {
+          "type": "array",
+          "items": {"type": "string", "minLength": 1},
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "kind": {"enum": ["RELATIONAL", "SCALAR"]},
+        "metadata": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/metadata"}
+        },
+        "child_links": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/child_link"}
+        }
+      }
+    }
+  }
+}

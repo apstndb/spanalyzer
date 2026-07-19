@@ -55,7 +55,7 @@ JOIN@{JOIN_METHOD=HASH_JOIN} Albums a
 ON s.SingerId = a.SingerId
 `
 
-const builtInCaseNames = "all, docs, optimizer_gaps, optimizer_unhinted_candidates, join_elimination, cte, dml, tvf, lock_hints, " +
+const builtInCaseNames = "all, docs, optimizer_gaps, optimizer_unhinted_candidates, join_elimination, planvocab_inference, cte, dml, tvf, lock_hints, " +
 	"full_text_search, json_search, vector_search, function_hint, hint_matrix, statement_hint_query_matrix, " +
 	"join_matrix, subquery_join_hint_matrix, push_broadcast_hash_join, or hash_join"
 
@@ -235,6 +235,9 @@ func loadDDLs(builtinCase string, paths []string) ([]string, error) {
 		if strings.EqualFold(strings.TrimSpace(builtinCase), "join_elimination") {
 			return parseBuiltInDDLs("join-elimination-schema.sql", joinEliminationDDL)
 		}
+		if strings.EqualFold(strings.TrimSpace(builtinCase), "planvocab_inference") {
+			return parseBuiltInDDLs("planvocab-inference-schema.sql", joinEliminationDDL)
+		}
 		if strings.EqualFold(strings.TrimSpace(builtinCase), "docs") ||
 			strings.EqualFold(strings.TrimSpace(builtinCase), "cte") ||
 			strings.EqualFold(strings.TrimSpace(builtinCase), "function_hint") ||
@@ -312,6 +315,8 @@ func loadQueries(builtinCase string, sqlTexts, sqlFiles []string) ([]queryCase, 
 		return optimizerUnhintedCandidateQueries, nil
 	case "join_elimination":
 		return joinEliminationQueries, nil
+	case "planvocab_inference":
+		return planVocabInferenceQueries, nil
 	case "cte":
 		return cteQueries, nil
 	case "dml":

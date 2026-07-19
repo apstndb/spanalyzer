@@ -1,0 +1,1599 @@
+{
+  "info": {
+    "version": "v0alpha1",
+    "repository": "https://github.com/apstndb/spanner-hacks",
+    "revision": "c7233fbe1521a525d5c9317692f0287033eedcd1",
+    "path": "content/ja/operators.md",
+    "blob": "270939a859cc32ad4cfa76bed002dec9181ef6f7",
+    "local_evidence": [
+      "plancontract/normalize.go",
+      "research/spanner-query-plan-shape/COMPACT_TREE_METADATA_OBSERVATIONS.md",
+      "research/spanner-query-plan-shape/PLANVOCAB_INFERENCE_OBSERVATIONS.md",
+      "research/spanner-query-plan-shape/QUERY_EXECUTION_OPERATORS_OBSERVATIONS.md",
+      "tools/spanner-query-plan-shape/planvocab_cases.go",
+      "tools/spanner-query-plan-shape/testdata/planvocab_inference_expectations.json"
+    ],
+    "compatibility": "Observational v0alpha vocabulary; not a stable Spanner wire contract. Missing metadata is allowed, link multiplicity is checked only where declared, and identifier values are wildcarded.",
+    "generated_by": "go run ./planvocab-gen",
+    "inputs": [
+      {
+        "path": "cmd/spanner-query-gen/testdata/plan_fixtures/distributed_anti_semi_apply_internal.json",
+        "sha256": "7e16a88f9d5ed3ae99f2651aa7b6ae40f96223daf6d3a274361af35b1a5e7ab7"
+      },
+      {
+        "path": "cmd/spanner-query-gen/testdata/plan_fixtures/distributed_semi_apply_internal.json",
+        "sha256": "b68041d51d9de14e736edeab9faad0b96743535efd9dc0cdcbbeb65b33ed3fa7"
+      },
+      {
+        "path": "cmd/spanner-query-gen/testdata/plan_fixtures/push_broadcast_branched_regular_hash_join.json",
+        "sha256": "001c65faafd212909fac4d0c8ec4d5cdbafffc4d55b522f65653eb834ed72891"
+      },
+      {
+        "path": "cmd/spanner-query-gen/testdata/plan_fixtures/push_broadcast_internal_hash_join.json",
+        "sha256": "4960c4c1c3ee46392b17ed51c81b9a0042e063c46d2c3e1c25c38fcdbd904162"
+      },
+      {
+        "path": "cmd/spanner-query-gen/testdata/plan_fixtures/standalone_hash_join.json",
+        "sha256": "1a0656f3fe9b234f40bfa05e997897fe07131cbc39d0e5bdae6c3167a362597a"
+      },
+      {
+        "path": "cmd/spanner-query-gen/testdata/plan_fixtures/standalone_semi_apply.json",
+        "sha256": "ce700bd46823f00eab0b8b47ce8edbe4780985a94d37e19b80b91c61c4948590"
+      },
+      {
+        "path": "plancontract/normalize.go",
+        "sha256": "c50da7e529c19ae7a1963ee258e5d689122f88016d16d1efd214b3922473db5c"
+      },
+      {
+        "path": "plancontract/planvocab/catalog_source.json",
+        "sha256": "3f9234d38a5c06fb8618dd69b3dfec8519c1179a64e213ea30f27ba5ede8eced"
+      },
+      {
+        "path": "research/spanner-query-plan-shape/COMPACT_TREE_METADATA_OBSERVATIONS.md",
+        "sha256": "d7666d4ac5207c162f1fba2c2359503f05ba40918572a1eb2a4cee41f212f8fc"
+      },
+      {
+        "path": "research/spanner-query-plan-shape/PLANVOCAB_INFERENCE_OBSERVATIONS.md",
+        "sha256": "259b91c48f843927dc564fd9e8907ac8f322e79cd069e7facdbcdee60659ddb3"
+      },
+      {
+        "path": "research/spanner-query-plan-shape/QUERY_EXECUTION_OPERATORS_OBSERVATIONS.md",
+        "sha256": "7a56a95084a13d942ef959858e1407e03a62c5d29aa2efc9580c6bc3a51b2a10"
+      },
+      {
+        "path": "schemas/spanalyzer.planvocab-expectations.v0alpha1.schema.json",
+        "sha256": "b371f895a7c7f0753b7729b7bfb555e142005cf5b5a4d59c26b258401329219e"
+      },
+      {
+        "path": "schemas/spanalyzer.planvocab.v0alpha1.schema.json",
+        "sha256": "3622eac91f891c10203386bc601f784dd52f2477558a370a13c944775d509c2f"
+      },
+      {
+        "path": "tools/planvocab-gen/main.go",
+        "sha256": "66dbfa6f940e3555558c251d116d31391e6546e2da019fee26939e0b2bbc4cf5"
+      },
+      {
+        "path": "tools/spanner-query-plan-shape/planvocab_cases.go",
+        "sha256": "21d2b5aa805bd0837076af1554072dd6447095433e657cd35e78fccd8967c6a6"
+      },
+      {
+        "path": "tools/spanner-query-plan-shape/testdata/planvocab_inference_expectations.json",
+        "sha256": "68f3d35d6876a1048b3106c851a854a1055fab4ff0b64c637647241b35b93318"
+      }
+    ]
+  },
+  "common_metadata": [
+    {
+      "key": "execution_method",
+      "values": [
+        "Batch",
+        "Row"
+      ]
+    }
+  ],
+  "operators": [
+    {
+      "names": [
+        "Aggregate"
+      ],
+      "kind": "RELATIONAL",
+      "metadata": [
+        {
+          "key": "call_type",
+          "values": [
+            "Global",
+            "Local"
+          ]
+        },
+        {
+          "key": "iterator_type",
+          "values": [
+            "Hash",
+            "Stream"
+          ]
+        },
+        {
+          "key": "scalar_aggregate",
+          "values": [
+            "true"
+          ]
+        }
+      ],
+      "child_links": [
+        {
+          "kind": "RELATIONAL",
+          "type": "",
+          "variable": "absent"
+        },
+        {
+          "kind": "SCALAR",
+          "type": "Agg",
+          "variable": "present",
+          "multiple": true
+        },
+        {
+          "kind": "SCALAR",
+          "type": "Key",
+          "variable": "present",
+          "multiple": true
+        }
+      ]
+    },
+    {
+      "names": [
+        "Anti Semi Apply",
+        "Anti-Semi Apply",
+        "Apply Join",
+        "Cross Apply",
+        "Semi Apply"
+      ],
+      "kind": "RELATIONAL",
+      "metadata": [],
+      "child_links": [
+        {
+          "kind": "RELATIONAL",
+          "type": "",
+          "variable": "absent",
+          "multiple": false
+        },
+        {
+          "kind": "RELATIONAL",
+          "type": "Map",
+          "variable": "absent",
+          "multiple": false
+        }
+      ]
+    },
+    {
+      "names": [
+        "Apply Mutations"
+      ],
+      "kind": "RELATIONAL",
+      "metadata": [
+        {
+          "key": "operation_type",
+          "values": [
+            "DELETE",
+            "INSERT",
+            "UPDATE"
+          ]
+        },
+        {
+          "key": "table"
+        }
+      ],
+      "child_links": [
+        {
+          "kind": "RELATIONAL",
+          "type": "",
+          "variable": "absent"
+        }
+      ]
+    },
+    {
+      "names": [
+        "Array Constructor",
+        "Function",
+        "Struct Constructor"
+      ],
+      "kind": "SCALAR",
+      "metadata": [],
+      "child_links": [
+        {
+          "kind": "SCALAR",
+          "type": "",
+          "variable": "absent",
+          "multiple": true
+        }
+      ]
+    },
+    {
+      "names": [
+        "Array Subquery",
+        "Scalar Subquery"
+      ],
+      "kind": "SCALAR",
+      "metadata": [],
+      "child_links": [
+        {
+          "kind": "RELATIONAL",
+          "type": "",
+          "variable": "absent"
+        },
+        {
+          "kind": "SCALAR",
+          "type": "",
+          "variable": "absent",
+          "multiple": true
+        }
+      ]
+    },
+    {
+      "names": [
+        "Array Unnest"
+      ],
+      "kind": "RELATIONAL",
+      "metadata": [],
+      "child_links": [
+        {
+          "kind": "SCALAR",
+          "type": "",
+          "variable": "present",
+          "multiple": true
+        }
+      ]
+    },
+    {
+      "names": [
+        "BloomFilterBuild"
+      ],
+      "kind": "RELATIONAL",
+      "metadata": [],
+      "child_links": [
+        {
+          "kind": "RELATIONAL",
+          "type": "",
+          "variable": "absent"
+        },
+        {
+          "kind": "SCALAR",
+          "type": "",
+          "variable": "present"
+        }
+      ]
+    },
+    {
+      "names": [
+        "ChangeStream TVF",
+        "TVF"
+      ],
+      "kind": "RELATIONAL",
+      "metadata": [
+        {
+          "key": "Name"
+        },
+        {
+          "key": "name"
+        }
+      ],
+      "child_links": [
+        {
+          "kind": "RELATIONAL",
+          "type": "",
+          "variable": "absent"
+        },
+        {
+          "kind": "SCALAR",
+          "type": "",
+          "variable": "any"
+        },
+        {
+          "kind": "SCALAR",
+          "type": "Output",
+          "variable": "present",
+          "multiple": true
+        },
+        {
+          "kind": "SCALAR",
+          "type": "Referenced",
+          "variable": "absent",
+          "multiple": true
+        }
+      ]
+    },
+    {
+      "names": [
+        "Compute"
+      ],
+      "kind": "RELATIONAL",
+      "metadata": [],
+      "child_links": [
+        {
+          "kind": "RELATIONAL",
+          "type": "",
+          "variable": "absent"
+        },
+        {
+          "kind": "SCALAR",
+          "type": "",
+          "variable": "present",
+          "multiple": true
+        }
+      ]
+    },
+    {
+      "names": [
+        "Compute Struct"
+      ],
+      "kind": "RELATIONAL",
+      "metadata": [],
+      "child_links": [
+        {
+          "kind": "RELATIONAL",
+          "type": "",
+          "variable": "absent"
+        },
+        {
+          "kind": "SCALAR",
+          "type": "",
+          "variable": "present",
+          "multiple": true
+        },
+        {
+          "kind": "SCALAR",
+          "type": "Scalar",
+          "variable": "absent",
+          "multiple": true
+        }
+      ]
+    },
+    {
+      "names": [
+        "Constant",
+        "Reference"
+      ],
+      "kind": "SCALAR",
+      "metadata": [],
+      "child_links": []
+    },
+    {
+      "names": [
+        "Create Batch"
+      ],
+      "kind": "RELATIONAL",
+      "metadata": [],
+      "child_links": [
+        {
+          "kind": "RELATIONAL",
+          "type": "",
+          "variable": "absent"
+        },
+        {
+          "kind": "SCALAR",
+          "type": "",
+          "variable": "present",
+          "multiple": true
+        }
+      ]
+    },
+    {
+      "names": [
+        "DataBlockToRow",
+        "DataBlockToRowAdapter"
+      ],
+      "kind": "RELATIONAL",
+      "metadata": [],
+      "child_links": [
+        {
+          "kind": "RELATIONAL",
+          "type": "",
+          "variable": "absent"
+        },
+        {
+          "kind": "SCALAR",
+          "type": "",
+          "variable": "any"
+        }
+      ]
+    },
+    {
+      "names": [
+        "Distributed Anti Semi Apply"
+      ],
+      "kind": "RELATIONAL",
+      "metadata": [
+        {
+          "key": "subquery_cluster_node"
+        }
+      ],
+      "child_links": [
+        {
+          "kind": "RELATIONAL",
+          "type": "",
+          "variable": "absent"
+        },
+        {
+          "kind": "RELATIONAL",
+          "type": "Map",
+          "variable": "absent"
+        },
+        {
+          "kind": "SCALAR",
+          "type": "Batch",
+          "variable": "present"
+        },
+        {
+          "kind": "SCALAR",
+          "type": "Map",
+          "variable": "present",
+          "multiple": true
+        },
+        {
+          "kind": "SCALAR",
+          "type": "Split Range",
+          "variable": "absent"
+        }
+      ]
+    },
+    {
+      "names": [
+        "Distributed Cross Apply"
+      ],
+      "kind": "RELATIONAL",
+      "metadata": [
+        {
+          "key": "order_preserving",
+          "values": [
+            "false",
+            "true"
+          ]
+        },
+        {
+          "key": "preserve_subquery_order",
+          "values": [
+            "true"
+          ]
+        },
+        {
+          "key": "subquery_cluster_node"
+        }
+      ],
+      "child_links": [
+        {
+          "kind": "RELATIONAL",
+          "type": "",
+          "variable": "absent"
+        },
+        {
+          "kind": "RELATIONAL",
+          "type": "Map",
+          "variable": "absent"
+        },
+        {
+          "kind": "SCALAR",
+          "type": "",
+          "variable": "absent"
+        },
+        {
+          "kind": "SCALAR",
+          "type": "Batch",
+          "variable": "present",
+          "multiple": true
+        },
+        {
+          "kind": "SCALAR",
+          "type": "Map",
+          "variable": "present",
+          "multiple": true
+        },
+        {
+          "kind": "SCALAR",
+          "type": "Split Range",
+          "variable": "absent"
+        }
+      ]
+    },
+    {
+      "names": [
+        "Distributed Outer Apply"
+      ],
+      "kind": "RELATIONAL",
+      "metadata": [
+        {
+          "key": "subquery_cluster_node"
+        }
+      ],
+      "child_links": [
+        {
+          "kind": "RELATIONAL",
+          "type": "",
+          "variable": "absent"
+        },
+        {
+          "kind": "RELATIONAL",
+          "type": "Map",
+          "variable": "absent"
+        },
+        {
+          "kind": "SCALAR",
+          "type": "Batch",
+          "variable": "present"
+        },
+        {
+          "kind": "SCALAR",
+          "type": "Map",
+          "variable": "present",
+          "multiple": true
+        },
+        {
+          "kind": "SCALAR",
+          "type": "Split Range",
+          "variable": "absent"
+        }
+      ]
+    },
+    {
+      "names": [
+        "Distributed Semi Apply"
+      ],
+      "kind": "RELATIONAL",
+      "metadata": [
+        {
+          "key": "subquery_cluster_node"
+        }
+      ],
+      "child_links": [
+        {
+          "kind": "RELATIONAL",
+          "type": "",
+          "variable": "absent"
+        },
+        {
+          "kind": "RELATIONAL",
+          "type": "Map",
+          "variable": "absent"
+        },
+        {
+          "kind": "SCALAR",
+          "type": "Batch",
+          "variable": "present"
+        },
+        {
+          "kind": "SCALAR",
+          "type": "Split Range",
+          "variable": "absent"
+        }
+      ]
+    },
+    {
+      "names": [
+        "Distributed Union"
+      ],
+      "kind": "RELATIONAL",
+      "metadata": [
+        {
+          "key": "call_type",
+          "values": [
+            "Local"
+          ]
+        },
+        {
+          "key": "distribution_table"
+        },
+        {
+          "key": "preserve_subquery_order",
+          "values": [
+            "true"
+          ]
+        },
+        {
+          "key": "split_ranges_aligned",
+          "values": [
+            "false",
+            "true"
+          ]
+        },
+        {
+          "key": "subquery_cluster_node"
+        }
+      ],
+      "child_links": [
+        {
+          "kind": "RELATIONAL",
+          "type": "",
+          "variable": "absent"
+        },
+        {
+          "kind": "SCALAR",
+          "type": "",
+          "variable": "absent"
+        },
+        {
+          "kind": "SCALAR",
+          "type": "Split Range",
+          "variable": "absent"
+        }
+      ]
+    },
+    {
+      "names": [
+        "Empty Relation"
+      ],
+      "kind": "RELATIONAL",
+      "metadata": [],
+      "child_links": [
+        {
+          "kind": "SCALAR",
+          "type": "",
+          "variable": "absent"
+        }
+      ]
+    },
+    {
+      "names": [
+        "Field"
+      ],
+      "kind": "SCALAR",
+      "metadata": [
+        {
+          "key": "index"
+        },
+        {
+          "key": "name"
+        }
+      ],
+      "child_links": [
+        {
+          "kind": "SCALAR",
+          "type": "",
+          "variable": "absent"
+        }
+      ]
+    },
+    {
+      "names": [
+        "Filter"
+      ],
+      "kind": "RELATIONAL",
+      "metadata": [],
+      "child_links": [
+        {
+          "kind": "RELATIONAL",
+          "type": "",
+          "variable": "absent"
+        },
+        {
+          "kind": "SCALAR",
+          "type": "Condition",
+          "variable": "absent"
+        }
+      ]
+    },
+    {
+      "names": [
+        "Filter Scan",
+        "FilterScan"
+      ],
+      "kind": "RELATIONAL",
+      "metadata": [
+        {
+          "key": "seekable_key_size"
+        }
+      ],
+      "child_links": [
+        {
+          "kind": "RELATIONAL",
+          "type": "",
+          "variable": "absent"
+        },
+        {
+          "kind": "SCALAR",
+          "type": "Residual Condition",
+          "variable": "absent"
+        },
+        {
+          "kind": "SCALAR",
+          "type": "Seek Condition",
+          "variable": "absent"
+        },
+        {
+          "kind": "SCALAR",
+          "type": "Timestamp Condition",
+          "variable": "absent"
+        }
+      ]
+    },
+    {
+      "names": [
+        "Generate Relation"
+      ],
+      "kind": "RELATIONAL",
+      "metadata": [],
+      "child_links": []
+    },
+    {
+      "names": [
+        "Global Limit",
+        "Limit",
+        "Local Limit"
+      ],
+      "kind": "RELATIONAL",
+      "metadata": [
+        {
+          "key": "call_type",
+          "values": [
+            "Global",
+            "Local"
+          ]
+        }
+      ],
+      "child_links": [
+        {
+          "kind": "RELATIONAL",
+          "type": "",
+          "variable": "absent"
+        },
+        {
+          "kind": "SCALAR",
+          "type": "Limit",
+          "variable": "absent"
+        },
+        {
+          "kind": "SCALAR",
+          "type": "Offset",
+          "variable": "absent"
+        }
+      ]
+    },
+    {
+      "names": [
+        "Hash Join"
+      ],
+      "kind": "RELATIONAL",
+      "metadata": [
+        {
+          "key": "join_type",
+          "values": [
+            "BUILD_ANTI_SEMI",
+            "BUILD_OUTER",
+            "BUILD_PROBE_OUTER",
+            "BUILD_SEMI",
+            "FULL_OUTER",
+            "INNER",
+            "LEFT_ANTI_SEMI",
+            "LEFT_OUTER",
+            "LEFT_SEMI",
+            "PROBE_ANTI_SEMI",
+            "PROBE_OUTER",
+            "PROBE_SEMI"
+          ]
+        }
+      ],
+      "child_links": [
+        {
+          "kind": "RELATIONAL",
+          "type": "Build",
+          "variable": "absent",
+          "multiple": false
+        },
+        {
+          "kind": "RELATIONAL",
+          "type": "Probe",
+          "variable": "absent",
+          "multiple": false
+        },
+        {
+          "kind": "SCALAR",
+          "type": "Build",
+          "variable": "present",
+          "multiple": true
+        },
+        {
+          "kind": "SCALAR",
+          "type": "Condition",
+          "variable": "absent"
+        },
+        {
+          "kind": "SCALAR",
+          "type": "Probe",
+          "variable": "present",
+          "multiple": true
+        },
+        {
+          "kind": "SCALAR",
+          "type": "Residual Condition",
+          "variable": "absent"
+        }
+      ]
+    },
+    {
+      "names": [
+        "Index Scan",
+        "Scan",
+        "Table Scan"
+      ],
+      "kind": "RELATIONAL",
+      "metadata": [
+        {
+          "key": "Full scan",
+          "values": [
+            "true"
+          ]
+        },
+        {
+          "key": "scan_format",
+          "values": [
+            "Columnar",
+            "Row"
+          ]
+        },
+        {
+          "key": "scan_method",
+          "values": [
+            "Automatic",
+            "Batch",
+            "Row"
+          ]
+        },
+        {
+          "key": "scan_target"
+        },
+        {
+          "key": "scan_type",
+          "values": [
+            "BatchScan",
+            "FilterScan",
+            "IndexScan",
+            "SearchIndexScan",
+            "SpoolScan",
+            "TableScan",
+            "VectorIndexLeafScan",
+            "VectorIndexRootScan"
+          ]
+        }
+      ],
+      "child_links": [
+        {
+          "kind": "SCALAR",
+          "type": "",
+          "variable": "absent"
+        },
+        {
+          "kind": "SCALAR",
+          "type": "",
+          "variable": "present",
+          "multiple": true
+        },
+        {
+          "kind": "SCALAR",
+          "type": "Search Predicate",
+          "variable": "absent"
+        },
+        {
+          "kind": "SCALAR",
+          "type": "Seek Condition",
+          "variable": "absent"
+        },
+        {
+          "kind": "SCALAR",
+          "type": "Timestamp Condition",
+          "variable": "absent"
+        }
+      ]
+    },
+    {
+      "names": [
+        "KeyRangeAccumulator"
+      ],
+      "kind": "RELATIONAL",
+      "metadata": [],
+      "child_links": [
+        {
+          "kind": "RELATIONAL",
+          "type": "",
+          "variable": "absent"
+        }
+      ]
+    },
+    {
+      "names": [
+        "Local Minor Sort",
+        "Minor Sort"
+      ],
+      "kind": "RELATIONAL",
+      "metadata": [
+        {
+          "key": "call_type",
+          "values": [
+            "Global",
+            "Local"
+          ]
+        }
+      ],
+      "child_links": [
+        {
+          "kind": "RELATIONAL",
+          "type": "",
+          "variable": "absent"
+        },
+        {
+          "kind": "SCALAR",
+          "type": "MajorKey",
+          "variable": "present",
+          "multiple": true
+        },
+        {
+          "kind": "SCALAR",
+          "type": "MinorKey",
+          "variable": "present",
+          "multiple": true
+        },
+        {
+          "kind": "SCALAR",
+          "type": "Value",
+          "variable": "present",
+          "multiple": true
+        }
+      ]
+    },
+    {
+      "names": [
+        "Local Minor Sort Limit",
+        "Minor Sort Limit"
+      ],
+      "kind": "RELATIONAL",
+      "metadata": [
+        {
+          "key": "call_type",
+          "values": [
+            "Global",
+            "Local"
+          ]
+        }
+      ],
+      "child_links": [
+        {
+          "kind": "RELATIONAL",
+          "type": "",
+          "variable": "absent"
+        },
+        {
+          "kind": "SCALAR",
+          "type": "Limit",
+          "variable": "absent"
+        },
+        {
+          "kind": "SCALAR",
+          "type": "MajorKey",
+          "variable": "present",
+          "multiple": true
+        },
+        {
+          "kind": "SCALAR",
+          "type": "MinorKey",
+          "variable": "present",
+          "multiple": true
+        },
+        {
+          "kind": "SCALAR",
+          "type": "Value",
+          "variable": "present",
+          "multiple": true
+        }
+      ]
+    },
+    {
+      "names": [
+        "Local Sort",
+        "Sort"
+      ],
+      "kind": "RELATIONAL",
+      "metadata": [
+        {
+          "key": "call_type",
+          "values": [
+            "Global",
+            "Local"
+          ]
+        }
+      ],
+      "child_links": [
+        {
+          "kind": "RELATIONAL",
+          "type": "",
+          "variable": "absent"
+        },
+        {
+          "kind": "SCALAR",
+          "type": "Key",
+          "variable": "present",
+          "multiple": true
+        },
+        {
+          "kind": "SCALAR",
+          "type": "Value",
+          "variable": "present",
+          "multiple": true
+        }
+      ]
+    },
+    {
+      "names": [
+        "Local Sort Limit",
+        "Sort Limit"
+      ],
+      "kind": "RELATIONAL",
+      "metadata": [
+        {
+          "key": "call_type",
+          "values": [
+            "Global",
+            "Local"
+          ]
+        }
+      ],
+      "child_links": [
+        {
+          "kind": "RELATIONAL",
+          "type": "",
+          "variable": "absent"
+        },
+        {
+          "kind": "SCALAR",
+          "type": "Key",
+          "variable": "present",
+          "multiple": true
+        },
+        {
+          "kind": "SCALAR",
+          "type": "Limit",
+          "variable": "absent"
+        },
+        {
+          "kind": "SCALAR",
+          "type": "Offset",
+          "variable": "absent"
+        },
+        {
+          "kind": "SCALAR",
+          "type": "Value",
+          "variable": "present",
+          "multiple": true
+        }
+      ]
+    },
+    {
+      "names": [
+        "Local Split Union"
+      ],
+      "kind": "RELATIONAL",
+      "metadata": [],
+      "child_links": []
+    },
+    {
+      "names": [
+        "Merge Join"
+      ],
+      "kind": "RELATIONAL",
+      "metadata": [
+        {
+          "key": "join_configuration",
+          "values": [
+            "MANY_TO_MANY",
+            "MANY_TO_ONE",
+            "ONE_TO_MANY",
+            "ONE_TO_ONE"
+          ]
+        },
+        {
+          "key": "join_type",
+          "values": [
+            "FULL_OUTER",
+            "INNER",
+            "LEFT_ANTI_SEMI",
+            "LEFT_OUTER",
+            "LEFT_SEMI",
+            "RIGHT_OUTER"
+          ]
+        }
+      ],
+      "child_links": [
+        {
+          "kind": "RELATIONAL",
+          "type": "Left",
+          "variable": "absent"
+        },
+        {
+          "kind": "RELATIONAL",
+          "type": "Right",
+          "variable": "absent"
+        },
+        {
+          "kind": "SCALAR",
+          "type": "Condition",
+          "variable": "absent"
+        },
+        {
+          "kind": "SCALAR",
+          "type": "Left",
+          "variable": "present",
+          "multiple": false
+        },
+        {
+          "kind": "SCALAR",
+          "type": "Right",
+          "variable": "present",
+          "multiple": false
+        }
+      ]
+    },
+    {
+      "names": [
+        "MiniBatchAssign"
+      ],
+      "kind": "RELATIONAL",
+      "metadata": [],
+      "child_links": [
+        {
+          "kind": "RELATIONAL",
+          "type": "",
+          "variable": "absent"
+        },
+        {
+          "kind": "SCALAR",
+          "type": "",
+          "variable": "absent"
+        }
+      ]
+    },
+    {
+      "names": [
+        "MiniBatchKeyOrder"
+      ],
+      "kind": "RELATIONAL",
+      "metadata": [],
+      "child_links": [
+        {
+          "kind": "RELATIONAL",
+          "type": "",
+          "variable": "absent"
+        }
+      ]
+    },
+    {
+      "names": [
+        "Outer Apply"
+      ],
+      "kind": "RELATIONAL",
+      "metadata": [],
+      "child_links": [
+        {
+          "kind": "RELATIONAL",
+          "type": "",
+          "variable": "absent",
+          "multiple": false
+        },
+        {
+          "kind": "RELATIONAL",
+          "type": "Map",
+          "variable": "absent",
+          "multiple": false
+        },
+        {
+          "kind": "SCALAR",
+          "type": "",
+          "variable": "present",
+          "multiple": true
+        }
+      ]
+    },
+    {
+      "names": [
+        "Parameter"
+      ],
+      "kind": "SCALAR",
+      "metadata": [
+        {
+          "key": "name"
+        },
+        {
+          "key": "type",
+          "values": [
+            "array",
+            "scalar"
+          ]
+        }
+      ],
+      "child_links": []
+    },
+    {
+      "names": [
+        "Push Broadcast Hash Join"
+      ],
+      "kind": "RELATIONAL",
+      "metadata": [
+        {
+          "key": "distribution_table"
+        },
+        {
+          "key": "subquery_cluster_node"
+        }
+      ],
+      "child_links": [
+        {
+          "kind": "RELATIONAL",
+          "type": "",
+          "variable": "absent"
+        },
+        {
+          "kind": "RELATIONAL",
+          "type": "Input",
+          "variable": "absent",
+          "multiple": false
+        },
+        {
+          "kind": "RELATIONAL",
+          "type": "Map",
+          "variable": "absent"
+        },
+        {
+          "kind": "SCALAR",
+          "type": "Batch",
+          "variable": "present"
+        },
+        {
+          "kind": "SCALAR",
+          "type": "Split Range",
+          "variable": "absent"
+        }
+      ]
+    },
+    {
+      "names": [
+        "Push Broadcast Hash Join Anti Semi Apply",
+        "Push Broadcast Hash Join Semi Apply"
+      ],
+      "kind": "RELATIONAL",
+      "metadata": [
+        {
+          "key": "distribution_table"
+        },
+        {
+          "key": "subquery_cluster_node"
+        }
+      ],
+      "child_links": [
+        {
+          "kind": "RELATIONAL",
+          "type": "",
+          "variable": "absent"
+        },
+        {
+          "kind": "RELATIONAL",
+          "type": "Input",
+          "variable": "absent",
+          "multiple": false
+        },
+        {
+          "kind": "RELATIONAL",
+          "type": "Map",
+          "variable": "absent"
+        },
+        {
+          "kind": "SCALAR",
+          "type": "Batch",
+          "variable": "present",
+          "multiple": true
+        },
+        {
+          "kind": "SCALAR",
+          "type": "Split Range",
+          "variable": "absent"
+        }
+      ]
+    },
+    {
+      "names": [
+        "Push Broadcast Hash Join Outer Apply"
+      ],
+      "kind": "RELATIONAL",
+      "metadata": [
+        {
+          "key": "distribution_table"
+        },
+        {
+          "key": "subquery_cluster_node"
+        }
+      ],
+      "child_links": [
+        {
+          "kind": "RELATIONAL",
+          "type": "",
+          "variable": "absent"
+        },
+        {
+          "kind": "RELATIONAL",
+          "type": "Input",
+          "variable": "absent",
+          "multiple": false
+        },
+        {
+          "kind": "RELATIONAL",
+          "type": "Map",
+          "variable": "absent"
+        },
+        {
+          "kind": "SCALAR",
+          "type": "Batch",
+          "variable": "present",
+          "multiple": true
+        },
+        {
+          "kind": "SCALAR",
+          "type": "Map",
+          "variable": "present"
+        },
+        {
+          "kind": "SCALAR",
+          "type": "Split Range",
+          "variable": "absent"
+        }
+      ]
+    },
+    {
+      "names": [
+        "Random Id Assign"
+      ],
+      "kind": "RELATIONAL",
+      "metadata": [],
+      "child_links": [
+        {
+          "kind": "RELATIONAL",
+          "type": "",
+          "variable": "absent"
+        },
+        {
+          "kind": "SCALAR",
+          "type": "",
+          "variable": "present"
+        }
+      ]
+    },
+    {
+      "names": [
+        "Recursive Spool Scan"
+      ],
+      "kind": "RELATIONAL",
+      "metadata": [
+        {
+          "key": "spool_name"
+        }
+      ],
+      "child_links": [
+        {
+          "kind": "SCALAR",
+          "type": "",
+          "variable": "present",
+          "multiple": true
+        }
+      ]
+    },
+    {
+      "names": [
+        "Recursive Union"
+      ],
+      "kind": "RELATIONAL",
+      "metadata": [],
+      "child_links": [
+        {
+          "kind": "RELATIONAL",
+          "type": "",
+          "variable": "absent",
+          "multiple": true
+        },
+        {
+          "kind": "SCALAR",
+          "type": "",
+          "variable": "absent",
+          "multiple": true
+        },
+        {
+          "kind": "SCALAR",
+          "type": "",
+          "variable": "present",
+          "multiple": true
+        }
+      ]
+    },
+    {
+      "names": [
+        "RowCount"
+      ],
+      "kind": "RELATIONAL",
+      "metadata": [],
+      "child_links": [
+        {
+          "kind": "RELATIONAL",
+          "type": "",
+          "variable": "absent"
+        },
+        {
+          "kind": "SCALAR",
+          "type": "",
+          "variable": "present"
+        }
+      ]
+    },
+    {
+      "names": [
+        "RowToDataBlock",
+        "RowToDataBlockAdapter"
+      ],
+      "kind": "RELATIONAL",
+      "metadata": [],
+      "child_links": [
+        {
+          "kind": "RELATIONAL",
+          "type": "",
+          "variable": "absent"
+        }
+      ]
+    },
+    {
+      "names": [
+        "Search Predicate"
+      ],
+      "kind": "SCALAR",
+      "metadata": [],
+      "child_links": [
+        {
+          "kind": "SCALAR",
+          "type": "",
+          "variable": "absent"
+        }
+      ]
+    },
+    {
+      "names": [
+        "Serialize Result"
+      ],
+      "kind": "RELATIONAL",
+      "metadata": [],
+      "child_links": [
+        {
+          "kind": "RELATIONAL",
+          "type": "",
+          "variable": "absent"
+        },
+        {
+          "kind": "SCALAR",
+          "type": "",
+          "variable": "absent",
+          "multiple": true
+        },
+        {
+          "kind": "SCALAR",
+          "type": "Scalar",
+          "variable": "absent",
+          "multiple": true
+        }
+      ]
+    },
+    {
+      "names": [
+        "SpoolBuild"
+      ],
+      "kind": "RELATIONAL",
+      "metadata": [
+        {
+          "key": "spool_name"
+        }
+      ],
+      "child_links": [
+        {
+          "kind": "RELATIONAL",
+          "type": "",
+          "variable": "absent"
+        },
+        {
+          "kind": "SCALAR",
+          "type": "",
+          "variable": "absent",
+          "multiple": true
+        }
+      ]
+    },
+    {
+      "names": [
+        "SpoolScan"
+      ],
+      "kind": "RELATIONAL",
+      "metadata": [
+        {
+          "key": "spool_name"
+        }
+      ],
+      "child_links": [
+        {
+          "kind": "SCALAR",
+          "type": "",
+          "variable": "any"
+        }
+      ]
+    },
+    {
+      "names": [
+        "Union All"
+      ],
+      "kind": "RELATIONAL",
+      "metadata": [],
+      "child_links": [
+        {
+          "kind": "RELATIONAL",
+          "type": "",
+          "variable": "absent",
+          "multiple": true
+        },
+        {
+          "kind": "SCALAR",
+          "type": "",
+          "variable": "present",
+          "multiple": true
+        }
+      ]
+    },
+    {
+      "names": [
+        "Union Input"
+      ],
+      "kind": "RELATIONAL",
+      "metadata": [],
+      "child_links": [
+        {
+          "kind": "RELATIONAL",
+          "type": "",
+          "variable": "absent"
+        },
+        {
+          "kind": "SCALAR",
+          "type": "input_*",
+          "variable": "absent"
+        }
+      ]
+    },
+    {
+      "names": [
+        "Unit Relation"
+      ],
+      "kind": "RELATIONAL",
+      "metadata": [],
+      "child_links": [
+        {
+          "kind": "SCALAR",
+          "type": "",
+          "variable": "absent"
+        }
+      ]
+    },
+    {
+      "names": [
+        "VerifyDeterminism"
+      ],
+      "kind": "RELATIONAL",
+      "metadata": [],
+      "child_links": [
+        {
+          "kind": "RELATIONAL",
+          "type": "",
+          "variable": "absent"
+        },
+        {
+          "kind": "SCALAR",
+          "type": "",
+          "variable": "absent",
+          "multiple": true
+        }
+      ]
+    }
+  ]
+}

@@ -63,6 +63,21 @@ go run ./tools/spanner-query-plan-shape \
   --continue-on-error
 ```
 
+Probe plausible catalog cross-products that are not established by the broader
+documentation matrices, including outer/one-to-one merge joins, OFFSET links,
+hash-join residuals, and simultaneous aggregate/minor-sort multiplicity:
+
+```sh
+go run ./tools/spanner-query-plan-shape \
+  --case planvocab_inference \
+  --output json \
+  --continue-on-error
+```
+
+Pipe this raw output through `planvocab-check` as documented in
+[`plancontract/planvocab/README.md`](../../plancontract/planvocab/README.md) to
+check both unknown vocabulary and positive operator requirements.
+
 Use `--omni-image` when reproducing an observation from a specific Spanner Omni
 release instead of the current spanemuboost default. Record the immutable image
 digest alongside retained raw plans:

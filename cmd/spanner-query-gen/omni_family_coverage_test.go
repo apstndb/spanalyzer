@@ -9,6 +9,7 @@ import (
 	"testing"
 
 	"cloud.google.com/go/spanner"
+	"cloud.google.com/go/spanner/apiv1/spannerpb"
 	"github.com/apstndb/spanalyzer/internal/querygen"
 	"github.com/apstndb/spanalyzer/plancontract"
 	"github.com/apstndb/spanemuboost"
@@ -189,6 +190,7 @@ func TestIntegrationPlanReportOperatorFamilyCoverageOnOmni(t *testing.T) {
 			if query.Status != "ok" {
 				t.Fatalf("status = %q, error = %q", query.Status, query.Error)
 			}
+			querygenOmniCheckPlanVocabulary(t, query.Name, query.RawPlan)
 			if got := query.OperatorFamilyCounts["unknown"]; got != 0 {
 				t.Errorf("unknown operator family count = %d, want 0\nplan:\n%s", got, query.Plan)
 			}
@@ -246,17 +248,20 @@ func TestIntegrationDMLOperatorFamilyCoverageOnOmni(t *testing.T) {
 		c := c
 		t.Run(c.Name, func(t *testing.T) {
 			var operators []plancontract.Operator
+			var queryPlan *spannerpb.QueryPlan
 			_, err := clients.Client.ReadWriteTransaction(t.Context(), func(ctx context.Context, txn *spanner.ReadWriteTransaction) error {
 				plan, err := txn.AnalyzeQuery(ctx, spanner.NewStatement(c.SQL))
 				if err != nil {
 					return err
 				}
+				queryPlan = plan
 				operators = plancontract.NormalizeOperators(plan)
 				return nil
 			})
 			if err != nil {
 				t.Fatalf("AnalyzeQuery(%s) error = %v", c.SQL, err)
 			}
+			querygenOmniCheckPlanVocabulary(t, c.Name, queryPlan)
 			counts := plancontract.OperatorFamilyCounts(operators)
 			if got := counts["unknown"]; got != 0 {
 				t.Errorf("unknown operator family count = %d, want 0", got)

@@ -263,6 +263,7 @@ func TestIntegrationQueryCodegenGeneratedSpannerQueriesRunOnOmni(t *testing.T) {
 			if query.Status != "ok" {
 				t.Fatalf("plan-report query %s status = %q, error = %q", query.Name, query.Status, query.Error)
 			}
+			querygenOmniCheckPlanVocabulary(t, query.Name, query.RawPlan)
 			if query.Plan == "" {
 				t.Fatalf("plan-report query %s has empty rendered plan", query.Name)
 			}
@@ -310,6 +311,7 @@ func querygenOmniIntegrationAnalyzeQuery(t testing.TB, client *spanner.Client, q
 	if err != nil {
 		t.Fatalf("AnalyzeQuery() error = %v\nSQL: %s\nparams: %#v", err, query.SQL, stmt.Params)
 	}
+	querygenOmniCheckPlanVocabulary(t, query.Name, plan)
 	return plan
 }
 

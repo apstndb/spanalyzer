@@ -26,10 +26,12 @@ The repository hosts four Go modules, split along dependency weight:
 - [`github.com/apstndb/spanalyzer/plancontract`](plancontract) — a
   lightweight nested module that normalizes raw `spannerpb.QueryPlan` values
   (operator family classification, operator topology, plan digests) and
-  evaluates plan contracts against them. It works with plans obtained from
-  Cloud Spanner, the emulator, Spanner Omni, or saved artifacts, and depends
-  only on the Spanner protos, CEL, and YAML — not on the GoogleSQL frontend
-  or containers.
+  evaluates plan contracts against them. Its experimental
+  [`planvocab`](plancontract/planvocab) package detects new operator metadata
+  and child-link vocabulary against a generated, provenance-stamped catalog.
+  It works with plans obtained from Cloud Spanner, the emulator, Spanner Omni,
+  or saved artifacts, and depends only on the Spanner protos, CEL, and YAML —
+  not on the GoogleSQL frontend or containers.
 - [`github.com/apstndb/spanalyzer/cmd/spanner-query-gen`](cmd/spanner-query-gen)
   — the query code generation CLI, including the Omni-backed `plan-report`
   workflow and integration tests. This is where spanemuboost,

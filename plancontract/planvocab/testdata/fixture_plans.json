@@ -1,0 +1,241 @@
+{
+  "version": "v0alpha1",
+  "plans": [
+    {
+      "name": "distributed_anti_semi_apply_internal",
+      "plan": {
+        "planNodes": [
+          {
+            "index": 1,
+            "displayName": "Distributed Anti Semi Apply",
+            "childLinks": [
+              {
+                "type": "Map",
+                "childIndex": 2
+              }
+            ]
+          },
+          {
+            "index": 2,
+            "displayName": "Semi Apply",
+            "childLinks": [
+              {
+                "childIndex": 3
+              }
+            ]
+          },
+          {
+            "index": 3,
+            "displayName": "Scan",
+            "metadata": {
+              "scan_method": "Row",
+              "scan_target": "$v3",
+              "scan_type": "BatchScan"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "distributed_semi_apply_internal",
+      "plan": {
+        "planNodes": [
+          {
+            "index": 1,
+            "displayName": "Distributed Semi Apply",
+            "childLinks": [
+              {
+                "type": "Map",
+                "childIndex": 2
+              }
+            ]
+          },
+          {
+            "index": 2,
+            "displayName": "Semi Apply",
+            "childLinks": [
+              {
+                "childIndex": 3
+              }
+            ]
+          },
+          {
+            "index": 3,
+            "displayName": "Scan",
+            "metadata": {
+              "scan_method": "Row",
+              "scan_target": "$v2",
+              "scan_type": "BatchScan"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "push_broadcast_branched_regular_hash_join",
+      "plan": {
+        "planNodes": [
+          {
+            "index": 1,
+            "displayName": "Push Broadcast Hash Join",
+            "childLinks": [
+              {
+                "type": "Map",
+                "childIndex": 8
+              }
+            ]
+          },
+          {
+            "index": 8,
+            "displayName": "Serialize Result",
+            "childLinks": [
+              {
+                "childIndex": 9
+              },
+              {
+                "childIndex": 30
+              }
+            ]
+          },
+          {
+            "index": 9,
+            "displayName": "Hash Join",
+            "childLinks": [
+              {
+                "type": "Build",
+                "childIndex": 10
+              }
+            ]
+          },
+          {
+            "index": 10,
+            "displayName": "Scan",
+            "metadata": {
+              "scan_method": "Batch",
+              "scan_target": "$v2",
+              "scan_type": "BatchScan"
+            }
+          },
+          {
+            "index": 30,
+            "displayName": "Hash Join"
+          }
+        ]
+      }
+    },
+    {
+      "name": "push_broadcast_internal_hash_join",
+      "plan": {
+        "planNodes": [
+          {
+            "index": 1,
+            "displayName": "Push Broadcast Hash Join",
+            "childLinks": [
+              {
+                "type": "Input",
+                "childIndex": 2
+              },
+              {
+                "type": "Map",
+                "childIndex": 8
+              }
+            ]
+          },
+          {
+            "index": 2,
+            "displayName": "Scan"
+          },
+          {
+            "index": 8,
+            "displayName": "Serialize Result",
+            "childLinks": [
+              {
+                "childIndex": 9
+              }
+            ]
+          },
+          {
+            "index": 9,
+            "displayName": "Hash Join",
+            "childLinks": [
+              {
+                "type": "Build",
+                "childIndex": 10
+              },
+              {
+                "type": "Probe",
+                "childIndex": 20
+              }
+            ]
+          },
+          {
+            "index": 10,
+            "displayName": "DataBlockToRow",
+            "childLinks": [
+              {
+                "childIndex": 11
+              }
+            ]
+          },
+          {
+            "index": 11,
+            "displayName": "Scan",
+            "metadata": {
+              "scan_method": "Batch",
+              "scan_target": "$v2",
+              "scan_type": "BatchScan"
+            }
+          },
+          {
+            "index": 20,
+            "displayName": "Scan"
+          }
+        ]
+      }
+    },
+    {
+      "name": "standalone_hash_join",
+      "plan": {
+        "planNodes": [
+          {
+            "index": 1,
+            "displayName": "Hash Join",
+            "childLinks": [
+              {
+                "type": "Build",
+                "childIndex": 2
+              },
+              {
+                "type": "Probe",
+                "childIndex": 3
+              }
+            ]
+          },
+          {
+            "index": 2,
+            "displayName": "Scan"
+          },
+          {
+            "index": 3,
+            "displayName": "Scan"
+          }
+        ]
+      }
+    },
+    {
+      "name": "standalone_semi_apply",
+      "plan": {
+        "planNodes": [
+          {
+            "index": 1,
+            "displayName": "Semi Apply"
+          },
+          {
+            "index": 2,
+            "displayName": "Anti-Semi Apply"
+          }
+        ]
+      }
+    }
+  ]
+}

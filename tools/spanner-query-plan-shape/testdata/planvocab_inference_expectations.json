@@ -1,0 +1,248 @@
+{
+  "version": "v0alpha1",
+  "queries": [
+    {
+      "label": "planvocab-inference/dca-order/default",
+      "patterns": [
+        {
+          "display_name": "Distributed Cross Apply",
+          "metadata": [
+            {"key": "order_preserving", "value": "true"}
+          ],
+          "child_links": [
+            {"kind": "SCALAR", "type": "Split Range", "variable": "absent"},
+            {"kind": "SCALAR", "type": "Batch", "variable": "present"},
+            {"kind": "SCALAR", "type": "Map", "variable": "present"}
+          ]
+        }
+      ]
+    },
+    {
+      "label": "planvocab-inference/dca-order/no-distributed-merge",
+      "patterns": [
+        {
+          "display_name": "Distributed Cross Apply",
+          "child_links": [
+            {"kind": "SCALAR", "type": "Split Range", "variable": "absent"}
+          ]
+        }
+      ]
+    },
+    {
+      "label": "planvocab-inference/merge-right-outer",
+      "patterns": [
+        {
+          "display_name": "Merge Join",
+          "metadata": [
+            {"key": "join_type", "value": "LEFT_OUTER"},
+            {"key": "join_configuration", "value": "MANY_TO_ONE"}
+          ],
+          "child_links": [
+            {"kind": "SCALAR", "type": "Right", "variable": "present"}
+          ]
+        }
+      ]
+    },
+    {
+      "label": "planvocab-inference/merge-left-outer-control",
+      "patterns": [
+        {
+          "display_name": "Merge Join",
+          "metadata": [
+            {"key": "join_type", "value": "LEFT_OUTER"},
+            {"key": "join_configuration", "value": "MANY_TO_ONE"}
+          ],
+          "child_links": [
+            {"kind": "SCALAR", "type": "Right", "variable": "present"}
+          ]
+        }
+      ]
+    },
+    {
+      "label": "planvocab-inference/merge-one-to-one",
+      "patterns": [
+        {
+          "display_name": "Merge Join",
+          "metadata": [
+            {"key": "join_type", "value": "INNER"},
+            {"key": "join_configuration", "value": "ONE_TO_MANY"}
+          ]
+        }
+      ]
+    },
+    {
+      "label": "planvocab-inference/merge-one-to-many-control",
+      "patterns": [
+        {
+          "display_name": "Merge Join",
+          "metadata": [
+            {"key": "join_type", "value": "INNER"},
+            {"key": "join_configuration", "value": "ONE_TO_MANY"}
+          ]
+        }
+      ]
+    },
+    {
+      "label": "planvocab-inference/offset-v1",
+      "patterns": [
+        {
+          "display_name": "Sort Limit",
+          "metadata": [
+            {"key": "call_type", "value": "Global"}
+          ],
+          "child_links": [
+            {"kind": "SCALAR", "type": "Limit", "variable": "absent"},
+            {"kind": "SCALAR", "type": "Offset", "variable": "absent"}
+          ]
+        }
+      ]
+    },
+    {
+      "label": "planvocab-inference/offset-v3",
+      "patterns": [
+        {
+          "display_name": "Limit",
+          "metadata": [
+            {"key": "call_type", "value": "Global"}
+          ],
+          "child_links": [
+            {"kind": "SCALAR", "type": "Limit", "variable": "absent"},
+            {"kind": "SCALAR", "type": "Offset", "variable": "absent"}
+          ]
+        }
+      ]
+    },
+    {
+      "label": "planvocab-inference/offset-v8",
+      "patterns": [
+        {
+          "display_name": "Limit",
+          "metadata": [
+            {"key": "call_type", "value": "Global"}
+          ],
+          "child_links": [
+            {"kind": "SCALAR", "type": "Limit", "variable": "absent"},
+            {"kind": "SCALAR", "type": "Offset", "variable": "absent"}
+          ]
+        }
+      ]
+    },
+    {
+      "label": "planvocab-inference/offset-control",
+      "patterns": [
+        {
+          "display_name": "Limit",
+          "metadata": [
+            {"key": "call_type", "value": "Global"}
+          ],
+          "child_links": [
+            {"kind": "SCALAR", "type": "Limit", "variable": "absent"}
+          ]
+        }
+      ]
+    },
+    {
+      "label": "planvocab-inference/hash-left-outer-residual-build-left",
+      "patterns": [
+        {
+          "display_name": "Hash Join",
+          "metadata": [
+            {"key": "join_type", "value": "BUILD_OUTER"}
+          ],
+          "child_links": [
+            {"kind": "SCALAR", "type": "Condition", "variable": "absent"},
+            {"kind": "SCALAR", "type": "Residual Condition", "variable": "absent"}
+          ]
+        }
+      ]
+    },
+    {
+      "label": "planvocab-inference/hash-left-outer-residual-build-right",
+      "patterns": [
+        {
+          "display_name": "Hash Join",
+          "metadata": [
+            {"key": "join_type", "value": "PROBE_OUTER"}
+          ],
+          "child_links": [
+            {"kind": "SCALAR", "type": "Condition", "variable": "absent"},
+            {"kind": "SCALAR", "type": "Residual Condition", "variable": "absent"}
+          ]
+        }
+      ]
+    },
+    {
+      "label": "planvocab-inference/hash-left-outer-control",
+      "patterns": [
+        {
+          "display_name": "Hash Join",
+          "metadata": [
+            {"key": "join_type", "value": "PROBE_OUTER"}
+          ],
+          "child_links": [
+            {"kind": "SCALAR", "type": "Condition", "variable": "absent"}
+          ]
+        }
+      ]
+    },
+    {
+      "label": "planvocab-inference/minor-sort-values",
+      "patterns": [
+        {
+          "display_name": "Minor Sort",
+          "child_links": [
+            {"kind": "SCALAR", "type": "MajorKey", "variable": "present"},
+            {"kind": "SCALAR", "type": "MinorKey", "variable": "present"},
+            {"kind": "SCALAR", "type": "Value", "variable": "present"}
+          ]
+        }
+      ]
+    },
+    {
+      "label": "planvocab-inference/minor-sort-limit-values",
+      "patterns": [
+        {
+          "display_name": "Minor Sort Limit",
+          "child_links": [
+            {"kind": "SCALAR", "type": "Limit", "variable": "absent"},
+            {"kind": "SCALAR", "type": "MajorKey", "variable": "present"},
+            {"kind": "SCALAR", "type": "MinorKey", "variable": "present"},
+            {"kind": "SCALAR", "type": "Value", "variable": "present"}
+          ]
+        }
+      ]
+    },
+    {
+      "label": "planvocab-inference/aggregate-hash-repeated-key-agg",
+      "patterns": [
+        {
+          "display_name": "Aggregate",
+          "family": "hash_aggregate",
+          "metadata": [
+            {"key": "iterator_type", "value": "Hash"}
+          ],
+          "child_links": [
+            {"kind": "SCALAR", "type": "Key", "variable": "present"},
+            {"kind": "SCALAR", "type": "Agg", "variable": "present"}
+          ]
+        }
+      ]
+    },
+    {
+      "label": "planvocab-inference/aggregate-stream-repeated-key-agg",
+      "patterns": [
+        {
+          "display_name": "Aggregate",
+          "family": "stream_aggregate",
+          "metadata": [
+            {"key": "iterator_type", "value": "Stream"}
+          ],
+          "child_links": [
+            {"kind": "SCALAR", "type": "Key", "variable": "present"},
+            {"kind": "SCALAR", "type": "Agg", "variable": "present"}
+          ]
+        }
+      ]
+    }
+  ]
+}
