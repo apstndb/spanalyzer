@@ -55,7 +55,7 @@ JOIN@{JOIN_METHOD=HASH_JOIN} Albums a
 ON s.SingerId = a.SingerId
 `
 
-const builtInCaseNames = "all, docs, optimizer_gaps, optimizer_unhinted_candidates, cte, dml, tvf, lock_hints, " +
+const builtInCaseNames = "all, docs, optimizer_gaps, optimizer_unhinted_candidates, join_elimination, cte, dml, tvf, lock_hints, " +
 	"full_text_search, json_search, vector_search, function_hint, hint_matrix, statement_hint_query_matrix, " +
 	"join_matrix, subquery_join_hint_matrix, push_broadcast_hash_join, or hash_join"
 
@@ -108,6 +108,7 @@ func run(args []string, stdout io.Writer) error {
 	optimizerVersionMatrix := fs.Bool("optimizer-version-matrix", false, "expand each query with OPTIMIZER_VERSION statement hints for versions 1 through 8")
 	optimizerVersionDiff := fs.Bool("optimizer-version-diff", false, "analyze each query with optimizer versions 1 through 8 and print only queries whose compact-tree-metadata shape changes")
 	allowDistributedMergeMatrix := fs.Bool("allow-distributed-merge-matrix", false, "expand each query across ALLOW_DISTRIBUTED_MERGE unspecified, TRUE, and FALSE")
+	omniImage := fs.String("omni-image", "", "Spanner Omni container image override; empty uses the spanemuboost default")
 	continueOnError := fs.Bool("continue-on-error", false, "print errors and continue analyzing remaining queries")
 	timeout := fs.Duration("timeout", 5*time.Minute, "maximum time to start Spanner Omni and analyze queries")
 	if err := fs.Parse(args); err != nil {
@@ -138,7 +139,10 @@ func run(args []string, stdout io.Writer) error {
 	ctx, cancel := context.WithTimeout(context.Background(), *timeout)
 	defer cancel()
 
-	runtime := spanemuboost.NewLazyRuntime(spanemuboost.BackendOmni)
+	runtime := spanemuboost.NewLazyRuntime(
+		spanemuboost.BackendOmni,
+		spanemuboost.WithContainerImage(strings.TrimSpace(*omniImage)),
+	)
 	defer func() {
 		_ = runtime.Close()
 	}()
@@ -228,6 +232,9 @@ func loadDDLs(builtinCase string, paths []string) ([]string, error) {
 			strings.EqualFold(strings.TrimSpace(builtinCase), "optimizer_unhinted_candidates") {
 			return parseBuiltInDDLs("optimizer-gaps-schema.sql", optimizerGapsDDL)
 		}
+		if strings.EqualFold(strings.TrimSpace(builtinCase), "join_elimination") {
+			return parseBuiltInDDLs("join-elimination-schema.sql", joinEliminationDDL)
+		}
 		if strings.EqualFold(strings.TrimSpace(builtinCase), "docs") ||
 			strings.EqualFold(strings.TrimSpace(builtinCase), "cte") ||
 			strings.EqualFold(strings.TrimSpace(builtinCase), "function_hint") ||
@@ -303,6 +310,8 @@ func loadQueries(builtinCase string, sqlTexts, sqlFiles []string) ([]queryCase, 
 		return optimizerGapQueries, nil
 	case "optimizer_unhinted_candidates":
 		return optimizerUnhintedCandidateQueries, nil
+	case "join_elimination":
+		return joinEliminationQueries, nil
 	case "cte":
 		return cteQueries, nil
 	case "dml":

@@ -121,6 +121,61 @@ CREATE TABLE FKOrders (
   CONSTRAINT FK_CustomerOrder FOREIGN KEY (CustomerId)
     REFERENCES FKCustomers (CustomerId) NOT ENFORCED,
 ) PRIMARY KEY(OrderId);
+
+`
+
+const joinEliminationDDL = docsDDL + `
+CREATE TABLE FKCustomers (
+  CustomerId INT64 NOT NULL,
+  CustomerName STRING(MAX) NOT NULL,
+) PRIMARY KEY(CustomerId);
+
+CREATE TABLE FKOrders (
+  OrderId INT64 NOT NULL,
+  CustomerId INT64 NOT NULL,
+  Quantity INT64 NOT NULL,
+  ProductId INT64 NOT NULL,
+  CONSTRAINT FK_CustomerOrder FOREIGN KEY (CustomerId)
+    REFERENCES FKCustomers (CustomerId) NOT ENFORCED,
+) PRIMARY KEY(OrderId);
+
+CREATE TABLE FKOrdersEnforced (
+  OrderId INT64 NOT NULL,
+  CustomerId INT64 NOT NULL,
+  Quantity INT64 NOT NULL,
+  ProductId INT64 NOT NULL,
+  CONSTRAINT FK_CustomerOrderEnforced FOREIGN KEY (CustomerId)
+    REFERENCES FKCustomers (CustomerId),
+) PRIMARY KEY(OrderId);
+
+CREATE TABLE FkSingers (
+  SingerId INT64 NOT NULL,
+  FirstName STRING(1024),
+) PRIMARY KEY(SingerId);
+
+CREATE TABLE FkAlbums (
+  SingerId INT64 NOT NULL,
+  AlbumId INT64 NOT NULL,
+  AlbumTitle STRING(MAX),
+  CONSTRAINT FK_FkAlbums_Singer FOREIGN KEY (SingerId)
+    REFERENCES FkSingers (SingerId),
+) PRIMARY KEY(SingerId, AlbumId);
+
+CREATE TABLE FkAlbumsNotEnforced (
+  SingerId INT64 NOT NULL,
+  AlbumId INT64 NOT NULL,
+  AlbumTitle STRING(MAX),
+  CONSTRAINT FK_FkAlbumsNE_Singer FOREIGN KEY (SingerId)
+    REFERENCES FkSingers (SingerId) NOT ENFORCED,
+) PRIMARY KEY(SingerId, AlbumId);
+
+CREATE TABLE FkAlbumsNotEnforcedNonLeadingPK (
+  SingerId INT64 NOT NULL,
+  AlbumId INT64 NOT NULL,
+  AlbumTitle STRING(MAX),
+  CONSTRAINT FK_FkAlbumsNENonLeading_Singer FOREIGN KEY (SingerId)
+    REFERENCES FkSingers (SingerId) NOT ENFORCED,
+) PRIMARY KEY(AlbumId, SingerId);
 `
 
 const changeStreamTVFDDL = `
@@ -463,6 +518,94 @@ WHERE SongName LIKE "A%z"`,
 	{
 		Label: "optimizer-gaps/v2/group-by-scan-prefix",
 		SQL:   `SELECT s.SingerId, s.AlbumId FROM Songs AS s GROUP BY s.SingerId, s.AlbumId`,
+	},
+}
+
+var joinEliminationQueries = []queryCase{
+	{
+		Label: "join-elimination/interleave",
+		SQL: `SELECT s.SingerId, a.AlbumTitle
+FROM Singers AS s
+JOIN Albums AS a ON s.SingerId = a.SingerId`,
+	},
+	{
+		Label: "join-elimination/interleave-hash-join-hint",
+		SQL: `SELECT s.SingerId, a.AlbumTitle
+FROM Singers AS s
+JOIN@{JOIN_METHOD=HASH_JOIN} Albums AS a ON s.SingerId = a.SingerId`,
+	},
+	{
+		Label: "join-elimination/no-constraint-control",
+		SQL: `SELECT c.SingerId, c.VenueId
+FROM Singers AS s
+JOIN Concerts AS c ON s.SingerId = c.SingerId`,
+	},
+	{
+		Label: "join-elimination/enforced-fk-leading-key",
+		SQL: `SELECT s.SingerId, a.AlbumTitle
+FROM FkSingers AS s
+JOIN FkAlbums AS a ON s.SingerId = a.SingerId`,
+	},
+	{
+		Label: "join-elimination/unenforced-fk-leading-key-true",
+		SQL: `@{USE_UNENFORCED_FOREIGN_KEY=TRUE}
+SELECT s.SingerId, a.AlbumTitle
+FROM FkSingers AS s
+JOIN FkAlbumsNotEnforced AS a ON s.SingerId = a.SingerId`,
+	},
+	{
+		Label: "join-elimination/unenforced-fk-leading-key-default",
+		SQL: `SELECT s.SingerId, a.AlbumTitle
+FROM FkSingers AS s
+JOIN FkAlbumsNotEnforced AS a ON s.SingerId = a.SingerId`,
+	},
+	{
+		Label: "join-elimination/unenforced-fk-leading-key-child-first-true",
+		SQL: `@{USE_UNENFORCED_FOREIGN_KEY=TRUE}
+SELECT a.SingerId
+FROM FkAlbumsNotEnforced AS a
+JOIN FkSingers AS s ON s.SingerId = a.SingerId`,
+	},
+	{
+		Label: "join-elimination/unenforced-fk-leading-key-true-hash-join-hint",
+		SQL: `@{USE_UNENFORCED_FOREIGN_KEY=TRUE}
+SELECT s.SingerId, a.AlbumTitle
+FROM FkSingers AS s
+JOIN@{JOIN_METHOD=HASH_JOIN} FkAlbumsNotEnforced AS a ON s.SingerId = a.SingerId`,
+	},
+	{
+		Label: "join-elimination/unenforced-fk-leading-key-false",
+		SQL: `@{USE_UNENFORCED_FOREIGN_KEY=FALSE}
+SELECT s.SingerId, a.AlbumTitle
+FROM FkSingers AS s
+JOIN FkAlbumsNotEnforced AS a ON s.SingerId = a.SingerId`,
+	},
+	{
+		Label: "join-elimination/unenforced-fk-in-pk-nonleading-true",
+		SQL: `@{USE_UNENFORCED_FOREIGN_KEY=TRUE}
+SELECT s.SingerId, a.AlbumTitle
+FROM FkSingers AS s
+JOIN FkAlbumsNotEnforcedNonLeadingPK AS a ON s.SingerId = a.SingerId`,
+	},
+	{
+		Label: "join-elimination/enforced-fk-outside-pk",
+		SQL: `SELECT o.CustomerId
+FROM FKOrdersEnforced AS o
+JOIN FKCustomers AS c ON c.CustomerId = o.CustomerId`,
+	},
+	{
+		Label: "join-elimination/unenforced-fk-outside-pk-true",
+		SQL: `@{USE_UNENFORCED_FOREIGN_KEY=TRUE}
+SELECT o.CustomerId
+FROM FKOrders AS o
+JOIN FKCustomers AS c ON c.CustomerId = o.CustomerId`,
+	},
+	{
+		Label: "join-elimination/unenforced-fk-outside-pk-false",
+		SQL: `@{USE_UNENFORCED_FOREIGN_KEY=FALSE}
+SELECT o.CustomerId
+FROM FKOrders AS o
+JOIN FKCustomers AS c ON c.CustomerId = o.CustomerId`,
 	},
 }
 

@@ -147,6 +147,28 @@ func TestLoadDDLsOptimizerGapsIncludesDedicatedObjects(t *testing.T) {
 	}
 }
 
+func TestLoadDDLsJoinEliminationIncludesControlledSchemas(t *testing.T) {
+	ddls, err := loadDDLs("join_elimination", nil)
+	if err != nil {
+		t.Fatalf("loadDDLs(%q) error = %v", "join_elimination", err)
+	}
+	joined := strings.Join(ddls, "\n")
+	for _, want := range []string{
+		"INTERLEAVE IN PARENT Singers",
+		"CREATE TABLE Concerts",
+		"CREATE TABLE FkAlbums",
+		"CREATE TABLE FkAlbumsNotEnforced",
+		"CREATE TABLE FkAlbumsNotEnforcedNonLeadingPK",
+		"REFERENCES FkSingers",
+		"CREATE TABLE FKOrders",
+		"CREATE TABLE FKOrdersEnforced",
+	} {
+		if !strings.Contains(joined, want) {
+			t.Fatalf("loadDDLs(\"join_elimination\") missing %q in:\n%s", want, joined)
+		}
+	}
+}
+
 func TestLoadDDLsDocsIncludesTimestampPushdownPrerequisites(t *testing.T) {
 	ddls, err := loadDDLs("docs", nil)
 	if err != nil {
@@ -182,6 +204,45 @@ func TestLoadQueriesDocsIncludesIndependentFullOuterJoinProbes(t *testing.T) {
 		if !strings.Contains(seen[label], "FULL JOIN") || !strings.Contains(seen[label], "Concerts") {
 			t.Fatalf("%s does not use the independent-table FULL JOIN shape: %s", label, seen[label])
 		}
+	}
+}
+
+func TestLoadQueriesJoinEliminationIncludesControls(t *testing.T) {
+	queries, err := loadQueries("join_elimination", nil, nil)
+	if err != nil {
+		t.Fatalf("loadQueries(%q) error = %v", "join_elimination", err)
+	}
+	seen := map[string]string{}
+	for _, query := range queries {
+		seen[query.Label] = query.SQL
+	}
+	for _, label := range []string{
+		"join-elimination/interleave",
+		"join-elimination/interleave-hash-join-hint",
+		"join-elimination/no-constraint-control",
+		"join-elimination/enforced-fk-leading-key",
+		"join-elimination/unenforced-fk-leading-key-true",
+		"join-elimination/unenforced-fk-leading-key-default",
+		"join-elimination/unenforced-fk-leading-key-child-first-true",
+		"join-elimination/unenforced-fk-leading-key-true-hash-join-hint",
+		"join-elimination/unenforced-fk-leading-key-false",
+		"join-elimination/unenforced-fk-in-pk-nonleading-true",
+		"join-elimination/enforced-fk-outside-pk",
+		"join-elimination/unenforced-fk-outside-pk-true",
+		"join-elimination/unenforced-fk-outside-pk-false",
+	} {
+		if seen[label] == "" {
+			t.Fatalf("loadQueries(\"join_elimination\") missing %s", label)
+		}
+	}
+	if !strings.Contains(seen["join-elimination/unenforced-fk-leading-key-true"], "USE_UNENFORCED_FOREIGN_KEY=TRUE") {
+		t.Fatal("leading-key TRUE probe is missing USE_UNENFORCED_FOREIGN_KEY=TRUE")
+	}
+	if !strings.Contains(seen["join-elimination/unenforced-fk-leading-key-true-hash-join-hint"], "JOIN_METHOD=HASH_JOIN") {
+		t.Fatal("leading-key TRUE hint probe is missing JOIN_METHOD=HASH_JOIN")
+	}
+	if !strings.Contains(seen["join-elimination/unenforced-fk-outside-pk-false"], "USE_UNENFORCED_FOREIGN_KEY=FALSE") {
+		t.Fatal("outside-PK FALSE control is missing USE_UNENFORCED_FOREIGN_KEY=FALSE")
 	}
 }
 

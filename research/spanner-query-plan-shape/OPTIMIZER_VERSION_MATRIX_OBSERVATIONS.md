@@ -156,7 +156,7 @@ performance validation for cost-based features.
 | --- | --- | --- |
 | Version 8 `WITH`, large `IN`, join, and `LIMIT` interaction | `optimizer-gaps/v8/with-large-in-join-order-limit` | Planned in every version. Shapes split into v1-v2, v3-v4, v5, and v6-v8 groups. The visible boundaries line up more closely with version 3 distributed merge / sorted `LIMIT`, version 5 cost model, and version 6 cardinality or limit-related changes than with a v8-only feature. No v8-only boundary was observed in the empty synthetic schema. |
 | Version 8 large `IN (...)` | `optimizer-gaps/v8/large-in-list` | Planned in every version with the same compact-tree-metadata shape. This verifies acceptance only; it does not verify the documented performance improvement. |
-| Version 8 foreign-key handling / `USE_UNENFORCED_FOREIGN_KEY` | `optimizer-gaps/v8/use-unenforced-foreign-key-true` and `...-false` | With `TRUE`, v1-v7 kept the join to `FKCustomers`, while v8 scanned only `FKOrders`. With `FALSE`, all versions kept the join. The most relevant official item is version 8's "Other improvements" entry that explicitly mentions foreign keys. |
+| Version 8 foreign-key handling / `USE_UNENFORCED_FOREIGN_KEY` | `optimizer-gaps/v8/use-unenforced-foreign-key-true` and `...-false`; dedicated `join_elimination` controls | With `TRUE`, v1-v7 kept the join to `FKCustomers`, while v8 scanned only `FKOrders`. The dedicated controls reproduced the same v8 boundary for both enforced and informational foreign keys, regardless of whether the referencing column led the primary key. With `FALSE`, all versions kept informational-FK joins. Interleaving eliminated the parent join in every version, while an unconstrained control retained it in every version. The most relevant official item is version 8's "Other improvements" entry that explicitly mentions foreign keys. |
 | Version 7 cost-based index union | `optimizer-gaps/v7/unhinted-index-union-candidate` | v1-v6 used a single distributed scan/filter shape; v7-v8 used `Union All` over two index-scan branches plus an aggregate. This directly exercises the unhinted index-union optimizer behavior in the synthetic schema. |
 | Version 7 smart seek versus scan | `optimizer-gaps/v7/partial-key-seek-candidate` | Planned in every version with the same shape and `seekable_key_size=1`. This confirms a stable accepted shape, not a statistics-sensitive seek/scan decision. |
 | Version 6 cost-based DML optimization | `optimizer-gaps/v6/dml-insert-select-filter` | Planned in a read-write transaction for every version with the same `Apply Mutations > ... > Filter Scan` shape. No v6 boundary was isolated. |
@@ -169,6 +169,64 @@ performance validation for cost-based features.
 | Version 2 `REGEXP_CONTAINS` prefix predicate | `optimizer-gaps/v2/regexp-contains-prefix-forced-index` | v1 performed a full `SongsBySongName` index scan with residual `REGEXP_CONTAINS`; v2 extracted `STARTS_WITH($SongName, 'A')` as split and seek conditions. |
 | Version 2 `LIKE` prefix predicate | `optimizer-gaps/v2/like-prefix-forced-index` | v1 performed a full `SongsBySongName` index scan with residual `LIKE`; v2 extracted `STARTS_WITH($SongName, 'A')` as split and seek conditions while keeping the full `LIKE` residual filter. |
 | Version 2 scan under `GROUP BY` | `optimizer-gaps/v2/group-by-scan-prefix` | Planned in every version with the same stream aggregate over an index scan. No v2 boundary was isolated. |
+
+### Join-elimination controls (2026-07-12)
+
+The dedicated `join_elimination` case was added after comparing the existing
+optimizer-gap probe with the newer `spanner-hacks` examples. It changes one
+schema or query property at a time while avoiding non-key payload columns from
+the referenced side, so elimination remains semantically possible:
+
+- interleaved child to parent;
+- no-constraint control;
+- enforced foreign key with the referencing column leading the primary key;
+- informational foreign key with the referencing column leading the primary
+  key, with `USE_UNENFORCED_FOREIGN_KEY=TRUE` and `FALSE`;
+- informational foreign key with the referencing column outside the primary
+  key, with the same hint controls;
+- informational foreign key with the referencing column inside but not leading
+  the primary key;
+- an enforced twin of the outside-primary-key layout;
+- parent-first and child-first projections plus default versus explicit `TRUE`
+  on the leading-key informational-FK layout;
+- representative `JOIN_METHOD=HASH_JOIN` variants for interleaving and an
+  informational foreign key, to test whether a method hint prevents removal.
+
+The full matrix was run against both locally cached Spanner Omni images:
+
+- `2026.r1-beta`:
+  `sha256:e98a088fa66d4a87dbb560d729bf21d998bb843f6018bd8dc118fe320e671886`;
+- `2026.r1-beta.2`:
+  `sha256:115622065afefd267f9ef3ff1025e35d73a03f66a7335de8e051b393ebdcfacc`.
+
+Both images produced the same boundaries. Interleaving eliminated the parent
+join in v1-v8. Enforced foreign keys and
+informational foreign keys with `TRUE` retained the join in v1-v7 and
+eliminated it in v8; leading, later-in-key, and outside-primary-key placement
+did not change that boundary. Default and explicit `TRUE` matched. Reversing
+the FROM/projection direction changed join order at v5 but did not change the
+v8 elimination boundary. Informational foreign keys with `FALSE` and the
+unconstrained control retained the join in v1-v8. These results narrow the
+stable v1-v8 claim to interleaving; they do not support applying it to
+foreign-key elimination on either checked Omni image.
+`JOIN_METHOD=HASH_JOIN` did not prevent removal: the interleaved join was absent
+in v1-v8, while the informational-FK query used Hash Join in v1-v7 and removed
+the join in v8 without an error or warning.
+As a syntax-position control, placing
+`USE_UNENFORCED_FOREIGN_KEY=TRUE` on `JOIN@{...}` instead of in the statement
+hint returned `InvalidArgument: Unsupported hint: USE_UNENFORCED_FOREIGN_KEY`,
+matching its documented statement-only scope.
+
+Reproduce the concise boundary output with:
+
+```sh
+go run ./tools/spanner-query-plan-shape \
+  --case join_elimination \
+  --optimizer-version-diff \
+  --omni-image us-docker.pkg.dev/spanner-omni/images/spanner-omni:2026.r1-beta \
+  --output compact-tree-metadata \
+  --continue-on-error
+```
 
 The cost-based limitations here are expected: the probe database is empty and
 does not have representative optimizer statistics. For those features, the

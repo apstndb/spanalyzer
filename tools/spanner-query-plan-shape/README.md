@@ -47,6 +47,35 @@ go run ./tools/spanner-query-plan-shape \
   --continue-on-error
 ```
 
+Compare join elimination across interleaving, enforced foreign keys,
+informational foreign keys, and an unconstrained control. The informational-FK
+queries vary whether the referencing column leads the primary key, appears
+later in it, or remains outside it, as well as the projection direction and the
+`USE_UNENFORCED_FOREIGN_KEY` hint. Earlier observations disagreed on the
+optimizer-version boundary, and primary-key placement was a plausible
+confounding variable that this matrix tests explicitly:
+
+```sh
+go run ./tools/spanner-query-plan-shape \
+  --case join_elimination \
+  --optimizer-version-matrix \
+  --output compact-tree-metadata \
+  --continue-on-error
+```
+
+Use `--omni-image` when reproducing an observation from a specific Spanner Omni
+release instead of the current spanemuboost default. Record the immutable image
+digest alongside retained raw plans:
+
+```sh
+go run ./tools/spanner-query-plan-shape \
+  --case join_elimination \
+  --optimizer-version-diff \
+  --omni-image us-docker.pkg.dev/spanner-omni/images/spanner-omni:2026.r1-beta \
+  --output compact-tree-metadata \
+  --continue-on-error
+```
+
 Use `compact-tree-metadata` for the canonical one-line research output. It keeps
 operator metadata and child-link topology, which is important for joins, apply
 nodes, scalar links, and predicate links:
