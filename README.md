@@ -57,6 +57,9 @@ Development across modules uses the committed `go.work` workspace.
   ([PLAN_CONTRACTS](cmd/spanner-query-gen/PLAN_CONTRACTS.md)).
 - [`research/`](research/README.md): non-normative observation notes and
   design background, indexed per area.
+- [`knowledge/`](knowledge/index.md): the OKF v0.2 knowledge bundle. Concepts
+  provide curated discovery metadata while code, schemas, tests, and command
+  documentation remain canonical for behavior.
 
 ## Why plan inspection
 

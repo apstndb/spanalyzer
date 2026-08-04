@@ -8,6 +8,9 @@ implementation surface directly before changing behavior.
 
 This directory supports the repository's positioning (see the root README):
 careful execution plan inspection, recorded so it does not have to be redone.
+Curated cross-area concepts live in the [`knowledge/`](../knowledge/index.md)
+OKF bundle; each concept has one writable body rather than duplicating a
+research note here.
 
 ## Areas
 

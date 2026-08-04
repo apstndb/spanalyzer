@@ -21,6 +21,13 @@ plans. Observation logs, not a stable contract.
 
 ## Optimizer behavior
 
+- [`GoogleSQL hint placement inventory`](../../knowledge/observations/googlesql-hint-placement.md):
+  normalized inventory of all generic hint placements in the reviewed
+  upstream GoogleSQL grammar, separated from frontend, runtime, and
+  plan-effect evidence.
+- [`HINT_POSITION_AUDIT_2026-08-04.md`](HINT_POSITION_AUDIT_2026-08-04.md):
+  frontend, Emulator, and Omni verification for the currently implemented
+  hint-position probe set.
 - [`SPANNER_OPTIMIZER_AND_HINTS.md`](SPANNER_OPTIMIZER_AND_HINTS.md):
   official optimizer-version and hint inventory mapped to local verification.
 - [`OPTIMIZER_DECISION_CONTROL_AND_OBSERVABILITY.md`](OPTIMIZER_DECISION_CONTROL_AND_OBSERVABILITY.md):
