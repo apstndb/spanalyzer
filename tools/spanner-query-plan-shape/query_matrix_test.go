@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"encoding/json"
 	"os"
 	"path/filepath"
 	"strings"
@@ -282,6 +283,173 @@ func TestLoadQueriesPlanVocabInferenceIncludesHypothesesAndControls(t *testing.T
 	}
 	if got, want := len(queries), len(seen); got != want {
 		t.Fatalf("planvocab inference queries include duplicate labels: queries=%d unique=%d", got, want)
+	}
+}
+
+func TestLoadQueriesHintPositionAuditIncludesMissingPositionsAndRejections(t *testing.T) {
+	queries, err := loadQueries("hint_position_audit", nil, nil)
+	if err != nil {
+		t.Fatalf("loadQueries(%q) error = %v", "hint_position_audit", err)
+	}
+	seen := map[string]queryCase{}
+	for _, query := range queries {
+		seen[query.Label] = query
+	}
+	for _, label := range []string{
+		"hint-position/accepted/select",
+		"hint-position/accepted/order-by",
+		"hint-position/accepted/set-operation-first",
+		"hint-position/rejected/set-operation-second-same-level",
+		"hint-position/accepted/sql-exists",
+		"hint-position/accepted/in-subquery",
+		"hint-position/rejected/in-value-list",
+		"hint-position/rejected/in-unnest",
+		"hint-position/accepted/like-any-subquery",
+		"hint-position/accepted/like-some-subquery",
+		"hint-position/accepted/like-all-subquery",
+		"hint-position/accepted/like-some-multi-hint-subquery",
+		"hint-position/accepted/like-all-multi-hint-subquery",
+		"hint-position/rejected/like-any-value-list",
+		"hint-position/rejected/like-some-value-list",
+		"hint-position/rejected/like-all-value-list",
+		"hint-position/accepted/quantified-subquery",
+		"hint-position/accepted/quantified-some-subquery",
+		"hint-position/accepted/quantified-all-subquery",
+		"hint-position/accepted/quantified-some-multi-hint-subquery",
+		"hint-position/accepted/quantified-all-multi-hint-subquery",
+		"hint-position/rejected/quantified-value-list",
+		"hint-position/rejected/quantified-some-value-list",
+		"hint-position/rejected/quantified-all-value-list",
+		"hint-position/accepted/window-partition",
+		"hint-position/accepted/tvf",
+		"hint-position/accepted/gql-return",
+		"hint-position/accepted/gql-order-by",
+		"hint-position/accepted/gql-with",
+		"hint-position/accepted/gql-value",
+		"hint-position/accepted/gql-exists",
+		"hint-position/rejected/gql-set-operation",
+		"hint-position/rejected/gql-subpath-leading",
+		"hint-position/rejected/gql-between-edges",
+		"hint-position/accepted/pipe-log-unsupported",
+		"hint-position/rejected/pipe-finish",
+		"hint-position/accepted/insert-target",
+		"hint-position/accepted/dml-statement-pdml",
+	} {
+		if _, ok := seen[label]; !ok {
+			t.Errorf("loadQueries(\"hint_position_audit\") missing %q", label)
+		}
+	}
+	if got, want := len(queries), len(seen); got != want {
+		t.Fatalf("hint-position queries include duplicate labels: queries=%d unique=%d", got, want)
+	}
+	for _, auditCase := range hintPositionAuditCases {
+		prefix := "hint-position/" + string(auditCase.Expectation) + "/"
+		if !strings.HasPrefix(auditCase.Query.Label, prefix) {
+			t.Errorf("case label %q does not match expectation %q", auditCase.Query.Label, auditCase.Expectation)
+		}
+	}
+	for _, label := range []string{
+		"hint-position/accepted/insert-target",
+		"hint-position/accepted/dml-statement-pdml",
+	} {
+		if got := seen[label].effectivePlanMode(); got != planModeReadWrite {
+			t.Errorf("%s plan mode = %q, want %q", label, got, planModeReadWrite)
+		}
+	}
+}
+
+func TestLoadQueriesHintPositionCombinationsIncludesPlanEffectsAndControls(t *testing.T) {
+	queries, err := loadQueries("hint_position_combinations", nil, nil)
+	if err != nil {
+		t.Fatalf("loadQueries(%q) error = %v", "hint_position_combinations", err)
+	}
+	seen := make(map[string]queryCase, len(queries))
+	for _, query := range queries {
+		seen[query.Label] = query
+	}
+	expectedLabels := []string{
+		"hint-combination/sql-exists/hash-build-left-one-pass",
+		"hint-combination/sql-exists/hash-build-right-one-pass",
+		"hint-combination/sql-exists/apply-batch-true",
+		"hint-combination/sql-exists/apply-batch-false",
+		"hint-combination/in-subquery/hash-build-left-one-pass",
+		"hint-combination/in-subquery/hash-build-right-one-pass",
+		"hint-combination/in-subquery/apply-batch-true",
+		"hint-combination/in-subquery/apply-batch-false",
+		"hint-combination/statement-plus-sql-exists/hash-build-left-one-pass",
+		"hint-combination/set-operation/hash-one-pass-control",
+		"hint-combination/scalar-sql-exists/hash-build-left-one-pass-control",
+		"hint-combination/scalar-in-subquery/hash-build-left-one-pass-control",
+		"hint-combination/gql-exists/hash-build-left-one-pass-control",
+	}
+	for _, label := range expectedLabels {
+		if _, ok := seen[label]; !ok {
+			t.Errorf("loadQueries(\"hint_position_combinations\") missing %q", label)
+		}
+	}
+	if got, want := len(queries), len(expectedLabels); got != want {
+		t.Fatalf("hint-position combination query count = %d, want %d", got, want)
+	}
+	if got, want := len(queries), len(seen); got != want {
+		t.Fatalf("hint-position combination queries include duplicate labels: queries=%d unique=%d", got, want)
+	}
+	for _, label := range []string{
+		"hint-combination/sql-exists/hash-build-left-one-pass",
+		"hint-combination/in-subquery/hash-build-left-one-pass",
+	} {
+		for _, assignment := range []string{
+			"JOIN_METHOD=HASH_JOIN",
+			"HASH_JOIN_BUILD_SIDE=BUILD_LEFT",
+			"HASH_JOIN_EXECUTION=ONE_PASS",
+		} {
+			if !strings.Contains(seen[label].SQL, assignment) {
+				t.Errorf("%s missing %q", label, assignment)
+			}
+		}
+	}
+
+	manifestBytes, err := os.ReadFile(filepath.Join("testdata", "hint_position_combination_expectations.json"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	var manifest struct {
+		Version string `json:"version"`
+		Queries []struct {
+			Label    string            `json:"label"`
+			Patterns []json.RawMessage `json:"patterns"`
+		} `json:"queries"`
+	}
+	if err := json.Unmarshal(manifestBytes, &manifest); err != nil {
+		t.Fatal(err)
+	}
+	if got, want := manifest.Version, "v0alpha1"; got != want {
+		t.Errorf("expectation version = %q, want %q", got, want)
+	}
+	if got, want := len(manifest.Queries), 9; got != want {
+		t.Fatalf("expectation query count = %d, want %d", got, want)
+	}
+	manifestLabels := make(map[string]struct{}, len(manifest.Queries))
+	for _, expectation := range manifest.Queries {
+		if _, ok := seen[expectation.Label]; !ok {
+			t.Errorf("expectation label %q is absent from the built-in case", expectation.Label)
+		}
+		if _, duplicate := manifestLabels[expectation.Label]; duplicate {
+			t.Errorf("expectation label %q is duplicated", expectation.Label)
+		}
+		manifestLabels[expectation.Label] = struct{}{}
+		if len(expectation.Patterns) == 0 {
+			t.Errorf("expectation label %q has no operator patterns", expectation.Label)
+		}
+	}
+	for _, controlLabel := range []string{
+		"hint-combination/set-operation/hash-one-pass-control",
+		"hint-combination/scalar-sql-exists/hash-build-left-one-pass-control",
+		"hint-combination/scalar-in-subquery/hash-build-left-one-pass-control",
+		"hint-combination/gql-exists/hash-build-left-one-pass-control",
+	} {
+		if _, ok := manifestLabels[controlLabel]; ok {
+			t.Errorf("syntax-only control %q must not have a plan-effect expectation", controlLabel)
+		}
 	}
 }
 

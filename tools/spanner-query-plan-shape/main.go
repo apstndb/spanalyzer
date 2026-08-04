@@ -57,7 +57,7 @@ ON s.SingerId = a.SingerId
 
 const builtInCaseNames = "all, docs, optimizer_gaps, optimizer_unhinted_candidates, join_elimination, planvocab_inference, cte, dml, tvf, lock_hints, " +
 	"full_text_search, json_search, vector_search, function_hint, hint_matrix, statement_hint_query_matrix, " +
-	"join_matrix, subquery_join_hint_matrix, push_broadcast_hash_join, or hash_join"
+	"hint_position_audit, hint_position_combinations, join_matrix, subquery_join_hint_matrix, push_broadcast_hash_join, or hash_join"
 
 type stringListFlag []string
 
@@ -243,6 +243,8 @@ func loadDDLs(builtinCase string, paths []string) ([]string, error) {
 			strings.EqualFold(strings.TrimSpace(builtinCase), "function_hint") ||
 			strings.EqualFold(strings.TrimSpace(builtinCase), "hint_matrix") ||
 			strings.EqualFold(strings.TrimSpace(builtinCase), "statement_hint_query_matrix") ||
+			strings.EqualFold(strings.TrimSpace(builtinCase), "hint_position_audit") ||
+			strings.EqualFold(strings.TrimSpace(builtinCase), "hint_position_combinations") ||
 			strings.EqualFold(strings.TrimSpace(builtinCase), "join_matrix") ||
 			strings.EqualFold(strings.TrimSpace(builtinCase), "subquery_join_hint_matrix") {
 			return parseBuiltInDDLs("docs-schema.sql", docsDDL)
@@ -337,6 +339,10 @@ func loadQueries(builtinCase string, sqlTexts, sqlFiles []string) ([]queryCase, 
 		return hintMatrixQueries, nil
 	case "statement_hint_query_matrix":
 		return statementHintQueryMatrixQueries, nil
+	case "hint_position_audit":
+		return hintPositionAuditQueries(), nil
+	case "hint_position_combinations":
+		return hintPositionCombinationQueries, nil
 	case "join_matrix":
 		return joinMatrixQueries, nil
 	case "subquery_join_hint_matrix":

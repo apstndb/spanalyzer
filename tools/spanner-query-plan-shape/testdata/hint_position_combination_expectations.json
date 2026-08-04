@@ -1,0 +1,126 @@
+{
+  "version": "v0alpha1",
+  "queries": [
+    {
+      "label": "hint-combination/sql-exists/hash-build-left-one-pass",
+      "patterns": [
+        {
+          "display_name": "Hash Join",
+          "metadata": [{"key": "join_type", "value": "BUILD_SEMI"}],
+          "child_links": [
+            {"kind": "RELATIONAL", "type": "Build", "variable": "absent"},
+            {"kind": "RELATIONAL", "type": "Probe", "variable": "absent"},
+            {"kind": "SCALAR", "type": "Condition", "variable": "absent"},
+            {"kind": "SCALAR", "type": "Build", "variable": "present"}
+          ]
+        }
+      ]
+    },
+    {
+      "label": "hint-combination/sql-exists/hash-build-right-one-pass",
+      "patterns": [
+        {
+          "display_name": "Hash Join",
+          "metadata": [{"key": "join_type", "value": "PROBE_SEMI"}],
+          "child_links": [
+            {"kind": "RELATIONAL", "type": "Build", "variable": "absent"},
+            {"kind": "RELATIONAL", "type": "Probe", "variable": "absent"},
+            {"kind": "SCALAR", "type": "Condition", "variable": "absent"},
+            {"kind": "SCALAR", "type": "Probe", "variable": "present"}
+          ]
+        }
+      ]
+    },
+    {
+      "label": "hint-combination/sql-exists/apply-batch-true",
+      "patterns": [
+        {
+          "display_name": "Distributed Semi Apply",
+          "metadata": [{"key": "subquery_cluster_node"}],
+          "child_links": [
+            {"kind": "RELATIONAL", "type": "Map", "variable": "absent"},
+            {"kind": "SCALAR", "type": "Split Range", "variable": "absent"},
+            {"kind": "SCALAR", "type": "Batch", "variable": "present", "min_count": 2}
+          ]
+        }
+      ]
+    },
+    {
+      "label": "hint-combination/sql-exists/apply-batch-false",
+      "patterns": [
+        {
+          "display_name": "Semi Apply",
+          "child_links": [{"kind": "RELATIONAL", "type": "Map", "variable": "absent"}]
+        }
+      ]
+    },
+    {
+      "label": "hint-combination/in-subquery/hash-build-left-one-pass",
+      "patterns": [
+        {
+          "display_name": "Hash Join",
+          "metadata": [{"key": "join_type", "value": "BUILD_SEMI"}],
+          "child_links": [
+            {"kind": "RELATIONAL", "type": "Build", "variable": "absent"},
+            {"kind": "RELATIONAL", "type": "Probe", "variable": "absent"},
+            {"kind": "SCALAR", "type": "Condition", "variable": "absent"},
+            {"kind": "SCALAR", "type": "Build", "variable": "present"}
+          ]
+        }
+      ]
+    },
+    {
+      "label": "hint-combination/in-subquery/hash-build-right-one-pass",
+      "patterns": [
+        {
+          "display_name": "Hash Join",
+          "metadata": [{"key": "join_type", "value": "PROBE_SEMI"}],
+          "child_links": [
+            {"kind": "RELATIONAL", "type": "Build", "variable": "absent"},
+            {"kind": "RELATIONAL", "type": "Probe", "variable": "absent"},
+            {"kind": "SCALAR", "type": "Condition", "variable": "absent"},
+            {"kind": "SCALAR", "type": "Probe", "variable": "present"}
+          ]
+        }
+      ]
+    },
+    {
+      "label": "hint-combination/in-subquery/apply-batch-true",
+      "patterns": [
+        {
+          "display_name": "Distributed Semi Apply",
+          "metadata": [{"key": "subquery_cluster_node"}],
+          "child_links": [
+            {"kind": "RELATIONAL", "type": "Map", "variable": "absent"},
+            {"kind": "SCALAR", "type": "Split Range", "variable": "absent"},
+            {"kind": "SCALAR", "type": "Batch", "variable": "present", "min_count": 2}
+          ]
+        }
+      ]
+    },
+    {
+      "label": "hint-combination/in-subquery/apply-batch-false",
+      "patterns": [
+        {
+          "display_name": "Semi Apply",
+          "child_links": [{"kind": "RELATIONAL", "type": "Map", "variable": "absent"}]
+        }
+      ]
+    },
+    {
+      "label": "hint-combination/statement-plus-sql-exists/hash-build-left-one-pass",
+      "patterns": [
+        {
+          "display_name": "Hash Join",
+          "metadata": [{"key": "join_type", "value": "BUILD_SEMI"}],
+          "child_links": [
+            {"kind": "RELATIONAL", "type": "Build", "variable": "absent"},
+            {"kind": "RELATIONAL", "type": "Probe", "variable": "absent"},
+            {"kind": "SCALAR", "type": "Condition", "variable": "absent"},
+            {"kind": "SCALAR", "type": "Build", "variable": "present"}
+          ]
+        }
+      ]
+    }
+  ]
+}

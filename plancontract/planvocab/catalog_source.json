@@ -7,10 +7,13 @@
     "blob": "270939a859cc32ad4cfa76bed002dec9181ef6f7",
     "local_evidence": [
       "research/spanner-query-plan-shape/COMPACT_TREE_METADATA_OBSERVATIONS.md",
+      "research/spanner-query-plan-shape/HINT_POSITION_AUDIT_2026-08-04.md",
       "research/spanner-query-plan-shape/QUERY_EXECUTION_OPERATORS_OBSERVATIONS.md",
       "research/spanner-query-plan-shape/PLANVOCAB_INFERENCE_OBSERVATIONS.md",
       "plancontract/normalize.go",
+      "tools/spanner-query-plan-shape/hint_position_combination_cases.go",
       "tools/spanner-query-plan-shape/planvocab_cases.go",
+      "tools/spanner-query-plan-shape/testdata/hint_position_combination_expectations.json",
       "tools/spanner-query-plan-shape/testdata/planvocab_inference_expectations.json"
     ],
     "compatibility": "Observational v0alpha vocabulary; not a stable Spanner wire contract. Missing metadata is allowed, link multiplicity is checked only where declared, and identifier values are wildcarded."
@@ -68,7 +71,7 @@
         {"kind": "RELATIONAL", "type": "", "variable": "absent"},
         {"kind": "RELATIONAL", "type": "Map", "variable": "absent"},
         {"kind": "SCALAR", "type": "Split Range", "variable": "absent"},
-        {"kind": "SCALAR", "type": "Batch", "variable": "present"}
+        {"kind": "SCALAR", "type": "Batch", "variable": "present", "multiple": true}
       ]
     },
     {

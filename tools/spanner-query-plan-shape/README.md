@@ -292,6 +292,56 @@ go run ./tools/spanner-query-plan-shape \
   --continue-on-error
 ```
 
+Verify hint positions that are not covered by the statement, table, join,
+group, graph, function, and DML matrices. This includes accepted positions with
+no known usable key, accepted subquery positions, and paired positions that
+must be rejected. Use `--continue-on-error`: an `Unsupported hint` or later
+feature error proves parsing reached hint validation, while `Syntax error` and
+the targeted GQL placement errors or `Hints on set operations must appear on
+the first operation` are expected for labels under `hint-position/rejected/`.
+
+```sh
+go run ./tools/spanner-query-plan-shape \
+  --case hint_position_audit \
+  --output summary \
+  --continue-on-error
+```
+
+The environment-gated integration assertion uses the same case table:
+
+```sh
+go test -tags=integration ./tools/spanner-query-plan-shape \
+  -run TestIntegrationHintPositionAuditOnEmulator
+
+SPANEMUBOOST_ENABLE_OMNI_TESTS=1 \
+  SPANALYZER_OMNI_IMAGE=us-docker.pkg.dev/spanner-omni/images/spanner-omni:2026.r1-beta.2 \
+  go test -tags=integration,omni ./tools/spanner-query-plan-shape \
+  -run TestIntegrationHintPositionAuditOnOmni
+```
+
+The Emulator tests above classify syntax with the execution API. The Emulator
+does not return plans for `PLAN` or `PROFILE` query modes; use Omni for the
+plan-shape checks below.
+
+Verify combinations of multiple hint keys on SQL `WHERE EXISTS` and `WHERE IN`
+predicates. The positive planvocab expectations check hash-join orientation,
+Apply batch mode, and coexistence with statement hints. Syntax-accepted
+set-operation, scalar-subquery, and GQL controls remain in the same raw stream
+without claiming that every accepted key affected the selected plan:
+
+```sh
+go build -o /tmp/planvocab-check ./plancontract/cmd/planvocab-check
+go build -o /tmp/spanner-query-plan-shape ./tools/spanner-query-plan-shape
+set -o pipefail
+/tmp/spanner-query-plan-shape \
+  --case hint_position_combinations \
+  --omni-image us-docker.pkg.dev/spanner-omni/images/spanner-omni:2026.r1-beta.2 \
+  --output json \
+  --continue-on-error \
+  | /tmp/planvocab-check \
+      --expect tools/spanner-query-plan-shape/testdata/hint_position_combination_expectations.json
+```
+
 See
 [`research/spanner-query-plan-shape/QUERY_EXECUTION_OPERATORS_OBSERVATIONS.md`](../../research/spanner-query-plan-shape/QUERY_EXECUTION_OPERATORS_OBSERVATIONS.md)
 for the checked Spanner documentation examples, and
