@@ -11,10 +11,13 @@
       "research/spanner-query-plan-shape/HINT_POSITION_AUDIT_2026-08-04.md",
       "research/spanner-query-plan-shape/PLANVOCAB_INFERENCE_OBSERVATIONS.md",
       "research/spanner-query-plan-shape/QUERY_EXECUTION_OPERATORS_OBSERVATIONS.md",
+      "research/spanner-query-plan-shape/SET_OPERATION_DISTINCT_HINTS_2026-08-04.md",
       "tools/spanner-query-plan-shape/hint_position_combination_cases.go",
       "tools/spanner-query-plan-shape/planvocab_cases.go",
+      "tools/spanner-query-plan-shape/set_operation_distinct_cases.go",
       "tools/spanner-query-plan-shape/testdata/hint_position_combination_expectations.json",
-      "tools/spanner-query-plan-shape/testdata/planvocab_inference_expectations.json"
+      "tools/spanner-query-plan-shape/testdata/planvocab_inference_expectations.json",
+      "tools/spanner-query-plan-shape/testdata/set_operation_distinct_expectations.json"
     ],
     "compatibility": "Observational v0alpha vocabulary; not a stable Spanner wire contract. Missing metadata is allowed, link multiplicity is checked only where declared, and identifier values are wildcarded.",
     "generated_by": "go run ./planvocab-gen",
@@ -49,7 +52,7 @@
       },
       {
         "path": "plancontract/planvocab/catalog_source.json",
-        "sha256": "6afb5a337dd1a2f33cb77c0f678c492fab796ff6dde405e3bf7968a2dc14e53d"
+        "sha256": "d6121c1c9ec8b17d251cb3a6c58541854a9e2d71c8794c0fe906bfd7320a6ffe"
       },
       {
         "path": "research/spanner-query-plan-shape/COMPACT_TREE_METADATA_OBSERVATIONS.md",
@@ -68,6 +71,10 @@
         "sha256": "7a56a95084a13d942ef959858e1407e03a62c5d29aa2efc9580c6bc3a51b2a10"
       },
       {
+        "path": "research/spanner-query-plan-shape/SET_OPERATION_DISTINCT_HINTS_2026-08-04.md",
+        "sha256": "8ea7642c136fb71162088e2931f206d50dccf28d33a1d0be4b13c93055b9f5c4"
+      },
+      {
         "path": "schemas/spanalyzer.planvocab-expectations.v0alpha1.schema.json",
         "sha256": "b371f895a7c7f0753b7729b7bfb555e142005cf5b5a4d59c26b258401329219e"
       },
@@ -77,7 +84,7 @@
       },
       {
         "path": "tools/planvocab-gen/main.go",
-        "sha256": "159ee3b70945a3895380be4f236d61460c39271dc54ecf3f28f0905c9e8a3af9"
+        "sha256": "b0fa327a821a4b840797a0c3d28c1c47324d4eaaa978b0647133a47a072a4cee"
       },
       {
         "path": "tools/spanner-query-plan-shape/hint_position_combination_cases.go",
@@ -88,12 +95,20 @@
         "sha256": "21d2b5aa805bd0837076af1554072dd6447095433e657cd35e78fccd8967c6a6"
       },
       {
+        "path": "tools/spanner-query-plan-shape/set_operation_distinct_cases.go",
+        "sha256": "340bfe284a9b66831e94b13d0fcbbf7ab744fc6925c3c0f31f1df28c5c2ce00e"
+      },
+      {
         "path": "tools/spanner-query-plan-shape/testdata/hint_position_combination_expectations.json",
         "sha256": "793b104f3bda12c4c54e1ea213420258fbcf0c1834daa22ea6dc425750f9b92a"
       },
       {
         "path": "tools/spanner-query-plan-shape/testdata/planvocab_inference_expectations.json",
         "sha256": "68f3d35d6876a1048b3106c851a854a1055fab4ff0b64c637647241b35b93318"
+      },
+      {
+        "path": "tools/spanner-query-plan-shape/testdata/set_operation_distinct_expectations.json",
+        "sha256": "3e59fb4dca3c3ddd47a4f20da333c6c4a32b06a2bda7d0072109c32f47debba3"
       }
     ]
   },
@@ -435,7 +450,8 @@
         {
           "kind": "SCALAR",
           "type": "Batch",
-          "variable": "present"
+          "variable": "present",
+          "multiple": true
         },
         {
           "kind": "SCALAR",
@@ -725,7 +741,13 @@
       ],
       "kind": "RELATIONAL",
       "metadata": [],
-      "child_links": []
+      "child_links": [
+        {
+          "kind": "SCALAR",
+          "type": "",
+          "variable": "absent"
+        }
+      ]
     },
     {
       "names": [

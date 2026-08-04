@@ -57,7 +57,7 @@ ON s.SingerId = a.SingerId
 
 const builtInCaseNames = "all, docs, optimizer_gaps, optimizer_unhinted_candidates, join_elimination, planvocab_inference, cte, dml, tvf, lock_hints, " +
 	"full_text_search, json_search, vector_search, function_hint, hint_matrix, statement_hint_query_matrix, " +
-	"hint_position_audit, hint_position_combinations, join_matrix, subquery_join_hint_matrix, push_broadcast_hash_join, or hash_join"
+	"hint_position_audit, hint_position_combinations, set_operation_distinct, join_matrix, subquery_join_hint_matrix, push_broadcast_hash_join, or hash_join"
 
 type stringListFlag []string
 
@@ -245,6 +245,7 @@ func loadDDLs(builtinCase string, paths []string) ([]string, error) {
 			strings.EqualFold(strings.TrimSpace(builtinCase), "statement_hint_query_matrix") ||
 			strings.EqualFold(strings.TrimSpace(builtinCase), "hint_position_audit") ||
 			strings.EqualFold(strings.TrimSpace(builtinCase), "hint_position_combinations") ||
+			strings.EqualFold(strings.TrimSpace(builtinCase), "set_operation_distinct") ||
 			strings.EqualFold(strings.TrimSpace(builtinCase), "join_matrix") ||
 			strings.EqualFold(strings.TrimSpace(builtinCase), "subquery_join_hint_matrix") {
 			return parseBuiltInDDLs("docs-schema.sql", docsDDL)
@@ -343,6 +344,8 @@ func loadQueries(builtinCase string, sqlTexts, sqlFiles []string) ([]queryCase, 
 		return hintPositionAuditQueries(), nil
 	case "hint_position_combinations":
 		return hintPositionCombinationQueries, nil
+	case "set_operation_distinct":
+		return setOperationDistinctQueries, nil
 	case "join_matrix":
 		return joinMatrixQueries, nil
 	case "subquery_join_hint_matrix":
@@ -357,31 +360,75 @@ func loadQueries(builtinCase string, sqlTexts, sqlFiles []string) ([]queryCase, 
 }
 
 func parseSQLFileQueries(path, sql string) ([]queryCase, error) {
-	statements, err := memefish.ParseStatements(path, sql)
+	statements, err := memefish.SplitRawStatements(path, sql)
 	if err != nil {
 		return nil, err
 	}
 	queries := make([]queryCase, 0, len(statements))
 	for i, statement := range statements {
-		querySQL := rawStatementSQL(sql, statement)
+		querySQL := strings.TrimSpace(statement.Statement)
 		if querySQL == "" {
 			continue
 		}
 		queries = append(queries, queryCase{
 			Label:    fmt.Sprintf("%s#%d", path, i+1),
 			SQL:      querySQL,
-			PlanMode: planModeForStatement(statement),
+			PlanMode: planModeForSQL(path, querySQL),
 		})
 	}
 	return queries, nil
 }
 
-func rawStatementSQL(source string, statement ast.Statement) string {
-	pos, end := statement.Pos(), statement.End()
-	if !pos.Invalid() && !end.Invalid() && int(pos) >= 0 && int(end) <= len(source) && pos < end {
-		return strings.TrimSpace(source[int(pos):int(end)])
+func planModeForSQL(path, sql string) planMode {
+	statement, err := memefish.ParseStatement(path, sql)
+	if err != nil {
+		// SQL files are probe inputs and can intentionally contain syntax newer
+		// than the pinned parser. Parsing is only needed to select the DML
+		// transaction mode; retain obvious DML prefixes and let Omni validate
+		// the SQL itself later.
+		if hasDMLPrefix(sql) {
+			return planModeReadWrite
+		}
+		return planModeAuto
 	}
-	return strings.TrimSpace(statement.SQL())
+	return planModeForStatement(statement)
+}
+
+func hasDMLPrefix(sql string) bool {
+	rest := strings.TrimSpace(sql)
+	for {
+		switch {
+		case strings.HasPrefix(rest, "--"), strings.HasPrefix(rest, "#"):
+			newline := strings.IndexByte(rest, '\n')
+			if newline < 0 {
+				return false
+			}
+			rest = strings.TrimSpace(rest[newline+1:])
+		case strings.HasPrefix(rest, "/*"):
+			end := strings.Index(rest[2:], "*/")
+			if end < 0 {
+				return false
+			}
+			rest = strings.TrimSpace(rest[end+4:])
+		case strings.HasPrefix(rest, "@{"):
+			end := strings.IndexByte(rest, '}')
+			if end < 0 {
+				return false
+			}
+			rest = strings.TrimSpace(rest[end+1:])
+		default:
+			fields := strings.Fields(rest)
+			if len(fields) == 0 {
+				return false
+			}
+			switch strings.ToUpper(fields[0]) {
+			case "INSERT", "UPDATE", "DELETE":
+				return true
+			default:
+				return false
+			}
+		}
+	}
 }
 
 func planModeForStatement(statement ast.Statement) planMode {

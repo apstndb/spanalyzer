@@ -342,6 +342,29 @@ set -o pipefail
       --expect tools/spanner-query-plan-shape/testdata/hint_position_combination_expectations.json
 ```
 
+Probe join-family selection for `INTERSECT` and `EXCEPT`, ALL multiplicity
+restoration, and aggregate implementations of `UNION DISTINCT` and
+`SELECT DISTINCT`:
+
+```sh
+set -o pipefail
+/tmp/spanner-query-plan-shape \
+  --case set_operation_distinct \
+  --omni-image us-docker.pkg.dev/spanner-omni/images/spanner-omni:2026.r1-beta.2 \
+  --output json \
+  --continue-on-error \
+  | /tmp/planvocab-check \
+      --allow-query-errors \
+      --expect tools/spanner-query-plan-shape/testdata/set_operation_distinct_expectations.json
+```
+
+The expected errors are negative controls for `GROUP_METHOD` directly on
+DISTINCT and `HASH_JOIN_BUILD_SIDE` on set operations. The positive
+expectations cover plan-visible HASH, MERGE, local APPLY, distributed APPLY,
+aggregate iterator, and `Generate Relation` link shapes. See
+[`SET_OPERATION_DISTINCT_HINTS_2026-08-04.md`](../../research/spanner-query-plan-shape/SET_OPERATION_DISTINCT_HINTS_2026-08-04.md)
+for the pinned-runtime evidence and rewrite caveats.
+
 See
 [`research/spanner-query-plan-shape/QUERY_EXECUTION_OPERATORS_OBSERVATIONS.md`](../../research/spanner-query-plan-shape/QUERY_EXECUTION_OPERATORS_OBSERVATIONS.md)
 for the checked Spanner documentation examples, and

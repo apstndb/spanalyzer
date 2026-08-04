@@ -8,13 +8,16 @@
     "local_evidence": [
       "research/spanner-query-plan-shape/COMPACT_TREE_METADATA_OBSERVATIONS.md",
       "research/spanner-query-plan-shape/HINT_POSITION_AUDIT_2026-08-04.md",
+      "research/spanner-query-plan-shape/SET_OPERATION_DISTINCT_HINTS_2026-08-04.md",
       "research/spanner-query-plan-shape/QUERY_EXECUTION_OPERATORS_OBSERVATIONS.md",
       "research/spanner-query-plan-shape/PLANVOCAB_INFERENCE_OBSERVATIONS.md",
       "plancontract/normalize.go",
       "tools/spanner-query-plan-shape/hint_position_combination_cases.go",
       "tools/spanner-query-plan-shape/planvocab_cases.go",
+      "tools/spanner-query-plan-shape/set_operation_distinct_cases.go",
       "tools/spanner-query-plan-shape/testdata/hint_position_combination_expectations.json",
-      "tools/spanner-query-plan-shape/testdata/planvocab_inference_expectations.json"
+      "tools/spanner-query-plan-shape/testdata/planvocab_inference_expectations.json",
+      "tools/spanner-query-plan-shape/testdata/set_operation_distinct_expectations.json"
     ],
     "compatibility": "Observational v0alpha vocabulary; not a stable Spanner wire contract. Missing metadata is allowed, link multiplicity is checked only where declared, and identifier values are wildcarded."
   },
@@ -30,7 +33,7 @@
         {"kind": "RELATIONAL", "type": "", "variable": "absent"},
         {"kind": "RELATIONAL", "type": "Map", "variable": "absent"},
         {"kind": "SCALAR", "type": "Split Range", "variable": "absent"},
-        {"kind": "SCALAR", "type": "Batch", "variable": "present"},
+        {"kind": "SCALAR", "type": "Batch", "variable": "present", "multiple": true},
         {"kind": "SCALAR", "type": "Map", "variable": "present", "multiple": true}
       ]
     },
@@ -156,7 +159,9 @@
       "names": ["Generate Relation"],
       "kind": "RELATIONAL",
       "metadata": [],
-      "child_links": []
+      "child_links": [
+        {"kind": "SCALAR", "type": "", "variable": "absent"}
+      ]
     },
     {
       "names": ["Scan", "Table Scan", "Index Scan"],

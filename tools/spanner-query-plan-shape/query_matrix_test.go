@@ -79,6 +79,49 @@ VALUES (1, "Alice");
 	}
 }
 
+func TestLoadQueriesSQLFileAllowsSetOperationHintsNewerThanParser(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "set-operations.sql")
+	input := `SELECT SingerId FROM Singers
+INTERSECT @{JOIN_METHOD=APPLY_JOIN, BATCH_MODE=FALSE} DISTINCT
+SELECT SingerId FROM Albums;
+
+SELECT SingerId FROM Singers
+EXCEPT @{JOIN_METHOD=HASH_JOIN} ALL
+SELECT SingerId FROM Albums;
+
+-- The DML prefix must survive parser fallback too.
+@{OPTIMIZER_VERSION=8}
+INSERT INTO Singers (SingerId)
+SELECT SingerId FROM Singers
+INTERSECT @{JOIN_METHOD=APPLY_JOIN, BATCH_MODE=FALSE} DISTINCT
+SELECT SingerId FROM Albums;
+`
+	if err := os.WriteFile(path, []byte(input), 0o600); err != nil {
+		t.Fatalf("WriteFile() error = %v", err)
+	}
+	queries, err := loadQueries("docs", nil, []string{path})
+	if err != nil {
+		t.Fatalf("loadQueries() error = %v", err)
+	}
+	if got, want := len(queries), 3; got != want {
+		t.Fatalf("len(queries) = %d, want %d", got, want)
+	}
+	if got := queries[0].SQL; !strings.Contains(got, "INTERSECT @{JOIN_METHOD=APPLY_JOIN") {
+		t.Fatalf("queries[0].SQL lost the set-operation hint: %q", got)
+	}
+	if got := queries[1].SQL; !strings.Contains(got, "EXCEPT @{JOIN_METHOD=HASH_JOIN} ALL") {
+		t.Fatalf("queries[1].SQL lost the set-operation hint: %q", got)
+	}
+	for _, query := range queries[:2] {
+		if got, want := query.effectivePlanMode(), planModeReadOnly; got != want {
+			t.Errorf("%s plan mode = %q, want %q", query.Label, got, want)
+		}
+	}
+	if got, want := queries[2].effectivePlanMode(), planModeReadWrite; got != want {
+		t.Errorf("queries[2] plan mode = %q, want %q", got, want)
+	}
+}
+
 func TestLoadQueriesDML(t *testing.T) {
 	queries, err := loadQueries("dml", nil, nil)
 	if err != nil {
@@ -449,6 +492,85 @@ func TestLoadQueriesHintPositionCombinationsIncludesPlanEffectsAndControls(t *te
 	} {
 		if _, ok := manifestLabels[controlLabel]; ok {
 			t.Errorf("syntax-only control %q must not have a plan-effect expectation", controlLabel)
+		}
+	}
+}
+
+func TestLoadQueriesSetOperationDistinctIncludesEffectsAndControls(t *testing.T) {
+	queries, err := loadQueries("set_operation_distinct", nil, nil)
+	if err != nil {
+		t.Fatalf("loadQueries(%q) error = %v", "set_operation_distinct", err)
+	}
+	seen := make(map[string]queryCase, len(queries))
+	for _, query := range queries {
+		if _, duplicate := seen[query.Label]; duplicate {
+			t.Errorf("duplicate query label %q", query.Label)
+		}
+		seen[query.Label] = query
+	}
+	for _, label := range []string{
+		"set-operation/intersect-distinct/hash",
+		"set-operation/intersect-distinct/apply-batch-true",
+		"set-operation/intersect-distinct/force-join-order",
+		"set-operation/intersect-distinct/three-input-force-join-order",
+		"set-operation/except-distinct/merge",
+		"set-operation/intersect-all/apply-batch-false",
+		"set-operation/except-all/hash",
+		"distinct/index-prefix/groupby-scan-true-control",
+		"distinct/base-table/groupby-scan-false-control",
+		"distinct/rewrite-group-by-stream",
+		"set-operation/union-distinct/rewrite-group-by-hash",
+	} {
+		if _, ok := seen[label]; !ok {
+			t.Errorf("loadQueries(\"set_operation_distinct\") missing %q", label)
+		}
+	}
+	if got, want := len(queries), 48; got != want {
+		t.Fatalf("set-operation/distinct query count = %d, want %d", got, want)
+	}
+
+	manifestBytes, err := os.ReadFile(filepath.Join("testdata", "set_operation_distinct_expectations.json"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	var manifest struct {
+		Version string `json:"version"`
+		Queries []struct {
+			Label    string            `json:"label"`
+			Patterns []json.RawMessage `json:"patterns"`
+		} `json:"queries"`
+	}
+	if err := json.Unmarshal(manifestBytes, &manifest); err != nil {
+		t.Fatal(err)
+	}
+	if got, want := manifest.Version, "v0alpha1"; got != want {
+		t.Errorf("expectation version = %q, want %q", got, want)
+	}
+	manifestLabels := make(map[string]struct{}, len(manifest.Queries))
+	for _, expectation := range manifest.Queries {
+		if _, ok := seen[expectation.Label]; !ok {
+			t.Errorf("expectation label %q is absent from the built-in case", expectation.Label)
+		}
+		if _, duplicate := manifestLabels[expectation.Label]; duplicate {
+			t.Errorf("expectation label %q is duplicated", expectation.Label)
+		}
+		manifestLabels[expectation.Label] = struct{}{}
+		if len(expectation.Patterns) == 0 {
+			t.Errorf("expectation label %q has no operator patterns", expectation.Label)
+		}
+	}
+	for _, controlLabel := range []string{
+		"set-operation/union-all/hash-control",
+		"set-operation/union-all/apply-batch-true-control",
+		"set-operation/union-distinct/hash-control",
+		"set-operation/union-distinct/group-hash-unsupported",
+		"set-operation/intersect-distinct/build-left-unsupported",
+		"set-operation/except-distinct/build-right-unsupported",
+		"distinct/index-prefix/groupby-scan-true-control",
+		"distinct/group-stream-unsupported",
+	} {
+		if _, ok := manifestLabels[controlLabel]; ok {
+			t.Errorf("acceptance-only control %q must not have a plan-effect expectation", controlLabel)
 		}
 	}
 }
