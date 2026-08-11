@@ -30,3 +30,21 @@ func TestFindRepoRoot(t *testing.T) {
 		}
 	}
 }
+
+func TestCatalogInputPathsIncludesEveryDeclaredLocalEvidence(t *testing.T) {
+	source := filepath.Join("..", "..", "plancontract", "planvocab", "catalog_source.json")
+	doc, err := readSource(source)
+	if err != nil {
+		t.Fatal(err)
+	}
+	inputs := catalogInputPaths("plancontract/planvocab/catalog_source.json", doc.Info.LocalEvidence)
+	seen := make(map[string]struct{}, len(inputs))
+	for _, input := range inputs {
+		seen[input] = struct{}{}
+	}
+	for _, evidence := range doc.Info.LocalEvidence {
+		if _, ok := seen[evidence]; !ok {
+			t.Errorf("declared local evidence %q is absent from catalog inputs", evidence)
+		}
+	}
+}

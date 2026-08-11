@@ -21,6 +21,8 @@ import (
 	"github.com/cloudspannerecosystem/memefish"
 	"github.com/cloudspannerecosystem/memefish/ast"
 	"google.golang.org/protobuf/encoding/protojson"
+	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/types/descriptorpb"
 )
 
 const singersDDL = `
@@ -57,7 +59,7 @@ ON s.SingerId = a.SingerId
 
 const builtInCaseNames = "all, docs, optimizer_gaps, optimizer_unhinted_candidates, join_elimination, planvocab_inference, cte, dml, tvf, lock_hints, " +
 	"full_text_search, json_search, vector_search, function_hint, hint_matrix, statement_hint_query_matrix, " +
-	"hint_position_audit, hint_position_combinations, set_operation_distinct, join_matrix, subquery_join_hint_matrix, push_broadcast_hash_join, or hash_join"
+	"hint_position_audit, hint_position_combinations, set_operation_distinct, factorized_mode, gql_surface, gql_hint_surface, google_sql_surface, google_sql_proto_surface, condition_boundaries, aggregate_functions, join_matrix, subquery_join_hint_matrix, push_broadcast_hash_join, or hash_join"
 
 type stringListFlag []string
 
@@ -74,6 +76,7 @@ type queryCase struct {
 	Label    string
 	SQL      string
 	PlanMode planMode
+	Params   map[string]interface{}
 }
 
 type planMode string
@@ -92,10 +95,12 @@ func main() {
 
 func run(args []string, stdout io.Writer) error {
 	var ddlFiles stringListFlag
+	var protoDescriptorFiles stringListFlag
 	var sqlTexts stringListFlag
 	var sqlFiles stringListFlag
 	fs := flag.NewFlagSet("spanner-query-plan-shape", flag.ContinueOnError)
 	fs.Var(&ddlFiles, "ddl", "Spanner DDL file to load; may be repeated. Defaults to built-in Singers/Albums DDL")
+	fs.Var(&protoDescriptorFiles, "proto-descriptors-file", "serialized FileDescriptorSet to load with CREATE/ALTER PROTO BUNDLE DDL; may be repeated")
 	fs.Var(&sqlTexts, "sql", "SQL text to analyze; may be repeated. Overrides --case built-ins when present")
 	fs.Var(&sqlFiles, "sql-file", "SQL file to analyze; may be repeated and may contain multiple semicolon-separated SQL statements. Overrides --case built-ins when present")
 	builtinCase := fs.String(
@@ -135,6 +140,13 @@ func run(args []string, stdout io.Writer) error {
 	if err != nil {
 		return err
 	}
+	protoDescriptors, err := loadFileDescriptorSet(protoDescriptorFiles)
+	if err != nil {
+		return err
+	}
+	if strings.EqualFold(strings.TrimSpace(*builtinCase), "google_sql_proto_surface") && protoDescriptors == nil {
+		return fmt.Errorf("--case google_sql_proto_surface requires --proto-descriptors-file")
+	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), *timeout)
 	defer cancel()
@@ -146,10 +158,14 @@ func run(args []string, stdout io.Writer) error {
 	defer func() {
 		_ = runtime.Close()
 	}()
-	clients, err := spanemuboost.OpenClients(ctx, runtime,
+	setupOptions := []spanemuboost.Option{
 		spanemuboost.WithRandomDatabaseID(),
 		spanemuboost.WithSetupDDLs(ddls),
-	)
+	}
+	if protoDescriptors != nil {
+		setupOptions = append(setupOptions, spanemuboost.WithSetupFileDescriptorSet(protoDescriptors))
+	}
+	clients, err := spanemuboost.OpenClients(ctx, runtime, setupOptions...)
 	if err != nil {
 		return err
 	}
@@ -238,6 +254,12 @@ func loadDDLs(builtinCase string, paths []string) ([]string, error) {
 		if strings.EqualFold(strings.TrimSpace(builtinCase), "planvocab_inference") {
 			return parseBuiltInDDLs("planvocab-inference-schema.sql", joinEliminationDDL)
 		}
+		if strings.EqualFold(strings.TrimSpace(builtinCase), "set_operation_distinct") {
+			return parseBuiltInDDLs("set-operation-distinct-schema.sql", setOperationDistinctDDL)
+		}
+		if strings.EqualFold(strings.TrimSpace(builtinCase), "google_sql_proto_surface") {
+			return parseBuiltInDDLs("google-sql-proto-surface-schema.sql", googleSQLProtoSurfaceDDL)
+		}
 		if strings.EqualFold(strings.TrimSpace(builtinCase), "docs") ||
 			strings.EqualFold(strings.TrimSpace(builtinCase), "cte") ||
 			strings.EqualFold(strings.TrimSpace(builtinCase), "function_hint") ||
@@ -245,7 +267,12 @@ func loadDDLs(builtinCase string, paths []string) ([]string, error) {
 			strings.EqualFold(strings.TrimSpace(builtinCase), "statement_hint_query_matrix") ||
 			strings.EqualFold(strings.TrimSpace(builtinCase), "hint_position_audit") ||
 			strings.EqualFold(strings.TrimSpace(builtinCase), "hint_position_combinations") ||
-			strings.EqualFold(strings.TrimSpace(builtinCase), "set_operation_distinct") ||
+			strings.EqualFold(strings.TrimSpace(builtinCase), "factorized_mode") ||
+			strings.EqualFold(strings.TrimSpace(builtinCase), "gql_surface") ||
+			strings.EqualFold(strings.TrimSpace(builtinCase), "gql_hint_surface") ||
+			strings.EqualFold(strings.TrimSpace(builtinCase), "google_sql_surface") ||
+			strings.EqualFold(strings.TrimSpace(builtinCase), "condition_boundaries") ||
+			strings.EqualFold(strings.TrimSpace(builtinCase), "aggregate_functions") ||
 			strings.EqualFold(strings.TrimSpace(builtinCase), "join_matrix") ||
 			strings.EqualFold(strings.TrimSpace(builtinCase), "subquery_join_hint_matrix") {
 			return parseBuiltInDDLs("docs-schema.sql", docsDDL)
@@ -267,6 +294,46 @@ func loadDDLs(builtinCase string, paths []string) ([]string, error) {
 		}
 	}
 	return out, nil
+}
+
+func loadFileDescriptorSet(paths []string) (*descriptorpb.FileDescriptorSet, error) {
+	if len(paths) == 0 {
+		return nil, nil
+	}
+	byName := make(map[string]*descriptorpb.FileDescriptorProto)
+	for _, path := range paths {
+		raw, err := os.ReadFile(path)
+		if err != nil {
+			return nil, fmt.Errorf("read proto descriptors %q: %w", path, err)
+		}
+		var current descriptorpb.FileDescriptorSet
+		if err := proto.Unmarshal(raw, &current); err != nil {
+			return nil, fmt.Errorf("decode proto descriptors %q: %w", path, err)
+		}
+		for _, file := range current.File {
+			name := file.GetName()
+			if name == "" {
+				return nil, fmt.Errorf("proto descriptors %q contain a file without a name", path)
+			}
+			if previous, ok := byName[name]; ok {
+				if !proto.Equal(previous, file) {
+					return nil, fmt.Errorf("conflicting proto descriptor for file %q", name)
+				}
+				continue
+			}
+			byName[name] = file
+		}
+	}
+	names := make([]string, 0, len(byName))
+	for name := range byName {
+		names = append(names, name)
+	}
+	sort.Strings(names)
+	merged := &descriptorpb.FileDescriptorSet{File: make([]*descriptorpb.FileDescriptorProto, 0, len(names))}
+	for _, name := range names {
+		merged.File = append(merged.File, byName[name])
+	}
+	return merged, nil
 }
 
 func parseBuiltInDDLs(path, ddlSQL string) ([]string, error) {
@@ -346,6 +413,20 @@ func loadQueries(builtinCase string, sqlTexts, sqlFiles []string) ([]queryCase, 
 		return hintPositionCombinationQueries, nil
 	case "set_operation_distinct":
 		return setOperationDistinctQueries, nil
+	case "factorized_mode":
+		return factorizedModeQueries, nil
+	case "gql_surface":
+		return gqlSurfaceQueries, nil
+	case "gql_hint_surface":
+		return gqlHintSurfaceQueries, nil
+	case "google_sql_surface":
+		return googleSQLSurfaceQueries, nil
+	case "google_sql_proto_surface":
+		return googleSQLProtoSurfaceQueries, nil
+	case "condition_boundaries":
+		return conditionBoundaryQueries, nil
+	case "aggregate_functions":
+		return aggregateFunctionQueries, nil
 	case "join_matrix":
 		return joinMatrixQueries, nil
 	case "subquery_join_hint_matrix":
@@ -446,6 +527,7 @@ func expandOptimizerVersionMatrix(queries []queryCase) []queryCase {
 				Label:    fmt.Sprintf("optimizer-version/v%d/%s", version, query.Label),
 				SQL:      withOptimizerVersionStatementHint(query.SQL, version),
 				PlanMode: query.PlanMode,
+				Params:   query.Params,
 			})
 		}
 	}
@@ -459,16 +541,19 @@ func expandAllowDistributedMergeMatrix(queries []queryCase) []queryCase {
 			Label:    fmt.Sprintf("allow-distributed-merge/default/%s", query.Label),
 			SQL:      query.SQL,
 			PlanMode: query.PlanMode,
+			Params:   query.Params,
 		})
 		out = append(out, queryCase{
 			Label:    fmt.Sprintf("allow-distributed-merge/true/%s", query.Label),
 			SQL:      withStatementHintAssignment(query.SQL, "ALLOW_DISTRIBUTED_MERGE=TRUE"),
 			PlanMode: query.PlanMode,
+			Params:   query.Params,
 		})
 		out = append(out, queryCase{
 			Label:    fmt.Sprintf("allow-distributed-merge/false/%s", query.Label),
 			SQL:      withStatementHintAssignment(query.SQL, "ALLOW_DISTRIBUTED_MERGE=FALSE"),
 			PlanMode: query.PlanMode,
+			Params:   query.Params,
 		})
 	}
 	return out
@@ -488,6 +573,7 @@ func printOptimizerVersionDiffs(ctx context.Context, stdout io.Writer, client *s
 				Label:    fmt.Sprintf("%s/v%d", query.Label, version),
 				SQL:      withOptimizerVersionStatementHint(query.SQL, version),
 				PlanMode: query.PlanMode,
+				Params:   query.Params,
 			}
 			plan, err := analyzePlan(ctx, client, versioned)
 			shape := ""
@@ -675,6 +761,7 @@ func printPlan(ctx context.Context, stdout io.Writer, client *spanner.Client, qu
 
 func analyzePlan(ctx context.Context, client *spanner.Client, query queryCase) (*spannerpb.QueryPlan, error) {
 	stmt := spanner.NewStatement(query.SQL)
+	stmt.Params = query.Params
 	switch query.effectivePlanMode() {
 	case planModeReadOnly:
 		return client.Single().AnalyzeQuery(ctx, stmt)

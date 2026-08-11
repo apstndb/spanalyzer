@@ -1,0 +1,72 @@
+{
+  "version": "v0alpha1",
+  "queries": [
+    {
+      "label": "full-text-search/gql-search-traversal",
+      "patterns": [
+        {
+          "display_name": "Scan",
+          "metadata": [
+            {"key": "scan_target", "value": "SearchSingersByBio"},
+            {"key": "scan_type", "value": "SearchIndexScan"}
+          ],
+          "child_links": [
+            {"kind": "SCALAR", "type": "Search Predicate", "variable": "absent"}
+          ]
+        },
+        {
+          "display_name": "Scan",
+          "metadata": [
+            {"key": "scan_target", "value": "SearchCollaborations"},
+            {"key": "scan_type", "value": "TableScan"}
+          ]
+        }
+      ]
+    },
+    {
+      "label": "vector-search/ann-gql-next-traversal",
+      "patterns": [
+        {
+          "display_name": "Scan",
+          "metadata": [
+            {"key": "scan_target", "value": "VectorDocumentsByEmbedding"},
+            {"key": "scan_type", "value": "VectorIndexMetadataScan"}
+          ]
+        },
+        {
+          "display_name": "Scan",
+          "metadata": [
+            {"key": "scan_target", "value": "VectorDocumentsByEmbedding"},
+            {"key": "scan_type", "value": "VectorIndexRootScan"}
+          ]
+        },
+        {
+          "display_name": "Scan",
+          "metadata": [
+            {"key": "scan_target", "value": "VectorDocumentsByEmbedding"},
+            {"key": "scan_type", "value": "VectorIndexLeafScan"}
+          ]
+        },
+        {
+          "display_name": "Scan",
+          "metadata": [
+            {"key": "scan_target", "value": "VectorRelated"},
+            {"key": "scan_type", "value": "TableScan"}
+          ]
+        },
+        {
+          "display_name": "Distributed Cross Apply",
+          "metadata": [
+            {"key": "execution_method", "value": "Batch"}
+          ],
+          "child_links": [
+            {"kind": "RELATIONAL", "type": "Map", "variable": "absent"},
+            {"kind": "SCALAR", "type": "Split Range", "variable": "absent"},
+            {"kind": "SCALAR", "type": "Batch", "variable": "present"}
+          ]
+        }
+      ]
+    }
+  ],
+  "expected_query_errors": []
+}

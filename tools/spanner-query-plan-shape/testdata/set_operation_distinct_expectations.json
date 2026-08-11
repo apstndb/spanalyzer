@@ -82,6 +82,27 @@
       ]
     },
     {
+      "label": "set-operation/intersect-distinct/scan-row",
+      "patterns": [
+        {
+          "display_name": "Scan",
+          "metadata": [
+            {"key": "scan_method", "value": "Row"},
+            {"key": "scan_format", "value": "Row"}
+          ]
+        }
+      ]
+    },
+    {
+      "label": "set-operation/intersect-distinct/scan-batch",
+      "patterns": [
+        {
+          "display_name": "Scan",
+          "metadata": [{"key": "scan_method", "value": "Batch"}]
+        }
+      ]
+    },
+    {
       "label": "set-operation/except-distinct/hash",
       "patterns": [
         {
@@ -146,6 +167,83 @@
       ]
     },
     {
+      "label": "set-operation/intersect-all/hash",
+      "patterns": [
+        {
+          "display_name": "Hash Join",
+          "metadata": [{"key": "join_type", "value": "INNER"}],
+          "child_links": [
+            {"kind": "RELATIONAL", "type": "Build", "variable": "absent"},
+            {"kind": "RELATIONAL", "type": "Probe", "variable": "absent"},
+            {"kind": "SCALAR", "type": "Condition", "variable": "absent"},
+            {"kind": "SCALAR", "type": "Build", "variable": "present", "min_count": 2},
+            {"kind": "SCALAR", "type": "Probe", "variable": "present"}
+          ]
+        },
+        {"display_name": "Generate Relation"}
+      ]
+    },
+    {
+      "label": "set-operation/intersect-all/merge",
+      "patterns": [
+        {
+          "display_name": "Merge Join",
+          "metadata": [
+            {"key": "join_type", "value": "INNER"},
+            {"key": "join_configuration", "value": "ONE_TO_MANY"}
+          ],
+          "child_links": [
+            {"kind": "RELATIONAL", "type": "Left", "variable": "absent"},
+            {"kind": "RELATIONAL", "type": "Right", "variable": "absent"},
+            {"kind": "SCALAR", "type": "Condition", "variable": "absent"}
+          ]
+        },
+        {"display_name": "Generate Relation"}
+      ]
+    },
+    {
+      "label": "set-operation/intersect-all/push-broadcast",
+      "patterns": [
+        {
+          "display_name": "Push Broadcast Hash Join",
+          "metadata": [{"key": "subquery_cluster_node"}],
+          "child_links": [
+            {"kind": "RELATIONAL", "type": "Map", "variable": "absent"},
+            {"kind": "SCALAR", "type": "Split Range", "variable": "absent"}
+          ]
+        },
+        {"display_name": "Generate Relation"}
+      ]
+    },
+    {
+      "label": "set-operation/intersect-all/apply-batch-true",
+      "patterns": [
+        {
+          "display_name": "Distributed Cross Apply",
+          "metadata": [{"key": "subquery_cluster_node"}],
+          "child_links": [
+            {"kind": "RELATIONAL", "type": "Map", "variable": "absent"},
+            {"kind": "SCALAR", "type": "Split Range", "variable": "absent"}
+          ]
+        },
+        {"display_name": "Generate Relation"}
+      ]
+    },
+    {
+      "label": "set-operation/intersect-all/factorized-both",
+      "patterns": [
+        {
+          "display_name": "Hash Join",
+          "metadata": [{"key": "join_type", "value": "INNER"}],
+          "child_links": [
+            {"kind": "SCALAR", "type": "Build", "variable": "present", "min_count": 2},
+            {"kind": "SCALAR", "type": "Probe", "variable": "present"}
+          ]
+        },
+        {"display_name": "Generate Relation"}
+      ]
+    },
+    {
       "label": "set-operation/except-all/hash",
       "patterns": [
         {"display_name": "Hash Join", "metadata": [{"key": "join_type", "value": "BUILD_OUTER"}]},
@@ -173,6 +271,194 @@
           "display_name": "Generate Relation",
           "child_links": [{"kind": "SCALAR", "type": "", "variable": "absent"}]
         }
+      ]
+    },
+    {
+      "label": "set-operation/except-all/push-broadcast",
+      "patterns": [
+        {
+          "display_name": "Push Broadcast Hash Join Outer Apply",
+          "metadata": [{"key": "subquery_cluster_node"}],
+          "child_links": [
+            {"kind": "RELATIONAL", "type": "Map", "variable": "absent"},
+            {"kind": "SCALAR", "type": "Split Range", "variable": "absent"},
+            {"kind": "SCALAR", "type": "Batch", "variable": "present", "min_count": 3},
+            {"kind": "SCALAR", "type": "Map", "variable": "present"}
+          ]
+        },
+        {"display_name": "Generate Relation"}
+      ]
+    },
+    {
+      "label": "set-operation/except-all/apply-batch-true",
+      "patterns": [
+        {
+          "display_name": "Distributed Outer Apply",
+          "metadata": [{"key": "subquery_cluster_node"}],
+          "child_links": [
+            {"kind": "RELATIONAL", "type": "Map", "variable": "absent"},
+            {"kind": "SCALAR", "type": "Split Range", "variable": "absent"},
+            {"kind": "SCALAR", "type": "Batch", "variable": "present", "min_count": 3},
+            {"kind": "SCALAR", "type": "Map", "variable": "present"}
+          ]
+        },
+        {"display_name": "Generate Relation"}
+      ]
+    },
+    {
+      "label": "set-operation/input-shape/intersect-distinct-both-duplicate",
+      "patterns": [
+        {"display_name": "Aggregate", "metadata": [{"key": "iterator_type", "value": "Stream"}]},
+        {"display_name": "Semi Apply", "metadata": [{"key": "execution_method", "value": "Row"}]}
+      ]
+    },
+    {
+      "label": "set-operation/input-shape/except-distinct-both-duplicate",
+      "patterns": [
+        {"display_name": "Aggregate", "metadata": [{"key": "iterator_type", "value": "Stream"}]},
+        {"display_name": "Anti-Semi Apply", "metadata": [{"key": "execution_method", "value": "Row"}]}
+      ]
+    },
+    {
+      "label": "set-operation/intersect-distinct/rewrite-exists/default",
+      "patterns": [
+        {"display_name": "Aggregate", "metadata": [{"key": "iterator_type", "value": "Stream"}]},
+        {"display_name": "Semi Apply"}
+      ]
+    },
+    {
+      "label": "set-operation/intersect-distinct/rewrite-exists/hash-build-left",
+      "patterns": [
+        {"display_name": "Aggregate", "metadata": [{"key": "iterator_type", "value": "Hash"}]},
+        {"display_name": "Hash Join", "metadata": [{"key": "join_type", "value": "BUILD_SEMI"}]}
+      ]
+    },
+    {
+      "label": "set-operation/intersect-distinct/rewrite-exists/hash-build-right",
+      "patterns": [
+        {"display_name": "Aggregate", "metadata": [{"key": "iterator_type", "value": "Hash"}]},
+        {"display_name": "Hash Join", "metadata": [{"key": "join_type", "value": "PROBE_SEMI"}]}
+      ]
+    },
+    {
+      "label": "set-operation/intersect-distinct/rewrite-exists/apply-batch-true",
+      "patterns": [
+        {
+          "display_name": "Distributed Semi Apply",
+          "metadata": [{"key": "order_preserving", "value": "true"}],
+          "child_links": [
+            {"kind": "RELATIONAL", "type": "Map", "variable": "absent"},
+            {"kind": "SCALAR", "type": "Split Range", "variable": "absent"},
+            {"kind": "SCALAR", "type": "Batch", "variable": "present", "min_count": 2}
+          ]
+        }
+      ]
+    },
+    {
+      "label": "set-operation/intersect-distinct/rewrite-exists/push-broadcast",
+      "patterns": [
+        {
+          "display_name": "Push Broadcast Hash Join Semi Apply",
+          "metadata": [{"key": "order_preserving", "value": "true"}],
+          "child_links": [
+            {"kind": "RELATIONAL", "type": "Map", "variable": "absent"},
+            {"kind": "SCALAR", "type": "Split Range", "variable": "absent"},
+            {"kind": "SCALAR", "type": "Batch", "variable": "present", "min_count": 2}
+          ]
+        }
+      ]
+    },
+    {
+      "label": "set-operation/intersect-distinct/rewrite-exists/group-hash",
+      "patterns": [
+        {"display_name": "Aggregate", "metadata": [{"key": "iterator_type", "value": "Hash"}]},
+        {"display_name": "Hash Join", "metadata": [{"key": "join_type", "value": "BUILD_SEMI"}]}
+      ]
+    },
+    {
+      "label": "set-operation/intersect-distinct/rewrite-exists/group-stream",
+      "patterns": [
+        {"display_name": "Aggregate", "metadata": [{"key": "iterator_type", "value": "Stream"}]},
+        {"display_name": "Merge Join", "metadata": [{"key": "join_type", "value": "LEFT_SEMI"}]}
+      ]
+    },
+    {
+      "label": "set-operation/intersect-distinct/rewrite-exists/multi-predicate-mixed-join-methods",
+      "patterns": [
+        {"display_name": "Aggregate", "metadata": [{"key": "iterator_type", "value": "Hash"}]},
+        {"display_name": "Hash Join", "metadata": [{"key": "join_type", "value": "BUILD_SEMI"}]},
+        {"display_name": "Semi Apply", "metadata": [{"key": "execution_method", "value": "Row"}]}
+      ]
+    },
+    {
+      "label": "set-operation/except-distinct/rewrite-not-exists/default",
+      "patterns": [
+        {"display_name": "Aggregate", "metadata": [{"key": "iterator_type", "value": "Stream"}]},
+        {"display_name": "Anti-Semi Apply"}
+      ]
+    },
+    {
+      "label": "set-operation/except-distinct/rewrite-not-exists/hash-build-left",
+      "patterns": [
+        {"display_name": "Aggregate", "metadata": [{"key": "iterator_type", "value": "Hash"}]},
+        {"display_name": "Hash Join", "metadata": [{"key": "join_type", "value": "BUILD_ANTI_SEMI"}]}
+      ]
+    },
+    {
+      "label": "set-operation/except-distinct/rewrite-not-exists/hash-build-right",
+      "patterns": [
+        {"display_name": "Aggregate", "metadata": [{"key": "iterator_type", "value": "Hash"}]},
+        {"display_name": "Hash Join", "metadata": [{"key": "join_type", "value": "PROBE_ANTI_SEMI"}]}
+      ]
+    },
+    {
+      "label": "set-operation/except-distinct/rewrite-not-exists/apply-batch-true",
+      "patterns": [
+        {
+          "display_name": "Distributed Anti Semi Apply",
+          "metadata": [{"key": "order_preserving", "value": "true"}],
+          "child_links": [
+            {"kind": "RELATIONAL", "type": "Map", "variable": "absent"},
+            {"kind": "SCALAR", "type": "Split Range", "variable": "absent"},
+            {"kind": "SCALAR", "type": "Batch", "variable": "present", "min_count": 2}
+          ]
+        }
+      ]
+    },
+    {
+      "label": "set-operation/except-distinct/rewrite-not-exists/push-broadcast",
+      "patterns": [
+        {
+          "display_name": "Push Broadcast Hash Join Anti Semi Apply",
+          "metadata": [{"key": "order_preserving", "value": "true"}],
+          "child_links": [
+            {"kind": "RELATIONAL", "type": "Map", "variable": "absent"},
+            {"kind": "SCALAR", "type": "Split Range", "variable": "absent"},
+            {"kind": "SCALAR", "type": "Batch", "variable": "present", "min_count": 2}
+          ]
+        }
+      ]
+    },
+    {
+      "label": "set-operation/except-distinct/rewrite-not-exists/group-hash",
+      "patterns": [
+        {"display_name": "Aggregate", "metadata": [{"key": "iterator_type", "value": "Hash"}]},
+        {"display_name": "Hash Join", "metadata": [{"key": "join_type", "value": "BUILD_ANTI_SEMI"}]}
+      ]
+    },
+    {
+      "label": "set-operation/except-distinct/rewrite-not-exists/group-stream",
+      "patterns": [
+        {"display_name": "Aggregate", "metadata": [{"key": "iterator_type", "value": "Stream"}]},
+        {"display_name": "Merge Join", "metadata": [{"key": "join_type", "value": "LEFT_ANTI_SEMI"}]}
+      ]
+    },
+    {
+      "label": "set-operation/except-distinct/rewrite-not-exists/multi-predicate-mixed-join-methods",
+      "patterns": [
+        {"display_name": "Aggregate", "metadata": [{"key": "iterator_type", "value": "Hash"}]},
+        {"display_name": "Hash Join", "metadata": [{"key": "join_type", "value": "BUILD_ANTI_SEMI"}]},
+        {"display_name": "Anti-Semi Apply", "metadata": [{"key": "execution_method", "value": "Row"}]}
       ]
     },
     {
@@ -213,6 +499,76 @@
         {"display_name": "Union All"},
         {"display_name": "Sort"}
       ]
+    }
+  ],
+  "expected_query_errors": [
+    {
+      "label": "set-operation/union-distinct/group-hash-unsupported",
+      "contains": "Unsupported hint: GROUP_METHOD"
+    },
+    {
+      "label": "set-operation/union-distinct/group-stream-unsupported",
+      "contains": "Unsupported hint: GROUP_METHOD"
+    },
+    {
+      "label": "set-operation/intersect-distinct/build-left-unsupported",
+      "contains": "Unsupported hint: HASH_JOIN_BUILD_SIDE"
+    },
+    {
+      "label": "set-operation/intersect-distinct/build-right-unsupported",
+      "contains": "Unsupported hint: HASH_JOIN_BUILD_SIDE"
+    },
+    {
+      "label": "set-operation/intersect-distinct/factorized-both-control",
+      "contains": "cannot be executed in factorized execution mode"
+    },
+    {
+      "label": "set-operation/except-distinct/build-left-unsupported",
+      "contains": "Unsupported hint: HASH_JOIN_BUILD_SIDE"
+    },
+    {
+      "label": "set-operation/except-distinct/build-right-unsupported",
+      "contains": "Unsupported hint: HASH_JOIN_BUILD_SIDE"
+    },
+    {
+      "label": "set-operation/except-distinct/factorized-both-control",
+      "contains": "cannot be executed in factorized execution mode"
+    },
+    {
+      "label": "set-operation/intersect-all/build-left-unsupported",
+      "contains": "Unsupported hint: HASH_JOIN_BUILD_SIDE"
+    },
+    {
+      "label": "set-operation/intersect-all/build-right-unsupported",
+      "contains": "Unsupported hint: HASH_JOIN_BUILD_SIDE"
+    },
+    {
+      "label": "set-operation/except-all/build-left-unsupported",
+      "contains": "Unsupported hint: HASH_JOIN_BUILD_SIDE"
+    },
+    {
+      "label": "set-operation/except-all/build-right-unsupported",
+      "contains": "Unsupported hint: HASH_JOIN_BUILD_SIDE"
+    },
+    {
+      "label": "set-operation/except-all/factorized-both-control",
+      "contains": "cannot be executed in factorized execution mode"
+    },
+    {
+      "label": "set-operation/intersect-distinct/multi-operator-second-hint-unsupported",
+      "contains": "Hints on set operations must appear on the first"
+    },
+    {
+      "label": "set-operation/except-distinct/multi-operator-second-hint-unsupported",
+      "contains": "Hints on set operations must appear on the first"
+    },
+    {
+      "label": "distinct/group-hash-unsupported",
+      "contains": "Unsupported hint: GROUP_METHOD"
+    },
+    {
+      "label": "distinct/group-stream-unsupported",
+      "contains": "Unsupported hint: GROUP_METHOD"
     }
   ]
 }

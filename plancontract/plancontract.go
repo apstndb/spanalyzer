@@ -1677,6 +1677,7 @@ func KnownOperatorFamilies() []string {
 		"compute",
 		"compute_struct",
 		"create_batch",
+		"crowd",
 		"data_block_to_row",
 		"apply_join",
 		"distributed_anti_semi_apply",

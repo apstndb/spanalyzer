@@ -163,6 +163,7 @@ contract convenience.
 | `compute` | Concrete | Compute operator. |
 | `compute_struct` | Concrete | Compute Struct operator. |
 | `create_batch` | Concrete | Create Batch operator. |
+| `crowd` | Concrete, observed | GQL `IS_FIRST(...) OVER (...)` analytic operator displayed as `Crowd` in the retained Spanner Omni plan. |
 | `data_block_to_row` | Concrete | DataBlockToRow operator (`DataBlockToRowAdapter` in the official docs). |
 | `distributed_anti_semi_apply` | Concrete | Distributed Anti Semi Apply wrapper. |
 | `distributed_anti_semi_apply_internal_apply` | Concrete contextual | Semi/Anti Semi Apply inside a Distributed Anti Semi Apply wrapper when it consumes a Batch Scan. |
@@ -916,9 +917,10 @@ boolean metadata fields such as `scalar_aggregate` and `full_scan` default to
 `operator_edges[]`, optional string fields include `type` and `variable`.
 
 `scan_type` uses normalized spelling such as `table_scan`, `index_scan`,
-`batch_scan`, `search_index_scan`, `vector_index_root_scan`,
-`vector_index_leaf_scan`, and `filter_scan`, not raw PlanNode metadata values
-such as `TableScan`, `IndexScan`, `VectorIndexRootScan`, or `FilterScan`.
+`batch_scan`, `search_index_scan`, `vector_index_metadata_scan`,
+`vector_index_root_scan`, `vector_index_leaf_scan`, and `filter_scan`, not raw
+PlanNode metadata values such as `TableScan`, `IndexScan`,
+`VectorIndexMetadataScan`, `VectorIndexRootScan`, or `FilterScan`.
 
 `execution_stats` is explicitly rejected.
 

@@ -128,7 +128,7 @@ families:
   order-preserving base-table back join.
 - JSON search uses `SearchIndexScan` plus direct Search Predicate links without
   the Search Query Conversion TVF. A mixed Full Text Search plus JSON predicate
-  restores that TVF. On Omni `2026.r1-beta.2`, automatic JSON-index selection
+  restores that TVF. On Omni `2026.r1-beta`, automatic JSON-index selection
   changes between optimizer versions 4 and 5; the version-5 success conflicts
   with the version-1-through-4 error text claiming version 6 is required, so
   DBaaS verification remains necessary.

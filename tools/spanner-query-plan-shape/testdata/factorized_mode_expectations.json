@@ -1,0 +1,187 @@
+{
+  "version": "v0alpha1",
+  "queries": [
+    {
+      "label": "factorized/control/default",
+      "patterns": [{"display_name": "Cross Apply"}]
+    },
+    {
+      "label": "factorized/effect/left",
+      "patterns": [
+        {
+          "display_name": "Aggregate",
+          "metadata": [
+            {"key": "call_type", "value": "Local"},
+            {"key": "iterator_type", "value": "Stream"}
+          ],
+          "child_links": [
+            {"kind": "SCALAR", "type": "Key", "variable": "present"},
+            {"kind": "SCALAR", "type": "Agg", "variable": "present"}
+          ]
+        },
+        {
+          "display_name": "Array Unnest",
+          "child_links": [{"variable": "present", "min_count": 2}]
+        }
+      ]
+    },
+    {
+      "label": "factorized/effect/right",
+      "patterns": [
+        {
+          "display_name": "Aggregate",
+          "metadata": [
+            {"key": "call_type", "value": "Local"},
+            {"key": "iterator_type", "value": "Stream"}
+          ],
+          "child_links": [
+            {"kind": "SCALAR", "type": "Key", "variable": "present"},
+            {"kind": "SCALAR", "type": "Agg", "variable": "present"}
+          ]
+        },
+        {
+          "display_name": "Array Unnest",
+          "child_links": [{"variable": "present", "min_count": 2}]
+        }
+      ]
+    },
+    {
+      "label": "factorized/effect/both",
+      "patterns": [
+        {
+          "display_name": "Hash Join",
+          "metadata": [{"key": "join_type", "value": "INNER"}],
+          "child_links": [
+            {"kind": "SCALAR", "type": "Build", "variable": "present"},
+            {"kind": "SCALAR", "type": "Probe", "variable": "present"}
+          ]
+        },
+        {
+          "display_name": "Aggregate",
+          "metadata": [
+            {"key": "call_type", "value": "Local"},
+            {"key": "iterator_type", "value": "Stream"}
+          ],
+          "child_links": [
+            {"kind": "SCALAR", "type": "Key", "variable": "present"},
+            {"kind": "SCALAR", "type": "Agg", "variable": "present"}
+          ]
+        },
+        {
+          "display_name": "Array Unnest",
+          "child_links": [{"variable": "present", "min_count": 2}]
+        }
+      ]
+    },
+    {
+      "label": "factorized/version/v1-hash-both-effect",
+      "patterns": [
+        {
+          "display_name": "Hash Join",
+          "metadata": [{"key": "join_type", "value": "INNER"}],
+          "child_links": [
+            {"kind": "SCALAR", "type": "Build", "variable": "present"},
+            {"kind": "SCALAR", "type": "Probe", "variable": "present"}
+          ]
+        },
+        {
+          "display_name": "Aggregate",
+          "metadata": [
+            {"key": "call_type", "value": "Local"},
+            {"key": "iterator_type", "value": "Stream"}
+          ],
+          "child_links": [
+            {"kind": "SCALAR", "type": "Key", "variable": "present"},
+            {"kind": "SCALAR", "type": "Agg", "variable": "present"}
+          ]
+        },
+        {
+          "display_name": "Array Unnest",
+          "child_links": [{"variable": "present", "min_count": 2}]
+        }
+      ]
+    },
+    {
+      "label": "factorized/version/v8-hash-both-effect",
+      "patterns": [
+        {
+          "display_name": "Hash Join",
+          "metadata": [{"key": "join_type", "value": "INNER"}],
+          "child_links": [
+            {"kind": "SCALAR", "type": "Build", "variable": "present"},
+            {"kind": "SCALAR", "type": "Probe", "variable": "present"}
+          ]
+        },
+        {
+          "display_name": "Aggregate",
+          "metadata": [
+            {"key": "call_type", "value": "Local"},
+            {"key": "iterator_type", "value": "Stream"}
+          ],
+          "child_links": [
+            {"kind": "SCALAR", "type": "Key", "variable": "present"},
+            {"kind": "SCALAR", "type": "Agg", "variable": "present"}
+          ]
+        },
+        {
+          "display_name": "Array Unnest",
+          "child_links": [{"variable": "present", "min_count": 2}]
+        }
+      ]
+    },
+    {
+      "label": "factorized/version/v4-left-accepted-no-visible-effect",
+      "patterns": [{"display_name": "Cross Apply"}]
+    },
+    {
+      "label": "factorized/version/v5-left-effect",
+      "patterns": [
+        {
+          "display_name": "Aggregate",
+          "metadata": [
+            {"key": "call_type", "value": "Local"},
+            {"key": "iterator_type", "value": "Stream"}
+          ],
+          "child_links": [
+            {"kind": "SCALAR", "type": "Key", "variable": "present"},
+            {"kind": "SCALAR", "type": "Agg", "variable": "present"}
+          ]
+        },
+        {
+          "display_name": "Array Unnest",
+          "child_links": [{"variable": "present", "min_count": 2}]
+        }
+      ]
+    },
+    {
+      "label": "factorized/version/v4-join-key-only-both-accepted-no-visible-effect",
+      "patterns": [{"display_name": "Cross Apply"}]
+    },
+    {
+      "label": "factorized/version/v4-non-equality-both-accepted-no-visible-effect",
+      "patterns": [{"display_name": "Distributed Cross Apply"}]
+    }
+  ],
+  "expected_query_errors": [
+    {
+      "label": "factorized/version/v8-unsupported/join-key-only-left",
+      "contains": "cannot be executed in factorized execution mode"
+    },
+    {
+      "label": "factorized/version/v8-unsupported/join-key-only-right",
+      "contains": "cannot be executed in factorized execution mode"
+    },
+    {
+      "label": "factorized/version/v8-unsupported/join-key-only-both",
+      "contains": "cannot be executed in factorized execution mode"
+    },
+    {
+      "label": "factorized/version/v8-unsupported/left-outer-both",
+      "contains": "cannot be executed in factorized execution mode"
+    },
+    {
+      "label": "factorized/version/v8-unsupported/non-equality-both",
+      "contains": "cannot be executed in factorized execution mode"
+    }
+  ]
+}

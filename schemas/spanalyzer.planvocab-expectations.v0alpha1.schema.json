@@ -4,16 +4,38 @@
   "title": "spanalyzer plan vocabulary expectations v0alpha1",
   "type": "object",
   "additionalProperties": false,
-  "required": ["version", "queries"],
+  "required": ["version"],
+  "anyOf": [
+    {
+      "required": ["queries"],
+      "properties": {"queries": {"minItems": 1}}
+    },
+    {
+      "required": ["expected_query_errors"],
+      "properties": {"expected_query_errors": {"minItems": 1}}
+    }
+  ],
   "properties": {
     "version": {"const": "v0alpha1"},
     "queries": {
       "type": "array",
-      "minItems": 1,
       "items": {"$ref": "#/$defs/query"}
+    },
+    "expected_query_errors": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/queryError"}
     }
   },
   "$defs": {
+    "queryError": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["label", "contains"],
+      "properties": {
+        "label": {"type": "string", "minLength": 1},
+        "contains": {"type": "string", "minLength": 1}
+      }
+    },
     "query": {
       "type": "object",
       "additionalProperties": false,

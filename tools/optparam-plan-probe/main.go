@@ -131,9 +131,9 @@ var fixtures = []Fixture{
 			"firstName": "Alice",
 		},
 	},
-	// Hand-rolled equivalent of IS NOT DISTINCT FROM. Worth comparing
-	// against the null_is_null fixture above to see whether the planner
-	// folds the OR into the same index-seek shape.
+	// Hand-written equality-or-both-NULL control for this STRING predicate.
+	// Compare it with the native IS NOT DISTINCT FROM fixture above to see
+	// whether the planner folds the OR into the same index-seek shape.
 	{
 		Name:     "firstName/manual_is_not_distinct_from",
 		DDL:      singersDDL,
@@ -180,9 +180,9 @@ WHERE TRUE
   /*?optional:firstName*/ AND FirstName = @firstName /*?end*/
 `
 
-// Verbatim from the user: hand-written null-safe equality without using
-// IS NOT DISTINCT FROM. Worth feeding to the planner unchanged to see
-// whether it recognizes the idiom.
+// Verbatim from the user: hand-written equality-or-both-NULL for STRING,
+// without using IS NOT DISTINCT FROM. Feed it to the planner unchanged to
+// see whether it recognizes the idiom; do not generalize it to every type.
 const firstNameManualNullSafeTemplate = `SELECT * FROM Singers WHERE FirstName = @firstName OR (FirstName IS NULL AND @firstName IS NULL)
 `
 

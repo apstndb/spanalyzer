@@ -30,8 +30,9 @@ type sourceInput struct {
 }
 
 type queryError struct {
-	Source string `json:"source"`
-	Label  string `json:"label"`
+	Source   string `json:"source"`
+	Label    string `json:"label"`
+	Expected bool   `json:"expected,omitempty"`
 }
 
 type findingRecord struct {
@@ -41,8 +42,14 @@ type findingRecord struct {
 }
 
 type expectationDocument struct {
-	Version string             `json:"version"`
-	Queries []queryExpectation `json:"queries"`
+	Version             string                  `json:"version"`
+	Queries             []queryExpectation      `json:"queries"`
+	ExpectedQueryErrors []queryErrorExpectation `json:"expected_query_errors"`
+}
+
+type queryErrorExpectation struct {
+	Label    string `json:"label"`
+	Contains string `json:"contains"`
 }
 
 type queryExpectation struct {
@@ -97,7 +104,7 @@ func run(args []string, stdin io.Reader, stdout io.Writer) error {
 	fs := flag.NewFlagSet("planvocab-check", flag.ContinueOnError)
 	allowQueryErrors := fs.Bool("allow-query-errors", false, "report source query errors without failing the vocabulary check")
 	outputFormat := fs.String("format", "text", "output format: text or json")
-	expectationPath := fs.String("expect", "", "positive expectation manifest keyed by query label")
+	expectationPath := fs.String("expect", "", "query-error and positive operator expectation manifest keyed by query label")
 	if err := fs.Parse(args); err != nil {
 		return err
 	}
@@ -165,6 +172,9 @@ func readExpectations(path string) (expectationDocument, error) {
 	if document.Version != "v0alpha1" {
 		return expectationDocument{}, fmt.Errorf("expectation manifest version = %q, want v0alpha1", document.Version)
 	}
+	if len(document.Queries) == 0 && len(document.ExpectedQueryErrors) == 0 {
+		return expectationDocument{}, errors.New("expectation manifest requires at least one query or expected query error")
+	}
 	seen := map[string]bool{}
 	for _, query := range document.Queries {
 		if strings.TrimSpace(query.Label) == "" || len(query.Patterns) == 0 {
@@ -174,6 +184,15 @@ func readExpectations(path string) (expectationDocument, error) {
 			return expectationDocument{}, fmt.Errorf("duplicate expectation query label %q", query.Label)
 		}
 		seen[query.Label] = true
+	}
+	for _, queryErr := range document.ExpectedQueryErrors {
+		if strings.TrimSpace(queryErr.Label) == "" || strings.TrimSpace(queryErr.Contains) == "" {
+			return expectationDocument{}, errors.New("expected query error requires a label and non-empty contains text")
+		}
+		if seen[queryErr.Label] {
+			return expectationDocument{}, fmt.Errorf("duplicate expectation query label %q", queryErr.Label)
+		}
+		seen[queryErr.Label] = true
 	}
 	return document, nil
 }
@@ -190,6 +209,10 @@ func inspectInputs(inputs []sourceInput, expectations expectationDocument) (chec
 		expectationsByLabel[query.Label] = query.Patterns
 		report.Expectations += len(query.Patterns)
 	}
+	expectedErrorsByLabel := make(map[string]queryErrorExpectation, len(expectations.ExpectedQueryErrors))
+	for _, queryErr := range expectations.ExpectedQueryErrors {
+		expectedErrorsByLabel[queryErr.Label] = queryErr
+	}
 	seenLabels := map[string]bool{}
 	for _, input := range inputs {
 		envelopes, err := decodeEnvelopes(input.Data)
@@ -203,7 +226,25 @@ func inspectInputs(inputs []sourceInput, expectations expectationDocument) (chec
 			}
 			seenLabels[label] = true
 			if envelope.Error != "" {
-				report.QueryErrors = append(report.QueryErrors, queryError{Source: input.Name, Label: label})
+				expectedError, hasExpectedError := expectedErrorsByLabel[label]
+				matchesExpectedError := hasExpectedError && strings.Contains(envelope.Error, expectedError.Contains)
+				report.QueryErrors = append(report.QueryErrors, queryError{
+					Source:   input.Name,
+					Label:    label,
+					Expected: matchesExpectedError,
+				})
+				switch {
+				case hasExpectedError && !matchesExpectedError:
+					report.ExpectationFailures = append(report.ExpectationFailures, expectationFailure{
+						Label:  label,
+						Reason: "query error did not match the expected classification",
+					})
+				case !hasExpectedError && len(expectations.ExpectedQueryErrors) != 0:
+					report.ExpectationFailures = append(report.ExpectationFailures, expectationFailure{
+						Label:  label,
+						Reason: "unexpected query error",
+					})
+				}
 				if patterns := expectationsByLabel[label]; len(patterns) != 0 {
 					report.ExpectationFailures = append(report.ExpectationFailures, expectationFailure{
 						Label:  label,
@@ -211,6 +252,12 @@ func inspectInputs(inputs []sourceInput, expectations expectationDocument) (chec
 					})
 				}
 				continue
+			}
+			if _, expectsError := expectedErrorsByLabel[label]; expectsError {
+				report.ExpectationFailures = append(report.ExpectationFailures, expectationFailure{
+					Label:  label,
+					Reason: "query produced a plan instead of the expected error",
+				})
 			}
 			if len(envelope.Plan) == 0 || bytes.Equal(bytes.TrimSpace(envelope.Plan), []byte("null")) {
 				return checkReport{}, fmt.Errorf("%s:%s has neither plan nor query error", input.Name, label)
@@ -251,6 +298,14 @@ func inspectInputs(inputs []sourceInput, expectations expectationDocument) (chec
 			report.ExpectationFailures = append(report.ExpectationFailures, expectationFailure{
 				Label:  query.Label,
 				Reason: "query label was not present in the input",
+			})
+		}
+	}
+	for _, queryErr := range expectations.ExpectedQueryErrors {
+		if !seenLabels[queryErr.Label] {
+			report.ExpectationFailures = append(report.ExpectationFailures, expectationFailure{
+				Label:  queryErr.Label,
+				Reason: "expected query-error label was not present in the input",
 			})
 		}
 	}

@@ -1,6 +1,7 @@
 # Plan Vocabulary Inference Observations
 
-Observed on 2026-07-18 with Spanner Omni through `spanemuboost`.
+Observed on 2026-07-18 and revalidated on 2026-08-11 with Spanner Omni through
+`spanemuboost`.
 
 This note records the live evidence used to extend the `planvocab` catalog and
 to turn plausible operator-shape hypotheses into executable positive
@@ -98,13 +99,14 @@ All three Omni integration suites passed with the bridge enabled. They made 31
 plan checks across 30 distinct named cases; every checker invocation passed.
 These tests used:
 
-- `spanner_omni_image`: `us-docker.pkg.dev/spanner-omni/images/spanner-omni:2026.r1-beta.2`
-- `spanner_omni_image_digest`: `sha256:115622065afefd267f9ef3ff1025e35d73a03f66a7335de8e051b393ebdcfacc`
+- `spanner_omni_image`: `us-docker.pkg.dev/spanner-omni/images/spanner-omni:2026.r1-beta`
+- `spanner_omni_image_digest`: `sha256:e98a088fa66d4a87dbb560d729bf21d998bb843f6018bd8dc118fe320e671886`
 - `spanemuboost`: `github.com/apstndb/spanemuboost v0.4.6`
 
 ```sh
 (cd cmd/spanner-query-gen && \
   SPANEMUBOOST_ENABLE_OMNI_TESTS=1 \
+  SPANALYZER_OMNI_IMAGE=us-docker.pkg.dev/spanner-omni/images/spanner-omni:2026.r1-beta \
   SPANALYZER_PLANVOCAB_CHECK_BIN=/tmp/planvocab-check \
   go test -tags='integration omni' \
     -run 'TestIntegration(QueryCodegenGeneratedSpannerQueriesRunOnOmni|PlanReportOperatorFamilyCoverageOnOmni|DMLOperatorFamilyCoverageOnOmni)$' \

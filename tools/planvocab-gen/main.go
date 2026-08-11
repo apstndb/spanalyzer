@@ -17,21 +17,9 @@ import (
 
 const generatedBy = "go run ./planvocab-gen"
 
-var evidencePaths = []string{
-	"plancontract/normalize.go",
-	"research/spanner-query-plan-shape/COMPACT_TREE_METADATA_OBSERVATIONS.md",
-	"research/spanner-query-plan-shape/HINT_POSITION_AUDIT_2026-08-04.md",
-	"research/spanner-query-plan-shape/SET_OPERATION_DISTINCT_HINTS_2026-08-04.md",
-	"research/spanner-query-plan-shape/PLANVOCAB_INFERENCE_OBSERVATIONS.md",
-	"research/spanner-query-plan-shape/QUERY_EXECUTION_OPERATORS_OBSERVATIONS.md",
+var generatorInputPaths = []string{
 	"schemas/spanalyzer.planvocab.v0alpha1.schema.json",
 	"schemas/spanalyzer.planvocab-expectations.v0alpha1.schema.json",
-	"tools/spanner-query-plan-shape/hint_position_combination_cases.go",
-	"tools/spanner-query-plan-shape/planvocab_cases.go",
-	"tools/spanner-query-plan-shape/set_operation_distinct_cases.go",
-	"tools/spanner-query-plan-shape/testdata/hint_position_combination_expectations.json",
-	"tools/spanner-query-plan-shape/testdata/planvocab_inference_expectations.json",
-	"tools/spanner-query-plan-shape/testdata/set_operation_distinct_expectations.json",
 	"tools/planvocab-gen/main.go",
 }
 
@@ -117,7 +105,7 @@ func run(args []string) error {
 		return err
 	}
 
-	inputs := append([]string{*sourcePath}, evidencePaths...)
+	inputs := catalogInputPaths(*sourcePath, doc.Info.LocalEvidence)
 	fixtures, err := filepath.Glob(filepath.Join(root, "cmd/spanner-query-gen/testdata/plan_fixtures/*.json"))
 	if err != nil {
 		return fmt.Errorf("glob plan fixtures: %w", err)
@@ -174,6 +162,31 @@ func run(args []string) error {
 		return fmt.Errorf("write generated fixture mirror: %w", err)
 	}
 	return nil
+}
+
+// catalogInputPaths keeps the structured source's local_evidence list as the
+// single authority for evidence provenance. Generator and schema inputs are
+// added separately because they define the generated representation rather
+// than authorize individual vocabulary entries.
+func catalogInputPaths(sourcePath string, localEvidence []string) []string {
+	seen := make(map[string]struct{}, 1+len(localEvidence)+len(generatorInputPaths))
+	inputs := make([]string, 0, 1+len(localEvidence)+len(generatorInputPaths))
+	add := func(path string) {
+		if _, ok := seen[path]; ok {
+			return
+		}
+		seen[path] = struct{}{}
+		inputs = append(inputs, path)
+	}
+	add(sourcePath)
+	for _, path := range localEvidence {
+		add(path)
+	}
+	for _, path := range generatorInputPaths {
+		add(path)
+	}
+	sort.Strings(inputs)
+	return inputs
 }
 
 func resolveRepoRoot(explicit string) (string, error) {

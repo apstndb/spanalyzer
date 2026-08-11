@@ -137,6 +137,14 @@ Update (2026-06-12): still no reproduction. The official query-operators-leaf
 page documents only generic properties for it with no example query, and
 `UNNEST(GENERATE_ARRAY(...))` classifies as `array_unnest`.
 
+Update (2026-08-11): the retained set-operation matrix reproduces
+`Generate Relation` under `INTERSECT ALL` and `EXCEPT ALL` on pinned Spanner
+Omni `2026.r1-beta`. The observed node has an untyped scalar child link used
+after computing the output multiplicity. The earlier generator candidates
+remain useful negative controls, but their no-reproduction conclusion no
+longer applies to the operator as a whole. See
+`SET_OPERATION_DISTINCT_HINTS_2026-08-04.md`.
+
 ## Local Split Union
 
 The current documentation-derived query set was regenerated with:

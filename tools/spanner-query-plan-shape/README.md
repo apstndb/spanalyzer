@@ -147,10 +147,12 @@ go run ./tools/spanner-query-plan-shape \
 ```
 
 This case intentionally does not reuse the documentation operator schema. It
-creates only the table and search indexes needed for Full Text Search, then
+creates only the tables, search indexes, and small property graph needed for
+Full Text Search, then
 checks `SEARCH`, `SEARCH_SUBSTRING`, multi-column search, mixed text and
 non-text predicates, `SNIPPET`, `SCORE`, `TOKENLIST_CONCAT`, partitioned
-ordered search indexes, and numeric array search-index predicates.
+ordered search indexes, numeric array search-index predicates, and a graph
+traversal whose destination predicate uses a search index.
 
 Inspect JSON search-index probes separately from Full Text Search:
 
@@ -178,7 +180,8 @@ go run ./tools/spanner-query-plan-shape \
 
 The vector case compares an exact `_BASE_TABLE` KNN query with ANN automatic
 index selection, extra-key and stored-column filters, a non-covering back join,
-and a filtered vector index. The vector index DDL is kept as an explicit raw
+a filtered vector index, and an ANN result passed through GQL `NEXT` into a
+relationship traversal. The vector index DDL is kept as an explicit raw
 statement list because the current memefish parser does not yet accept the
 documented extra key columns after the embedding column.
 
@@ -314,7 +317,7 @@ go test -tags=integration ./tools/spanner-query-plan-shape \
   -run TestIntegrationHintPositionAuditOnEmulator
 
 SPANEMUBOOST_ENABLE_OMNI_TESTS=1 \
-  SPANALYZER_OMNI_IMAGE=us-docker.pkg.dev/spanner-omni/images/spanner-omni:2026.r1-beta.2 \
+  SPANALYZER_OMNI_IMAGE=us-docker.pkg.dev/spanner-omni/images/spanner-omni:2026.r1-beta \
   go test -tags=integration,omni ./tools/spanner-query-plan-shape \
   -run TestIntegrationHintPositionAuditOnOmni
 ```
@@ -335,12 +338,185 @@ go build -o /tmp/spanner-query-plan-shape ./tools/spanner-query-plan-shape
 set -o pipefail
 /tmp/spanner-query-plan-shape \
   --case hint_position_combinations \
-  --omni-image us-docker.pkg.dev/spanner-omni/images/spanner-omni:2026.r1-beta.2 \
+  --omni-image us-docker.pkg.dev/spanner-omni/images/spanner-omni:2026.r1-beta \
   --output json \
   --continue-on-error \
   | /tmp/planvocab-check \
       --expect tools/spanner-query-plan-shape/testdata/hint_position_combination_expectations.json
 ```
+
+Separate factorized-hint acceptance from plan-visible effect and eligibility
+rejection:
+
+```sh
+set -o pipefail
+/tmp/spanner-query-plan-shape \
+  --case factorized_mode \
+  --omni-image us-docker.pkg.dev/spanner-omni/images/spanner-omni:2026.r1-beta \
+  --output json \
+  --continue-on-error \
+  | /tmp/planvocab-check \
+      --allow-query-errors \
+      --expect tools/spanner-query-plan-shape/testdata/factorized_mode_expectations.json
+```
+
+The explicit v4/v5 controls preserve the boundary between accepted hints with
+no visible factorization and the Aggregate/Array Unnest signature. The
+explicit v8 errors cover join-key-only projections, outer joins, and
+non-equality conditions. Use `--optimizer-version-matrix` to reproduce the
+v1-v8 acceptance boundary; prefixed matrix labels are a vocabulary gate and do
+not match the unprefixed expectation manifest.
+
+Probe the broad GQL and SQL/GQL bridge surface, including accepted clauses
+that optimize to a simpler control plan:
+
+```sh
+set -o pipefail
+/tmp/spanner-query-plan-shape \
+  --case gql_surface \
+  --omni-image us-docker.pkg.dev/spanner-omni/images/spanner-omni:2026.r1-beta \
+  --output json \
+  --continue-on-error \
+  | /tmp/planvocab-check \
+      --allow-query-errors \
+      --expect tools/spanner-query-plan-shape/testdata/gql_surface_expectations.json
+```
+
+This case retains nontrivial graph DISTINCT and ALL set-operation arms,
+correlated ARRAY/IN/NOT IN, inner/optional/uncorrelated CALL and MATCH controls,
+recursive/subpath/path-construction variants, element functions and predicates,
+meaningful compound-label OR/AND over a multi-label graph, graph-element SQL
+bridging, correlated FOR, GQL-native BERNOULLI/RESERVOIR, horizontal
+aggregates, composed `IS_FIRST`/`Crowd` plans, and explicit capability errors.
+See
+[`GQL_SURFACE_OBSERVATIONS_2026-08-11.md`](../../research/spanner-query-plan-shape/GQL_SURFACE_OBSERVATIONS_2026-08-11.md)
+for the plan and optimizer-version evidence.
+
+Probe graph-specific hint placements and their default plan shapes:
+
+```sh
+set -o pipefail
+/tmp/spanner-query-plan-shape \
+  --case gql_hint_surface \
+  --omni-image us-docker.pkg.dev/spanner-omni/images/spanner-omni:2026.r1-beta \
+  --output json \
+  --continue-on-error \
+  | /tmp/planvocab-check \
+      --allow-query-errors \
+      --expect tools/spanner-query-plan-shape/testdata/gql_hint_surface_expectations.json
+```
+
+The selector covers graph `FACTORIZE_BOTH`, GQL set-operation statement/arm
+controls, correlated EXISTS/VALUE hint placement, traversal MERGE/HASH/APPLY,
+official and pinned-runtime-extension traversal-hint positions, graph-element
+FORCE_INDEX/INDEX_STRATEGY/SCAN_METHOD/GROUPBY_SCAN_OPTIMIZATION/
+SEEKABLE_KEY_SIZE composition—including distinct COLUMNAR/NO_COLUMNAR scan
+metadata—and graph PUSH boundaries. Its focused Omni
+test enforces v4/v5 factorization equality changes, ONE_PASS v3/v4, PUSH
+v2/v3, edge BATCH v5/v6, between-path HASH v2/v3, and the v1-v8 plan effects
+that a presence-only manifest cannot express. See
+[`GQL_HINT_VERSION_OBSERVATIONS_2026-08-11.md`](../../research/spanner-query-plan-shape/GQL_HINT_VERSION_OBSERVATIONS_2026-08-11.md).
+
+Probe generic GoogleSQL grammar surfaces with accepted PLAN shapes or explicit
+runtime/transaction boundaries:
+
+```sh
+set -o pipefail
+/tmp/spanner-query-plan-shape \
+  --case google_sql_surface \
+  --omni-image us-docker.pkg.dev/spanner-omni/images/spanner-omni:2026.r1-beta \
+  --output json \
+  --continue-on-error \
+  | /tmp/planvocab-check \
+      --allow-query-errors \
+      --expect tools/spanner-query-plan-shape/testdata/google_sql_surface_expectations.json
+```
+
+This case covers accepted HAVING, aggregate-call DISTINCT/null modifiers,
+SELECT ALL, star
+EXCEPT/REPLACE, subquery SELECT AS VALUE, scalar WITH, IN UNNEST, COLLATE, and
+read-write FOR UPDATE. It also retains explicit errors for analytic functions
+on the pinned Omni runtime, TABLESAMPLE REPEATABLE, pipes, grouping
+extensions, PIVOT/UNPIVOT, recursive WITH, top-level value tables, subquery
+WITH, read-only FOR UPDATE, and the lock-hint/FOR UPDATE conflict.
+
+Descriptor-backed GoogleSQL surfaces use a separate selector because Spanner
+must receive the serialized `FileDescriptorSet` with `CREATE PROTO BUNDLE`:
+
+```sh
+set -o pipefail
+/tmp/spanner-query-plan-shape \
+  --case google_sql_proto_surface \
+  --proto-descriptors-file testdata/protos/order_descriptors.pb \
+  --proto-descriptors-file testdata/protos/complex/complex_descriptors.pb \
+  --omni-image us-docker.pkg.dev/spanner-omni/images/spanner-omni:2026.r1-beta \
+  --output json \
+  --continue-on-error \
+  | /tmp/planvocab-check \
+      --allow-query-errors \
+      --expect tools/spanner-query-plan-shape/testdata/google_sql_proto_surface_expectations.json
+```
+
+The selector covers both `NEW` constructor forms, `CAST AS PROTO`,
+`REPLACE_FIELDS` with a nested field path, nested `SELECT AS typename`, the
+documented rule that `DISTINCT` is applied before proto construction, scalar,
+nested, presence, enum, and repeated proto field access, repeated-field
+`UNNEST`, and the top-level value-table boundary. The descriptor flag may be
+repeated; descriptor files are merged by source file name and conflicting
+definitions are rejected before the runtime starts.
+
+The same selector retains six upstream GoogleSQL proto surfaces as explicit
+unsupported expectations: `EXTRACT(FIELD/HAS/RAW/ONEOF_CASE)`,
+`PROTO_DEFAULT_IF_NULL`, and `FILTER_FIELDS`. On the pinned runtime each error
+class is invariant from optimizer v1 through v8. Add
+`--optimizer-version-matrix` without the unprefixed expectation manifest to
+repeat the 144-submission vocabulary matrix.
+
+Compare expression boundaries between distributed split selection, scan
+seeking, residual filtering, and join-key evaluation:
+
+```sh
+set -o pipefail
+/tmp/spanner-query-plan-shape \
+  --case condition_boundaries \
+  --omni-image us-docker.pkg.dev/spanner-omni/images/spanner-omni:2026.r1-beta \
+  --output json \
+  --continue-on-error \
+  | /tmp/planvocab-check \
+      --expect tools/spanner-query-plan-shape/testdata/condition_boundary_expectations.json
+```
+
+The selector contrasts literal and parameterized prefix predicates, partial
+`LIKE` and regexp extraction, substring/suffix/transformed-key residuals,
+conjunctions and disjunctions, computed Hash/Merge equality keys, non-equality
+join residuals, one-side scan pushdown, and Apply Join correlation. Add
+`--optimizer-version-matrix` without the unprefixed expectation manifest to
+repeat the 288-plan matrix. Expression text and version boundaries are checked
+by the focused Omni integration test and recorded in
+[`CONDITION_BOUNDARY_OBSERVATIONS_2026-08-11.md`](../../research/spanner-query-plan-shape/CONDITION_BOUNDARY_OBSERVATIONS_2026-08-11.md).
+
+Compare the 19 documented Spanner aggregate-function names with the physical
+expressions attached to Aggregate `Agg` child links:
+
+```sh
+set -o pipefail
+/tmp/spanner-query-plan-shape \
+  --case aggregate_functions \
+  --omni-image us-docker.pkg.dev/spanner-omni/images/spanner-omni:2026.r1-beta \
+  --output json \
+  --continue-on-error \
+  | /tmp/planvocab-check \
+      --allow-query-errors \
+      --expect tools/spanner-query-plan-shape/testdata/aggregate_function_expectations.json
+```
+
+The selector retains all documented general/statistical functions plus
+`DISTINCT`, ordering/limit, `HAVING MAX/MIN`, grouping-only, and unsupported
+controls. Add `--optimizer-version-matrix` without the unprefixed expectation
+manifest to repeat the 248-submission matrix. Exact `Agg` expression types,
+alias plan equality, and finalization outside Aggregate are checked by the
+focused Omni integration test and recorded in
+[`AGGREGATE_FUNCTION_AGG_TYPE_OBSERVATIONS_2026-08-11.md`](../../research/spanner-query-plan-shape/AGGREGATE_FUNCTION_AGG_TYPE_OBSERVATIONS_2026-08-11.md).
 
 Probe join-family selection for `INTERSECT` and `EXCEPT`, ALL multiplicity
 restoration, and aggregate implementations of `UNION DISTINCT` and
@@ -350,7 +526,7 @@ restoration, and aggregate implementations of `UNION DISTINCT` and
 set -o pipefail
 /tmp/spanner-query-plan-shape \
   --case set_operation_distinct \
-  --omni-image us-docker.pkg.dev/spanner-omni/images/spanner-omni:2026.r1-beta.2 \
+  --omni-image us-docker.pkg.dev/spanner-omni/images/spanner-omni:2026.r1-beta \
   --output json \
   --continue-on-error \
   | /tmp/planvocab-check \
@@ -361,9 +537,26 @@ set -o pipefail
 The expected errors are negative controls for `GROUP_METHOD` directly on
 DISTINCT and `HASH_JOIN_BUILD_SIDE` on set operations. The positive
 expectations cover plan-visible HASH, MERGE, local APPLY, distributed APPLY,
-aggregate iterator, and `Generate Relation` link shapes. See
+aggregate iterator, and `Generate Relation` link shapes. The same case also
+compares `INTERSECT DISTINCT` / `EXCEPT DISTINCT` with `EXISTS` / `NOT EXISTS`
+rewrites on non-null keys: the rewrites cover hash build-side selection and
+simultaneous join plus group-method controls that the direct set operators do
+not expose. The retained three-input controls also show that separately hinted
+predicates can select Hash and APPLY semi/anti comparisons in one plan, while
+a hint on the second same-level set operator is rejected. Separate NULL-bearing
+result probes use native `IS NOT DISTINCT FROM` comparisons. See
 [`SET_OPERATION_DISTINCT_HINTS_2026-08-04.md`](../../research/spanner-query-plan-shape/SET_OPERATION_DISTINCT_HINTS_2026-08-04.md)
 for the pinned-runtime evidence and rewrite caveats.
+
+Run the populated multi-column and three-input result-equivalence test on the
+pinned Omni image with:
+
+```sh
+SPANEMUBOOST_ENABLE_OMNI_TESTS=1 \
+SPANALYZER_OMNI_IMAGE=us-docker.pkg.dev/spanner-omni/images/spanner-omni:2026.r1-beta \
+go test -tags='integration omni' ./tools/spanner-query-plan-shape \
+  -run '^TestIntegrationSetOperationRewriteEquivalenceOnOmni$' -count=1
+```
 
 See
 [`research/spanner-query-plan-shape/QUERY_EXECUTION_OPERATORS_OBSERVATIONS.md`](../../research/spanner-query-plan-shape/QUERY_EXECUTION_OPERATORS_OBSERVATIONS.md)

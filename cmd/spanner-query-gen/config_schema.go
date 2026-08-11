@@ -171,7 +171,7 @@ func planContractJSONSchema() map[string]interface{} {
 
 func planReportJSONSchema() map[string]interface{} {
 	const scanTypeDescription = "Normalized scan_type metadata, for example table_scan, index_scan, batch_scan, " +
-		"search_index_scan, vector_index_root_scan, vector_index_leaf_scan, or filter_scan."
+		"search_index_scan, vector_index_metadata_scan, vector_index_root_scan, vector_index_leaf_scan, or filter_scan."
 
 	return map[string]interface{}{
 		"$schema":              "https://json-schema.org/draft/2020-12/schema",

@@ -1,0 +1,25 @@
+{
+  "version": "v0alpha1",
+  "queries": [
+    {"label":"google-sql-proto-surface/accepted/new-map-constructor-field-access","patterns":[{"display_name":"Proto Constructor","child_links":[{"kind":"SCALAR","type":"","variable":"absent","min_count":2}]},{"display_name":"Scan","metadata":[{"key":"scan_target","value":"Orders"},{"key":"scan_type","value":"TableScan"}]}]},
+    {"label":"google-sql-proto-surface/accepted/new-parenthesized-constructor-field-access","patterns":[{"display_name":"Proto Constructor","child_links":[{"kind":"SCALAR","type":"","variable":"absent","min_count":2}]},{"display_name":"Scan","metadata":[{"key":"scan_target","value":"Orders"},{"key":"scan_type","value":"TableScan"}]}]},
+    {"label":"google-sql-proto-surface/accepted/cast-string-to-proto-field-access","patterns":[{"display_name":"Field"},{"display_name":"Function"},{"display_name":"Scan","metadata":[{"key":"scan_target","value":"Orders"},{"key":"scan_type","value":"TableScan"}]}]},
+    {"label":"google-sql-proto-surface/accepted/replace-proto-fields","patterns":[{"display_name":"Field","metadata":[{"key":"name","value":"order_number"}]},{"display_name":"Field","metadata":[{"key":"name","value":"country"}]},{"display_name":"Scan","metadata":[{"key":"scan_target","value":"Orders"},{"key":"scan_type","value":"TableScan"}]}]},
+    {"label":"google-sql-proto-surface/accepted/select-as-proto-nested","patterns":[{"display_name":"Proto Constructor","child_links":[{"kind":"SCALAR","type":"","variable":"absent","min_count":2}]},{"display_name":"Scan","metadata":[{"key":"scan_target","value":"Orders"},{"key":"scan_type","value":"TableScan"}]}]},
+    {"label":"google-sql-proto-surface/accepted/select-as-proto-distinct-nested","patterns":[{"display_name":"Aggregate","metadata":[{"key":"call_type","value":"Global"},{"key":"iterator_type","value":"Hash"}],"child_links":[{"kind":"SCALAR","type":"Key","variable":"present","min_count":2}]},{"display_name":"Aggregate","metadata":[{"key":"call_type","value":"Local"},{"key":"iterator_type","value":"Hash"}],"child_links":[{"kind":"SCALAR","type":"Key","variable":"present","min_count":2}]},{"display_name":"Compute","child_links":[{"kind":"SCALAR","type":"","variable":"present","min_count":2}]},{"display_name":"Proto Constructor","child_links":[{"kind":"SCALAR","type":"","variable":"absent","min_count":2}]}]},
+    {"label":"google-sql-proto-surface/accepted/proto-field-access","patterns":[{"display_name":"Field","metadata":[{"key":"name","value":"order_number"}]},{"display_name":"Scan","metadata":[{"key":"scan_target","value":"Orders"}]}]},
+    {"label":"google-sql-proto-surface/accepted/proto-nested-field-access","patterns":[{"display_name":"Field","metadata":[{"key":"name","value":"shipping_address"}]},{"display_name":"Field","metadata":[{"key":"name","value":"country"}]},{"display_name":"Scan","metadata":[{"key":"scan_target","value":"Orders"}]}]},
+    {"label":"google-sql-proto-surface/accepted/proto-presence-field-access","patterns":[{"display_name":"Field","metadata":[{"key":"name","value":"order_number"}]},{"display_name":"Scan","metadata":[{"key":"scan_target","value":"Orders"}]}]},
+    {"label":"google-sql-proto-surface/accepted/proto-enum-field-access","patterns":[{"display_name":"Field","metadata":[{"key":"name","value":"type"}]},{"display_name":"Scan","metadata":[{"key":"scan_target","value":"ProtoUsers"}]}]},
+    {"label":"google-sql-proto-surface/accepted/proto-repeated-field-unnest","patterns":[{"display_name":"Cross Apply","metadata":[{"key":"execution_method","value":"Row"}],"child_links":[{"kind":"RELATIONAL","type":"Map","variable":"absent"}]},{"display_name":"Array Unnest","metadata":[{"key":"execution_method","value":"Row"}],"child_links":[{"kind":"SCALAR","type":"","variable":"present","min_count":2}]},{"display_name":"Field","metadata":[{"key":"name","value":"line_item"}]}]}
+  ],
+  "expected_query_errors": [
+    {"label":"google-sql-proto-surface/unsupported/extract-field","contains":"EXTRACT from PROTO is not supported"},
+    {"label":"google-sql-proto-surface/unsupported/extract-presence","contains":"EXTRACT from PROTO is not supported"},
+    {"label":"google-sql-proto-surface/unsupported/extract-raw-field","contains":"EXTRACT from PROTO is not supported"},
+    {"label":"google-sql-proto-surface/unsupported/proto-default-if-null","contains":"Function not found: PROTO_DEFAULT_IF_NULL"},
+    {"label":"google-sql-proto-surface/unsupported/filter-fields","contains":"Function not found: FILTER_FIELDS"},
+    {"label":"google-sql-proto-surface/unsupported/extract-oneof-case","contains":"EXTRACT from PROTO is not supported"},
+    {"label":"google-sql-proto-surface/unsupported/select-as-proto-top-level","contains":"Top level queries may not specify value tables"}
+  ]
+}

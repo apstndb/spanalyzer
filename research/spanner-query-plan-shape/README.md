@@ -7,6 +7,9 @@ plans. Observation logs, not a stable contract.
 
 ## Operator vocabulary
 
+- [`AGGREGATE_FUNCTION_AGG_TYPE_OBSERVATIONS_2026-08-11.md`](AGGREGATE_FUNCTION_AGG_TYPE_OBSERVATIONS_2026-08-11.md):
+  documented Spanner aggregate functions versus the physical expressions on
+  Aggregate `Agg` child links, including partial/final lowering and modifiers.
 - [`QUERY_EXECUTION_OPERATORS_OBSERVATIONS.md`](QUERY_EXECUTION_OPERATORS_OBSERVATIONS.md):
   observed Spanner query-plan operator vocabulary, normalization impact, and
   probe environment notes.
@@ -37,6 +40,21 @@ plans. Observation logs, not a stable contract.
   optimizer-version and `ALLOW_DISTRIBUTED_MERGE` matrix observations.
 - [`OPTIMIZER_VERSION_RENDERED_EXAMPLES.md`](OPTIMIZER_VERSION_RENDERED_EXAMPLES.md):
   representative optimizer-version before/after rendered examples.
+- [`FACTORIZED_MODE_OBSERVATIONS_2026-08-11.md`](FACTORIZED_MODE_OBSERVATIONS_2026-08-11.md):
+  factorized join acceptance, plan-visible effect, eligibility, and the v4/v5
+  optimizer boundary.
+- [`GQL_SURFACE_OBSERVATIONS_2026-08-11.md`](GQL_SURFACE_OBSERVATIONS_2026-08-11.md):
+  broad GQL/SQL bridge plan coverage, nontrivial graph set operations,
+  OPTIONAL MATCH lowering, and QUALIFY capability boundaries.
+- [`GQL_HINT_VERSION_OBSERVATIONS_2026-08-11.md`](GQL_HINT_VERSION_OBSERVATIONS_2026-08-11.md):
+  graph-specific hint placements, plan-visible effects, accepted-no-effect
+  controls, and exact optimizer-version boundaries.
+- [`GOOGLESQL_SURFACE_CAPABILITY_OBSERVATIONS_2026-08-11.md`](GOOGLESQL_SURFACE_CAPABILITY_OBSERVATIONS_2026-08-11.md):
+  accepted generic GoogleSQL PLAN surfaces plus explicit runtime and
+  transaction capability boundaries.
+- [`CONDITION_BOUNDARY_OBSERVATIONS_2026-08-11.md`](CONDITION_BOUNDARY_OBSERVATIONS_2026-08-11.md):
+  expression boundaries between Split Range, scan Seek/Residual Condition,
+  and Hash/Merge/Apply join conditions across optimizer v1-v8.
 
 ## Pattern studies
 

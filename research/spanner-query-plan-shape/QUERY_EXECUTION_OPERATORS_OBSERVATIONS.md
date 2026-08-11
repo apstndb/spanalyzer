@@ -275,6 +275,19 @@ vocabulary:
   `SearchIndexScan` plus a residual `Filter Scan` in the observed plans.
   Selecting a non-stored column such as `Cover` produced a back join to the base
   table.
+- A GQL traversal with `SEARCH` on the destination node connected the
+  `SearchIndexScan` and `Search Predicate` subtree to the relationship and node
+  table scans in one plan. Optimizer versions 1 through 4 returned a SEARCH
+  version-capability error; versions 5 through 8 returned plans, despite the
+  error text saying that version 6 or above is required. Treat the observed v5
+  acceptance as pinned-runtime evidence, not a documentation correction.
+- An ANN result passed through GQL `NEXT` retained
+  `VectorIndexMetadataScan`, `VectorIndexRootScan`, and `VectorIndexLeafScan`
+  together with the relationship and destination-node scans at every optimizer
+  version from 1 through 8. This is direct composition evidence for vector
+  search followed by graph traversal. The newly observed metadata scan is
+  normalized as `scan_type: vector_index_metadata_scan`; like the root and leaf
+  spellings, it remains in the generic `scan` operator family.
 
 Full regenerated Full Text Search results are recorded in [`COMPACT_TREE_METADATA_OBSERVATIONS.md`](COMPACT_TREE_METADATA_OBSERVATIONS.md#full-text-search).
 Shareable `spannerplan/plantree/reference` output is recorded in
@@ -335,11 +348,26 @@ plan as `Distributed Union` with `preserve_subquery_order: true`. The
 that metadata shape; it should not be read as evidence for a separate raw
 `PlanNode.displayName` named `Distributed Merge Union`.
 
-The current documentation-derived and candidate-query probes still have no
+The initial documentation-derived and generator candidate probes had no
 positive `Generate Relation` or `Local Split Union` reproduction. Constant-only
 queries use `Unit Relation`; array generators use `Array Unnest` plus scalar
-function or constructor nodes. Local Split Union likely needs placement or
+function or constructor nodes. A later set-operation matrix reproduced
+`Generate Relation` under `INTERSECT ALL` and `EXCEPT ALL` on pinned Spanner
+Omni `2026.r1-beta`; see `SET_OPERATION_DISTINCT_HINTS_2026-08-04.md`.
+`Local Split Union` remains unreproduced and likely needs placement or
 locality-specific configuration that is absent from the synthetic schema.
+
+GQL `IS_FIRST(1) OVER (...)` reproduced the relational `Crowd` display name on
+2026-08-11. Its observed shape had one relational child, three untyped scalar
+children without variables, one variable-bearing scalar result, and
+`execution_method=Row`. The same function was unsupported in ordinary SQL.
+The GQL plan contained a Sort below `Crowd`, and the shape remained known to
+planvocab across optimizer versions 1 through 8.
+
+A recursive GQL path-materialization probe using `NODES`, `EDGES`,
+`PATH_FIRST`, and `PATH_LAST` added a second observed `Compute` scalar-link
+shape: untyped variable-bearing result links coexist with repeated
+`type=Scalar`, variable-absent expression links.
 
 The `tvf/change-stream` row confirms that Spanner Omni accepts a
 `READ_<change_stream_name>` table-valued function after `CREATE CHANGE STREAM`

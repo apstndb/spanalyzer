@@ -5,10 +5,14 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
+	"slices"
 	"strings"
 	"testing"
 
 	"cloud.google.com/go/spanner/apiv1/spannerpb"
+	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/reflect/protodesc"
+	"google.golang.org/protobuf/types/descriptorpb"
 	"google.golang.org/protobuf/types/known/structpb"
 )
 
@@ -516,6 +520,23 @@ func TestLoadQueriesSetOperationDistinctIncludesEffectsAndControls(t *testing.T)
 		"set-operation/except-distinct/merge",
 		"set-operation/intersect-all/apply-batch-false",
 		"set-operation/except-all/hash",
+		"set-operation/except-all/hash-one-pass",
+		"set-operation/except-all/build-left-unsupported",
+		"set-operation/intersect-distinct/push-broadcast",
+		"set-operation/intersect-distinct/apply-batch-true-execution-row",
+		"set-operation/intersect-all/apply-batch-true",
+		"set-operation/intersect-all/factorized-both",
+		"set-operation/input-shape/except-all-reversed",
+		"set-operation/input-shape/intersect-distinct-multi-column",
+		"set-operation/input-shape/mixed-parenthesized",
+		"set-operation/intersect-distinct/rewrite-exists/hash-build-right",
+		"set-operation/intersect-distinct/rewrite-exists/group-stream",
+		"set-operation/intersect-distinct/rewrite-exists/multi-predicate-mixed-join-methods",
+		"set-operation/intersect-distinct/multi-operator-second-hint-unsupported",
+		"set-operation/except-distinct/rewrite-not-exists/apply-batch-true",
+		"set-operation/except-distinct/rewrite-not-exists/group-hash",
+		"set-operation/except-distinct/rewrite-not-exists/multi-predicate-mixed-join-methods",
+		"set-operation/except-distinct/multi-operator-second-hint-unsupported",
 		"distinct/index-prefix/groupby-scan-true-control",
 		"distinct/base-table/groupby-scan-false-control",
 		"distinct/rewrite-group-by-stream",
@@ -525,7 +546,7 @@ func TestLoadQueriesSetOperationDistinctIncludesEffectsAndControls(t *testing.T)
 			t.Errorf("loadQueries(\"set_operation_distinct\") missing %q", label)
 		}
 	}
-	if got, want := len(queries), 48; got != want {
+	if got, want := len(queries), 116; got != want {
 		t.Fatalf("set-operation/distinct query count = %d, want %d", got, want)
 	}
 
@@ -539,6 +560,10 @@ func TestLoadQueriesSetOperationDistinctIncludesEffectsAndControls(t *testing.T)
 			Label    string            `json:"label"`
 			Patterns []json.RawMessage `json:"patterns"`
 		} `json:"queries"`
+		ExpectedQueryErrors []struct {
+			Label    string `json:"label"`
+			Contains string `json:"contains"`
+		} `json:"expected_query_errors"`
 	}
 	if err := json.Unmarshal(manifestBytes, &manifest); err != nil {
 		t.Fatal(err)
@@ -546,7 +571,14 @@ func TestLoadQueriesSetOperationDistinctIncludesEffectsAndControls(t *testing.T)
 	if got, want := manifest.Version, "v0alpha1"; got != want {
 		t.Errorf("expectation version = %q, want %q", got, want)
 	}
+	if got, want := len(manifest.Queries), 47; got != want {
+		t.Errorf("set-operation positive expectations = %d, want %d", got, want)
+	}
+	if got, want := len(manifest.ExpectedQueryErrors), 17; got != want {
+		t.Errorf("set-operation error expectations = %d, want %d", got, want)
+	}
 	manifestLabels := make(map[string]struct{}, len(manifest.Queries))
+	patternCount := 0
 	for _, expectation := range manifest.Queries {
 		if _, ok := seen[expectation.Label]; !ok {
 			t.Errorf("expectation label %q is absent from the built-in case", expectation.Label)
@@ -558,6 +590,10 @@ func TestLoadQueriesSetOperationDistinctIncludesEffectsAndControls(t *testing.T)
 		if len(expectation.Patterns) == 0 {
 			t.Errorf("expectation label %q has no operator patterns", expectation.Label)
 		}
+		patternCount += len(expectation.Patterns)
+	}
+	if got, want := patternCount, 77; got != want {
+		t.Errorf("set-operation operator patterns = %d, want %d", got, want)
 	}
 	for _, controlLabel := range []string{
 		"set-operation/union-all/hash-control",
@@ -572,6 +608,919 @@ func TestLoadQueriesSetOperationDistinctIncludesEffectsAndControls(t *testing.T)
 		if _, ok := manifestLabels[controlLabel]; ok {
 			t.Errorf("acceptance-only control %q must not have a plan-effect expectation", controlLabel)
 		}
+	}
+	expectedErrorLabels := make(map[string]struct{}, len(manifest.ExpectedQueryErrors))
+	for _, expectation := range manifest.ExpectedQueryErrors {
+		if _, ok := seen[expectation.Label]; !ok {
+			t.Errorf("expected query-error label %q is absent from the built-in case", expectation.Label)
+		}
+		if expectation.Contains == "" {
+			t.Errorf("expected query-error label %q has empty matching text", expectation.Label)
+		}
+		if _, duplicate := expectedErrorLabels[expectation.Label]; duplicate {
+			t.Errorf("expected query-error label %q is duplicated", expectation.Label)
+		}
+		if _, duplicate := manifestLabels[expectation.Label]; duplicate {
+			t.Errorf("expected query-error label %q also has positive plan expectations", expectation.Label)
+		}
+		expectedErrorLabels[expectation.Label] = struct{}{}
+	}
+	for _, label := range []string{
+		"set-operation/union-distinct/group-hash-unsupported",
+		"set-operation/union-distinct/group-stream-unsupported",
+		"set-operation/intersect-distinct/build-left-unsupported",
+		"set-operation/intersect-distinct/build-right-unsupported",
+		"set-operation/intersect-distinct/factorized-both-control",
+		"set-operation/except-distinct/build-left-unsupported",
+		"set-operation/except-distinct/build-right-unsupported",
+		"set-operation/except-distinct/factorized-both-control",
+		"set-operation/intersect-all/build-left-unsupported",
+		"set-operation/intersect-all/build-right-unsupported",
+		"set-operation/except-all/build-left-unsupported",
+		"set-operation/except-all/build-right-unsupported",
+		"set-operation/except-all/factorized-both-control",
+		"set-operation/intersect-distinct/multi-operator-second-hint-unsupported",
+		"set-operation/except-distinct/multi-operator-second-hint-unsupported",
+		"distinct/group-hash-unsupported",
+		"distinct/group-stream-unsupported",
+	} {
+		if _, ok := expectedErrorLabels[label]; !ok {
+			t.Errorf("expected query-error manifest is missing %q", label)
+		}
+	}
+
+	// These cases are still submitted to Omni and observed by planvocab, but
+	// intentionally have no retained positive or error contract. Pinning the
+	// exact set prevents a newly added case from silently landing in that gap.
+	intentionallyUnasserted := make(map[string]struct{})
+	for _, label := range []string{
+		"distinct/base-table/groupby-scan-false-control",
+		"distinct/base-table/groupby-scan-true-control",
+		"distinct/index-prefix/groupby-scan-false-control",
+		"distinct/index-prefix/groupby-scan-true-control",
+		"set-operation/except-all/default",
+		"set-operation/except-all/force-join-order",
+		"set-operation/except-all/hash-multi-pass",
+		"set-operation/except-all/hash-one-pass",
+		"set-operation/except-distinct/apply-batch-true-execution-batch",
+		"set-operation/except-distinct/apply-batch-true-execution-row",
+		"set-operation/except-distinct/default",
+		"set-operation/except-distinct/force-join-order",
+		"set-operation/except-distinct/hash-multi-pass",
+		"set-operation/except-distinct/hash-one-pass",
+		"set-operation/except-distinct/push-broadcast",
+		"set-operation/input-shape/except-all-both-duplicate",
+		"set-operation/input-shape/except-all-multi-column",
+		"set-operation/input-shape/except-all-parenthesized-right",
+		"set-operation/input-shape/except-all-reversed",
+		"set-operation/input-shape/except-all-three-input",
+		"set-operation/input-shape/except-distinct-reversed",
+		"set-operation/input-shape/except-distinct-three-input",
+		"set-operation/input-shape/intersect-all-both-duplicate",
+		"set-operation/input-shape/intersect-all-reversed",
+		"set-operation/input-shape/intersect-distinct-multi-column",
+		"set-operation/input-shape/intersect-distinct-reversed",
+		"set-operation/input-shape/mixed-parenthesized",
+		"set-operation/input-shape/union-distinct-multi-column",
+		"set-operation/input-shape/union-distinct-three-input",
+		"set-operation/intersect-all/default",
+		"set-operation/intersect-all/force-join-order",
+		"set-operation/intersect-all/hash-multi-pass",
+		"set-operation/intersect-all/hash-one-pass",
+		"set-operation/intersect-distinct/apply-batch-true-execution-batch",
+		"set-operation/intersect-distinct/apply-batch-true-execution-row",
+		"set-operation/intersect-distinct/default",
+		"set-operation/intersect-distinct/hash-multi-pass",
+		"set-operation/intersect-distinct/hash-one-pass",
+		"set-operation/intersect-distinct/push-broadcast",
+		"set-operation/intersect-distinct/three-input-default",
+		"set-operation/intersect-distinct/three-input-force-join-order",
+		"set-operation/union-all/apply-batch-false-control",
+		"set-operation/union-all/apply-batch-true-control",
+		"set-operation/union-all/default",
+		"set-operation/union-all/hash-control",
+		"set-operation/union-all/merge-control",
+		"set-operation/union-all/push-broadcast-control",
+		"set-operation/union-distinct/apply-batch-false-control",
+		"set-operation/union-distinct/apply-batch-true-control",
+		"set-operation/union-distinct/hash-control",
+		"set-operation/union-distinct/merge-control",
+		"set-operation/union-distinct/push-broadcast-control",
+	} {
+		intentionallyUnasserted[label] = struct{}{}
+	}
+	for label := range seen {
+		if _, ok := manifestLabels[label]; ok {
+			continue
+		}
+		if _, ok := expectedErrorLabels[label]; ok {
+			continue
+		}
+		if _, ok := intentionallyUnasserted[label]; !ok {
+			t.Errorf("set-operation case %q has no plan, error, or intentional-unasserted classification", label)
+		}
+		delete(intentionallyUnasserted, label)
+	}
+	for label := range intentionallyUnasserted {
+		t.Errorf("intentional-unasserted set-operation label %q is absent from the built-in cases", label)
+	}
+}
+
+func TestLoadDDLsSetOperationDistinctIncludesIndependentThreeWayInputs(t *testing.T) {
+	ddls, err := loadDDLs("set_operation_distinct", nil)
+	if err != nil {
+		t.Fatalf("loadDDLs(%q) error = %v", "set_operation_distinct", err)
+	}
+	joined := strings.Join(ddls, "\n")
+	for _, table := range []string{"SetOpR", "SetOpS", "SetOpT"} {
+		if !strings.Contains(joined, "CREATE TABLE "+table) {
+			t.Errorf("set-operation schema is missing independent table %q", table)
+		}
+	}
+}
+
+func TestLoadQueriesFactorizedModeIncludesEffectsAndEligibilityControls(t *testing.T) {
+	queries, err := loadQueries("factorized_mode", nil, nil)
+	if err != nil {
+		t.Fatalf("loadQueries(%q) error = %v", "factorized_mode", err)
+	}
+	if got, want := len(queries), 15; got != want {
+		t.Fatalf("factorized query count = %d, want %d", got, want)
+	}
+	seen := make(map[string]struct{}, len(queries))
+	for _, query := range queries {
+		if _, duplicate := seen[query.Label]; duplicate {
+			t.Errorf("duplicate factorized query label %q", query.Label)
+		}
+		seen[query.Label] = struct{}{}
+	}
+	for _, label := range []string{
+		"factorized/control/default",
+		"factorized/effect/left",
+		"factorized/effect/right",
+		"factorized/effect/both",
+		"factorized/version/v1-hash-both-effect",
+		"factorized/version/v8-hash-both-effect",
+		"factorized/version/v4-left-accepted-no-visible-effect",
+		"factorized/version/v5-left-effect",
+		"factorized/version/v4-join-key-only-both-accepted-no-visible-effect",
+		"factorized/version/v4-non-equality-both-accepted-no-visible-effect",
+		"factorized/version/v8-unsupported/join-key-only-left",
+		"factorized/version/v8-unsupported/join-key-only-right",
+		"factorized/version/v8-unsupported/join-key-only-both",
+		"factorized/version/v8-unsupported/left-outer-both",
+		"factorized/version/v8-unsupported/non-equality-both",
+	} {
+		if _, ok := seen[label]; !ok {
+			t.Errorf("factorized case is missing %q", label)
+		}
+	}
+
+	manifestBytes, err := os.ReadFile(filepath.Join("testdata", "factorized_mode_expectations.json"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	var manifest struct {
+		Version string `json:"version"`
+		Queries []struct {
+			Label    string            `json:"label"`
+			Patterns []json.RawMessage `json:"patterns"`
+		} `json:"queries"`
+		ExpectedQueryErrors []struct {
+			Label    string `json:"label"`
+			Contains string `json:"contains"`
+		} `json:"expected_query_errors"`
+	}
+	if err := json.Unmarshal(manifestBytes, &manifest); err != nil {
+		t.Fatal(err)
+	}
+	if got, want := manifest.Version, "v0alpha1"; got != want {
+		t.Errorf("factorized expectation version = %q, want %q", got, want)
+	}
+	if got, want := len(manifest.Queries), 10; got != want {
+		t.Errorf("factorized positive expectations = %d, want %d", got, want)
+	}
+	if got, want := len(manifest.ExpectedQueryErrors), 5; got != want {
+		t.Errorf("factorized error expectations = %d, want %d", got, want)
+	}
+	for _, expectation := range manifest.Queries {
+		if _, ok := seen[expectation.Label]; !ok {
+			t.Errorf("factorized expectation label %q is absent from the built-in case", expectation.Label)
+		}
+		if len(expectation.Patterns) == 0 {
+			t.Errorf("factorized expectation label %q has no operator patterns", expectation.Label)
+		}
+	}
+	for _, expectation := range manifest.ExpectedQueryErrors {
+		if _, ok := seen[expectation.Label]; !ok {
+			t.Errorf("factorized expected-error label %q is absent from the built-in case", expectation.Label)
+		}
+		if expectation.Contains == "" {
+			t.Errorf("factorized expected-error label %q has no matching text", expectation.Label)
+		}
+	}
+
+	ddls, err := loadDDLs("factorized_mode", nil)
+	if err != nil {
+		t.Fatalf("loadDDLs(%q) error = %v", "factorized_mode", err)
+	}
+	joined := strings.Join(ddls, "\n")
+	for _, table := range []string{"Albums", "Songs"} {
+		if !strings.Contains(joined, "CREATE TABLE "+table) {
+			t.Errorf("factorized schema is missing table %q", table)
+		}
+	}
+}
+
+func TestLoadQueriesGQLSurfaceIncludesBroadAcceptanceAndCapabilityControls(t *testing.T) {
+	queries, err := loadQueries("gql_surface", nil, nil)
+	if err != nil {
+		t.Fatalf("loadQueries(%q) error = %v", "gql_surface", err)
+	}
+	if got, want := len(queries), 117; got != want {
+		t.Fatalf("GQL surface query count = %d, want %d", got, want)
+	}
+	seen := make(map[string]struct{}, len(queries))
+	for _, query := range queries {
+		if !strings.HasPrefix(query.Label, "gql-surface/") {
+			t.Errorf("GQL surface label %q has wrong prefix", query.Label)
+		}
+		if _, duplicate := seen[query.Label]; duplicate {
+			t.Errorf("duplicate GQL surface query label %q", query.Label)
+		}
+		seen[query.Label] = struct{}{}
+	}
+	for _, label := range []string{
+		"gql-surface/linear/for-with-offset",
+		"gql-surface/call/optional-correlated",
+		"gql-surface/call/uncorrelated-aggregate",
+		"gql-surface/subquery/correlated-exists",
+		"gql-surface/subquery/correlated-value",
+		"gql-surface/subquery/correlated-array",
+		"gql-surface/subquery/correlated-in",
+		"gql-surface/subquery/correlated-not-in",
+		"gql-surface/subquery/exists-match-body",
+		"gql-surface/subquery/exists-pattern-body",
+		"gql-surface/subquery/exists-pattern-filter",
+		"gql-surface/bridge/dml-update-recursive-in",
+		"gql-surface/set-operation/intersect-distinct-nontrivial",
+		"gql-surface/set-operation/intersect-all-nontrivial",
+		"gql-surface/set-operation/reordered-intersect-distinct",
+		"gql-surface/set-operation/three-arm-union-all",
+		"gql-surface/set-operation/full-union-all-omni",
+		"gql-surface/search/any-cheapest-bounded",
+		"gql-surface/search/any-cheapest-property-cost",
+		"gql-surface/mode/acyclic-quantified",
+		"gql-surface/mode/acyclic-fixed",
+		"gql-surface/path/functions",
+		"gql-surface/path/recursive-materialization",
+		"gql-surface/path/construct",
+		"gql-surface/path/concatenate",
+		"gql-surface/path/quantified-subpath-where",
+		"gql-surface/path/zero-hop",
+		"gql-surface/path/two-quantified-segments",
+		"gql-surface/element/functions",
+		"gql-surface/element/predicates",
+		"gql-surface/pattern/label-or",
+		"gql-surface/pattern/label-and",
+		"gql-surface/pattern/label-and-single-control",
+		"gql-surface/direction/any",
+		"gql-surface/graph-table/tablesample-bernoulli",
+		"gql-surface/linear/tablesample-bernoulli",
+		"gql-surface/with/group-order-limit",
+		"gql-surface/with/group-filter",
+		"gql-surface/with/implicit-grouping",
+		"gql-surface/pagination/primitive-order-by-collate-limit",
+		"gql-surface/aggregate/horizontal-count-distinct",
+		"gql-surface/factorized/quantified-left",
+		"gql-surface/match/optional",
+		"gql-surface/linear/next-two-stage-traversal",
+		"gql-surface/analytic/is-first",
+		"gql-surface/unsupported/gql-row-number",
+		"gql-surface/unsupported/sql-is-first-control",
+		"gql-surface/unsupported/pagerank-requires-export",
+		"gql-surface/unsupported/gql-native-qualify",
+		"gql-surface/unsupported/sql-qualify-control",
+		"gql-surface/unsupported/any-path-count",
+		"gql-surface/unsupported/simple-path",
+		"gql-surface/unsupported/unbounded-quantifier",
+		"gql-surface/unsupported/tablesample-repeatable",
+		"gql-surface/unsupported/malformed-label-or",
+		"gql-surface/unsupported/all-cheapest",
+		"gql-surface/unsupported/pagerank-call-per-requires-export",
+		"gql-surface/unsupported/final-graph-element",
+		"gql-surface/unsupported/mixed-set-operation-kinds",
+		"gql-surface/unsupported/export-data-graph-shape",
+	} {
+		if _, ok := seen[label]; !ok {
+			t.Errorf("GQL surface case is missing %q", label)
+		}
+	}
+
+	manifestBytes, err := os.ReadFile(filepath.Join("testdata", "gql_surface_expectations.json"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	var manifest struct {
+		Version string `json:"version"`
+		Queries []struct {
+			Label    string            `json:"label"`
+			Patterns []json.RawMessage `json:"patterns"`
+		} `json:"queries"`
+		ExpectedQueryErrors []struct {
+			Label    string `json:"label"`
+			Contains string `json:"contains"`
+		} `json:"expected_query_errors"`
+	}
+	if err := json.Unmarshal(manifestBytes, &manifest); err != nil {
+		t.Fatal(err)
+	}
+	if got, want := manifest.Version, "v0alpha1"; got != want {
+		t.Errorf("GQL surface expectation version = %q, want %q", got, want)
+	}
+	if got, want := len(manifest.Queries), 94; got != want {
+		t.Errorf("GQL surface positive expectations = %d, want %d", got, want)
+	}
+	if got, want := len(manifest.ExpectedQueryErrors), 23; got != want {
+		t.Errorf("GQL surface error expectations = %d, want %d", got, want)
+	}
+	patternCount := 0
+	for _, expectation := range manifest.Queries {
+		if _, ok := seen[expectation.Label]; !ok {
+			t.Errorf("GQL surface expectation label %q is absent from the built-in case", expectation.Label)
+		}
+		if len(expectation.Patterns) == 0 {
+			t.Errorf("GQL surface expectation label %q has no operator patterns", expectation.Label)
+		}
+		patternCount += len(expectation.Patterns)
+	}
+	if got, want := patternCount, 191; got != want {
+		t.Errorf("GQL surface operator patterns = %d, want %d", got, want)
+	}
+	for _, expectation := range manifest.ExpectedQueryErrors {
+		if _, ok := seen[expectation.Label]; !ok {
+			t.Errorf("GQL surface expected-error label %q is absent from the built-in case", expectation.Label)
+		}
+		if expectation.Contains == "" {
+			t.Errorf("GQL surface expected-error label %q has no matching text", expectation.Label)
+		}
+	}
+
+	ddls, err := loadDDLs("gql_surface", nil)
+	if err != nil {
+		t.Fatalf("loadDDLs(%q) error = %v", "gql_surface", err)
+	}
+	joined := strings.Join(ddls, "\n")
+	for _, want := range []string{"CREATE TABLE Singers", "CREATE TABLE Collaborations", "PROPERTY GRAPH MusicGraph", "PROPERTY GRAPH LabelGraph"} {
+		if !strings.Contains(joined, want) {
+			t.Errorf("GQL surface schema is missing %q", want)
+		}
+	}
+}
+
+func TestLoadQueriesGQLHintSurfaceIncludesVersionBoundaries(t *testing.T) {
+	queries, err := loadQueries("gql_hint_surface", nil, nil)
+	if err != nil {
+		t.Fatalf("loadQueries(%q) error = %v", "gql_hint_surface", err)
+	}
+	if got, want := len(queries), 50; got != want {
+		t.Fatalf("GQL hint surface query count = %d, want %d", got, want)
+	}
+	seen := make(map[string]struct{}, len(queries))
+	for _, query := range queries {
+		if !strings.HasPrefix(query.Label, "gql-hint/") {
+			t.Errorf("GQL hint surface label %q has wrong prefix", query.Label)
+		}
+		if _, duplicate := seen[query.Label]; duplicate {
+			t.Errorf("duplicate GQL hint surface query label %q", query.Label)
+		}
+		seen[query.Label] = struct{}{}
+	}
+	for _, label := range []string{
+		"gql-hint/factorized/quantified-both",
+		"gql-hint/factorized/nonlinear-both",
+		"gql-hint/set-operation/direct-hint-unsupported",
+		"gql-hint/set-operation/statement-hash",
+		"gql-hint/set-operation/statement-merge",
+		"gql-hint/set-operation/statement-push",
+		"gql-hint/set-operation/arm-mixed-hash-apply",
+		"gql-hint/subquery/exists-hash-multi-pass-accepted-no-effect",
+		"gql-hint/subquery/exists-hash-one-pass-accepted-no-effect",
+		"gql-hint/element/node-force-base-table",
+		"gql-hint/element/node-force-secondary-index-seekable-key-size-1",
+		"gql-hint/element/node-force-secondary-index-scan-columnar",
+		"gql-hint/element/node-force-secondary-index-scan-no-columnar",
+		"gql-hint/element/node-index-strategy-force-index-union",
+		"gql-hint/element/node-force-secondary-index-groupby-scan-true",
+		"gql-hint/element/edge-scan-batch",
+		"gql-hint/element/traversal-hash-build-right",
+		"gql-hint/element/traversal-apply-batch-false",
+		"gql-hint/element/node-to-edge-hash-build-right",
+		"gql-hint/element/subpath-to-edge-apply-batch-false",
+		"gql-hint/element/between-path-patterns-hash",
+		"gql-hint/runtime-extension/subpath-to-node-hash",
+		"gql-hint/runtime-extension/subpath-to-subpath-hash",
+		"gql-hint/match/second-merge",
+		"gql-hint/match/second-push",
+		"gql-hint/graph-table/node-scan-batch",
+		"gql-hint/version/traversal-push",
+	} {
+		if _, ok := seen[label]; !ok {
+			t.Errorf("GQL hint surface case is missing %q", label)
+		}
+	}
+
+	manifestBytes, err := os.ReadFile(filepath.Join("testdata", "gql_hint_surface_expectations.json"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	var manifest struct {
+		Version string `json:"version"`
+		Queries []struct {
+			Label    string            `json:"label"`
+			Patterns []json.RawMessage `json:"patterns"`
+		} `json:"queries"`
+		ExpectedQueryErrors []struct {
+			Label    string `json:"label"`
+			Contains string `json:"contains"`
+		} `json:"expected_query_errors"`
+	}
+	if err := json.Unmarshal(manifestBytes, &manifest); err != nil {
+		t.Fatal(err)
+	}
+	if got, want := manifest.Version, "v0alpha1"; got != want {
+		t.Errorf("GQL hint surface expectation version = %q, want %q", got, want)
+	}
+	if got, want := len(manifest.Queries), 47; got != want {
+		t.Errorf("GQL hint surface positive expectations = %d, want %d", got, want)
+	}
+	if got, want := len(manifest.ExpectedQueryErrors), 3; got != want {
+		t.Errorf("GQL hint surface error expectations = %d, want %d", got, want)
+	}
+	patternCount := 0
+	for _, expectation := range manifest.Queries {
+		if _, ok := seen[expectation.Label]; !ok {
+			t.Errorf("GQL hint expectation label %q is absent from the built-in case", expectation.Label)
+		}
+		if len(expectation.Patterns) == 0 {
+			t.Errorf("GQL hint expectation label %q has no operator patterns", expectation.Label)
+		}
+		patternCount += len(expectation.Patterns)
+	}
+	if got, want := patternCount, 93; got != want {
+		t.Errorf("GQL hint operator patterns = %d, want %d", got, want)
+	}
+	for _, expectation := range manifest.ExpectedQueryErrors {
+		if _, ok := seen[expectation.Label]; !ok {
+			t.Errorf("GQL hint expected-error label %q is absent from the built-in case", expectation.Label)
+		}
+		if expectation.Contains == "" {
+			t.Errorf("GQL hint expected-error label %q has no matching text", expectation.Label)
+		}
+	}
+}
+
+func TestLoadQueriesGoogleSQLSurfaceIncludesPlansAndRuntimeCapabilityErrors(t *testing.T) {
+	queries, err := loadQueries("google_sql_surface", nil, nil)
+	if err != nil {
+		t.Fatalf("loadQueries(%q) error = %v", "google_sql_surface", err)
+	}
+	if got, want := len(queries), 54; got != want {
+		t.Fatalf("GoogleSQL surface query count = %d, want %d", got, want)
+	}
+	seen := make(map[string]struct{}, len(queries))
+	for _, query := range queries {
+		if !strings.HasPrefix(query.Label, "google-sql-surface/accepted/") &&
+			!strings.HasPrefix(query.Label, "google-sql-surface/unsupported/") {
+			t.Errorf("GoogleSQL surface label %q has wrong prefix", query.Label)
+		}
+		if _, duplicate := seen[query.Label]; duplicate {
+			t.Errorf("duplicate GoogleSQL surface query label %q", query.Label)
+		}
+		seen[query.Label] = struct{}{}
+	}
+
+	manifestBytes, err := os.ReadFile(filepath.Join("testdata", "google_sql_surface_expectations.json"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	var manifest struct {
+		Version string `json:"version"`
+		Queries []struct {
+			Label    string            `json:"label"`
+			Patterns []json.RawMessage `json:"patterns"`
+		} `json:"queries"`
+		ExpectedQueryErrors []struct {
+			Label    string `json:"label"`
+			Contains string `json:"contains"`
+		} `json:"expected_query_errors"`
+	}
+	if err := json.Unmarshal(manifestBytes, &manifest); err != nil {
+		t.Fatal(err)
+	}
+	if got, want := manifest.Version, "v0alpha1"; got != want {
+		t.Errorf("GoogleSQL surface expectation version = %q, want %q", got, want)
+	}
+	if got, want := len(manifest.Queries), 32; got != want {
+		t.Errorf("GoogleSQL surface positive expectations = %d, want %d", got, want)
+	}
+	if got, want := len(manifest.ExpectedQueryErrors), 22; got != want {
+		t.Errorf("GoogleSQL surface error expectations = %d, want %d", got, want)
+	}
+	patternCount := 0
+	for _, expectation := range manifest.Queries {
+		if _, ok := seen[expectation.Label]; !ok {
+			t.Errorf("GoogleSQL surface expectation label %q is absent from the built-in case", expectation.Label)
+		}
+		if len(expectation.Patterns) == 0 {
+			t.Errorf("GoogleSQL surface expectation label %q has no operator patterns", expectation.Label)
+		}
+		patternCount += len(expectation.Patterns)
+	}
+	if got, want := patternCount, 64; got != want {
+		t.Errorf("GoogleSQL surface operator patterns = %d, want %d", got, want)
+	}
+	for _, expectation := range manifest.ExpectedQueryErrors {
+		if _, ok := seen[expectation.Label]; !ok {
+			t.Errorf("GoogleSQL surface expected-error label %q is absent from the built-in case", expectation.Label)
+		}
+		if expectation.Contains == "" {
+			t.Errorf("GoogleSQL surface expected-error label %q has no matching text", expectation.Label)
+		}
+	}
+}
+
+func TestLoadQueriesGoogleSQLProtoSurface(t *testing.T) {
+	queries, err := loadQueries("google_sql_proto_surface", nil, nil)
+	if err != nil {
+		t.Fatalf("loadQueries(%q) error = %v", "google_sql_proto_surface", err)
+	}
+	if got, want := len(queries), 18; got != want {
+		t.Fatalf("GoogleSQL proto surface query count = %d, want %d", got, want)
+	}
+	seen := make(map[string]bool, len(queries))
+	accepted, unsupported := 0, 0
+	for _, query := range queries {
+		switch {
+		case strings.HasPrefix(query.Label, "google-sql-proto-surface/accepted/"):
+			accepted++
+		case strings.HasPrefix(query.Label, "google-sql-proto-surface/unsupported/"):
+			unsupported++
+		default:
+			t.Errorf("GoogleSQL proto surface label %q has wrong prefix", query.Label)
+		}
+		if seen[query.Label] {
+			t.Errorf("duplicate GoogleSQL proto surface label %q", query.Label)
+		}
+		seen[query.Label] = true
+	}
+	if got, want := len(seen), len(queries); got != want {
+		t.Fatalf("unique GoogleSQL proto surface labels = %d, want %d", got, want)
+	}
+	if accepted != 11 || unsupported != 7 {
+		t.Fatalf("GoogleSQL proto surface classes = accepted %d, unsupported %d; want 11/7", accepted, unsupported)
+	}
+
+	manifestBytes, err := os.ReadFile(filepath.Join("testdata", "google_sql_proto_surface_expectations.json"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	var manifest struct {
+		Version string `json:"version"`
+		Queries []struct {
+			Label    string            `json:"label"`
+			Patterns []json.RawMessage `json:"patterns"`
+		} `json:"queries"`
+		ExpectedQueryErrors []struct {
+			Label    string `json:"label"`
+			Contains string `json:"contains"`
+		} `json:"expected_query_errors"`
+	}
+	if err := json.Unmarshal(manifestBytes, &manifest); err != nil {
+		t.Fatal(err)
+	}
+	if got, want := manifest.Version, "v0alpha1"; got != want {
+		t.Errorf("GoogleSQL proto expectation version = %q, want %q", got, want)
+	}
+	if got, want := len(manifest.Queries), 11; got != want {
+		t.Errorf("GoogleSQL proto positive expectations = %d, want %d", got, want)
+	}
+	if got, want := len(manifest.ExpectedQueryErrors), 7; got != want {
+		t.Errorf("GoogleSQL proto error expectations = %d, want %d", got, want)
+	}
+	manifestLabels := make(map[string]struct{}, len(queries))
+	patternCount := 0
+	for _, expectation := range manifest.Queries {
+		if !seen[expectation.Label] {
+			t.Errorf("GoogleSQL proto expectation label %q is absent from the built-in case", expectation.Label)
+		}
+		if _, duplicate := manifestLabels[expectation.Label]; duplicate {
+			t.Errorf("GoogleSQL proto expectation label %q is duplicated", expectation.Label)
+		}
+		manifestLabels[expectation.Label] = struct{}{}
+		if len(expectation.Patterns) == 0 {
+			t.Errorf("GoogleSQL proto expectation label %q has no operator patterns", expectation.Label)
+		}
+		patternCount += len(expectation.Patterns)
+	}
+	if got, want := patternCount, 28; got != want {
+		t.Errorf("GoogleSQL proto operator patterns = %d, want %d", got, want)
+	}
+	for _, expectation := range manifest.ExpectedQueryErrors {
+		if !seen[expectation.Label] {
+			t.Errorf("GoogleSQL proto expected-error label %q is absent from the built-in case", expectation.Label)
+		}
+		if expectation.Contains == "" {
+			t.Errorf("GoogleSQL proto expected-error label %q has no matching text", expectation.Label)
+		}
+		if _, duplicate := manifestLabels[expectation.Label]; duplicate {
+			t.Errorf("GoogleSQL proto expected-error label %q is duplicated", expectation.Label)
+		}
+		manifestLabels[expectation.Label] = struct{}{}
+	}
+	if got, want := len(manifestLabels), len(queries); got != want {
+		t.Errorf("GoogleSQL proto expectation coverage = %d labels, want %d", got, want)
+	}
+}
+
+func TestLoadDDLsGoogleSQLProtoSurface(t *testing.T) {
+	ddls, err := loadDDLs("google_sql_proto_surface", nil)
+	if err != nil {
+		t.Fatalf("loadDDLs(%q) error = %v", "google_sql_proto_surface", err)
+	}
+	joined := strings.Join(ddls, "\n")
+	for _, want := range []string{"CREATE PROTO BUNDLE", "examples.shipping.Order", "examples.user.User", "examples.user.User.UserType", "CREATE TABLE Orders", "CREATE TABLE ProtoUsers"} {
+		if !strings.Contains(joined, want) {
+			t.Fatalf("loadDDLs(\"google_sql_proto_surface\") missing %q in:\n%s", want, joined)
+		}
+	}
+}
+
+func TestLoadQueriesConditionBoundaries(t *testing.T) {
+	queries, err := loadQueries("condition_boundaries", nil, nil)
+	if err != nil {
+		t.Fatalf("loadQueries(%q) error = %v", "condition_boundaries", err)
+	}
+	if got, want := len(queries), 36; got != want {
+		t.Fatalf("condition boundary query count = %d, want %d", got, want)
+	}
+	seen := make(map[string]struct{}, len(queries))
+	parameterized := 0
+	for _, query := range queries {
+		if !strings.HasPrefix(query.Label, "condition-boundary/scan/") &&
+			!strings.HasPrefix(query.Label, "condition-boundary/join/") {
+			t.Errorf("condition boundary label %q has wrong prefix", query.Label)
+		}
+		if _, duplicate := seen[query.Label]; duplicate {
+			t.Errorf("duplicate condition boundary label %q", query.Label)
+		}
+		seen[query.Label] = struct{}{}
+		if len(query.Params) != 0 {
+			parameterized++
+		}
+	}
+	if got, want := parameterized, 2; got != want {
+		t.Errorf("parameterized condition boundary cases = %d, want %d", got, want)
+	}
+	ddls, err := loadDDLs("condition_boundaries", nil)
+	if err != nil {
+		t.Fatalf("loadDDLs(%q) error = %v", "condition_boundaries", err)
+	}
+	joined := strings.Join(ddls, "\n")
+	for _, want := range []string{"CREATE TABLE Songs", "CREATE INDEX SongsBySongName", "CREATE TABLE Albums"} {
+		if !strings.Contains(joined, want) {
+			t.Errorf("condition boundary DDL is missing %q", want)
+		}
+	}
+
+	manifestBytes, err := os.ReadFile(filepath.Join("testdata", "condition_boundary_expectations.json"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	var manifest struct {
+		Version string `json:"version"`
+		Queries []struct {
+			Label    string            `json:"label"`
+			Patterns []json.RawMessage `json:"patterns"`
+		} `json:"queries"`
+		ExpectedQueryErrors []json.RawMessage `json:"expected_query_errors"`
+	}
+	if err := json.Unmarshal(manifestBytes, &manifest); err != nil {
+		t.Fatal(err)
+	}
+	if got, want := manifest.Version, "v0alpha1"; got != want {
+		t.Errorf("condition boundary expectation version = %q, want %q", got, want)
+	}
+	if got, want := len(manifest.Queries), len(queries); got != want {
+		t.Errorf("condition boundary positive expectations = %d, want %d", got, want)
+	}
+	if got := len(manifest.ExpectedQueryErrors); got != 0 {
+		t.Errorf("condition boundary error expectations = %d, want 0", got)
+	}
+	manifestLabels := make(map[string]struct{}, len(manifest.Queries))
+	patternCount := 0
+	for _, expectation := range manifest.Queries {
+		if _, ok := seen[expectation.Label]; !ok {
+			t.Errorf("condition boundary expectation label %q is absent from the built-in case", expectation.Label)
+		}
+		if _, duplicate := manifestLabels[expectation.Label]; duplicate {
+			t.Errorf("condition boundary expectation label %q is duplicated", expectation.Label)
+		}
+		manifestLabels[expectation.Label] = struct{}{}
+		if len(expectation.Patterns) == 0 {
+			t.Errorf("condition boundary expectation label %q has no operator patterns", expectation.Label)
+		}
+		patternCount += len(expectation.Patterns)
+	}
+	if got, want := patternCount, 60; got != want {
+		t.Errorf("condition boundary operator patterns = %d, want %d", got, want)
+	}
+}
+
+func TestLoadQueriesAggregateFunctions(t *testing.T) {
+	queries, err := loadQueries("aggregate_functions", nil, nil)
+	if err != nil {
+		t.Fatalf("loadQueries(%q) error = %v", "aggregate_functions", err)
+	}
+	if got, want := len(queries), 31; got != want {
+		t.Fatalf("aggregate function query count = %d, want %d", got, want)
+	}
+	seen := make(map[string]struct{}, len(queries))
+	for _, query := range queries {
+		if !strings.HasPrefix(query.Label, "aggregate-function/") {
+			t.Errorf("aggregate function label %q has wrong prefix", query.Label)
+		}
+		if _, duplicate := seen[query.Label]; duplicate {
+			t.Errorf("duplicate aggregate function label %q", query.Label)
+		}
+		seen[query.Label] = struct{}{}
+	}
+	for _, label := range []string{
+		"aggregate-function/general/any-value",
+		"aggregate-function/general/array-agg",
+		"aggregate-function/general/array-concat-agg",
+		"aggregate-function/general/avg",
+		"aggregate-function/general/bit-and",
+		"aggregate-function/general/bit-or",
+		"aggregate-function/general/bit-xor",
+		"aggregate-function/general/count",
+		"aggregate-function/general/countif",
+		"aggregate-function/general/logical-and",
+		"aggregate-function/general/logical-or",
+		"aggregate-function/general/max",
+		"aggregate-function/general/min",
+		"aggregate-function/statistical/stddev",
+		"aggregate-function/statistical/stddev-samp",
+		"aggregate-function/general/string-agg",
+		"aggregate-function/general/sum",
+		"aggregate-function/statistical/var-samp",
+		"aggregate-function/statistical/variance",
+	} {
+		if _, ok := seen[label]; !ok {
+			t.Errorf("documented aggregate function case %q is missing", label)
+		}
+	}
+	ddls, err := loadDDLs("aggregate_functions", nil)
+	if err != nil {
+		t.Fatalf("loadDDLs(%q) error = %v", "aggregate_functions", err)
+	}
+	if joined := strings.Join(ddls, "\n"); !strings.Contains(joined, "CREATE TABLE Songs") {
+		t.Error("aggregate function DDL is missing Songs")
+	}
+
+	manifestBytes, err := os.ReadFile(filepath.Join("testdata", "aggregate_function_expectations.json"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	var manifest struct {
+		Version string `json:"version"`
+		Queries []struct {
+			Label    string            `json:"label"`
+			Patterns []json.RawMessage `json:"patterns"`
+		} `json:"queries"`
+		ExpectedQueryErrors []struct {
+			Label    string `json:"label"`
+			Contains string `json:"contains"`
+		} `json:"expected_query_errors"`
+	}
+	if err := json.Unmarshal(manifestBytes, &manifest); err != nil {
+		t.Fatal(err)
+	}
+	if got, want := manifest.Version, "v0alpha1"; got != want {
+		t.Errorf("aggregate function expectation version = %q, want %q", got, want)
+	}
+	if got, want := len(manifest.Queries), 29; got != want {
+		t.Errorf("aggregate function positive expectations = %d, want %d", got, want)
+	}
+	if got, want := len(manifest.ExpectedQueryErrors), 2; got != want {
+		t.Errorf("aggregate function error expectations = %d, want %d", got, want)
+	}
+	manifestLabels := make(map[string]struct{}, len(queries))
+	patternCount := 0
+	for _, expectation := range manifest.Queries {
+		if _, ok := seen[expectation.Label]; !ok {
+			t.Errorf("aggregate function expectation label %q is absent from the built-in case", expectation.Label)
+		}
+		if _, duplicate := manifestLabels[expectation.Label]; duplicate {
+			t.Errorf("aggregate function expectation label %q is duplicated", expectation.Label)
+		}
+		manifestLabels[expectation.Label] = struct{}{}
+		if len(expectation.Patterns) == 0 {
+			t.Errorf("aggregate function expectation label %q has no operator patterns", expectation.Label)
+		}
+		patternCount += len(expectation.Patterns)
+	}
+	if got, want := patternCount, 62; got != want {
+		t.Errorf("aggregate function operator patterns = %d, want %d", got, want)
+	}
+	for _, expectation := range manifest.ExpectedQueryErrors {
+		if _, ok := seen[expectation.Label]; !ok {
+			t.Errorf("aggregate function error label %q is absent from the built-in case", expectation.Label)
+		}
+		if _, duplicate := manifestLabels[expectation.Label]; duplicate {
+			t.Errorf("aggregate function expectation label %q is duplicated", expectation.Label)
+		}
+		manifestLabels[expectation.Label] = struct{}{}
+		if expectation.Contains == "" {
+			t.Errorf("aggregate function error label %q has empty error text", expectation.Label)
+		}
+	}
+	if got, want := len(manifestLabels), len(queries); got != want {
+		t.Errorf("aggregate function expectation coverage = %d labels, want %d", got, want)
+	}
+}
+
+func TestLoadFileDescriptorSet(t *testing.T) {
+	const path = "../../testdata/protos/order_descriptors.pb"
+	set, err := loadFileDescriptorSet([]string{path, path})
+	if err != nil {
+		t.Fatalf("loadFileDescriptorSet() error = %v", err)
+	}
+	if set == nil {
+		t.Fatal("loadFileDescriptorSet() = nil, want descriptor set")
+	}
+	if got, want := len(set.File), 1; got != want {
+		t.Fatalf("descriptor file count = %d, want %d", got, want)
+	}
+	if got, want := set.File[0].GetName(), "order_protos.proto"; got != want {
+		t.Fatalf("descriptor file name = %q, want %q", got, want)
+	}
+
+	set, err = loadFileDescriptorSet([]string{
+		path,
+		"../../testdata/protos/complex/complex_descriptors.pb",
+	})
+	if err != nil {
+		t.Fatalf("loadFileDescriptorSet(two fixtures) error = %v", err)
+	}
+	gotNames := make([]string, 0, len(set.File))
+	for _, file := range set.File {
+		gotNames = append(gotNames, file.GetName())
+	}
+	wantNames := []string{
+		"order_protos.proto",
+		"testdata/protos/complex/order_ext.proto",
+		"testdata/protos/complex/user.proto",
+	}
+	if !slices.Equal(gotNames, wantNames) {
+		t.Fatalf("merged descriptor names = %v, want %v", gotNames, wantNames)
+	}
+	if _, err := protodesc.NewFiles(set); err != nil {
+		t.Fatalf("protodesc.NewFiles(merged descriptor set) error = %v", err)
+	}
+
+	set, err = loadFileDescriptorSet(nil)
+	if err != nil {
+		t.Fatalf("loadFileDescriptorSet(nil) error = %v", err)
+	}
+	if set != nil {
+		t.Fatalf("loadFileDescriptorSet(nil) = %v, want nil", set)
+	}
+}
+
+func TestLoadFileDescriptorSetRejectsConflictingFiles(t *testing.T) {
+	writeSet := func(name, packageName string) string {
+		t.Helper()
+		path := filepath.Join(t.TempDir(), name+".pb")
+		raw, err := proto.Marshal(&descriptorpb.FileDescriptorSet{File: []*descriptorpb.FileDescriptorProto{{
+			Name:    proto.String("shared.proto"),
+			Package: proto.String(packageName),
+		}}})
+		if err != nil {
+			t.Fatalf("proto.Marshal() error = %v", err)
+		}
+		if err := os.WriteFile(path, raw, 0o600); err != nil {
+			t.Fatalf("os.WriteFile() error = %v", err)
+		}
+		return path
+	}
+
+	_, err := loadFileDescriptorSet([]string{
+		writeSet("first", "example.first"),
+		writeSet("second", "example.second"),
+	})
+	if err == nil || !strings.Contains(err.Error(), "conflicting proto descriptor") {
+		t.Fatalf("loadFileDescriptorSet() error = %v, want conflicting descriptor error", err)
 	}
 }
 
@@ -589,12 +1538,14 @@ func TestLoadDDLsFullTextSearchUsesDedicatedSchema(t *testing.T) {
 		"CREATE SEARCH INDEX SearchAlbumsTitleSubstringIndex",
 		"CREATE SEARCH INDEX SearchAlbumsTitleRatingIndex",
 		"CREATE SEARCH INDEX SearchAlbumsMixedIndex",
+		"CREATE SEARCH INDEX SearchSingersByBio",
+		"CREATE PROPERTY GRAPH SearchMusicGraph",
 	} {
 		if !strings.Contains(joined, want) {
 			t.Fatalf("loadDDLs(\"full_text_search\") missing %q in:\n%s", want, joined)
 		}
 	}
-	if strings.Contains(joined, "MusicGraph") || strings.Contains(joined, "CREATE TABLE Singers") {
+	if strings.Contains(joined, "CREATE PROPERTY GRAPH MusicGraph") || strings.Contains(joined, "CREATE TABLE Singers") {
 		t.Fatalf("full_text_search schema unexpectedly includes docs schema objects:\n%s", joined)
 	}
 }
@@ -633,12 +1584,14 @@ func TestLoadDDLsVectorSearchUsesDedicatedSchema(t *testing.T) {
 		"ON VectorDocuments(Embedding, TenantId)",
 		"CREATE VECTOR INDEX TechVectorDocumentsByEmbedding",
 		"WHERE TechOnly IS NOT NULL",
+		"CREATE TABLE VectorRelated",
+		"CREATE PROPERTY GRAPH VectorGraph",
 	} {
 		if !strings.Contains(joined, want) {
 			t.Fatalf("loadDDLs(\"vector_search\") missing %q in:\n%s", want, joined)
 		}
 	}
-	if strings.Contains(joined, "MusicGraph") || strings.Contains(joined, "CREATE TABLE Singers") {
+	if strings.Contains(joined, "CREATE PROPERTY GRAPH MusicGraph") || strings.Contains(joined, "CREATE TABLE Singers") {
 		t.Fatalf("vector_search schema unexpectedly includes docs schema objects:\n%s", joined)
 	}
 }
@@ -794,6 +1747,7 @@ func TestLoadQueriesFullTextSearch(t *testing.T) {
 		"full-text-search/mixed-accelerated",
 		"full-text-search/mixed-stored-filter",
 		"full-text-search/mixed-back-join",
+		"full-text-search/gql-search-traversal",
 	} {
 		if seen[label] == "" {
 			t.Fatalf("loadQueries(\"full_text_search\") missing %s", label)
@@ -807,6 +1761,9 @@ func TestLoadQueriesFullTextSearch(t *testing.T) {
 	}
 	if !strings.Contains(seen["full-text-search/numeric-array-any"], "ARRAY_INCLUDES_ANY") {
 		t.Fatalf("numeric array query missing ARRAY_INCLUDES_ANY(): %s", seen["full-text-search/numeric-array-any"])
+	}
+	if !strings.Contains(seen["full-text-search/gql-search-traversal"], "GRAPH SearchMusicGraph") {
+		t.Fatalf("GQL search traversal probe missing graph query: %s", seen["full-text-search/gql-search-traversal"])
 	}
 }
 
@@ -860,6 +1817,7 @@ func TestLoadQueriesVectorSearch(t *testing.T) {
 		"vector-search/ann-stored-filter",
 		"vector-search/ann-back-join",
 		"vector-search/ann-filtered-index",
+		"vector-search/ann-gql-next-traversal",
 	} {
 		if seen[label] == "" {
 			t.Fatalf("loadQueries(\"vector_search\") missing %s", label)
@@ -873,6 +1831,53 @@ func TestLoadQueriesVectorSearch(t *testing.T) {
 	}
 	if !strings.Contains(seen["vector-search/ann-back-join"], "Body") {
 		t.Fatalf("back-join probe missing non-stored Body projection: %s", seen["vector-search/ann-back-join"])
+	}
+	if !strings.Contains(seen["vector-search/ann-gql-next-traversal"], "NEXT") {
+		t.Fatalf("ANN GQL traversal probe missing NEXT: %s", seen["vector-search/ann-gql-next-traversal"])
+	}
+}
+
+func TestSearchGraphExpectationManifestMatchesBuiltInCases(t *testing.T) {
+	manifestBytes, err := os.ReadFile(filepath.Join("testdata", "search_graph_expectations.json"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	var manifest struct {
+		Version string `json:"version"`
+		Queries []struct {
+			Label    string            `json:"label"`
+			Patterns []json.RawMessage `json:"patterns"`
+		} `json:"queries"`
+		ExpectedQueryErrors []json.RawMessage `json:"expected_query_errors"`
+	}
+	if err := json.Unmarshal(manifestBytes, &manifest); err != nil {
+		t.Fatal(err)
+	}
+	if got, want := manifest.Version, "v0alpha1"; got != want {
+		t.Errorf("search graph expectation version = %q, want %q", got, want)
+	}
+	if got, want := len(manifest.Queries), 2; got != want {
+		t.Fatalf("search graph positive expectations = %d, want %d", got, want)
+	}
+	if got := len(manifest.ExpectedQueryErrors); got != 0 {
+		t.Errorf("search graph error expectations = %d, want 0", got)
+	}
+	patternCount := 0
+	seen := make(map[string]struct{}, len(fullTextSearchQueries)+len(vectorSearchQueries))
+	for _, query := range append(append([]queryCase(nil), fullTextSearchQueries...), vectorSearchQueries...) {
+		seen[query.Label] = struct{}{}
+	}
+	for _, expectation := range manifest.Queries {
+		if _, ok := seen[expectation.Label]; !ok {
+			t.Errorf("search graph expectation label %q is absent from the built-in cases", expectation.Label)
+		}
+		if len(expectation.Patterns) == 0 {
+			t.Errorf("search graph expectation label %q has no operator patterns", expectation.Label)
+		}
+		patternCount += len(expectation.Patterns)
+	}
+	if got, want := patternCount, 7; got != want {
+		t.Errorf("search graph operator patterns = %d, want %d", got, want)
 	}
 }
 
@@ -969,8 +1974,9 @@ func TestLoadDDLsTVFIncludesChangeStream(t *testing.T) {
 }
 
 func TestExpandOptimizerVersionMatrixUsesStatementHints(t *testing.T) {
+	params := map[string]interface{}{"prefix": "A"}
 	got := expandOptimizerVersionMatrix([]queryCase{
-		{Label: "plain", SQL: "SELECT 1"},
+		{Label: "plain", SQL: "SELECT 1", Params: params},
 		{Label: "hinted", SQL: "@{JOIN_METHOD=APPLY_JOIN, OPTIMIZER_VERSION=5} SELECT 1"},
 	})
 	if gotLen, wantLen := len(got), 16; gotLen != wantLen {
@@ -981,6 +1987,9 @@ func TestExpandOptimizerVersionMatrixUsesStatementHints(t *testing.T) {
 	}
 	if gotSQL, wantSQL := got[0].SQL, "@{OPTIMIZER_VERSION=1}\nSELECT 1"; gotSQL != wantSQL {
 		t.Fatalf("first SQL = %q, want %q", gotSQL, wantSQL)
+	}
+	if gotParam, wantParam := got[0].Params["prefix"], "A"; gotParam != wantParam {
+		t.Fatalf("first params[prefix] = %v, want %v", gotParam, wantParam)
 	}
 	if gotLabel, wantLabel := got[15].Label, "optimizer-version/v8/hinted"; gotLabel != wantLabel {
 		t.Fatalf("last label = %q, want %q", gotLabel, wantLabel)
@@ -1027,8 +2036,9 @@ func TestLoadQueriesStatementHintQueryMatrix(t *testing.T) {
 }
 
 func TestExpandAllowDistributedMergeMatrixUsesStatementHints(t *testing.T) {
+	params := map[string]interface{}{"prefix": "A"}
 	got := expandAllowDistributedMergeMatrix([]queryCase{
-		{Label: "plain", SQL: "SELECT 1"},
+		{Label: "plain", SQL: "SELECT 1", Params: params},
 		{Label: "hinted", SQL: "@{JOIN_METHOD=APPLY_JOIN, ALLOW_DISTRIBUTED_MERGE=TRUE} SELECT 1"},
 	})
 	if gotLen, wantLen := len(got), 6; gotLen != wantLen {
@@ -1039,6 +2049,9 @@ func TestExpandAllowDistributedMergeMatrixUsesStatementHints(t *testing.T) {
 	}
 	if gotSQL, wantSQL := got[0].SQL, "SELECT 1"; gotSQL != wantSQL {
 		t.Fatalf("first SQL = %q, want %q", gotSQL, wantSQL)
+	}
+	if gotParam, wantParam := got[0].Params["prefix"], "A"; gotParam != wantParam {
+		t.Fatalf("first params[prefix] = %v, want %v", gotParam, wantParam)
 	}
 	if gotLabel, wantLabel := got[2].Label, "allow-distributed-merge/false/plain"; gotLabel != wantLabel {
 		t.Fatalf("third label = %q, want %q", gotLabel, wantLabel)

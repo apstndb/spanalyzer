@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -162,5 +163,103 @@ func TestRunReportsMissingExpectationLabelWithoutValues(t *testing.T) {
 	}
 	if got := output.String(); strings.Contains(got, `"pattern"`) || !strings.Contains(got, `"reason": "query label was not present in the input"`) {
 		t.Fatalf("run(json) output = %q, want label-level failure without a pattern ordinal", got)
+	}
+}
+
+func TestRunChecksExpectedQueryErrors(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name       string
+		input      string
+		label      string
+		contains   string
+		wantErr    string
+		wantOutput string
+	}{
+		{
+			name:       "matching error",
+			input:      `[{"query_label":"unsupported","error":"Unsupported hint: GROUP_METHOD"}]`,
+			label:      "unsupported",
+			contains:   "Unsupported hint: GROUP_METHOD",
+			wantOutput: `"expected": true`,
+		},
+		{
+			name:     "different error",
+			input:    `[{"query_label":"unsupported","error":"some other backend failure"}]`,
+			label:    "unsupported",
+			contains: "Unsupported hint: GROUP_METHOD",
+			wantErr:  "1 expectation failure",
+		},
+		{
+			name:     "unexpected error",
+			input:    `[{"query_label":"other","error":"unexpected backend failure"}]`,
+			label:    "unsupported",
+			contains: "Unsupported hint: GROUP_METHOD",
+			wantErr:  "2 expectation failure",
+		},
+		{
+			name:     "plan instead of error",
+			input:    `[{"query_label":"unsupported","plan":{"planNodes":[{"index":1,"displayName":"Scan"}]}}]`,
+			label:    "unsupported",
+			contains: "Unsupported hint: GROUP_METHOD",
+			wantErr:  "1 expectation failure",
+		},
+		{
+			name:     "missing label",
+			input:    `[{"query_label":"other","plan":{"planNodes":[{"index":1,"displayName":"Scan"}]}}]`,
+			label:    "unsupported",
+			contains: "Unsupported hint: GROUP_METHOD",
+			wantErr:  "1 expectation failure",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			manifest := fmt.Sprintf(
+				`{"version":"v0alpha1","queries":[],"expected_query_errors":[{"label":%q,"contains":%q}]}`,
+				tt.label,
+				tt.contains,
+			)
+			path := filepath.Join(t.TempDir(), "expectations.json")
+			if err := os.WriteFile(path, []byte(manifest), 0o600); err != nil {
+				t.Fatal(err)
+			}
+
+			var output bytes.Buffer
+			err := run(
+				[]string{"--expect", path, "--allow-query-errors", "--format", "json"},
+				strings.NewReader(tt.input),
+				&output,
+			)
+			if tt.wantErr == "" {
+				if err != nil {
+					t.Fatalf("run() error = %v\n%s", err, output.String())
+				}
+			} else if err == nil || !strings.Contains(err.Error(), tt.wantErr) {
+				t.Fatalf("run() error = %v, want %q\n%s", err, tt.wantErr, output.String())
+			}
+			if tt.wantOutput != "" && !strings.Contains(output.String(), tt.wantOutput) {
+				t.Fatalf("run() output = %q, want substring %q", output.String(), tt.wantOutput)
+			}
+			if strings.Contains(output.String(), "backend failure") {
+				t.Fatalf("run() output exposed source error: %q", output.String())
+			}
+		})
+	}
+}
+
+func TestReadExpectationsRejectsEmptyDocument(t *testing.T) {
+	t.Parallel()
+
+	path := filepath.Join(t.TempDir(), "expectations.json")
+	if err := os.WriteFile(path, []byte(`{"version":"v0alpha1","queries":[]}`), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	_, err := readExpectations(path)
+	if err == nil || !strings.Contains(err.Error(), "requires at least one") {
+		t.Fatalf("readExpectations() error = %v, want non-empty manifest error", err)
 	}
 }

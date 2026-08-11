@@ -6,18 +6,54 @@
     "path": "content/ja/operators.md",
     "blob": "270939a859cc32ad4cfa76bed002dec9181ef6f7",
     "local_evidence": [
-      "research/spanner-query-plan-shape/COMPACT_TREE_METADATA_OBSERVATIONS.md",
-      "research/spanner-query-plan-shape/HINT_POSITION_AUDIT_2026-08-04.md",
-      "research/spanner-query-plan-shape/SET_OPERATION_DISTINCT_HINTS_2026-08-04.md",
-      "research/spanner-query-plan-shape/QUERY_EXECUTION_OPERATORS_OBSERVATIONS.md",
-      "research/spanner-query-plan-shape/PLANVOCAB_INFERENCE_OBSERVATIONS.md",
       "plancontract/normalize.go",
+      "research/spanner-query-plan-shape/AGGREGATE_FUNCTION_AGG_TYPE_OBSERVATIONS_2026-08-11.md",
+      "research/spanner-query-plan-shape/COMPACT_TREE_METADATA_OBSERVATIONS.md",
+      "research/spanner-query-plan-shape/CONDITION_BOUNDARY_OBSERVATIONS_2026-08-11.md",
+      "research/spanner-query-plan-shape/FACTORIZED_MODE_OBSERVATIONS_2026-08-11.md",
+      "research/spanner-query-plan-shape/GOOGLESQL_SURFACE_CAPABILITY_OBSERVATIONS_2026-08-11.md",
+      "research/spanner-query-plan-shape/GQL_HINT_VERSION_OBSERVATIONS_2026-08-11.md",
+      "research/spanner-query-plan-shape/GQL_SURFACE_OBSERVATIONS_2026-08-11.md",
+      "research/spanner-query-plan-shape/HINT_POSITION_AUDIT_2026-08-04.md",
+      "research/spanner-query-plan-shape/PLANVOCAB_INFERENCE_OBSERVATIONS.md",
+      "research/spanner-query-plan-shape/QUERY_EXECUTION_OPERATORS_OBSERVATIONS.md",
+      "research/spanner-query-plan-shape/SET_OPERATION_DISTINCT_HINTS_2026-08-04.md",
+      "testdata/protos/complex/complex_descriptors.pb",
+      "testdata/protos/complex/order_ext.proto",
+      "testdata/protos/complex/user.proto",
+      "testdata/protos/order_descriptors.pb",
+      "testdata/protos/order_protos.proto",
+      "tools/spanner-query-plan-shape/aggregate_function_cases.go",
+      "tools/spanner-query-plan-shape/aggregate_function_omni_test.go",
+      "tools/spanner-query-plan-shape/condition_boundary_cases.go",
+      "tools/spanner-query-plan-shape/condition_boundary_omni_test.go",
+      "tools/spanner-query-plan-shape/docs_cases.go",
+      "tools/spanner-query-plan-shape/factorized_mode_cases.go",
+      "tools/spanner-query-plan-shape/full_text_search_cases.go",
+      "tools/spanner-query-plan-shape/google_sql_proto_surface_cases.go",
+      "tools/spanner-query-plan-shape/google_sql_surface_cases.go",
+      "tools/spanner-query-plan-shape/google_sql_surface_omni_test.go",
+      "tools/spanner-query-plan-shape/gql_hint_surface_cases.go",
+      "tools/spanner-query-plan-shape/gql_hint_surface_omni_test.go",
+      "tools/spanner-query-plan-shape/gql_surface_cases.go",
+      "tools/spanner-query-plan-shape/gql_surface_omni_test.go",
       "tools/spanner-query-plan-shape/hint_position_combination_cases.go",
       "tools/spanner-query-plan-shape/planvocab_cases.go",
+      "tools/spanner-query-plan-shape/search_graph_omni_test.go",
       "tools/spanner-query-plan-shape/set_operation_distinct_cases.go",
+      "tools/spanner-query-plan-shape/set_operation_equivalence_omni_test.go",
+      "tools/spanner-query-plan-shape/testdata/aggregate_function_expectations.json",
+      "tools/spanner-query-plan-shape/testdata/condition_boundary_expectations.json",
+      "tools/spanner-query-plan-shape/testdata/factorized_mode_expectations.json",
+      "tools/spanner-query-plan-shape/testdata/google_sql_proto_surface_expectations.json",
+      "tools/spanner-query-plan-shape/testdata/google_sql_surface_expectations.json",
+      "tools/spanner-query-plan-shape/testdata/gql_hint_surface_expectations.json",
+      "tools/spanner-query-plan-shape/testdata/gql_surface_expectations.json",
       "tools/spanner-query-plan-shape/testdata/hint_position_combination_expectations.json",
       "tools/spanner-query-plan-shape/testdata/planvocab_inference_expectations.json",
-      "tools/spanner-query-plan-shape/testdata/set_operation_distinct_expectations.json"
+      "tools/spanner-query-plan-shape/testdata/search_graph_expectations.json",
+      "tools/spanner-query-plan-shape/testdata/set_operation_distinct_expectations.json",
+      "tools/spanner-query-plan-shape/vector_search_cases.go"
     ],
     "compatibility": "Observational v0alpha vocabulary; not a stable Spanner wire contract. Missing metadata is allowed, link multiplicity is checked only where declared, and identifier values are wildcarded."
   },
@@ -28,7 +64,10 @@
     {
       "names": ["Distributed Anti Semi Apply"],
       "kind": "RELATIONAL",
-      "metadata": [{"key": "subquery_cluster_node"}],
+      "metadata": [
+        {"key": "order_preserving", "values": ["true"]},
+        {"key": "subquery_cluster_node"}
+      ],
       "child_links": [
         {"kind": "RELATIONAL", "type": "", "variable": "absent"},
         {"kind": "RELATIONAL", "type": "Map", "variable": "absent"},
@@ -69,7 +108,10 @@
     {
       "names": ["Distributed Semi Apply"],
       "kind": "RELATIONAL",
-      "metadata": [{"key": "subquery_cluster_node"}],
+      "metadata": [
+        {"key": "order_preserving", "values": ["true"]},
+        {"key": "subquery_cluster_node"}
+      ],
       "child_links": [
         {"kind": "RELATIONAL", "type": "", "variable": "absent"},
         {"kind": "RELATIONAL", "type": "Map", "variable": "absent"},
@@ -113,6 +155,7 @@
       "kind": "RELATIONAL",
       "metadata": [
         {"key": "distribution_table"},
+        {"key": "order_preserving", "values": ["true"]},
         {"key": "subquery_cluster_node"}
       ],
       "child_links": [
@@ -164,12 +207,22 @@
       ]
     },
     {
+      "names": ["Crowd"],
+      "kind": "RELATIONAL",
+      "metadata": [],
+      "child_links": [
+        {"kind": "RELATIONAL", "type": "", "variable": "absent"},
+        {"kind": "SCALAR", "type": "", "variable": "absent", "multiple": true},
+        {"kind": "SCALAR", "type": "", "variable": "present"}
+      ]
+    },
+    {
       "names": ["Scan", "Table Scan", "Index Scan"],
       "kind": "RELATIONAL",
       "metadata": [
         {"key": "Full scan", "values": ["true"]},
         {"key": "scan_target"},
-        {"key": "scan_type", "values": ["IndexScan", "TableScan", "SearchIndexScan", "BatchScan", "FilterScan", "SpoolScan", "VectorIndexRootScan", "VectorIndexLeafScan"]},
+        {"key": "scan_type", "values": ["IndexScan", "TableScan", "SearchIndexScan", "BatchScan", "FilterScan", "SpoolScan", "VectorIndexMetadataScan", "VectorIndexRootScan", "VectorIndexLeafScan"]},
         {"key": "scan_method", "values": ["Automatic", "Row", "Batch"]},
         {"key": "scan_format", "values": ["Row", "Columnar"]}
       ],
@@ -189,7 +242,8 @@
         {"kind": "RELATIONAL", "type": "", "variable": "absent"},
         {"kind": "SCALAR", "type": "Seek Condition", "variable": "absent"},
         {"kind": "SCALAR", "type": "Residual Condition", "variable": "absent"},
-        {"kind": "SCALAR", "type": "Timestamp Condition", "variable": "absent"}
+        {"kind": "SCALAR", "type": "Timestamp Condition", "variable": "absent"},
+        {"kind": "SCALAR", "type": "Scalar", "variable": "absent"}
       ]
     },
     {
@@ -256,7 +310,8 @@
       "metadata": [],
       "child_links": [
         {"kind": "RELATIONAL", "type": "", "variable": "absent"},
-        {"kind": "SCALAR", "type": "", "variable": "present", "multiple": true}
+        {"kind": "SCALAR", "type": "", "variable": "present", "multiple": true},
+        {"kind": "SCALAR", "type": "Scalar", "variable": "absent", "multiple": true}
       ]
     },
     {
@@ -293,7 +348,8 @@
       "metadata": [],
       "child_links": [
         {"kind": "RELATIONAL", "type": "", "variable": "absent"},
-        {"kind": "SCALAR", "type": "Condition", "variable": "absent"}
+        {"kind": "SCALAR", "type": "Condition", "variable": "absent"},
+        {"kind": "SCALAR", "type": "Scalar", "variable": "absent"}
       ]
     },
     {
@@ -484,8 +540,9 @@
         {"kind": "RELATIONAL", "type": "Left", "variable": "absent"},
         {"kind": "RELATIONAL", "type": "Right", "variable": "absent"},
         {"kind": "SCALAR", "type": "Condition", "variable": "absent"},
+        {"kind": "SCALAR", "type": "Residual Condition", "variable": "absent"},
         {"kind": "SCALAR", "type": "Left", "variable": "present", "multiple": false},
-        {"kind": "SCALAR", "type": "Right", "variable": "present", "multiple": false}
+        {"kind": "SCALAR", "type": "Right", "variable": "present", "multiple": true}
       ]
     },
     {
@@ -535,6 +592,14 @@
     },
     {
       "names": ["Array Constructor", "Function", "Struct Constructor"],
+      "kind": "SCALAR",
+      "metadata": [],
+      "child_links": [
+        {"kind": "SCALAR", "type": "", "variable": "absent", "multiple": true}
+      ]
+    },
+    {
+      "names": ["Proto Constructor"],
       "kind": "SCALAR",
       "metadata": [],
       "child_links": [

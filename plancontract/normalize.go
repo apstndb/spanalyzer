@@ -363,6 +363,8 @@ func OperatorFamily(node *spannerpb.PlanNode) string {
 		return "compute_struct"
 	case "create batch":
 		return "create_batch"
+	case "crowd":
+		return "crowd"
 	case "datablocktorow", "datablocktorowadapter":
 		return "data_block_to_row"
 	case "empty relation":
@@ -629,6 +631,8 @@ func OperatorMetadataString(node *spannerpb.PlanNode, key string) string {
 			return "batch_scan"
 		case "searchindexscan":
 			return "search_index_scan"
+		case "vectorindexmetadatascan":
+			return "vector_index_metadata_scan"
 		case "vectorindexrootscan":
 			return "vector_index_root_scan"
 		case "vectorindexleafscan":

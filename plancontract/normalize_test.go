@@ -367,6 +367,7 @@ func TestOperatorFamilyDocumentedCoverage(t *testing.T) {
 		want        string
 	}{
 		{name: "generate relation", displayName: "Generate Relation", want: "generate_relation"},
+		{name: "GQL IS_FIRST crowd", displayName: "Crowd", want: "crowd"},
 		{name: "local split union", displayName: "Local Split Union", want: "local_split_union"},
 		{name: "generic tvf", displayName: "TVF", metadata: map[string]any{"Name": "ML.PREDICT"}, want: "tvf"},
 		{name: "search query conversion tvf stays specialized", displayName: "TVF", metadata: map[string]any{"Name": "Search Query Conversion"}, want: "search_query_conversion_tvf"},
@@ -375,6 +376,12 @@ func TestOperatorFamilyDocumentedCoverage(t *testing.T) {
 		{name: "scan with filter scan metadata", displayName: "Scan", metadata: map[string]any{"scan_type": "FilterScan"}, want: "filter_scan"},
 		{name: "historical unspaced filter scan", displayName: "FilterScan", want: "filter_scan"},
 		{name: "ordinary scan remains scan", displayName: "Scan", metadata: map[string]any{"scan_type": "TableScan"}, want: "scan"},
+		{
+			name:        "vector index metadata scan remains scan",
+			displayName: "Scan",
+			metadata:    map[string]any{"scan_type": "VectorIndexMetadataScan"},
+			want:        "scan",
+		},
 		{
 			name:        "vector index root scan remains scan",
 			displayName: "Scan",
@@ -409,8 +416,9 @@ func TestVectorIndexScanTypeMetadataNormalized(t *testing.T) {
 	t.Parallel()
 
 	for raw, want := range map[string]string{
-		"VectorIndexRootScan": "vector_index_root_scan",
-		"VectorIndexLeafScan": "vector_index_leaf_scan",
+		"VectorIndexMetadataScan": "vector_index_metadata_scan",
+		"VectorIndexRootScan":     "vector_index_root_scan",
+		"VectorIndexLeafScan":     "vector_index_leaf_scan",
 	} {
 		t.Run(raw, func(t *testing.T) {
 			t.Parallel()

@@ -31,6 +31,218 @@ CREATE TABLE Singers (
 	assertField(t, rowType.Fields[2], "Active", spannerpb.TypeCode_BOOL)
 }
 
+func TestAnalyzerRowTypeForDistinctPredicates(t *testing.T) {
+	tests := []struct {
+		name string
+		sql  string
+		want string
+	}{
+		{
+			name: "not distinct",
+			sql:  "SELECT NULL IS NOT DISTINCT FROM NULL AS not_distinct",
+			want: "not_distinct",
+		},
+		{
+			name: "distinct",
+			sql:  "SELECT NULL IS DISTINCT FROM NULL AS distinct_value",
+			want: "distinct_value",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			analyzer, err := NewAnalyzerFromDDL("schema.sql", "")
+			if err != nil {
+				t.Fatalf("NewAnalyzerFromDDL() error = %v", err)
+			}
+			rowType, err := analyzer.RowTypeForStatement(tt.sql)
+			if err != nil {
+				t.Fatalf("RowTypeForStatement() error = %v", err)
+			}
+			if got, want := len(rowType.Fields), 1; got != want {
+				t.Fatalf("len(rowType.Fields) = %d, want %d", got, want)
+			}
+			assertField(t, rowType.Fields[0], tt.want, spannerpb.TypeCode_BOOL)
+		})
+	}
+}
+
+func TestAnalyzerRowTypeForBroaderGoogleSQLGrammarSurface(t *testing.T) {
+	const ddl = `
+CREATE TABLE Singers (
+  SingerId INT64 NOT NULL,
+  FirstName STRING(MAX),
+) PRIMARY KEY (SingerId);
+
+CREATE TABLE Albums (
+  SingerId INT64 NOT NULL,
+  AlbumId INT64 NOT NULL,
+  AlbumTitle STRING(MAX),
+) PRIMARY KEY (SingerId, AlbumId);
+
+CREATE TABLE Concerts (
+  VenueId INT64 NOT NULL,
+  TicketPrices ARRAY<INT64>,
+) PRIMARY KEY (VenueId);
+`
+	tests := []struct {
+		name       string
+		sql        string
+		wantFields []struct {
+			name string
+			code spannerpb.TypeCode
+		}
+	}{
+		{
+			name: "explicit correlated unnest",
+			sql:  `SELECT c.VenueId, price FROM Concerts AS c CROSS JOIN UNNEST(c.TicketPrices) AS price`,
+			wantFields: []struct {
+				name string
+				code spannerpb.TypeCode
+			}{{"VenueId", spannerpb.TypeCode_INT64}, {"price", spannerpb.TypeCode_INT64}},
+		},
+		{
+			name: "implicit correlated unnest",
+			sql:  `SELECT c.VenueId, price FROM Concerts AS c, c.TicketPrices AS price`,
+			wantFields: []struct {
+				name string
+				code spannerpb.TypeCode
+			}{{"VenueId", spannerpb.TypeCode_INT64}, {"price", spannerpb.TypeCode_INT64}},
+		},
+		{
+			name: "left correlated unnest",
+			sql:  `SELECT c.VenueId, price FROM Concerts AS c LEFT JOIN UNNEST(c.TicketPrices) AS price ON TRUE`,
+			wantFields: []struct {
+				name string
+				code spannerpb.TypeCode
+			}{{"VenueId", spannerpb.TypeCode_INT64}, {"price", spannerpb.TypeCode_INT64}},
+		},
+		{
+			name: "in unnested array subquery",
+			sql:  `SELECT SingerId FROM Singers WHERE SingerId IN UNNEST(ARRAY(SELECT SingerId FROM Albums))`,
+			wantFields: []struct {
+				name string
+				code spannerpb.TypeCode
+			}{{"SingerId", spannerpb.TypeCode_INT64}},
+		},
+		{
+			name: "group by ordinal",
+			sql:  `SELECT SingerId, COUNT(*) AS album_count FROM Albums GROUP BY 1`,
+			wantFields: []struct {
+				name string
+				code spannerpb.TypeCode
+			}{{"SingerId", spannerpb.TypeCode_INT64}, {"album_count", spannerpb.TypeCode_INT64}},
+		},
+		{
+			name: "aggregate having min",
+			sql:  `SELECT SingerId, ANY_VALUE(AlbumTitle HAVING MIN AlbumId) AS earliest_title FROM Albums GROUP BY SingerId`,
+			wantFields: []struct {
+				name string
+				code spannerpb.TypeCode
+			}{{"SingerId", spannerpb.TypeCode_INT64}, {"earliest_title", spannerpb.TypeCode_STRING}},
+		},
+		{
+			name: "tablesample on subquery",
+			sql:  `SELECT SingerId FROM (SELECT SingerId FROM Singers WHERE SingerId > 0) TABLESAMPLE BERNOULLI (50 PERCENT)`,
+			wantFields: []struct {
+				name string
+				code spannerpb.TypeCode
+			}{{"SingerId", spannerpb.TypeCode_INT64}},
+		},
+		{
+			name: "struct expression star",
+			sql:  `SELECT row_value.* FROM (SELECT STRUCT(1 AS x, "a" AS y) AS row_value)`,
+			wantFields: []struct {
+				name string
+				code spannerpb.TypeCode
+			}{{"x", spannerpb.TypeCode_INT64}, {"y", spannerpb.TypeCode_STRING}},
+		},
+		{
+			name: "unnest array of struct",
+			sql:  `SELECT * FROM UNNEST(ARRAY<STRUCT<x INT64, y STRING>>[(1, "a"), (2, "b")])`,
+			wantFields: []struct {
+				name string
+				code spannerpb.TypeCode
+			}{{"x", spannerpb.TypeCode_INT64}, {"y", spannerpb.TypeCode_STRING}},
+		},
+		{
+			name: "set operation regular first",
+			sql:  `SELECT SingerId FROM Singers UNION ALL SELECT AS VALUE SingerId FROM Albums`,
+			wantFields: []struct {
+				name string
+				code spannerpb.TypeCode
+			}{{"SingerId", spannerpb.TypeCode_INT64}},
+		},
+		{
+			name: "set operation value first",
+			sql:  `SELECT AS VALUE SingerId FROM Singers UNION ALL SELECT SingerId FROM Albums`,
+			wantFields: []struct {
+				name string
+				code spannerpb.TypeCode
+			}{{"$value_column", spannerpb.TypeCode_INT64}},
+		},
+		{
+			name: "lateral",
+			sql:  `SELECT s.SingerId, a.AlbumId FROM Singers AS s CROSS JOIN LATERAL (SELECT AlbumId FROM Albums WHERE Albums.SingerId = s.SingerId) AS a`,
+			wantFields: []struct {
+				name string
+				code spannerpb.TypeCode
+			}{{"SingerId", spannerpb.TypeCode_INT64}, {"AlbumId", spannerpb.TypeCode_INT64}},
+		},
+		{
+			name: "set operation by name",
+			sql:  `SELECT SingerId AS id, FirstName AS name FROM Singers UNION ALL BY NAME SELECT AlbumId AS id, AlbumTitle AS name FROM Albums`,
+			wantFields: []struct {
+				name string
+				code spannerpb.TypeCode
+			}{{"id", spannerpb.TypeCode_INT64}, {"name", spannerpb.TypeCode_STRING}},
+		},
+		{
+			name: "set operation corresponding",
+			sql:  `SELECT SingerId AS id, FirstName AS name FROM Singers UNION ALL CORRESPONDING SELECT AlbumId AS id, AlbumTitle AS name FROM Albums`,
+			wantFields: []struct {
+				name string
+				code spannerpb.TypeCode
+			}{{"id", spannerpb.TypeCode_INT64}, {"name", spannerpb.TypeCode_STRING}},
+		},
+		{
+			name: "group by all",
+			sql:  `SELECT SingerId, COUNT(*) AS album_count FROM Albums GROUP BY ALL`,
+			wantFields: []struct {
+				name string
+				code spannerpb.TypeCode
+			}{{"SingerId", spannerpb.TypeCode_INT64}, {"album_count", spannerpb.TypeCode_INT64}},
+		},
+		{
+			name: "match recognize",
+			sql:  `SELECT * FROM Albums MATCH_RECOGNIZE (PARTITION BY SingerId ORDER BY AlbumId MEASURES MATCH_NUMBER() AS match_num PATTERN (A) DEFINE A AS TRUE)`,
+			wantFields: []struct {
+				name string
+				code spannerpb.TypeCode
+			}{{"SingerId", spannerpb.TypeCode_INT64}, {"match_num", spannerpb.TypeCode_INT64}},
+		},
+	}
+
+	analyzer, err := NewAnalyzerFromDDL("schema.sql", ddl)
+	if err != nil {
+		t.Fatalf("NewAnalyzerFromDDL() error = %v", err)
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			rowType, err := analyzer.RowTypeForStatement(tt.sql)
+			if err != nil {
+				t.Fatalf("RowTypeForStatement() error = %v", err)
+			}
+			if got, want := len(rowType.Fields), len(tt.wantFields); got != want {
+				t.Fatalf("len(rowType.Fields) = %d, want %d", got, want)
+			}
+			for i, want := range tt.wantFields {
+				assertField(t, rowType.Fields[i], want.name, want.code)
+			}
+		})
+	}
+}
+
 func TestComposableGoogleSQLCatalogHelperAndResultConversion(t *testing.T) {
 	const ddl = `
 CREATE TABLE Singers (
@@ -714,6 +926,157 @@ CREATE TABLE Orders (
 	assertField(t, rowType.Fields[0], "order_number", spannerpb.TypeCode_STRING)
 	assertField(t, rowType.Fields[1], "country", spannerpb.TypeCode_STRING)
 	assertProtoField(t, rowType.Fields[2], "shipping_address", "examples.shipping.Order.Address")
+
+	replacedRowType, err := analyzer.RowTypeForStatement("SELECT order_value.order_number, order_value.shipping_address.country FROM (SELECT REPLACE_FIELDS(NEW `examples.shipping.Order` { order_number: \"A-1\" shipping_address { country: \"US\" } }, \"B-2\" AS order_number, \"CA\" AS shipping_address.country) AS order_value)")
+	if err != nil {
+		t.Fatalf("RowTypeForStatement(REPLACE_FIELDS) error = %v", err)
+	}
+	if got, want := len(replacedRowType.Fields), 2; got != want {
+		t.Fatalf("len(REPLACE_FIELDS row fields) = %d, want %d", got, want)
+	}
+	assertField(t, replacedRowType.Fields[0], "order_number", spannerpb.TypeCode_STRING)
+	assertField(t, replacedRowType.Fields[1], "country", spannerpb.TypeCode_STRING)
+
+	for _, tt := range []struct {
+		name     string
+		sql      string
+		wantName string
+		wantCode spannerpb.TypeCode
+	}{
+		{
+			name:     "new-map-constructor-field-access",
+			sql:      "SELECT order_value.order_number FROM (SELECT NEW `examples.shipping.Order` { order_number: \"A-1\" date: 123 } AS order_value)",
+			wantName: "order_number",
+			wantCode: spannerpb.TypeCode_STRING,
+		},
+		{
+			name:     "new-parenthesized-constructor-field-access",
+			sql:      "SELECT order_value.order_number FROM (SELECT NEW `examples.shipping.Order`(\"A-1\" AS order_number, 123 AS date) AS order_value)",
+			wantName: "order_number",
+			wantCode: spannerpb.TypeCode_STRING,
+		},
+		{
+			name:     "cast-string-to-proto-field-access",
+			sql:      "SELECT order_value.order_number FROM (SELECT CAST('order_number: \"A-1\" date: 123' AS `examples.shipping.Order`) AS order_value)",
+			wantName: "order_number",
+			wantCode: spannerpb.TypeCode_STRING,
+		},
+		{
+			name:     "select-as-proto-nested",
+			sql:      "SELECT order_value.order_number FROM (SELECT AS `examples.shipping.Order` \"A-1\" AS order_number, 123 AS date) AS order_value",
+			wantName: "order_number",
+			wantCode: spannerpb.TypeCode_STRING,
+		},
+		{
+			name:     "select-as-proto-distinct-nested",
+			sql:      "SELECT order_value.order_number FROM (SELECT DISTINCT AS `examples.shipping.Order` CAST(Id AS STRING) AS order_number, Id AS date FROM Orders) AS order_value",
+			wantName: "order_number",
+			wantCode: spannerpb.TypeCode_STRING,
+		},
+		{
+			name:     "nested-proto-field-access",
+			sql:      "SELECT OrderInfo.shipping_address.country FROM Orders",
+			wantName: "country",
+			wantCode: spannerpb.TypeCode_STRING,
+		},
+		{
+			name:     "proto-presence-field-access",
+			sql:      "SELECT OrderInfo.has_order_number FROM Orders",
+			wantName: "has_order_number",
+			wantCode: spannerpb.TypeCode_BOOL,
+		},
+		{
+			name:     "upstream-extract-proto-field",
+			sql:      "SELECT EXTRACT(FIELD(order_number) FROM OrderInfo) AS order_number FROM Orders",
+			wantName: "order_number",
+			wantCode: spannerpb.TypeCode_STRING,
+		},
+		{
+			name:     "upstream-extract-proto-presence",
+			sql:      "SELECT EXTRACT(HAS(order_number) FROM OrderInfo) AS has_order_number FROM Orders",
+			wantName: "has_order_number",
+			wantCode: spannerpb.TypeCode_BOOL,
+		},
+		{
+			name:     "upstream-extract-raw-proto-field",
+			sql:      "SELECT EXTRACT(RAW(order_number) FROM OrderInfo) AS raw_order_number FROM Orders",
+			wantName: "raw_order_number",
+			wantCode: spannerpb.TypeCode_STRING,
+		},
+		{
+			name:     "upstream-filter-proto-fields",
+			sql:      "SELECT filtered.order_number FROM (SELECT FILTER_FIELDS(OrderInfo, +order_number) AS filtered FROM Orders)",
+			wantName: "order_number",
+			wantCode: spannerpb.TypeCode_STRING,
+		},
+		{
+			name:     "upstream-extract-proto-oneof-case",
+			sql:      "SELECT EXTRACT(ONEOF_CASE(fulfillment) FROM OrderInfo) AS fulfillment_case FROM Orders",
+			wantName: "fulfillment_case",
+			wantCode: spannerpb.TypeCode_STRING,
+		},
+		{
+			name:     "repeated-proto-field-unnest",
+			sql:      "SELECT item.product_name FROM Orders AS o, UNNEST(o.OrderInfo.line_item) AS item",
+			wantName: "product_name",
+			wantCode: spannerpb.TypeCode_STRING,
+		},
+	} {
+		t.Run(tt.name, func(t *testing.T) {
+			rowType, err := analyzer.RowTypeForStatement(tt.sql)
+			if err != nil {
+				t.Fatalf("RowTypeForStatement() error = %v", err)
+			}
+			if got, want := len(rowType.Fields), 1; got != want {
+				t.Fatalf("len(rowType.Fields) = %d, want %d", got, want)
+			}
+			assertField(t, rowType.Fields[0], tt.wantName, tt.wantCode)
+		})
+	}
+
+	_, err = analyzer.RowTypeForStatement("SELECT PROTO_DEFAULT_IF_NULL(OrderInfo.order_number) AS order_number FROM Orders")
+	if err == nil || !strings.Contains(err.Error(), "Function not found: PROTO_DEFAULT_IF_NULL") {
+		t.Fatalf("RowTypeForStatement(PROTO_DEFAULT_IF_NULL) error = %v, want missing-function error", err)
+	}
+
+	for _, tt := range []struct {
+		name string
+		sql  string
+		want []string
+	}{
+		{
+			name: "proto construction and access",
+			sql:  "SELECT order_value.order_number FROM (SELECT NEW `examples.shipping.Order` { order_number: \"A-1\" date: 123 } AS order_value)",
+			want: []string{"MakeProto", "GetProtoField"},
+		},
+		{
+			name: "proto field replacement",
+			sql:  "SELECT order_value.order_number FROM (SELECT REPLACE_FIELDS(NEW `examples.shipping.Order` { order_number: \"A-1\" }, \"B-2\" AS order_number) AS order_value)",
+			want: []string{"MakeProto", "ReplaceField", "GetProtoField"},
+		},
+		{
+			name: "proto field filtering",
+			sql:  "SELECT filtered.order_number FROM (SELECT FILTER_FIELDS(OrderInfo, +order_number) AS filtered FROM Orders)",
+			want: []string{"FilterField", "GetProtoField"},
+		},
+		{
+			name: "proto oneof case extraction",
+			sql:  "SELECT EXTRACT(ONEOF_CASE(fulfillment) FROM OrderInfo) AS fulfillment_case FROM Orders",
+			want: []string{"GetProtoOneof"},
+		},
+	} {
+		t.Run(tt.name+" resolved AST", func(t *testing.T) {
+			debug, err := analyzer.ResolvedASTDebugString("query", tt.sql)
+			if err != nil {
+				t.Fatalf("ResolvedASTDebugString() error = %v", err)
+			}
+			for _, want := range tt.want {
+				if !strings.Contains(debug, want) {
+					t.Errorf("ResolvedASTDebugString() missing %q in:\n%s", want, debug)
+				}
+			}
+		})
+	}
 }
 
 func TestAnalyzerRowTypeForPropertyGraphWithExpressions(t *testing.T) {

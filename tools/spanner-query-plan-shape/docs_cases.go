@@ -79,6 +79,17 @@ CREATE OR REPLACE PROPERTY GRAPH MusicGraph
         FeaturingSingerId,
         SingerId)
   );
+
+CREATE OR REPLACE PROPERTY GRAPH LabelGraph
+  NODE TABLES(
+    Singers AS singer_nodes
+      KEY(SingerId)
+      LABEL Singer NO PROPERTIES
+      LABEL Person NO PROPERTIES,
+    Albums AS album_nodes
+      KEY(SingerId, AlbumId)
+      LABEL Album NO PROPERTIES
+  );
 `
 
 const dmlDDL = docsDDL + `

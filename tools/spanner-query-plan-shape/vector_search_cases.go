@@ -20,6 +20,27 @@ ON VectorDocuments(Embedding, TenantId)
 STORING (TechOnly, Category)
 WHERE TechOnly IS NOT NULL
 OPTIONS (distance_type = 'COSINE')`,
+	`CREATE TABLE VectorRelated (
+  SourceTenantId INT64 NOT NULL,
+  SourceDocumentId INT64 NOT NULL,
+  TargetTenantId INT64 NOT NULL,
+  TargetDocumentId INT64 NOT NULL,
+) PRIMARY KEY(SourceTenantId, SourceDocumentId, TargetTenantId, TargetDocumentId)`,
+	`CREATE PROPERTY GRAPH VectorGraph
+  NODE TABLES(
+    VectorDocuments
+      KEY(TenantId, DocumentId)
+      LABEL Document PROPERTIES(TenantId, DocumentId, Category, Embedding)
+  )
+  EDGE TABLES(
+    VectorRelated AS Related
+      KEY(SourceTenantId, SourceDocumentId, TargetTenantId, TargetDocumentId)
+      SOURCE KEY(SourceTenantId, SourceDocumentId)
+        REFERENCES VectorDocuments(TenantId, DocumentId)
+      DESTINATION KEY(TargetTenantId, TargetDocumentId)
+        REFERENCES VectorDocuments(TenantId, DocumentId)
+      LABEL Related PROPERTIES ALL COLUMNS
+)`,
 }
 
 var vectorSearchQueries = []queryCase{
@@ -85,5 +106,20 @@ FROM VectorDocuments@{FORCE_INDEX=TechVectorDocumentsByEmbedding}
 WHERE TenantId = 7 AND TechOnly IS NOT NULL
 ORDER BY Distance
 LIMIT 10`,
+	},
+	{
+		Label: "vector-search/ann-gql-next-traversal",
+		SQL: `GRAPH VectorGraph
+MATCH (@{FORCE_INDEX=VectorDocumentsByEmbedding} d:Document)
+WHERE d.TenantId = 7
+RETURN d,
+  APPROX_COSINE_DISTANCE(
+    ARRAY<FLOAT32>[1.0, 0.0, 0.0], d.Embedding,
+    options => JSON '{"num_leaves_to_search": 1}') AS distance
+ORDER BY distance
+LIMIT 10
+NEXT
+MATCH (d)-[:Related]->(r:Document)
+RETURN d.DocumentId AS document_id, r.DocumentId AS related_id, distance`,
 	},
 }

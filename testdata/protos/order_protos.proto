@@ -21,7 +21,10 @@ message Order {
 
   repeated Item line_item = 4;
 
-  
+  oneof fulfillment {
+    string pickup_location = 5;
+    string delivery_location = 6;
+  }
 
 }
 

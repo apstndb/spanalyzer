@@ -7,17 +7,53 @@
     "blob": "270939a859cc32ad4cfa76bed002dec9181ef6f7",
     "local_evidence": [
       "plancontract/normalize.go",
+      "research/spanner-query-plan-shape/AGGREGATE_FUNCTION_AGG_TYPE_OBSERVATIONS_2026-08-11.md",
       "research/spanner-query-plan-shape/COMPACT_TREE_METADATA_OBSERVATIONS.md",
+      "research/spanner-query-plan-shape/CONDITION_BOUNDARY_OBSERVATIONS_2026-08-11.md",
+      "research/spanner-query-plan-shape/FACTORIZED_MODE_OBSERVATIONS_2026-08-11.md",
+      "research/spanner-query-plan-shape/GOOGLESQL_SURFACE_CAPABILITY_OBSERVATIONS_2026-08-11.md",
+      "research/spanner-query-plan-shape/GQL_HINT_VERSION_OBSERVATIONS_2026-08-11.md",
+      "research/spanner-query-plan-shape/GQL_SURFACE_OBSERVATIONS_2026-08-11.md",
       "research/spanner-query-plan-shape/HINT_POSITION_AUDIT_2026-08-04.md",
       "research/spanner-query-plan-shape/PLANVOCAB_INFERENCE_OBSERVATIONS.md",
       "research/spanner-query-plan-shape/QUERY_EXECUTION_OPERATORS_OBSERVATIONS.md",
       "research/spanner-query-plan-shape/SET_OPERATION_DISTINCT_HINTS_2026-08-04.md",
+      "testdata/protos/complex/complex_descriptors.pb",
+      "testdata/protos/complex/order_ext.proto",
+      "testdata/protos/complex/user.proto",
+      "testdata/protos/order_descriptors.pb",
+      "testdata/protos/order_protos.proto",
+      "tools/spanner-query-plan-shape/aggregate_function_cases.go",
+      "tools/spanner-query-plan-shape/aggregate_function_omni_test.go",
+      "tools/spanner-query-plan-shape/condition_boundary_cases.go",
+      "tools/spanner-query-plan-shape/condition_boundary_omni_test.go",
+      "tools/spanner-query-plan-shape/docs_cases.go",
+      "tools/spanner-query-plan-shape/factorized_mode_cases.go",
+      "tools/spanner-query-plan-shape/full_text_search_cases.go",
+      "tools/spanner-query-plan-shape/google_sql_proto_surface_cases.go",
+      "tools/spanner-query-plan-shape/google_sql_surface_cases.go",
+      "tools/spanner-query-plan-shape/google_sql_surface_omni_test.go",
+      "tools/spanner-query-plan-shape/gql_hint_surface_cases.go",
+      "tools/spanner-query-plan-shape/gql_hint_surface_omni_test.go",
+      "tools/spanner-query-plan-shape/gql_surface_cases.go",
+      "tools/spanner-query-plan-shape/gql_surface_omni_test.go",
       "tools/spanner-query-plan-shape/hint_position_combination_cases.go",
       "tools/spanner-query-plan-shape/planvocab_cases.go",
+      "tools/spanner-query-plan-shape/search_graph_omni_test.go",
       "tools/spanner-query-plan-shape/set_operation_distinct_cases.go",
+      "tools/spanner-query-plan-shape/set_operation_equivalence_omni_test.go",
+      "tools/spanner-query-plan-shape/testdata/aggregate_function_expectations.json",
+      "tools/spanner-query-plan-shape/testdata/condition_boundary_expectations.json",
+      "tools/spanner-query-plan-shape/testdata/factorized_mode_expectations.json",
+      "tools/spanner-query-plan-shape/testdata/google_sql_proto_surface_expectations.json",
+      "tools/spanner-query-plan-shape/testdata/google_sql_surface_expectations.json",
+      "tools/spanner-query-plan-shape/testdata/gql_hint_surface_expectations.json",
+      "tools/spanner-query-plan-shape/testdata/gql_surface_expectations.json",
       "tools/spanner-query-plan-shape/testdata/hint_position_combination_expectations.json",
       "tools/spanner-query-plan-shape/testdata/planvocab_inference_expectations.json",
-      "tools/spanner-query-plan-shape/testdata/set_operation_distinct_expectations.json"
+      "tools/spanner-query-plan-shape/testdata/search_graph_expectations.json",
+      "tools/spanner-query-plan-shape/testdata/set_operation_distinct_expectations.json",
+      "tools/spanner-query-plan-shape/vector_search_cases.go"
     ],
     "compatibility": "Observational v0alpha vocabulary; not a stable Spanner wire contract. Missing metadata is allowed, link multiplicity is checked only where declared, and identifier values are wildcarded.",
     "generated_by": "go run ./planvocab-gen",
@@ -48,43 +84,143 @@
       },
       {
         "path": "plancontract/normalize.go",
-        "sha256": "c50da7e529c19ae7a1963ee258e5d689122f88016d16d1efd214b3922473db5c"
+        "sha256": "9703fa54d26ee71475b3232707de4e79349bb691c53e62d719cda42161702c9b"
       },
       {
         "path": "plancontract/planvocab/catalog_source.json",
-        "sha256": "d6121c1c9ec8b17d251cb3a6c58541854a9e2d71c8794c0fe906bfd7320a6ffe"
+        "sha256": "e15565869a1b450b3f571986431256562016cf1d8e83c1bd4eb9619321ed0735"
+      },
+      {
+        "path": "research/spanner-query-plan-shape/AGGREGATE_FUNCTION_AGG_TYPE_OBSERVATIONS_2026-08-11.md",
+        "sha256": "f86f8e6e0d0a36b316a5e44c9b1746b52c873f16d76fd91f981bf94481fb4023"
       },
       {
         "path": "research/spanner-query-plan-shape/COMPACT_TREE_METADATA_OBSERVATIONS.md",
         "sha256": "d7666d4ac5207c162f1fba2c2359503f05ba40918572a1eb2a4cee41f212f8fc"
       },
       {
+        "path": "research/spanner-query-plan-shape/CONDITION_BOUNDARY_OBSERVATIONS_2026-08-11.md",
+        "sha256": "ed29fb8e02b719179b5a7fcea17cca28e5fa401278b3f300e76e182da3fb308c"
+      },
+      {
+        "path": "research/spanner-query-plan-shape/FACTORIZED_MODE_OBSERVATIONS_2026-08-11.md",
+        "sha256": "3a26b972fee9cd32d523a728c3ad47af9d86132224e9bf8b65e6848de5ef2f39"
+      },
+      {
+        "path": "research/spanner-query-plan-shape/GOOGLESQL_SURFACE_CAPABILITY_OBSERVATIONS_2026-08-11.md",
+        "sha256": "ab7d8be45c38e4713ba2d7d709b19f22ef939eadf64be168c56ca78e2854c662"
+      },
+      {
+        "path": "research/spanner-query-plan-shape/GQL_HINT_VERSION_OBSERVATIONS_2026-08-11.md",
+        "sha256": "3aaeca00de398f1092b48fc8001da4bf186661044dae664418f09d768f096b38"
+      },
+      {
+        "path": "research/spanner-query-plan-shape/GQL_SURFACE_OBSERVATIONS_2026-08-11.md",
+        "sha256": "20b483183de9b5fc44f0cc0e0a5805964eb1b36aecfc2bdb54955c974b86cbaf"
+      },
+      {
         "path": "research/spanner-query-plan-shape/HINT_POSITION_AUDIT_2026-08-04.md",
-        "sha256": "6d60ecee2e4f863d98a1ab8fe7179433e895157308049fe5dbedd786f975c18f"
+        "sha256": "d583fec4fe8c3d3ca727c326b796483c4b4f923237066b9bbd1530783b2d7b19"
       },
       {
         "path": "research/spanner-query-plan-shape/PLANVOCAB_INFERENCE_OBSERVATIONS.md",
-        "sha256": "259b91c48f843927dc564fd9e8907ac8f322e79cd069e7facdbcdee60659ddb3"
+        "sha256": "85d15eee69e66b83f85e7c38c8e50dba252ef18981dc3ce189ea71dd554d7341"
       },
       {
         "path": "research/spanner-query-plan-shape/QUERY_EXECUTION_OPERATORS_OBSERVATIONS.md",
-        "sha256": "7a56a95084a13d942ef959858e1407e03a62c5d29aa2efc9580c6bc3a51b2a10"
+        "sha256": "f0f04277f2bc0905aa18e78504abac8caa4263e8a39bca2ce99569082a35ca97"
       },
       {
         "path": "research/spanner-query-plan-shape/SET_OPERATION_DISTINCT_HINTS_2026-08-04.md",
-        "sha256": "8ea7642c136fb71162088e2931f206d50dccf28d33a1d0be4b13c93055b9f5c4"
+        "sha256": "748c6ec729132c1fcaeb149f3c88aa3aaea63c0cea7e7037eb33253bbefe6096"
       },
       {
         "path": "schemas/spanalyzer.planvocab-expectations.v0alpha1.schema.json",
-        "sha256": "b371f895a7c7f0753b7729b7bfb555e142005cf5b5a4d59c26b258401329219e"
+        "sha256": "5a670eef5dfb1c7a2f5e9d88a1c77830f6b3691560b6918f2b7e87ed077db21e"
       },
       {
         "path": "schemas/spanalyzer.planvocab.v0alpha1.schema.json",
         "sha256": "3622eac91f891c10203386bc601f784dd52f2477558a370a13c944775d509c2f"
       },
       {
+        "path": "testdata/protos/complex/complex_descriptors.pb",
+        "sha256": "119124c86aece3247b4a80ba14655408b6d10e623171aa47b57493e0e7091b65"
+      },
+      {
+        "path": "testdata/protos/complex/order_ext.proto",
+        "sha256": "5c9049f575ad0c16578696335cd6ad1b213da1bad63067930ac39692c3fb4c53"
+      },
+      {
+        "path": "testdata/protos/complex/user.proto",
+        "sha256": "307cbd8c7c8cbe9bb3e2c249334e135f5f3d1589a0dd9101848a6b18f2ca3774"
+      },
+      {
+        "path": "testdata/protos/order_descriptors.pb",
+        "sha256": "54f19a45a01ee03a99845ef4662deb46f80571b5cdbab069bd063040e617fa37"
+      },
+      {
+        "path": "testdata/protos/order_protos.proto",
+        "sha256": "9467329f64fc06cc72a6257e1a89976ac016bca238407f01b80c5ce63c37d347"
+      },
+      {
         "path": "tools/planvocab-gen/main.go",
-        "sha256": "b0fa327a821a4b840797a0c3d28c1c47324d4eaaa978b0647133a47a072a4cee"
+        "sha256": "e1d977db904b81167e763c1c4acfb95da99c5faef0d8b7f592eccd5b873bef13"
+      },
+      {
+        "path": "tools/spanner-query-plan-shape/aggregate_function_cases.go",
+        "sha256": "5b85c7ed6fb375ac23ab0c118e45fb1d091f65127d8d5f8a91697aa465a4030c"
+      },
+      {
+        "path": "tools/spanner-query-plan-shape/aggregate_function_omni_test.go",
+        "sha256": "59c423d20e2b5318741a47c924e7d6a6dadcc1a6d663ec556b37d139c4442057"
+      },
+      {
+        "path": "tools/spanner-query-plan-shape/condition_boundary_cases.go",
+        "sha256": "02dc0b41327fa7dd7b473a317920d7efefaae9bf7442104b62548972c29db865"
+      },
+      {
+        "path": "tools/spanner-query-plan-shape/condition_boundary_omni_test.go",
+        "sha256": "d26cd7055e64d79e205549470dee83a37b79f7fe458cc12b2c1c9fe91d3d7d78"
+      },
+      {
+        "path": "tools/spanner-query-plan-shape/docs_cases.go",
+        "sha256": "1b7e6509ba06ff763464f8e858e78c33e445a83ee201362f3c8cf74cab0a2125"
+      },
+      {
+        "path": "tools/spanner-query-plan-shape/factorized_mode_cases.go",
+        "sha256": "ffca4cb090b97d3ad6c94dce13e52a79eeb6f420363f3ab7288d57581e8779ae"
+      },
+      {
+        "path": "tools/spanner-query-plan-shape/full_text_search_cases.go",
+        "sha256": "8768746e86abf2917de31e9909e1a1099706cf797ea72ee7a3b32aea2cdeda03"
+      },
+      {
+        "path": "tools/spanner-query-plan-shape/google_sql_proto_surface_cases.go",
+        "sha256": "7b04204e2c74fff8c88195e1e0545d1ee288850e7e9774f850e30c0c8158f8c2"
+      },
+      {
+        "path": "tools/spanner-query-plan-shape/google_sql_surface_cases.go",
+        "sha256": "10a02557b7b80c24bd01091725a07b54ec116f2a68807dafd1c068cc5d8ce2bf"
+      },
+      {
+        "path": "tools/spanner-query-plan-shape/google_sql_surface_omni_test.go",
+        "sha256": "cb88cb524bca22f64fec014be16f39e001c05859f4299696d2765ea28bde651a"
+      },
+      {
+        "path": "tools/spanner-query-plan-shape/gql_hint_surface_cases.go",
+        "sha256": "52076c1fbee7762088cde24edb55a2b6d5416bfb17cf95bc038d760590fa7987"
+      },
+      {
+        "path": "tools/spanner-query-plan-shape/gql_hint_surface_omni_test.go",
+        "sha256": "7cc22d43cd1334808ff3fad1cbb16a219a7499d45f25d3cdccc5c43988cea126"
+      },
+      {
+        "path": "tools/spanner-query-plan-shape/gql_surface_cases.go",
+        "sha256": "f445506f7755bc07be246554fdaaa1be68b03bdd5d714b02668f75edb10595a9"
+      },
+      {
+        "path": "tools/spanner-query-plan-shape/gql_surface_omni_test.go",
+        "sha256": "0e55da3a5547a9e57134734fb4410d1479a6e7f68c46bf16675cb0fed9757a1c"
       },
       {
         "path": "tools/spanner-query-plan-shape/hint_position_combination_cases.go",
@@ -95,8 +231,44 @@
         "sha256": "21d2b5aa805bd0837076af1554072dd6447095433e657cd35e78fccd8967c6a6"
       },
       {
+        "path": "tools/spanner-query-plan-shape/search_graph_omni_test.go",
+        "sha256": "cbefd4d3a2540e8877adf874000eab8f49564360de2cc00de80cb9ec26a1072d"
+      },
+      {
         "path": "tools/spanner-query-plan-shape/set_operation_distinct_cases.go",
-        "sha256": "340bfe284a9b66831e94b13d0fcbbf7ab744fc6925c3c0f31f1df28c5c2ce00e"
+        "sha256": "4d496ae73fe9fd907fece25b0a4980ec9215d0e9dc68460e4bd08cf4126da7d6"
+      },
+      {
+        "path": "tools/spanner-query-plan-shape/set_operation_equivalence_omni_test.go",
+        "sha256": "6a79c3c707cd8c9ef7dad9ce8f72b0c3ae6c9740402af11854a668fb2bfd0d19"
+      },
+      {
+        "path": "tools/spanner-query-plan-shape/testdata/aggregate_function_expectations.json",
+        "sha256": "ac4ea6744aa7a85c5395bc7527e368a246fe86995552a33d162b8374e558fe92"
+      },
+      {
+        "path": "tools/spanner-query-plan-shape/testdata/condition_boundary_expectations.json",
+        "sha256": "afa6c0f5e76995b0d68fbfcdcf0dee0d4611549ce3ca822d90de38c2dcd10881"
+      },
+      {
+        "path": "tools/spanner-query-plan-shape/testdata/factorized_mode_expectations.json",
+        "sha256": "69e18cacc7f398cff6580cd34f4e53c2ab0d9a4a8aa02b885d82b57f4235fca9"
+      },
+      {
+        "path": "tools/spanner-query-plan-shape/testdata/google_sql_proto_surface_expectations.json",
+        "sha256": "6f5b2fc6d2a431157c7f199cda5ba45d77e28944f00100a0eb443c883a1bf3a2"
+      },
+      {
+        "path": "tools/spanner-query-plan-shape/testdata/google_sql_surface_expectations.json",
+        "sha256": "4d54c3daf1e3a095f09cf37ac4247c0412ad1bae3fe14faf2b5c728828a12286"
+      },
+      {
+        "path": "tools/spanner-query-plan-shape/testdata/gql_hint_surface_expectations.json",
+        "sha256": "32339074ad7050d5d23e94cf3c3ffe9a2b9005de3f3f30b16988b691aa51604d"
+      },
+      {
+        "path": "tools/spanner-query-plan-shape/testdata/gql_surface_expectations.json",
+        "sha256": "b4669d50377802caa8bd98c1e5becefe97b0860b6b1e9c20fcfe0999fbe2bfdd"
       },
       {
         "path": "tools/spanner-query-plan-shape/testdata/hint_position_combination_expectations.json",
@@ -107,8 +279,16 @@
         "sha256": "68f3d35d6876a1048b3106c851a854a1055fab4ff0b64c637647241b35b93318"
       },
       {
+        "path": "tools/spanner-query-plan-shape/testdata/search_graph_expectations.json",
+        "sha256": "86932c8616495d9ef6b3839cdfc561cb3a8a0d6e3763dfd47c1a134651501337"
+      },
+      {
         "path": "tools/spanner-query-plan-shape/testdata/set_operation_distinct_expectations.json",
-        "sha256": "3e59fb4dca3c3ddd47a4f20da333c6c4a32b06a2bda7d0072109c32f47debba3"
+        "sha256": "c2dc292bfce9ac6136875a3944c614c57e85be3fed8e1079df9d14e5757b4f6c"
+      },
+      {
+        "path": "tools/spanner-query-plan-shape/vector_search_cases.go",
+        "sha256": "d352ac3f544983abf1428e0558dea7ec246cbefa0c094b50146ad4b6f53e024f"
       }
     ]
   },
@@ -348,6 +528,12 @@
           "type": "",
           "variable": "present",
           "multiple": true
+        },
+        {
+          "kind": "SCALAR",
+          "type": "Scalar",
+          "variable": "absent",
+          "multiple": true
         }
       ]
     },
@@ -408,6 +594,31 @@
     },
     {
       "names": [
+        "Crowd"
+      ],
+      "kind": "RELATIONAL",
+      "metadata": [],
+      "child_links": [
+        {
+          "kind": "RELATIONAL",
+          "type": "",
+          "variable": "absent"
+        },
+        {
+          "kind": "SCALAR",
+          "type": "",
+          "variable": "absent",
+          "multiple": true
+        },
+        {
+          "kind": "SCALAR",
+          "type": "",
+          "variable": "present"
+        }
+      ]
+    },
+    {
+      "names": [
         "DataBlockToRow",
         "DataBlockToRowAdapter"
       ],
@@ -432,6 +643,12 @@
       ],
       "kind": "RELATIONAL",
       "metadata": [
+        {
+          "key": "order_preserving",
+          "values": [
+            "true"
+          ]
+        },
         {
           "key": "subquery_cluster_node"
         }
@@ -570,6 +787,12 @@
       "kind": "RELATIONAL",
       "metadata": [
         {
+          "key": "order_preserving",
+          "values": [
+            "true"
+          ]
+        },
+        {
           "key": "subquery_cluster_node"
         }
       ],
@@ -698,6 +921,11 @@
           "kind": "SCALAR",
           "type": "Condition",
           "variable": "absent"
+        },
+        {
+          "kind": "SCALAR",
+          "type": "Scalar",
+          "variable": "absent"
         }
       ]
     },
@@ -721,6 +949,11 @@
         {
           "kind": "SCALAR",
           "type": "Residual Condition",
+          "variable": "absent"
+        },
+        {
+          "kind": "SCALAR",
+          "type": "Scalar",
           "variable": "absent"
         },
         {
@@ -886,6 +1119,7 @@
             "SpoolScan",
             "TableScan",
             "VectorIndexLeafScan",
+            "VectorIndexMetadataScan",
             "VectorIndexRootScan"
           ]
         }
@@ -1159,9 +1393,14 @@
         },
         {
           "kind": "SCALAR",
+          "type": "Residual Condition",
+          "variable": "absent"
+        },
+        {
+          "kind": "SCALAR",
           "type": "Right",
           "variable": "present",
-          "multiple": false
+          "multiple": true
         }
       ]
     },
@@ -1246,6 +1485,21 @@
     },
     {
       "names": [
+        "Proto Constructor"
+      ],
+      "kind": "SCALAR",
+      "metadata": [],
+      "child_links": [
+        {
+          "kind": "SCALAR",
+          "type": "",
+          "variable": "absent",
+          "multiple": true
+        }
+      ]
+    },
+    {
+      "names": [
         "Push Broadcast Hash Join"
       ],
       "kind": "RELATIONAL",
@@ -1295,6 +1549,12 @@
       "metadata": [
         {
           "key": "distribution_table"
+        },
+        {
+          "key": "order_preserving",
+          "values": [
+            "true"
+          ]
         },
         {
           "key": "subquery_cluster_node"

@@ -16,9 +16,10 @@ is recorded here.
   `google/googlesql@1f8aa333f4d6353cd3a64471fc83121df72df3f7`.
 - spanalyzer frontend tested here: `github.com/goccy/go-googlesql@v0.3.0`.
 - Emulator: `gcr.io/cloud-spanner-emulator/emulator:1.5.55`.
-- Omni: `us-docker.pkg.dev/spanner-omni/images/spanner-omni:2026.r1-beta.2`,
+- Omni: `us-docker.pkg.dev/spanner-omni/images/spanner-omni:2026.r1-beta`,
   local image digest
-  `sha256:115622065afefd267f9ef3ff1025e35d73a03f66a7335de8e051b393ebdcfacc`.
+  `sha256:e98a088fa66d4a87dbb560d729bf21d998bb843f6018bd8dc118fe320e671886`,
+  revalidated 2026-08-11.
 
 The integration probes submit statements directly through the Spanner Go
 client. Memefish is used only to parse the fixture DDL before database setup;
@@ -46,7 +47,7 @@ plan-shape evidence. See the
 
 ## Result matrix
 
-| Position or restriction | Frontend | Emulator 1.5.55 | Omni 2026.r1-beta.2 |
+| Position or restriction | Frontend | Emulator 1.5.55 | Omni 2026.r1-beta |
 |---|---|---|---|
 | SELECT hint | parse + Hint AST + unparse | accepted; unsupported synthetic key | accepted; unsupported synthetic key |
 | ORDER BY hint | parse + Hint AST + unparse | accepted; unsupported synthetic key | accepted; unsupported synthetic key |
@@ -66,6 +67,10 @@ plan-shape evidence. See the
 | GQL set-operation hint | rejected | rejected | rejected |
 | Hint at the beginning of a GQL parenthesized path | rejected | rejected | rejected |
 | Hint between two GQL edge patterns | rejected | rejected | rejected |
+| GQL node-to-edge and subpath-to-edge traversal hints | parse + Hint AST + unparse | not separately re-run | accepted; plan-visible |
+| GQL hint between comma-separated path patterns | parse + Hint AST + unparse | not separately re-run | accepted v1-v8; plan-visible from v3 |
+| GQL hint on a later MATCH | parse + Hint AST + unparse | not separately re-run | MERGE accepted v1-v8; PUSH accepted v3-v8 |
+| GQL subpath-to-node or subpath-to-subpath hint | grammar accepts | not separately re-run | accepted and plan-visible v1-v8 despite current documentation saying not allowed |
 | Pipe LOG hint | parse + Hint AST + unparse | accepted; pipe syntax unsupported later | accepted; pipe syntax unsupported later |
 | Pipe FINISH hint | rejected | rejected | rejected |
 | INSERT target hint | parse + Hint AST + unparse | accepted; unsupported synthetic key | executed |
@@ -111,6 +116,14 @@ remain in the raw-plan stream and are still checked for unknown plan
 vocabulary. The batch-true expectations require both observed `Batch` links,
 which also records that multiplicity in the embedded catalog.
 
+The later graph-specific matrix found a documentation/runtime discrepancy that
+must not be collapsed into the generic rejected rows above. The shared grammar
+permits a hint between successive `graph_path_factor` values, and the pinned
+Omni runtime accepts and honors HASH between a subpath and node and between two
+subpaths. Current Spanner graph-hint prose says those two relationships are not
+allowed. The retained cases are therefore labeled `runtime-extension`; they
+record pinned-Omni behavior without claiming official managed-service support.
+
 ## Reproduction
 
 Frontend and case-table tests:
@@ -128,7 +141,7 @@ Runtime integration tests:
 
 (cd tools && \
   SPANEMUBOOST_ENABLE_OMNI_TESTS=1 \
-  SPANALYZER_OMNI_IMAGE=us-docker.pkg.dev/spanner-omni/images/spanner-omni:2026.r1-beta.2 \
+  SPANALYZER_OMNI_IMAGE=us-docker.pkg.dev/spanner-omni/images/spanner-omni:2026.r1-beta \
   go test -tags=integration,omni ./spanner-query-plan-shape \
   -run TestIntegrationHintPositionAuditOnOmni -v)
 ```
@@ -150,9 +163,19 @@ go build -o /tmp/spanner-query-plan-shape ./tools/spanner-query-plan-shape
 set -o pipefail
 /tmp/spanner-query-plan-shape \
   --case hint_position_combinations \
-  --omni-image us-docker.pkg.dev/spanner-omni/images/spanner-omni:2026.r1-beta.2 \
+  --omni-image us-docker.pkg.dev/spanner-omni/images/spanner-omni:2026.r1-beta \
   --output json \
   --continue-on-error \
   | /tmp/planvocab-check \
       --expect tools/spanner-query-plan-shape/testdata/hint_position_combination_expectations.json
 ```
+
+The later `gql_hint_surface` selector adds graph-specific plan-effect and
+optimizer-version evidence that this placement inventory did not originally
+enforce: nonlinear and quantified `FACTORIZE_BOTH`, statement/arm-local GQL
+set-operation controls, correlated EXISTS acceptance-without-effect,
+graph-element index/scan/seek composition, traversal MERGE/HASH/APPLY value
+axes, official and runtime-extension traversal placements, index-union and
+groupby-scan controls, edge BATCH v5/v6, and direct/statement GQL PUSH v2/v3
+boundaries. See
+[`GQL_HINT_VERSION_OBSERVATIONS_2026-08-11.md`](GQL_HINT_VERSION_OBSERVATIONS_2026-08-11.md).

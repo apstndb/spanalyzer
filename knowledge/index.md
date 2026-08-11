@@ -24,3 +24,7 @@ Other concept types are deferred until a concrete routing need is established.
 - [GoogleSQL hint placement inventory](observations/googlesql-hint-placement.md)
   - Normalized generic hint placements in a pinned upstream GoogleSQL grammar,
     separated from frontend, runtime-syntax, and plan-effect evidence.
+- [Spanner set operations](observations/spanner-set-operations.md)
+  - SQL-standard multiplicity semantics and environment-scoped Spanner plan
+    observations for `UNION`, `INTERSECT`, and `EXCEPT` with `ALL` and
+    `DISTINCT`.
