@@ -100,6 +100,34 @@ the descriptor fixture at:
 testdata/protos/order_descriptors.pb
 ```
 
+## Documentation Guidelines
+
+The [`knowledge/`](knowledge/index.md) directory is the repository's embedded
+OKF v0.2 bundle. Keep canonical command, design, status, and research documents
+at their repository-native paths; represent them in OKF through concepts and
+links instead of copying their bodies. When adding or removing tracked
+Markdown outside the bundle, update
+[`knowledge/references/repository-documents.md`](knowledge/references/repository-documents.md).
+Every non-`index.md` concept inside the bundle must have parseable YAML
+frontmatter with a non-empty `type`, and every concept must be reachable from
+the root `knowledge/index.md` through directory indexes.
+
+Non-Markdown discovery is intentionally narrower than repository inventory.
+[`knowledge/references/repository-assets.md`](knowledge/references/repository-assets.md)
+classifies contract schemas, plan-vocabulary artifacts, executable plan
+evidence, and reusable fixtures. Do not extend it into a census of general Go
+sources, module files, CI configuration, IDE metadata, or other operational
+files. Inventory membership is discovery metadata, not evidence that an asset
+supports a claim; `planvocab` continues to derive its authoritative hashed
+inputs from `catalog_source.info.local_evidence`.
+
+Run the OKF checks from the `tools` module after changing the bundle or either
+inventory:
+
+```sh
+go run ./okf-check --repo-root .. --gate all
+```
+
 ## Coding Style
 
 Follow idiomatic Go and `gofmt`. Keep helpers small and explicit. Avoid broad

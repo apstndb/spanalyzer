@@ -42,6 +42,18 @@ jobs:
           # append entries to it on CI.
           git diff --exit-code -- go.mod go.sum plancontract/go.mod plancontract/go.sum cmd/spanner-query-gen/go.mod cmd/spanner-query-gen/go.sum tools/go.mod tools/go.sum
 
+      - name: Verify OKF v0.2 conformance
+        working-directory: tools
+        run: mise x -- go run ./okf-check --repo-root .. --gate conformance
+
+      - name: Verify spanalyzer OKF quality
+        working-directory: tools
+        run: mise x -- go run ./okf-check --repo-root .. --gate quality
+
+      - name: Verify knowledge-bearing asset inventory
+        working-directory: tools
+        run: mise x -- go run ./okf-check --repo-root .. --gate assets
+
       - name: Vet
         run: mise x -- go vet ./...
 

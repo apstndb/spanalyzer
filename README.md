@@ -44,7 +44,14 @@ Development across modules uses the committed `go.work` workspace.
 
 ## Documentation map
 
-- This README: positioning, module layout, analyzer usage.
+- [`knowledge/`](knowledge/index.md): the OKF v0.2 entry point for the
+  repository. It organizes architecture concepts, curated observations, and a
+  [complete tracked-Markdown inventory](knowledge/references/repository-documents.md),
+  plus a selective inventory of
+  [knowledge-bearing repository assets](knowledge/references/repository-assets.md),
+  while leaving every canonical body at its native path.
+- This README: positioning, module layout, analyzer usage, and public
+  limitations.
 - [`AGENTS.md`](AGENTS.md): guidance for coding agents (commands, module
   rules, testing layout).
 - [`TODO.md`](TODO.md): open follow-up work only; resolved history is
@@ -57,9 +64,6 @@ Development across modules uses the committed `go.work` workspace.
   ([PLAN_CONTRACTS](cmd/spanner-query-gen/PLAN_CONTRACTS.md)).
 - [`research/`](research/README.md): non-normative observation notes and
   design background, indexed per area.
-- [`knowledge/`](knowledge/index.md): the OKF v0.2 knowledge bundle. Concepts
-  provide curated discovery metadata while code, schemas, tests, and command
-  documentation remain canonical for behavior.
 
 ## Why plan inspection
 
