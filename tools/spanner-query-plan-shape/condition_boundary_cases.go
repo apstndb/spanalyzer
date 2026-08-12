@@ -1,5 +1,13 @@
 package main
 
+const conditionBoundaryDDL = docsDDL + `
+CREATE TABLE CommitTimestampKeys (
+  CommitTs TIMESTAMP NOT NULL OPTIONS (allow_commit_timestamp = true),
+  RowId INT64 NOT NULL,
+  Payload STRING(MAX),
+) PRIMARY KEY(CommitTs, RowId);
+`
+
 // conditionBoundaryQueries compares predicates that are logically similar but
 // cross a physical-plan boundary between split extraction, scan seeking,
 // residual filtering, and join-key evaluation.
@@ -23,6 +31,10 @@ var conditionBoundaryQueries = []queryCase{
 	{Label: "condition-boundary/scan/seek-plus-residual", SQL: `SELECT SongName FROM Songs@{FORCE_INDEX=SongsBySongName} WHERE STARTS_WITH(SongName, 'A') AND STRPOS(SongName, 'x') > 0`},
 	{Label: "condition-boundary/scan/like-prefix-with-residual", SQL: `SELECT SongName FROM Songs@{FORCE_INDEX=SongsBySongName} WHERE SongName LIKE 'A_B%'`},
 	{Label: "condition-boundary/scan/or-seekable-and-residual", SQL: `SELECT SongName FROM Songs@{FORCE_INDEX=SongsBySongName} WHERE STARTS_WITH(SongName, 'A') OR ENDS_WITH(SongName, 'B')`},
+	{Label: "condition-boundary/timestamp-key/pushdown-true", SQL: `@{ALLOW_TIMESTAMP_PREDICATE_PUSHDOWN=TRUE}
+SELECT Payload FROM CommitTimestampKeys WHERE CommitTs > TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL 12 HOUR)`},
+	{Label: "condition-boundary/timestamp-key/pushdown-false", SQL: `@{ALLOW_TIMESTAMP_PREDICATE_PUSHDOWN=FALSE}
+SELECT Payload FROM CommitTimestampKeys WHERE CommitTs > TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL 12 HOUR)`},
 
 	{Label: "condition-boundary/join/hash-equality", SQL: `SELECT a.AlbumId, s.TrackId FROM Albums AS a JOIN@{JOIN_METHOD=HASH_JOIN} Songs AS s ON a.SingerId = s.SingerId`},
 	{Label: "condition-boundary/join/hash-two-equalities", SQL: `SELECT a.AlbumTitle, s.TrackId FROM Albums AS a JOIN@{JOIN_METHOD=HASH_JOIN} Songs AS s ON a.SingerId = s.SingerId AND a.AlbumId = s.AlbumId`},

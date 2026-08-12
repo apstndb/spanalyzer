@@ -11,14 +11,17 @@ Spanner GQL and SQL/GQL bridge syntax. It is not a stable optimizer contract.
   `sha256:e98a088fa66d4a87dbb560d729bf21d998bb843f6018bd8dc118fe320e671886`.
 - API: `AnalyzeQuery(QueryMode=PLAN)` through
   `spanner-query-plan-shape`.
+- Official docs (retrieved 2026-08-12 with `dkcli`):
+  [`IS_FIRST`](https://docs.cloud.google.com/spanner/docs/reference/standard-sql/graph-gql-functions#is_first)
+  and [Graph query best practices](https://docs.cloud.google.com/spanner/docs/graph/best-practices-tuning-queries).
 - Schema: the built-in `MusicGraph` over `Singers` and `Collaborations`, plus
   `LabelGraph` over multi-labeled `Singers` and `Albums` nodes.
-- Retained case: `gql_surface` with 117 queries and
+- Retained case: `gql_surface` with 120 queries and
   `testdata/gql_surface_expectations.json`.
-- Revalidation: 94 plans, 23 expected query errors, 191 planvocab patterns,
+- Revalidation: 97 plans, 23 expected query errors, 197 planvocab patterns,
   zero expectation failures, and zero vocabulary findings.
-- Optimizer matrix: 936 submissions covering versions 1 through 8; every
-  version returned 94 plans and the same 23 expected errors, with zero
+- Optimizer matrix: 960 submissions covering versions 1 through 8; every
+  version returned 97 plans and the same 23 expected errors, with zero
   vocabulary findings.
 
 ## Retained accepted surface
@@ -47,8 +50,9 @@ serve as runtime acceptance evidence.
 - outgoing, reverse, any-direction, edge-only, wildcard, endpoint-predicate,
   and compound label OR/AND graph patterns, plus graph element metadata
   functions and predicates;
-- GQL `IS_FIRST(...) OVER (...)`, including filtering between `NEXT` stages
-  and edge-valued membership inside a quantified traversal;
+- GQL `IS_FIRST(...) OVER (...)` in `RETURN`, direct `FILTER`, one-hop and
+  quantified edge-valued membership, and ordered or unordered filtering
+  between `NEXT` stages;
 - graph traversal `FACTORIZED_MODE`, both SQL/`GRAPH_TABLE` and GQL-native
   `TABLESAMPLE BERNOULLI`/`RESERVOIR`, ordered and unordered horizontal
   `ARRAY_AGG`, horizontal `COUNT(DISTINCT ...)`, and property-dependent
@@ -245,18 +249,76 @@ than a distinct physical family. The malformed
 
 ### GQL analytic and graph factorization
 
-GQL `IS_FIRST(1) OVER (...)` returned a row `Crowd` operator above a Sort in
-every optimizer version from 1 through 8. The same `IS_FIRST` expression in
-ordinary SQL returned `Unsupported built-in function: IS_FIRST.` The observed
-`Crowd` shape has one relational input, three untyped scalar inputs without
-variables, and one variable-bearing scalar result; plancontract normalizes it
-as the concrete `crowd` family.
+The [`IS_FIRST` function reference](https://docs.cloud.google.com/spanner/docs/reference/standard-sql/graph-gql-functions#is_first)
+defines a boolean window result. Its result is non-deterministic when `ORDER
+BY` is omitted or values tie, so the retained unordered `NEXT` case is
+acceptance/PLAN coverage only; a separately retained ordered case is used for
+result assertions.
 
-When `IS_FIRST` filtered the intermediate result before a second `NEXT`
-traversal, the plan contained exactly two Crowd operators at every optimizer
-version; the no-filter two-stage control contained none. An edge-valued `IN`
-subquery containing `IS_FIRST` inside a quantified traversal retained the
-Recursive Union and added Limit-based selection beneath it.
+In a `RETURN` expression, GQL `IS_FIRST(1) OVER (...)` returned a row `Crowd`
+operator above a Sort in every optimizer version from 1 through 8. The same
+`IS_FIRST` expression in ordinary SQL returned `Unsupported built-in function:
+IS_FIRST.` The observed `Crowd` shape has one relational input, three untyped
+scalar inputs without variables, and one variable-bearing scalar result;
+plancontract normalizes it as the concrete `crowd` family.
+
+Placement is semantically and physically significant. The populated-graph
+integration test inserts five nodes and six ordered edges. `RETURN IS_FIRST`
+keeps all six rows and marks three as true; a direct `FILTER` and a one-hop
+edge-valued `IN` subquery both return those same three selected edges. The
+direct and one-hop forms contain two `Crowd` operators in v1-v5 and three in
+v6-v8. The quantified edge-valued form uses the documented
+[`FILTER`-inside-edge predicate pattern](https://docs.cloud.google.com/spanner/docs/graph/best-practices-tuning-queries#limit-traversed-edges-to-improve-query-performance): it retains `Recursive Union` and Limit-based selection, with no `Crowd` in this v1-v8 matrix. On the fixture it reduces the unfiltered `{1,3}` traversal from ten result rows to three.
+
+When `IS_FIRST` filters the intermediate result before a second `NEXT`
+traversal, the unordered plan contains exactly two `Crowd` operators at every
+optimizer version; the no-filter two-stage control contains none. The ordered
+form contains at least two `Crowd` operators and reduces the populated control
+from four rows to two before the second traversal. Thus, `Crowd` is a
+placement-specific lowering, not a syntax-wide marker for every `IS_FIRST`
+use.
+
+#### Managed Spanner revalidation and Top-k lowering hypothesis
+
+On 2026-08-12, the same `MusicGraph` schema and six-edge fixture used by the
+Omni integration test were created in a managed Spanner database reached via
+the dedicated user-level managed-probe profile. Connection identifiers are not
+recorded. Read-only execution and `EXPLAIN` covered the six retained placements
+at the default optimizer setting and explicit versions 1 through 8. Every
+deterministic result multiset was identical across the eight versions:
+`RETURN` kept all six edges and marked three true; direct and one-hop filters
+returned the same three edges; quantified filtering reduced the ten-row
+control to three; and the ordered `NEXT` filter reduced its four-row control to
+two.
+
+The managed plans establish an implementation boundary that the pinned Omni
+plans do not expose. At versions 1 through 4, direct and one-hop filtering used
+two `Crowd` operators, while the quantified edge predicate used no `Crowd` and
+placed `Limit`, `Sort Limit`, and `Local Sort Limit` under the recursive map.
+The current recursive tail key appeared in the same subtree's scan seek
+condition. This is plan evidence for a per-tail, per-recursion-step Top-k
+pushdown, not a measured performance result.
+
+At managed versions 5 through 8, direct and one-hop filtering used one `Crowd`.
+The quantified form retained `Recursive Union` but changed to one `Crowd` over
+a `Sort`: it first formed the selected edge relation and then joined it to the
+recursive spool with an equality filter. The default plan used this latter
+family, but plan similarity does not establish which optimizer version the
+service selected. This precomputed/decorrelated family differs from the pinned
+Omni matrix, where the quantified form kept the recursive Limit-based lowering
+and no `Crowd` through v8.
+
+An `ORDER BY` ablation separates `Crowd` from sorting. In both `RETURN` and
+filter positions, removing `ORDER BY` removed `Sort` while retaining `Crowd`.
+Changing `IS_FIRST(1)` to `IS_FIRST(2)` retained the non-recursive
+`Crowd`/`Sort` family, although the managed v4 quantified plan changed the
+distributed Top-k pipeline around its Limits. The evidence therefore supports
+the narrower working model that `Crowd` evaluates or carries `IS_FIRST`'s
+partition state, `Sort` supplies requested order, and a predicate-only
+`IS_FIRST` may be rewritten to ordinary Top-k operators when that selection can
+be pushed into traversal. It does not support treating `Crowd` as an alias for
+`Sort`, `Limit`, or `Sort Limit`, nor treating operator counts as portable
+across runtimes.
 
 Native `TABLESAMPLE RESERVOIR` used Random Id Assign plus Sort Limit, while
 BERNOULLI used Random Id Assign plus Filter. `WITH WEIGHT` was rejected at all

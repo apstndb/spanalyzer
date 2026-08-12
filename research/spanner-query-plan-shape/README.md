@@ -52,12 +52,21 @@ plans. Observation logs, not a stable contract.
 - [`GOOGLESQL_SURFACE_CAPABILITY_OBSERVATIONS_2026-08-11.md`](GOOGLESQL_SURFACE_CAPABILITY_OBSERVATIONS_2026-08-11.md):
   accepted generic GoogleSQL PLAN surfaces plus explicit runtime and
   transaction capability boundaries.
+- [`REWRITER_SURFACE_OBSERVATIONS_2026-08-12.md`](REWRITER_SURFACE_OBSERVATIONS_2026-08-12.md):
+  complete pinned GoogleSQL rewriter registry mapped to retained Spanner PLAN,
+  capability-error, indirect, or not-exposed evidence.
 - [`CONDITION_BOUNDARY_OBSERVATIONS_2026-08-11.md`](CONDITION_BOUNDARY_OBSERVATIONS_2026-08-11.md):
   expression boundaries between Split Range, scan Seek/Residual Condition,
   and Hash/Merge/Apply join conditions across optimizer v1-v8.
+- [`OPTIMIZER_V9_REAL_INSTANCE_NOTES_2026-07-28.md`](OPTIMIZER_V9_REAL_INSTANCE_NOTES_2026-07-28.md):
+  managed-Spanner optimizer-v9 DCA input-pruning evidence and the corresponding
+  future Omni probe design.
 
 ## Pattern studies
 
+- [`SET_OPERATION_DISTINCT_HINTS_2026-08-04.md`](SET_OPERATION_DISTINCT_HINTS_2026-08-04.md):
+  set-operation multiplicities, hint boundaries, rewrite flexibility, and
+  common-supertype requirements.
 - [`TIMESTAMP_ORDERED_SHARD_QUERY_OBSERVATIONS.md`](TIMESTAMP_ORDERED_SHARD_QUERY_OBSERVATIONS.md):
   the timestamp-ordered sharded index pattern (Stack Overflow thread,
   gcpug/nouhau#135) verified against rendered plans, updated 2026-06-12 with

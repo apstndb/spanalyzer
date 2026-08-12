@@ -59,7 +59,7 @@ ON s.SingerId = a.SingerId
 
 const builtInCaseNames = "all, docs, optimizer_gaps, optimizer_unhinted_candidates, join_elimination, planvocab_inference, cte, dml, tvf, lock_hints, " +
 	"full_text_search, json_search, vector_search, function_hint, hint_matrix, statement_hint_query_matrix, " +
-	"hint_position_audit, hint_position_combinations, set_operation_distinct, factorized_mode, gql_surface, gql_set_propagation, gql_hint_surface, google_sql_surface, google_sql_proto_surface, condition_boundaries, aggregate_functions, join_matrix, subquery_join_hint_matrix, push_broadcast_hash_join, or hash_join"
+	"hint_position_audit, hint_position_combinations, set_operation_distinct, factorized_mode, gql_surface, gql_set_propagation, gql_hint_surface, google_sql_surface, google_sql_proto_surface, rewriter_surface, condition_boundaries, aggregate_functions, join_matrix, subquery_join_hint_matrix, push_broadcast_hash_join, or hash_join"
 
 type stringListFlag []string
 
@@ -260,6 +260,12 @@ func loadDDLs(builtinCase string, paths []string) ([]string, error) {
 		if strings.EqualFold(strings.TrimSpace(builtinCase), "google_sql_proto_surface") {
 			return parseBuiltInDDLs("google-sql-proto-surface-schema.sql", googleSQLProtoSurfaceDDL)
 		}
+		if strings.EqualFold(strings.TrimSpace(builtinCase), "rewriter_surface") {
+			return parseBuiltInDDLs("rewriter-surface-schema.sql", rewriterSurfaceDDL)
+		}
+		if strings.EqualFold(strings.TrimSpace(builtinCase), "condition_boundaries") {
+			return parseBuiltInDDLs("condition-boundary-schema.sql", conditionBoundaryDDL)
+		}
 		if strings.EqualFold(strings.TrimSpace(builtinCase), "docs") ||
 			strings.EqualFold(strings.TrimSpace(builtinCase), "cte") ||
 			strings.EqualFold(strings.TrimSpace(builtinCase), "function_hint") ||
@@ -272,7 +278,6 @@ func loadDDLs(builtinCase string, paths []string) ([]string, error) {
 			strings.EqualFold(strings.TrimSpace(builtinCase), "gql_set_propagation") ||
 			strings.EqualFold(strings.TrimSpace(builtinCase), "gql_hint_surface") ||
 			strings.EqualFold(strings.TrimSpace(builtinCase), "google_sql_surface") ||
-			strings.EqualFold(strings.TrimSpace(builtinCase), "condition_boundaries") ||
 			strings.EqualFold(strings.TrimSpace(builtinCase), "aggregate_functions") ||
 			strings.EqualFold(strings.TrimSpace(builtinCase), "join_matrix") ||
 			strings.EqualFold(strings.TrimSpace(builtinCase), "subquery_join_hint_matrix") {
@@ -426,6 +431,8 @@ func loadQueries(builtinCase string, sqlTexts, sqlFiles []string) ([]queryCase, 
 		return googleSQLSurfaceQueries, nil
 	case "google_sql_proto_surface":
 		return googleSQLProtoSurfaceQueries, nil
+	case "rewriter_surface":
+		return rewriterSurfaceQueries, nil
 	case "condition_boundaries":
 		return conditionBoundaryQueries, nil
 	case "aggregate_functions":

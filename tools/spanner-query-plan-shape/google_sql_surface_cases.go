@@ -13,6 +13,8 @@ var googleSQLSurfaceQueries = []queryCase{
 	{Label: "google-sql-surface/accepted/aggregate-having-max", SQL: `SELECT SingerId, ANY_VALUE(AlbumTitle HAVING MAX AlbumId) AS latest_title FROM Albums GROUP BY SingerId`},
 	{Label: "google-sql-surface/accepted/aggregate-having-min", SQL: `SELECT SingerId, ANY_VALUE(AlbumTitle HAVING MIN AlbumId) AS earliest_title FROM Albums GROUP BY SingerId`},
 	{Label: "google-sql-surface/accepted/array-agg-order-limit", SQL: `SELECT SingerId, ARRAY_AGG(AlbumTitle ORDER BY AlbumId DESC LIMIT 2) AS titles FROM Albums GROUP BY SingerId`},
+	{Label: "google-sql-surface/accepted/array-transform-lambda", SQL: `SELECT ARRAY_TRANSFORM([1, 2, 3], e -> e * 2) AS values`},
+	{Label: "google-sql-surface/accepted/array-filter-lambda", SQL: `SELECT ARRAY_FILTER([1, 2, 3], e -> e != 2) AS values`},
 	{Label: "google-sql-surface/accepted/in-unnest", SQL: `SELECT SingerId FROM Singers WHERE SingerId IN UNNEST([1, 2, 3])`},
 	{Label: "google-sql-surface/accepted/with-expression", SQL: `SELECT SingerId, WITH(a AS COALESCE(FirstName, ''), b AS UPPER(a), LENGTH(b)) AS normalized_length FROM Singers`},
 	{Label: "google-sql-surface/accepted/order-by-collate", SQL: `SELECT FirstName FROM Singers ORDER BY FirstName COLLATE "und:ci"`},
@@ -59,4 +61,5 @@ var googleSQLSurfaceQueries = []queryCase{
 	{Label: "google-sql-surface/unsupported/group-by-all", SQL: `SELECT SingerId, COUNT(*) AS album_count FROM Albums GROUP BY ALL`},
 	{Label: "google-sql-surface/unsupported/match-recognize", SQL: `SELECT * FROM Albums MATCH_RECOGNIZE (PARTITION BY SingerId ORDER BY AlbumId MEASURES MATCH_NUMBER() AS match_num PATTERN (A) DEFINE A AS TRUE)`},
 	{Label: "google-sql-surface/unsupported/set-operation-value-first-top-level", SQL: `SELECT AS VALUE SingerId FROM Singers UNION ALL SELECT SingerId FROM Albums`},
+	{Label: "google-sql-surface/unsupported/secure-context", SQL: `SELECT SECURE_CONTEXT("key") AS value`},
 }

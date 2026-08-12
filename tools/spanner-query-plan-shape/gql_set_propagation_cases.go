@@ -1,7 +1,5 @@
 package main
 
-const gqlSetPropagationStrictError = "GQL set operation requires all input queries to have identical column names"
-
 var gqlSetPropagationQueries = []queryCase{
 	{
 		Label: "gql-set-propagation/full",

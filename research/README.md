@@ -10,7 +10,10 @@ This directory supports the repository's positioning (see the root README):
 careful execution plan inspection, recorded so it does not have to be redone.
 Curated cross-area concepts live in the [`knowledge/`](../knowledge/index.md)
 OKF bundle; each concept has one writable body rather than duplicating a
-research note here.
+research note here. The bundle's
+[repository-document inventory](../knowledge/references/repository-documents.md)
+also classifies every tracked research note while this directory remains the
+canonical evidence store.
 
 ## Areas
 

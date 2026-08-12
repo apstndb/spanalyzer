@@ -837,7 +837,7 @@ func TestLoadQueriesGQLSurfaceIncludesBroadAcceptanceAndCapabilityControls(t *te
 	if err != nil {
 		t.Fatalf("loadQueries(%q) error = %v", "gql_surface", err)
 	}
-	if got, want := len(queries), 117; got != want {
+	if got, want := len(queries), 120; got != want {
 		t.Fatalf("GQL surface query count = %d, want %d", got, want)
 	}
 	seen := make(map[string]struct{}, len(queries))
@@ -895,7 +895,12 @@ func TestLoadQueriesGQLSurfaceIncludesBroadAcceptanceAndCapabilityControls(t *te
 		"gql-surface/factorized/quantified-left",
 		"gql-surface/match/optional",
 		"gql-surface/linear/next-two-stage-traversal",
-		"gql-surface/analytic/is-first",
+		gqlSurfaceISFirstReturnLabel,
+		gqlSurfaceISFirstFilterLabel,
+		gqlSurfaceISFirstEdgeOneHopLabel,
+		gqlSurfaceISFirstQuantifiedLabel,
+		gqlSurfaceISFirstBeforeNextLabel,
+		gqlSurfaceISFirstBeforeNextOrderedLabel,
 		"gql-surface/unsupported/gql-row-number",
 		"gql-surface/unsupported/sql-is-first-control",
 		"gql-surface/unsupported/pagerank-requires-export",
@@ -938,7 +943,7 @@ func TestLoadQueriesGQLSurfaceIncludesBroadAcceptanceAndCapabilityControls(t *te
 	if got, want := manifest.Version, "v0alpha1"; got != want {
 		t.Errorf("GQL surface expectation version = %q, want %q", got, want)
 	}
-	if got, want := len(manifest.Queries), 94; got != want {
+	if got, want := len(manifest.Queries), 97; got != want {
 		t.Errorf("GQL surface positive expectations = %d, want %d", got, want)
 	}
 	if got, want := len(manifest.ExpectedQueryErrors), 23; got != want {
@@ -954,7 +959,7 @@ func TestLoadQueriesGQLSurfaceIncludesBroadAcceptanceAndCapabilityControls(t *te
 		}
 		patternCount += len(expectation.Patterns)
 	}
-	if got, want := patternCount, 191; got != want {
+	if got, want := patternCount, 197; got != want {
 		t.Errorf("GQL surface operator patterns = %d, want %d", got, want)
 	}
 	for _, expectation := range manifest.ExpectedQueryErrors {
@@ -1085,7 +1090,7 @@ func TestLoadQueriesGoogleSQLSurfaceIncludesPlansAndRuntimeCapabilityErrors(t *t
 	if err != nil {
 		t.Fatalf("loadQueries(%q) error = %v", "google_sql_surface", err)
 	}
-	if got, want := len(queries), 54; got != want {
+	if got, want := len(queries), 57; got != want {
 		t.Fatalf("GoogleSQL surface query count = %d, want %d", got, want)
 	}
 	seen := make(map[string]struct{}, len(queries))
@@ -1121,10 +1126,10 @@ func TestLoadQueriesGoogleSQLSurfaceIncludesPlansAndRuntimeCapabilityErrors(t *t
 	if got, want := manifest.Version, "v0alpha1"; got != want {
 		t.Errorf("GoogleSQL surface expectation version = %q, want %q", got, want)
 	}
-	if got, want := len(manifest.Queries), 32; got != want {
+	if got, want := len(manifest.Queries), 34; got != want {
 		t.Errorf("GoogleSQL surface positive expectations = %d, want %d", got, want)
 	}
-	if got, want := len(manifest.ExpectedQueryErrors), 22; got != want {
+	if got, want := len(manifest.ExpectedQueryErrors), 23; got != want {
 		t.Errorf("GoogleSQL surface error expectations = %d, want %d", got, want)
 	}
 	patternCount := 0
@@ -1137,7 +1142,7 @@ func TestLoadQueriesGoogleSQLSurfaceIncludesPlansAndRuntimeCapabilityErrors(t *t
 		}
 		patternCount += len(expectation.Patterns)
 	}
-	if got, want := patternCount, 64; got != want {
+	if got, want := patternCount, 71; got != want {
 		t.Errorf("GoogleSQL surface operator patterns = %d, want %d", got, want)
 	}
 	for _, expectation := range manifest.ExpectedQueryErrors {
@@ -1261,13 +1266,14 @@ func TestLoadQueriesConditionBoundaries(t *testing.T) {
 	if err != nil {
 		t.Fatalf("loadQueries(%q) error = %v", "condition_boundaries", err)
 	}
-	if got, want := len(queries), 36; got != want {
+	if got, want := len(queries), 38; got != want {
 		t.Fatalf("condition boundary query count = %d, want %d", got, want)
 	}
 	seen := make(map[string]struct{}, len(queries))
 	parameterized := 0
 	for _, query := range queries {
 		if !strings.HasPrefix(query.Label, "condition-boundary/scan/") &&
+			!strings.HasPrefix(query.Label, "condition-boundary/timestamp-key/") &&
 			!strings.HasPrefix(query.Label, "condition-boundary/join/") {
 			t.Errorf("condition boundary label %q has wrong prefix", query.Label)
 		}
@@ -1287,7 +1293,7 @@ func TestLoadQueriesConditionBoundaries(t *testing.T) {
 		t.Fatalf("loadDDLs(%q) error = %v", "condition_boundaries", err)
 	}
 	joined := strings.Join(ddls, "\n")
-	for _, want := range []string{"CREATE TABLE Songs", "CREATE INDEX SongsBySongName", "CREATE TABLE Albums"} {
+	for _, want := range []string{"CREATE TABLE Songs", "CREATE INDEX SongsBySongName", "CREATE TABLE Albums", "CREATE TABLE CommitTimestampKeys"} {
 		if !strings.Contains(joined, want) {
 			t.Errorf("condition boundary DDL is missing %q", want)
 		}
@@ -1332,7 +1338,7 @@ func TestLoadQueriesConditionBoundaries(t *testing.T) {
 		}
 		patternCount += len(expectation.Patterns)
 	}
-	if got, want := patternCount, 60; got != want {
+	if got, want := patternCount, 62; got != want {
 		t.Errorf("condition boundary operator patterns = %d, want %d", got, want)
 	}
 }
@@ -1584,6 +1590,10 @@ func TestLoadDDLsVectorSearchUsesDedicatedSchema(t *testing.T) {
 		"ON VectorDocuments(Embedding, TenantId)",
 		"CREATE VECTOR INDEX TechVectorDocumentsByEmbedding",
 		"WHERE TechOnly IS NOT NULL",
+		"CREATE VECTOR INDEX VectorDocumentsByDotProduct",
+		"OPTIONS (distance_type = 'DOT_PRODUCT')",
+		"CREATE VECTOR INDEX VectorDocumentsByEuclidean",
+		"OPTIONS (distance_type = 'EUCLIDEAN')",
 		"CREATE TABLE VectorRelated",
 		"CREATE PROPERTY GRAPH VectorGraph",
 	} {
@@ -1817,6 +1827,8 @@ func TestLoadQueriesVectorSearch(t *testing.T) {
 		"vector-search/ann-stored-filter",
 		"vector-search/ann-back-join",
 		"vector-search/ann-filtered-index",
+		"vector-search/ann-dot-product",
+		"vector-search/ann-euclidean-distance",
 		"vector-search/ann-gql-next-traversal",
 	} {
 		if seen[label] == "" {
@@ -1828,6 +1840,12 @@ func TestLoadQueriesVectorSearch(t *testing.T) {
 	}
 	if !strings.Contains(seen["vector-search/ann-auto-index"], "APPROX_COSINE_DISTANCE(") {
 		t.Fatalf("ANN probe missing APPROX_COSINE_DISTANCE(): %s", seen["vector-search/ann-auto-index"])
+	}
+	if !strings.Contains(seen["vector-search/ann-dot-product"], "APPROX_DOT_PRODUCT(") {
+		t.Fatalf("ANN probe missing APPROX_DOT_PRODUCT(): %s", seen["vector-search/ann-dot-product"])
+	}
+	if !strings.Contains(seen["vector-search/ann-euclidean-distance"], "APPROX_EUCLIDEAN_DISTANCE(") {
+		t.Fatalf("ANN probe missing APPROX_EUCLIDEAN_DISTANCE(): %s", seen["vector-search/ann-euclidean-distance"])
 	}
 	if !strings.Contains(seen["vector-search/ann-back-join"], "Body") {
 		t.Fatalf("back-join probe missing non-stored Body projection: %s", seen["vector-search/ann-back-join"])

@@ -16,6 +16,8 @@ import (
 	"google.golang.org/protobuf/proto"
 )
 
+const gqlSetPropagationStrictError = "GQL set operation requires all input queries to have identical column names"
+
 func TestIntegrationGQLSetPropagationOnOmni(t *testing.T) {
 	if os.Getenv("SPANEMUBOOST_ENABLE_OMNI_TESTS") == "" {
 		t.Skip("set SPANEMUBOOST_ENABLE_OMNI_TESTS=1 to run Spanner Omni tests")

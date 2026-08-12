@@ -21,7 +21,7 @@ func TestIntegrationConditionBoundariesVersionMatrixOnOmni(t *testing.T) {
 	if image == "" {
 		t.Fatal("set SPANALYZER_OMNI_IMAGE to the pinned Spanner Omni image under test")
 	}
-	ddls, err := parseBuiltInDDLs("condition-boundary-schema.sql", docsDDL)
+	ddls, err := parseBuiltInDDLs("condition-boundary-schema.sql", conditionBoundaryDDL)
 	if err != nil {
 		t.Fatalf("parseBuiltInDDLs() error = %v", err)
 	}
@@ -110,6 +110,11 @@ func TestIntegrationConditionBoundariesVersionMatrixOnOmni(t *testing.T) {
 				assertNoCondition(t, mixedOR, "Scan", "Seek Condition")
 			}
 
+			assertScanHasConditions(t, plans["condition-boundary/timestamp-key/pushdown-true"], "CommitTimestampKeys", "Seek Condition", "Timestamp Condition")
+			assertNoCondition(t, plans["condition-boundary/timestamp-key/pushdown-true"], "Filter Scan", "Timestamp Condition")
+			assertScanHasConditions(t, plans["condition-boundary/timestamp-key/pushdown-false"], "CommitTimestampKeys", "Seek Condition")
+			assertNoCondition(t, plans["condition-boundary/timestamp-key/pushdown-false"], "Scan", "Timestamp Condition")
+
 			assertCondition(t, plans["condition-boundary/join/hash-equality"], "Hash Join", "Condition", "($SingerId = $SingerId_1)")
 			assertCondition(t, plans["condition-boundary/join/hash-two-equalities"], "Hash Join", "Condition", "(($SingerId = $SingerId_1) AND ($AlbumId = $AlbumId_1))")
 			assertConditionContains(t, plans["condition-boundary/join/hash-cast-equality"], "Hash Join", "Condition", "CAST<STRING>")
@@ -168,6 +173,30 @@ func conditionExpressions(plan *spannerpb.QueryPlan, parentName, linkType string
 	}
 	slices.Sort(expressions)
 	return expressions
+}
+
+func assertScanHasConditions(t *testing.T, plan *spannerpb.QueryPlan, target string, linkTypes ...string) {
+	t.Helper()
+	nodes := make(map[int32]*spannerpb.PlanNode, len(plan.GetPlanNodes()))
+	for _, node := range plan.GetPlanNodes() {
+		nodes[node.GetIndex()] = node
+	}
+	for _, node := range plan.GetPlanNodes() {
+		if node.GetDisplayName() != "Scan" || node.GetMetadata().GetFields()["scan_target"].GetStringValue() != target {
+			continue
+		}
+		found := make(map[string]bool, len(node.GetChildLinks()))
+		for _, link := range node.GetChildLinks() {
+			if nodes[link.GetChildIndex()] != nil {
+				found[link.GetType()] = true
+			}
+		}
+		if slices.ContainsFunc(linkTypes, func(linkType string) bool { return !found[linkType] }) {
+			continue
+		}
+		return
+	}
+	t.Errorf("Scan on %s does not have all condition links %q", target, linkTypes)
 }
 
 func assertCondition(t *testing.T, plan *spannerpb.QueryPlan, parentName, linkType, want string) {

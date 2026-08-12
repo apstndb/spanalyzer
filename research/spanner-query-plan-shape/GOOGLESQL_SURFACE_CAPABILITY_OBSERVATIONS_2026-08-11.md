@@ -18,12 +18,14 @@ evidence.
   `3ae52a8eb15d2d6952da6f387605ff2bc89d2720` (2026-08-10).
 - Upstream grammar, AST, resolver, and tests: `google/googlesql` commit
   `1f8aa333f4d6353cd3a64471fc83121df72df3f7` (2026-07-21).
-- Retained selector: `google_sql_surface`, 54 queries.
-- Default result: 32 plans, 22 expected errors, 64 operator
+- Emulator cross-check: `GoogleCloudPlatform/cloud-spanner-emulator` commit
+  `2abe04c1ace40b8760133e6ca0800d257d127da4` (2026-08-03).
+- Retained selector: `google_sql_surface`, 57 queries.
+- Default result: 34 plans, 23 expected errors, 71 operator
   expectations, zero expectation failures, and zero vocabulary findings.
-- Optimizer matrix: 432 submissions covering versions 1 through 8; every
-  version returned the same 32 plans and 22 error classes. The matrix returned
-  256 plans and 176 expected errors in total, with zero vocabulary findings.
+- Optimizer matrix: 456 submissions covering versions 1 through 8; every
+  version returned the same 34 plans and 23 error classes. The matrix returned
+  272 plans and 184 expected errors in total, with zero vocabulary findings.
 - Descriptor-backed selector: `google_sql_proto_surface`, 18 queries. Its
   default result is 11 plans, 7 expected errors, and 28 operator expectations;
   its optimizer matrix is 144 submissions (88 plans and 56 errors). Both have
@@ -43,6 +45,8 @@ evidence.
 | aggregate-call `HAVING MAX` | Stream Aggregate with Key/Agg links |
 | aggregate-call `HAVING MIN` | Stream Aggregate with Key/Agg links |
 | `ARRAY_AGG(... ORDER BY ... LIMIT ...)` | Aggregate, Sort Limit, and Array Unnest |
+| `ARRAY_TRANSFORM(array, e -> expression)` | scalar Array Subquery over Array Unnest, with the lambda body as a Function child |
+| `ARRAY_FILTER(array, e -> predicate)` | scalar Array Subquery over Filter and Array Unnest; the predicate is the Filter's Condition child |
 | `IN UNNEST(array)` | primary-key Filter Scan plus Array Constructor |
 | scalar `WITH(...)` expression | scalar functions over a covering IndexScan |
 | `ORDER BY ... COLLATE` | Compute/Function below Sort |
@@ -145,6 +149,7 @@ same top-level value-table restriction as `SELECT AS VALUE` and
 | `GROUP BY ALL` | `GROUP BY ALL is not supported` |
 | `MATCH_RECOGNIZE` | service syntax error at the clause |
 | value-table-first top-level set operation | top-level value-table shape error |
+| `SECURE_CONTEXT(key)` | `Unsupported built-in function: SECURE_CONTEXT is not supported` |
 
 The same `FOR UPDATE` statement was analyzed in both transaction contexts. It
 returned a plan in read-write mode and the documented transaction-type error
@@ -160,6 +165,21 @@ missing plan-vocabulary case. Aggregate-call `DISTINCT` is supported: its
 tested plan gains a `Minor Sort` only at optimizer versions 5 through 8.
 `IGNORE NULLS` adds one Filter at every version, while the explicit
 `RESPECT NULLS` form retains the no-filter shape.
+
+The emulator conformance suite executes `ARRAY_TRANSFORM`, `ARRAY_FILTER`,
+`ARRAY_FIRST`, and `ARRAY_LAST`; the first and last functions were already
+covered by spanalyzer's frontend tests. The retained PLAN pair adds the two
+lambda forms and distinguishes transformation from filtering by the latter's
+relational Filter. The same emulator suite also executes `SECURE_CONTEXT`
+inside a `SQL SECURITY DEFINER` view, but pinned Omni rejects a direct
+`SECURE_CONTEXT` query at every optimizer version. This is a runtime
+capability divergence, not evidence that either implementation defines the
+managed-service contract. The current official
+[Spanner views documentation](https://docs.cloud.google.com/spanner/docs/views)
+describes and gives examples of `SQL SECURITY DEFINER`, which the local
+row-type analyzer now covers, but it does not document a `SECURE_CONTEXT`
+function. Consequently spanalyzer does not register that emulator-only
+function in its local catalog.
 
 ## Source and runtime divergences
 
@@ -208,6 +228,6 @@ set -o pipefail
 ```
 
 Add `--optimizer-version-matrix` without the unprefixed expectation manifest
-to repeat the 432-submission capability and vocabulary matrix. The
+to repeat the 456-submission capability and vocabulary matrix. The
 descriptor-backed selector uses the analogous command documented in
 `tools/spanner-query-plan-shape/README.md` and requires both descriptor flags.

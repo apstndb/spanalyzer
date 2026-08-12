@@ -1,0 +1,39 @@
+{
+  "version": "v0alpha1",
+  "queries": [
+    {"label":"rewriter-surface/accepted/array-first","patterns":[{"display_name":"Function"},{"display_name":"Scan","metadata":[{"key":"scan_target","value":"Concerts"}]}]},
+    {"label":"rewriter-surface/accepted/array-last","patterns":[{"display_name":"Function"},{"display_name":"Scan","metadata":[{"key":"scan_target","value":"Concerts"}]}]},
+    {"label":"rewriter-surface/accepted/array-min","patterns":[{"display_name":"Scalar Subquery"},{"display_name":"Sort Limit"},{"display_name":"Filter"},{"display_name":"Array Unnest"}]},
+    {"label":"rewriter-surface/accepted/array-max","patterns":[{"display_name":"Scalar Subquery"},{"display_name":"Sort Limit"},{"display_name":"Filter"},{"display_name":"Array Unnest"}]},
+    {"label":"rewriter-surface/accepted/array-slice","patterns":[{"display_name":"Array Subquery"},{"display_name":"Filter"},{"display_name":"Array Unnest"}]},
+    {"label":"rewriter-surface/accepted/array-filter-with-index","patterns":[{"display_name":"Array Subquery"},{"display_name":"Filter","child_links":[{"kind":"SCALAR","type":"Condition","variable":"absent"}]},{"display_name":"Array Unnest"}]},
+    {"label":"rewriter-surface/accepted/array-transform-with-index","patterns":[{"display_name":"Array Subquery"},{"display_name":"Array Unnest"}]},
+    {"label":"rewriter-surface/accepted/array-includes-value","patterns":[{"display_name":"Scalar Subquery"},{"display_name":"Aggregate"},{"display_name":"Filter"},{"display_name":"Array Unnest"}]},
+    {"label":"rewriter-surface/accepted/array-includes-lambda","patterns":[{"display_name":"Scalar Subquery"},{"display_name":"Aggregate"},{"display_name":"Filter"},{"display_name":"Array Unnest"}]},
+    {"label":"rewriter-surface/accepted/array-includes-any","patterns":[{"display_name":"Scalar Subquery"},{"display_name":"Aggregate"},{"display_name":"Filter"},{"display_name":"Array Unnest"}]},
+    {"label":"rewriter-surface/accepted/array-includes-all","patterns":[{"display_name":"Scalar Subquery"},{"display_name":"Aggregate"},{"display_name":"Cross Apply","child_links":[{"kind":"RELATIONAL","type":"Map","variable":"absent"}]},{"display_name":"Array Unnest"}]},
+    {"label":"rewriter-surface/accepted/dot-product","patterns":[{"display_name":"Function"},{"display_name":"Scan","metadata":[{"key":"scan_target","value":"Concerts"}]}]},
+    {"label":"rewriter-surface/accepted/array-concat-agg-order-limit","patterns":[{"display_name":"Aggregate"},{"display_name":"Sort Limit","child_links":[{"kind":"SCALAR","type":"Limit","variable":"absent"},{"kind":"SCALAR","type":"Key","variable":"present"}]},{"display_name":"Array Unnest"},{"display_name":"Minor Sort"}]},
+    {"label":"rewriter-surface/accepted/view","patterns":[{"display_name":"Scan","metadata":[{"key":"scan_type","value":"IndexScan"}]}]},
+    {"label":"rewriter-surface/accepted/view-control","patterns":[{"display_name":"Scan","metadata":[{"key":"scan_type","value":"IndexScan"}]}]},
+    {"label":"rewriter-surface/accepted/nested-view","patterns":[{"display_name":"Filter Scan","metadata":[{"key":"seekable_key_size","value":"0"}]},{"display_name":"Scan","metadata":[{"key":"scan_type","value":"IndexScan"}]}]},
+    {"label":"rewriter-surface/accepted/nested-view-control","patterns":[{"display_name":"Filter Scan","metadata":[{"key":"seekable_key_size","value":"0"}]},{"display_name":"Scan","metadata":[{"key":"scan_type","value":"IndexScan"}]}]},
+    {"label":"rewriter-surface/accepted/insert-values-multi-row","patterns":[{"display_name":"Apply Mutations"},{"display_name":"Union All"},{"display_name":"Union Input"},{"display_name":"Unit Relation"}]}
+  ],
+  "expected_query_errors": [
+    {"label":"rewriter-surface/unsupported/aggregation-threshold","contains":"Unexpected keyword WITH"},
+    {"label":"rewriter-surface/unsupported/anonymization","contains":"Unexpected keyword WITH"},
+    {"label":"rewriter-surface/unsupported/differential-privacy","contains":"Unexpected keyword WITH"},
+    {"label":"rewriter-surface/unsupported/flatten","contains":"Function not found: FLATTEN"},
+    {"label":"rewriter-surface/unsupported/like-any","contains":"LIKE ANY is not supported"},
+    {"label":"rewriter-surface/unsupported/quantified-comparison","contains":"Quantified comparisons (= ANY) are not supported"},
+    {"label":"rewriter-surface/unsupported/nulliferror","contains":"Unsupported built-in function: nulliferror"},
+    {"label":"rewriter-surface/unsupported/typeof","contains":"Function not found: TYPEOF"},
+    {"label":"rewriter-surface/unsupported/multiway-unnest","contains":"The UNNEST operator supports exactly one argument"},
+    {"label":"rewriter-surface/unsupported/pipe-assert","contains":"Syntax error: Unexpected FROM"},
+    {"label":"rewriter-surface/unsupported/pipe-describe","contains":"Syntax error: Unexpected FROM"},
+    {"label":"rewriter-surface/unsupported/pipe-if","contains":"Syntax error: Unexpected FROM"},
+    {"label":"rewriter-surface/unsupported/tumble","contains":"Table-valued function not found: TUMBLE"},
+    {"label":"rewriter-surface/unsupported/nested-array-update","contains":"Nested updates on table columns of type ARRAY are not supported"}
+  ]
+}

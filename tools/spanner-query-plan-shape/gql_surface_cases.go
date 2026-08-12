@@ -4,7 +4,7 @@ package main
 // including clauses that optimize to the same physical shape as a simpler
 // control. Distinctive plan-shape claims live in the companion planvocab
 // manifest; expected errors record runtime capability boundaries separately.
-var gqlSurfaceQueries = []queryCase{
+var gqlSurfaceQueries = append([]queryCase{
 	{Label: "gql-surface/graph-table/baseline", SQL: `SELECT SingerId FROM GRAPH_TABLE(MusicGraph MATCH (p:Singers) RETURN p.SingerId AS SingerId)`},
 	{Label: "gql-surface/graph-table/self-join-eliminated-control", SQL: `SELECT g.SingerId, s.FirstName FROM GRAPH_TABLE(MusicGraph MATCH (p:Singers) RETURN p.SingerId AS SingerId) AS g JOIN Singers AS s USING (SingerId)`},
 	{Label: "gql-surface/graph-table/filter", SQL: `SELECT SingerId FROM GRAPH_TABLE(MusicGraph MATCH (p:Singers) RETURN p.SingerId AS SingerId) AS g WHERE SingerId > 0`},
@@ -28,7 +28,6 @@ var gqlSurfaceQueries = []queryCase{
 	{Label: "gql-surface/subquery/exists-pattern-filter", SQL: `GRAPH MusicGraph MATCH (s:Singers) FILTER EXISTS { (x:Singers WHERE x = s)-[:CollabWith]->(f:Singers) } RETURN s.SingerId AS singer_id`},
 	{Label: "gql-surface/subquery/exists-full-filter-control", SQL: `GRAPH MusicGraph MATCH (s:Singers) FILTER EXISTS { MATCH (x:Singers)-[:CollabWith]->(f:Singers) FILTER x = s RETURN f } RETURN s.SingerId AS singer_id`},
 	{Label: "gql-surface/bridge/dml-update-recursive-in", SQL: `UPDATE Singers SET FirstName = FirstName WHERE SingerId IN { GRAPH MusicGraph MATCH (a:Singers WHERE a.SingerId = 1)-[:CollabWith]->{1,2}(b:Singers) RETURN b.SingerId }`, PlanMode: planModeReadWrite},
-	{Label: "gql-surface/subquery/edge-in-is-first-quantified", SQL: `GRAPH MusicGraph MATCH (a:Singers)-[e:CollabWith WHERE e IN { MATCH -[selected_e:CollabWith]-> FILTER IS_FIRST(2) OVER (PARTITION BY SOURCE_NODE_ID(selected_e) ORDER BY selected_e.AlbumTitle DESC) RETURN selected_e }]->{1,3}(b:Singers) RETURN a.SingerId AS src_id, b.SingerId AS dst_id`},
 	{Label: "gql-surface/linear/next", SQL: `GRAPH MusicGraph MATCH (p:Singers) RETURN p NEXT RETURN p.SingerId`},
 	{Label: "gql-surface/return/with-distinct-node-control", SQL: `GRAPH MusicGraph MATCH (p:Singers) WITH DISTINCT p RETURN p.SingerId`},
 	{Label: "gql-surface/return/distinct-traversal", SQL: `GRAPH MusicGraph MATCH (p:Singers)-[:CollabWith]->(q:Singers) RETURN DISTINCT q.SingerId`},
@@ -103,8 +102,6 @@ var gqlSurfaceQueries = []queryCase{
 	{Label: "gql-surface/match/inner-control", SQL: `GRAPH MusicGraph MATCH (s:Singers) MATCH (s)-[c:CollabWith]->(f:Singers) RETURN s.SingerId AS singer_id, f.SingerId AS friend_id`},
 	{Label: "gql-surface/match/optional", SQL: `GRAPH MusicGraph MATCH (s:Singers) OPTIONAL MATCH (s)-[c:CollabWith]->(f:Singers) RETURN s.SingerId AS singer_id, f.SingerId AS friend_id`},
 	{Label: "gql-surface/linear/next-two-stage-traversal", SQL: `GRAPH MusicGraph MATCH (s:Singers)-[:CollabWith]->(frontier:Singers) RETURN frontier NEXT MATCH (frontier)-[:CollabWith]->(dest:Singers) RETURN frontier.SingerId AS frontier_id, dest.SingerId AS destination_id`},
-	{Label: "gql-surface/analytic/is-first", SQL: `GRAPH MusicGraph MATCH (s:Singers)-[:CollabWith]->(f:Singers) RETURN s.SingerId AS singer_id, f.SingerId AS friend_id, IS_FIRST(1) OVER (PARTITION BY s.SingerId ORDER BY f.SingerId) AS first_friend`},
-	{Label: "gql-surface/analytic/is-first-before-next", SQL: `GRAPH MusicGraph MATCH (a1:Singers)-[e1:CollabWith]->(a2:Singers) FILTER IS_FIRST(1) OVER (PARTITION BY a2) RETURN a1, a2 NEXT MATCH (a2)-[e2:CollabWith]->(a3:Singers) RETURN a1.SingerId AS src_id, a2.SingerId AS mid_id, a3.SingerId AS dst_id`},
 
 	{Label: "gql-surface/unsupported/gql-row-number", SQL: `GRAPH MusicGraph MATCH (p:Singers) RETURN p.SingerId AS singer_id, ROW_NUMBER() OVER (ORDER BY p.SingerId) AS rn`},
 	{Label: "gql-surface/unsupported/sql-is-first-control", SQL: `SELECT IS_FIRST(1) OVER (ORDER BY SingerId) FROM Singers`},
@@ -129,4 +126,4 @@ var gqlSurfaceQueries = []queryCase{
 	{Label: "gql-surface/unsupported/graph-table-final-element", SQL: `SELECT n FROM GRAPH_TABLE(MusicGraph MATCH (n:Singers) RETURN n)`},
 	{Label: "gql-surface/unsupported/mixed-set-operation-kinds", SQL: `GRAPH MusicGraph MATCH (s:Singers) RETURN s.SingerId AS id UNION ALL MATCH (t:Singers) RETURN t.SingerId AS id EXCEPT DISTINCT MATCH (u:Singers) RETURN u.SingerId AS id`},
 	{Label: "gql-surface/unsupported/export-data-graph-shape", SQL: `EXPORT DATA OPTIONS (uri = "gs://unused-spanalyzer-plan-probe/pagerank/*.csv", format = "CSV") AS GRAPH MusicGraph CALL PageRank(node_labels => ["Singers"], edge_labels => ["CollabWith"]) YIELD node, score RETURN node.SingerId AS singer_id, score`},
-}
+}, gqlISFirstSurfaceQueries...)

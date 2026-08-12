@@ -357,12 +357,17 @@ Omni `2026.r1-beta`; see `SET_OPERATION_DISTINCT_HINTS_2026-08-04.md`.
 `Local Split Union` remains unreproduced and likely needs placement or
 locality-specific configuration that is absent from the synthetic schema.
 
-GQL `IS_FIRST(1) OVER (...)` reproduced the relational `Crowd` display name on
-2026-08-11. Its observed shape had one relational child, three untyped scalar
-children without variables, one variable-bearing scalar result, and
+GQL `RETURN IS_FIRST(1) OVER (...)` reproduced the relational `Crowd` display
+name on 2026-08-11. Its observed shape had one relational child, three untyped
+scalar children without variables, one variable-bearing scalar result, and
 `execution_method=Row`. The same function was unsupported in ordinary SQL.
 The GQL plan contained a Sort below `Crowd`, and the shape remained known to
-planvocab across optimizer versions 1 through 8.
+planvocab across optimizer versions 1 through 8. This is not a universal
+`IS_FIRST` mapping: direct `FILTER` and one-hop edge membership forms have
+multiple `Crowd` operators, while the documented filtered edge predicate in a
+quantified traversal lowers to `Recursive Union` plus Limit-based selection
+without `Crowd` in the retained matrix. See
+`GQL_SURFACE_OBSERVATIONS_2026-08-11.md` for the result and placement details.
 
 A recursive GQL path-materialization probe using `NODES`, `EDGES`,
 `PATH_FIRST`, and `PATH_LAST` added a second observed `Compute` scalar-link
@@ -794,10 +799,10 @@ not a universal "2 is unforceable". The robust observations are:
    above already does. This is why the validated annotation prototype left
    `0` unannotated.
 
-Confirmed on Cloud Spanner DBaaS (2026-06-13, `gcpug-public-spanner`, via
-`spanner-mycli EXPLAIN`), so the behaviour is not Omni-specific. Using a
-self-contained minimal base table `SeekableKeySizeDemo(k1, k2) PRIMARY KEY
-(k1, k2)` with `FORCE_INDEX=_BASE_TABLE` (since dropped):
+Confirmed on Cloud Spanner DBaaS (2026-06-13, through the user-level managed
+profile with `spanner-mycli EXPLAIN`), so the behaviour is not Omni-specific.
+Using a self-contained minimal base table `SeekableKeySizeDemo(k1, k2) PRIMARY
+KEY (k1, k2)` with `FORCE_INDEX=_BASE_TABLE` (since dropped):
 
 | Query / hint | Reported `seekable_key_size` |
 | --- | --- |

@@ -118,6 +118,39 @@ func TestIntegrationSetOperationRewriteEquivalenceOnOmni(t *testing.T) {
 	for _, rewrite := range nullableRewrites {
 		assertNullablePairQueryEqual(t, clients.Client, rewrite.name, rewrite.directSQL, rewrite.rewriteSQL, rewrite.want)
 	}
+
+	// Set operations coerce each output position to a common supertype. A
+	// correlated rewrite must apply that coercion to both the comparison and
+	// the projected result; otherwise it can preserve the left input's type and
+	// value even when the direct set operation rounds during conversion.
+	directCommonSupertypeSQL := `SELECT K FROM (
+		SELECT CAST(9007199254740993 AS INT64) AS K
+		INTERSECT DISTINCT
+		SELECT CAST(9007199254740993 AS FLOAT64) AS K
+	)`
+	naiveCommonSupertypeRewriteSQL := `WITH
+		l AS (SELECT CAST(9007199254740993 AS INT64) AS K),
+		r AS (SELECT CAST(9007199254740993 AS FLOAT64) AS K)
+		SELECT DISTINCT l.K
+		FROM l
+		WHERE EXISTS (SELECT 1 FROM r WHERE r.K IS NOT DISTINCT FROM l.K)`
+	coercedCommonSupertypeRewriteSQL := `WITH
+		l AS (SELECT CAST(9007199254740993 AS INT64) AS K),
+		r AS (SELECT CAST(9007199254740993 AS FLOAT64) AS K)
+		SELECT DISTINCT CAST(l.K AS FLOAT64)
+		FROM l
+		WHERE EXISTS (
+			SELECT 1 FROM r
+			WHERE CAST(r.K AS FLOAT64) IS NOT DISTINCT FROM CAST(l.K AS FLOAT64)
+		)`
+	directCommonSupertype := readFloat64s(t, clients.Client, directCommonSupertypeSQL)
+	coercedCommonSupertypeRewrite := readFloat64s(t, clients.Client, coercedCommonSupertypeRewriteSQL)
+	if want := []float64{9007199254740992}; !slices.Equal(directCommonSupertype, want) || !slices.Equal(coercedCommonSupertypeRewrite, want) {
+		t.Fatalf("common-supertype results: direct=%v coerced rewrite=%v want=%v", directCommonSupertype, coercedCommonSupertypeRewrite, want)
+	}
+	if got, want := readInt64s(t, clients.Client, naiveCommonSupertypeRewriteSQL), []int64{9007199254740993}; !slices.Equal(got, want) {
+		t.Fatalf("naive left-typed rewrite result = %v, want %v", got, want)
+	}
 	for version := 1; version <= 8; version++ {
 		for _, rewrite := range nullableRewrites {
 			directPlan, err := analyzePlan(t.Context(), clients.Client, queryCase{
@@ -203,6 +236,23 @@ func readInt64s(t *testing.T, client *spanner.Client, sql string) []int64 {
 	var got []int64
 	err := client.Single().Query(t.Context(), spanner.Statement{SQL: sql}).Do(func(row *spanner.Row) error {
 		var value int64
+		if err := row.Columns(&value); err != nil {
+			return err
+		}
+		got = append(got, value)
+		return nil
+	})
+	if err != nil {
+		t.Fatalf("query failed: %v\nSQL: %s", err, sql)
+	}
+	return got
+}
+
+func readFloat64s(t *testing.T, client *spanner.Client, sql string) []float64 {
+	t.Helper()
+	var got []float64
+	err := client.Single().Query(t.Context(), spanner.Statement{SQL: sql}).Do(func(row *spanner.Row) error {
+		var value float64
 		if err := row.Columns(&value); err != nil {
 			return err
 		}

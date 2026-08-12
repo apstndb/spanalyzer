@@ -42,9 +42,10 @@ func TestIntegrationFullTextSearchGQLTraversalOnOmni(t *testing.T) {
 	}
 }
 
-func TestIntegrationVectorSearchGQLNextTraversalOnOmni(t *testing.T) {
+func TestIntegrationVectorSearchPlansOnOmni(t *testing.T) {
 	clients := openSearchGraphOmniClients(t, append([]string(nil), vectorSearchDDLs...))
-	query := queryCasesByLabel(t, vectorSearchQueries)["vector-search/ann-gql-next-traversal"]
+	cases := queryCasesByLabel(t, vectorSearchQueries)
+	query := cases["vector-search/ann-gql-next-traversal"]
 
 	for version := 1; version <= 8; version++ {
 		plan, err := analyzeVersionedSearchGraphPlan(t, clients.Client, query, version)
@@ -67,6 +68,27 @@ func TestIntegrationVectorSearchGQLNextTraversalOnOmni(t *testing.T) {
 		}
 		if got := countPlanNodes(plan, "Distributed Cross Apply", ""); got < 3 {
 			t.Errorf("ANN GQL NEXT traversal v%d Distributed Cross Apply count = %d, want at least 3", version, got)
+		}
+
+		for _, tt := range []struct {
+			label  string
+			target string
+		}{
+			{label: "vector-search/ann-dot-product", target: "VectorDocumentsByDotProduct"},
+			{label: "vector-search/ann-euclidean-distance", target: "VectorDocumentsByEuclidean"},
+		} {
+			plan, err := analyzeVersionedSearchGraphPlan(t, clients.Client, cases[tt.label], version)
+			if err != nil {
+				t.Fatalf("AnalyzeQuery(%s, v%d) error = %v", tt.label, version, err)
+			}
+			for _, scanType := range []string{"VectorIndexRootScan", "VectorIndexLeafScan"} {
+				if got := countPlanNodesWithMetadata(plan, "Scan", map[string]string{
+					"scan_target": tt.target,
+					"scan_type":   scanType,
+				}); got != 1 {
+					t.Errorf("%s v%d %s count = %d, want 1", tt.label, version, scanType, got)
+				}
+			}
 		}
 	}
 }

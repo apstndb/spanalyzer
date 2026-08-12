@@ -240,10 +240,10 @@ The pinned Omni probes found the following boundaries:[^runtime-observation]
 ## Equivalent rewrites and hintability
 
 Result equivalence was checked separately with duplicate-bearing and
-NULL-bearing inputs. `INTERSECT DISTINCT` matched `SELECT DISTINCT` plus a
-correlated `EXISTS`, and `EXCEPT DISTINCT` matched `SELECT DISTINCT` plus a
-correlated `NOT EXISTS`, when their correlation predicate treated two NULLs as
-equal:
+NULL-bearing inputs whose corresponding columns already had the same types.
+`INTERSECT DISTINCT` matched `SELECT DISTINCT` plus a correlated `EXISTS`, and
+`EXCEPT DISTINCT` matched `SELECT DISTINCT` plus a correlated `NOT EXISTS`,
+when their correlation predicate treated two NULLs as equal:
 
 ```sql
 right_key IS NOT DISTINCT FROM left_key
@@ -257,14 +257,29 @@ BigQuery page is syntax and semantics evidence for that product, not evidence
 that Spanner accepts the spelling. Separately, the spanalyzer GoogleSQL
 frontend and the pinned Omni runtime accepted both spellings, and Omni
 constant-folded the two NULL comparisons to the expected Boolean values in
-optimizer versions 1 through 8. The retained nullable rewrite therefore uses
-the native operator as a pinned-Omni observation.[^bigquery-operators][^spanner-operators][^runtime-observation]
+optimizer versions 1 through 8. A read-only managed Spanner probe on
+2026-08-12 also returned `true` for `NULL IS NOT DISTINCT FROM NULL`, `false`
+for `NULL IS DISTINCT FROM NULL`, `true` for two NaN values, and `true` for
+positive zero versus negative zero. The retained nullable rewrite therefore
+uses a native Spanner operator rather than a sibling-product spelling inferred
+from documentation.[^bigquery-operators][^spanner-operators][^runtime-observation]
 
 The retained Omni integration test extends this to two-column rows whose
 columns can be independently NULL, duplicate input rows, and three-input
 intersection and difference. The direct and rewritten results matched in all
 four cases. For multiple columns, the rewrite must apply the NULL-safe
-comparison to every coerced output column and deduplicate the complete row.
+comparison to every output column and deduplicate the complete row.
+
+The common-supertype conversion is part of the equivalence, not merely a type
+checker detail. A managed Spanner counterexample used the exactly represented
+`INT64` value `9007199254740993` on the left and its `FLOAT64` conversion on
+the right. Direct `INTERSECT DISTINCT` returned a `FLOAT64` value rounded to
+`9007199254740992`. A naive `EXISTS` rewrite compared the coercible operands
+but projected the original left `INT64`, returning `9007199254740993` instead.
+Casting both correlation operands and the projected left value to the set
+operation's resolved common supertype restores equivalence. Rewrites must
+therefore reproduce the resolved type of every output position as well as its
+NULL-safe row comparison.
 
 The rewrites had four observed control advantages over direct `INTERSECT
 DISTINCT` and `EXCEPT DISTINCT`:
@@ -358,8 +373,9 @@ and [planvocab expectation manifest](../../tools/spanner-query-plan-shape/testda
 
 ## Verification limits
 
-- The plan evidence is from the pinned Omni environment recorded in the
-  source note, not the Emulator or managed Cloud Spanner.
+- The physical-plan evidence is from the pinned Omni environment recorded in
+  the source note. Managed Spanner was used only for the explicitly identified
+  result-semantics checks above, not to generalize the Omni plan shapes.
 - The plan probes used `PLAN` against empty tables. They establish optimizer
   topology, not runtime cardinalities, costs, or performance.
 - A separate duplicate-bearing result fixture exercised the representative

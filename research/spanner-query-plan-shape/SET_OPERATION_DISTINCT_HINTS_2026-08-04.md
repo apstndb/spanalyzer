@@ -139,7 +139,19 @@ retained as integration cases.
 
 The multi-column rewrite applies `IS NOT DISTINCT FROM` independently to every
 output column and deduplicates the entire output row. Omitting any output
-column from the correlation is not equivalent to the direct set operation.
+column from the correlation is not equivalent to the direct set operation. It
+must also reproduce the direct operation's resolved common supertype in both
+the comparison and projection.
+
+A read-only managed Spanner probe on 2026-08-12 demonstrated why the type step
+is load-bearing. Direct `INTERSECT DISTINCT` between
+`INT64(9007199254740993)` and the corresponding `FLOAT64` value returned the
+common-supertype result `FLOAT64(9007199254740992)`. The naive correlated
+rewrite compared the coercible values but projected the left `INT64`, so it
+returned the exact integer `9007199254740993`. Explicitly casting both
+correlation operands and the projected value to `FLOAT64` restored the direct
+result. The integration test retains this counterexample so future rewrite
+guidance cannot silently omit output coercion.
 
 The DISTINCT rewrites exposed more hint controls than the direct set
 operators. On the same duplicate-capable `Albums`/`Songs` inputs:

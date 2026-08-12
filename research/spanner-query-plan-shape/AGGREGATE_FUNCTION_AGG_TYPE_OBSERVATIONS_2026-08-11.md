@@ -99,6 +99,26 @@ dedup Aggregate from Stream to Hash at version 6, and `ANY_VALUE` changed a
 generated variable name at version 6, but neither change altered the `Agg`
 type mapping.
 
+## Managed Spanner `ANY_VALUE` row versus STRUCT recheck
+
+A read-only managed Spanner probe on 2026-08-12 compared three independent
+calls, `ANY_VALUE(a HAVING MAX d)`, `ANY_VALUE(b HAVING MAX d)`, and
+`ANY_VALUE(c HAVING MAX d)`, with `ANY_VALUE(STRUCT(a, b, c) HAVING MAX d).*`.
+On the populated table used for the probe, both returned the same row. This
+data had no observed tie at the maximum key, so the result comparison does not
+prove that independent calls select a coherent source row when ties exist; the
+STRUCT form expresses that requirement directly.
+
+The compact PLAN topology was identical for the two spellings at optimizer
+versions 8 and 9: `Serialize Result`, Global Stream `Aggregate`, `Distributed
+Union`, Local Stream `Aggregate`, Local Distributed Union, and an index scan.
+Thus there was no managed-plan evidence of an operator-count or distribution
+advantage for either spelling. A later attempt to re-fetch the raw Aggregate
+nodes encountered an endpoint-wide `DeadlineExceeded`, including for
+`SELECT 1`; detailed `Agg` expression cardinality therefore remains
+unverified on managed Spanner rather than being inferred from the compact
+tree.
+
 ## Unsupported controls
 
 Pinned Omni returned stable `Unimplemented` errors at every optimizer version

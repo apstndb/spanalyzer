@@ -179,9 +179,12 @@ go run ./tools/spanner-query-plan-shape \
 ```
 
 The vector case compares an exact `_BASE_TABLE` KNN query with ANN automatic
-index selection, extra-key and stored-column filters, a non-covering back join,
-a filtered vector index, and an ANN result passed through GQL `NEXT` into a
-relationship traversal. The vector index DDL is kept as an explicit raw
+index selection, explicit COSINE, DOT_PRODUCT, and EUCLIDEAN index families,
+extra-key and stored-column filters, a non-covering back join, a filtered
+vector index, and an ANN result passed through GQL `NEXT` into a relationship
+traversal. The focused Omni test requires DOT_PRODUCT and EUCLIDEAN queries to
+route to their matching VectorIndexRootScan and VectorIndexLeafScan targets in
+optimizer versions 1 through 8. The vector index DDL is kept as an explicit raw
 statement list because the current memefish parser does not yet accept the
 documented extra key columns after the embedding column.
 
@@ -387,7 +390,8 @@ correlated ARRAY/IN/NOT IN, inner/optional/uncorrelated CALL and MATCH controls,
 recursive/subpath/path-construction variants, element functions and predicates,
 meaningful compound-label OR/AND over a multi-label graph, graph-element SQL
 bridging, correlated FOR, GQL-native BERNOULLI/RESERVOIR, horizontal
-aggregates, composed `IS_FIRST`/`Crowd` plans, and explicit capability errors.
+aggregates, `IS_FIRST` in `RETURN`, direct and edge `FILTER`, quantified
+traversal, and `NEXT` placements, and explicit capability errors.
 See
 [`GQL_SURFACE_OBSERVATIONS_2026-08-11.md`](../../research/spanner-query-plan-shape/GQL_SURFACE_OBSERVATIONS_2026-08-11.md)
 for the plan and optimizer-version evidence.
@@ -452,12 +456,36 @@ set -o pipefail
 ```
 
 This case covers accepted HAVING, aggregate-call DISTINCT/null modifiers,
-SELECT ALL, star
+array lambda transform/filter, SELECT ALL, star
 EXCEPT/REPLACE, subquery SELECT AS VALUE, scalar WITH, IN UNNEST, COLLATE, and
 read-write FOR UPDATE. It also retains explicit errors for analytic functions
 on the pinned Omni runtime, TABLESAMPLE REPEATABLE, pipes, grouping
 extensions, PIVOT/UNPIVOT, recursive WITH, top-level value tables, subquery
-WITH, read-only FOR UPDATE, and the lock-hint/FOR UPDATE conflict.
+WITH, read-only FOR UPDATE, `SECURE_CONTEXT`, and the lock-hint/FOR UPDATE
+conflict.
+
+Map every public rewriter registered by the pinned GoogleSQL frontend to
+retained Spanner evidence:
+
+```sh
+set -o pipefail
+/tmp/spanner-query-plan-shape \
+  --case rewriter_surface \
+  --omni-image us-docker.pkg.dev/spanner-omni/images/spanner-omni:2026.r1-beta \
+  --output json \
+  --continue-on-error \
+  | /tmp/planvocab-check \
+      --allow-query-errors \
+      --expect tools/spanner-query-plan-shape/testdata/rewriter_surface_expectations.json
+```
+
+The selector retains 18 PLAN-producing surfaces and 14 exact runtime
+capability errors. A separate completeness table records all 32 registered
+rewriters, including internal or GoogleSQL-only features that Spanner does not
+expose. The focused Omni test repeats all 32 direct probes for optimizer
+versions 1 through 8 and verifies plan-visible array lowerings, aggregate
+modifier topology, view/control equivalence, and stable error classes. See
+[`REWRITER_SURFACE_OBSERVATIONS_2026-08-12.md`](../../research/spanner-query-plan-shape/REWRITER_SURFACE_OBSERVATIONS_2026-08-12.md).
 
 Descriptor-backed GoogleSQL surfaces use a separate selector because Spanner
 must receive the serialized `FileDescriptorSet` with `CREATE PROTO BUNDLE`:
@@ -508,10 +536,12 @@ set -o pipefail
 The selector contrasts literal and parameterized prefix predicates, partial
 `LIKE` and regexp extraction, substring/suffix/transformed-key residuals,
 conjunctions and disjunctions, computed Hash/Merge equality keys, non-equality
-join residuals, one-side scan pushdown, and Apply Join correlation. Add
-`--optimizer-version-matrix` without the unprefixed expectation manifest to
-repeat the 288-plan matrix. Expression text and version boundaries are checked
-by the focused Omni integration test and recorded in
+join residuals, one-side scan pushdown, Apply Join correlation, and a leading
+commit-timestamp primary key with `ALLOW_TIMESTAMP_PREDICATE_PUSHDOWN` enabled
+or disabled. The enabled case requires `Seek Condition` and `Timestamp
+Condition` on the same Scan. Add `--optimizer-version-matrix` without the
+unprefixed expectation manifest to repeat the 304-plan matrix. Expression text
+and version boundaries are checked by the focused Omni integration test and recorded in
 [`CONDITION_BOUNDARY_OBSERVATIONS_2026-08-11.md`](../../research/spanner-query-plan-shape/CONDITION_BOUNDARY_OBSERVATIONS_2026-08-11.md).
 
 Compare the 19 documented Spanner aggregate-function names with the physical

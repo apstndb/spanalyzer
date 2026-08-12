@@ -95,12 +95,16 @@ the groups below relate when their contents appear to disagree.
   - optimizer versions 1 through 8 and distributed-merge controls.
 - [Optimizer-version rendered examples](../../research/spanner-query-plan-shape/OPTIMIZER_VERSION_RENDERED_EXAMPLES.md)
   - representative version-dependent rendered plans.
+- [Optimizer version 9 real-instance notes](../../research/spanner-query-plan-shape/OPTIMIZER_V9_REAL_INSTANCE_NOTES_2026-07-28.md)
+  - managed-Spanner optimizer-v9 observations and future Omni probe design.
 - [Hint-position audit](../../research/spanner-query-plan-shape/HINT_POSITION_AUDIT_2026-08-04.md)
   - frontend, Emulator, and Omni placement verification.
 - [Factorized-mode observations](../../research/spanner-query-plan-shape/FACTORIZED_MODE_OBSERVATIONS_2026-08-11.md)
   - eligibility, effects, controls, and optimizer boundary.
 - [GoogleSQL surface capability observations](../../research/spanner-query-plan-shape/GOOGLESQL_SURFACE_CAPABILITY_OBSERVATIONS_2026-08-11.md)
   - generic GoogleSQL PLAN surfaces and capability errors.
+- [GoogleSQL rewriter surface observations](../../research/spanner-query-plan-shape/REWRITER_SURFACE_OBSERVATIONS_2026-08-12.md)
+  - pinned upstream rewriters mapped to Spanner plans and capability boundaries.
 - [GQL surface observations](../../research/spanner-query-plan-shape/GQL_SURFACE_OBSERVATIONS_2026-08-11.md)
   - graph-plan topology and SQL/GQL bridge coverage.
 - [GQL hint-version observations](../../research/spanner-query-plan-shape/GQL_HINT_VERSION_OBSERVATIONS_2026-08-11.md)

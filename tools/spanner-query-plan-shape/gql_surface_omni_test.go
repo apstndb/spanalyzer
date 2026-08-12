@@ -53,9 +53,13 @@ func TestIntegrationGQLCompositionalSurfaceOnOmni(t *testing.T) {
 		return plan
 	}
 
-	edgeIn := cases["gql-surface/subquery/edge-in-is-first-quantified"]
+	isFirstReturn := cases[gqlSurfaceISFirstReturnLabel]
+	isFirstFilter := cases[gqlSurfaceISFirstFilterLabel]
+	isFirstEdgeOneHop := cases[gqlSurfaceISFirstEdgeOneHopLabel]
+	edgeIn := cases[gqlSurfaceISFirstQuantifiedLabel]
 	edgeControl := cases["gql-surface/search/all-bounded"]
-	isFirstNext := cases["gql-surface/analytic/is-first-before-next"]
+	isFirstNext := cases[gqlSurfaceISFirstBeforeNextLabel]
+	isFirstNextOrdered := cases[gqlSurfaceISFirstBeforeNextOrderedLabel]
 	nextControl := cases["gql-surface/linear/next-two-stage-traversal"]
 	reservoir := cases["gql-surface/linear/tablesample-reservoir"]
 	bernoulli := cases["gql-surface/linear/tablesample-bernoulli"]
@@ -80,6 +84,29 @@ func TestIntegrationGQLCompositionalSurfaceOnOmni(t *testing.T) {
 	repeatable := cases["gql-surface/unsupported/tablesample-repeatable"]
 
 	for version := 1; version <= 8; version++ {
+		returnPlan := mustAnalyze(t, isFirstReturn, version)
+		if got := countPlanNodes(returnPlan, "Crowd", ""); got != 1 {
+			t.Errorf("IS_FIRST RETURN v%d Crowd count = %d, want 1", version, got)
+		}
+		for _, test := range []struct {
+			label string
+			query queryCase
+		}{
+			{label: "IS_FIRST FILTER", query: isFirstFilter},
+			{label: "one-hop edge IN/IS_FIRST", query: isFirstEdgeOneHop},
+		} {
+			plan := mustAnalyze(t, test.query, version)
+			// v6 adds an outer Crowd while preserving the result rows; retain
+			// the observed version boundary instead of flattening it to >= 2.
+			wantCrowds := 2
+			if version >= 6 {
+				wantCrowds = 3
+			}
+			if got := countPlanNodes(plan, "Crowd", ""); got != wantCrowds {
+				t.Errorf("%s v%d Crowd count = %d, want %d", test.label, version, got, wantCrowds)
+			}
+		}
+
 		edgePlan := mustAnalyze(t, edgeIn, version)
 		edgeControlPlan := mustAnalyze(t, edgeControl, version)
 		if got := countPlanNodes(edgePlan, "Recursive Union", ""); got != 1 {
@@ -87,6 +114,9 @@ func TestIntegrationGQLCompositionalSurfaceOnOmni(t *testing.T) {
 		}
 		if got := countPlanNodes(edgePlan, "Limit", ""); got == 0 {
 			t.Errorf("edge IN/IS_FIRST v%d Limit count = 0, want positive", version)
+		}
+		if got := countPlanNodes(edgePlan, "Crowd", ""); got != 0 {
+			t.Errorf("quantified edge IN/IS_FIRST v%d Crowd count = %d, want 0", version, got)
 		}
 		if got := countPlanNodes(edgeControlPlan, "Limit", ""); got != 0 {
 			t.Errorf("quantified control v%d Limit count = %d, want 0", version, got)
@@ -99,6 +129,10 @@ func TestIntegrationGQLCompositionalSurfaceOnOmni(t *testing.T) {
 		}
 		if got := countPlanNodes(nextControlPlan, "Crowd", ""); got != 0 {
 			t.Errorf("NEXT control v%d Crowd count = %d, want 0", version, got)
+		}
+		orderedNextPlan := mustAnalyze(t, isFirstNextOrdered, version)
+		if got := countPlanNodes(orderedNextPlan, "Crowd", ""); got < 2 {
+			t.Errorf("ordered IS_FIRST/NEXT v%d Crowd count = %d, want at least 2", version, got)
 		}
 
 		reservoirPlan := mustAnalyze(t, reservoir, version)

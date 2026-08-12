@@ -20,6 +20,12 @@ ON VectorDocuments(Embedding, TenantId)
 STORING (TechOnly, Category)
 WHERE TechOnly IS NOT NULL
 OPTIONS (distance_type = 'COSINE')`,
+	`CREATE VECTOR INDEX VectorDocumentsByDotProduct
+ON VectorDocuments(Embedding, TenantId)
+OPTIONS (distance_type = 'DOT_PRODUCT')`,
+	`CREATE VECTOR INDEX VectorDocumentsByEuclidean
+ON VectorDocuments(Embedding, TenantId)
+OPTIONS (distance_type = 'EUCLIDEAN')`,
 	`CREATE TABLE VectorRelated (
   SourceTenantId INT64 NOT NULL,
   SourceDocumentId INT64 NOT NULL,
@@ -104,6 +110,26 @@ LIMIT 10`,
     options => JSON '{"num_leaves_to_search": 1}') AS Distance
 FROM VectorDocuments@{FORCE_INDEX=TechVectorDocumentsByEmbedding}
 WHERE TenantId = 7 AND TechOnly IS NOT NULL
+ORDER BY Distance
+LIMIT 10`,
+	},
+	{
+		Label: "vector-search/ann-dot-product",
+		SQL: `SELECT DocumentId,
+  APPROX_DOT_PRODUCT(
+    Embedding, ARRAY<FLOAT32>[1.0, 0.0, 0.0],
+    options => JSON '{"num_leaves_to_search": 1}') AS Distance
+FROM VectorDocuments@{FORCE_INDEX=VectorDocumentsByDotProduct}
+ORDER BY Distance DESC
+LIMIT 10`,
+	},
+	{
+		Label: "vector-search/ann-euclidean-distance",
+		SQL: `SELECT DocumentId,
+  APPROX_EUCLIDEAN_DISTANCE(
+    Embedding, ARRAY<FLOAT32>[1.0, 0.0, 0.0],
+    options => JSON '{"num_leaves_to_search": 1}') AS Distance
+FROM VectorDocuments@{FORCE_INDEX=VectorDocumentsByEuclidean}
 ORDER BY Distance
 LIMIT 10`,
 	},

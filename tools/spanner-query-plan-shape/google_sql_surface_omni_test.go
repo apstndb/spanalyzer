@@ -69,6 +69,8 @@ func TestIntegrationGoogleSQLSurfaceVersionMatrixOnOmni(t *testing.T) {
 	havingMax := cases["google-sql-surface/accepted/aggregate-having-max"]
 	havingMin := cases["google-sql-surface/accepted/aggregate-having-min"]
 	arrayAgg := cases["google-sql-surface/accepted/array-agg-order-limit"]
+	arrayTransform := cases["google-sql-surface/accepted/array-transform-lambda"]
+	arrayFilter := cases["google-sql-surface/accepted/array-filter-lambda"]
 	inUnnest := cases["google-sql-surface/accepted/in-unnest"]
 	withExpression := cases["google-sql-surface/accepted/with-expression"]
 	collate := cases["google-sql-surface/accepted/order-by-collate"]
@@ -103,6 +105,7 @@ func TestIntegrationGoogleSQLSurfaceVersionMatrixOnOmni(t *testing.T) {
 	groupByAll := cases["google-sql-surface/unsupported/group-by-all"]
 	matchRecognize := cases["google-sql-surface/unsupported/match-recognize"]
 	valueFirstSetOperation := cases["google-sql-surface/unsupported/set-operation-value-first-top-level"]
+	secureContext := cases["google-sql-surface/unsupported/secure-context"]
 
 	for version := 1; version <= 8; version++ {
 		readWritePlan := mustAnalyze(t, readWrite, version)
@@ -128,6 +131,26 @@ func TestIntegrationGoogleSQLSurfaceVersionMatrixOnOmni(t *testing.T) {
 		}
 		if got := countPlanNodes(arrayAggPlan, "Array Unnest", ""); got != 1 {
 			t.Errorf("ARRAY_AGG ORDER BY LIMIT v%d Array Unnest count = %d, want 1", version, got)
+		}
+		arrayTransformPlan := mustAnalyze(t, arrayTransform, version)
+		if got := countPlanNodesByKind(arrayTransformPlan, spannerpb.PlanNode_SCALAR, "Array Subquery"); got != 1 {
+			t.Errorf("ARRAY_TRANSFORM v%d Array Subquery count = %d, want 1", version, got)
+		}
+		if got := countPlanNodes(arrayTransformPlan, "Array Unnest", ""); got != 1 {
+			t.Errorf("ARRAY_TRANSFORM v%d Array Unnest count = %d, want 1", version, got)
+		}
+		if got := countPlanNodes(arrayTransformPlan, "Filter", ""); got != 0 {
+			t.Errorf("ARRAY_TRANSFORM v%d Filter count = %d, want 0", version, got)
+		}
+		arrayFilterPlan := mustAnalyze(t, arrayFilter, version)
+		if got := countPlanNodesByKind(arrayFilterPlan, spannerpb.PlanNode_SCALAR, "Array Subquery"); got != 1 {
+			t.Errorf("ARRAY_FILTER v%d Array Subquery count = %d, want 1", version, got)
+		}
+		if got := countPlanNodes(arrayFilterPlan, "Array Unnest", ""); got != 1 {
+			t.Errorf("ARRAY_FILTER v%d Array Unnest count = %d, want 1", version, got)
+		}
+		if got := countPlanNodes(arrayFilterPlan, "Filter", ""); got != 1 {
+			t.Errorf("ARRAY_FILTER v%d Filter count = %d, want 1", version, got)
 		}
 		if got := countPlanNodes(mustAnalyze(t, inUnnest, version), "Filter Scan", ""); got != 1 {
 			t.Errorf("IN UNNEST v%d Filter Scan count = %d, want 1", version, got)
@@ -306,6 +329,9 @@ func TestIntegrationGoogleSQLSurfaceVersionMatrixOnOmni(t *testing.T) {
 		}
 		if _, err := analyze(t, matchRecognize, version); err == nil || !strings.Contains(err.Error(), "Syntax error:") {
 			t.Errorf("MATCH_RECOGNIZE v%d error = %v, want stable syntax error", version, err)
+		}
+		if _, err := analyze(t, secureContext, version); err == nil || !strings.Contains(err.Error(), "Unsupported built-in function: SECURE_CONTEXT") {
+			t.Errorf("SECURE_CONTEXT v%d error = %v, want stable unsupported-function error", version, err)
 		}
 	}
 

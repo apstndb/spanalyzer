@@ -19,9 +19,9 @@ optimizer will make the same choice for another schema or release.
   `3ae52a8eb15d2d6952da6f387605ff2bc89d2720` (2026-08-10).
 - Upstream grammar and analyzer: `google/googlesql` commit
   `1f8aa333f4d6353cd3a64471fc83121df72df3f7` (2026-07-21).
-- Retained selector: `condition_boundaries`, 36 queries.
-- Default result: 36 plans, no errors, and 60 operator expectations.
-- Optimizer matrix: 288 plans covering versions 1 through 8, with no query
+- Retained selector: `condition_boundaries`, 38 queries.
+- Default result: 38 plans, no errors, and 62 operator expectations.
+- Optimizer matrix: 304 plans covering versions 1 through 8, with no query
   errors. The focused integration test checks the condition expression text,
   not only operator presence.
 
@@ -93,6 +93,20 @@ a `Seek Condition` in v1-v6, but wholly as a `Residual Condition` in v7-v8.
 boundary as observed behavior; it does not infer that arbitrary disjunctions
 containing a non-seekable term are semantically seekable.
 
+## Commit timestamp key boundary
+
+`CommitTimestampKeys` has an `allow_commit_timestamp = true` `CommitTs`
+column as the leading primary-key part. With a range predicate on `CommitTs`
+and `ALLOW_TIMESTAMP_PREDICATE_PUSHDOWN=TRUE`, the same `Scan` has both a
+`Seek Condition` and a `Timestamp Condition` in every optimizer version from
+v1 through v8. The two links therefore coexist: the former is the key-range
+access signal and the latter is the commit-timestamp storage-pruning signal.
+
+With the same SQL and `ALLOW_TIMESTAMP_PREDICATE_PUSHDOWN=FALSE`, the
+`Seek Condition` remains on that `Scan`, while `Timestamp Condition` is
+absent. This is a plan-shape observation only; it does not quantify the
+additional pruning or prove a runtime-performance effect.
+
 ## Join condition boundary
 
 For a forced Hash Join, `Condition` is broader than bare column equality.
@@ -162,7 +176,7 @@ set -o pipefail
 ```
 
 Add `--optimizer-version-matrix` without the unprefixed expectation manifest
-to repeat the 288-plan vocabulary matrix. The focused integration test is the
+to repeat the 304-plan vocabulary matrix. The focused integration test is the
 authority for the expression strings and optimizer-version partitions because
 the plan-vocabulary manifest intentionally matches operator/link structure,
 not free-form `short_representation.description` text.
