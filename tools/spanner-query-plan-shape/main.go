@@ -59,7 +59,7 @@ ON s.SingerId = a.SingerId
 
 const builtInCaseNames = "all, docs, optimizer_gaps, optimizer_unhinted_candidates, join_elimination, planvocab_inference, cte, dml, tvf, lock_hints, " +
 	"full_text_search, json_search, vector_search, function_hint, hint_matrix, statement_hint_query_matrix, " +
-	"hint_position_audit, hint_position_combinations, set_operation_distinct, factorized_mode, gql_surface, gql_hint_surface, google_sql_surface, google_sql_proto_surface, condition_boundaries, aggregate_functions, join_matrix, subquery_join_hint_matrix, push_broadcast_hash_join, or hash_join"
+	"hint_position_audit, hint_position_combinations, set_operation_distinct, factorized_mode, gql_surface, gql_set_propagation, gql_hint_surface, google_sql_surface, google_sql_proto_surface, condition_boundaries, aggregate_functions, join_matrix, subquery_join_hint_matrix, push_broadcast_hash_join, or hash_join"
 
 type stringListFlag []string
 
@@ -269,6 +269,7 @@ func loadDDLs(builtinCase string, paths []string) ([]string, error) {
 			strings.EqualFold(strings.TrimSpace(builtinCase), "hint_position_combinations") ||
 			strings.EqualFold(strings.TrimSpace(builtinCase), "factorized_mode") ||
 			strings.EqualFold(strings.TrimSpace(builtinCase), "gql_surface") ||
+			strings.EqualFold(strings.TrimSpace(builtinCase), "gql_set_propagation") ||
 			strings.EqualFold(strings.TrimSpace(builtinCase), "gql_hint_surface") ||
 			strings.EqualFold(strings.TrimSpace(builtinCase), "google_sql_surface") ||
 			strings.EqualFold(strings.TrimSpace(builtinCase), "condition_boundaries") ||
@@ -417,6 +418,8 @@ func loadQueries(builtinCase string, sqlTexts, sqlFiles []string) ([]queryCase, 
 		return factorizedModeQueries, nil
 	case "gql_surface":
 		return gqlSurfaceQueries, nil
+	case "gql_set_propagation":
+		return gqlSetPropagationQueries, nil
 	case "gql_hint_surface":
 		return gqlHintSurfaceQueries, nil
 	case "google_sql_surface":

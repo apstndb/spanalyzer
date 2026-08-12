@@ -392,6 +392,25 @@ See
 [`GQL_SURFACE_OBSERVATIONS_2026-08-11.md`](../../research/spanner-query-plan-shape/GQL_SURFACE_OBSERVATIONS_2026-08-11.md)
 for the plan and optimizer-version evidence.
 
+Inspect GQL set-operation column propagation independently from the broad
+surface inventory:
+
+```sh
+go run ./tools/spanner-query-plan-shape \
+  --case gql_set_propagation \
+  --output compact-tree-metadata \
+  --continue-on-error
+```
+
+The six accepted spellings compare `FULL`, `INNER`, and `LEFT` propagation
+with their `OUTER` aliases over deliberately mismatched output names. A
+seventh default/`STRICT` control must fail before producing a plan. The focused
+Omni integration test verifies result columns and rows, `Union Input` slot
+counts, typed-NULL synthesis, and alias plan equivalence at the default
+optimizer setting and explicit versions 1 through 8. These modifiers are not
+advertised by the current Spanner GQL set-operation documentation, so the
+probe records runtime evidence rather than a portable syntax guarantee.
+
 Probe graph-specific hint placements and their default plan shapes:
 
 ```sh

@@ -143,6 +143,74 @@ GQL documentation does not advertise `FULL`; treat it as an Omni observation,
 not a portable syntax promise. Mixed UNION/EXCEPT chains were rejected with
 the documented same-operation-type rule.
 
+#### Column propagation mode lowering
+
+The memefish propagation-mode work exposed a stronger plan probe than the
+same-name `FULL` acceptance control. The retained `gql_set_propagation` case
+uses two constant arms whose column sets overlap only at `shared`:
+
+```sql
+GRAPH MusicGraph
+RETURN 1 AS left_only, 10 AS shared
+<mode> UNION ALL
+RETURN 2 AS right_only, 20 AS shared
+```
+
+The graph name is semantically inert here; `MusicGraph` lets the repository
+harness reuse its existing schema, while the managed recheck used the existing
+`FinGraph` database from the parser verification. The query does not read a
+node, edge, or property in either environment.
+
+Evidence gathered on 2026-08-12:
+
+- Spanner Omni image
+  `us-docker.pkg.dev/spanner-omni/images/spanner-omni:2026.r1-beta.2`, local
+  digest
+  `sha256:115622065afefd267f9ef3ff1025e35d73a03f66a7335de8e051b393ebdcfacc`,
+  through `AnalyzeQuery(QueryMode=PLAN)`;
+- managed Spanner through the dedicated user-level profile, with connection
+  identifiers not recorded, using read-only `PLAN` requests and
+  `CLI_EXPLAIN_PRINT_SECTIONS=full`; and
+- the official [GQL set-operation
+  documentation](https://docs.cloud.google.com/spanner/docs/reference/standard-sql/graph-query-statements#gql_set),
+  retrieved in full with `dkcli` on 2026-08-12. Its grammar does not advertise
+  propagation modifiers and describes the default behavior as requiring
+  identical column-name sets.
+
+The Japanese operator notes in `apstndb/spanner-hacks` were also checked at
+commit `ed0c72b22e563af4113d98c0aa98cc784240f7ec`. They describe `Union Input`
+slot mappings but contained no prior GQL propagation-mode observation.
+
+| Spelling | Result columns | `Union Input` slots per arm | Typed NULLs in the raw plan |
+| --- | --- | ---: | ---: |
+| `FULL`, `FULL OUTER`, `OUTER` | `left_only`, `shared`, `right_only` | 3 | 2 |
+| `INNER` | `shared` | 1 | 0 |
+| `LEFT`, `LEFT OUTER` | `left_only`, `shared` | 2 | 1 |
+| default (`STRICT`) | no result | no plan | no plan |
+
+All accepted forms lowered to two `Union Input` arms under one `Union All`.
+`FULL` synthesized `right_only=<typed null>` in the left arm and
+`left_only=<typed null>` in the right arm. `INNER` pruned both non-shared
+columns before the union. `LEFT` retained the left schema and synthesized
+`left_only=<typed null>` in the right arm. The focused Omni integration test
+also executes every form and verifies the corresponding result schema and
+rows.
+
+The three FULL spellings produced byte-equal managed plan renderings at the
+default setting, and the two LEFT spellings did the same. On Omni their raw
+query-plan protos were equal within each alias group at the default setting and
+every explicit optimizer version from 1 through 8. The FULL, INNER, and LEFT
+managed renderings were each byte-equal across versions 1 through 8 and to the
+default rendering. The STRICT control was rejected before plan construction
+because its two inputs have different column-name sets.
+
+These exact shapes are environment-bound regression evidence, not a stable
+optimizer or performance contract. In particular, a future optimizer may move
+or eliminate `Compute` while preserving the same result schema and NULL
+semantics. The durable semantic checks and raw evidence should therefore stay
+together; a normalized topology digest alone cannot prove which output slot
+received a typed NULL.
+
 ### Recursive and path forms
 
 `ANY SHORTEST` and constant-cost `ANY CHEAPEST` exposed `Recursive Union`,
