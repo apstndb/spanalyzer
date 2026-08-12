@@ -269,16 +269,50 @@ CREATE TABLE Singers (
 	assertField(t, rowType.Fields[0], "singer_count", spannerpb.TypeCode_INT64)
 	assertField(t, rowType.Fields[1], "first_name", spannerpb.TypeCode_STRING)
 
-	exprOut, err := helper.AnalyzeExpression("ARRAY_FIRST([1, 2, 3])")
-	if err != nil {
-		t.Fatalf("AnalyzeExpression() error = %v", err)
+	for _, expr := range []string{
+		"ARRAY_FIRST([1, 2, 3])",
+		"ARRAY_LAST([1, 2, 3])",
+	} {
+		exprOut, err := helper.AnalyzeExpression(expr)
+		if err != nil {
+			t.Fatalf("AnalyzeExpression(%q) error = %v", expr, err)
+		}
+		typ, err := TypeFromAnalyzerOutput(exprOut)
+		if err != nil {
+			t.Fatalf("TypeFromAnalyzerOutput(%q) error = %v", expr, err)
+		}
+		if got, want := typ.Code, spannerpb.TypeCode_INT64; got != want {
+			t.Fatalf("%s type = %s, want %s", expr, got, want)
+		}
 	}
-	typ, err := TypeFromAnalyzerOutput(exprOut)
+}
+
+func TestAnalyzerArrayLambdaFunctionResultTypes(t *testing.T) {
+	analyzer, err := NewAnalyzerFromDDL("schema.sql", "")
 	if err != nil {
-		t.Fatalf("TypeFromAnalyzerOutput() error = %v", err)
+		t.Fatalf("NewAnalyzerFromDDL() error = %v", err)
 	}
-	if got, want := typ.Code, spannerpb.TypeCode_INT64; got != want {
-		t.Fatalf("typ.Code = %s, want %s", got, want)
+	for _, tt := range []struct {
+		name string
+		sql  string
+	}{
+		{name: "transform", sql: "SELECT ARRAY_TRANSFORM([1, 2, 3], e -> e * 2) AS values"},
+		{name: "filter", sql: "SELECT ARRAY_FILTER([1, 2, 3], e -> e != 2) AS values"},
+	} {
+		t.Run(tt.name, func(t *testing.T) {
+			rowType, err := analyzer.RowTypeForStatement(tt.sql)
+			if err != nil {
+				t.Fatalf("RowTypeForStatement() error = %v", err)
+			}
+			if got, want := len(rowType.Fields), 1; got != want {
+				t.Fatalf("len(rowType.Fields) = %d, want %d", got, want)
+			}
+			field := rowType.Fields[0]
+			assertField(t, field, "values", spannerpb.TypeCode_ARRAY)
+			if got, want := field.Type.GetArrayElementType().GetCode(), spannerpb.TypeCode_INT64; got != want {
+				t.Fatalf("array element type = %s, want %s", got, want)
+			}
+		})
 	}
 }
 
@@ -294,6 +328,31 @@ CREATE VIEW SingerNames SQL SECURITY INVOKER AS
 SELECT SingerId, FirstName AS Name FROM Singers;
 `
 	analyzer, err := NewAnalyzerFromDDL("schema.sql", ddl)
+	if err != nil {
+		t.Fatalf("NewAnalyzerFromDDL() error = %v", err)
+	}
+	rowType, err := analyzer.RowTypeForStatement("SELECT * FROM SingerNames")
+	if err != nil {
+		t.Fatalf("RowTypeForStatement() error = %v", err)
+	}
+	if got, want := len(rowType.Fields), 2; got != want {
+		t.Fatalf("len(rowType.Fields) = %d, want %d", got, want)
+	}
+	assertField(t, rowType.Fields[0], "SingerId", spannerpb.TypeCode_INT64)
+	assertField(t, rowType.Fields[1], "Name", spannerpb.TypeCode_STRING)
+}
+
+func TestAnalyzerRowTypeForDefinerView(t *testing.T) {
+	const ddl = `
+CREATE TABLE Singers (
+  SingerId INT64 NOT NULL,
+  FirstName STRING(MAX),
+) PRIMARY KEY (SingerId);
+
+CREATE VIEW SingerNames SQL SECURITY DEFINER AS
+SELECT SingerId, FirstName AS Name FROM Singers;
+`
+	analyzer, err := NewAnalyzerFromDDL("definer_view.sql", ddl)
 	if err != nil {
 		t.Fatalf("NewAnalyzerFromDDL() error = %v", err)
 	}
@@ -869,6 +928,37 @@ CREATE PROPERTY GRAPH g
 		t.Fatalf("len(rowType.Fields) = %d, want %d", got, want)
 	}
 	assertField(t, rowType.Fields[0], "id", spannerpb.TypeCode_INT64)
+}
+
+func TestAnalyzerRowTypeForPropertyGraphWithDynamicMetadata(t *testing.T) {
+	const ddl = `
+CREATE TABLE GraphNode (
+  id INT64 NOT NULL,
+  label STRING(MAX) NOT NULL,
+  properties JSON,
+) PRIMARY KEY (id);
+
+CREATE PROPERTY GRAPH DynamicGraph
+  NODE TABLES (
+    GraphNode
+      DYNAMIC LABEL (label)
+      DYNAMIC PROPERTIES (properties)
+  );
+`
+	analyzer, err := NewAnalyzerFromDDL("dynamic_graph.sql", ddl)
+	if err != nil {
+		t.Fatalf("NewAnalyzerFromDDL() error = %v", err)
+	}
+	rowType, err := analyzer.RowTypeForStatement("GRAPH DynamicGraph MATCH (n) RETURN n.id AS id")
+	if err != nil {
+		t.Fatalf("RowTypeForStatement() error = %v", err)
+	}
+	if got, want := len(rowType.Fields), 1; got != want {
+		t.Fatalf("len(rowType.Fields) = %d, want %d", got, want)
+	}
+	// Because id is not declared as a static graph property, the frontend
+	// resolves it through DYNAMIC PROPERTIES and reports JSON.
+	assertField(t, rowType.Fields[0], "id", spannerpb.TypeCode_JSON)
 }
 
 func TestAnalyzerRowTypeForNestedView(t *testing.T) {

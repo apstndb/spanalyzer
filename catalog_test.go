@@ -472,6 +472,58 @@ CREATE OR REPLACE PROPERTY GRAPH FinGraph
 	}
 }
 
+func TestBuildSchemaCatalogPropertyGraphDynamicMetadata(t *testing.T) {
+	const ddl = `
+CREATE TABLE GraphNode (
+  id INT64 NOT NULL,
+  label STRING(MAX) NOT NULL,
+  properties JSON,
+) PRIMARY KEY (id);
+CREATE TABLE GraphEdge (
+  id INT64 NOT NULL,
+  dest_id INT64 NOT NULL,
+  edge_id INT64 NOT NULL,
+  label STRING(MAX) NOT NULL,
+  properties JSON,
+) PRIMARY KEY (id, dest_id, edge_id);
+CREATE PROPERTY GRAPH DynamicGraph
+  NODE TABLES (
+    GraphNode
+      DYNAMIC LABEL (label)
+      DYNAMIC PROPERTIES (properties)
+  )
+  EDGE TABLES (
+    GraphEdge
+      SOURCE KEY (id) REFERENCES GraphNode (id)
+      DESTINATION KEY (dest_id) REFERENCES GraphNode (id)
+      DYNAMIC LABEL (label)
+      DYNAMIC PROPERTIES (properties)
+  );
+`
+	catalog, err := BuildSchemaCatalog("dynamic_graph.sql", ddl)
+	if err != nil {
+		t.Fatalf("BuildSchemaCatalog() error = %v", err)
+	}
+	graph := catalog.PropertyGraphs["DynamicGraph"]
+	if graph == nil {
+		t.Fatalf("DynamicGraph property graph not found")
+	}
+	if got, want := len(graph.NodeTables), 1; got != want {
+		t.Fatalf("len(graph.NodeTables) = %d, want %d", got, want)
+	}
+	if got, want := len(graph.EdgeTables), 1; got != want {
+		t.Fatalf("len(graph.EdgeTables) = %d, want %d", got, want)
+	}
+	for _, elem := range []*GraphElement{graph.NodeTables[0], graph.EdgeTables[0]} {
+		if got, want := elem.DynamicLabel, "label"; got != want {
+			t.Errorf("%s dynamic label = %q, want %q", elem.Name, got, want)
+		}
+		if got, want := elem.DynamicProperties, "properties"; got != want {
+			t.Errorf("%s dynamic properties = %q, want %q", elem.Name, got, want)
+		}
+	}
+}
+
 func TestBuildSchemaCatalogDropPropertyGraph(t *testing.T) {
 	const ddl = `
 CREATE TABLE Account (
