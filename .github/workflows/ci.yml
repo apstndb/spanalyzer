@@ -105,17 +105,15 @@ jobs:
       - name: Download modules
         run: mise x -- go mod download
 
-      - name: Compile Spanner Omni integration test sources without running Omni
-        working-directory: cmd/spanner-query-gen
-        run: mise x -- go test -count=1 -tags='integration omni' -run '^$' ./...
-
       - name: Compile plan-probe Omni integration test sources without running Omni
         working-directory: tools
         run: mise x -- go test -count=1 -tags='integration omni' -run '^$' ./...
 
-      - name: Run Spanner emulator integration tests
+      - name: Run Spanner emulator integration tests and compile Omni sources
         working-directory: cmd/spanner-query-gen
-        run: mise x -- go test -race -count=1 -tags=integration -run '^TestIntegration' ./...
+        env:
+          SPANEMUBOOST_ENABLE_OMNI_TESTS: ""
+        run: mise x -- go test -race -count=1 -tags='integration omni' -run '^TestIntegration' ./...
 
   lint:
     name: golangci-lint
