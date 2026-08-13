@@ -15,7 +15,17 @@ performance guarantee.
 
 ## Usage
 
-Inspect the built-in Push Broadcast Hash Join and Hash Join examples:
+List every built-in selector, its query count, and a short description without
+starting Spanner Omni:
+
+```sh
+go run ./tools/spanner-query-plan-shape --list-cases
+go run ./tools/spanner-query-plan-shape --list-cases --list-cases-format json
+```
+
+The default `all` selector is intentionally a small smoke test, not a union of
+all selectors. It inspects the built-in Push Broadcast Hash Join and Hash Join
+examples:
 
 ```sh
 go run ./tools/spanner-query-plan-shape
