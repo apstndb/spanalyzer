@@ -1,0 +1,17 @@
+{
+  "version": "v0alpha1",
+  "queries": [
+    {"label":"statement-surface/call/cancel-literal","patterns":[{"display_name":"Serialize Result"},{"display_name":"TVF","child_links":[{"kind":"SCALAR","type":"Output","variable":"present"}]},{"display_name":"Unit Relation"}]},
+    {"label":"statement-surface/call/cancel-cast","patterns":[{"display_name":"Serialize Result"},{"display_name":"TVF","child_links":[{"kind":"SCALAR","type":"Output","variable":"present"}]},{"display_name":"Unit Relation"}]},
+    {"label":"statement-surface/call/compact-all","patterns":[{"display_name":"Serialize Result"},{"display_name":"TVF","child_links":[{"kind":"SCALAR","type":"Output","variable":"present"}]},{"display_name":"Unit Relation"}]}
+  ],
+  "expected_query_errors": [
+    {"label":"statement-surface/call/cancel-parameter-error","contains":"Invalid arguments to procedure: cancel_query"},
+    {"label":"statement-surface/call/cancel-expression-error","contains":"Invalid arguments to procedure: cancel_query"},
+    {"label":"statement-surface/call/unknown-procedure-error","contains":"missing_spanalyzer_procedure is not supported"},
+    {"label":"statement-surface/call/sql-optimizer-hint-error","contains":"Unsupported hint: OPTIMIZER_VERSION"},
+    {"label":"statement-surface/routing/analyze-ddl-error","contains":"DDL statements cannot be processed by the Query API"},
+    {"label":"statement-surface/routing/start-batch-ddl-error","contains":"Statement not supported: StartBatchStatement"},
+    {"label":"statement-surface/routing/execute-immediate-error","contains":"Statement not supported: ExecuteImmediateStatement"}
+  ]
+}

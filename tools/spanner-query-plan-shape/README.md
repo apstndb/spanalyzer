@@ -127,6 +127,30 @@ the tool only asks for `PLAN`:
 go run ./tools/spanner-query-plan-shape --case dml --output compact-tree-metadata --continue-on-error
 ```
 
+The 29-case selector has a retained expectation manifest at
+`testdata/dml_expectations.json`: 28 plans require the expected `Apply
+Mutations` operation and table, while the documented `ASSERT_ROWS_MODIFIED`
+form records the pinned-Omni capability error. The focused Omni test repeats
+all cases at optimizer versions 1 through 8 and pins the eight observed
+version-sensitive compact-tree partitions.
+
+Inspect top-level system-procedure `CALL` plans and representative Query API
+routing boundaries:
+
+```sh
+go run ./tools/spanner-query-plan-shape --case statement_surface --output json --continue-on-error
+```
+
+The positive cases cover literal and cast arguments to `cancel_query`, plus
+`compact_all`; the manifest requires `Serialize Result`, `TVF`, and `Unit
+Relation`. The focused Omni test also sends each positive through both
+`ExecuteSql(PLAN)` and `ExecuteStreamingSql(PLAN)` and sets optimizer versions
+1 through 8 in RPC `query_options`. CALL does not accept the SQL
+`OPTIMIZER_VERSION` statement hint, so `--optimizer-version-matrix` is not the
+version test for this selector. The remaining cases retain procedure-argument,
+unknown-procedure, DDL-routing, batch-command, and procedural-language
+capability boundaries without treating them as operator vocabulary.
+
 Inspect a change-stream table-valued function probe:
 
 ```sh

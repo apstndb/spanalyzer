@@ -1,0 +1,36 @@
+{
+  "version": "v0alpha1",
+  "queries": [
+    {"label":"dml/insert-values","patterns":[{"display_name":"Apply Mutations","metadata":[{"key":"operation_type","value":"INSERT"},{"key":"table","value":"Singers"}]}]},
+    {"label":"dml/insert-default","patterns":[{"display_name":"Apply Mutations","metadata":[{"key":"operation_type","value":"INSERT"},{"key":"table","value":"Singers"}]}]},
+    {"label":"dml/insert-select","patterns":[{"display_name":"Apply Mutations","metadata":[{"key":"operation_type","value":"INSERT"},{"key":"table","value":"Singers"}]}]},
+    {"label":"dml/insert-select-unnest","patterns":[{"display_name":"Apply Mutations","metadata":[{"key":"operation_type","value":"INSERT"},{"key":"table","value":"Singers"}]}]},
+    {"label":"dml/insert-subquery","patterns":[{"display_name":"Apply Mutations","metadata":[{"key":"operation_type","value":"INSERT"},{"key":"table","value":"Singers"}]}]},
+    {"label":"dml/insert-ignore","patterns":[{"display_name":"Apply Mutations","metadata":[{"key":"operation_type","value":"INSERT"},{"key":"table","value":"Singers"}]}]},
+    {"label":"dml/insert-or-ignore","patterns":[{"display_name":"Apply Mutations","metadata":[{"key":"operation_type","value":"INSERT"},{"key":"table","value":"Singers"}]}]},
+    {"label":"dml/insert-or-update","patterns":[{"display_name":"Apply Mutations","metadata":[{"key":"operation_type","value":"INSERT"},{"key":"table","value":"Singers"}]}]},
+    {"label":"dml/insert-or-update-then-return-with-action","patterns":[{"display_name":"Apply Mutations","metadata":[{"key":"operation_type","value":"INSERT"},{"key":"table","value":"Singers"}]}]},
+    {"label":"dml/insert-on-conflict-do-nothing","patterns":[{"display_name":"Apply Mutations","metadata":[{"key":"operation_type","value":"INSERT"},{"key":"table","value":"Singers"}]}]},
+    {"label":"dml/insert-on-conflict-target-do-nothing","patterns":[{"display_name":"Apply Mutations","metadata":[{"key":"operation_type","value":"INSERT"},{"key":"table","value":"Singers"}]}]},
+    {"label":"dml/insert-on-conflict-unique-do-nothing","patterns":[{"display_name":"Apply Mutations","metadata":[{"key":"operation_type","value":"INSERT"},{"key":"table","value":"Singers"}]}]},
+    {"label":"dml/insert-on-conflict-do-update","patterns":[{"display_name":"Apply Mutations","metadata":[{"key":"operation_type","value":"INSERT"},{"key":"table","value":"Singers"}]}]},
+    {"label":"dml/insert-on-conflict-do-update-where","patterns":[{"display_name":"Apply Mutations","metadata":[{"key":"operation_type","value":"INSERT"},{"key":"table","value":"Singers"}]}]},
+    {"label":"dml/insert-on-conflict-select","patterns":[{"display_name":"Apply Mutations","metadata":[{"key":"operation_type","value":"INSERT"},{"key":"table","value":"Singers"}]}]},
+    {"label":"dml/insert-then-return","patterns":[{"display_name":"Apply Mutations","metadata":[{"key":"operation_type","value":"INSERT"},{"key":"table","value":"Singers"}]}]},
+    {"label":"dml/insert-fans-default-key-then-return","patterns":[{"display_name":"Apply Mutations","metadata":[{"key":"operation_type","value":"INSERT"},{"key":"table","value":"Fans"}]}]},
+    {"label":"dml/update-literal","patterns":[{"display_name":"Apply Mutations","metadata":[{"key":"operation_type","value":"UPDATE"},{"key":"table","value":"Singers"}]}]},
+    {"label":"dml/update-default","patterns":[{"display_name":"Apply Mutations","metadata":[{"key":"operation_type","value":"UPDATE"},{"key":"table","value":"Singers"}]}]},
+    {"label":"dml/update-on-update-column","patterns":[{"display_name":"Apply Mutations","metadata":[{"key":"operation_type","value":"UPDATE"},{"key":"table","value":"Singers"}]}]},
+    {"label":"dml/update-array","patterns":[{"display_name":"Apply Mutations","metadata":[{"key":"operation_type","value":"UPDATE"},{"key":"table","value":"Concerts"}]}]},
+    {"label":"dml/update-subquery","patterns":[{"display_name":"Apply Mutations","metadata":[{"key":"operation_type","value":"UPDATE"},{"key":"table","value":"Singers"}]}]},
+    {"label":"dml/update-force-index","patterns":[{"display_name":"Apply Mutations","metadata":[{"key":"operation_type","value":"UPDATE"},{"key":"table","value":"Singers"}]}]},
+    {"label":"dml/update-then-return","patterns":[{"display_name":"Apply Mutations","metadata":[{"key":"operation_type","value":"UPDATE"},{"key":"table","value":"Singers"}]}]},
+    {"label":"dml/delete-where","patterns":[{"display_name":"Apply Mutations","metadata":[{"key":"operation_type","value":"DELETE"},{"key":"table","value":"Singers"}]}]},
+    {"label":"dml/delete-subquery","patterns":[{"display_name":"Apply Mutations","metadata":[{"key":"operation_type","value":"DELETE"},{"key":"table","value":"Singers"}]}]},
+    {"label":"dml/delete-force-index","patterns":[{"display_name":"Apply Mutations","metadata":[{"key":"operation_type","value":"DELETE"},{"key":"table","value":"Singers"}]}]},
+    {"label":"dml/delete-then-return","patterns":[{"display_name":"Apply Mutations","metadata":[{"key":"operation_type","value":"DELETE"},{"key":"table","value":"Singers"}]}]}
+  ],
+  "expected_query_errors": [
+    {"label":"dml/insert-assert-rows-modified","contains":"ASSERT_ROWS_MODIFIED is not supported"}
+  ]
+}

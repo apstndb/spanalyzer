@@ -472,6 +472,53 @@ but Spanner Omni 2026.r1-beta returned `Unimplemented` for `PLAN`:
 
 Regenerated DML results are recorded in [`COMPACT_TREE_METADATA_OBSERVATIONS.md`](COMPACT_TREE_METADATA_OBSERVATIONS.md#dml).
 
+The retained 29-case selector produced 28 plans and the one expected
+`ASSERT_ROWS_MODIFIED` error on pinned Spanner Omni `2026.r1-beta`. Every
+positive plan contained exactly one `Apply Mutations` node with the expected
+`INSERT`, `UPDATE`, or `DELETE` operation type and target table. Repeating all
+cases at optimizer versions 1 through 8 found eight compact-tree partition
+boundaries:
+
+- `insert-on-conflict-do-nothing`: v1-v2, v3-v6, and v7-v8;
+- the conflict-target, unique-constraint, and insert-select `DO NOTHING`
+  variants: v1-v2 and v3-v8;
+- `insert-on-conflict-do-update-where`: v1-v6 and v7-v8; and
+- `update-subquery`, `delete-subquery`, and `delete-then-return`: v1-v4 and
+  v5-v8.
+
+The other 20 positive cases retained one compact shape across v1-v8. These
+are empty-fixture PLAN observations, not execution-performance evidence.
+
+## Top-Level CALL and Query API Routing
+
+Pinned Spanner Omni `2026.r1-beta` returned a standard six-node QueryPlan for
+both `CALL cancel_query(<literal>)` and `CALL compact_all()` through unary
+`ExecuteSql(PLAN)` and streaming `ExecuteStreamingSql(PLAN)`. The relational
+topology is `Serialize Result -> TVF -> Unit Relation`; the remaining scalar
+nodes are one `Constant` and two `Reference` nodes. The TVF has a scalar
+`Output` link with a variable, but the plan metadata does not identify the
+procedure name.
+
+For each retained positive CALL, unary and streaming plans were equal, and
+the plans were equal across optimizer versions 1 through 8 when the version
+was supplied in `ExecuteSqlRequest.query_options`. The SQL spelling
+`@{OPTIMIZER_VERSION=1} CALL ...` instead returned `Unsupported hint:
+OPTIMIZER_VERSION`. A safe managed-Spanner PLAN recheck of `cancel_query` with
+a nonexistent query ID returned the same three relational operators;
+`compact_all` was deliberately not submitted to managed Spanner.
+
+On Omni PLAN, a string literal and `CAST(string_literal AS STRING)` were valid
+`cancel_query` arguments. A bound parameter and `CONCAT(...)` were rejected as
+invalid procedure arguments, and an unknown procedure name was rejected as
+unsupported. These are PLAN-time argument boundaries and are not generalized
+to normal procedure execution.
+
+Representative direct Query API probes also separated statement routing from
+operator coverage: `ANALYZE` was recognized as DDL and directed to the DDL
+API; `START BATCH DDL` was an unsupported Query API statement kind; and
+`EXECUTE IMMEDIATE` was recognized but unsupported by Spanner. They are
+retained expected errors rather than synthetic PlanNode families.
+
 ## Schema-Sensitive Best-Practice Variants
 
 Some SQL best-practice examples intentionally change the schema before rerunning

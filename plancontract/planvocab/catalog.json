@@ -34,6 +34,7 @@
       "tools/spanner-query-plan-shape/ai_plan_test.go",
       "tools/spanner-query-plan-shape/condition_boundary_cases.go",
       "tools/spanner-query-plan-shape/condition_boundary_omni_test.go",
+      "tools/spanner-query-plan-shape/dml_surface_omni_test.go",
       "tools/spanner-query-plan-shape/docs_cases.go",
       "tools/spanner-query-plan-shape/factorized_mode_cases.go",
       "tools/spanner-query-plan-shape/full_text_search_cases.go",
@@ -54,15 +55,19 @@
       "tools/spanner-query-plan-shape/ngram_search_omni_test.go",
       "tools/spanner-query-plan-shape/ngram_search_test.go",
       "tools/spanner-query-plan-shape/planvocab_cases.go",
+      "tools/spanner-query-plan-shape/retained_surface_test.go",
       "tools/spanner-query-plan-shape/rewriter_surface_cases.go",
       "tools/spanner-query-plan-shape/rewriter_surface_omni_test.go",
       "tools/spanner-query-plan-shape/rewriter_surface_test.go",
       "tools/spanner-query-plan-shape/search_graph_omni_test.go",
       "tools/spanner-query-plan-shape/set_operation_distinct_cases.go",
       "tools/spanner-query-plan-shape/set_operation_equivalence_omni_test.go",
+      "tools/spanner-query-plan-shape/statement_surface_cases.go",
+      "tools/spanner-query-plan-shape/statement_surface_omni_test.go",
       "tools/spanner-query-plan-shape/testdata/aggregate_function_expectations.json",
       "tools/spanner-query-plan-shape/testdata/ai_plan_expectations.json",
       "tools/spanner-query-plan-shape/testdata/condition_boundary_expectations.json",
+      "tools/spanner-query-plan-shape/testdata/dml_expectations.json",
       "tools/spanner-query-plan-shape/testdata/facet_search_expectations.json",
       "tools/spanner-query-plan-shape/testdata/factorized_mode_expectations.json",
       "tools/spanner-query-plan-shape/testdata/full_text_residual_expectations.json",
@@ -76,6 +81,7 @@
       "tools/spanner-query-plan-shape/testdata/rewriter_surface_expectations.json",
       "tools/spanner-query-plan-shape/testdata/search_graph_expectations.json",
       "tools/spanner-query-plan-shape/testdata/set_operation_distinct_expectations.json",
+      "tools/spanner-query-plan-shape/testdata/statement_surface_expectations.json",
       "tools/spanner-query-plan-shape/vector_search_cases.go"
     ],
     "compatibility": "Observational v0alpha vocabulary; not a stable Spanner wire contract. Missing metadata is allowed, link multiplicity is checked only where declared, and identifier values are wildcarded.",
@@ -151,7 +157,7 @@
       },
       {
         "path": "plancontract/planvocab/catalog_source.json",
-        "sha256": "c36ab791be24fb8f52c09fb77ecd851f6817bea3931d600d2349839aaae1de07"
+        "sha256": "1c7224349debc69f6a21d96412d0604b0784890b21ac236f4778c295bc57bde1"
       },
       {
         "path": "research/spanner-query-plan-shape/AGGREGATE_FUNCTION_AGG_TYPE_OBSERVATIONS_2026-08-11.md",
@@ -203,7 +209,7 @@
       },
       {
         "path": "research/spanner-query-plan-shape/QUERY_EXECUTION_OPERATORS_OBSERVATIONS.md",
-        "sha256": "5de893b837961671e8e0778721caff0f9bbab367f1ace671e4f0486925501930"
+        "sha256": "fd8198c7b41ee50d73fe0b3a96f9ef29c625f903b31a6f4ea061ab9cb339963e"
       },
       {
         "path": "research/spanner-query-plan-shape/REWRITER_SURFACE_OBSERVATIONS_2026-08-12.md",
@@ -272,6 +278,10 @@
       {
         "path": "tools/spanner-query-plan-shape/condition_boundary_omni_test.go",
         "sha256": "b9d93436b980c7ac1c7a0ecf2d12e17464f79c394581f68156683006e4ad58f3"
+      },
+      {
+        "path": "tools/spanner-query-plan-shape/dml_surface_omni_test.go",
+        "sha256": "261bfb5cc4ee514df94a2d2dd29aaedbe0e278ef21be1e927cd66902d2768f46"
       },
       {
         "path": "tools/spanner-query-plan-shape/docs_cases.go",
@@ -354,6 +364,10 @@
         "sha256": "21d2b5aa805bd0837076af1554072dd6447095433e657cd35e78fccd8967c6a6"
       },
       {
+        "path": "tools/spanner-query-plan-shape/retained_surface_test.go",
+        "sha256": "a1bf1d4631f247e3ec236167658c703178a235d53c26de5f30090adc039ad927"
+      },
+      {
         "path": "tools/spanner-query-plan-shape/rewriter_surface_cases.go",
         "sha256": "4f376216ef2ad1e1abdf82cd0442f5dbedcaaf6dabf405627a5767eb2be0b22e"
       },
@@ -378,6 +392,14 @@
         "sha256": "3ca86126c1ca51ba206c7ef7108323ceb6096d61c754d3d0a26fde26f1243c91"
       },
       {
+        "path": "tools/spanner-query-plan-shape/statement_surface_cases.go",
+        "sha256": "53b9fa4924f0d82a6ed02fc4a7e40f49390fec054fdf0022f9d2228a543002b6"
+      },
+      {
+        "path": "tools/spanner-query-plan-shape/statement_surface_omni_test.go",
+        "sha256": "89aea568a845114a53d0851449c005ae10fcf51b0fadf3280c7cc698ec1b6911"
+      },
+      {
         "path": "tools/spanner-query-plan-shape/testdata/aggregate_function_expectations.json",
         "sha256": "ac4ea6744aa7a85c5395bc7527e368a246fe86995552a33d162b8374e558fe92"
       },
@@ -388,6 +410,10 @@
       {
         "path": "tools/spanner-query-plan-shape/testdata/condition_boundary_expectations.json",
         "sha256": "17b22c72d1d3ad0fb2434e22550929555794a1dff10570eadf6f4f28c6da56e3"
+      },
+      {
+        "path": "tools/spanner-query-plan-shape/testdata/dml_expectations.json",
+        "sha256": "5bc05d1ef65addd7d7d31d0a2d78aa7dce3c94e9b360a3fae8abdc8559bde697"
       },
       {
         "path": "tools/spanner-query-plan-shape/testdata/facet_search_expectations.json",
@@ -440,6 +466,10 @@
       {
         "path": "tools/spanner-query-plan-shape/testdata/set_operation_distinct_expectations.json",
         "sha256": "c2dc292bfce9ac6136875a3944c614c57e85be3fed8e1079df9d14e5757b4f6c"
+      },
+      {
+        "path": "tools/spanner-query-plan-shape/testdata/statement_surface_expectations.json",
+        "sha256": "8cf3a01d9e0212c7a10d436c3428a6477a925911f2aec0bbed4146fb0fe6e2f8"
       },
       {
         "path": "tools/spanner-query-plan-shape/vector_search_cases.go",

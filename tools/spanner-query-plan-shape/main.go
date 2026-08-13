@@ -58,7 +58,7 @@ ON s.SingerId = a.SingerId
 `
 
 const builtInCaseNames = "all, docs, optimizer_gaps, optimizer_unhinted_candidates, join_elimination, planvocab_inference, cte, dml, tvf, lock_hints, " +
-	"full_text_search, ngram_search, json_search, vector_search, search_graph, ai_plan, function_hint, hint_matrix, statement_hint_query_matrix, " +
+	"full_text_search, ngram_search, json_search, vector_search, search_graph, ai_plan, statement_surface, function_hint, hint_matrix, statement_hint_query_matrix, " +
 	"hint_position_audit, hint_position_combinations, set_operation_distinct, factorized_mode, gql_surface, gql_set_propagation, gql_hint_surface, google_sql_surface, google_sql_proto_surface, rewriter_surface, condition_boundaries, aggregate_functions, join_matrix, subquery_join_hint_matrix, push_broadcast_hash_join, or hash_join"
 
 type stringListFlag []string
@@ -228,6 +228,9 @@ func loadDDLs(builtinCase string, paths []string) ([]string, error) {
 	if len(paths) == 0 {
 		if strings.EqualFold(strings.TrimSpace(builtinCase), "dml") {
 			return parseBuiltInDDLs("dml-schema.sql", dmlDDL)
+		}
+		if strings.EqualFold(strings.TrimSpace(builtinCase), "statement_surface") {
+			return nil, nil
 		}
 		if strings.EqualFold(strings.TrimSpace(builtinCase), "tvf") {
 			return parseBuiltInDDLs("tvf-schema.sql", changeStreamTVFDDL)
@@ -425,6 +428,8 @@ func loadQueries(builtinCase string, sqlTexts, sqlFiles []string) ([]queryCase, 
 		return append(queries, vectorSearchQueries...), nil
 	case "ai_plan":
 		return aiPlanQueries, nil
+	case "statement_surface":
+		return statementSurfaceQueries, nil
 	case "function_hint":
 		return functionHintQueries, nil
 	case "hint_matrix":
