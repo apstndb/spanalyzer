@@ -105,6 +105,10 @@ jobs:
         working-directory: cmd/spanner-query-gen
         run: mise x -- go test -count=1 -tags='integration omni' -run '^$' ./...
 
+      - name: Compile plan-probe Omni integration test sources without running Omni
+        working-directory: tools
+        run: mise x -- go test -count=1 -tags='integration omni' -run '^$' ./...
+
       - name: Run Spanner emulator integration tests
         working-directory: cmd/spanner-query-gen
         run: mise x -- go test -race -count=1 -tags=integration -run '^TestIntegration' ./...
