@@ -1,9 +1,6 @@
 package main
 
 import (
-	"encoding/json"
-	"os"
-	"path/filepath"
 	"slices"
 	"strings"
 	"testing"
@@ -105,67 +102,14 @@ func TestLoadQueriesRewriterSurfaceMatchesManifest(t *testing.T) {
 		seen[query.Label] = struct{}{}
 	}
 
-	manifestBytes, err := os.ReadFile(filepath.Join("testdata", "rewriter_surface_expectations.json"))
-	if err != nil {
-		t.Fatal(err)
-	}
-	var manifest struct {
-		Version string `json:"version"`
-		Queries []struct {
-			Label    string            `json:"label"`
-			Patterns []json.RawMessage `json:"patterns"`
-		} `json:"queries"`
-		ExpectedQueryErrors []struct {
-			Label    string `json:"label"`
-			Contains string `json:"contains"`
-		} `json:"expected_query_errors"`
-	}
-	if err := json.Unmarshal(manifestBytes, &manifest); err != nil {
-		t.Fatal(err)
-	}
-	if got, want := manifest.Version, "v0alpha1"; got != want {
-		t.Errorf("rewriter surface expectation version = %q, want %q", got, want)
-	}
-	if got, want := len(manifest.Queries), 18; got != want {
-		t.Errorf("rewriter surface positive expectations = %d, want %d", got, want)
-	}
-	if got, want := len(manifest.ExpectedQueryErrors), 15; got != want {
-		t.Errorf("rewriter surface error expectations = %d, want %d", got, want)
-	}
+	manifest := loadExpectationManifest(t, "rewriter_surface_expectations.json")
 	patternCount := 0
-	manifestLabels := make(map[string]struct{}, len(queries))
 	for _, expectation := range manifest.Queries {
-		if _, ok := seen[expectation.Label]; !ok {
-			t.Errorf("rewriter surface expectation label %q is absent from the built-in case", expectation.Label)
-		}
-		if len(expectation.Patterns) == 0 {
-			t.Errorf("rewriter surface expectation label %q has no operator patterns", expectation.Label)
-		}
-		if _, duplicate := manifestLabels[expectation.Label]; duplicate {
-			t.Errorf("duplicate rewriter surface manifest label %q", expectation.Label)
-		}
-		manifestLabels[expectation.Label] = struct{}{}
 		patternCount += len(expectation.Patterns)
 	}
 	if got, want := patternCount, 52; got != want {
 		t.Errorf("rewriter surface operator patterns = %d, want %d", got, want)
 	}
-	for _, expectation := range manifest.ExpectedQueryErrors {
-		if _, ok := seen[expectation.Label]; !ok {
-			t.Errorf("rewriter surface expected-error label %q is absent from the built-in case", expectation.Label)
-		}
-		if expectation.Contains == "" {
-			t.Errorf("rewriter surface expected-error label %q has no matching text", expectation.Label)
-		}
-		if _, duplicate := manifestLabels[expectation.Label]; duplicate {
-			t.Errorf("duplicate rewriter surface manifest label %q", expectation.Label)
-		}
-		manifestLabels[expectation.Label] = struct{}{}
-	}
-	if len(manifestLabels) != len(seen) {
-		t.Errorf("rewriter surface manifest labels = %d, query labels = %d", len(manifestLabels), len(seen))
-	}
-
 	ddls, err := loadDDLs("rewriter_surface", nil)
 	if err != nil {
 		t.Fatalf("loadDDLs(%q) error = %v", "rewriter_surface", err)
