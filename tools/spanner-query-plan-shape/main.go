@@ -57,10 +57,6 @@ JOIN@{JOIN_METHOD=HASH_JOIN} Albums a
 ON s.SingerId = a.SingerId
 `
 
-const builtInCaseNames = "all, docs, optimizer_gaps, optimizer_unhinted_candidates, join_elimination, planvocab_inference, cte, dml, tvf, lock_hints, " +
-	"full_text_search, ngram_search, json_search, vector_search, search_graph, ai_plan, statement_surface, function_hint, hint_matrix, statement_hint_query_matrix, " +
-	"hint_position_audit, hint_position_combinations, set_operation_distinct, factorized_mode, gql_surface, gql_set_propagation, gql_hint_surface, google_sql_surface, google_sql_proto_surface, rewriter_surface, condition_boundaries, aggregate_functions, join_matrix, subquery_join_hint_matrix, push_broadcast_hash_join, or hash_join"
-
 type stringListFlag []string
 
 func (f *stringListFlag) String() string {
@@ -106,7 +102,7 @@ func run(args []string, stdout io.Writer) error {
 	builtinCase := fs.String(
 		"case",
 		"all",
-		"built-in query case when --sql/--sql-file is omitted: "+builtInCaseNames,
+		"built-in query case when --sql/--sql-file is omitted: "+builtInCaseNames(),
 	)
 	output := fs.String("output", "nodes", "output format: compact-dfs, compact-dfs-metadata, compact-tree, compact-tree-metadata, json, nodes, reference, summary, yaml, or legacy aliases compact/compact-metadata")
 	compactTreeIndexes := fs.Bool("compact-tree-indexes", false, "include PlanNode indexes in compact-tree and compact-tree-metadata output")
@@ -144,8 +140,8 @@ func run(args []string, stdout io.Writer) error {
 	if err != nil {
 		return err
 	}
-	if strings.EqualFold(strings.TrimSpace(*builtinCase), "google_sql_proto_surface") && protoDescriptors == nil {
-		return fmt.Errorf("--case google_sql_proto_surface requires --proto-descriptors-file")
+	if spec, ok := lookupBuiltInCase(*builtinCase); ok && spec.RequiresProtoDescriptors && protoDescriptors == nil {
+		return fmt.Errorf("--case %s requires --proto-descriptors-file", spec.Name)
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), *timeout)
@@ -226,78 +222,10 @@ func isRawPlanOutput(output string) bool {
 
 func loadDDLs(builtinCase string, paths []string) ([]string, error) {
 	if len(paths) == 0 {
-		if strings.EqualFold(strings.TrimSpace(builtinCase), "dml") {
-			return parseBuiltInDDLs("dml-schema.sql", dmlDDL)
+		if spec, ok := lookupBuiltInCase(builtinCase); ok {
+			return spec.DDLs()
 		}
-		if strings.EqualFold(strings.TrimSpace(builtinCase), "statement_surface") {
-			return nil, nil
-		}
-		if strings.EqualFold(strings.TrimSpace(builtinCase), "tvf") {
-			return parseBuiltInDDLs("tvf-schema.sql", changeStreamTVFDDL)
-		}
-		if strings.EqualFold(strings.TrimSpace(builtinCase), "lock_hints") {
-			return parseBuiltInDDLs("lock-hints-schema.sql", docsDDL)
-		}
-		if strings.EqualFold(strings.TrimSpace(builtinCase), "full_text_search") {
-			return parseBuiltInDDLs("full-text-search-schema.sql", fullTextSearchDDL)
-		}
-		if strings.EqualFold(strings.TrimSpace(builtinCase), "search_graph") {
-			fullTextDDLs, err := parseBuiltInDDLs("full-text-search-schema.sql", fullTextSearchDDL)
-			if err != nil {
-				return nil, err
-			}
-			return append(fullTextDDLs, vectorSearchDDLs...), nil
-		}
-		if strings.EqualFold(strings.TrimSpace(builtinCase), "ngram_search") {
-			return parseBuiltInDDLs("ngram-search-schema.sql", ngramSearchDDL)
-		}
-		if strings.EqualFold(strings.TrimSpace(builtinCase), "json_search") {
-			return parseBuiltInDDLs("json-search-schema.sql", jsonSearchDDL)
-		}
-		if strings.EqualFold(strings.TrimSpace(builtinCase), "vector_search") {
-			return append([]string(nil), vectorSearchDDLs...), nil
-		}
-		if strings.EqualFold(strings.TrimSpace(builtinCase), "optimizer_gaps") ||
-			strings.EqualFold(strings.TrimSpace(builtinCase), "optimizer_unhinted_candidates") {
-			return parseBuiltInDDLs("optimizer-gaps-schema.sql", optimizerGapsDDL)
-		}
-		if strings.EqualFold(strings.TrimSpace(builtinCase), "join_elimination") {
-			return parseBuiltInDDLs("join-elimination-schema.sql", joinEliminationDDL)
-		}
-		if strings.EqualFold(strings.TrimSpace(builtinCase), "planvocab_inference") {
-			return parseBuiltInDDLs("planvocab-inference-schema.sql", joinEliminationDDL)
-		}
-		if strings.EqualFold(strings.TrimSpace(builtinCase), "set_operation_distinct") {
-			return parseBuiltInDDLs("set-operation-distinct-schema.sql", setOperationDistinctDDL)
-		}
-		if strings.EqualFold(strings.TrimSpace(builtinCase), "google_sql_proto_surface") {
-			return parseBuiltInDDLs("google-sql-proto-surface-schema.sql", googleSQLProtoSurfaceDDL)
-		}
-		if strings.EqualFold(strings.TrimSpace(builtinCase), "rewriter_surface") {
-			return parseBuiltInDDLs("rewriter-surface-schema.sql", rewriterSurfaceDDL)
-		}
-		if strings.EqualFold(strings.TrimSpace(builtinCase), "condition_boundaries") {
-			return parseBuiltInDDLs("condition-boundary-schema.sql", conditionBoundaryDDL)
-		}
-		if strings.EqualFold(strings.TrimSpace(builtinCase), "docs") ||
-			strings.EqualFold(strings.TrimSpace(builtinCase), "cte") ||
-			strings.EqualFold(strings.TrimSpace(builtinCase), "function_hint") ||
-			strings.EqualFold(strings.TrimSpace(builtinCase), "hint_matrix") ||
-			strings.EqualFold(strings.TrimSpace(builtinCase), "statement_hint_query_matrix") ||
-			strings.EqualFold(strings.TrimSpace(builtinCase), "hint_position_audit") ||
-			strings.EqualFold(strings.TrimSpace(builtinCase), "hint_position_combinations") ||
-			strings.EqualFold(strings.TrimSpace(builtinCase), "factorized_mode") ||
-			strings.EqualFold(strings.TrimSpace(builtinCase), "gql_surface") ||
-			strings.EqualFold(strings.TrimSpace(builtinCase), "gql_set_propagation") ||
-			strings.EqualFold(strings.TrimSpace(builtinCase), "gql_hint_surface") ||
-			strings.EqualFold(strings.TrimSpace(builtinCase), "google_sql_surface") ||
-			strings.EqualFold(strings.TrimSpace(builtinCase), "ai_plan") ||
-			strings.EqualFold(strings.TrimSpace(builtinCase), "aggregate_functions") ||
-			strings.EqualFold(strings.TrimSpace(builtinCase), "join_matrix") ||
-			strings.EqualFold(strings.TrimSpace(builtinCase), "subquery_join_hint_matrix") {
-			return parseBuiltInDDLs("docs-schema.sql", docsDDL)
-		}
-		return []string{singersDDL, albumsDDL}, nil
+		return defaultDDLProvider()
 	}
 	var out []string
 	for _, path := range paths {
@@ -391,86 +319,11 @@ func loadQueries(builtinCase string, sqlTexts, sqlFiles []string) ([]queryCase, 
 		return queries, nil
 	}
 
-	switch strings.ToLower(strings.TrimSpace(builtinCase)) {
-	case "all":
-		return []queryCase{
-			{Label: "PUSH_BROADCAST_HASH_JOIN", SQL: pushBroadcastSQL},
-			{Label: "HASH_JOIN", SQL: hashSQL},
-		}, nil
-	case "docs":
-		return docsQueries, nil
-	case "optimizer_gaps":
-		return optimizerGapQueries, nil
-	case "optimizer_unhinted_candidates":
-		return optimizerUnhintedCandidateQueries, nil
-	case "join_elimination":
-		return joinEliminationQueries, nil
-	case "planvocab_inference":
-		return planVocabInferenceQueries, nil
-	case "cte":
-		return cteQueries, nil
-	case "dml":
-		return dmlQueries, nil
-	case "tvf":
-		return tvfQueries, nil
-	case "lock_hints":
-		return lockHintQueries, nil
-	case "full_text_search":
-		return fullTextSearchQueries, nil
-	case "ngram_search":
-		return ngramSearchQueries, nil
-	case "json_search":
-		return jsonSearchQueries, nil
-	case "vector_search":
-		return vectorSearchQueries, nil
-	case "search_graph":
-		queries := append([]queryCase(nil), fullTextSearchQueries...)
-		return append(queries, vectorSearchQueries...), nil
-	case "ai_plan":
-		return aiPlanQueries, nil
-	case "statement_surface":
-		return statementSurfaceQueries, nil
-	case "function_hint":
-		return functionHintQueries, nil
-	case "hint_matrix":
-		return hintMatrixQueries, nil
-	case "statement_hint_query_matrix":
-		return statementHintQueryMatrixQueries, nil
-	case "hint_position_audit":
-		return hintPositionAuditQueries(), nil
-	case "hint_position_combinations":
-		return hintPositionCombinationQueries, nil
-	case "set_operation_distinct":
-		return setOperationDistinctQueries, nil
-	case "factorized_mode":
-		return factorizedModeQueries, nil
-	case "gql_surface":
-		return gqlSurfaceQueries, nil
-	case "gql_set_propagation":
-		return gqlSetPropagationQueries, nil
-	case "gql_hint_surface":
-		return gqlHintSurfaceQueries, nil
-	case "google_sql_surface":
-		return googleSQLSurfaceQueries, nil
-	case "google_sql_proto_surface":
-		return googleSQLProtoSurfaceQueries, nil
-	case "rewriter_surface":
-		return rewriterSurfaceQueries, nil
-	case "condition_boundaries":
-		return conditionBoundaryQueries, nil
-	case "aggregate_functions":
-		return aggregateFunctionQueries, nil
-	case "join_matrix":
-		return joinMatrixQueries, nil
-	case "subquery_join_hint_matrix":
-		return subqueryJoinHintMatrixQueries, nil
-	case "push_broadcast_hash_join":
-		return []queryCase{{Label: "PUSH_BROADCAST_HASH_JOIN", SQL: pushBroadcastSQL}}, nil
-	case "hash_join":
-		return []queryCase{{Label: "HASH_JOIN", SQL: hashSQL}}, nil
-	default:
-		return nil, fmt.Errorf("unsupported --case %q; use %s", builtinCase, builtInCaseNames)
+	spec, ok := lookupBuiltInCase(builtinCase)
+	if !ok {
+		return nil, fmt.Errorf("unsupported --case %q; use %s", builtinCase, builtInCaseNames())
 	}
+	return spec.Queries(), nil
 }
 
 func parseSQLFileQueries(path, sql string) ([]queryCase, error) {
