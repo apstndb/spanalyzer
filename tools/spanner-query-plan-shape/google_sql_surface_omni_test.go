@@ -3,7 +3,6 @@
 package main
 
 import (
-	"os"
 	"slices"
 	"strconv"
 	"strings"
@@ -17,30 +16,11 @@ import (
 )
 
 func TestIntegrationGoogleSQLSurfaceVersionMatrixOnOmni(t *testing.T) {
-	if os.Getenv("SPANEMUBOOST_ENABLE_OMNI_TESTS") == "" {
-		t.Skip("set SPANEMUBOOST_ENABLE_OMNI_TESTS=1 to run Spanner Omni tests")
-	}
-	image := strings.TrimSpace(os.Getenv("SPANALYZER_OMNI_IMAGE"))
-	if image == "" {
-		t.Fatal("set SPANALYZER_OMNI_IMAGE to the pinned Spanner Omni image under test")
-	}
 	ddls, err := parseBuiltInDDLs("google-sql-surface-schema.sql", docsDDL)
 	if err != nil {
 		t.Fatalf("parseBuiltInDDLs() error = %v", err)
 	}
-	runtime := spanemuboost.NewLazyRuntime(
-		spanemuboost.BackendOmni,
-		spanemuboost.WithContainerImage(image),
-	)
-	t.Cleanup(func() { _ = runtime.Close() })
-	clients, err := spanemuboost.OpenClients(t.Context(), runtime,
-		spanemuboost.WithRandomDatabaseID(),
-		spanemuboost.WithSetupDDLs(ddls),
-	)
-	if err != nil {
-		t.Fatalf("OpenClients() error = %v", err)
-	}
-	t.Cleanup(func() { _ = clients.Close() })
+	clients := openOmniClients(t, ddls)
 	if _, err := clients.Client.Apply(t.Context(), []*spanner.Mutation{
 		spanner.Insert("Concerts", []string{"VenueId", "SingerId", "ConcertDate", "TicketPrices"}, []any{int64(1), int64(1), civil.Date{Year: 2026, Month: 8, Day: 11}, []int64{}}),
 		spanner.Insert("Concerts", []string{"VenueId", "SingerId", "ConcertDate", "TicketPrices"}, []any{int64(2), int64(2), civil.Date{Year: 2026, Month: 8, Day: 11}, []int64{10, 20}}),
@@ -340,13 +320,6 @@ func TestIntegrationGoogleSQLSurfaceVersionMatrixOnOmni(t *testing.T) {
 }
 
 func TestIntegrationGoogleSQLProtoSurfaceVersionMatrixOnOmni(t *testing.T) {
-	if os.Getenv("SPANEMUBOOST_ENABLE_OMNI_TESTS") == "" {
-		t.Skip("set SPANEMUBOOST_ENABLE_OMNI_TESTS=1 to run Spanner Omni tests")
-	}
-	image := strings.TrimSpace(os.Getenv("SPANALYZER_OMNI_IMAGE"))
-	if image == "" {
-		t.Fatal("set SPANALYZER_OMNI_IMAGE to the pinned Spanner Omni image under test")
-	}
 	descriptors, err := loadFileDescriptorSet([]string{
 		"../../testdata/protos/order_descriptors.pb",
 		"../../testdata/protos/complex/complex_descriptors.pb",
@@ -358,20 +331,7 @@ func TestIntegrationGoogleSQLProtoSurfaceVersionMatrixOnOmni(t *testing.T) {
 	if err != nil {
 		t.Fatalf("parseBuiltInDDLs() error = %v", err)
 	}
-	runtime := spanemuboost.NewLazyRuntime(
-		spanemuboost.BackendOmni,
-		spanemuboost.WithContainerImage(image),
-	)
-	t.Cleanup(func() { _ = runtime.Close() })
-	clients, err := spanemuboost.OpenClients(t.Context(), runtime,
-		spanemuboost.WithRandomDatabaseID(),
-		spanemuboost.WithSetupDDLs(ddls),
-		spanemuboost.WithSetupFileDescriptorSet(descriptors),
-	)
-	if err != nil {
-		t.Fatalf("OpenClients() error = %v", err)
-	}
-	t.Cleanup(func() { _ = clients.Close() })
+	clients := openOmniClients(t, ddls, spanemuboost.WithSetupFileDescriptorSet(descriptors))
 
 	unsupportedErrors := map[string]string{
 		"google-sql-proto-surface/unsupported/extract-field":             "EXTRACT from PROTO is not supported",

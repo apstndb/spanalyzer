@@ -17,7 +17,7 @@ import (
 )
 
 func TestIntegrationStatementSurfaceOnOmni(t *testing.T) {
-	clients := openSearchGraphOmniClients(t, nil)
+	clients := openOmniClients(t, nil)
 	cases := queryCasesByLabel(t, statementSurfaceQueries)
 
 	wantErrors := map[string]string{

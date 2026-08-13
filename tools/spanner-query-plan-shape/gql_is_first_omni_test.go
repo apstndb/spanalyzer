@@ -4,42 +4,18 @@ package main
 
 import (
 	"fmt"
-	"os"
 	"slices"
-	"strings"
 	"testing"
 
 	"cloud.google.com/go/spanner"
-	"github.com/apstndb/spanemuboost"
 )
 
 func TestIntegrationGQLISFirstPlacementSemanticsOnOmni(t *testing.T) {
-	if os.Getenv("SPANEMUBOOST_ENABLE_OMNI_TESTS") == "" {
-		t.Skip("set SPANEMUBOOST_ENABLE_OMNI_TESTS=1 to run Spanner Omni tests")
-	}
-	image := strings.TrimSpace(os.Getenv("SPANALYZER_OMNI_IMAGE"))
-	if image == "" {
-		t.Fatal("set SPANALYZER_OMNI_IMAGE to the pinned Spanner Omni image under test")
-	}
 	ddls, err := parseBuiltInDDLs("gql-is-first-schema.sql", docsDDL)
 	if err != nil {
 		t.Fatalf("parseBuiltInDDLs() error = %v", err)
 	}
-	runtime := spanemuboost.NewLazyRuntime(
-		spanemuboost.BackendOmni,
-		spanemuboost.WithContainerImage(image),
-	)
-	t.Cleanup(func() { _ = runtime.Close() })
-	clients, err := spanemuboost.OpenClients(
-		t.Context(),
-		runtime,
-		spanemuboost.WithRandomDatabaseID(),
-		spanemuboost.WithSetupDDLs(ddls),
-	)
-	if err != nil {
-		t.Fatalf("OpenClients() error = %v", err)
-	}
-	t.Cleanup(func() { _ = clients.Close() })
+	clients := openOmniClients(t, ddls)
 
 	mutations := make([]*spanner.Mutation, 0, 11)
 	for _, singerID := range []int64{1, 2, 3, 4, 5} {

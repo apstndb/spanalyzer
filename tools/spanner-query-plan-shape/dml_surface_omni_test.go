@@ -12,7 +12,7 @@ func TestIntegrationDMLSurfaceOnOmni(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	clients := openSearchGraphOmniClients(t, ddls)
+	clients := openOmniClients(t, ddls)
 	plansByLabel := make(map[string][]optimizerVersionShape)
 	for version := 1; version <= 8; version++ {
 		for _, query := range dmlQueries {

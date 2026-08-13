@@ -4,13 +4,10 @@ package main
 
 import (
 	"fmt"
-	"os"
 	"slices"
-	"strings"
 	"testing"
 
 	"cloud.google.com/go/spanner"
-	"github.com/apstndb/spanemuboost"
 )
 
 const setOperationEquivalenceDDL = `
@@ -43,30 +40,11 @@ CREATE TABLE SetOpT (
 `
 
 func TestIntegrationSetOperationRewriteEquivalenceOnOmni(t *testing.T) {
-	if os.Getenv("SPANEMUBOOST_ENABLE_OMNI_TESTS") == "" {
-		t.Skip("set SPANEMUBOOST_ENABLE_OMNI_TESTS=1 to run Spanner Omni tests")
-	}
-	image := strings.TrimSpace(os.Getenv("SPANALYZER_OMNI_IMAGE"))
-	if image == "" {
-		t.Fatal("set SPANALYZER_OMNI_IMAGE to the pinned Spanner Omni image under test")
-	}
 	ddls, err := parseBuiltInDDLs("set-operation-equivalence-schema.sql", setOperationEquivalenceDDL)
 	if err != nil {
 		t.Fatalf("parseBuiltInDDLs() error = %v", err)
 	}
-	runtime := spanemuboost.NewLazyRuntime(
-		spanemuboost.BackendOmni,
-		spanemuboost.WithContainerImage(image),
-	)
-	t.Cleanup(func() { _ = runtime.Close() })
-	clients, err := spanemuboost.OpenClients(t.Context(), runtime,
-		spanemuboost.WithRandomDatabaseID(),
-		spanemuboost.WithSetupDDLs(ddls),
-	)
-	if err != nil {
-		t.Fatalf("OpenClients() error = %v", err)
-	}
-	t.Cleanup(func() { _ = clients.Close() })
+	clients := openOmniClients(t, ddls)
 
 	mutations := []*spanner.Mutation{
 		spanner.Insert("LeftRows", []string{"Id", "K", "V"}, []any{int64(1), nil, "x"}),

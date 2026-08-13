@@ -4,7 +4,6 @@ package main
 
 import (
 	"context"
-	"os"
 	"strconv"
 	"strings"
 	"testing"
@@ -12,12 +11,11 @@ import (
 
 	"cloud.google.com/go/spanner"
 	"cloud.google.com/go/spanner/apiv1/spannerpb"
-	"github.com/apstndb/spanemuboost"
 	"google.golang.org/protobuf/proto"
 )
 
 func TestIntegrationFullTextSearchPlansOnOmni(t *testing.T) {
-	clients := openSearchGraphOmniClients(t, fullTextSearchDDLs(t))
+	clients := openOmniClients(t, fullTextSearchDDLs(t))
 	cases := queryCasesByLabel(t, fullTextSearchQueries)
 	query := cases["full-text-search/gql-search-traversal"]
 
@@ -189,7 +187,7 @@ func planShortDescriptionContains(plan *spannerpb.QueryPlan, substring string) b
 }
 
 func TestIntegrationVectorSearchPlansOnOmni(t *testing.T) {
-	clients := openSearchGraphOmniClients(t, append([]string(nil), vectorSearchDDLs...))
+	clients := openOmniClients(t, append([]string(nil), vectorSearchDDLs...))
 	cases := queryCasesByLabel(t, vectorSearchQueries)
 	query := cases["vector-search/ann-gql-next-traversal"]
 
@@ -400,31 +398,6 @@ func fullTextSearchDDLs(t *testing.T) []string {
 		t.Fatalf("parseBuiltInDDLs() error = %v", err)
 	}
 	return ddls
-}
-
-func openSearchGraphOmniClients(t *testing.T, ddls []string) *spanemuboost.Clients {
-	t.Helper()
-	if os.Getenv("SPANEMUBOOST_ENABLE_OMNI_TESTS") == "" {
-		t.Skip("set SPANEMUBOOST_ENABLE_OMNI_TESTS=1 to run Spanner Omni tests")
-	}
-	image := strings.TrimSpace(os.Getenv("SPANALYZER_OMNI_IMAGE"))
-	if image == "" {
-		t.Fatal("set SPANALYZER_OMNI_IMAGE to the pinned Spanner Omni image under test")
-	}
-	runtime := spanemuboost.NewLazyRuntime(
-		spanemuboost.BackendOmni,
-		spanemuboost.WithContainerImage(image),
-	)
-	t.Cleanup(func() { _ = runtime.Close() })
-	clients, err := spanemuboost.OpenClients(t.Context(), runtime,
-		spanemuboost.WithRandomDatabaseID(),
-		spanemuboost.WithSetupDDLs(ddls),
-	)
-	if err != nil {
-		t.Fatalf("OpenClients() error = %v", err)
-	}
-	t.Cleanup(func() { _ = clients.Close() })
-	return clients
 }
 
 func analyzeVersionedSearchGraphPlan(t *testing.T, client *spanner.Client, query queryCase, version int) (*spannerpb.QueryPlan, error) {

@@ -14,7 +14,7 @@ func TestIntegrationNgramSearchVersionMatrixOnOmni(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	clients := openSearchGraphOmniClients(t, ddls)
+	clients := openOmniClients(t, ddls)
 	cases := queryCasesByLabel(t, ngramSearchQueries)
 
 	baseLabels := []string{
