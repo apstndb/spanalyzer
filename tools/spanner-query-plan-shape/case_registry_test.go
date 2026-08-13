@@ -1,6 +1,9 @@
 package main
 
 import (
+	"bytes"
+	"encoding/json"
+	"io"
 	"slices"
 	"strings"
 	"testing"
@@ -39,6 +42,54 @@ func TestBuiltInCaseRegistry(t *testing.T) {
 
 	if got, want := builtInCaseNames(), strings.Join(names, ", "); got != want {
 		t.Errorf("builtInCaseNames() = %q, want %q", got, want)
+	}
+}
+
+func TestListBuiltInCasesText(t *testing.T) {
+	var stdout bytes.Buffer
+	if err := run([]string{"--list-cases"}, &stdout); err != nil {
+		t.Fatal(err)
+	}
+	lines := strings.Split(strings.TrimSpace(stdout.String()), "\n")
+	if got, want := len(lines), len(builtInCaseSpecs)+1; got != want {
+		t.Fatalf("list line count = %d, want %d", got, want)
+	}
+	if got, want := lines[0], "NAME\tQUERIES\tDESCRIPTION"; got != want {
+		t.Errorf("list heading = %q, want %q", got, want)
+	}
+	if got, want := lines[1], "all\t2\ttwo representative hash-join probes (not every built-in case)"; got != want {
+		t.Errorf("first case row = %q, want %q", got, want)
+	}
+}
+
+func TestListBuiltInCasesJSON(t *testing.T) {
+	var stdout bytes.Buffer
+	if err := run([]string{"--list-cases", "--list-cases-format", "json"}, &stdout); err != nil {
+		t.Fatal(err)
+	}
+	var summaries []builtInCaseSummary
+	if err := json.Unmarshal(stdout.Bytes(), &summaries); err != nil {
+		t.Fatal(err)
+	}
+	if got, want := len(summaries), len(builtInCaseSpecs); got != want {
+		t.Fatalf("JSON case count = %d, want %d", got, want)
+	}
+	proto := summaries[0]
+	for _, summary := range summaries {
+		if summary.Name == "google_sql_proto_surface" {
+			proto = summary
+			break
+		}
+	}
+	if proto.Name != "google_sql_proto_surface" || !proto.RequiresProtoDescriptors {
+		t.Errorf("proto case summary = %#v", proto)
+	}
+}
+
+func TestListBuiltInCasesRejectsUnknownFormat(t *testing.T) {
+	err := run([]string{"--list-cases", "--list-cases-format", "yaml"}, io.Discard)
+	if err == nil || !strings.Contains(err.Error(), "use text or json") {
+		t.Fatalf("run() error = %v, want unsupported list format", err)
 	}
 }
 

@@ -1,6 +1,11 @@
 package main
 
-import "strings"
+import (
+	"encoding/json"
+	"fmt"
+	"io"
+	"strings"
+)
 
 type queryProvider func() []queryCase
 
@@ -12,6 +17,13 @@ type builtInCaseSpec struct {
 	Queries                  queryProvider
 	DDLs                     ddlProvider
 	RequiresProtoDescriptors bool
+}
+
+type builtInCaseSummary struct {
+	Name                     string `json:"name"`
+	Description              string `json:"description"`
+	QueryCount               int    `json:"query_count"`
+	RequiresProtoDescriptors bool   `json:"requires_proto_descriptors,omitempty"`
 }
 
 var (
@@ -80,6 +92,37 @@ func builtInCaseNames() string {
 		names = append(names, spec.Name)
 	}
 	return strings.Join(names, ", ")
+}
+
+func printBuiltInCases(stdout io.Writer, outputFormat string) error {
+	summaries := make([]builtInCaseSummary, 0, len(builtInCaseSpecs))
+	for _, spec := range builtInCaseSpecs {
+		summaries = append(summaries, builtInCaseSummary{
+			Name:                     spec.Name,
+			Description:              spec.Description,
+			QueryCount:               len(spec.Queries()),
+			RequiresProtoDescriptors: spec.RequiresProtoDescriptors,
+		})
+	}
+
+	switch strings.ToLower(strings.TrimSpace(outputFormat)) {
+	case "text":
+		if _, err := fmt.Fprintln(stdout, "NAME\tQUERIES\tDESCRIPTION"); err != nil {
+			return err
+		}
+		for _, summary := range summaries {
+			if _, err := fmt.Fprintf(stdout, "%s\t%d\t%s\n", summary.Name, summary.QueryCount, summary.Description); err != nil {
+				return err
+			}
+		}
+		return nil
+	case "json":
+		encoder := json.NewEncoder(stdout)
+		encoder.SetIndent("", "  ")
+		return encoder.Encode(summaries)
+	default:
+		return fmt.Errorf("unsupported --list-cases-format %q; use text or json", outputFormat)
+	}
 }
 
 func staticQueryProvider(queries []queryCase) queryProvider {

@@ -99,6 +99,8 @@ func run(args []string, stdout io.Writer) error {
 	fs.Var(&protoDescriptorFiles, "proto-descriptors-file", "serialized FileDescriptorSet to load with CREATE/ALTER PROTO BUNDLE DDL; may be repeated")
 	fs.Var(&sqlTexts, "sql", "SQL text to analyze; may be repeated. Overrides --case built-ins when present")
 	fs.Var(&sqlFiles, "sql-file", "SQL file to analyze; may be repeated and may contain multiple semicolon-separated SQL statements. Overrides --case built-ins when present")
+	listCases := fs.Bool("list-cases", false, "list built-in query cases without starting Spanner Omni")
+	listCasesFormat := fs.String("list-cases-format", "text", "output format for --list-cases: text or json")
 	builtinCase := fs.String(
 		"case",
 		"all",
@@ -114,6 +116,9 @@ func run(args []string, stdout io.Writer) error {
 	timeout := fs.Duration("timeout", 5*time.Minute, "maximum time to start Spanner Omni and analyze queries")
 	if err := fs.Parse(args); err != nil {
 		return err
+	}
+	if *listCases {
+		return printBuiltInCases(stdout, *listCasesFormat)
 	}
 	if *optimizerVersionDiff && *optimizerVersionMatrix {
 		return fmt.Errorf("--optimizer-version-diff already expands optimizer versions; do not combine it with --optimizer-version-matrix")
