@@ -326,6 +326,16 @@ versions. Ordered and unordered horizontal `ARRAY_AGG` both contained a Sort;
 their stable distinction was the Sort's scalar links (ordered: Key only;
 unordered control: Key and Value), not the presence of Sort itself.
 
+Horizontal `STRING_AGG` repeated that ordered-versus-positional Sort-link
+distinction at every version and lowered through `ARRAY_AGG` plus
+`ARRAY_TO_STRING`. Horizontal `ARRAY_CONCAT_AGG([e.AlbumTitle] ORDER BY ...)`
+used the common three-Aggregate recursive shell but added an `Array Subquery`,
+two more `Array Unnest` nodes, and `Minor Sort`; it was not plan-equivalent to
+the semantically aligned horizontal `ARRAY_AGG` control. Moving either
+`STRING_AGG(e.AlbumTitle, ...)` or `ARRAY_CONCAT_AGG(e.AlbumTitle)` directly to
+`RETURN` did not become a vertical aggregate: `e` is an array-valued group
+variable there, and all v1-v8 probes failed with the same field-access error.
+
 Primitive `ORDER BY ... LIMIT` used two Sort Limit operators and no separate
 Limit in v1-v2, then one Sort Limit plus one Limit in v3-v8. Adding GQL
 `COLLATE` preserved that boundary. Post-aggregate `FILTER` adds one Filter to

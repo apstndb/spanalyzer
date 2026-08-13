@@ -8,6 +8,7 @@
     "local_evidence": [
       "plancontract/normalize.go",
       "research/spanner-query-plan-shape/AGGREGATE_FUNCTION_AGG_TYPE_OBSERVATIONS_2026-08-11.md",
+      "research/spanner-query-plan-shape/AI_PLAN_OBSERVATIONS_2026-08-13.md",
       "research/spanner-query-plan-shape/COMPACT_TREE_METADATA_OBSERVATIONS.md",
       "research/spanner-query-plan-shape/CONDITION_BOUNDARY_OBSERVATIONS_2026-08-11.md",
       "research/spanner-query-plan-shape/FACTORIZED_MODE_OBSERVATIONS_2026-08-11.md",
@@ -15,6 +16,8 @@
       "research/spanner-query-plan-shape/GQL_HINT_VERSION_OBSERVATIONS_2026-08-11.md",
       "research/spanner-query-plan-shape/GQL_SURFACE_OBSERVATIONS_2026-08-11.md",
       "research/spanner-query-plan-shape/HINT_POSITION_AUDIT_2026-08-04.md",
+      "research/spanner-query-plan-shape/NGRAM_SEARCH_OBSERVATIONS_2026-08-13.md",
+      "research/spanner-query-plan-shape/OPTIMIZER_V9_REAL_INSTANCE_NOTES_2026-07-28.md",
       "research/spanner-query-plan-shape/PLANVOCAB_INFERENCE_OBSERVATIONS.md",
       "research/spanner-query-plan-shape/QUERY_EXECUTION_OPERATORS_OBSERVATIONS.md",
       "research/spanner-query-plan-shape/REWRITER_SURFACE_OBSERVATIONS_2026-08-12.md",
@@ -26,6 +29,9 @@
       "testdata/protos/order_protos.proto",
       "tools/spanner-query-plan-shape/aggregate_function_cases.go",
       "tools/spanner-query-plan-shape/aggregate_function_omni_test.go",
+      "tools/spanner-query-plan-shape/ai_plan_cases.go",
+      "tools/spanner-query-plan-shape/ai_plan_omni_test.go",
+      "tools/spanner-query-plan-shape/ai_plan_test.go",
       "tools/spanner-query-plan-shape/condition_boundary_cases.go",
       "tools/spanner-query-plan-shape/condition_boundary_omni_test.go",
       "tools/spanner-query-plan-shape/docs_cases.go",
@@ -38,9 +44,15 @@
       "tools/spanner-query-plan-shape/gql_hint_surface_omni_test.go",
       "tools/spanner-query-plan-shape/gql_is_first_cases.go",
       "tools/spanner-query-plan-shape/gql_is_first_omni_test.go",
+      "tools/spanner-query-plan-shape/gql_set_propagation_cases.go",
+      "tools/spanner-query-plan-shape/gql_set_propagation_omni_test.go",
+      "tools/spanner-query-plan-shape/gql_set_propagation_test.go",
       "tools/spanner-query-plan-shape/gql_surface_cases.go",
       "tools/spanner-query-plan-shape/gql_surface_omni_test.go",
       "tools/spanner-query-plan-shape/hint_position_combination_cases.go",
+      "tools/spanner-query-plan-shape/ngram_search_cases.go",
+      "tools/spanner-query-plan-shape/ngram_search_omni_test.go",
+      "tools/spanner-query-plan-shape/ngram_search_test.go",
       "tools/spanner-query-plan-shape/planvocab_cases.go",
       "tools/spanner-query-plan-shape/rewriter_surface_cases.go",
       "tools/spanner-query-plan-shape/rewriter_surface_omni_test.go",
@@ -49,13 +61,17 @@
       "tools/spanner-query-plan-shape/set_operation_distinct_cases.go",
       "tools/spanner-query-plan-shape/set_operation_equivalence_omni_test.go",
       "tools/spanner-query-plan-shape/testdata/aggregate_function_expectations.json",
+      "tools/spanner-query-plan-shape/testdata/ai_plan_expectations.json",
       "tools/spanner-query-plan-shape/testdata/condition_boundary_expectations.json",
+      "tools/spanner-query-plan-shape/testdata/facet_search_expectations.json",
       "tools/spanner-query-plan-shape/testdata/factorized_mode_expectations.json",
+      "tools/spanner-query-plan-shape/testdata/full_text_residual_expectations.json",
       "tools/spanner-query-plan-shape/testdata/google_sql_proto_surface_expectations.json",
       "tools/spanner-query-plan-shape/testdata/google_sql_surface_expectations.json",
       "tools/spanner-query-plan-shape/testdata/gql_hint_surface_expectations.json",
       "tools/spanner-query-plan-shape/testdata/gql_surface_expectations.json",
       "tools/spanner-query-plan-shape/testdata/hint_position_combination_expectations.json",
+      "tools/spanner-query-plan-shape/testdata/ngram_search_expectations.json",
       "tools/spanner-query-plan-shape/testdata/planvocab_inference_expectations.json",
       "tools/spanner-query-plan-shape/testdata/rewriter_surface_expectations.json",
       "tools/spanner-query-plan-shape/testdata/search_graph_expectations.json",
@@ -194,7 +210,8 @@
       "kind": "RELATIONAL",
       "metadata": [],
       "child_links": [
-        {"kind": "SCALAR", "type": "", "variable": "present", "multiple": true}
+        {"kind": "SCALAR", "type": "", "variable": "present", "multiple": true},
+        {"kind": "SCALAR", "type": "Scalar", "variable": "absent", "multiple": true}
       ]
     },
     {
@@ -481,6 +498,7 @@
         {"kind": "RELATIONAL", "type": "", "variable": "absent"},
         {"kind": "SCALAR", "type": "", "variable": "any"},
         {"kind": "SCALAR", "type": "Output", "variable": "present", "multiple": true},
+        {"kind": "SCALAR", "type": "PassThroughVars", "variable": "present", "multiple": true},
         {"kind": "SCALAR", "type": "Referenced", "variable": "absent", "multiple": true}
       ]
     },

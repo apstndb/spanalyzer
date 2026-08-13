@@ -51,6 +51,8 @@ Source pages:
 - <https://docs.cloud.google.com/spanner/docs/full-text-search/substring-search>
 - <https://docs.cloud.google.com/spanner/docs/full-text-search/search-multiple-columns>
 - <https://docs.cloud.google.com/spanner/docs/full-text-search/mix-full-text-and-non-text-queries>
+- <https://docs.cloud.google.com/spanner/docs/full-text-search/search-query-enhancement>
+- <https://docs.cloud.google.com/spanner/docs/full-text-search/fuzzy-search>
 - <https://docs.cloud.google.com/spanner/docs/sql-best-practices>
 - <https://docs.cloud.google.com/spanner/docs/query-optimizer/versions>
 
@@ -131,7 +133,8 @@ the broader documentation operator schema. It covers documented examples around
 `SEARCH`, `SEARCH_SUBSTRING`, multi-column search, mixed text and non-text
 predicates, explicit search-index hints, `SNIPPET`, ranked `SCORE` ordering,
 `TOKENLIST_CONCAT`, partitioned ordered search indexes, and numeric array
-predicates backed by search indexes.
+predicates backed by search indexes. It also retains enhanced-query statement
+hints and the documented `SOUNDEX` generated-column/search-index composition.
 
 ## `subquery_cluster_node` Metadata
 
@@ -288,6 +291,65 @@ vocabulary:
   search followed by graph traversal. The newly observed metadata scan is
   normalized as `scan_type: vector_index_metadata_scan`; like the root and leaf
   spellings, it remains in the generic `scan` operator family.
+- A pinned-Omni reciprocal-rank-fusion query retained a dot-product
+  `VectorIndexRootScan` and `VectorIndexLeafScan` together with a
+  `SearchIndexScan` under the same `Union All`, followed by an Aggregate
+  and global Sort Limit. The paired exact-KNN `_BASE_TABLE` control preserved
+  the fusion shell and text-search branch but replaced both vector scans with
+  one table scan. This demonstrates composition in one plan, not ranking
+  quality or runtime performance. `Search Query Conversion` was hoisted above
+  the union, and the SQL RRF shape had no `VectorIndexMetadataScan`.
+  A destination-redacted managed-Spanner recheck on 2026-08-13 confirmed the
+  same retrieval/fusion families at optimizer versions 5 through 8; versions
+  1 through 4 rejected both candidate and control at the scored text branch.
+  The managed vector branch additionally contained `BatchScan`. Candidate
+  fingerprints differed at v5, v6, and v7-v8, while the root/leaf + search
+  scan + Union All invariant remained stable. Both managed Spanner and pinned
+  Omni used a Stream Aggregate at v5 and a Hash Aggregate at v6 through v8.
+  The temporary tables and indexes were deleted and verified absent after
+  capture.
+- N-gram pattern acceleration used `Search Predicate` for candidate retrieval
+  and `Residual Condition` for exact checking. Parameterized `LIKE` and a
+  literal shorter than the configured minimum n-gram size read the forced
+  search index as a full scan with only a residual condition, so the presence
+  of `SearchIndexScan` alone does not prove that pattern acceleration occurred.
+- The covering multi-facet query read `SearchAlbumsFacetIndex` once, built a
+  named `search_results` spool once, and used three `SpoolScan` consumers for
+  the result page, rating counts, and unnested genre counts. Its page-only
+  control had no spool or Aggregate. Versions 1 through 4 returned the usual
+  SEARCH capability error, while versions 5 through 8 kept the same operator
+  counts. This is evidence of shared CTE materialization for this query shape,
+  not a general promise that every CTE is materialized.
+- `SEARCH(..., enhance_query => TRUE)` changed the Search Query Conversion
+  scalar description from `enhance_query: false` to `enhance_query: true` but
+  did not change the operator topology. `require_enhance_query=true` and
+  `enhance_query_timeout_ms=200` produced byte-identical plans to the enhanced
+  query without a statement hint at versions 5 through 8. Omni documents query
+  enhancement as unsupported, so this proves syntax and PLAN visibility there,
+  not synonym expansion or execution semantics.
+  A destination-redacted managed-Spanner recheck on 2026-08-13 also returned
+  PLAN output at optimizer versions 5 and 8 for the enhanced/default pair and
+  both statement hints. The reference renderer showed the same operator tree;
+  it does not expose the conversion scalar's `enhance_query` flag, so the raw
+  Omni protobuf remains the evidence for that distinction.
+  A two-row execution check kept the official misspelling example minimal:
+  searching `hotl cal` returned no IDs with the default and ID 1 (`Hotel
+  California`) with enhancement. This establishes managed-service behavior for
+  that capture; the documentation explicitly allows enhancement results to
+  evolve over time.
+- The documented phonetic composition over
+  `LOWER(SOUNDEX(ArtistName))` and a second full-text token column used one
+  `SearchIndexScan`. Its scan predicate was a scalar `Function` combining two
+  `Search Predicate` nodes; the search-only control had one predicate and no
+  combining Function. The constant-folded Soundex term appeared in the raw
+  short representation. This shows index composition, not result correctness
+  on the empty PLAN fixture.
+  Managed Spanner reproduced the combined two-term Search Predicate at versions
+  5 and 8. The temporary table and indexes used for that check were removed
+  after capture; connection destinations are not recorded.
+  On the same two-row fixture, `LOWER(SOUNDEX('stefan'))` plus a full-text
+  `hotel` term returned the row whose artist was `Steven`, while an unrelated
+  `Stella` row did not match.
 
 Full regenerated Full Text Search results are recorded in [`COMPACT_TREE_METADATA_OBSERVATIONS.md`](COMPACT_TREE_METADATA_OBSERVATIONS.md#full-text-search).
 Shareable `spannerplan/plantree/reference` output is recorded in
@@ -296,7 +358,8 @@ With `spannerplan v0.1.9`, the reference renderer marks `SearchIndex Scan`
 rows and prints `Search Predicate:` annotations in the
 `Predicates(identified by ID)` section.
 
-Raw-vs-reference follow-up confirmed that all 15 Full Text Search cases with
+Raw-vs-reference follow-up confirmed that all 15 Full Text Search cases present
+in the earlier corpus with
 raw `Search Predicate` child links are visible in the v0.1.9 reference output.
 Simple cases link to a scalar `Search Predicate` node, while composite cases
 can link to a scalar `Function` node whose descendants contain multiple

@@ -6,6 +6,7 @@ CREATE TABLE SearchAlbums (
   AlbumId STRING(MAX) NOT NULL,
   AlbumTitle STRING(MAX),
   AlbumStudio STRING(MAX),
+  ArtistName STRING(MAX),
   Rating FLOAT64,
   ReleaseTimestamp INT64 NOT NULL,
   Likes INT64,
@@ -15,6 +16,8 @@ CREATE TABLE SearchAlbums (
   AlbumTitle_Tokens TOKENLIST AS (TOKENIZE_FULLTEXT(AlbumTitle)) HIDDEN,
   AlbumTitle_SubstringTokens TOKENLIST AS (TOKENIZE_SUBSTRING(AlbumTitle)) HIDDEN,
   AlbumStudio_Tokens TOKENLIST AS (TOKENIZE_FULLTEXT(AlbumStudio)) HIDDEN,
+  ArtistNameSoundex STRING(MAX) AS (LOWER(SOUNDEX(ArtistName))),
+  ArtistNameSoundex_Tokens TOKENLIST AS (TOKEN(ArtistNameSoundex)) HIDDEN,
   Rating_Tokens TOKENLIST AS (TOKENIZE_NUMBER(Rating)) HIDDEN,
   Genres_Tokens TOKENLIST AS (TOKEN(Genres)) HIDDEN,
   Ratings_Tokens TOKENLIST AS (TOKENIZE_NUMBER(Ratings, comparison_type=>"equality")) HIDDEN,
@@ -41,6 +44,13 @@ ON SearchAlbums(Ratings_Tokens);
 CREATE SEARCH INDEX SearchAlbumsMixedIndex
 ON SearchAlbums(AlbumTitle_Tokens, Rating_Tokens, Genres_Tokens)
 STORING (Likes);
+
+CREATE SEARCH INDEX SearchAlbumsFacetIndex
+ON SearchAlbums(AlbumTitle_Tokens)
+STORING (AlbumTitle, Rating, Genres, Likes);
+
+CREATE SEARCH INDEX SearchAlbumsPhoneticIndex
+ON SearchAlbums(AlbumTitle_Tokens, ArtistNameSoundex_Tokens);
 
 CREATE TABLE SearchSingers (
   SingerId INT64 NOT NULL,
@@ -87,6 +97,30 @@ var fullTextSearchQueries = []queryCase{
 	{
 		Label: "full-text-search/score-order",
 		SQL:   `SELECT AlbumId FROM SearchAlbums WHERE SEARCH(AlbumTitle_Tokens, "fifth symphony") ORDER BY SCORE(AlbumTitle_Tokens, "fifth symphony") DESC`,
+	},
+	{
+		Label: "full-text-search/enhanced-query",
+		SQL:   `SELECT AlbumId FROM SearchAlbums@{FORCE_INDEX=SearchAlbumsTitleIndex} WHERE SEARCH(AlbumTitle_Tokens, "hotl cal", enhance_query => TRUE)`,
+	},
+	{
+		Label: "full-text-search/enhanced-query-control",
+		SQL:   `SELECT AlbumId FROM SearchAlbums@{FORCE_INDEX=SearchAlbumsTitleIndex} WHERE SEARCH(AlbumTitle_Tokens, "hotl cal")`,
+	},
+	{
+		Label: "full-text-search/enhanced-query-required-hint",
+		SQL:   `@{require_enhance_query=true} SELECT AlbumId FROM SearchAlbums@{FORCE_INDEX=SearchAlbumsTitleIndex} WHERE SEARCH(AlbumTitle_Tokens, "hotl cal", enhance_query => TRUE)`,
+	},
+	{
+		Label: "full-text-search/enhanced-query-timeout-hint",
+		SQL:   `@{enhance_query_timeout_ms=200} SELECT AlbumId FROM SearchAlbums@{FORCE_INDEX=SearchAlbumsTitleIndex} WHERE SEARCH(AlbumTitle_Tokens, "hotl cal", enhance_query => TRUE)`,
+	},
+	{
+		Label: "full-text-search/phonetic-composition",
+		SQL:   `SELECT AlbumId FROM SearchAlbums@{FORCE_INDEX=SearchAlbumsPhoneticIndex} WHERE ArtistNameSoundex = LOWER(SOUNDEX("stefan")) AND SEARCH(AlbumTitle_Tokens, "cat")`,
+	},
+	{
+		Label: "full-text-search/phonetic-search-only-control",
+		SQL:   `SELECT AlbumId FROM SearchAlbums@{FORCE_INDEX=SearchAlbumsPhoneticIndex} WHERE SEARCH(AlbumTitle_Tokens, "cat")`,
 	},
 	{
 		Label: "full-text-search/substring",
@@ -139,5 +173,45 @@ MATCH (src:Singer)-[:CollabWith]->(dst:Singer)
 WHERE SEARCH(dst.BioTokens, "jazz")
 RETURN src.SingerId AS src_id, dst.SingerId AS dst_id
 ORDER BY dst.SingerId`,
+	},
+	{
+		Label: "full-text-search/facet-single-count",
+		SQL: `SELECT Rating, COUNT(*) AS result_count
+FROM SearchAlbums@{FORCE_INDEX=SearchAlbumsFacetIndex}
+WHERE SEARCH(AlbumTitle_Tokens, 'foo')
+GROUP BY Rating
+ORDER BY Rating DESC`,
+	},
+	{
+		Label: "full-text-search/facet-search-only-control",
+		SQL: `SELECT Rating
+FROM SearchAlbums@{FORCE_INDEX=SearchAlbumsFacetIndex}
+WHERE SEARCH(AlbumTitle_Tokens, 'foo')
+ORDER BY Rating DESC`,
+	},
+	{
+		Label: "full-text-search/facet-multiple",
+		SQL: `WITH search_results AS (
+  SELECT SingerId, AlbumId, AlbumTitle, Genres, Rating, Likes
+  FROM SearchAlbums@{FORCE_INDEX=SearchAlbumsFacetIndex}
+  WHERE SEARCH(AlbumTitle_Tokens, 'foo')
+  ORDER BY Likes DESC, SingerId, AlbumId
+  LIMIT 10000
+)
+SELECT
+  ARRAY(SELECT AS STRUCT * FROM search_results ORDER BY Likes DESC, SingerId, AlbumId LIMIT 50) AS result_page,
+  ARRAY(SELECT AS STRUCT Rating, COUNT(*) AS result_count FROM search_results GROUP BY Rating ORDER BY result_count DESC, Rating DESC) AS rating_counts,
+  ARRAY(SELECT AS STRUCT genre, COUNT(*) AS result_count FROM search_results JOIN UNNEST(Genres) AS genre GROUP BY genre ORDER BY result_count DESC, genre LIMIT 5) AS genres_counts`,
+	},
+	{
+		Label: "full-text-search/facet-result-page-control",
+		SQL: `WITH search_results AS (
+  SELECT SingerId, AlbumId, AlbumTitle, Genres, Rating, Likes
+  FROM SearchAlbums@{FORCE_INDEX=SearchAlbumsFacetIndex}
+  WHERE SEARCH(AlbumTitle_Tokens, 'foo')
+  ORDER BY Likes DESC, SingerId, AlbumId
+  LIMIT 10000
+)
+SELECT ARRAY(SELECT AS STRUCT * FROM search_results ORDER BY Likes DESC, SingerId, AlbumId LIMIT 50) AS result_page`,
 	},
 }

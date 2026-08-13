@@ -62,11 +62,16 @@ Mechanism, fully visible in the v9 raw plan:
   `Reference $FirstName` against the retained input batch. Non-key input
   columns never cross the network.
 
-### 3. LIMIT suppresses the new shape (documented boundary confirmed)
+### 3. LIMIT behavior is not a stable suppression boundary
 
-The same query with `LIMIT 5` produces byte-identical v8/v9 plans (row-mode
-DCA, map-side Serialize Result). Matches the doc: prefer DA "if there is no
-`LIMIT` above the apply".
+The 2026-07-28 probe observed byte-identical v8/v9 plans for the same query
+with `LIMIT 5` (row-mode DCA, map-side Serialize Result). A fresh managed
+probe on 2026-08-13 refuted that as a durable boundary: v8 still used a Row
+DCA, while v9 used the same Batch DCA, typed-null `__row_id`, and
+`restored_ConcertDate` mechanism as the no-LIMIT query. The documentation's
+preference when there is no LIMIT is therefore not an optimizer-shape
+guarantee; statistics, rollout state, or other optimizer inputs can change
+the decision.
 
 ### 4. Probes with no visible v8→v9 change on this schema/data
 
@@ -97,7 +102,8 @@ family next to the existing per-version gap probes in
   Create Batch field defined by `Constant <typed null>` (`__row_id`), and
   `restored_*` variables on the DCA.
 - `optimizer-gaps/v9/dca-input-column-pruning-limit-control`: same query
-  `LIMIT 5`; expected to match the v8 shape (control).
+  `LIMIT 5`; record whether the Batch signature remains instead of expecting
+  equality with v8.
 - `optimizer-gaps/v9/index-union-aggressiveness`: the section-4 OR query; the
   real instance showed no shape change on this data — run it anyway on Omni
   and record whichever way it lands (empty-stats caveat applies).
@@ -131,3 +137,30 @@ query's raw v8/v9 nodes failed with endpoint-wide `DeadlineExceeded`, and the
 same failure reproduced with `SELECT 1`. That failure is transport evidence,
 not a query or optimizer rejection. The detailed DCA comparison above remains
 the 2026-07-28 observation until a successful raw-node recheck is captured.
+
+## Revalidation status (2026-08-13)
+
+The managed runner successfully re-fetched destination-redacted raw read-only
+`QueryPlan` protobuf JSON for the no-LIMIT and LIMIT queries at v8 and v9.
+The captures are retained as replayable fixtures under
+[`cmd/spanner-query-gen/testdata/plan_fixtures`](../../cmd/spanner-query-gen/testdata/plan_fixtures/)
+and their regression test asserts the DCA execution method, v9 typed-null row
+identifier/restored-column signature, and absence of destination material.
+The no-LIMIT plans confirm the original
+row-versus-Batch DCA boundary and the v9 `__row_id`/restored-column mechanism,
+but the chosen join orientation is reversed from the July capture: the fresh
+plan retains `ConcertDate` locally as `restored_ConcertDate` and maps into
+`Singers` for `FirstName`. The mechanism is stable in these observations; the
+specific retained column and map side are not. The LIMIT plan provides the
+counterexample recorded in section 3.
+
+The retained fixture SHA-256 values are:
+
+- v8 no LIMIT (`managed_dca_v8.json`):
+  `0a4cfa959413c4ada4bff64f6198508fee173ebb98ed7131809f4bb555770465`;
+- v9 no LIMIT (`managed_dca_v9.json`):
+  `f36c2b0b7d39402c731a27dd59a671fa10e639f3f37038833b38111aa82f58ed`;
+- v8 with LIMIT (`managed_dca_limit_v8.json`):
+  `e81dce2168ba1375be01807616de615d885889844a245484d5652ba822fe85f0`;
+- v9 with LIMIT (`managed_dca_limit_v9.json`):
+  `5d24759a81fef10cda351105515490bb195de5008b9eb5a6eb9473c4ab8e6985`.

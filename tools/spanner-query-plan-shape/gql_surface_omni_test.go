@@ -66,6 +66,11 @@ func TestIntegrationGQLCompositionalSurfaceOnOmni(t *testing.T) {
 	withWeight := cases["gql-surface/unsupported/tablesample-with-weight"]
 	ordered := cases["gql-surface/aggregate/horizontal-array-agg-ordered"]
 	unordered := cases["gql-surface/aggregate/horizontal-array-agg-unordered-control"]
+	stringOrdered := cases["gql-surface/aggregate/horizontal-string-agg-ordered"]
+	stringUnordered := cases["gql-surface/aggregate/horizontal-string-agg-unordered-control"]
+	stringReturn := cases["gql-surface/unsupported/horizontal-string-agg-return"]
+	arrayConcatOrdered := cases["gql-surface/aggregate/horizontal-array-concat-agg-ordered"]
+	arrayConcatReturn := cases["gql-surface/unsupported/vertical-array-concat-agg-group-variable"]
 	existsMatch := cases["gql-surface/subquery/exists-match-body"]
 	existsPattern := cases["gql-surface/subquery/exists-pattern-body"]
 	existsPatternFilter := cases["gql-surface/subquery/exists-pattern-filter"]
@@ -182,6 +187,49 @@ func TestIntegrationGQLCompositionalSurfaceOnOmni(t *testing.T) {
 		}
 		if got := countScalarChildLinks(unorderedPlan, unorderedSort, "Value"); got != 1 {
 			t.Errorf("unordered horizontal ARRAY_AGG v%d Sort Value links = %d, want 1", version, got)
+		}
+
+		stringOrderedPlan := mustAnalyze(t, stringOrdered, version)
+		stringUnorderedPlan := mustAnalyze(t, stringUnordered, version)
+		for label, plan := range map[string]*spannerpb.QueryPlan{"ordered": stringOrderedPlan, "unordered": stringUnorderedPlan} {
+			if got := countPlanNodes(plan, "Aggregate", ""); got != 3 {
+				t.Errorf("horizontal STRING_AGG %s v%d Aggregate count = %d, want 3", label, version, got)
+			}
+			if got := countPlanNodes(plan, "Array Unnest", ""); got != 2 {
+				t.Errorf("horizontal STRING_AGG %s v%d Array Unnest count = %d, want 2", label, version, got)
+			}
+			if !planHasScalarFunctionType(plan, "ARRAY_TO_STRING") {
+				t.Errorf("horizontal STRING_AGG %s v%d lacks ARRAY_TO_STRING lowering", label, version)
+			}
+		}
+		stringOrderedSort := singleRelationalNode(t, stringOrderedPlan, "Sort")
+		stringUnorderedSort := singleRelationalNode(t, stringUnorderedPlan, "Sort")
+		if got := countScalarChildLinks(stringOrderedPlan, stringOrderedSort, "Value"); got != 0 {
+			t.Errorf("ordered horizontal STRING_AGG v%d Sort Value links = %d, want 0", version, got)
+		}
+		if got := countScalarChildLinks(stringUnorderedPlan, stringUnorderedSort, "Value"); got != 1 {
+			t.Errorf("unordered horizontal STRING_AGG v%d Sort Value links = %d, want 1", version, got)
+		}
+		for _, query := range []queryCase{stringReturn, arrayConcatReturn} {
+			if _, err := analyze(t, query, version); err == nil || !strings.Contains(err.Error(), "Cannot access field AlbumTitle on a value with type ARRAY<GRAPH_EDGE") {
+				t.Errorf("AnalyzeQuery(%s, v%d) error = %v, want group-variable field-access error", query.Label, version, err)
+			}
+		}
+
+		arrayConcatPlan := mustAnalyze(t, arrayConcatOrdered, version)
+		for displayName, want := range map[string]int{"Aggregate": 3, "Array Unnest": 4, "Minor Sort": 1} {
+			if got := countPlanNodes(arrayConcatPlan, displayName, ""); got != want {
+				t.Errorf("horizontal ARRAY_CONCAT_AGG v%d %s count = %d, want %d", version, displayName, got, want)
+			}
+		}
+		if got := countPlanNodesAnyKind(arrayConcatPlan, "Array Subquery"); got != 1 {
+			t.Errorf("horizontal ARRAY_CONCAT_AGG v%d Array Subquery count = %d, want 1", version, got)
+		}
+		if !planHasScalarFunctionType(arrayConcatPlan, "ARRAY_CONCAT") {
+			t.Errorf("horizontal ARRAY_CONCAT_AGG v%d lacks ARRAY_CONCAT lowering", version)
+		}
+		if proto.Equal(arrayConcatPlan, orderedPlan) {
+			t.Errorf("horizontal ARRAY_CONCAT_AGG/ARRAY_AGG v%d plans unexpectedly equal", version)
 		}
 
 		existsMatchPlan := mustAnalyze(t, existsMatch, version)

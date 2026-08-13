@@ -1,0 +1,627 @@
+{
+  "label": "dca-limit-v9",
+  "sql": "@{OPTIMIZER_VERSION=9} SELECT s.FirstName, c.ConcertDate FROM Concerts AS c JOIN Singers AS s ON s.SingerId = c.SingerId LIMIT 5",
+  "environment": "managed-spanner (destination identifiers not recorded)",
+  "captured_at": "2026-08-13T03:11:50Z",
+  "plan": {
+    "plan_nodes": [
+      {
+        "kind": "RELATIONAL",
+        "display_name": "Limit",
+        "child_links": [
+          {
+            "child_index": 1
+          },
+          {
+            "child_index": 48,
+            "type": "Limit"
+          }
+        ],
+        "metadata": {
+          "call_type": "Global",
+          "execution_method": "Row"
+        }
+      },
+      {
+        "index": 1,
+        "kind": "RELATIONAL",
+        "display_name": "Distributed Union",
+        "child_links": [
+          {
+            "child_index": 2
+          },
+          {
+            "child_index": 47,
+            "type": "Split Range"
+          }
+        ],
+        "metadata": {
+          "distribution_table": "ConcertsByConcertDateSingerIdCovering",
+          "execution_method": "Row",
+          "split_ranges_aligned": "false",
+          "subquery_cluster_node": "2"
+        }
+      },
+      {
+        "index": 2,
+        "kind": "RELATIONAL",
+        "display_name": "Serialize Result",
+        "child_links": [
+          {
+            "child_index": 3
+          },
+          {
+            "child_index": 45
+          },
+          {
+            "child_index": 46
+          }
+        ],
+        "metadata": {
+          "execution_method": "Row"
+        }
+      },
+      {
+        "index": 3,
+        "kind": "RELATIONAL",
+        "display_name": "Limit",
+        "child_links": [
+          {
+            "child_index": 4
+          },
+          {
+            "child_index": 44,
+            "type": "Limit"
+          }
+        ],
+        "metadata": {
+          "call_type": "Local",
+          "execution_method": "Row"
+        }
+      },
+      {
+        "index": 4,
+        "kind": "RELATIONAL",
+        "display_name": "DataBlockToRow",
+        "child_links": [
+          {
+            "child_index": 5
+          },
+          {
+            "child_index": 42,
+            "variable": "FirstName'2"
+          },
+          {
+            "child_index": 43,
+            "variable": "restored_ConcertDate'2"
+          }
+        ]
+      },
+      {
+        "index": 5,
+        "kind": "RELATIONAL",
+        "display_name": "Distributed Cross Apply",
+        "child_links": [
+          {
+            "child_index": 6
+          },
+          {
+            "child_index": 14,
+            "type": "Map"
+          },
+          {
+            "child_index": 34,
+            "type": "Split Range"
+          },
+          {
+            "child_index": 37,
+            "type": "Batch",
+            "variable": "restored_ConcertDate'"
+          },
+          {
+            "child_index": 38,
+            "type": "Batch",
+            "variable": "SingerId'"
+          },
+          {
+            "child_index": 39,
+            "type": "Batch",
+            "variable": "batched___row_id'"
+          },
+          {
+            "child_index": 40,
+            "type": "Map",
+            "variable": "FirstName'"
+          },
+          {
+            "child_index": 41
+          }
+        ],
+        "metadata": {
+          "execution_method": "Batch",
+          "subquery_cluster_node": "14"
+        }
+      },
+      {
+        "index": 6,
+        "kind": "RELATIONAL",
+        "display_name": "Create Batch",
+        "child_links": [
+          {
+            "child_index": 7
+          },
+          {
+            "child_index": 12,
+            "variable": "v5.Batch.SingerId"
+          },
+          {
+            "child_index": 13,
+            "variable": "v5.Batch.__row_id"
+          }
+        ],
+        "metadata": {
+          "execution_method": "Batch"
+        }
+      },
+      {
+        "index": 7,
+        "kind": "RELATIONAL",
+        "display_name": "RowToDataBlock",
+        "child_links": [
+          {
+            "child_index": 8
+          }
+        ]
+      },
+      {
+        "index": 8,
+        "kind": "RELATIONAL",
+        "display_name": "Distributed Union",
+        "child_links": [
+          {
+            "child_index": 9
+          }
+        ],
+        "metadata": {
+          "call_type": "Local",
+          "execution_method": "Row",
+          "subquery_cluster_node": "9"
+        }
+      },
+      {
+        "index": 9,
+        "kind": "RELATIONAL",
+        "display_name": "Scan",
+        "child_links": [
+          {
+            "child_index": 10,
+            "variable": "ConcertDate"
+          },
+          {
+            "child_index": 11,
+            "variable": "SingerId"
+          }
+        ],
+        "metadata": {
+          "Full scan": "true",
+          "execution_method": "Row",
+          "scan_method": "Row",
+          "scan_target": "ConcertsByConcertDateSingerIdCovering",
+          "scan_type": "IndexScan"
+        }
+      },
+      {
+        "index": 10,
+        "kind": "SCALAR",
+        "display_name": "Reference",
+        "short_representation": {
+          "description": "ConcertDate"
+        }
+      },
+      {
+        "index": 11,
+        "kind": "SCALAR",
+        "display_name": "Reference",
+        "short_representation": {
+          "description": "SingerId"
+        }
+      },
+      {
+        "index": 12,
+        "kind": "SCALAR",
+        "display_name": "Reference",
+        "short_representation": {
+          "description": "$SingerId"
+        }
+      },
+      {
+        "index": 13,
+        "kind": "SCALAR",
+        "display_name": "Constant",
+        "short_representation": {
+          "description": "\u003ctyped null\u003e"
+        }
+      },
+      {
+        "index": 14,
+        "kind": "RELATIONAL",
+        "display_name": "RowToDataBlock",
+        "child_links": [
+          {
+            "child_index": 15
+          }
+        ]
+      },
+      {
+        "index": 15,
+        "kind": "RELATIONAL",
+        "display_name": "Limit",
+        "child_links": [
+          {
+            "child_index": 16
+          },
+          {
+            "child_index": 33,
+            "type": "Limit"
+          }
+        ],
+        "metadata": {
+          "call_type": "Local",
+          "execution_method": "Row"
+        }
+      },
+      {
+        "index": 16,
+        "kind": "RELATIONAL",
+        "display_name": "Cross Apply",
+        "child_links": [
+          {
+            "child_index": 17
+          },
+          {
+            "child_index": 24,
+            "type": "Map"
+          }
+        ],
+        "metadata": {
+          "execution_method": "Row"
+        }
+      },
+      {
+        "index": 17,
+        "kind": "RELATIONAL",
+        "display_name": "KeyRangeAccumulator",
+        "child_links": [
+          {
+            "child_index": 18
+          }
+        ],
+        "metadata": {
+          "execution_method": "Row"
+        }
+      },
+      {
+        "index": 18,
+        "kind": "RELATIONAL",
+        "display_name": "DataBlockToRow",
+        "child_links": [
+          {
+            "child_index": 19
+          },
+          {
+            "child_index": 22,
+            "variable": "batched_SingerId'"
+          },
+          {
+            "child_index": 23,
+            "variable": "batched___row_id'2"
+          }
+        ]
+      },
+      {
+        "index": 19,
+        "kind": "RELATIONAL",
+        "display_name": "Scan",
+        "child_links": [
+          {
+            "child_index": 20,
+            "variable": "batched_SingerId"
+          },
+          {
+            "child_index": 21,
+            "variable": "batched___row_id"
+          }
+        ],
+        "metadata": {
+          "execution_method": "Batch",
+          "scan_method": "Batch",
+          "scan_target": "$v5",
+          "scan_type": "BatchScan"
+        }
+      },
+      {
+        "index": 20,
+        "kind": "SCALAR",
+        "display_name": "Reference",
+        "short_representation": {
+          "description": "SingerId"
+        }
+      },
+      {
+        "index": 21,
+        "kind": "SCALAR",
+        "display_name": "Reference",
+        "short_representation": {
+          "description": "__row_id"
+        }
+      },
+      {
+        "index": 22,
+        "kind": "SCALAR",
+        "display_name": "Reference",
+        "short_representation": {
+          "description": "$batched_SingerId"
+        }
+      },
+      {
+        "index": 23,
+        "kind": "SCALAR",
+        "display_name": "Reference",
+        "short_representation": {
+          "description": "$batched___row_id"
+        }
+      },
+      {
+        "index": 24,
+        "kind": "RELATIONAL",
+        "display_name": "Distributed Union",
+        "child_links": [
+          {
+            "child_index": 25
+          }
+        ],
+        "metadata": {
+          "call_type": "Local",
+          "execution_method": "Row",
+          "subquery_cluster_node": "25"
+        }
+      },
+      {
+        "index": 25,
+        "kind": "RELATIONAL",
+        "display_name": "Filter Scan",
+        "child_links": [
+          {
+            "child_index": 26
+          }
+        ],
+        "metadata": {
+          "execution_method": "Row",
+          "seekable_key_size": "0"
+        }
+      },
+      {
+        "index": 26,
+        "kind": "RELATIONAL",
+        "display_name": "Scan",
+        "child_links": [
+          {
+            "child_index": 27,
+            "variable": "SingerId_1"
+          },
+          {
+            "child_index": 28,
+            "variable": "FirstName"
+          },
+          {
+            "child_index": 32,
+            "type": "Seek Condition"
+          }
+        ],
+        "metadata": {
+          "execution_method": "Row",
+          "scan_method": "Row",
+          "scan_target": "Singers",
+          "scan_type": "TableScan"
+        }
+      },
+      {
+        "index": 27,
+        "kind": "SCALAR",
+        "display_name": "Reference",
+        "short_representation": {
+          "description": "SingerId"
+        }
+      },
+      {
+        "index": 28,
+        "kind": "SCALAR",
+        "display_name": "Reference",
+        "short_representation": {
+          "description": "FirstName"
+        }
+      },
+      {
+        "index": 29,
+        "kind": "SCALAR",
+        "display_name": "Function",
+        "child_links": [
+          {
+            "child_index": 30
+          },
+          {
+            "child_index": 31
+          }
+        ],
+        "short_representation": {
+          "description": "($SingerId_1 = $batched_SingerId')"
+        }
+      },
+      {
+        "index": 30,
+        "kind": "SCALAR",
+        "display_name": "Reference",
+        "short_representation": {
+          "description": "$SingerId_1"
+        }
+      },
+      {
+        "index": 31,
+        "kind": "SCALAR",
+        "display_name": "Reference",
+        "short_representation": {
+          "description": "$batched_SingerId'"
+        }
+      },
+      {
+        "index": 32,
+        "kind": "SCALAR",
+        "display_name": "Function",
+        "child_links": [
+          {
+            "child_index": 29
+          }
+        ],
+        "short_representation": {
+          "description": "($SingerId_1 = $batched_SingerId')"
+        }
+      },
+      {
+        "index": 33,
+        "kind": "SCALAR",
+        "display_name": "Constant",
+        "short_representation": {
+          "description": "5"
+        }
+      },
+      {
+        "index": 34,
+        "kind": "SCALAR",
+        "display_name": "Function",
+        "child_links": [
+          {
+            "child_index": 35
+          },
+          {
+            "child_index": 36
+          }
+        ],
+        "short_representation": {
+          "description": "($SingerId_1 = $SingerId)"
+        }
+      },
+      {
+        "index": 35,
+        "kind": "SCALAR",
+        "display_name": "Reference",
+        "short_representation": {
+          "description": "$SingerId_1"
+        }
+      },
+      {
+        "index": 36,
+        "kind": "SCALAR",
+        "display_name": "Reference",
+        "short_representation": {
+          "description": "$SingerId"
+        }
+      },
+      {
+        "index": 37,
+        "kind": "SCALAR",
+        "display_name": "Reference",
+        "short_representation": {
+          "description": "$ConcertDate"
+        }
+      },
+      {
+        "index": 38,
+        "kind": "SCALAR",
+        "display_name": "Reference",
+        "short_representation": {
+          "description": "$batched_SingerId'"
+        }
+      },
+      {
+        "index": 39,
+        "kind": "SCALAR",
+        "display_name": "Reference",
+        "short_representation": {
+          "description": "$batched___row_id'2"
+        }
+      },
+      {
+        "index": 40,
+        "kind": "SCALAR",
+        "display_name": "Reference",
+        "short_representation": {
+          "description": "$FirstName"
+        }
+      },
+      {
+        "index": 41,
+        "kind": "SCALAR",
+        "display_name": "Constant",
+        "short_representation": {
+          "description": "5"
+        }
+      },
+      {
+        "index": 42,
+        "kind": "SCALAR",
+        "display_name": "Reference",
+        "short_representation": {
+          "description": "$FirstName'"
+        }
+      },
+      {
+        "index": 43,
+        "kind": "SCALAR",
+        "display_name": "Reference",
+        "short_representation": {
+          "description": "$restored_ConcertDate'"
+        }
+      },
+      {
+        "index": 44,
+        "kind": "SCALAR",
+        "display_name": "Constant",
+        "short_representation": {
+          "description": "5"
+        }
+      },
+      {
+        "index": 45,
+        "kind": "SCALAR",
+        "display_name": "Reference",
+        "short_representation": {
+          "description": "$FirstName'2"
+        }
+      },
+      {
+        "index": 46,
+        "kind": "SCALAR",
+        "display_name": "Reference",
+        "short_representation": {
+          "description": "$restored_ConcertDate'2"
+        }
+      },
+      {
+        "index": 47,
+        "kind": "SCALAR",
+        "display_name": "Constant",
+        "short_representation": {
+          "description": "true"
+        }
+      },
+      {
+        "index": 48,
+        "kind": "SCALAR",
+        "display_name": "Constant",
+        "short_representation": {
+          "description": "5"
+        }
+      }
+    ]
+  }
+}

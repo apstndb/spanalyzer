@@ -138,6 +138,7 @@ func TestIntegrationRewriterSurfaceVersionMatrixOnOmni(t *testing.T) {
 				"rewriter-surface/unsupported/pipe-assert":           "Syntax error: Unexpected FROM",
 				"rewriter-surface/unsupported/pipe-describe":         "Syntax error: Unexpected FROM",
 				"rewriter-surface/unsupported/pipe-if":               "Syntax error: Unexpected FROM",
+				"rewriter-surface/unsupported/hop":                   "Table-valued function not found: HOP",
 				"rewriter-surface/unsupported/tumble":                "Table-valued function not found: TUMBLE",
 				"rewriter-surface/unsupported/nested-array-update":   "Nested updates on table columns of type ARRAY are not supported",
 			} {

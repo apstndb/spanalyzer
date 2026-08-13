@@ -61,9 +61,15 @@ plans. Observation logs, not a stable contract.
 - [`OPTIMIZER_V9_REAL_INSTANCE_NOTES_2026-07-28.md`](OPTIMIZER_V9_REAL_INSTANCE_NOTES_2026-07-28.md):
   managed-Spanner optimizer-v9 DCA input-pruning evidence and the corresponding
   future Omni probe design.
+- [`AI_PLAN_OBSERVATIONS_2026-08-13.md`](AI_PLAN_OBSERVATIONS_2026-08-13.md):
+  managed-Spanner PLAN-only lowering of `AI.CLASSIFY`, `AI.IF`, and
+  `AI.SCORE`, with scalar controls and v1-v8 shape partitions.
 
 ## Pattern studies
 
+- [`NGRAM_SEARCH_OBSERVATIONS_2026-08-13.md`](NGRAM_SEARCH_OBSERVATIONS_2026-08-13.md):
+  fuzzy search, ordinary pattern acceleration, eligibility boundaries, and
+  the pinned-Omni optimizer-version boundary.
 - [`SET_OPERATION_DISTINCT_HINTS_2026-08-04.md`](SET_OPERATION_DISTINCT_HINTS_2026-08-04.md):
   set-operation multiplicities, hint boundaries, rewrite flexibility, and
   common-supertype requirements.

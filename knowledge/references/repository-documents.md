@@ -74,6 +74,8 @@ the groups below relate when their contents appear to disagree.
 
 - [Aggregate function Agg-type observations](../../research/spanner-query-plan-shape/AGGREGATE_FUNCTION_AGG_TYPE_OBSERVATIONS_2026-08-11.md)
   - aggregate functions and their physical `Agg` expressions.
+- [AI function PLAN observations](../../research/spanner-query-plan-shape/AI_PLAN_OBSERVATIONS_2026-08-13.md)
+  - managed PLAN-only TVF lowering, controls, and optimizer-version partitions.
 - [Query execution operator observations](../../research/spanner-query-plan-shape/QUERY_EXECUTION_OPERATORS_OBSERVATIONS.md)
   - observed operator vocabulary, metadata, hints, and normalization impact.
 - [Compact-tree metadata observations](../../research/spanner-query-plan-shape/COMPACT_TREE_METADATA_OBSERVATIONS.md)
@@ -114,6 +116,8 @@ the groups below relate when their contents appear to disagree.
 
 ## Query-pattern studies and feedback
 
+- [N-gram search observations](../../research/spanner-query-plan-shape/NGRAM_SEARCH_OBSERVATIONS_2026-08-13.md)
+  - fuzzy search, pattern acceleration, controls, and eligibility boundaries.
 - [Set-operation and DISTINCT hints](../../research/spanner-query-plan-shape/SET_OPERATION_DISTINCT_HINTS_2026-08-04.md)
   - set semantics, plan families, hints, and equivalent rewrites.
 - [Timestamp-ordered shard queries](../../research/spanner-query-plan-shape/TIMESTAMP_ORDERED_SHARD_QUERY_OBSERVATIONS.md)

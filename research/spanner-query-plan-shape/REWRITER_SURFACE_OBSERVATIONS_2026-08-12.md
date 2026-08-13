@@ -1,7 +1,7 @@
 # GoogleSQL rewriter surface observations (2026-08-12)
 
 This note maps every public rewriter registered by
-[`RegisterBuiltinRewriters`](https://github.com/google/googlesql/blob/0e7d7073ed0360be587a5efa0fa78abeee00f17b/googlesql/analyzer/all_rewriters.cc)
+[`RegisterBuiltinRewriters`](https://github.com/google/googlesql/blob/1f8aa333f4d6353cd3a64471fc83121df72df3f7/googlesql/analyzer/all_rewriters.cc)
 at the pinned `google/googlesql` revision to retained spanalyzer evidence. It
 does not assume that every registered rewriter is a Spanner syntax feature.
 Some rewriters consume internal resolved nodes, and others belong to GoogleSQL
@@ -11,18 +11,20 @@ features that Spanner does not expose.
 
 - Runtime: Spanner Omni image
   `us-docker.pkg.dev/spanner-omni/images/spanner-omni:2026.r1-beta`.
+- Managed recheck: read-only PLAN through the dedicated user-level profile on
+  2026-08-13; destination identifiers are not recorded.
 - API: `AnalyzeQuery(QueryMode=PLAN)` through `spanner-query-plan-shape`.
 - Optimizer versions: 1 through 8.
 - Current Spanner language inventory:
   [GoogleSQL overview](https://docs.cloud.google.com/spanner/docs/reference/standard-sql/overview),
   [query syntax](https://docs.cloud.google.com/spanner/docs/reference/standard-sql/query-syntax),
   and [data types](https://docs.cloud.google.com/spanner/docs/reference/standard-sql/data-types).
-- Retained selector: `rewriter_surface`, 32 queries.
-- Results at every optimizer version: 18 plans and 14 expected errors.
+- Retained selector: `rewriter_surface`, 33 queries.
+- Results at every optimizer version: 18 plans and 15 expected errors.
 - Manifest: 52 positive operator expectations, zero failures, and zero
   plan-vocabulary findings.
 - Completeness gate: `TestRewriterSurfaceCatalogIsComplete` fixes the complete
-  32-name upstream set and rejects missing, extra, or dangling evidence labels.
+  33-name upstream set and rejects missing, extra, or dangling evidence labels.
 
 PLAN is evidence about the physical plan returned after frontend analysis. It
 does not expose a trace of which frontend rewriters ran. The classifications
@@ -40,6 +42,7 @@ indirect.
 | `REWRITE_FLATTEN` | direct error | explicit `FLATTEN` reports `Function not found` |
 | `REWRITE_GENERALIZED_QUERY_STMT` | existing error | the generic pipe query reports `Pipe query syntax not supported` |
 | `REWRITE_GROUPING_SET` | existing errors | GROUPING SETS, ROLLUP, and CUBE each retain their explicit unsupported boundary |
+| `REWRITE_HOP_FUNCTION` | direct error | managed Spanner and pinned Omni v1-v8 report `Table-valued function not found: HOP` |
 | `REWRITE_INLINE_SQL_FUNCTIONS` | not exposed | Spanner has no SQL scalar-function definition surface |
 | `REWRITE_INLINE_SQL_TVFS` | not exposed | Spanner has no SQL table-function definition surface |
 | `REWRITE_INLINE_SQL_UDAS` | not exposed | Spanner has no SQL aggregate-function definition surface |
@@ -127,6 +130,6 @@ set -o pipefail
       --expect tools/spanner-query-plan-shape/testdata/rewriter_surface_expectations.json
 ```
 
-The focused integration test runs the same 32 surfaces at optimizer versions
+The focused integration test runs the same 33 surfaces at optimizer versions
 1 through 8 and adds topology, view/control equality, and error-class checks
 that cannot be represented by a presence-only manifest.

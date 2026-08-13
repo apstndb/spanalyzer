@@ -58,7 +58,7 @@ ON s.SingerId = a.SingerId
 `
 
 const builtInCaseNames = "all, docs, optimizer_gaps, optimizer_unhinted_candidates, join_elimination, planvocab_inference, cte, dml, tvf, lock_hints, " +
-	"full_text_search, json_search, vector_search, function_hint, hint_matrix, statement_hint_query_matrix, " +
+	"full_text_search, ngram_search, json_search, vector_search, search_graph, ai_plan, function_hint, hint_matrix, statement_hint_query_matrix, " +
 	"hint_position_audit, hint_position_combinations, set_operation_distinct, factorized_mode, gql_surface, gql_set_propagation, gql_hint_surface, google_sql_surface, google_sql_proto_surface, rewriter_surface, condition_boundaries, aggregate_functions, join_matrix, subquery_join_hint_matrix, push_broadcast_hash_join, or hash_join"
 
 type stringListFlag []string
@@ -238,6 +238,16 @@ func loadDDLs(builtinCase string, paths []string) ([]string, error) {
 		if strings.EqualFold(strings.TrimSpace(builtinCase), "full_text_search") {
 			return parseBuiltInDDLs("full-text-search-schema.sql", fullTextSearchDDL)
 		}
+		if strings.EqualFold(strings.TrimSpace(builtinCase), "search_graph") {
+			fullTextDDLs, err := parseBuiltInDDLs("full-text-search-schema.sql", fullTextSearchDDL)
+			if err != nil {
+				return nil, err
+			}
+			return append(fullTextDDLs, vectorSearchDDLs...), nil
+		}
+		if strings.EqualFold(strings.TrimSpace(builtinCase), "ngram_search") {
+			return parseBuiltInDDLs("ngram-search-schema.sql", ngramSearchDDL)
+		}
 		if strings.EqualFold(strings.TrimSpace(builtinCase), "json_search") {
 			return parseBuiltInDDLs("json-search-schema.sql", jsonSearchDDL)
 		}
@@ -278,6 +288,7 @@ func loadDDLs(builtinCase string, paths []string) ([]string, error) {
 			strings.EqualFold(strings.TrimSpace(builtinCase), "gql_set_propagation") ||
 			strings.EqualFold(strings.TrimSpace(builtinCase), "gql_hint_surface") ||
 			strings.EqualFold(strings.TrimSpace(builtinCase), "google_sql_surface") ||
+			strings.EqualFold(strings.TrimSpace(builtinCase), "ai_plan") ||
 			strings.EqualFold(strings.TrimSpace(builtinCase), "aggregate_functions") ||
 			strings.EqualFold(strings.TrimSpace(builtinCase), "join_matrix") ||
 			strings.EqualFold(strings.TrimSpace(builtinCase), "subquery_join_hint_matrix") {
@@ -403,10 +414,17 @@ func loadQueries(builtinCase string, sqlTexts, sqlFiles []string) ([]queryCase, 
 		return lockHintQueries, nil
 	case "full_text_search":
 		return fullTextSearchQueries, nil
+	case "ngram_search":
+		return ngramSearchQueries, nil
 	case "json_search":
 		return jsonSearchQueries, nil
 	case "vector_search":
 		return vectorSearchQueries, nil
+	case "search_graph":
+		queries := append([]queryCase(nil), fullTextSearchQueries...)
+		return append(queries, vectorSearchQueries...), nil
+	case "ai_plan":
+		return aiPlanQueries, nil
 	case "function_hint":
 		return functionHintQueries, nil
 	case "hint_matrix":

@@ -8,6 +8,7 @@
     "local_evidence": [
       "plancontract/normalize.go",
       "research/spanner-query-plan-shape/AGGREGATE_FUNCTION_AGG_TYPE_OBSERVATIONS_2026-08-11.md",
+      "research/spanner-query-plan-shape/AI_PLAN_OBSERVATIONS_2026-08-13.md",
       "research/spanner-query-plan-shape/COMPACT_TREE_METADATA_OBSERVATIONS.md",
       "research/spanner-query-plan-shape/CONDITION_BOUNDARY_OBSERVATIONS_2026-08-11.md",
       "research/spanner-query-plan-shape/FACTORIZED_MODE_OBSERVATIONS_2026-08-11.md",
@@ -15,6 +16,8 @@
       "research/spanner-query-plan-shape/GQL_HINT_VERSION_OBSERVATIONS_2026-08-11.md",
       "research/spanner-query-plan-shape/GQL_SURFACE_OBSERVATIONS_2026-08-11.md",
       "research/spanner-query-plan-shape/HINT_POSITION_AUDIT_2026-08-04.md",
+      "research/spanner-query-plan-shape/NGRAM_SEARCH_OBSERVATIONS_2026-08-13.md",
+      "research/spanner-query-plan-shape/OPTIMIZER_V9_REAL_INSTANCE_NOTES_2026-07-28.md",
       "research/spanner-query-plan-shape/PLANVOCAB_INFERENCE_OBSERVATIONS.md",
       "research/spanner-query-plan-shape/QUERY_EXECUTION_OPERATORS_OBSERVATIONS.md",
       "research/spanner-query-plan-shape/REWRITER_SURFACE_OBSERVATIONS_2026-08-12.md",
@@ -26,6 +29,9 @@
       "testdata/protos/order_protos.proto",
       "tools/spanner-query-plan-shape/aggregate_function_cases.go",
       "tools/spanner-query-plan-shape/aggregate_function_omni_test.go",
+      "tools/spanner-query-plan-shape/ai_plan_cases.go",
+      "tools/spanner-query-plan-shape/ai_plan_omni_test.go",
+      "tools/spanner-query-plan-shape/ai_plan_test.go",
       "tools/spanner-query-plan-shape/condition_boundary_cases.go",
       "tools/spanner-query-plan-shape/condition_boundary_omni_test.go",
       "tools/spanner-query-plan-shape/docs_cases.go",
@@ -38,9 +44,15 @@
       "tools/spanner-query-plan-shape/gql_hint_surface_omni_test.go",
       "tools/spanner-query-plan-shape/gql_is_first_cases.go",
       "tools/spanner-query-plan-shape/gql_is_first_omni_test.go",
+      "tools/spanner-query-plan-shape/gql_set_propagation_cases.go",
+      "tools/spanner-query-plan-shape/gql_set_propagation_omni_test.go",
+      "tools/spanner-query-plan-shape/gql_set_propagation_test.go",
       "tools/spanner-query-plan-shape/gql_surface_cases.go",
       "tools/spanner-query-plan-shape/gql_surface_omni_test.go",
       "tools/spanner-query-plan-shape/hint_position_combination_cases.go",
+      "tools/spanner-query-plan-shape/ngram_search_cases.go",
+      "tools/spanner-query-plan-shape/ngram_search_omni_test.go",
+      "tools/spanner-query-plan-shape/ngram_search_test.go",
       "tools/spanner-query-plan-shape/planvocab_cases.go",
       "tools/spanner-query-plan-shape/rewriter_surface_cases.go",
       "tools/spanner-query-plan-shape/rewriter_surface_omni_test.go",
@@ -49,13 +61,17 @@
       "tools/spanner-query-plan-shape/set_operation_distinct_cases.go",
       "tools/spanner-query-plan-shape/set_operation_equivalence_omni_test.go",
       "tools/spanner-query-plan-shape/testdata/aggregate_function_expectations.json",
+      "tools/spanner-query-plan-shape/testdata/ai_plan_expectations.json",
       "tools/spanner-query-plan-shape/testdata/condition_boundary_expectations.json",
+      "tools/spanner-query-plan-shape/testdata/facet_search_expectations.json",
       "tools/spanner-query-plan-shape/testdata/factorized_mode_expectations.json",
+      "tools/spanner-query-plan-shape/testdata/full_text_residual_expectations.json",
       "tools/spanner-query-plan-shape/testdata/google_sql_proto_surface_expectations.json",
       "tools/spanner-query-plan-shape/testdata/google_sql_surface_expectations.json",
       "tools/spanner-query-plan-shape/testdata/gql_hint_surface_expectations.json",
       "tools/spanner-query-plan-shape/testdata/gql_surface_expectations.json",
       "tools/spanner-query-plan-shape/testdata/hint_position_combination_expectations.json",
+      "tools/spanner-query-plan-shape/testdata/ngram_search_expectations.json",
       "tools/spanner-query-plan-shape/testdata/planvocab_inference_expectations.json",
       "tools/spanner-query-plan-shape/testdata/rewriter_surface_expectations.json",
       "tools/spanner-query-plan-shape/testdata/search_graph_expectations.json",
@@ -72,6 +88,46 @@
       {
         "path": "cmd/spanner-query-gen/testdata/plan_fixtures/distributed_semi_apply_internal.json",
         "sha256": "b68041d51d9de14e736edeab9faad0b96743535efd9dc0cdcbbeb65b33ed3fa7"
+      },
+      {
+        "path": "cmd/spanner-query-gen/testdata/plan_fixtures/managed_ai_classify_case_control.json",
+        "sha256": "0d1c491e5962fe87a5ba8ac55c8226d69f90b8f0d7362a5dbfa60b98d9ac4088"
+      },
+      {
+        "path": "cmd/spanner-query-gen/testdata/plan_fixtures/managed_ai_classify_projection.json",
+        "sha256": "f14b40adf7e2b435d7741f9d2da749b50e93a67d8195df3fcc2810bfff472a6e"
+      },
+      {
+        "path": "cmd/spanner-query-gen/testdata/plan_fixtures/managed_ai_if_filter.json",
+        "sha256": "b72301a18641a3820fcfdea8cdbe1fc0f0a157c354557a3bfb8cfea06e7bbf58"
+      },
+      {
+        "path": "cmd/spanner-query-gen/testdata/plan_fixtures/managed_ai_if_scalar_filter_control.json",
+        "sha256": "f4b6bc65141e877a96ae71722e087622d5302f87783897289d15bef1878b0b9e"
+      },
+      {
+        "path": "cmd/spanner-query-gen/testdata/plan_fixtures/managed_ai_score_order_limit.json",
+        "sha256": "67c5fa7df158e23791e6f934a2b7bdc26a98ad1d85a1ad8cd6958f323433b7f9"
+      },
+      {
+        "path": "cmd/spanner-query-gen/testdata/plan_fixtures/managed_ai_score_scalar_order_limit_control.json",
+        "sha256": "e90937e0babc94a2e28c08220856985536933a378d9946c23ab9528d256fb572"
+      },
+      {
+        "path": "cmd/spanner-query-gen/testdata/plan_fixtures/managed_dca_limit_v8.json",
+        "sha256": "e81dce2168ba1375be01807616de615d885889844a245484d5652ba822fe85f0"
+      },
+      {
+        "path": "cmd/spanner-query-gen/testdata/plan_fixtures/managed_dca_limit_v9.json",
+        "sha256": "5d24759a81fef10cda351105515490bb195de5008b9eb5a6eb9473c4ab8e6985"
+      },
+      {
+        "path": "cmd/spanner-query-gen/testdata/plan_fixtures/managed_dca_v8.json",
+        "sha256": "0a4cfa959413c4ada4bff64f6198508fee173ebb98ed7131809f4bb555770465"
+      },
+      {
+        "path": "cmd/spanner-query-gen/testdata/plan_fixtures/managed_dca_v9.json",
+        "sha256": "f36c2b0b7d39402c731a27dd59a671fa10e639f3f37038833b38111aa82f58ed"
       },
       {
         "path": "cmd/spanner-query-gen/testdata/plan_fixtures/push_broadcast_branched_regular_hash_join.json",
@@ -95,11 +151,15 @@
       },
       {
         "path": "plancontract/planvocab/catalog_source.json",
-        "sha256": "6609180dfce49e897e1e3e8732e7e62dc43830257995f838b7c6f15eec2caf6f"
+        "sha256": "c36ab791be24fb8f52c09fb77ecd851f6817bea3931d600d2349839aaae1de07"
       },
       {
         "path": "research/spanner-query-plan-shape/AGGREGATE_FUNCTION_AGG_TYPE_OBSERVATIONS_2026-08-11.md",
         "sha256": "7d63a93c9b4ce4b416c1c768eea6fca4acbad45c56010a26b88262056affce94"
+      },
+      {
+        "path": "research/spanner-query-plan-shape/AI_PLAN_OBSERVATIONS_2026-08-13.md",
+        "sha256": "f17dd965ced547ee6f39aeb4253e59d075399c0ef8ce2fb9176efe1b9a5404cb"
       },
       {
         "path": "research/spanner-query-plan-shape/COMPACT_TREE_METADATA_OBSERVATIONS.md",
@@ -123,11 +183,19 @@
       },
       {
         "path": "research/spanner-query-plan-shape/GQL_SURFACE_OBSERVATIONS_2026-08-11.md",
-        "sha256": "27cb52722fbb56cf9092ea4f3988c791dae61c2d8be9969092ab07e3954df662"
+        "sha256": "390b3fe217e83584107743fc2cf0d0a80ac34b3624cc7fd074835913728d5da8"
       },
       {
         "path": "research/spanner-query-plan-shape/HINT_POSITION_AUDIT_2026-08-04.md",
         "sha256": "d583fec4fe8c3d3ca727c326b796483c4b4f923237066b9bbd1530783b2d7b19"
+      },
+      {
+        "path": "research/spanner-query-plan-shape/NGRAM_SEARCH_OBSERVATIONS_2026-08-13.md",
+        "sha256": "6cfad88f2cf5cb7f554bc11a9fb36d9e84d0f4956abf61c237526f4a89a9083a"
+      },
+      {
+        "path": "research/spanner-query-plan-shape/OPTIMIZER_V9_REAL_INSTANCE_NOTES_2026-07-28.md",
+        "sha256": "83a47cb8f3ad7a997728f574d37c092bdd3f86676ef6a9ef8d64e8831296e5c4"
       },
       {
         "path": "research/spanner-query-plan-shape/PLANVOCAB_INFERENCE_OBSERVATIONS.md",
@@ -135,11 +203,11 @@
       },
       {
         "path": "research/spanner-query-plan-shape/QUERY_EXECUTION_OPERATORS_OBSERVATIONS.md",
-        "sha256": "ac46917085b7bfb0fd6e74437b7c0b9753c3952907d12d228cc3956ed86b7e49"
+        "sha256": "5de893b837961671e8e0778721caff0f9bbab367f1ace671e4f0486925501930"
       },
       {
         "path": "research/spanner-query-plan-shape/REWRITER_SURFACE_OBSERVATIONS_2026-08-12.md",
-        "sha256": "65fed035afe6c3d0a67a7e60ab006ab38f26e8fe78a89b4bf5fe5f4c1442329a"
+        "sha256": "b1fee8971a73398b326d3ac1d4a006b516e7114a482d75c6016598194951d8b7"
       },
       {
         "path": "research/spanner-query-plan-shape/SET_OPERATION_DISTINCT_HINTS_2026-08-04.md",
@@ -186,6 +254,18 @@
         "sha256": "59c423d20e2b5318741a47c924e7d6a6dadcc1a6d663ec556b37d139c4442057"
       },
       {
+        "path": "tools/spanner-query-plan-shape/ai_plan_cases.go",
+        "sha256": "353f33548ea2083a7f2b791419f2a7a8c47484959c7278a417b34385844a477e"
+      },
+      {
+        "path": "tools/spanner-query-plan-shape/ai_plan_omni_test.go",
+        "sha256": "173d222d0defacfca4d5acf4f691dfe768fc63c20ddf02d31815af9c635d97fc"
+      },
+      {
+        "path": "tools/spanner-query-plan-shape/ai_plan_test.go",
+        "sha256": "6c7431c4374c03eb3cc6667cd54c8c90b73a7d6e2fd6634ab973c449c650f63d"
+      },
+      {
         "path": "tools/spanner-query-plan-shape/condition_boundary_cases.go",
         "sha256": "b700f4591fa49cb91d4f92949e4850420a55e1df0113dfc54694bdddc1192b09"
       },
@@ -203,7 +283,7 @@
       },
       {
         "path": "tools/spanner-query-plan-shape/full_text_search_cases.go",
-        "sha256": "8768746e86abf2917de31e9909e1a1099706cf797ea72ee7a3b32aea2cdeda03"
+        "sha256": "9f4f7bebb2a99a7c0ac5a6d1ff1488ba95f314baca0c0d3385c87dfdf5d440a3"
       },
       {
         "path": "tools/spanner-query-plan-shape/google_sql_proto_surface_cases.go",
@@ -234,16 +314,40 @@
         "sha256": "c584910061c292c8521d7aa9fc804cda1d9eb80201a1760966aa2ef341bcce4b"
       },
       {
+        "path": "tools/spanner-query-plan-shape/gql_set_propagation_cases.go",
+        "sha256": "3e9d83b934ffcffe6c0f91c7a9e3a979d868a74e71bc4d49be7ef1a9bbabfa7c"
+      },
+      {
+        "path": "tools/spanner-query-plan-shape/gql_set_propagation_omni_test.go",
+        "sha256": "f5cfb1f3653628881e1d907f9cbbd5d495bab79f08895d2f810e1dec2d66587c"
+      },
+      {
+        "path": "tools/spanner-query-plan-shape/gql_set_propagation_test.go",
+        "sha256": "df8a4b06c11818e52b03c708e231e8e07120aed49d88a2560ae7ea7effcb2ce8"
+      },
+      {
         "path": "tools/spanner-query-plan-shape/gql_surface_cases.go",
-        "sha256": "d57bd1ca1d73fa1126f2f9e6d45d60dbe4a192b18863a2a650a8ba602817bbec"
+        "sha256": "b565bee0a3a97ae915508d7a0fc0caaf4a3edd170dd18fe95fa3e27aafed0fdc"
       },
       {
         "path": "tools/spanner-query-plan-shape/gql_surface_omni_test.go",
-        "sha256": "fa28dbd21e29f0a4363e78b9c109a840069b791547aa6849a8edafbfb1682225"
+        "sha256": "7a84e556589ad2f073983e0a5db306a6e802b720fec4435a8a36cb625cc48976"
       },
       {
         "path": "tools/spanner-query-plan-shape/hint_position_combination_cases.go",
         "sha256": "e8fbc9ee81c455ababbfde0f21574e182af3cb86e7cd3973101c66c239ca7b0c"
+      },
+      {
+        "path": "tools/spanner-query-plan-shape/ngram_search_cases.go",
+        "sha256": "3f17b9ae246e76bb2ea9f6d6d534f9ed2fe90b0a6fccc220220d8fda23b2c826"
+      },
+      {
+        "path": "tools/spanner-query-plan-shape/ngram_search_omni_test.go",
+        "sha256": "254a46ed9732c2eed1b308b11814e6a197e8f9a546094f81d218ad8d5a8ed276"
+      },
+      {
+        "path": "tools/spanner-query-plan-shape/ngram_search_test.go",
+        "sha256": "ee11270afe3eee88e4eb3fecdc7f1614c3452c5a0c5884edd8ab9635062836b5"
       },
       {
         "path": "tools/spanner-query-plan-shape/planvocab_cases.go",
@@ -251,19 +355,19 @@
       },
       {
         "path": "tools/spanner-query-plan-shape/rewriter_surface_cases.go",
-        "sha256": "d594587f0703ae2d4c92a1cba7463c63efdaf2c61ae9d13239d7664729db4d43"
+        "sha256": "4f376216ef2ad1e1abdf82cd0442f5dbedcaaf6dabf405627a5767eb2be0b22e"
       },
       {
         "path": "tools/spanner-query-plan-shape/rewriter_surface_omni_test.go",
-        "sha256": "2e517500aae28930cdee2a91b07396397081fae54628babe42f451acdc96ca86"
+        "sha256": "e4b3e3c3fd3be43fcdd4a8f5dc14d3f701b52780815f4e06dd06073e508cb855"
       },
       {
         "path": "tools/spanner-query-plan-shape/rewriter_surface_test.go",
-        "sha256": "654b9fbb55669ffcb986a0ddadc706233822e9feb2ffc423f338d6dc01499d1b"
+        "sha256": "a62c040da6adaf22314bca8b4a468acbabb6018d7b7633b24e1f7b95026a6402"
       },
       {
         "path": "tools/spanner-query-plan-shape/search_graph_omni_test.go",
-        "sha256": "b2be509051251611a2c918fe0eefbfce1bdd5f6d0414369b477b8d7e495edb7d"
+        "sha256": "d7f909e9a99c0adf807b00f2a14f7e5b5a7ea30c4493f1a2b0b44120e01369ce"
       },
       {
         "path": "tools/spanner-query-plan-shape/set_operation_distinct_cases.go",
@@ -278,12 +382,24 @@
         "sha256": "ac4ea6744aa7a85c5395bc7527e368a246fe86995552a33d162b8374e558fe92"
       },
       {
+        "path": "tools/spanner-query-plan-shape/testdata/ai_plan_expectations.json",
+        "sha256": "a31c6c44709554586b0764c82734c72213223ae667948b0380a5faa1aa74e60b"
+      },
+      {
         "path": "tools/spanner-query-plan-shape/testdata/condition_boundary_expectations.json",
         "sha256": "17b22c72d1d3ad0fb2434e22550929555794a1dff10570eadf6f4f28c6da56e3"
       },
       {
+        "path": "tools/spanner-query-plan-shape/testdata/facet_search_expectations.json",
+        "sha256": "35c97bbb80becd0796c4441046f8ed925cc4fa540448b391a4ff904a751581ba"
+      },
+      {
         "path": "tools/spanner-query-plan-shape/testdata/factorized_mode_expectations.json",
         "sha256": "69e18cacc7f398cff6580cd34f4e53c2ab0d9a4a8aa02b885d82b57f4235fca9"
+      },
+      {
+        "path": "tools/spanner-query-plan-shape/testdata/full_text_residual_expectations.json",
+        "sha256": "e1f931827eb8c548458346a4ec7b7ffa35d1da9ab189d2888e43747ed01e4174"
       },
       {
         "path": "tools/spanner-query-plan-shape/testdata/google_sql_proto_surface_expectations.json",
@@ -299,11 +415,15 @@
       },
       {
         "path": "tools/spanner-query-plan-shape/testdata/gql_surface_expectations.json",
-        "sha256": "33e3e0c0d650d4e905418e5b4d04a15e38db7a8ff46ac92f461cdd145c02b870"
+        "sha256": "9bde1fcc60707f99a48fb93cd3f7cbb24ba9bfbc1e7ed4fd6e71c1535481d766"
       },
       {
         "path": "tools/spanner-query-plan-shape/testdata/hint_position_combination_expectations.json",
         "sha256": "793b104f3bda12c4c54e1ea213420258fbcf0c1834daa22ea6dc425750f9b92a"
+      },
+      {
+        "path": "tools/spanner-query-plan-shape/testdata/ngram_search_expectations.json",
+        "sha256": "e2e3abcbd581b81259a576a0a836cc6d37bee371e733aff7c940d240c75248ba"
       },
       {
         "path": "tools/spanner-query-plan-shape/testdata/planvocab_inference_expectations.json",
@@ -311,11 +431,11 @@
       },
       {
         "path": "tools/spanner-query-plan-shape/testdata/rewriter_surface_expectations.json",
-        "sha256": "00ac9753ddb4b7b0f760866ccb5fb6bf18452de21d0e0e062a81a23df60721ae"
+        "sha256": "6c893a3438eafb96ca4dfd8dc159563f19e715761cfa519415af6e94124637d4"
       },
       {
         "path": "tools/spanner-query-plan-shape/testdata/search_graph_expectations.json",
-        "sha256": "86932c8616495d9ef6b3839cdfc561cb3a8a0d6e3763dfd47c1a134651501337"
+        "sha256": "cdefc097b58147f20f1b95bfddcbc6c32a94f1996aa16b48a203e0e524beccb8"
       },
       {
         "path": "tools/spanner-query-plan-shape/testdata/set_operation_distinct_expectations.json",
@@ -323,7 +443,7 @@
       },
       {
         "path": "tools/spanner-query-plan-shape/vector_search_cases.go",
-        "sha256": "4d553d8f4ccfaf10ca57c4077bc19e552f54d44fe89ac878ebd1bb7393ce69b9"
+        "sha256": "8f5fa469c920481f5f5e7cf279a3a45c00fffcfa7fbe35372e40cfff77e96923"
       }
     ]
   },
@@ -485,6 +605,12 @@
           "type": "",
           "variable": "present",
           "multiple": true
+        },
+        {
+          "kind": "SCALAR",
+          "type": "Scalar",
+          "variable": "absent",
+          "multiple": true
         }
       ]
     },
@@ -535,6 +661,12 @@
         {
           "kind": "SCALAR",
           "type": "Output",
+          "variable": "present",
+          "multiple": true
+        },
+        {
+          "kind": "SCALAR",
+          "type": "PassThroughVars",
           "variable": "present",
           "multiple": true
         },

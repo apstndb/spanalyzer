@@ -43,6 +43,7 @@ var rewriterSurfaceQueries = []queryCase{
 	{Label: "rewriter-surface/unsupported/pipe-assert", SQL: `FROM Singers |> ASSERT SingerId > 0 |> SELECT SingerId`},
 	{Label: "rewriter-surface/unsupported/pipe-describe", SQL: `FROM Singers |> DESCRIBE`},
 	{Label: "rewriter-surface/unsupported/pipe-if", SQL: `FROM Singers |> IF true THEN (|> SELECT SingerId)`},
+	{Label: "rewriter-surface/unsupported/hop", SQL: `SELECT * FROM HOP(TABLE Concerts, 'BeginTime', INTERVAL 1 HOUR, INTERVAL 15 MINUTE)`},
 	{Label: "rewriter-surface/unsupported/tumble", SQL: `SELECT * FROM TUMBLE(TABLE Concerts, DESCRIPTOR(BeginTime), INTERVAL 1 HOUR)`},
 	{Label: "rewriter-surface/unsupported/nested-array-update", SQL: `UPDATE Concerts c SET (UPDATE c.TicketPrices price SET price = price + 1 WHERE price > 0) WHERE VenueId = 1`, PlanMode: planModeReadWrite},
 }
@@ -66,7 +67,7 @@ type rewriterCoverageEntry struct {
 
 // registeredRewriterCoverage enumerates every rewriter registered by
 // RegisterBuiltinRewriters() at google/googlesql revision
-// 0e7d7073ed0360be587a5efa0fa78abeee00f17b. A registered rewriter is not
+// 1f8aa333f4d6353cd3a64471fc83121df72df3f7. A registered rewriter is not
 // necessarily a user-visible Spanner syntax feature: several operate only on
 // internal resolved nodes or on language features that Spanner does not expose.
 var registeredRewriterCoverage = []rewriterCoverageEntry{
@@ -76,6 +77,7 @@ var registeredRewriterCoverage = []rewriterCoverageEntry{
 	{Name: "REWRITE_FLATTEN", Retention: rewriterDirectError, EvidenceLabels: []string{"rewriter-surface/unsupported/flatten"}},
 	{Name: "REWRITE_GENERALIZED_QUERY_STMT", Retention: rewriterExistingError, EvidenceLabels: []string{"google-sql-surface/unsupported/core-pipe"}},
 	{Name: "REWRITE_GROUPING_SET", Retention: rewriterExistingError, EvidenceLabels: []string{"google-sql-surface/unsupported/grouping-sets", "google-sql-surface/unsupported/rollup", "google-sql-surface/unsupported/cube"}},
+	{Name: "REWRITE_HOP_FUNCTION", Retention: rewriterDirectError, EvidenceLabels: []string{"rewriter-surface/unsupported/hop"}, Note: "Managed Spanner recognizes the TVF position but reports that HOP is not exposed."},
 	{Name: "REWRITE_INLINE_SQL_FUNCTIONS", Retention: rewriterNotExposed, Note: "Spanner does not expose SQL scalar-function definitions."},
 	{Name: "REWRITE_INLINE_SQL_TVFS", Retention: rewriterNotExposed, Note: "Spanner does not expose SQL table-function definitions."},
 	{Name: "REWRITE_INLINE_SQL_UDAS", Retention: rewriterNotExposed, Note: "Spanner does not expose SQL aggregate-function definitions."},

@@ -152,7 +152,85 @@ Full Text Search, then
 checks `SEARCH`, `SEARCH_SUBSTRING`, multi-column search, mixed text and
 non-text predicates, `SNIPPET`, `SCORE`, `TOKENLIST_CONCAT`, partitioned
 ordered search indexes, numeric array search-index predicates, and a graph
-traversal whose destination predicate uses a search index.
+traversal whose destination predicate uses a search index. The facet cases
+compare a covering single aggregation with a search-only control and show a
+multi-facet CTE being materialized once with `SpoolBuild` and read three times
+with `SpoolScan`. Additional pairs retain `enhance_query` with its default
+control and both documented statement hints, plus the documented `SOUNDEX`
+generated-column composition on a multi-column search index.
+
+The full-text raw stream has two focused manifests so aggregation composition
+and query-enhancement/phonetic composition can evolve independently:
+
+```sh
+/tmp/spanner-query-plan-shape \
+  --case full_text_search \
+  --omni-image us-docker.pkg.dev/spanner-omni/images/spanner-omni:2026.r1-beta \
+  --output json \
+  --continue-on-error > /tmp/full-text-search.json
+/tmp/planvocab-check \
+  --expect tools/spanner-query-plan-shape/testdata/facet_search_expectations.json \
+  < /tmp/full-text-search.json
+/tmp/planvocab-check \
+  --expect tools/spanner-query-plan-shape/testdata/full_text_residual_expectations.json \
+  < /tmp/full-text-search.json
+```
+
+Inspect n-gram fuzzy search and ordinary pattern-predicate acceleration with a
+minimal two-token-column fixture:
+
+```sh
+go run ./tools/spanner-query-plan-shape \
+  --case ngram_search \
+  --optimizer-version-matrix \
+  --output compact-tree-metadata \
+  --continue-on-error
+```
+
+The fuzzy column uses a direct source-column reference for `SCORE_NGRAMS`;
+the separate pattern column uses `TOKENIZE_NGRAMS(LOWER(...))`. The matrix
+includes forced search-index/base-table pairs for `LIKE`, `STARTS_WITH`,
+`ENDS_WITH`, and `REGEXP_CONTAINS`, plus parameter and too-short-literal
+eligibility boundaries.
+
+```sh
+set -o pipefail
+/tmp/spanner-query-plan-shape \
+  --case ngram_search \
+  --omni-image us-docker.pkg.dev/spanner-omni/images/spanner-omni:2026.r1-beta \
+  --output json \
+  --continue-on-error \
+  | /tmp/planvocab-check \
+      --expect tools/spanner-query-plan-shape/testdata/ngram_search_expectations.json
+```
+
+The `vector_search` selector also includes a reciprocal-rank-fusion candidate
+that keeps ANN and full-text retrieval below one `Union All`, plus an exact-KNN
+control that removes the vector-index access path while preserving the fusion
+shell.
+
+Use the combined `search_graph` selector to check the manifest that spans the
+full-text GQL traversal, vector GQL traversal, and hybrid RRF shape in one raw
+stream:
+
+```sh
+set -o pipefail
+/tmp/spanner-query-plan-shape \
+  --case search_graph \
+  --omni-image us-docker.pkg.dev/spanner-omni/images/spanner-omni:2026.r1-beta \
+  --output json \
+  --continue-on-error \
+  | /tmp/planvocab-check \
+      --expect tools/spanner-query-plan-shape/testdata/search_graph_expectations.json
+```
+
+The `ai_plan` query set pairs `AI.CLASSIFY`, `AI.IF`, and `AI.SCORE` with scalar
+controls. Its positive evidence comes from managed Spanner
+`AnalyzeQuery(QueryMode=PLAN)`; the CLI's pinned Omni backend returns a stable
+`Internal` capability error for the AI candidates while planning the controls.
+No retained probe executes external inference. Destination-redacted managed
+fixtures make the observed TVF lowering replayable without another service
+call, and the focused Omni test preserves the environment divergence.
 
 Inspect JSON search-index probes separately from Full Text Search:
 
@@ -479,10 +557,10 @@ set -o pipefail
       --expect tools/spanner-query-plan-shape/testdata/rewriter_surface_expectations.json
 ```
 
-The selector retains 18 PLAN-producing surfaces and 14 exact runtime
-capability errors. A separate completeness table records all 32 registered
+The selector retains 18 PLAN-producing surfaces and 15 exact runtime
+capability errors. A separate completeness table records all 33 registered
 rewriters, including internal or GoogleSQL-only features that Spanner does not
-expose. The focused Omni test repeats all 32 direct probes for optimizer
+expose. The focused Omni test repeats all 33 direct probes for optimizer
 versions 1 through 8 and verifies plan-visible array lowerings, aggregate
 modifier topology, view/control equivalence, and stable error classes. See
 [`REWRITER_SURFACE_OBSERVATIONS_2026-08-12.md`](../../research/spanner-query-plan-shape/REWRITER_SURFACE_OBSERVATIONS_2026-08-12.md).

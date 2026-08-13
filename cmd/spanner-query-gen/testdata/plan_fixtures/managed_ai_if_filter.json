@@ -1,0 +1,432 @@
+{
+  "label": "ai-plan/if-filter",
+  "sql": "SELECT SingerId, AlbumId, TrackId, SongName FROM Songs@{FORCE_INDEX=_BASE_TABLE} WHERE SingerId = 1 AND AI.IF(CONCAT('The following is a love song: ', SongName))",
+  "environment": "managed-spanner (destination identifiers not recorded)",
+  "captured_at": "2026-08-13",
+  "plan": {
+    "plan_nodes": [
+      {
+        "kind": "RELATIONAL",
+        "display_name": "Distributed Union",
+        "child_links": [
+          {
+            "child_index": 1
+          },
+          {
+            "child_index": 31,
+            "type": "Split Range"
+          }
+        ],
+        "metadata": {
+          "distribution_table": "Songs",
+          "execution_method": "Row",
+          "split_ranges_aligned": "false",
+          "subquery_cluster_node": "1"
+        }
+      },
+      {
+        "index": 1,
+        "kind": "RELATIONAL",
+        "display_name": "Serialize Result",
+        "child_links": [
+          {
+            "child_index": 2
+          },
+          {
+            "child_index": 27
+          },
+          {
+            "child_index": 28
+          },
+          {
+            "child_index": 29
+          },
+          {
+            "child_index": 30
+          }
+        ],
+        "metadata": {
+          "execution_method": "Row"
+        }
+      },
+      {
+        "index": 2,
+        "kind": "RELATIONAL",
+        "display_name": "Filter",
+        "child_links": [
+          {
+            "child_index": 3
+          },
+          {
+            "child_index": 24,
+            "type": "Condition"
+          }
+        ],
+        "metadata": {
+          "execution_method": "Row"
+        }
+      },
+      {
+        "index": 3,
+        "kind": "RELATIONAL",
+        "display_name": "TVF",
+        "child_links": [
+          {
+            "child_index": 4
+          },
+          {
+            "child_index": 19,
+            "type": "Referenced"
+          },
+          {
+            "child_index": 20,
+            "type": "Output",
+            "variable": "udf"
+          },
+          {
+            "child_index": 21,
+            "type": "PassThroughVars",
+            "variable": "AlbumId'"
+          },
+          {
+            "child_index": 22,
+            "type": "PassThroughVars",
+            "variable": "SongName'"
+          },
+          {
+            "child_index": 23,
+            "type": "PassThroughVars",
+            "variable": "TrackId'"
+          }
+        ],
+        "metadata": {
+          "execution_method": "Row"
+        }
+      },
+      {
+        "index": 4,
+        "kind": "RELATIONAL",
+        "display_name": "Distributed Union",
+        "child_links": [
+          {
+            "child_index": 5
+          }
+        ],
+        "metadata": {
+          "call_type": "Local",
+          "execution_method": "Row",
+          "subquery_cluster_node": "5"
+        }
+      },
+      {
+        "index": 5,
+        "kind": "RELATIONAL",
+        "display_name": "Compute",
+        "child_links": [
+          {
+            "child_index": 6
+          },
+          {
+            "child_index": 16,
+            "variable": "arg"
+          }
+        ],
+        "metadata": {
+          "execution_method": "Row"
+        }
+      },
+      {
+        "index": 6,
+        "kind": "RELATIONAL",
+        "display_name": "Filter Scan",
+        "child_links": [
+          {
+            "child_index": 7
+          }
+        ],
+        "metadata": {
+          "execution_method": "Row",
+          "seekable_key_size": "0"
+        }
+      },
+      {
+        "index": 7,
+        "kind": "RELATIONAL",
+        "display_name": "Scan",
+        "child_links": [
+          {
+            "child_index": 8,
+            "variable": "SingerId"
+          },
+          {
+            "child_index": 9,
+            "variable": "AlbumId"
+          },
+          {
+            "child_index": 10,
+            "variable": "TrackId"
+          },
+          {
+            "child_index": 11,
+            "variable": "SongName"
+          },
+          {
+            "child_index": 15,
+            "type": "Seek Condition"
+          }
+        ],
+        "metadata": {
+          "execution_method": "Row",
+          "scan_method": "Automatic",
+          "scan_target": "Songs",
+          "scan_type": "TableScan"
+        }
+      },
+      {
+        "index": 8,
+        "kind": "SCALAR",
+        "display_name": "Reference",
+        "short_representation": {
+          "description": "SingerId"
+        }
+      },
+      {
+        "index": 9,
+        "kind": "SCALAR",
+        "display_name": "Reference",
+        "short_representation": {
+          "description": "AlbumId"
+        }
+      },
+      {
+        "index": 10,
+        "kind": "SCALAR",
+        "display_name": "Reference",
+        "short_representation": {
+          "description": "TrackId"
+        }
+      },
+      {
+        "index": 11,
+        "kind": "SCALAR",
+        "display_name": "Reference",
+        "short_representation": {
+          "description": "SongName"
+        }
+      },
+      {
+        "index": 12,
+        "kind": "SCALAR",
+        "display_name": "Function",
+        "child_links": [
+          {
+            "child_index": 13
+          },
+          {
+            "child_index": 14
+          }
+        ],
+        "short_representation": {
+          "description": "($SingerId = 1)"
+        }
+      },
+      {
+        "index": 13,
+        "kind": "SCALAR",
+        "display_name": "Reference",
+        "short_representation": {
+          "description": "$SingerId"
+        }
+      },
+      {
+        "index": 14,
+        "kind": "SCALAR",
+        "display_name": "Constant",
+        "short_representation": {
+          "description": "1"
+        }
+      },
+      {
+        "index": 15,
+        "kind": "SCALAR",
+        "display_name": "Function",
+        "child_links": [
+          {
+            "child_index": 12
+          }
+        ],
+        "short_representation": {
+          "description": "($SingerId = 1)"
+        }
+      },
+      {
+        "index": 16,
+        "kind": "SCALAR",
+        "display_name": "Function",
+        "child_links": [
+          {
+            "child_index": 17
+          },
+          {
+            "child_index": 18
+          }
+        ],
+        "short_representation": {
+          "description": "CONCAT('The following is a love song: ', $SongName)"
+        }
+      },
+      {
+        "index": 17,
+        "kind": "SCALAR",
+        "display_name": "Constant",
+        "short_representation": {
+          "description": "'The following is a love song: '"
+        }
+      },
+      {
+        "index": 18,
+        "kind": "SCALAR",
+        "display_name": "Reference",
+        "short_representation": {
+          "description": "$SongName"
+        }
+      },
+      {
+        "index": 19,
+        "kind": "SCALAR",
+        "display_name": "Reference",
+        "short_representation": {
+          "description": "$arg"
+        }
+      },
+      {
+        "index": 20,
+        "kind": "SCALAR",
+        "display_name": "Reference",
+        "short_representation": {
+          "description": "output_0"
+        }
+      },
+      {
+        "index": 21,
+        "kind": "SCALAR",
+        "display_name": "Reference",
+        "short_representation": {
+          "description": "$AlbumId"
+        }
+      },
+      {
+        "index": 22,
+        "kind": "SCALAR",
+        "display_name": "Reference",
+        "short_representation": {
+          "description": "$SongName"
+        }
+      },
+      {
+        "index": 23,
+        "kind": "SCALAR",
+        "display_name": "Reference",
+        "short_representation": {
+          "description": "$TrackId"
+        }
+      },
+      {
+        "index": 24,
+        "kind": "SCALAR",
+        "display_name": "Function",
+        "child_links": [
+          {
+            "child_index": 25
+          },
+          {
+            "child_index": 26
+          }
+        ],
+        "short_representation": {
+          "description": "($udf = true)"
+        }
+      },
+      {
+        "index": 25,
+        "kind": "SCALAR",
+        "display_name": "Reference",
+        "short_representation": {
+          "description": "$udf"
+        }
+      },
+      {
+        "index": 26,
+        "kind": "SCALAR",
+        "display_name": "Constant",
+        "short_representation": {
+          "description": "true"
+        }
+      },
+      {
+        "index": 27,
+        "kind": "SCALAR",
+        "display_name": "Constant",
+        "short_representation": {
+          "description": "1"
+        }
+      },
+      {
+        "index": 28,
+        "kind": "SCALAR",
+        "display_name": "Reference",
+        "short_representation": {
+          "description": "$AlbumId'"
+        }
+      },
+      {
+        "index": 29,
+        "kind": "SCALAR",
+        "display_name": "Reference",
+        "short_representation": {
+          "description": "$TrackId'"
+        }
+      },
+      {
+        "index": 30,
+        "kind": "SCALAR",
+        "display_name": "Reference",
+        "short_representation": {
+          "description": "$SongName'"
+        }
+      },
+      {
+        "index": 31,
+        "kind": "SCALAR",
+        "display_name": "Function",
+        "child_links": [
+          {
+            "child_index": 32
+          },
+          {
+            "child_index": 33
+          }
+        ],
+        "short_representation": {
+          "description": "($SingerId = 1)"
+        }
+      },
+      {
+        "index": 32,
+        "kind": "SCALAR",
+        "display_name": "Reference",
+        "short_representation": {
+          "description": "$SingerId"
+        }
+      },
+      {
+        "index": 33,
+        "kind": "SCALAR",
+        "display_name": "Constant",
+        "short_representation": {
+          "description": "1"
+        }
+      }
+    ]
+  }
+}

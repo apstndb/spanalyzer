@@ -837,7 +837,7 @@ func TestLoadQueriesGQLSurfaceIncludesBroadAcceptanceAndCapabilityControls(t *te
 	if err != nil {
 		t.Fatalf("loadQueries(%q) error = %v", "gql_surface", err)
 	}
-	if got, want := len(queries), 120; got != want {
+	if got, want := len(queries), 125; got != want {
 		t.Fatalf("GQL surface query count = %d, want %d", got, want)
 	}
 	seen := make(map[string]struct{}, len(queries))
@@ -901,6 +901,11 @@ func TestLoadQueriesGQLSurfaceIncludesBroadAcceptanceAndCapabilityControls(t *te
 		gqlSurfaceISFirstQuantifiedLabel,
 		gqlSurfaceISFirstBeforeNextLabel,
 		gqlSurfaceISFirstBeforeNextOrderedLabel,
+		"gql-surface/aggregate/horizontal-string-agg-ordered",
+		"gql-surface/aggregate/horizontal-string-agg-unordered-control",
+		"gql-surface/unsupported/horizontal-string-agg-return",
+		"gql-surface/aggregate/horizontal-array-concat-agg-ordered",
+		"gql-surface/unsupported/vertical-array-concat-agg-group-variable",
 		"gql-surface/unsupported/gql-row-number",
 		"gql-surface/unsupported/sql-is-first-control",
 		"gql-surface/unsupported/pagerank-requires-export",
@@ -943,10 +948,10 @@ func TestLoadQueriesGQLSurfaceIncludesBroadAcceptanceAndCapabilityControls(t *te
 	if got, want := manifest.Version, "v0alpha1"; got != want {
 		t.Errorf("GQL surface expectation version = %q, want %q", got, want)
 	}
-	if got, want := len(manifest.Queries), 97; got != want {
+	if got, want := len(manifest.Queries), 100; got != want {
 		t.Errorf("GQL surface positive expectations = %d, want %d", got, want)
 	}
-	if got, want := len(manifest.ExpectedQueryErrors), 23; got != want {
+	if got, want := len(manifest.ExpectedQueryErrors), 25; got != want {
 		t.Errorf("GQL surface error expectations = %d, want %d", got, want)
 	}
 	patternCount := 0
@@ -959,7 +964,7 @@ func TestLoadQueriesGQLSurfaceIncludesBroadAcceptanceAndCapabilityControls(t *te
 		}
 		patternCount += len(expectation.Patterns)
 	}
-	if got, want := patternCount, 197; got != want {
+	if got, want := patternCount, 208; got != want {
 		t.Errorf("GQL surface operator patterns = %d, want %d", got, want)
 	}
 	for _, expectation := range manifest.ExpectedQueryErrors {
@@ -1544,6 +1549,9 @@ func TestLoadDDLsFullTextSearchUsesDedicatedSchema(t *testing.T) {
 		"CREATE SEARCH INDEX SearchAlbumsTitleSubstringIndex",
 		"CREATE SEARCH INDEX SearchAlbumsTitleRatingIndex",
 		"CREATE SEARCH INDEX SearchAlbumsMixedIndex",
+		"CREATE SEARCH INDEX SearchAlbumsFacetIndex",
+		"CREATE SEARCH INDEX SearchAlbumsPhoneticIndex",
+		"ArtistNameSoundex STRING(MAX) AS (LOWER(SOUNDEX(ArtistName)))",
 		"CREATE SEARCH INDEX SearchSingersByBio",
 		"CREATE PROPERTY GRAPH SearchMusicGraph",
 	} {
@@ -1746,6 +1754,12 @@ func TestLoadQueriesFullTextSearch(t *testing.T) {
 		"full-text-search/force-index",
 		"full-text-search/snippet",
 		"full-text-search/score-order",
+		"full-text-search/enhanced-query",
+		"full-text-search/enhanced-query-control",
+		"full-text-search/enhanced-query-required-hint",
+		"full-text-search/enhanced-query-timeout-hint",
+		"full-text-search/phonetic-composition",
+		"full-text-search/phonetic-search-only-control",
 		"full-text-search/substring",
 		"full-text-search/multi-column-conjunction",
 		"full-text-search/multi-column-disjunction",
@@ -1758,6 +1772,10 @@ func TestLoadQueriesFullTextSearch(t *testing.T) {
 		"full-text-search/mixed-stored-filter",
 		"full-text-search/mixed-back-join",
 		"full-text-search/gql-search-traversal",
+		"full-text-search/facet-single-count",
+		"full-text-search/facet-search-only-control",
+		"full-text-search/facet-multiple",
+		"full-text-search/facet-result-page-control",
 	} {
 		if seen[label] == "" {
 			t.Fatalf("loadQueries(\"full_text_search\") missing %s", label)
@@ -1769,11 +1787,105 @@ func TestLoadQueriesFullTextSearch(t *testing.T) {
 	if !strings.Contains(seen["full-text-search/score-order"], "SCORE(") {
 		t.Fatalf("score query missing SCORE(): %s", seen["full-text-search/score-order"])
 	}
+	if !strings.Contains(seen["full-text-search/enhanced-query"], "enhance_query => TRUE") {
+		t.Fatalf("enhanced-query probe missing named argument: %s", seen["full-text-search/enhanced-query"])
+	}
+	if !strings.Contains(seen["full-text-search/enhanced-query-required-hint"], "require_enhance_query=true") ||
+		!strings.Contains(seen["full-text-search/enhanced-query-timeout-hint"], "enhance_query_timeout_ms=200") {
+		t.Fatal("enhanced-query statement hint probes missing expected hint")
+	}
+	if !strings.Contains(seen["full-text-search/phonetic-composition"], `LOWER(SOUNDEX("stefan"))`) {
+		t.Fatalf("phonetic composition probe missing SOUNDEX(): %s", seen["full-text-search/phonetic-composition"])
+	}
 	if !strings.Contains(seen["full-text-search/numeric-array-any"], "ARRAY_INCLUDES_ANY") {
 		t.Fatalf("numeric array query missing ARRAY_INCLUDES_ANY(): %s", seen["full-text-search/numeric-array-any"])
 	}
 	if !strings.Contains(seen["full-text-search/gql-search-traversal"], "GRAPH SearchMusicGraph") {
 		t.Fatalf("GQL search traversal probe missing graph query: %s", seen["full-text-search/gql-search-traversal"])
+	}
+}
+
+func TestFacetSearchExpectationManifestMatchesCases(t *testing.T) {
+	data, err := os.ReadFile(filepath.Join("testdata", "facet_search_expectations.json"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	var manifest struct {
+		Version string `json:"version"`
+		Queries []struct {
+			Label    string            `json:"label"`
+			Patterns []json.RawMessage `json:"patterns"`
+		} `json:"queries"`
+		ExpectedQueryErrors []json.RawMessage `json:"expected_query_errors"`
+	}
+	if err := json.Unmarshal(data, &manifest); err != nil {
+		t.Fatal(err)
+	}
+	if manifest.Version != "v0alpha1" || len(manifest.Queries) != 4 || len(manifest.ExpectedQueryErrors) != 0 {
+		t.Fatalf("facet manifest summary = version %q, %d queries, %d errors", manifest.Version, len(manifest.Queries), len(manifest.ExpectedQueryErrors))
+	}
+	queries, err := loadQueries("full_text_search", nil, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	seen := make(map[string]struct{}, len(queries))
+	for _, query := range queries {
+		seen[query.Label] = struct{}{}
+	}
+	patterns := 0
+	for _, expectation := range manifest.Queries {
+		if _, ok := seen[expectation.Label]; !ok {
+			t.Errorf("facet manifest label %q absent from full-text selector", expectation.Label)
+		}
+		if len(expectation.Patterns) == 0 {
+			t.Errorf("facet manifest label %q has no patterns", expectation.Label)
+		}
+		patterns += len(expectation.Patterns)
+	}
+	if patterns != 14 {
+		t.Errorf("facet manifest pattern count = %d, want 14", patterns)
+	}
+}
+
+func TestFullTextResidualExpectationManifestMatchesCases(t *testing.T) {
+	data, err := os.ReadFile(filepath.Join("testdata", "full_text_residual_expectations.json"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	var manifest struct {
+		Version string `json:"version"`
+		Queries []struct {
+			Label    string            `json:"label"`
+			Patterns []json.RawMessage `json:"patterns"`
+		} `json:"queries"`
+		ExpectedQueryErrors []json.RawMessage `json:"expected_query_errors"`
+	}
+	if err := json.Unmarshal(data, &manifest); err != nil {
+		t.Fatal(err)
+	}
+	if manifest.Version != "v0alpha1" || len(manifest.Queries) != 6 || len(manifest.ExpectedQueryErrors) != 0 {
+		t.Fatalf("full-text residual manifest summary = version %q, %d queries, %d errors", manifest.Version, len(manifest.Queries), len(manifest.ExpectedQueryErrors))
+	}
+	queries, err := loadQueries("full_text_search", nil, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	seen := make(map[string]struct{}, len(queries))
+	for _, query := range queries {
+		seen[query.Label] = struct{}{}
+	}
+	patterns := 0
+	for _, expectation := range manifest.Queries {
+		if _, ok := seen[expectation.Label]; !ok {
+			t.Errorf("full-text residual manifest label %q absent from full-text selector", expectation.Label)
+		}
+		if len(expectation.Patterns) == 0 {
+			t.Errorf("full-text residual manifest label %q has no patterns", expectation.Label)
+		}
+		patterns += len(expectation.Patterns)
+	}
+	if patterns != 17 {
+		t.Errorf("full-text residual manifest pattern count = %d, want 17", patterns)
 	}
 }
 
@@ -1830,6 +1942,8 @@ func TestLoadQueriesVectorSearch(t *testing.T) {
 		"vector-search/ann-dot-product",
 		"vector-search/ann-euclidean-distance",
 		"vector-search/ann-gql-next-traversal",
+		"vector-search/hybrid-rrf",
+		"vector-search/hybrid-rrf-exact-control",
 	} {
 		if seen[label] == "" {
 			t.Fatalf("loadQueries(\"vector_search\") missing %s", label)
@@ -1853,6 +1967,21 @@ func TestLoadQueriesVectorSearch(t *testing.T) {
 	if !strings.Contains(seen["vector-search/ann-gql-next-traversal"], "NEXT") {
 		t.Fatalf("ANN GQL traversal probe missing NEXT: %s", seen["vector-search/ann-gql-next-traversal"])
 	}
+	hybrid := seen["vector-search/hybrid-rrf"]
+	for _, want := range []string{"UNION ALL", "SEARCH(", "SCORE(", "APPROX_DOT_PRODUCT("} {
+		if !strings.Contains(hybrid, want) {
+			t.Errorf("hybrid RRF probe missing %q: %s", want, hybrid)
+		}
+	}
+	control := seen["vector-search/hybrid-rrf-exact-control"]
+	for _, want := range []string{"_BASE_TABLE", "DOT_PRODUCT("} {
+		if !strings.Contains(control, want) {
+			t.Errorf("hybrid RRF exact control missing %q: %s", want, control)
+		}
+	}
+	if strings.Contains(control, "APPROX_DOT_PRODUCT(") {
+		t.Errorf("hybrid RRF exact control unexpectedly uses ANN: %s", control)
+	}
 }
 
 func TestSearchGraphExpectationManifestMatchesBuiltInCases(t *testing.T) {
@@ -1874,15 +2003,29 @@ func TestSearchGraphExpectationManifestMatchesBuiltInCases(t *testing.T) {
 	if got, want := manifest.Version, "v0alpha1"; got != want {
 		t.Errorf("search graph expectation version = %q, want %q", got, want)
 	}
-	if got, want := len(manifest.Queries), 2; got != want {
+	if got, want := len(manifest.Queries), 3; got != want {
 		t.Fatalf("search graph positive expectations = %d, want %d", got, want)
 	}
 	if got := len(manifest.ExpectedQueryErrors); got != 0 {
 		t.Errorf("search graph error expectations = %d, want 0", got)
 	}
 	patternCount := 0
-	seen := make(map[string]struct{}, len(fullTextSearchQueries)+len(vectorSearchQueries))
-	for _, query := range append(append([]queryCase(nil), fullTextSearchQueries...), vectorSearchQueries...) {
+	queries, err := loadQueries("search_graph", nil, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	ddls, err := loadDDLs("search_graph", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	joinedDDLs := strings.Join(ddls, "\n")
+	for _, want := range []string{"CREATE TABLE SearchAlbums", "CREATE TABLE VectorDocuments", "CREATE PROPERTY GRAPH SearchMusicGraph", "CREATE PROPERTY GRAPH VectorGraph"} {
+		if !strings.Contains(joinedDDLs, want) {
+			t.Errorf("search_graph schema missing %q", want)
+		}
+	}
+	seen := make(map[string]struct{}, len(queries))
+	for _, query := range queries {
 		seen[query.Label] = struct{}{}
 	}
 	for _, expectation := range manifest.Queries {
@@ -1894,7 +2037,7 @@ func TestSearchGraphExpectationManifestMatchesBuiltInCases(t *testing.T) {
 		}
 		patternCount += len(expectation.Patterns)
 	}
-	if got, want := patternCount, 7; got != want {
+	if got, want := patternCount, 14; got != want {
 		t.Errorf("search graph operator patterns = %d, want %d", got, want)
 	}
 }

@@ -17,6 +17,7 @@ func TestRewriterSurfaceCatalogIsComplete(t *testing.T) {
 		"REWRITE_FLATTEN",
 		"REWRITE_GENERALIZED_QUERY_STMT",
 		"REWRITE_GROUPING_SET",
+		"REWRITE_HOP_FUNCTION",
 		"REWRITE_INLINE_SQL_FUNCTIONS",
 		"REWRITE_INLINE_SQL_TVFS",
 		"REWRITE_INLINE_SQL_UDAS",
@@ -89,7 +90,7 @@ func TestLoadQueriesRewriterSurfaceMatchesManifest(t *testing.T) {
 	if err != nil {
 		t.Fatalf("loadQueries(%q) error = %v", "rewriter_surface", err)
 	}
-	if got, want := len(queries), 32; got != want {
+	if got, want := len(queries), 33; got != want {
 		t.Fatalf("rewriter surface query count = %d, want %d", got, want)
 	}
 	seen := make(map[string]struct{}, len(queries))
@@ -128,7 +129,7 @@ func TestLoadQueriesRewriterSurfaceMatchesManifest(t *testing.T) {
 	if got, want := len(manifest.Queries), 18; got != want {
 		t.Errorf("rewriter surface positive expectations = %d, want %d", got, want)
 	}
-	if got, want := len(manifest.ExpectedQueryErrors), 14; got != want {
+	if got, want := len(manifest.ExpectedQueryErrors), 15; got != want {
 		t.Errorf("rewriter surface error expectations = %d, want %d", got, want)
 	}
 	patternCount := 0

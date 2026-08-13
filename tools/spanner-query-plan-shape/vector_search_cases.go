@@ -8,6 +8,7 @@ var vectorSearchDDLs = []string{
   DocumentId INT64 NOT NULL,
   Category STRING(MAX),
   Body STRING(MAX),
+  BodyTokens TOKENLIST AS (TOKENIZE_FULLTEXT(Body)) HIDDEN,
   Embedding ARRAY<FLOAT32>(vector_length=>3) NOT NULL,
   TechOnly BOOL AS (IF(Category = "tech", TRUE, NULL)) HIDDEN,
 ) PRIMARY KEY(TenantId, DocumentId)`,
@@ -23,6 +24,9 @@ OPTIONS (distance_type = 'COSINE')`,
 	`CREATE VECTOR INDEX VectorDocumentsByDotProduct
 ON VectorDocuments(Embedding, TenantId)
 OPTIONS (distance_type = 'DOT_PRODUCT')`,
+	`CREATE SEARCH INDEX VectorDocumentsByBody
+ON VectorDocuments(BodyTokens)
+PARTITION BY TenantId`,
 	`CREATE VECTOR INDEX VectorDocumentsByEuclidean
 ON VectorDocuments(Embedding, TenantId)
 OPTIONS (distance_type = 'EUCLIDEAN')`,
@@ -147,5 +151,60 @@ LIMIT 10
 NEXT
 MATCH (d)-[:Related]->(r:Document)
 RETURN d.DocumentId AS document_id, r.DocumentId AS related_id, distance`,
+	},
+	{
+		Label: "vector-search/hybrid-rrf",
+		SQL: `SELECT SUM(1.0 / (60 + rank)) AS rrf_score, document_id
+FROM (
+  SELECT rank, document_id
+  FROM UNNEST(ARRAY(
+    SELECT DocumentId
+    FROM VectorDocuments@{FORCE_INDEX=VectorDocumentsByDotProduct}
+    WHERE TenantId = 7
+    ORDER BY APPROX_DOT_PRODUCT(
+      ARRAY<FLOAT32>[1.0, 0.0, 0.0], Embedding,
+      OPTIONS => JSON '{"num_leaves_to_search": 1}') DESC
+    LIMIT 10
+  )) AS document_id WITH OFFSET AS rank
+  UNION ALL
+  SELECT rank, document_id
+  FROM UNNEST(ARRAY(
+    SELECT DocumentId
+    FROM VectorDocuments@{FORCE_INDEX=VectorDocumentsByBody}
+    WHERE TenantId = 7 AND SEARCH(BodyTokens, 'green')
+    ORDER BY SCORE(BodyTokens, 'green') DESC
+    LIMIT 10
+  )) AS document_id WITH OFFSET AS rank
+)
+GROUP BY document_id
+ORDER BY rrf_score DESC
+LIMIT 5`,
+	},
+	{
+		Label: "vector-search/hybrid-rrf-exact-control",
+		SQL: `SELECT SUM(1.0 / (60 + rank)) AS rrf_score, document_id
+FROM (
+  SELECT rank, document_id
+  FROM UNNEST(ARRAY(
+    SELECT DocumentId
+    FROM VectorDocuments@{FORCE_INDEX=_BASE_TABLE}
+    WHERE TenantId = 7
+    ORDER BY DOT_PRODUCT(
+      ARRAY<FLOAT32>[1.0, 0.0, 0.0], Embedding) DESC
+    LIMIT 10
+  )) AS document_id WITH OFFSET AS rank
+  UNION ALL
+  SELECT rank, document_id
+  FROM UNNEST(ARRAY(
+    SELECT DocumentId
+    FROM VectorDocuments@{FORCE_INDEX=VectorDocumentsByBody}
+    WHERE TenantId = 7 AND SEARCH(BodyTokens, 'green')
+    ORDER BY SCORE(BodyTokens, 'green') DESC
+    LIMIT 10
+  )) AS document_id WITH OFFSET AS rank
+)
+GROUP BY document_id
+ORDER BY rrf_score DESC
+LIMIT 5`,
 	},
 }

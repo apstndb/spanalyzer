@@ -3565,6 +3565,123 @@ func TestPlanReportOperatorFamilyFixtures(t *testing.T) {
 	}
 }
 
+func TestManagedDCAOptimizerVersionFixtures(t *testing.T) {
+	tests := []struct {
+		name       string
+		wantMethod string
+		wantPruned bool
+	}{
+		{name: "managed_dca_v8", wantMethod: "Row"},
+		{name: "managed_dca_v9", wantMethod: "Batch", wantPruned: true},
+		{name: "managed_dca_limit_v8", wantMethod: "Row"},
+		{name: "managed_dca_limit_v9", wantMethod: "Batch", wantPruned: true},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			plan, _, _ := loadPlanReportOperatorFixture(t, tt.name)
+			var dca *spannerpb.PlanNode
+			hasTypedNullRowID := false
+			hasRestoredBatchOutput := false
+			for _, node := range plan.GetPlanNodes() {
+				if node.GetDisplayName() == "Distributed Cross Apply" {
+					if dca != nil {
+						t.Fatal("fixture contains multiple Distributed Cross Apply nodes")
+					}
+					dca = node
+				}
+				if node.GetDisplayName() == "Constant" && node.GetShortRepresentation().GetDescription() == "<typed null>" {
+					hasTypedNullRowID = true
+				}
+			}
+			if dca == nil {
+				t.Fatal("fixture lacks Distributed Cross Apply")
+			}
+			if got := dca.GetMetadata().GetFields()["execution_method"].GetStringValue(); got != tt.wantMethod {
+				t.Errorf("Distributed Cross Apply execution_method = %q, want %q", got, tt.wantMethod)
+			}
+			for _, link := range dca.GetChildLinks() {
+				if link.GetType() == "Batch" && strings.Contains(link.GetVariable(), "restored_") {
+					hasRestoredBatchOutput = true
+				}
+			}
+			if hasTypedNullRowID != tt.wantPruned {
+				t.Errorf("DCA typed-null row identifier = %t, want %t", hasTypedNullRowID, tt.wantPruned)
+			}
+			if hasRestoredBatchOutput != tt.wantPruned {
+				t.Errorf("DCA restored batch output = %t, want %t", hasRestoredBatchOutput, tt.wantPruned)
+			}
+
+			path := filepath.Join("testdata", "plan_fixtures", tt.name+".json")
+			data, err := os.ReadFile(path)
+			if err != nil {
+				t.Fatal(err)
+			}
+			for _, forbidden := range []string{"projects/", "instances/", "databases/", "SPANNER_PROJECT", "SPANNER_INSTANCE", "SPANNER_DATABASE"} {
+				if bytes.Contains(data, []byte(forbidden)) {
+					t.Errorf("managed fixture contains forbidden destination material %q", forbidden)
+				}
+			}
+		})
+	}
+}
+
+func TestManagedAIPlanFixtures(t *testing.T) {
+	tests := []struct {
+		name              string
+		wantTVF           int
+		wantFilter        int
+		wantResidual      int
+		wantDeterministic int
+	}{
+		{name: "managed_ai_classify_projection", wantTVF: 1},
+		{name: "managed_ai_classify_case_control"},
+		{name: "managed_ai_if_filter", wantTVF: 1, wantFilter: 1},
+		{name: "managed_ai_if_scalar_filter_control", wantResidual: 1},
+		{name: "managed_ai_score_order_limit", wantTVF: 1, wantDeterministic: 1},
+		{name: "managed_ai_score_scalar_order_limit_control"},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			plan, _, _ := loadPlanReportOperatorFixture(t, tt.name)
+			counts := map[string]int{}
+			residuals := 0
+			for _, node := range plan.GetPlanNodes() {
+				counts[node.GetDisplayName()]++
+				for _, link := range node.GetChildLinks() {
+					if link.GetType() == "Residual Condition" {
+						residuals++
+					}
+				}
+			}
+			for name, want := range map[string]int{
+				"TVF":               tt.wantTVF,
+				"Filter":            tt.wantFilter,
+				"VerifyDeterminism": tt.wantDeterministic,
+			} {
+				if got := counts[name]; got != want {
+					t.Errorf("%s count = %d, want %d", name, got, want)
+				}
+			}
+			if residuals != tt.wantResidual {
+				t.Errorf("Residual Condition count = %d, want %d", residuals, tt.wantResidual)
+			}
+			if counts["Scan"] == 0 {
+				t.Error("managed AI fixture lacks a Scan")
+			}
+
+			data, err := os.ReadFile(filepath.Join("testdata", "plan_fixtures", tt.name+".json"))
+			if err != nil {
+				t.Fatal(err)
+			}
+			for _, forbidden := range []string{"projects/", "instances/", "databases/", "SPANNER_PROJECT", "SPANNER_INSTANCE", "SPANNER_DATABASE"} {
+				if bytes.Contains(data, []byte(forbidden)) {
+					t.Errorf("managed fixture contains forbidden destination material %q", forbidden)
+				}
+			}
+		})
+	}
+}
+
 func TestPlanReportContractFixtureSemantics(t *testing.T) {
 	tests := []struct {
 		fixture        string

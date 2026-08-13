@@ -23,6 +23,44 @@ control query. Raw JSON should be retained whenever the compact tree changes,
 because a new metadata value or scalar child link can be important even when
 all relational nodes remain in known families.
 
+## Residual audit update (2026-08-13)
+
+A fresh comparison against current official Spanner documentation and the
+`google/googlesql` public rewriter registry closed several gaps from this
+matrix:
+
+- retained pinned-Omni and managed-Spanner n-gram fuzzy retrieval and ordinary `LIKE`, `STARTS_WITH`,
+  `ENDS_WITH`, and `REGEXP_CONTAINS` search-index acceleration, including
+  parameter and minimum-token-size controls;
+- retained pinned-Omni and managed-Spanner reciprocal-rank fusion with ANN and
+  text retrieval in one plan;
+- retained covering single- and multi-facet search compositions;
+- retained query enhancement, its two documented statement hints, and the
+  documented generated-column `SOUNDEX` composition, with pinned Omni and
+  managed PLAN evidence;
+- retained managed PLAN lowering for `AI.CLASSIFY`, `AI.IF`, and `AI.SCORE`,
+  while preserving the pinned-Omni capability error; and
+- added the newly registered upstream `REWRITE_HOP_FUNCTION` to the rewriter
+  completeness gate with the stable Spanner `HOP`-not-found boundary.
+
+Three environment-dependent candidates below remain intentionally unexecuted:
+Local Split Union needs an Enterprise Plus multi-region instance and a
+user-created instance partition; `ML.PREDICT` needs a user-authorized remote
+model endpoint and IAM setup; graph-algorithm `EXPORT DATA` needs scale-up mode
+and an authorized Cloud Storage destination. Creating those external resources
+would expand the authority of a PLAN audit, so their exact recipes remain here
+rather than being reported as product rejections. The managed checks performed
+for this update used only temporary, destination-redacted database objects and
+removed them after capture.
+
+The same upstream comparison found no additional current Spanner probe to
+promote. Graph `INSERT` has grammar, AST, resolver, and builder machinery in
+`google/googlesql`, but its own default feature test still classifies the
+statement as unsupported. The newer macro-visibility and named `MODEL` and
+`SEQUENCE` argument surfaces are generic GoogleSQL features without matching
+Spanner documentation or runtime evidence. They therefore remain upstream-only
+leads rather than entries in the Spanner PLAN matrix.
+
 ## Newly observed while constructing the matrix
 
 ### Full outer join metadata
