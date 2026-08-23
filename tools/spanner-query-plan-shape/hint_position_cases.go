@@ -52,7 +52,7 @@ var hintPositionAuditCases = []hintPositionAuditCase{
 	{queryCase{Label: "hint-position/rejected/gql-subpath-leading", SQL: `GRAPH MusicGraph MATCH ( @{a=1} (p:Singers) ) RETURN p.SingerId`}, hintPositionRejected},
 	{queryCase{Label: "hint-position/rejected/gql-between-edges", SQL: `GRAPH MusicGraph MATCH (a:Singers)-[e:CollabWith]->@{a=1}-[f:CollabWith]->(b:Singers) RETURN a.SingerId`}, hintPositionRejected},
 	{queryCase{Label: "hint-position/accepted/pipe-log-unsupported", SQL: `SELECT * FROM Singers |> LOG @{a=1}`}, hintPositionAccepted},
-	{queryCase{Label: "hint-position/rejected/pipe-finish", SQL: `SELECT * FROM Singers |> FINISH @{a=1}`}, hintPositionRejected},
+	{queryCase{Label: "hint-position/versioned/pipe-finish", SQL: `SELECT * FROM Singers |> FINISH @{a=1}`}, hintPositionRejected},
 	{queryCase{Label: "hint-position/accepted/insert-target", SQL: `INSERT INTO Singers @{a=1} (SingerId, FirstName) SELECT SingerId, FirstName FROM Singers WHERE FALSE`, PlanMode: planModeReadWrite}, hintPositionAccepted},
 	{queryCase{Label: "hint-position/accepted/dml-statement-pdml", SQL: `@{PDML_MAX_PARALLELISM=1} UPDATE Singers SET FirstName = FirstName WHERE FALSE`, PlanMode: planModeReadWrite}, hintPositionAccepted},
 }

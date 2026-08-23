@@ -82,7 +82,7 @@ func TestIntegrationGQLSetPropagationOnOmni(t *testing.T) {
 		},
 	}
 
-	for version := 0; version <= 8; version++ {
+	for version := 0; version <= latestOptimizerVersion; version++ {
 		versionName := "default"
 		if version != 0 {
 			versionName = fmt.Sprintf("v%d", version)

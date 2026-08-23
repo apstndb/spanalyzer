@@ -34,10 +34,10 @@
     {"label":"google-sql-surface/accepted/struct-expression-star","patterns":[{"display_name":"Unit Relation","metadata":[{"key":"execution_method","value":"Row"}]},{"display_name":"Constant"}]},
     {"label":"google-sql-surface/accepted/unnest-array-of-struct","patterns":[{"display_name":"Array Constructor"},{"display_name":"Struct Constructor"},{"display_name":"Array Unnest","metadata":[{"key":"execution_method","value":"Row"}],"child_links":[{"kind":"SCALAR","type":"","variable":"present","min_count":2}]}]},
     {"label":"google-sql-surface/accepted/set-operation-regular-first-value-second","patterns":[{"display_name":"Union All","metadata":[{"key":"execution_method","value":"Row"}]},{"display_name":"Union Input","child_links":[{"kind":"SCALAR","type":"input_0","variable":"absent"}]}]},
-    {"label":"google-sql-surface/accepted/set-operation-value-first-nested","patterns":[{"display_name":"Union All","metadata":[{"key":"execution_method","value":"Row"}]},{"display_name":"Union Input","child_links":[{"kind":"SCALAR","type":"input_0","variable":"absent"}]}]}
+    {"label":"google-sql-surface/accepted/set-operation-value-first-nested","patterns":[{"display_name":"Union All","metadata":[{"key":"execution_method","value":"Row"}]},{"display_name":"Union Input","child_links":[{"kind":"SCALAR","type":"input_0","variable":"absent"}]}]},
+    {"label":"google-sql-surface/accepted/core-pipe","patterns":[{"display_name":"Limit"},{"display_name":"Filter Scan"},{"display_name":"Scan","metadata":[{"key":"scan_target","value":"Singers"}]}]}
   ],
   "expected_query_errors": [
-    {"label":"google-sql-surface/unsupported/core-pipe","contains":"Pipe query syntax not supported"},
     {"label":"google-sql-surface/unsupported/grouping-sets","contains":"GROUP BY GROUPING SETS is unsupported"},
     {"label":"google-sql-surface/unsupported/rollup","contains":"GROUP BY ROLLUP is unsupported"},
     {"label":"google-sql-surface/unsupported/cube","contains":"GROUP BY CUBE is unsupported"},

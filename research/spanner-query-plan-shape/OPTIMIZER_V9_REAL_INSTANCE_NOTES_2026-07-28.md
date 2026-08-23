@@ -1,4 +1,10 @@
-# Optimizer version 9: real-instance observations and planned Omni probes (2026-07-28)
+# Optimizer version 9: real-instance observations and Omni probe design (2026-07-28)
+
+Implementation update (2026-08-24): Spanner Omni `2026.r2.1-beta` supports
+optimizer version 9. The planned probes below are now implemented by the
+`optimizer_v9` selector; see
+[`OMNI_R2_1_MANAGED_DIFF_2026-08-24.md`](OMNI_R2_1_MANAGED_DIFF_2026-08-24.md)
+for the fresh managed/Omni comparison.
 
 Purpose: preserve the first observed evidence of optimizer version 9 behavior
 so the probe implementation is ready the moment a Spanner Omni release ships

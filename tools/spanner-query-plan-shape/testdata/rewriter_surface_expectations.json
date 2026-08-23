@@ -30,9 +30,9 @@
     {"label":"rewriter-surface/unsupported/nulliferror","contains":"Unsupported built-in function: nulliferror"},
     {"label":"rewriter-surface/unsupported/typeof","contains":"Function not found: TYPEOF"},
     {"label":"rewriter-surface/unsupported/multiway-unnest","contains":"The UNNEST operator supports exactly one argument"},
-    {"label":"rewriter-surface/unsupported/pipe-assert","contains":"Syntax error: Unexpected FROM"},
-    {"label":"rewriter-surface/unsupported/pipe-describe","contains":"Syntax error: Unexpected FROM"},
-    {"label":"rewriter-surface/unsupported/pipe-if","contains":"Syntax error: Unexpected FROM"},
+    {"label":"rewriter-surface/unsupported/pipe-assert","contains":"Pipe ASSERT not supported"},
+    {"label":"rewriter-surface/unsupported/pipe-describe","contains":"Pipe DESCRIBE not supported"},
+    {"label":"rewriter-surface/unsupported/pipe-if","contains":"Pipe IF not supported"},
     {"label":"rewriter-surface/unsupported/hop","contains":"Table-valued function not found: HOP"},
     {"label":"rewriter-surface/unsupported/tumble","contains":"Table-valued function not found: TUMBLE"},
     {"label":"rewriter-surface/unsupported/nested-array-update","contains":"Nested updates on table columns of type ARRAY are not supported"}

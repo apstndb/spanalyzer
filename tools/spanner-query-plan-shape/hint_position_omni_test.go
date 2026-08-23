@@ -8,5 +8,7 @@ import (
 
 func TestIntegrationHintPositionAuditOnOmni(t *testing.T) {
 	clients := openOmniClients(t, hintPositionDDLs(t))
-	runHintPositionAuditCases(t, clients.Client)
+	runHintPositionAuditCasesWithOverrides(t, clients.Client, map[string]hintPositionExpectation{
+		"hint-position/versioned/pipe-finish": hintPositionAccepted,
+	})
 }

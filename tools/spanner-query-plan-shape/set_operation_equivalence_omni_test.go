@@ -129,7 +129,7 @@ func TestIntegrationSetOperationRewriteEquivalenceOnOmni(t *testing.T) {
 	if got, want := readInt64s(t, clients.Client, naiveCommonSupertypeRewriteSQL), []int64{9007199254740993}; !slices.Equal(got, want) {
 		t.Fatalf("naive left-typed rewrite result = %v, want %v", got, want)
 	}
-	for version := 1; version <= 8; version++ {
+	for version := firstOptimizerVersion; version <= latestOptimizerVersion; version++ {
 		for _, rewrite := range nullableRewrites {
 			directPlan, err := analyzePlan(t.Context(), clients.Client, queryCase{
 				Label: rewrite.name + "/direct",

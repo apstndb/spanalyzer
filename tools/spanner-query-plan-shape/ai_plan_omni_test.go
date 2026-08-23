@@ -26,7 +26,7 @@ func TestIntegrationAIPlanCapabilityBoundaryOnOmni(t *testing.T) {
 		"ai-plan/if-scalar-filter-control",
 		"ai-plan/score-scalar-order-limit-control",
 	}
-	for version := 1; version <= 8; version++ {
+	for version := firstOptimizerVersion; version <= latestOptimizerVersion; version++ {
 		for _, label := range candidates {
 			if _, err := analyzeVersionedSearchGraphPlan(t, clients.Client, cases[label], version); status.Code(err) != codes.Internal {
 				t.Errorf("AnalyzeQuery(%s, v%d) error = %v, want Omni Internal capability boundary", label, version, err)

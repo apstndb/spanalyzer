@@ -59,7 +59,7 @@ func TestIntegrationGQLHintSurfaceVersionBoundariesOnOmni(t *testing.T) {
 		multi := hintCases["gql-hint/subquery/exists-hash-multi-pass-accepted-no-effect"]
 		one := hintCases["gql-hint/subquery/exists-hash-one-pass-accepted-no-effect"]
 		unhinted := gqlCases["gql-surface/subquery/correlated-exists"]
-		for version := 1; version <= 8; version++ {
+		for version := firstOptimizerVersion; version <= latestOptimizerVersion; version++ {
 			unhintedPlan := mustAnalyze(t, unhinted, version)
 			multiPlan := mustAnalyze(t, multi, version)
 			if !proto.Equal(multiPlan, unhintedPlan) {
@@ -113,7 +113,7 @@ func TestIntegrationGQLHintSurfaceVersionBoundariesOnOmni(t *testing.T) {
 		applyTrue := hintCases["gql-hint/element/traversal-apply-batch-true"]
 		applyFalse := hintCases["gql-hint/element/traversal-apply-batch-false"]
 
-		for version := 1; version <= 8; version++ {
+		for version := firstOptimizerVersion; version <= latestOptimizerVersion; version++ {
 			if _, err := analyze(t, directSetHint, version); err == nil || !strings.Contains(err.Error(), "Expected keyword ALL or keyword DISTINCT but got") {
 				t.Errorf("direct GQL set hint v%d error = %v, want stable syntax error", version, err)
 			}
@@ -232,7 +232,7 @@ func TestIntegrationGQLHintSurfaceVersionBoundariesOnOmni(t *testing.T) {
 		secondary := hintCases["gql-hint/element/node-force-secondary-index"]
 		row := hintCases["gql-hint/graph-table/node-scan-row"]
 		batch := hintCases["gql-hint/graph-table/node-scan-batch"]
-		for version := 1; version <= 8; version++ {
+		for version := firstOptimizerVersion; version <= latestOptimizerVersion; version++ {
 			statementPlan := mustAnalyze(t, statementHash, version)
 			unhintedPlan := mustAnalyze(t, unhintedSet, version)
 			if proto.Equal(statementPlan, unhintedPlan) {
@@ -297,7 +297,7 @@ func TestIntegrationGQLHintSurfaceVersionBoundariesOnOmni(t *testing.T) {
 			}
 		}
 
-		for version := 1; version <= 8; version++ {
+		for version := firstOptimizerVersion; version <= latestOptimizerVersion; version++ {
 			indexUnionPlan := mustAnalyze(t, indexUnion, version)
 			indexControlPlan := mustAnalyze(t, indexControl, version)
 			if proto.Equal(indexUnionPlan, indexControlPlan) {

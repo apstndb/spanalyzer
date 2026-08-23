@@ -378,7 +378,7 @@ func TestLoadQueriesHintPositionAuditIncludesMissingPositionsAndRejections(t *te
 		"hint-position/rejected/gql-subpath-leading",
 		"hint-position/rejected/gql-between-edges",
 		"hint-position/accepted/pipe-log-unsupported",
-		"hint-position/rejected/pipe-finish",
+		"hint-position/versioned/pipe-finish",
 		"hint-position/accepted/insert-target",
 		"hint-position/accepted/dml-statement-pdml",
 	} {
@@ -390,6 +390,9 @@ func TestLoadQueriesHintPositionAuditIncludesMissingPositionsAndRejections(t *te
 		t.Fatalf("hint-position queries include duplicate labels: queries=%d unique=%d", got, want)
 	}
 	for _, auditCase := range hintPositionAuditCases {
+		if strings.HasPrefix(auditCase.Query.Label, "hint-position/versioned/") {
+			continue
+		}
 		prefix := "hint-position/" + string(auditCase.Expectation) + "/"
 		if !strings.HasPrefix(auditCase.Query.Label, prefix) {
 			t.Errorf("case label %q does not match expectation %q", auditCase.Query.Label, auditCase.Expectation)
@@ -1131,10 +1134,10 @@ func TestLoadQueriesGoogleSQLSurfaceIncludesPlansAndRuntimeCapabilityErrors(t *t
 	if got, want := manifest.Version, "v0alpha1"; got != want {
 		t.Errorf("GoogleSQL surface expectation version = %q, want %q", got, want)
 	}
-	if got, want := len(manifest.Queries), 34; got != want {
+	if got, want := len(manifest.Queries), 35; got != want {
 		t.Errorf("GoogleSQL surface positive expectations = %d, want %d", got, want)
 	}
-	if got, want := len(manifest.ExpectedQueryErrors), 23; got != want {
+	if got, want := len(manifest.ExpectedQueryErrors), 22; got != want {
 		t.Errorf("GoogleSQL surface error expectations = %d, want %d", got, want)
 	}
 	patternCount := 0
@@ -1147,7 +1150,7 @@ func TestLoadQueriesGoogleSQLSurfaceIncludesPlansAndRuntimeCapabilityErrors(t *t
 		}
 		patternCount += len(expectation.Patterns)
 	}
-	if got, want := patternCount, 71; got != want {
+	if got, want := patternCount, 74; got != want {
 		t.Errorf("GoogleSQL surface operator patterns = %d, want %d", got, want)
 	}
 	for _, expectation := range manifest.ExpectedQueryErrors {
@@ -2140,7 +2143,7 @@ func TestExpandOptimizerVersionMatrixUsesStatementHints(t *testing.T) {
 		{Label: "plain", SQL: "SELECT 1", Params: params},
 		{Label: "hinted", SQL: "@{JOIN_METHOD=APPLY_JOIN, OPTIMIZER_VERSION=5} SELECT 1"},
 	})
-	if gotLen, wantLen := len(got), 16; gotLen != wantLen {
+	if gotLen, wantLen := len(got), optimizerVersionCount*2; gotLen != wantLen {
 		t.Fatalf("len(expandOptimizerVersionMatrix()) = %d, want %d", gotLen, wantLen)
 	}
 	if gotLabel, wantLabel := got[0].Label, "optimizer-version/v1/plain"; gotLabel != wantLabel {
@@ -2152,10 +2155,11 @@ func TestExpandOptimizerVersionMatrixUsesStatementHints(t *testing.T) {
 	if gotParam, wantParam := got[0].Params["prefix"], "A"; gotParam != wantParam {
 		t.Fatalf("first params[prefix] = %v, want %v", gotParam, wantParam)
 	}
-	if gotLabel, wantLabel := got[15].Label, "optimizer-version/v8/hinted"; gotLabel != wantLabel {
+	last := len(got) - 1
+	if gotLabel, wantLabel := got[last].Label, "optimizer-version/v9/hinted"; gotLabel != wantLabel {
 		t.Fatalf("last label = %q, want %q", gotLabel, wantLabel)
 	}
-	if gotSQL, wantSQL := got[15].SQL, "@{OPTIMIZER_VERSION=8, JOIN_METHOD=APPLY_JOIN}\nSELECT 1"; gotSQL != wantSQL {
+	if gotSQL, wantSQL := got[last].SQL, "@{OPTIMIZER_VERSION=9, JOIN_METHOD=APPLY_JOIN}\nSELECT 1"; gotSQL != wantSQL {
 		t.Fatalf("last SQL = %q, want %q", gotSQL, wantSQL)
 	}
 }

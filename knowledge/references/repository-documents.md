@@ -98,7 +98,9 @@ the groups below relate when their contents appear to disagree.
 - [Optimizer-version rendered examples](../../research/spanner-query-plan-shape/OPTIMIZER_VERSION_RENDERED_EXAMPLES.md)
   - representative version-dependent rendered plans.
 - [Optimizer version 9 real-instance notes](../../research/spanner-query-plan-shape/OPTIMIZER_V9_REAL_INSTANCE_NOTES_2026-07-28.md)
-  - managed-Spanner optimizer-v9 observations and future Omni probe design.
+  - managed-Spanner optimizer-v9 observations and the implemented Omni probe design.
+- [Spanner Omni r2.1 and managed comparison](../../research/spanner-query-plan-shape/OMNI_R2_1_MANAGED_DIFF_2026-08-24.md)
+  - pipe syntax, optimizer v9, DCA pruning, LIMIT sensitivity, and DML differences.
 - [Hint-position audit](../../research/spanner-query-plan-shape/HINT_POSITION_AUDIT_2026-08-04.md)
   - frontend, Emulator, and Omni placement verification.
 - [Factorized-mode observations](../../research/spanner-query-plan-shape/FACTORIZED_MODE_OBSERVATIONS_2026-08-11.md)

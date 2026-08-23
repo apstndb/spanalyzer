@@ -33,7 +33,7 @@ func TestIntegrationConditionBoundariesVersionMatrixOnOmni(t *testing.T) {
 		return plan
 	}
 
-	for version := 1; version <= 8; version++ {
+	for version := firstOptimizerVersion; version <= latestOptimizerVersion; version++ {
 		t.Run("v"+strconv.Itoa(version), func(t *testing.T) {
 			plans := make(map[string]*spannerpb.QueryPlan, len(cases))
 			for label := range cases {

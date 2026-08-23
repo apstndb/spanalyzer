@@ -67,7 +67,7 @@ func TestIntegrationGQLCompositionalSurfaceOnOmni(t *testing.T) {
 	horizontalCount := cases["gql-surface/aggregate/horizontal-count-control"]
 	repeatable := cases["gql-surface/unsupported/tablesample-repeatable"]
 
-	for version := 1; version <= 8; version++ {
+	for version := firstOptimizerVersion; version <= latestOptimizerVersion; version++ {
 		returnPlan := mustAnalyze(t, isFirstReturn, version)
 		if got := countPlanNodes(returnPlan, "Crowd", ""); got != 1 {
 			t.Errorf("IS_FIRST RETURN v%d Crowd count = %d, want 1", version, got)

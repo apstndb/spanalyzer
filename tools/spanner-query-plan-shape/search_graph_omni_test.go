@@ -19,7 +19,7 @@ func TestIntegrationFullTextSearchPlansOnOmni(t *testing.T) {
 	cases := queryCasesByLabel(t, fullTextSearchQueries)
 	query := cases["full-text-search/gql-search-traversal"]
 
-	for version := 1; version <= 8; version++ {
+	for version := firstOptimizerVersion; version <= latestOptimizerVersion; version++ {
 		plan, err := analyzeVersionedSearchGraphPlan(t, clients.Client, query, version)
 		if version <= 4 {
 			if err == nil || !strings.Contains(err.Error(), "SEARCH is only supported in queries with query optimizer version 6 or above") {
@@ -44,7 +44,7 @@ func TestIntegrationFullTextSearchPlansOnOmni(t *testing.T) {
 		}
 	}
 
-	for version := 1; version <= 8; version++ {
+	for version := firstOptimizerVersion; version <= latestOptimizerVersion; version++ {
 		plans := map[string]*spannerpb.QueryPlan{}
 		for _, label := range []string{
 			"full-text-search/facet-single-count",
@@ -99,7 +99,7 @@ func TestIntegrationFullTextSearchPlansOnOmni(t *testing.T) {
 		}
 	}
 
-	for version := 1; version <= 8; version++ {
+	for version := firstOptimizerVersion; version <= latestOptimizerVersion; version++ {
 		labels := []string{
 			"full-text-search/enhanced-query",
 			"full-text-search/enhanced-query-control",
@@ -191,7 +191,7 @@ func TestIntegrationVectorSearchPlansOnOmni(t *testing.T) {
 	cases := queryCasesByLabel(t, vectorSearchQueries)
 	query := cases["vector-search/ann-gql-next-traversal"]
 
-	for version := 1; version <= 8; version++ {
+	for version := firstOptimizerVersion; version <= latestOptimizerVersion; version++ {
 		plan, err := analyzeVersionedSearchGraphPlan(t, clients.Client, query, version)
 		if err != nil {
 			t.Fatalf("AnalyzeQuery(%s, v%d) error = %v", query.Label, version, err)
@@ -236,7 +236,7 @@ func TestIntegrationVectorSearchPlansOnOmni(t *testing.T) {
 		}
 	}
 
-	for version := 1; version <= 8; version++ {
+	for version := firstOptimizerVersion; version <= latestOptimizerVersion; version++ {
 		for _, tt := range []struct {
 			label      string
 			wantVector bool

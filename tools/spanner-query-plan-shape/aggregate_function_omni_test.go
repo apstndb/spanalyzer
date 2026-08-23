@@ -57,7 +57,7 @@ func TestIntegrationAggregateFunctionAggTypesVersionMatrixOnOmni(t *testing.T) {
 		"aggregate-function/control/select-distinct-without-agg": {},
 	}
 
-	for version := 1; version <= 8; version++ {
+	for version := firstOptimizerVersion; version <= latestOptimizerVersion; version++ {
 		t.Run("v"+strconv.Itoa(version), func(t *testing.T) {
 			plans := make(map[string]*spannerpb.QueryPlan, len(wantAggTypes))
 			for label, want := range wantAggTypes {

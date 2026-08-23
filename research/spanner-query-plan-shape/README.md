@@ -60,7 +60,10 @@ plans. Observation logs, not a stable contract.
   and Hash/Merge/Apply join conditions across optimizer v1-v8.
 - [`OPTIMIZER_V9_REAL_INSTANCE_NOTES_2026-07-28.md`](OPTIMIZER_V9_REAL_INSTANCE_NOTES_2026-07-28.md):
   managed-Spanner optimizer-v9 DCA input-pruning evidence and the corresponding
-  future Omni probe design.
+  Omni probe design that was later implemented.
+- [`OMNI_R2_1_MANAGED_DIFF_2026-08-24.md`](OMNI_R2_1_MANAGED_DIFF_2026-08-24.md):
+  fresh managed/Omni comparison for pipe syntax, optimizer v9 DCA pruning,
+  LIMIT sensitivity, and the v9 DML shape boundary.
 - [`AI_PLAN_OBSERVATIONS_2026-08-13.md`](AI_PLAN_OBSERVATIONS_2026-08-13.md):
   managed-Spanner PLAN-only lowering of `AI.CLASSIFY`, `AI.IF`, and
   `AI.SCORE`, with scalar controls and v1-v8 shape partitions.

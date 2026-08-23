@@ -38,7 +38,7 @@ func TestIntegrationNgramSearchVersionMatrixOnOmni(t *testing.T) {
 		"ngram-search/pattern/like-too-short/search-index",
 	}
 
-	for version := 1; version <= 8; version++ {
+	for version := firstOptimizerVersion; version <= latestOptimizerVersion; version++ {
 		for _, label := range baseLabels {
 			plan, err := analyzeVersionedSearchGraphPlan(t, clients.Client, cases[label], version)
 			if err != nil {

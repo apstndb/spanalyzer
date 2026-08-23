@@ -39,7 +39,7 @@ var googleSQLSurfaceQueries = []queryCase{
 	{Label: "google-sql-surface/accepted/set-operation-regular-first-value-second", SQL: `SELECT SingerId FROM Singers UNION ALL SELECT AS VALUE SingerId FROM Albums`},
 	{Label: "google-sql-surface/accepted/set-operation-value-first-nested", SQL: `SELECT value_column FROM (SELECT AS VALUE SingerId FROM Singers UNION ALL SELECT SingerId FROM Albums) AS value_column`},
 
-	{Label: "google-sql-surface/unsupported/core-pipe", SQL: `SELECT SingerId, FirstName FROM Singers |> WHERE SingerId > 0 |> SELECT SingerId |> ORDER BY SingerId |> LIMIT 2`},
+	{Label: "google-sql-surface/accepted/core-pipe", SQL: `SELECT SingerId, FirstName FROM Singers |> WHERE SingerId > 0 |> SELECT SingerId |> ORDER BY SingerId |> LIMIT 2`},
 	{Label: "google-sql-surface/unsupported/grouping-sets", SQL: `SELECT SingerId, SongGenre, COUNT(*) AS c FROM Songs GROUP BY GROUPING SETS ((SingerId), (SongGenre), ())`},
 	{Label: "google-sql-surface/unsupported/rollup", SQL: `SELECT SingerId, SongGenre, COUNT(*) AS c FROM Songs GROUP BY ROLLUP(SingerId, SongGenre)`},
 	{Label: "google-sql-surface/unsupported/cube", SQL: `SELECT SingerId, SongGenre, COUNT(*) AS c FROM Songs GROUP BY CUBE(SingerId, SongGenre)`},

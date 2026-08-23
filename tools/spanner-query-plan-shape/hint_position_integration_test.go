@@ -45,14 +45,22 @@ func hintPositionDDLs(t *testing.T) []string {
 }
 
 func runHintPositionAuditCases(t *testing.T, client *spanner.Client) {
+	runHintPositionAuditCasesWithOverrides(t, client, nil)
+}
+
+func runHintPositionAuditCasesWithOverrides(t *testing.T, client *spanner.Client, overrides map[string]hintPositionExpectation) {
 	t.Helper()
 	for _, auditCase := range hintPositionAuditCases {
 		t.Run(auditCase.Query.Label, func(t *testing.T) {
 			err := executeHintPositionProbe(t, client, auditCase.Query)
 			got, detail := classifyHintPositionResult(err)
 			t.Logf("classification=%s detail=%s", got, detail)
-			if got != auditCase.Expectation {
-				t.Fatalf("syntax classification = %q, want %q: %s\nSQL: %s", got, auditCase.Expectation, detail, auditCase.Query.SQL)
+			want := auditCase.Expectation
+			if override, ok := overrides[auditCase.Query.Label]; ok {
+				want = override
+			}
+			if got != want {
+				t.Fatalf("syntax classification = %q, want %q: %s\nSQL: %s", got, want, detail, auditCase.Query.SQL)
 			}
 		})
 	}

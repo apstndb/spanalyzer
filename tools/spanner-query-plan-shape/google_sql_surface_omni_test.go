@@ -87,7 +87,7 @@ func TestIntegrationGoogleSQLSurfaceVersionMatrixOnOmni(t *testing.T) {
 	valueFirstSetOperation := cases["google-sql-surface/unsupported/set-operation-value-first-top-level"]
 	secureContext := cases["google-sql-surface/unsupported/secure-context"]
 
-	for version := 1; version <= 8; version++ {
+	for version := firstOptimizerVersion; version <= latestOptimizerVersion; version++ {
 		readWritePlan := mustAnalyze(t, readWrite, version)
 		if got := countPlanNodesWithMetadata(readWritePlan, "Filter Scan", map[string]string{"seekable_key_size": "1"}); got != 1 {
 			t.Errorf("read-write FOR UPDATE v%d Filter Scan count = %d, want 1", version, got)
@@ -344,7 +344,7 @@ func TestIntegrationGoogleSQLProtoSurfaceVersionMatrixOnOmni(t *testing.T) {
 	}
 	baselinePlans := make(map[string]*spannerpb.QueryPlan)
 
-	for version := 1; version <= 8; version++ {
+	for version := firstOptimizerVersion; version <= latestOptimizerVersion; version++ {
 		for _, query := range googleSQLProtoSurfaceQueries {
 			query.SQL = withOptimizerVersionStatementHint(query.SQL, version)
 			plan, err := analyzePlan(t.Context(), clients.Client, query)
@@ -438,7 +438,7 @@ func assertValueTableSetOperationDirectionOnOmni(t *testing.T, client *spanner.C
 		},
 	}
 
-	for version := 1; version <= 8; version++ {
+	for version := firstOptimizerVersion; version <= latestOptimizerVersion; version++ {
 		for _, tt := range tests {
 			regularSQL := withOptimizerVersionStatementHint(tt.regularFirst, version)
 			if got := readInt64s(t, client, regularSQL); !slices.Equal(got, tt.want) {
@@ -483,7 +483,7 @@ func assertCorrelatedUnnestResultsOnOmni(t *testing.T, client *spanner.Client) {
 		},
 	}
 
-	for version := 1; version <= 8; version++ {
+	for version := firstOptimizerVersion; version <= latestOptimizerVersion; version++ {
 		var explicit, implicit []string
 		for _, tt := range tests {
 			got := readVenuePrices(t, client, withOptimizerVersionStatementHint(tt.sql, version))

@@ -1,0 +1,14 @@
+{
+  "version": "v0alpha1",
+  "queries": [
+    {"label":"optimizer-v9/dca-input-column-pruning/v8-control","patterns":[{"display_name":"Distributed Cross Apply","metadata":[{"key":"execution_method","value":"Row"}]},{"display_name":"Create Batch","metadata":[{"key":"execution_method","value":"Batch"}]}]},
+    {"label":"optimizer-v9/dca-input-column-pruning/v9","patterns":[{"display_name":"Distributed Cross Apply","metadata":[{"key":"execution_method","value":"Batch"}]},{"display_name":"Create Batch","metadata":[{"key":"execution_method","value":"Batch"}]}]},
+    {"label":"optimizer-v9/dca-input-column-pruning-limit/v9","patterns":[{"display_name":"Limit"}]},
+    {"label":"optimizer-v9/index-union-aggressiveness/v9","patterns":[{"display_name":"Union All"},{"display_name":"Aggregate"}]},
+    {"label":"optimizer-v9/dml-delete-then-return/v8-control","patterns":[{"display_name":"Apply Mutations","metadata":[{"key":"operation_type","value":"DELETE"},{"key":"table","value":"Singers"}]}]},
+    {"label":"optimizer-v9/dml-delete-then-return/v9","patterns":[{"display_name":"Apply Mutations","metadata":[{"key":"operation_type","value":"DELETE"},{"key":"table","value":"Singers"}]}]}
+  ],
+  "expected_query_errors": [
+    {"label":"optimizer-v9/unsupported/v10","contains":"Query optimizer version: 10 is not supported"}
+  ]
+}

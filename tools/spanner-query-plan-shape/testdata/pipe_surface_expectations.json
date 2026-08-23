@@ -1,0 +1,20 @@
+{
+  "version": "v0alpha1",
+  "queries": [
+    {"label":"pipe-surface/accepted/select","patterns":[{"display_name":"Scan"}]},
+    {"label":"pipe-surface/accepted/extend","patterns":[{"display_name":"Function"},{"display_name":"Scan"}]},
+    {"label":"pipe-surface/accepted/set","patterns":[{"display_name":"Function"},{"display_name":"Scan"}]},
+    {"label":"pipe-surface/accepted/drop","patterns":[{"display_name":"Scan"}]},
+    {"label":"pipe-surface/accepted/rename","patterns":[{"display_name":"Scan"}]},
+    {"label":"pipe-surface/accepted/as","patterns":[{"display_name":"Scan"}]},
+    {"label":"pipe-surface/accepted/where","patterns":[{"display_name":"Filter Scan"},{"display_name":"Scan"}]},
+    {"label":"pipe-surface/accepted/aggregate","patterns":[{"display_name":"Aggregate"},{"display_name":"Scan"}]},
+    {"label":"pipe-surface/accepted/join","patterns":[{"display_name":"Distributed Cross Apply"},{"display_name":"Create Batch"}]},
+    {"label":"pipe-surface/accepted/order-by","patterns":[{"display_name":"Sort"},{"display_name":"Scan"}]},
+    {"label":"pipe-surface/accepted/limit","patterns":[{"display_name":"Limit"},{"display_name":"Scan"}]},
+    {"label":"pipe-surface/accepted/union","patterns":[{"display_name":"Union All"},{"display_name":"Union Input"}]},
+    {"label":"pipe-surface/accepted/intersect","patterns":[{"display_name":"Cross Apply"},{"display_name":"Aggregate"}]},
+    {"label":"pipe-surface/accepted/except","patterns":[{"display_name":"Anti-Semi Apply"},{"display_name":"Aggregate"}]},
+    {"label":"pipe-surface/accepted/tablesample","patterns":[{"display_name":"Random Id Assign"},{"display_name":"Filter"}]}
+  ]
+}

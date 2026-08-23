@@ -108,8 +108,8 @@ func run(args []string, stdout io.Writer) error {
 	)
 	output := fs.String("output", "nodes", "output format: compact-dfs, compact-dfs-metadata, compact-tree, compact-tree-metadata, json, nodes, reference, summary, yaml, or legacy aliases compact/compact-metadata")
 	compactTreeIndexes := fs.Bool("compact-tree-indexes", false, "include PlanNode indexes in compact-tree and compact-tree-metadata output")
-	optimizerVersionMatrix := fs.Bool("optimizer-version-matrix", false, "expand each query with OPTIMIZER_VERSION statement hints for versions 1 through 8")
-	optimizerVersionDiff := fs.Bool("optimizer-version-diff", false, "analyze each query with optimizer versions 1 through 8 and print only queries whose compact-tree-metadata shape changes")
+	optimizerVersionMatrix := fs.Bool("optimizer-version-matrix", false, "expand each query with OPTIMIZER_VERSION statement hints for every supported optimizer version")
+	optimizerVersionDiff := fs.Bool("optimizer-version-diff", false, "analyze each query with every supported optimizer version and print only queries whose compact-tree-metadata shape changes")
 	allowDistributedMergeMatrix := fs.Bool("allow-distributed-merge-matrix", false, "expand each query across ALLOW_DISTRIBUTED_MERGE unspecified, TRUE, and FALSE")
 	omniImage := fs.String("omni-image", "", "Spanner Omni container image override; empty uses the spanemuboost default")
 	continueOnError := fs.Bool("continue-on-error", false, "print errors and continue analyzing remaining queries")
@@ -411,9 +411,9 @@ func planModeForStatement(statement ast.Statement) planMode {
 }
 
 func expandOptimizerVersionMatrix(queries []queryCase) []queryCase {
-	out := make([]queryCase, 0, len(queries)*8)
+	out := make([]queryCase, 0, len(queries)*optimizerVersionCount)
 	for _, query := range queries {
-		for version := 1; version <= 8; version++ {
+		for version := firstOptimizerVersion; version <= latestOptimizerVersion; version++ {
 			out = append(out, queryCase{
 				Label:    fmt.Sprintf("optimizer-version/v%d/%s", version, query.Label),
 				SQL:      withOptimizerVersionStatementHint(query.SQL, version),
@@ -458,8 +458,8 @@ type optimizerVersionShape struct {
 func printOptimizerVersionDiffs(ctx context.Context, stdout io.Writer, client *spanner.Client, queries []queryCase) error {
 	var printed int
 	for _, query := range queries {
-		shapes := make([]optimizerVersionShape, 0, 8)
-		for version := 1; version <= 8; version++ {
+		shapes := make([]optimizerVersionShape, 0, optimizerVersionCount)
+		for version := firstOptimizerVersion; version <= latestOptimizerVersion; version++ {
 			versioned := queryCase{
 				Label:    fmt.Sprintf("%s/v%d", query.Label, version),
 				SQL:      withOptimizerVersionStatementHint(query.SQL, version),

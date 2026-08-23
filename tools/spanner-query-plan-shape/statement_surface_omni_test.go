@@ -69,7 +69,7 @@ func TestIntegrationStatementSurfaceOnOmni(t *testing.T) {
 	} {
 		query := cases[label]
 		var first *spannerpb.QueryPlan
-		for version := 1; version <= 8; version++ {
+		for version := firstOptimizerVersion; version <= latestOptimizerVersion; version++ {
 			t.Run(label+"/v"+strconv.Itoa(version), func(t *testing.T) {
 				ctx, cancel := context.WithTimeout(t.Context(), 30*time.Second)
 				defer cancel()

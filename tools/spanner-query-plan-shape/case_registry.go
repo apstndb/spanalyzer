@@ -65,6 +65,8 @@ var (
 		{Name: "gql_set_propagation", Description: "GQL set-operation column-propagation probes", Queries: staticQueryProvider(gqlSetPropagationQueries), DDLs: docsDDLProvider},
 		{Name: "gql_hint_surface", Description: "GQL hint names, values, placements, and boundaries", Queries: staticQueryProvider(gqlHintSurfaceQueries), DDLs: docsDDLProvider},
 		{Name: "google_sql_surface", Description: "GoogleSQL syntax and runtime-capability boundaries", Queries: staticQueryProvider(googleSQLSurfaceQueries), DDLs: docsDDLProvider},
+		{Name: "pipe_surface", Description: "all pipe operators documented by Spanner", Queries: staticQueryProvider(pipeSurfaceQueries), DDLs: docsDDLProvider},
+		{Name: "optimizer_v9", Description: "optimizer version 9 acceptance and plan-shape probes", Queries: staticQueryProvider(optimizerV9Queries), DDLs: parsedDDLProvider("optimizer-v9-schema.sql", dmlDDL)},
 		{Name: "google_sql_proto_surface", Description: "protocol-buffer expression surfaces", Queries: staticQueryProvider(googleSQLProtoSurfaceQueries), DDLs: parsedDDLProvider("google-sql-proto-surface-schema.sql", googleSQLProtoSurfaceDDL), RequiresProtoDescriptors: true},
 		{Name: "rewriter_surface", Description: "GoogleSQL rewriter-backed syntax surfaces", Queries: staticQueryProvider(rewriterSurfaceQueries), DDLs: parsedDDLProvider("rewriter-surface-schema.sql", rewriterSurfaceDDL)},
 		{Name: "condition_boundaries", Description: "seek, residual, split-range, and join conditions", Queries: staticQueryProvider(conditionBoundaryQueries), DDLs: parsedDDLProvider("condition-boundary-schema.sql", conditionBoundaryDDL)},

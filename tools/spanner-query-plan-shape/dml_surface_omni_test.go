@@ -14,7 +14,7 @@ func TestIntegrationDMLSurfaceOnOmni(t *testing.T) {
 	}
 	clients := openOmniClients(t, ddls)
 	plansByLabel := make(map[string][]optimizerVersionShape)
-	for version := 1; version <= 8; version++ {
+	for version := firstOptimizerVersion; version <= latestOptimizerVersion; version++ {
 		for _, query := range dmlQueries {
 			plan, err := analyzeVersionedSearchGraphPlan(t, clients.Client, query, version)
 			if query.Label == "dml/insert-assert-rows-modified" {
@@ -41,19 +41,19 @@ func TestIntegrationDMLSurfaceOnOmni(t *testing.T) {
 	}
 
 	sensitiveGroups := map[string][]string{
-		"dml/insert-on-conflict-do-nothing":        {"v1-v2", "v3-v6", "v7-v8"},
-		"dml/insert-on-conflict-target-do-nothing": {"v1-v2", "v3-v8"},
-		"dml/insert-on-conflict-unique-do-nothing": {"v1-v2", "v3-v8"},
-		"dml/insert-on-conflict-do-update-where":   {"v1-v6", "v7-v8"},
-		"dml/insert-on-conflict-select":            {"v1-v2", "v3-v8"},
-		"dml/update-subquery":                      {"v1-v4", "v5-v8"},
-		"dml/delete-subquery":                      {"v1-v4", "v5-v8"},
-		"dml/delete-then-return":                   {"v1-v4", "v5-v8"},
+		"dml/insert-on-conflict-do-nothing":        {"v1-v2", "v3-v6", "v7-v9"},
+		"dml/insert-on-conflict-target-do-nothing": {"v1-v2", "v3-v9"},
+		"dml/insert-on-conflict-unique-do-nothing": {"v1-v2", "v3-v9"},
+		"dml/insert-on-conflict-do-update-where":   {"v1-v6", "v7-v9"},
+		"dml/insert-on-conflict-select":            {"v1-v2", "v3-v9"},
+		"dml/update-subquery":                      {"v1-v4", "v5-v9"},
+		"dml/delete-subquery":                      {"v1-v4", "v5-v9"},
+		"dml/delete-then-return":                   {"v1-v4", "v5-v8", "v9"},
 	}
 	for label, shapes := range plansByLabel {
 		want, sensitive := sensitiveGroups[label]
 		if !sensitive {
-			want = []string{"v1-v8"}
+			want = []string{"v1-v9"}
 		}
 		groups := groupOptimizerVersionShapes(shapes)
 		if len(groups) != len(want) {

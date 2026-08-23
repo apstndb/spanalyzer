@@ -36,7 +36,7 @@ func TestIntegrationRewriterSurfaceVersionMatrixOnOmni(t *testing.T) {
 		return plan
 	}
 
-	for version := 1; version <= 8; version++ {
+	for version := firstOptimizerVersion; version <= latestOptimizerVersion; version++ {
 		t.Run("v"+strconv.Itoa(version), func(t *testing.T) {
 			first := mustAnalyze(t, "rewriter-surface/accepted/array-first", version)
 			if !planHasDescriptionContaining(first, "ARRAY_AT_OFFSET") {
@@ -114,9 +114,9 @@ func TestIntegrationRewriterSurfaceVersionMatrixOnOmni(t *testing.T) {
 				"rewriter-surface/unsupported/nulliferror":           "Unsupported built-in function: nulliferror",
 				"rewriter-surface/unsupported/typeof":                "Function not found: TYPEOF",
 				"rewriter-surface/unsupported/multiway-unnest":       "The UNNEST operator supports exactly one argument",
-				"rewriter-surface/unsupported/pipe-assert":           "Syntax error: Unexpected FROM",
-				"rewriter-surface/unsupported/pipe-describe":         "Syntax error: Unexpected FROM",
-				"rewriter-surface/unsupported/pipe-if":               "Syntax error: Unexpected FROM",
+				"rewriter-surface/unsupported/pipe-assert":           "Pipe ASSERT not supported",
+				"rewriter-surface/unsupported/pipe-describe":         "Pipe DESCRIBE not supported",
+				"rewriter-surface/unsupported/pipe-if":               "Pipe IF not supported",
 				"rewriter-surface/unsupported/hop":                   "Table-valued function not found: HOP",
 				"rewriter-surface/unsupported/tumble":                "Table-valued function not found: TUMBLE",
 				"rewriter-surface/unsupported/nested-array-update":   "Nested updates on table columns of type ARRAY are not supported",
