@@ -96,6 +96,57 @@ CREATE TABLE Singers (
 	}
 }
 
+func TestBuildSchemaCatalogUUIDColumn(t *testing.T) {
+	const ddl = `
+CREATE TABLE Fans (
+  FanId UUID DEFAULT (NEW_UUID()),
+  Name STRING(MAX),
+) PRIMARY KEY (FanId);
+`
+	catalog, err := BuildSchemaCatalog("schema.sql", ddl)
+	if err != nil {
+		t.Fatalf("BuildSchemaCatalog() error = %v", err)
+	}
+	table := catalog.Tables["Fans"]
+	if table == nil {
+		t.Fatal("Fans table was not created")
+	}
+	fanID, _ := table.Column("FanId")
+	if fanID == nil {
+		t.Fatal("FanId column was not created")
+	}
+	if got, want := fanID.Type.Code, spannerpb.TypeCode_UUID; got != want {
+		t.Fatalf("FanId type = %v, want %v", got, want)
+	}
+	if got, want := fanID.DefaultSQL, "NEW_UUID()"; got != want {
+		t.Fatalf("FanId default = %q, want %q", got, want)
+	}
+}
+
+func TestBuildSchemaCatalogQualifiedNamedTypeRemainsProto(t *testing.T) {
+	const ddl = `
+CREATE PROTO BUNDLE (` + "`example.UUID`" + `);
+CREATE TABLE Records (
+  RecordId INT64 NOT NULL,
+  Payload ` + "`example.UUID`" + `,
+) PRIMARY KEY (RecordId);
+`
+	catalog, err := BuildSchemaCatalog("schema.sql", ddl)
+	if err != nil {
+		t.Fatalf("BuildSchemaCatalog() error = %v", err)
+	}
+	payload, _ := catalog.Tables["Records"].Column("Payload")
+	if payload == nil {
+		t.Fatal("Payload column was not created")
+	}
+	if got, want := payload.Type.Code, spannerpb.TypeCode_PROTO; got != want {
+		t.Fatalf("Payload type = %v, want %v", got, want)
+	}
+	if got, want := payload.Type.ProtoTypeFQN, "example.UUID"; got != want {
+		t.Fatalf("Payload proto type = %q, want %q", got, want)
+	}
+}
+
 func TestBuildSchemaCatalogTableSynonymAndRename(t *testing.T) {
 	const ddl = `
 CREATE TABLE Singers (

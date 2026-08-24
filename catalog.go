@@ -697,7 +697,7 @@ func schemaTypeToTypeSpec(t ast.SchemaType) (*TypeSpec, error) {
 		}
 		return &TypeSpec{Code: spannerpb.TypeCode_STRUCT, StructFields: fields}, nil
 	case *ast.NamedType:
-		return &TypeSpec{Code: spannerpb.TypeCode_PROTO, ProtoTypeFQN: normalizeProtoTypeName(identPathString(t.Path))}, nil
+		return namedTypeToTypeSpec(t.Path), nil
 	default:
 		return nil, fmt.Errorf("unsupported schema type %T", t)
 	}
@@ -821,4 +821,11 @@ func identPathString(path []*ast.Ident) string {
 		parts = append(parts, ident.Name)
 	}
 	return strings.Join(parts, ".")
+}
+
+func namedTypeToTypeSpec(path []*ast.Ident) *TypeSpec {
+	if len(path) == 1 && strings.EqualFold(path[0].Name, "UUID") {
+		return &TypeSpec{Code: spannerpb.TypeCode_UUID}
+	}
+	return &TypeSpec{Code: spannerpb.TypeCode_PROTO, ProtoTypeFQN: normalizeProtoTypeName(identPathString(path))}
 }

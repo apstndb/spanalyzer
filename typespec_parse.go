@@ -62,7 +62,7 @@ func typeToTypeSpec(t ast.Type) (*TypeSpec, error) {
 		}
 		return &TypeSpec{Code: spannerpb.TypeCode_STRUCT, StructFields: fields}, nil
 	case *ast.NamedType:
-		return &TypeSpec{Code: spannerpb.TypeCode_PROTO, ProtoTypeFQN: normalizeProtoTypeName(identPathString(t.Path))}, nil
+		return namedTypeToTypeSpec(t.Path), nil
 	default:
 		return nil, fmt.Errorf("unsupported type syntax %T", t)
 	}

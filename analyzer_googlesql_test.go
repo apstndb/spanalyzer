@@ -63,6 +63,35 @@ CREATE TABLE Singers (
 	assertField(t, rowIDType.Fields[0], "rowid", spannerpb.TypeCode_INT64)
 }
 
+func TestAnalyzerRowTypeForUUID(t *testing.T) {
+	paramType, err := ParseTypeSpec("param", "UUID")
+	if err != nil {
+		t.Fatalf("ParseTypeSpec(UUID) error = %v", err)
+	}
+	if got, want := paramType.Code, spannerpb.TypeCode_UUID; got != want {
+		t.Fatalf("ParseTypeSpec(UUID).Code = %v, want %v", got, want)
+	}
+
+	const ddl = `
+CREATE TABLE Fans (
+  FanId UUID DEFAULT (NEW_UUID()),
+) PRIMARY KEY (FanId);
+`
+	analyzer, err := NewAnalyzerFromDDL("schema.sql", ddl)
+	if err != nil {
+		t.Fatalf("NewAnalyzerFromDDL() error = %v", err)
+	}
+	rowType, err := analyzer.RowTypeForStatement("SELECT FanId, NEW_UUID() AS GeneratedId FROM Fans")
+	if err != nil {
+		t.Fatalf("RowTypeForStatement() error = %v", err)
+	}
+	if got, want := len(rowType.Fields), 2; got != want {
+		t.Fatalf("len(rowType.Fields) = %d, want %d", got, want)
+	}
+	assertField(t, rowType.Fields[0], "FanId", spannerpb.TypeCode_UUID)
+	assertField(t, rowType.Fields[1], "GeneratedId", spannerpb.TypeCode_UUID)
+}
+
 func TestAnalyzerRowTypeForDistinctPredicates(t *testing.T) {
 	tests := []struct {
 		name string
