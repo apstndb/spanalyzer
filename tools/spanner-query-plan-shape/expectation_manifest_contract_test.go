@@ -43,7 +43,7 @@ var expectationManifestContracts = []expectationManifestContract{
 	{Selector: "dml", Manifest: "dml_expectations.json", Coverage: manifestCoverageExact, Plans: 28, Errors: 1, PatternCount: 28},
 	{Selector: "full_text_search", Manifest: "facet_search_expectations.json", Coverage: manifestCoverageSubset, Plans: 4, PatternCount: 14},
 	{Selector: "factorized_mode", Manifest: "factorized_mode_expectations.json", Coverage: manifestCoverageExact, Plans: 10, Errors: 5, PatternCount: 19},
-	{Selector: "full_text_search", Manifest: "full_text_residual_expectations.json", Coverage: manifestCoverageSubset, Plans: 6, PatternCount: 17},
+	{Selector: "full_text_search", Manifest: "full_text_residual_expectations.json", Coverage: manifestCoverageSubset, Plans: 9, PatternCount: 26},
 	{Selector: "google_sql_proto_surface", Manifest: "google_sql_proto_surface_expectations.json", Coverage: manifestCoverageExact, Plans: 11, Errors: 7, PatternCount: 28},
 	{Selector: "google_sql_surface", Manifest: "google_sql_surface_expectations.json", Coverage: manifestCoverageExact, Plans: 35, Errors: 22, PatternCount: 74},
 	{Selector: "gql_hint_surface", Manifest: "gql_hint_surface_expectations.json", Coverage: manifestCoverageExact, Plans: 47, Errors: 3, PatternCount: 93},

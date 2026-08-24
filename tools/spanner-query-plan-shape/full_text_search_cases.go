@@ -61,6 +61,15 @@ CREATE TABLE SearchSingers (
 CREATE SEARCH INDEX SearchSingersByBio
 ON SearchSingers(BioTokens);
 
+CREATE TABLE MyCustomDictionary (
+  Key STRING(MAX) NOT NULL,
+  Value ARRAY<STRING(MAX)> NOT NULL,
+) PRIMARY KEY(Key),
+OPTIONS (
+  fulltext_dictionary_table = true,
+  fulltext_dictionary_staleness = '5s'
+);
+
 CREATE TABLE SearchCollaborations (
   SingerId INT64 NOT NULL,
   FeaturingSingerId INT64 NOT NULL,
@@ -113,6 +122,18 @@ var fullTextSearchQueries = []queryCase{
 	{
 		Label: "full-text-search/enhanced-query-timeout-hint",
 		SQL:   `@{enhance_query_timeout_ms=200} SELECT AlbumId FROM SearchAlbums@{FORCE_INDEX=SearchAlbumsTitleIndex} WHERE SEARCH(AlbumTitle_Tokens, "hotl cal", enhance_query => TRUE)`,
+	},
+	{
+		Label: "full-text-search/custom-dictionary",
+		SQL:   `SELECT AlbumId FROM SearchAlbums@{FORCE_INDEX=SearchAlbumsTitleIndex} WHERE SEARCH(AlbumTitle_Tokens, "album", dictionary => "MyCustomDictionary")`,
+	},
+	{
+		Label: "full-text-search/custom-dictionary-staleness-hint",
+		SQL:   `@{fulltext_dictionary_staleness="0s"} SELECT AlbumId FROM SearchAlbums@{FORCE_INDEX=SearchAlbumsTitleIndex} WHERE SEARCH(AlbumTitle_Tokens, "album", dictionary => "MyCustomDictionary")`,
+	},
+	{
+		Label: "full-text-search/custom-dictionary-enhanced-query",
+		SQL:   `SELECT AlbumId FROM SearchAlbums@{FORCE_INDEX=SearchAlbumsTitleIndex} WHERE SEARCH(AlbumTitle_Tokens, "album", dictionary => "MyCustomDictionary", enhance_query => TRUE)`,
 	},
 	{
 		Label: "full-text-search/phonetic-composition",

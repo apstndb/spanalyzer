@@ -107,6 +107,9 @@ func TestIntegrationFullTextSearchPlansOnOmni(t *testing.T) {
 			"full-text-search/enhanced-query-timeout-hint",
 			"full-text-search/phonetic-composition",
 			"full-text-search/phonetic-search-only-control",
+			"full-text-search/custom-dictionary",
+			"full-text-search/custom-dictionary-staleness-hint",
+			"full-text-search/custom-dictionary-enhanced-query",
 		}
 		plans := map[string]*spannerpb.QueryPlan{}
 		for _, label := range labels {
@@ -173,6 +176,29 @@ func TestIntegrationFullTextSearchPlansOnOmni(t *testing.T) {
 		}
 		if got := countPlanNodesAnyKind(phoneticControl, "Function"); got != 0 {
 			t.Errorf("phonetic control v%d Function count = %d, want 0", version, got)
+		}
+
+		customDictionary := plans["full-text-search/custom-dictionary"]
+		customDictionaryWithHint := plans["full-text-search/custom-dictionary-staleness-hint"]
+		customDictionaryEnhanced := plans["full-text-search/custom-dictionary-enhanced-query"]
+		for _, plan := range []*spannerpb.QueryPlan{customDictionary, customDictionaryWithHint, customDictionaryEnhanced} {
+			if got := countPlanNodesWithMetadata(plan, "Scan", map[string]string{
+				"scan_target": "SearchAlbumsTitleIndex",
+				"scan_type":   "SearchIndexScan",
+			}); got != 1 {
+				t.Errorf("custom dictionary v%d SearchIndexScan count = %d, want 1", version, got)
+			}
+			if !planShortDescriptionContains(plan, "dictionary: MyCustomDictionary") {
+				t.Errorf("custom dictionary v%d plan does not retain its dictionary name", version)
+			}
+		}
+		if !proto.Equal(customDictionary, customDictionaryWithHint) {
+			t.Errorf("custom dictionary staleness hint v%d changes the logical plan", version)
+		}
+		if proto.Equal(customDictionary, customDictionaryEnhanced) ||
+			!planShortDescriptionContains(customDictionary, "enhance_query: false") ||
+			!planShortDescriptionContains(customDictionaryEnhanced, "enhance_query: true") {
+			t.Errorf("custom dictionary enhance_query v%d lacks the expected conversion-plan difference", version)
 		}
 	}
 }

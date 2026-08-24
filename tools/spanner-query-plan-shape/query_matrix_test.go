@@ -1556,6 +1556,9 @@ func TestLoadDDLsFullTextSearchUsesDedicatedSchema(t *testing.T) {
 		"CREATE SEARCH INDEX SearchAlbumsPhoneticIndex",
 		"ArtistNameSoundex STRING(MAX) AS (LOWER(SOUNDEX(ArtistName)))",
 		"CREATE SEARCH INDEX SearchSingersByBio",
+		"CREATE TABLE MyCustomDictionary",
+		"fulltext_dictionary_table = true",
+		`fulltext_dictionary_staleness = "5s"`,
 		"CREATE PROPERTY GRAPH SearchMusicGraph",
 	} {
 		if !strings.Contains(joined, want) {
@@ -1761,6 +1764,9 @@ func TestLoadQueriesFullTextSearch(t *testing.T) {
 		"full-text-search/enhanced-query-control",
 		"full-text-search/enhanced-query-required-hint",
 		"full-text-search/enhanced-query-timeout-hint",
+		"full-text-search/custom-dictionary",
+		"full-text-search/custom-dictionary-staleness-hint",
+		"full-text-search/custom-dictionary-enhanced-query",
 		"full-text-search/phonetic-composition",
 		"full-text-search/phonetic-search-only-control",
 		"full-text-search/substring",
@@ -1796,6 +1802,15 @@ func TestLoadQueriesFullTextSearch(t *testing.T) {
 	if !strings.Contains(seen["full-text-search/enhanced-query-required-hint"], "require_enhance_query=true") ||
 		!strings.Contains(seen["full-text-search/enhanced-query-timeout-hint"], "enhance_query_timeout_ms=200") {
 		t.Fatal("enhanced-query statement hint probes missing expected hint")
+	}
+	if !strings.Contains(seen["full-text-search/custom-dictionary"], `dictionary => "MyCustomDictionary"`) {
+		t.Fatalf("custom dictionary probe missing dictionary argument: %s", seen["full-text-search/custom-dictionary"])
+	}
+	if !strings.Contains(seen["full-text-search/custom-dictionary-staleness-hint"], `fulltext_dictionary_staleness="0s"`) {
+		t.Fatalf("custom dictionary staleness probe missing statement hint: %s", seen["full-text-search/custom-dictionary-staleness-hint"])
+	}
+	if !strings.Contains(seen["full-text-search/custom-dictionary-enhanced-query"], "enhance_query => TRUE") {
+		t.Fatalf("custom dictionary enhanced probe missing enhance_query: %s", seen["full-text-search/custom-dictionary-enhanced-query"])
 	}
 	if !strings.Contains(seen["full-text-search/phonetic-composition"], `LOWER(SOUNDEX("stefan"))`) {
 		t.Fatalf("phonetic composition probe missing SOUNDEX(): %s", seen["full-text-search/phonetic-composition"])
@@ -1866,7 +1881,7 @@ func TestFullTextResidualExpectationManifestMatchesCases(t *testing.T) {
 	if err := json.Unmarshal(data, &manifest); err != nil {
 		t.Fatal(err)
 	}
-	if manifest.Version != "v0alpha1" || len(manifest.Queries) != 6 || len(manifest.ExpectedQueryErrors) != 0 {
+	if manifest.Version != "v0alpha1" || len(manifest.Queries) != 9 || len(manifest.ExpectedQueryErrors) != 0 {
 		t.Fatalf("full-text residual manifest summary = version %q, %d queries, %d errors", manifest.Version, len(manifest.Queries), len(manifest.ExpectedQueryErrors))
 	}
 	queries, err := loadQueries("full_text_search", nil, nil)
@@ -1887,8 +1902,8 @@ func TestFullTextResidualExpectationManifestMatchesCases(t *testing.T) {
 		}
 		patterns += len(expectation.Patterns)
 	}
-	if patterns != 17 {
-		t.Errorf("full-text residual manifest pattern count = %d, want 17", patterns)
+	if patterns != 26 {
+		t.Errorf("full-text residual manifest pattern count = %d, want 26", patterns)
 	}
 }
 

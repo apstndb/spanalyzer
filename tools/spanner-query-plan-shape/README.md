@@ -191,8 +191,9 @@ traversal whose destination predicate uses a search index. The facet cases
 compare a covering single aggregation with a search-only control and show a
 multi-facet CTE being materialized once with `SpoolBuild` and read three times
 with `SpoolScan`. Additional pairs retain `enhance_query` with its default
-control and both documented statement hints, plus the documented `SOUNDEX`
-generated-column composition on a multi-column search index.
+control and both documented statement hints, the documented `SOUNDEX`
+generated-column composition on a multi-column search index, and custom
+dictionary lookup with its staleness hint and `enhance_query` composition.
 
 The full-text raw stream has two focused manifests so aggregation composition
 and query-enhancement/phonetic composition can evolve independently:
