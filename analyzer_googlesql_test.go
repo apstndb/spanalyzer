@@ -31,6 +31,38 @@ CREATE TABLE Singers (
 	assertField(t, rowType.Fields[2], "Active", spannerpb.TypeCode_BOOL)
 }
 
+func TestAnalyzerRowTypeForTableWithoutPrimaryKey(t *testing.T) {
+	const ddl = `
+CREATE TABLE Singers (
+  Name STRING(MAX),
+  Rank INT64
+);
+`
+	analyzer, err := NewAnalyzerFromDDL("schema.sql", ddl)
+	if err != nil {
+		t.Fatalf("NewAnalyzerFromDDL() error = %v", err)
+	}
+
+	starType, err := analyzer.RowTypeForStatement("SELECT * FROM Singers")
+	if err != nil {
+		t.Fatalf("RowTypeForStatement(SELECT *) error = %v", err)
+	}
+	if got, want := len(starType.Fields), 2; got != want {
+		t.Fatalf("len(SELECT * fields) = %d, want %d", got, want)
+	}
+	assertField(t, starType.Fields[0], "Name", spannerpb.TypeCode_STRING)
+	assertField(t, starType.Fields[1], "Rank", spannerpb.TypeCode_INT64)
+
+	rowIDType, err := analyzer.RowTypeForStatement("SELECT rowid FROM Singers")
+	if err != nil {
+		t.Fatalf("RowTypeForStatement(SELECT rowid) error = %v", err)
+	}
+	if got, want := len(rowIDType.Fields), 1; got != want {
+		t.Fatalf("len(SELECT rowid fields) = %d, want %d", got, want)
+	}
+	assertField(t, rowIDType.Fields[0], "rowid", spannerpb.TypeCode_INT64)
+}
+
 func TestAnalyzerRowTypeForDistinctPredicates(t *testing.T) {
 	tests := []struct {
 		name string

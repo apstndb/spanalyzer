@@ -54,6 +54,48 @@ ALTER TABLE Singers ALTER COLUMN FirstName STRING(256);
 	}
 }
 
+func TestBuildSchemaCatalogTableWithoutPrimaryKey(t *testing.T) {
+	const ddl = `
+CREATE TABLE Singers (
+  Name STRING(MAX),
+  Rank INT64
+);
+`
+	catalog, err := BuildSchemaCatalog("schema.sql", ddl)
+	if err != nil {
+		t.Fatalf("BuildSchemaCatalog() error = %v", err)
+	}
+	table := catalog.Tables["Singers"]
+	if table == nil {
+		t.Fatal("Singers table was not created")
+	}
+	rowID, _ := table.Column("rowid")
+	if rowID == nil {
+		t.Fatal("generated rowid column was not created")
+	}
+	if rowID.Type.Code != spannerpb.TypeCode_INT64 || !rowID.NotNull || !rowID.Hidden || !rowID.PrimaryKey {
+		t.Fatalf("generated rowid = %#v, want hidden non-null INT64 primary key", rowID)
+	}
+	if rowID.GeneratedSQL == "" {
+		t.Fatal("generated rowid has no identity metadata")
+	}
+	if got, want := len(table.PrimaryKey), 1; got != want || table.PrimaryKey[0].Name != "rowid" {
+		t.Fatalf("primary key = %#v, want rowid", table.PrimaryKey)
+	}
+}
+
+func TestBuildSchemaCatalogTableWithoutPrimaryKeyRejectsUserRowID(t *testing.T) {
+	const ddl = `
+CREATE TABLE Singers (
+  rowid INT64,
+  Name STRING(MAX)
+);
+`
+	if _, err := BuildSchemaCatalog("schema.sql", ddl); err == nil || !strings.Contains(err.Error(), "reserves rowid") {
+		t.Fatalf("BuildSchemaCatalog() error = %v, want reserved rowid error", err)
+	}
+}
+
 func TestBuildSchemaCatalogTableSynonymAndRename(t *testing.T) {
 	const ddl = `
 CREATE TABLE Singers (
