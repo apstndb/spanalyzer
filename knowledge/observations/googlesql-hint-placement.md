@@ -8,7 +8,7 @@ sources:
   - id: googlesql-grammar
     resource: https://github.com/google/googlesql/blob/fd972655db97deac02f0696ea652a390209b794b/googlesql/parser/googlesql.tm
     title: GoogleSQL parser grammar at fd972655
-    last_modified: 2026-07-17
+    last_modified: 2026-07-17T00:00:00Z
   - id: frontend-tests
     resource: ../../analyzer_hint_position_test.go
     title: spanalyzer GoogleSQL frontend hint-position tests

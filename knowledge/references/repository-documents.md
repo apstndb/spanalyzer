@@ -48,9 +48,9 @@ the groups below relate when their contents appear to disagree.
 - [spanner-query-plan-shape README](../../tools/spanner-query-plan-shape/README.md)
   - developer probe usage, case families, and runtime requirements.
 
-## Research indexes and history
+## Legacy research indexes and history
 
-- [Research index](../../research/README.md) - role and conventions for all
+- [Research index](../../research/README.md) - role and conventions for legacy
   non-normative research material.
 - [Query-generator research index](../../research/spanner-query-gen/README.md)
   - design background and verification logs for `spanner-query-gen`.
@@ -132,4 +132,6 @@ the groups below relate when their contents appear to disagree.
 - [Bundle index](../index.md) - progressive-disclosure root.
 - [Concepts](../concepts/index.md) - architecture and documentation guides.
 - [Observations](../observations/index.md) - curated cross-source findings.
+- [Research](../research/index.md) - authoring policy for new OKF-native
+  research and migration from the legacy tree.
 - [References](index.md) - canonical-document discovery.

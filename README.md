@@ -45,11 +45,12 @@ Development across modules uses the committed `go.work` workspace.
 ## Documentation map
 
 - [`knowledge/`](knowledge/index.md): the OKF v0.2 entry point for the
-  repository. It organizes architecture concepts, curated observations, and a
+  repository. It organizes architecture concepts, curated observations,
+  OKF-native research notes, and a
   [complete tracked-Markdown inventory](knowledge/references/repository-documents.md),
   plus a selective inventory of
   [knowledge-bearing repository assets](knowledge/references/repository-assets.md),
-  while leaving every canonical body at its native path.
+  while preserving one canonical body per topic.
 - This README: positioning, module layout, analyzer usage, and public
   limitations.
 - [`AGENTS.md`](AGENTS.md): guidance for coding agents (commands, module
@@ -62,8 +63,9 @@ Development across modules uses the committed `go.work` workspace.
   ([IMPLEMENTATION_STATUS](cmd/spanner-query-gen/IMPLEMENTATION_STATUS.md)),
   and the contract surface
   ([PLAN_CONTRACTS](cmd/spanner-query-gen/PLAN_CONTRACTS.md)).
-- [`research/`](research/README.md): non-normative observation notes and
-  design background, indexed per area.
+- [`research/`](research/README.md): legacy non-normative observation notes and
+  design background. New substantive research is authored under
+  [`knowledge/research/`](knowledge/research/index.md).
 
 ## Why plan inspection
 
@@ -139,9 +141,10 @@ Developer-only probes live under `tools/`. For example,
 [`tools/spanner-query-plan-shape`](tools/spanner-query-plan-shape) starts
 Spanner Omni through [`spanemuboost`](https://github.com/apstndb/spanemuboost)
 and prints raw query plan node shapes for plan normalization work.
-Long-form investigation notes and review archives live under
-[`research/`](research/); they are non-normative supporting material rather than
-the public CLI contract.
+Existing legacy investigation notes and review archives live under
+[`research/`](research/); new substantive research is authored under
+[`knowledge/research/`](knowledge/research/index.md). Both are non-normative
+supporting material rather than the public CLI contract.
 
 The repository includes the Protocol Buffers example from the
 [Cloud Spanner protocol buffers reference](https://cloud.google.com/spanner/docs/reference/standard-sql/protocol-buffers)

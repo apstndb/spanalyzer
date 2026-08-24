@@ -3,6 +3,7 @@
 package main
 
 import (
+	_ "embed"
 	"errors"
 	"flag"
 	"fmt"
@@ -15,6 +16,7 @@ import (
 	"regexp"
 	"sort"
 	"strings"
+	"time"
 
 	"github.com/goccy/go-yaml"
 )
@@ -23,24 +25,79 @@ const (
 	bundleRoot            = "knowledge"
 	markdownInventoryPath = "knowledge/references/repository-documents.md"
 	assetInventoryPath    = "knowledge/references/repository-assets.md"
+	legacyResearchIndex   = "research/README.md"
+	researchRoot          = "knowledge/research/"
+	researchNoteType      = "Research Note"
+	legacyResearchInitial = 31
 )
+
+// legacyResearchBaseline records the immutable initial migration set. The
+// active allowlist may shrink as notes move into the OKF bundle, but every
+// active entry must remain a member of this baseline.
+//
+//go:embed legacy-research-baseline.txt
+var legacyResearchBaseline string
+
+// legacyResearchMarkdown is the active migration allowlist, not a discovery
+// inventory. It may shrink to zero but must not admit a path outside the
+// immutable baseline.
+//
+//go:embed legacy-research-markdown.txt
+var legacyResearchMarkdown string
 
 var (
 	markdownLinkPattern = regexp.MustCompile(`\]\(([^)]+)\)`)
 	footnotePattern     = regexp.MustCompile(`\[\^([A-Za-z0-9._-]+)\]`)
+	rfc3339Pattern      = regexp.MustCompile(`^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(?:\.[0-9]+)?(?:Z|[+-]([0-9]{2}):([0-9]{2}))$`)
 )
 
 type frontMatter struct {
-	OKFVersion    string        `yaml:"okf_version"`
-	Type          string        `yaml:"type"`
-	Resource      string        `yaml:"resource"`
-	Sources       []source      `yaml:"sources"`
-	AssetFamilies []assetFamily `yaml:"asset_families"`
+	OKFVersion    string         `yaml:"okf_version"`
+	Type          string         `yaml:"type"`
+	Title         string         `yaml:"title"`
+	Description   string         `yaml:"description"`
+	Resource      string         `yaml:"resource"`
+	Tags          []string       `yaml:"tags"`
+	Status        string         `yaml:"status"`
+	StaleAfter    string         `yaml:"stale_after"`
+	Generated     *actorEvent    `yaml:"generated"`
+	Verified      verifiedEvents `yaml:"verified"`
+	UsageWindow   *usageWindow   `yaml:"usage_window"`
+	Sources       []source       `yaml:"sources"`
+	AssetFamilies []assetFamily  `yaml:"asset_families"`
 }
 
 type source struct {
-	ID       string `yaml:"id"`
-	Resource string `yaml:"resource"`
+	ID           string       `yaml:"id"`
+	Resource     string       `yaml:"resource"`
+	LastModified string       `yaml:"last_modified"`
+	UsageWindow  *usageWindow `yaml:"usage_window"`
+}
+
+type actorEvent struct {
+	By string `yaml:"by"`
+	At string `yaml:"at"`
+}
+
+type verifiedEvents []actorEvent
+
+func (events *verifiedEvents) UnmarshalYAML(data []byte) error {
+	var multiple []actorEvent
+	if err := yaml.Unmarshal(data, &multiple); err == nil {
+		*events = multiple
+		return nil
+	}
+	var single actorEvent
+	if err := yaml.Unmarshal(data, &single); err != nil {
+		return err
+	}
+	*events = []actorEvent{single}
+	return nil
+}
+
+type usageWindow struct {
+	From string `yaml:"from"`
+	To   string `yaml:"to"`
 }
 
 type assetFamily struct {
@@ -166,8 +223,145 @@ func checkQuality(root string) error {
 		if err := checkSourceIDs(doc); err != nil {
 			return err
 		}
+		if err := checkLifecycleAndTrustFields(doc); err != nil {
+			return err
+		}
+		if err := checkResearchNote(doc); err != nil {
+			return err
+		}
 	}
-	return checkMarkdownInventory(root, documents)
+	if err := checkMarkdownInventory(root, documents); err != nil {
+		return err
+	}
+	return checkLegacyResearch(root)
+}
+
+func checkLifecycleAndTrustFields(doc document) error {
+	if doc.Front.Status != "" && !validStatus(doc.Front.Status) {
+		return fmt.Errorf("%s: status = %q; want draft, stable, or deprecated", doc.Path, doc.Front.Status)
+	}
+	if err := checkOptionalTimestamp(doc.Path, "stale_after", doc.Front.StaleAfter); err != nil {
+		return err
+	}
+	if doc.Front.Generated != nil {
+		if strings.TrimSpace(doc.Front.Generated.By) == "" {
+			return fmt.Errorf("%s: generated.by is empty", doc.Path)
+		}
+		if err := checkOptionalTimestamp(doc.Path, "generated.at", doc.Front.Generated.At); err != nil {
+			return err
+		}
+	}
+	for i, event := range doc.Front.Verified {
+		if strings.TrimSpace(event.By) == "" {
+			return fmt.Errorf("%s: verified[%d].by is empty", doc.Path, i)
+		}
+		if strings.TrimSpace(event.At) == "" {
+			return fmt.Errorf("%s: verified[%d].at is empty", doc.Path, i)
+		}
+		if err := checkOptionalTimestamp(doc.Path, fmt.Sprintf("verified[%d].at", i), event.At); err != nil {
+			return err
+		}
+	}
+	if err := checkUsageWindow(doc.Path, "usage_window", doc.Front.UsageWindow); err != nil {
+		return err
+	}
+	for i, source := range doc.Front.Sources {
+		if err := checkOptionalTimestamp(doc.Path, fmt.Sprintf("sources[%d].last_modified", i), source.LastModified); err != nil {
+			return err
+		}
+		if err := checkUsageWindow(doc.Path, fmt.Sprintf("sources[%d].usage_window", i), source.UsageWindow); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func checkResearchNote(doc document) error {
+	isReserved := filepath.Base(doc.Path) == "index.md" || filepath.Base(doc.Path) == "log.md"
+	isResearchPath := strings.HasPrefix(doc.Path, researchRoot)
+	isResearchNote := doc.Front.Type == researchNoteType
+
+	if isReserved && isResearchPath {
+		return nil
+	}
+	if isResearchPath && !isResearchNote {
+		return fmt.Errorf("%s: concepts below %s must use type %q", doc.Path, researchRoot, researchNoteType)
+	}
+	if isResearchNote {
+		relative := strings.TrimPrefix(doc.Path, researchRoot)
+		if !isResearchPath || !strings.Contains(relative, "/") {
+			return fmt.Errorf("%s: Research Note must be below %s<area>/", doc.Path, researchRoot)
+		}
+	} else {
+		return nil
+	}
+
+	required := []struct {
+		name  string
+		value string
+	}{
+		{name: "title", value: doc.Front.Title},
+		{name: "description", value: doc.Front.Description},
+		{name: "status", value: doc.Front.Status},
+	}
+	for _, field := range required {
+		if strings.TrimSpace(field.value) == "" {
+			return fmt.Errorf("%s: Research Note has an empty %s", doc.Path, field.name)
+		}
+	}
+	if !validStatus(doc.Front.Status) {
+		return fmt.Errorf("%s: Research Note status = %q; want draft, stable, or deprecated", doc.Path, doc.Front.Status)
+	}
+	if len(doc.Front.Tags) == 0 {
+		return fmt.Errorf("%s: Research Note has no tags", doc.Path)
+	}
+	for i, tag := range doc.Front.Tags {
+		if strings.TrimSpace(tag) == "" {
+			return fmt.Errorf("%s: Research Note tags[%d] is empty", doc.Path, i)
+		}
+	}
+	if len(doc.Front.Sources) == 0 {
+		return fmt.Errorf("%s: Research Note has no sources", doc.Path)
+	}
+	return nil
+}
+
+func validStatus(status string) bool {
+	switch status {
+	case "draft", "stable", "deprecated":
+		return true
+	default:
+		return false
+	}
+}
+
+func checkUsageWindow(documentPath, field string, window *usageWindow) error {
+	if window == nil {
+		return nil
+	}
+	if strings.TrimSpace(window.From) == "" || strings.TrimSpace(window.To) == "" {
+		return fmt.Errorf("%s: %s must contain both from and to", documentPath, field)
+	}
+	if err := checkOptionalTimestamp(documentPath, field+".from", window.From); err != nil {
+		return err
+	}
+	return checkOptionalTimestamp(documentPath, field+".to", window.To)
+}
+
+func checkOptionalTimestamp(documentPath, field, value string) error {
+	if strings.TrimSpace(value) == "" {
+		return nil
+	}
+	match := rfc3339Pattern.FindStringSubmatch(value)
+	if match == nil || len(match) == 3 && (match[1] > "23" || match[2] > "59") {
+		return fmt.Errorf("%s: %s = %q is not an RFC 3339 datetime with an explicit UTC offset", documentPath, field, value)
+	}
+	// time.Time cannot represent RFC 3339 leap seconds, so this repository
+	// intentionally rejects them rather than silently normalizing the value.
+	if _, err := time.Parse(time.RFC3339, value); err != nil {
+		return fmt.Errorf("%s: %s = %q is not an RFC 3339 datetime with an explicit UTC offset: %w", documentPath, field, value, err)
+	}
+	return nil
 }
 
 func checkAssets(root string) error {
@@ -383,6 +577,81 @@ func checkMarkdownInventory(root string, documents map[string]document) error {
 	missing, extra := setDifference(want, listed), setDifference(listed, want)
 	if len(missing) != 0 || len(extra) != 0 {
 		return fmt.Errorf("%s: tracked Markdown membership mismatch; missing=%v extra=%v", markdownInventoryPath, missing, extra)
+	}
+	return nil
+}
+
+func checkLegacyResearch(root string) error {
+	baseline, err := parseLegacyResearchMarkdown(legacyResearchBaseline)
+	if err != nil {
+		return fmt.Errorf("legacy research baseline: %w", err)
+	}
+	if len(baseline) != legacyResearchInitial {
+		return fmt.Errorf("legacy research baseline has %d paths; want immutable initial count %d", len(baseline), legacyResearchInitial)
+	}
+	allowed, err := parseLegacyResearchMarkdown(legacyResearchMarkdown)
+	if err != nil {
+		return fmt.Errorf("legacy research allowlist: %w", err)
+	}
+	if unknown := setDifference(allowed, baseline); len(unknown) != 0 {
+		return fmt.Errorf("legacy research allowlist contains paths outside the immutable baseline: %v", unknown)
+	}
+
+	tracked, err := gitTrackedFiles(root, "*.md")
+	if err != nil {
+		return err
+	}
+	return checkLegacyResearchMembership(tracked, baseline, allowed)
+}
+
+func parseLegacyResearchMarkdown(contents string) (map[string]struct{}, error) {
+	allowed := make(map[string]struct{})
+	var previous string
+	for lineNumber, line := range strings.Split(contents, "\n") {
+		name := strings.TrimSpace(line)
+		if name == "" || strings.HasPrefix(name, "#") {
+			continue
+		}
+		if !strings.HasPrefix(name, "research/") || name == legacyResearchIndex || filepath.Ext(name) != ".md" {
+			return nil, fmt.Errorf("line %d: %q must be a Markdown path below research/ and not %s", lineNumber+1, name, legacyResearchIndex)
+		}
+		if filepath.ToSlash(filepath.Clean(name)) != name {
+			return nil, fmt.Errorf("line %d: path %q is not canonical", lineNumber+1, name)
+		}
+		if _, exists := allowed[name]; exists {
+			return nil, fmt.Errorf("line %d: duplicate path %q", lineNumber+1, name)
+		}
+		if previous != "" && name < previous {
+			return nil, fmt.Errorf("line %d: path %q is out of order after %q", lineNumber+1, name, previous)
+		}
+		allowed[name] = struct{}{}
+		previous = name
+	}
+	return allowed, nil
+}
+
+func checkLegacyResearchMembership(tracked []string, baseline, allowed map[string]struct{}) error {
+	if unknown := setDifference(allowed, baseline); len(unknown) != 0 {
+		return fmt.Errorf("legacy research allowlist contains paths outside the immutable baseline: %v", unknown)
+	}
+	actual := make(map[string]struct{})
+	rootIndexFound := false
+	for _, name := range tracked {
+		if name == legacyResearchIndex {
+			rootIndexFound = true
+			continue
+		}
+		if strings.HasPrefix(name, "research/") && filepath.Ext(name) == ".md" {
+			actual[name] = struct{}{}
+		}
+	}
+	if !rootIndexFound {
+		return fmt.Errorf("missing legacy research policy index %q", legacyResearchIndex)
+	}
+
+	stale, unapproved := setDifference(allowed, actual), setDifference(actual, allowed)
+	if len(stale) != 0 || len(unapproved) != 0 {
+		return fmt.Errorf("legacy research membership mismatch; stale_allowlist=%v unapproved=%v; author new research under knowledge/research and remove migrated paths from the allowlist", stale, unapproved)
 	}
 	return nil
 }

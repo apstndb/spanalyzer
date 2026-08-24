@@ -13,7 +13,10 @@ sources:
     title: spanner-query-plan-shape README
   - id: evidence-index
     resource: ../../research/spanner-query-plan-shape/README.md
-    title: spanner-query-plan-shape research index
+    title: legacy spanner-query-plan-shape research index
+  - id: okf-research-index
+    resource: ../research/index.md
+    title: spanalyzer OKF research authoring guide
   - id: planvocab-source
     resource: ../../plancontract/planvocab/catalog_source.json
     title: reviewed plan-vocabulary source catalog
@@ -48,8 +51,9 @@ structural evidence. It deliberately separates observation from contract:
    surfacing unknown vocabulary instead of silently accepting it. Its reviewed
    source, generated catalog, and schemas are separate assets with explicit
    provenance.[^planvocab-source][^planvocab-catalog][^planvocab-schema][^planvocab-expectations-schema]
-4. [Research notes](../../research/spanner-query-plan-shape/README.md) retain
-   environments, controls, negative results, and interpretation limits.
+4. [OKF-native research notes](../research/index.md), together with the
+   [legacy plan-shape research](../../research/spanner-query-plan-shape/README.md),
+   retain environments, controls, negative results, and interpretation limits.
 5. [OKF observations](../observations/index.md) curate cross-source conclusions
    that are useful beyond a single probe session.
 

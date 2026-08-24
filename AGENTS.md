@@ -103,14 +103,26 @@ testdata/protos/order_descriptors.pb
 ## Documentation Guidelines
 
 The [`knowledge/`](knowledge/index.md) directory is the repository's embedded
-OKF v0.2 bundle. Keep canonical command, design, status, and research documents
-at their repository-native paths; represent them in OKF through concepts and
-links instead of copying their bodies. When adding or removing tracked
-Markdown outside the bundle, update
+OKF v0.2 bundle. Keep canonical command, design, and status documents at their
+repository-native paths; represent them in OKF through concepts and links
+instead of copying their bodies. Author new substantive research directly
+under [`knowledge/research/<area>/`](knowledge/research/index.md) as `Research Note`
+concepts. The existing [`research/`](research/README.md) tree is a frozen
+legacy store: maintain or migrate its current notes, but do not add new notes
+there. When adding or removing tracked Markdown outside the bundle, update
 [`knowledge/references/repository-documents.md`](knowledge/references/repository-documents.md).
 Every non-`index.md` concept inside the bundle must have parseable YAML
 frontmatter with a non-empty `type`, and every concept must be reachable from
 the root `knowledge/index.md` through directory indexes.
+
+Repository policy requires every `Research Note` to declare a non-empty
+`title`, `description`, `tags`, explicit `status`, and at least one `sources`
+entry. Use `generated`, `verified`, credibility signals, and `stale_after` only
+when the corresponding producer, verification event, source fact, or expiry is
+actually known. A later migration from `research/` must use `git mv`, remove
+the path from the legacy allowlist, and update every inbound link and hashed
+`planvocab` evidence path in the same change; never leave a duplicate writable
+body.
 
 Non-Markdown discovery is intentionally narrower than repository inventory.
 [`knowledge/references/repository-assets.md`](knowledge/references/repository-assets.md)

@@ -61,8 +61,10 @@ for hashed catalog provenance; this inventory does not replace it.
 The [`spanner-query-plan-shape`](../../tools/spanner-query-plan-shape/)
 developer tool retains case selectors, deterministic tests, and structural
 expectation manifests. Together they provide executable evidence for the
-environment-scoped notes under
-[`research/spanner-query-plan-shape`](../../research/spanner-query-plan-shape/).
+environment-scoped notes authored under [`knowledge/research`](../research/)
+or retained in the legacy
+[`research/spanner-query-plan-shape`](../../research/spanner-query-plan-shape/)
+tree.
 
 ## Query-generator fixtures
 

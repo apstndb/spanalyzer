@@ -8,11 +8,11 @@ sources:
   - id: spanner-query-syntax
     resource: https://docs.cloud.google.com/spanner/docs/reference/standard-sql/query-syntax
     title: Cloud Spanner GoogleSQL query syntax
-    last_modified: 2026-08-06
+    last_modified: 2026-08-06T00:00:00Z
   - id: spanner-operators
     resource: https://docs.cloud.google.com/spanner/docs/reference/standard-sql/operators
     title: Cloud Spanner GoogleSQL operators
-    last_modified: 2026-08-04
+    last_modified: 2026-08-04T00:00:00Z
   - id: bigquery-operators
     resource: https://docs.cloud.google.com/bigquery/docs/reference/standard-sql/operators#is_distinct_from_operator
     title: BigQuery GoogleSQL IS DISTINCT FROM operator

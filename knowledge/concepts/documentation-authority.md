@@ -13,7 +13,10 @@ sources:
     title: spanner-query-gen implementation status
   - id: research-index
     resource: ../../research/README.md
-    title: spanalyzer research index
+    title: spanalyzer legacy research index
+  - id: okf-research-index
+    resource: ../research/index.md
+    title: spanalyzer OKF research authoring guide
 ---
 
 # Documentation Authority
@@ -32,9 +35,9 @@ does not automatically override a canonical behavior surface.
    identify deliberate deferrals and open work; they are not behavior specs.
 4. **Curated observations:** OKF observations synthesize claims across named
    sources while preserving their verification scope.
-5. **Research evidence:** dated or environment-specific notes record how a
-   conclusion was reached. They do not create a stable Spanner or spanalyzer
-   contract.
+5. **Research evidence:** OKF-native `Research Note` concepts and legacy dated
+   or environment-specific notes record how a conclusion was reached. They do
+   not create a stable Spanner or spanalyzer contract.
 6. **History:** archive documents and git history explain resolved work but do
    not describe the current surface.
 
@@ -47,6 +50,8 @@ every tracked Markdown file to one of these roles.
 
 An OKF concept may summarize and link canonical material, but it must not copy
 large behavior descriptions or observation tables into a second writable body.
-The `resource` and `sources` fields point to the material that owns those
+New research is itself canonical inside the bundle; a legacy research note
+becomes canonical there only through `git mv`, never through a wrapper copy.
+The `resource` and `sources` fields point to material that owns supporting
 details. This keeps the bundle useful for discovery without creating a shadow
 documentation tree.
