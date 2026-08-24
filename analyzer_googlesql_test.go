@@ -113,6 +113,40 @@ OPTIONS (endpoint = "https://spanalyzer-remote-test-uc.a.run.app", max_batching_
 	assertField(t, rowType.Fields[0], "total", spannerpb.TypeCode_INT64)
 }
 
+func TestAnalyzerRowTypeForZSTDCompressionFunctions(t *testing.T) {
+	analyzer, err := NewAnalyzerFromDDL("schema.sql", "")
+	if err != nil {
+		t.Fatalf("NewAnalyzerFromDDL() error = %v", err)
+	}
+	rowType, err := analyzer.RowTypeForStatement(`SELECT
+  ZSTD_COMPRESS("hello") AS compressed_string,
+  ZSTD_COMPRESS(b"hello", level => 1) AS compressed_bytes,
+  ZSTD_DECOMPRESS_TO_BYTES(ZSTD_COMPRESS(b"hello")) AS decompressed_bytes,
+  ZSTD_DECOMPRESS_TO_BYTES(ZSTD_COMPRESS(b"hello"), size_limit => 1024) AS limited_bytes,
+  ZSTD_DECOMPRESS_TO_STRING(ZSTD_COMPRESS("hello")) AS decompressed_string,
+  ZSTD_DECOMPRESS_TO_STRING(ZSTD_COMPRESS("hello"), size_limit => 1024) AS limited_string`)
+	if err != nil {
+		t.Fatalf("RowTypeForStatement() error = %v", err)
+	}
+	want := []struct {
+		name string
+		code spannerpb.TypeCode
+	}{
+		{name: "compressed_string", code: spannerpb.TypeCode_BYTES},
+		{name: "compressed_bytes", code: spannerpb.TypeCode_BYTES},
+		{name: "decompressed_bytes", code: spannerpb.TypeCode_BYTES},
+		{name: "limited_bytes", code: spannerpb.TypeCode_BYTES},
+		{name: "decompressed_string", code: spannerpb.TypeCode_STRING},
+		{name: "limited_string", code: spannerpb.TypeCode_STRING},
+	}
+	if got := len(rowType.Fields); got != len(want) {
+		t.Fatalf("len(rowType.Fields) = %d, want %d", got, len(want))
+	}
+	for i, field := range want {
+		assertField(t, rowType.Fields[i], field.name, field.code)
+	}
+}
+
 func TestAnalyzerRowTypeForDistinctPredicates(t *testing.T) {
 	tests := []struct {
 		name string
