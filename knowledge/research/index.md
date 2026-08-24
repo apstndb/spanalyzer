@@ -46,16 +46,31 @@ sources:
 
 ## Migrating legacy notes
 
-Migrate with `git mv` so the topic keeps one writable body and useful history.
-In the same change:
+Use `git mv` when one coherent legacy body remains one `Research Note`. When
+the useful material has different owners or lifecycles, use semantic
+disposition instead: split it, merge it with a compatible evidence unit,
+absorb current behavior into canonical documentation or executable evidence,
+or retire material whose role has ended.
 
-1. add truthful OKF frontmatter and link the concept from the appropriate
-   directory index;
+Every body-changing migration completes its source-hashed entry in the
+[legacy research migration ledger](../references/legacy-research-migrations.md).
+The entry identifies each retained claim group or retired section and its
+successor or controlled retirement reason. In the same change:
+
+1. add truthful OKF frontmatter to new concepts and link them from the
+   appropriate directory index;
 2. remove the old path from
    [`legacy-research-markdown.txt`](../../tools/okf-check/legacy-research-markdown.txt);
 3. update every inbound link; and
-4. if the path appears in `catalog_source.info.local_evidence`, update it and
-   regenerate the plan-vocabulary artifacts.
+4. if the path was a hashed planvocab input, map the catalog selectors it
+   supported to retained evidence and regenerate the plan-vocabulary
+   artifacts.
+
+Executable probe code is a reproducer, an expectation manifest is an
+assertion, and a raw result or scoped run record is observation evidence.
+Preserve the datum, backend and version scope, case identity, outcome class,
+derivation, and immutable evidence before replacing a hashed narrative with
+non-narrative inputs.
 
 Do not use `Attested Computation` merely because a probe is executable. That
 type requires the executor, receipt, and attester semantics defined by OKF;

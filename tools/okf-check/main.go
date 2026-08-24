@@ -4,6 +4,7 @@ package main
 
 import (
 	_ "embed"
+	"encoding/json"
 	"errors"
 	"flag"
 	"fmt"
@@ -22,13 +23,18 @@ import (
 )
 
 const (
-	bundleRoot            = "knowledge"
-	markdownInventoryPath = "knowledge/references/repository-documents.md"
-	assetInventoryPath    = "knowledge/references/repository-assets.md"
-	legacyResearchIndex   = "research/README.md"
-	researchRoot          = "knowledge/research/"
-	researchNoteType      = "Research Note"
-	legacyResearchInitial = 31
+	bundleRoot                   = "knowledge"
+	markdownInventoryPath        = "knowledge/references/repository-documents.md"
+	assetInventoryPath           = "knowledge/references/repository-assets.md"
+	legacyMigrationPath          = "knowledge/references/legacy-research-migrations.md"
+	legacyResearchIndex          = "research/README.md"
+	legacyResearchBaselinePath   = "tools/okf-check/legacy-research-baseline.txt"
+	legacyResearchPlanvocabPath  = "tools/okf-check/legacy-research-planvocab.txt"
+	planvocabSourcePath          = "plancontract/planvocab/catalog_source.json"
+	researchRoot                 = "knowledge/research/"
+	researchNoteType             = "Research Note"
+	legacyResearchInitial        = 31
+	legacyResearchPlanvocabCount = 16
 )
 
 // legacyResearchBaseline records the immutable initial migration set. The
@@ -45,26 +51,53 @@ var legacyResearchBaseline string
 //go:embed legacy-research-markdown.txt
 var legacyResearchMarkdown string
 
+// legacyResearchPlanvocab records which initial legacy bodies were hashed
+// planvocab inputs. It stays immutable after a body moves so the migration
+// gate can continue to require an explicit evidence disposition.
+//
+//go:embed legacy-research-planvocab.txt
+var legacyResearchPlanvocab string
+
 var (
 	markdownLinkPattern = regexp.MustCompile(`\]\(([^)]+)\)`)
 	footnotePattern     = regexp.MustCompile(`\[\^([A-Za-z0-9._-]+)\]`)
 	rfc3339Pattern      = regexp.MustCompile(`^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(?:\.[0-9]+)?(?:Z|[+-]([0-9]{2}):([0-9]{2}))$`)
+	gitObjectIDPattern  = regexp.MustCompile(`^[0-9a-f]{40}(?:[0-9a-f]{24})?$`)
 )
 
 type frontMatter struct {
-	OKFVersion    string         `yaml:"okf_version"`
-	Type          string         `yaml:"type"`
-	Title         string         `yaml:"title"`
-	Description   string         `yaml:"description"`
-	Resource      string         `yaml:"resource"`
-	Tags          []string       `yaml:"tags"`
-	Status        string         `yaml:"status"`
-	StaleAfter    string         `yaml:"stale_after"`
-	Generated     *actorEvent    `yaml:"generated"`
-	Verified      verifiedEvents `yaml:"verified"`
-	UsageWindow   *usageWindow   `yaml:"usage_window"`
-	Sources       []source       `yaml:"sources"`
-	AssetFamilies []assetFamily  `yaml:"asset_families"`
+	OKFVersion               string                    `yaml:"okf_version"`
+	Type                     string                    `yaml:"type"`
+	Title                    string                    `yaml:"title"`
+	Description              string                    `yaml:"description"`
+	Resource                 string                    `yaml:"resource"`
+	Tags                     []string                  `yaml:"tags"`
+	Status                   string                    `yaml:"status"`
+	StaleAfter               string                    `yaml:"stale_after"`
+	Generated                *actorEvent               `yaml:"generated"`
+	Verified                 verifiedEvents            `yaml:"verified"`
+	UsageWindow              *usageWindow              `yaml:"usage_window"`
+	Sources                  []source                  `yaml:"sources"`
+	AssetFamilies            []assetFamily             `yaml:"asset_families"`
+	LegacyResearchMigrations []legacyResearchMigration `yaml:"legacy_research_migrations"`
+}
+
+type legacyResearchMigration struct {
+	LegacyPath         string                      `yaml:"legacy_path"`
+	State              string                      `yaml:"state"`
+	SourceRef          string                      `yaml:"source_ref"`
+	SourceBlob         string                      `yaml:"source_blob"`
+	Dispositions       []legacyResearchDisposition `yaml:"dispositions"`
+	PlanvocabAction    string                      `yaml:"planvocab_action"`
+	PlanvocabEvidence  []string                    `yaml:"planvocab_evidence"`
+	PlanvocabSelectors []string                    `yaml:"planvocab_selectors"`
+}
+
+type legacyResearchDisposition struct {
+	Kind       string   `yaml:"kind"`
+	Scope      string   `yaml:"scope"`
+	Successors []string `yaml:"successors"`
+	Reason     string   `yaml:"reason"`
 }
 
 type source struct {
@@ -233,7 +266,7 @@ func checkQuality(root string) error {
 	if err := checkMarkdownInventory(root, documents); err != nil {
 		return err
 	}
-	return checkLegacyResearch(root)
+	return checkLegacyResearch(root, documents)
 }
 
 func checkLifecycleAndTrustFields(doc document) error {
@@ -581,7 +614,7 @@ func checkMarkdownInventory(root string, documents map[string]document) error {
 	return nil
 }
 
-func checkLegacyResearch(root string) error {
+func checkLegacyResearch(root string, documents map[string]document) error {
 	baseline, err := parseLegacyResearchMarkdown(legacyResearchBaseline)
 	if err != nil {
 		return fmt.Errorf("legacy research baseline: %w", err)
@@ -596,12 +629,279 @@ func checkLegacyResearch(root string) error {
 	if unknown := setDifference(allowed, baseline); len(unknown) != 0 {
 		return fmt.Errorf("legacy research allowlist contains paths outside the immutable baseline: %v", unknown)
 	}
+	initialPlanvocab, err := parseLegacyResearchMarkdown(legacyResearchPlanvocab)
+	if err != nil {
+		return fmt.Errorf("legacy research planvocab baseline: %w", err)
+	}
+	if len(initialPlanvocab) != legacyResearchPlanvocabCount {
+		return fmt.Errorf("legacy research planvocab baseline has %d paths; want immutable initial count %d", len(initialPlanvocab), legacyResearchPlanvocabCount)
+	}
+	if unknown := setDifference(initialPlanvocab, baseline); len(unknown) != 0 {
+		return fmt.Errorf("legacy research planvocab baseline contains paths outside the immutable baseline: %v", unknown)
+	}
 
-	tracked, err := gitTrackedFiles(root, "*.md")
+	trackedMarkdown, err := gitTrackedFiles(root, "*.md")
 	if err != nil {
 		return err
 	}
-	return checkLegacyResearchMembership(tracked, baseline, allowed)
+	if err := checkLegacyResearchMembership(trackedMarkdown, baseline, allowed); err != nil {
+		return err
+	}
+	tracked, err := gitTrackedFiles(root)
+	if err != nil {
+		return err
+	}
+	currentPlanvocab, err := readPlanvocabLocalEvidence(root)
+	if err != nil {
+		return err
+	}
+	return checkLegacyResearchMigrations(root, documents, baseline, allowed, initialPlanvocab, currentPlanvocab, tracked)
+}
+
+func readPlanvocabLocalEvidence(root string) (map[string]struct{}, error) {
+	data, err := os.ReadFile(filepath.Join(root, filepath.FromSlash(planvocabSourcePath)))
+	if err != nil {
+		return nil, fmt.Errorf("read planvocab source: %w", err)
+	}
+	var source struct {
+		Info struct {
+			LocalEvidence []string `json:"local_evidence"`
+		} `json:"info"`
+	}
+	if err := json.Unmarshal(data, &source); err != nil {
+		return nil, fmt.Errorf("parse %s: %w", planvocabSourcePath, err)
+	}
+	result := make(map[string]struct{}, len(source.Info.LocalEvidence))
+	for _, name := range source.Info.LocalEvidence {
+		result[filepath.ToSlash(name)] = struct{}{}
+	}
+	return result, nil
+}
+
+func checkLegacyResearchMigrations(
+	root string,
+	documents map[string]document,
+	baseline, allowed, initialPlanvocab, currentPlanvocab map[string]struct{},
+	tracked []string,
+) error {
+	doc, ok := documents[legacyMigrationPath]
+	if !ok {
+		return fmt.Errorf("missing legacy research migration ledger %q", legacyMigrationPath)
+	}
+	if doc.Front.Type != "Reference" {
+		return fmt.Errorf("%s: type = %q, want Reference", legacyMigrationPath, doc.Front.Type)
+	}
+
+	entries := doc.Front.LegacyResearchMigrations
+	seen := make(map[string]struct{}, len(entries))
+	pending := make(map[string]struct{})
+	completed := make(map[string]struct{})
+	trackedSet := make(map[string]struct{}, len(tracked))
+	for _, name := range tracked {
+		trackedSet[name] = struct{}{}
+	}
+	var previous string
+	for i, entry := range entries {
+		name := entry.LegacyPath
+		if _, ok := baseline[name]; !ok {
+			return fmt.Errorf("%s: legacy_research_migrations[%d] path %q is outside the immutable baseline", legacyMigrationPath, i, name)
+		}
+		if _, ok := seen[name]; ok {
+			return fmt.Errorf("%s: duplicate migration entry for %q", legacyMigrationPath, name)
+		}
+		if previous != "" && name < previous {
+			return fmt.Errorf("%s: migration path %q is out of order after %q", legacyMigrationPath, name, previous)
+		}
+		seen[name] = struct{}{}
+		previous = name
+
+		_, wasPlanvocab := initialPlanvocab[name]
+		switch entry.State {
+		case "pending":
+			pending[name] = struct{}{}
+			if err := checkPendingLegacyResearchMigration(entry, wasPlanvocab, currentPlanvocab); err != nil {
+				return fmt.Errorf("%s: %w", legacyMigrationPath, err)
+			}
+		case "completed":
+			completed[name] = struct{}{}
+			if err := checkCompletedLegacyResearchMigration(root, documents, entry, wasPlanvocab, currentPlanvocab, trackedSet); err != nil {
+				return fmt.Errorf("%s: %w", legacyMigrationPath, err)
+			}
+			if err := checkRemovedLegacyResearchReferences(root, entry, tracked); err != nil {
+				return err
+			}
+		default:
+			return fmt.Errorf("%s: migration entry %q state = %q; want pending or completed", legacyMigrationPath, name, entry.State)
+		}
+	}
+
+	if missing := setDifference(baseline, seen); len(missing) != 0 {
+		return fmt.Errorf("%s: baseline paths missing from migration ledger: %v", legacyMigrationPath, missing)
+	}
+	if missing, extra := setDifference(allowed, pending), setDifference(pending, allowed); len(missing) != 0 || len(extra) != 0 {
+		return fmt.Errorf("legacy research active/ledger mismatch; active_without_pending=%v pending_without_active=%v", missing, extra)
+	}
+	if overlap := setIntersection(pending, completed); len(overlap) != 0 {
+		return fmt.Errorf("legacy research pending/completed sets overlap: %v", overlap)
+	}
+	return nil
+}
+
+func checkPendingLegacyResearchMigration(entry legacyResearchMigration, wasPlanvocab bool, currentPlanvocab map[string]struct{}) error {
+	if entry.SourceRef != "" || entry.SourceBlob != "" || len(entry.Dispositions) != 0 || len(entry.PlanvocabEvidence) != 0 || len(entry.PlanvocabSelectors) != 0 {
+		return fmt.Errorf("pending migration %q must not declare completed disposition fields", entry.LegacyPath)
+	}
+	_, currentlyHashed := currentPlanvocab[entry.LegacyPath]
+	if wasPlanvocab != currentlyHashed {
+		return fmt.Errorf("pending migration %q planvocab baseline/current mismatch", entry.LegacyPath)
+	}
+	want := "not-applicable"
+	if wasPlanvocab {
+		want = "pending"
+	}
+	if entry.PlanvocabAction != want {
+		return fmt.Errorf("pending migration %q planvocab_action = %q, want %q", entry.LegacyPath, entry.PlanvocabAction, want)
+	}
+	return nil
+}
+
+func checkCompletedLegacyResearchMigration(
+	root string,
+	documents map[string]document,
+	entry legacyResearchMigration,
+	wasPlanvocab bool,
+	currentPlanvocab, tracked map[string]struct{},
+) error {
+	if !gitObjectIDPattern.MatchString(entry.SourceRef) || !gitObjectIDPattern.MatchString(entry.SourceBlob) {
+		return fmt.Errorf("completed migration %q must declare full hexadecimal source_ref and source_blob object IDs", entry.LegacyPath)
+	}
+	if err := checkLegacySourceObject(root, entry); err != nil {
+		return err
+	}
+	if len(entry.Dispositions) == 0 {
+		return fmt.Errorf("completed migration %q has no dispositions", entry.LegacyPath)
+	}
+	for i, disposition := range entry.Dispositions {
+		if err := checkLegacyResearchDisposition(documents, tracked, entry.LegacyPath, i, disposition); err != nil {
+			return err
+		}
+	}
+	if _, ok := currentPlanvocab[entry.LegacyPath]; ok {
+		return fmt.Errorf("completed migration %q remains in planvocab local_evidence", entry.LegacyPath)
+	}
+	if !wasPlanvocab {
+		if entry.PlanvocabAction != "not-applicable" || len(entry.PlanvocabEvidence) != 0 || len(entry.PlanvocabSelectors) != 0 {
+			return fmt.Errorf("completed non-planvocab migration %q must use planvocab_action not-applicable without evidence or selectors", entry.LegacyPath)
+		}
+		return nil
+	}
+	if entry.PlanvocabAction != "path-moved" && entry.PlanvocabAction != "evidence-replaced" && entry.PlanvocabAction != "evidence-retained" {
+		return fmt.Errorf("completed hashed migration %q planvocab_action = %q; want path-moved, evidence-replaced, or evidence-retained", entry.LegacyPath, entry.PlanvocabAction)
+	}
+	if len(entry.PlanvocabEvidence) == 0 || len(entry.PlanvocabSelectors) == 0 {
+		return fmt.Errorf("completed hashed migration %q must map replacement evidence and catalog selectors", entry.LegacyPath)
+	}
+	for _, name := range entry.PlanvocabEvidence {
+		if _, ok := currentPlanvocab[name]; !ok {
+			return fmt.Errorf("completed hashed migration %q replacement evidence %q is not in current planvocab local_evidence", entry.LegacyPath, name)
+		}
+		if _, ok := tracked[name]; !ok {
+			return fmt.Errorf("completed hashed migration %q replacement evidence %q is not tracked", entry.LegacyPath, name)
+		}
+	}
+	for i, selector := range entry.PlanvocabSelectors {
+		if strings.TrimSpace(selector) == "" {
+			return fmt.Errorf("completed hashed migration %q planvocab_selectors[%d] is empty", entry.LegacyPath, i)
+		}
+	}
+	return nil
+}
+
+func checkLegacyResearchDisposition(documents map[string]document, tracked map[string]struct{}, legacyPath string, index int, disposition legacyResearchDisposition) error {
+	validKinds := map[string]struct{}{
+		"retain-move": {}, "split": {}, "merge": {}, "absorb": {}, "executable-replacement": {}, "retire": {},
+	}
+	if _, ok := validKinds[disposition.Kind]; !ok {
+		return fmt.Errorf("completed migration %q dispositions[%d] kind = %q", legacyPath, index, disposition.Kind)
+	}
+	if strings.TrimSpace(disposition.Scope) == "" {
+		return fmt.Errorf("completed migration %q dispositions[%d] has an empty scope", legacyPath, index)
+	}
+	if disposition.Kind == "retire" {
+		validReasons := map[string]struct{}{
+			"resolved-history": {}, "delivered-history": {}, "obsolete": {}, "superseded": {}, "reproducible-from-retained-evidence": {},
+		}
+		if _, ok := validReasons[disposition.Reason]; !ok {
+			return fmt.Errorf("completed migration %q dispositions[%d] retirement reason = %q", legacyPath, index, disposition.Reason)
+		}
+	} else if len(disposition.Successors) == 0 {
+		return fmt.Errorf("completed migration %q dispositions[%d] kind %q has no successors", legacyPath, index, disposition.Kind)
+	}
+	for _, successor := range disposition.Successors {
+		name, _, _ := strings.Cut(successor, "#")
+		if name == "" || filepath.IsAbs(name) || filepath.ToSlash(filepath.Clean(name)) != name || strings.HasPrefix(name, "../") {
+			return fmt.Errorf("completed migration %q successor %q is not a canonical repository-relative path", legacyPath, successor)
+		}
+		if _, ok := tracked[name]; !ok {
+			return fmt.Errorf("completed migration %q successor %q is not tracked", legacyPath, successor)
+		}
+		if strings.HasPrefix(name, bundleRoot+"/") && filepath.Ext(name) == ".md" {
+			if _, ok := documents[name]; !ok {
+				return fmt.Errorf("completed migration %q successor %q is not an OKF document", legacyPath, successor)
+			}
+		}
+	}
+	return nil
+}
+
+func checkLegacySourceObject(root string, entry legacyResearchMigration) error {
+	commit, err := gitOutput(root, "rev-parse", "--verify", entry.SourceRef+"^{commit}")
+	if err != nil || commit != entry.SourceRef {
+		return fmt.Errorf("completed migration %q source_ref %q is not the exact retained commit", entry.LegacyPath, entry.SourceRef)
+	}
+	blob, err := gitOutput(root, "rev-parse", "--verify", entry.SourceRef+":"+entry.LegacyPath)
+	if err != nil || blob != entry.SourceBlob {
+		return fmt.Errorf("completed migration %q source_blob %q does not match %s:%s", entry.LegacyPath, entry.SourceBlob, entry.SourceRef, entry.LegacyPath)
+	}
+	return nil
+}
+
+func gitOutput(root string, args ...string) (string, error) {
+	commandArgs := append([]string{"-C", root}, args...)
+	output, err := exec.Command("git", commandArgs...).Output()
+	return strings.TrimSpace(string(output)), err
+}
+
+func checkRemovedLegacyResearchReferences(root string, entry legacyResearchMigration, tracked []string) error {
+	for _, name := range tracked {
+		if name == legacyMigrationPath || name == legacyResearchBaselinePath || name == legacyResearchPlanvocabPath || !trackedTextPath(name) {
+			continue
+		}
+		data, err := os.ReadFile(filepath.Join(root, filepath.FromSlash(name)))
+		if err != nil {
+			return fmt.Errorf("read tracked text %q while checking removed legacy references: %w", name, err)
+		}
+		for lineNumber, line := range strings.Split(string(data), "\n") {
+			if !strings.Contains(line, entry.LegacyPath) {
+				continue
+			}
+			pinned := "/blob/" + entry.SourceRef + "/" + entry.LegacyPath
+			if strings.Contains(line, pinned) {
+				continue
+			}
+			return fmt.Errorf("removed legacy path %q still referenced by %s:%d", entry.LegacyPath, name, lineNumber+1)
+		}
+	}
+	return nil
+}
+
+func trackedTextPath(name string) bool {
+	switch filepath.Ext(name) {
+	case ".go", ".json", ".md", ".sql", ".txt", ".yaml", ".yml":
+		return true
+	default:
+		return false
+	}
 }
 
 func parseLegacyResearchMarkdown(contents string) (map[string]struct{}, error) {
@@ -660,6 +960,17 @@ func setDifference(left, right map[string]struct{}) []string {
 	var result []string
 	for item := range left {
 		if _, ok := right[item]; !ok {
+			result = append(result, item)
+		}
+	}
+	sort.Strings(result)
+	return result
+}
+
+func setIntersection(left, right map[string]struct{}) []string {
+	var result []string
+	for item := range left {
+		if _, ok := right[item]; ok {
 			result = append(result, item)
 		}
 	}

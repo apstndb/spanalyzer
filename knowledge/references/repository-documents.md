@@ -135,3 +135,5 @@ the groups below relate when their contents appear to disagree.
 - [Research](../research/index.md) - authoring policy for new OKF-native
   research and migration from the legacy tree.
 - [References](index.md) - canonical-document discovery.
+- [Legacy research migration ledger](legacy-research-migrations.md) - pending
+  and completed semantic dispositions for every legacy research body.

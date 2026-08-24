@@ -119,10 +119,13 @@ Repository policy requires every `Research Note` to declare a non-empty
 `title`, `description`, `tags`, explicit `status`, and at least one `sources`
 entry. Use `generated`, `verified`, credibility signals, and `stale_after` only
 when the corresponding producer, verification event, source fact, or expiry is
-actually known. A later migration from `research/` must use `git mv`, remove
-the path from the legacy allowlist, and update every inbound link and hashed
-`planvocab` evidence path in the same change; never leave a duplicate writable
-body.
+actually known. Use `git mv` when one coherent legacy body remains one
+`Research Note`. Split, merge, absorption, executable replacement, and
+retirement instead require a completed, source-hashed entry in
+[`legacy-research-migrations.md`](knowledge/references/legacy-research-migrations.md).
+In the same change, remove the path from the active legacy allowlist, update
+every inbound link, and disposition any hashed `planvocab` evidence. Never
+leave a duplicate writable body.
 
 Non-Markdown discovery is intentionally narrower than repository inventory.
 [`knowledge/references/repository-assets.md`](knowledge/references/repository-assets.md)

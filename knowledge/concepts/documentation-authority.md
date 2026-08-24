@@ -50,8 +50,10 @@ every tracked Markdown file to one of these roles.
 
 An OKF concept may summarize and link canonical material, but it must not copy
 large behavior descriptions or observation tables into a second writable body.
-New research is itself canonical inside the bundle; a legacy research note
-becomes canonical there only through `git mv`, never through a wrapper copy.
-The `resource` and `sources` fields point to material that owns supporting
-details. This keeps the bundle useful for discovery without creating a shadow
-documentation tree.
+New research is itself canonical inside the bundle. Use `git mv` when one
+legacy body remains one Research Note; otherwise the source-hashed
+[migration ledger](../references/legacy-research-migrations.md) records its
+split, merge, absorption, executable replacement, or retirement. A wrapper
+copy is never a migration. The `resource` and `sources` fields point to
+material that owns supporting details. This keeps the bundle useful for
+discovery without creating a shadow documentation tree.

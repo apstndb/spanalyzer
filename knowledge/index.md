@@ -37,8 +37,8 @@ but must not maintain a second copy of its findings.
   specific comparison or verification scope.
 - `Research Note`: environment-scoped probe results, design background, or
   candidate ideas with explicit provenance and lifecycle metadata.
-- `Reference`: discovery metadata for canonical material that remains at its
-  repository-native path.
+- `Reference`: discovery metadata for canonical material and durable routing
+  metadata such as historical migration lineage.
 
 The bundle is intentionally a navigation and synthesis layer. Current CLI
 behavior remains defined by code, schemas, tests, package documentation, and

@@ -20,11 +20,21 @@ body. The bundle's
 [repository-document inventory](../knowledge/references/repository-documents.md)
 also classifies every tracked legacy note while it remains at its current path.
 
-Migration is incremental. Move one note with `git mv`, remove its path from
-`tools/okf-check/legacy-research-markdown.txt`, add truthful OKF frontmatter,
-and update inbound links plus any `catalog_source.info.local_evidence` path and
-generated plan-vocabulary artifacts in the same change. Do not leave a wrapper
-or copied summary at the old path.
+Migration is incremental and follows the
+[legacy research migration ledger](../knowledge/references/legacy-research-migrations.md).
+Use `git mv` when one coherent body remains one `Research Note`. A split,
+merge, absorption into canonical documentation or executable evidence, or
+retirement must instead disposition every retained claim group and retired
+section in a source-hashed ledger entry. In the same change, remove the old
+path from `tools/okf-check/legacy-research-markdown.txt`, update inbound links,
+and disposition any `catalog_source.info.local_evidence` entry and generated
+plan-vocabulary artifacts. Do not leave a wrapper or copied summary at the old
+path.
+
+Probe code records how to reproduce a check, and an expectation records what a
+check asserts. Neither alone replaces a dated observation that a particular
+backend, image, and optimizer version produced a result. Preserve that scope,
+including negative results and retractions, before retiring a narrative body.
 
 ## Areas
 

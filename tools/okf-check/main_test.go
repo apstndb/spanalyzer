@@ -1,6 +1,8 @@
 package main
 
 import (
+	"os"
+	"os/exec"
 	"path/filepath"
 	"testing"
 
@@ -133,6 +135,16 @@ func TestLegacyResearchAllowlist(t *testing.T) {
 	if unknown := setDifference(allowed, baseline); len(unknown) != 0 {
 		t.Fatalf("legacy allowlist has paths outside baseline: %v", unknown)
 	}
+	planvocab, err := parseLegacyResearchMarkdown(legacyResearchPlanvocab)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got := len(planvocab); got != legacyResearchPlanvocabCount {
+		t.Fatalf("legacy planvocab baseline has %d paths, want %d", got, legacyResearchPlanvocabCount)
+	}
+	if unknown := setDifference(planvocab, baseline); len(unknown) != 0 {
+		t.Fatalf("legacy planvocab baseline has paths outside baseline: %v", unknown)
+	}
 	empty, err := parseLegacyResearchMarkdown("# no active legacy bodies remain\n")
 	if err != nil {
 		t.Fatal(err)
@@ -218,6 +230,198 @@ func TestCheckLegacyResearchMembership(t *testing.T) {
 				t.Fatalf("checkLegacyResearchMembership() error = %v, wantError %v", err, tt.wantError)
 			}
 		})
+	}
+}
+
+func TestCheckLegacyResearchMigrationLedgerMembership(t *testing.T) {
+	baseline := map[string]struct{}{
+		"research/area/a.md": {},
+		"research/area/b.md": {},
+	}
+	initialPlanvocab := map[string]struct{}{"research/area/b.md": {}}
+	currentPlanvocab := map[string]struct{}{"research/area/b.md": {}}
+	valid := []legacyResearchMigration{
+		{LegacyPath: "research/area/a.md", State: "pending", PlanvocabAction: "not-applicable"},
+		{LegacyPath: "research/area/b.md", State: "pending", PlanvocabAction: "pending"},
+	}
+	tests := []struct {
+		name      string
+		entries   []legacyResearchMigration
+		allowed   map[string]struct{}
+		wantError bool
+	}{
+		{name: "exact pending baseline", entries: valid, allowed: baseline},
+		{name: "missing baseline entry", entries: valid[:1], allowed: map[string]struct{}{"research/area/a.md": {}}, wantError: true},
+		{name: "out of order", entries: []legacyResearchMigration{valid[1], valid[0]}, allowed: baseline, wantError: true},
+		{name: "duplicate", entries: []legacyResearchMigration{valid[0], valid[0]}, allowed: baseline, wantError: true},
+		{name: "active without pending", entries: valid, allowed: map[string]struct{}{"research/area/a.md": {}}, wantError: true},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			documents := map[string]document{
+				legacyMigrationPath: {
+					Path: legacyMigrationPath,
+					Front: frontMatter{
+						Type:                     "Reference",
+						LegacyResearchMigrations: tt.entries,
+					},
+				},
+			}
+			err := checkLegacyResearchMigrations(t.TempDir(), documents, baseline, tt.allowed, initialPlanvocab, currentPlanvocab, nil)
+			if (err != nil) != tt.wantError {
+				t.Fatalf("checkLegacyResearchMigrations() error = %v, wantError %v", err, tt.wantError)
+			}
+		})
+	}
+}
+
+func TestCheckPendingLegacyResearchMigration(t *testing.T) {
+	hashed := "research/area/hashed.md"
+	current := map[string]struct{}{hashed: {}}
+	for _, tt := range []struct {
+		name      string
+		entry     legacyResearchMigration
+		wasHashed bool
+		wantError bool
+	}{
+		{
+			name:      "hashed",
+			entry:     legacyResearchMigration{LegacyPath: hashed, State: "pending", PlanvocabAction: "pending"},
+			wasHashed: true,
+		},
+		{
+			name:  "not hashed",
+			entry: legacyResearchMigration{LegacyPath: "research/area/plain.md", State: "pending", PlanvocabAction: "not-applicable"},
+		},
+		{
+			name:      "hashed action lost",
+			entry:     legacyResearchMigration{LegacyPath: hashed, State: "pending", PlanvocabAction: "not-applicable"},
+			wasHashed: true,
+			wantError: true,
+		},
+		{
+			name:      "completed fields on pending",
+			entry:     legacyResearchMigration{LegacyPath: hashed, State: "pending", SourceRef: "unexpected", PlanvocabAction: "pending"},
+			wasHashed: true,
+			wantError: true,
+		},
+	} {
+		t.Run(tt.name, func(t *testing.T) {
+			err := checkPendingLegacyResearchMigration(tt.entry, tt.wasHashed, current)
+			if (err != nil) != tt.wantError {
+				t.Fatalf("checkPendingLegacyResearchMigration() error = %v, wantError %v", err, tt.wantError)
+			}
+		})
+	}
+}
+
+func TestCheckCompletedLegacyResearchMigration(t *testing.T) {
+	root, sourceRef, sourceBlob := newMigrationTestRepository(t)
+	legacyPath := "research/area/a.md"
+	successor := "knowledge/research/area/a.md"
+	documents := map[string]document{successor: {Path: successor}}
+	tracked := map[string]struct{}{successor: {}}
+
+	validRetire := legacyResearchMigration{
+		LegacyPath: legacyPath,
+		State:      "completed",
+		SourceRef:  sourceRef,
+		SourceBlob: sourceBlob,
+		Dispositions: []legacyResearchDisposition{{
+			Kind:   "retire",
+			Scope:  "entire document",
+			Reason: "resolved-history",
+		}},
+		PlanvocabAction: "not-applicable",
+	}
+	if err := checkCompletedLegacyResearchMigration(root, documents, validRetire, false, nil, tracked); err != nil {
+		t.Fatal(err)
+	}
+
+	validHashed := validRetire
+	validHashed.Dispositions = []legacyResearchDisposition{{Kind: "retain-move", Scope: "entire document", Successors: []string{successor}}}
+	validHashed.PlanvocabAction = "path-moved"
+	validHashed.PlanvocabEvidence = []string{successor}
+	validHashed.PlanvocabSelectors = []string{"/operators/Scan"}
+	current := map[string]struct{}{successor: {}}
+	if err := checkCompletedLegacyResearchMigration(root, documents, validHashed, true, current, tracked); err != nil {
+		t.Fatal(err)
+	}
+
+	for _, tt := range []struct {
+		name      string
+		mutate    func(*legacyResearchMigration)
+		wasHashed bool
+		current   map[string]struct{}
+	}{
+		{name: "missing source ref", mutate: func(entry *legacyResearchMigration) { entry.SourceRef = "" }},
+		{name: "no dispositions", mutate: func(entry *legacyResearchMigration) { entry.Dispositions = nil }},
+		{name: "bad retirement reason", mutate: func(entry *legacyResearchMigration) { entry.Dispositions[0].Reason = "because" }},
+		{
+			name:      "hashed without mapping",
+			mutate:    func(entry *legacyResearchMigration) { entry.PlanvocabAction = "pending" },
+			wasHashed: true,
+		},
+	} {
+		t.Run(tt.name, func(t *testing.T) {
+			entry := validRetire
+			entry.Dispositions = append([]legacyResearchDisposition(nil), validRetire.Dispositions...)
+			tt.mutate(&entry)
+			if err := checkCompletedLegacyResearchMigration(root, documents, entry, tt.wasHashed, tt.current, tracked); err == nil {
+				t.Fatal("checkCompletedLegacyResearchMigration() succeeded, want error")
+			}
+		})
+	}
+}
+
+func TestCheckRemovedLegacyResearchReferences(t *testing.T) {
+	root := t.TempDir()
+	entry := legacyResearchMigration{
+		LegacyPath: "research/area/a.md",
+		SourceRef:  "0123456789012345678901234567890123456789",
+	}
+	writeTestFile(t, root, "clean.md", "No legacy reference.\n")
+	writeTestFile(t, root, "pinned.md", "https://github.com/apstndb/spanalyzer/blob/"+entry.SourceRef+"/"+entry.LegacyPath+"\n")
+	writeTestFile(t, root, legacyResearchPlanvocabPath, entry.LegacyPath+"\n")
+	if err := checkRemovedLegacyResearchReferences(root, entry, []string{"clean.md", "pinned.md", legacyResearchPlanvocabPath}); err != nil {
+		t.Fatal(err)
+	}
+	writeTestFile(t, root, "stale.md", "See "+entry.LegacyPath+".\n")
+	if err := checkRemovedLegacyResearchReferences(root, entry, []string{"stale.md"}); err == nil {
+		t.Fatal("checkRemovedLegacyResearchReferences() succeeded, want error")
+	}
+}
+
+func newMigrationTestRepository(t *testing.T) (root, sourceRef, sourceBlob string) {
+	t.Helper()
+	root = t.TempDir()
+	legacyPath := "research/area/a.md"
+	writeTestFile(t, root, legacyPath, "# Legacy evidence\n")
+	writeTestFile(t, root, "knowledge/research/area/a.md", "# Successor\n")
+	runGitTestCommand(t, root, "init", "-q")
+	runGitTestCommand(t, root, "add", legacyPath, "knowledge/research/area/a.md")
+	runGitTestCommand(t, root, "-c", "user.name=Test", "-c", "user.email=test@example.com", "-c", "commit.gpgsign=false", "commit", "-qm", "fixture")
+	sourceRef, _ = gitOutput(root, "rev-parse", "HEAD")
+	sourceBlob, _ = gitOutput(root, "rev-parse", "HEAD:"+legacyPath)
+	return root, sourceRef, sourceBlob
+}
+
+func writeTestFile(t *testing.T, root, name, contents string) {
+	t.Helper()
+	path := filepath.Join(root, filepath.FromSlash(name))
+	if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(path, []byte(contents), 0o644); err != nil {
+		t.Fatal(err)
+	}
+}
+
+func runGitTestCommand(t *testing.T, root string, args ...string) {
+	t.Helper()
+	commandArgs := append([]string{"-C", root}, args...)
+	if output, err := exec.Command("git", commandArgs...).CombinedOutput(); err != nil {
+		t.Fatalf("git %v: %v\n%s", args, err, output)
 	}
 }
 
