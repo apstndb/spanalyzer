@@ -54,6 +54,7 @@ var (
 		)},
 		{Name: "ai_plan", Description: "AI function plan-capability probes", Queries: staticQueryProvider(aiPlanQueries), DDLs: docsDDLProvider},
 		{Name: "statement_surface", Description: "schema-independent top-level statement boundaries", Queries: staticQueryProvider(statementSurfaceQueries), DDLs: noDDLProvider},
+		{Name: "remote_function", Description: "remote-function literal and table-input plans", Queries: staticQueryProvider(remoteFunctionQueries), DDLs: parsedDDLProvider("remote-function-schema.sql", remoteFunctionDDL)},
 		{Name: "function_hint", Description: "function-level hint probes", Queries: staticQueryProvider(functionHintQueries), DDLs: docsDDLProvider},
 		{Name: "hint_matrix", Description: "cross-surface hint matrix", Queries: staticQueryProvider(hintMatrixQueries), DDLs: docsDDLProvider},
 		{Name: "statement_hint_query_matrix", Description: "statement-hint query matrix", Queries: staticQueryProvider(statementHintQueryMatrixQueries), DDLs: docsDDLProvider},

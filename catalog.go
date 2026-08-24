@@ -18,6 +18,7 @@ type Catalog struct {
 	PropertyGraphs   map[string]*PropertyGraph
 	Sequences        map[string]*Sequence
 	Models           map[string]*Model
+	Functions        map[string]*Function
 	ProtoTypes       map[string]bool
 	ProtoDescriptors *ProtoDescriptorSet
 }
@@ -77,6 +78,17 @@ type Model struct {
 }
 
 type ModelColumn struct {
+	Name string
+	Type *TypeSpec
+}
+
+type Function struct {
+	Name       ObjectName
+	Parameters []*FunctionParameter
+	ReturnType *TypeSpec
+}
+
+type FunctionParameter struct {
 	Name string
 	Type *TypeSpec
 }
@@ -172,6 +184,7 @@ func BuildSchemaCatalog(path, ddlSQL string) (*Catalog, error) {
 		PropertyGraphs: map[string]*PropertyGraph{},
 		Sequences:      map[string]*Sequence{},
 		Models:         map[string]*Model{},
+		Functions:      map[string]*Function{},
 		ProtoTypes:     map[string]bool{},
 	}
 	for _, ddl := range ddls {
@@ -221,6 +234,11 @@ func (c *Catalog) ApplyDDL(ddl ast.DDL) error {
 		return nil
 	case *ast.DropModel:
 		delete(c.Models, ddl.Name.Name)
+		return nil
+	case *ast.CreateFunction:
+		return c.applyCreateFunction(ddl)
+	case *ast.DropFunction:
+		delete(c.Functions, objectNameFromPath(ddl.Name).String())
 		return nil
 	case *ast.CreateProtoBundle:
 		return c.applyCreateProtoBundle(ddl)
@@ -333,6 +351,37 @@ func (c *Catalog) applyCreateModel(ddl *ast.CreateModel) error {
 		model.Outputs = outputs
 	}
 	c.Models[name] = model
+	return nil
+}
+
+func (c *Catalog) applyCreateFunction(ddl *ast.CreateFunction) error {
+	name := objectNameFromPath(ddl.Name)
+	key := name.String()
+	if _, ok := c.Functions[key]; ok && !ddl.OrReplace {
+		return fmt.Errorf("function %s already exists", name)
+	}
+	if !strings.EqualFold(ddl.Language, "REMOTE") {
+		return fmt.Errorf("function %s uses unsupported language %q; only Spanner remote functions are supported", name, ddl.Language)
+	}
+	if ddl.ReturnType == nil {
+		return fmt.Errorf("function %s has no return type", name)
+	}
+	returnType, err := schemaTypeToTypeSpec(ddl.ReturnType)
+	if err != nil {
+		return fmt.Errorf("function %s return type: %w", name, err)
+	}
+	function := &Function{Name: name, ReturnType: returnType}
+	for _, parameter := range ddl.Params {
+		if parameter.DefaultExpr != nil {
+			return fmt.Errorf("function %s parameter %s has an unsupported default expression", name, parameter.Name.Name)
+		}
+		typ, err := schemaTypeToTypeSpec(parameter.Type)
+		if err != nil {
+			return fmt.Errorf("function %s parameter %s: %w", name, parameter.Name.Name, err)
+		}
+		function.Parameters = append(function.Parameters, &FunctionParameter{Name: parameter.Name.Name, Type: typ})
+	}
+	c.Functions[key] = function
 	return nil
 }
 

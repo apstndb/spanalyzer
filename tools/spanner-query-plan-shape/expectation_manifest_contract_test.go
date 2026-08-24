@@ -53,6 +53,7 @@ var expectationManifestContracts = []expectationManifestContract{
 	{Selector: "planvocab_inference", Manifest: "planvocab_inference_expectations.json", Coverage: manifestCoverageExact, Plans: 17, PatternCount: 17},
 	{Selector: "pipe_surface", Manifest: "pipe_surface_expectations.json", Coverage: manifestCoverageExact, Plans: 15, PatternCount: 26},
 	{Selector: "optimizer_v9", Manifest: "optimizer_v9_expectations.json", Coverage: manifestCoverageExact, Plans: 6, Errors: 1, PatternCount: 9},
+	{Selector: "remote_function", Manifest: "remote_function_expectations.json", Coverage: manifestCoverageExact, Plans: 2, PatternCount: 6},
 	{Selector: "rewriter_surface", Manifest: "rewriter_surface_expectations.json", Coverage: manifestCoverageExact, Plans: 18, Errors: 15, PatternCount: 52},
 	{Selector: "search_graph", Manifest: "search_graph_expectations.json", Coverage: manifestCoverageSubset, Plans: 3, PatternCount: 14},
 	{Selector: "set_operation_distinct", Manifest: "set_operation_distinct_expectations.json", Coverage: manifestCoverageSubset, Plans: 47, Errors: 17, PatternCount: 77},

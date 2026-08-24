@@ -21,6 +21,25 @@ func TestDMLCases(t *testing.T) {
 	assertRetainedSurfaceLabels(t, "dml", "dml/")
 }
 
+func TestRemoteFunctionCases(t *testing.T) {
+	assertRetainedSurfaceLabels(t, "remote_function", "remote-function/")
+	ddls, err := loadDDLs("remote_function", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	joined := strings.Join(ddls, "\n")
+	for _, want := range []string{
+		"CREATE SCHEMA spanalyzer_remote",
+		"CREATE TABLE RemoteFunctionInputs",
+		"CREATE FUNCTION spanalyzer_remote.remote_add",
+		"LANGUAGE REMOTE",
+	} {
+		if !strings.Contains(joined, want) {
+			t.Errorf("remote_function DDL missing %q", want)
+		}
+	}
+}
+
 func assertRetainedSurfaceLabels(t *testing.T, selector, prefix string) {
 	t.Helper()
 	queries, err := loadQueries(selector, nil, nil)

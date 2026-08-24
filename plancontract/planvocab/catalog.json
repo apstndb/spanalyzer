@@ -68,6 +68,8 @@
       "tools/spanner-query-plan-shape/pipe_surface_omni_test.go",
       "tools/spanner-query-plan-shape/pipe_surface_test.go",
       "tools/spanner-query-plan-shape/planvocab_cases.go",
+      "tools/spanner-query-plan-shape/remote_function_cases.go",
+      "tools/spanner-query-plan-shape/remote_function_omni_test.go",
       "tools/spanner-query-plan-shape/retained_surface_test.go",
       "tools/spanner-query-plan-shape/rewriter_surface_cases.go",
       "tools/spanner-query-plan-shape/rewriter_surface_omni_test.go",
@@ -93,6 +95,7 @@
       "tools/spanner-query-plan-shape/testdata/optimizer_v9_expectations.json",
       "tools/spanner-query-plan-shape/testdata/pipe_surface_expectations.json",
       "tools/spanner-query-plan-shape/testdata/planvocab_inference_expectations.json",
+      "tools/spanner-query-plan-shape/testdata/remote_function_expectations.json",
       "tools/spanner-query-plan-shape/testdata/rewriter_surface_expectations.json",
       "tools/spanner-query-plan-shape/testdata/search_graph_expectations.json",
       "tools/spanner-query-plan-shape/testdata/set_operation_distinct_expectations.json",
@@ -172,7 +175,7 @@
       },
       {
         "path": "plancontract/planvocab/catalog_source.json",
-        "sha256": "55a0f256579990a6881e6cd921f766f02b8aa54fbe1f46cba0d3947ea844a459"
+        "sha256": "75e454cd23ddcda8721dbd7e85318d842c4dfdb1f84ea7151fa52bc2d81e9108"
       },
       {
         "path": "research/spanner-query-plan-shape/AGGREGATE_FUNCTION_AGG_TYPE_OBSERVATIONS_2026-08-11.md",
@@ -308,7 +311,7 @@
       },
       {
         "path": "tools/spanner-query-plan-shape/expectation_manifest_contract_test.go",
-        "sha256": "27b5f76b4deacff048be84e3dc8a01e2c025f8d0afff5798904ada3700b2cf19"
+        "sha256": "dcb8051785e03121f57dff0a2c3d95b41cc162501983290cd138c9da0a6d8204"
       },
       {
         "path": "tools/spanner-query-plan-shape/factorized_mode_cases.go",
@@ -431,8 +434,16 @@
         "sha256": "21d2b5aa805bd0837076af1554072dd6447095433e657cd35e78fccd8967c6a6"
       },
       {
+        "path": "tools/spanner-query-plan-shape/remote_function_cases.go",
+        "sha256": "53dccdeeddfe58702353ce9c7d4750579a932f5f1a3fb5719c8e92e907de2b89"
+      },
+      {
+        "path": "tools/spanner-query-plan-shape/remote_function_omni_test.go",
+        "sha256": "debce05914e4e7e2543e464606d6b86ac0517bd4354184d25da623c552113962"
+      },
+      {
         "path": "tools/spanner-query-plan-shape/retained_surface_test.go",
-        "sha256": "31cae800fb6dd2573615a8dcade24025b8e5c57e5e61b155ba8fbea5fc5a2e23"
+        "sha256": "4c4f8d78038353148d72ffbd4c7b73788efcd15089cea17394329173bf2ed637"
       },
       {
         "path": "tools/spanner-query-plan-shape/rewriter_surface_cases.go",
@@ -529,6 +540,10 @@
       {
         "path": "tools/spanner-query-plan-shape/testdata/planvocab_inference_expectations.json",
         "sha256": "68f3d35d6876a1048b3106c851a854a1055fab4ff0b64c637647241b35b93318"
+      },
+      {
+        "path": "tools/spanner-query-plan-shape/testdata/remote_function_expectations.json",
+        "sha256": "85083cdaccfdf0f362ca0f917426743bf67154b8185de641fab91a9c53a2583a"
       },
       {
         "path": "tools/spanner-query-plan-shape/testdata/rewriter_surface_expectations.json",

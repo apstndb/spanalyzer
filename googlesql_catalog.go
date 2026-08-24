@@ -85,6 +85,9 @@ func BuildGoogleSQLCatalogFromSpannerCatalog(schema *Catalog, options ...Analyze
 	if err := out.addSpannerFunctions(); err != nil {
 		return nil, err
 	}
+	if err := out.addRemoteFunctions(); err != nil {
+		return nil, err
+	}
 	if err := out.addViews(); err != nil {
 		return nil, err
 	}
@@ -92,6 +95,47 @@ func BuildGoogleSQLCatalogFromSpannerCatalog(schema *Catalog, options ...Analyze
 		return nil, err
 	}
 	return out, nil
+}
+
+func (c *GoogleSQLCatalog) addRemoteFunctions() error {
+	for _, function := range c.SpannerCatalog.Functions {
+		returnType, err := c.TypeSpecToGoogleSQLType(function.ReturnType)
+		if err != nil {
+			return fmt.Errorf("function %s result: %w", function.Name, err)
+		}
+		resultArg, err := newFunctionArgumentType(returnType)
+		if err != nil {
+			return fmt.Errorf("function %s result: %w", function.Name, err)
+		}
+		arguments := make([]*googlesql.FunctionArgumentType, 0, len(function.Parameters))
+		for _, parameter := range function.Parameters {
+			typ, err := c.TypeSpecToGoogleSQLType(parameter.Type)
+			if err != nil {
+				return fmt.Errorf("function %s parameter %s: %w", function.Name, parameter.Name, err)
+			}
+			argument, err := newFunctionArgumentType(typ)
+			if err != nil {
+				return fmt.Errorf("function %s parameter %s: %w", function.Name, parameter.Name, err)
+			}
+			arguments = append(arguments, argument)
+		}
+		signature, err := googlesql.NewFunctionSignature3(resultArg, arguments, int64(googlesql.FunctionSignatureIdFnInvalidFunctionId))
+		if err != nil {
+			return fmt.Errorf("function %s signature: %w", function.Name, err)
+		}
+		parent, leaf, err := simpleCatalogForObjectName(c.SimpleCatalog, c.simpleCatalogs, function.Name)
+		if err != nil {
+			return err
+		}
+		fn, err := googlesql.NewFunction([]string{leaf}, "Spanner remote", googlesql.FunctionEnums_ModeScalar, []*googlesql.FunctionSignature{signature}, nil)
+		if err != nil {
+			return fmt.Errorf("function %s: %w", function.Name, err)
+		}
+		if err := parent.AddOwnedFunction(fn); err != nil {
+			return fmt.Errorf("function %s: %w", function.Name, err)
+		}
+	}
+	return nil
 }
 
 func (c *GoogleSQLCatalog) Helper() *GoogleSQLHelper {

@@ -123,6 +123,51 @@ CREATE TABLE Fans (
 	}
 }
 
+func TestBuildSchemaCatalogRemoteFunction(t *testing.T) {
+	const ddl = `
+CREATE SCHEMA spanalyzer_remote;
+CREATE FUNCTION spanalyzer_remote.remote_add(x INT64, y INT64) RETURNS INT64
+NOT DETERMINISTIC LANGUAGE REMOTE
+OPTIONS (endpoint = "https://spanalyzer-remote-test-uc.a.run.app", max_batching_rows = 10);
+`
+	catalog, err := BuildSchemaCatalog("schema.sql", ddl)
+	if err != nil {
+		t.Fatalf("BuildSchemaCatalog() error = %v", err)
+	}
+	function := catalog.Functions["spanalyzer_remote.remote_add"]
+	if function == nil {
+		t.Fatal("remote_add function was not created")
+	}
+	if got, want := function.ReturnType.Code, spannerpb.TypeCode_INT64; got != want {
+		t.Fatalf("remote_add return type = %v, want %v", got, want)
+	}
+	if got, want := len(function.Parameters), 2; got != want {
+		t.Fatalf("remote_add parameter count = %d, want %d", got, want)
+	}
+	for i, name := range []string{"x", "y"} {
+		if got := function.Parameters[i]; got.Name != name || got.Type.Code != spannerpb.TypeCode_INT64 {
+			t.Errorf("remote_add parameter %d = %#v, want %s INT64", i, got, name)
+		}
+	}
+}
+
+func TestBuildSchemaCatalogDropRemoteFunction(t *testing.T) {
+	const ddl = `
+CREATE SCHEMA spanalyzer_remote;
+CREATE FUNCTION spanalyzer_remote.remote_add(x INT64, y INT64) RETURNS INT64
+NOT DETERMINISTIC LANGUAGE REMOTE
+OPTIONS (endpoint = "https://spanalyzer-remote-test-uc.a.run.app");
+DROP FUNCTION spanalyzer_remote.remote_add;
+`
+	catalog, err := BuildSchemaCatalog("schema.sql", ddl)
+	if err != nil {
+		t.Fatalf("BuildSchemaCatalog() error = %v", err)
+	}
+	if len(catalog.Functions) != 0 {
+		t.Fatalf("functions = %#v, want empty", catalog.Functions)
+	}
+}
+
 func TestBuildSchemaCatalogQualifiedNamedTypeRemainsProto(t *testing.T) {
 	const ddl = `
 CREATE PROTO BUNDLE (` + "`example.UUID`" + `);

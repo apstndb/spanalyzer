@@ -92,6 +92,27 @@ CREATE TABLE Fans (
 	assertField(t, rowType.Fields[1], "GeneratedId", spannerpb.TypeCode_UUID)
 }
 
+func TestAnalyzerRowTypeForRemoteFunction(t *testing.T) {
+	const ddl = `
+CREATE SCHEMA spanalyzer_remote;
+CREATE FUNCTION spanalyzer_remote.remote_add(x INT64, y INT64) RETURNS INT64
+NOT DETERMINISTIC LANGUAGE REMOTE
+OPTIONS (endpoint = "https://spanalyzer-remote-test-uc.a.run.app", max_batching_rows = 10);
+`
+	analyzer, err := NewAnalyzerFromDDL("schema.sql", ddl)
+	if err != nil {
+		t.Fatalf("NewAnalyzerFromDDL() error = %v", err)
+	}
+	rowType, err := analyzer.RowTypeForStatement("SELECT spanalyzer_remote.remote_add(1, 2) AS total")
+	if err != nil {
+		t.Fatalf("RowTypeForStatement() error = %v", err)
+	}
+	if got, want := len(rowType.Fields), 1; got != want {
+		t.Fatalf("len(rowType.Fields) = %d, want %d", got, want)
+	}
+	assertField(t, rowType.Fields[0], "total", spannerpb.TypeCode_INT64)
+}
+
 func TestAnalyzerRowTypeForDistinctPredicates(t *testing.T) {
 	tests := []struct {
 		name string

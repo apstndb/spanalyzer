@@ -162,6 +162,26 @@ version test for this selector. The remaining cases retain procedure-argument,
 unknown-procedure, DDL-routing, batch-command, and procedural-language
 capability boundaries without treating them as operator vocabulary.
 
+Inspect remote-function lowering without invoking the configured endpoint:
+
+```sh
+set -o pipefail
+/tmp/spanner-query-plan-shape \
+  --case remote_function \
+  --omni-image us-docker.pkg.dev/spanner-omni/images/spanner-omni:2026.r2.1-beta \
+  --output json \
+  | /tmp/planvocab-check \
+      --expect tools/spanner-query-plan-shape/testdata/remote_function_expectations.json
+```
+
+The fixture uses a non-existent but syntactically valid Cloud Run hostname;
+`PLAN` does not call it. Both a literal call and a table-column call lower to a
+`TVF` named `spanalyzer_remote.remote_add`; the table form also retains the
+input key through a `PassThroughVars` link. The focused Omni test repeats both
+shapes at optimizer versions 1 through 8. Omni 2026.r2.1-beta requires remote
+functions in a named schema, so the fixture does not use the default-schema
+form shown in the managed Spanner guide.
+
 Inspect a change-stream table-valued function probe:
 
 ```sh
