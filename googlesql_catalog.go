@@ -34,7 +34,9 @@ func BuildGoogleSQLCatalogFromSpannerCatalog(schema *Catalog, options ...Analyze
 	if schema == nil {
 		return nil, fmt.Errorf("nil schema catalog")
 	}
-	schema.addInformationSchemaTables()
+	if err := schema.addInformationSchemaTables(); err != nil {
+		return nil, err
+	}
 	schema.addSpannerSysTables()
 	config := defaultAnalyzerConfig()
 	for _, option := range options {

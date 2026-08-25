@@ -1,0 +1,226 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/apstndb/spanalyzer/schemas/spanalyzer.information-schema-manifest.v0alpha1.schema.json",
+  "title": "Spanalyzer INFORMATION_SCHEMA manifest",
+  "description": "A pinned live-primary INFORMATION_SCHEMA observation and its analyzer projection policy.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "source",
+    "documentation",
+    "content_sha256",
+    "tables"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "v0alpha1"
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "repository",
+        "commit",
+        "path",
+        "export_sha256",
+        "exporter_note"
+      ],
+      "properties": {
+        "repository": {
+          "type": "string",
+          "minLength": 1
+        },
+        "commit": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "export_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "exporter_note": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "documentation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "url",
+        "last_updated"
+      ],
+      "properties": {
+        "url": {
+          "type": "string",
+          "format": "uri"
+        },
+        "last_updated": {
+          "type": "string",
+          "format": "date"
+        }
+      }
+    },
+    "content_sha256": {
+      "$ref": "#/$defs/sha256"
+    },
+    "tables": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/table"
+      }
+    }
+  },
+  "$defs": {
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "table": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "columns"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "columns": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/column"
+          }
+        }
+      }
+    },
+    "column": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "raw_type",
+        "evidence_status",
+        "project"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "ordinal": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "raw_type": {
+          "type": "string",
+          "minLength": 1
+        },
+        "evidence_status": {
+          "enum": [
+            "live_observed",
+            "rolling",
+            "docs_only_absent"
+          ]
+        },
+        "project": {
+          "type": "boolean"
+        },
+        "projected_type": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "evidence_status": {
+                "enum": [
+                  "live_observed",
+                  "rolling"
+                ]
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "ordinal"
+            ],
+            "properties": {
+              "project": {
+                "const": true
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "evidence_status": {
+                "const": "docs_only_absent"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "project": {
+                "const": false
+              }
+            },
+            "not": {
+              "anyOf": [
+                {
+                  "required": [
+                    "ordinal"
+                  ]
+                },
+                {
+                  "required": [
+                    "projected_type"
+                  ]
+                }
+              ]
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "raw_type": {
+                "pattern": "^PROTO<"
+              },
+              "evidence_status": {
+                "enum": [
+                  "live_observed",
+                  "rolling"
+                ]
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "projected_type"
+            ]
+          },
+          "else": {
+            "not": {
+              "required": [
+                "projected_type"
+              ]
+            }
+          }
+        }
+      ]
+    }
+  }
+}

@@ -651,19 +651,21 @@ SELECT
   TABLE_NAME,
   COLUMN_NAME,
   ORDINAL_POSITION,
-  SPANNER_TYPE
+  SPANNER_TYPE,
+  IS_HIDDEN
 FROM INFORMATION_SCHEMA.COLUMNS
 `)
 	if err != nil {
 		t.Fatalf("RowTypeForStatement() error = %v", err)
 	}
-	if got, want := len(rowType.Fields), 4; got != want {
+	if got, want := len(rowType.Fields), 5; got != want {
 		t.Fatalf("len(rowType.Fields) = %d, want %d", got, want)
 	}
 	assertField(t, rowType.Fields[0], "TABLE_NAME", spannerpb.TypeCode_STRING)
 	assertField(t, rowType.Fields[1], "COLUMN_NAME", spannerpb.TypeCode_STRING)
 	assertField(t, rowType.Fields[2], "ORDINAL_POSITION", spannerpb.TypeCode_INT64)
 	assertField(t, rowType.Fields[3], "SPANNER_TYPE", spannerpb.TypeCode_STRING)
+	assertField(t, rowType.Fields[4], "IS_HIDDEN", spannerpb.TypeCode_BOOL)
 }
 
 func TestAnalyzerRowTypeForSpannerSys(t *testing.T) {

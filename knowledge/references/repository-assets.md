@@ -14,6 +14,9 @@ asset_families:
       - plancontract/planvocab/catalog.json
       - plancontract/planvocab/catalog_source.json
       - plancontract/planvocab/testdata/fixture_plans.json
+  - id: information-schema-catalog
+    paths:
+      - information_schema_manifest.json
   - id: executable-plan-evidence
     paths:
       - tools/spanner-query-plan-shape/*_cases.go
@@ -55,6 +58,15 @@ generated [`catalog.json`](../../plancontract/planvocab/catalog.json), and the
 generated [`fixture_plans.json`](../../plancontract/planvocab/testdata/fixture_plans.json)
 mirror. The source catalog's `info.local_evidence` list remains the authority
 for hashed catalog provenance; this inventory does not replace it.
+
+## INFORMATION_SCHEMA catalog
+
+The [`information_schema_manifest.json`](../../information_schema_manifest.json)
+file is the analyzer's live-primary INFORMATION_SCHEMA projection. It records
+the pinned survey commit and export hash, raw observed types, rollout status,
+explicit frontend projection overrides, and documentation-only columns that
+are intentionally excluded from analysis. The corresponding JSON Schema is
+covered by the contract-schemas family.
 
 ## Executable plan evidence
 

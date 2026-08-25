@@ -1,0 +1,2468 @@
+{
+  "schema_version": "v0alpha1",
+  "source": {
+    "repository": "github.com/apstndb/spanner-emulator-survey",
+    "commit": "d3f4840a73dca7fa83627e2aa4303e7ef7fecadb",
+    "path": "infoschem/meta.go",
+    "export_sha256": "2a569cf756e131ba73ef048c956d9c38905c928ed0ff6bdccde3e79bf138cc85",
+    "exporter_note": "infoschem.AllTableMetas JSON exported at the pinned commit"
+  },
+  "documentation": {
+    "url": "https://docs.cloud.google.com/spanner/docs/information-schema",
+    "last_updated": "2026-08-15"
+  },
+  "content_sha256": "6040e547c6d5153264a4eac3df0b4224ef333b6b456e172ec0f1c55a045a9db7",
+  "tables": [
+    {
+      "name": "CHANGE_STREAMS",
+      "columns": [
+        {
+          "name": "CHANGE_STREAM_CATALOG",
+          "ordinal": 1,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "CHANGE_STREAM_SCHEMA",
+          "ordinal": 2,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "CHANGE_STREAM_NAME",
+          "ordinal": 3,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "ALL",
+          "ordinal": 4,
+          "raw_type": "BOOL",
+          "evidence_status": "live_observed",
+          "project": true
+        }
+      ]
+    },
+    {
+      "name": "CHANGE_STREAM_COLUMNS",
+      "columns": [
+        {
+          "name": "CHANGE_STREAM_CATALOG",
+          "ordinal": 1,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "CHANGE_STREAM_SCHEMA",
+          "ordinal": 2,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "CHANGE_STREAM_NAME",
+          "ordinal": 3,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "TABLE_CATALOG",
+          "ordinal": 4,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "TABLE_SCHEMA",
+          "ordinal": 5,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "TABLE_NAME",
+          "ordinal": 6,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "COLUMN_NAME",
+          "ordinal": 7,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        }
+      ]
+    },
+    {
+      "name": "CHANGE_STREAM_OPTIONS",
+      "columns": [
+        {
+          "name": "CHANGE_STREAM_CATALOG",
+          "ordinal": 1,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "CHANGE_STREAM_SCHEMA",
+          "ordinal": 2,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "CHANGE_STREAM_NAME",
+          "ordinal": 3,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "OPTION_NAME",
+          "ordinal": 4,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "OPTION_TYPE",
+          "ordinal": 5,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "OPTION_VALUE",
+          "ordinal": 6,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        }
+      ]
+    },
+    {
+      "name": "CHANGE_STREAM_PRIVILEGES",
+      "columns": [
+        {
+          "name": "CHANGE_STREAM_CATALOG",
+          "ordinal": 1,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "CHANGE_STREAM_SCHEMA",
+          "ordinal": 2,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "CHANGE_STREAM_NAME",
+          "ordinal": 3,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "PRIVILEGE_TYPE",
+          "ordinal": 4,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "GRANTEE",
+          "ordinal": 5,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        }
+      ]
+    },
+    {
+      "name": "CHANGE_STREAM_TABLES",
+      "columns": [
+        {
+          "name": "CHANGE_STREAM_CATALOG",
+          "ordinal": 1,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "CHANGE_STREAM_SCHEMA",
+          "ordinal": 2,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "CHANGE_STREAM_NAME",
+          "ordinal": 3,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "TABLE_CATALOG",
+          "ordinal": 4,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "TABLE_SCHEMA",
+          "ordinal": 5,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "TABLE_NAME",
+          "ordinal": 6,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "ALL_COLUMNS",
+          "ordinal": 7,
+          "raw_type": "BOOL",
+          "evidence_status": "live_observed",
+          "project": true
+        }
+      ]
+    },
+    {
+      "name": "CHECK_CONSTRAINTS",
+      "columns": [
+        {
+          "name": "CONSTRAINT_CATALOG",
+          "ordinal": 1,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "CONSTRAINT_SCHEMA",
+          "ordinal": 2,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "CONSTRAINT_NAME",
+          "ordinal": 3,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "CHECK_CLAUSE",
+          "ordinal": 4,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "SPANNER_STATE",
+          "ordinal": 5,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        }
+      ]
+    },
+    {
+      "name": "COLUMNS",
+      "columns": [
+        {
+          "name": "TABLE_CATALOG",
+          "ordinal": 1,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "TABLE_SCHEMA",
+          "ordinal": 2,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "TABLE_NAME",
+          "ordinal": 3,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "COLUMN_NAME",
+          "ordinal": 4,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "ORDINAL_POSITION",
+          "ordinal": 5,
+          "raw_type": "INT64",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "COLUMN_DEFAULT",
+          "ordinal": 6,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "DATA_TYPE",
+          "ordinal": 7,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "IS_NULLABLE",
+          "ordinal": 8,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "SPANNER_TYPE",
+          "ordinal": 9,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "IS_GENERATED",
+          "ordinal": 10,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "GENERATION_EXPRESSION",
+          "ordinal": 11,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "IS_STORED",
+          "ordinal": 12,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "IS_HIDDEN",
+          "ordinal": 13,
+          "raw_type": "BOOL",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "SPANNER_STATE",
+          "ordinal": 14,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "IS_IDENTITY",
+          "ordinal": 15,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "IDENTITY_GENERATION",
+          "ordinal": 16,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "IDENTITY_KIND",
+          "ordinal": 17,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "IDENTITY_START_WITH_COUNTER",
+          "ordinal": 18,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "IDENTITY_SKIP_RANGE_MIN",
+          "ordinal": 19,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "IDENTITY_SKIP_RANGE_MAX",
+          "ordinal": 20,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "ON_UPDATE_EXPRESSION",
+          "ordinal": 21,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        }
+      ]
+    },
+    {
+      "name": "COLUMN_COLUMN_USAGE",
+      "columns": [
+        {
+          "name": "TABLE_CATALOG",
+          "ordinal": 1,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "TABLE_SCHEMA",
+          "ordinal": 2,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "TABLE_NAME",
+          "ordinal": 3,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "COLUMN_NAME",
+          "ordinal": 4,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "DEPENDENT_COLUMN",
+          "ordinal": 5,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        }
+      ]
+    },
+    {
+      "name": "COLUMN_OPTIONS",
+      "columns": [
+        {
+          "name": "TABLE_CATALOG",
+          "ordinal": 1,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "TABLE_SCHEMA",
+          "ordinal": 2,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "TABLE_NAME",
+          "ordinal": 3,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "COLUMN_NAME",
+          "ordinal": 4,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "OPTION_NAME",
+          "ordinal": 5,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "OPTION_TYPE",
+          "ordinal": 6,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "OPTION_VALUE",
+          "ordinal": 7,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        }
+      ]
+    },
+    {
+      "name": "COLUMN_PRIVILEGES",
+      "columns": [
+        {
+          "name": "TABLE_CATALOG",
+          "ordinal": 1,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "TABLE_SCHEMA",
+          "ordinal": 2,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "TABLE_NAME",
+          "ordinal": 3,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "COLUMN_NAME",
+          "ordinal": 4,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "PRIVILEGE_TYPE",
+          "ordinal": 5,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "GRANTEE",
+          "ordinal": 6,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        }
+      ]
+    },
+    {
+      "name": "CONSTRAINT_COLUMN_USAGE",
+      "columns": [
+        {
+          "name": "TABLE_CATALOG",
+          "ordinal": 1,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "TABLE_SCHEMA",
+          "ordinal": 2,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "TABLE_NAME",
+          "ordinal": 3,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "COLUMN_NAME",
+          "ordinal": 4,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "CONSTRAINT_CATALOG",
+          "ordinal": 5,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "CONSTRAINT_SCHEMA",
+          "ordinal": 6,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "CONSTRAINT_NAME",
+          "ordinal": 7,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        }
+      ]
+    },
+    {
+      "name": "CONSTRAINT_TABLE_USAGE",
+      "columns": [
+        {
+          "name": "TABLE_CATALOG",
+          "ordinal": 1,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "TABLE_SCHEMA",
+          "ordinal": 2,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "TABLE_NAME",
+          "ordinal": 3,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "CONSTRAINT_CATALOG",
+          "ordinal": 4,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "CONSTRAINT_SCHEMA",
+          "ordinal": 5,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "CONSTRAINT_NAME",
+          "ordinal": 6,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        }
+      ]
+    },
+    {
+      "name": "DATABASE_OPTIONS",
+      "columns": [
+        {
+          "name": "CATALOG_NAME",
+          "ordinal": 1,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "SCHEMA_NAME",
+          "ordinal": 2,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "OPTION_NAME",
+          "ordinal": 3,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "OPTION_TYPE",
+          "ordinal": 4,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "OPTION_VALUE",
+          "ordinal": 5,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        }
+      ]
+    },
+    {
+      "name": "INDEXES",
+      "columns": [
+        {
+          "name": "TABLE_CATALOG",
+          "ordinal": 1,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "TABLE_SCHEMA",
+          "ordinal": 2,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "TABLE_NAME",
+          "ordinal": 3,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "INDEX_NAME",
+          "ordinal": 4,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "INDEX_TYPE",
+          "ordinal": 5,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "PARENT_TABLE_NAME",
+          "ordinal": 6,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "IS_UNIQUE",
+          "ordinal": 7,
+          "raw_type": "BOOL",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "IS_NULL_FILTERED",
+          "ordinal": 8,
+          "raw_type": "BOOL",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "INDEX_STATE",
+          "ordinal": 9,
+          "raw_type": "STRING(100)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "FILTER",
+          "ordinal": 10,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "SPANNER_IS_MANAGED",
+          "ordinal": 11,
+          "raw_type": "BOOL",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "SEARCH_PARTITION_BY",
+          "ordinal": 12,
+          "raw_type": "ARRAY\u003cSTRING(MAX)\u003e",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "SEARCH_ORDER_BY",
+          "ordinal": 13,
+          "raw_type": "ARRAY\u003cSTRING(MAX)\u003e",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "SEARCH_UNNEST",
+          "ordinal": 14,
+          "raw_type": "ARRAY\u003cSTRING(MAX)\u003e",
+          "evidence_status": "rolling",
+          "project": true
+        }
+      ]
+    },
+    {
+      "name": "INDEX_COLUMNS",
+      "columns": [
+        {
+          "name": "TABLE_CATALOG",
+          "ordinal": 1,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "TABLE_SCHEMA",
+          "ordinal": 2,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "TABLE_NAME",
+          "ordinal": 3,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "INDEX_NAME",
+          "ordinal": 4,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "INDEX_TYPE",
+          "ordinal": 5,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "COLUMN_NAME",
+          "ordinal": 6,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "ORDINAL_POSITION",
+          "ordinal": 7,
+          "raw_type": "INT64",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "COLUMN_ORDERING",
+          "ordinal": 8,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "IS_NULLABLE",
+          "ordinal": 9,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "SPANNER_TYPE",
+          "ordinal": 10,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "EXPRESSION",
+          "ordinal": 11,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "rolling",
+          "project": true
+        }
+      ]
+    },
+    {
+      "name": "INDEX_OPTIONS",
+      "columns": [
+        {
+          "name": "TABLE_CATALOG",
+          "ordinal": 1,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "TABLE_SCHEMA",
+          "ordinal": 2,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "TABLE_NAME",
+          "ordinal": 3,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "INDEX_NAME",
+          "ordinal": 4,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "INDEX_TYPE",
+          "ordinal": 5,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "OPTION_NAME",
+          "ordinal": 6,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "OPTION_TYPE",
+          "ordinal": 7,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "OPTION_VALUE",
+          "ordinal": 8,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        }
+      ]
+    },
+    {
+      "name": "KEY_COLUMN_USAGE",
+      "columns": [
+        {
+          "name": "CONSTRAINT_CATALOG",
+          "ordinal": 1,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "CONSTRAINT_SCHEMA",
+          "ordinal": 2,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "CONSTRAINT_NAME",
+          "ordinal": 3,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "TABLE_CATALOG",
+          "ordinal": 4,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "TABLE_SCHEMA",
+          "ordinal": 5,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "TABLE_NAME",
+          "ordinal": 6,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "COLUMN_NAME",
+          "ordinal": 7,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "ORDINAL_POSITION",
+          "ordinal": 8,
+          "raw_type": "INT64",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "POSITION_IN_UNIQUE_CONSTRAINT",
+          "ordinal": 9,
+          "raw_type": "INT64",
+          "evidence_status": "live_observed",
+          "project": true
+        }
+      ]
+    },
+    {
+      "name": "LOCALITY_GROUP_OPTIONS",
+      "columns": [
+        {
+          "name": "LOCALITY_GROUP_NAME",
+          "ordinal": 1,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "OPTION_NAME",
+          "ordinal": 2,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "OPTION_VALUE",
+          "ordinal": 3,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        }
+      ]
+    },
+    {
+      "name": "MODELS",
+      "columns": [
+        {
+          "name": "MODEL_CATALOG",
+          "ordinal": 1,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "MODEL_SCHEMA",
+          "ordinal": 2,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "MODEL_NAME",
+          "ordinal": 3,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "IS_REMOTE",
+          "ordinal": 4,
+          "raw_type": "BOOL",
+          "evidence_status": "live_observed",
+          "project": true
+        }
+      ]
+    },
+    {
+      "name": "MODEL_COLUMNS",
+      "columns": [
+        {
+          "name": "MODEL_CATALOG",
+          "ordinal": 1,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "MODEL_SCHEMA",
+          "ordinal": 2,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "MODEL_NAME",
+          "ordinal": 3,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "COLUMN_KIND",
+          "ordinal": 4,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "COLUMN_NAME",
+          "ordinal": 5,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "ORDINAL_POSITION",
+          "ordinal": 6,
+          "raw_type": "INT64",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "DATA_TYPE",
+          "ordinal": 7,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "IS_EXPLICIT",
+          "ordinal": 8,
+          "raw_type": "BOOL",
+          "evidence_status": "live_observed",
+          "project": true
+        }
+      ]
+    },
+    {
+      "name": "MODEL_COLUMN_OPTIONS",
+      "columns": [
+        {
+          "name": "MODEL_CATALOG",
+          "ordinal": 1,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "MODEL_SCHEMA",
+          "ordinal": 2,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "MODEL_NAME",
+          "ordinal": 3,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "COLUMN_KIND",
+          "ordinal": 4,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "COLUMN_NAME",
+          "ordinal": 5,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "OPTION_NAME",
+          "ordinal": 6,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "OPTION_TYPE",
+          "ordinal": 7,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "OPTION_VALUE",
+          "ordinal": 8,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        }
+      ]
+    },
+    {
+      "name": "MODEL_OPTIONS",
+      "columns": [
+        {
+          "name": "MODEL_CATALOG",
+          "ordinal": 1,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "MODEL_SCHEMA",
+          "ordinal": 2,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "MODEL_NAME",
+          "ordinal": 3,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "OPTION_NAME",
+          "ordinal": 4,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "OPTION_TYPE",
+          "ordinal": 5,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "OPTION_VALUE",
+          "ordinal": 6,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        }
+      ]
+    },
+    {
+      "name": "MODEL_PRIVILEGES",
+      "columns": [
+        {
+          "name": "MODEL_CATALOG",
+          "ordinal": 1,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "MODEL_SCHEMA",
+          "ordinal": 2,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "MODEL_NAME",
+          "ordinal": 3,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "PRIVILEGE_TYPE",
+          "ordinal": 4,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "GRANTEE",
+          "ordinal": 5,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        }
+      ]
+    },
+    {
+      "name": "PARAMETERS",
+      "columns": [
+        {
+          "name": "SPECIFIC_CATALOG",
+          "ordinal": 1,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "SPECIFIC_SCHEMA",
+          "ordinal": 2,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "SPECIFIC_NAME",
+          "ordinal": 3,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "ORDINAL_POSITION",
+          "ordinal": 4,
+          "raw_type": "INT64",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "PARAMETER_NAME",
+          "ordinal": 5,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "DATA_TYPE",
+          "ordinal": 6,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "PARAMETER_DEFAULT",
+          "ordinal": 7,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "SPANNER_TYPE",
+          "ordinal": 8,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        }
+      ]
+    },
+    {
+      "name": "PLACEMENTS",
+      "columns": [
+        {
+          "name": "PLACEMENT_NAME",
+          "ordinal": 1,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "IS_DEFAULT",
+          "ordinal": 2,
+          "raw_type": "BOOL",
+          "evidence_status": "live_observed",
+          "project": true
+        }
+      ]
+    },
+    {
+      "name": "PLACEMENT_OPTIONS",
+      "columns": [
+        {
+          "name": "PLACEMENT_NAME",
+          "ordinal": 1,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "OPTION_NAME",
+          "ordinal": 2,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "OPTION_TYPE",
+          "ordinal": 3,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "OPTION_VALUE",
+          "ordinal": 4,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        }
+      ]
+    },
+    {
+      "name": "PROPERTY_GRAPHS",
+      "columns": [
+        {
+          "name": "PROPERTY_GRAPH_CATALOG",
+          "ordinal": 1,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "PROPERTY_GRAPH_SCHEMA",
+          "ordinal": 2,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "PROPERTY_GRAPH_NAME",
+          "ordinal": 3,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "PROPERTY_GRAPH_METADATA_JSON",
+          "ordinal": 4,
+          "raw_type": "JSON",
+          "evidence_status": "live_observed",
+          "project": true
+        }
+      ]
+    },
+    {
+      "name": "REFERENTIAL_CONSTRAINTS",
+      "columns": [
+        {
+          "name": "CONSTRAINT_CATALOG",
+          "ordinal": 1,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "CONSTRAINT_SCHEMA",
+          "ordinal": 2,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "CONSTRAINT_NAME",
+          "ordinal": 3,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "UNIQUE_CONSTRAINT_CATALOG",
+          "ordinal": 4,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "UNIQUE_CONSTRAINT_SCHEMA",
+          "ordinal": 5,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "UNIQUE_CONSTRAINT_NAME",
+          "ordinal": 6,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "MATCH_OPTION",
+          "ordinal": 7,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "UPDATE_RULE",
+          "ordinal": 8,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "DELETE_RULE",
+          "ordinal": 9,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "SPANNER_STATE",
+          "ordinal": 10,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        }
+      ]
+    },
+    {
+      "name": "ROLES",
+      "columns": [
+        {
+          "name": "ROLE_NAME",
+          "ordinal": 1,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "IS_SYSTEM",
+          "ordinal": 2,
+          "raw_type": "BOOL",
+          "evidence_status": "live_observed",
+          "project": true
+        }
+      ]
+    },
+    {
+      "name": "ROLE_CHANGE_STREAM_GRANTS",
+      "columns": [
+        {
+          "name": "CHANGE_STREAM_CATALOG",
+          "ordinal": 1,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "CHANGE_STREAM_SCHEMA",
+          "ordinal": 2,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "CHANGE_STREAM_NAME",
+          "ordinal": 3,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "PRIVILEGE_TYPE",
+          "ordinal": 4,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "GRANTEE",
+          "ordinal": 5,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        }
+      ]
+    },
+    {
+      "name": "ROLE_COLUMN_GRANTS",
+      "columns": [
+        {
+          "name": "TABLE_CATALOG",
+          "ordinal": 1,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "TABLE_SCHEMA",
+          "ordinal": 2,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "TABLE_NAME",
+          "ordinal": 3,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "COLUMN_NAME",
+          "ordinal": 4,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "PRIVILEGE_TYPE",
+          "ordinal": 5,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "GRANTEE",
+          "ordinal": 6,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "GRANTOR",
+          "raw_type": "STRING",
+          "evidence_status": "docs_only_absent",
+          "project": false
+        },
+        {
+          "name": "IS_GRANTABLE",
+          "raw_type": "STRING",
+          "evidence_status": "docs_only_absent",
+          "project": false
+        }
+      ]
+    },
+    {
+      "name": "ROLE_GRANTEES",
+      "columns": [
+        {
+          "name": "ROLE_NAME",
+          "ordinal": 1,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "GRANTEE",
+          "ordinal": 2,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        }
+      ]
+    },
+    {
+      "name": "ROLE_MODEL_GRANTS",
+      "columns": [
+        {
+          "name": "MODEL_CATALOG",
+          "ordinal": 1,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "MODEL_SCHEMA",
+          "ordinal": 2,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "MODEL_NAME",
+          "ordinal": 3,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "PRIVILEGE_TYPE",
+          "ordinal": 4,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "GRANTEE",
+          "ordinal": 5,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "GRANTOR",
+          "raw_type": "STRING",
+          "evidence_status": "docs_only_absent",
+          "project": false
+        },
+        {
+          "name": "IS_GRANTABLE",
+          "raw_type": "STRING",
+          "evidence_status": "docs_only_absent",
+          "project": false
+        }
+      ]
+    },
+    {
+      "name": "ROLE_ROUTINE_GRANTS",
+      "columns": [
+        {
+          "name": "SPECIFIC_CATALOG",
+          "ordinal": 1,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "SPECIFIC_SCHEMA",
+          "ordinal": 2,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "SPECIFIC_NAME",
+          "ordinal": 3,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "PRIVILEGE_TYPE",
+          "ordinal": 4,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "GRANTEE",
+          "ordinal": 5,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "GRANTOR",
+          "raw_type": "STRING",
+          "evidence_status": "docs_only_absent",
+          "project": false
+        },
+        {
+          "name": "IS_GRANTABLE",
+          "raw_type": "STRING",
+          "evidence_status": "docs_only_absent",
+          "project": false
+        }
+      ]
+    },
+    {
+      "name": "ROLE_TABLE_GRANTS",
+      "columns": [
+        {
+          "name": "TABLE_CATALOG",
+          "ordinal": 1,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "TABLE_SCHEMA",
+          "ordinal": 2,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "TABLE_NAME",
+          "ordinal": 3,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "PRIVILEGE_TYPE",
+          "ordinal": 4,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "GRANTEE",
+          "ordinal": 5,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "GRANTOR",
+          "raw_type": "STRING",
+          "evidence_status": "docs_only_absent",
+          "project": false
+        },
+        {
+          "name": "IS_GRANTABLE",
+          "raw_type": "STRING",
+          "evidence_status": "docs_only_absent",
+          "project": false
+        }
+      ]
+    },
+    {
+      "name": "ROUTINES",
+      "columns": [
+        {
+          "name": "SPECIFIC_CATALOG",
+          "ordinal": 1,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "SPECIFIC_SCHEMA",
+          "ordinal": 2,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "SPECIFIC_NAME",
+          "ordinal": 3,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "ROUTINE_CATALOG",
+          "ordinal": 4,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "ROUTINE_SCHEMA",
+          "ordinal": 5,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "ROUTINE_NAME",
+          "ordinal": 6,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "ROUTINE_TYPE",
+          "ordinal": 7,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "DATA_TYPE",
+          "ordinal": 8,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "ROUTINE_BODY",
+          "ordinal": 9,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "ROUTINE_DEFINITION",
+          "ordinal": 10,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "SECURITY_TYPE",
+          "ordinal": 11,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "SPANNER_TYPE",
+          "ordinal": 12,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        }
+      ]
+    },
+    {
+      "name": "ROUTINE_OPTIONS",
+      "columns": [
+        {
+          "name": "SPECIFIC_CATALOG",
+          "ordinal": 1,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "SPECIFIC_SCHEMA",
+          "ordinal": 2,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "SPECIFIC_NAME",
+          "ordinal": 3,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "OPTION_NAME",
+          "ordinal": 4,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "OPTION_TYPE",
+          "ordinal": 5,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "OPTION_VALUE",
+          "ordinal": 6,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        }
+      ]
+    },
+    {
+      "name": "ROUTINE_PRIVILEGES",
+      "columns": [
+        {
+          "name": "SPECIFIC_CATALOG",
+          "ordinal": 1,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "SPECIFIC_SCHEMA",
+          "ordinal": 2,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "SPECIFIC_NAME",
+          "ordinal": 3,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "PRIVILEGE_TYPE",
+          "ordinal": 4,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "GRANTEE",
+          "ordinal": 5,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        }
+      ]
+    },
+    {
+      "name": "SCHEMATA",
+      "columns": [
+        {
+          "name": "CATALOG_NAME",
+          "ordinal": 1,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "SCHEMA_NAME",
+          "ordinal": 2,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "EFFECTIVE_TIMESTAMP",
+          "ordinal": 3,
+          "raw_type": "INT64",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "PROTO_BUNDLE",
+          "ordinal": 4,
+          "raw_type": "PROTO\u003cproto2.FileDescriptorSet\u003e",
+          "evidence_status": "live_observed",
+          "project": true,
+          "projected_type": "STRING(MAX)"
+        },
+        {
+          "name": "SCHEMA_OWNER",
+          "ordinal": 5,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        }
+      ]
+    },
+    {
+      "name": "SEQUENCES",
+      "columns": [
+        {
+          "name": "CATALOG",
+          "ordinal": 1,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "SCHEMA",
+          "ordinal": 2,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "NAME",
+          "ordinal": 3,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "DATA_TYPE",
+          "ordinal": 4,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        }
+      ]
+    },
+    {
+      "name": "SEQUENCE_OPTIONS",
+      "columns": [
+        {
+          "name": "CATALOG",
+          "ordinal": 1,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "SCHEMA",
+          "ordinal": 2,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "NAME",
+          "ordinal": 3,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "OPTION_NAME",
+          "ordinal": 4,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "OPTION_TYPE",
+          "ordinal": 5,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "OPTION_VALUE",
+          "ordinal": 6,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        }
+      ]
+    },
+    {
+      "name": "SPANNER_STATISTICS",
+      "columns": [
+        {
+          "name": "CATALOG_NAME",
+          "ordinal": 1,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "SCHEMA_NAME",
+          "ordinal": 2,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "PACKAGE_NAME",
+          "ordinal": 3,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "ALLOW_GC",
+          "ordinal": 4,
+          "raw_type": "BOOL",
+          "evidence_status": "live_observed",
+          "project": true
+        }
+      ]
+    },
+    {
+      "name": "TABLES",
+      "columns": [
+        {
+          "name": "TABLE_CATALOG",
+          "ordinal": 1,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "TABLE_SCHEMA",
+          "ordinal": 2,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "TABLE_NAME",
+          "ordinal": 3,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "PARENT_TABLE_NAME",
+          "ordinal": 4,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "ON_DELETE_ACTION",
+          "ordinal": 5,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "TABLE_TYPE",
+          "ordinal": 6,
+          "raw_type": "STRING(32)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "SPANNER_STATE",
+          "ordinal": 7,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "INTERLEAVE_TYPE",
+          "ordinal": 8,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "ROW_DELETION_POLICY_EXPRESSION",
+          "ordinal": 9,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        }
+      ]
+    },
+    {
+      "name": "TABLE_OPTIONS",
+      "columns": [
+        {
+          "name": "TABLE_CATALOG",
+          "ordinal": 1,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "TABLE_SCHEMA",
+          "ordinal": 2,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "TABLE_NAME",
+          "ordinal": 3,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "OPTION_NAME",
+          "ordinal": 4,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "OPTION_TYPE",
+          "ordinal": 5,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "OPTION_VALUE",
+          "ordinal": 6,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        }
+      ]
+    },
+    {
+      "name": "TABLE_CONSTRAINTS",
+      "columns": [
+        {
+          "name": "CONSTRAINT_CATALOG",
+          "ordinal": 1,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "CONSTRAINT_SCHEMA",
+          "ordinal": 2,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "CONSTRAINT_NAME",
+          "ordinal": 3,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "TABLE_CATALOG",
+          "ordinal": 4,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "TABLE_SCHEMA",
+          "ordinal": 5,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "TABLE_NAME",
+          "ordinal": 6,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "CONSTRAINT_TYPE",
+          "ordinal": 7,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "IS_DEFERRABLE",
+          "ordinal": 8,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "INITIALLY_DEFERRED",
+          "ordinal": 9,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "ENFORCED",
+          "ordinal": 10,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        }
+      ]
+    },
+    {
+      "name": "TABLE_PRIVILEGES",
+      "columns": [
+        {
+          "name": "TABLE_CATALOG",
+          "ordinal": 1,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "TABLE_SCHEMA",
+          "ordinal": 2,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "TABLE_NAME",
+          "ordinal": 3,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "PRIVILEGE_TYPE",
+          "ordinal": 4,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "GRANTEE",
+          "ordinal": 5,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        }
+      ]
+    },
+    {
+      "name": "TABLE_SYNONYMS",
+      "columns": [
+        {
+          "name": "SYNONYM_CATALOG",
+          "ordinal": 1,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "SYNONYM_SCHEMA",
+          "ordinal": 2,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "SYNONYM_NAME",
+          "ordinal": 3,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "TABLE_CATALOG",
+          "ordinal": 4,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "TABLE_SCHEMA",
+          "ordinal": 5,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "TABLE_NAME",
+          "ordinal": 6,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "SYNONYM_TABLE_NAME",
+          "raw_type": "STRING",
+          "evidence_status": "docs_only_absent",
+          "project": false
+        }
+      ]
+    },
+    {
+      "name": "VIEWS",
+      "columns": [
+        {
+          "name": "TABLE_CATALOG",
+          "ordinal": 1,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "TABLE_SCHEMA",
+          "ordinal": 2,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "TABLE_NAME",
+          "ordinal": 3,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "VIEW_DEFINITION",
+          "ordinal": 4,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "SECURITY_TYPE",
+          "ordinal": 5,
+          "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        }
+      ]
+    }
+  ]
+}

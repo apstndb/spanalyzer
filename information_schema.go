@@ -1,28 +1,30 @@
 package spanalyzer
 
-import "cloud.google.com/go/spanner/apiv1/spannerpb"
+import (
+	"bytes"
+	"crypto/sha256"
+	_ "embed"
+	"encoding/hex"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"net/url"
+	"strings"
+	"sync"
+	"time"
 
-const informationSchemaName = "INFORMATION_SCHEMA"
+	"cloud.google.com/go/spanner/apiv1/spannerpb"
+)
+
+const (
+	informationSchemaName                  = "INFORMATION_SCHEMA"
+	informationSchemaManifestSchemaVersion = "v0alpha1"
+)
 
 type informationSchemaColumn struct {
 	name string
-	code spannerpb.TypeCode
-}
-
-func (c *Catalog) addInformationSchemaTables() {
-	for _, def := range informationSchemaTables {
-		table := &Table{
-			Name:    ObjectName{Parts: []string{informationSchemaName, def.name}},
-			Columns: make([]*Column, 0, len(def.columns)),
-		}
-		for _, column := range def.columns {
-			table.Columns = append(table.Columns, &Column{
-				Name: column.name,
-				Type: &TypeSpec{Code: column.code},
-			})
-		}
-		c.Tables[table.Name.String()] = table
-	}
+	typ  *TypeSpec
 }
 
 type informationSchemaTable struct {
@@ -30,402 +32,251 @@ type informationSchemaTable struct {
 	columns []informationSchemaColumn
 }
 
-var informationSchemaTables = []informationSchemaTable{
-	infoSchemaTable("SCHEMATA",
-		infoString("CATALOG_NAME"),
-		infoString("SCHEMA_NAME"),
-		infoString("PROTO_BUNDLE"),
-	),
-	infoSchemaTable("DATABASE_OPTIONS",
-		infoString("CATALOG_NAME"),
-		infoString("SCHEMA_NAME"),
-		infoString("OPTION_NAME"),
-		infoString("OPTION_TYPE"),
-		infoString("OPTION_VALUE"),
-	),
-	infoSchemaTable("PLACEMENTS",
-		infoString("PLACEMENT_NAME"),
-		infoBool("IS_DEFAULT"),
-	),
-	infoSchemaTable("PLACEMENT_OPTIONS",
-		infoString("PLACEMENT_NAME"),
-		infoString("OPTION_NAME"),
-		infoString("OPTION_TYPE"),
-		infoString("OPTION_VALUE"),
-	),
-	infoSchemaTable("LOCALITY_GROUP_OPTIONS",
-		infoString("LOCALITY_GROUP_NAME"),
-		infoString("OPTION_NAME"),
-		infoString("OPTION_VALUE"),
-	),
-	infoSchemaTable("TABLES",
-		infoString("TABLE_CATALOG"),
-		infoString("TABLE_SCHEMA"),
-		infoString("TABLE_NAME"),
-		infoString("TABLE_TYPE"),
-		infoString("PARENT_TABLE_NAME"),
-		infoString("ON_DELETE_ACTION"),
-		infoString("SPANNER_STATE"),
-		infoString("INTERLEAVE_TYPE"),
-		infoString("ROW_DELETION_POLICY_EXPRESSION"),
-	),
-	infoSchemaTable("COLUMNS",
-		infoString("TABLE_CATALOG"),
-		infoString("TABLE_SCHEMA"),
-		infoString("TABLE_NAME"),
-		infoString("COLUMN_NAME"),
-		infoInt64("ORDINAL_POSITION"),
-		infoString("COLUMN_DEFAULT"),
-		infoString("DATA_TYPE"),
-		infoString("IS_NULLABLE"),
-		infoString("SPANNER_TYPE"),
-		infoString("IS_GENERATED"),
-		infoString("GENERATION_EXPRESSION"),
-		infoString("IS_STORED"),
-		infoString("IS_HIDDEN"),
-		infoString("SPANNER_STATE"),
-		infoString("IS_IDENTITY"),
-		infoString("IDENTITY_GENERATION"),
-		infoString("IDENTITY_KIND"),
-		infoString("IDENTITY_START_WITH_COUNTER"),
-		infoString("IDENTITY_SKIP_RANGE_MIN"),
-		infoString("IDENTITY_SKIP_RANGE_MAX"),
-		infoString("ON_UPDATE_EXPRESSION"),
-	),
-	infoSchemaTable("COLUMN_PRIVILEGES",
-		infoString("TABLE_CATALOG"),
-		infoString("TABLE_SCHEMA"),
-		infoString("TABLE_NAME"),
-		infoString("COLUMN_NAME"),
-		infoString("PRIVILEGE_TYPE"),
-		infoString("GRANTEE"),
-	),
-	infoSchemaTable("TABLE_PRIVILEGES",
-		infoString("TABLE_CATALOG"),
-		infoString("TABLE_SCHEMA"),
-		infoString("TABLE_NAME"),
-		infoString("PRIVILEGE_TYPE"),
-		infoString("GRANTEE"),
-	),
-	infoSchemaTable("TABLE_CONSTRAINTS",
-		infoString("CONSTRAINT_CATALOG"),
-		infoString("CONSTRAINT_SCHEMA"),
-		infoString("CONSTRAINT_NAME"),
-		infoString("TABLE_CATALOG"),
-		infoString("TABLE_SCHEMA"),
-		infoString("TABLE_NAME"),
-		infoString("CONSTRAINT_TYPE"),
-		infoString("IS_DEFERRABLE"),
-		infoString("INITIALLY_DEFERRED"),
-		infoString("ENFORCED"),
-	),
-	infoSchemaTable("CONSTRAINT_TABLE_USAGE",
-		infoString("TABLE_CATALOG"),
-		infoString("TABLE_SCHEMA"),
-		infoString("TABLE_NAME"),
-		infoString("CONSTRAINT_CATALOG"),
-		infoString("CONSTRAINT_SCHEMA"),
-		infoString("CONSTRAINT_NAME"),
-	),
-	infoSchemaTable("REFERENTIAL_CONSTRAINTS",
-		infoString("CONSTRAINT_CATALOG"),
-		infoString("CONSTRAINT_SCHEMA"),
-		infoString("CONSTRAINT_NAME"),
-		infoString("UNIQUE_CONSTRAINT_CATALOG"),
-		infoString("UNIQUE_CONSTRAINT_SCHEMA"),
-		infoString("UNIQUE_CONSTRAINT_NAME"),
-		infoString("MATCH_OPTION"),
-		infoString("UPDATE_RULE"),
-		infoString("DELETE_RULE"),
-		infoString("SPANNER_STATE"),
-	),
-	infoSchemaTable("CHECK_CONSTRAINTS",
-		infoString("CONSTRAINT_CATALOG"),
-		infoString("CONSTRAINT_SCHEMA"),
-		infoString("CONSTRAINT_NAME"),
-		infoString("CHECK_CLAUSE"),
-		infoString("SPANNER_STATE"),
-	),
-	infoSchemaTable("KEY_COLUMN_USAGE",
-		infoString("CONSTRAINT_CATALOG"),
-		infoString("CONSTRAINT_SCHEMA"),
-		infoString("CONSTRAINT_NAME"),
-		infoString("TABLE_CATALOG"),
-		infoString("TABLE_SCHEMA"),
-		infoString("TABLE_NAME"),
-		infoString("COLUMN_NAME"),
-		infoInt64("ORDINAL_POSITION"),
-		infoInt64("POSITION_IN_UNIQUE_CONSTRAINT"),
-	),
-	infoSchemaTable("CONSTRAINT_COLUMN_USAGE",
-		infoString("TABLE_CATALOG"),
-		infoString("TABLE_SCHEMA"),
-		infoString("TABLE_NAME"),
-		infoString("COLUMN_NAME"),
-		infoString("CONSTRAINT_CATALOG"),
-		infoString("CONSTRAINT_SCHEMA"),
-		infoString("CONSTRAINT_NAME"),
-	),
-	infoSchemaTable("TABLE_SYNONYMS",
-		infoString("TABLE_CATALOG"),
-		infoString("TABLE_SCHEMA"),
-		infoString("TABLE_NAME"),
-		infoString("SYNONYM_CATALOG"),
-		infoString("SYNONYM_SCHEMA"),
-		infoString("SYNONYM_TABLE_NAME"),
-	),
-	infoSchemaTable("INDEXES",
-		infoString("TABLE_CATALOG"),
-		infoString("TABLE_SCHEMA"),
-		infoString("TABLE_NAME"),
-		infoString("INDEX_NAME"),
-		infoString("INDEX_TYPE"),
-		infoString("PARENT_TABLE_NAME"),
-		infoBool("IS_UNIQUE"),
-		infoBool("IS_NULL_FILTERED"),
-		infoString("INDEX_STATE"),
-		infoBool("SPANNER_IS_MANAGED"),
-	),
-	infoSchemaTable("INDEX_COLUMNS",
-		infoString("TABLE_CATALOG"),
-		infoString("TABLE_SCHEMA"),
-		infoString("TABLE_NAME"),
-		infoString("INDEX_NAME"),
-		infoString("COLUMN_NAME"),
-		infoInt64("ORDINAL_POSITION"),
-		infoString("COLUMN_ORDERING"),
-		infoString("IS_NULLABLE"),
-		infoString("SPANNER_TYPE"),
-	),
-	infoSchemaTable("COLUMN_OPTIONS",
-		infoString("TABLE_CATALOG"),
-		infoString("TABLE_SCHEMA"),
-		infoString("TABLE_NAME"),
-		infoString("COLUMN_NAME"),
-		infoString("OPTION_NAME"),
-		infoString("OPTION_TYPE"),
-		infoString("OPTION_VALUE"),
-	),
-	infoSchemaTable("SEQUENCES",
-		infoString("CATALOG"),
-		infoString("SCHEMA"),
-		infoString("NAME"),
-		infoString("DATA_TYPE"),
-	),
-	infoSchemaTable("SEQUENCE_OPTIONS",
-		infoString("CATALOG"),
-		infoString("SCHEMA"),
-		infoString("NAME"),
-		infoString("OPTION_NAME"),
-		infoString("OPTION_TYPE"),
-		infoString("OPTION_VALUE"),
-	),
-	infoSchemaTable("SPANNER_STATISTICS",
-		infoString("CATALOG_NAME"),
-		infoString("SCHEMA_NAME"),
-		infoString("PACKAGE_NAME"),
-		infoBool("ALLOW_GC"),
-	),
-	infoSchemaTable("VIEWS",
-		infoString("TABLE_CATALOG"),
-		infoString("TABLE_SCHEMA"),
-		infoString("TABLE_NAME"),
-		infoString("VIEW_DEFINITION"),
-		infoString("SECURITY_TYPE"),
-	),
-	infoSchemaTable("ROLES",
-		infoString("ROLE_NAME"),
-		infoBool("IS_SYSTEM"),
-	),
-	infoSchemaTable("ROLE_GRANTEES",
-		infoString("ROLE_NAME"),
-		infoString("GRANTEE"),
-	),
-	infoSchemaTable("CHANGE_STREAMS",
-		infoString("CHANGE_STREAM_CATALOG"),
-		infoString("CHANGE_STREAM_SCHEMA"),
-		infoString("CHANGE_STREAM_NAME"),
-		infoBool("ALL"),
-	),
-	infoSchemaTable("CHANGE_STREAM_TABLES",
-		infoString("CHANGE_STREAM_CATALOG"),
-		infoString("CHANGE_STREAM_SCHEMA"),
-		infoString("CHANGE_STREAM_NAME"),
-		infoString("TABLE_CATALOG"),
-		infoString("TABLE_SCHEMA"),
-		infoString("TABLE_NAME"),
-		infoBool("ALL_COLUMNS"),
-	),
-	infoSchemaTable("CHANGE_STREAM_COLUMNS",
-		infoString("CHANGE_STREAM_CATALOG"),
-		infoString("CHANGE_STREAM_SCHEMA"),
-		infoString("CHANGE_STREAM_NAME"),
-		infoString("TABLE_CATALOG"),
-		infoString("TABLE_SCHEMA"),
-		infoString("TABLE_NAME"),
-		infoString("COLUMN_NAME"),
-	),
-	infoSchemaTable("CHANGE_STREAM_OPTIONS",
-		infoString("CHANGE_STREAM_CATALOG"),
-		infoString("CHANGE_STREAM_SCHEMA"),
-		infoString("CHANGE_STREAM_NAME"),
-		infoString("OPTION_NAME"),
-		infoString("OPTION_TYPE"),
-		infoString("OPTION_VALUE"),
-	),
-	infoSchemaTable("CHANGE_STREAM_PRIVILEGES",
-		infoString("CHANGE_STREAM_CATALOG"),
-		infoString("CHANGE_STREAM_SCHEMA"),
-		infoString("CHANGE_STREAM_NAME"),
-		infoString("PRIVILEGE_TYPE"),
-		infoString("GRANTEE"),
-	),
-	infoSchemaTable("ROUTINES",
-		infoString("SPECIFIC_CATALOG"),
-		infoString("SPECIFIC_SCHEMA"),
-		infoString("SPECIFIC_NAME"),
-		infoString("ROUTINE_CATALOG"),
-		infoString("ROUTINE_SCHEMA"),
-		infoString("ROUTINE_NAME"),
-		infoString("ROUTINE_TYPE"),
-		infoString("DATA_TYPE"),
-		infoString("ROUTINE_BODY"),
-		infoString("ROUTINE_DEFINITION"),
-		infoString("SECURITY_TYPE"),
-	),
-	infoSchemaTable("ROUTINE_OPTIONS",
-		infoString("SPECIFIC_CATALOG"),
-		infoString("SPECIFIC_SCHEMA"),
-		infoString("SPECIFIC_NAME"),
-		infoString("OPTION_NAME"),
-		infoString("OPTION_TYPE"),
-		infoString("OPTION_VALUE"),
-	),
-	infoSchemaTable("PARAMETERS",
-		infoString("SPECIFIC_CATALOG"),
-		infoString("SPECIFIC_SCHEMA"),
-		infoString("SPECIFIC_NAME"),
-		infoInt64("ORDINAL_POSITION"),
-		infoString("PARAMETER_NAME"),
-		infoString("DATA_TYPE"),
-		infoString("PARAMETER_DEFAULT"),
-	),
-	infoSchemaTable("ROUTINE_PRIVILEGES",
-		infoString("SPECIFIC_CATALOG"),
-		infoString("SPECIFIC_SCHEMA"),
-		infoString("SPECIFIC_NAME"),
-		infoString("PRIVILEGE_TYPE"),
-		infoString("GRANTEE"),
-	),
-	infoSchemaTable("ROLE_TABLE_GRANTS",
-		infoString("GRANTOR"),
-		infoString("GRANTEE"),
-		infoString("TABLE_CATALOG"),
-		infoString("TABLE_SCHEMA"),
-		infoString("TABLE_NAME"),
-		infoString("PRIVILEGE_TYPE"),
-		infoString("IS_GRANTABLE"),
-	),
-	infoSchemaTable("ROLE_COLUMN_GRANTS",
-		infoString("GRANTOR"),
-		infoString("GRANTEE"),
-		infoString("TABLE_CATALOG"),
-		infoString("TABLE_SCHEMA"),
-		infoString("TABLE_NAME"),
-		infoString("COLUMN_NAME"),
-		infoString("PRIVILEGE_TYPE"),
-		infoString("IS_GRANTABLE"),
-	),
-	infoSchemaTable("ROLE_CHANGE_STREAM_GRANTS",
-		infoString("CHANGE_STREAM_CATALOG"),
-		infoString("CHANGE_STREAM_SCHEMA"),
-		infoString("CHANGE_STREAM_NAME"),
-		infoString("PRIVILEGE_TYPE"),
-		infoString("GRANTEE"),
-	),
-	infoSchemaTable("ROLE_MODEL_GRANTS",
-		infoString("GRANTOR"),
-		infoString("GRANTEE"),
-		infoString("MODEL_CATALOG"),
-		infoString("MODEL_SCHEMA"),
-		infoString("MODEL_NAME"),
-		infoString("PRIVILEGE_TYPE"),
-		infoString("IS_GRANTABLE"),
-	),
-	infoSchemaTable("ROLE_ROUTINE_GRANTS",
-		infoString("GRANTOR"),
-		infoString("GRANTEE"),
-		infoString("SPECIFIC_CATALOG"),
-		infoString("SPECIFIC_SCHEMA"),
-		infoString("SPECIFIC_NAME"),
-		infoString("PRIVILEGE_TYPE"),
-		infoString("IS_GRANTABLE"),
-	),
-	infoSchemaTable("MODELS",
-		infoString("MODEL_CATALOG"),
-		infoString("MODEL_SCHEMA"),
-		infoString("MODEL_NAME"),
-		infoBool("IS_REMOTE"),
-	),
-	infoSchemaTable("MODEL_OPTIONS",
-		infoString("MODEL_CATALOG"),
-		infoString("MODEL_SCHEMA"),
-		infoString("MODEL_NAME"),
-		infoString("OPTION_NAME"),
-		infoString("OPTION_TYPE"),
-		infoString("OPTION_VALUE"),
-	),
-	infoSchemaTable("MODEL_COLUMNS",
-		infoString("MODEL_CATALOG"),
-		infoString("MODEL_SCHEMA"),
-		infoString("MODEL_NAME"),
-		infoString("COLUMN_KIND"),
-		infoString("COLUMN_NAME"),
-		infoString("DATA_TYPE"),
-		infoInt64("ORDINAL_POSITION"),
-		infoBool("IS_EXPLICIT"),
-	),
-	infoSchemaTable("MODEL_COLUMN_OPTIONS",
-		infoString("MODEL_CATALOG"),
-		infoString("MODEL_SCHEMA"),
-		infoString("MODEL_NAME"),
-		infoString("COLUMN_KIND"),
-		infoString("COLUMN_NAME"),
-		infoString("OPTION_NAME"),
-		infoString("OPTION_TYPE"),
-		infoString("OPTION_VALUE"),
-	),
-	infoSchemaTable("MODEL_PRIVILEGES",
-		infoString("MODEL_CATALOG"),
-		infoString("MODEL_SCHEMA"),
-		infoString("MODEL_NAME"),
-		infoString("PRIVILEGE_TYPE"),
-		infoString("GRANTEE"),
-	),
-	infoSchemaTable("PROPERTY_GRAPHS",
-		infoString("PROPERTY_GRAPH_CATALOG"),
-		infoString("PROPERTY_GRAPH_SCHEMA"),
-		infoString("PROPERTY_GRAPH_NAME"),
-		infoJSON("PROPERTY_GRAPH_METADATA_JSON"),
-	),
+type informationSchemaManifest struct {
+	SchemaVersion string                                 `json:"schema_version"`
+	Source        informationSchemaManifestSource        `json:"source"`
+	Documentation informationSchemaManifestDocumentation `json:"documentation"`
+	ContentSHA256 string                                 `json:"content_sha256"`
+	Tables        []informationSchemaManifestTable       `json:"tables"`
 }
 
-func infoSchemaTable(name string, columns ...informationSchemaColumn) informationSchemaTable {
-	return informationSchemaTable{name: name, columns: columns}
+type informationSchemaManifestSource struct {
+	Repository   string `json:"repository"`
+	Commit       string `json:"commit"`
+	Path         string `json:"path"`
+	ExportSHA256 string `json:"export_sha256"`
+	ExporterNote string `json:"exporter_note"`
 }
 
-func infoString(name string) informationSchemaColumn {
-	return informationSchemaColumn{name: name, code: spannerpb.TypeCode_STRING}
+type informationSchemaManifestDocumentation struct {
+	URL         string `json:"url"`
+	LastUpdated string `json:"last_updated"`
 }
 
-func infoInt64(name string) informationSchemaColumn {
-	return informationSchemaColumn{name: name, code: spannerpb.TypeCode_INT64}
+type informationSchemaManifestTable struct {
+	Name    string                            `json:"name"`
+	Columns []informationSchemaManifestColumn `json:"columns"`
 }
 
-func infoBool(name string) informationSchemaColumn {
-	return informationSchemaColumn{name: name, code: spannerpb.TypeCode_BOOL}
+type informationSchemaManifestColumn struct {
+	Name           string `json:"name"`
+	Ordinal        int    `json:"ordinal,omitempty"`
+	RawType        string `json:"raw_type"`
+	EvidenceStatus string `json:"evidence_status"`
+	Project        bool   `json:"project"`
+	ProjectedType  string `json:"projected_type,omitempty"`
 }
 
-func infoJSON(name string) informationSchemaColumn {
-	return informationSchemaColumn{name: name, code: spannerpb.TypeCode_JSON}
+//go:embed information_schema_manifest.json
+var embeddedInformationSchemaManifest []byte
+
+var (
+	informationSchemaOnce   sync.Once
+	informationSchemaTables []informationSchemaTable
+	informationSchemaErr    error
+)
+
+func (c *Catalog) addInformationSchemaTables() error {
+	tables, err := loadInformationSchemaTables()
+	if err != nil {
+		return err
+	}
+	for _, def := range tables {
+		table := &Table{
+			Name:    ObjectName{Parts: []string{informationSchemaName, def.name}},
+			Columns: make([]*Column, 0, len(def.columns)),
+		}
+		for _, column := range def.columns {
+			table.Columns = append(table.Columns, &Column{
+				Name: column.name,
+				Type: column.typ,
+			})
+		}
+		c.Tables[table.Name.String()] = table
+	}
+	return nil
+}
+
+func loadInformationSchemaTables() ([]informationSchemaTable, error) {
+	informationSchemaOnce.Do(func() {
+		_, informationSchemaTables, informationSchemaErr = parseInformationSchemaManifest(embeddedInformationSchemaManifest)
+	})
+	if informationSchemaErr != nil {
+		return nil, informationSchemaErr
+	}
+	return informationSchemaTables, nil
+}
+
+func parseInformationSchemaManifest(data []byte) (*informationSchemaManifest, []informationSchemaTable, error) {
+	decoder := json.NewDecoder(bytes.NewReader(data))
+	decoder.DisallowUnknownFields()
+	var manifest informationSchemaManifest
+	if err := decoder.Decode(&manifest); err != nil {
+		return nil, nil, fmt.Errorf("decode embedded INFORMATION_SCHEMA manifest: %w", err)
+	}
+	if err := decoder.Decode(&struct{}{}); !errors.Is(err, io.EOF) {
+		if err == nil {
+			return nil, nil, errors.New("decode embedded INFORMATION_SCHEMA manifest: multiple JSON values")
+		}
+		return nil, nil, fmt.Errorf("decode embedded INFORMATION_SCHEMA manifest trailer: %w", err)
+	}
+
+	if manifest.SchemaVersion != informationSchemaManifestSchemaVersion {
+		return nil, nil, fmt.Errorf("INFORMATION_SCHEMA manifest schema_version = %q, want %q", manifest.SchemaVersion, informationSchemaManifestSchemaVersion)
+	}
+	if manifest.Source.Repository == "" || manifest.Source.Commit == "" || manifest.Source.Path == "" || manifest.Source.ExporterNote == "" {
+		return nil, nil, errors.New("INFORMATION_SCHEMA manifest source provenance is incomplete")
+	}
+	if err := validateGitCommit(manifest.Source.Commit); err != nil {
+		return nil, nil, err
+	}
+	if err := validateSHA256("source.export_sha256", manifest.Source.ExportSHA256); err != nil {
+		return nil, nil, err
+	}
+	if manifest.Documentation.URL == "" || manifest.Documentation.LastUpdated == "" {
+		return nil, nil, errors.New("INFORMATION_SCHEMA manifest documentation provenance is incomplete")
+	}
+	documentationURL, err := url.ParseRequestURI(manifest.Documentation.URL)
+	if err != nil || documentationURL.Scheme == "" || documentationURL.Host == "" {
+		return nil, nil, fmt.Errorf("INFORMATION_SCHEMA manifest documentation.url = %q, want an absolute URI", manifest.Documentation.URL)
+	}
+	if _, err := time.Parse(time.DateOnly, manifest.Documentation.LastUpdated); err != nil {
+		return nil, nil, fmt.Errorf("INFORMATION_SCHEMA manifest documentation.last_updated = %q, want YYYY-MM-DD", manifest.Documentation.LastUpdated)
+	}
+	if len(manifest.Tables) == 0 {
+		return nil, nil, errors.New("INFORMATION_SCHEMA manifest has no tables")
+	}
+
+	wantHash, err := hashInformationSchemaManifestTables(manifest.Tables)
+	if err != nil {
+		return nil, nil, err
+	}
+	if err := validateSHA256("content_sha256", manifest.ContentSHA256); err != nil {
+		return nil, nil, err
+	}
+	if manifest.ContentSHA256 != wantHash {
+		return nil, nil, fmt.Errorf("INFORMATION_SCHEMA manifest content_sha256 = %q, want %q", manifest.ContentSHA256, wantHash)
+	}
+
+	tableNames := make(map[string]struct{}, len(manifest.Tables))
+	tables := make([]informationSchemaTable, 0, len(manifest.Tables))
+	for _, manifestTable := range manifest.Tables {
+		if manifestTable.Name == "" {
+			return nil, nil, errors.New("INFORMATION_SCHEMA manifest contains a table with an empty name")
+		}
+		if _, exists := tableNames[manifestTable.Name]; exists {
+			return nil, nil, fmt.Errorf("INFORMATION_SCHEMA manifest contains duplicate table %q", manifestTable.Name)
+		}
+		tableNames[manifestTable.Name] = struct{}{}
+
+		columnNames := make(map[string]struct{}, len(manifestTable.Columns))
+		projectedOrdinals := make(map[int]string, len(manifestTable.Columns))
+		lastProjectedOrdinal := 0
+		table := informationSchemaTable{name: manifestTable.Name}
+		for _, manifestColumn := range manifestTable.Columns {
+			path := manifestTable.Name + "." + manifestColumn.Name
+			if manifestColumn.Name == "" {
+				return nil, nil, fmt.Errorf("INFORMATION_SCHEMA manifest table %q contains a column with an empty name", manifestTable.Name)
+			}
+			if _, exists := columnNames[manifestColumn.Name]; exists {
+				return nil, nil, fmt.Errorf("INFORMATION_SCHEMA manifest contains duplicate column %q", path)
+			}
+			columnNames[manifestColumn.Name] = struct{}{}
+			if manifestColumn.RawType == "" {
+				return nil, nil, fmt.Errorf("INFORMATION_SCHEMA manifest column %q has an empty raw_type", path)
+			}
+
+			switch manifestColumn.EvidenceStatus {
+			case "live_observed", "rolling":
+				if !manifestColumn.Project {
+					return nil, nil, fmt.Errorf("INFORMATION_SCHEMA manifest column %q is %s but project is false", path, manifestColumn.EvidenceStatus)
+				}
+				if manifestColumn.Ordinal <= 0 {
+					return nil, nil, fmt.Errorf("INFORMATION_SCHEMA manifest projected column %q has ordinal %d", path, manifestColumn.Ordinal)
+				}
+			case "docs_only_absent":
+				if manifestColumn.Project {
+					return nil, nil, fmt.Errorf("INFORMATION_SCHEMA manifest docs-only column %q must not be projected", path)
+				}
+				if manifestColumn.Ordinal != 0 {
+					return nil, nil, fmt.Errorf("INFORMATION_SCHEMA manifest docs-only column %q must not declare an ordinal", path)
+				}
+				if manifestColumn.ProjectedType != "" {
+					return nil, nil, fmt.Errorf("INFORMATION_SCHEMA manifest docs-only column %q must not declare projected_type", path)
+				}
+				continue
+			default:
+				return nil, nil, fmt.Errorf("INFORMATION_SCHEMA manifest column %q has unknown evidence_status %q", path, manifestColumn.EvidenceStatus)
+			}
+
+			if existing, duplicate := projectedOrdinals[manifestColumn.Ordinal]; duplicate {
+				return nil, nil, fmt.Errorf("INFORMATION_SCHEMA manifest columns %q and %q share ordinal %d", existing, path, manifestColumn.Ordinal)
+			}
+			if manifestColumn.Ordinal <= lastProjectedOrdinal {
+				return nil, nil, fmt.Errorf("INFORMATION_SCHEMA manifest projected column %q is out of ordinal order", path)
+			}
+			projectedOrdinals[manifestColumn.Ordinal] = path
+			lastProjectedOrdinal = manifestColumn.Ordinal
+
+			typ, err := informationSchemaColumnType(manifestColumn)
+			if err != nil {
+				return nil, nil, fmt.Errorf("INFORMATION_SCHEMA manifest column %q: %w", path, err)
+			}
+			table.columns = append(table.columns, informationSchemaColumn{name: manifestColumn.Name, typ: typ})
+		}
+		if len(table.columns) == 0 {
+			return nil, nil, fmt.Errorf("INFORMATION_SCHEMA manifest table %q has no projected columns", manifestTable.Name)
+		}
+		tables = append(tables, table)
+	}
+	return &manifest, tables, nil
+}
+
+func informationSchemaColumnType(column informationSchemaManifestColumn) (*TypeSpec, error) {
+	typeSQL := column.RawType
+	if strings.HasPrefix(column.RawType, "PROTO<") {
+		if column.ProjectedType == "" {
+			return nil, fmt.Errorf("raw type %q requires an explicit projected_type override", column.RawType)
+		}
+		typeSQL = column.ProjectedType
+	} else if column.ProjectedType != "" {
+		return nil, fmt.Errorf("raw type %q does not permit projected_type override %q", column.RawType, column.ProjectedType)
+	}
+
+	typ, err := ParseTypeSpec("information_schema_manifest.json", typeSQL)
+	if err != nil {
+		return nil, fmt.Errorf("parse projected type %q: %w", typeSQL, err)
+	}
+	if typ.Code == spannerpb.TypeCode_PROTO || typ.Code == spannerpb.TypeCode_ENUM {
+		return nil, fmt.Errorf("projected type %q requires descriptor policy not provided by the manifest", typeSQL)
+	}
+	return typ, nil
+}
+
+func hashInformationSchemaManifestTables(tables []informationSchemaManifestTable) (string, error) {
+	data, err := json.Marshal(tables)
+	if err != nil {
+		return "", fmt.Errorf("marshal INFORMATION_SCHEMA manifest tables for hashing: %w", err)
+	}
+	sum := sha256.Sum256(data)
+	return hex.EncodeToString(sum[:]), nil
+}
+
+func validateSHA256(name, value string) error {
+	decoded, err := hex.DecodeString(value)
+	if err != nil || len(decoded) != sha256.Size {
+		return fmt.Errorf("INFORMATION_SCHEMA manifest %s = %q, want a lowercase SHA-256 digest", name, value)
+	}
+	if value != strings.ToLower(value) {
+		return fmt.Errorf("INFORMATION_SCHEMA manifest %s = %q, want lowercase hexadecimal", name, value)
+	}
+	return nil
+}
+
+func validateGitCommit(value string) error {
+	decoded, err := hex.DecodeString(value)
+	if err != nil || len(decoded) != 20 || value != strings.ToLower(value) {
+		return fmt.Errorf("INFORMATION_SCHEMA manifest source.commit = %q, want a lowercase 40-hex Git object ID", value)
+	}
+	return nil
 }

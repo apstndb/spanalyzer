@@ -22,7 +22,10 @@ func ParseTypeSpec(path, typeSQL string) (*TypeSpec, error) {
 
 func parseSchemaTypeSpecFromColumn(path, typeSQL string) (*TypeSpec, error) {
 	ddl := "CREATE TABLE _ParamType (_Key INT64 NOT NULL, _Value " + typeSQL + ") PRIMARY KEY(_Key);"
-	catalog, err := BuildSchemaCatalog(path, ddl)
+	// Type parsing is used while loading the embedded built-in catalogs. Avoid
+	// adding those catalogs recursively while the manifest is still being
+	// decoded.
+	catalog, err := buildSchemaCatalog(path, ddl, false)
 	if err != nil {
 		return nil, err
 	}

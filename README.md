@@ -247,7 +247,19 @@ code: STRING
 
 Cloud Spanner `INFORMATION_SCHEMA` tables are registered as built-in catalog
 tables for analysis. They provide names and column types only; no row data is
-materialized.
+materialized. The built-in surface comes from the pinned, live-primary
+[`information_schema_manifest.json`](information_schema_manifest.json):
+observed and rolling columns are projected, while documented columns observed
+absent from the pinned survey remain evidence metadata only.
+
+Validate the manifest itself, and optionally compare it with the exact pinned
+survey checkout, from the tools module:
+
+```sh
+(cd tools && go run ./infoschema-survey-check)
+(cd tools && go run ./infoschema-survey-check \
+  --survey-root /path/to/spanner-emulator-survey)
+```
 
 ```sh
 go run ./cmd/spanner-analyzer \

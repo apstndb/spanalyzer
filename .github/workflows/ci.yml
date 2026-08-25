@@ -54,6 +54,10 @@ jobs:
         working-directory: tools
         run: mise x -- go run ./okf-check --repo-root .. --gate assets
 
+      - name: Verify INFORMATION_SCHEMA manifest
+        working-directory: tools
+        run: mise x -- go run ./infoschema-survey-check
+
       - name: Verify generated plan-vocabulary catalog
         working-directory: tools
         run: mise x -- go run ./planvocab-gen --check

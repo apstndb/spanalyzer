@@ -173,6 +173,10 @@ type StructField struct {
 }
 
 func BuildSchemaCatalog(path, ddlSQL string) (*Catalog, error) {
+	return buildSchemaCatalog(path, ddlSQL, true)
+}
+
+func buildSchemaCatalog(path, ddlSQL string, addBuiltins bool) (*Catalog, error) {
 	ddls, err := memefish.ParseDDLs(path, ddlSQL)
 	if err != nil {
 		return nil, err
@@ -192,8 +196,12 @@ func BuildSchemaCatalog(path, ddlSQL string) (*Catalog, error) {
 			return nil, err
 		}
 	}
-	catalog.addInformationSchemaTables()
-	catalog.addSpannerSysTables()
+	if addBuiltins {
+		if err := catalog.addInformationSchemaTables(); err != nil {
+			return nil, err
+		}
+		catalog.addSpannerSysTables()
+	}
 	return catalog, nil
 }
 
