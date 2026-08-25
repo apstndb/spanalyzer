@@ -1,6 +1,7 @@
 package spanalyzer
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"reflect"
@@ -111,6 +112,29 @@ func TestInformationSchemaManifestRejectsStaleHash(t *testing.T) {
 	_, _, err = parseInformationSchemaManifest(data)
 	if err == nil || !strings.Contains(err.Error(), "content_sha256") {
 		t.Fatalf("parseInformationSchemaManifest() error = %v, want stale content_sha256", err)
+	}
+}
+
+func TestInformationSchemaManifestRejectsDuplicateKeys(t *testing.T) {
+	data := bytes.Replace(
+		embeddedInformationSchemaManifest,
+		[]byte(`"schema_version": "v0alpha2",`),
+		[]byte(`"schema_version": "v0alpha2", "schema_version": "v0alpha2",`),
+		1,
+	)
+	_, _, err := parseInformationSchemaManifest(data)
+	if err == nil || !strings.Contains(err.Error(), "duplicate key") {
+		t.Fatalf("parseInformationSchemaManifest() error = %v, want duplicate key", err)
+	}
+}
+
+func TestInformationSchemaManifestRejectsNoncanonicalObservationPath(t *testing.T) {
+	manifest := decodedInformationSchemaManifest(t)
+	manifest.Source.SelectedObservationPath = "survey/infoschem/evidence/managed/latest.json"
+	data := encodedInformationSchemaManifest(t, manifest)
+	_, _, err := parseInformationSchemaManifest(data)
+	if err == nil || !strings.Contains(err.Error(), "selected observation path") {
+		t.Fatalf("parseInformationSchemaManifest() error = %v, want observation path failure", err)
 	}
 }
 

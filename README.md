@@ -251,13 +251,16 @@ code: STRING
 
 Cloud Spanner `INFORMATION_SCHEMA` tables are registered as built-in catalog
 tables for analysis. They provide names and column types only; no row data is
-materialized. The built-in surface comes from the pinned, live-primary
-[`information_schema_manifest.json`](information_schema_manifest.json):
-observed and rolling columns are projected, while documented columns observed
-absent from the pinned survey remain evidence metadata only.
+materialized. The built-in surface comes from the generated
+[`information_schema_manifest.json`](information_schema_manifest.json), whose
+[`projection source`](information_schema_projection_source.json) selects one
+exact point-in-time managed observation. Observed and rolling columns are
+projected, while documented columns absent from that observation remain
+evidence metadata only. The observation is scoped to one database and does not
+claim that managed Spanner has a fleet-wide or durable metadata version.
 
-Validate the manifest and reproduce its survey export from the retained
-in-repository producer module:
+Validate the selected capture, producer registry, projection source, and exact
+generated manifest bytes:
 
 ```sh
 (cd tools && go run ./infoschema-survey-check)

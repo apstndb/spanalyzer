@@ -32,16 +32,48 @@ agreement as a universal service contract.
    tests retain which target, version, and date were actually observed.
 2. Redacted captures retain only the metadata needed for a claim. They exclude
    project, instance, database, endpoint, credential, and local runner state.
-3. Producer manifests combine structural declarations with explicit target
-   observations and fail closed when required evidence is missing or disagrees.
-4. Analyzer manifests project a pinned common surface. Their source identity
-   remains immutable even after the producer code moves.
+3. The SPANNER_SYS producer manifest combines structural declarations with
+   explicit required-target observations and fails closed on disagreement.
+   INFORMATION_SCHEMA instead retains independent target captures and selects
+   one managed observation explicitly; it has no cross-target producer
+   manifest.
+4. Analyzer manifests project their reviewed policy. SPANNER_SYS uses a pinned
+   common surface, while INFORMATION_SCHEMA uses the explicit managed-primary
+   selector. Their source identity remains reviewable after producer code
+   moves.
 5. Consumer tests and commands reproduce committed bytes from the retained
    producer and independently validate the legacy import mapping.
 
 These layers intentionally preserve target distinctions. Managed, Omni, and
 Emulator results can agree, differ, or be unavailable without being collapsed
 into a single `supported` flag.
+
+## Observation identity and projection selection
+
+Managed Spanner is a rolling service. A retained managed capture is evidence
+for one database at its read-only transaction timestamp; it is not a fleet-wide
+claim and does not remain current merely because its bytes are still tracked.
+The database locator is never retained, and the public capture does not assign
+a reusable pseudonymous database identifier.
+
+Spanner Omni and the Emulator are container releases that can be rerun after
+the original observation date. Their primary identity is the platform-specific
+OCI manifest digest and the resolved `os/arch[/variant]`; the mutable tag is
+retained for readability and the timestamp is secondary provenance. Two files
+with the same tag but different digests are distinct observations.
+
+INFORMATION_SCHEMA captures retain advertised column tuples and bounded
+queryability outcomes for rolling columns. Their source and invocation hashes
+identify the reviewed capture inputs but are not execution attestations. Raw
+captures remain producer-owned JSON assets rather than OKF concepts.
+
+The analyzer never selects a capture by modification time or a `latest` name.
+[`information_schema_projection_source.json`](../../information_schema_projection_source.json)
+names one exact managed capture and its whole-file hash. The generated
+[`information_schema_manifest.json`](../../information_schema_manifest.json)
+remains the sole analyzer projection; Omni and Emulator observations are
+comparison evidence and do not implicitly intersect or demote the
+managed-primary surface.
 
 ## Legacy repository disposition
 

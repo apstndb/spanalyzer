@@ -100,6 +100,17 @@ environment. See [`AGENTS.md`](AGENTS.md) for package architecture, exact gate
 semantics, runtime prerequisites, and the pitfalls that must remain visible to
 implementers.
 
+## Current INFORMATION_SCHEMA evidence
+
+The current machine-readable target observations, explicit managed-primary
+selection, and analyzer projection are described in the OKF
+[`INFORMATION_SCHEMA managed-primary catalog`](../knowledge/observations/information-schema-managed-primary-catalog.md)
+Observation. Raw captures live under [`infoschem/evidence`](infoschem/evidence/),
+and the root `information_schema_projection_source.json` names the selected
+managed capture by path and whole-file hash. Routine reruns update raw evidence
+or the selector; they do not create another dated Markdown report unless a
+material disagreement requires interpretation.
+
 ## Historical evidence
 
 The dated Emulator-versus-managed metadata observations are retained in:
@@ -109,5 +120,6 @@ The dated Emulator-versus-managed metadata observations are retained in:
 - [`docs/spanner-schema-diff-report-20260509.md`](docs/spanner-schema-diff-report-20260509.md)
 
 These reports are historical observations, not current compatibility claims.
-Current behavior is defined by code, executable tests, manifests, and the
-explicit boundaries in `UNSUPPORTED_DDL.md`.
+Current code behavior is defined by code, executable tests, and manifests;
+current target evidence is always timestamp- or digest-scoped as described
+above. Conversion boundaries remain explicit in `UNSUPPORTED_DDL.md`.

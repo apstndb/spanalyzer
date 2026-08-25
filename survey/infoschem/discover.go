@@ -11,10 +11,19 @@ import (
 	"google.golang.org/grpc/codes"
 )
 
+// ColumnDiscoveryQuery is the canonical query used for retained
+// INFORMATION_SCHEMA surface observations.
+const ColumnDiscoveryQuery = `SELECT TABLE_NAME, COLUMN_NAME, SPANNER_TYPE, ORDINAL_POSITION
+FROM INFORMATION_SCHEMA.COLUMNS
+WHERE TABLE_SCHEMA = 'INFORMATION_SCHEMA'
+ORDER BY TABLE_NAME, ORDINAL_POSITION`
+
 // DiscoverColumns queries INFORMATION_SCHEMA.COLUMNS to build a set of all
 // available tables and columns in the current database environment.
 func DiscoverColumns(ctx context.Context, client *spanner.Client) (DiscoveredColumns, error) {
-	return DiscoverColumnsWithTxn(ctx, client.Single())
+	txn := client.ReadOnlyTransaction()
+	defer txn.Close()
+	return DiscoverColumnsWithTxn(ctx, txn)
 }
 
 // DiscoveredColumnMetadata is the column type and ordinal surface advertised by
@@ -73,11 +82,7 @@ func DiscoverColumnMetadataWithTxn(
 		OrdinalPosition int64  `spanner:"ORDINAL_POSITION"`
 	}
 
-	iter := txn.Query(ctx, spanner.NewStatement(
-		`SELECT TABLE_NAME, COLUMN_NAME, SPANNER_TYPE, ORDINAL_POSITION
-		 FROM INFORMATION_SCHEMA.COLUMNS
-		 WHERE TABLE_SCHEMA = 'INFORMATION_SCHEMA'`,
-	))
+	iter := txn.Query(ctx, spanner.NewStatement(ColumnDiscoveryQuery))
 	defer iter.Stop()
 
 	var rows []columnRow
@@ -122,6 +127,9 @@ func filterQueryableRollingColumns(
 			}
 
 			if err := probe(meta.Name, column.Name); err != nil {
+				if isClientClosedTransactionError(err) {
+					return fmt.Errorf("probe %s.%s: %w", meta.Name, column.Name, err)
+				}
 				switch spanner.ErrCode(err) {
 				case codes.InvalidArgument, codes.Unimplemented:
 					// During a rolling backend release, COLUMNS can advertise a

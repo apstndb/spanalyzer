@@ -9,3 +9,6 @@
 - [SPANNER_SYS live-primary catalog](spanner-sys-live-primary-catalog.md) -
   pinned managed and Omni metadata, fail-closed projection policy, and the
   replacement of the handwritten analyzer registry.
+- [INFORMATION_SCHEMA managed-primary catalog](information-schema-managed-primary-catalog.md) -
+  point-in-time managed selection, digest-pinned Omni and Emulator comparison
+  captures, and rolling-column queryability.

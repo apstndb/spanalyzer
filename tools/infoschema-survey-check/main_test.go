@@ -1,7 +1,8 @@
 package main
 
 import (
-	"os"
+	"bytes"
+	"encoding/json"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -9,12 +10,6 @@ import (
 
 func TestRunValidatesRepositoryManifest(t *testing.T) {
 	if err := run([]string{"--repo-root", "../.."}); err != nil {
-		t.Fatal(err)
-	}
-}
-
-func TestRunValidatesRepositoryProducer(t *testing.T) {
-	if err := run([]string{"--repo-root", "../..", "--survey-root", "../../survey"}); err != nil {
 		t.Fatal(err)
 	}
 }
@@ -39,74 +34,133 @@ func TestFindRepoRoot(t *testing.T) {
 	}
 }
 
-func TestCompareManifestToSurveyFixture(t *testing.T) {
-	survey := readSurveyFixture(t)
-	doc := fixtureManifest(t, survey)
-	if err := compareManifestToSurvey(&doc, survey); err != nil {
-		t.Fatal(err)
-	}
-}
-
-func TestCompareManifestToSurveyRejectsHiddenLiveColumn(t *testing.T) {
-	survey := readSurveyFixture(t)
-	doc := fixtureManifest(t, survey)
-	column := &doc.Tables[0].Columns[0]
-	column.EvidenceStatus = "docs_only_absent"
-	column.Project = false
-	column.Ordinal = 0
-	doc.ContentSHA256 = mustHashJSON(t, doc.Tables)
-	err := compareManifestToSurvey(&doc, survey)
-	if err == nil || !strings.Contains(err.Error(), "docs_only_absent") {
-		t.Fatalf("compareManifestToSurvey() error = %v, want hidden live-column failure", err)
-	}
-}
-
-func TestRunRejectsExplicitInvalidSurveyRoot(t *testing.T) {
-	err := run([]string{"--repo-root", "../..", "--survey-root", filepath.Join(t.TempDir(), "missing")})
-	if err == nil || !strings.Contains(err.Error(), "invalid --survey-root") {
-		t.Fatalf("run() error = %v, want invalid --survey-root", err)
-	}
-}
-
-func readSurveyFixture(t *testing.T) []surveyTable {
-	t.Helper()
-	data, err := os.ReadFile("testdata/survey-export.json")
+func TestBuildManifestBindsObservation(t *testing.T) {
+	policy := fixtureProjectionSource()
+	exported := fixtureSurveyExport()
+	document, err := buildManifest(&policy, strings.Repeat("9", 64), &exported)
 	if err != nil {
 		t.Fatal(err)
 	}
-	survey, err := decodeSurveyExport(data)
+	if document.SchemaVersion != "v0alpha2" {
+		t.Fatalf("SchemaVersion = %q", document.SchemaVersion)
+	}
+	if document.Source.SelectedObservationPath != policy.SelectedObservation.Path || document.Source.ObservedAt != exported.Capture.ObservedAt {
+		t.Fatalf("manifest source = %#v", document.Source)
+	}
+	if got, want := document.Tables[0].Columns[0].EvidenceStatus, "live_observed"; got != want {
+		t.Fatalf("evidence status = %q, want %q", got, want)
+	}
+	if got, want := document.Tables[0].Columns[1].EvidenceStatus, "rolling"; got != want {
+		t.Fatalf("rolling evidence status = %q, want %q", got, want)
+	}
+	if got, want := document.Tables[0].Columns[1].ProjectedType, "STRING(MAX)"; got != want {
+		t.Fatalf("projected type = %q, want %q", got, want)
+	}
+	if got, want := document.Tables[0].Columns[2].EvidenceStatus, "docs_only_absent"; got != want {
+		t.Fatalf("documentation-only status = %q, want %q", got, want)
+	}
+	if err := validateManifest(document); err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestBuildManifestRejectsMissingStableColumn(t *testing.T) {
+	policy := fixtureProjectionSource()
+	exported := fixtureSurveyExport()
+	exported.Capture.Columns = nil
+	_, err := buildManifest(&policy, strings.Repeat("9", 64), &exported)
+	if err == nil || !strings.Contains(err.Error(), "missing stable registry column") {
+		t.Fatalf("buildManifest() error = %v, want missing stable column", err)
+	}
+}
+
+func TestValidateProjectionSourceRejectsImplicitLatest(t *testing.T) {
+	policy := fixtureProjectionSource()
+	policy.SelectedObservation.Path = "survey/infoschem/evidence/managed/latest.json"
+	if err := validateProjectionSource(&policy); err == nil {
+		t.Fatal("validateProjectionSource() error = nil")
+	}
+}
+
+func TestDecodeProjectionSourceRejectsDuplicateKeys(t *testing.T) {
+	data, err := json.Marshal(fixtureProjectionSource())
 	if err != nil {
 		t.Fatal(err)
 	}
-	return survey
+	tests := map[string][]byte{
+		"top level": bytes.Replace(data, []byte(`"mode":"managed_live_primary"`), []byte(`"mode":"managed_live_primary","mode":"managed_live_primary"`), 1),
+		"nested":    bytes.Replace(data, []byte(`"file_sha256":"`), []byte(`"file_sha256":"`+strings.Repeat("1", 64)+`","file_sha256":"`), 1),
+	}
+	for name, input := range tests {
+		t.Run(name, func(t *testing.T) {
+			_, err := decodeProjectionSource(input)
+			if err == nil || !strings.Contains(err.Error(), "duplicate key") {
+				t.Fatalf("decodeProjectionSource() error = %v, want duplicate key", err)
+			}
+		})
+	}
 }
 
-func fixtureManifest(t *testing.T, survey []surveyTable) manifest {
-	t.Helper()
-	doc := manifest{
+func TestSafeRepositoryPath(t *testing.T) {
+	root := t.TempDir()
+	if _, err := safeRepositoryPath(root, "survey/infoschem/evidence/managed/capture.json"); err != nil {
+		t.Fatal(err)
+	}
+	for _, path := range []string{"../capture.json", "/tmp/capture.json", `survey\capture.json`} {
+		if _, err := safeRepositoryPath(root, path); err == nil {
+			t.Fatalf("safeRepositoryPath(%q) error = nil", path)
+		}
+	}
+}
+
+func fixtureProjectionSource() projectionSource {
+	return projectionSource{
 		SchemaVersion: "v0alpha1",
-		Source: source{
-			Commit:       "0123456789012345678901234567890123456789",
-			ExportSHA256: mustHashJSON(t, survey),
+		Mode:          "managed_live_primary",
+		SelectedObservation: selectedObservation{
+			Path:       "survey/infoschem/evidence/managed/20260825T083012Z-0123456789ab.json",
+			FileSHA256: strings.Repeat("1", 64),
 		},
-		Tables: []table{{
-			Name: "EXAMPLE_TABLE",
-			Columns: []column{
-				{Name: "LIVE_COLUMN", Ordinal: 1, RawType: "STRING(MAX)", EvidenceStatus: "live_observed", Project: true},
-				{Name: "ROLLING_COLUMN", Ordinal: 2, RawType: "BOOL", EvidenceStatus: "rolling", Project: true},
-				{Name: "DOCUMENTED_COLUMN", RawType: "STRING", EvidenceStatus: "docs_only_absent", Project: false},
-			},
+		RollingAdvertisementPolicy: "runtime_filtered",
+		Documentation: documentation{
+			URL:         "https://cloud.google.com/spanner/docs/information-schema",
+			LastUpdated: "2026-08-15",
+		},
+		DocumentationOnlyAbsent: []documentationOnlyColumn{{
+			TableName:  "EXAMPLE",
+			ColumnName: "DOCUMENTED_ONLY",
+			RawType:    "STRING",
+		}},
+		ProjectionOverrides: []projectionOverride{{
+			TableName:     "EXAMPLE",
+			ColumnName:    "ROLLING_PROTO",
+			ProjectedType: "STRING(MAX)",
 		}},
 	}
-	doc.ContentSHA256 = mustHashJSON(t, doc.Tables)
-	return doc
 }
 
-func mustHashJSON(t *testing.T, value any) string {
-	t.Helper()
-	hash, err := hashJSON(value)
-	if err != nil {
-		t.Fatal(err)
+func fixtureSurveyExport() surveyExport {
+	return surveyExport{
+		Registry: []surveyTable{{
+			Schema: "INFORMATION_SCHEMA",
+			Name:   "EXAMPLE",
+			Columns: []surveyColumn{
+				{Name: "STABLE", SpannerType: "STRING(MAX)", OrdinalPosition: 1},
+				{Name: "ROLLING_PROTO", SpannerType: "PROTO<example.Type>", OrdinalPosition: 2, Rolling: true},
+			},
+		}},
+		Capture: captureDocument{
+			SchemaVersion:        "v0alpha1",
+			Catalog:              "INFORMATION_SCHEMA",
+			Dialect:              "googlesql",
+			Target:               captureTarget{Kind: "managed", ObservationScope: "single_database"},
+			ObservedAt:           "2026-08-25T08:30:12Z",
+			ProducerSourceSHA256: strings.Repeat("2", 64),
+			InvocationSHA256:     strings.Repeat("3", 64),
+			SurfaceSHA256:        strings.Repeat("4", 64),
+			Columns: []captureColumn{
+				{TableName: "EXAMPLE", ColumnName: "STABLE", SpannerType: "STRING(MAX)", OrdinalPosition: 1},
+			},
+		},
 	}
-	return hash
 }

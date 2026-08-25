@@ -75,3 +75,9 @@ non-narrative inputs.
 Do not use `Attested Computation` merely because a probe is executable. That
 type requires the executor, receipt, and attester semantics defined by OKF;
 ordinary probe code and expectation manifests belong in `sources`.
+
+Routine reruns that produce no substantive disagreement or interpretation add
+or validate raw evidence only; they do not create a Research Note. A concise
+`Observation` may summarize an explicitly selected projection, while the raw
+JSON and executable checks remain authoritative for individual tuples and
+target identities.

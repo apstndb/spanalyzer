@@ -1,0 +1,1876 @@
+{
+  "schema_version": "v0alpha1",
+  "catalog": "INFORMATION_SCHEMA",
+  "dialect": "googlesql",
+  "target": {
+    "kind": "managed",
+    "observation_scope": "single_database"
+  },
+  "observed_at": "2026-08-25T12:05:38.437354Z",
+  "producer_source_sha256": "b0321b75b16fbec130be2e0af15fdc0204ad5d2bb451576102448958bf36f5e3",
+  "invocation_sha256": "172d84c2f8c48372ff2500088d54918b90a88c9b53d90d6f602ce0553c05cb4c",
+  "query": "SELECT TABLE_NAME, COLUMN_NAME, SPANNER_TYPE, ORDINAL_POSITION\nFROM INFORMATION_SCHEMA.COLUMNS\nWHERE TABLE_SCHEMA = 'INFORMATION_SCHEMA'\nORDER BY TABLE_NAME, ORDINAL_POSITION",
+  "surface_sha256": "f8b0ea3092e7601f260d6d9cb59002dcd0cf4fba6283df8a7c04c004e6a664ee",
+  "columns": [
+    {
+      "table_name": "CHANGE_STREAMS",
+      "column_name": "CHANGE_STREAM_CATALOG",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 1
+    },
+    {
+      "table_name": "CHANGE_STREAMS",
+      "column_name": "CHANGE_STREAM_SCHEMA",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 2
+    },
+    {
+      "table_name": "CHANGE_STREAMS",
+      "column_name": "CHANGE_STREAM_NAME",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 3
+    },
+    {
+      "table_name": "CHANGE_STREAMS",
+      "column_name": "ALL",
+      "spanner_type": "BOOL",
+      "ordinal_position": 4
+    },
+    {
+      "table_name": "CHANGE_STREAM_COLUMNS",
+      "column_name": "CHANGE_STREAM_CATALOG",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 1
+    },
+    {
+      "table_name": "CHANGE_STREAM_COLUMNS",
+      "column_name": "CHANGE_STREAM_SCHEMA",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 2
+    },
+    {
+      "table_name": "CHANGE_STREAM_COLUMNS",
+      "column_name": "CHANGE_STREAM_NAME",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 3
+    },
+    {
+      "table_name": "CHANGE_STREAM_COLUMNS",
+      "column_name": "TABLE_CATALOG",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 4
+    },
+    {
+      "table_name": "CHANGE_STREAM_COLUMNS",
+      "column_name": "TABLE_SCHEMA",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 5
+    },
+    {
+      "table_name": "CHANGE_STREAM_COLUMNS",
+      "column_name": "TABLE_NAME",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 6
+    },
+    {
+      "table_name": "CHANGE_STREAM_COLUMNS",
+      "column_name": "COLUMN_NAME",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 7
+    },
+    {
+      "table_name": "CHANGE_STREAM_OPTIONS",
+      "column_name": "CHANGE_STREAM_CATALOG",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 1
+    },
+    {
+      "table_name": "CHANGE_STREAM_OPTIONS",
+      "column_name": "CHANGE_STREAM_SCHEMA",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 2
+    },
+    {
+      "table_name": "CHANGE_STREAM_OPTIONS",
+      "column_name": "CHANGE_STREAM_NAME",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 3
+    },
+    {
+      "table_name": "CHANGE_STREAM_OPTIONS",
+      "column_name": "OPTION_NAME",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 4
+    },
+    {
+      "table_name": "CHANGE_STREAM_OPTIONS",
+      "column_name": "OPTION_TYPE",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 5
+    },
+    {
+      "table_name": "CHANGE_STREAM_OPTIONS",
+      "column_name": "OPTION_VALUE",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 6
+    },
+    {
+      "table_name": "CHANGE_STREAM_PRIVILEGES",
+      "column_name": "CHANGE_STREAM_CATALOG",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 1
+    },
+    {
+      "table_name": "CHANGE_STREAM_PRIVILEGES",
+      "column_name": "CHANGE_STREAM_SCHEMA",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 2
+    },
+    {
+      "table_name": "CHANGE_STREAM_PRIVILEGES",
+      "column_name": "CHANGE_STREAM_NAME",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 3
+    },
+    {
+      "table_name": "CHANGE_STREAM_PRIVILEGES",
+      "column_name": "PRIVILEGE_TYPE",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 4
+    },
+    {
+      "table_name": "CHANGE_STREAM_PRIVILEGES",
+      "column_name": "GRANTEE",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 5
+    },
+    {
+      "table_name": "CHANGE_STREAM_TABLES",
+      "column_name": "CHANGE_STREAM_CATALOG",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 1
+    },
+    {
+      "table_name": "CHANGE_STREAM_TABLES",
+      "column_name": "CHANGE_STREAM_SCHEMA",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 2
+    },
+    {
+      "table_name": "CHANGE_STREAM_TABLES",
+      "column_name": "CHANGE_STREAM_NAME",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 3
+    },
+    {
+      "table_name": "CHANGE_STREAM_TABLES",
+      "column_name": "TABLE_CATALOG",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 4
+    },
+    {
+      "table_name": "CHANGE_STREAM_TABLES",
+      "column_name": "TABLE_SCHEMA",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 5
+    },
+    {
+      "table_name": "CHANGE_STREAM_TABLES",
+      "column_name": "TABLE_NAME",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 6
+    },
+    {
+      "table_name": "CHANGE_STREAM_TABLES",
+      "column_name": "ALL_COLUMNS",
+      "spanner_type": "BOOL",
+      "ordinal_position": 7
+    },
+    {
+      "table_name": "CHECK_CONSTRAINTS",
+      "column_name": "CONSTRAINT_CATALOG",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 1
+    },
+    {
+      "table_name": "CHECK_CONSTRAINTS",
+      "column_name": "CONSTRAINT_SCHEMA",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 2
+    },
+    {
+      "table_name": "CHECK_CONSTRAINTS",
+      "column_name": "CONSTRAINT_NAME",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 3
+    },
+    {
+      "table_name": "CHECK_CONSTRAINTS",
+      "column_name": "CHECK_CLAUSE",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 4
+    },
+    {
+      "table_name": "CHECK_CONSTRAINTS",
+      "column_name": "SPANNER_STATE",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 5
+    },
+    {
+      "table_name": "COLUMNS",
+      "column_name": "TABLE_CATALOG",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 1
+    },
+    {
+      "table_name": "COLUMNS",
+      "column_name": "TABLE_SCHEMA",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 2
+    },
+    {
+      "table_name": "COLUMNS",
+      "column_name": "TABLE_NAME",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 3
+    },
+    {
+      "table_name": "COLUMNS",
+      "column_name": "COLUMN_NAME",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 4
+    },
+    {
+      "table_name": "COLUMNS",
+      "column_name": "ORDINAL_POSITION",
+      "spanner_type": "INT64",
+      "ordinal_position": 5
+    },
+    {
+      "table_name": "COLUMNS",
+      "column_name": "COLUMN_DEFAULT",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 6
+    },
+    {
+      "table_name": "COLUMNS",
+      "column_name": "DATA_TYPE",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 7
+    },
+    {
+      "table_name": "COLUMNS",
+      "column_name": "IS_NULLABLE",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 8
+    },
+    {
+      "table_name": "COLUMNS",
+      "column_name": "SPANNER_TYPE",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 9
+    },
+    {
+      "table_name": "COLUMNS",
+      "column_name": "IS_GENERATED",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 10
+    },
+    {
+      "table_name": "COLUMNS",
+      "column_name": "GENERATION_EXPRESSION",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 11
+    },
+    {
+      "table_name": "COLUMNS",
+      "column_name": "IS_STORED",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 12
+    },
+    {
+      "table_name": "COLUMNS",
+      "column_name": "IS_HIDDEN",
+      "spanner_type": "BOOL",
+      "ordinal_position": 13
+    },
+    {
+      "table_name": "COLUMNS",
+      "column_name": "SPANNER_STATE",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 14
+    },
+    {
+      "table_name": "COLUMNS",
+      "column_name": "IS_IDENTITY",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 15
+    },
+    {
+      "table_name": "COLUMNS",
+      "column_name": "IDENTITY_GENERATION",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 16
+    },
+    {
+      "table_name": "COLUMNS",
+      "column_name": "IDENTITY_KIND",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 17
+    },
+    {
+      "table_name": "COLUMNS",
+      "column_name": "IDENTITY_START_WITH_COUNTER",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 18
+    },
+    {
+      "table_name": "COLUMNS",
+      "column_name": "IDENTITY_SKIP_RANGE_MIN",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 19
+    },
+    {
+      "table_name": "COLUMNS",
+      "column_name": "IDENTITY_SKIP_RANGE_MAX",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 20
+    },
+    {
+      "table_name": "COLUMNS",
+      "column_name": "ON_UPDATE_EXPRESSION",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 21
+    },
+    {
+      "table_name": "COLUMN_COLUMN_USAGE",
+      "column_name": "TABLE_CATALOG",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 1
+    },
+    {
+      "table_name": "COLUMN_COLUMN_USAGE",
+      "column_name": "TABLE_SCHEMA",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 2
+    },
+    {
+      "table_name": "COLUMN_COLUMN_USAGE",
+      "column_name": "TABLE_NAME",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 3
+    },
+    {
+      "table_name": "COLUMN_COLUMN_USAGE",
+      "column_name": "COLUMN_NAME",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 4
+    },
+    {
+      "table_name": "COLUMN_COLUMN_USAGE",
+      "column_name": "DEPENDENT_COLUMN",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 5
+    },
+    {
+      "table_name": "COLUMN_OPTIONS",
+      "column_name": "TABLE_CATALOG",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 1
+    },
+    {
+      "table_name": "COLUMN_OPTIONS",
+      "column_name": "TABLE_SCHEMA",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 2
+    },
+    {
+      "table_name": "COLUMN_OPTIONS",
+      "column_name": "TABLE_NAME",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 3
+    },
+    {
+      "table_name": "COLUMN_OPTIONS",
+      "column_name": "COLUMN_NAME",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 4
+    },
+    {
+      "table_name": "COLUMN_OPTIONS",
+      "column_name": "OPTION_NAME",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 5
+    },
+    {
+      "table_name": "COLUMN_OPTIONS",
+      "column_name": "OPTION_TYPE",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 6
+    },
+    {
+      "table_name": "COLUMN_OPTIONS",
+      "column_name": "OPTION_VALUE",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 7
+    },
+    {
+      "table_name": "COLUMN_PRIVILEGES",
+      "column_name": "TABLE_CATALOG",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 1
+    },
+    {
+      "table_name": "COLUMN_PRIVILEGES",
+      "column_name": "TABLE_SCHEMA",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 2
+    },
+    {
+      "table_name": "COLUMN_PRIVILEGES",
+      "column_name": "TABLE_NAME",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 3
+    },
+    {
+      "table_name": "COLUMN_PRIVILEGES",
+      "column_name": "COLUMN_NAME",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 4
+    },
+    {
+      "table_name": "COLUMN_PRIVILEGES",
+      "column_name": "PRIVILEGE_TYPE",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 5
+    },
+    {
+      "table_name": "COLUMN_PRIVILEGES",
+      "column_name": "GRANTEE",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 6
+    },
+    {
+      "table_name": "CONSTRAINT_COLUMN_USAGE",
+      "column_name": "TABLE_CATALOG",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 1
+    },
+    {
+      "table_name": "CONSTRAINT_COLUMN_USAGE",
+      "column_name": "TABLE_SCHEMA",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 2
+    },
+    {
+      "table_name": "CONSTRAINT_COLUMN_USAGE",
+      "column_name": "TABLE_NAME",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 3
+    },
+    {
+      "table_name": "CONSTRAINT_COLUMN_USAGE",
+      "column_name": "COLUMN_NAME",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 4
+    },
+    {
+      "table_name": "CONSTRAINT_COLUMN_USAGE",
+      "column_name": "CONSTRAINT_CATALOG",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 5
+    },
+    {
+      "table_name": "CONSTRAINT_COLUMN_USAGE",
+      "column_name": "CONSTRAINT_SCHEMA",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 6
+    },
+    {
+      "table_name": "CONSTRAINT_COLUMN_USAGE",
+      "column_name": "CONSTRAINT_NAME",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 7
+    },
+    {
+      "table_name": "CONSTRAINT_TABLE_USAGE",
+      "column_name": "TABLE_CATALOG",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 1
+    },
+    {
+      "table_name": "CONSTRAINT_TABLE_USAGE",
+      "column_name": "TABLE_SCHEMA",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 2
+    },
+    {
+      "table_name": "CONSTRAINT_TABLE_USAGE",
+      "column_name": "TABLE_NAME",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 3
+    },
+    {
+      "table_name": "CONSTRAINT_TABLE_USAGE",
+      "column_name": "CONSTRAINT_CATALOG",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 4
+    },
+    {
+      "table_name": "CONSTRAINT_TABLE_USAGE",
+      "column_name": "CONSTRAINT_SCHEMA",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 5
+    },
+    {
+      "table_name": "CONSTRAINT_TABLE_USAGE",
+      "column_name": "CONSTRAINT_NAME",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 6
+    },
+    {
+      "table_name": "DATABASE_OPTIONS",
+      "column_name": "CATALOG_NAME",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 1
+    },
+    {
+      "table_name": "DATABASE_OPTIONS",
+      "column_name": "SCHEMA_NAME",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 2
+    },
+    {
+      "table_name": "DATABASE_OPTIONS",
+      "column_name": "OPTION_NAME",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 3
+    },
+    {
+      "table_name": "DATABASE_OPTIONS",
+      "column_name": "OPTION_TYPE",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 4
+    },
+    {
+      "table_name": "DATABASE_OPTIONS",
+      "column_name": "OPTION_VALUE",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 5
+    },
+    {
+      "table_name": "INDEXES",
+      "column_name": "TABLE_CATALOG",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 1
+    },
+    {
+      "table_name": "INDEXES",
+      "column_name": "TABLE_SCHEMA",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 2
+    },
+    {
+      "table_name": "INDEXES",
+      "column_name": "TABLE_NAME",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 3
+    },
+    {
+      "table_name": "INDEXES",
+      "column_name": "INDEX_NAME",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 4
+    },
+    {
+      "table_name": "INDEXES",
+      "column_name": "INDEX_TYPE",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 5
+    },
+    {
+      "table_name": "INDEXES",
+      "column_name": "PARENT_TABLE_NAME",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 6
+    },
+    {
+      "table_name": "INDEXES",
+      "column_name": "IS_UNIQUE",
+      "spanner_type": "BOOL",
+      "ordinal_position": 7
+    },
+    {
+      "table_name": "INDEXES",
+      "column_name": "IS_NULL_FILTERED",
+      "spanner_type": "BOOL",
+      "ordinal_position": 8
+    },
+    {
+      "table_name": "INDEXES",
+      "column_name": "INDEX_STATE",
+      "spanner_type": "STRING(100)",
+      "ordinal_position": 9
+    },
+    {
+      "table_name": "INDEXES",
+      "column_name": "FILTER",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 10
+    },
+    {
+      "table_name": "INDEXES",
+      "column_name": "SPANNER_IS_MANAGED",
+      "spanner_type": "BOOL",
+      "ordinal_position": 11
+    },
+    {
+      "table_name": "INDEXES",
+      "column_name": "SEARCH_PARTITION_BY",
+      "spanner_type": "ARRAY\u003cSTRING(MAX)\u003e",
+      "ordinal_position": 12
+    },
+    {
+      "table_name": "INDEXES",
+      "column_name": "SEARCH_ORDER_BY",
+      "spanner_type": "ARRAY\u003cSTRING(MAX)\u003e",
+      "ordinal_position": 13
+    },
+    {
+      "table_name": "INDEXES",
+      "column_name": "SEARCH_UNNEST",
+      "spanner_type": "ARRAY\u003cSTRING(MAX)\u003e",
+      "ordinal_position": 14
+    },
+    {
+      "table_name": "INDEX_COLUMNS",
+      "column_name": "TABLE_CATALOG",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 1
+    },
+    {
+      "table_name": "INDEX_COLUMNS",
+      "column_name": "TABLE_SCHEMA",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 2
+    },
+    {
+      "table_name": "INDEX_COLUMNS",
+      "column_name": "TABLE_NAME",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 3
+    },
+    {
+      "table_name": "INDEX_COLUMNS",
+      "column_name": "INDEX_NAME",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 4
+    },
+    {
+      "table_name": "INDEX_COLUMNS",
+      "column_name": "INDEX_TYPE",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 5
+    },
+    {
+      "table_name": "INDEX_COLUMNS",
+      "column_name": "COLUMN_NAME",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 6
+    },
+    {
+      "table_name": "INDEX_COLUMNS",
+      "column_name": "ORDINAL_POSITION",
+      "spanner_type": "INT64",
+      "ordinal_position": 7
+    },
+    {
+      "table_name": "INDEX_COLUMNS",
+      "column_name": "COLUMN_ORDERING",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 8
+    },
+    {
+      "table_name": "INDEX_COLUMNS",
+      "column_name": "IS_NULLABLE",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 9
+    },
+    {
+      "table_name": "INDEX_COLUMNS",
+      "column_name": "SPANNER_TYPE",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 10
+    },
+    {
+      "table_name": "INDEX_COLUMNS",
+      "column_name": "EXPRESSION",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 11
+    },
+    {
+      "table_name": "INDEX_OPTIONS",
+      "column_name": "TABLE_CATALOG",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 1
+    },
+    {
+      "table_name": "INDEX_OPTIONS",
+      "column_name": "TABLE_SCHEMA",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 2
+    },
+    {
+      "table_name": "INDEX_OPTIONS",
+      "column_name": "TABLE_NAME",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 3
+    },
+    {
+      "table_name": "INDEX_OPTIONS",
+      "column_name": "INDEX_NAME",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 4
+    },
+    {
+      "table_name": "INDEX_OPTIONS",
+      "column_name": "INDEX_TYPE",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 5
+    },
+    {
+      "table_name": "INDEX_OPTIONS",
+      "column_name": "OPTION_NAME",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 6
+    },
+    {
+      "table_name": "INDEX_OPTIONS",
+      "column_name": "OPTION_TYPE",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 7
+    },
+    {
+      "table_name": "INDEX_OPTIONS",
+      "column_name": "OPTION_VALUE",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 8
+    },
+    {
+      "table_name": "KEY_COLUMN_USAGE",
+      "column_name": "CONSTRAINT_CATALOG",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 1
+    },
+    {
+      "table_name": "KEY_COLUMN_USAGE",
+      "column_name": "CONSTRAINT_SCHEMA",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 2
+    },
+    {
+      "table_name": "KEY_COLUMN_USAGE",
+      "column_name": "CONSTRAINT_NAME",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 3
+    },
+    {
+      "table_name": "KEY_COLUMN_USAGE",
+      "column_name": "TABLE_CATALOG",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 4
+    },
+    {
+      "table_name": "KEY_COLUMN_USAGE",
+      "column_name": "TABLE_SCHEMA",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 5
+    },
+    {
+      "table_name": "KEY_COLUMN_USAGE",
+      "column_name": "TABLE_NAME",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 6
+    },
+    {
+      "table_name": "KEY_COLUMN_USAGE",
+      "column_name": "COLUMN_NAME",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 7
+    },
+    {
+      "table_name": "KEY_COLUMN_USAGE",
+      "column_name": "ORDINAL_POSITION",
+      "spanner_type": "INT64",
+      "ordinal_position": 8
+    },
+    {
+      "table_name": "KEY_COLUMN_USAGE",
+      "column_name": "POSITION_IN_UNIQUE_CONSTRAINT",
+      "spanner_type": "INT64",
+      "ordinal_position": 9
+    },
+    {
+      "table_name": "LOCALITY_GROUP_OPTIONS",
+      "column_name": "LOCALITY_GROUP_NAME",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 1
+    },
+    {
+      "table_name": "LOCALITY_GROUP_OPTIONS",
+      "column_name": "OPTION_NAME",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 2
+    },
+    {
+      "table_name": "LOCALITY_GROUP_OPTIONS",
+      "column_name": "OPTION_VALUE",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 3
+    },
+    {
+      "table_name": "MODELS",
+      "column_name": "MODEL_CATALOG",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 1
+    },
+    {
+      "table_name": "MODELS",
+      "column_name": "MODEL_SCHEMA",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 2
+    },
+    {
+      "table_name": "MODELS",
+      "column_name": "MODEL_NAME",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 3
+    },
+    {
+      "table_name": "MODELS",
+      "column_name": "IS_REMOTE",
+      "spanner_type": "BOOL",
+      "ordinal_position": 4
+    },
+    {
+      "table_name": "MODEL_COLUMNS",
+      "column_name": "MODEL_CATALOG",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 1
+    },
+    {
+      "table_name": "MODEL_COLUMNS",
+      "column_name": "MODEL_SCHEMA",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 2
+    },
+    {
+      "table_name": "MODEL_COLUMNS",
+      "column_name": "MODEL_NAME",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 3
+    },
+    {
+      "table_name": "MODEL_COLUMNS",
+      "column_name": "COLUMN_KIND",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 4
+    },
+    {
+      "table_name": "MODEL_COLUMNS",
+      "column_name": "COLUMN_NAME",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 5
+    },
+    {
+      "table_name": "MODEL_COLUMNS",
+      "column_name": "ORDINAL_POSITION",
+      "spanner_type": "INT64",
+      "ordinal_position": 6
+    },
+    {
+      "table_name": "MODEL_COLUMNS",
+      "column_name": "DATA_TYPE",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 7
+    },
+    {
+      "table_name": "MODEL_COLUMNS",
+      "column_name": "IS_EXPLICIT",
+      "spanner_type": "BOOL",
+      "ordinal_position": 8
+    },
+    {
+      "table_name": "MODEL_COLUMN_OPTIONS",
+      "column_name": "MODEL_CATALOG",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 1
+    },
+    {
+      "table_name": "MODEL_COLUMN_OPTIONS",
+      "column_name": "MODEL_SCHEMA",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 2
+    },
+    {
+      "table_name": "MODEL_COLUMN_OPTIONS",
+      "column_name": "MODEL_NAME",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 3
+    },
+    {
+      "table_name": "MODEL_COLUMN_OPTIONS",
+      "column_name": "COLUMN_KIND",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 4
+    },
+    {
+      "table_name": "MODEL_COLUMN_OPTIONS",
+      "column_name": "COLUMN_NAME",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 5
+    },
+    {
+      "table_name": "MODEL_COLUMN_OPTIONS",
+      "column_name": "OPTION_NAME",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 6
+    },
+    {
+      "table_name": "MODEL_COLUMN_OPTIONS",
+      "column_name": "OPTION_TYPE",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 7
+    },
+    {
+      "table_name": "MODEL_COLUMN_OPTIONS",
+      "column_name": "OPTION_VALUE",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 8
+    },
+    {
+      "table_name": "MODEL_OPTIONS",
+      "column_name": "MODEL_CATALOG",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 1
+    },
+    {
+      "table_name": "MODEL_OPTIONS",
+      "column_name": "MODEL_SCHEMA",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 2
+    },
+    {
+      "table_name": "MODEL_OPTIONS",
+      "column_name": "MODEL_NAME",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 3
+    },
+    {
+      "table_name": "MODEL_OPTIONS",
+      "column_name": "OPTION_NAME",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 4
+    },
+    {
+      "table_name": "MODEL_OPTIONS",
+      "column_name": "OPTION_TYPE",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 5
+    },
+    {
+      "table_name": "MODEL_OPTIONS",
+      "column_name": "OPTION_VALUE",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 6
+    },
+    {
+      "table_name": "MODEL_PRIVILEGES",
+      "column_name": "MODEL_CATALOG",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 1
+    },
+    {
+      "table_name": "MODEL_PRIVILEGES",
+      "column_name": "MODEL_SCHEMA",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 2
+    },
+    {
+      "table_name": "MODEL_PRIVILEGES",
+      "column_name": "MODEL_NAME",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 3
+    },
+    {
+      "table_name": "MODEL_PRIVILEGES",
+      "column_name": "PRIVILEGE_TYPE",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 4
+    },
+    {
+      "table_name": "MODEL_PRIVILEGES",
+      "column_name": "GRANTEE",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 5
+    },
+    {
+      "table_name": "PARAMETERS",
+      "column_name": "SPECIFIC_CATALOG",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 1
+    },
+    {
+      "table_name": "PARAMETERS",
+      "column_name": "SPECIFIC_SCHEMA",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 2
+    },
+    {
+      "table_name": "PARAMETERS",
+      "column_name": "SPECIFIC_NAME",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 3
+    },
+    {
+      "table_name": "PARAMETERS",
+      "column_name": "ORDINAL_POSITION",
+      "spanner_type": "INT64",
+      "ordinal_position": 4
+    },
+    {
+      "table_name": "PARAMETERS",
+      "column_name": "PARAMETER_NAME",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 5
+    },
+    {
+      "table_name": "PARAMETERS",
+      "column_name": "DATA_TYPE",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 6
+    },
+    {
+      "table_name": "PARAMETERS",
+      "column_name": "PARAMETER_DEFAULT",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 7
+    },
+    {
+      "table_name": "PARAMETERS",
+      "column_name": "SPANNER_TYPE",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 8
+    },
+    {
+      "table_name": "PLACEMENTS",
+      "column_name": "PLACEMENT_NAME",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 1
+    },
+    {
+      "table_name": "PLACEMENTS",
+      "column_name": "IS_DEFAULT",
+      "spanner_type": "BOOL",
+      "ordinal_position": 2
+    },
+    {
+      "table_name": "PLACEMENT_OPTIONS",
+      "column_name": "PLACEMENT_NAME",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 1
+    },
+    {
+      "table_name": "PLACEMENT_OPTIONS",
+      "column_name": "OPTION_NAME",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 2
+    },
+    {
+      "table_name": "PLACEMENT_OPTIONS",
+      "column_name": "OPTION_TYPE",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 3
+    },
+    {
+      "table_name": "PLACEMENT_OPTIONS",
+      "column_name": "OPTION_VALUE",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 4
+    },
+    {
+      "table_name": "PROPERTY_GRAPHS",
+      "column_name": "PROPERTY_GRAPH_CATALOG",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 1
+    },
+    {
+      "table_name": "PROPERTY_GRAPHS",
+      "column_name": "PROPERTY_GRAPH_SCHEMA",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 2
+    },
+    {
+      "table_name": "PROPERTY_GRAPHS",
+      "column_name": "PROPERTY_GRAPH_NAME",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 3
+    },
+    {
+      "table_name": "PROPERTY_GRAPHS",
+      "column_name": "PROPERTY_GRAPH_METADATA_JSON",
+      "spanner_type": "JSON",
+      "ordinal_position": 4
+    },
+    {
+      "table_name": "REFERENTIAL_CONSTRAINTS",
+      "column_name": "CONSTRAINT_CATALOG",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 1
+    },
+    {
+      "table_name": "REFERENTIAL_CONSTRAINTS",
+      "column_name": "CONSTRAINT_SCHEMA",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 2
+    },
+    {
+      "table_name": "REFERENTIAL_CONSTRAINTS",
+      "column_name": "CONSTRAINT_NAME",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 3
+    },
+    {
+      "table_name": "REFERENTIAL_CONSTRAINTS",
+      "column_name": "UNIQUE_CONSTRAINT_CATALOG",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 4
+    },
+    {
+      "table_name": "REFERENTIAL_CONSTRAINTS",
+      "column_name": "UNIQUE_CONSTRAINT_SCHEMA",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 5
+    },
+    {
+      "table_name": "REFERENTIAL_CONSTRAINTS",
+      "column_name": "UNIQUE_CONSTRAINT_NAME",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 6
+    },
+    {
+      "table_name": "REFERENTIAL_CONSTRAINTS",
+      "column_name": "MATCH_OPTION",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 7
+    },
+    {
+      "table_name": "REFERENTIAL_CONSTRAINTS",
+      "column_name": "UPDATE_RULE",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 8
+    },
+    {
+      "table_name": "REFERENTIAL_CONSTRAINTS",
+      "column_name": "DELETE_RULE",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 9
+    },
+    {
+      "table_name": "REFERENTIAL_CONSTRAINTS",
+      "column_name": "SPANNER_STATE",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 10
+    },
+    {
+      "table_name": "ROLES",
+      "column_name": "ROLE_NAME",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 1
+    },
+    {
+      "table_name": "ROLES",
+      "column_name": "IS_SYSTEM",
+      "spanner_type": "BOOL",
+      "ordinal_position": 2
+    },
+    {
+      "table_name": "ROLE_CHANGE_STREAM_GRANTS",
+      "column_name": "CHANGE_STREAM_CATALOG",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 1
+    },
+    {
+      "table_name": "ROLE_CHANGE_STREAM_GRANTS",
+      "column_name": "CHANGE_STREAM_SCHEMA",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 2
+    },
+    {
+      "table_name": "ROLE_CHANGE_STREAM_GRANTS",
+      "column_name": "CHANGE_STREAM_NAME",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 3
+    },
+    {
+      "table_name": "ROLE_CHANGE_STREAM_GRANTS",
+      "column_name": "PRIVILEGE_TYPE",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 4
+    },
+    {
+      "table_name": "ROLE_CHANGE_STREAM_GRANTS",
+      "column_name": "GRANTEE",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 5
+    },
+    {
+      "table_name": "ROLE_COLUMN_GRANTS",
+      "column_name": "TABLE_CATALOG",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 1
+    },
+    {
+      "table_name": "ROLE_COLUMN_GRANTS",
+      "column_name": "TABLE_SCHEMA",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 2
+    },
+    {
+      "table_name": "ROLE_COLUMN_GRANTS",
+      "column_name": "TABLE_NAME",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 3
+    },
+    {
+      "table_name": "ROLE_COLUMN_GRANTS",
+      "column_name": "COLUMN_NAME",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 4
+    },
+    {
+      "table_name": "ROLE_COLUMN_GRANTS",
+      "column_name": "PRIVILEGE_TYPE",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 5
+    },
+    {
+      "table_name": "ROLE_COLUMN_GRANTS",
+      "column_name": "GRANTEE",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 6
+    },
+    {
+      "table_name": "ROLE_GRANTEES",
+      "column_name": "ROLE_NAME",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 1
+    },
+    {
+      "table_name": "ROLE_GRANTEES",
+      "column_name": "GRANTEE",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 2
+    },
+    {
+      "table_name": "ROLE_MODEL_GRANTS",
+      "column_name": "MODEL_CATALOG",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 1
+    },
+    {
+      "table_name": "ROLE_MODEL_GRANTS",
+      "column_name": "MODEL_SCHEMA",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 2
+    },
+    {
+      "table_name": "ROLE_MODEL_GRANTS",
+      "column_name": "MODEL_NAME",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 3
+    },
+    {
+      "table_name": "ROLE_MODEL_GRANTS",
+      "column_name": "PRIVILEGE_TYPE",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 4
+    },
+    {
+      "table_name": "ROLE_MODEL_GRANTS",
+      "column_name": "GRANTEE",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 5
+    },
+    {
+      "table_name": "ROLE_ROUTINE_GRANTS",
+      "column_name": "SPECIFIC_CATALOG",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 1
+    },
+    {
+      "table_name": "ROLE_ROUTINE_GRANTS",
+      "column_name": "SPECIFIC_SCHEMA",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 2
+    },
+    {
+      "table_name": "ROLE_ROUTINE_GRANTS",
+      "column_name": "SPECIFIC_NAME",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 3
+    },
+    {
+      "table_name": "ROLE_ROUTINE_GRANTS",
+      "column_name": "PRIVILEGE_TYPE",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 4
+    },
+    {
+      "table_name": "ROLE_ROUTINE_GRANTS",
+      "column_name": "GRANTEE",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 5
+    },
+    {
+      "table_name": "ROLE_TABLE_GRANTS",
+      "column_name": "TABLE_CATALOG",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 1
+    },
+    {
+      "table_name": "ROLE_TABLE_GRANTS",
+      "column_name": "TABLE_SCHEMA",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 2
+    },
+    {
+      "table_name": "ROLE_TABLE_GRANTS",
+      "column_name": "TABLE_NAME",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 3
+    },
+    {
+      "table_name": "ROLE_TABLE_GRANTS",
+      "column_name": "PRIVILEGE_TYPE",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 4
+    },
+    {
+      "table_name": "ROLE_TABLE_GRANTS",
+      "column_name": "GRANTEE",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 5
+    },
+    {
+      "table_name": "ROUTINES",
+      "column_name": "SPECIFIC_CATALOG",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 1
+    },
+    {
+      "table_name": "ROUTINES",
+      "column_name": "SPECIFIC_SCHEMA",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 2
+    },
+    {
+      "table_name": "ROUTINES",
+      "column_name": "SPECIFIC_NAME",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 3
+    },
+    {
+      "table_name": "ROUTINES",
+      "column_name": "ROUTINE_CATALOG",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 4
+    },
+    {
+      "table_name": "ROUTINES",
+      "column_name": "ROUTINE_SCHEMA",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 5
+    },
+    {
+      "table_name": "ROUTINES",
+      "column_name": "ROUTINE_NAME",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 6
+    },
+    {
+      "table_name": "ROUTINES",
+      "column_name": "ROUTINE_TYPE",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 7
+    },
+    {
+      "table_name": "ROUTINES",
+      "column_name": "DATA_TYPE",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 8
+    },
+    {
+      "table_name": "ROUTINES",
+      "column_name": "ROUTINE_BODY",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 9
+    },
+    {
+      "table_name": "ROUTINES",
+      "column_name": "ROUTINE_DEFINITION",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 10
+    },
+    {
+      "table_name": "ROUTINES",
+      "column_name": "SECURITY_TYPE",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 11
+    },
+    {
+      "table_name": "ROUTINES",
+      "column_name": "SPANNER_TYPE",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 12
+    },
+    {
+      "table_name": "ROUTINE_OPTIONS",
+      "column_name": "SPECIFIC_CATALOG",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 1
+    },
+    {
+      "table_name": "ROUTINE_OPTIONS",
+      "column_name": "SPECIFIC_SCHEMA",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 2
+    },
+    {
+      "table_name": "ROUTINE_OPTIONS",
+      "column_name": "SPECIFIC_NAME",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 3
+    },
+    {
+      "table_name": "ROUTINE_OPTIONS",
+      "column_name": "OPTION_NAME",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 4
+    },
+    {
+      "table_name": "ROUTINE_OPTIONS",
+      "column_name": "OPTION_TYPE",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 5
+    },
+    {
+      "table_name": "ROUTINE_OPTIONS",
+      "column_name": "OPTION_VALUE",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 6
+    },
+    {
+      "table_name": "ROUTINE_PRIVILEGES",
+      "column_name": "SPECIFIC_CATALOG",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 1
+    },
+    {
+      "table_name": "ROUTINE_PRIVILEGES",
+      "column_name": "SPECIFIC_SCHEMA",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 2
+    },
+    {
+      "table_name": "ROUTINE_PRIVILEGES",
+      "column_name": "SPECIFIC_NAME",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 3
+    },
+    {
+      "table_name": "ROUTINE_PRIVILEGES",
+      "column_name": "PRIVILEGE_TYPE",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 4
+    },
+    {
+      "table_name": "ROUTINE_PRIVILEGES",
+      "column_name": "GRANTEE",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 5
+    },
+    {
+      "table_name": "SCHEMATA",
+      "column_name": "CATALOG_NAME",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 1
+    },
+    {
+      "table_name": "SCHEMATA",
+      "column_name": "SCHEMA_NAME",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 2
+    },
+    {
+      "table_name": "SCHEMATA",
+      "column_name": "EFFECTIVE_TIMESTAMP",
+      "spanner_type": "INT64",
+      "ordinal_position": 3
+    },
+    {
+      "table_name": "SCHEMATA",
+      "column_name": "PROTO_BUNDLE",
+      "spanner_type": "PROTO\u003cproto2.FileDescriptorSet\u003e",
+      "ordinal_position": 4
+    },
+    {
+      "table_name": "SCHEMATA",
+      "column_name": "SCHEMA_OWNER",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 5
+    },
+    {
+      "table_name": "SEQUENCES",
+      "column_name": "CATALOG",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 1
+    },
+    {
+      "table_name": "SEQUENCES",
+      "column_name": "SCHEMA",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 2
+    },
+    {
+      "table_name": "SEQUENCES",
+      "column_name": "NAME",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 3
+    },
+    {
+      "table_name": "SEQUENCES",
+      "column_name": "DATA_TYPE",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 4
+    },
+    {
+      "table_name": "SEQUENCE_OPTIONS",
+      "column_name": "CATALOG",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 1
+    },
+    {
+      "table_name": "SEQUENCE_OPTIONS",
+      "column_name": "SCHEMA",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 2
+    },
+    {
+      "table_name": "SEQUENCE_OPTIONS",
+      "column_name": "NAME",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 3
+    },
+    {
+      "table_name": "SEQUENCE_OPTIONS",
+      "column_name": "OPTION_NAME",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 4
+    },
+    {
+      "table_name": "SEQUENCE_OPTIONS",
+      "column_name": "OPTION_TYPE",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 5
+    },
+    {
+      "table_name": "SEQUENCE_OPTIONS",
+      "column_name": "OPTION_VALUE",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 6
+    },
+    {
+      "table_name": "SPANNER_STATISTICS",
+      "column_name": "CATALOG_NAME",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 1
+    },
+    {
+      "table_name": "SPANNER_STATISTICS",
+      "column_name": "SCHEMA_NAME",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 2
+    },
+    {
+      "table_name": "SPANNER_STATISTICS",
+      "column_name": "PACKAGE_NAME",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 3
+    },
+    {
+      "table_name": "SPANNER_STATISTICS",
+      "column_name": "ALLOW_GC",
+      "spanner_type": "BOOL",
+      "ordinal_position": 4
+    },
+    {
+      "table_name": "TABLES",
+      "column_name": "TABLE_CATALOG",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 1
+    },
+    {
+      "table_name": "TABLES",
+      "column_name": "TABLE_SCHEMA",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 2
+    },
+    {
+      "table_name": "TABLES",
+      "column_name": "TABLE_NAME",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 3
+    },
+    {
+      "table_name": "TABLES",
+      "column_name": "PARENT_TABLE_NAME",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 4
+    },
+    {
+      "table_name": "TABLES",
+      "column_name": "ON_DELETE_ACTION",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 5
+    },
+    {
+      "table_name": "TABLES",
+      "column_name": "TABLE_TYPE",
+      "spanner_type": "STRING(32)",
+      "ordinal_position": 6
+    },
+    {
+      "table_name": "TABLES",
+      "column_name": "SPANNER_STATE",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 7
+    },
+    {
+      "table_name": "TABLES",
+      "column_name": "INTERLEAVE_TYPE",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 8
+    },
+    {
+      "table_name": "TABLES",
+      "column_name": "ROW_DELETION_POLICY_EXPRESSION",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 9
+    },
+    {
+      "table_name": "TABLE_CONSTRAINTS",
+      "column_name": "CONSTRAINT_CATALOG",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 1
+    },
+    {
+      "table_name": "TABLE_CONSTRAINTS",
+      "column_name": "CONSTRAINT_SCHEMA",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 2
+    },
+    {
+      "table_name": "TABLE_CONSTRAINTS",
+      "column_name": "CONSTRAINT_NAME",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 3
+    },
+    {
+      "table_name": "TABLE_CONSTRAINTS",
+      "column_name": "TABLE_CATALOG",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 4
+    },
+    {
+      "table_name": "TABLE_CONSTRAINTS",
+      "column_name": "TABLE_SCHEMA",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 5
+    },
+    {
+      "table_name": "TABLE_CONSTRAINTS",
+      "column_name": "TABLE_NAME",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 6
+    },
+    {
+      "table_name": "TABLE_CONSTRAINTS",
+      "column_name": "CONSTRAINT_TYPE",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 7
+    },
+    {
+      "table_name": "TABLE_CONSTRAINTS",
+      "column_name": "IS_DEFERRABLE",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 8
+    },
+    {
+      "table_name": "TABLE_CONSTRAINTS",
+      "column_name": "INITIALLY_DEFERRED",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 9
+    },
+    {
+      "table_name": "TABLE_CONSTRAINTS",
+      "column_name": "ENFORCED",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 10
+    },
+    {
+      "table_name": "TABLE_OPTIONS",
+      "column_name": "TABLE_CATALOG",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 1
+    },
+    {
+      "table_name": "TABLE_OPTIONS",
+      "column_name": "TABLE_SCHEMA",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 2
+    },
+    {
+      "table_name": "TABLE_OPTIONS",
+      "column_name": "TABLE_NAME",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 3
+    },
+    {
+      "table_name": "TABLE_OPTIONS",
+      "column_name": "OPTION_NAME",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 4
+    },
+    {
+      "table_name": "TABLE_OPTIONS",
+      "column_name": "OPTION_TYPE",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 5
+    },
+    {
+      "table_name": "TABLE_OPTIONS",
+      "column_name": "OPTION_VALUE",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 6
+    },
+    {
+      "table_name": "TABLE_PRIVILEGES",
+      "column_name": "TABLE_CATALOG",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 1
+    },
+    {
+      "table_name": "TABLE_PRIVILEGES",
+      "column_name": "TABLE_SCHEMA",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 2
+    },
+    {
+      "table_name": "TABLE_PRIVILEGES",
+      "column_name": "TABLE_NAME",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 3
+    },
+    {
+      "table_name": "TABLE_PRIVILEGES",
+      "column_name": "PRIVILEGE_TYPE",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 4
+    },
+    {
+      "table_name": "TABLE_PRIVILEGES",
+      "column_name": "GRANTEE",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 5
+    },
+    {
+      "table_name": "TABLE_SYNONYMS",
+      "column_name": "SYNONYM_CATALOG",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 1
+    },
+    {
+      "table_name": "TABLE_SYNONYMS",
+      "column_name": "SYNONYM_SCHEMA",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 2
+    },
+    {
+      "table_name": "TABLE_SYNONYMS",
+      "column_name": "SYNONYM_NAME",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 3
+    },
+    {
+      "table_name": "TABLE_SYNONYMS",
+      "column_name": "TABLE_CATALOG",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 4
+    },
+    {
+      "table_name": "TABLE_SYNONYMS",
+      "column_name": "TABLE_SCHEMA",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 5
+    },
+    {
+      "table_name": "TABLE_SYNONYMS",
+      "column_name": "TABLE_NAME",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 6
+    },
+    {
+      "table_name": "VIEWS",
+      "column_name": "TABLE_CATALOG",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 1
+    },
+    {
+      "table_name": "VIEWS",
+      "column_name": "TABLE_SCHEMA",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 2
+    },
+    {
+      "table_name": "VIEWS",
+      "column_name": "TABLE_NAME",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 3
+    },
+    {
+      "table_name": "VIEWS",
+      "column_name": "VIEW_DEFINITION",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 4
+    },
+    {
+      "table_name": "VIEWS",
+      "column_name": "SECURITY_TYPE",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 5
+    }
+  ],
+  "rolling_queryability": [
+    {
+      "table_name": "INDEXES",
+      "column_name": "SEARCH_UNNEST",
+      "status": "queryable"
+    },
+    {
+      "table_name": "INDEX_COLUMNS",
+      "column_name": "EXPRESSION",
+      "status": "queryable"
+    }
+  ]
+}

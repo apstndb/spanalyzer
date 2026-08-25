@@ -19,7 +19,7 @@ import (
 
 const (
 	informationSchemaName                  = "INFORMATION_SCHEMA"
-	informationSchemaManifestSchemaVersion = "v0alpha1"
+	informationSchemaManifestSchemaVersion = "v0alpha2"
 )
 
 type informationSchemaColumn struct {
@@ -41,11 +41,17 @@ type informationSchemaManifest struct {
 }
 
 type informationSchemaManifestSource struct {
-	Repository   string `json:"repository"`
-	Commit       string `json:"commit"`
-	Path         string `json:"path"`
-	ExportSHA256 string `json:"export_sha256"`
-	ExporterNote string `json:"exporter_note"`
+	Repository                    string `json:"repository"`
+	RegistryPath                  string `json:"registry_path"`
+	RegistryExportSHA256          string `json:"registry_export_sha256"`
+	SelectedObservationPath       string `json:"selected_observation_path"`
+	SelectedObservationFileSHA256 string `json:"selected_observation_file_sha256"`
+	ObservedAt                    string `json:"observed_at"`
+	SurfaceSHA256                 string `json:"surface_sha256"`
+	ProducerSourceSHA256          string `json:"producer_source_sha256"`
+	InvocationSHA256              string `json:"invocation_sha256"`
+	ProjectionSourcePath          string `json:"projection_source_path"`
+	ProjectionSourceSHA256        string `json:"projection_source_sha256"`
 }
 
 type informationSchemaManifestDocumentation struct {
@@ -108,6 +114,9 @@ func loadInformationSchemaTables() ([]informationSchemaTable, error) {
 }
 
 func parseInformationSchemaManifest(data []byte) (*informationSchemaManifest, []informationSchemaTable, error) {
+	if err := rejectDuplicateInformationSchemaJSONKeys(data); err != nil {
+		return nil, nil, err
+	}
 	decoder := json.NewDecoder(bytes.NewReader(data))
 	decoder.DisallowUnknownFields()
 	var manifest informationSchemaManifest
@@ -124,14 +133,35 @@ func parseInformationSchemaManifest(data []byte) (*informationSchemaManifest, []
 	if manifest.SchemaVersion != informationSchemaManifestSchemaVersion {
 		return nil, nil, fmt.Errorf("INFORMATION_SCHEMA manifest schema_version = %q, want %q", manifest.SchemaVersion, informationSchemaManifestSchemaVersion)
 	}
-	if manifest.Source.Repository == "" || manifest.Source.Commit == "" || manifest.Source.Path == "" || manifest.Source.ExporterNote == "" {
-		return nil, nil, errors.New("INFORMATION_SCHEMA manifest source provenance is incomplete")
+	if manifest.Source.Repository != "github.com/apstndb/spanalyzer" || manifest.Source.RegistryPath != "survey/infoschem" {
+		return nil, nil, errors.New("INFORMATION_SCHEMA manifest source repository or registry path is invalid")
 	}
-	if err := validateGitCommit(manifest.Source.Commit); err != nil {
-		return nil, nil, err
+	if manifest.Source.ProjectionSourcePath != "information_schema_projection_source.json" {
+		return nil, nil, fmt.Errorf("INFORMATION_SCHEMA manifest projection source path = %q", manifest.Source.ProjectionSourcePath)
 	}
-	if err := validateSHA256("source.export_sha256", manifest.Source.ExportSHA256); err != nil {
-		return nil, nil, err
+	for label, value := range map[string]string{
+		"source.registry_export_sha256":           manifest.Source.RegistryExportSHA256,
+		"source.selected_observation_file_sha256": manifest.Source.SelectedObservationFileSHA256,
+		"source.surface_sha256":                   manifest.Source.SurfaceSHA256,
+		"source.producer_source_sha256":           manifest.Source.ProducerSourceSHA256,
+		"source.invocation_sha256":                manifest.Source.InvocationSHA256,
+		"source.projection_source_sha256":         manifest.Source.ProjectionSourceSHA256,
+	} {
+		if err := validateSHA256(label, value); err != nil {
+			return nil, nil, err
+		}
+	}
+	observedAt, err := time.Parse(time.RFC3339Nano, manifest.Source.ObservedAt)
+	if err != nil || observedAt.Location() != time.UTC || observedAt.Format(time.RFC3339Nano) != manifest.Source.ObservedAt {
+		return nil, nil, fmt.Errorf("INFORMATION_SCHEMA manifest source observed_at = %q, want canonical RFC3339 UTC", manifest.Source.ObservedAt)
+	}
+	expectedObservationPath := fmt.Sprintf(
+		"survey/infoschem/evidence/managed/%s-%s.json",
+		observedAt.UTC().Format("20060102T150405Z"),
+		manifest.Source.SurfaceSHA256[:12],
+	)
+	if manifest.Source.SelectedObservationPath != expectedObservationPath {
+		return nil, nil, fmt.Errorf("INFORMATION_SCHEMA manifest selected observation path = %q, want %q from observed_at and surface_sha256", manifest.Source.SelectedObservationPath, expectedObservationPath)
 	}
 	if manifest.Documentation.URL == "" || manifest.Documentation.LastUpdated == "" {
 		return nil, nil, errors.New("INFORMATION_SCHEMA manifest documentation provenance is incomplete")
@@ -273,10 +303,71 @@ func validateSHA256(name, value string) error {
 	return nil
 }
 
-func validateGitCommit(value string) error {
-	decoded, err := hex.DecodeString(value)
-	if err != nil || len(decoded) != 20 || value != strings.ToLower(value) {
-		return fmt.Errorf("INFORMATION_SCHEMA manifest source.commit = %q, want a lowercase 40-hex Git object ID", value)
+func rejectDuplicateInformationSchemaJSONKeys(data []byte) error {
+	decoder := json.NewDecoder(bytes.NewReader(data))
+	if err := scanInformationSchemaJSONValue(decoder, "$"); err != nil {
+		return fmt.Errorf("validate embedded INFORMATION_SCHEMA manifest keys: %w", err)
+	}
+	if err := decoder.Decode(&struct{}{}); !errors.Is(err, io.EOF) {
+		if err == nil {
+			return errors.New("validate embedded INFORMATION_SCHEMA manifest keys: multiple JSON values")
+		}
+		return fmt.Errorf("validate embedded INFORMATION_SCHEMA manifest trailer: %w", err)
+	}
+	return nil
+}
+
+func scanInformationSchemaJSONValue(decoder *json.Decoder, path string) error {
+	token, err := decoder.Token()
+	if err != nil {
+		return err
+	}
+	delimiter, ok := token.(json.Delim)
+	if !ok {
+		return nil
+	}
+	switch delimiter {
+	case '{':
+		keys := make(map[string]bool)
+		for decoder.More() {
+			keyToken, err := decoder.Token()
+			if err != nil {
+				return err
+			}
+			key, ok := keyToken.(string)
+			if !ok {
+				return fmt.Errorf("object %s contains a non-string key", path)
+			}
+			if keys[key] {
+				return fmt.Errorf("object %s contains duplicate key %q", path, key)
+			}
+			keys[key] = true
+			if err := scanInformationSchemaJSONValue(decoder, path+"."+key); err != nil {
+				return err
+			}
+		}
+		closing, err := decoder.Token()
+		if err != nil {
+			return err
+		}
+		if closing != json.Delim('}') {
+			return fmt.Errorf("object %s has invalid closing token %v", path, closing)
+		}
+	case '[':
+		for index := 0; decoder.More(); index++ {
+			if err := scanInformationSchemaJSONValue(decoder, fmt.Sprintf("%s[%d]", path, index)); err != nil {
+				return err
+			}
+		}
+		closing, err := decoder.Token()
+		if err != nil {
+			return err
+		}
+		if closing != json.Delim(']') {
+			return fmt.Errorf("array %s has invalid closing token %v", path, closing)
+		}
+	default:
+		return fmt.Errorf("value %s starts with unexpected delimiter %q", path, delimiter)
 	}
 	return nil
 }

@@ -157,8 +157,8 @@
 - ~~Resolve the actual Omni image selected by `spanemuboost` and record image
   digest/platform provenance without changing repository dependencies.~~ Done:
   at audit time v0.4.6 still defaulted to `2026.r1-beta.2`; the module was later
-  updated to spanemuboost v0.4.7 and the latest linux/arm64 digest is recorded
-  in `HANDOFF.md`.
+  updated to spanemuboost v0.4.7. The retained INFORMATION_SCHEMA capture under
+  `infoschem/evidence/omni/` now records the observed linux/arm64 OCI digest.
 - ~~Run the repository Omni drift gate and a bounded loader/DDL fixture against
   the newest image, distinguishing product regressions from container-runtime
   or readiness failures.~~ Done: both old and new images start; latest accepts
@@ -167,8 +167,10 @@
 - ~~Compare the observed Omni metadata surface with the current registry,
   emulator v1.5.56, and the latest real-Spanner observations, then record the
   verified outcome without committing or publishing it.~~ Done: latest Omni is
-  48/308 and exposes both new queryable columns; v1.5.56 remains 28/198 without
-  them, while the latest managed-service probe showed a partial rollout.
+  48/308 and advertises both new columns; a retained same-transaction probe
+  records both as queryable in Omni and in the selected managed observation.
+  Emulator v1.5.56 remains 28/198 without them, while managed-service rollout
+  remains observation-time dependent.
 - ~~Before registering the two rolling columns, design the real-Spanner path for
   columns that are advertised but not queryable in the same session/snapshot.~~
   Done in `d9778d4`: rolling columns are probed before selection, and failure to
@@ -178,7 +180,8 @@
 
 - ~~Verify the latest published Cloud Spanner Emulator release and container
   image from current primary sources.~~ Done: stable v1.5.56 remains latest;
-  the tested linux/arm64 image digest is recorded in `HANDOFF.md`.
+  the retained capture under `infoschem/evidence/emulator/` records the tested
+  linux/arm64 OCI digest.
 - ~~Refresh `origin/main` and the latest public memefish module version without
   disturbing the existing dirty worktree.~~ memefish remains v0.8.1. The local
   checkout has no remotes, and the expected GitHub repository API returned 404,

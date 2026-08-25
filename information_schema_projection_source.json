@@ -1,0 +1,67 @@
+{
+  "schema_version": "v0alpha1",
+  "mode": "managed_live_primary",
+  "selected_observation": {
+    "path": "survey/infoschem/evidence/managed/20260825T120538Z-f8b0ea3092e7.json",
+    "file_sha256": "94e8c662f3e719d2ebe3143f39d0473c5c6f27d7255d3cc1a8ee3d711047802f"
+  },
+  "rolling_advertisement_policy": "runtime_filtered",
+  "documentation": {
+    "url": "https://docs.cloud.google.com/spanner/docs/information-schema",
+    "last_updated": "2026-08-15"
+  },
+  "documentation_only_absent": [
+    {
+      "table_name": "ROLE_COLUMN_GRANTS",
+      "column_name": "GRANTOR",
+      "raw_type": "STRING"
+    },
+    {
+      "table_name": "ROLE_COLUMN_GRANTS",
+      "column_name": "IS_GRANTABLE",
+      "raw_type": "STRING"
+    },
+    {
+      "table_name": "ROLE_MODEL_GRANTS",
+      "column_name": "GRANTOR",
+      "raw_type": "STRING"
+    },
+    {
+      "table_name": "ROLE_MODEL_GRANTS",
+      "column_name": "IS_GRANTABLE",
+      "raw_type": "STRING"
+    },
+    {
+      "table_name": "ROLE_ROUTINE_GRANTS",
+      "column_name": "GRANTOR",
+      "raw_type": "STRING"
+    },
+    {
+      "table_name": "ROLE_ROUTINE_GRANTS",
+      "column_name": "IS_GRANTABLE",
+      "raw_type": "STRING"
+    },
+    {
+      "table_name": "ROLE_TABLE_GRANTS",
+      "column_name": "GRANTOR",
+      "raw_type": "STRING"
+    },
+    {
+      "table_name": "ROLE_TABLE_GRANTS",
+      "column_name": "IS_GRANTABLE",
+      "raw_type": "STRING"
+    },
+    {
+      "table_name": "TABLE_SYNONYMS",
+      "column_name": "SYNONYM_TABLE_NAME",
+      "raw_type": "STRING"
+    }
+  ],
+  "projection_overrides": [
+    {
+      "table_name": "SCHEMATA",
+      "column_name": "PROTO_BUNDLE",
+      "projected_type": "STRING(MAX)"
+    }
+  ]
+}

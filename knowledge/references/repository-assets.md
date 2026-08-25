@@ -17,15 +17,20 @@ asset_families:
   - id: information-schema-catalog
     paths:
       - information_schema_manifest.json
+      - information_schema_projection_source.json
   - id: spanner-sys-catalog
     paths:
       - spanner_sys_manifest.json
   - id: survey-provenance-and-contracts
     paths:
       - survey/import-provenance.json
+      - survey/infoschem/capture-definition.v0alpha1.json
       - survey/schemas/*.schema.json
   - id: survey-observational-evidence
     paths:
+      - survey/infoschem/evidence/managed/*.json
+      - survey/infoschem/evidence/omni/*/*.json
+      - survey/infoschem/evidence/emulator/*/*.json
       - survey/spannersys/evidence/*.json
   - id: executable-plan-evidence
     paths:
@@ -71,12 +76,15 @@ for hashed catalog provenance; this inventory does not replace it.
 
 ## INFORMATION_SCHEMA catalog
 
-The [`information_schema_manifest.json`](../../information_schema_manifest.json)
-file is the analyzer's live-primary INFORMATION_SCHEMA projection. It records
-the pinned survey commit and export hash, raw observed types, rollout status,
-explicit frontend projection overrides, and documentation-only columns that
-are intentionally excluded from analysis. The corresponding JSON Schema is
-covered by the contract-schemas family.
+The [`information_schema_projection_source.json`](../../information_schema_projection_source.json)
+file explicitly selects one point-in-time managed observation and owns
+analyzer-only exceptions. The generated
+[`information_schema_manifest.json`](../../information_schema_manifest.json)
+is the analyzer projection. It binds the selected capture, producer and
+invocation hashes, registry export, projection-source hash, raw observed types,
+rollout status, frontend projection overrides, and documentation-only columns
+that are intentionally excluded from analysis. The corresponding JSON Schemas
+are covered by the contract-schemas family.
 
 ## SPANNER_SYS catalog
 
@@ -93,9 +101,13 @@ consumed prerelease contract without creating a second schema authority.
 The strict [`import-provenance.json`](../../survey/import-provenance.json)
 records the exact unpublished source commit/tree and initial spanalyzer import
 commit/subtree, plus exclusions and dispositions. The survey schemas define
-the producer's prerelease capture and manifest contracts. The capture files
-retain only redacted SPANNER_SYS names, raw types, and ordinals for their
-identified managed and Omni targets.
+the producer's prerelease capture and manifest contracts. The versioned
+[`capture definition`](../../survey/infoschem/capture-definition.v0alpha1.json)
+freezes the INFORMATION_SCHEMA query, rolling probes, execution policy, and
+hashed producer inputs. INFORMATION_SCHEMA captures retain redacted names, raw
+types, ordinals, and bounded rolling-column queryability for managed, Omni, and
+Emulator targets. SPANNER_SYS captures retain only redacted names, raw types,
+and ordinals for their identified managed and Omni targets.
 
 ## Executable plan evidence
 

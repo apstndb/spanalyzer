@@ -1,0 +1,33 @@
+{
+  "schema_version": "v0alpha1",
+  "invocation_id": "information-schema-columns-v0alpha1",
+  "query": "SELECT TABLE_NAME, COLUMN_NAME, SPANNER_TYPE, ORDINAL_POSITION\nFROM INFORMATION_SCHEMA.COLUMNS\nWHERE TABLE_SCHEMA = 'INFORMATION_SCHEMA'\nORDER BY TABLE_NAME, ORDINAL_POSITION",
+  "execution": {
+    "go_work": "off",
+    "module_mode": "readonly"
+  },
+  "rolling_columns": [
+    {
+      "table_name": "INDEXES",
+      "column_name": "SEARCH_UNNEST"
+    },
+    {
+      "table_name": "INDEX_COLUMNS",
+      "column_name": "EXPRESSION"
+    }
+  ],
+  "rolling_queryability_statuses": [
+    "advertised_not_queryable",
+    "not_advertised",
+    "queryable"
+  ],
+  "producer_inputs": [
+    "survey/infoschem/*.go",
+    "survey/internal/strictjson/*.go",
+    "survey/cmd/infoschema-capture/*.go",
+    "survey/infoschem/capture-definition.v0alpha1.json",
+    "survey/schemas/information-schema-capture.v0alpha1.schema.json",
+    "survey/go.mod",
+    "survey/go.sum"
+  ]
+}

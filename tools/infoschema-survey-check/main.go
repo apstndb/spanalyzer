@@ -1,5 +1,6 @@
-// Command infoschema-survey-check validates the committed INFORMATION_SCHEMA
-// manifest and compares it with the retained in-repository survey producer.
+// Command infoschema-survey-check regenerates and validates the generated
+// INFORMATION_SCHEMA analyzer projection from one explicitly selected managed
+// observation and the retained survey registry.
 package main
 
 import (
@@ -11,14 +12,25 @@ import (
 	"flag"
 	"fmt"
 	"io"
+	"net/url"
 	"os"
 	"os/exec"
 	"path/filepath"
+	"regexp"
+	"strings"
+	"time"
 )
 
+var managedCapturePathPattern = regexp.MustCompile(`^survey/infoschem/evidence/managed/[0-9]{8}T[0-9]{6}Z-[0-9a-f]{12}\.json$`)
+
 const (
-	defaultManifestPath = "information_schema_manifest.json"
-	exporterSource      = `package main
+	defaultManifestPath        = "information_schema_manifest.json"
+	defaultProjectionSource    = "information_schema_projection_source.json"
+	manifestSchemaVersion      = "v0alpha2"
+	projectionSchemaVersion    = "v0alpha1"
+	projectionMode             = "managed_live_primary"
+	rollingAdvertisementPolicy = "runtime_filtered"
+	exporterSource             = `package main
 
 import (
 	"encoding/json"
@@ -27,8 +39,30 @@ import (
 	"github.com/apstndb/spanalyzer/survey/infoschem"
 )
 
+type output struct {
+	Registry            []*infoschem.TableMeta      ` + "`json:\"registry\"`" + `
+	Capture             *infoschem.CaptureDocument ` + "`json:\"capture\"`" + `
+	ExpectedCapturePath string                      ` + "`json:\"expected_capture_path\"`" + `
+}
+
 func main() {
-	if err := json.NewEncoder(os.Stdout).Encode(infoschem.AllTableMetas()); err != nil {
+	data, err := os.ReadFile(os.Args[1])
+	if err != nil {
+		panic(err)
+	}
+	capture, err := infoschem.DecodeCapture(data)
+	if err != nil {
+		panic(err)
+	}
+	expected, err := infoschem.ExpectedCapturePath(capture)
+	if err != nil {
+		panic(err)
+	}
+	if err := json.NewEncoder(os.Stdout).Encode(output{
+		Registry: infoschem.AllTableMetas(),
+		Capture: capture,
+		ExpectedCapturePath: expected,
+	}); err != nil {
 		panic(err)
 	}
 }
@@ -44,11 +78,17 @@ type manifest struct {
 }
 
 type source struct {
-	Repository   string `json:"repository"`
-	Commit       string `json:"commit"`
-	Path         string `json:"path"`
-	ExportSHA256 string `json:"export_sha256"`
-	ExporterNote string `json:"exporter_note"`
+	Repository                    string `json:"repository"`
+	RegistryPath                  string `json:"registry_path"`
+	RegistryExportSHA256          string `json:"registry_export_sha256"`
+	SelectedObservationPath       string `json:"selected_observation_path"`
+	SelectedObservationFileSHA256 string `json:"selected_observation_file_sha256"`
+	ObservedAt                    string `json:"observed_at"`
+	SurfaceSHA256                 string `json:"surface_sha256"`
+	ProducerSourceSHA256          string `json:"producer_source_sha256"`
+	InvocationSHA256              string `json:"invocation_sha256"`
+	ProjectionSourcePath          string `json:"projection_source_path"`
+	ProjectionSourceSHA256        string `json:"projection_source_sha256"`
 }
 
 type documentation struct {
@@ -70,6 +110,39 @@ type column struct {
 	ProjectedType  string `json:"projected_type,omitempty"`
 }
 
+type projectionSource struct {
+	SchemaVersion              string                    `json:"schema_version"`
+	Mode                       string                    `json:"mode"`
+	SelectedObservation        selectedObservation       `json:"selected_observation"`
+	RollingAdvertisementPolicy string                    `json:"rolling_advertisement_policy"`
+	Documentation              documentation             `json:"documentation"`
+	DocumentationOnlyAbsent    []documentationOnlyColumn `json:"documentation_only_absent"`
+	ProjectionOverrides        []projectionOverride      `json:"projection_overrides"`
+}
+
+type selectedObservation struct {
+	Path       string `json:"path"`
+	FileSHA256 string `json:"file_sha256"`
+}
+
+type documentationOnlyColumn struct {
+	TableName  string `json:"table_name"`
+	ColumnName string `json:"column_name"`
+	RawType    string `json:"raw_type"`
+}
+
+type projectionOverride struct {
+	TableName     string `json:"table_name"`
+	ColumnName    string `json:"column_name"`
+	ProjectedType string `json:"projected_type"`
+}
+
+type surveyExport struct {
+	Registry            []surveyTable   `json:"registry"`
+	Capture             captureDocument `json:"capture"`
+	ExpectedCapturePath string          `json:"expected_capture_path"`
+}
+
 type surveyTable struct {
 	Schema  string         `json:"Schema"`
 	Name    string         `json:"Name"`
@@ -83,6 +156,39 @@ type surveyColumn struct {
 	Rolling         bool   `json:"Rolling"`
 }
 
+type captureDocument struct {
+	SchemaVersion        string                `json:"schema_version"`
+	Catalog              string                `json:"catalog"`
+	Dialect              string                `json:"dialect"`
+	Target               captureTarget         `json:"target"`
+	ObservedAt           string                `json:"observed_at"`
+	ProducerSourceSHA256 string                `json:"producer_source_sha256"`
+	InvocationSHA256     string                `json:"invocation_sha256"`
+	Query                string                `json:"query"`
+	SurfaceSHA256        string                `json:"surface_sha256"`
+	Columns              []captureColumn       `json:"columns"`
+	RollingQueryability  []rollingQueryability `json:"rolling_queryability"`
+}
+
+type captureTarget struct {
+	Kind             string `json:"kind"`
+	ObservationScope string `json:"observation_scope,omitempty"`
+}
+
+type captureColumn struct {
+	TableName       string `json:"table_name"`
+	ColumnName      string `json:"column_name"`
+	SpannerType     string `json:"spanner_type"`
+	OrdinalPosition int    `json:"ordinal_position"`
+}
+
+type rollingQueryability struct {
+	TableName  string `json:"table_name"`
+	ColumnName string `json:"column_name"`
+	Status     string `json:"status"`
+	StatusCode string `json:"status_code,omitempty"`
+}
+
 func main() {
 	if err := run(os.Args[1:]); err != nil {
 		fmt.Fprintln(os.Stderr, err)
@@ -91,30 +197,85 @@ func main() {
 }
 
 func run(args []string) error {
-	fs := flag.NewFlagSet("infoschema-survey-check", flag.ContinueOnError)
-	repoRoot := fs.String("repo-root", "", "spanalyzer repository root (auto-detected when omitted)")
-	manifestPath := fs.String("manifest", defaultManifestPath, "manifest path relative to the spanalyzer repository root")
-	surveyRoot := fs.String("survey-root", "", "survey module root (defaults to the in-repository survey directory)")
-	if err := fs.Parse(args); err != nil {
+	flags := flag.NewFlagSet("infoschema-survey-check", flag.ContinueOnError)
+	repoRoot := flags.String("repo-root", "", "spanalyzer repository root (auto-detected when omitted)")
+	manifestPath := flags.String("manifest", defaultManifestPath, "manifest path relative to the spanalyzer repository root")
+	write := flags.Bool("write", false, "write the deterministic generated manifest instead of checking it")
+	if err := flags.Parse(args); err != nil {
 		return err
+	}
+	if flags.NArg() != 0 {
+		return fmt.Errorf("unexpected positional arguments: %v", flags.Args())
 	}
 
 	root, err := resolveRepoRoot(*repoRoot)
 	if err != nil {
 		return err
 	}
-	doc, err := readManifest(filepath.Join(root, filepath.FromSlash(*manifestPath)))
+	projectionFile := filepath.Join(root, defaultProjectionSource)
+	policyData, err := os.ReadFile(projectionFile)
+	if err != nil {
+		return fmt.Errorf("read INFORMATION_SCHEMA projection source: %w", err)
+	}
+	policy, err := decodeProjectionSource(policyData)
 	if err != nil {
 		return err
 	}
-	if err := validateManifest(doc); err != nil {
+	if err := validateProjectionSource(policy); err != nil {
 		return err
 	}
-	producerRoot := *surveyRoot
-	if producerRoot == "" {
-		producerRoot = filepath.Join(root, "survey")
+
+	capturePath, err := safeRepositoryPath(root, policy.SelectedObservation.Path)
+	if err != nil {
+		return fmt.Errorf("resolve selected INFORMATION_SCHEMA observation: %w", err)
 	}
-	return compareSurveyModule(doc, producerRoot)
+	captureData, err := os.ReadFile(capturePath)
+	if err != nil {
+		return fmt.Errorf("read selected INFORMATION_SCHEMA observation: %w", err)
+	}
+	if got := hashBytes(captureData); got != policy.SelectedObservation.FileSHA256 {
+		return fmt.Errorf("selected observation SHA-256 = %q, projection source pins %q", got, policy.SelectedObservation.FileSHA256)
+	}
+
+	producerRoot := filepath.Join(root, "survey")
+	exported, err := exportSurveyModule(producerRoot, capturePath)
+	if err != nil {
+		return err
+	}
+	if err := validateExportedCapture(policy, exported, captureData); err != nil {
+		return err
+	}
+	document, err := buildManifest(policy, hashBytes(policyData), exported)
+	if err != nil {
+		return err
+	}
+	generated, err := json.MarshalIndent(document, "", "  ")
+	if err != nil {
+		return fmt.Errorf("encode INFORMATION_SCHEMA manifest: %w", err)
+	}
+	generated = append(generated, '\n')
+	manifestFile := filepath.Join(root, filepath.FromSlash(*manifestPath))
+	if *write {
+		if err := os.WriteFile(manifestFile, generated, 0o644); err != nil {
+			return fmt.Errorf("write INFORMATION_SCHEMA manifest: %w", err)
+		}
+		return nil
+	}
+	committed, err := os.ReadFile(manifestFile)
+	if err != nil {
+		return fmt.Errorf("read INFORMATION_SCHEMA manifest: %w", err)
+	}
+	var decoded manifest
+	if err := decodeStrict(committed, &decoded, "INFORMATION_SCHEMA manifest"); err != nil {
+		return err
+	}
+	if err := validateManifest(&decoded); err != nil {
+		return err
+	}
+	if !bytes.Equal(committed, generated) {
+		return errors.New("INFORMATION_SCHEMA manifest is stale; run infoschema-survey-check --write")
+	}
+	return nil
 }
 
 func resolveRepoRoot(explicit string) (string, error) {
@@ -133,19 +294,19 @@ func resolveRepoRoot(explicit string) (string, error) {
 }
 
 func findRepoRoot(start string) (string, error) {
-	dir, err := filepath.Abs(start)
+	directory, err := filepath.Abs(start)
 	if err != nil {
 		return "", fmt.Errorf("resolve working directory: %w", err)
 	}
 	for {
-		if regularFile(filepath.Join(dir, defaultManifestPath)) && regularFile(filepath.Join(dir, "tools", "infoschema-survey-check", "main.go")) {
-			return dir, nil
+		if regularFile(filepath.Join(directory, defaultManifestPath)) && regularFile(filepath.Join(directory, "tools", "infoschema-survey-check", "main.go")) {
+			return directory, nil
 		}
-		parent := filepath.Dir(dir)
-		if parent == dir {
+		parent := filepath.Dir(directory)
+		if parent == directory {
 			return "", fmt.Errorf("spanalyzer repository root not found from %q; pass --repo-root", start)
 		}
-		dir = parent
+		directory = parent
 	}
 }
 
@@ -154,152 +315,360 @@ func regularFile(path string) bool {
 	return err == nil && info.Mode().IsRegular()
 }
 
-func readManifest(path string) (*manifest, error) {
-	data, err := os.ReadFile(path)
-	if err != nil {
-		return nil, fmt.Errorf("read INFORMATION_SCHEMA manifest: %w", err)
+func decodeProjectionSource(data []byte) (*projectionSource, error) {
+	var policy projectionSource
+	if err := decodeStrict(data, &policy, "INFORMATION_SCHEMA projection source"); err != nil {
+		return nil, err
+	}
+	return &policy, nil
+}
+
+func decodeStrict(data []byte, destination any, label string) error {
+	if err := rejectDuplicateKeys(data); err != nil {
+		return fmt.Errorf("decode %s: %w", label, err)
 	}
 	decoder := json.NewDecoder(bytes.NewReader(data))
 	decoder.DisallowUnknownFields()
-	var doc manifest
-	if err := decoder.Decode(&doc); err != nil {
-		return nil, fmt.Errorf("decode INFORMATION_SCHEMA manifest: %w", err)
+	if err := decoder.Decode(destination); err != nil {
+		return fmt.Errorf("decode %s: %w", label, err)
 	}
 	if err := decoder.Decode(&struct{}{}); !errors.Is(err, io.EOF) {
 		if err == nil {
-			return nil, errors.New("decode INFORMATION_SCHEMA manifest: multiple JSON values")
+			return fmt.Errorf("decode %s: multiple JSON values", label)
 		}
-		return nil, fmt.Errorf("decode INFORMATION_SCHEMA manifest trailer: %w", err)
-	}
-	return &doc, nil
-}
-
-func validateManifest(doc *manifest) error {
-	if doc.SchemaVersion != "v0alpha1" {
-		return fmt.Errorf("manifest schema_version = %q, want v0alpha1", doc.SchemaVersion)
-	}
-	if doc.Source.Commit == "" || doc.Source.ExportSHA256 == "" {
-		return errors.New("manifest source provenance is incomplete")
-	}
-	want, err := hashJSON(doc.Tables)
-	if err != nil {
-		return fmt.Errorf("hash manifest tables: %w", err)
-	}
-	if doc.ContentSHA256 != want {
-		return fmt.Errorf("manifest content_sha256 = %q, want %q", doc.ContentSHA256, want)
+		return fmt.Errorf("decode %s trailer: %w", label, err)
 	}
 	return nil
 }
 
-func compareSurveyModule(doc *manifest, surveyRoot string) error {
+func rejectDuplicateKeys(data []byte) error {
+	decoder := json.NewDecoder(bytes.NewReader(data))
+	if err := scanJSONValue(decoder, "$"); err != nil {
+		return fmt.Errorf("validate JSON keys: %w", err)
+	}
+	if err := decoder.Decode(&struct{}{}); !errors.Is(err, io.EOF) {
+		if err == nil {
+			return errors.New("validate JSON keys: multiple JSON values")
+		}
+		return fmt.Errorf("validate JSON trailer: %w", err)
+	}
+	return nil
+}
+
+func scanJSONValue(decoder *json.Decoder, path string) error {
+	token, err := decoder.Token()
+	if err != nil {
+		return err
+	}
+	delimiter, ok := token.(json.Delim)
+	if !ok {
+		return nil
+	}
+	switch delimiter {
+	case '{':
+		keys := make(map[string]bool)
+		for decoder.More() {
+			keyToken, err := decoder.Token()
+			if err != nil {
+				return err
+			}
+			key, ok := keyToken.(string)
+			if !ok {
+				return fmt.Errorf("object %s contains a non-string key", path)
+			}
+			if keys[key] {
+				return fmt.Errorf("object %s contains duplicate key %q", path, key)
+			}
+			keys[key] = true
+			if err := scanJSONValue(decoder, path+"."+key); err != nil {
+				return err
+			}
+		}
+		closing, err := decoder.Token()
+		if err != nil {
+			return err
+		}
+		if closing != json.Delim('}') {
+			return fmt.Errorf("object %s has invalid closing token %v", path, closing)
+		}
+	case '[':
+		for index := 0; decoder.More(); index++ {
+			if err := scanJSONValue(decoder, fmt.Sprintf("%s[%d]", path, index)); err != nil {
+				return err
+			}
+		}
+		closing, err := decoder.Token()
+		if err != nil {
+			return err
+		}
+		if closing != json.Delim(']') {
+			return fmt.Errorf("array %s has invalid closing token %v", path, closing)
+		}
+	default:
+		return fmt.Errorf("value %s starts with unexpected delimiter %q", path, delimiter)
+	}
+	return nil
+}
+
+func validateProjectionSource(policy *projectionSource) error {
+	if policy.SchemaVersion != projectionSchemaVersion || policy.Mode != projectionMode {
+		return fmt.Errorf("projection source identity = %q/%q, want %q/%q", policy.SchemaVersion, policy.Mode, projectionSchemaVersion, projectionMode)
+	}
+	if policy.RollingAdvertisementPolicy != rollingAdvertisementPolicy {
+		return fmt.Errorf("projection source rolling_advertisement_policy = %q, want %q", policy.RollingAdvertisementPolicy, rollingAdvertisementPolicy)
+	}
+	if !managedCapturePathPattern.MatchString(policy.SelectedObservation.Path) {
+		return fmt.Errorf("projection source selected observation path %q is not a managed capture", policy.SelectedObservation.Path)
+	}
+	if err := validateSHA256("projection source selected observation file_sha256", policy.SelectedObservation.FileSHA256); err != nil {
+		return err
+	}
+	if err := validateDocumentation(policy.Documentation); err != nil {
+		return err
+	}
+	seen := make(map[string]string)
+	for _, documented := range policy.DocumentationOnlyAbsent {
+		key := documented.TableName + "." + documented.ColumnName
+		if documented.TableName == "" || documented.ColumnName == "" || documented.RawType == "" {
+			return fmt.Errorf("projection source documentation-only column %q is incomplete", key)
+		}
+		if previous := seen[key]; previous != "" {
+			return fmt.Errorf("projection source repeats column %s as %s and documentation_only_absent", key, previous)
+		}
+		seen[key] = "documentation_only_absent"
+	}
+	for _, override := range policy.ProjectionOverrides {
+		key := override.TableName + "." + override.ColumnName
+		if override.TableName == "" || override.ColumnName == "" || override.ProjectedType == "" {
+			return fmt.Errorf("projection source override %q is incomplete", key)
+		}
+		if previous := seen[key]; previous != "" {
+			return fmt.Errorf("projection source repeats column %s as %s and projection_override", key, previous)
+		}
+		seen[key] = "projection_override"
+	}
+	return nil
+}
+
+func safeRepositoryPath(root, slashPath string) (string, error) {
+	if filepath.IsAbs(slashPath) || strings.Contains(slashPath, "\\") {
+		return "", fmt.Errorf("path %q is not a canonical repository-relative slash path", slashPath)
+	}
+	cleaned := filepath.ToSlash(filepath.Clean(filepath.FromSlash(slashPath)))
+	if cleaned != slashPath || cleaned == "." || strings.HasPrefix(cleaned, "../") {
+		return "", fmt.Errorf("path %q escapes or is not canonical", slashPath)
+	}
+	return filepath.Join(root, filepath.FromSlash(slashPath)), nil
+}
+
+func exportSurveyModule(surveyRoot, capturePath string) (*surveyExport, error) {
 	root, err := filepath.Abs(surveyRoot)
 	if err != nil {
-		return fmt.Errorf("resolve survey root: %w", err)
+		return nil, fmt.Errorf("resolve survey root: %w", err)
 	}
 	if info, err := os.Stat(root); err != nil || !info.IsDir() {
 		if err == nil {
 			err = errors.New("not a directory")
 		}
-		return fmt.Errorf("invalid --survey-root %q: %w", root, err)
+		return nil, fmt.Errorf("invalid --survey-root %q: %w", root, err)
 	}
 
 	temporary, err := os.CreateTemp("", "spanalyzer-infoschema-survey-export-*.go")
 	if err != nil {
-		return fmt.Errorf("create temporary survey exporter: %w", err)
+		return nil, fmt.Errorf("create temporary survey exporter: %w", err)
 	}
 	temporaryPath := temporary.Name()
-	defer func() {
-		// Cleanup is best-effort after the exporter has already been closed and
-		// its output has either been consumed or reported.
-		_ = os.Remove(temporaryPath)
-	}()
+	defer func() { _ = os.Remove(temporaryPath) }()
 	if _, writeErr := temporary.WriteString(exporterSource); writeErr != nil {
-		if closeErr := temporary.Close(); closeErr != nil {
-			return fmt.Errorf("write and close temporary survey exporter: %w", errors.Join(writeErr, closeErr))
-		}
-		return fmt.Errorf("write temporary survey exporter: %w", writeErr)
+		_ = temporary.Close()
+		return nil, fmt.Errorf("write temporary survey exporter: %w", writeErr)
 	}
 	if err := temporary.Close(); err != nil {
-		return fmt.Errorf("close temporary survey exporter: %w", err)
+		return nil, fmt.Errorf("close temporary survey exporter: %w", err)
 	}
 
-	exportCommand := exec.Command("go", "run", temporaryPath)
-	exportCommand.Dir = root
-	exportCommand.Env = append(os.Environ(), "GOWORK=off")
-	exportOutput, err := exportCommand.Output()
+	command := exec.Command("go", "run", temporaryPath, capturePath)
+	command.Dir = root
+	command.Env = append(os.Environ(), "GOWORK=off")
+	output, err := command.CombinedOutput()
 	if err != nil {
-		return fmt.Errorf("run survey exporter in %q: %w", root, err)
+		return nil, fmt.Errorf("run survey exporter in %q: %w\n%s", root, err, output)
 	}
-	survey, err := decodeSurveyExport(exportOutput)
-	if err != nil {
-		return err
+	var exported surveyExport
+	if err := decodeStrict(output, &exported, "survey export"); err != nil {
+		return nil, err
 	}
-	return compareManifestToSurvey(doc, survey)
+	return &exported, nil
 }
 
-func decodeSurveyExport(data []byte) ([]surveyTable, error) {
-	decoder := json.NewDecoder(bytes.NewReader(data))
-	decoder.DisallowUnknownFields()
-	var survey []surveyTable
-	if err := decoder.Decode(&survey); err != nil {
-		return nil, fmt.Errorf("decode survey export: %w", err)
+func validateExportedCapture(policy *projectionSource, exported *surveyExport, captureData []byte) error {
+	if exported.Capture.SchemaVersion != "v0alpha1" || exported.Capture.Catalog != "INFORMATION_SCHEMA" || exported.Capture.Dialect != "googlesql" {
+		return errors.New("selected observation has an unexpected capture contract identity")
 	}
-	if err := decoder.Decode(&struct{}{}); !errors.Is(err, io.EOF) {
-		if err == nil {
-			return nil, errors.New("decode survey export: multiple JSON values")
-		}
-		return nil, fmt.Errorf("decode survey export trailer: %w", err)
+	if exported.Capture.Target.Kind != "managed" || exported.Capture.Target.ObservationScope != "single_database" {
+		return errors.New("selected observation is not a single-database managed capture")
 	}
-	return survey, nil
+	wantRelative := strings.TrimPrefix(policy.SelectedObservation.Path, "survey/infoschem/")
+	if wantRelative == policy.SelectedObservation.Path || exported.ExpectedCapturePath != wantRelative {
+		return fmt.Errorf("selected observation path = %q, capture identity requires %q", policy.SelectedObservation.Path, filepath.ToSlash(filepath.Join("survey", "infoschem", exported.ExpectedCapturePath)))
+	}
+	fileHash := hashBytes(captureData)
+	if fileHash != policy.SelectedObservation.FileSHA256 {
+		return fmt.Errorf("selected observation file SHA-256 = %q, projection source pins %q", fileHash, policy.SelectedObservation.FileSHA256)
+	}
+	return nil
 }
 
-func compareManifestToSurvey(doc *manifest, survey []surveyTable) error {
-	exportHash, err := hashJSON(survey)
+func buildManifest(policy *projectionSource, policyHash string, exported *surveyExport) (*manifest, error) {
+	registryHash, err := hashJSON(exported.Registry)
 	if err != nil {
-		return fmt.Errorf("hash survey export: %w", err)
+		return nil, fmt.Errorf("hash survey registry export: %w", err)
 	}
-	if exportHash != doc.Source.ExportSHA256 {
-		return fmt.Errorf("survey export SHA-256 = %q, manifest pins %q", exportHash, doc.Source.ExportSHA256)
+	observed := make(map[string]captureColumn, len(exported.Capture.Columns))
+	for _, captured := range exported.Capture.Columns {
+		key := captured.TableName + "." + captured.ColumnName
+		observed[key] = captured
 	}
-	if len(doc.Tables) != len(survey) {
-		return fmt.Errorf("manifest has %d tables, survey exports %d", len(doc.Tables), len(survey))
+	known := make(map[string]bool)
+	overrides := make(map[string]string, len(policy.ProjectionOverrides))
+	for _, override := range policy.ProjectionOverrides {
+		overrides[override.TableName+"."+override.ColumnName] = override.ProjectedType
 	}
-	for tableIndex, surveyTable := range survey {
-		manifestTable := doc.Tables[tableIndex]
-		if surveyTable.Schema != "INFORMATION_SCHEMA" {
-			return fmt.Errorf("survey table %q schema = %q", surveyTable.Name, surveyTable.Schema)
-		}
-		if manifestTable.Name != surveyTable.Name {
-			return fmt.Errorf("table %d manifest name = %q, survey name = %q", tableIndex, manifestTable.Name, surveyTable.Name)
-		}
+	usedOverrides := make(map[string]bool)
 
-		surveyByName := make(map[string]surveyColumn, len(surveyTable.Columns))
-		for _, surveyColumn := range surveyTable.Columns {
-			surveyByName[surveyColumn.Name] = surveyColumn
+	tables := make([]table, 0, len(exported.Registry))
+	tableIndexes := make(map[string]int, len(exported.Registry))
+	for _, registeredTable := range exported.Registry {
+		if registeredTable.Schema != "INFORMATION_SCHEMA" {
+			return nil, fmt.Errorf("survey table %q schema = %q", registeredTable.Name, registeredTable.Schema)
 		}
-		manifestLive := make([]column, 0, len(manifestTable.Columns))
-		for _, manifestColumn := range manifestTable.Columns {
-			if manifestColumn.EvidenceStatus == "docs_only_absent" {
-				if _, exists := surveyByName[manifestColumn.Name]; exists {
-					return fmt.Errorf("manifest marks live survey column %s.%s as docs_only_absent", manifestTable.Name, manifestColumn.Name)
-				}
-				continue
+		manifestTable := table{Name: registeredTable.Name, Columns: make([]column, 0, len(registeredTable.Columns))}
+		for _, registeredColumn := range registeredTable.Columns {
+			key := registeredTable.Name + "." + registeredColumn.Name
+			known[key] = true
+			captured, exists := observed[key]
+			if !exists && !registeredColumn.Rolling {
+				return nil, fmt.Errorf("selected managed observation is missing stable registry column %s", key)
 			}
-			manifestLive = append(manifestLive, manifestColumn)
-		}
-		if len(manifestLive) != len(surveyTable.Columns) {
-			return fmt.Errorf("manifest table %s has %d live columns, survey exports %d", manifestTable.Name, len(manifestLive), len(surveyTable.Columns))
-		}
-		for columnIndex, surveyColumn := range surveyTable.Columns {
-			manifestColumn := manifestLive[columnIndex]
-			wantStatus := "live_observed"
-			if surveyColumn.Rolling {
-				wantStatus = "rolling"
+			if exists && (captured.SpannerType != registeredColumn.SpannerType || captured.OrdinalPosition != registeredColumn.OrdinalPosition) {
+				return nil, fmt.Errorf("selected managed observation column %s = %s ordinal %d, registry = %s ordinal %d", key, captured.SpannerType, captured.OrdinalPosition, registeredColumn.SpannerType, registeredColumn.OrdinalPosition)
 			}
-			if manifestColumn.Name != surveyColumn.Name || manifestColumn.Ordinal != surveyColumn.OrdinalPosition || manifestColumn.RawType != surveyColumn.SpannerType || manifestColumn.EvidenceStatus != wantStatus || !manifestColumn.Project {
-				return fmt.Errorf("manifest column %s[%d] = {%s %d %s %s project=%t}, survey = {%s %d %s %s project=true}", manifestTable.Name, columnIndex, manifestColumn.Name, manifestColumn.Ordinal, manifestColumn.RawType, manifestColumn.EvidenceStatus, manifestColumn.Project, surveyColumn.Name, surveyColumn.OrdinalPosition, surveyColumn.SpannerType, wantStatus)
+			status := "live_observed"
+			if registeredColumn.Rolling {
+				status = "rolling"
 			}
+			manifestColumn := column{
+				Name:           registeredColumn.Name,
+				Ordinal:        registeredColumn.OrdinalPosition,
+				RawType:        registeredColumn.SpannerType,
+				EvidenceStatus: status,
+				Project:        true,
+			}
+			if projectedType := overrides[key]; projectedType != "" {
+				manifestColumn.ProjectedType = projectedType
+				usedOverrides[key] = true
+			}
+			manifestTable.Columns = append(manifestTable.Columns, manifestColumn)
 		}
+		tableIndexes[manifestTable.Name] = len(tables)
+		tables = append(tables, manifestTable)
+	}
+	for key := range observed {
+		if !known[key] {
+			return nil, fmt.Errorf("selected managed observation contains unknown registry column %s", key)
+		}
+	}
+	for key := range overrides {
+		if !usedOverrides[key] {
+			return nil, fmt.Errorf("projection source override %s does not identify a projected registry column", key)
+		}
+	}
+	for _, documented := range policy.DocumentationOnlyAbsent {
+		index, ok := tableIndexes[documented.TableName]
+		if !ok {
+			return nil, fmt.Errorf("documentation-only column %s.%s names an unknown table", documented.TableName, documented.ColumnName)
+		}
+		key := documented.TableName + "." + documented.ColumnName
+		if known[key] || observed[key].ColumnName != "" {
+			return nil, fmt.Errorf("documentation-only column %s is present in registry or selected observation", key)
+		}
+		tables[index].Columns = append(tables[index].Columns, column{
+			Name:           documented.ColumnName,
+			RawType:        documented.RawType,
+			EvidenceStatus: "docs_only_absent",
+			Project:        false,
+		})
+	}
+	contentHash, err := hashJSON(tables)
+	if err != nil {
+		return nil, fmt.Errorf("hash INFORMATION_SCHEMA manifest tables: %w", err)
+	}
+	return &manifest{
+		SchemaVersion: manifestSchemaVersion,
+		Source: source{
+			Repository:                    "github.com/apstndb/spanalyzer",
+			RegistryPath:                  "survey/infoschem",
+			RegistryExportSHA256:          registryHash,
+			SelectedObservationPath:       policy.SelectedObservation.Path,
+			SelectedObservationFileSHA256: policy.SelectedObservation.FileSHA256,
+			ObservedAt:                    exported.Capture.ObservedAt,
+			SurfaceSHA256:                 exported.Capture.SurfaceSHA256,
+			ProducerSourceSHA256:          exported.Capture.ProducerSourceSHA256,
+			InvocationSHA256:              exported.Capture.InvocationSHA256,
+			ProjectionSourcePath:          defaultProjectionSource,
+			ProjectionSourceSHA256:        policyHash,
+		},
+		Documentation: policy.Documentation,
+		ContentSHA256: contentHash,
+		Tables:        tables,
+	}, nil
+}
+
+func validateManifest(document *manifest) error {
+	if document.SchemaVersion != manifestSchemaVersion {
+		return fmt.Errorf("manifest schema_version = %q, want %q", document.SchemaVersion, manifestSchemaVersion)
+	}
+	for label, value := range map[string]string{
+		"source.registry_export_sha256":           document.Source.RegistryExportSHA256,
+		"source.selected_observation_file_sha256": document.Source.SelectedObservationFileSHA256,
+		"source.surface_sha256":                   document.Source.SurfaceSHA256,
+		"source.producer_source_sha256":           document.Source.ProducerSourceSHA256,
+		"source.invocation_sha256":                document.Source.InvocationSHA256,
+		"source.projection_source_sha256":         document.Source.ProjectionSourceSHA256,
+		"content_sha256":                          document.ContentSHA256,
+	} {
+		if err := validateSHA256(label, value); err != nil {
+			return err
+		}
+	}
+	want, err := hashJSON(document.Tables)
+	if err != nil {
+		return fmt.Errorf("hash manifest tables: %w", err)
+	}
+	if document.ContentSHA256 != want {
+		return fmt.Errorf("manifest content_sha256 = %q, want %q", document.ContentSHA256, want)
+	}
+	return validateDocumentation(document.Documentation)
+}
+
+func validateDocumentation(value documentation) error {
+	parsed, err := url.ParseRequestURI(value.URL)
+	if err != nil || parsed.Scheme == "" || parsed.Host == "" {
+		return fmt.Errorf("documentation URL = %q, want an absolute URI", value.URL)
+	}
+	if _, err := time.Parse(time.DateOnly, value.LastUpdated); err != nil {
+		return fmt.Errorf("documentation last_updated = %q, want YYYY-MM-DD", value.LastUpdated)
+	}
+	return nil
+}
+
+func validateSHA256(label, value string) error {
+	if len(value) != 64 {
+		return fmt.Errorf("%s = %q, want 64 lowercase hexadecimal characters", label, value)
+	}
+	decoded, err := hex.DecodeString(value)
+	if err != nil || hex.EncodeToString(decoded) != value {
+		return fmt.Errorf("%s = %q, want 64 lowercase hexadecimal characters", label, value)
 	}
 	return nil
 }
@@ -309,6 +678,10 @@ func hashJSON(value any) (string, error) {
 	if err != nil {
 		return "", err
 	}
+	return hashBytes(data), nil
+}
+
+func hashBytes(data []byte) string {
 	sum := sha256.Sum256(data)
-	return hex.EncodeToString(sum[:]), nil
+	return hex.EncodeToString(sum[:])
 }

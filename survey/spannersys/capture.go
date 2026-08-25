@@ -8,10 +8,11 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io"
 	"slices"
 	"strings"
 	"time"
+
+	"github.com/apstndb/spanalyzer/survey/internal/strictjson"
 )
 
 const (
@@ -84,95 +85,17 @@ func loadEmbeddedCaptures() ([]embeddedCapture, error) {
 }
 
 func decodeCapture(data []byte) (*captureDocument, error) {
-	if err := rejectDuplicateJSONKeys(data); err != nil {
-		return nil, err
-	}
-	if err := rejectDestinationIdentifiers(data); err != nil {
-		return nil, err
-	}
-
-	decoder := json.NewDecoder(bytes.NewReader(data))
-	decoder.DisallowUnknownFields()
 	var capture captureDocument
-	if err := decoder.Decode(&capture); err != nil {
+	if err := strictjson.Decode(data, &capture); err != nil {
 		return nil, fmt.Errorf("decode capture: %w", err)
 	}
-	if err := decoder.Decode(&struct{}{}); !errors.Is(err, io.EOF) {
-		if err == nil {
-			return nil, errors.New("decode capture: multiple JSON values")
-		}
-		return nil, fmt.Errorf("decode capture trailer: %w", err)
+	if err := rejectDestinationIdentifiers(&capture); err != nil {
+		return nil, err
 	}
 	if err := validateCapture(&capture); err != nil {
 		return nil, err
 	}
 	return &capture, nil
-}
-
-func rejectDuplicateJSONKeys(data []byte) error {
-	decoder := json.NewDecoder(bytes.NewReader(data))
-	if err := scanJSONValue(decoder, "$"); err != nil {
-		return fmt.Errorf("validate capture JSON keys: %w", err)
-	}
-	return nil
-}
-
-func scanJSONValue(decoder *json.Decoder, path string) error {
-	token, err := decoder.Token()
-	if err != nil {
-		return err
-	}
-	delimiter, ok := token.(json.Delim)
-	if !ok {
-		return nil
-	}
-
-	switch delimiter {
-	case '{':
-		objectKeys := make(map[string]bool)
-		for decoder.More() {
-			keyToken, err := decoder.Token()
-			if err != nil {
-				return err
-			}
-			key, ok := keyToken.(string)
-			if !ok {
-				return fmt.Errorf("object %s contains a non-string key", path)
-			}
-			if objectKeys[key] {
-				return fmt.Errorf("object %s contains duplicate key %q", path, key)
-			}
-			objectKeys[key] = true
-			if err := scanJSONValue(decoder, path+"."+key); err != nil {
-				return err
-			}
-		}
-		closing, err := decoder.Token()
-		if err != nil {
-			return err
-		}
-		if closing != json.Delim('}') {
-			return fmt.Errorf("object %s has invalid closing token %v", path, closing)
-		}
-	case '[':
-		index := 0
-		for decoder.More() {
-			if err := scanJSONValue(decoder, fmt.Sprintf("%s[%d]", path, index)); err != nil {
-				return err
-			}
-			index++
-		}
-		closing, err := decoder.Token()
-		if err != nil {
-			return err
-		}
-		if closing != json.Delim(']') {
-			return fmt.Errorf("array %s has invalid closing token %v", path, closing)
-		}
-	default:
-		return fmt.Errorf("value %s starts with unexpected delimiter %q", path, delimiter)
-	}
-	return nil
 }
 
 func validateCapture(capture *captureDocument) error {
@@ -285,7 +208,18 @@ func validateSHA256(label, value string) error {
 	return nil
 }
 
-func rejectDestinationIdentifiers(data []byte) error {
+func rejectDestinationIdentifiers(value any) error {
+	if data, ok := value.([]byte); ok {
+		var decoded any
+		if err := strictjson.Decode(data, &decoded); err != nil {
+			return fmt.Errorf("decode JSON for destination-identifier validation: %w", err)
+		}
+		value = decoded
+	}
+	data, err := json.Marshal(value)
+	if err != nil {
+		return fmt.Errorf("encode capture for destination-identifier validation: %w", err)
+	}
 	lower := bytes.ToLower(data)
 	for _, marker := range [][]byte{
 		[]byte("projects/"),

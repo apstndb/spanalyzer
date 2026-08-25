@@ -45,6 +45,11 @@ two required capable targets:
 - managed Cloud Spanner on 2026-08-25;
 - Spanner Omni `2026.r2.1-beta` on 2026-08-25.
 
+These are grandfathered legacy captures. The Omni capture records a tag and
+date but not an OCI manifest digest or resolved platform, so it cannot prove
+the stronger retrospective container identity required for new captures. No
+digest or platform should be inferred from the tag after the fact.
+
 The captures contain only SPANNER_SYS table names, column names, raw
 `SPANNER_TYPE` values, and ordinals. They do not contain a project, instance,
 database, endpoint, or credential. Both current targets produced the same 539

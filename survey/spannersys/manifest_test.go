@@ -294,6 +294,16 @@ func TestDecodeCaptureStrictness(t *testing.T) {
 			wantError: "forbidden destination identifier",
 		},
 		{
+			name: "escaped destination identifier",
+			mutate: func(t *testing.T, data []byte) []byte {
+				t.Helper()
+				capture := decodeCaptureForTest(t, data)
+				capture.RuntimeVersion = "projects/example/instances/example/databases/example"
+				return bytes.ReplaceAll(encodeCaptureForTest(t, capture), []byte("/"), []byte(`\u002f`))
+			},
+			wantError: "forbidden destination identifier",
+		},
+		{
 			name: "stale hash",
 			mutate: func(t *testing.T, data []byte) []byte {
 				t.Helper()

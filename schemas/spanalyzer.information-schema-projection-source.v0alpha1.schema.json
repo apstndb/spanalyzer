@@ -1,0 +1,158 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/apstndb/spanalyzer/schemas/spanalyzer.information-schema-projection-source.v0alpha1.schema.json",
+  "title": "Spanalyzer INFORMATION_SCHEMA projection source",
+  "description": "The explicit managed-primary observation selection and analyzer-only exceptions used to generate the INFORMATION_SCHEMA manifest.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "mode",
+    "selected_observation",
+    "rolling_advertisement_policy",
+    "documentation",
+    "documentation_only_absent",
+    "projection_overrides"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "v0alpha1"
+    },
+    "mode": {
+      "const": "managed_live_primary"
+    },
+    "selected_observation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "file_sha256"
+      ],
+      "properties": {
+        "path": {
+          "type": "string",
+          "pattern": "^survey/infoschem/evidence/managed/[0-9]{8}T[0-9]{6}Z-[0-9a-f]{12}\\.json$"
+        },
+        "file_sha256": {
+          "$ref": "#/$defs/sha256"
+        }
+      }
+    },
+    "rolling_advertisement_policy": {
+      "const": "runtime_filtered"
+    },
+    "documentation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "url",
+        "last_updated"
+      ],
+      "properties": {
+        "url": {
+          "type": "string",
+          "format": "uri"
+        },
+        "last_updated": {
+          "type": "string",
+          "format": "date"
+        }
+      }
+    },
+    "documentation_only_absent": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/documentationOnlyColumn"
+      }
+    },
+    "projection_overrides": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/projectionOverride"
+      }
+    }
+  },
+  "$defs": {
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "columnIdentity": {
+      "type": "object",
+      "required": [
+        "table_name",
+        "column_name"
+      ],
+      "properties": {
+        "table_name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "column_name": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "documentationOnlyColumn": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/columnIdentity"
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "table_name",
+            "column_name",
+            "raw_type"
+          ],
+          "properties": {
+            "table_name": {
+              "type": "string",
+              "minLength": 1
+            },
+            "column_name": {
+              "type": "string",
+              "minLength": 1
+            },
+            "raw_type": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      ]
+    },
+    "projectionOverride": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/columnIdentity"
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "table_name",
+            "column_name",
+            "projected_type"
+          ],
+          "properties": {
+            "table_name": {
+              "type": "string",
+              "minLength": 1
+            },
+            "column_name": {
+              "type": "string",
+              "minLength": 1
+            },
+            "projected_type": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      ]
+    }
+  }
+}

@@ -76,6 +76,7 @@ func TestFilterQueryableRollingColumns(t *testing.T) {
 		{name: "queryable", wantSearchUnnest: true},
 		{name: "advertised before query support", probeErr: status.Error(codes.InvalidArgument, "unknown name")},
 		{name: "backend reports unimplemented", probeErr: status.Error(codes.Unimplemented, "not implemented")},
+		{name: "closed transaction is preserved", probeErr: status.Error(codes.InvalidArgument, closedTransactionErr), wantSearchUnnest: true, wantErr: true},
 		{name: "unrelated failure is preserved", probeErr: errors.New("transport failed"), wantSearchUnnest: true, wantErr: true},
 	}
 

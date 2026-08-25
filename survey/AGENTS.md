@@ -43,6 +43,16 @@ mise run test-canonical-real # Read-only aggregate GetDatabaseDdl versus reconst
 mise run run-roundtrip       # end-to-end demo: starts emulator via spanemuboost,
                              # creates sample DDL, queries INFORMATION_SCHEMA,
                              # rebuilds DDL, prints generated SQL
+GOWORK=off GOFLAGS=-mod=readonly go run ./cmd/infoschema-capture \
+  --target managed --write --repo-root ..
+GOWORK=off GOFLAGS=-mod=readonly go run ./cmd/infoschema-capture \
+  --target emulator \
+  --image gcr.io/cloud-spanner-emulator/emulator:1.5.56@sha256:5b1e3607fe8574fb04144eeabfa54120559fb01968ffe3ffc0a9a8f6776fc454 \
+  --write --repo-root ..
+GOWORK=off GOFLAGS=-mod=readonly go run ./cmd/infoschema-capture \
+  --target omni \
+  --image us-docker.pkg.dev/spanner-omni/images/spanner-omni:2026.r2.1-beta@sha256:ed31d9ee72eeee69cac78566eb3a6e72ee389b26234735f0ef449774cc006741 \
+  --write --repo-root ..
 ```
 
 `cmd/roundtrip` requires Docker (uses `spanemuboost` / testcontainers).
@@ -176,7 +186,12 @@ mise run run-roundtrip       # end-to-end demo: starts emulator via spanemuboost
   `INFORMATION_SCHEMA.ROUTINES` only stores SQL UDFs and remote UDFs, both modeled as
   `ast.CreateFunction`.
 
-- **Schema diff data.** Source-of-truth for which columns exist on real vs. emulator is
-  `/tmp/spanner-schema-diff-20260509/{emulator-v1.5.55,real}.csv`; the human-readable summary is
-  `docs/spanner-schema-diff-report-20260509.md`. The `spanner-schema-diff` skill regenerates
-  these.
+- **Target evidence.** Redacted retained observations live under
+  `infoschem/evidence/`: managed captures are timestamp-primary, while Omni and
+  Emulator captures are keyed by OCI manifest digest and platform. The root
+  `information_schema_projection_source.json` explicitly selects one managed
+  capture; no `/tmp` output or modification-time-based `latest` file is an
+  authority. Canonical capture commands require `GOWORK=off` and
+  `GOFLAGS=-mod=readonly`, so the producer hash closes over the survey module's
+  pinned dependency graph. The dated reports in `docs/` remain historical
+  summaries.
