@@ -10,8 +10,11 @@ import (
 
 const (
 	manifestSchemaVersion = "v0alpha1"
-	surveyRepository      = "github.com/apstndb/spanner-emulator-survey"
-	surveySourcePath      = "spannersys"
+	// surveyRepository is the immutable legacy producer identity used by the
+	// already-pinned v0alpha1 manifest. New retained runs use the in-repository
+	// producer-revision protocol and will require an explicit schema revision.
+	surveyRepository = "github.com/apstndb/spanner-emulator-survey"
+	surveySourcePath = "spannersys"
 )
 
 type manifestDocument struct {

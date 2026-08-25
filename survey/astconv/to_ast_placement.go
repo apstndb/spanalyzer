@@ -1,7 +1,7 @@
 package astconv
 
 import (
-	"github.com/apstndb/spanner-emulator-survey/infoschem"
+	"github.com/apstndb/spanalyzer/survey/infoschem"
 	"github.com/cloudspannerecosystem/memefish/ast"
 )
 

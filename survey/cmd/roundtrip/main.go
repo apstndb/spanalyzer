@@ -11,8 +11,8 @@ import (
 	"log"
 	"sort"
 
+	"github.com/apstndb/spanalyzer/survey/astconv"
 	"github.com/apstndb/spanemuboost"
-	"github.com/apstndb/spanner-emulator-survey/astconv"
 )
 
 var sampleDDLs = []string{

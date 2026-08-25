@@ -4,7 +4,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/apstndb/spanner-emulator-survey/infoschem"
+	"github.com/apstndb/spanalyzer/survey/infoschem"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/descriptorpb"
 )

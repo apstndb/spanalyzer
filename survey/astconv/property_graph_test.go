@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"cloud.google.com/go/spanner"
-	"github.com/apstndb/spanner-emulator-survey/infoschem"
+	"github.com/apstndb/spanalyzer/survey/infoschem"
 	"github.com/cloudspannerecosystem/memefish"
 	"github.com/cloudspannerecosystem/memefish/ast"
 )

@@ -12,7 +12,7 @@ import (
 	"cloud.google.com/go/spanner"
 	database "cloud.google.com/go/spanner/admin/database/apiv1"
 	databasepb "cloud.google.com/go/spanner/admin/database/apiv1/databasepb"
-	"github.com/apstndb/spanner-emulator-survey/astconv"
+	"github.com/apstndb/spanalyzer/survey/astconv"
 	"github.com/cloudspannerecosystem/memefish"
 	"github.com/cloudspannerecosystem/memefish/ast"
 	"google.golang.org/grpc/status"

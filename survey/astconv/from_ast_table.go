@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/apstndb/spanner-emulator-survey/infoschem"
+	"github.com/apstndb/spanalyzer/survey/infoschem"
 	"github.com/cloudspannerecosystem/memefish/ast"
 	"github.com/cloudspannerecosystem/memefish/token"
 )

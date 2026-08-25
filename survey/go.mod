@@ -1,4 +1,4 @@
-module github.com/apstndb/spanner-emulator-survey
+module github.com/apstndb/spanalyzer/survey
 
 go 1.25.0
 

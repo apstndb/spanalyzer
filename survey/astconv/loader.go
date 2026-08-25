@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"cloud.google.com/go/spanner"
-	"github.com/apstndb/spanner-emulator-survey/infoschem"
+	"github.com/apstndb/spanalyzer/survey/infoschem"
 )
 
 // LoadSchema queries the live database's INFORMATION_SCHEMA under a single

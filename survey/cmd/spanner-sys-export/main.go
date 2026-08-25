@@ -1,5 +1,5 @@
 // Command spanner-sys-export writes the deterministic SPANNER_SYS manifest
-// for an explicitly identified spanner-emulator-survey commit.
+// for an explicitly identified legacy survey source revision.
 package main
 
 import (
@@ -11,7 +11,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/apstndb/spanner-emulator-survey/spannersys"
+	"github.com/apstndb/spanalyzer/survey/spannersys"
 )
 
 func main() {
@@ -24,7 +24,7 @@ func run(args []string, stdout, stderr io.Writer) int {
 	sourceCommit := flags.String(
 		"source-commit",
 		"",
-		"exact 40-hex spanner-emulator-survey commit containing this exporter",
+		"exact 40-hex legacy survey source commit represented by this export",
 	)
 	if err := flags.Parse(args); err != nil {
 		if errors.Is(err, flag.ErrHelp) {

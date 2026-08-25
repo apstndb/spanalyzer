@@ -1,0 +1,32 @@
+{
+  "schema_version": "v0alpha1",
+  "source": {
+    "kind": "unpublished_local_git",
+    "module": "github.com/apstndb/spanner-emulator-survey",
+    "commit": "91908d001349f844aac070cc6518119c0e3c36c0",
+    "tree": "34d63cf89aaf885cbfd8069e91c4ead707b048c8",
+    "commit_count": 27,
+    "history_published": false
+  },
+  "destination": {
+    "repository": "github.com/apstndb/spanalyzer",
+    "path": "survey",
+    "import_commit": "cd1de13e5d60af39033fa8611b5c4df6b5a3f6ea",
+    "import_tree": "34d63cf89aaf885cbfd8069e91c4ead707b048c8"
+  },
+  "excluded_paths": [
+    ".claude",
+    ".codex",
+    ".grok",
+    ".opencode",
+    ".tmp",
+    "MEMEFISH_FEEDBACK.md",
+    "mise.local.toml",
+    "node_modules"
+  ],
+  "dispositions": {
+    "standalone_repository_published": false,
+    "untracked_memefish_feedback": "retired_after_upstream_issues_193_and_385_closed",
+    "local_environment": "excluded"
+  }
+}

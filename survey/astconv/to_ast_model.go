@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"sort"
 
-	"github.com/apstndb/spanner-emulator-survey/infoschem"
-	"github.com/apstndb/spanner-emulator-survey/spannertype"
+	"github.com/apstndb/spanalyzer/survey/infoschem"
+	"github.com/apstndb/spanalyzer/survey/spannertype"
 	"github.com/cloudspannerecosystem/memefish/ast"
 	"github.com/cloudspannerecosystem/memefish/token"
 )

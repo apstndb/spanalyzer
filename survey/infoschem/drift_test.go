@@ -9,10 +9,10 @@ import (
 	"testing"
 
 	"cloud.google.com/go/spanner"
+	"github.com/apstndb/spanalyzer/survey/astconv"
+	"github.com/apstndb/spanalyzer/survey/infoschem"
+	"github.com/apstndb/spanalyzer/survey/spannersys"
 	"github.com/apstndb/spanemuboost"
-	"github.com/apstndb/spanner-emulator-survey/astconv"
-	"github.com/apstndb/spanner-emulator-survey/infoschem"
-	"github.com/apstndb/spanner-emulator-survey/spannersys"
 	"github.com/cloudspannerecosystem/memefish/ast"
 	"google.golang.org/api/iterator"
 )

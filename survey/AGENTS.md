@@ -1,16 +1,17 @@
-# AGENTS.md
+# Survey Module Guidance
 
-Guidance for AI coding agents working in this repository.
+Guidance for coding agents working in the nested
+`github.com/apstndb/spanalyzer/survey` module.
 
 ## Task tracking
 
 - Before proceeding with unfinished work, write the remaining actionable tasks
-  to `TODO.md` at the repository root and update that file as tasks are
+  to `TODO.md` at the module root and update that file as tasks are
   completed or superseded.
 
 ## Project purpose
 
-Go module that round-trips Cloud Spanner DDL through `INFORMATION_SCHEMA`:
+This module round-trips Cloud Spanner DDL through `INFORMATION_SCHEMA`:
 DDL string → memefish AST → `infoschem` structs (mirror of `INFORMATION_SCHEMA` rows) → DDL string.
 The same `infoschem` structs can be populated by querying a live database (real or emulator)
 and converted back to DDL via `astconv`.
@@ -91,8 +92,8 @@ mise run run-roundtrip       # end-to-end demo: starts emulator via spanemuboost
   It emits the prerelease JSON contract defined under `schemas/`, performs no
   Git lookup or live probe, and fails closed unless every required target has a
   complete agreeing observation. `cmd/spanner-sys-export` is the corresponding
-  explicit-commit CLI; downstream repositories pin its bytes rather than
-  importing this module.
+  explicit-commit CLI. The parent analyzer pins its bytes without importing
+  producer packages into the root module.
 
 - `astconv/` — bidirectional conversion between `infoschem.Schema` (a bag holding every
   `infoschem` slice) and `[]ast.DDL`. Each DDL family has paired files `to_ast_<family>.go`

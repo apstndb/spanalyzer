@@ -1,5 +1,20 @@
 # TODO
 
+## Integrate the survey into spanalyzer (2026-08-25)
+
+- Rename the nested module and internal imports to
+  `github.com/apstndb/spanalyzer/survey` without changing the legacy source
+  identity embedded in the already-pinned manifests.
+- Add a checked source-commit/tree to initial destination-commit/subtree mapping
+  for the squashed import. The unpublished 27-commit source history and local
+  agent/runtime state must not be published.
+- Make the INFORMATION_SCHEMA and SPANNER_SYS regeneration checks use the
+  in-repository `survey/` module without requiring the old sibling checkout.
+- Add the module, schemas, captures, and documentation to the existing workspace
+  and OKF discovery surfaces without creating a second evidence authority.
+- Pass standalone `GOWORK=off`, workspace, manifest-regeneration, OKF, and review
+  gates; then record that the former local checkout is safe to delete.
+
 ## Export a portable SPANNER_SYS manifest (S-C)
 
 - ~~Persist the current managed-Spanner and Omni `2026.r2.1-beta` column

@@ -4,7 +4,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/apstndb/spanner-emulator-survey/infoschem"
+	"github.com/apstndb/spanalyzer/survey/infoschem"
 )
 
 func TestRoundtrip_PlacementKey(t *testing.T) {
