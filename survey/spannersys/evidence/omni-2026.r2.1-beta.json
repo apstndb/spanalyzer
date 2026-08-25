@@ -1,0 +1,3244 @@
+{
+  "schema_version": "v0alpha1",
+  "target": "omni",
+  "captured_at": "2026-08-25",
+  "runtime_version": "2026.r2.1-beta",
+  "query": "SELECT TABLE_NAME, COLUMN_NAME, SPANNER_TYPE, ORDINAL_POSITION\nFROM INFORMATION_SCHEMA.COLUMNS\nWHERE TABLE_SCHEMA = 'SPANNER_SYS'\nORDER BY TABLE_NAME, ORDINAL_POSITION",
+  "content_sha256": "2f1acd9eeff25dcccde68758984e35698f41338d3b4674b7fc7b25d36536fd44",
+  "columns": [
+    {
+      "table_name": "ACTIVE_PARTITIONED_DMLS",
+      "column_name": "TEXT",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 1
+    },
+    {
+      "table_name": "ACTIVE_PARTITIONED_DMLS",
+      "column_name": "TEXT_FINGERPRINT",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 2
+    },
+    {
+      "table_name": "ACTIVE_PARTITIONED_DMLS",
+      "column_name": "SESSION_ID",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 3
+    },
+    {
+      "table_name": "ACTIVE_PARTITIONED_DMLS",
+      "column_name": "NUM_PARTITIONS_TOTAL",
+      "spanner_type": "INT64",
+      "ordinal_position": 4
+    },
+    {
+      "table_name": "ACTIVE_PARTITIONED_DMLS",
+      "column_name": "NUM_PARTITIONS_COMPLETE",
+      "spanner_type": "INT64",
+      "ordinal_position": 5
+    },
+    {
+      "table_name": "ACTIVE_PARTITIONED_DMLS",
+      "column_name": "NUM_TRIVIAL_PARTITIONS_COMPLETE",
+      "spanner_type": "INT64",
+      "ordinal_position": 6
+    },
+    {
+      "table_name": "ACTIVE_PARTITIONED_DMLS",
+      "column_name": "PROGRESS",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 7
+    },
+    {
+      "table_name": "ACTIVE_PARTITIONED_DMLS",
+      "column_name": "ROWS_PROCESSED",
+      "spanner_type": "INT64",
+      "ordinal_position": 8
+    },
+    {
+      "table_name": "ACTIVE_PARTITIONED_DMLS",
+      "column_name": "START_TIMESTAMP",
+      "spanner_type": "TIMESTAMP",
+      "ordinal_position": 9
+    },
+    {
+      "table_name": "ACTIVE_PARTITIONED_DMLS",
+      "column_name": "LAST_UPDATE_TIMESTAMP",
+      "spanner_type": "TIMESTAMP",
+      "ordinal_position": 10
+    },
+    {
+      "table_name": "ACTIVE_QUERIES_SUMMARY",
+      "column_name": "ACTIVE_COUNT",
+      "spanner_type": "INT64",
+      "ordinal_position": 1
+    },
+    {
+      "table_name": "ACTIVE_QUERIES_SUMMARY",
+      "column_name": "OLDEST_START_TIME",
+      "spanner_type": "TIMESTAMP",
+      "ordinal_position": 2
+    },
+    {
+      "table_name": "ACTIVE_QUERIES_SUMMARY",
+      "column_name": "COUNT_OLDER_THAN_1S",
+      "spanner_type": "INT64",
+      "ordinal_position": 3
+    },
+    {
+      "table_name": "ACTIVE_QUERIES_SUMMARY",
+      "column_name": "COUNT_OLDER_THAN_10S",
+      "spanner_type": "INT64",
+      "ordinal_position": 4
+    },
+    {
+      "table_name": "ACTIVE_QUERIES_SUMMARY",
+      "column_name": "COUNT_OLDER_THAN_100S",
+      "spanner_type": "INT64",
+      "ordinal_position": 5
+    },
+    {
+      "table_name": "COLUMN_OPERATIONS_STATS_10MINUTE",
+      "column_name": "INTERVAL_END",
+      "spanner_type": "TIMESTAMP",
+      "ordinal_position": 1
+    },
+    {
+      "table_name": "COLUMN_OPERATIONS_STATS_10MINUTE",
+      "column_name": "TABLE_NAME",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 2
+    },
+    {
+      "table_name": "COLUMN_OPERATIONS_STATS_10MINUTE",
+      "column_name": "COLUMN_NAME",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 3
+    },
+    {
+      "table_name": "COLUMN_OPERATIONS_STATS_10MINUTE",
+      "column_name": "QUERY_COUNT",
+      "spanner_type": "INT64",
+      "ordinal_position": 4
+    },
+    {
+      "table_name": "COLUMN_OPERATIONS_STATS_10MINUTE",
+      "column_name": "READ_COUNT",
+      "spanner_type": "INT64",
+      "ordinal_position": 5
+    },
+    {
+      "table_name": "COLUMN_OPERATIONS_STATS_10MINUTE",
+      "column_name": "WRITE_COUNT",
+      "spanner_type": "INT64",
+      "ordinal_position": 6
+    },
+    {
+      "table_name": "COLUMN_OPERATIONS_STATS_10MINUTE",
+      "column_name": "IS_QUERY_CACHE_MEMORY_CAPPED",
+      "spanner_type": "BOOL",
+      "ordinal_position": 7
+    },
+    {
+      "table_name": "COLUMN_OPERATIONS_STATS_HOUR",
+      "column_name": "INTERVAL_END",
+      "spanner_type": "TIMESTAMP",
+      "ordinal_position": 1
+    },
+    {
+      "table_name": "COLUMN_OPERATIONS_STATS_HOUR",
+      "column_name": "TABLE_NAME",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 2
+    },
+    {
+      "table_name": "COLUMN_OPERATIONS_STATS_HOUR",
+      "column_name": "COLUMN_NAME",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 3
+    },
+    {
+      "table_name": "COLUMN_OPERATIONS_STATS_HOUR",
+      "column_name": "QUERY_COUNT",
+      "spanner_type": "INT64",
+      "ordinal_position": 4
+    },
+    {
+      "table_name": "COLUMN_OPERATIONS_STATS_HOUR",
+      "column_name": "READ_COUNT",
+      "spanner_type": "INT64",
+      "ordinal_position": 5
+    },
+    {
+      "table_name": "COLUMN_OPERATIONS_STATS_HOUR",
+      "column_name": "WRITE_COUNT",
+      "spanner_type": "INT64",
+      "ordinal_position": 6
+    },
+    {
+      "table_name": "COLUMN_OPERATIONS_STATS_HOUR",
+      "column_name": "IS_QUERY_CACHE_MEMORY_CAPPED",
+      "spanner_type": "BOOL",
+      "ordinal_position": 7
+    },
+    {
+      "table_name": "COLUMN_OPERATIONS_STATS_MINUTE",
+      "column_name": "INTERVAL_END",
+      "spanner_type": "TIMESTAMP",
+      "ordinal_position": 1
+    },
+    {
+      "table_name": "COLUMN_OPERATIONS_STATS_MINUTE",
+      "column_name": "TABLE_NAME",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 2
+    },
+    {
+      "table_name": "COLUMN_OPERATIONS_STATS_MINUTE",
+      "column_name": "COLUMN_NAME",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 3
+    },
+    {
+      "table_name": "COLUMN_OPERATIONS_STATS_MINUTE",
+      "column_name": "QUERY_COUNT",
+      "spanner_type": "INT64",
+      "ordinal_position": 4
+    },
+    {
+      "table_name": "COLUMN_OPERATIONS_STATS_MINUTE",
+      "column_name": "READ_COUNT",
+      "spanner_type": "INT64",
+      "ordinal_position": 5
+    },
+    {
+      "table_name": "COLUMN_OPERATIONS_STATS_MINUTE",
+      "column_name": "WRITE_COUNT",
+      "spanner_type": "INT64",
+      "ordinal_position": 6
+    },
+    {
+      "table_name": "COLUMN_OPERATIONS_STATS_MINUTE",
+      "column_name": "IS_QUERY_CACHE_MEMORY_CAPPED",
+      "spanner_type": "BOOL",
+      "ordinal_position": 7
+    },
+    {
+      "table_name": "GRAPH_OPERATION_EXECUTION_STATUS",
+      "column_name": "QUERY_ID",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 1
+    },
+    {
+      "table_name": "GRAPH_OPERATION_EXECUTION_STATUS",
+      "column_name": "QUERY_TEXT",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 2
+    },
+    {
+      "table_name": "GRAPH_OPERATION_EXECUTION_STATUS",
+      "column_name": "START_TIMESTAMP",
+      "spanner_type": "TIMESTAMP",
+      "ordinal_position": 3
+    },
+    {
+      "table_name": "GRAPH_OPERATION_EXECUTION_STATUS",
+      "column_name": "LAST_UPDATE_TIMESTAMP",
+      "spanner_type": "TIMESTAMP",
+      "ordinal_position": 4
+    },
+    {
+      "table_name": "GRAPH_OPERATION_EXECUTION_STATUS",
+      "column_name": "PROGRESS",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 5
+    },
+    {
+      "table_name": "GRAPH_OPERATION_EXECUTION_STATUS",
+      "column_name": "STATUS",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 6
+    },
+    {
+      "table_name": "GRAPH_OPERATION_EXECUTION_STATUS",
+      "column_name": "ERROR_MESSAGE",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 7
+    },
+    {
+      "table_name": "LOCK_STATS_TOP_10MINUTE",
+      "column_name": "INTERVAL_END",
+      "spanner_type": "TIMESTAMP",
+      "ordinal_position": 1
+    },
+    {
+      "table_name": "LOCK_STATS_TOP_10MINUTE",
+      "column_name": "ROW_RANGE_START_KEY",
+      "spanner_type": "BYTES(MAX)",
+      "ordinal_position": 2
+    },
+    {
+      "table_name": "LOCK_STATS_TOP_10MINUTE",
+      "column_name": "LOCK_WAIT_SECONDS",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 3
+    },
+    {
+      "table_name": "LOCK_STATS_TOP_10MINUTE",
+      "column_name": "SAMPLE_LOCK_REQUESTS",
+      "spanner_type": "ARRAY\u003cSTRUCT\u003cCOLUMN STRING(MAX), LOCK_MODE STRING(MAX), TRANSACTION_TAG STRING(MAX)\u003e\u003e",
+      "ordinal_position": 4
+    },
+    {
+      "table_name": "LOCK_STATS_TOP_10MINUTE",
+      "column_name": "SAMPLE_LOCK_REQUESTS_JSON_STRING",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 5
+    },
+    {
+      "table_name": "LOCK_STATS_TOP_HOUR",
+      "column_name": "INTERVAL_END",
+      "spanner_type": "TIMESTAMP",
+      "ordinal_position": 1
+    },
+    {
+      "table_name": "LOCK_STATS_TOP_HOUR",
+      "column_name": "ROW_RANGE_START_KEY",
+      "spanner_type": "BYTES(MAX)",
+      "ordinal_position": 2
+    },
+    {
+      "table_name": "LOCK_STATS_TOP_HOUR",
+      "column_name": "LOCK_WAIT_SECONDS",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 3
+    },
+    {
+      "table_name": "LOCK_STATS_TOP_HOUR",
+      "column_name": "SAMPLE_LOCK_REQUESTS",
+      "spanner_type": "ARRAY\u003cSTRUCT\u003cCOLUMN STRING(MAX), LOCK_MODE STRING(MAX), TRANSACTION_TAG STRING(MAX)\u003e\u003e",
+      "ordinal_position": 4
+    },
+    {
+      "table_name": "LOCK_STATS_TOP_HOUR",
+      "column_name": "SAMPLE_LOCK_REQUESTS_JSON_STRING",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 5
+    },
+    {
+      "table_name": "LOCK_STATS_TOP_MINUTE",
+      "column_name": "INTERVAL_END",
+      "spanner_type": "TIMESTAMP",
+      "ordinal_position": 1
+    },
+    {
+      "table_name": "LOCK_STATS_TOP_MINUTE",
+      "column_name": "ROW_RANGE_START_KEY",
+      "spanner_type": "BYTES(MAX)",
+      "ordinal_position": 2
+    },
+    {
+      "table_name": "LOCK_STATS_TOP_MINUTE",
+      "column_name": "LOCK_WAIT_SECONDS",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 3
+    },
+    {
+      "table_name": "LOCK_STATS_TOP_MINUTE",
+      "column_name": "SAMPLE_LOCK_REQUESTS",
+      "spanner_type": "ARRAY\u003cSTRUCT\u003cCOLUMN STRING(MAX), LOCK_MODE STRING(MAX), TRANSACTION_TAG STRING(MAX)\u003e\u003e",
+      "ordinal_position": 4
+    },
+    {
+      "table_name": "LOCK_STATS_TOP_MINUTE",
+      "column_name": "SAMPLE_LOCK_REQUESTS_JSON_STRING",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 5
+    },
+    {
+      "table_name": "LOCK_STATS_TOTAL_10MINUTE",
+      "column_name": "INTERVAL_END",
+      "spanner_type": "TIMESTAMP",
+      "ordinal_position": 1
+    },
+    {
+      "table_name": "LOCK_STATS_TOTAL_10MINUTE",
+      "column_name": "TOTAL_LOCK_WAIT_SECONDS",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 2
+    },
+    {
+      "table_name": "LOCK_STATS_TOTAL_HOUR",
+      "column_name": "INTERVAL_END",
+      "spanner_type": "TIMESTAMP",
+      "ordinal_position": 1
+    },
+    {
+      "table_name": "LOCK_STATS_TOTAL_HOUR",
+      "column_name": "TOTAL_LOCK_WAIT_SECONDS",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 2
+    },
+    {
+      "table_name": "LOCK_STATS_TOTAL_MINUTE",
+      "column_name": "INTERVAL_END",
+      "spanner_type": "TIMESTAMP",
+      "ordinal_position": 1
+    },
+    {
+      "table_name": "LOCK_STATS_TOTAL_MINUTE",
+      "column_name": "TOTAL_LOCK_WAIT_SECONDS",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 2
+    },
+    {
+      "table_name": "OLDEST_ACTIVE_QUERIES",
+      "column_name": "START_TIME",
+      "spanner_type": "TIMESTAMP",
+      "ordinal_position": 1
+    },
+    {
+      "table_name": "OLDEST_ACTIVE_QUERIES",
+      "column_name": "TEXT_FINGERPRINT",
+      "spanner_type": "INT64",
+      "ordinal_position": 2
+    },
+    {
+      "table_name": "OLDEST_ACTIVE_QUERIES",
+      "column_name": "TEXT",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 3
+    },
+    {
+      "table_name": "OLDEST_ACTIVE_QUERIES",
+      "column_name": "TEXT_TRUNCATED",
+      "spanner_type": "BOOL",
+      "ordinal_position": 4
+    },
+    {
+      "table_name": "OLDEST_ACTIVE_QUERIES",
+      "column_name": "SESSION_ID",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 5
+    },
+    {
+      "table_name": "OLDEST_ACTIVE_QUERIES",
+      "column_name": "QUERY_ID",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 6
+    },
+    {
+      "table_name": "OLDEST_ACTIVE_QUERIES",
+      "column_name": "CLIENT_IP_ADDRESS",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 7
+    },
+    {
+      "table_name": "OLDEST_ACTIVE_QUERIES",
+      "column_name": "API_CLIENT_HEADER",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 8
+    },
+    {
+      "table_name": "OLDEST_ACTIVE_QUERIES",
+      "column_name": "USER_AGENT_HEADER",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 9
+    },
+    {
+      "table_name": "OLDEST_ACTIVE_QUERIES",
+      "column_name": "SERVER_REGION",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 10
+    },
+    {
+      "table_name": "OLDEST_ACTIVE_QUERIES",
+      "column_name": "PRIORITY",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 11
+    },
+    {
+      "table_name": "OLDEST_ACTIVE_QUERIES",
+      "column_name": "TRANSACTION_TYPE",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 12
+    },
+    {
+      "table_name": "QUERY_PROFILES_TOP_10MINUTE",
+      "column_name": "INTERVAL_END",
+      "spanner_type": "TIMESTAMP",
+      "ordinal_position": 1
+    },
+    {
+      "table_name": "QUERY_PROFILES_TOP_10MINUTE",
+      "column_name": "TEXT_FINGERPRINT",
+      "spanner_type": "INT64",
+      "ordinal_position": 2
+    },
+    {
+      "table_name": "QUERY_PROFILES_TOP_10MINUTE",
+      "column_name": "LATENCY_SECONDS",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 3
+    },
+    {
+      "table_name": "QUERY_PROFILES_TOP_10MINUTE",
+      "column_name": "QUERY_PROFILE",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 4
+    },
+    {
+      "table_name": "QUERY_PROFILES_TOP_HOUR",
+      "column_name": "INTERVAL_END",
+      "spanner_type": "TIMESTAMP",
+      "ordinal_position": 1
+    },
+    {
+      "table_name": "QUERY_PROFILES_TOP_HOUR",
+      "column_name": "TEXT_FINGERPRINT",
+      "spanner_type": "INT64",
+      "ordinal_position": 2
+    },
+    {
+      "table_name": "QUERY_PROFILES_TOP_HOUR",
+      "column_name": "LATENCY_SECONDS",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 3
+    },
+    {
+      "table_name": "QUERY_PROFILES_TOP_HOUR",
+      "column_name": "QUERY_PROFILE",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 4
+    },
+    {
+      "table_name": "QUERY_PROFILES_TOP_MINUTE",
+      "column_name": "INTERVAL_END",
+      "spanner_type": "TIMESTAMP",
+      "ordinal_position": 1
+    },
+    {
+      "table_name": "QUERY_PROFILES_TOP_MINUTE",
+      "column_name": "TEXT_FINGERPRINT",
+      "spanner_type": "INT64",
+      "ordinal_position": 2
+    },
+    {
+      "table_name": "QUERY_PROFILES_TOP_MINUTE",
+      "column_name": "LATENCY_SECONDS",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 3
+    },
+    {
+      "table_name": "QUERY_PROFILES_TOP_MINUTE",
+      "column_name": "QUERY_PROFILE",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 4
+    },
+    {
+      "table_name": "QUERY_RECOMMENDATIONS",
+      "column_name": "GENERATION_TIME",
+      "spanner_type": "TIMESTAMP",
+      "ordinal_position": 1
+    },
+    {
+      "table_name": "QUERY_RECOMMENDATIONS",
+      "column_name": "TEXT_FINGERPRINT",
+      "spanner_type": "INT64",
+      "ordinal_position": 2
+    },
+    {
+      "table_name": "QUERY_RECOMMENDATIONS",
+      "column_name": "QUERY_RECOMMENDATIONS",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 3
+    },
+    {
+      "table_name": "QUERY_STATS_TOP_10MINUTE",
+      "column_name": "INTERVAL_END",
+      "spanner_type": "TIMESTAMP",
+      "ordinal_position": 1
+    },
+    {
+      "table_name": "QUERY_STATS_TOP_10MINUTE",
+      "column_name": "TEXT",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 2
+    },
+    {
+      "table_name": "QUERY_STATS_TOP_10MINUTE",
+      "column_name": "TEXT_TRUNCATED",
+      "spanner_type": "BOOL",
+      "ordinal_position": 3
+    },
+    {
+      "table_name": "QUERY_STATS_TOP_10MINUTE",
+      "column_name": "TEXT_FINGERPRINT",
+      "spanner_type": "INT64",
+      "ordinal_position": 4
+    },
+    {
+      "table_name": "QUERY_STATS_TOP_10MINUTE",
+      "column_name": "EXECUTION_COUNT",
+      "spanner_type": "INT64",
+      "ordinal_position": 5
+    },
+    {
+      "table_name": "QUERY_STATS_TOP_10MINUTE",
+      "column_name": "AVG_LATENCY_SECONDS",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 6
+    },
+    {
+      "table_name": "QUERY_STATS_TOP_10MINUTE",
+      "column_name": "AVG_ROWS",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 7
+    },
+    {
+      "table_name": "QUERY_STATS_TOP_10MINUTE",
+      "column_name": "AVG_BYTES",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 8
+    },
+    {
+      "table_name": "QUERY_STATS_TOP_10MINUTE",
+      "column_name": "AVG_ROWS_SCANNED",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 9
+    },
+    {
+      "table_name": "QUERY_STATS_TOP_10MINUTE",
+      "column_name": "AVG_CPU_SECONDS",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 10
+    },
+    {
+      "table_name": "QUERY_STATS_TOP_10MINUTE",
+      "column_name": "CANCELLED_OR_DISCONNECTED_EXECUTION_COUNT",
+      "spanner_type": "INT64",
+      "ordinal_position": 11
+    },
+    {
+      "table_name": "QUERY_STATS_TOP_10MINUTE",
+      "column_name": "TIMED_OUT_EXECUTION_COUNT",
+      "spanner_type": "INT64",
+      "ordinal_position": 12
+    },
+    {
+      "table_name": "QUERY_STATS_TOP_10MINUTE",
+      "column_name": "ALL_FAILED_EXECUTION_COUNT",
+      "spanner_type": "INT64",
+      "ordinal_position": 13
+    },
+    {
+      "table_name": "QUERY_STATS_TOP_10MINUTE",
+      "column_name": "ALL_FAILED_AVG_LATENCY_SECONDS",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 14
+    },
+    {
+      "table_name": "QUERY_STATS_TOP_10MINUTE",
+      "column_name": "REQUEST_TAG",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 15
+    },
+    {
+      "table_name": "QUERY_STATS_TOP_10MINUTE",
+      "column_name": "AVG_BYTES_WRITTEN",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 16
+    },
+    {
+      "table_name": "QUERY_STATS_TOP_10MINUTE",
+      "column_name": "AVG_ROWS_WRITTEN",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 17
+    },
+    {
+      "table_name": "QUERY_STATS_TOP_10MINUTE",
+      "column_name": "STATEMENT_COUNT",
+      "spanner_type": "INT64",
+      "ordinal_position": 18
+    },
+    {
+      "table_name": "QUERY_STATS_TOP_10MINUTE",
+      "column_name": "LATENCY_DISTRIBUTION",
+      "spanner_type": "ARRAY\u003cSTRUCT\u003cCOUNT INT64, MEAN FLOAT64, SUM_OF_SQUARED_DEVIATION FLOAT64, NUM_FINITE_BUCKETS INT64, GROWTH_FACTOR FLOAT64, SCALE FLOAT64, BUCKET_COUNTS ARRAY\u003cINT64\u003e\u003e\u003e",
+      "ordinal_position": 19
+    },
+    {
+      "table_name": "QUERY_STATS_TOP_10MINUTE",
+      "column_name": "RUN_IN_RW_TRANSACTION_EXECUTION_COUNT",
+      "spanner_type": "INT64",
+      "ordinal_position": 20
+    },
+    {
+      "table_name": "QUERY_STATS_TOP_10MINUTE",
+      "column_name": "QUERY_TYPE",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 21
+    },
+    {
+      "table_name": "QUERY_STATS_TOP_10MINUTE",
+      "column_name": "AVG_MEMORY_PEAK_USAGE_BYTES",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 22
+    },
+    {
+      "table_name": "QUERY_STATS_TOP_10MINUTE",
+      "column_name": "AVG_MEMORY_USAGE_PERCENTAGE",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 23
+    },
+    {
+      "table_name": "QUERY_STATS_TOP_10MINUTE",
+      "column_name": "AVG_QUERY_PLAN_CREATION_TIME_SECS",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 24
+    },
+    {
+      "table_name": "QUERY_STATS_TOP_10MINUTE",
+      "column_name": "AVG_FILESYSTEM_DELAY_SECS",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 25
+    },
+    {
+      "table_name": "QUERY_STATS_TOP_10MINUTE",
+      "column_name": "AVG_REMOTE_SERVER_CALLS",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 26
+    },
+    {
+      "table_name": "QUERY_STATS_TOP_10MINUTE",
+      "column_name": "AVG_ROWS_SPOOLED",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 27
+    },
+    {
+      "table_name": "QUERY_STATS_TOP_10MINUTE",
+      "column_name": "AVG_DISK_IO_COST",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 28
+    },
+    {
+      "table_name": "QUERY_STATS_TOP_10MINUTE",
+      "column_name": "LATENCY_DISTRIBUTION_JSON_STRING",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 29
+    },
+    {
+      "table_name": "QUERY_STATS_TOP_10MINUTE",
+      "column_name": "AVG_COLUMNAR_READ_SHARE",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 30
+    },
+    {
+      "table_name": "QUERY_STATS_TOP_10MINUTE",
+      "column_name": "QUERY_OPTIMIZER_VERSIONS",
+      "spanner_type": "ARRAY\u003cINT64\u003e",
+      "ordinal_position": 31
+    },
+    {
+      "table_name": "QUERY_STATS_TOP_10MINUTE",
+      "column_name": "STATISTICS_PACKAGE_NAMES",
+      "spanner_type": "ARRAY\u003cSTRING(MAX)\u003e",
+      "ordinal_position": 32
+    },
+    {
+      "table_name": "QUERY_STATS_TOP_HOUR",
+      "column_name": "INTERVAL_END",
+      "spanner_type": "TIMESTAMP",
+      "ordinal_position": 1
+    },
+    {
+      "table_name": "QUERY_STATS_TOP_HOUR",
+      "column_name": "TEXT",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 2
+    },
+    {
+      "table_name": "QUERY_STATS_TOP_HOUR",
+      "column_name": "TEXT_TRUNCATED",
+      "spanner_type": "BOOL",
+      "ordinal_position": 3
+    },
+    {
+      "table_name": "QUERY_STATS_TOP_HOUR",
+      "column_name": "TEXT_FINGERPRINT",
+      "spanner_type": "INT64",
+      "ordinal_position": 4
+    },
+    {
+      "table_name": "QUERY_STATS_TOP_HOUR",
+      "column_name": "EXECUTION_COUNT",
+      "spanner_type": "INT64",
+      "ordinal_position": 5
+    },
+    {
+      "table_name": "QUERY_STATS_TOP_HOUR",
+      "column_name": "AVG_LATENCY_SECONDS",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 6
+    },
+    {
+      "table_name": "QUERY_STATS_TOP_HOUR",
+      "column_name": "AVG_ROWS",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 7
+    },
+    {
+      "table_name": "QUERY_STATS_TOP_HOUR",
+      "column_name": "AVG_BYTES",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 8
+    },
+    {
+      "table_name": "QUERY_STATS_TOP_HOUR",
+      "column_name": "AVG_ROWS_SCANNED",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 9
+    },
+    {
+      "table_name": "QUERY_STATS_TOP_HOUR",
+      "column_name": "AVG_CPU_SECONDS",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 10
+    },
+    {
+      "table_name": "QUERY_STATS_TOP_HOUR",
+      "column_name": "CANCELLED_OR_DISCONNECTED_EXECUTION_COUNT",
+      "spanner_type": "INT64",
+      "ordinal_position": 11
+    },
+    {
+      "table_name": "QUERY_STATS_TOP_HOUR",
+      "column_name": "TIMED_OUT_EXECUTION_COUNT",
+      "spanner_type": "INT64",
+      "ordinal_position": 12
+    },
+    {
+      "table_name": "QUERY_STATS_TOP_HOUR",
+      "column_name": "ALL_FAILED_EXECUTION_COUNT",
+      "spanner_type": "INT64",
+      "ordinal_position": 13
+    },
+    {
+      "table_name": "QUERY_STATS_TOP_HOUR",
+      "column_name": "ALL_FAILED_AVG_LATENCY_SECONDS",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 14
+    },
+    {
+      "table_name": "QUERY_STATS_TOP_HOUR",
+      "column_name": "REQUEST_TAG",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 15
+    },
+    {
+      "table_name": "QUERY_STATS_TOP_HOUR",
+      "column_name": "AVG_BYTES_WRITTEN",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 16
+    },
+    {
+      "table_name": "QUERY_STATS_TOP_HOUR",
+      "column_name": "AVG_ROWS_WRITTEN",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 17
+    },
+    {
+      "table_name": "QUERY_STATS_TOP_HOUR",
+      "column_name": "STATEMENT_COUNT",
+      "spanner_type": "INT64",
+      "ordinal_position": 18
+    },
+    {
+      "table_name": "QUERY_STATS_TOP_HOUR",
+      "column_name": "LATENCY_DISTRIBUTION",
+      "spanner_type": "ARRAY\u003cSTRUCT\u003cCOUNT INT64, MEAN FLOAT64, SUM_OF_SQUARED_DEVIATION FLOAT64, NUM_FINITE_BUCKETS INT64, GROWTH_FACTOR FLOAT64, SCALE FLOAT64, BUCKET_COUNTS ARRAY\u003cINT64\u003e\u003e\u003e",
+      "ordinal_position": 19
+    },
+    {
+      "table_name": "QUERY_STATS_TOP_HOUR",
+      "column_name": "RUN_IN_RW_TRANSACTION_EXECUTION_COUNT",
+      "spanner_type": "INT64",
+      "ordinal_position": 20
+    },
+    {
+      "table_name": "QUERY_STATS_TOP_HOUR",
+      "column_name": "QUERY_TYPE",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 21
+    },
+    {
+      "table_name": "QUERY_STATS_TOP_HOUR",
+      "column_name": "AVG_MEMORY_PEAK_USAGE_BYTES",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 22
+    },
+    {
+      "table_name": "QUERY_STATS_TOP_HOUR",
+      "column_name": "AVG_MEMORY_USAGE_PERCENTAGE",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 23
+    },
+    {
+      "table_name": "QUERY_STATS_TOP_HOUR",
+      "column_name": "AVG_QUERY_PLAN_CREATION_TIME_SECS",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 24
+    },
+    {
+      "table_name": "QUERY_STATS_TOP_HOUR",
+      "column_name": "AVG_FILESYSTEM_DELAY_SECS",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 25
+    },
+    {
+      "table_name": "QUERY_STATS_TOP_HOUR",
+      "column_name": "AVG_REMOTE_SERVER_CALLS",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 26
+    },
+    {
+      "table_name": "QUERY_STATS_TOP_HOUR",
+      "column_name": "AVG_ROWS_SPOOLED",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 27
+    },
+    {
+      "table_name": "QUERY_STATS_TOP_HOUR",
+      "column_name": "AVG_DISK_IO_COST",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 28
+    },
+    {
+      "table_name": "QUERY_STATS_TOP_HOUR",
+      "column_name": "LATENCY_DISTRIBUTION_JSON_STRING",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 29
+    },
+    {
+      "table_name": "QUERY_STATS_TOP_HOUR",
+      "column_name": "AVG_COLUMNAR_READ_SHARE",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 30
+    },
+    {
+      "table_name": "QUERY_STATS_TOP_HOUR",
+      "column_name": "QUERY_OPTIMIZER_VERSIONS",
+      "spanner_type": "ARRAY\u003cINT64\u003e",
+      "ordinal_position": 31
+    },
+    {
+      "table_name": "QUERY_STATS_TOP_HOUR",
+      "column_name": "STATISTICS_PACKAGE_NAMES",
+      "spanner_type": "ARRAY\u003cSTRING(MAX)\u003e",
+      "ordinal_position": 32
+    },
+    {
+      "table_name": "QUERY_STATS_TOP_MINUTE",
+      "column_name": "INTERVAL_END",
+      "spanner_type": "TIMESTAMP",
+      "ordinal_position": 1
+    },
+    {
+      "table_name": "QUERY_STATS_TOP_MINUTE",
+      "column_name": "TEXT",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 2
+    },
+    {
+      "table_name": "QUERY_STATS_TOP_MINUTE",
+      "column_name": "TEXT_TRUNCATED",
+      "spanner_type": "BOOL",
+      "ordinal_position": 3
+    },
+    {
+      "table_name": "QUERY_STATS_TOP_MINUTE",
+      "column_name": "TEXT_FINGERPRINT",
+      "spanner_type": "INT64",
+      "ordinal_position": 4
+    },
+    {
+      "table_name": "QUERY_STATS_TOP_MINUTE",
+      "column_name": "EXECUTION_COUNT",
+      "spanner_type": "INT64",
+      "ordinal_position": 5
+    },
+    {
+      "table_name": "QUERY_STATS_TOP_MINUTE",
+      "column_name": "AVG_LATENCY_SECONDS",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 6
+    },
+    {
+      "table_name": "QUERY_STATS_TOP_MINUTE",
+      "column_name": "AVG_ROWS",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 7
+    },
+    {
+      "table_name": "QUERY_STATS_TOP_MINUTE",
+      "column_name": "AVG_BYTES",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 8
+    },
+    {
+      "table_name": "QUERY_STATS_TOP_MINUTE",
+      "column_name": "AVG_ROWS_SCANNED",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 9
+    },
+    {
+      "table_name": "QUERY_STATS_TOP_MINUTE",
+      "column_name": "AVG_CPU_SECONDS",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 10
+    },
+    {
+      "table_name": "QUERY_STATS_TOP_MINUTE",
+      "column_name": "CANCELLED_OR_DISCONNECTED_EXECUTION_COUNT",
+      "spanner_type": "INT64",
+      "ordinal_position": 11
+    },
+    {
+      "table_name": "QUERY_STATS_TOP_MINUTE",
+      "column_name": "TIMED_OUT_EXECUTION_COUNT",
+      "spanner_type": "INT64",
+      "ordinal_position": 12
+    },
+    {
+      "table_name": "QUERY_STATS_TOP_MINUTE",
+      "column_name": "ALL_FAILED_EXECUTION_COUNT",
+      "spanner_type": "INT64",
+      "ordinal_position": 13
+    },
+    {
+      "table_name": "QUERY_STATS_TOP_MINUTE",
+      "column_name": "ALL_FAILED_AVG_LATENCY_SECONDS",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 14
+    },
+    {
+      "table_name": "QUERY_STATS_TOP_MINUTE",
+      "column_name": "REQUEST_TAG",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 15
+    },
+    {
+      "table_name": "QUERY_STATS_TOP_MINUTE",
+      "column_name": "AVG_BYTES_WRITTEN",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 16
+    },
+    {
+      "table_name": "QUERY_STATS_TOP_MINUTE",
+      "column_name": "AVG_ROWS_WRITTEN",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 17
+    },
+    {
+      "table_name": "QUERY_STATS_TOP_MINUTE",
+      "column_name": "STATEMENT_COUNT",
+      "spanner_type": "INT64",
+      "ordinal_position": 18
+    },
+    {
+      "table_name": "QUERY_STATS_TOP_MINUTE",
+      "column_name": "LATENCY_DISTRIBUTION",
+      "spanner_type": "ARRAY\u003cSTRUCT\u003cCOUNT INT64, MEAN FLOAT64, SUM_OF_SQUARED_DEVIATION FLOAT64, NUM_FINITE_BUCKETS INT64, GROWTH_FACTOR FLOAT64, SCALE FLOAT64, BUCKET_COUNTS ARRAY\u003cINT64\u003e\u003e\u003e",
+      "ordinal_position": 19
+    },
+    {
+      "table_name": "QUERY_STATS_TOP_MINUTE",
+      "column_name": "RUN_IN_RW_TRANSACTION_EXECUTION_COUNT",
+      "spanner_type": "INT64",
+      "ordinal_position": 20
+    },
+    {
+      "table_name": "QUERY_STATS_TOP_MINUTE",
+      "column_name": "QUERY_TYPE",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 21
+    },
+    {
+      "table_name": "QUERY_STATS_TOP_MINUTE",
+      "column_name": "AVG_MEMORY_PEAK_USAGE_BYTES",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 22
+    },
+    {
+      "table_name": "QUERY_STATS_TOP_MINUTE",
+      "column_name": "AVG_MEMORY_USAGE_PERCENTAGE",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 23
+    },
+    {
+      "table_name": "QUERY_STATS_TOP_MINUTE",
+      "column_name": "AVG_QUERY_PLAN_CREATION_TIME_SECS",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 24
+    },
+    {
+      "table_name": "QUERY_STATS_TOP_MINUTE",
+      "column_name": "AVG_FILESYSTEM_DELAY_SECS",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 25
+    },
+    {
+      "table_name": "QUERY_STATS_TOP_MINUTE",
+      "column_name": "AVG_REMOTE_SERVER_CALLS",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 26
+    },
+    {
+      "table_name": "QUERY_STATS_TOP_MINUTE",
+      "column_name": "AVG_ROWS_SPOOLED",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 27
+    },
+    {
+      "table_name": "QUERY_STATS_TOP_MINUTE",
+      "column_name": "AVG_DISK_IO_COST",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 28
+    },
+    {
+      "table_name": "QUERY_STATS_TOP_MINUTE",
+      "column_name": "LATENCY_DISTRIBUTION_JSON_STRING",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 29
+    },
+    {
+      "table_name": "QUERY_STATS_TOP_MINUTE",
+      "column_name": "AVG_COLUMNAR_READ_SHARE",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 30
+    },
+    {
+      "table_name": "QUERY_STATS_TOP_MINUTE",
+      "column_name": "QUERY_OPTIMIZER_VERSIONS",
+      "spanner_type": "ARRAY\u003cINT64\u003e",
+      "ordinal_position": 31
+    },
+    {
+      "table_name": "QUERY_STATS_TOP_MINUTE",
+      "column_name": "STATISTICS_PACKAGE_NAMES",
+      "spanner_type": "ARRAY\u003cSTRING(MAX)\u003e",
+      "ordinal_position": 32
+    },
+    {
+      "table_name": "QUERY_STATS_TOTAL_10MINUTE",
+      "column_name": "INTERVAL_END",
+      "spanner_type": "TIMESTAMP",
+      "ordinal_position": 1
+    },
+    {
+      "table_name": "QUERY_STATS_TOTAL_10MINUTE",
+      "column_name": "EXECUTION_COUNT",
+      "spanner_type": "INT64",
+      "ordinal_position": 2
+    },
+    {
+      "table_name": "QUERY_STATS_TOTAL_10MINUTE",
+      "column_name": "AVG_LATENCY_SECONDS",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 3
+    },
+    {
+      "table_name": "QUERY_STATS_TOTAL_10MINUTE",
+      "column_name": "AVG_ROWS",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 4
+    },
+    {
+      "table_name": "QUERY_STATS_TOTAL_10MINUTE",
+      "column_name": "AVG_BYTES",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 5
+    },
+    {
+      "table_name": "QUERY_STATS_TOTAL_10MINUTE",
+      "column_name": "AVG_ROWS_SCANNED",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 6
+    },
+    {
+      "table_name": "QUERY_STATS_TOTAL_10MINUTE",
+      "column_name": "AVG_CPU_SECONDS",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 7
+    },
+    {
+      "table_name": "QUERY_STATS_TOTAL_10MINUTE",
+      "column_name": "CANCELLED_OR_DISCONNECTED_EXECUTION_COUNT",
+      "spanner_type": "INT64",
+      "ordinal_position": 8
+    },
+    {
+      "table_name": "QUERY_STATS_TOTAL_10MINUTE",
+      "column_name": "TIMED_OUT_EXECUTION_COUNT",
+      "spanner_type": "INT64",
+      "ordinal_position": 9
+    },
+    {
+      "table_name": "QUERY_STATS_TOTAL_10MINUTE",
+      "column_name": "ALL_FAILED_EXECUTION_COUNT",
+      "spanner_type": "INT64",
+      "ordinal_position": 10
+    },
+    {
+      "table_name": "QUERY_STATS_TOTAL_10MINUTE",
+      "column_name": "ALL_FAILED_AVG_LATENCY_SECONDS",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 11
+    },
+    {
+      "table_name": "QUERY_STATS_TOTAL_10MINUTE",
+      "column_name": "AVG_BYTES_WRITTEN",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 12
+    },
+    {
+      "table_name": "QUERY_STATS_TOTAL_10MINUTE",
+      "column_name": "AVG_ROWS_WRITTEN",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 13
+    },
+    {
+      "table_name": "QUERY_STATS_TOTAL_10MINUTE",
+      "column_name": "LATENCY_DISTRIBUTION",
+      "spanner_type": "ARRAY\u003cSTRUCT\u003cCOUNT INT64, MEAN FLOAT64, SUM_OF_SQUARED_DEVIATION FLOAT64, NUM_FINITE_BUCKETS INT64, GROWTH_FACTOR FLOAT64, SCALE FLOAT64, BUCKET_COUNTS ARRAY\u003cINT64\u003e\u003e\u003e",
+      "ordinal_position": 14
+    },
+    {
+      "table_name": "QUERY_STATS_TOTAL_10MINUTE",
+      "column_name": "RUN_IN_RW_TRANSACTION_EXECUTION_COUNT",
+      "spanner_type": "INT64",
+      "ordinal_position": 15
+    },
+    {
+      "table_name": "QUERY_STATS_TOTAL_10MINUTE",
+      "column_name": "AVG_MEMORY_PEAK_USAGE_BYTES",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 16
+    },
+    {
+      "table_name": "QUERY_STATS_TOTAL_10MINUTE",
+      "column_name": "AVG_MEMORY_USAGE_PERCENTAGE",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 17
+    },
+    {
+      "table_name": "QUERY_STATS_TOTAL_10MINUTE",
+      "column_name": "AVG_QUERY_PLAN_CREATION_TIME_SECS",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 18
+    },
+    {
+      "table_name": "QUERY_STATS_TOTAL_10MINUTE",
+      "column_name": "AVG_FILESYSTEM_DELAY_SECS",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 19
+    },
+    {
+      "table_name": "QUERY_STATS_TOTAL_10MINUTE",
+      "column_name": "AVG_REMOTE_SERVER_CALLS",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 20
+    },
+    {
+      "table_name": "QUERY_STATS_TOTAL_10MINUTE",
+      "column_name": "AVG_ROWS_SPOOLED",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 21
+    },
+    {
+      "table_name": "QUERY_STATS_TOTAL_10MINUTE",
+      "column_name": "AVG_DISK_IO_COST",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 22
+    },
+    {
+      "table_name": "QUERY_STATS_TOTAL_10MINUTE",
+      "column_name": "LATENCY_DISTRIBUTION_JSON_STRING",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 23
+    },
+    {
+      "table_name": "QUERY_STATS_TOTAL_10MINUTE",
+      "column_name": "AVG_COLUMNAR_READ_SHARE",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 24
+    },
+    {
+      "table_name": "QUERY_STATS_TOTAL_HOUR",
+      "column_name": "INTERVAL_END",
+      "spanner_type": "TIMESTAMP",
+      "ordinal_position": 1
+    },
+    {
+      "table_name": "QUERY_STATS_TOTAL_HOUR",
+      "column_name": "EXECUTION_COUNT",
+      "spanner_type": "INT64",
+      "ordinal_position": 2
+    },
+    {
+      "table_name": "QUERY_STATS_TOTAL_HOUR",
+      "column_name": "AVG_LATENCY_SECONDS",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 3
+    },
+    {
+      "table_name": "QUERY_STATS_TOTAL_HOUR",
+      "column_name": "AVG_ROWS",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 4
+    },
+    {
+      "table_name": "QUERY_STATS_TOTAL_HOUR",
+      "column_name": "AVG_BYTES",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 5
+    },
+    {
+      "table_name": "QUERY_STATS_TOTAL_HOUR",
+      "column_name": "AVG_ROWS_SCANNED",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 6
+    },
+    {
+      "table_name": "QUERY_STATS_TOTAL_HOUR",
+      "column_name": "AVG_CPU_SECONDS",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 7
+    },
+    {
+      "table_name": "QUERY_STATS_TOTAL_HOUR",
+      "column_name": "CANCELLED_OR_DISCONNECTED_EXECUTION_COUNT",
+      "spanner_type": "INT64",
+      "ordinal_position": 8
+    },
+    {
+      "table_name": "QUERY_STATS_TOTAL_HOUR",
+      "column_name": "TIMED_OUT_EXECUTION_COUNT",
+      "spanner_type": "INT64",
+      "ordinal_position": 9
+    },
+    {
+      "table_name": "QUERY_STATS_TOTAL_HOUR",
+      "column_name": "ALL_FAILED_EXECUTION_COUNT",
+      "spanner_type": "INT64",
+      "ordinal_position": 10
+    },
+    {
+      "table_name": "QUERY_STATS_TOTAL_HOUR",
+      "column_name": "ALL_FAILED_AVG_LATENCY_SECONDS",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 11
+    },
+    {
+      "table_name": "QUERY_STATS_TOTAL_HOUR",
+      "column_name": "AVG_BYTES_WRITTEN",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 12
+    },
+    {
+      "table_name": "QUERY_STATS_TOTAL_HOUR",
+      "column_name": "AVG_ROWS_WRITTEN",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 13
+    },
+    {
+      "table_name": "QUERY_STATS_TOTAL_HOUR",
+      "column_name": "LATENCY_DISTRIBUTION",
+      "spanner_type": "ARRAY\u003cSTRUCT\u003cCOUNT INT64, MEAN FLOAT64, SUM_OF_SQUARED_DEVIATION FLOAT64, NUM_FINITE_BUCKETS INT64, GROWTH_FACTOR FLOAT64, SCALE FLOAT64, BUCKET_COUNTS ARRAY\u003cINT64\u003e\u003e\u003e",
+      "ordinal_position": 14
+    },
+    {
+      "table_name": "QUERY_STATS_TOTAL_HOUR",
+      "column_name": "RUN_IN_RW_TRANSACTION_EXECUTION_COUNT",
+      "spanner_type": "INT64",
+      "ordinal_position": 15
+    },
+    {
+      "table_name": "QUERY_STATS_TOTAL_HOUR",
+      "column_name": "AVG_MEMORY_PEAK_USAGE_BYTES",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 16
+    },
+    {
+      "table_name": "QUERY_STATS_TOTAL_HOUR",
+      "column_name": "AVG_MEMORY_USAGE_PERCENTAGE",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 17
+    },
+    {
+      "table_name": "QUERY_STATS_TOTAL_HOUR",
+      "column_name": "AVG_QUERY_PLAN_CREATION_TIME_SECS",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 18
+    },
+    {
+      "table_name": "QUERY_STATS_TOTAL_HOUR",
+      "column_name": "AVG_FILESYSTEM_DELAY_SECS",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 19
+    },
+    {
+      "table_name": "QUERY_STATS_TOTAL_HOUR",
+      "column_name": "AVG_REMOTE_SERVER_CALLS",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 20
+    },
+    {
+      "table_name": "QUERY_STATS_TOTAL_HOUR",
+      "column_name": "AVG_ROWS_SPOOLED",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 21
+    },
+    {
+      "table_name": "QUERY_STATS_TOTAL_HOUR",
+      "column_name": "AVG_DISK_IO_COST",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 22
+    },
+    {
+      "table_name": "QUERY_STATS_TOTAL_HOUR",
+      "column_name": "LATENCY_DISTRIBUTION_JSON_STRING",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 23
+    },
+    {
+      "table_name": "QUERY_STATS_TOTAL_HOUR",
+      "column_name": "AVG_COLUMNAR_READ_SHARE",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 24
+    },
+    {
+      "table_name": "QUERY_STATS_TOTAL_MINUTE",
+      "column_name": "INTERVAL_END",
+      "spanner_type": "TIMESTAMP",
+      "ordinal_position": 1
+    },
+    {
+      "table_name": "QUERY_STATS_TOTAL_MINUTE",
+      "column_name": "EXECUTION_COUNT",
+      "spanner_type": "INT64",
+      "ordinal_position": 2
+    },
+    {
+      "table_name": "QUERY_STATS_TOTAL_MINUTE",
+      "column_name": "AVG_LATENCY_SECONDS",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 3
+    },
+    {
+      "table_name": "QUERY_STATS_TOTAL_MINUTE",
+      "column_name": "AVG_ROWS",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 4
+    },
+    {
+      "table_name": "QUERY_STATS_TOTAL_MINUTE",
+      "column_name": "AVG_BYTES",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 5
+    },
+    {
+      "table_name": "QUERY_STATS_TOTAL_MINUTE",
+      "column_name": "AVG_ROWS_SCANNED",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 6
+    },
+    {
+      "table_name": "QUERY_STATS_TOTAL_MINUTE",
+      "column_name": "AVG_CPU_SECONDS",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 7
+    },
+    {
+      "table_name": "QUERY_STATS_TOTAL_MINUTE",
+      "column_name": "CANCELLED_OR_DISCONNECTED_EXECUTION_COUNT",
+      "spanner_type": "INT64",
+      "ordinal_position": 8
+    },
+    {
+      "table_name": "QUERY_STATS_TOTAL_MINUTE",
+      "column_name": "TIMED_OUT_EXECUTION_COUNT",
+      "spanner_type": "INT64",
+      "ordinal_position": 9
+    },
+    {
+      "table_name": "QUERY_STATS_TOTAL_MINUTE",
+      "column_name": "ALL_FAILED_EXECUTION_COUNT",
+      "spanner_type": "INT64",
+      "ordinal_position": 10
+    },
+    {
+      "table_name": "QUERY_STATS_TOTAL_MINUTE",
+      "column_name": "ALL_FAILED_AVG_LATENCY_SECONDS",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 11
+    },
+    {
+      "table_name": "QUERY_STATS_TOTAL_MINUTE",
+      "column_name": "AVG_BYTES_WRITTEN",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 12
+    },
+    {
+      "table_name": "QUERY_STATS_TOTAL_MINUTE",
+      "column_name": "AVG_ROWS_WRITTEN",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 13
+    },
+    {
+      "table_name": "QUERY_STATS_TOTAL_MINUTE",
+      "column_name": "LATENCY_DISTRIBUTION",
+      "spanner_type": "ARRAY\u003cSTRUCT\u003cCOUNT INT64, MEAN FLOAT64, SUM_OF_SQUARED_DEVIATION FLOAT64, NUM_FINITE_BUCKETS INT64, GROWTH_FACTOR FLOAT64, SCALE FLOAT64, BUCKET_COUNTS ARRAY\u003cINT64\u003e\u003e\u003e",
+      "ordinal_position": 14
+    },
+    {
+      "table_name": "QUERY_STATS_TOTAL_MINUTE",
+      "column_name": "RUN_IN_RW_TRANSACTION_EXECUTION_COUNT",
+      "spanner_type": "INT64",
+      "ordinal_position": 15
+    },
+    {
+      "table_name": "QUERY_STATS_TOTAL_MINUTE",
+      "column_name": "AVG_MEMORY_PEAK_USAGE_BYTES",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 16
+    },
+    {
+      "table_name": "QUERY_STATS_TOTAL_MINUTE",
+      "column_name": "AVG_MEMORY_USAGE_PERCENTAGE",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 17
+    },
+    {
+      "table_name": "QUERY_STATS_TOTAL_MINUTE",
+      "column_name": "AVG_QUERY_PLAN_CREATION_TIME_SECS",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 18
+    },
+    {
+      "table_name": "QUERY_STATS_TOTAL_MINUTE",
+      "column_name": "AVG_FILESYSTEM_DELAY_SECS",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 19
+    },
+    {
+      "table_name": "QUERY_STATS_TOTAL_MINUTE",
+      "column_name": "AVG_REMOTE_SERVER_CALLS",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 20
+    },
+    {
+      "table_name": "QUERY_STATS_TOTAL_MINUTE",
+      "column_name": "AVG_ROWS_SPOOLED",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 21
+    },
+    {
+      "table_name": "QUERY_STATS_TOTAL_MINUTE",
+      "column_name": "AVG_DISK_IO_COST",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 22
+    },
+    {
+      "table_name": "QUERY_STATS_TOTAL_MINUTE",
+      "column_name": "LATENCY_DISTRIBUTION_JSON_STRING",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 23
+    },
+    {
+      "table_name": "QUERY_STATS_TOTAL_MINUTE",
+      "column_name": "AVG_COLUMNAR_READ_SHARE",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 24
+    },
+    {
+      "table_name": "READ_STATS_TOP_10MINUTE",
+      "column_name": "INTERVAL_END",
+      "spanner_type": "TIMESTAMP",
+      "ordinal_position": 1
+    },
+    {
+      "table_name": "READ_STATS_TOP_10MINUTE",
+      "column_name": "READ_COLUMNS",
+      "spanner_type": "ARRAY\u003cSTRING(MAX)\u003e",
+      "ordinal_position": 2
+    },
+    {
+      "table_name": "READ_STATS_TOP_10MINUTE",
+      "column_name": "FPRINT",
+      "spanner_type": "INT64",
+      "ordinal_position": 3
+    },
+    {
+      "table_name": "READ_STATS_TOP_10MINUTE",
+      "column_name": "EXECUTION_COUNT",
+      "spanner_type": "INT64",
+      "ordinal_position": 4
+    },
+    {
+      "table_name": "READ_STATS_TOP_10MINUTE",
+      "column_name": "AVG_ROWS",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 5
+    },
+    {
+      "table_name": "READ_STATS_TOP_10MINUTE",
+      "column_name": "AVG_BYTES",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 6
+    },
+    {
+      "table_name": "READ_STATS_TOP_10MINUTE",
+      "column_name": "AVG_CPU_SECONDS",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 7
+    },
+    {
+      "table_name": "READ_STATS_TOP_10MINUTE",
+      "column_name": "AVG_LOCKING_DELAY_SECONDS",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 8
+    },
+    {
+      "table_name": "READ_STATS_TOP_10MINUTE",
+      "column_name": "AVG_CLIENT_WAIT_SECONDS",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 9
+    },
+    {
+      "table_name": "READ_STATS_TOP_10MINUTE",
+      "column_name": "AVG_LEADER_REFRESH_DELAY_SECONDS",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 10
+    },
+    {
+      "table_name": "READ_STATS_TOP_10MINUTE",
+      "column_name": "REQUEST_TAG",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 11
+    },
+    {
+      "table_name": "READ_STATS_TOP_10MINUTE",
+      "column_name": "RUN_IN_RW_TRANSACTION_EXECUTION_COUNT",
+      "spanner_type": "INT64",
+      "ordinal_position": 12
+    },
+    {
+      "table_name": "READ_STATS_TOP_10MINUTE",
+      "column_name": "READ_TYPE",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 13
+    },
+    {
+      "table_name": "READ_STATS_TOP_10MINUTE",
+      "column_name": "AVG_DISK_IO_COST",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 14
+    },
+    {
+      "table_name": "READ_STATS_TOP_HOUR",
+      "column_name": "INTERVAL_END",
+      "spanner_type": "TIMESTAMP",
+      "ordinal_position": 1
+    },
+    {
+      "table_name": "READ_STATS_TOP_HOUR",
+      "column_name": "READ_COLUMNS",
+      "spanner_type": "ARRAY\u003cSTRING(MAX)\u003e",
+      "ordinal_position": 2
+    },
+    {
+      "table_name": "READ_STATS_TOP_HOUR",
+      "column_name": "FPRINT",
+      "spanner_type": "INT64",
+      "ordinal_position": 3
+    },
+    {
+      "table_name": "READ_STATS_TOP_HOUR",
+      "column_name": "EXECUTION_COUNT",
+      "spanner_type": "INT64",
+      "ordinal_position": 4
+    },
+    {
+      "table_name": "READ_STATS_TOP_HOUR",
+      "column_name": "AVG_ROWS",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 5
+    },
+    {
+      "table_name": "READ_STATS_TOP_HOUR",
+      "column_name": "AVG_BYTES",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 6
+    },
+    {
+      "table_name": "READ_STATS_TOP_HOUR",
+      "column_name": "AVG_CPU_SECONDS",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 7
+    },
+    {
+      "table_name": "READ_STATS_TOP_HOUR",
+      "column_name": "AVG_LOCKING_DELAY_SECONDS",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 8
+    },
+    {
+      "table_name": "READ_STATS_TOP_HOUR",
+      "column_name": "AVG_CLIENT_WAIT_SECONDS",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 9
+    },
+    {
+      "table_name": "READ_STATS_TOP_HOUR",
+      "column_name": "AVG_LEADER_REFRESH_DELAY_SECONDS",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 10
+    },
+    {
+      "table_name": "READ_STATS_TOP_HOUR",
+      "column_name": "REQUEST_TAG",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 11
+    },
+    {
+      "table_name": "READ_STATS_TOP_HOUR",
+      "column_name": "RUN_IN_RW_TRANSACTION_EXECUTION_COUNT",
+      "spanner_type": "INT64",
+      "ordinal_position": 12
+    },
+    {
+      "table_name": "READ_STATS_TOP_HOUR",
+      "column_name": "READ_TYPE",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 13
+    },
+    {
+      "table_name": "READ_STATS_TOP_HOUR",
+      "column_name": "AVG_DISK_IO_COST",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 14
+    },
+    {
+      "table_name": "READ_STATS_TOP_MINUTE",
+      "column_name": "INTERVAL_END",
+      "spanner_type": "TIMESTAMP",
+      "ordinal_position": 1
+    },
+    {
+      "table_name": "READ_STATS_TOP_MINUTE",
+      "column_name": "READ_COLUMNS",
+      "spanner_type": "ARRAY\u003cSTRING(MAX)\u003e",
+      "ordinal_position": 2
+    },
+    {
+      "table_name": "READ_STATS_TOP_MINUTE",
+      "column_name": "FPRINT",
+      "spanner_type": "INT64",
+      "ordinal_position": 3
+    },
+    {
+      "table_name": "READ_STATS_TOP_MINUTE",
+      "column_name": "EXECUTION_COUNT",
+      "spanner_type": "INT64",
+      "ordinal_position": 4
+    },
+    {
+      "table_name": "READ_STATS_TOP_MINUTE",
+      "column_name": "AVG_ROWS",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 5
+    },
+    {
+      "table_name": "READ_STATS_TOP_MINUTE",
+      "column_name": "AVG_BYTES",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 6
+    },
+    {
+      "table_name": "READ_STATS_TOP_MINUTE",
+      "column_name": "AVG_CPU_SECONDS",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 7
+    },
+    {
+      "table_name": "READ_STATS_TOP_MINUTE",
+      "column_name": "AVG_LOCKING_DELAY_SECONDS",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 8
+    },
+    {
+      "table_name": "READ_STATS_TOP_MINUTE",
+      "column_name": "AVG_CLIENT_WAIT_SECONDS",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 9
+    },
+    {
+      "table_name": "READ_STATS_TOP_MINUTE",
+      "column_name": "AVG_LEADER_REFRESH_DELAY_SECONDS",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 10
+    },
+    {
+      "table_name": "READ_STATS_TOP_MINUTE",
+      "column_name": "REQUEST_TAG",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 11
+    },
+    {
+      "table_name": "READ_STATS_TOP_MINUTE",
+      "column_name": "RUN_IN_RW_TRANSACTION_EXECUTION_COUNT",
+      "spanner_type": "INT64",
+      "ordinal_position": 12
+    },
+    {
+      "table_name": "READ_STATS_TOP_MINUTE",
+      "column_name": "READ_TYPE",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 13
+    },
+    {
+      "table_name": "READ_STATS_TOP_MINUTE",
+      "column_name": "AVG_DISK_IO_COST",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 14
+    },
+    {
+      "table_name": "READ_STATS_TOTAL_10MINUTE",
+      "column_name": "INTERVAL_END",
+      "spanner_type": "TIMESTAMP",
+      "ordinal_position": 1
+    },
+    {
+      "table_name": "READ_STATS_TOTAL_10MINUTE",
+      "column_name": "EXECUTION_COUNT",
+      "spanner_type": "INT64",
+      "ordinal_position": 2
+    },
+    {
+      "table_name": "READ_STATS_TOTAL_10MINUTE",
+      "column_name": "AVG_ROWS",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 3
+    },
+    {
+      "table_name": "READ_STATS_TOTAL_10MINUTE",
+      "column_name": "AVG_BYTES",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 4
+    },
+    {
+      "table_name": "READ_STATS_TOTAL_10MINUTE",
+      "column_name": "AVG_CPU_SECONDS",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 5
+    },
+    {
+      "table_name": "READ_STATS_TOTAL_10MINUTE",
+      "column_name": "AVG_LOCKING_DELAY_SECONDS",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 6
+    },
+    {
+      "table_name": "READ_STATS_TOTAL_10MINUTE",
+      "column_name": "AVG_CLIENT_WAIT_SECONDS",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 7
+    },
+    {
+      "table_name": "READ_STATS_TOTAL_10MINUTE",
+      "column_name": "AVG_LEADER_REFRESH_DELAY_SECONDS",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 8
+    },
+    {
+      "table_name": "READ_STATS_TOTAL_10MINUTE",
+      "column_name": "RUN_IN_RW_TRANSACTION_EXECUTION_COUNT",
+      "spanner_type": "INT64",
+      "ordinal_position": 9
+    },
+    {
+      "table_name": "READ_STATS_TOTAL_10MINUTE",
+      "column_name": "AVG_DISK_IO_COST",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 10
+    },
+    {
+      "table_name": "READ_STATS_TOTAL_HOUR",
+      "column_name": "INTERVAL_END",
+      "spanner_type": "TIMESTAMP",
+      "ordinal_position": 1
+    },
+    {
+      "table_name": "READ_STATS_TOTAL_HOUR",
+      "column_name": "EXECUTION_COUNT",
+      "spanner_type": "INT64",
+      "ordinal_position": 2
+    },
+    {
+      "table_name": "READ_STATS_TOTAL_HOUR",
+      "column_name": "AVG_ROWS",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 3
+    },
+    {
+      "table_name": "READ_STATS_TOTAL_HOUR",
+      "column_name": "AVG_BYTES",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 4
+    },
+    {
+      "table_name": "READ_STATS_TOTAL_HOUR",
+      "column_name": "AVG_CPU_SECONDS",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 5
+    },
+    {
+      "table_name": "READ_STATS_TOTAL_HOUR",
+      "column_name": "AVG_LOCKING_DELAY_SECONDS",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 6
+    },
+    {
+      "table_name": "READ_STATS_TOTAL_HOUR",
+      "column_name": "AVG_CLIENT_WAIT_SECONDS",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 7
+    },
+    {
+      "table_name": "READ_STATS_TOTAL_HOUR",
+      "column_name": "AVG_LEADER_REFRESH_DELAY_SECONDS",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 8
+    },
+    {
+      "table_name": "READ_STATS_TOTAL_HOUR",
+      "column_name": "RUN_IN_RW_TRANSACTION_EXECUTION_COUNT",
+      "spanner_type": "INT64",
+      "ordinal_position": 9
+    },
+    {
+      "table_name": "READ_STATS_TOTAL_HOUR",
+      "column_name": "AVG_DISK_IO_COST",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 10
+    },
+    {
+      "table_name": "READ_STATS_TOTAL_MINUTE",
+      "column_name": "INTERVAL_END",
+      "spanner_type": "TIMESTAMP",
+      "ordinal_position": 1
+    },
+    {
+      "table_name": "READ_STATS_TOTAL_MINUTE",
+      "column_name": "EXECUTION_COUNT",
+      "spanner_type": "INT64",
+      "ordinal_position": 2
+    },
+    {
+      "table_name": "READ_STATS_TOTAL_MINUTE",
+      "column_name": "AVG_ROWS",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 3
+    },
+    {
+      "table_name": "READ_STATS_TOTAL_MINUTE",
+      "column_name": "AVG_BYTES",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 4
+    },
+    {
+      "table_name": "READ_STATS_TOTAL_MINUTE",
+      "column_name": "AVG_CPU_SECONDS",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 5
+    },
+    {
+      "table_name": "READ_STATS_TOTAL_MINUTE",
+      "column_name": "AVG_LOCKING_DELAY_SECONDS",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 6
+    },
+    {
+      "table_name": "READ_STATS_TOTAL_MINUTE",
+      "column_name": "AVG_CLIENT_WAIT_SECONDS",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 7
+    },
+    {
+      "table_name": "READ_STATS_TOTAL_MINUTE",
+      "column_name": "AVG_LEADER_REFRESH_DELAY_SECONDS",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 8
+    },
+    {
+      "table_name": "READ_STATS_TOTAL_MINUTE",
+      "column_name": "RUN_IN_RW_TRANSACTION_EXECUTION_COUNT",
+      "spanner_type": "INT64",
+      "ordinal_position": 9
+    },
+    {
+      "table_name": "READ_STATS_TOTAL_MINUTE",
+      "column_name": "AVG_DISK_IO_COST",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 10
+    },
+    {
+      "table_name": "ROW_DELETION_POLICIES",
+      "column_name": "TABLE_NAME",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 1
+    },
+    {
+      "table_name": "ROW_DELETION_POLICIES",
+      "column_name": "PROCESSED_WATERMARK",
+      "spanner_type": "TIMESTAMP",
+      "ordinal_position": 2
+    },
+    {
+      "table_name": "ROW_DELETION_POLICIES",
+      "column_name": "UNDELETABLE_ROWS",
+      "spanner_type": "INT64",
+      "ordinal_position": 3
+    },
+    {
+      "table_name": "ROW_DELETION_POLICIES",
+      "column_name": "MIN_UNDELETABLE_TIMESTAMP",
+      "spanner_type": "TIMESTAMP",
+      "ordinal_position": 4
+    },
+    {
+      "table_name": "SCHEMA_RECOMMENDATIONS",
+      "column_name": "GENERATION_TIME",
+      "spanner_type": "TIMESTAMP",
+      "ordinal_position": 1
+    },
+    {
+      "table_name": "SCHEMA_RECOMMENDATIONS",
+      "column_name": "FINGERPRINT",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 2
+    },
+    {
+      "table_name": "SCHEMA_RECOMMENDATIONS",
+      "column_name": "SCHEMA_RECOMMENDATIONS",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 3
+    },
+    {
+      "table_name": "SPLIT_HOTNESS_STATS_TOP_MINUTE",
+      "column_name": "INTERVAL_END",
+      "spanner_type": "TIMESTAMP",
+      "ordinal_position": 1
+    },
+    {
+      "table_name": "SPLIT_HOTNESS_STATS_TOP_MINUTE",
+      "column_name": "SPLIT_START",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 2
+    },
+    {
+      "table_name": "SPLIT_HOTNESS_STATS_TOP_MINUTE",
+      "column_name": "SPLIT_LIMIT",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 3
+    },
+    {
+      "table_name": "SPLIT_HOTNESS_STATS_TOP_MINUTE",
+      "column_name": "AFFECTED_TABLES",
+      "spanner_type": "ARRAY\u003cSTRING(MAX)\u003e",
+      "ordinal_position": 4
+    },
+    {
+      "table_name": "SPLIT_HOTNESS_STATS_TOP_MINUTE",
+      "column_name": "HOTNESS",
+      "spanner_type": "INT64",
+      "ordinal_position": 5
+    },
+    {
+      "table_name": "SPLIT_STATS_TOP_10MINUTE",
+      "column_name": "INTERVAL_END",
+      "spanner_type": "TIMESTAMP",
+      "ordinal_position": 1
+    },
+    {
+      "table_name": "SPLIT_STATS_TOP_10MINUTE",
+      "column_name": "SPLIT_START",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 2
+    },
+    {
+      "table_name": "SPLIT_STATS_TOP_10MINUTE",
+      "column_name": "SPLIT_LIMIT",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 3
+    },
+    {
+      "table_name": "SPLIT_STATS_TOP_10MINUTE",
+      "column_name": "AFFECTED_TABLES",
+      "spanner_type": "ARRAY\u003cSTRING(MAX)\u003e",
+      "ordinal_position": 4
+    },
+    {
+      "table_name": "SPLIT_STATS_TOP_10MINUTE",
+      "column_name": "CPU_USAGE_SCORE",
+      "spanner_type": "INT64",
+      "ordinal_position": 5
+    },
+    {
+      "table_name": "SPLIT_STATS_TOP_10MINUTE",
+      "column_name": "UNSPLITTABLE_REASONS",
+      "spanner_type": "ARRAY\u003cSTRING(MAX)\u003e",
+      "ordinal_position": 6
+    },
+    {
+      "table_name": "SPLIT_STATS_TOP_HOUR",
+      "column_name": "INTERVAL_END",
+      "spanner_type": "TIMESTAMP",
+      "ordinal_position": 1
+    },
+    {
+      "table_name": "SPLIT_STATS_TOP_HOUR",
+      "column_name": "SPLIT_START",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 2
+    },
+    {
+      "table_name": "SPLIT_STATS_TOP_HOUR",
+      "column_name": "SPLIT_LIMIT",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 3
+    },
+    {
+      "table_name": "SPLIT_STATS_TOP_HOUR",
+      "column_name": "AFFECTED_TABLES",
+      "spanner_type": "ARRAY\u003cSTRING(MAX)\u003e",
+      "ordinal_position": 4
+    },
+    {
+      "table_name": "SPLIT_STATS_TOP_HOUR",
+      "column_name": "CPU_USAGE_SCORE",
+      "spanner_type": "INT64",
+      "ordinal_position": 5
+    },
+    {
+      "table_name": "SPLIT_STATS_TOP_HOUR",
+      "column_name": "UNSPLITTABLE_REASONS",
+      "spanner_type": "ARRAY\u003cSTRING(MAX)\u003e",
+      "ordinal_position": 6
+    },
+    {
+      "table_name": "SPLIT_STATS_TOP_MINUTE",
+      "column_name": "INTERVAL_END",
+      "spanner_type": "TIMESTAMP",
+      "ordinal_position": 1
+    },
+    {
+      "table_name": "SPLIT_STATS_TOP_MINUTE",
+      "column_name": "SPLIT_START",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 2
+    },
+    {
+      "table_name": "SPLIT_STATS_TOP_MINUTE",
+      "column_name": "SPLIT_LIMIT",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 3
+    },
+    {
+      "table_name": "SPLIT_STATS_TOP_MINUTE",
+      "column_name": "AFFECTED_TABLES",
+      "spanner_type": "ARRAY\u003cSTRING(MAX)\u003e",
+      "ordinal_position": 4
+    },
+    {
+      "table_name": "SPLIT_STATS_TOP_MINUTE",
+      "column_name": "CPU_USAGE_SCORE",
+      "spanner_type": "INT64",
+      "ordinal_position": 5
+    },
+    {
+      "table_name": "SPLIT_STATS_TOP_MINUTE",
+      "column_name": "UNSPLITTABLE_REASONS",
+      "spanner_type": "ARRAY\u003cSTRING(MAX)\u003e",
+      "ordinal_position": 6
+    },
+    {
+      "table_name": "SUPPORTED_OPTIMIZER_VERSIONS",
+      "column_name": "VERSION",
+      "spanner_type": "INT64",
+      "ordinal_position": 1
+    },
+    {
+      "table_name": "SUPPORTED_OPTIMIZER_VERSIONS",
+      "column_name": "RELEASE_DATE",
+      "spanner_type": "DATE",
+      "ordinal_position": 2
+    },
+    {
+      "table_name": "SUPPORTED_OPTIMIZER_VERSIONS",
+      "column_name": "IS_DEFAULT",
+      "spanner_type": "BOOL",
+      "ordinal_position": 3
+    },
+    {
+      "table_name": "TABLE_OPERATIONS_STATS_10MINUTE",
+      "column_name": "INTERVAL_END",
+      "spanner_type": "TIMESTAMP",
+      "ordinal_position": 1
+    },
+    {
+      "table_name": "TABLE_OPERATIONS_STATS_10MINUTE",
+      "column_name": "TABLE_NAME",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 2
+    },
+    {
+      "table_name": "TABLE_OPERATIONS_STATS_10MINUTE",
+      "column_name": "READ_QUERY_COUNT",
+      "spanner_type": "INT64",
+      "ordinal_position": 3
+    },
+    {
+      "table_name": "TABLE_OPERATIONS_STATS_10MINUTE",
+      "column_name": "WRITE_COUNT",
+      "spanner_type": "INT64",
+      "ordinal_position": 4
+    },
+    {
+      "table_name": "TABLE_OPERATIONS_STATS_10MINUTE",
+      "column_name": "DELETE_COUNT",
+      "spanner_type": "INT64",
+      "ordinal_position": 5
+    },
+    {
+      "table_name": "TABLE_OPERATIONS_STATS_HOUR",
+      "column_name": "INTERVAL_END",
+      "spanner_type": "TIMESTAMP",
+      "ordinal_position": 1
+    },
+    {
+      "table_name": "TABLE_OPERATIONS_STATS_HOUR",
+      "column_name": "TABLE_NAME",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 2
+    },
+    {
+      "table_name": "TABLE_OPERATIONS_STATS_HOUR",
+      "column_name": "READ_QUERY_COUNT",
+      "spanner_type": "INT64",
+      "ordinal_position": 3
+    },
+    {
+      "table_name": "TABLE_OPERATIONS_STATS_HOUR",
+      "column_name": "WRITE_COUNT",
+      "spanner_type": "INT64",
+      "ordinal_position": 4
+    },
+    {
+      "table_name": "TABLE_OPERATIONS_STATS_HOUR",
+      "column_name": "DELETE_COUNT",
+      "spanner_type": "INT64",
+      "ordinal_position": 5
+    },
+    {
+      "table_name": "TABLE_OPERATIONS_STATS_MINUTE",
+      "column_name": "INTERVAL_END",
+      "spanner_type": "TIMESTAMP",
+      "ordinal_position": 1
+    },
+    {
+      "table_name": "TABLE_OPERATIONS_STATS_MINUTE",
+      "column_name": "TABLE_NAME",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 2
+    },
+    {
+      "table_name": "TABLE_OPERATIONS_STATS_MINUTE",
+      "column_name": "READ_QUERY_COUNT",
+      "spanner_type": "INT64",
+      "ordinal_position": 3
+    },
+    {
+      "table_name": "TABLE_OPERATIONS_STATS_MINUTE",
+      "column_name": "WRITE_COUNT",
+      "spanner_type": "INT64",
+      "ordinal_position": 4
+    },
+    {
+      "table_name": "TABLE_OPERATIONS_STATS_MINUTE",
+      "column_name": "DELETE_COUNT",
+      "spanner_type": "INT64",
+      "ordinal_position": 5
+    },
+    {
+      "table_name": "TABLE_SIZES_STATS_1HOUR",
+      "column_name": "INTERVAL_END",
+      "spanner_type": "TIMESTAMP",
+      "ordinal_position": 1
+    },
+    {
+      "table_name": "TABLE_SIZES_STATS_1HOUR",
+      "column_name": "TABLE_NAME",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 2
+    },
+    {
+      "table_name": "TABLE_SIZES_STATS_1HOUR",
+      "column_name": "USED_BYTES",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 3
+    },
+    {
+      "table_name": "TABLE_SIZES_STATS_1HOUR",
+      "column_name": "USED_SSD_BYTES",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 4
+    },
+    {
+      "table_name": "TABLE_SIZES_STATS_1HOUR",
+      "column_name": "USED_HDD_BYTES",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 5
+    },
+    {
+      "table_name": "TABLE_SIZES_STATS_1HOUR",
+      "column_name": "COLUMNAR_USED_BYTES",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 6
+    },
+    {
+      "table_name": "TABLE_SIZES_STATS_1HOUR",
+      "column_name": "COLUMNAR_USED_SSD_BYTES",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 7
+    },
+    {
+      "table_name": "TABLE_SIZES_STATS_1HOUR",
+      "column_name": "COLUMNAR_USED_HDD_BYTES",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 8
+    },
+    {
+      "table_name": "TABLE_SIZES_STATS_1HOUR",
+      "column_name": "COLUMNAR_COVERAGE_RATIO",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 9
+    },
+    {
+      "table_name": "TABLE_SIZES_STATS_1HOUR",
+      "column_name": "COLUMNAR_SSD_COVERAGE_RATIO",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 10
+    },
+    {
+      "table_name": "TABLE_SIZES_STATS_1HOUR",
+      "column_name": "COLUMNAR_HDD_COVERAGE_RATIO",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 11
+    },
+    {
+      "table_name": "TABLE_SIZES_STATS_PER_LOCALITY_GROUP_1HOUR",
+      "column_name": "INTERVAL_END",
+      "spanner_type": "TIMESTAMP",
+      "ordinal_position": 1
+    },
+    {
+      "table_name": "TABLE_SIZES_STATS_PER_LOCALITY_GROUP_1HOUR",
+      "column_name": "TABLE_NAME",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 2
+    },
+    {
+      "table_name": "TABLE_SIZES_STATS_PER_LOCALITY_GROUP_1HOUR",
+      "column_name": "LOCALITY_GROUP",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 3
+    },
+    {
+      "table_name": "TABLE_SIZES_STATS_PER_LOCALITY_GROUP_1HOUR",
+      "column_name": "USED_SSD_BYTES",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 4
+    },
+    {
+      "table_name": "TABLE_SIZES_STATS_PER_LOCALITY_GROUP_1HOUR",
+      "column_name": "USED_HDD_BYTES",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 5
+    },
+    {
+      "table_name": "TASKS",
+      "column_name": "TASK_NAME",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 1
+    },
+    {
+      "table_name": "TASKS",
+      "column_name": "PROCESSED_WATERMARK",
+      "spanner_type": "TIMESTAMP",
+      "ordinal_position": 2
+    },
+    {
+      "table_name": "TASKS",
+      "column_name": "LAST_RUN_STATUS",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 3
+    },
+    {
+      "table_name": "TASKS",
+      "column_name": "UNDELETABLE_ROWS",
+      "spanner_type": "INT64",
+      "ordinal_position": 4
+    },
+    {
+      "table_name": "TXN_STATS_TOP_10MINUTE",
+      "column_name": "INTERVAL_END",
+      "spanner_type": "TIMESTAMP",
+      "ordinal_position": 1
+    },
+    {
+      "table_name": "TXN_STATS_TOP_10MINUTE",
+      "column_name": "FPRINT",
+      "spanner_type": "INT64",
+      "ordinal_position": 2
+    },
+    {
+      "table_name": "TXN_STATS_TOP_10MINUTE",
+      "column_name": "READ_COLUMNS",
+      "spanner_type": "ARRAY\u003cSTRING(MAX)\u003e",
+      "ordinal_position": 3
+    },
+    {
+      "table_name": "TXN_STATS_TOP_10MINUTE",
+      "column_name": "WRITE_CONSTRUCTIVE_COLUMNS",
+      "spanner_type": "ARRAY\u003cSTRING(MAX)\u003e",
+      "ordinal_position": 4
+    },
+    {
+      "table_name": "TXN_STATS_TOP_10MINUTE",
+      "column_name": "WRITE_DELETE_TABLES",
+      "spanner_type": "ARRAY\u003cSTRING(MAX)\u003e",
+      "ordinal_position": 5
+    },
+    {
+      "table_name": "TXN_STATS_TOP_10MINUTE",
+      "column_name": "COMMIT_ATTEMPT_COUNT",
+      "spanner_type": "INT64",
+      "ordinal_position": 6
+    },
+    {
+      "table_name": "TXN_STATS_TOP_10MINUTE",
+      "column_name": "COMMIT_FAILED_PRECONDITION_COUNT",
+      "spanner_type": "INT64",
+      "ordinal_position": 7
+    },
+    {
+      "table_name": "TXN_STATS_TOP_10MINUTE",
+      "column_name": "COMMIT_ABORT_COUNT",
+      "spanner_type": "INT64",
+      "ordinal_position": 8
+    },
+    {
+      "table_name": "TXN_STATS_TOP_10MINUTE",
+      "column_name": "AVG_PARTICIPANTS",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 9
+    },
+    {
+      "table_name": "TXN_STATS_TOP_10MINUTE",
+      "column_name": "AVG_TOTAL_LATENCY_SECONDS",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 10
+    },
+    {
+      "table_name": "TXN_STATS_TOP_10MINUTE",
+      "column_name": "AVG_COMMIT_LATENCY_SECONDS",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 11
+    },
+    {
+      "table_name": "TXN_STATS_TOP_10MINUTE",
+      "column_name": "AVG_BYTES",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 12
+    },
+    {
+      "table_name": "TXN_STATS_TOP_10MINUTE",
+      "column_name": "COMMIT_RETRY_COUNT",
+      "spanner_type": "INT64",
+      "ordinal_position": 13
+    },
+    {
+      "table_name": "TXN_STATS_TOP_10MINUTE",
+      "column_name": "TRANSACTION_TAG",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 14
+    },
+    {
+      "table_name": "TXN_STATS_TOP_10MINUTE",
+      "column_name": "OPERATIONS_BY_TABLE",
+      "spanner_type": "ARRAY\u003cSTRUCT\u003cTABLE_NAME STRING(MAX), INSERT_OR_UPDATE_COUNT INT64, INSERT_OR_UPDATE_BYTES INT64\u003e\u003e",
+      "ordinal_position": 15
+    },
+    {
+      "table_name": "TXN_STATS_TOP_10MINUTE",
+      "column_name": "TOTAL_LATENCY_DISTRIBUTION",
+      "spanner_type": "ARRAY\u003cSTRUCT\u003cCOUNT INT64, MEAN FLOAT64, SUM_OF_SQUARED_DEVIATION FLOAT64, NUM_FINITE_BUCKETS INT64, GROWTH_FACTOR FLOAT64, SCALE FLOAT64, BUCKET_COUNTS ARRAY\u003cINT64\u003e\u003e\u003e",
+      "ordinal_position": 16
+    },
+    {
+      "table_name": "TXN_STATS_TOP_10MINUTE",
+      "column_name": "ATTEMPT_COUNT",
+      "spanner_type": "INT64",
+      "ordinal_position": 17
+    },
+    {
+      "table_name": "TXN_STATS_TOP_10MINUTE",
+      "column_name": "SERIALIZABLE_PESSIMISTIC_TXN_COUNT",
+      "spanner_type": "INT64",
+      "ordinal_position": 18
+    },
+    {
+      "table_name": "TXN_STATS_TOP_10MINUTE",
+      "column_name": "REPEATABLE_READ_OPTIMISTIC_TXN_COUNT",
+      "spanner_type": "INT64",
+      "ordinal_position": 19
+    },
+    {
+      "table_name": "TXN_STATS_TOP_10MINUTE",
+      "column_name": "OPERATIONS_BY_TABLE_JSON_STRING",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 20
+    },
+    {
+      "table_name": "TXN_STATS_TOP_10MINUTE",
+      "column_name": "TOTAL_LATENCY_DISTRIBUTION_JSON_STRING",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 21
+    },
+    {
+      "table_name": "TXN_STATS_TOP_10MINUTE",
+      "column_name": "SERIALIZABLE_OPTIMISTIC_TXN_COUNT",
+      "spanner_type": "INT64",
+      "ordinal_position": 22
+    },
+    {
+      "table_name": "TXN_STATS_TOP_10MINUTE",
+      "column_name": "REPEATABLE_READ_PESSIMISTIC_TXN_COUNT",
+      "spanner_type": "INT64",
+      "ordinal_position": 23
+    },
+    {
+      "table_name": "TXN_STATS_TOP_HOUR",
+      "column_name": "INTERVAL_END",
+      "spanner_type": "TIMESTAMP",
+      "ordinal_position": 1
+    },
+    {
+      "table_name": "TXN_STATS_TOP_HOUR",
+      "column_name": "FPRINT",
+      "spanner_type": "INT64",
+      "ordinal_position": 2
+    },
+    {
+      "table_name": "TXN_STATS_TOP_HOUR",
+      "column_name": "READ_COLUMNS",
+      "spanner_type": "ARRAY\u003cSTRING(MAX)\u003e",
+      "ordinal_position": 3
+    },
+    {
+      "table_name": "TXN_STATS_TOP_HOUR",
+      "column_name": "WRITE_CONSTRUCTIVE_COLUMNS",
+      "spanner_type": "ARRAY\u003cSTRING(MAX)\u003e",
+      "ordinal_position": 4
+    },
+    {
+      "table_name": "TXN_STATS_TOP_HOUR",
+      "column_name": "WRITE_DELETE_TABLES",
+      "spanner_type": "ARRAY\u003cSTRING(MAX)\u003e",
+      "ordinal_position": 5
+    },
+    {
+      "table_name": "TXN_STATS_TOP_HOUR",
+      "column_name": "COMMIT_ATTEMPT_COUNT",
+      "spanner_type": "INT64",
+      "ordinal_position": 6
+    },
+    {
+      "table_name": "TXN_STATS_TOP_HOUR",
+      "column_name": "COMMIT_FAILED_PRECONDITION_COUNT",
+      "spanner_type": "INT64",
+      "ordinal_position": 7
+    },
+    {
+      "table_name": "TXN_STATS_TOP_HOUR",
+      "column_name": "COMMIT_ABORT_COUNT",
+      "spanner_type": "INT64",
+      "ordinal_position": 8
+    },
+    {
+      "table_name": "TXN_STATS_TOP_HOUR",
+      "column_name": "AVG_PARTICIPANTS",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 9
+    },
+    {
+      "table_name": "TXN_STATS_TOP_HOUR",
+      "column_name": "AVG_TOTAL_LATENCY_SECONDS",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 10
+    },
+    {
+      "table_name": "TXN_STATS_TOP_HOUR",
+      "column_name": "AVG_COMMIT_LATENCY_SECONDS",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 11
+    },
+    {
+      "table_name": "TXN_STATS_TOP_HOUR",
+      "column_name": "AVG_BYTES",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 12
+    },
+    {
+      "table_name": "TXN_STATS_TOP_HOUR",
+      "column_name": "COMMIT_RETRY_COUNT",
+      "spanner_type": "INT64",
+      "ordinal_position": 13
+    },
+    {
+      "table_name": "TXN_STATS_TOP_HOUR",
+      "column_name": "TRANSACTION_TAG",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 14
+    },
+    {
+      "table_name": "TXN_STATS_TOP_HOUR",
+      "column_name": "OPERATIONS_BY_TABLE",
+      "spanner_type": "ARRAY\u003cSTRUCT\u003cTABLE_NAME STRING(MAX), INSERT_OR_UPDATE_COUNT INT64, INSERT_OR_UPDATE_BYTES INT64\u003e\u003e",
+      "ordinal_position": 15
+    },
+    {
+      "table_name": "TXN_STATS_TOP_HOUR",
+      "column_name": "TOTAL_LATENCY_DISTRIBUTION",
+      "spanner_type": "ARRAY\u003cSTRUCT\u003cCOUNT INT64, MEAN FLOAT64, SUM_OF_SQUARED_DEVIATION FLOAT64, NUM_FINITE_BUCKETS INT64, GROWTH_FACTOR FLOAT64, SCALE FLOAT64, BUCKET_COUNTS ARRAY\u003cINT64\u003e\u003e\u003e",
+      "ordinal_position": 16
+    },
+    {
+      "table_name": "TXN_STATS_TOP_HOUR",
+      "column_name": "ATTEMPT_COUNT",
+      "spanner_type": "INT64",
+      "ordinal_position": 17
+    },
+    {
+      "table_name": "TXN_STATS_TOP_HOUR",
+      "column_name": "SERIALIZABLE_PESSIMISTIC_TXN_COUNT",
+      "spanner_type": "INT64",
+      "ordinal_position": 18
+    },
+    {
+      "table_name": "TXN_STATS_TOP_HOUR",
+      "column_name": "REPEATABLE_READ_OPTIMISTIC_TXN_COUNT",
+      "spanner_type": "INT64",
+      "ordinal_position": 19
+    },
+    {
+      "table_name": "TXN_STATS_TOP_HOUR",
+      "column_name": "OPERATIONS_BY_TABLE_JSON_STRING",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 20
+    },
+    {
+      "table_name": "TXN_STATS_TOP_HOUR",
+      "column_name": "TOTAL_LATENCY_DISTRIBUTION_JSON_STRING",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 21
+    },
+    {
+      "table_name": "TXN_STATS_TOP_HOUR",
+      "column_name": "SERIALIZABLE_OPTIMISTIC_TXN_COUNT",
+      "spanner_type": "INT64",
+      "ordinal_position": 22
+    },
+    {
+      "table_name": "TXN_STATS_TOP_HOUR",
+      "column_name": "REPEATABLE_READ_PESSIMISTIC_TXN_COUNT",
+      "spanner_type": "INT64",
+      "ordinal_position": 23
+    },
+    {
+      "table_name": "TXN_STATS_TOP_MINUTE",
+      "column_name": "INTERVAL_END",
+      "spanner_type": "TIMESTAMP",
+      "ordinal_position": 1
+    },
+    {
+      "table_name": "TXN_STATS_TOP_MINUTE",
+      "column_name": "FPRINT",
+      "spanner_type": "INT64",
+      "ordinal_position": 2
+    },
+    {
+      "table_name": "TXN_STATS_TOP_MINUTE",
+      "column_name": "READ_COLUMNS",
+      "spanner_type": "ARRAY\u003cSTRING(MAX)\u003e",
+      "ordinal_position": 3
+    },
+    {
+      "table_name": "TXN_STATS_TOP_MINUTE",
+      "column_name": "WRITE_CONSTRUCTIVE_COLUMNS",
+      "spanner_type": "ARRAY\u003cSTRING(MAX)\u003e",
+      "ordinal_position": 4
+    },
+    {
+      "table_name": "TXN_STATS_TOP_MINUTE",
+      "column_name": "WRITE_DELETE_TABLES",
+      "spanner_type": "ARRAY\u003cSTRING(MAX)\u003e",
+      "ordinal_position": 5
+    },
+    {
+      "table_name": "TXN_STATS_TOP_MINUTE",
+      "column_name": "COMMIT_ATTEMPT_COUNT",
+      "spanner_type": "INT64",
+      "ordinal_position": 6
+    },
+    {
+      "table_name": "TXN_STATS_TOP_MINUTE",
+      "column_name": "COMMIT_FAILED_PRECONDITION_COUNT",
+      "spanner_type": "INT64",
+      "ordinal_position": 7
+    },
+    {
+      "table_name": "TXN_STATS_TOP_MINUTE",
+      "column_name": "COMMIT_ABORT_COUNT",
+      "spanner_type": "INT64",
+      "ordinal_position": 8
+    },
+    {
+      "table_name": "TXN_STATS_TOP_MINUTE",
+      "column_name": "AVG_PARTICIPANTS",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 9
+    },
+    {
+      "table_name": "TXN_STATS_TOP_MINUTE",
+      "column_name": "AVG_TOTAL_LATENCY_SECONDS",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 10
+    },
+    {
+      "table_name": "TXN_STATS_TOP_MINUTE",
+      "column_name": "AVG_COMMIT_LATENCY_SECONDS",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 11
+    },
+    {
+      "table_name": "TXN_STATS_TOP_MINUTE",
+      "column_name": "AVG_BYTES",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 12
+    },
+    {
+      "table_name": "TXN_STATS_TOP_MINUTE",
+      "column_name": "COMMIT_RETRY_COUNT",
+      "spanner_type": "INT64",
+      "ordinal_position": 13
+    },
+    {
+      "table_name": "TXN_STATS_TOP_MINUTE",
+      "column_name": "TRANSACTION_TAG",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 14
+    },
+    {
+      "table_name": "TXN_STATS_TOP_MINUTE",
+      "column_name": "OPERATIONS_BY_TABLE",
+      "spanner_type": "ARRAY\u003cSTRUCT\u003cTABLE_NAME STRING(MAX), INSERT_OR_UPDATE_COUNT INT64, INSERT_OR_UPDATE_BYTES INT64\u003e\u003e",
+      "ordinal_position": 15
+    },
+    {
+      "table_name": "TXN_STATS_TOP_MINUTE",
+      "column_name": "TOTAL_LATENCY_DISTRIBUTION",
+      "spanner_type": "ARRAY\u003cSTRUCT\u003cCOUNT INT64, MEAN FLOAT64, SUM_OF_SQUARED_DEVIATION FLOAT64, NUM_FINITE_BUCKETS INT64, GROWTH_FACTOR FLOAT64, SCALE FLOAT64, BUCKET_COUNTS ARRAY\u003cINT64\u003e\u003e\u003e",
+      "ordinal_position": 16
+    },
+    {
+      "table_name": "TXN_STATS_TOP_MINUTE",
+      "column_name": "ATTEMPT_COUNT",
+      "spanner_type": "INT64",
+      "ordinal_position": 17
+    },
+    {
+      "table_name": "TXN_STATS_TOP_MINUTE",
+      "column_name": "SERIALIZABLE_PESSIMISTIC_TXN_COUNT",
+      "spanner_type": "INT64",
+      "ordinal_position": 18
+    },
+    {
+      "table_name": "TXN_STATS_TOP_MINUTE",
+      "column_name": "REPEATABLE_READ_OPTIMISTIC_TXN_COUNT",
+      "spanner_type": "INT64",
+      "ordinal_position": 19
+    },
+    {
+      "table_name": "TXN_STATS_TOP_MINUTE",
+      "column_name": "OPERATIONS_BY_TABLE_JSON_STRING",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 20
+    },
+    {
+      "table_name": "TXN_STATS_TOP_MINUTE",
+      "column_name": "TOTAL_LATENCY_DISTRIBUTION_JSON_STRING",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 21
+    },
+    {
+      "table_name": "TXN_STATS_TOP_MINUTE",
+      "column_name": "SERIALIZABLE_OPTIMISTIC_TXN_COUNT",
+      "spanner_type": "INT64",
+      "ordinal_position": 22
+    },
+    {
+      "table_name": "TXN_STATS_TOP_MINUTE",
+      "column_name": "REPEATABLE_READ_PESSIMISTIC_TXN_COUNT",
+      "spanner_type": "INT64",
+      "ordinal_position": 23
+    },
+    {
+      "table_name": "TXN_STATS_TOTAL_10MINUTE",
+      "column_name": "INTERVAL_END",
+      "spanner_type": "TIMESTAMP",
+      "ordinal_position": 1
+    },
+    {
+      "table_name": "TXN_STATS_TOTAL_10MINUTE",
+      "column_name": "COMMIT_ATTEMPT_COUNT",
+      "spanner_type": "INT64",
+      "ordinal_position": 2
+    },
+    {
+      "table_name": "TXN_STATS_TOTAL_10MINUTE",
+      "column_name": "COMMIT_FAILED_PRECONDITION_COUNT",
+      "spanner_type": "INT64",
+      "ordinal_position": 3
+    },
+    {
+      "table_name": "TXN_STATS_TOTAL_10MINUTE",
+      "column_name": "COMMIT_ABORT_COUNT",
+      "spanner_type": "INT64",
+      "ordinal_position": 4
+    },
+    {
+      "table_name": "TXN_STATS_TOTAL_10MINUTE",
+      "column_name": "AVG_PARTICIPANTS",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 5
+    },
+    {
+      "table_name": "TXN_STATS_TOTAL_10MINUTE",
+      "column_name": "AVG_TOTAL_LATENCY_SECONDS",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 6
+    },
+    {
+      "table_name": "TXN_STATS_TOTAL_10MINUTE",
+      "column_name": "AVG_COMMIT_LATENCY_SECONDS",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 7
+    },
+    {
+      "table_name": "TXN_STATS_TOTAL_10MINUTE",
+      "column_name": "AVG_BYTES",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 8
+    },
+    {
+      "table_name": "TXN_STATS_TOTAL_10MINUTE",
+      "column_name": "COMMIT_RETRY_COUNT",
+      "spanner_type": "INT64",
+      "ordinal_position": 9
+    },
+    {
+      "table_name": "TXN_STATS_TOTAL_10MINUTE",
+      "column_name": "OPERATIONS_BY_TABLE",
+      "spanner_type": "ARRAY\u003cSTRUCT\u003cTABLE_NAME STRING(MAX), INSERT_OR_UPDATE_COUNT INT64, INSERT_OR_UPDATE_BYTES INT64\u003e\u003e",
+      "ordinal_position": 10
+    },
+    {
+      "table_name": "TXN_STATS_TOTAL_10MINUTE",
+      "column_name": "TOTAL_LATENCY_DISTRIBUTION",
+      "spanner_type": "ARRAY\u003cSTRUCT\u003cCOUNT INT64, MEAN FLOAT64, SUM_OF_SQUARED_DEVIATION FLOAT64, NUM_FINITE_BUCKETS INT64, GROWTH_FACTOR FLOAT64, SCALE FLOAT64, BUCKET_COUNTS ARRAY\u003cINT64\u003e\u003e\u003e",
+      "ordinal_position": 11
+    },
+    {
+      "table_name": "TXN_STATS_TOTAL_10MINUTE",
+      "column_name": "ATTEMPT_COUNT",
+      "spanner_type": "INT64",
+      "ordinal_position": 12
+    },
+    {
+      "table_name": "TXN_STATS_TOTAL_10MINUTE",
+      "column_name": "SERIALIZABLE_PESSIMISTIC_TXN_COUNT",
+      "spanner_type": "INT64",
+      "ordinal_position": 13
+    },
+    {
+      "table_name": "TXN_STATS_TOTAL_10MINUTE",
+      "column_name": "REPEATABLE_READ_OPTIMISTIC_TXN_COUNT",
+      "spanner_type": "INT64",
+      "ordinal_position": 14
+    },
+    {
+      "table_name": "TXN_STATS_TOTAL_10MINUTE",
+      "column_name": "OPERATIONS_BY_TABLE_JSON_STRING",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 15
+    },
+    {
+      "table_name": "TXN_STATS_TOTAL_10MINUTE",
+      "column_name": "TOTAL_LATENCY_DISTRIBUTION_JSON_STRING",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 16
+    },
+    {
+      "table_name": "TXN_STATS_TOTAL_10MINUTE",
+      "column_name": "SERIALIZABLE_OPTIMISTIC_TXN_COUNT",
+      "spanner_type": "INT64",
+      "ordinal_position": 17
+    },
+    {
+      "table_name": "TXN_STATS_TOTAL_10MINUTE",
+      "column_name": "REPEATABLE_READ_PESSIMISTIC_TXN_COUNT",
+      "spanner_type": "INT64",
+      "ordinal_position": 18
+    },
+    {
+      "table_name": "TXN_STATS_TOTAL_HOUR",
+      "column_name": "INTERVAL_END",
+      "spanner_type": "TIMESTAMP",
+      "ordinal_position": 1
+    },
+    {
+      "table_name": "TXN_STATS_TOTAL_HOUR",
+      "column_name": "COMMIT_ATTEMPT_COUNT",
+      "spanner_type": "INT64",
+      "ordinal_position": 2
+    },
+    {
+      "table_name": "TXN_STATS_TOTAL_HOUR",
+      "column_name": "COMMIT_FAILED_PRECONDITION_COUNT",
+      "spanner_type": "INT64",
+      "ordinal_position": 3
+    },
+    {
+      "table_name": "TXN_STATS_TOTAL_HOUR",
+      "column_name": "COMMIT_ABORT_COUNT",
+      "spanner_type": "INT64",
+      "ordinal_position": 4
+    },
+    {
+      "table_name": "TXN_STATS_TOTAL_HOUR",
+      "column_name": "AVG_PARTICIPANTS",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 5
+    },
+    {
+      "table_name": "TXN_STATS_TOTAL_HOUR",
+      "column_name": "AVG_TOTAL_LATENCY_SECONDS",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 6
+    },
+    {
+      "table_name": "TXN_STATS_TOTAL_HOUR",
+      "column_name": "AVG_COMMIT_LATENCY_SECONDS",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 7
+    },
+    {
+      "table_name": "TXN_STATS_TOTAL_HOUR",
+      "column_name": "AVG_BYTES",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 8
+    },
+    {
+      "table_name": "TXN_STATS_TOTAL_HOUR",
+      "column_name": "COMMIT_RETRY_COUNT",
+      "spanner_type": "INT64",
+      "ordinal_position": 9
+    },
+    {
+      "table_name": "TXN_STATS_TOTAL_HOUR",
+      "column_name": "OPERATIONS_BY_TABLE",
+      "spanner_type": "ARRAY\u003cSTRUCT\u003cTABLE_NAME STRING(MAX), INSERT_OR_UPDATE_COUNT INT64, INSERT_OR_UPDATE_BYTES INT64\u003e\u003e",
+      "ordinal_position": 10
+    },
+    {
+      "table_name": "TXN_STATS_TOTAL_HOUR",
+      "column_name": "TOTAL_LATENCY_DISTRIBUTION",
+      "spanner_type": "ARRAY\u003cSTRUCT\u003cCOUNT INT64, MEAN FLOAT64, SUM_OF_SQUARED_DEVIATION FLOAT64, NUM_FINITE_BUCKETS INT64, GROWTH_FACTOR FLOAT64, SCALE FLOAT64, BUCKET_COUNTS ARRAY\u003cINT64\u003e\u003e\u003e",
+      "ordinal_position": 11
+    },
+    {
+      "table_name": "TXN_STATS_TOTAL_HOUR",
+      "column_name": "ATTEMPT_COUNT",
+      "spanner_type": "INT64",
+      "ordinal_position": 12
+    },
+    {
+      "table_name": "TXN_STATS_TOTAL_HOUR",
+      "column_name": "SERIALIZABLE_PESSIMISTIC_TXN_COUNT",
+      "spanner_type": "INT64",
+      "ordinal_position": 13
+    },
+    {
+      "table_name": "TXN_STATS_TOTAL_HOUR",
+      "column_name": "REPEATABLE_READ_OPTIMISTIC_TXN_COUNT",
+      "spanner_type": "INT64",
+      "ordinal_position": 14
+    },
+    {
+      "table_name": "TXN_STATS_TOTAL_HOUR",
+      "column_name": "OPERATIONS_BY_TABLE_JSON_STRING",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 15
+    },
+    {
+      "table_name": "TXN_STATS_TOTAL_HOUR",
+      "column_name": "TOTAL_LATENCY_DISTRIBUTION_JSON_STRING",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 16
+    },
+    {
+      "table_name": "TXN_STATS_TOTAL_HOUR",
+      "column_name": "SERIALIZABLE_OPTIMISTIC_TXN_COUNT",
+      "spanner_type": "INT64",
+      "ordinal_position": 17
+    },
+    {
+      "table_name": "TXN_STATS_TOTAL_HOUR",
+      "column_name": "REPEATABLE_READ_PESSIMISTIC_TXN_COUNT",
+      "spanner_type": "INT64",
+      "ordinal_position": 18
+    },
+    {
+      "table_name": "TXN_STATS_TOTAL_MINUTE",
+      "column_name": "INTERVAL_END",
+      "spanner_type": "TIMESTAMP",
+      "ordinal_position": 1
+    },
+    {
+      "table_name": "TXN_STATS_TOTAL_MINUTE",
+      "column_name": "COMMIT_ATTEMPT_COUNT",
+      "spanner_type": "INT64",
+      "ordinal_position": 2
+    },
+    {
+      "table_name": "TXN_STATS_TOTAL_MINUTE",
+      "column_name": "COMMIT_FAILED_PRECONDITION_COUNT",
+      "spanner_type": "INT64",
+      "ordinal_position": 3
+    },
+    {
+      "table_name": "TXN_STATS_TOTAL_MINUTE",
+      "column_name": "COMMIT_ABORT_COUNT",
+      "spanner_type": "INT64",
+      "ordinal_position": 4
+    },
+    {
+      "table_name": "TXN_STATS_TOTAL_MINUTE",
+      "column_name": "AVG_PARTICIPANTS",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 5
+    },
+    {
+      "table_name": "TXN_STATS_TOTAL_MINUTE",
+      "column_name": "AVG_TOTAL_LATENCY_SECONDS",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 6
+    },
+    {
+      "table_name": "TXN_STATS_TOTAL_MINUTE",
+      "column_name": "AVG_COMMIT_LATENCY_SECONDS",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 7
+    },
+    {
+      "table_name": "TXN_STATS_TOTAL_MINUTE",
+      "column_name": "AVG_BYTES",
+      "spanner_type": "FLOAT64",
+      "ordinal_position": 8
+    },
+    {
+      "table_name": "TXN_STATS_TOTAL_MINUTE",
+      "column_name": "COMMIT_RETRY_COUNT",
+      "spanner_type": "INT64",
+      "ordinal_position": 9
+    },
+    {
+      "table_name": "TXN_STATS_TOTAL_MINUTE",
+      "column_name": "OPERATIONS_BY_TABLE",
+      "spanner_type": "ARRAY\u003cSTRUCT\u003cTABLE_NAME STRING(MAX), INSERT_OR_UPDATE_COUNT INT64, INSERT_OR_UPDATE_BYTES INT64\u003e\u003e",
+      "ordinal_position": 10
+    },
+    {
+      "table_name": "TXN_STATS_TOTAL_MINUTE",
+      "column_name": "TOTAL_LATENCY_DISTRIBUTION",
+      "spanner_type": "ARRAY\u003cSTRUCT\u003cCOUNT INT64, MEAN FLOAT64, SUM_OF_SQUARED_DEVIATION FLOAT64, NUM_FINITE_BUCKETS INT64, GROWTH_FACTOR FLOAT64, SCALE FLOAT64, BUCKET_COUNTS ARRAY\u003cINT64\u003e\u003e\u003e",
+      "ordinal_position": 11
+    },
+    {
+      "table_name": "TXN_STATS_TOTAL_MINUTE",
+      "column_name": "ATTEMPT_COUNT",
+      "spanner_type": "INT64",
+      "ordinal_position": 12
+    },
+    {
+      "table_name": "TXN_STATS_TOTAL_MINUTE",
+      "column_name": "SERIALIZABLE_PESSIMISTIC_TXN_COUNT",
+      "spanner_type": "INT64",
+      "ordinal_position": 13
+    },
+    {
+      "table_name": "TXN_STATS_TOTAL_MINUTE",
+      "column_name": "REPEATABLE_READ_OPTIMISTIC_TXN_COUNT",
+      "spanner_type": "INT64",
+      "ordinal_position": 14
+    },
+    {
+      "table_name": "TXN_STATS_TOTAL_MINUTE",
+      "column_name": "OPERATIONS_BY_TABLE_JSON_STRING",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 15
+    },
+    {
+      "table_name": "TXN_STATS_TOTAL_MINUTE",
+      "column_name": "TOTAL_LATENCY_DISTRIBUTION_JSON_STRING",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 16
+    },
+    {
+      "table_name": "TXN_STATS_TOTAL_MINUTE",
+      "column_name": "SERIALIZABLE_OPTIMISTIC_TXN_COUNT",
+      "spanner_type": "INT64",
+      "ordinal_position": 17
+    },
+    {
+      "table_name": "TXN_STATS_TOTAL_MINUTE",
+      "column_name": "REPEATABLE_READ_PESSIMISTIC_TXN_COUNT",
+      "spanner_type": "INT64",
+      "ordinal_position": 18
+    },
+    {
+      "table_name": "USER_SPLIT_POINTS",
+      "column_name": "TABLE_NAME",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 1
+    },
+    {
+      "table_name": "USER_SPLIT_POINTS",
+      "column_name": "INDEX_NAME",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 2
+    },
+    {
+      "table_name": "USER_SPLIT_POINTS",
+      "column_name": "INITIATOR",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 3
+    },
+    {
+      "table_name": "USER_SPLIT_POINTS",
+      "column_name": "SPLIT_KEY",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 4
+    },
+    {
+      "table_name": "USER_SPLIT_POINTS",
+      "column_name": "EXPIRE_TIME",
+      "spanner_type": "TIMESTAMP",
+      "ordinal_position": 5
+    },
+    {
+      "table_name": "VECTOR_INDEX_METRICS_HISTORY",
+      "column_name": "VECTOR_INDEX_NAME",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 1
+    },
+    {
+      "table_name": "VECTOR_INDEX_METRICS_HISTORY",
+      "column_name": "START_TIME",
+      "spanner_type": "TIMESTAMP",
+      "ordinal_position": 2
+    },
+    {
+      "table_name": "VECTOR_INDEX_METRICS_HISTORY",
+      "column_name": "COMPLETION_TIME",
+      "spanner_type": "TIMESTAMP",
+      "ordinal_position": 3
+    },
+    {
+      "table_name": "VECTOR_INDEX_METRICS_HISTORY",
+      "column_name": "ROWS_SCANNED",
+      "spanner_type": "INT64",
+      "ordinal_position": 4
+    },
+    {
+      "table_name": "VECTOR_INDEX_METRICS_HISTORY",
+      "column_name": "CLUSTERS_SAMPLED",
+      "spanner_type": "INT64",
+      "ordinal_position": 5
+    },
+    {
+      "table_name": "VECTOR_INDEX_METRICS_HISTORY",
+      "column_name": "ZERO_SIZE_CLUSTERS_SAMPLED",
+      "spanner_type": "INT64",
+      "ordinal_position": 6
+    },
+    {
+      "table_name": "VECTOR_INDEX_METRICS_HISTORY",
+      "column_name": "MIN_CLUSTER_SIZE",
+      "spanner_type": "INT64",
+      "ordinal_position": 7
+    },
+    {
+      "table_name": "VECTOR_INDEX_METRICS_HISTORY",
+      "column_name": "MAX_CLUSTER_SIZE",
+      "spanner_type": "INT64",
+      "ordinal_position": 8
+    },
+    {
+      "table_name": "VECTOR_INDEX_METRICS_HISTORY",
+      "column_name": "CLUSTER_SIZE_PERCENTILES",
+      "spanner_type": "ARRAY\u003cSTRUCT\u003cpercentile INT64, value_at_percentile INT64\u003e\u003e",
+      "ordinal_position": 9
+    },
+    {
+      "table_name": "VECTOR_INDEX_METRICS_HISTORY",
+      "column_name": "CLUSTER_AVERAGE_DISTANCE_TO_CENTROID_PERCENTILES",
+      "spanner_type": "ARRAY\u003cSTRUCT\u003cpercentile INT64, value_at_percentile FLOAT64\u003e\u003e",
+      "ordinal_position": 10
+    },
+    {
+      "table_name": "VECTOR_INDEX_METRICS_HISTORY",
+      "column_name": "NUM_LEAVES",
+      "spanner_type": "INT64",
+      "ordinal_position": 11
+    },
+    {
+      "table_name": "VECTOR_INDEX_METRICS_HISTORY",
+      "column_name": "NUM_BRANCHES",
+      "spanner_type": "INT64",
+      "ordinal_position": 12
+    }
+  ]
+}

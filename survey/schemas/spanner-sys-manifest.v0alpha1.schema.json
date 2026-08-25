@@ -1,0 +1,476 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/apstndb/spanner-emulator-survey/schemas/spanner-sys-manifest.v0alpha1.schema.json",
+  "title": "SPANNER_SYS portable manifest",
+  "description": "A deterministic structural registry, required-target observations, and fail-closed projection policy for SPANNER_SYS.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "source",
+    "required_targets",
+    "captures",
+    "documentation",
+    "content_sha256",
+    "tables"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "v0alpha1"
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "repository",
+        "commit",
+        "path"
+      ],
+      "properties": {
+        "repository": {
+          "const": "github.com/apstndb/spanner-emulator-survey"
+        },
+        "commit": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "path": {
+          "const": "spannersys"
+        }
+      }
+    },
+    "required_targets": {
+      "type": "array",
+      "prefixItems": [
+        {
+          "const": "managed"
+        },
+        {
+          "const": "omni"
+        }
+      ],
+      "minItems": 2,
+      "maxItems": 2
+    },
+    "captures": {
+      "type": "array",
+      "prefixItems": [
+        {
+          "$ref": "#/$defs/managed_capture"
+        },
+        {
+          "$ref": "#/$defs/omni_capture"
+        }
+      ],
+      "minItems": 2,
+      "maxItems": 2
+    },
+    "documentation": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/documentation_evidence"
+      }
+    },
+    "content_sha256": {
+      "description": "SHA-256 of the canonical compact JSON encoding of required_targets and tables only.",
+      "$ref": "#/$defs/sha256"
+    },
+    "tables": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/table"
+      }
+    }
+  },
+  "$defs": {
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "capture": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "target",
+        "captured_at",
+        "query",
+        "content_sha256"
+      ],
+      "properties": {
+        "target": {
+          "enum": [
+            "managed",
+            "omni"
+          ]
+        },
+        "captured_at": {
+          "type": "string",
+          "format": "date"
+        },
+        "runtime_version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "query": {
+          "const": "SELECT TABLE_NAME, COLUMN_NAME, SPANNER_TYPE, ORDINAL_POSITION\nFROM INFORMATION_SCHEMA.COLUMNS\nWHERE TABLE_SCHEMA = 'SPANNER_SYS'\nORDER BY TABLE_NAME, ORDINAL_POSITION"
+        },
+        "content_sha256": {
+          "$ref": "#/$defs/sha256"
+        }
+      }
+    },
+    "managed_capture": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/capture"
+        },
+        {
+          "properties": {
+            "target": {
+              "const": "managed"
+            }
+          },
+          "not": {
+            "required": [
+              "runtime_version"
+            ]
+          }
+        }
+      ]
+    },
+    "omni_capture": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/capture"
+        },
+        {
+          "required": [
+            "runtime_version"
+          ],
+          "properties": {
+            "target": {
+              "const": "omni"
+            }
+          }
+        }
+      ]
+    },
+    "table": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "evidence_status",
+        "project",
+        "columns"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "evidence_status": {
+          "enum": [
+            "observed_both",
+            "absent_both"
+          ]
+        },
+        "project": {
+          "type": "boolean"
+        },
+        "columns": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/column"
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "evidence_status": {
+                "const": "observed_both"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "project": {
+                "const": true
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "project": {
+                "const": false
+              }
+            }
+          }
+        }
+      ]
+    },
+    "column": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "type",
+        "decoder_nullable",
+        "canonical_spanner_type",
+        "observations",
+        "evidence_status",
+        "project"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "type": {
+          "$ref": "#/$defs/type_descriptor"
+        },
+        "decoder_nullable": {
+          "type": "boolean"
+        },
+        "canonical_spanner_type": {
+          "type": "string",
+          "minLength": 1
+        },
+        "observations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/observation"
+          }
+        },
+        "evidence_status": {
+          "enum": [
+            "observed_both",
+            "absent_both"
+          ]
+        },
+        "project": {
+          "type": "boolean"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "evidence_status": {
+                "const": "observed_both"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "project": {
+                "const": true
+              },
+              "observations": {
+                "minItems": 2,
+                "maxItems": 2
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "project": {
+                "const": false
+              },
+              "observations": {
+                "maxItems": 0
+              }
+            }
+          }
+        }
+      ]
+    },
+    "observation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "target",
+        "spanner_type",
+        "ordinal_position"
+      ],
+      "properties": {
+        "target": {
+          "enum": [
+            "managed",
+            "omni"
+          ]
+        },
+        "spanner_type": {
+          "type": "string",
+          "minLength": 1
+        },
+        "ordinal_position": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    },
+    "type_descriptor": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/scalar_descriptor"
+        },
+        {
+          "$ref": "#/$defs/array_descriptor"
+        },
+        {
+          "$ref": "#/$defs/struct_descriptor"
+        }
+      ]
+    },
+    "scalar_descriptor": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "scalar"
+      ],
+      "properties": {
+        "kind": {
+          "const": "scalar"
+        },
+        "scalar": {
+          "enum": [
+            "BOOL",
+            "INT64",
+            "FLOAT64",
+            "STRING(MAX)",
+            "BYTES(MAX)",
+            "DATE",
+            "TIMESTAMP"
+          ]
+        }
+      }
+    },
+    "array_descriptor": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "element"
+      ],
+      "properties": {
+        "kind": {
+          "const": "array"
+        },
+        "element": {
+          "$ref": "#/$defs/non_array_descriptor"
+        },
+        "element_decoder_nullable": {
+          "type": "boolean"
+        }
+      }
+    },
+    "struct_descriptor": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "fields"
+      ],
+      "properties": {
+        "kind": {
+          "const": "struct"
+        },
+        "fields": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/struct_field"
+          }
+        }
+      }
+    },
+    "non_array_descriptor": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/scalar_descriptor"
+        },
+        {
+          "$ref": "#/$defs/struct_descriptor"
+        }
+      ]
+    },
+    "struct_field": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "type",
+        "decoder_nullable"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "type": {
+          "$ref": "#/$defs/type_descriptor"
+        },
+        "decoder_nullable": {
+          "type": "boolean"
+        }
+      }
+    },
+    "documentation_evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "table_name",
+        "column_name",
+        "url",
+        "document_updated_at",
+        "retrieved_at",
+        "documented_spanner_type",
+        "observed_spanner_type",
+        "conflicts_with_live"
+      ],
+      "properties": {
+        "table_name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "column_name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "url": {
+          "type": "string",
+          "format": "uri"
+        },
+        "document_updated_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "retrieved_at": {
+          "type": "string",
+          "format": "date"
+        },
+        "documented_name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "documented_spanner_type": {
+          "type": "string",
+          "minLength": 1
+        },
+        "observed_spanner_type": {
+          "type": "string",
+          "minLength": 1
+        },
+        "conflicts_with_live": {
+          "const": true
+        }
+      }
+    }
+  }
+}

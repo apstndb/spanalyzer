@@ -1,0 +1,115 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/apstndb/spanner-emulator-survey/schemas/spanner-sys-capture.v0alpha1.schema.json",
+  "title": "SPANNER_SYS target capture",
+  "description": "A redacted, complete INFORMATION_SCHEMA.COLUMNS observation for one required SPANNER_SYS target.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "target",
+    "captured_at",
+    "query",
+    "content_sha256",
+    "columns"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "v0alpha1"
+    },
+    "target": {
+      "enum": [
+        "managed",
+        "omni"
+      ]
+    },
+    "captured_at": {
+      "type": "string",
+      "format": "date"
+    },
+    "runtime_version": {
+      "type": "string",
+      "minLength": 1
+    },
+    "query": {
+      "const": "SELECT TABLE_NAME, COLUMN_NAME, SPANNER_TYPE, ORDINAL_POSITION\nFROM INFORMATION_SCHEMA.COLUMNS\nWHERE TABLE_SCHEMA = 'SPANNER_SYS'\nORDER BY TABLE_NAME, ORDINAL_POSITION"
+    },
+    "content_sha256": {
+      "description": "SHA-256 of the canonical compact JSON encoding of the columns array only.",
+      "$ref": "#/$defs/sha256"
+    },
+    "columns": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/column"
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "target": {
+            "const": "managed"
+          }
+        }
+      },
+      "then": {
+        "not": {
+          "required": [
+            "runtime_version"
+          ]
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "target": {
+            "const": "omni"
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "runtime_version"
+        ]
+      }
+    }
+  ],
+  "$defs": {
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "column": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "table_name",
+        "column_name",
+        "spanner_type",
+        "ordinal_position"
+      ],
+      "properties": {
+        "table_name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "column_name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "spanner_type": {
+          "type": "string",
+          "minLength": 1
+        },
+        "ordinal_position": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    }
+  }
+}

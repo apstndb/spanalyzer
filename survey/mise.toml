@@ -1,0 +1,46 @@
+[tasks.build]
+description = "Build all packages"
+run = "go build ./..."
+
+[tasks.test]
+description = "Run all tests (starts in-process emulator)"
+run = "go test ./..."
+
+[tasks.test-drift-emulator]
+description = "Run drift test against Cloud Spanner Emulator"
+run = "go test -v -run TestDrift_EmulatorTableMetas ./infoschem"
+
+[tasks.test-drift-omni]
+description = "Run drift test against Spanner Omni"
+run = "go test -v -run TestDrift_OmniTableMetas ./infoschem"
+
+[tasks.test-drift-real]
+description = "Required real-Spanner drift gate (fails unless TEST_REAL_SPANNER_DATABASE is configured)"
+env = { REQUIRE_REAL_SPANNER_DRIFT = "1" }
+run = "go test -v -run TestDrift_RealTableMetas ./infoschem"
+
+[tasks.test-uuid-real]
+description = "Managed-Spanner UUID metadata and reconstruction fixture"
+env = { REQUIRE_REAL_SPANNER_UUID = "1" }
+run = "go test -v -run TestUUID_RealSpanner ./infoschem"
+
+[tasks.test-canonical-real]
+description = "Read-only managed-Spanner canonical DDL aggregate comparison"
+env = { REQUIRE_REAL_SPANNER_CANONICAL = "1" }
+run = "go test -v -run TestCanonicalDDL_RealSpanner ./infoschem"
+
+[tasks.run-roundtrip]
+description = "Run the roundtrip end-to-end demo"
+run = "go run ./cmd/roundtrip"
+
+[tools]
+golangci-lint = "2.12.2"
+
+
+[tasks.lint]
+description = "Run golangci-lint"
+run = "golangci-lint run ./..."
+
+[tasks.test-all]
+description = "Run the default local gate (lint, build, and tests; real-Spanner drift is a separate required gate)"
+depends = ["lint", "build", "test"]
