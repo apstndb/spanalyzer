@@ -114,6 +114,17 @@ copied into spanalyzer. The internal consumer validator and catalog tests check
 the pinned `v0alpha1` contract, complete projection, recursive types, ordinals,
 and denied entries.
 
+The default repository gate validates the manifest without relying on a sibling
+checkout:
+
+```sh
+(cd tools && go run ./spannersys-survey-check)
+```
+
+An explicit `--survey-root` additionally requires a clean checkout at the
+pinned source commit, runs that commit's exporter, and compares the complete
+file byte-for-byte, including its trailing newline. No sibling path is inferred.
+
 ## Interpretation
 
 This catalog is suitable for type-checking queries against the pinned common

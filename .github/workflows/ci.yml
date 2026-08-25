@@ -58,6 +58,10 @@ jobs:
         working-directory: tools
         run: mise x -- go run ./infoschema-survey-check
 
+      - name: Verify SPANNER_SYS manifest
+        working-directory: tools
+        run: mise x -- go run ./spannersys-survey-check
+
       - name: Verify generated plan-vocabulary catalog
         working-directory: tools
         run: mise x -- go run ./planvocab-gen --check

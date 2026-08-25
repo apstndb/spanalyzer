@@ -276,6 +276,18 @@ evidence metadata. This is a pinned common surface, not a guarantee about every
 deployment or future rollout. The tables are useful for type-checking monitoring
 queries and statistics helpers such as `SPANNER_SYS.DISTRIBUTION_PERCENTILE`.
 
+Validate the manifest without a sibling checkout, or reproduce its exact bytes
+from the clean, exact pinned survey commit:
+
+```sh
+(cd tools && go run ./spannersys-survey-check)
+(cd tools && go run ./spannersys-survey-check \
+  --survey-root /path/to/spanner-emulator-survey)
+```
+
+The optional comparison refuses a dirty survey worktree and does not discover
+a sibling checkout implicitly.
+
 ```sh
 go run ./cmd/spanner-analyzer \
   --sql 'SELECT
