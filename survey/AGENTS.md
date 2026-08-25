@@ -55,6 +55,12 @@ GOWORK=off GOFLAGS=-mod=readonly go run ./cmd/infoschema-capture \
   --write --repo-root ..
 ```
 
+`--write` creates but never replaces the canonical capture path. An equivalent
+rerun preserves the first artifact only when its producer-source and invocation
+hashes also match. If either producer identity changes, the command fails
+closed and reports both identities; review or remove the retained file before
+recapturing rather than treating stale provenance as a successful rerun.
+
 `cmd/roundtrip` requires Docker (uses `spanemuboost` / testcontainers).
 
 ## Package structure

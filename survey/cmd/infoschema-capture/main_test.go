@@ -165,6 +165,20 @@ func TestWriteCaptureContainerKeepsFirstEquivalentObservation(t *testing.T) {
 	if !bytes.Equal(retained, firstData) {
 		t.Fatal("equivalent rerun replaced the first retained observation")
 	}
+
+	changedProducer := producer
+	changedProducer.SourceSHA256 = strings.Repeat("c", 64)
+	third, err := infoschem.BuildCapture(metadata, queryability, time.Date(2026, 8, 27, 1, 0, 0, 0, time.UTC), target("another-alias"), changedProducer)
+	if err != nil {
+		t.Fatal(err)
+	}
+	thirdData, err := infoschem.EncodeCapture(third)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if wrote, err := writeCapture(path, thirdData, third); err == nil || wrote || !strings.Contains(err.Error(), "producer identity") {
+		t.Fatalf("producer mismatch write = %t, %v; want producer identity error", wrote, err)
+	}
 }
 
 func TestWriteCaptureManagedKeepsFirstEquivalentObservationInSameSecond(t *testing.T) {
@@ -213,6 +227,20 @@ func TestWriteCaptureManagedKeepsFirstEquivalentObservationInSameSecond(t *testi
 	}
 	if !bytes.Equal(retained, firstData) {
 		t.Fatal("same-second equivalent rerun replaced the first retained observation")
+	}
+
+	changedProducer := producer
+	changedProducer.InvocationSHA256 = strings.Repeat("c", 64)
+	third, err := infoschem.BuildCapture(metadata, queryability, time.Date(2026, 8, 25, 1, 0, 0, 950, time.UTC), target, changedProducer)
+	if err != nil {
+		t.Fatal(err)
+	}
+	thirdData, err := infoschem.EncodeCapture(third)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if wrote, err := writeCapture(path, thirdData, third); err == nil || wrote || !strings.Contains(err.Error(), "producer identity") {
+		t.Fatalf("invocation mismatch write = %t, %v; want producer identity error", wrote, err)
 	}
 }
 

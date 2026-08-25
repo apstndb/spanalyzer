@@ -132,7 +132,7 @@ func run(args []string, stdout, stderr io.Writer) int {
 		return 1
 	}
 	if !wrote {
-		writeDiagnostic(stderr, "already retained %s\n", filepath.ToSlash(filepath.Join("survey", "infoschem", relative)))
+		writeDiagnostic(stderr, "already retained equivalent observation %s\n", filepath.ToSlash(filepath.Join("survey", "infoschem", relative)))
 		return 0
 	}
 	writeDiagnostic(stderr, "wrote %s\n", filepath.ToSlash(filepath.Join("survey", "infoschem", relative)))
@@ -364,6 +364,16 @@ func writeCapture(path string, data []byte, document *infoschem.CaptureDocument)
 		return false, fmt.Errorf("decode existing canonical capture: %w", err)
 	}
 	if sameCanonicalCaptureIdentity(previous, document) {
+		if previous.ProducerSourceSHA256 != document.ProducerSourceSHA256 || previous.InvocationSHA256 != document.InvocationSHA256 {
+			return false, fmt.Errorf(
+				"canonical capture path %q already exists with producer identity source=%s invocation=%s; current capture uses source=%s invocation=%s; review or remove the retained file before recapturing",
+				filepath.ToSlash(path),
+				previous.ProducerSourceSHA256,
+				previous.InvocationSHA256,
+				document.ProducerSourceSHA256,
+				document.InvocationSHA256,
+			)
+		}
 		// Preserve the first observation assigned to a canonical path. Container
 		// paths key on runtime identity and surface; managed paths key on the
 		// observation second and surface while the JSON retains the exact time.
