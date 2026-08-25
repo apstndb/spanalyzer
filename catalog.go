@@ -200,7 +200,9 @@ func buildSchemaCatalog(path, ddlSQL string, addBuiltins bool) (*Catalog, error)
 		if err := catalog.addInformationSchemaTables(); err != nil {
 			return nil, err
 		}
-		catalog.addSpannerSysTables()
+		if err := catalog.addSpannerSysTables(); err != nil {
+			return nil, err
+		}
 	}
 	return catalog, nil
 }

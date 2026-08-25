@@ -17,6 +17,9 @@ asset_families:
   - id: information-schema-catalog
     paths:
       - information_schema_manifest.json
+  - id: spanner-sys-catalog
+    paths:
+      - spanner_sys_manifest.json
   - id: executable-plan-evidence
     paths:
       - tools/spanner-query-plan-shape/*_cases.go
@@ -67,6 +70,15 @@ the pinned survey commit and export hash, raw observed types, rollout status,
 explicit frontend projection overrides, and documentation-only columns that
 are intentionally excluded from analysis. The corresponding JSON Schema is
 covered by the contract-schemas family.
+
+## SPANNER_SYS catalog
+
+The [`spanner_sys_manifest.json`](../../spanner_sys_manifest.json) file is the
+analyzer's pinned live-primary SPANNER_SYS projection. It combines a structural
+type registry with matching managed and Omni observations, explicit
+default-deny entries, capture provenance, and documentation-conflict sidecars.
+Its producer-owned JSON Schema remains in `spanner-emulator-survey`; spanalyzer
+validates the consumed prerelease contract without copying that schema.
 
 ## Executable plan evidence
 

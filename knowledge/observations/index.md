@@ -6,3 +6,6 @@
 - [Spanner set operations](spanner-set-operations.md) - SQL-standard
   multiplicity semantics and environment-scoped Spanner plan observations for
   `UNION`, `INTERSECT`, and `EXCEPT` with `ALL` and `DISTINCT`.
+- [SPANNER_SYS live-primary catalog](spanner-sys-live-primary-catalog.md) -
+  pinned managed and Omni metadata, fail-closed projection policy, and the
+  replacement of the handwritten analyzer registry.

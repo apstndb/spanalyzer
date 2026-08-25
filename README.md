@@ -268,8 +268,13 @@ go run ./cmd/spanner-analyzer \
 ```
 
 Cloud Spanner `SPANNER_SYS` introspection tables are also registered as built-in
-catalog tables. They are useful for type-checking monitoring queries and
-statistics helpers such as `SPANNER_SYS.DISTRIBUTION_PERCENTILE`.
+catalog tables. The built-in surface comes from the pinned, live-primary
+[`spanner_sys_manifest.json`](spanner_sys_manifest.json): only columns observed
+with identical type and ordinal on both the recorded managed and Omni targets
+are projected, while known-absent entries and documentation conflicts remain
+evidence metadata. This is a pinned common surface, not a guarantee about every
+deployment or future rollout. The tables are useful for type-checking monitoring
+queries and statistics helpers such as `SPANNER_SYS.DISTRIBUTION_PERCENTILE`.
 
 ```sh
 go run ./cmd/spanner-analyzer \
