@@ -13,6 +13,12 @@ func TestRunValidatesRepositoryManifest(t *testing.T) {
 	}
 }
 
+func TestRunValidatesRepositoryProducer(t *testing.T) {
+	if err := run([]string{"--repo-root", "../..", "--survey-root", "../../survey"}); err != nil {
+		t.Fatal(err)
+	}
+}
+
 func TestFindRepoRoot(t *testing.T) {
 	root, err := filepath.Abs("../..")
 	if err != nil {

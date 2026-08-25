@@ -85,8 +85,6 @@ func TestCompareSurveyCheckoutExactBytes(t *testing.T) {
 	manifestBytes := repositoryManifest(t)
 	surveyRoot := t.TempDir()
 	wantCalls := [][]string{
-		{"git", "status", "--porcelain=v1", "--untracked-files=all"},
-		{"git", "rev-parse", "HEAD"},
 		{"go", "run", "./cmd/spanner-sys-export", "--source-commit", repositorySourceCommit},
 	}
 	callIndex := 0
@@ -103,18 +101,13 @@ func TestCompareSurveyCheckoutExactBytes(t *testing.T) {
 		}
 		callIndex++
 		switch name {
-		case "git":
-			if arguments[0] == "status" {
-				return nil, nil
-			}
-			return []byte(repositorySourceCommit + "\n"), nil
 		case "go":
 			return manifestBytes, nil
 		default:
 			return nil, errors.New("unexpected command")
 		}
 	}
-	if err := compareSurveyCheckout(manifestBytes, repositorySourceCommit, surveyRoot, runner); err != nil {
+	if err := compareSurveyModule(manifestBytes, repositorySourceCommit, surveyRoot, runner); err != nil {
 		t.Fatal(err)
 	}
 	if callIndex != len(wantCalls) {
@@ -122,52 +115,19 @@ func TestCompareSurveyCheckoutExactBytes(t *testing.T) {
 	}
 }
 
-func TestCompareSurveyCheckoutRejectsDirtyWorktree(t *testing.T) {
-	manifestBytes := repositoryManifest(t)
-	runner := func(_ string, _ string, _ ...string) ([]byte, error) {
-		return []byte("?? scratch.txt\n"), nil
-	}
-	err := compareSurveyCheckout(manifestBytes, repositorySourceCommit, t.TempDir(), runner)
-	if err == nil || !strings.Contains(err.Error(), "is dirty") {
-		t.Fatalf("compareSurveyCheckout() error = %v, want dirty-worktree failure", err)
-	}
-}
-
-func TestCompareSurveyCheckoutRejectsWrongCommit(t *testing.T) {
-	manifestBytes := repositoryManifest(t)
-	call := 0
-	runner := func(_ string, _ string, _ ...string) ([]byte, error) {
-		call++
-		if call == 1 {
-			return nil, nil
-		}
-		return []byte("0123456789012345678901234567890123456789\n"), nil
-	}
-	err := compareSurveyCheckout(manifestBytes, repositorySourceCommit, t.TempDir(), runner)
-	if err == nil || !strings.Contains(err.Error(), "manifest pins") {
-		t.Fatalf("compareSurveyCheckout() error = %v, want pinned-commit failure", err)
-	}
-}
-
 func TestCompareSurveyCheckoutRejectsByteDifference(t *testing.T) {
 	manifestBytes := repositoryManifest(t)
-	call := 0
 	runner := func(_ string, name string, _ ...string) ([]byte, error) {
-		call++
-		switch call {
-		case 1:
-			return nil, nil
-		case 2:
-			return []byte(repositorySourceCommit + "\n"), nil
-		case 3:
+		switch name {
+		case "go":
 			return append(append([]byte(nil), manifestBytes...), ' '), nil
 		default:
 			return nil, errors.New("unexpected call")
 		}
 	}
-	err := compareSurveyCheckout(manifestBytes, repositorySourceCommit, t.TempDir(), runner)
+	err := compareSurveyModule(manifestBytes, repositorySourceCommit, t.TempDir(), runner)
 	if err == nil || !strings.Contains(err.Error(), "export differs") {
-		t.Fatalf("compareSurveyCheckout() error = %v, want exact-byte failure", err)
+		t.Fatalf("compareSurveyModule() error = %v, want exact-byte failure", err)
 	}
 }
 

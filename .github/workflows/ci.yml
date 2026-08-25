@@ -37,10 +37,15 @@ jobs:
           mise x -- go mod tidy
           (cd plancontract && mise x -- go mod tidy)
           (cd cmd/spanner-query-gen && mise x -- go mod tidy)
+          (cd survey && GOWORK=off mise x -- go mod tidy)
           (cd tools && mise x -- go mod tidy)
           # go.work.sum is intentionally untracked and ignored because
           # workspace download steps append entries to it on CI.
-          git diff --exit-code -- go.mod go.sum plancontract/go.mod plancontract/go.sum cmd/spanner-query-gen/go.mod cmd/spanner-query-gen/go.sum tools/go.mod tools/go.sum
+          git diff --exit-code -- go.mod go.sum plancontract/go.mod plancontract/go.sum cmd/spanner-query-gen/go.mod cmd/spanner-query-gen/go.sum survey/go.mod survey/go.sum tools/go.mod tools/go.sum
+
+      - name: Verify survey import provenance
+        working-directory: tools
+        run: mise x -- go run ./survey-import-check
 
       - name: Verify OKF v0.2 conformance
         working-directory: tools
@@ -95,6 +100,14 @@ jobs:
       - name: Test tools module
         working-directory: tools
         run: mise x -- go test -race -shuffle=on ./...
+
+      - name: Vet survey module independently
+        working-directory: survey
+        run: GOWORK=off mise x -- go vet ./...
+
+      - name: Test survey module independently
+        working-directory: survey
+        run: GOWORK=off mise x -- go test -race -shuffle=on ./...
 
   integration-test:
     name: Integration Test
@@ -152,6 +165,10 @@ jobs:
         working-directory: tools
         run: mise x -- golangci-lint run --timeout=5m
 
+      - name: Run golangci-lint on survey module independently
+        working-directory: survey
+        run: GOWORK=off mise x -- golangci-lint run --timeout=5m
+
   govulncheck:
     name: govulncheck
     runs-on: ubuntu-latest
@@ -180,3 +197,7 @@ jobs:
       - name: Run govulncheck on tools module
         working-directory: tools
         run: mise x -- govulncheck ./...
+
+      - name: Run govulncheck on survey module independently
+        working-directory: survey
+        run: GOWORK=off mise x -- govulncheck ./...

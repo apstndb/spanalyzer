@@ -1,6 +1,5 @@
 // Command infoschema-survey-check validates the committed INFORMATION_SCHEMA
-// manifest and optionally compares it with a pinned spanner-emulator-survey
-// checkout.
+// manifest and compares it with the retained in-repository survey producer.
 package main
 
 import (
@@ -15,7 +14,6 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
-	"strings"
 )
 
 const (
@@ -26,7 +24,7 @@ import (
 	"encoding/json"
 	"os"
 
-	"github.com/apstndb/spanner-emulator-survey/infoschem"
+	"github.com/apstndb/spanalyzer/survey/infoschem"
 )
 
 func main() {
@@ -96,7 +94,7 @@ func run(args []string) error {
 	fs := flag.NewFlagSet("infoschema-survey-check", flag.ContinueOnError)
 	repoRoot := fs.String("repo-root", "", "spanalyzer repository root (auto-detected when omitted)")
 	manifestPath := fs.String("manifest", defaultManifestPath, "manifest path relative to the spanalyzer repository root")
-	surveyRoot := fs.String("survey-root", "", "optional spanner-emulator-survey checkout to compare")
+	surveyRoot := fs.String("survey-root", "", "survey module root (defaults to the in-repository survey directory)")
 	if err := fs.Parse(args); err != nil {
 		return err
 	}
@@ -112,10 +110,11 @@ func run(args []string) error {
 	if err := validateManifest(doc); err != nil {
 		return err
 	}
-	if *surveyRoot == "" {
-		return nil
+	producerRoot := *surveyRoot
+	if producerRoot == "" {
+		producerRoot = filepath.Join(root, "survey")
 	}
-	return compareSurveyCheckout(doc, *surveyRoot)
+	return compareSurveyModule(doc, producerRoot)
 }
 
 func resolveRepoRoot(explicit string) (string, error) {
@@ -192,7 +191,7 @@ func validateManifest(doc *manifest) error {
 	return nil
 }
 
-func compareSurveyCheckout(doc *manifest, surveyRoot string) error {
+func compareSurveyModule(doc *manifest, surveyRoot string) error {
 	root, err := filepath.Abs(surveyRoot)
 	if err != nil {
 		return fmt.Errorf("resolve survey root: %w", err)
@@ -202,17 +201,6 @@ func compareSurveyCheckout(doc *manifest, surveyRoot string) error {
 			err = errors.New("not a directory")
 		}
 		return fmt.Errorf("invalid --survey-root %q: %w", root, err)
-	}
-
-	commitCommand := exec.Command("git", "rev-parse", "HEAD")
-	commitCommand.Dir = root
-	commitOutput, err := commitCommand.Output()
-	if err != nil {
-		return fmt.Errorf("resolve survey commit in %q: %w", root, err)
-	}
-	commit := strings.TrimSpace(string(commitOutput))
-	if commit != doc.Source.Commit {
-		return fmt.Errorf("survey checkout commit = %q, manifest pins %q", commit, doc.Source.Commit)
 	}
 
 	temporary, err := os.CreateTemp("", "spanalyzer-infoschema-survey-export-*.go")
@@ -237,6 +225,7 @@ func compareSurveyCheckout(doc *manifest, surveyRoot string) error {
 
 	exportCommand := exec.Command("go", "run", temporaryPath)
 	exportCommand.Dir = root
+	exportCommand.Env = append(os.Environ(), "GOWORK=off")
 	exportOutput, err := exportCommand.Output()
 	if err != nil {
 		return fmt.Errorf("run survey exporter in %q: %w", root, err)

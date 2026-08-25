@@ -1,6 +1,6 @@
 // Command spannersys-survey-check validates the committed SPANNER_SYS
-// manifest and optionally compares its exact bytes with the exporter at the
-// pinned spanner-emulator-survey commit.
+// manifest and compares its exact bytes with the retained in-repository survey
+// exporter.
 package main
 
 import (
@@ -40,7 +40,7 @@ func runWithRunner(arguments []string, runner commandRunner) error {
 	flags := flag.NewFlagSet("spannersys-survey-check", flag.ContinueOnError)
 	repoRoot := flags.String("repo-root", "", "spanalyzer repository root (auto-detected when omitted)")
 	manifestPath := flags.String("manifest", defaultManifestPath, "manifest path relative to the spanalyzer repository root")
-	surveyRoot := flags.String("survey-root", "", "optional clean spanner-emulator-survey checkout to compare")
+	surveyRoot := flags.String("survey-root", "", "survey module root (defaults to the in-repository survey directory)")
 	if err := flags.Parse(arguments); err != nil {
 		return err
 	}
@@ -56,10 +56,11 @@ func runWithRunner(arguments []string, runner commandRunner) error {
 	if err != nil {
 		return err
 	}
-	if *surveyRoot == "" {
-		return nil
+	producerRoot := *surveyRoot
+	if producerRoot == "" {
+		producerRoot = filepath.Join(root, "survey")
 	}
-	return compareSurveyCheckout(manifest.Bytes, manifest.SourceCommit, *surveyRoot, runner)
+	return compareSurveyModule(manifest.Bytes, manifest.SourceCommit, producerRoot, runner)
 }
 
 func resolveRepoRoot(explicit string) (string, error) {
@@ -136,7 +137,7 @@ func readAndValidateManifest(root, path string, runner commandRunner) (*validate
 	return &validatedManifest{Bytes: data, SourceCommit: commit}, nil
 }
 
-func compareSurveyCheckout(
+func compareSurveyModule(
 	manifestBytes []byte,
 	sourceCommit string,
 	surveyRoot string,
@@ -153,23 +154,6 @@ func compareSurveyCheckout(
 		return fmt.Errorf("invalid --survey-root %q: %w", root, err)
 	}
 
-	status, err := runner(root, "git", "status", "--porcelain=v1", "--untracked-files=all")
-	if err != nil {
-		return fmt.Errorf("inspect survey worktree status in %q: %w", root, err)
-	}
-	if len(status) != 0 {
-		return fmt.Errorf("survey checkout %q is dirty; exact producer comparison requires a clean worktree: %s", root, strings.TrimSpace(string(status)))
-	}
-
-	commitOutput, err := runner(root, "git", "rev-parse", "HEAD")
-	if err != nil {
-		return fmt.Errorf("resolve survey commit in %q: %w", root, err)
-	}
-	commit := strings.TrimSpace(string(commitOutput))
-	if commit != sourceCommit {
-		return fmt.Errorf("survey checkout commit = %q, manifest pins %q", commit, sourceCommit)
-	}
-
 	exported, err := runner(
 		root,
 		"go",
@@ -179,7 +163,7 @@ func compareSurveyCheckout(
 		sourceCommit,
 	)
 	if err != nil {
-		return fmt.Errorf("export SPANNER_SYS manifest from survey checkout %q: %w", root, err)
+		return fmt.Errorf("export SPANNER_SYS manifest from survey module %q: %w", root, err)
 	}
 	if !bytes.Equal(exported, manifestBytes) {
 		return fmt.Errorf(
@@ -196,6 +180,7 @@ func compareSurveyCheckout(
 func runCommand(directory, name string, arguments ...string) ([]byte, error) {
 	command := exec.Command(name, arguments...)
 	command.Dir = directory
+	command.Env = append(os.Environ(), "GOWORK=off")
 	output, err := command.Output()
 	if err == nil {
 		return output, nil
