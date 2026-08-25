@@ -18,6 +18,10 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v6.0.2
+        with:
+          # survey-import-check verifies the immutable initial import commit,
+          # so this job needs repository history rather than a shallow HEAD.
+          fetch-depth: 0
 
       - name: Setup mise
         uses: jdx/mise-action@v4.0.1
