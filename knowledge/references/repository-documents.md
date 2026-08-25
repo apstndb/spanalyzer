@@ -48,6 +48,26 @@ the groups below relate when their contents appear to disagree.
 - [spanner-query-plan-shape README](../../tools/spanner-query-plan-shape/README.md)
   - developer probe usage, case families, and runtime requirements.
 
+## Cross-environment survey producer
+
+- [Survey AGENTS](../../survey/AGENTS.md) - producer purpose, package map,
+  validation commands, and reconstruction boundaries.
+- [Survey CLAUDE](../../survey/CLAUDE.md) - agent-guide indirection retained
+  for tool compatibility.
+- [Survey TODO](../../survey/TODO.md) - open and completed producer work.
+- [Survey handoff](../../survey/HANDOFF.md) - dated environment findings and
+  maintenance handoff.
+- [Survey feedback](../../survey/FEEDBACK.md) - historical review record; not
+  the current behavior contract.
+- [Unsupported DDL](../../survey/UNSUPPORTED_DDL.md) - explicit memefish,
+  INFORMATION_SCHEMA, and reconstruction boundaries.
+- [2026-03-09 schema diff](../../survey/docs/spanner-schema-diff-report-20260309.md)
+  - historical Emulator/managed metadata comparison.
+- [2026-04-29 schema diff](../../survey/docs/spanner-schema-diff-report-20260429.md)
+  - historical Emulator/managed metadata comparison.
+- [2026-05-09 schema diff](../../survey/docs/spanner-schema-diff-report-20260509.md)
+  - historical Emulator/managed metadata comparison.
+
 ## Legacy research indexes and history
 
 - [Research index](../../research/README.md) - role and conventions for legacy

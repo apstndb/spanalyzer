@@ -20,6 +20,13 @@ asset_families:
   - id: spanner-sys-catalog
     paths:
       - spanner_sys_manifest.json
+  - id: survey-provenance-and-contracts
+    paths:
+      - survey/import-provenance.json
+      - survey/schemas/*.schema.json
+  - id: survey-observational-evidence
+    paths:
+      - survey/spannersys/evidence/*.json
   - id: executable-plan-evidence
     paths:
       - tools/spanner-query-plan-shape/*_cases.go
@@ -77,8 +84,18 @@ The [`spanner_sys_manifest.json`](../../spanner_sys_manifest.json) file is the
 analyzer's pinned live-primary SPANNER_SYS projection. It combines a structural
 type registry with matching managed and Omni observations, explicit
 default-deny entries, capture provenance, and documentation-conflict sidecars.
-Its producer-owned JSON Schema remains in `spanner-emulator-survey`; spanalyzer
-validates the consumed prerelease contract without copying that schema.
+Its producer-owned JSON Schema and redacted managed/Omni captures are retained
+in the nested [`survey`](../../survey/) module. Spanalyzer validates the
+consumed prerelease contract without creating a second schema authority.
+
+## Survey provenance and evidence
+
+The strict [`import-provenance.json`](../../survey/import-provenance.json)
+records the exact unpublished source commit/tree and initial spanalyzer import
+commit/subtree, plus exclusions and dispositions. The survey schemas define
+the producer's prerelease capture and manifest contracts. The capture files
+retain only redacted SPANNER_SYS names, raw types, and ordinals for their
+identified managed and Omni targets.
 
 ## Executable plan evidence
 

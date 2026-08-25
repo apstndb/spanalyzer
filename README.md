@@ -17,7 +17,7 @@ are not a stable public contract.
 
 This repository was previously named `go-googlesql-spanner-poc`.
 
-The repository hosts four Go modules, split along dependency weight:
+The repository hosts five Go modules, split along dependency weight:
 
 - `github.com/apstndb/spanalyzer` — the analyzer framework: DDL catalog,
   GoogleSQL analysis, type conversion, code generation planning, and the
@@ -36,6 +36,10 @@ The repository hosts four Go modules, split along dependency weight:
   — the query code generation CLI, including the Omni-backed `plan-report`
   workflow and integration tests. This is where spanemuboost,
   testcontainers, and the Docker client enter the dependency graph.
+- [`github.com/apstndb/spanalyzer/survey`](survey) — retained schema discovery,
+  DDL round-trip, and managed/Omni/Emulator evidence producers. It remains an
+  independently testable nested module; its unpublished legacy Git history is
+  represented by a checked import-provenance record rather than published.
 - [`github.com/apstndb/spanalyzer/tools`](tools) — developer-only Spanner
   Omni probes (`spanner-query-plan-shape`, `optparam-plan-probe`), with the
   same container-tooling dependencies.
@@ -252,13 +256,11 @@ materialized. The built-in surface comes from the pinned, live-primary
 observed and rolling columns are projected, while documented columns observed
 absent from the pinned survey remain evidence metadata only.
 
-Validate the manifest itself, and optionally compare it with the exact pinned
-survey checkout, from the tools module:
+Validate the manifest and reproduce its survey export from the retained
+in-repository producer module:
 
 ```sh
 (cd tools && go run ./infoschema-survey-check)
-(cd tools && go run ./infoschema-survey-check \
-  --survey-root /path/to/spanner-emulator-survey)
 ```
 
 ```sh
@@ -276,17 +278,19 @@ evidence metadata. This is a pinned common surface, not a guarantee about every
 deployment or future rollout. The tables are useful for type-checking monitoring
 queries and statistics helpers such as `SPANNER_SYS.DISTRIBUTION_PERCENTILE`.
 
-Validate the manifest without a sibling checkout, or reproduce its exact bytes
-from the clean, exact pinned survey commit:
+Validate the manifest and reproduce its exact bytes from the retained
+in-repository survey exporter:
 
 ```sh
 (cd tools && go run ./spannersys-survey-check)
-(cd tools && go run ./spannersys-survey-check \
-  --survey-root /path/to/spanner-emulator-survey)
 ```
 
-The optional comparison refuses a dirty survey worktree and does not discover
-a sibling checkout implicitly.
+The immutable mapping from the unpublished legacy source snapshot to the
+initial imported subtree is checked separately:
+
+```sh
+(cd tools && go run ./survey-import-check)
+```
 
 ```sh
 go run ./cmd/spanner-analyzer \

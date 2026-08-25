@@ -27,8 +27,8 @@ code lives in the root package. `spanner-query-gen`-specific config, planning,
 and DTO rendering code lives in `internal/querygen`; keep generator-only
 dependencies out of the root package.
 
-The repository is a four-module Go workspace (see `go.work`): the root
-analyzer module, `plancontract`, `cmd/spanner-query-gen`, and `tools`.
+The repository is a five-module Go workspace (see `go.work`): the root
+analyzer module, `plancontract`, `cmd/spanner-query-gen`, `survey`, and `tools`.
 `go test ./...` covers only the current module; run tests per module
 directory. Dependency-weight rules to preserve:
 
@@ -37,7 +37,9 @@ directory. Dependency-weight rules to preserve:
   spanemuboost, or container tooling there.
 - The root module must not depend on spanemuboost, testcontainers, the
   Docker client, or spannerplan; those belong in `cmd/spanner-query-gen`
-  and `tools`.
+  and `tools`. The `survey` module may use spanemuboost for environment probes
+  and schema reconstruction tests but must remain independently testable with
+  `GOWORK=off`.
 
 ## Essential Commands
 
@@ -47,6 +49,7 @@ Use the Go toolchain declared in `go.mod`.
 go test ./...
 (cd plancontract && go test ./...)
 (cd cmd/spanner-query-gen && go test ./...)
+(cd survey && GOWORK=off go test ./...)
 (cd tools && go test ./...)
 go build ./...
 go run ./cmd/spanner-analyzer --ddl testdata/order-proto-schema.sql \

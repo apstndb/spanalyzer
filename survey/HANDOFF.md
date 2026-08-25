@@ -1,5 +1,22 @@
 # Handoff — spanner-emulator-survey
 
+## Retained in spanalyzer (2026-08-25)
+
+The final tracked source tree is retained as the independently testable
+`github.com/apstndb/spanalyzer/survey` nested module. The unpublished legacy
+repository's 27-commit history is intentionally not published. The strict
+[`import-provenance.json`](import-provenance.json) maps legacy commit
+`91908d001349f844aac070cc6518119c0e3c36c0` and tree
+`34d63cf89aaf885cbfd8069e91c4ead707b048c8` to the exact initial spanalyzer
+import commit and subtree.
+
+Ignored agent/runtime directories, the local managed-database locator, and the
+untracked memefish feedback scratch file were excluded. The scratch file's two
+actionable upstream issues are closed. Once the integration commits are present
+on remote `main`, the former local checkout is not required for builds, tests,
+manifest regeneration, provenance checks, or retained knowledge and can be
+deleted separately with explicit authority.
+
 Last reviewed: 2026-08-25 / all repository-local release-note and live-parity
 follow-ups are implemented and committed. The latest work covers named-schema
 DDL, omitted and zero-column primary keys, rolling metadata columns, metadata

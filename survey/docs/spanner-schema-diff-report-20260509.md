@@ -103,20 +103,20 @@ emulator 向けクエリでも `FILTER` を取得するよう修正した。
 2026-05-09 時点で、次の issue は **まだ open のまま** だが、少なくとも
 v1.5.53 の実測では再現しなかった。
 
-- [#338](https://github.com/GoogleCloudPlatform/cloud-spanner-emulator/issues/338)  
+- [#338](https://github.com/GoogleCloudPlatform/cloud-spanner-emulator/issues/338)
   `INFORMATION_SCHEMA.COLUMNS.ON_UPDATE_EXPRESSION` 欠落
-- [#330](https://github.com/GoogleCloudPlatform/cloud-spanner-emulator/issues/330)  
+- [#330](https://github.com/GoogleCloudPlatform/cloud-spanner-emulator/issues/330)
   `INFORMATION_SCHEMA.INDEXES.FILTER` 欠落
 
 一方で、次の gap は引き続き残っている。
 
-- [#340](https://github.com/GoogleCloudPlatform/cloud-spanner-emulator/issues/340)  
+- [#340](https://github.com/GoogleCloudPlatform/cloud-spanner-emulator/issues/340)
   `INFORMATION_SCHEMA.SCHEMATA.PROTO_BUNDLE`
-- [#339](https://github.com/GoogleCloudPlatform/cloud-spanner-emulator/issues/339) / [#290](https://github.com/GoogleCloudPlatform/cloud-spanner-emulator/issues/290)  
+- [#339](https://github.com/GoogleCloudPlatform/cloud-spanner-emulator/issues/339) / [#290](https://github.com/GoogleCloudPlatform/cloud-spanner-emulator/issues/290)
   `TABLE_SYNONYMS`
-- [#261](https://github.com/GoogleCloudPlatform/cloud-spanner-emulator/issues/261)  
+- [#261](https://github.com/GoogleCloudPlatform/cloud-spanner-emulator/issues/261)
   ルーティン本体 / `INFORMATION_SCHEMA.ROUTINES` 系
-- [#205](https://github.com/GoogleCloudPlatform/cloud-spanner-emulator/issues/205)  
+- [#205](https://github.com/GoogleCloudPlatform/cloud-spanner-emulator/issues/205)
   `PLACEMENTS` / `PLACEMENT_OPTIONS`
 
 今回確認した範囲では、依然として open issue が見当たらなかったのは次。

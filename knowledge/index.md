@@ -20,7 +20,8 @@ but must not maintain a second copy of its findings.
 ## Browse by purpose
 
 - [Concepts](concepts/index.md) - cross-cutting explanations of the repository's
-  architecture, documentation authority, query generation, and plan tooling.
+  architecture, evidence lifecycle, documentation authority, query generation,
+  and plan tooling.
 - [Observations](observations/index.md) - curated, non-normative findings tied
   to identified sources and an explicit verification scope.
 - [Research](research/index.md) - canonical authoring guidance for new

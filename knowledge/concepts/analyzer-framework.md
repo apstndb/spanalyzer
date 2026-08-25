@@ -1,7 +1,7 @@
 ---
 type: Architecture
 title: spanalyzer Analyzer Framework
-description: The four-module architecture and dependency boundaries of spanalyzer.
+description: The five-module architecture and dependency boundaries of spanalyzer.
 resource: ../../README.md
 tags: [spanalyzer, architecture, go, spanner]
 status: draft
@@ -19,9 +19,10 @@ sources:
 
 # spanalyzer Analyzer Framework
 
-spanalyzer separates query analysis, plan normalization, query generation, and
-developer probes into four Go modules so container and generator dependencies
-do not leak into the reusable analyzer or plan-contract libraries.[^go-workspace]
+spanalyzer separates query analysis, plan normalization, query generation,
+cross-environment schema surveys, and developer probes into five Go modules so
+container and generator dependencies do not leak into the reusable analyzer or
+plan-contract libraries.[^go-workspace]
 
 ## Module boundaries
 
@@ -32,6 +33,9 @@ do not leak into the reusable analyzer or plan-contract libraries.[^go-workspace
   or container tooling.
 - [`cmd/spanner-query-gen`](../../cmd/spanner-query-gen/README.md) owns query
   generation, plan-report orchestration, and optional Spanner Omni integration.
+- [`survey`](../../survey/) retains schema discovery, DDL reconstruction, and
+  managed, Omni, and Emulator evidence producers. It remains independently
+  testable with `GOWORK=off`.
 - [`tools`](../../tools/spanner-query-plan-shape/README.md) contains
   developer-only probes and may depend on container tooling.
 
@@ -45,5 +49,6 @@ duplicate them.
 - [Query generation](query-generation.md)
 - [Query-plan inspection](query-plan-inspection.md)
 - [Documentation authority](documentation-authority.md)
+- [Cross-environment evidence lifecycle](evidence-lifecycle.md)
 
-[^go-workspace]: The committed Go workspace defines the four local modules.
+[^go-workspace]: The committed Go workspace defines the five local modules.

@@ -245,22 +245,22 @@ conformance test の unsupported list をそのまま鵜呑みにせず、実測
 
 今回の差分・クロスチェックに関連する open issue として確認できたもの:
 
-- [#338](https://github.com/GoogleCloudPlatform/cloud-spanner-emulator/issues/338)  
+- [#338](https://github.com/GoogleCloudPlatform/cloud-spanner-emulator/issues/338)
   `INFORMATION_SCHEMA.COLUMNS.ON_UPDATE_EXPRESSION` が emulator に存在しない。
-- [#330](https://github.com/GoogleCloudPlatform/cloud-spanner-emulator/issues/330)  
+- [#330](https://github.com/GoogleCloudPlatform/cloud-spanner-emulator/issues/330)
   `INFORMATION_SCHEMA.INDEXES.FILTER` が emulator に存在しない。
-- [#339](https://github.com/GoogleCloudPlatform/cloud-spanner-emulator/issues/339)  
+- [#339](https://github.com/GoogleCloudPlatform/cloud-spanner-emulator/issues/339)
   `INFORMATION_SCHEMA.TABLE_SYNONYMS` 自体が emulator に存在しない。
-- [#290](https://github.com/GoogleCloudPlatform/cloud-spanner-emulator/issues/290)  
+- [#290](https://github.com/GoogleCloudPlatform/cloud-spanner-emulator/issues/290)
   table synonym は実装されているが、emulator の information schema に表示されない。
-- [#261](https://github.com/GoogleCloudPlatform/cloud-spanner-emulator/issues/261)  
+- [#261](https://github.com/GoogleCloudPlatform/cloud-spanner-emulator/issues/261)
   UDF サポート issue。コメントでは 2025-09 時点で「2026年初頭 ETA」と案内され、
   2026-02 には emulator v1.5.48 で UDF 実行自体は動く報告がある一方、
   2026-04 の follow-up で `ROUTINES` / `ROUTINE_OPTIONS` / `PARAMETERS` /
   `ROUTINE_PRIVILEGES` など `INFORMATION_SCHEMA` 側の不足が指摘されている。
-- [#205](https://github.com/GoogleCloudPlatform/cloud-spanner-emulator/issues/205)  
+- [#205](https://github.com/GoogleCloudPlatform/cloud-spanner-emulator/issues/205)
   geo-partitioning 未対応。`CREATE PLACEMENT` / `PLACEMENT KEY` の未対応と整合する。
-- [#340](https://github.com/GoogleCloudPlatform/cloud-spanner-emulator/issues/340)  
+- [#340](https://github.com/GoogleCloudPlatform/cloud-spanner-emulator/issues/340)
   `INFORMATION_SCHEMA.SCHEMATA.PROTO_BUNDLE` が emulator に存在しない。
 
 一方で、今回確認した範囲では **open issue が見当たらなかった** 項目もある:
