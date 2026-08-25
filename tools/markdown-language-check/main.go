@@ -93,12 +93,13 @@ func checkMarkdownFiles(root string, paths []string) ([]violation, error) {
 				violations = append(violations, violation{path: name, line: lineNumber})
 			}
 		}
-		if err := scanner.Err(); err != nil {
-			file.Close()
-			return nil, fmt.Errorf("scan %s: %w", name, err)
+		scanErr := scanner.Err()
+		closeErr := file.Close()
+		if scanErr != nil {
+			return nil, fmt.Errorf("scan %s: %w", name, scanErr)
 		}
-		if err := file.Close(); err != nil {
-			return nil, fmt.Errorf("close %s: %w", name, err)
+		if closeErr != nil {
+			return nil, fmt.Errorf("close %s: %w", name, closeErr)
 		}
 	}
 	return violations, nil
