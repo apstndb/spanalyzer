@@ -59,6 +59,10 @@ jobs:
         working-directory: tools
         run: mise x -- go run ./okf-check --repo-root .. --gate quality
 
+      - name: Verify Markdown language policy
+        working-directory: tools
+        run: mise x -- go run ./markdown-language-check --repo-root ..
+
       - name: Verify knowledge-bearing asset inventory
         working-directory: tools
         run: mise x -- go run ./okf-check --repo-root .. --gate assets

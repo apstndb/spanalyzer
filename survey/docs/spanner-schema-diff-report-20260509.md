@@ -1,37 +1,44 @@
-# Spanner エミュレータ v1.5.53 vs 実機 INFORMATION_SCHEMA / SPANNER_SYS 差分調査レポート
+# Spanner Emulator v1.5.53 versus managed Spanner INFORMATION_SCHEMA and SPANNER_SYS
 
-**調査日**: 2026-05-09
-**実機**: `gcpug-public-spanner / merpay-sponsored-instance / apstndb-sampledb3`
-**エミュレータ**: `spanner-mycli --embedded-emulator --emulator-image=gcr.io/cloud-spanner-emulator/emulator:1.5.53`
-**ドキュメント**: https://cloud.google.com/spanner/docs/information-schema
+**Observation date**: 2026-05-09
+
+**Managed target**: `gcpug-public-spanner / merpay-sponsored-instance / apstndb-sampledb3`
+
+**Emulator**: `spanner-mycli --embedded-emulator --emulator-image=gcr.io/cloud-spanner-emulator/emulator:1.5.53`
+
+**Documentation**: https://cloud.google.com/spanner/docs/information-schema
+
+This is a dated observation, not a current compatibility claim.
 
 ---
 
-## サマリ
+## Summary
 
-|  | エミュレータ v1.5.53 | 実機 |
+|  | Emulator v1.5.53 | Managed Spanner |
 |---|---|---|
-| **INFORMATION_SCHEMA テーブル数** | 28 | 47 |
-| **INFORMATION_SCHEMA カラム数** | 195 | 300 |
-| **SPANNER_SYS テーブル数** | 0 (※) | 49 |
-| **SPANNER_SYS カラム数** | 0 (※) | 523 |
+| **INFORMATION_SCHEMA tables** | 28 | 47 |
+| **INFORMATION_SCHEMA columns** | 195 | 300 |
+| **SPANNER_SYS tables** | 0 (*) | 49 |
+| **SPANNER_SYS columns** | 0 (*) | 523 |
 
-※ エミュレータは `SPANNER_SYS.SUPPORTED_OPTIMIZER_VERSIONS` を直接クエリ可能だが、
-`INFORMATION_SCHEMA.COLUMNS` には登録されていない。
+(*) The Emulator accepts direct queries against
+`SPANNER_SYS.SUPPORTED_OPTIMIZER_VERSIONS`, but does not advertise that table
+through `INFORMATION_SCHEMA.COLUMNS`.
 
-v1.5.52 からの主な変化:
+The principal changes since v1.5.52 were:
 
-- `INFORMATION_SCHEMA.COLUMNS.ON_UPDATE_EXPRESSION` が **追加された**
-- `INFORMATION_SCHEMA.INDEXES.FILTER` が **追加された**
-- その結果、共通テーブルの実機差分は **5 カラム → 3 カラム** に減少した
+- `INFORMATION_SCHEMA.COLUMNS.ON_UPDATE_EXPRESSION` was added.
+- `INFORMATION_SCHEMA.INDEXES.FILTER` was added.
+- Consequently, the common-table difference from managed Spanner decreased
+  from five columns to three.
 
 ---
 
-## 1. INFORMATION_SCHEMA: 現在の差分
+## 1. Current INFORMATION_SCHEMA differences
 
-### 実機のみに存在するテーブル（19テーブル）
+### Tables present only on managed Spanner
 
-v1.5.52 から変化なし。
+The set of 19 tables was unchanged from v1.5.52:
 
 - `CHANGE_STREAM_PRIVILEGES`
 - `COLUMN_PRIVILEGES`
@@ -53,80 +60,82 @@ v1.5.52 から変化なし。
 - `PLACEMENT_OPTIONS`
 - `TABLE_SYNONYMS`
 
-### 共通テーブルのカラム差分
+### Column differences in common tables
 
 #### `COLUMNS`
 
-- **欠落カラムはなくなった**
-- ただしカラム順序はまだ実機と異なる
+- There were no longer any missing columns.
+- Column order still differed from managed Spanner.
 
-| エミュレータ v1.5.53 | 実機 |
+| Emulator v1.5.53 | Managed Spanner |
 |---|---|
 | `... IS_GENERATED, IS_HIDDEN, GENERATION_EXPRESSION, ON_UPDATE_EXPRESSION, IS_STORED, ...` | `... IS_GENERATED, GENERATION_EXPRESSION, IS_STORED, IS_HIDDEN, ... ON_UPDATE_EXPRESSION` |
 
 #### `INDEXES`
 
-- `FILTER` は v1.5.53 で追加された
-- まだ実機のみに存在するカラム:
+- `FILTER` was added in v1.5.53.
+- The following columns remained present only on managed Spanner:
   - `SEARCH_PARTITION_BY` (`ARRAY<STRING(MAX)>`)
   - `SEARCH_ORDER_BY` (`ARRAY<STRING(MAX)>`)
 
 #### `SCHEMATA`
 
-- まだ実機のみに存在するカラム:
-  - `PROTO_BUNDLE` (`PROTO<proto2.FileDescriptorSet>`)
+The following column remained present only on managed Spanner:
+
+- `PROTO_BUNDLE` (`PROTO<proto2.FileDescriptorSet>`)
 
 ---
 
-## 2. v1.5.52 から解消された項目
+## 2. Differences resolved since v1.5.52
 
 ### `COLUMNS.ON_UPDATE_EXPRESSION`
 
-前回レポートでは emulator 欠落カラムだったが、v1.5.53 では
-`INFORMATION_SCHEMA.COLUMNS` に存在することを確認した。
+The previous report recorded this as missing from the Emulator. In v1.5.53 it
+was present in `INFORMATION_SCHEMA.COLUMNS`.
 
-これに合わせて、この repo でも `infoschem.TableMeta` の target 定義を更新し、
-emulator 向けクエリでも `ON_UPDATE_EXPRESSION` を取得するよう修正した。
+The survey's `infoschem.TableMeta` target definition was updated accordingly,
+so Emulator queries also select `ON_UPDATE_EXPRESSION`.
 
 ### `INDEXES.FILTER`
 
-前回レポートでは emulator 欠落カラムだったが、v1.5.53 では
-`INFORMATION_SCHEMA.INDEXES` に存在することを確認した。
+The previous report recorded this as missing from the Emulator. In v1.5.53 it
+was present in `INFORMATION_SCHEMA.INDEXES`.
 
-これに合わせて、この repo でも `infoschem.TableMeta` の target 定義を更新し、
-emulator 向けクエリでも `FILTER` を取得するよう修正した。
+The survey's `infoschem.TableMeta` target definition was updated accordingly,
+so Emulator queries also select `FILTER`.
 
 ---
 
-## 3. open issue との対応
+## 3. Relationship to open issues
 
-2026-05-09 時点で、次の issue は **まだ open のまま** だが、少なくとも
-v1.5.53 の実測では再現しなかった。
+As of 2026-05-09, the following issues remained open, but their reported
+behavior did not reproduce in the v1.5.53 observation:
 
-- [#338](https://github.com/GoogleCloudPlatform/cloud-spanner-emulator/issues/338)
-  `INFORMATION_SCHEMA.COLUMNS.ON_UPDATE_EXPRESSION` 欠落
-- [#330](https://github.com/GoogleCloudPlatform/cloud-spanner-emulator/issues/330)
-  `INFORMATION_SCHEMA.INDEXES.FILTER` 欠落
+- [#338](https://github.com/GoogleCloudPlatform/cloud-spanner-emulator/issues/338):
+  missing `INFORMATION_SCHEMA.COLUMNS.ON_UPDATE_EXPRESSION`.
+- [#330](https://github.com/GoogleCloudPlatform/cloud-spanner-emulator/issues/330):
+  missing `INFORMATION_SCHEMA.INDEXES.FILTER`.
 
-一方で、次の gap は引き続き残っている。
+The following gaps remained:
 
-- [#340](https://github.com/GoogleCloudPlatform/cloud-spanner-emulator/issues/340)
-  `INFORMATION_SCHEMA.SCHEMATA.PROTO_BUNDLE`
-- [#339](https://github.com/GoogleCloudPlatform/cloud-spanner-emulator/issues/339) / [#290](https://github.com/GoogleCloudPlatform/cloud-spanner-emulator/issues/290)
-  `TABLE_SYNONYMS`
-- [#261](https://github.com/GoogleCloudPlatform/cloud-spanner-emulator/issues/261)
-  ルーティン本体 / `INFORMATION_SCHEMA.ROUTINES` 系
-- [#205](https://github.com/GoogleCloudPlatform/cloud-spanner-emulator/issues/205)
-  `PLACEMENTS` / `PLACEMENT_OPTIONS`
+- [#340](https://github.com/GoogleCloudPlatform/cloud-spanner-emulator/issues/340):
+  `INFORMATION_SCHEMA.SCHEMATA.PROTO_BUNDLE`.
+- [#339](https://github.com/GoogleCloudPlatform/cloud-spanner-emulator/issues/339)
+  and [#290](https://github.com/GoogleCloudPlatform/cloud-spanner-emulator/issues/290):
+  `TABLE_SYNONYMS`.
+- [#261](https://github.com/GoogleCloudPlatform/cloud-spanner-emulator/issues/261):
+  routines and the `INFORMATION_SCHEMA.ROUTINES` family.
+- [#205](https://github.com/GoogleCloudPlatform/cloud-spanner-emulator/issues/205):
+  `PLACEMENTS` and `PLACEMENT_OPTIONS`.
 
-今回確認した範囲では、依然として open issue が見当たらなかったのは次。
+No open issue was found during this observation for:
 
 - `INDEXES.SEARCH_PARTITION_BY`
 - `INDEXES.SEARCH_ORDER_BY`
 
 ---
 
-## 4. 実行コマンド
+## 4. Reproduction
 
 ```bash
 python3 ~/.claude/skills/spanner-schema-diff/scripts/spanner_schema_diff.py \
@@ -138,9 +147,9 @@ python3 ~/.claude/skills/spanner-schema-diff/scripts/spanner_schema_diff.py \
   --output=/tmp/spanner-schema-diff-20260509
 ```
 
-### 生成物
+Historical generated artifacts:
 
-- レポート下書き: `/tmp/spanner-schema-diff-20260509/diff_report.md`
-- 実機ダンプ: `/tmp/spanner-schema-diff-20260509/real.csv`
-- エミュレータダンプ: `/tmp/spanner-schema-diff-20260509/emulator-v1.5.53.csv`
-- ドキュメント抽出: `/tmp/spanner-schema-diff-20260509/doc.csv`
+- Draft report: `/tmp/spanner-schema-diff-20260509/diff_report.md`
+- Managed dump: `/tmp/spanner-schema-diff-20260509/real.csv`
+- Emulator dump: `/tmp/spanner-schema-diff-20260509/emulator-v1.5.53.csv`
+- Documentation extraction: `/tmp/spanner-schema-diff-20260509/doc.csv`

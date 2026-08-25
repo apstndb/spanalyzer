@@ -1,154 +1,174 @@
-# Spanner エミュレータ vs 実機 INFORMATION_SCHEMA / SPANNER_SYS 差分調査レポート
+# Spanner Emulator versus managed Spanner INFORMATION_SCHEMA and SPANNER_SYS
 
-**調査日**: 2026-03-09
-**実機**: `gcpug-public-spanner / merpay-sponsored-instance / apstndb-sampledb3`
-**エミュレータ**: `spanner-mycli --embedded-emulator`
-**ドキュメント**: https://cloud.google.com/spanner/docs/information-schema
+**Observation date**: 2026-03-09
+
+**Managed target**: `gcpug-public-spanner / merpay-sponsored-instance / apstndb-sampledb3`
+
+**Emulator**: `spanner-mycli --embedded-emulator`
+
+**Documentation**: https://cloud.google.com/spanner/docs/information-schema
+
+This is a dated observation, not a current compatibility claim.
 
 ---
 
-## サマリ
+## Summary
 
-|  | エミュレータ | 実機 |
+|  | Emulator | Managed Spanner |
 |---|---|---|
-| **INFORMATION_SCHEMA テーブル数** | 28 | 47 |
-| **INFORMATION_SCHEMA カラム数** | 193 | 298 |
-| **SPANNER_SYS テーブル数** | 0 (※) | 49 |
-| **SPANNER_SYS カラム数** | 0 (※) | 514 |
+| **INFORMATION_SCHEMA tables** | 28 | 47 |
+| **INFORMATION_SCHEMA columns** | 193 | 298 |
+| **SPANNER_SYS tables** | 0 (*) | 49 |
+| **SPANNER_SYS columns** | 0 (*) | 514 |
 
-※ エミュレータは `SPANNER_SYS.SUPPORTED_OPTIMIZER_VERSIONS` をクエリ可能だが、`INFORMATION_SCHEMA.COLUMNS` には登録されていない
+(*) The Emulator accepted direct queries against
+`SPANNER_SYS.SUPPORTED_OPTIMIZER_VERSIONS`, but did not advertise that table
+through `INFORMATION_SCHEMA.COLUMNS`.
 
 ---
 
-## 1. INFORMATION_SCHEMA: テーブルレベルの差分
+## 1. INFORMATION_SCHEMA differences
 
-### 実機のみに存在するテーブル（19テーブル）
+### Tables present only on managed Spanner
 
-| テーブル名 | カテゴリ |
+| Table | Category |
 |---|---|
-| `CHANGE_STREAM_PRIVILEGES` | FGAC |
-| `COLUMN_PRIVILEGES` | FGAC |
-| `MODEL_PRIVILEGES` | FGAC |
-| `ROUTINE_PRIVILEGES` | FGAC |
-| `TABLE_PRIVILEGES` | FGAC |
-| `ROLES` | FGAC |
-| `ROLE_CHANGE_STREAM_GRANTS` | FGAC |
-| `ROLE_COLUMN_GRANTS` | FGAC |
-| `ROLE_GRANTEES` | FGAC |
-| `ROLE_MODEL_GRANTS` | FGAC |
-| `ROLE_ROUTINE_GRANTS` | FGAC |
-| `ROLE_TABLE_GRANTS` | FGAC |
-| `ROUTINES` | ルーティン |
-| `ROUTINE_OPTIONS` | ルーティン |
-| `PARAMETERS` | ルーティン |
-| `INDEX_OPTIONS` | インデックス |
-| `PLACEMENTS` | 配置 |
-| `PLACEMENT_OPTIONS` | 配置 |
-| `TABLE_SYNONYMS` | シノニム |
+| `CHANGE_STREAM_PRIVILEGES` | Fine-grained access control |
+| `COLUMN_PRIVILEGES` | Fine-grained access control |
+| `MODEL_PRIVILEGES` | Fine-grained access control |
+| `ROUTINE_PRIVILEGES` | Fine-grained access control |
+| `TABLE_PRIVILEGES` | Fine-grained access control |
+| `ROLES` | Fine-grained access control |
+| `ROLE_CHANGE_STREAM_GRANTS` | Fine-grained access control |
+| `ROLE_COLUMN_GRANTS` | Fine-grained access control |
+| `ROLE_GRANTEES` | Fine-grained access control |
+| `ROLE_MODEL_GRANTS` | Fine-grained access control |
+| `ROLE_ROUTINE_GRANTS` | Fine-grained access control |
+| `ROLE_TABLE_GRANTS` | Fine-grained access control |
+| `ROUTINES` | Routines |
+| `ROUTINE_OPTIONS` | Routines |
+| `PARAMETERS` | Routines |
+| `INDEX_OPTIONS` | Indexes |
+| `PLACEMENTS` | Placements |
+| `PLACEMENT_OPTIONS` | Placements |
+| `TABLE_SYNONYMS` | Synonyms |
 
-エミュレータにはFine-Grained Access Control、ルーティン、配置、シノニム関連のテーブルが一切存在しない。
+The Emulator had none of the fine-grained access-control, routine, placement,
+or synonym tables listed above.
 
-### 共通テーブルのカラム差分
+### Column differences in common tables
 
 #### `COLUMNS`
 
-| 差分 | エミュレータ | 実機 |
+| Difference | Emulator | Managed Spanner |
 |---|---|---|
-| 追加カラム | - | `ON_UPDATE_EXPRESSION` (STRING(MAX)) |
-| カラム順序 | `IS_GENERATED` → **`IS_HIDDEN`** → `GENERATION_EXPRESSION` → `IS_STORED` | `IS_GENERATED` → `GENERATION_EXPRESSION` → `IS_STORED` → **`IS_HIDDEN`** |
+| Additional column | - | `ON_UPDATE_EXPRESSION` (`STRING(MAX)`) |
+| Column order | `IS_GENERATED` → **`IS_HIDDEN`** → `GENERATION_EXPRESSION` → `IS_STORED` | `IS_GENERATED` → `GENERATION_EXPRESSION` → `IS_STORED` → **`IS_HIDDEN`** |
 
 #### `INDEXES`
 
-| 差分 | エミュレータ | 実機 |
+| Difference | Emulator | Managed Spanner |
 |---|---|---|
-| 追加カラム | - | `FILTER` (STRING(MAX)) |
-| 追加カラム | - | `SEARCH_PARTITION_BY` (ARRAY\<STRING(MAX)\>) |
-| 追加カラム | - | `SEARCH_ORDER_BY` (ARRAY\<STRING(MAX)\>) |
+| Additional column | - | `FILTER` (`STRING(MAX)`) |
+| Additional column | - | `SEARCH_PARTITION_BY` (`ARRAY<STRING(MAX)>`) |
+| Additional column | - | `SEARCH_ORDER_BY` (`ARRAY<STRING(MAX)>`) |
 
 #### `SCHEMATA`
 
-| 差分 | エミュレータ | 実機 |
+| Difference | Emulator | Managed Spanner |
 |---|---|---|
-| 追加カラム | - | `PROTO_BUNDLE` (PROTO\<proto2.FileDescriptorSet\>) |
+| Additional column | - | `PROTO_BUNDLE` (`PROTO<proto2.FileDescriptorSet>`) |
 
-### IS_HIDDEN について
+### `IS_HIDDEN`
 
-`INFORMATION_SCHEMA` および `SPANNER_SYS` のカラムには `IS_HIDDEN = TRUE` のものは存在しない。ユーザーテーブルでは Full-Text Search 用の TOKENLIST カラム（`_Tokens` サフィックス）のみが該当する。
+No `INFORMATION_SCHEMA` or `SPANNER_SYS` column had `IS_HIDDEN = TRUE`.
+Among user tables, only full-text-search `TOKENLIST` columns with the
+`_Tokens` suffix had that value.
 
 ---
 
-## 2. SPANNER_SYS: テーブルレベルの差分
+## 2. SPANNER_SYS differences
 
-エミュレータは `INFORMATION_SCHEMA.COLUMNS` 経由で取得できる SPANNER_SYS テーブルが **0**。実機は **49テーブル**。
+The Emulator advertised zero `SPANNER_SYS` tables through
+`INFORMATION_SCHEMA.COLUMNS`; managed Spanner advertised 49.
 
-### `SUPPORTED_OPTIMIZER_VERSIONS`（唯一エミュレータでもクエリ可能）
+### `SUPPORTED_OPTIMIZER_VERSIONS`
 
-| エミュレータのカラム順序 | 実機のカラム順序 |
+This was the only `SPANNER_SYS` table that the Emulator accepted when queried
+directly.
+
+| Emulator column order | Managed column order |
 |---|---|
-| IS_DEFAULT, RELEASE_DATE, VERSION | VERSION, RELEASE_DATE, IS_DEFAULT |
+| `IS_DEFAULT, RELEASE_DATE, VERSION` | `VERSION, RELEASE_DATE, IS_DEFAULT` |
 
-### 実機のみの SPANNER_SYS テーブル一覧（48テーブル）
+### SPANNER_SYS tables present only on managed Spanner
 
-| カテゴリ | テーブル |
+The remaining 48 tables were:
+
+| Category | Tables |
 |---|---|
-| アクティブクエリ | `ACTIVE_QUERIES_SUMMARY`, `OLDEST_ACTIVE_QUERIES`, `ACTIVE_PARTITIONED_DMLS` |
-| クエリ統計 | `QUERY_STATS_TOP_{MINUTE,10MINUTE,HOUR}`, `QUERY_STATS_TOTAL_{MINUTE,10MINUTE,HOUR}` |
-| クエリプロファイル | `QUERY_PROFILES_TOP_{MINUTE,10MINUTE,HOUR}` |
-| クエリ推奨 | `QUERY_RECOMMENDATIONS` |
-| Read統計 | `READ_STATS_TOP_{MINUTE,10MINUTE,HOUR}`, `READ_STATS_TOTAL_{MINUTE,10MINUTE,HOUR}` |
-| Txn統計 | `TXN_STATS_TOP_{MINUTE,10MINUTE,HOUR}`, `TXN_STATS_TOTAL_{MINUTE,10MINUTE,HOUR}` |
-| ロック統計 | `LOCK_STATS_TOP_{MINUTE,10MINUTE,HOUR}`, `LOCK_STATS_TOTAL_{MINUTE,10MINUTE,HOUR}` |
-| カラム操作統計 | `COLUMN_OPERATIONS_STATS_{MINUTE,10MINUTE,HOUR}` |
-| テーブル操作統計 | `TABLE_OPERATIONS_STATS_{MINUTE,10MINUTE,HOUR}` |
-| テーブルサイズ | `TABLE_SIZES_STATS_1HOUR`, `TABLE_SIZES_STATS_PER_LOCALITY_GROUP_1HOUR` |
-| スプリット | `SPLIT_STATS_TOP_{MINUTE,10MINUTE,HOUR}`, `SPLIT_HOTNESS_STATS_TOP_MINUTE`, `USER_SPLIT_POINTS` |
-| タスク/ポリシー | `TASKS`, `ROW_DELETION_POLICIES` |
-| スキーマ推奨 | `SCHEMA_RECOMMENDATIONS` |
-| ベクトルインデックス | `VECTOR_INDEX_METRICS_HISTORY` |
+| Active queries | `ACTIVE_QUERIES_SUMMARY`, `OLDEST_ACTIVE_QUERIES`, `ACTIVE_PARTITIONED_DMLS` |
+| Query statistics | `QUERY_STATS_TOP_{MINUTE,10MINUTE,HOUR}`, `QUERY_STATS_TOTAL_{MINUTE,10MINUTE,HOUR}` |
+| Query profiles | `QUERY_PROFILES_TOP_{MINUTE,10MINUTE,HOUR}` |
+| Query recommendations | `QUERY_RECOMMENDATIONS` |
+| Read statistics | `READ_STATS_TOP_{MINUTE,10MINUTE,HOUR}`, `READ_STATS_TOTAL_{MINUTE,10MINUTE,HOUR}` |
+| Transaction statistics | `TXN_STATS_TOP_{MINUTE,10MINUTE,HOUR}`, `TXN_STATS_TOTAL_{MINUTE,10MINUTE,HOUR}` |
+| Lock statistics | `LOCK_STATS_TOP_{MINUTE,10MINUTE,HOUR}`, `LOCK_STATS_TOTAL_{MINUTE,10MINUTE,HOUR}` |
+| Column-operation statistics | `COLUMN_OPERATIONS_STATS_{MINUTE,10MINUTE,HOUR}` |
+| Table-operation statistics | `TABLE_OPERATIONS_STATS_{MINUTE,10MINUTE,HOUR}` |
+| Table sizes | `TABLE_SIZES_STATS_1HOUR`, `TABLE_SIZES_STATS_PER_LOCALITY_GROUP_1HOUR` |
+| Splits | `SPLIT_STATS_TOP_{MINUTE,10MINUTE,HOUR}`, `SPLIT_HOTNESS_STATS_TOP_MINUTE`, `USER_SPLIT_POINTS` |
+| Tasks and policies | `TASKS`, `ROW_DELETION_POLICIES` |
+| Schema recommendations | `SCHEMA_RECOMMENDATIONS` |
+| Vector indexes | `VECTOR_INDEX_METRICS_HISTORY` |
 
 ---
 
-## 3. ドキュメント vs 実機の差分
+## 3. Documentation differences observed on managed Spanner
 
-### ドキュメントに記載がないテーブル
+These statements describe the documentation snapshot read on 2026-03-09.
 
-- `COLUMN_COLUMN_USAGE` -- エミュレータ・実機の両方に存在
-- `INDEX_OPTIONS` -- 実機のみに存在
+### Tables absent from the documentation
 
-### ドキュメントに記載がないカラム
+- `COLUMN_COLUMN_USAGE`, present on both Emulator and managed Spanner.
+- `INDEX_OPTIONS`, present only on managed Spanner.
 
-| テーブル | カラム | 型 |
+### Columns absent from the documentation
+
+| Table | Column | Observed type |
 |---|---|---|
-| `SCHEMATA` | `EFFECTIVE_TIMESTAMP` | INT64 |
-| `SCHEMATA` | `SCHEMA_OWNER` | STRING(MAX) |
-| `INDEXES` | `FILTER` | STRING(MAX) |
-| `INDEXES` | `SEARCH_PARTITION_BY` | ARRAY\<STRING(MAX)\> |
-| `INDEXES` | `SEARCH_ORDER_BY` | ARRAY\<STRING(MAX)\> |
-| `INDEX_COLUMNS` | `INDEX_TYPE` | STRING(MAX) |
-| `COLUMNS` | `ON_UPDATE_EXPRESSION` | STRING(MAX) |
+| `SCHEMATA` | `EFFECTIVE_TIMESTAMP` | `INT64` |
+| `SCHEMATA` | `SCHEMA_OWNER` | `STRING(MAX)` |
+| `INDEXES` | `FILTER` | `STRING(MAX)` |
+| `INDEXES` | `SEARCH_PARTITION_BY` | `ARRAY<STRING(MAX)>` |
+| `INDEXES` | `SEARCH_ORDER_BY` | `ARRAY<STRING(MAX)>` |
+| `INDEX_COLUMNS` | `INDEX_TYPE` | `STRING(MAX)` |
+| `COLUMNS` | `ON_UPDATE_EXPRESSION` | `STRING(MAX)` |
 
-### 型の不一致
+### Type differences
 
-| テーブル | カラム | ドキュメント | 実機 |
+| Table | Column | Documentation | Managed Spanner |
 |---|---|---|---|
-| `SCHEMATA` | `PROTO_BUNDLE` | STRING | PROTO\<proto2.FileDescriptorSet\> |
-| `COLUMNS` | `IS_HIDDEN` | STRING | BOOL |
-| `INDEXES` | `INDEX_STATE` | STRING | STRING(100) |
-| `TABLES` | `TABLE_TYPE` | STRING | STRING(32) |
+| `SCHEMATA` | `PROTO_BUNDLE` | `STRING` | `PROTO<proto2.FileDescriptorSet>` |
+| `COLUMNS` | `IS_HIDDEN` | `STRING` | `BOOL` |
+| `INDEXES` | `INDEX_STATE` | `STRING` | `STRING(100)` |
+| `TABLES` | `TABLE_TYPE` | `STRING` | `STRING(32)` |
 
-### カラム構成の不一致: `TABLE_SYNONYMS`
+### `TABLE_SYNONYMS` column-shape difference
 
-| ドキュメント | 実機 |
+| Documentation | Managed Spanner |
 |---|---|
-| TABLE_CATALOG, TABLE_SCHEMA, TABLE_NAME, SYNONYM_CATALOG, SYNONYM_SCHEMA, **SYNONYM_TABLE_NAME** | SYNONYM_CATALOG, SYNONYM_SCHEMA, **SYNONYM_NAME**, TABLE_CATALOG, TABLE_SCHEMA, TABLE_NAME |
+| `TABLE_CATALOG, TABLE_SCHEMA, TABLE_NAME, SYNONYM_CATALOG, SYNONYM_SCHEMA, SYNONYM_TABLE_NAME` | `SYNONYM_CATALOG, SYNONYM_SCHEMA, SYNONYM_NAME, TABLE_CATALOG, TABLE_SCHEMA, TABLE_NAME` |
 
-カラム名が異なり (`SYNONYM_TABLE_NAME` vs `SYNONYM_NAME`)、カラム順序も異なる。
+Both the column name (`SYNONYM_TABLE_NAME` versus `SYNONYM_NAME`) and column
+order differed.
 
-### ROLE\_\*\_GRANTS テーブルの不一致
+### `ROLE_*_GRANTS` column differences
 
-ドキュメントには `GRANTOR` と `IS_GRANTABLE` カラムが記載されているが、実機にはこれらのカラムが存在しない:
+The documentation listed `GRANTOR` and `IS_GRANTABLE`, but those columns were
+absent from the managed target:
 
-| テーブル | ドキュメントにあるが実機にないカラム |
+| Table | Documented but not observed |
 |---|---|
 | `ROLE_TABLE_GRANTS` | `GRANTOR`, `IS_GRANTABLE` |
 | `ROLE_COLUMN_GRANTS` | `GRANTOR`, `IS_GRANTABLE` |
@@ -157,17 +177,15 @@
 
 ---
 
-## 4. 調査方法
+## 4. Method
 
-### 使用ツール
+Tools used:
 
-- `spanner-mycli` (embedded emulator / real Spanner 接続)
-- `curl` (ドキュメント HTML 取得)
-- Python 3 `html.parser` (ドキュメント DOM パース)
+- `spanner-mycli` for embedded-Emulator and managed-Spanner access.
+- `curl` to retrieve documentation HTML.
+- Python 3 `html.parser` to parse the documentation DOM.
 
-### データ取得クエリ
-
-エミュレータ・実機ともに以下の1クエリでバルク取得:
+Both environments were queried in bulk with:
 
 ```sql
 SELECT TABLE_SCHEMA, TABLE_NAME, COLUMN_NAME, ORDINAL_POSITION, SPANNER_TYPE
@@ -180,9 +198,8 @@ ORDER BY TABLE_SCHEMA, TABLE_NAME, ORDINAL_POSITION;
 spanner-mycli --format=csv -e "SELECT ..."
 ```
 
-### 自動化スキル
-
-調査を自動化するスキルを作成: `~/.claude/skills/spanner-schema-diff/`
+The historical automation lived at
+`~/.claude/skills/spanner-schema-diff/` and was invoked as:
 
 ```bash
 python3 ~/.claude/skills/spanner-schema-diff/scripts/spanner_schema_diff.py \
@@ -192,6 +209,7 @@ python3 ~/.claude/skills/spanner-schema-diff/scripts/spanner_schema_diff.py \
   --output=/tmp/spanner-schema-diff
 ```
 
-### 関連 Issue
+Related issue:
 
-- [apstndb/spanner-mycli#554](https://github.com/apstndb/spanner-mycli/issues/554) -- JSONL 出力フォーマットの追加提案
+- [apstndb/spanner-mycli#554](https://github.com/apstndb/spanner-mycli/issues/554):
+  proposal for JSONL output.

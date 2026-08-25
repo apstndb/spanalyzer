@@ -144,6 +144,7 @@ inventory:
 
 ```sh
 go run ./okf-check --repo-root .. --gate all
+go run ./markdown-language-check --repo-root ..
 ```
 
 ## Coding Style

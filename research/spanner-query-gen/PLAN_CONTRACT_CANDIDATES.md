@@ -3,7 +3,7 @@
 Sources:
 
 - [`apstndb/zenn-contents/articles/spanner-query-optimizing-guide.md`](https://github.com/apstndb/zenn-contents/blob/main/articles/spanner-query-optimizing-guide.md)
-- [`Cloud Spanner の Partition Query における root-partitionable の判定方法について`](https://zenn.dev/apstndb/articles/9f63227ac8a1da)
+- [`Cloud Spanner の Partition Query における root-partitionable の判定方法について`](https://zenn.dev/apstndb/articles/9f63227ac8a1da) <!-- language-check: allow-non-english -->
 - [`Read data in parallel`](https://docs.cloud.google.com/spanner/docs/reads#read_data_in_parallel)
 - [`Full-text search`](https://docs.cloud.google.com/spanner/docs/full-text-search)
 - [`apstndb/spannerplan/cmd/lintplan`](https://github.com/apstndb/spannerplan/tree/main/cmd/lintplan)

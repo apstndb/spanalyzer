@@ -57,8 +57,6 @@ the groups below relate when their contents appear to disagree.
 - [Survey TODO](../../survey/TODO.md) - open and completed producer work.
 - [Survey handoff](../../survey/HANDOFF.md) - dated environment findings and
   maintenance handoff.
-- [Survey feedback](../../survey/FEEDBACK.md) - historical review record; not
-  the current behavior contract.
 - [Unsupported DDL](../../survey/UNSUPPORTED_DDL.md) - explicit memefish,
   INFORMATION_SCHEMA, and reconstruction boundaries.
 - [2026-03-09 schema diff](../../survey/docs/spanner-schema-diff-report-20260309.md)
