@@ -2,3 +2,93 @@
 go = "1.26.6"
 golangci-lint = "2.12.1"
 "go:golang.org/x/vuln/cmd/govulncheck" = "1.5.0"
+
+[tasks.verify-root-module]
+description = "Test the root analyzer module"
+run = "go test -count=1 ./..."
+
+[tasks.verify-plancontract-module]
+description = "Test the plancontract module"
+dir = "plancontract"
+run = "go test -count=1 ./..."
+
+[tasks.verify-querygen-module]
+description = "Test the query-generator module"
+dir = "cmd/spanner-query-gen"
+run = "go test -count=1 ./..."
+
+[tasks.verify-survey-module]
+description = "Test the survey module independently without live/container probes"
+dir = "survey"
+env = { GOWORK = "off" }
+run = "go test -count=1 -short ./..."
+
+[tasks.verify-survey-container-module]
+description = "Run the survey module's Docker-backed Emulator and Omni tests"
+dir = "survey"
+env = { GOWORK = "off" }
+run = "go test -count=1 ./..."
+
+[tasks.verify-tools-module]
+description = "Test the tools module"
+dir = "tools"
+run = "go test -count=1 ./..."
+
+[tasks.verify-generated-evidence]
+description = "Check generated catalogs, survey manifests, OKF, and Markdown policy"
+dir = "tools"
+run = [
+  "go run ./planvocab-gen --check",
+  "go run ./infoschema-survey-check",
+  "go run ./spannersys-survey-check",
+  "go run ./okf-check --repo-root .. --gate all",
+  "go run ./markdown-language-check --repo-root ..",
+]
+
+[tasks.verify-local]
+description = "Run all read-only local module and generated-evidence checks"
+depends = [
+  "verify-root-module",
+  "verify-plancontract-module",
+  "verify-querygen-module",
+  "verify-survey-module",
+  "verify-tools-module",
+  "verify-generated-evidence",
+]
+
+[tasks.verify-omni-integration]
+description = "Run both Omni integration packages against one pinned shared runtime"
+dir = "tools"
+run = "go run ./omni-integration-runner --repo-root .."
+
+[tasks.verify-containers]
+description = "Run pinned Emulator and Omni checks without writing evidence"
+run = [
+  "mise run verify-survey-container-module",
+  "mise run --cd survey check-infoschema-emulator",
+  "mise run --cd survey check-infoschema-omni",
+  "mise run --cd survey check-spanner-sys-omni",
+  "mise run verify-omni-integration",
+]
+
+[tasks.verify-managed]
+description = "Run current managed-Spanner checks without writing evidence"
+run = [
+  "mise run --cd survey check-infoschema-managed",
+  "mise run --cd survey check-spanner-sys-managed",
+  "mise run --cd survey test-managed-current",
+]
+
+[tasks.verify-pinned]
+description = "Run local and reproducible pinned-container verification"
+run = [
+  "mise run verify-local",
+  "mise run verify-containers",
+]
+
+[tasks.verify-current]
+description = "Run local, pinned-container, and point-in-time managed verification"
+run = [
+  "mise run verify-pinned",
+  "mise run verify-managed",
+]

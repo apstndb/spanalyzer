@@ -92,14 +92,14 @@ func TestCanonicalDDL_RealSpanner(t *testing.T) {
 	sort.Strings(names)
 
 	t.Logf(
-		"canonical DDL aggregate: canonical_total=%d canonical_parse_errors=%d generated_total=%d",
+		"canonical DDL diagnostic_metrics canonical_total=%d canonical_parse_errors=%d generated_total=%d",
 		len(canonical.Statements),
 		parseErrors,
 		len(generated),
 	)
 	for _, name := range names {
 		t.Logf(
-			"canonical DDL family: family=%s canonical=%d generated=%d delta=%+d",
+			"canonical DDL diagnostic_family family=%s canonical=%d generated=%d delta=%+d",
 			name,
 			canonicalCounts[name],
 			generatedCounts[name],

@@ -111,7 +111,7 @@ func run(args []string, stdout io.Writer) error {
 	optimizerVersionMatrix := fs.Bool("optimizer-version-matrix", false, "expand each query with OPTIMIZER_VERSION statement hints for every supported optimizer version")
 	optimizerVersionDiff := fs.Bool("optimizer-version-diff", false, "analyze each query with every supported optimizer version and print only queries whose compact-tree-metadata shape changes")
 	allowDistributedMergeMatrix := fs.Bool("allow-distributed-merge-matrix", false, "expand each query across ALLOW_DISTRIBUTED_MERGE unspecified, TRUE, and FALSE")
-	omniImage := fs.String("omni-image", "", "Spanner Omni container image override; empty uses the spanemuboost default")
+	omniImage := fs.String("omni-image", "", "Spanner Omni container image override; empty uses runtime_targets.json")
 	continueOnError := fs.Bool("continue-on-error", false, "print errors and continue analyzing remaining queries")
 	timeout := fs.Duration("timeout", 5*time.Minute, "maximum time to start Spanner Omni and analyze queries")
 	if err := fs.Parse(args); err != nil {
@@ -148,13 +148,19 @@ func run(args []string, stdout io.Writer) error {
 	if spec, ok := lookupBuiltInCase(*builtinCase); ok && spec.RequiresProtoDescriptors && protoDescriptors == nil {
 		return fmt.Errorf("--case %s requires --proto-descriptors-file", spec.Name)
 	}
+	if strings.TrimSpace(*omniImage) == "" {
+		*omniImage, err = repositoryPinnedImage("omni")
+		if err != nil {
+			return fmt.Errorf("resolve pinned Spanner Omni image: %w; pass --omni-image for an explicit override", err)
+		}
+	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), *timeout)
 	defer cancel()
 
 	runtime := spanemuboost.NewLazyRuntime(
 		spanemuboost.BackendOmni,
-		spanemuboost.WithContainerImage(strings.TrimSpace(*omniImage)),
+		spanemuboost.WithContainerImage(*omniImage),
 	)
 	defer func() {
 		_ = runtime.Close()

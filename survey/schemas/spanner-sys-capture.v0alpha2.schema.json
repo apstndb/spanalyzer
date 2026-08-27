@@ -1,0 +1,88 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/apstndb/spanalyzer/survey/schemas/spanner-sys-capture.v0alpha2.schema.json",
+  "title": "SPANNER_SYS provenance-complete surface capture",
+  "description": "A redacted point-in-time managed or exact-container observation of the complete SPANNER_SYS column surface.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "catalog",
+    "dialect",
+    "target",
+    "observed_at",
+    "producer_source_sha256",
+    "invocation_sha256",
+    "query",
+    "surface_sha256",
+    "columns"
+  ],
+  "properties": {
+    "schema_version": { "const": "v0alpha2" },
+    "catalog": { "const": "SPANNER_SYS" },
+    "dialect": { "const": "googlesql" },
+    "target": { "$ref": "#/$defs/target" },
+    "observed_at": { "type": "string", "format": "date-time" },
+    "producer_source_sha256": { "$ref": "#/$defs/sha256" },
+    "invocation_sha256": { "$ref": "#/$defs/sha256" },
+    "query": {
+      "const": "SELECT TABLE_NAME, COLUMN_NAME, SPANNER_TYPE, ORDINAL_POSITION\nFROM INFORMATION_SCHEMA.COLUMNS\nWHERE TABLE_SCHEMA = 'SPANNER_SYS'\nORDER BY TABLE_NAME, ORDINAL_POSITION"
+    },
+    "surface_sha256": {
+      "description": "SHA-256 of the canonical compact JSON encoding of the columns array only.",
+      "$ref": "#/$defs/sha256"
+    },
+    "columns": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/column" }
+    }
+  },
+  "$defs": {
+    "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "target": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "observation_scope"],
+          "properties": {
+            "kind": { "const": "managed" },
+            "observation_scope": { "const": "single_database" }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "image"],
+          "properties": {
+            "kind": { "const": "omni" },
+            "image": { "$ref": "#/$defs/image" }
+          }
+        }
+      ]
+    },
+    "image": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["family", "tag", "digest", "platform"],
+      "properties": {
+        "family": { "type": "string", "minLength": 1 },
+        "tag": { "type": "string", "pattern": "^[A-Za-z0-9_][A-Za-z0-9_.-]{0,127}$" },
+        "digest": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+        "platform": { "type": "string", "pattern": "^linux/(amd64|arm64)(/v[0-9]+)?$" }
+      }
+    },
+    "column": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["table_name", "column_name", "spanner_type", "ordinal_position"],
+      "properties": {
+        "table_name": { "type": "string", "minLength": 1 },
+        "column_name": { "type": "string", "minLength": 1 },
+        "spanner_type": { "type": "string", "minLength": 1 },
+        "ordinal_position": { "type": "integer", "minimum": 1 }
+      }
+    }
+  }
+}

@@ -10,18 +10,27 @@ import (
 	"github.com/apstndb/spanemuboost"
 )
 
-const hintPositionEmulatorImage = "gcr.io/cloud-spanner-emulator/emulator:1.5.55"
-
 func TestIntegrationHintPositionAuditOnEmulator(t *testing.T) {
+	emulatorImage, err := repositoryPinnedImage("emulator")
+	if err != nil {
+		t.Fatal(err)
+	}
 	runtime := spanemuboost.NewLazyRuntime(
 		spanemuboost.BackendEmulator,
 		spanemuboost.EnableInstanceAutoConfigOnly(),
-		spanemuboost.WithContainerImage(hintPositionEmulatorImage),
+		spanemuboost.WithContainerImage(emulatorImage),
 	)
-	runHintPositionAudit(t, runtime)
+	runHintPositionAuditWithOverrides(t, runtime, map[string]hintPositionExpectation{
+		"hint-position/accepted/pipe-log-unsupported": hintPositionUnavailable,
+		"hint-position/versioned/pipe-finish":         hintPositionUnavailable,
+	})
 }
 
 func runHintPositionAudit(t *testing.T, runtime *spanemuboost.LazyRuntime) {
+	runHintPositionAuditWithOverrides(t, runtime, nil)
+}
+
+func runHintPositionAuditWithOverrides(t *testing.T, runtime *spanemuboost.LazyRuntime, overrides map[string]hintPositionExpectation) {
 	t.Helper()
 	t.Cleanup(func() { _ = runtime.Close() })
 	clients, err := spanemuboost.OpenClients(t.Context(), runtime,
@@ -32,7 +41,7 @@ func runHintPositionAudit(t *testing.T, runtime *spanemuboost.LazyRuntime) {
 		t.Fatalf("OpenClients() error = %v", err)
 	}
 	t.Cleanup(func() { _ = clients.Close() })
-	runHintPositionAuditCases(t, clients.Client)
+	runHintPositionAuditCasesWithOverrides(t, clients.Client, overrides)
 }
 
 func hintPositionDDLs(t *testing.T) []string {

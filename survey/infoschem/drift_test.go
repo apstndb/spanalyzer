@@ -11,6 +11,7 @@ import (
 	"cloud.google.com/go/spanner"
 	"github.com/apstndb/spanalyzer/survey/astconv"
 	"github.com/apstndb/spanalyzer/survey/infoschem"
+	"github.com/apstndb/spanalyzer/survey/internal/runtimepins"
 	"github.com/apstndb/spanalyzer/survey/spannersys"
 	"github.com/apstndb/spanemuboost"
 	"github.com/cloudspannerecosystem/memefish/ast"
@@ -29,9 +30,7 @@ func TestDrift_EmulatorTableMetas(t *testing.T) {
 		t.Skip("skipping emulator drift test in short mode")
 	}
 
-	// Pin to the emulator version that meta.go was calibrated against.
-	// Update this (and re-run the diff) when upgrading.
-	const emulatorImage = "gcr.io/cloud-spanner-emulator/emulator:1.5.56"
+	emulatorImage := pinnedRuntimeImage(t, "emulator")
 
 	ctx := context.Background()
 
@@ -59,6 +58,7 @@ func TestDrift_OmniTableMetas(t *testing.T) {
 	env, err := spanemuboost.RunWithClients(
 		ctx,
 		spanemuboost.BackendOmni,
+		spanemuboost.WithContainerImage(pinnedRuntimeImage(t, "omni")),
 		spanemuboost.WithSetupDDLs([]string{
 			"CREATE CHANGE STREAM DefaultRetentionProbe FOR ALL",
 			uuidFixtureDDL,
@@ -73,6 +73,19 @@ func TestDrift_OmniTableMetas(t *testing.T) {
 	verifyOmittedChangeStreamRetention(t, schema, "DefaultRetentionProbe")
 	verifyUUIDFixture(ctx, t, env.Client, uuidFixtureTable)
 	verifySpannerSys(ctx, t, env.Client, "omni")
+}
+
+func pinnedRuntimeImage(t *testing.T, kind string) string {
+	t.Helper()
+	root, err := runtimepins.FindRepositoryRoot(".")
+	if err != nil {
+		t.Fatal(err)
+	}
+	image, err := runtimepins.ImageForHost(root, kind)
+	if err != nil {
+		t.Fatal(err)
+	}
+	return image
 }
 
 func TestDrift_RealTableMetas(t *testing.T) {
@@ -133,14 +146,21 @@ func verifySpannerSys(ctx context.Context, t *testing.T, client *spanner.Client,
 		)
 	}
 	t.Logf(
-		"SPANNER_SYS audit (%s): registered_tables=%d advertised_tables=%d advertised_columns=%d checked_tables=%d decoded_rows=%d known_absent_columns=%d",
+		"SPANNER_SYS contract_metrics target=%s registered_tables=%d advertised_tables=%d advertised_columns=%d known_absent_columns=%d has_drift=%t",
 		target,
 		report.RegisteredTables,
 		report.AdvertisedTables,
 		report.AdvertisedColumns,
+		knownAbsentColumns,
+		report.HasDrift(),
+	)
+	// Query execution and decoded row counts depend on current database activity;
+	// keep them out of the stable surface-contract record above.
+	t.Logf(
+		"SPANNER_SYS diagnostic_metrics target=%s checked_tables=%d decoded_rows=%d",
+		target,
 		report.CheckedTables,
 		report.DecodedRows,
-		knownAbsentColumns,
 	)
 	if report.HasDrift() {
 		t.Errorf(

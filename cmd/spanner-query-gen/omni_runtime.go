@@ -30,9 +30,15 @@ func querygenOmniIntegrationRequireRuntime(tb testing.TB) {
 func querygenOmniRuntime(tb testing.TB) spanemuboost.RuntimeHandle {
 	tb.Helper()
 	var options []spanemuboost.Option
-	if image := strings.TrimSpace(os.Getenv(querygenOmniImageEnv)); image != "" {
-		options = append(options, spanemuboost.WithContainerImage(image))
+	image := strings.TrimSpace(os.Getenv(querygenOmniImageEnv))
+	if image == "" {
+		var err error
+		image, err = querygenPinnedRuntimeImage("omni")
+		if err != nil {
+			tb.Fatalf("resolve pinned Spanner Omni image: %v", err)
+		}
 	}
+	options = append(options, spanemuboost.WithContainerImage(image))
 	runtime, err := spanemuboost.NewLazyRuntimeFromEnvOrStart(spanemuboost.BackendOmni, options...)
 	if err != nil {
 		tb.Fatalf("NewLazyRuntimeFromEnvOrStart: %v", err)

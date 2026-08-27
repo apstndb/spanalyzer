@@ -3,6 +3,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 	"strings"
 	"testing"
@@ -10,13 +11,38 @@ import (
 	"github.com/apstndb/spanemuboost"
 )
 
-var planProbeOmniRuntime = spanemuboost.NewLazyRuntime(
-	spanemuboost.BackendOmni,
-	spanemuboost.WithContainerImage(strings.TrimSpace(os.Getenv("SPANALYZER_OMNI_IMAGE"))),
-)
+var planProbeOmniRuntime spanemuboost.RuntimeHandle
 
 func TestMain(m *testing.M) {
-	planProbeOmniRuntime.TestMain(m)
+	if os.Getenv("SPANEMUBOOST_ENABLE_OMNI_TESTS") == "" {
+		os.Exit(m.Run())
+	}
+	image := strings.TrimSpace(os.Getenv("SPANALYZER_OMNI_IMAGE"))
+	if image == "" {
+		var err error
+		image, err = repositoryPinnedImage("omni")
+		if err != nil {
+			_, _ = fmt.Fprintf(os.Stderr, "resolve pinned Spanner Omni image: %v\n", err)
+			os.Exit(1)
+		}
+	}
+	runtime, err := spanemuboost.NewLazyRuntimeFromEnvOrStart(
+		spanemuboost.BackendOmni,
+		spanemuboost.WithContainerImage(image),
+	)
+	if err != nil {
+		_, _ = fmt.Fprintf(os.Stderr, "open Spanner Omni runtime: %v\n", err)
+		os.Exit(1)
+	}
+	planProbeOmniRuntime = runtime
+	code := m.Run()
+	if err := runtime.Close(); err != nil {
+		_, _ = fmt.Fprintf(os.Stderr, "close Spanner Omni runtime: %v\n", err)
+		if code == 0 {
+			code = 1
+		}
+	}
+	os.Exit(code)
 }
 
 func openOmniClients(t *testing.T, ddls []string, options ...spanemuboost.Option) *spanemuboost.Clients {
@@ -24,10 +50,6 @@ func openOmniClients(t *testing.T, ddls []string, options ...spanemuboost.Option
 	if os.Getenv("SPANEMUBOOST_ENABLE_OMNI_TESTS") == "" {
 		t.Skip("set SPANEMUBOOST_ENABLE_OMNI_TESTS=1 to run Spanner Omni tests")
 	}
-	if strings.TrimSpace(os.Getenv("SPANALYZER_OMNI_IMAGE")) == "" {
-		t.Fatal("set SPANALYZER_OMNI_IMAGE to the pinned Spanner Omni image under test")
-	}
-
 	// Reopening one LazyRuntime disables database auto-configuration by
 	// default, while random databases are not normally dropped on Close.
 	// Re-enable creation and force per-test teardown so suites share only the

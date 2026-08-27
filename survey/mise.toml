@@ -24,15 +24,50 @@ description = "Retain a point-in-time managed INFORMATION_SCHEMA capture"
 env = { GOWORK = "off", GOFLAGS = "-mod=readonly" }
 run = "go run ./cmd/infoschema-capture --target managed --write --repo-root .."
 
+[tasks.check-infoschema-managed]
+description = "Compare managed INFORMATION_SCHEMA with retained evidence without writing"
+env = { GOWORK = "off", GOFLAGS = "-mod=readonly" }
+run = "go run ./cmd/infoschema-capture check --target managed --repo-root .."
+
 [tasks.capture-infoschema-emulator]
 description = "Retain the pinned Emulator INFORMATION_SCHEMA capture"
 env = { GOWORK = "off", GOFLAGS = "-mod=readonly" }
-run = "go run ./cmd/infoschema-capture --target emulator --image gcr.io/cloud-spanner-emulator/emulator:1.5.56@sha256:5b1e3607fe8574fb04144eeabfa54120559fb01968ffe3ffc0a9a8f6776fc454 --write --repo-root .."
+run = "go run ./cmd/infoschema-capture --target emulator --write --repo-root .."
+
+[tasks.check-infoschema-emulator]
+description = "Compare pinned Emulator INFORMATION_SCHEMA with retained evidence without writing"
+env = { GOWORK = "off", GOFLAGS = "-mod=readonly" }
+run = "go run ./cmd/infoschema-capture check --target emulator --repo-root .."
 
 [tasks.capture-infoschema-omni]
 description = "Retain the pinned Omni INFORMATION_SCHEMA capture"
 env = { GOWORK = "off", GOFLAGS = "-mod=readonly" }
-run = "go run ./cmd/infoschema-capture --target omni --image us-docker.pkg.dev/spanner-omni/images/spanner-omni:2026.r2.1-beta@sha256:ed31d9ee72eeee69cac78566eb3a6e72ee389b26234735f0ef449774cc006741 --write --repo-root .."
+run = "go run ./cmd/infoschema-capture --target omni --write --repo-root .."
+
+[tasks.check-infoschema-omni]
+description = "Compare pinned Omni INFORMATION_SCHEMA with retained evidence without writing"
+env = { GOWORK = "off", GOFLAGS = "-mod=readonly" }
+run = "go run ./cmd/infoschema-capture check --target omni --repo-root .."
+
+[tasks.capture-spanner-sys-managed]
+description = "Retain a provenance-complete point-in-time managed SPANNER_SYS capture"
+env = { GOWORK = "off", GOFLAGS = "-mod=readonly" }
+run = "go run ./cmd/spanner-sys-capture --target managed --write --repo-root .."
+
+[tasks.check-spanner-sys-managed]
+description = "Compare managed SPANNER_SYS with retained evidence without writing"
+env = { GOWORK = "off", GOFLAGS = "-mod=readonly" }
+run = "go run ./cmd/spanner-sys-capture check --target managed --repo-root .."
+
+[tasks.capture-spanner-sys-omni]
+description = "Retain the pinned Omni SPANNER_SYS capture with complete provenance"
+env = { GOWORK = "off", GOFLAGS = "-mod=readonly" }
+run = "go run ./cmd/spanner-sys-capture --target omni --write --repo-root .."
+
+[tasks.check-spanner-sys-omni]
+description = "Compare pinned Omni SPANNER_SYS with retained evidence without writing"
+env = { GOWORK = "off", GOFLAGS = "-mod=readonly" }
+run = "go run ./cmd/spanner-sys-capture check --target omni --repo-root .."
 
 [tasks.test-uuid-real]
 description = "Managed-Spanner UUID metadata and reconstruction fixture"
@@ -43,6 +78,11 @@ run = "go test -v -run TestUUID_RealSpanner ./infoschem"
 description = "Read-only managed-Spanner canonical DDL aggregate comparison"
 env = { REQUIRE_REAL_SPANNER_CANONICAL = "1" }
 run = "go test -v -run TestCanonicalDDL_RealSpanner ./infoschem"
+
+[tasks.test-managed-current]
+description = "Run all read-only/current managed-Spanner verification tests"
+env = { REQUIRE_REAL_SPANNER_CANONICAL = "1", REQUIRE_REAL_SPANNER_DRIFT = "1", REQUIRE_REAL_SPANNER_UUID = "1" }
+run = "go test -count=1 -v -run 'Test(CanonicalDDL_RealSpanner|Drift_RealTableMetas|UUID_RealSpanner)$' ./infoschem"
 
 [tasks.run-roundtrip]
 description = "Run the roundtrip end-to-end demo"

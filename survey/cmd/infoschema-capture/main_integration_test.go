@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"cloud.google.com/go/spanner"
+	"github.com/apstndb/spanalyzer/survey/internal/runtimepins"
 	"github.com/apstndb/spanemuboost"
 )
 
@@ -13,10 +14,18 @@ func TestCaptureTransactionSupportsMultipleQueries(t *testing.T) {
 		t.Skip("skipping Emulator-backed transaction test in short mode")
 	}
 	ctx := context.Background()
+	repoRoot, err := runtimepins.FindRepositoryRoot(".")
+	if err != nil {
+		t.Fatal(err)
+	}
+	emulatorImage, err := runtimepins.ImageForHost(repoRoot, "emulator")
+	if err != nil {
+		t.Fatal(err)
+	}
 	env, err := spanemuboost.RunWithClients(
 		ctx,
 		spanemuboost.BackendEmulator,
-		spanemuboost.WithContainerImage("gcr.io/cloud-spanner-emulator/emulator:1.5.56"),
+		spanemuboost.WithContainerImage(emulatorImage),
 	)
 	if err != nil {
 		t.Fatal(err)

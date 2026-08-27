@@ -5,6 +5,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/apstndb/spanalyzer/survey/internal/runtimepins"
 	"github.com/apstndb/spanemuboost"
 	"github.com/cloudspannerecosystem/memefish/ast"
 )
@@ -71,7 +72,14 @@ func TestLoadSchema_EmulatorRoundtrip(t *testing.T) {
 	}
 
 	ctx := context.Background()
-	const emulatorImage = "gcr.io/cloud-spanner-emulator/emulator:1.5.56"
+	repoRoot, err := runtimepins.FindRepositoryRoot(".")
+	if err != nil {
+		t.Fatal(err)
+	}
+	emulatorImage, err := runtimepins.ImageForHost(repoRoot, "emulator")
+	if err != nil {
+		t.Fatal(err)
+	}
 	env, err := spanemuboost.RunWithClients(ctx, spanemuboost.BackendEmulator,
 		spanemuboost.WithContainerImage(emulatorImage),
 		spanemuboost.WithSetupDDLs(loaderSampleDDLs),

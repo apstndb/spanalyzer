@@ -25,6 +25,18 @@ The integration probes submit statements directly through the Spanner Go
 client. Memefish is used only to parse the fixture DDL before database setup;
 it is not in the candidate-statement path.
 
+### Emulator 1.5.56 revalidation (2026-08-27)
+
+The repository-wide current-target run revalidated the audit on Emulator
+`1.5.56`, `linux/arm64`, platform-manifest digest
+`sha256:5b1e3607fe8574fb04144eeabfa54120559fb01968ffe3ffc0a9a8f6776fc454`.
+Both `|> LOG @{a=1}` and `|> FINISH @{a=1}` now return `Pipe query syntax not
+supported` at the pipe operator, before the hint. That result is classified as
+`feature_unavailable`: it proves neither acceptance nor a position-specific
+rejection of the hint. The executable audit keeps this state separate from
+`accepted`, `rejected`, and transport-level `inconclusive` results. No managed
+Spanner or Omni claim is changed by this Emulator-only grammar boundary.
+
 ## Classification
 
 - **accepted**: execution succeeded, or a non-syntax error proved that parsing

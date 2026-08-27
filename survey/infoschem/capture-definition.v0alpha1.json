@@ -22,7 +22,11 @@
     "queryable"
   ],
   "producer_inputs": [
+    "runtime_targets.json",
     "survey/infoschem/*.go",
+    "survey/internal/captureenv/*.go",
+    "survey/internal/capturemeta/*.go",
+    "survey/internal/runtimepins/*.go",
     "survey/internal/strictjson/*.go",
     "survey/cmd/infoschema-capture/*.go",
     "survey/infoschem/capture-definition.v0alpha1.json",

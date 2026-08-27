@@ -46,13 +46,13 @@ mise run run-roundtrip       # end-to-end demo: starts emulator via spanemuboost
 GOWORK=off GOFLAGS=-mod=readonly go run ./cmd/infoschema-capture \
   --target managed --write --repo-root ..
 GOWORK=off GOFLAGS=-mod=readonly go run ./cmd/infoschema-capture \
-  --target emulator \
-  --image gcr.io/cloud-spanner-emulator/emulator:1.5.56@sha256:5b1e3607fe8574fb04144eeabfa54120559fb01968ffe3ffc0a9a8f6776fc454 \
-  --write --repo-root ..
+  --target emulator --write --repo-root ..
 GOWORK=off GOFLAGS=-mod=readonly go run ./cmd/infoschema-capture \
-  --target omni \
-  --image us-docker.pkg.dev/spanner-omni/images/spanner-omni:2026.r2.1-beta@sha256:ed31d9ee72eeee69cac78566eb3a6e72ee389b26234735f0ef449774cc006741 \
-  --write --repo-root ..
+  --target omni --write --repo-root ..
+GOWORK=off GOFLAGS=-mod=readonly go run ./cmd/spanner-sys-capture \
+  --target managed --write --repo-root ..
+GOWORK=off GOFLAGS=-mod=readonly go run ./cmd/spanner-sys-capture \
+  --target omni --write --repo-root ..
 ```
 
 `--write` creates but never replaces the canonical capture path. An equivalent
@@ -60,6 +60,17 @@ rerun preserves the first artifact only when its producer-source and invocation
 hashes also match. If either producer identity changes, the command fails
 closed and reports both identities; review or remove the retained file before
 recapturing rather than treating stale provenance as a successful rerun.
+Container targets default to the exact host-platform image manifest pinned in
+the repository-root `runtime_targets.json`; `--image` is an explicit probe
+override and the running manifest is still inspected before a capture is
+accepted.
+
+Prefix either capture command with `check` and omit `--write` to compare the
+live target with retained evidence and emit only a compact read-only report.
+The SPANNER_SYS command writes the provenance-complete `v0alpha2` capture
+format. Its legacy `v0alpha1` sidecars remain immutable inputs to the existing
+manifest and serve as comparison baselines until an equivalent v0alpha2
+observation is deliberately retained.
 
 `cmd/roundtrip` requires Docker (uses `spanemuboost` / testcontainers).
 
@@ -110,6 +121,11 @@ recapturing rather than treating stale provenance as a successful rerun.
   complete agreeing observation. `cmd/spanner-sys-export` is the corresponding
   explicit-commit CLI. The parent analyzer pins its bytes without importing
   producer packages into the root module.
+  `CaptureSurfaceFromTransaction` and `cmd/spanner-sys-capture` independently
+  produce the provenance-complete `v0alpha2` observational contract. Managed
+  targets retain a point-in-time read timestamp; Omni targets retain the exact
+  platform manifest digest. This does not rewrite or silently upgrade the
+  legacy manifest inputs.
 
 - `astconv/` — bidirectional conversion between `infoschem.Schema` (a bag holding every
   `infoschem` slice) and `[]ast.DDL`. Each DDL family has paired files `to_ast_<family>.go`
@@ -201,3 +217,6 @@ recapturing rather than treating stale provenance as a successful rerun.
   `GOFLAGS=-mod=readonly`, so the producer hash closes over the survey module's
   pinned dependency graph. The dated reports in `docs/` remain historical
   summaries.
+  SPANNER_SYS uses the same target-identity and create-once policy under
+  `spannersys/evidence/`; new captures use nested managed or digest/platform
+  paths while the two flat v0alpha1 files stay frozen for manifest compatibility.

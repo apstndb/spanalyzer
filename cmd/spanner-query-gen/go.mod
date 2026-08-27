@@ -5,7 +5,7 @@ go 1.26.2
 require (
 	cloud.google.com/go v0.123.0
 	github.com/apstndb/spanalyzer v0.2.1
-	github.com/apstndb/spanemuboost v0.4.6
+	github.com/apstndb/spanemuboost v0.4.7
 	github.com/cloudspannerecosystem/memefish v0.6.3-0.20260429070454-64f857b2c61e
 	github.com/moby/moby/api v1.54.1
 	github.com/testcontainers/testcontainers-go v0.42.0

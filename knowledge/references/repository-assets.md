@@ -9,6 +9,9 @@ asset_families:
   - id: contract-schemas
     paths:
       - schemas/*.schema.json
+  - id: runtime-target-contract
+    paths:
+      - runtime_targets.json
   - id: plan-vocabulary
     paths:
       - plancontract/planvocab/catalog.json
@@ -25,6 +28,7 @@ asset_families:
     paths:
       - survey/import-provenance.json
       - survey/infoschem/capture-definition.v0alpha1.json
+      - survey/spannersys/capture-definition.v0alpha2.json
       - survey/schemas/*.schema.json
   - id: survey-observational-evidence
     paths:
@@ -65,6 +69,11 @@ contracts for the mutable `v0alpha1` plan-vocabulary formats and the `v1alpha`
 query-generator configuration, plan-report, and plan-contract formats. The
 schema files remain the canonical definitions.
 
+The [`runtime_targets.json`](../../runtime_targets.json) contract centralizes
+the descriptive release tags and platform-specific OCI manifest digests used
+by every Emulator and Omni test or capture path. A tag remains human-readable;
+the digest is the execution identity.
+
 ## Plan vocabulary
 
 The observational vocabulary consists of the reviewed
@@ -104,10 +113,14 @@ commit/subtree, plus exclusions and dispositions. The survey schemas define
 the producer's prerelease capture and manifest contracts. The versioned
 [`capture definition`](../../survey/infoschem/capture-definition.v0alpha1.json)
 freezes the INFORMATION_SCHEMA query, rolling probes, execution policy, and
-hashed producer inputs. INFORMATION_SCHEMA captures retain redacted names, raw
+hashed producer inputs. The independent
+[`SPANNER_SYS v0alpha2 definition`](../../survey/spannersys/capture-definition.v0alpha2.json)
+closes the same provenance gap without reinterpreting the immutable v0alpha1
+manifest sidecars. INFORMATION_SCHEMA captures retain redacted names, raw
 types, ordinals, and bounded rolling-column queryability for managed, Omni, and
-Emulator targets. SPANNER_SYS captures retain only redacted names, raw types,
-and ordinals for their identified managed and Omni targets.
+Emulator targets. SPANNER_SYS v0alpha2 captures additionally bind those
+redacted names, raw types, and ordinals to the producer source, invocation,
+point-in-time managed timestamp, or exact Omni platform manifest.
 
 ## Executable plan evidence
 

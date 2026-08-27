@@ -5,24 +5,18 @@ package main
 import (
 	"bytes"
 	"context"
-	"crypto/rand"
-	"encoding/hex"
 	"errors"
 	"flag"
 	"fmt"
 	"io"
 	"os"
 	"path/filepath"
-	"slices"
-	"strings"
 	"time"
 
 	"cloud.google.com/go/spanner"
 	"github.com/apstndb/spanalyzer/survey/infoschem"
-	"github.com/apstndb/spanemuboost"
-	"github.com/distribution/reference"
-	"github.com/moby/moby/client"
-	"github.com/testcontainers/testcontainers-go"
+	"github.com/apstndb/spanalyzer/survey/internal/captureenv"
+	"github.com/apstndb/spanalyzer/survey/internal/runtimepins"
 )
 
 const captureLabel = "io.github.apstndb.spanalyzer.infoschema-capture"
@@ -32,11 +26,15 @@ func main() {
 }
 
 func run(args []string, stdout, stderr io.Writer) int {
+	checkMode := len(args) > 0 && args[0] == "check"
+	if checkMode {
+		args = args[1:]
+	}
 	flags := flag.NewFlagSet("infoschema-capture", flag.ContinueOnError)
 	flags.SetOutput(stderr)
 	target := flags.String("target", "", "capture target: managed, omni, or emulator")
 	database := flags.String("database", os.Getenv("TEST_REAL_SPANNER_DATABASE"), "managed Spanner database resource (defaults to TEST_REAL_SPANNER_DATABASE; never retained)")
-	image := flags.String("image", "", "container image with an explicit descriptive tag and optional @sha256 digest pin (required for omni and emulator)")
+	image := flags.String("image", "", "container image override with an explicit descriptive tag and optional @sha256 digest pin; defaults to runtime_targets.json")
 	repoRoot := flags.String("repo-root", "", "spanalyzer repository root (auto-detected when omitted)")
 	output := flags.String("output", "", "canonical repository output path (stdout when omitted)")
 	write := flags.Bool("write", false, "write to the canonical repository path")
@@ -55,16 +53,16 @@ func run(args []string, stdout, stderr io.Writer) int {
 		writeDiagnostic(stderr, "--write and --output are mutually exclusive\n")
 		return 2
 	}
+	if checkMode && (*write || *output != "") {
+		writeDiagnostic(stderr, "check does not accept --write or --output\n")
+		return 2
+	}
 	if *target != "managed" && *target != "omni" && *target != "emulator" {
 		writeDiagnostic(stderr, "--target must be managed, omni, or emulator\n")
 		return 2
 	}
 	if *target == "managed" && *database == "" {
 		writeDiagnostic(stderr, "--database or TEST_REAL_SPANNER_DATABASE is required for target managed\n")
-		return 2
-	}
-	if *target != "managed" && *image == "" {
-		writeDiagnostic(stderr, "--image with an explicit tag is required for target %s\n", *target)
 		return 2
 	}
 	if err := validateExecutionEnvironment(); err != nil {
@@ -76,6 +74,13 @@ func run(args []string, stdout, stderr io.Writer) int {
 	if err != nil {
 		writeDiagnostic(stderr, "%v\n", err)
 		return 1
+	}
+	if *target != "managed" && *image == "" {
+		*image, err = runtimepins.ImageForHost(root, *target)
+		if err != nil {
+			writeDiagnostic(stderr, "resolve pinned %s image: %v\n", *target, err)
+			return 1
+		}
 	}
 	producer, err := infoschem.ComputeProducerIdentity(root)
 	if err != nil {
@@ -101,6 +106,21 @@ func run(args []string, stdout, stderr io.Writer) int {
 		return 1
 	}
 	canonicalOutput := filepath.Join(root, "survey", "infoschem", filepath.FromSlash(relative))
+	if checkMode {
+		report, err := compareRetainedCapture(root, document)
+		if err != nil {
+			writeDiagnostic(stderr, "compare retained INFORMATION_SCHEMA capture: %v\n", err)
+			return 1
+		}
+		if err := writeComparisonReport(stdout, report); err != nil {
+			writeDiagnostic(stderr, "write INFORMATION_SCHEMA comparison: %v\n", err)
+			return 1
+		}
+		if report.MaterialChange {
+			return 1
+		}
+		return 0
+	}
 	if !*write && *output == "" {
 		if _, err := stdout.Write(data); err != nil {
 			writeDiagnostic(stderr, "write capture: %v\n", err)
@@ -146,63 +166,14 @@ func capture(
 	imageReference string,
 	producer infoschem.ProducerIdentity,
 ) (*infoschem.CaptureDocument, error) {
-	if targetKind == "managed" {
-		client, err := spanner.NewClient(ctx, database)
-		if err != nil {
-			return nil, fmt.Errorf("open managed Spanner client: %w", err)
-		}
-		defer client.Close()
-		txn := newCaptureTransaction(client)
-		defer txn.Close()
-		return infoschem.CaptureFromTransaction(ctx, txn, infoschem.CaptureTarget{
-			Kind:             "managed",
-			ObservationScope: "single_database",
-		}, producer)
-	}
-
-	family, tag, pinnedDigest, err := splitTaggedImage(imageReference)
+	environment, err := captureenv.Open(ctx, targetKind, database, imageReference, captureLabel)
 	if err != nil {
 		return nil, err
 	}
-	labelValue, err := randomLabelValue()
-	if err != nil {
-		return nil, err
-	}
-	backend := spanemuboost.BackendOmni
-	if targetKind == "emulator" {
-		backend = spanemuboost.BackendEmulator
-	}
-	env, err := spanemuboost.RunWithClients(
-		ctx,
-		backend,
-		spanemuboost.WithContainerImage(imageReference),
-		spanemuboost.WithContainerCustomizers(testcontainers.WithLabels(map[string]string{
-			captureLabel: labelValue,
-		})),
-	)
-	if err != nil {
-		return nil, fmt.Errorf("start %s image %q: %w", targetKind, imageReference, err)
-	}
-	defer func() { _ = env.Close() }()
-
-	digest, platform, err := inspectRuntimeImage(ctx, captureLabel, labelValue)
-	if err != nil {
-		return nil, err
-	}
-	if pinnedDigest != "" && digest != pinnedDigest {
-		return nil, fmt.Errorf("running container manifest digest = %q, pinned image reference requires %q", digest, pinnedDigest)
-	}
-	txn := newCaptureTransaction(env.Client)
+	defer func() { _ = environment.Close() }()
+	txn := newCaptureTransaction(environment.Client)
 	defer txn.Close()
-	return infoschem.CaptureFromTransaction(ctx, txn, infoschem.CaptureTarget{
-		Kind: targetKind,
-		Image: &infoschem.ImageIdentity{
-			Family:   family,
-			Tag:      tag,
-			Digest:   digest,
-			Platform: platform,
-		},
-	}, producer)
+	return infoschem.CaptureFromTransaction(ctx, txn, environment.Target, producer)
 }
 
 func newCaptureTransaction(client *spanner.Client) *spanner.ReadOnlyTransaction {
@@ -210,68 +181,11 @@ func newCaptureTransaction(client *spanner.Client) *spanner.ReadOnlyTransaction 
 }
 
 func splitTaggedImage(value string) (string, string, string, error) {
-	named, err := reference.ParseNormalizedNamed(value)
-	if err != nil {
-		return "", "", "", fmt.Errorf("parse --image %q: %w", value, err)
-	}
-	tagged, ok := named.(reference.Tagged)
-	if !ok {
-		return "", "", "", errors.New("--image must include an explicit descriptive tag")
-	}
-	pinnedDigest := ""
-	if digested, ok := named.(reference.Digested); ok {
-		pinnedDigest = digested.Digest().String()
-	}
-	return named.Name(), tagged.Tag(), pinnedDigest, nil
+	return captureenv.SplitTaggedImage(value)
 }
 
 func validateExecutionEnvironment() error {
-	if os.Getenv("GOWORK") != "off" {
-		return errors.New("capture execution requires GOWORK=off so producer hashes close over the survey module graph")
-	}
-	if slices.Contains(strings.Fields(os.Getenv("GOFLAGS")), "-mod=readonly") {
-		return nil
-	}
-	return errors.New("capture execution requires GOFLAGS=-mod=readonly")
-}
-
-func inspectRuntimeImage(ctx context.Context, label, value string) (string, string, error) {
-	docker, err := client.New(client.FromEnv)
-	if err != nil {
-		return "", "", fmt.Errorf("open Docker client: %w", err)
-	}
-	defer func() { _ = docker.Close() }()
-	containers, err := docker.ContainerList(ctx, client.ContainerListOptions{
-		All:     true,
-		Filters: client.Filters{}.Add("label", label+"="+value),
-	})
-	if err != nil {
-		return "", "", fmt.Errorf("list labeled capture containers: %w", err)
-	}
-	if len(containers.Items) != 1 {
-		return "", "", fmt.Errorf("capture label selected %d containers, want exactly 1", len(containers.Items))
-	}
-	inspection, err := docker.ContainerInspect(ctx, containers.Items[0].ID, client.ContainerInspectOptions{})
-	if err != nil {
-		return "", "", fmt.Errorf("inspect capture container: %w", err)
-	}
-	descriptor := inspection.Container.ImageManifestDescriptor
-	if descriptor == nil || descriptor.Digest.String() == "" || descriptor.Platform == nil {
-		return "", "", errors.New("docker inspect did not return a platform-specific image manifest descriptor")
-	}
-	platform := descriptor.Platform.OS + "/" + descriptor.Platform.Architecture
-	if descriptor.Platform.Variant != "" {
-		platform += "/" + descriptor.Platform.Variant
-	}
-	return descriptor.Digest.String(), platform, nil
-}
-
-func randomLabelValue() (string, error) {
-	value := make([]byte, 16)
-	if _, err := rand.Read(value); err != nil {
-		return "", fmt.Errorf("generate capture container label: %w", err)
-	}
-	return hex.EncodeToString(value), nil
+	return captureenv.ValidateExecutionEnvironment()
 }
 
 func resolveRepoRoot(explicit string) (string, error) {

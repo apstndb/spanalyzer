@@ -46,6 +46,25 @@ The repository hosts five Go modules, split along dependency weight:
 
 Development across modules uses the committed `go.work` workspace.
 
+## Repository verification
+
+The repository root owns read-only verification tasks across all five modules
+and the currently pinned target runtimes:
+
+```sh
+mise run verify-local       # modules, generated evidence, OKF, Markdown policy
+mise run verify-containers  # exact Emulator/Omni manifests; no evidence writes
+mise run verify-managed     # point-in-time checks against TEST_REAL_SPANNER_DATABASE
+mise run verify-current     # local + containers + managed
+```
+
+[`runtime_targets.json`](runtime_targets.json) is the single source of truth
+for the descriptive tags and platform-specific OCI manifest digests used by
+Emulator and Omni tests. Container check commands compare live catalog surfaces
+with retained evidence and emit compact JSON; they do not create new captures.
+The two Omni plan suites share one runtime in `verify-containers`, avoiding a
+second cold container startup.
+
 ## Documentation map
 
 - [`knowledge/`](knowledge/index.md): the OKF v0.2 entry point for the

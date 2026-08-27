@@ -27,6 +27,14 @@ func TestRunRejectsWriteAndOutput(t *testing.T) {
 	}
 }
 
+func TestRunCheckRejectsWrite(t *testing.T) {
+	var stdout, stderr bytes.Buffer
+	got := run([]string{"check", "--target", "managed", "--write"}, &stdout, &stderr)
+	if got != 2 || !strings.Contains(stderr.String(), "check does not accept") {
+		t.Fatalf("run() = %d, stderr = %q", got, stderr.String())
+	}
+}
+
 func TestSplitTaggedImage(t *testing.T) {
 	family, tag, digest, err := splitTaggedImage("gcr.io/cloud-spanner-emulator/emulator:1.5.56")
 	if err != nil {

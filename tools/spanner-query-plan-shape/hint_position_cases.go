@@ -3,8 +3,9 @@ package main
 type hintPositionExpectation string
 
 const (
-	hintPositionAccepted hintPositionExpectation = "accepted"
-	hintPositionRejected hintPositionExpectation = "rejected"
+	hintPositionAccepted    hintPositionExpectation = "accepted"
+	hintPositionRejected    hintPositionExpectation = "rejected"
+	hintPositionUnavailable hintPositionExpectation = "feature_unavailable"
 )
 
 type hintPositionAuditCase struct {

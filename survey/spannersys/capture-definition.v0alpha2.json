@@ -1,0 +1,22 @@
+{
+  "schema_version": "v0alpha2",
+  "invocation_id": "spanner-sys-columns-v0alpha2",
+  "query": "SELECT TABLE_NAME, COLUMN_NAME, SPANNER_TYPE, ORDINAL_POSITION\nFROM INFORMATION_SCHEMA.COLUMNS\nWHERE TABLE_SCHEMA = 'SPANNER_SYS'\nORDER BY TABLE_NAME, ORDINAL_POSITION",
+  "execution": {
+    "go_work": "off",
+    "module_mode": "readonly"
+  },
+  "producer_inputs": [
+    "runtime_targets.json",
+    "survey/spannersys/*.go",
+    "survey/internal/captureenv/*.go",
+    "survey/internal/capturemeta/*.go",
+    "survey/internal/runtimepins/*.go",
+    "survey/internal/strictjson/*.go",
+    "survey/cmd/spanner-sys-capture/*.go",
+    "survey/spannersys/capture-definition.v0alpha2.json",
+    "survey/schemas/spanner-sys-capture.v0alpha2.schema.json",
+    "survey/go.mod",
+    "survey/go.sum"
+  ]
+}

@@ -25,6 +25,12 @@ func classifyHintPositionResult(err error) (hintPositionExpectation, string) {
 	}
 	description := spanner.ErrDesc(err)
 	lower := strings.ToLower(description)
+	// Emulator 1.5.56 rejects the pipe grammar before reaching the operator or
+	// its hint. Treat that as unavailable evidence, not acceptance or a
+	// position-specific rejection.
+	if strings.Contains(lower, "pipe query syntax not supported") {
+		return hintPositionUnavailable, description
+	}
 	if strings.Contains(lower, "syntax error") || isKnownHintPositionRejection(lower) {
 		return hintPositionRejected, description
 	}
@@ -70,6 +76,7 @@ func TestClassifyHintPositionResult(t *testing.T) {
 		{name: "LIKE value list", err: status.Error(codes.InvalidArgument, "HINTs cannot be specified on LIKE clause with value list"), want: hintPositionRejected},
 		{name: "quantified value list", err: status.Error(codes.InvalidArgument, "HINTs cannot be specified on ANY/SOME/ALL clause with value list"), want: hintPositionRejected},
 		{name: "set operation restriction", err: status.Error(codes.InvalidArgument, "Hints on set operations must appear on the first operation"), want: hintPositionRejected},
+		{name: "pipe grammar gate", err: status.Error(codes.InvalidArgument, "Pipe query syntax not supported"), want: hintPositionUnavailable},
 		{name: "unsupported hint", err: status.Error(codes.InvalidArgument, "Unsupported hint: a"), want: hintPositionAccepted},
 		{name: "feature not supported", err: status.Error(codes.InvalidArgument, "LIKE ALL is not supported"), want: hintPositionAccepted},
 		{name: "name resolution", err: status.Error(codes.NotFound, "Table-valued function not found"), want: hintPositionAccepted},

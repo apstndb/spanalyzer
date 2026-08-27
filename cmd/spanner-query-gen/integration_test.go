@@ -4,6 +4,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"math"
 	"os"
 	"path/filepath"
@@ -22,15 +23,22 @@ import (
 	"github.com/testcontainers/testcontainers-go"
 )
 
-var querygenIntegrationRuntime = spanemuboost.NewLazyRuntime(
-	spanemuboost.BackendEmulator,
-	spanemuboost.EnableInstanceAutoConfigOnly(),
-	spanemuboost.WithContainerCustomizers(testcontainers.WithConfigModifier(func(config *dcontainer.Config) {
-		config.Cmd = []string{"./gateway_main", "--hostname", "0.0.0.0", "--disable_query_null_filtered_index_check"}
-	})),
-)
+var querygenIntegrationRuntime *spanemuboost.LazyRuntime
 
 func TestMain(m *testing.M) {
+	emulatorImage, err := querygenPinnedRuntimeImage("emulator")
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
+	}
+	querygenIntegrationRuntime = spanemuboost.NewLazyRuntime(
+		spanemuboost.BackendEmulator,
+		spanemuboost.EnableInstanceAutoConfigOnly(),
+		spanemuboost.WithContainerImage(emulatorImage),
+		spanemuboost.WithContainerCustomizers(testcontainers.WithConfigModifier(func(config *dcontainer.Config) {
+			config.Cmd = []string{"./gateway_main", "--hostname", "0.0.0.0", "--disable_query_null_filtered_index_check"}
+		})),
+	)
 	querygenIntegrationRuntime.TestMain(m)
 }
 

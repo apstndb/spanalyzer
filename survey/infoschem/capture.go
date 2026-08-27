@@ -17,6 +17,7 @@ import (
 	"time"
 
 	"cloud.google.com/go/spanner"
+	"github.com/apstndb/spanalyzer/survey/internal/capturemeta"
 	"github.com/apstndb/spanalyzer/survey/internal/strictjson"
 	"google.golang.org/api/iterator"
 	"google.golang.org/grpc/codes"
@@ -27,14 +28,11 @@ const (
 	captureSchemaVersion = "v0alpha1"
 	captureCatalog       = "INFORMATION_SCHEMA"
 	captureDialect       = "googlesql"
-	managedScope         = "single_database"
 	closedTransactionErr = "cannot use a closed transaction"
 )
 
 var (
-	sha256Pattern   = regexp.MustCompile(`^[0-9a-f]{64}$`)
-	imageTagPattern = regexp.MustCompile(`^[A-Za-z0-9_][A-Za-z0-9_.-]{0,127}$`)
-	platformPattern = regexp.MustCompile(`^linux/(amd64|arm64)(/v[0-9]+)?$`)
+	sha256Pattern = regexp.MustCompile(`^[0-9a-f]{64}$`)
 )
 
 // CaptureDocument is a redacted observation of one target's advertised
@@ -55,19 +53,10 @@ type CaptureDocument struct {
 
 // CaptureTarget identifies either a rolling managed observation or a
 // retrospectively reproducible container release.
-type CaptureTarget struct {
-	Kind             string         `json:"kind"`
-	ObservationScope string         `json:"observation_scope,omitempty"`
-	Image            *ImageIdentity `json:"image,omitempty"`
-}
+type CaptureTarget = capturemeta.Target
 
 // ImageIdentity identifies the platform-specific OCI manifest actually run.
-type ImageIdentity struct {
-	Family   string `json:"family"`
-	Tag      string `json:"tag"`
-	Digest   string `json:"digest"`
-	Platform string `json:"platform"`
-}
+type ImageIdentity = capturemeta.ImageIdentity
 
 // CaptureColumn is one complete INFORMATION_SCHEMA.COLUMNS tuple.
 type CaptureColumn struct {
@@ -331,7 +320,7 @@ func ValidateCapture(document *CaptureDocument) error {
 	if document.Catalog != captureCatalog || document.Dialect != captureDialect {
 		return fmt.Errorf("capture catalog/dialect = %q/%q, want %q/%q", document.Catalog, document.Dialect, captureCatalog, captureDialect)
 	}
-	if err := validateTarget(document.Target); err != nil {
+	if err := capturemeta.ValidateTarget(document.Target); err != nil {
 		return err
 	}
 	observedAt, err := time.Parse(time.RFC3339Nano, document.ObservedAt)
@@ -377,35 +366,6 @@ func ValidateCapture(document *CaptureDocument) error {
 	}
 	if document.SurfaceSHA256 != wantHash {
 		return fmt.Errorf("capture surface_sha256 = %q, want %q", document.SurfaceSHA256, wantHash)
-	}
-	return nil
-}
-
-func validateTarget(target CaptureTarget) error {
-	switch target.Kind {
-	case "managed":
-		if target.ObservationScope != managedScope || target.Image != nil {
-			return errors.New("managed capture must set observation_scope=single_database and omit image")
-		}
-	case "omni", "emulator":
-		if target.ObservationScope != "" || target.Image == nil {
-			return fmt.Errorf("%s capture must set image and omit observation_scope", target.Kind)
-		}
-		image := target.Image
-		if image.Family == "" || strings.ContainsAny(image.Family, "@\n\r\t ") {
-			return fmt.Errorf("capture image family = %q, want a non-empty repository without digest or whitespace", image.Family)
-		}
-		if !imageTagPattern.MatchString(image.Tag) {
-			return fmt.Errorf("capture image tag = %q, want a canonical OCI tag", image.Tag)
-		}
-		if !strings.HasPrefix(image.Digest, "sha256:") || !sha256Pattern.MatchString(strings.TrimPrefix(image.Digest, "sha256:")) {
-			return fmt.Errorf("capture image digest = %q, want sha256:<64 lowercase hex>", image.Digest)
-		}
-		if !platformPattern.MatchString(image.Platform) {
-			return fmt.Errorf("capture image platform = %q, want normalized linux/amd64 or linux/arm64[/variant]", image.Platform)
-		}
-	default:
-		return fmt.Errorf("capture target kind = %q, want managed, omni, or emulator", target.Kind)
 	}
 	return nil
 }
@@ -475,19 +435,7 @@ func ExpectedCapturePath(document *CaptureDocument) (string, error) {
 	if err := ValidateCapture(document); err != nil {
 		return "", err
 	}
-	shortHash := document.SurfaceSHA256[:12]
-	switch document.Target.Kind {
-	case "managed":
-		observedAt, _ := time.Parse(time.RFC3339Nano, document.ObservedAt)
-		stamp := observedAt.UTC().Format("20060102T150405Z")
-		return filepath.ToSlash(filepath.Join("evidence", "managed", stamp+"-"+shortHash+".json")), nil
-	case "omni", "emulator":
-		digest := strings.TrimPrefix(document.Target.Image.Digest, "sha256:")
-		platform := strings.ReplaceAll(document.Target.Image.Platform, "/", "-")
-		return filepath.ToSlash(filepath.Join("evidence", document.Target.Kind, digest, platform+"-"+shortHash+".json")), nil
-	default:
-		panic("ValidateCapture accepted an unknown target")
-	}
+	return capturemeta.ExpectedPath(document.Target, document.ObservedAt, document.SurfaceSHA256)
 }
 
 // ComputeProducerIdentity hashes the closed producer input set declared by the

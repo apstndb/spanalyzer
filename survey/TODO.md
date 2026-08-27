@@ -1,5 +1,43 @@
 # TODO
 
+## Improve current-state revalidation workflow (2026-08-27)
+
+- ~~Centralize the exact Emulator and Omni image families, descriptive tags, and
+  platform-specific digest pins in one machine-readable repository contract;
+  require live tests and capture tasks to consume that contract rather than a
+  dependency default or a mutable tag alone.~~ Done in the root
+  `runtime_targets.json` contract with strict loaders in each independently
+  resolved module.
+- ~~Add a compact, read-only INFORMATION_SCHEMA comparison command that
+  distinguishes an unchanged surface, producer-only change, surface drift, and
+  target-identity drift without writing evidence.~~ Done through the `check`
+  subcommand; all three targets reproduced their retained surfaces.
+- ~~Add repository-root `mise` tasks for local, container, managed, and complete
+  pinned-state verification. The default path must remain read-only.~~ Done;
+  the managed selector was also corrected to run the exact canonical, drift,
+  and UUID test names.
+- ~~Allow the plan-shape integration package to attach to the same long-lived
+  Spanner Omni endpoint already supported by query-generator integration tests,
+  then measure the full-suite elapsed-time effect without changing assertions.~~
+  Done. Two interleaved local trials reduced the independent-runtime totals
+  from 219.98/228.66 seconds to 102.23/141.77 seconds with one runtime; these
+  are diagnostic observations, not a fixed performance gate.
+- ~~Introduce a provenance-complete SPANNER_SYS capture contract and live capture
+  command with the same target identity and comparison guarantees as the
+  INFORMATION_SCHEMA capture path.~~ Done as `v0alpha2`; final managed and
+  exact-pinned Omni checks each reproduced the legacy 539-column surface while
+  preserving the legacy sidecars unchanged.
+- ~~Separate stable contract metrics from database-content-dependent diagnostic
+  counts in managed and SPANNER_SYS test output.~~ Done. The current managed
+  database's generated DDL count moved from the historical 341 to 342 without
+  changing the catalog contract, demonstrating why the diagnostic channel is
+  intentionally non-normative.
+- ~~Run focused tests, all five module test suites, generated/evidence/OKF gates,
+  tagged integration compilation, Docker-backed comparison and integration
+  tests, and managed-Spanner read-only checks before closing this section.~~
+  Done on the final worktree snapshot; the managed SPANNER_SYS contract remained
+  50 advertised tables / 539 columns / eight known-absent entries with no drift.
+
 ## Export a portable SPANNER_SYS manifest (S-C)
 
 - ~~Persist the current managed-Spanner and Omni `2026.r2.1-beta` column
