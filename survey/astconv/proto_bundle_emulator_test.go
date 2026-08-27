@@ -20,6 +20,7 @@ func TestProtoBundle_FromEmulatorSCHEMATA(t *testing.T) {
 	fds := exampleShippingFileDescriptorSet(t)
 
 	env, err := spanemuboost.RunWithClients(ctx, spanemuboost.BackendEmulator,
+		spanemuboost.WithContainerImage(pinnedEmulatorImage(t)),
 		spanemuboost.WithSetupDDLs([]string{
 			"CREATE SCHEMA app",
 			"CREATE PROTO BUNDLE (`examples.shipping.Order`)",

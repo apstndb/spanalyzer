@@ -5,7 +5,6 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/apstndb/spanalyzer/survey/internal/runtimepins"
 	"github.com/apstndb/spanemuboost"
 	"github.com/cloudspannerecosystem/memefish/ast"
 )
@@ -72,16 +71,8 @@ func TestLoadSchema_EmulatorRoundtrip(t *testing.T) {
 	}
 
 	ctx := context.Background()
-	repoRoot, err := runtimepins.FindRepositoryRoot(".")
-	if err != nil {
-		t.Fatal(err)
-	}
-	emulatorImage, err := runtimepins.ImageForHost(repoRoot, "emulator")
-	if err != nil {
-		t.Fatal(err)
-	}
 	env, err := spanemuboost.RunWithClients(ctx, spanemuboost.BackendEmulator,
-		spanemuboost.WithContainerImage(emulatorImage),
+		spanemuboost.WithContainerImage(pinnedEmulatorImage(t)),
 		spanemuboost.WithSetupDDLs(loaderSampleDDLs),
 	)
 	if err != nil {
