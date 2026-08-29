@@ -714,6 +714,30 @@ unprefixed expectation manifest to repeat the 304-plan matrix. Expression text
 and version boundaries are checked by the focused Omni integration test and recorded in
 [`CONDITION_BOUNDARY_OBSERVATIONS_2026-08-11.md`](../../research/spanner-query-plan-shape/CONDITION_BOUNDARY_OBSERVATIONS_2026-08-11.md).
 
+Probe automatic, forced, mixed-key, and base-table access for GoogleSQL
+scalar-expression indexes:
+
+```sh
+set -o pipefail
+/tmp/spanner-query-plan-shape \
+  --case expression_index \
+  --omni-image us-docker.pkg.dev/spanner-omni/images/spanner-omni:2026.r2.1-beta \
+  --output json \
+  --continue-on-error \
+  | /tmp/planvocab-check \
+      --expect tools/spanner-query-plan-shape/testdata/expression_index_expectations.json
+```
+
+The case keeps its DDL as raw SQL because the pinned memefish AST cannot
+represent expression index keys. It verifies automatic and forced index
+selection, an ordinary leading key followed by an expression key, and a
+`_BASE_TABLE` control. On the pinned Omni runtime, expression indexes use the
+existing `Scan`/`IndexScan` vocabulary with `Seek Condition`; distributed
+access also retains a `Split Range` on `Distributed Union`. The focused Omni
+integration test additionally checks the internal expression-key variables.
+Syntax, metadata, reconstruction, and environment boundaries are recorded in
+the [expression-index observation](../../knowledge/observations/spanner-expression-indexes.md).
+
 Compare the 19 documented Spanner aggregate-function names with the physical
 expressions attached to Aggregate `Agg` child links:
 

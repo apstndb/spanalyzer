@@ -195,6 +195,54 @@ func TestLoadDDLsOptimizerGapsIncludesDedicatedObjects(t *testing.T) {
 	}
 }
 
+func TestLoadExpressionIndexCases(t *testing.T) {
+	queries, err := loadQueries("expression_index", nil, nil)
+	if err != nil {
+		t.Fatalf("loadQueries(expression_index) error = %v", err)
+	}
+	if got, want := len(queries), 4; got != want {
+		t.Fatalf("expression-index queries = %d, want %d", got, want)
+	}
+	labels := make(map[string]string, len(queries))
+	for _, query := range queries {
+		labels[query.Label] = query.SQL
+	}
+	for _, label := range []string{
+		"expression-index/auto-city",
+		"expression-index/force-city",
+		"expression-index/composite-name-state",
+		"expression-index/base-table-control",
+	} {
+		if _, ok := labels[label]; !ok {
+			t.Errorf("expression-index selector is missing %s", label)
+		}
+	}
+	if !strings.Contains(labels["expression-index/force-city"], "FORCE_INDEX=ExpressionIndexVenuesByCity") {
+		t.Errorf("forced expression-index query = %q", labels["expression-index/force-city"])
+	}
+	if !strings.Contains(labels["expression-index/base-table-control"], "FORCE_INDEX=_BASE_TABLE") {
+		t.Errorf("base-table expression-index control = %q", labels["expression-index/base-table-control"])
+	}
+
+	ddls, err := loadDDLs("expression_index", nil)
+	if err != nil {
+		t.Fatalf("loadDDLs(expression_index) error = %v", err)
+	}
+	if got, want := len(ddls), 3; got != want {
+		t.Fatalf("expression-index DDLs = %d, want %d", got, want)
+	}
+	joined := strings.Join(ddls, "\n")
+	for _, want := range []string{
+		"CREATE TABLE ExpressionIndexVenues",
+		"ExpressionIndexVenues((JSON_VALUE(VenueData.address.city)))",
+		"ExpressionIndexVenues(VenueName, (JSON_VALUE(VenueData.address.state)))",
+	} {
+		if !strings.Contains(joined, want) {
+			t.Errorf("expression-index DDL is missing %q in:\n%s", want, joined)
+		}
+	}
+}
+
 func TestLoadDDLsJoinEliminationIncludesControlledSchemas(t *testing.T) {
 	ddls, err := loadDDLs("join_elimination", nil)
 	if err != nil {

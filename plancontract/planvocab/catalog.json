@@ -38,6 +38,8 @@
       "tools/spanner-query-plan-shape/dml_surface_omni_test.go",
       "tools/spanner-query-plan-shape/docs_cases.go",
       "tools/spanner-query-plan-shape/expectation_manifest_contract_test.go",
+      "tools/spanner-query-plan-shape/expression_index_cases.go",
+      "tools/spanner-query-plan-shape/expression_index_omni_test.go",
       "tools/spanner-query-plan-shape/factorized_mode_cases.go",
       "tools/spanner-query-plan-shape/full_text_search_cases.go",
       "tools/spanner-query-plan-shape/google_sql_proto_surface_cases.go",
@@ -83,6 +85,7 @@
       "tools/spanner-query-plan-shape/testdata/ai_plan_expectations.json",
       "tools/spanner-query-plan-shape/testdata/condition_boundary_expectations.json",
       "tools/spanner-query-plan-shape/testdata/dml_expectations.json",
+      "tools/spanner-query-plan-shape/testdata/expression_index_expectations.json",
       "tools/spanner-query-plan-shape/testdata/facet_search_expectations.json",
       "tools/spanner-query-plan-shape/testdata/factorized_mode_expectations.json",
       "tools/spanner-query-plan-shape/testdata/full_text_residual_expectations.json",
@@ -175,7 +178,7 @@
       },
       {
         "path": "plancontract/planvocab/catalog_source.json",
-        "sha256": "75e454cd23ddcda8721dbd7e85318d842c4dfdb1f84ea7151fa52bc2d81e9108"
+        "sha256": "b5fce02639a2a202e23bfbcea75d7a3f118ad8e0aa3f93a482d9535be399a2dc"
       },
       {
         "path": "research/spanner-query-plan-shape/AGGREGATE_FUNCTION_AGG_TYPE_OBSERVATIONS_2026-08-11.md",
@@ -311,7 +314,15 @@
       },
       {
         "path": "tools/spanner-query-plan-shape/expectation_manifest_contract_test.go",
-        "sha256": "dcb8051785e03121f57dff0a2c3d95b41cc162501983290cd138c9da0a6d8204"
+        "sha256": "ea78b5ef55f614b87f337b0f74919a23c848bd185080634e503b2021d458f2d1"
+      },
+      {
+        "path": "tools/spanner-query-plan-shape/expression_index_cases.go",
+        "sha256": "f377df9170518000e230bdfa664666c572a01bf6edba582b5ca20379c6e98fec"
+      },
+      {
+        "path": "tools/spanner-query-plan-shape/expression_index_omni_test.go",
+        "sha256": "4585e3f3f3015fb2c02f6c8d0d2825fd6b782a0854d9f29dad4c461a7f80070b"
       },
       {
         "path": "tools/spanner-query-plan-shape/factorized_mode_cases.go",
@@ -492,6 +503,10 @@
       {
         "path": "tools/spanner-query-plan-shape/testdata/dml_expectations.json",
         "sha256": "5bc05d1ef65addd7d7d31d0a2d78aa7dce3c94e9b360a3fae8abdc8559bde697"
+      },
+      {
+        "path": "tools/spanner-query-plan-shape/testdata/expression_index_expectations.json",
+        "sha256": "1429a9c7c0e8eb2894b089dc2188c55f99568fa5bdbce245a6532f823be92991"
       },
       {
         "path": "tools/spanner-query-plan-shape/testdata/facet_search_expectations.json",

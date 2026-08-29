@@ -12,3 +12,6 @@
 - [INFORMATION_SCHEMA managed-primary catalog](information-schema-managed-primary-catalog.md) -
   point-in-time managed selection, digest-pinned Omni and Emulator comparison
   captures, and rolling-column queryability.
+- [Spanner scalar-expression indexes](spanner-expression-indexes.md) -
+  cross-target syntax and metadata boundaries, fail-closed reconstruction,
+  and the observed index-scan plan shape.

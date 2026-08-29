@@ -40,6 +40,9 @@ mise run test-drift-real     # Required real-Spanner drift gate; fails unless
 mise run test-uuid-real      # Managed-Spanner UUID metadata/reconstruction fixture;
                              # uses a collision-safe temporary table and verifies cleanup
 mise run test-canonical-real # Read-only aggregate GetDatabaseDdl versus reconstructed DDL comparison
+mise run test-expression-index-real
+                             # Managed-Spanner expression-index syntax and metadata fixture;
+                             # uses collision-safe temporary objects and verifies cleanup
 mise run run-roundtrip       # end-to-end demo: starts emulator via spanemuboost,
                              # creates sample DDL, queries INFORMATION_SCHEMA,
                              # rebuilds DDL, prints generated SQL
@@ -138,6 +141,10 @@ observation is deliberately retained.
   DATABASE → tables → indexes → vector indexes → views → change streams → sequences →
   models → graphs → placements → functions → locality groups → roles+grants → ALTER
   STATISTICS).
+  Expression indexes are loaded from `INDEX_COLUMNS.EXPRESSION`, but memefish
+  v0.8.1 cannot represent expression keys. Reconstruction therefore fails
+  closed instead of emitting the service's internal `_ExpressionIndex_*`
+  column name as user DDL.
 
 ## Architectural notes that aren't obvious from the code
 

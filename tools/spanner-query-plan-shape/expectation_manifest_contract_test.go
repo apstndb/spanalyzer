@@ -41,6 +41,7 @@ var expectationManifestContracts = []expectationManifestContract{
 	{Selector: "ai_plan", Manifest: "ai_plan_expectations.json", Coverage: manifestCoverageExact, Plans: 6, PatternCount: 16},
 	{Selector: "condition_boundaries", Manifest: "condition_boundary_expectations.json", Coverage: manifestCoverageExact, Plans: 38, PatternCount: 62},
 	{Selector: "dml", Manifest: "dml_expectations.json", Coverage: manifestCoverageExact, Plans: 28, Errors: 1, PatternCount: 28},
+	{Selector: "expression_index", Manifest: "expression_index_expectations.json", Coverage: manifestCoverageExact, Plans: 4, PatternCount: 7},
 	{Selector: "full_text_search", Manifest: "facet_search_expectations.json", Coverage: manifestCoverageSubset, Plans: 4, PatternCount: 14},
 	{Selector: "factorized_mode", Manifest: "factorized_mode_expectations.json", Coverage: manifestCoverageExact, Plans: 10, Errors: 5, PatternCount: 19},
 	{Selector: "full_text_search", Manifest: "full_text_residual_expectations.json", Coverage: manifestCoverageSubset, Plans: 9, PatternCount: 26},

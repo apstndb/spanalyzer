@@ -71,6 +71,7 @@ var (
 		{Name: "google_sql_proto_surface", Description: "protocol-buffer expression surfaces", Queries: staticQueryProvider(googleSQLProtoSurfaceQueries), DDLs: parsedDDLProvider("google-sql-proto-surface-schema.sql", googleSQLProtoSurfaceDDL), RequiresProtoDescriptors: true},
 		{Name: "rewriter_surface", Description: "GoogleSQL rewriter-backed syntax surfaces", Queries: staticQueryProvider(rewriterSurfaceQueries), DDLs: parsedDDLProvider("rewriter-surface-schema.sql", rewriterSurfaceDDL)},
 		{Name: "condition_boundaries", Description: "seek, residual, split-range, and join conditions", Queries: staticQueryProvider(conditionBoundaryQueries), DDLs: parsedDDLProvider("condition-boundary-schema.sql", conditionBoundaryDDL)},
+		{Name: "expression_index", Description: "scalar-expression index access and base-table controls", Queries: staticQueryProvider(expressionIndexQueries), DDLs: rawDDLProvider(expressionIndexDDLs...)},
 		{Name: "aggregate_functions", Description: "aggregate function plan-shape probes", Queries: staticQueryProvider(aggregateFunctionQueries), DDLs: docsDDLProvider},
 		{Name: "join_matrix", Description: "join-method and build-side matrix", Queries: staticQueryProvider(joinMatrixQueries), DDLs: docsDDLProvider},
 		{Name: "subquery_join_hint_matrix", Description: "subquery join-hint matrix", Queries: staticQueryProvider(subqueryJoinHintMatrixQueries), DDLs: docsDDLProvider},

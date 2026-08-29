@@ -59,7 +59,10 @@ func (s *Schema) toIndexesDDL() ([]ast.DDL, error) {
 
 		switch idx.IndexType {
 		case "INDEX":
-			ddl := buildCreateIndex(idx, cols, opts)
+			ddl, err := buildCreateIndex(idx, cols, opts)
+			if err != nil {
+				return nil, err
+			}
 			ddls = append(ddls, ddl)
 		case "SEARCH", "SEARCH_INDEX":
 			ddl, err := buildCreateSearchIndex(idx, cols, opts)
@@ -72,7 +75,7 @@ func (s *Schema) toIndexesDDL() ([]ast.DDL, error) {
 	return ddls, nil
 }
 
-func buildCreateIndex(idx *infoschem.Index, cols []*infoschem.IndexColumn, opts []*infoschem.IndexOption) *ast.CreateIndex {
+func buildCreateIndex(idx *infoschem.Index, cols []*infoschem.IndexColumn, opts []*infoschem.IndexOption) (*ast.CreateIndex, error) {
 	var keys []*ast.IndexKey
 	var storing []*ast.Ident
 
@@ -88,6 +91,15 @@ func buildCreateIndex(idx *infoschem.Index, cols []*infoschem.IndexColumn, opts 
 	})
 
 	for _, c := range cols {
+		if c.Expression != nil {
+			return nil, fmt.Errorf(
+				"unsupported expression index %q on table %q: index key %q has expression %q that the current memefish AST cannot represent",
+				idx.IndexName,
+				tableDisplayName(idx.TableSchema, idx.TableName),
+				c.ColumnName,
+				*c.Expression,
+			)
+		}
 		if c.OrdinalPosition != nil && c.ColumnOrdering != nil {
 			keys = append(keys, indexKey(c.ColumnName, dirFromString(*c.ColumnOrdering)))
 		} else {
@@ -121,7 +133,7 @@ func buildCreateIndex(idx *infoschem.Index, cols []*infoschem.IndexColumn, opts 
 		ci.Options = mkOptions(defs...)
 	}
 
-	return ci
+	return ci, nil
 }
 
 func buildCreateSearchIndex(idx *infoschem.Index, cols []*infoschem.IndexColumn, opts []*infoschem.IndexOption) (*ast.CreateSearchIndex, error) {

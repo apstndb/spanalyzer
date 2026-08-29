@@ -69,6 +69,37 @@ probe reached semantic/configuration validation (`InvalidArgument` without a
 `Syntax error:` marker), confirming that the service parser accepts the syntax;
 the configured instance did not allow the table to be created.
 
+### Scalar-expression indexes — live metadata, no memefish AST
+
+Managed Spanner and the pinned Spanner Omni runtime accepted GoogleSQL index
+keys containing scalar expressions in a 2026-08-28 probe. The documented
+spelling wraps an expression in an extra pair of parentheses, and ordinary
+column keys can precede an expression key in the same index:
+
+```sql
+CREATE INDEX VenuesByCity
+ON Venues((JSON_VALUE(VenueData.address.city)));
+
+CREATE INDEX VenuesByNameState
+ON Venues(VenueName, (JSON_VALUE(VenueData.address.state)));
+```
+
+`INFORMATION_SCHEMA.INDEX_COLUMNS` retains the scalar text in `EXPRESSION`
+and exposes an internal `_ExpressionIndex_<index>_<position>` value in
+`COLUMN_NAME`. That internal name is not a table column and must not be emitted
+as user DDL. memefish v0.8.1 has no index-expression AST node, so
+`ToDDLStatements` returns an explicit error whenever an index key has a
+non-NULL `EXPRESSION`.
+
+The pinned Cloud Spanner Emulator rejects the documented expression-key form
+as a syntax error. Current managed Spanner and Omni also reject `DESC` after a
+GoogleSQL expression key even though the DDL grammar displays an ordering
+suffix. A non-deterministic key such as `CURRENT_TIMESTAMP()` reaches semantic
+validation and is rejected as non-deterministic. These runtime observations
+are probes, not a promise that the boundaries are stable. See the
+[expression-index observation](../knowledge/observations/spanner-expression-indexes.md)
+for the retained environment and plan evidence.
+
 ## Resolved parser surfaces wired in `astconv`
 
 ### Tables without an explicit primary key and zero-column primary keys

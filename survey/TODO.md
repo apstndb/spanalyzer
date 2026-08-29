@@ -1,5 +1,19 @@
 # TODO
 
+## Complete expression-index probes while memefish support is pending (2026-08-28)
+
+- [x] Add retained plan-probe cases and structural expectations for automatic,
+  forced, composite, and base-table expression-index access on pinned Omni.
+- [x] Verify expression-index metadata rows and syntax boundaries on pinned
+  Omni, pinned Emulator, and a cleanup-safe managed-Spanner fixture.
+- [x] Make INFORMATION_SCHEMA-to-DDL reconstruction fail closed when
+  `INDEX_COLUMNS.EXPRESSION` is populated instead of emitting the internal
+  `_ExpressionIndex_*` column name as user DDL.
+- [x] Record the documented surface, observed runtime divergence, and deferred
+  memefish boundary in the survey and OKF documentation.
+- [x] Run focused tests, the survey and tools module gates, pinned container
+  probes, the managed fixture, generated plan-vocabulary checks, and OKF gates.
+
 ## Improve current-state revalidation workflow (2026-08-27)
 
 - ~~Centralize the exact Emulator and Omni image families, descriptive tags, and

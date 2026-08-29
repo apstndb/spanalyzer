@@ -1,0 +1,69 @@
+{
+  "version": "v0alpha1",
+  "queries": [
+    {
+      "label": "expression-index/auto-city",
+      "patterns": [
+        {
+          "display_name": "Distributed Union",
+          "child_links": [{"kind": "SCALAR", "type": "Split Range", "variable": "absent"}]
+        },
+        {
+          "display_name": "Scan",
+          "metadata": [
+            {"key": "scan_target", "value": "ExpressionIndexVenuesByCity"},
+            {"key": "scan_type", "value": "IndexScan"}
+          ],
+          "child_links": [{"kind": "SCALAR", "type": "Seek Condition", "variable": "absent"}]
+        }
+      ]
+    },
+    {
+      "label": "expression-index/force-city",
+      "patterns": [
+        {
+          "display_name": "Distributed Union",
+          "child_links": [{"kind": "SCALAR", "type": "Split Range", "variable": "absent"}]
+        },
+        {
+          "display_name": "Scan",
+          "metadata": [
+            {"key": "scan_target", "value": "ExpressionIndexVenuesByCity"},
+            {"key": "scan_type", "value": "IndexScan"}
+          ],
+          "child_links": [{"kind": "SCALAR", "type": "Seek Condition", "variable": "absent"}]
+        }
+      ]
+    },
+    {
+      "label": "expression-index/composite-name-state",
+      "patterns": [
+        {
+          "display_name": "Distributed Union",
+          "child_links": [{"kind": "SCALAR", "type": "Split Range", "variable": "absent"}]
+        },
+        {
+          "display_name": "Scan",
+          "metadata": [
+            {"key": "scan_target", "value": "ExpressionIndexVenuesByNameState"},
+            {"key": "scan_type", "value": "IndexScan"}
+          ],
+          "child_links": [{"kind": "SCALAR", "type": "Seek Condition", "variable": "absent"}]
+        }
+      ]
+    },
+    {
+      "label": "expression-index/base-table-control",
+      "patterns": [
+        {
+          "display_name": "Scan",
+          "metadata": [
+            {"key": "scan_target", "value": "ExpressionIndexVenues"},
+            {"key": "scan_type", "value": "TableScan"}
+          ]
+        }
+      ]
+    }
+  ],
+  "expected_query_errors": []
+}

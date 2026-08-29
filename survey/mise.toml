@@ -79,10 +79,15 @@ description = "Read-only managed-Spanner canonical DDL aggregate comparison"
 env = { REQUIRE_REAL_SPANNER_CANONICAL = "1" }
 run = "go test -v -run TestCanonicalDDL_RealSpanner ./infoschem"
 
+[tasks.test-expression-index-real]
+description = "Cleanup-safe managed-Spanner expression-index metadata and syntax fixture"
+env = { REQUIRE_REAL_SPANNER_EXPRESSION_INDEX = "1" }
+run = "go test -v -run TestExpressionIndex_RealSpanner ./infoschem"
+
 [tasks.test-managed-current]
-description = "Run all read-only/current managed-Spanner verification tests"
-env = { REQUIRE_REAL_SPANNER_CANONICAL = "1", REQUIRE_REAL_SPANNER_DRIFT = "1", REQUIRE_REAL_SPANNER_UUID = "1" }
-run = "go test -count=1 -v -run 'Test(CanonicalDDL_RealSpanner|Drift_RealTableMetas|UUID_RealSpanner)$' ./infoschem"
+description = "Run current managed-Spanner verification tests; mutation fixtures create collision-safe temporary objects and clean them up"
+env = { REQUIRE_REAL_SPANNER_CANONICAL = "1", REQUIRE_REAL_SPANNER_DRIFT = "1", REQUIRE_REAL_SPANNER_EXPRESSION_INDEX = "1", REQUIRE_REAL_SPANNER_UUID = "1" }
+run = "go test -count=1 -v -run 'Test(CanonicalDDL_RealSpanner|Drift_RealTableMetas|ExpressionIndex_RealSpanner|UUID_RealSpanner)$' ./infoschem"
 
 [tasks.run-roundtrip]
 description = "Run the roundtrip end-to-end demo"
