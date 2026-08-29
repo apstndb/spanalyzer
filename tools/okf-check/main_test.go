@@ -1,9 +1,11 @@
 package main
 
 import (
+	"encoding/json"
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/goccy/go-yaml"
@@ -117,6 +119,271 @@ func TestExplicitLocalResource(t *testing.T) {
 		if got := explicitLocalResource(tt.resource); got != tt.want {
 			t.Errorf("explicitLocalResource(%q) = %v, want %v", tt.resource, got, tt.want)
 		}
+	}
+}
+
+func TestPublicationIdentity(t *testing.T) {
+	tests := []struct {
+		path         string
+		entryID      string
+		parent       string
+		documentKind string
+	}{
+		{path: "knowledge/index.md", entryID: "index", documentKind: "navigation"},
+		{path: "knowledge/concepts/index.md", entryID: "concepts/index", parent: "index", documentKind: "navigation"},
+		{path: "knowledge/concepts/example.md", entryID: "concepts/example", parent: "concepts/index", documentKind: "concept"},
+		{path: "knowledge/research/area/example.md", entryID: "research/area/example", parent: "research/area/index", documentKind: "concept"},
+	}
+	for _, tt := range tests {
+		t.Run(tt.path, func(t *testing.T) {
+			got := publicationIdentity(tt.path)
+			if got.EntryID != tt.entryID || got.ParentEntry != tt.parent || got.DocumentKind != tt.documentKind {
+				t.Fatalf("publicationIdentity(%q) = %+v", tt.path, got)
+			}
+		})
+	}
+}
+
+func TestCheckPublicationParents(t *testing.T) {
+	valid := []publicationInventoryEntry{
+		{EntryID: "index", Path: "knowledge/index.md", DocumentKind: "navigation"},
+		{EntryID: "concepts/index", Path: "knowledge/concepts/index.md", ParentEntry: "index", DocumentKind: "navigation"},
+		{EntryID: "concepts/example", Path: "knowledge/concepts/example.md", ParentEntry: "concepts/index", DocumentKind: "concept"},
+	}
+	if err := checkPublicationParents(valid); err != nil {
+		t.Fatal(err)
+	}
+	missing := append([]publicationInventoryEntry(nil), valid...)
+	missing[2].ParentEntry = "missing/index"
+	if err := checkPublicationParents(missing); err == nil {
+		t.Fatal("checkPublicationParents() accepted a missing parent")
+	}
+	nonNavigation := append([]publicationInventoryEntry(nil), valid...)
+	nonNavigation[2].ParentEntry = "concepts/example"
+	if err := checkPublicationParents(nonNavigation); err == nil {
+		t.Fatal("checkPublicationParents() accepted a non-navigation parent")
+	}
+}
+
+func TestPublicationReference(t *testing.T) {
+	root := newPublicationTestRepository(t, map[string]string{
+		"README.md": "# Read me\n",
+	})
+	commit, err := gitOutput(root, "rev-parse", "HEAD")
+	if err != nil {
+		t.Fatal(err)
+	}
+	got, err := publicationReference(root, "knowledge/concepts/example.md", "../../README.md#overview", commit, true)
+	if err != nil {
+		t.Fatal(err)
+	}
+	want := publicationRepositoryURL + "/blob/" + commit + "/README.md#overview"
+	if got.Published != want {
+		t.Fatalf("publicationReference() = %q, want %q", got.Published, want)
+	}
+}
+
+func TestPublicationReferenceDirtyCandidatePreservesOriginalReference(t *testing.T) {
+	root := t.TempDir()
+	commit := strings.Repeat("a", 40)
+	got, err := publicationReference(root, "knowledge/concepts/example.md", "../../missing.md#overview", commit, false)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got.Published != got.Original {
+		t.Fatalf("publicationReference() published = %q, want original %q", got.Published, got.Original)
+	}
+}
+
+func TestPublicationReferenceRejectsIgnoredWorktreeTarget(t *testing.T) {
+	root := newPublicationTestRepository(t, map[string]string{
+		".gitignore": "ignored.md\n",
+	})
+	writeTestFile(t, root, "ignored.md", "not committed\n")
+	commit, err := gitOutput(root, "rev-parse", "HEAD")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := publicationReference(root, "knowledge/concepts/example.md", "../../ignored.md", commit, true); err == nil {
+		t.Fatal("publicationReference() accepted an ignored worktree-only target")
+	}
+}
+
+func TestPublicationReferenceResolvesRepositoryRootTree(t *testing.T) {
+	root := newPublicationTestRepository(t, map[string]string{
+		"README.md": "# Repository\n",
+		"other.txt": "another top-level entry\n",
+	})
+	commit, err := gitOutput(root, "rev-parse", "HEAD")
+	if err != nil {
+		t.Fatal(err)
+	}
+	got, err := publicationReference(root, "knowledge/references/repository-assets.md", "../../", commit, true)
+	if err != nil {
+		t.Fatal(err)
+	}
+	want := publicationRepositoryURL + "/tree/" + commit
+	if got.Published != want {
+		t.Fatalf("publicationReference() = %q, want repository root tree %q", got.Published, want)
+	}
+}
+
+func TestPublicationReferenceDoesNotTraverseTrackedSymlink(t *testing.T) {
+	root := t.TempDir()
+	writeTestFile(t, root, "outside/file.md", "outside\n")
+	if err := os.MkdirAll(filepath.Join(root, "knowledge"), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.Symlink("../outside", filepath.Join(root, "knowledge", "linked")); err != nil {
+		t.Skipf("create symlink: %v", err)
+	}
+	runGitTestCommand(t, root, "init", "-q")
+	runGitTestCommand(t, root, "add", "knowledge/linked")
+	runGitTestCommand(t, root, "-c", "user.name=Test", "-c", "user.email=test@example.com", "-c", "commit.gpgsign=false", "commit", "-qm", "fixture")
+	commit, err := gitOutput(root, "rev-parse", "HEAD")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := publicationReference(root, "knowledge/concepts/example.md", "../linked/file.md", commit, true); err == nil {
+		t.Fatal("publicationReference() traversed a tracked symlink")
+	}
+	got, err := publicationReference(root, "knowledge/concepts/example.md", "../linked", commit, true)
+	if err != nil {
+		t.Fatal(err)
+	}
+	want := publicationRepositoryURL + "/blob/" + commit + "/knowledge/linked"
+	if got.Published != want {
+		t.Fatalf("publicationReference() = %q, want committed symlink blob %q", got.Published, want)
+	}
+}
+
+func TestVerifyPublicationDocumentComparesCommittedBlob(t *testing.T) {
+	const name = "knowledge/index.md"
+	root := newPublicationTestRepository(t, map[string]string{
+		name: "# Committed\n",
+	})
+	commit, err := gitOutput(root, "rev-parse", "HEAD")
+	if err != nil {
+		t.Fatal(err)
+	}
+	writeTestFile(t, root, name, "# Hidden change\n")
+	runGitTestCommand(t, root, "update-index", "--assume-unchanged", name)
+	doc, err := readDocument(filepath.Join(root, filepath.FromSlash(name)), name)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := verifyPublicationDocument(root, commit, doc); err == nil {
+		t.Fatal("verifyPublicationDocument() accepted content that differs from the committed blob")
+	}
+}
+
+func TestVerifyPublicationBlobRejectsHiddenInventoryChange(t *testing.T) {
+	const name = publicationInventoryPath
+	committed := []byte("{\"schema_version\":\"spanalyzer.okf-publication/v0alpha1\",\"entries\":[],\"retired_entries\":[]}\n")
+	root := newPublicationTestRepository(t, map[string]string{
+		name: string(committed),
+	})
+	commit, err := gitOutput(root, "rev-parse", "HEAD")
+	if err != nil {
+		t.Fatal(err)
+	}
+	changed := []byte("{\"schema_version\":\"spanalyzer.okf-publication/v0alpha1\",\"entries\":[],\"retired_entries\":[{\"entry_id\":\"retired\"}]}\n")
+	if err := os.WriteFile(filepath.Join(root, filepath.FromSlash(name)), changed, 0o644); err != nil {
+		t.Fatal(err)
+	}
+	runGitTestCommand(t, root, "update-index", "--assume-unchanged", name)
+	state, err := publicationSourceState(root)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if state != "committed-tree" {
+		t.Fatalf("publicationSourceState() = %q, want committed-tree fixture", state)
+	}
+	if err := verifyPublicationBlob(root, commit, name, changed); err == nil {
+		t.Fatal("verifyPublicationBlob() accepted hidden retirement data that differs from the committed inventory")
+	}
+}
+
+func TestPublicationGitCommandsIgnoreReplacementObjects(t *testing.T) {
+	root := t.TempDir()
+	runGitTestCommand(t, root, "init", "-q")
+	writeTestFile(t, root, "README.md", "commit A\n")
+	runGitTestCommand(t, root, "add", "README.md")
+	runGitTestCommand(t, root, "-c", "user.name=Test", "-c", "user.email=test@example.com", "-c", "commit.gpgsign=false", "commit", "-qm", "commit A")
+	commitA, err := gitOutput(root, "rev-parse", "HEAD")
+	if err != nil {
+		t.Fatal(err)
+	}
+	writeTestFile(t, root, "README.md", "commit B\n")
+	runGitTestCommand(t, root, "add", "README.md")
+	runGitTestCommand(t, root, "-c", "user.name=Test", "-c", "user.email=test@example.com", "-c", "commit.gpgsign=false", "commit", "-qm", "commit B")
+	commitB, err := gitOutput(root, "rev-parse", "HEAD")
+	if err != nil {
+		t.Fatal(err)
+	}
+	runGitTestCommand(t, root, "replace", commitA, commitB)
+	runGitTestCommand(t, root, "checkout", "--detach", "-q", commitA)
+	if output, err := exec.Command("git", "-C", root, "status", "--porcelain").Output(); err != nil || strings.TrimSpace(string(output)) != "" {
+		t.Fatalf("ordinary replacement-aware status = %q, error %v; want clean bypass fixture", output, err)
+	}
+	head, err := publicationGitOutput(root, "rev-parse", "HEAD")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if head != commitA {
+		t.Fatalf("publication HEAD = %s, want unreplaced commit A %s", head, commitA)
+	}
+	state, err := publicationSourceState(root)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if state != "dirty-worktree" {
+		t.Fatalf("publicationSourceState() = %q, want dirty-worktree against unreplaced commit A", state)
+	}
+	if err := verifyPublicationBlob(root, commitA, "README.md", []byte("commit B\n")); err == nil {
+		t.Fatal("verifyPublicationBlob() accepted replacement commit B bytes for source commit A")
+	}
+}
+
+func newPublicationTestRepository(t *testing.T, files map[string]string) string {
+	t.Helper()
+	root := t.TempDir()
+	for name, contents := range files {
+		writeTestFile(t, root, name, contents)
+	}
+	runGitTestCommand(t, root, "init", "-q")
+	for name := range files {
+		runGitTestCommand(t, root, "add", name)
+	}
+	runGitTestCommand(t, root, "-c", "user.name=Test", "-c", "user.email=test@example.com", "-c", "commit.gpgsign=false", "commit", "-qm", "fixture")
+	return root
+}
+
+func TestPublicationManifest(t *testing.T) {
+	manifestPath := filepath.Join(t.TempDir(), "publication.json")
+	if err := run([]string{
+		"--repo-root", "../..",
+		"--gate", "publication",
+		"--publication-manifest", manifestPath,
+	}); err != nil {
+		t.Fatal(err)
+	}
+	data, err := os.ReadFile(manifestPath)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var manifest publicationManifest
+	if err := json.Unmarshal(data, &manifest); err != nil {
+		t.Fatal(err)
+	}
+	if manifest.SchemaVersion != publicationSchemaVersion {
+		t.Fatalf("schema_version = %q, want %q", manifest.SchemaVersion, publicationSchemaVersion)
+	}
+	if manifest.DocumentCount != len(manifest.Documents) || manifest.DocumentCount == 0 {
+		t.Fatalf("document_count = %d, documents = %d", manifest.DocumentCount, len(manifest.Documents))
+	}
+	if !gitObjectIDPattern.MatchString(manifest.SourceCommit) {
+		t.Fatalf("source_commit = %q, want full object ID", manifest.SourceCommit)
 	}
 }
 

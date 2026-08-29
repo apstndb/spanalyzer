@@ -3,6 +3,8 @@
 package main
 
 import (
+	"bytes"
+	"crypto/sha256"
 	_ "embed"
 	"encoding/json"
 	"errors"
@@ -14,6 +16,7 @@ import (
 	"os/exec"
 	"path"
 	"path/filepath"
+	"reflect"
 	"regexp"
 	"sort"
 	"strings"
@@ -30,11 +33,14 @@ const (
 	legacyResearchIndex          = "research/README.md"
 	legacyResearchBaselinePath   = "tools/okf-check/legacy-research-baseline.txt"
 	legacyResearchPlanvocabPath  = "tools/okf-check/legacy-research-planvocab.txt"
+	publicationInventoryPath     = "tools/okf-check/publication-inventory.json"
 	planvocabSourcePath          = "plancontract/planvocab/catalog_source.json"
 	researchRoot                 = "knowledge/research/"
 	researchNoteType             = "Research Note"
 	legacyResearchInitial        = 31
 	legacyResearchPlanvocabCount = 16
+	publicationSchemaVersion     = "spanalyzer.okf-publication/v0alpha1"
+	publicationRepositoryURL     = "https://github.com/apstndb/spanalyzer"
 )
 
 // legacyResearchBaseline records the immutable initial migration set. The
@@ -57,6 +63,13 @@ var legacyResearchMarkdown string
 //
 //go:embed legacy-research-planvocab.txt
 var legacyResearchPlanvocab string
+
+// publicationInventory pins path-derived Knowledge Catalog entry identities.
+// The normal gate fails closed when a concept, index, or hierarchy edge moves
+// until the inventory change and its remote deletion consequences are reviewed.
+//
+//go:embed publication-inventory.json
+var publicationInventoryJSON []byte
 
 var (
 	markdownLinkPattern = regexp.MustCompile(`\]\(([^)]+)\)`)
@@ -103,6 +116,7 @@ type legacyResearchDisposition struct {
 type source struct {
 	ID           string       `yaml:"id"`
 	Resource     string       `yaml:"resource"`
+	Title        string       `yaml:"title"`
 	LastModified string       `yaml:"last_modified"`
 	UsageWindow  *usageWindow `yaml:"usage_window"`
 }
@@ -143,7 +157,57 @@ type document struct {
 	Front    frontMatter
 	RawFront map[string]any
 	Body     string
+	Raw      []byte
 	HasFront bool
+}
+
+type publicationInventory struct {
+	SchemaVersion string                      `json:"schema_version"`
+	Entries       []publicationInventoryEntry `json:"entries"`
+	Retired       []publicationRetiredEntry   `json:"retired_entries"`
+}
+
+type publicationInventoryEntry struct {
+	EntryID      string `json:"entry_id"`
+	Path         string `json:"path"`
+	ParentEntry  string `json:"parent_entry_id,omitempty"`
+	DocumentKind string `json:"document_kind"`
+}
+
+type publicationRetiredEntry struct {
+	EntryID          string `json:"entry_id"`
+	FormerPath       string `json:"former_path"`
+	RemovedAtCommit  string `json:"removed_at_commit"`
+	Reason           string `json:"reason"`
+	SuccessorEntryID string `json:"successor_entry_id,omitempty"`
+}
+
+type publicationManifest struct {
+	SchemaVersion string                     `json:"schema_version"`
+	OKFVersion    string                     `json:"okf_version"`
+	Repository    string                     `json:"repository"`
+	SourceCommit  string                     `json:"source_commit"`
+	SourceState   string                     `json:"source_state"`
+	BundleSHA256  string                     `json:"bundle_sha256"`
+	DocumentCount int                        `json:"document_count"`
+	Documents     []publicationManifestEntry `json:"documents"`
+	Retired       []publicationRetiredEntry  `json:"retired_entries,omitempty"`
+}
+
+type publicationManifestEntry struct {
+	publicationInventoryEntry
+	Type           string                `json:"type,omitempty"`
+	Title          string                `json:"title,omitempty"`
+	Status         string                `json:"status,omitempty"`
+	DocumentSHA256 string                `json:"document_sha256"`
+	SourceURL      string                `json:"source_url,omitempty"`
+	Resources      []publicationResource `json:"resources,omitempty"`
+	Links          []publicationResource `json:"links,omitempty"`
+}
+
+type publicationResource struct {
+	Original  string `json:"original"`
+	Published string `json:"published"`
 }
 
 func main() {
@@ -156,7 +220,10 @@ func main() {
 func run(args []string) error {
 	flags := flag.NewFlagSet("okf-check", flag.ContinueOnError)
 	repoRoot := flags.String("repo-root", "", "repository root (auto-detected when omitted)")
-	gate := flags.String("gate", "all", "gate to run: conformance, quality, assets, or all")
+	gate := flags.String("gate", "all", "gate to run: conformance, quality, assets, publication, or all")
+	publicationSourceCommit := flags.String("publication-source-commit", "", "full source commit for publication URLs (defaults to HEAD)")
+	publicationManifestPath := flags.String("publication-manifest", "", "optional path for the ephemeral publication manifest")
+	publicationRequireClean := flags.Bool("publication-require-clean", false, "require the repository worktree to match the source commit")
 	if err := flags.Parse(args); err != nil {
 		return err
 	}
@@ -170,11 +237,23 @@ func run(args []string) error {
 		"conformance": checkConformance,
 		"quality":     checkQuality,
 		"assets":      checkAssets,
+		"publication": func(root string) error {
+			manifest, err := checkPublication(root, *publicationSourceCommit, *publicationRequireClean)
+			if err != nil {
+				return err
+			}
+			if *publicationManifestPath != "" {
+				if err := writePublicationManifest(root, *publicationManifestPath, manifest); err != nil {
+					return err
+				}
+			}
+			return nil
+		},
 	}
 	if *gate != "all" {
 		check, ok := checks[*gate]
 		if !ok {
-			return fmt.Errorf("unknown gate %q; use conformance, quality, assets, or all", *gate)
+			return fmt.Errorf("unknown gate %q; use conformance, quality, assets, publication, or all", *gate)
 		}
 		if err := check(root); err != nil {
 			return fmt.Errorf("%s gate: %w", *gate, err)
@@ -183,7 +262,7 @@ func run(args []string) error {
 		return nil
 	}
 
-	for _, name := range []string{"conformance", "quality", "assets"} {
+	for _, name := range []string{"conformance", "quality", "assets", "publication"} {
 		if err := checks[name](root); err != nil {
 			return fmt.Errorf("%s gate: %w", name, err)
 		}
@@ -267,6 +346,376 @@ func checkQuality(root string) error {
 		return err
 	}
 	return checkLegacyResearch(root, documents)
+}
+
+func checkPublication(root, sourceCommit string, requireClean bool) (publicationManifest, error) {
+	documents, err := readBundle(root)
+	if err != nil {
+		return publicationManifest{}, err
+	}
+	headCommit, err := publicationGitOutput(root, "rev-parse", "HEAD")
+	if err != nil {
+		return publicationManifest{}, fmt.Errorf("resolve publication checkout commit: %w", err)
+	}
+	if sourceCommit == "" {
+		sourceCommit = headCommit
+	}
+	if !gitObjectIDPattern.MatchString(sourceCommit) {
+		return publicationManifest{}, fmt.Errorf("publication source commit %q is not a full hexadecimal object ID", sourceCommit)
+	}
+	if sourceCommit != headCommit {
+		return publicationManifest{}, fmt.Errorf("publication source commit %s does not match checkout HEAD %s", sourceCommit, headCommit)
+	}
+
+	sourceState, err := publicationSourceState(root)
+	if err != nil {
+		return publicationManifest{}, err
+	}
+	if requireClean && sourceState != "committed-tree" {
+		return publicationManifest{}, errors.New("repository worktree differs from the publication source commit")
+	}
+	commitPinned := sourceState == "committed-tree"
+	if commitPinned {
+		if err := verifyPublicationBlob(root, sourceCommit, publicationInventoryPath, publicationInventoryJSON); err != nil {
+			return publicationManifest{}, fmt.Errorf("verify publication inventory provenance: %w", err)
+		}
+	}
+
+	rootDoc, ok := documents[path.Join(bundleRoot, "index.md")]
+	if !ok {
+		return publicationManifest{}, errors.New("publication bundle has no root index")
+	}
+	manifest := publicationManifest{
+		SchemaVersion: publicationSchemaVersion,
+		OKFVersion:    rootDoc.Front.OKFVersion,
+		Repository:    publicationRepositoryURL,
+		SourceCommit:  sourceCommit,
+		SourceState:   sourceState,
+	}
+	var bundleMaterial strings.Builder
+	for _, name := range sortedDocumentNames(documents) {
+		doc := documents[name]
+		sourceURL := ""
+		if commitPinned {
+			if err := verifyPublicationDocument(root, sourceCommit, doc); err != nil {
+				return publicationManifest{}, err
+			}
+			sourceURL = publicationPathURL("blob", sourceCommit, name)
+		}
+		entry := publicationManifestEntry{
+			publicationInventoryEntry: publicationIdentity(name),
+			Type:                      doc.Front.Type,
+			Title:                     doc.Front.Title,
+			Status:                    doc.Front.Status,
+			DocumentSHA256:            fmt.Sprintf("%x", sha256.Sum256(doc.Raw)),
+			SourceURL:                 sourceURL,
+		}
+		bundleMaterial.WriteString(name)
+		bundleMaterial.WriteByte(0)
+		bundleMaterial.WriteString(entry.DocumentSHA256)
+		bundleMaterial.WriteByte('\n')
+
+		resources := []string{doc.Front.Resource}
+		for _, source := range doc.Front.Sources {
+			resources = append(resources, source.Resource)
+		}
+		for _, resource := range resources {
+			if strings.TrimSpace(resource) == "" {
+				continue
+			}
+			resolved, err := publicationReference(root, name, resource, sourceCommit, commitPinned)
+			if err != nil {
+				return publicationManifest{}, fmt.Errorf("%s: publication resource %q: %w", name, resource, err)
+			}
+			entry.Resources = append(entry.Resources, resolved)
+		}
+		for _, target := range markdownTargets(doc.Body) {
+			resolved, err := publicationReference(root, name, target, sourceCommit, commitPinned)
+			if err != nil {
+				return publicationManifest{}, fmt.Errorf("%s: publication link %q: %w", name, target, err)
+			}
+			entry.Links = append(entry.Links, resolved)
+		}
+		manifest.Documents = append(manifest.Documents, entry)
+	}
+	manifest.DocumentCount = len(manifest.Documents)
+	manifest.BundleSHA256 = fmt.Sprintf("%x", sha256.Sum256([]byte(bundleMaterial.String())))
+
+	candidate := publicationInventory{SchemaVersion: publicationSchemaVersion}
+	for _, entry := range manifest.Documents {
+		candidate.Entries = append(candidate.Entries, entry.publicationInventoryEntry)
+	}
+	retained, err := checkPublicationInventory(candidate)
+	if err != nil {
+		return publicationManifest{}, err
+	}
+	manifest.Retired = retained.Retired
+	return manifest, nil
+}
+
+func publicationIdentity(documentPath string) publicationInventoryEntry {
+	relative := strings.TrimPrefix(documentPath, bundleRoot+"/")
+	entryID := strings.TrimSuffix(relative, filepath.Ext(relative))
+	kind := "concept"
+	if filepath.Base(documentPath) == "index.md" || filepath.Base(documentPath) == "log.md" {
+		kind = "navigation"
+	}
+	parent := ""
+	dir := path.Dir(entryID)
+	if entryID != "index" {
+		if path.Base(entryID) == "index" {
+			parentDir := path.Dir(dir)
+			if parentDir == "." {
+				parent = "index"
+			} else {
+				parent = path.Join(parentDir, "index")
+			}
+		} else {
+			parent = path.Join(dir, "index")
+		}
+	}
+	return publicationInventoryEntry{
+		EntryID:      entryID,
+		Path:         documentPath,
+		ParentEntry:  parent,
+		DocumentKind: kind,
+	}
+}
+
+func checkPublicationInventory(candidate publicationInventory) (publicationInventory, error) {
+	var retained publicationInventory
+	if err := json.Unmarshal(publicationInventoryJSON, &retained); err != nil {
+		return publicationInventory{}, fmt.Errorf("parse %s: %w", publicationInventoryPath, err)
+	}
+	if retained.SchemaVersion != publicationSchemaVersion {
+		return publicationInventory{}, fmt.Errorf("%s: schema_version = %q, want %q", publicationInventoryPath, retained.SchemaVersion, publicationSchemaVersion)
+	}
+	seen := make(map[string]string, len(retained.Entries))
+	for i, entry := range retained.Entries {
+		if entry.EntryID == "" || entry.Path == "" || entry.DocumentKind == "" {
+			return publicationInventory{}, fmt.Errorf("%s: entries[%d] has an empty identity field", publicationInventoryPath, i)
+		}
+		if previous, ok := seen[entry.EntryID]; ok {
+			return publicationInventory{}, fmt.Errorf("%s: duplicate entry_id %q for %s and %s", publicationInventoryPath, entry.EntryID, previous, entry.Path)
+		}
+		seen[entry.EntryID] = entry.Path
+		if i > 0 && retained.Entries[i-1].Path >= entry.Path {
+			return publicationInventory{}, fmt.Errorf("%s: entries are not strictly ordered by path at %q", publicationInventoryPath, entry.Path)
+		}
+	}
+	if err := checkPublicationParents(retained.Entries); err != nil {
+		return publicationInventory{}, fmt.Errorf("%s: %w", publicationInventoryPath, err)
+	}
+	for i, entry := range retained.Retired {
+		if entry.EntryID == "" || entry.FormerPath == "" || entry.Reason == "" || !gitObjectIDPattern.MatchString(entry.RemovedAtCommit) {
+			return publicationInventory{}, fmt.Errorf("%s: retired_entries[%d] has incomplete identity, reason, or removal commit", publicationInventoryPath, i)
+		}
+		if previous, ok := seen[entry.EntryID]; ok {
+			return publicationInventory{}, fmt.Errorf("%s: retired entry_id %q conflicts with %s", publicationInventoryPath, entry.EntryID, previous)
+		}
+		seen[entry.EntryID] = entry.FormerPath
+		if entry.SuccessorEntryID != "" {
+			if _, ok := findPublicationEntry(retained.Entries, entry.SuccessorEntryID); !ok {
+				return publicationInventory{}, fmt.Errorf("%s: retired entry_id %q names missing successor %q", publicationInventoryPath, entry.EntryID, entry.SuccessorEntryID)
+			}
+		}
+	}
+	if !reflect.DeepEqual(retained.Entries, candidate.Entries) {
+		return publicationInventory{}, fmt.Errorf("%s: active publication identity mismatch; record removed or moved IDs in retired_entries", publicationInventoryPath)
+	}
+	return retained, nil
+}
+
+func checkPublicationParents(entries []publicationInventoryEntry) error {
+	for _, entry := range entries {
+		if entry.ParentEntry == "" {
+			continue
+		}
+		parent, ok := findPublicationEntry(entries, entry.ParentEntry)
+		if !ok {
+			return fmt.Errorf("entry_id %q names missing parent_entry_id %q", entry.EntryID, entry.ParentEntry)
+		}
+		if parent.DocumentKind != "navigation" {
+			return fmt.Errorf("entry_id %q names non-navigation parent_entry_id %q", entry.EntryID, entry.ParentEntry)
+		}
+	}
+	return nil
+}
+
+func findPublicationEntry(entries []publicationInventoryEntry, entryID string) (publicationInventoryEntry, bool) {
+	for _, entry := range entries {
+		if entry.EntryID == entryID {
+			return entry, true
+		}
+	}
+	return publicationInventoryEntry{}, false
+}
+
+func publicationReference(root, documentPath, reference, sourceCommit string, commitPinned bool) (publicationResource, error) {
+	result := publicationResource{Original: reference, Published: reference}
+	trimmed := strings.TrimSpace(reference)
+	if strings.HasPrefix(trimmed, "#") {
+		if commitPinned {
+			result.Published = publicationPathURL("blob", sourceCommit, documentPath) + trimmed
+		}
+		return result, nil
+	}
+	resolved, local, err := resolveLocalTarget(root, documentPath, reference)
+	if err != nil || !local {
+		return result, err
+	}
+	if !commitPinned {
+		return result, nil
+	}
+	entry, err := publicationTreeEntry(root, sourceCommit, resolved)
+	if err != nil {
+		return result, err
+	}
+	kind := entry.ObjectType
+	result.Published = publicationPathURL(kind, sourceCommit, resolved)
+	parsed, err := url.Parse(normalizeMarkdownTarget(reference))
+	if err == nil {
+		if parsed.RawQuery != "" {
+			result.Published += "?" + parsed.RawQuery
+		}
+		if parsed.Fragment != "" {
+			result.Published += "#" + parsed.Fragment
+		}
+	}
+	return result, nil
+}
+
+type publicationGitTreeEntry struct {
+	Mode       string
+	ObjectType string
+	ObjectID   string
+}
+
+func publicationTreeEntry(root, sourceCommit, repositoryPath string) (publicationGitTreeEntry, error) {
+	if repositoryPath == "." {
+		objectID, err := publicationGitOutput(root, "rev-parse", "--verify", sourceCommit+"^{tree}")
+		if err != nil || !gitObjectIDPattern.MatchString(objectID) {
+			return publicationGitTreeEntry{}, fmt.Errorf("resolve repository root tree at publication source commit %s", sourceCommit)
+		}
+		return publicationGitTreeEntry{Mode: "040000", ObjectType: "tree", ObjectID: objectID}, nil
+	}
+	command := publicationGitCommand(root, "ls-tree", "-z", sourceCommit, "--", repositoryPath)
+	output, err := command.Output()
+	if err != nil {
+		return publicationGitTreeEntry{}, fmt.Errorf("resolve %s at publication source commit %s: %w", repositoryPath, sourceCommit, err)
+	}
+	output = bytes.TrimSuffix(output, []byte{0})
+	if len(output) == 0 || bytes.Contains(output, []byte{0}) {
+		return publicationGitTreeEntry{}, fmt.Errorf("%s does not name one object at publication source commit %s", repositoryPath, sourceCommit)
+	}
+	header, foundPath, ok := bytes.Cut(output, []byte{'\t'})
+	if !ok || string(foundPath) != repositoryPath {
+		return publicationGitTreeEntry{}, fmt.Errorf("%s does not resolve exactly at publication source commit %s", repositoryPath, sourceCommit)
+	}
+	fields := strings.Fields(string(header))
+	if len(fields) != 3 || (fields[1] != "blob" && fields[1] != "tree") || !gitObjectIDPattern.MatchString(fields[2]) {
+		return publicationGitTreeEntry{}, fmt.Errorf("%s has an unsupported Git tree entry at publication source commit %s", repositoryPath, sourceCommit)
+	}
+	return publicationGitTreeEntry{Mode: fields[0], ObjectType: fields[1], ObjectID: fields[2]}, nil
+}
+
+func verifyPublicationDocument(root, sourceCommit string, doc document) error {
+	if err := verifyPublicationBlob(root, sourceCommit, doc.Path, doc.Raw); err != nil {
+		return fmt.Errorf("%s: verify publication document provenance: %w", doc.Path, err)
+	}
+	return nil
+}
+
+func verifyPublicationBlob(root, sourceCommit, repositoryPath string, worktreeData []byte) error {
+	entry, err := publicationTreeEntry(root, sourceCommit, repositoryPath)
+	if err != nil {
+		return err
+	}
+	if entry.ObjectType != "blob" || entry.Mode == "120000" {
+		return fmt.Errorf("%s is not a regular blob at publication source commit %s", repositoryPath, sourceCommit)
+	}
+	committed, err := publicationGitCommand(root, "cat-file", "blob", entry.ObjectID).Output()
+	if err != nil {
+		return fmt.Errorf("read committed blob %s for %s: %w", entry.ObjectID, repositoryPath, err)
+	}
+	if !bytes.Equal(committed, worktreeData) {
+		return fmt.Errorf("%s worktree content differs from publication source commit %s", repositoryPath, sourceCommit)
+	}
+	return nil
+}
+
+func publicationPathURL(kind, sourceCommit, repositoryPath string) string {
+	if repositoryPath == "." {
+		return publicationRepositoryURL + "/" + kind + "/" + sourceCommit
+	}
+	parts := strings.Split(filepath.ToSlash(repositoryPath), "/")
+	for i := range parts {
+		parts[i] = url.PathEscape(parts[i])
+	}
+	return publicationRepositoryURL + "/" + kind + "/" + sourceCommit + "/" + strings.Join(parts, "/")
+}
+
+func normalizeMarkdownTarget(target string) string {
+	target = strings.TrimSpace(target)
+	if strings.HasPrefix(target, "<") && strings.Contains(target, ">") {
+		return strings.TrimPrefix(strings.SplitN(target, ">", 2)[0], "<")
+	}
+	if cut := strings.IndexAny(target, " \t"); cut >= 0 {
+		return target[:cut]
+	}
+	return target
+}
+
+func publicationSourceState(root string) (string, error) {
+	output, err := publicationGitCommand(root, "status", "--porcelain", "--", ".").Output()
+	if err != nil {
+		return "", fmt.Errorf("inspect publication source state: %w", err)
+	}
+	if strings.TrimSpace(string(output)) == "" {
+		return "committed-tree", nil
+	}
+	return "dirty-worktree", nil
+}
+
+func publicationGitOutput(root string, args ...string) (string, error) {
+	output, err := publicationGitCommand(root, args...).Output()
+	return strings.TrimSpace(string(output)), err
+}
+
+func publicationGitCommand(root string, args ...string) *exec.Cmd {
+	commandArgs := append([]string{"-C", root}, args...)
+	command := exec.Command("git", commandArgs...)
+	command.Env = make([]string, 0, len(os.Environ())+1)
+	for _, item := range os.Environ() {
+		if !strings.HasPrefix(item, "GIT_NO_REPLACE_OBJECTS=") {
+			command.Env = append(command.Env, item)
+		}
+	}
+	command.Env = append(command.Env, "GIT_NO_REPLACE_OBJECTS=1")
+	return command
+}
+
+func writePublicationManifest(root, name string, manifest publicationManifest) error {
+	absolute, err := filepath.Abs(name)
+	if err != nil {
+		return fmt.Errorf("resolve publication manifest path %q: %w", name, err)
+	}
+	relative, err := filepath.Rel(root, absolute)
+	if err != nil {
+		return fmt.Errorf("compare publication manifest path %q with repository root: %w", name, err)
+	}
+	if relative != ".." && !strings.HasPrefix(relative, ".."+string(filepath.Separator)) {
+		return fmt.Errorf("publication manifest %q must be written outside the repository", name)
+	}
+	data, err := json.MarshalIndent(manifest, "", "  ")
+	if err != nil {
+		return fmt.Errorf("encode publication manifest: %w", err)
+	}
+	data = append(data, '\n')
+	if err := os.WriteFile(name, data, 0o644); err != nil {
+		return fmt.Errorf("write publication manifest %q: %w", name, err)
+	}
+	return nil
 }
 
 func checkLifecycleAndTrustFields(doc document) error {
@@ -1083,7 +1532,7 @@ func readDocument(filePath, name string) (document, error) {
 	if err != nil {
 		return document{}, fmt.Errorf("%s: %w", name, err)
 	}
-	doc := document{Path: name, Body: body, HasFront: hasFront}
+	doc := document{Path: name, Body: body, Raw: data, HasFront: hasFront}
 	if !hasFront {
 		return doc, nil
 	}

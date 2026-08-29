@@ -67,6 +67,10 @@ jobs:
         working-directory: tools
         run: mise x -- go run ./okf-check --repo-root .. --gate assets
 
+      - name: Verify OKF publication identity and provenance
+        working-directory: tools
+        run: mise x -- go run ./okf-check --repo-root .. --gate publication --publication-source-commit "$GITHUB_SHA" --publication-require-clean
+
       - name: Verify INFORMATION_SCHEMA manifest
         working-directory: tools
         run: mise x -- go run ./infoschema-survey-check

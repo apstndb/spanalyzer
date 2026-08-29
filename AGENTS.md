@@ -147,6 +147,11 @@ go run ./okf-check --repo-root .. --gate all
 go run ./markdown-language-check --repo-root ..
 ```
 
+The `all` gate includes the checked Knowledge Catalog publication inventory.
+It does not write to Google Cloud. Use `--publication-manifest <temporary-path>`
+to inspect a candidate manifest; require a committed bundle with
+`--publication-require-clean` before any external synchronization.
+
 ## Coding Style
 
 Follow idiomatic Go and `gofmt`. Keep helpers small and explicit. Avoid broad

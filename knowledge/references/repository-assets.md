@@ -12,6 +12,9 @@ asset_families:
   - id: runtime-target-contract
     paths:
       - runtime_targets.json
+  - id: okf-publication-contract
+    paths:
+      - tools/okf-check/publication-inventory.json
   - id: plan-vocabulary
     paths:
       - plancontract/planvocab/catalog.json
@@ -82,6 +85,16 @@ generated [`catalog.json`](../../plancontract/planvocab/catalog.json), and the
 generated [`fixture_plans.json`](../../plancontract/planvocab/testdata/fixture_plans.json)
 mirror. The source catalog's `info.local_evidence` list remains the authority
 for hashed catalog provenance; this inventory does not replace it.
+
+## OKF publication contract
+
+The checked
+[`publication-inventory.json`](../../tools/okf-check/publication-inventory.json)
+pins the path-derived Entry IDs and parent hierarchy for a future Knowledge
+Catalog projection. It deliberately excludes content hashes and deployment
+coordinates: the publication gate derives hashes and commit-pinned source URLs
+for each candidate, while cloud project, location, and EntryGroup remain
+operator configuration.
 
 ## INFORMATION_SCHEMA catalog
 

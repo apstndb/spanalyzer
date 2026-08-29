@@ -35,7 +35,7 @@ dir = "tools"
 run = "go test -count=1 ./..."
 
 [tasks.verify-generated-evidence]
-description = "Check generated catalogs, survey manifests, OKF, and Markdown policy"
+description = "Check generated catalogs, survey manifests, OKF publication readiness, and Markdown policy"
 dir = "tools"
 run = [
   "go run ./planvocab-gen --check",
