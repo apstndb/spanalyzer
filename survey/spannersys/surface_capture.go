@@ -120,10 +120,7 @@ func BuildSurfaceCapture(
 ) (*SurfaceCapture, error) {
 	columns := make([]SurfaceCaptureColumn, 0, len(observations))
 	for _, observation := range observations {
-		columns = append(columns, SurfaceCaptureColumn{
-			TableName: observation.TableName, ColumnName: observation.ColumnName,
-			SpannerType: observation.SpannerType, OrdinalPosition: observation.OrdinalPosition,
-		})
+		columns = append(columns, SurfaceCaptureColumn(observation))
 	}
 	sort.Slice(columns, func(i, j int) bool {
 		if columns[i].TableName != columns[j].TableName {

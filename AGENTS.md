@@ -46,6 +46,7 @@ directory. Dependency-weight rules to preserve:
 Use the Go toolchain declared in `go.mod`.
 
 ```sh
+mise run lint
 go test ./...
 (cd plancontract && go test ./...)
 (cd cmd/spanner-query-gen && go test ./...)
@@ -56,6 +57,10 @@ go run ./cmd/spanner-analyzer --ddl testdata/order-proto-schema.sql \
   --proto-descriptors-file testdata/protos/order_descriptors.pb \
   --sql 'SELECT OrderInfo.order_number FROM Orders'
 ```
+
+Run `mise run hooks-install` once per clone to activate the versioned pre-push
+hook. It invokes the same `mise run lint` task used by CI across all five Go
+modules. CI remains authoritative because local hooks can be bypassed.
 
 Run `gofmt` on edited Go files. Run the per-module tests above (at least the
 modules you touched) before reporting a change as complete.

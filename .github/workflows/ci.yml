@@ -162,24 +162,8 @@ jobs:
           install: true
           install_args: go golangci-lint
 
-      - name: Run golangci-lint
-        run: mise x -- golangci-lint run --timeout=5m
-
-      - name: Run golangci-lint on plancontract module
-        working-directory: plancontract
-        run: mise x -- golangci-lint run --timeout=5m
-
-      - name: Run golangci-lint on cmd/spanner-query-gen module
-        working-directory: cmd/spanner-query-gen
-        run: mise x -- golangci-lint run --timeout=5m
-
-      - name: Run golangci-lint on tools module
-        working-directory: tools
-        run: mise x -- golangci-lint run --timeout=5m
-
-      - name: Run golangci-lint on survey module independently
-        working-directory: survey
-        run: GOWORK=off mise x -- golangci-lint run --timeout=5m
+      - name: Run repository lint gate
+        run: mise run lint
 
   govulncheck:
     name: govulncheck

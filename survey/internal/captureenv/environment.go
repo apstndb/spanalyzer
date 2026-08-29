@@ -9,6 +9,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"slices"
 	"strings"
 
 	"cloud.google.com/go/spanner"
@@ -156,10 +157,8 @@ func ValidateExecutionEnvironment() error {
 	if strings.TrimSpace(strings.ToLower(os.Getenv("GOWORK"))) != "off" {
 		return errors.New("capture execution requires GOWORK=off so producer hashes close over the survey module graph")
 	}
-	for _, field := range strings.Fields(os.Getenv("GOFLAGS")) {
-		if field == "-mod=readonly" {
-			return nil
-		}
+	if slices.Contains(strings.Fields(os.Getenv("GOFLAGS")), "-mod=readonly") {
+		return nil
 	}
 	return errors.New("capture execution requires GOFLAGS=-mod=readonly")
 }

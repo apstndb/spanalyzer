@@ -3,6 +3,35 @@ go = "1.26.6"
 golangci-lint = "2.12.1"
 "go:golang.org/x/vuln/cmd/govulncheck" = "1.5.0"
 
+[tasks.lint]
+description = "Lint all five Go modules"
+run = [
+  "mise x -- golangci-lint run --timeout=5m",
+  "mise -C plancontract x -- golangci-lint run --timeout=5m",
+  "mise -C cmd/spanner-query-gen x -- golangci-lint run --timeout=5m",
+  "mise -C tools x -- golangci-lint run --timeout=5m",
+  "GOWORK=off mise -C survey x -- golangci-lint run --timeout=5m",
+]
+
+[tasks.hooks-install]
+description = "Activate the repository-managed Git hooks for this clone"
+run = '''
+current=$(git config --local --get core.hooksPath || true)
+default_hooks=$(git rev-parse --git-path hooks)
+if [ -n "$current" ] && [ "$current" != ".git/hooks" ] && [ "$current" != "$default_hooks" ] && [ "$current" != ".githooks" ]; then
+  echo "refusing to replace custom core.hooksPath: $current" >&2
+  exit 1
+fi
+git config --local core.hooksPath .githooks
+'''
+
+[tasks.hooks-check]
+description = "Verify that the repository-managed Git hooks are active"
+run = '''
+test "$(git config --local --get core.hooksPath)" = ".githooks"
+test -x .githooks/pre-push
+'''
+
 [tasks.verify-root-module]
 description = "Test the root analyzer module"
 run = "go test -count=1 ./..."

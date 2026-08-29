@@ -31,9 +31,7 @@ const (
 	closedTransactionErr = "cannot use a closed transaction"
 )
 
-var (
-	sha256Pattern = regexp.MustCompile(`^[0-9a-f]{64}$`)
-)
+var sha256Pattern = regexp.MustCompile(`^[0-9a-f]{64}$`)
 
 // CaptureDocument is a redacted observation of one target's advertised
 // INFORMATION_SCHEMA definition surface.

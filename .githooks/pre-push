@@ -1,0 +1,13 @@
+#!/bin/sh
+set -eu
+
+command -v mise >/dev/null 2>&1 || {
+	echo "pre-push: mise is required; install mise or run git push --no-verify explicitly" >&2
+	exit 1
+}
+
+repo_root=$(git rev-parse --show-toplevel)
+cd "$repo_root"
+
+echo "pre-push: running repository lint gate"
+exec mise run lint
