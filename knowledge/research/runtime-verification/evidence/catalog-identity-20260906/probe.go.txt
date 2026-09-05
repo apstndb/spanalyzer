@@ -1,0 +1,100 @@
+package main
+
+import (
+	"cloud.google.com/go/spanner"
+	"cloud.google.com/go/spanner/admin/database/apiv1/databasepb"
+	"context"
+	"encoding/json"
+	"fmt"
+	b "github.com/apstndb/spanemuboost"
+	"os"
+	"runtime"
+	"time"
+)
+
+func main() {
+	if e := run(); e != nil {
+		fmt.Fprintln(os.Stderr, e)
+		os.Exit(1)
+	}
+}
+func run() error {
+	// The explicit JSON tags below match the checked runtime contract.
+	var raw struct {
+		Targets []struct {
+			Kind      string `json:"kind"`
+			Image     string `json:"image_family"`
+			Tag       string `json:"tag"`
+			Platforms []struct{ Platform, Digest string }
+		}
+	}
+	data, e := os.ReadFile("../runtime_targets.json")
+	if e != nil {
+		return e
+	}
+	if e = json.Unmarshal(data, &raw); e != nil {
+		return e
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), 8*time.Minute)
+	defer cancel()
+	for _, target := range raw.Targets {
+		var image string
+		for _, p := range target.Platforms {
+			if p.Platform == "linux/"+runtime.GOARCH {
+				image = target.Image + ":" + target.Tag + "@" + p.Digest
+			}
+		}
+		if image == "" {
+			return fmt.Errorf("no host pin for %s", target.Kind)
+		}
+		fmt.Printf("RUNTIME kind=%s image=%s\n", target.Kind, image)
+		rt, e := b.Run(ctx, b.Backend(target.Kind), b.WithContainerImage(image), b.DisableAutoConfig())
+		if e != nil {
+			return e
+		}
+		e = probe(ctx, rt, target.Kind)
+		closeErr := rt.Close()
+		if e != nil {
+			return e
+		}
+		if closeErr != nil {
+			return closeErr
+		}
+	}
+	return nil
+}
+func probe(ctx context.Context, rt b.Runtime, kind string) error {
+	bootstrap := b.EnableAutoConfig()
+	if kind == "omni" {
+		bootstrap = b.EnableDatabaseAutoConfigOnly()
+	}
+	c, e := b.OpenClients(ctx, rt, bootstrap, b.WithRandomDatabaseID(), b.WithSetupDDLs([]string{"CREATE TABLE Singers (Id INT64 NOT NULL) PRIMARY KEY(Id)", "ALTER TABLE Singers ADD SYNONYM Vocalists", "CREATE VIEW Other SQL SECURITY INVOKER AS SELECT 1 AS Id"}))
+	if e != nil {
+		return e
+	}
+	defer c.Close()
+	cases := []struct{ id, ddl string }{
+		{"exact_alter", "ALTER TABLE Singers ADD COLUMN Age INT64"},
+		{"folded_alter", "ALTER TABLE singers ADD COLUMN Age2 INT64"},
+		{"synonym_alter", "ALTER TABLE Vocalists ADD COLUMN Age3 INT64"},
+		{"folded_duplicate", "CREATE TABLE singers (Id INT64 NOT NULL) PRIMARY KEY(Id)"},
+		{"table_after_view", "CREATE TABLE Other (Id INT64 NOT NULL) PRIMARY KEY(Id)"},
+		{"folded_drop", "DROP TABLE singers"},
+		{"missing_drop", "DROP TABLE Missing"},
+		{"missing_drop_if_exists", "DROP TABLE IF EXISTS Missing"},
+	}
+	for _, x := range cases {
+		op, e := c.DatabaseClient.UpdateDatabaseDdl(ctx, &databasepb.UpdateDatabaseDdlRequest{Database: c.DatabasePath(), Statements: []string{x.ddl}})
+		if e == nil {
+			e = op.Wait(ctx)
+		}
+		fmt.Printf("%s ddl=%q err=%v\n", x.id, x.ddl, e)
+	}
+	for _, name := range []string{"Singers", "singers", "SINGERS", "Vocalists"} {
+		it := c.Client.Single().Query(ctx, spanner.Statement{SQL: "SELECT COUNT(*) FROM " + name})
+		_, e := it.Next()
+		it.Stop()
+		fmt.Printf("query name=%s err=%v\n", name, e)
+	}
+	return nil
+}

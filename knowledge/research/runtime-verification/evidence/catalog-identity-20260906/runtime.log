@@ -1,0 +1,30 @@
+RUNTIME kind=emulator image=gcr.io/cloud-spanner-emulator/emulator:1.5.56@sha256:5b1e3607fe8574fb04144eeabfa54120559fb01968ffe3ffc0a9a8f6776fc454
+exact_alter ddl="ALTER TABLE Singers ADD COLUMN Age INT64" err=<nil>
+folded_alter ddl="ALTER TABLE singers ADD COLUMN Age2 INT64" err=rpc error: code = NotFound desc = Table not found: singers
+synonym_alter ddl="ALTER TABLE Vocalists ADD COLUMN Age3 INT64" err=<nil>
+folded_duplicate ddl="CREATE TABLE singers (Id INT64 NOT NULL) PRIMARY KEY(Id)" err=rpc error: code = FailedPrecondition desc = Duplicate name in schema: singers.
+table_after_view ddl="CREATE TABLE Other (Id INT64 NOT NULL) PRIMARY KEY(Id)" err=rpc error: code = FailedPrecondition desc = Duplicate name in schema: Other.
+folded_drop ddl="DROP TABLE singers" err=rpc error: code = NotFound desc = Table not found: singers
+missing_drop ddl="DROP TABLE Missing" err=rpc error: code = NotFound desc = Table not found: Missing
+missing_drop_if_exists ddl="DROP TABLE IF EXISTS Missing" err=<nil>
+query name=Singers err=<nil>
+query name=singers err=<nil>
+query name=SINGERS err=<nil>
+query name=Vocalists err=<nil>
+RUNTIME kind=omni image=us-docker.pkg.dev/spanner-omni/images/spanner-omni:2026.r2.1-beta@sha256:ed31d9ee72eeee69cac78566eb3a6e72ee389b26234735f0ef449774cc006741
+exact_alter ddl="ALTER TABLE Singers ADD COLUMN Age INT64" err=<nil>
+folded_alter ddl="ALTER TABLE singers ADD COLUMN Age2 INT64" err=rpc error: code = NotFound desc = Table not found: singers
+error details: name = ResourceInfo type = spanner.googleapis.com/Table resourcename = singers owner =  desc = Table not found
+synonym_alter ddl="ALTER TABLE Vocalists ADD COLUMN Age3 INT64" err=rpc error: code = NotFound desc = Table not found: Vocalists
+error details: name = ResourceInfo type = spanner.googleapis.com/Table resourcename = Vocalists owner =  desc = Table not found
+folded_duplicate ddl="CREATE TABLE singers (Id INT64 NOT NULL) PRIMARY KEY(Id)" err=rpc error: code = FailedPrecondition desc = Schema object names differ only in case: Singers, singers.
+table_after_view ddl="CREATE TABLE Other (Id INT64 NOT NULL) PRIMARY KEY(Id)" err=rpc error: code = FailedPrecondition desc = Duplicate name in schema: Other.
+folded_drop ddl="DROP TABLE singers" err=rpc error: code = NotFound desc = Table not found: singers
+error details: name = ResourceInfo type = spanner.googleapis.com/Table resourcename = singers owner =  desc = Table not found
+missing_drop ddl="DROP TABLE Missing" err=rpc error: code = NotFound desc = Table not found: Missing
+error details: name = ResourceInfo type = spanner.googleapis.com/Table resourcename = Missing owner =  desc = Table not found
+missing_drop_if_exists ddl="DROP TABLE IF EXISTS Missing" err=<nil>
+query name=Singers err=<nil>
+query name=singers err=<nil>
+query name=SINGERS err=<nil>
+query name=Vocalists err=<nil>

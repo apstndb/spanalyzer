@@ -12,13 +12,17 @@ kept as long-term planning notes rather than immediate fixes because most of
 them change public APIs, module boundaries, diagnostics, or larger internal
 architecture.
 
-- [ ] **Normalize catalog object identity before any v1 freeze.** Spanner
-  identifiers are case-insensitive, but several root catalog maps are keyed by
-  original spelling. Introduce a single normalized object-key helper that keeps
-  display spelling in values, then route table, index, view, sequence, model,
-  proto, and graph lookups through it. Fold related DDL consistency issues into
-  the same pass: table/view conflict checks, rename/drop index bookkeeping,
-  synonym overwrite handling, and raw map lookups from analyzer-returned names.
+- [ ] **Separate catalog uniqueness, DDL references, and query lookup before
+  any v1 freeze.** Creation must reject names differing only by case, while DDL
+  references require original case and query/DML lookup is case-insensitive.
+  Preserve case-sensitive proto/enum type names. Do not replace these rules
+  with one universal folded key. Add creation conflict checks across tables
+  and views, honor missing-object errors versus `IF EXISTS`, and review rename,
+  index, and synonym bookkeeping while preserving public map compatibility.
+  The [2026-09-06 runtime comparison](knowledge/research/runtime-verification/catalog-identity-20260906.md)
+  reproduces duplicate-name and silent-DROP gaps and records an Emulator/Omni
+  difference for ALTER through a synonym; managed-service behavior for that
+  difference remains unverified.
 - [ ] **Make row-type-irrelevant DDL lenient by design.** Common migration DDL
   such as `ALTER TABLE ADD/DROP CONSTRAINT`, row deletion policies, and
   unsupported `ALTER INDEX` alterations should not hard-fail row-type analysis
@@ -54,8 +58,9 @@ architecture.
 - [ ] **Strengthen `plancontract` as an independently reliable module.** Add
   table-driven tests for operator-family classification, topology,
   predefined-contract expansion, YAML validation, CEL evaluation, and digest
-  behavior. Extract `Validate(File)`, call it from both `ReadFile` and
-  `Evaluate`, report per-contract CEL errors instead of aborting the whole
+  behavior. Input validation is now shared by `ReadFile`, `Validate`, and
+  `Evaluate`, including predicate expansion and CEL compilation before target
+  lookup. Consider reporting per-contract runtime CEL errors instead of aborting the whole
   batch, prefer typed CEL inputs for normalized data, make digests deterministic
   by sorting by node index, include scan-target identity where appropriate, and
   emit diagnostics when a family comes from a heuristic fallback.
@@ -66,8 +71,9 @@ architecture.
   handling, report assembly, annotation, and invariant validation can be tested
   without an Omni container. Catalog-open/DDL failures should become per-target
   errors when possible instead of discarding the entire partial report.
-- [ ] **Finish querygen and optparam structural cleanup.** Share the
-  GenerateQueryCode/BuildQueryCodegenPlan resolution pipeline, dedupe table
+- [ ] **Finish querygen and optparam structural cleanup.** Generation and
+  plan projection now share SQL resolution, analysis, DTO merging, write
+  planning, and namespace validation. Dedupe table
   and index key-prefix predicate assembly, decide nullable ARRAY element
   policy for query results, escape GoogleSQL string literals and identifiers
   according to dialect rules, escape generated struct-tag values, introduce
@@ -87,14 +93,6 @@ architecture.
 
 ## Analyzer And Catalog
 
-- [ ] **Property graph derived expressions still hardcode `JSON`.** As
-  verified in the Cloud Spanner Emulator source (`PopulatePropertyGraph`),
-  the property type should match the analyzed type of the expression (for
-  example `INT64` for `LENGTH(FirstName)`). Extract the correct type from the
-  analyzer output without increasing direct dependencies on `go-zetasql`.
-  Note that `TestAnalyzerRowTypeForPropertyGraphWithExpressions` currently
-  asserts the hardcoded `JSON` behaviour; fix the extraction first or mark
-  the test as pinning known-wrong behaviour.
 - Continue comparing native proto/enum analyzer behavior with Cloud Spanner
   and the Cloud Spanner emulator (top-level proto outputs, nested fields,
   arrays, enum values).

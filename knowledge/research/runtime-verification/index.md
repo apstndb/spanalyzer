@@ -7,6 +7,7 @@ source evidence, results and unverified boundaries travel with each note.
 
 | Runtime and observation scope | Research Note |
 | --- | --- |
+| Emulator 1.5.56 and Omni 2026.r2.1-beta, 2026-09-06 | [Catalog identity](catalog-identity-20260906.md): creation uniqueness, exact DDL references, query lookup, and synonym divergence |
 | Emulator 1.5.57, 2026-09-05 | [Release verification](cloud-spanner-emulator-1.5.57-verification.md): announced changes, survey results and metadata |
 | Emulator 1.5.56 to 1.5.57, 2026-09-05 | [Source audit](cloud-spanner-emulator-1.5.57-source-audit.md): all 105 changed files and unannounced behavior |
 | Omni 2026.r2.1-beta, August 2026 observations consolidated on 2026-09-05 | [Retained runtime verification](spanner-omni-2026.r2.1-beta-verification.md): direct metadata captures and identified historical run reports |
