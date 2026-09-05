@@ -316,64 +316,18 @@ type QueryCodegenPlanField struct {
 }
 
 func GenerateQueryCode(config QueryCodegenConfig, baseDir string) (string, error) {
-	if len(config.Queries) == 0 && len(config.Writes) == 0 {
-		return "", fmt.Errorf("no queries or writes configured")
-	}
-	options := GoStructOptions{
-		PackageName: config.Package,
-		StructName:  "QueryRow",
-		Target:      GoStructTarget(strings.ToLower(string(config.Client))),
-	}
-	if options.Target == "" {
-		options.Target = GoStructTargetBoth
-	}
-	if err := validateGoStructOptions(options); err != nil {
-		return "", err
-	}
-	schemas, err := queryCodegenSchemas(config)
+	resolved, err := resolveQueryCodegen(config, baseDir)
 	if err != nil {
 		return "", err
 	}
-	structs := map[string][]goResultField{}
-	constants := make([]generatedGoConst, 0, len(config.Queries))
+	options, structs := resolved.options, resolved.structs
+	querySpecs, writeSpecs := resolved.querySpecs, resolved.writeSpecs
+	writeStructFields := resolved.writeStructFields
+	constants := make([]generatedGoConst, 0, len(resolved.queries))
 	var builderCode bytes.Buffer
 	var builderImports []string
-	var querySpecs []resolvedQuerySpec
-	for i, query := range config.Queries {
-		if query.Name == "" {
-			return "", fmt.Errorf("query name is required")
-		}
-		if err := validateQueryCodegenQuery(query); err != nil {
-			return "", err
-		}
-		query, err := resolveCodegenQuerySQL(schemas, query, baseDir)
-		if err != nil {
-			return "", err
-		}
-		if err := validateQueryCodegenParams(query); err != nil {
-			return "", err
-		}
-		fields, _, err := analyzeCodegenQuery(schemas, query, baseDir)
-		if err != nil {
-			return "", err
-		}
-		fields, err = applyRequiredFields(fields, query.Required, query.RequiredPolicy)
-		if err != nil {
-			return "", fmt.Errorf("query %s: %w", query.Name, err)
-		}
-		if err := validateUniqueQueryResultFieldNames(fields); err != nil {
-			return "", fmt.Errorf("query %s: %w", query.Name, err)
-		}
-		structName := queryResultStructName(query)
-		merged, err := mergeGoResultFields(structs[structName], fields)
-		if err != nil {
-			return "", fmt.Errorf("query %s result_struct %s: %w", query.Name, structName, err)
-		}
-		structs[structName] = merged
-		spec, err := newResolvedQuerySpec(schemas, query, structName, i)
-		if err != nil {
-			return "", err
-		}
+	for _, item := range resolved.queries {
+		query, spec := item.query, item.spec
 		if spec.BuilderFunc != "" {
 			code, imports, err := emitQueryGoBuilder(query, spec.BuilderFunc, spec.ParamsType)
 			if err != nil {
@@ -387,15 +341,8 @@ func GenerateQueryCode(config QueryCodegenConfig, baseDir string) (string, error
 		} else {
 			constants = append(constants, queryGoConstants(query)...)
 		}
-		querySpecs = append(querySpecs, spec)
 	}
-	writeStructFields, writeSpecs, err := planWriteSpecs(schemas, config.Writes, baseDir, structs)
-	if err != nil {
-		return "", err
-	}
-	if err := validateGeneratedPackageNamespace(querySpecs, writeSpecs, structs, writeStructFields, options.Target); err != nil {
-		return "", err
-	}
+
 	writeImports, writeCode, err := emitWriteCode(writeStructFields, writeSpecs)
 	if err != nil {
 		return "", err
@@ -853,15 +800,13 @@ func digestBytes(value []byte) string {
 }
 
 func BuildQueryCodegenPlan(config QueryCodegenConfig, baseDir string) (*QueryCodegenPlan, error) {
-	if len(config.Queries) == 0 && len(config.Writes) == 0 {
-		return nil, fmt.Errorf("no queries or writes configured")
-	}
-	schemas, err := queryCodegenSchemas(config)
+	resolved, err := resolveQueryCodegen(config, baseDir)
 	if err != nil {
 		return nil, err
 	}
-	structs := map[string][]goResultField{}
-	var querySpecs []resolvedQuerySpec
+	schemas, structs := resolved.schemas, resolved.structs
+	writeStructFields, writeSpecs := resolved.writeStructFields, resolved.writeSpecs
+
 	plan := &QueryCodegenPlan{
 		PlanVersion: 1,
 		Generator: QueryCodegenPlanGenerator{
@@ -883,37 +828,9 @@ func BuildQueryCodegenPlan(config QueryCodegenConfig, baseDir string) (*QueryCod
 	}
 	plan.CatalogBindings = catalogBindings
 	applyCatalogBindingSeverityOverrides(plan.CatalogBindings, config.RuleSeverity)
-	for i, query := range config.Queries {
-		if query.Name == "" {
-			return nil, fmt.Errorf("query name is required")
-		}
-		if err := validateQueryCodegenQuery(query); err != nil {
-			return nil, err
-		}
-		query, err := resolveCodegenQuerySQL(schemas, query, baseDir)
-		if err != nil {
-			return nil, err
-		}
-		if err := validateQueryCodegenParams(query); err != nil {
-			return nil, err
-		}
-		fields, variants, err := analyzeCodegenQuery(schemas, query, baseDir)
-		if err != nil {
-			return nil, err
-		}
-		fields, err = applyRequiredFields(fields, query.Required, query.RequiredPolicy)
-		if err != nil {
-			return nil, fmt.Errorf("query %s: %w", query.Name, err)
-		}
-		if err := validateUniqueQueryResultFieldNames(fields); err != nil {
-			return nil, fmt.Errorf("query %s: %w", query.Name, err)
-		}
-		structName := queryResultStructName(query)
-		merged, err := mergeGoResultFields(structs[structName], fields)
-		if err != nil {
-			return nil, fmt.Errorf("query %s result_struct %s: %w", query.Name, structName, err)
-		}
-		structs[structName] = merged
+	for _, item := range resolved.queries {
+		query, fields, variants := item.query, item.fields, item.variants
+		structName := item.spec.ResultStruct
 		sourceName, err := querySourceName(schemas, query)
 		if err != nil {
 			return nil, err
@@ -937,11 +854,6 @@ func BuildQueryCodegenPlan(config QueryCodegenConfig, baseDir string) (*QueryCod
 				planVariants = nil
 			}
 		}
-		spec, specErr := newResolvedQuerySpec(schemas, query, structName, i)
-		if specErr != nil {
-			return nil, specErr
-		}
-		querySpecs = append(querySpecs, spec)
 		plan.Queries = append(plan.Queries, QueryCodegenPlanQuery{
 			Name:            query.Name,
 			Catalog:         sourceName,
@@ -960,10 +872,6 @@ func BuildQueryCodegenPlan(config QueryCodegenConfig, baseDir string) (*QueryCod
 			Warnings:        warnings,
 			Fields:          planFields(fields),
 		})
-	}
-	writeStructFields, writeSpecs, err := planWriteSpecs(schemas, config.Writes, baseDir, structs)
-	if err != nil {
-		return nil, err
 	}
 	for _, spec := range writeSpecs {
 		plan.Writes = append(plan.Writes, QueryCodegenPlanWrite{
@@ -990,13 +898,6 @@ func BuildQueryCodegenPlan(config QueryCodegenConfig, baseDir string) (*QueryCod
 	sort.Slice(plan.Structs, func(i, j int) bool {
 		return plan.Structs[i].Name < plan.Structs[j].Name
 	})
-	target := GoStructTarget(strings.ToLower(string(config.Client)))
-	if target == "" {
-		target = GoStructTargetBoth
-	}
-	if err := validateGeneratedPackageNamespace(querySpecs, writeSpecs, structs, writeStructFields, target); err != nil {
-		return nil, err
-	}
 	return plan, nil
 }
 

@@ -1220,6 +1220,21 @@ root analyzer package. `plancontract` is intentionally kept independent
 of `go-googlesql`, `memefish`, and `spanemuboost`; callers pass an
 already-collected `spannerpb.QueryPlan` plus normalized operator metadata.
 
+Within `internal/querygen`, `resolveQueryCodegen` builds the common model used
+by `GenerateQueryCode` and `BuildQueryCodegenPlan`: resolved SQL, analyzed
+variants, merged query DTOs, write specs, and validated package symbols.
+Rendering consumes this model; plan projection adds audit-only metadata and
+warnings. Keep query-result and write-only DTO fields distinct because only
+query results activate decoder support declarations. This shared boundary
+prevents validation rules from drifting between generation and explanation.
+
+Plan contract input has its own validation boundary in `plancontract`.
+`ReadFile`, `Validate`, and `Evaluate` share document checks, predicate
+resolution, and CEL compilation. Evaluation validates all contracts before
+looking up targets, and the CLI validates the contract file before SQL analysis
+or backend startup. Missing or failed targets affect evaluation availability,
+not whether a contract definition is well formed.
+
 ## CLI UX
 
 The CLI should feel like a normal generator with explicit subcommands:
