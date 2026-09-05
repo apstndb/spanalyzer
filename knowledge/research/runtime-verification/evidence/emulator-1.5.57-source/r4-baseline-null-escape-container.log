@@ -1,0 +1,45 @@
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+I0000 00:00:1788591686.144007      20 emulator_main.cc:39] Cloud Spanner Emulator running.
+I0000 00:00:1788591686.145202      20 emulator_main.cc:40] Server address: 0.0.0.0:9010
+2026/09/05 07:01:27 gateway.go:163: Cloud Spanner emulator running.
+2026/09/05 07:01:27 gateway.go:164: REST server listening at 0.0.0.0:9020
+2026/09/05 07:01:27 gateway.go:165: gRPC server listening at 0.0.0.0:9010
+I0000 00:00:1788591694.301569      32 spangres_translator.cc:373] EngineSystemCatalog initialized
+F0000 00:00:1788591694.436805      32 value_inl.h:918] Check failed: !metadata_.is_null() Null value
+[symbolize_elf.inc : 378] RAW: Unable to get high fd: rc=0, limit=1024
+*** Check failure stack trace: ***
+    @       0x4003326cd9  (unknown)
+    @       0x400046eeb3  (unknown)
+    @       0x4000825466  (unknown)
+    @       0x4000b04afe  (unknown)
+    @       0x4000b04e0f  (unknown)
+    @       0x4000b0eec5  (unknown)
+    @       0x4000b0f3d2  (unknown)
+    @       0x4000b10973  (unknown)
+    @       0x4000b0ee77  (unknown)
+    @       0x4000ac2623  (unknown)
+    @       0x4000acbf4e  (unknown)
+    @       0x4000accfe2  (unknown)
+    @       0x4000ad0ebd  (unknown)
+    @       0x4000ad4029  (unknown)
+    @       0x40009d82df  (unknown)
+    @       0x40009da5e7  (unknown)
+    @       0x40009c4a85  (unknown)
+    @       0x40009bfbfc  (unknown)
+    @       0x400099f69f  (unknown)
+    @       0x400081b851  (unknown)
+    @       0x400081cb28  (unknown)
+    @       0x400086fb47  (unknown)
+    @       0x4000817578  (unknown)
+    @       0x40008156e4  (unknown)
+    @       0x40007ea556  (unknown)
+    @       0x40007ea8d9  (unknown)
+    @       0x40007eab2b  (unknown)
+    @       0x4002b1629e  (unknown)
+    @       0x4002b1a400  (unknown)
+    @       0x4002b60f67  (unknown)
+    @       0x4002b68961  (unknown)
+    @       0x4002b68b28  (unknown)
+    @       0x40032f4f62  (unknown)
+    @       0x40091701f5  (unknown)
+2026/09/05 07:01:34 gateway.go:130: Shutting down gateway server since grpc server is terminated.

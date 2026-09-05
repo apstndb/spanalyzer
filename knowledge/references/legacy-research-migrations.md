@@ -31,7 +31,19 @@ legacy_research_migrations:
   - { legacy_path: research/spanner-query-plan-shape/GQL_SURFACE_OBSERVATIONS_2026-08-11.md, state: pending, planvocab_action: pending }
   - { legacy_path: research/spanner-query-plan-shape/HINT_POSITION_AUDIT_2026-08-04.md, state: pending, planvocab_action: pending }
   - { legacy_path: research/spanner-query-plan-shape/NGRAM_SEARCH_OBSERVATIONS_2026-08-13.md, state: pending, planvocab_action: pending }
-  - { legacy_path: research/spanner-query-plan-shape/OMNI_R2_1_MANAGED_DIFF_2026-08-24.md, state: pending, planvocab_action: pending }
+  - legacy_path: research/spanner-query-plan-shape/OMNI_R2_1_MANAGED_DIFF_2026-08-24.md
+    state: completed
+    source_ref: ed36db1e144340a160a53e1f6ab5c7e628d2cffe
+    source_blob: c09746452b36d11c13066cbbbb9511c671372028
+    dispositions:
+      - kind: retain-move
+        scope: Complete dated managed/Omni comparison, including pipe syntax, optimizer-v9 controls, DML partitions and original runtime provenance.
+        successors:
+          - knowledge/research/runtime-verification/spanner-omni-2026.r2.1-beta-managed-plan-comparison-20260824.md
+    planvocab_action: path-moved
+    planvocab_evidence:
+      - knowledge/research/runtime-verification/spanner-omni-2026.r2.1-beta-managed-plan-comparison-20260824.md
+    planvocab_selectors: [pipe_surface, optimizer_v9, google_sql_surface, rewriter_surface, hint_position_audit]
   - { legacy_path: research/spanner-query-plan-shape/OPERATOR_VERIFICATION_FOLLOWUP.md, state: pending, planvocab_action: not-applicable }
   - { legacy_path: research/spanner-query-plan-shape/OPTIMIZER_DECISION_CONTROL_AND_OBSERVABILITY.md, state: pending, planvocab_action: not-applicable }
   - { legacy_path: research/spanner-query-plan-shape/OPTIMIZER_V9_REAL_INSTANCE_NOTES_2026-07-28.md, state: pending, planvocab_action: pending }

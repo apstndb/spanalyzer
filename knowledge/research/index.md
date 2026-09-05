@@ -9,6 +9,15 @@ Place each research body at `knowledge/research/<area>/<note>.md` and declare
 it as `type: Research Note`. Direct concept files under `knowledge/research/`
 and Research Notes outside this subtree are rejected by the repository gate.
 
+## Areas
+
+- [Runtime verification](runtime-verification/index.md): Emulator releases,
+  source audits, Spanner Omni captures and managed-runtime comparisons.
+
+Keep runtime verification findings in the Research Notes, with evidence linked
+from their sources. `.cursor/handoffs` is for coordination and links to these
+canonical results.
+
 ## Research Note policy
 
 Use `type: Research Note` for environment-scoped probe results, design

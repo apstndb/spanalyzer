@@ -1,0 +1,349 @@
+//go:build integration
+
+// Temporary release verification artifact. Retain with the local verification
+// report; it is not part of the repository or the reviewed improvement train.
+package releaseprobe_test
+
+import (
+	"context"
+	"fmt"
+	"os"
+	"strings"
+	"testing"
+	"time"
+
+	"cloud.google.com/go/spanner"
+	databasepb "cloud.google.com/go/spanner/admin/database/apiv1/databasepb"
+	"github.com/apstndb/spanalyzer/survey/astconv"
+	"github.com/apstndb/spanemuboost"
+	"github.com/cloudspannerecosystem/memefish/ast"
+	"google.golang.org/api/iterator"
+	"google.golang.org/grpc/codes"
+)
+
+const latestImage = "gcr.io/cloud-spanner-emulator/emulator:1.5.57@sha256:4987860c9f8ecf1fffbbcdac115cb88cb9d1a42bd966c235a9ab843aea34fbd1"
+
+func runtimeEnv(t *testing.T, dialect databasepb.DatabaseDialect) *spanemuboost.RuntimeEnv {
+	t.Helper()
+	image := os.Getenv("RELEASE_PROBE_IMAGE")
+	if image == "" {
+		image = latestImage
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
+	t.Cleanup(cancel)
+	env, err := spanemuboost.RunWithClients(ctx, spanemuboost.BackendEmulator,
+		spanemuboost.WithContainerImage(image), spanemuboost.WithDatabaseDialect(dialect))
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() {
+		if err := env.Close(); err != nil {
+			t.Errorf("runtime cleanup: %v", err)
+		}
+	})
+	t.Logf("image=%s dialect=%s", image, dialect)
+	return env
+}
+
+func ddl(ctx context.Context, env *spanemuboost.RuntimeEnv, statements ...string) error {
+	op, err := env.DatabaseClient.UpdateDatabaseDdl(ctx, &databasepb.UpdateDatabaseDdlRequest{
+		Database: env.DatabasePath(), Statements: statements,
+	})
+	if err != nil {
+		return err
+	}
+	return op.Wait(ctx)
+}
+
+func mustDDL(t *testing.T, env *spanemuboost.RuntimeEnv, statements ...string) {
+	t.Helper()
+	if err := ddl(t.Context(), env, statements...); err != nil {
+		t.Fatal(err)
+	}
+}
+
+func mustDML(t *testing.T, env *spanemuboost.RuntimeEnv, statements ...string) {
+	t.Helper()
+	_, err := env.Client.ReadWriteTransaction(t.Context(), func(ctx context.Context, tx *spanner.ReadWriteTransaction) error {
+		for _, sql := range statements {
+			if _, err := tx.Update(ctx, spanner.NewStatement(sql)); err != nil {
+				return err
+			}
+		}
+		return nil
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func query(t *testing.T, env *spanemuboost.RuntimeEnv, sql string) []*spanner.Row {
+	t.Helper()
+	iter := env.Client.Single().Query(t.Context(), spanner.NewStatement(sql))
+	defer iter.Stop()
+	var rows []*spanner.Row
+	for {
+		row, err := iter.Next()
+		if err == iterator.Done {
+			return rows
+		}
+		if err != nil {
+			t.Fatalf("%s: %v", sql, err)
+		}
+		rows = append(rows, row)
+	}
+}
+
+func scalar[T comparable](t *testing.T, env *spanemuboost.RuntimeEnv, sql string, want T) {
+	t.Helper()
+	rows := query(t, env, sql)
+	if len(rows) != 1 {
+		t.Fatalf("%s: rows=%d, want 1", sql, len(rows))
+	}
+	var got T
+	if err := rows[0].Column(0, &got); err != nil {
+		t.Fatal(err)
+	}
+	if got != want {
+		t.Fatalf("%s: got %v, want %v", sql, got, want)
+	}
+}
+
+func distinct(t *testing.T, env *spanemuboost.RuntimeEnv, pg bool) {
+	t.Helper()
+	nan := "CAST('NaN' AS FLOAT64)"
+	if pg {
+		nan = "'NaN'::float8"
+	}
+	cases := []struct {
+		name, left, right string
+		want              bool
+	}{
+		{"equal", "1", "1", false},
+		{"unequal", "1", "2", true},
+		{"both_null", "CAST(NULL AS BIGINT)", "CAST(NULL AS BIGINT)", false},
+		{"one_null", "1", "CAST(NULL AS BIGINT)", true},
+		{"nan_equal", nan, nan, false},
+		{"nan_number", nan, "1.0", true},
+	}
+	if !pg {
+		for i := range cases {
+			cases[i].left = strings.ReplaceAll(cases[i].left, "BIGINT", "INT64")
+			cases[i].right = strings.ReplaceAll(cases[i].right, "BIGINT", "INT64")
+		}
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			for _, pair := range [][2]string{{tc.left, tc.right}, {tc.right, tc.left}} {
+				scalar(t, env, "SELECT "+pair[0]+" IS DISTINCT FROM "+pair[1], tc.want)
+				scalar(t, env, "SELECT "+pair[0]+" IS NOT DISTINCT FROM "+pair[1], !tc.want)
+			}
+		})
+	}
+}
+
+func TestGoogleSQLRelease(t *testing.T) {
+	env := runtimeEnv(t, databasepb.DatabaseDialect_GOOGLE_STANDARD_SQL)
+	t.Run("OmittedPrimaryKeyAndReconstruction", func(t *testing.T) {
+		mustDDL(t, env, "CREATE TABLE NoPK (Value STRING(MAX))")
+		mustDML(t, env, "INSERT INTO NoPK (Value) VALUES ('first'), ('second')")
+		rows := query(t, env, "SELECT * FROM NoPK ORDER BY Value")
+		if len(rows) != 2 || rows[0].Size() != 1 {
+			t.Fatalf("SELECT * returned %d rows; hidden rowid must be excluded", len(rows))
+		}
+		scalar(t, env, "SELECT COUNT(DISTINCT rowid) FROM NoPK", int64(2))
+		scalar(t, env, "SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'NoPK' AND COLUMN_NAME = 'rowid' AND IS_HIDDEN = TRUE AND IS_IDENTITY = 'YES'", int64(1))
+		mustDML(t, env, "INSERT INTO NoPK (rowid, Value) VALUES (100, 'explicit')", "UPDATE NoPK SET Value='updated' WHERE rowid=100")
+		scalar(t, env, "SELECT Value FROM NoPK WHERE rowid=100", "updated")
+		mustDML(t, env, "DELETE FROM NoPK WHERE rowid=100")
+		scalar(t, env, "SELECT COUNT(*) FROM NoPK", int64(2))
+		err := ddl(t.Context(), env, "CREATE TABLE RowIDConflict (rowid INT64, Value STRING(MAX))")
+		if spanner.ErrCode(err) != codes.FailedPrecondition {
+			t.Fatalf("rowid collision error=%v", err)
+		}
+		schema, err := astconv.LoadSchema(t.Context(), env.Client)
+		if err != nil {
+			t.Fatal(err)
+		}
+		statements, err := schema.ToDDLStatements()
+		if err != nil {
+			t.Fatal(err)
+		}
+		found := false
+		for _, statement := range statements {
+			sql := statement.SQL()
+			if strings.HasPrefix(sql, "CREATE TABLE NoPK ") {
+				found = true
+				t.Logf("reconstructed=%s", sql)
+				table, ok := statement.(*ast.CreateTable)
+				if !ok || len(table.PrimaryKeys) != 1 || table.PrimaryKeys[0].Name.Name != "rowid" || !strings.Contains(sql, "HIDDEN") || !strings.Contains(sql, "IDENTITY") {
+					t.Errorf("reconstruction lost hidden identity key: %s", sql)
+				}
+				mustDDL(t, env, strings.Replace(sql, "CREATE TABLE NoPK ", "CREATE TABLE NoPKCopy ", 1))
+				mustDML(t, env, "INSERT INTO NoPKCopy (Value) VALUES ('copy1'), ('copy2')")
+				scalar(t, env, "SELECT COUNT(DISTINCT rowid) FROM NoPKCopy", int64(2))
+			}
+		}
+		if !found {
+			t.Fatal("NoPK absent from reconstructed schema")
+		}
+	})
+	t.Run("ExplicitEmptyPrimaryKeyRemainsSingleton", func(t *testing.T) {
+		mustDDL(t, env, "CREATE TABLE Singleton (Value STRING(MAX)) PRIMARY KEY ()")
+		mustDML(t, env, "INSERT INTO Singleton (Value) VALUES ('one')")
+		_, err := env.Client.ReadWriteTransaction(t.Context(), func(ctx context.Context, tx *spanner.ReadWriteTransaction) error {
+			_, err := tx.Update(ctx, spanner.NewStatement("INSERT INTO Singleton (Value) VALUES ('two')"))
+			return err
+		})
+		if spanner.ErrCode(err) != codes.AlreadyExists {
+			t.Fatalf("second singleton insert=%v", err)
+		}
+	})
+	t.Run("DistinctFrom", func(t *testing.T) { distinct(t, env, false) })
+	t.Run("PendingCommitTimestampStoredInIndex", func(t *testing.T) {
+		mustDDL(t, env,
+			"CREATE TABLE PendingTS (ID INT64 NOT NULL, K STRING(MAX), V STRING(MAX), TS TIMESTAMP OPTIONS (allow_commit_timestamp=true)) PRIMARY KEY (ID)",
+			"CREATE UNIQUE INDEX PendingTSByK ON PendingTS(K) STORING (TS)")
+		mustDML(t, env,
+			"INSERT INTO PendingTS (ID,K,V,TS) VALUES (1,'key','before',PENDING_COMMIT_TIMESTAMP())",
+			"UPDATE PendingTS SET V='after' WHERE ID=1")
+		scalar(t, env, "SELECT V FROM PendingTS WHERE ID=1", "after")
+		scalar(t, env, "SELECT COUNT(*) FROM PendingTS@{FORCE_INDEX=PendingTSByK} WHERE TS IS NOT NULL", int64(1))
+	})
+	t.Run("ChangeStreamAfterColumnDrop", func(t *testing.T) {
+		mustDDL(t, env,
+			"CREATE TABLE StreamTable (ID INT64 NOT NULL, Status STRING(MAX), Channel STRING(MAX)) PRIMARY KEY (ID)",
+			"CREATE CHANGE STREAM ReleaseStream FOR StreamTable")
+		for _, statement := range []string{
+			"ALTER TABLE StreamTable DROP COLUMN Channel",
+			"ALTER CHANGE STREAM ReleaseStream SET FOR StreamTable",
+			"ALTER CHANGE STREAM ReleaseStream SET FOR StreamTable(Status)",
+			"ALTER CHANGE STREAM ReleaseStream SET FOR ALL",
+			"ALTER CHANGE STREAM ReleaseStream DROP FOR ALL",
+			"DROP CHANGE STREAM ReleaseStream",
+		} {
+			mustDDL(t, env, statement)
+		}
+		scalar(t, env, "SELECT 1", int64(1))
+	})
+	t.Run("ChangeStreamAfterTableDrop", func(t *testing.T) {
+		mustDDL(t, env,
+			"CREATE TABLE DropStreamTable (ID INT64 NOT NULL) PRIMARY KEY (ID)",
+			"CREATE CHANGE STREAM DropTableStream FOR ALL")
+		mustDDL(t, env, "DROP TABLE DropStreamTable")
+		mustDDL(t, env, "ALTER CHANGE STREAM DropTableStream SET FOR ALL")
+		mustDDL(t, env, "ALTER CHANGE STREAM DropTableStream DROP FOR ALL")
+		mustDDL(t, env, "DROP CHANGE STREAM DropTableStream")
+		scalar(t, env, "SELECT 1", int64(1))
+	})
+	t.Run("CloudQueueDDLObservation", func(t *testing.T) {
+		for _, statement := range []string{"CREATE QUEUE ReleaseQueue", "CREATE CLOUD QUEUE ReleaseQueue"} {
+			err := ddl(t.Context(), env, statement)
+			t.Logf("statement=%s code=%s error=%v", statement, spanner.ErrCode(err), err)
+		}
+		scalar(t, env, "SELECT 1", int64(1))
+	})
+}
+
+// This adjacent edge case is recorded separately from the upstream release
+// regression sequence, so a historical limitation cannot mask release fixes.
+func TestChangeStreamExplicitToAllTableDrop(t *testing.T) {
+	for _, name := range []string{"Batch", "Separate"} {
+		t.Run(name, func(t *testing.T) {
+			env := runtimeEnv(t, databasepb.DatabaseDialect_GOOGLE_STANDARD_SQL)
+			statements := []string{
+				"CREATE TABLE SwitchStreamTable (ID INT64 NOT NULL, Status STRING(MAX), Channel STRING(MAX)) PRIMARY KEY (ID)",
+				"CREATE CHANGE STREAM SwitchStream FOR SwitchStreamTable",
+				"ALTER TABLE SwitchStreamTable DROP COLUMN Channel",
+				"ALTER CHANGE STREAM SwitchStream SET FOR SwitchStreamTable(Status)",
+				"ALTER CHANGE STREAM SwitchStream SET FOR ALL",
+				"DROP TABLE SwitchStreamTable",
+			}
+			if name == "Batch" {
+				mustDDL(t, env, statements...)
+			} else {
+				for _, statement := range statements {
+					mustDDL(t, env, statement)
+				}
+			}
+		})
+	}
+}
+
+func TestChangeStreamSubsetToAllTableDrop(t *testing.T) {
+	for _, name := range []string{"CreateSubset", "AlterToSubset"} {
+		t.Run(name, func(t *testing.T) {
+			env := runtimeEnv(t, databasepb.DatabaseDialect_GOOGLE_STANDARD_SQL)
+			mustDDL(t, env, "CREATE TABLE SubsetTable (ID INT64 NOT NULL, Status STRING(MAX)) PRIMARY KEY (ID)")
+			if name == "CreateSubset" {
+				mustDDL(t, env, "CREATE CHANGE STREAM SubsetStream FOR SubsetTable(Status)")
+			} else {
+				mustDDL(t, env, "CREATE CHANGE STREAM SubsetStream FOR SubsetTable")
+				mustDDL(t, env, "ALTER CHANGE STREAM SubsetStream SET FOR SubsetTable(Status)")
+			}
+			mustDDL(t, env, "ALTER CHANGE STREAM SubsetStream SET FOR ALL")
+			mustDDL(t, env, "DROP TABLE SubsetTable")
+		})
+	}
+}
+
+func TestPostgreSQLRelease(t *testing.T) {
+	env := runtimeEnv(t, databasepb.DatabaseDialect_POSTGRESQL)
+	t.Run("OmittedPrimaryKey", func(t *testing.T) {
+		mustDDL(t, env, "CREATE TABLE nopk (value varchar)")
+		mustDML(t, env, "INSERT INTO nopk (value) VALUES ('first'), ('second')")
+		rows := query(t, env, "SELECT * FROM nopk ORDER BY value")
+		if len(rows) != 2 || rows[0].Size() != 1 {
+			t.Fatal("hidden rowid leaked or two rows were not inserted")
+		}
+		scalar(t, env, "SELECT COUNT(DISTINCT rowid) FROM nopk", int64(2))
+	})
+	t.Run("DistinctFrom", func(t *testing.T) { distinct(t, env, true) })
+	t.Run("SetAndDropNotNull", func(t *testing.T) {
+		mustDDL(t, env, "CREATE TABLE nullability (id bigint PRIMARY KEY, value bigint)",
+			"ALTER TABLE nullability ALTER COLUMN value SET NOT NULL")
+		_, err := env.Client.ReadWriteTransaction(t.Context(), func(ctx context.Context, tx *spanner.ReadWriteTransaction) error {
+			_, err := tx.Update(ctx, spanner.NewStatement("INSERT INTO nullability (id,value) VALUES (1,NULL)"))
+			return err
+		})
+		if err == nil {
+			t.Fatal("SET NOT NULL did not reject NULL")
+		}
+		mustDDL(t, env, "ALTER TABLE nullability ALTER COLUMN value DROP NOT NULL")
+		mustDML(t, env, "INSERT INTO nullability (id,value) VALUES (1,NULL)")
+		scalar(t, env, "SELECT COUNT(*) FROM nullability WHERE value IS NULL", int64(1))
+	})
+	t.Run("PartitionedDMLParameters", func(t *testing.T) {
+		mustDDL(t, env, "CREATE TABLE pdml (id bigint PRIMARY KEY, name varchar)")
+		mustDML(t, env, "INSERT INTO pdml (id,name) VALUES (1,'one'),(2,'two'),(10,'ten')")
+		n, err := env.Client.PartitionedUpdate(t.Context(), spanner.Statement{
+			SQL: "UPDATE pdml SET name=$1 WHERE id>$2", Params: map[string]any{"p1": "updated", "p2": int64(1)},
+		})
+		if err != nil || n != 2 {
+			t.Fatalf("PartitionedUpdate rows=%d error=%v", n, err)
+		}
+		scalar(t, env, "SELECT COUNT(*) FROM pdml WHERE name='updated'", int64(2))
+	})
+	t.Run("TableSample", func(t *testing.T) {
+		mustDDL(t, env, "CREATE TABLE sampled (id bigint PRIMARY KEY)")
+		var values []string
+		for i := range 10 {
+			values = append(values, fmt.Sprintf("(%d)", i))
+		}
+		mustDML(t, env, "INSERT INTO sampled (id) VALUES "+strings.Join(values, ","))
+		scalar(t, env, "SELECT COUNT(*) FROM sampled TABLESAMPLE BERNOULLI(100)", int64(10))
+		scalar(t, env, "SELECT COUNT(*) FROM sampled TABLESAMPLE BERNOULLI(0)", int64(0))
+		scalar(t, env, "SELECT COUNT(*) FROM sampled TABLESAMPLE SPANNER.RESERVOIR(1)", int64(1))
+		for _, sql := range []string{
+			"SELECT * FROM sampled TABLESAMPLE SYSTEM(50)",
+			"SELECT * FROM sampled TABLESAMPLE BERNOULLI(50) REPEATABLE(5)",
+		} {
+			iter := env.Client.Single().Query(t.Context(), spanner.NewStatement(sql))
+			_, err := iter.Next()
+			iter.Stop()
+			if spanner.ErrCode(err) != codes.Unimplemented {
+				t.Fatalf("unsupported sample error=%v", err)
+			}
+		}
+	})
+}

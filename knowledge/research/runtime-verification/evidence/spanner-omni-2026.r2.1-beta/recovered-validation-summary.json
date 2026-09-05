@@ -1,0 +1,47 @@
+{
+  "record_kind": "recovered historical validation summary",
+  "recorded_on": "2026-09-05",
+  "observation_scope": "2026-08-31 baseline and subsequent accepted improvement-train verification; individual terminal timestamps not retained",
+  "source_head": "ed36db1e144340a160a53e1f6ab5c7e628d2cffe",
+  "source_artifacts": [
+    {
+      "path": ".cursor/handoffs/spanalyzer-improvements-20260905.md",
+      "sha256": "9b938aee35c712361cde5497aecc3142c97d8c65b8f9f181ad621c6f3f341f6f"
+    },
+    {
+      "path": "IMPROVEMENT_PLAN.md",
+      "sha256": "0ea3670033ed863615717d82f5c1a2ec33aa6c21d9398efe2e747c0dfc8ffa19"
+    }
+  ],
+  "backend": "spanner-omni",
+  "image": "us-docker.pkg.dev/spanner-omni/images/spanner-omni:2026.r2.1-beta",
+  "platform": "linux/arm64",
+  "manifest_digest": "sha256:ed31d9ee72eeee69cac78566eb3a6e72ee389b26234735f0ef449774cc006741",
+  "reported_outcomes": {
+    "verify_containers": "passed",
+    "information_schema_columns": 308,
+    "spanner_sys_columns": 539,
+    "INDEXES.SEARCH_UNNEST": "queryable",
+    "INDEX_COLUMNS.EXPRESSION": "queryable",
+    "shared_plan_shape_and_query_generator_probes": "passed",
+    "graph_derived_property_metadata": {
+      "CONCAT": "STRING",
+      "LENGTH": "INT64"
+    },
+    "query_generator_omni_identity_gate": "passed with the pinned arm64 image; attached manual and unverified identity states remain distinct"
+  },
+  "limits": [
+    "No fresh runtime execution during OKF migration.",
+    "Original complete terminal streams are not retained in this receipt.",
+    "The retained INFORMATION_SCHEMA capture independently proves its own metadata surface and platform identity, not all integration-test outcomes.",
+    "No managed destination identifiers are retained."
+  ],
+  "reproducer_sources": [
+    {
+      "path": "tools/spanner-query-plan-shape/graph_derived_property_omni_test.go",
+      "sha256": "b48c871d6d57f9cd7452feb6c24664519fbb491c8ccacc2a2cc2b4ef94477e0c",
+      "role": "case and expected metadata, not an independent execution receipt",
+      "retained_path": "knowledge/research/runtime-verification/evidence/spanner-omni-2026.r2.1-beta/graph_derived_property_omni_test.go.txt"
+    }
+  ]
+}

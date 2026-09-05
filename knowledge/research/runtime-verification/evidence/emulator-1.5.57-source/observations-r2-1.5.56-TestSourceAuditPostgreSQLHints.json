@@ -1,0 +1,101 @@
+[
+  {
+    "name": "scalar_statement_hint",
+    "sql": "/*@ scan_method='row' */ SELECT 1::text",
+    "code": "OK",
+    "values": [
+      "1"
+    ]
+  },
+  {
+    "name": "empty_statement_array_hint",
+    "sql": "/*@ scan_method=[] */ SELECT 1::text",
+    "code": "InvalidArgument",
+    "error": "spanner: code = \"InvalidArgument\", desc = \"[ERROR] syntax error at or near \\\"[\\\"\", requestID = \"1.0018221ee355815a.2.4.6.1\""
+  },
+  {
+    "name": "empty_statement_typed_array_hint",
+    "sql": "/*@ scan_method=ARRAY[] */ SELECT 1::text",
+    "code": "InvalidArgument",
+    "error": "spanner: code = \"InvalidArgument\", desc = \"[ERROR] cannot determine type of empty array\\nHint: Explicitly cast to the desired type, for example ARRAY[]::integer[].\", requestID = \"1.0018221ee355815a.2.1.7.1\""
+  },
+  {
+    "name": "populated_statement_array_hint",
+    "sql": "/*@ scan_method=['row'] */ SELECT 1::text",
+    "code": "InvalidArgument",
+    "error": "spanner: code = \"InvalidArgument\", desc = \"[ERROR] syntax error at or near \\\"[\\\"\", requestID = \"1.0018221ee355815a.2.2.8.1\""
+  },
+  {
+    "name": "empty_table_array_hint",
+    "sql": "SELECT id::text FROM hint_table /*@ force_index=[] */",
+    "code": "InvalidArgument",
+    "error": "spanner: code = \"InvalidArgument\", desc = \"[ERROR] syntax error at or near \\\"[\\\"\", requestID = \"1.0018221ee355815a.2.3.9.1\""
+  },
+  {
+    "name": "empty_unknown_statement_array_hint",
+    "sql": "/*@ unknown_hint=[] */ SELECT 1::text",
+    "code": "InvalidArgument",
+    "error": "spanner: code = \"InvalidArgument\", desc = \"[ERROR] syntax error at or near \\\"[\\\"\", requestID = \"1.0018221ee355815a.2.4.10.1\""
+  },
+  {
+    "name": "populated_unknown_statement_array_hint",
+    "sql": "/*@ unknown_hint=['x'] */ SELECT 1::text",
+    "code": "InvalidArgument",
+    "error": "spanner: code = \"InvalidArgument\", desc = \"[ERROR] syntax error at or near \\\"[\\\"\", requestID = \"1.0018221ee355815a.2.1.11.1\""
+  },
+  {
+    "name": "nonnull_like_escape",
+    "sql": "SELECT ('a' LIKE 'a' ESCAPE '\\')::text",
+    "code": "OK",
+    "values": [
+      "true"
+    ]
+  },
+  {
+    "name": "jsonb_in_subquery",
+    "sql": "SELECT ('{\"a\":1}'::jsonb IN (SELECT '{\"a\":1}'::jsonb))::text",
+    "code": "Internal",
+    "error": "spanner: code = \"Internal\", desc = \"Resolved AST validation failed: GOOGLESQL_RET_CHECK failure (external/googlesql~/googlesql/resolved_ast/validator.cc:1854) in_expr_type-\u003eSupportsEquality() \\nQueryStmt\\n+-parse_location=0-0\\n+-output_column_list=\\n| +-$query.text#2 AS text [STRING]\\n+-query=\\n  +-ProjectScan\\n    +-column_list=[$query.text#2]\\n    +-expr_list=\\n    | +-text#2 :=\\n    |   +-Cast(BOOL -\u003e STRING)\\n    |     +-SubqueryExpr (validation failed here)\\n    |       +-type=BOOL\\n    |       +-subquery_type=IN\\n    |       +-in_expr=\\n    |       | +-Literal(parse_location=8-17, type=PG.JSONB, value={\\\"a\\\": 1})\\n    |       +-subquery=\\n    |         +-ProjectScan\\n    |           +-column_list=[$expr_subquery.jsonb#1]\\n    |           +-expr_list=\\n    |           | +-jsonb#1 := Literal(parse_location=36-45, type=PG.JSONB, value={\\\"a\\\": 1})\\n    |           +-input_scan=\\n    |             +-SingleRowScan\\n    +-input_scan=\\n      +-SingleRowScan\\n\", requestID = \"1.0018221ee355815a.2.3.14.1\""
+  },
+  {
+    "name": "statement_hint_view",
+    "sql": "CREATE VIEW hint_view SQL SECURITY INVOKER AS /*@ scan_method='row' */ SELECT id, value FROM hint_table",
+    "code": "InvalidArgument",
+    "error": "rpc error: code = InvalidArgument desc = [ERROR] syntax error at or near \"AS /*@\"; failed to parse the DDL statements.\nerror details: name = ErrorInfo reason = SQL_ERROR domain = spanner.googleapis.com metadata = map[pg_sqlerrcode:42601]"
+  },
+  {
+    "name": "empty_array_hint_view",
+    "sql": "CREATE VIEW empty_hint_view SQL SECURITY INVOKER AS /*@ scan_method=[] */ SELECT id, value FROM hint_table",
+    "code": "InvalidArgument",
+    "error": "rpc error: code = InvalidArgument desc = [ERROR] syntax error at or near \"AS /*@\"; failed to parse the DDL statements.\nerror details: name = ErrorInfo reason = SQL_ERROR domain = spanner.googleapis.com metadata = map[pg_sqlerrcode:42601]"
+  },
+  {
+    "name": "remote_string_option",
+    "sql": "CREATE FUNCTION remote_string(x bigint) RETURNS bigint VOLATILE LANGUAGE REMOTE AS $${\"endpoint\":\"http://127.0.0.1:1\"}$$",
+    "code": "OK"
+  },
+  {
+    "name": "remote_string_array",
+    "sql": "CREATE FUNCTION remote_array(x bigint) RETURNS bigint VOLATILE LANGUAGE REMOTE AS $${\"endpoint\":\"http://127.0.0.1:1\",\"endpoints\":[\"http://127.0.0.1:1\"]}$$",
+    "code": "InvalidArgument",
+    "error": "rpc error: code = InvalidArgument desc = Unsupported value type 'array' for option 'endpoints' in CREATE FUNCTION statement."
+  },
+  {
+    "name": "remote_mixed_array",
+    "sql": "CREATE FUNCTION remote_mixed(x bigint) RETURNS bigint VOLATILE LANGUAGE REMOTE AS $${\"endpoint\":\"http://127.0.0.1:1\",\"endpoints\":[\"http://127.0.0.1:1\",1]}$$",
+    "code": "InvalidArgument",
+    "error": "rpc error: code = InvalidArgument desc = Unsupported value type 'array' for option 'endpoints' in CREATE FUNCTION statement."
+  },
+  {
+    "name": "query_hint_view",
+    "sql": "SELECT id::text FROM hint_view",
+    "code": "InvalidArgument",
+    "error": "spanner: code = \"InvalidArgument\", desc = \"relation \\\"hint_view\\\" does not exist\", requestID = \"1.0018221ee355815a.2.4.15.1\""
+  },
+  {
+    "name": "dump_pg_hints",
+    "sql": "",
+    "code": "FailedPrecondition",
+    "error": "rpc error: code = FailedPrecondition desc = Spanner type \u003c\u003e is not supported."
+  }
+]

@@ -1,0 +1,88 @@
+[
+  {
+    "name": "control",
+    "sql": "SELECT CAST(1 AS STRING)",
+    "code": "OK",
+    "values": [
+      "1"
+    ]
+  },
+  {
+    "name": "score_version_1",
+    "sql": "ALTER DATABASE `emulator-database` SET OPTIONS (score_version = 1)",
+    "code": "OK"
+  },
+  {
+    "name": "dump_score_version_1",
+    "sql": "",
+    "code": "OK",
+    "values": [
+      "ALTER DATABASE emulator-database SET OPTIONS (score_version = '')"
+    ]
+  },
+  {
+    "name": "roundtrip_score_version_1",
+    "sql": "ALTER DATABASE emulator-database SET OPTIONS (score_version = '')",
+    "code": "InvalidArgument",
+    "error": "rpc error: code = InvalidArgument desc = Error parsing Spanner DDL statement: ALTER DATABASE emulator-database SET OPTIONS (score_version = '') : Syntax error on line 1, column 24: Expecting 'SET' but found '-'"
+  },
+  {
+    "name": "roundtrip_score_version_1_quoted_db",
+    "sql": "ALTER DATABASE `emulator-database` SET OPTIONS (score_version = '')",
+    "code": "InvalidArgument",
+    "error": "rpc error: code = InvalidArgument desc = Error parsing Spanner DDL statement: ALTER DATABASE `emulator-database` SET OPTIONS (score_version = '') : Unexpected value for option: score_version. Supported option values are integers and NULL."
+  },
+  {
+    "name": "score_version_metadata_count",
+    "sql": "SELECT CAST(COUNT(*) AS STRING) FROM INFORMATION_SCHEMA.DATABASE_OPTIONS WHERE OPTION_NAME = 'score_version'",
+    "code": "OK",
+    "values": [
+      "0"
+    ]
+  },
+  {
+    "name": "score_version_-1",
+    "sql": "ALTER DATABASE `emulator-database` SET OPTIONS (score_version = -1)",
+    "code": "OK"
+  },
+  {
+    "name": "dump_score_version_-1",
+    "sql": "",
+    "code": "OK",
+    "values": [
+      "ALTER DATABASE emulator-database SET OPTIONS (score_version = '')"
+    ]
+  },
+  {
+    "name": "score_version_9223372036854775807",
+    "sql": "ALTER DATABASE `emulator-database` SET OPTIONS (score_version = 9223372036854775807)",
+    "code": "OK"
+  },
+  {
+    "name": "dump_score_version_9223372036854775807",
+    "sql": "",
+    "code": "OK",
+    "values": [
+      "ALTER DATABASE emulator-database SET OPTIONS (score_version = '')"
+    ]
+  },
+  {
+    "name": "score_version_NULL",
+    "sql": "ALTER DATABASE `emulator-database` SET OPTIONS (score_version = NULL)",
+    "code": "OK"
+  },
+  {
+    "name": "dump_score_version_NULL",
+    "sql": "",
+    "code": "OK",
+    "values": [
+      "ALTER DATABASE emulator-database SET OPTIONS (score_version = '')"
+    ]
+  },
+  {
+    "name": "score_version_'1'",
+    "sql": "ALTER DATABASE `emulator-database` SET OPTIONS (score_version = '1')",
+    "code": "InvalidArgument",
+    "error": "rpc error: code = InvalidArgument desc = Error parsing Spanner DDL statement: ALTER DATABASE `emulator-database` SET OPTIONS (score_version = '1') : Unexpected value for option: score_version. Supported option values are integers and NULL."
+  }
+]

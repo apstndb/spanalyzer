@@ -1,0 +1,22 @@
+[
+  {
+    "name": "null_escape_pre_control",
+    "sql": "SELECT 1::text",
+    "code": "OK",
+    "values": [
+      "1"
+    ]
+  },
+  {
+    "name": "isolated_like_null_escape",
+    "sql": "SELECT ('a' LIKE 'a' ESCAPE NULL)::text",
+    "code": "DeadlineExceeded",
+    "error": "spanner: code = \"DeadlineExceeded\", desc = \"context deadline exceeded\""
+  },
+  {
+    "name": "null_escape_post_control",
+    "sql": "SELECT 1::text",
+    "code": "DeadlineExceeded",
+    "error": "spanner: code = \"DeadlineExceeded\", desc = \"context deadline exceeded\""
+  }
+]

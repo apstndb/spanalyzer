@@ -117,7 +117,11 @@ instead of copying their bodies. Author new substantive research directly
 under [`knowledge/research/<area>/`](knowledge/research/index.md) as `Research Note`
 concepts. The existing [`research/`](research/README.md) tree is a frozen
 legacy store: maintain or migrate its current notes, but do not add new notes
-there. When adding or removing tracked Markdown outside the bundle, update
+there. Save Emulator and Spanner Omni verification findings under
+[`knowledge/research/runtime-verification/`](knowledge/research/runtime-verification/index.md),
+with runtime identity and retained evidence. Use `.cursor/handoffs` for
+coordination and links to those notes, not as the canonical result store.
+When adding or removing tracked Markdown outside the bundle, update
 [`knowledge/references/repository-documents.md`](knowledge/references/repository-documents.md).
 Every non-`index.md` concept inside the bundle must have parseable YAML
 frontmatter with a non-empty `type`, and every concept must be reachable from

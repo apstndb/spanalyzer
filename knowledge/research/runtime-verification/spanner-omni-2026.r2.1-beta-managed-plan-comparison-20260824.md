@@ -1,8 +1,28 @@
+---
+type: Research Note
+title: "Spanner Omni 2026.r2.1-beta and managed-Spanner PLAN comparison on 2026-08-24"
+description: "Dated pipe-syntax, optimizer-v9, distributed-apply and DML-plan observations, moved coherently from the legacy research corpus."
+tags: [spanner, spanner-omni, query-plan, optimizer, pipe]
+status: draft
+sources:
+  - id: original
+    resource: https://github.com/apstndb/spanalyzer/blob/ed36db1e144340a160a53e1f6ab5c7e628d2cffe/research/spanner-query-plan-shape/OMNI_R2_1_MANAGED_DIFF_2026-08-24.md
+    title: "Exact pre-migration research record"
+  - id: pipe-probes
+    resource: ../../../tools/spanner-query-plan-shape/pipe_surface_cases.go
+    title: "Retained pipe-surface reproducers"
+  - id: optimizer-probes
+    resource: ../../../tools/spanner-query-plan-shape/optimizer_v9_cases.go
+    title: "Retained optimizer-v9 reproducers"
+---
+
 # Spanner Omni 2026.r2.1-beta and managed-Spanner PLAN differences (2026-08-24)
 
-This note records a fresh, destination-redacted comparison between managed
+This note records the 2026-08-24 destination-redacted comparison between managed
 Spanner and Spanner Omni. It is observational evidence, not a portability
-contract.
+contract. It was moved into OKF on 2026-09-05 without rerunning the probes.
+The original image digest is retained; its platform was not recorded and must
+not be inferred from later arm64 metadata captures.[^original]
 
 ## Environment and source baseline
 
@@ -15,7 +35,7 @@ contract.
 - Official release note baseline: the August 20, 2026 release announces
   `2026.r2.1-beta`, editions, a standalone server package, and flag
   deprecations. It does not enumerate SQL or optimizer changes.
-- Official pipe syntax baseline: the current Spanner reference lists 15 pipe
+- Official pipe syntax baseline: the Spanner reference read on 2026-08-24 lists 15 pipe
   operators: `SELECT`, `EXTEND`, `SET`, `DROP`, `RENAME`, `AS`, `WHERE`,
   `AGGREGATE`, `JOIN`, `ORDER BY`, `LIMIT`, `UNION`, `INTERSECT`, `EXCEPT`,
   and `TABLESAMPLE`.
@@ -36,7 +56,7 @@ with optimizer versions 1 through 9. The same 15 SQL texts returned plans on
 managed Spanner.
 
 The dedicated `pipe_surface` selector retains one query per documented
-operator. It uses `TABLESAMPLE BERNOULLI`, because Spanner rejects the
+operator.[^pipe-probes] It uses `TABLESAMPLE BERNOULLI`, because Spanner rejects the
 reference page's `SYSTEM (1 PERCENT)` example as an unsupported sampling
 algorithm even though the pipe operator itself is supported.
 
@@ -87,7 +107,7 @@ Extending the existing DML matrix to v9 found one new compact-tree partition:
 `Apply Mutations(operation_type=DELETE, table=Singers)`, but v9 adds
 `DataBlockToRow` above a Batch `Distributed Cross Apply` and replaces the
 map-side `Cross Apply` input with `RowToDataBlock`. The `optimizer_v9` selector
-retains v8 and v9 controls and requires their compact trees to differ.
+retains v8 and v9 controls and requires their compact trees to differ.[^optimizer-probes]
 
 ## Retained probes
 
@@ -107,3 +127,12 @@ The existing Omni integration suites were rerun against `2026.r2.1-beta` with
 their optimizer matrices extended through v9. Apart from the newly recorded
 pipe, DCA, and DML partitions above, their asserted plan and capability
 boundaries remained valid.
+
+[^original]: The exact [pre-migration record](https://github.com/apstndb/spanalyzer/blob/ed36db1e144340a160a53e1f6ab5c7e628d2cffe/research/spanner-query-plan-shape/OMNI_R2_1_MANAGED_DIFF_2026-08-24.md)
+    is bound by commit and blob in the [migration ledger](../../references/legacy-research-migrations.md).
+[^pipe-probes]: [Pipe cases](../../../tools/spanner-query-plan-shape/pipe_surface_cases.go)
+    and [Omni integration assertions](../../../tools/spanner-query-plan-shape/pipe_surface_omni_test.go)
+    preserve the query family. Executable cases are reproducers, not run receipts.
+[^optimizer-probes]: [Optimizer-v9 cases](../../../tools/spanner-query-plan-shape/optimizer_v9_cases.go)
+    and [Omni assertions](../../../tools/spanner-query-plan-shape/optimizer_v9_omni_test.go)
+    preserve the v8/v9 controls and rejection boundary.

@@ -1,0 +1,40 @@
+[
+  {
+    "name": "control",
+    "sql": "SELECT CAST(1 AS STRING)",
+    "code": "OK",
+    "values": [
+      "1"
+    ]
+  },
+  {
+    "name": "score_version_1",
+    "sql": "ALTER DATABASE `emulator-database` SET OPTIONS (score_version = 1)",
+    "code": "InvalidArgument",
+    "error": "rpc error: code = InvalidArgument desc = Error parsing Spanner DDL statement: ALTER DATABASE `emulator-database` SET OPTIONS (score_version = 1) : Option: score_version is unknown."
+  },
+  {
+    "name": "score_version_-1",
+    "sql": "ALTER DATABASE `emulator-database` SET OPTIONS (score_version = -1)",
+    "code": "InvalidArgument",
+    "error": "rpc error: code = InvalidArgument desc = Error parsing Spanner DDL statement: ALTER DATABASE `emulator-database` SET OPTIONS (score_version = -1) : Option: score_version is unknown."
+  },
+  {
+    "name": "score_version_9223372036854775807",
+    "sql": "ALTER DATABASE `emulator-database` SET OPTIONS (score_version = 9223372036854775807)",
+    "code": "InvalidArgument",
+    "error": "rpc error: code = InvalidArgument desc = Error parsing Spanner DDL statement: ALTER DATABASE `emulator-database` SET OPTIONS (score_version = 9223372036854775807) : Option: score_version is unknown."
+  },
+  {
+    "name": "score_version_NULL",
+    "sql": "ALTER DATABASE `emulator-database` SET OPTIONS (score_version = NULL)",
+    "code": "InvalidArgument",
+    "error": "rpc error: code = InvalidArgument desc = Error parsing Spanner DDL statement: ALTER DATABASE `emulator-database` SET OPTIONS (score_version = NULL) : Option: score_version is unknown."
+  },
+  {
+    "name": "score_version_'1'",
+    "sql": "ALTER DATABASE `emulator-database` SET OPTIONS (score_version = '1')",
+    "code": "InvalidArgument",
+    "error": "rpc error: code = InvalidArgument desc = Error parsing Spanner DDL statement: ALTER DATABASE `emulator-database` SET OPTIONS (score_version = '1') : Option: score_version is unknown."
+  }
+]

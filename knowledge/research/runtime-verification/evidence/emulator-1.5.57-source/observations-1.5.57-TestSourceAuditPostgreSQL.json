@@ -1,0 +1,162 @@
+[
+  {
+    "name": "control",
+    "sql": "SELECT 1::text",
+    "code": "OK",
+    "values": [
+      "1"
+    ]
+  },
+  {
+    "name": "jsonb_brackets_1",
+    "sql": "SELECT (('[\"a\",\"b\"]'::jsonb)[1])::text",
+    "code": "Unimplemented",
+    "error": "spanner: code = \"Unimplemented\", desc = \"Unsupported Postgres expression. Expression type: SubscriptingRef, Arguments: (jsonb, bigint)\", requestID = \"1.743ca44088855759.2.3.4.1\""
+  },
+  {
+    "name": "jsonb_arrowtext_1",
+    "sql": "SELECT '[\"a\",\"b\"]'::jsonb -\u003e\u003e 1",
+    "code": "OK",
+    "values": [
+      "b"
+    ]
+  },
+  {
+    "name": "jsonb_brackets_-1",
+    "sql": "SELECT (('[\"a\",\"b\"]'::jsonb)[-1])::text",
+    "code": "Unimplemented",
+    "error": "spanner: code = \"Unimplemented\", desc = \"Unsupported Postgres expression. Expression type: SubscriptingRef, Arguments: (jsonb, bigint)\", requestID = \"1.743ca44088855759.2.1.7.1\""
+  },
+  {
+    "name": "jsonb_arrowtext_-1",
+    "sql": "SELECT '[\"a\",\"b\"]'::jsonb -\u003e\u003e -1",
+    "code": "OK",
+    "values": [
+      "b"
+    ]
+  },
+  {
+    "name": "jsonb_brackets_2147483648",
+    "sql": "SELECT (('[\"a\",\"b\"]'::jsonb)[2147483648])::text",
+    "code": "Unimplemented",
+    "error": "spanner: code = \"Unimplemented\", desc = \"Unsupported Postgres expression. Expression type: SubscriptingRef, Arguments: (jsonb, bigint)\", requestID = \"1.743ca44088855759.2.3.10.1\""
+  },
+  {
+    "name": "jsonb_arrowtext_2147483648",
+    "sql": "SELECT '[\"a\",\"b\"]'::jsonb -\u003e\u003e 2147483648",
+    "code": "OK",
+    "values": [
+      null
+    ]
+  },
+  {
+    "name": "jsonb_brackets_4294967296",
+    "sql": "SELECT (('[\"a\",\"b\"]'::jsonb)[4294967296])::text",
+    "code": "Unimplemented",
+    "error": "spanner: code = \"Unimplemented\", desc = \"Unsupported Postgres expression. Expression type: SubscriptingRef, Arguments: (jsonb, bigint)\", requestID = \"1.743ca44088855759.2.1.13.1\""
+  },
+  {
+    "name": "jsonb_arrowtext_4294967296",
+    "sql": "SELECT '[\"a\",\"b\"]'::jsonb -\u003e\u003e 4294967296",
+    "code": "OK",
+    "values": [
+      "a"
+    ]
+  },
+  {
+    "name": "jsonb_brackets_4294967297",
+    "sql": "SELECT (('[\"a\",\"b\"]'::jsonb)[4294967297])::text",
+    "code": "Unimplemented",
+    "error": "spanner: code = \"Unimplemented\", desc = \"Unsupported Postgres expression. Expression type: SubscriptingRef, Arguments: (jsonb, bigint)\", requestID = \"1.743ca44088855759.2.3.16.1\""
+  },
+  {
+    "name": "jsonb_arrowtext_4294967297",
+    "sql": "SELECT '[\"a\",\"b\"]'::jsonb -\u003e\u003e 4294967297",
+    "code": "OK",
+    "values": [
+      "b"
+    ]
+  },
+  {
+    "name": "jsonb_brackets_-4294967296",
+    "sql": "SELECT (('[\"a\",\"b\"]'::jsonb)[-4294967296])::text",
+    "code": "Unimplemented",
+    "error": "spanner: code = \"Unimplemented\", desc = \"Unsupported Postgres expression. Expression type: SubscriptingRef, Arguments: (jsonb, bigint)\", requestID = \"1.743ca44088855759.2.1.19.1\""
+  },
+  {
+    "name": "jsonb_arrowtext_-4294967296",
+    "sql": "SELECT '[\"a\",\"b\"]'::jsonb -\u003e\u003e -4294967296",
+    "code": "OK",
+    "values": [
+      "a"
+    ]
+  },
+  {
+    "name": "compression",
+    "sql": "CREATE TABLE compression_probe(id bigint PRIMARY KEY, v text COMPRESSION pglz)",
+    "code": "InvalidArgument",
+    "error": "rpc error: code = InvalidArgument desc = Column compression is not supported."
+  },
+  {
+    "name": "catalog_query",
+    "sql": "SELECT count(*)::text FROM pg_catalog.pg_type",
+    "code": "OK",
+    "values": [
+      "35"
+    ]
+  },
+  {
+    "name": "catalog_query",
+    "sql": "SELECT count(*)::text FROM pg_catalog.pg_tables",
+    "code": "OK",
+    "values": [
+      "0"
+    ]
+  },
+  {
+    "name": "catalog_query",
+    "sql": "SELECT count(*)::text FROM pg_type",
+    "code": "InvalidArgument",
+    "error": "spanner: code = \"InvalidArgument\", desc = \"relation \\\"pg_type\\\" does not exist\", requestID = \"1.743ca44088855759.2.1.26.1\""
+  },
+  {
+    "name": "catalog_view",
+    "sql": "CREATE VIEW catalog_view SQL SECURITY INVOKER AS SELECT tablename FROM pg_catalog.pg_tables",
+    "code": "InvalidArgument",
+    "error": "rpc error: code = InvalidArgument desc = Error analyzing the definition of view `catalog_view`: GOOGLESQL_RET_CHECK failure (backend/schema/updater/sql_expression_validators.cc:223) Dependency not found: pg_tables"
+  },
+  {
+    "name": "query_catalog_view",
+    "sql": "SELECT count(*)::text FROM catalog_view",
+    "code": "InvalidArgument",
+    "error": "spanner: code = \"InvalidArgument\", desc = \"relation \\\"catalog_view\\\" does not exist\", requestID = \"1.743ca44088855759.2.2.27.1\""
+  },
+  {
+    "name": "unnest_view",
+    "sql": "CREATE VIEW unnest_view SQL SECURITY INVOKER AS SELECT unnest(ARRAY[1,2]) AS value",
+    "code": "OK"
+  },
+  {
+    "name": "query_unnest_view",
+    "sql": "SELECT value::text FROM unnest_view ORDER BY value",
+    "code": "OK",
+    "values": [
+      "1",
+      "2"
+    ]
+  },
+  {
+    "name": "like_null_escape",
+    "sql": "SELECT ('a' LIKE 'a' ESCAPE NULL)::text",
+    "code": "InvalidArgument",
+    "error": "spanner: code = \"InvalidArgument\", desc = \"Invalid escape character: NULL. Currently only backslash constant '\\\\' is supported.\", requestID = \"1.743ca44088855759.2.4.30.1\""
+  },
+  {
+    "name": "post_probe_control",
+    "sql": "SELECT 1::text",
+    "code": "OK",
+    "values": [
+      "1"
+    ]
+  }
+]

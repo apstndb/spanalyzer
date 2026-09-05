@@ -1,0 +1,200 @@
+{
+  "checks": [
+    {
+      "name": "score_version 1 newly accepted",
+      "status": "PASS"
+    },
+    {
+      "name": "score_version 1 loses typed value in DDL",
+      "status": "PASS"
+    },
+    {
+      "name": "score_version -1 newly accepted",
+      "status": "PASS"
+    },
+    {
+      "name": "score_version -1 loses typed value in DDL",
+      "status": "PASS"
+    },
+    {
+      "name": "score_version 9223372036854775807 newly accepted",
+      "status": "PASS"
+    },
+    {
+      "name": "score_version 9223372036854775807 loses typed value in DDL",
+      "status": "PASS"
+    },
+    {
+      "name": "score_version NULL newly accepted",
+      "status": "PASS"
+    },
+    {
+      "name": "score_version NULL loses typed value in DDL",
+      "status": "PASS"
+    },
+    {
+      "name": "score_version string remains rejected",
+      "status": "PASS"
+    },
+    {
+      "name": "quoted-name replay isolates score_version type loss",
+      "status": "PASS"
+    },
+    {
+      "name": "score_version omitted from metadata",
+      "status": "PASS"
+    },
+    {
+      "name": "empty_statement_array_hint now discarded",
+      "status": "PASS"
+    },
+    {
+      "name": "empty_statement_typed_array_hint now discarded",
+      "status": "PASS"
+    },
+    {
+      "name": "empty_table_array_hint now discarded",
+      "status": "PASS"
+    },
+    {
+      "name": "empty_unknown_statement_array_hint now discarded",
+      "status": "PASS"
+    },
+    {
+      "name": "populated hint arrays not supported",
+      "status": "PASS"
+    },
+    {
+      "name": "compression now ordinary user error",
+      "status": "PASS"
+    },
+    {
+      "name": "JSONB IN now ordinary user error",
+      "status": "PASS"
+    },
+    {
+      "name": "JSONB bracket 1 remains unsupported at later layer",
+      "status": "PASS"
+    },
+    {
+      "name": "JSONB ->> 1 unchanged",
+      "status": "PASS"
+    },
+    {
+      "name": "JSONB bracket -1 remains unsupported at later layer",
+      "status": "PASS"
+    },
+    {
+      "name": "JSONB ->> -1 unchanged",
+      "status": "PASS"
+    },
+    {
+      "name": "JSONB bracket 2147483648 remains unsupported at later layer",
+      "status": "PASS"
+    },
+    {
+      "name": "JSONB ->> 2147483648 unchanged",
+      "status": "PASS"
+    },
+    {
+      "name": "JSONB bracket 4294967296 remains unsupported at later layer",
+      "status": "PASS"
+    },
+    {
+      "name": "JSONB ->> 4294967296 unchanged",
+      "status": "PASS"
+    },
+    {
+      "name": "JSONB bracket 4294967297 remains unsupported at later layer",
+      "status": "PASS"
+    },
+    {
+      "name": "JSONB ->> 4294967297 unchanged",
+      "status": "PASS"
+    },
+    {
+      "name": "JSONB bracket -4294967296 remains unsupported at later layer",
+      "status": "PASS"
+    },
+    {
+      "name": "JSONB ->> -4294967296 unchanged",
+      "status": "PASS"
+    },
+    {
+      "name": "large JSONB ->> wraparound pre-exists",
+      "status": "PASS"
+    },
+    {
+      "name": "remote-UDF array only moves failure boundary",
+      "status": "PASS"
+    },
+    {
+      "name": "remote-UDF mixed array gets element error",
+      "status": "PASS"
+    },
+    {
+      "name": "PG catalog view still unsupported",
+      "status": "PASS"
+    },
+    {
+      "name": "statement-hint view still raw-parse rejected",
+      "status": "PASS"
+    },
+    {
+      "name": "PG view DDL follows rewritten SRF",
+      "status": "PASS"
+    },
+    {
+      "name": "view result unchanged",
+      "status": "PASS"
+    },
+    {
+      "name": "baseline emulator exited without OOM on NULL escape",
+      "status": "PASS"
+    },
+    {
+      "name": "candidate rejects NULL escape and remains usable",
+      "status": "PASS"
+    },
+    {
+      "name": "all changed files assigned exactly once",
+      "status": "PASS"
+    },
+    {
+      "name": "R4 fresh baseline pre-control and exact pre-send SQL logged",
+      "status": "PASS"
+    },
+    {
+      "name": "R4 exact container fatal null-value check and non-OOM exit255",
+      "status": "PASS"
+    },
+    {
+      "name": "R4 baseline query and post-control deadlines after crash",
+      "status": "PASS"
+    },
+    {
+      "name": "R4 candidate clean error followed by healthy control",
+      "status": "PASS"
+    }
+  ],
+  "passed": 44,
+  "observation_sources": [
+    "observations-1.5.56-TestSourceAuditGoogleSQL.json",
+    "observations-r2-1.5.57-TestSourceAuditGoogleSQL.json",
+    "observations-r2-1.5.56-TestSourceAuditPostgreSQL.json",
+    "observations-1.5.57-TestSourceAuditPostgreSQL.json",
+    "observations-r2-1.5.56-TestSourceAuditPostgreSQLHints.json",
+    "observations-r2-1.5.57-TestSourceAuditPostgreSQLHints.json",
+    "observations-r3-1.5.56-TestSourceAuditPostgreSQLViewDDL.json",
+    "observations-r3-1.5.57-TestSourceAuditPostgreSQLViewDDL.json",
+    "observations-r4-1.5.56-TestSourceAuditNullEscape.json",
+    "observations-r4-1.5.57-TestSourceAuditNullEscape.json"
+  ],
+  "observation_count": 108,
+  "baseline_initial_run": "exit 1 after 8-minute Go test timeout because the isolated emulator crashed on NULL ESCAPE; exact emulator log/state retained",
+  "probe_v1_sha256": "e5e56b14956849069cb3a3e13f37213a7457f56303958b1c474fbead71416a3d",
+  "probe_v2_sha256": "cdf5610a04e2bd92cbc1e8f1572cf38e6d91995c94ed4a1bba6ff0434b6ad559",
+  "probe_v3_sha256": "e5cc3d244d4722333e43f7403ab033aae048f662f04b964f6cb9a6e81ad396c1",
+  "other_runs": "Seven runs exited 0, including two R4 observation collectors; baseline R4 contains expected DeadlineExceeded after confirmed emulator crash.",
+  "probe_v4_sha256": "1d47c08b9fc0db6262151332ef4a9252097ae71e4cc0e2fd5635280542a38ce5"
+}

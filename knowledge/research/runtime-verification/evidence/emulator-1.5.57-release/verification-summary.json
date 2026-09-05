@@ -1,0 +1,2455 @@
+{
+  "recorded_at": "2026-09-05T06:25:17.993902+00:00",
+  "release": "v1.5.57",
+  "native_arm64_verified": false,
+  "runtime_platform": "linux/amd64",
+  "surface_columns": 198,
+  "surface_equal_to_retained_1_5_56": true,
+  "repository_pin_modified": false,
+  "queue_ddl_demonstrated": false,
+  "checks": {
+    "survey-tests-r2": {
+      "observed_exit_code": 0,
+      "outcomes": [
+        {
+          "test": null,
+          "package": "github.com/apstndb/spanalyzer/survey/cmd/roundtrip",
+          "action": "skip",
+          "elapsed": 0
+        },
+        {
+          "test": "TestSplitTaggedImage",
+          "package": "github.com/apstndb/spanalyzer/survey/internal/captureenv",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestValidateExecutionEnvironment",
+          "package": "github.com/apstndb/spanalyzer/survey/internal/captureenv",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestImageForPlatform/emulator_amd64",
+          "package": "github.com/apstndb/spanalyzer/survey/internal/runtimepins",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestImageForPlatform/emulator_arm64",
+          "package": "github.com/apstndb/spanalyzer/survey/internal/runtimepins",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestImageForPlatform/omni_amd64",
+          "package": "github.com/apstndb/spanalyzer/survey/internal/runtimepins",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestImageForPlatform/omni_arm64",
+          "package": "github.com/apstndb/spanalyzer/survey/internal/runtimepins",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestImageForPlatform",
+          "package": "github.com/apstndb/spanalyzer/survey/internal/runtimepins",
+          "action": "pass",
+          "elapsed": 0.01
+        },
+        {
+          "test": null,
+          "package": "github.com/apstndb/spanalyzer/survey/internal/captureenv",
+          "action": "pass",
+          "elapsed": 1.152
+        },
+        {
+          "test": "TestRuntimeTargetsSatisfyJSONSchema",
+          "package": "github.com/apstndb/spanalyzer/survey/internal/runtimepins",
+          "action": "pass",
+          "elapsed": 0.01
+        },
+        {
+          "test": "TestImageForPlatformRejectsUnknownTarget",
+          "package": "github.com/apstndb/spanalyzer/survey/internal/runtimepins",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": null,
+          "package": "github.com/apstndb/spanalyzer/survey/internal/runtimepins",
+          "action": "pass",
+          "elapsed": 1.156
+        },
+        {
+          "test": "TestTableRegistry",
+          "package": "github.com/apstndb/spanalyzer/survey/spannersys",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestAuditReportHasDrift/none",
+          "package": "github.com/apstndb/spanalyzer/survey/spannersys",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestAuditReportHasDrift/known_absent_is_not_drift",
+          "package": "github.com/apstndb/spanalyzer/survey/spannersys",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestAuditReportHasDrift/unknown_table",
+          "package": "github.com/apstndb/spanalyzer/survey/spannersys",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestAuditReportHasDrift/unknown_column",
+          "package": "github.com/apstndb/spanalyzer/survey/spannersys",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestAuditReportHasDrift/ordinal_mismatch",
+          "package": "github.com/apstndb/spanalyzer/survey/spannersys",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestAuditReportHasDrift/type_mismatch",
+          "package": "github.com/apstndb/spanalyzer/survey/spannersys",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestAuditReportHasDrift",
+          "package": "github.com/apstndb/spanalyzer/survey/spannersys",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestBuildAuditReportChecksActivePartitionedDMLTypes",
+          "package": "github.com/apstndb/spanalyzer/survey/spannersys",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestBuildAuditReportRetainsMetadataAndSeparatesKnownAbsence",
+          "package": "github.com/apstndb/spanalyzer/survey/spannersys",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestBuildAuditReportDetectsRelativeOrderDrift",
+          "package": "github.com/apstndb/spanalyzer/survey/spannersys",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestBuildAuditReportCompleteEmptySurfaceIsKnownAbsent",
+          "package": "github.com/apstndb/spanalyzer/survey/spannersys",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestQuoteIdentifiersQualifiesColumns",
+          "package": "github.com/apstndb/spanalyzer/survey/spannersys",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestRowDecodeActivePartitionedDML",
+          "package": "github.com/apstndb/spanalyzer/survey/spannersys",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestRowDecodeOperationsByTable",
+          "package": "github.com/apstndb/spanalyzer/survey/spannersys",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestRowDecodeTableSizesStatsPerLocalityGroup",
+          "package": "github.com/apstndb/spanalyzer/survey/spannersys",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestRegistryDescriptorsCoverKnownSurface",
+          "package": "github.com/apstndb/spanalyzer/survey/spannersys",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestRegistryDescriptorsRetainDecoderNullabilitySeparately",
+          "package": "github.com/apstndb/spanalyzer/survey/spannersys",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestRegistryDescriptorsAreFreshAndDeterministic",
+          "package": "github.com/apstndb/spanalyzer/survey/spannersys",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestDescriptorsFromRegistryRejectsUnsupportedShapes/nil_row_type",
+          "package": "github.com/apstndb/spanalyzer/survey/spannersys",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestDescriptorsFromRegistryRejectsUnsupportedShapes/non_struct_row",
+          "package": "github.com/apstndb/spanalyzer/survey/spannersys",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestDescriptorsFromRegistryRejectsUnsupportedShapes/missing_top-level_tag",
+          "package": "github.com/apstndb/spanalyzer/survey/spannersys",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestDescriptorsFromRegistryRejectsUnsupportedShapes/duplicate_top-level_tag",
+          "package": "github.com/apstndb/spanalyzer/survey/spannersys",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestDescriptorsFromRegistryRejectsUnsupportedShapes/unexported_top-level_field",
+          "package": "github.com/apstndb/spanalyzer/survey/spannersys",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestDescriptorsFromRegistryRejectsUnsupportedShapes/missing_nested_tag",
+          "package": "github.com/apstndb/spanalyzer/survey/spannersys",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestDescriptorsFromRegistryRejectsUnsupportedShapes/duplicate_nested_tag",
+          "package": "github.com/apstndb/spanalyzer/survey/spannersys",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestDescriptorsFromRegistryRejectsUnsupportedShapes/unexported_nested_field",
+          "package": "github.com/apstndb/spanalyzer/survey/spannersys",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestDescriptorsFromRegistryRejectsUnsupportedShapes/nested_array",
+          "package": "github.com/apstndb/spanalyzer/survey/spannersys",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestDescriptorsFromRegistryRejectsUnsupportedShapes/recursive_struct",
+          "package": "github.com/apstndb/spanalyzer/survey/spannersys",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestDescriptorsFromRegistryRejectsUnsupportedShapes/empty_struct",
+          "package": "github.com/apstndb/spanalyzer/survey/spannersys",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestDescriptorsFromRegistryRejectsUnsupportedShapes/map",
+          "package": "github.com/apstndb/spanalyzer/survey/spannersys",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestDescriptorsFromRegistryRejectsUnsupportedShapes/named_scalar",
+          "package": "github.com/apstndb/spanalyzer/survey/spannersys",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestDescriptorsFromRegistryRejectsUnsupportedShapes",
+          "package": "github.com/apstndb/spanalyzer/survey/spannersys",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestCanonicalSpannerTypeRejectsMalformedDescriptors/unknown_kind",
+          "package": "github.com/apstndb/spanalyzer/survey/spannersys",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestCanonicalSpannerTypeRejectsMalformedDescriptors/unknown_scalar",
+          "package": "github.com/apstndb/spanalyzer/survey/spannersys",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestCanonicalSpannerTypeRejectsMalformedDescriptors/scalar_with_element",
+          "package": "github.com/apstndb/spanalyzer/survey/spannersys",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestCanonicalSpannerTypeRejectsMalformedDescriptors/array_without_element",
+          "package": "github.com/apstndb/spanalyzer/survey/spannersys",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestCanonicalSpannerTypeRejectsMalformedDescriptors/nested_array",
+          "package": "github.com/apstndb/spanalyzer/survey/spannersys",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestCanonicalSpannerTypeRejectsMalformedDescriptors/empty_struct",
+          "package": "github.com/apstndb/spanalyzer/survey/spannersys",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestCanonicalSpannerTypeRejectsMalformedDescriptors/empty_field_name",
+          "package": "github.com/apstndb/spanalyzer/survey/spannersys",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestCanonicalSpannerTypeRejectsMalformedDescriptors/duplicate_field",
+          "package": "github.com/apstndb/spanalyzer/survey/spannersys",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestCanonicalSpannerTypeRejectsMalformedDescriptors",
+          "package": "github.com/apstndb/spanalyzer/survey/spannersys",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestCompareLiveTypes",
+          "package": "github.com/apstndb/spanalyzer/survey/spannersys",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestCompareLiveTypesRejectsInvalidDescriptors",
+          "package": "github.com/apstndb/spanalyzer/survey/spannersys",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestIntervalQueriesValidateIntervals/read_stats_top",
+          "package": "github.com/apstndb/spanalyzer/survey/spannersys",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestIntervalQueriesValidateIntervals/transaction_stats_top",
+          "package": "github.com/apstndb/spanalyzer/survey/spannersys",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestIntervalQueriesValidateIntervals/transaction_stats_total",
+          "package": "github.com/apstndb/spanalyzer/survey/spannersys",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestIntervalQueriesValidateIntervals/lock_stats_top",
+          "package": "github.com/apstndb/spanalyzer/survey/spannersys",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestIntervalQueriesValidateIntervals/column_operations_stats",
+          "package": "github.com/apstndb/spanalyzer/survey/spannersys",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestIntervalQueriesValidateIntervals/read_stats_total",
+          "package": "github.com/apstndb/spanalyzer/survey/spannersys",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestIntervalQueriesValidateIntervals/lock_stats_total",
+          "package": "github.com/apstndb/spanalyzer/survey/spannersys",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestIntervalQueriesValidateIntervals/table_operations_stats",
+          "package": "github.com/apstndb/spanalyzer/survey/spannersys",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestIntervalQueriesValidateIntervals/split_stats_top",
+          "package": "github.com/apstndb/spanalyzer/survey/spannersys",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestIntervalQueriesValidateIntervals/query_profiles_stats_top",
+          "package": "github.com/apstndb/spanalyzer/survey/spannersys",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestIntervalQueriesValidateIntervals/query_stats_top",
+          "package": "github.com/apstndb/spanalyzer/survey/spannersys",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestIntervalQueriesValidateIntervals/query_stats_total",
+          "package": "github.com/apstndb/spanalyzer/survey/spannersys",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestIntervalQueriesValidateIntervals",
+          "package": "github.com/apstndb/spanalyzer/survey/spannersys",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestGraphOperationExecutionStatusQuery",
+          "package": "github.com/apstndb/spanalyzer/survey/spannersys",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestVectorIndexStatsQuery",
+          "package": "github.com/apstndb/spanalyzer/survey/spannersys",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestSurfaceCaptureRoundTripAndPath",
+          "package": "github.com/apstndb/spanalyzer/survey/spannersys",
+          "action": "pass",
+          "elapsed": 0.01
+        },
+        {
+          "test": "TestDecodeSurfaceCaptureRejectsDestinationIdentifier/escaped",
+          "package": "github.com/apstndb/spanalyzer/survey/spannersys",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestDecodeSurfaceCaptureRejectsDestinationIdentifier/literal",
+          "package": "github.com/apstndb/spanalyzer/survey/spannersys",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestDecodeSurfaceCaptureRejectsDestinationIdentifier",
+          "package": "github.com/apstndb/spanalyzer/survey/spannersys",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestComputeSurfaceCaptureProducerIdentity",
+          "package": "github.com/apstndb/spanalyzer/survey/spannersys",
+          "action": "pass",
+          "elapsed": 0.01
+        },
+        {
+          "test": "TestSurfaceCaptureSatisfiesJSONSchema",
+          "package": "github.com/apstndb/spanalyzer/survey/spannersys",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestLoadLegacySurfaceBaseline",
+          "package": "github.com/apstndb/spanalyzer/survey/spannersys",
+          "action": "pass",
+          "elapsed": 0.01
+        },
+        {
+          "test": "TestValidateSourceCommit/lowercase_hex",
+          "package": "github.com/apstndb/spanalyzer/survey/spannersys",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestExportManifestFailsClosed/missing_required_target",
+          "package": "github.com/apstndb/spanalyzer/survey/spannersys",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestValidateSourceCommit/nonhex",
+          "package": "github.com/apstndb/spanalyzer/survey/spannersys",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestValidateSourceCommit/short",
+          "package": "github.com/apstndb/spanalyzer/survey/spannersys",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestValidateSourceCommit/uppercase",
+          "package": "github.com/apstndb/spanalyzer/survey/spannersys",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestValidateSourceCommit/empty",
+          "package": "github.com/apstndb/spanalyzer/survey/spannersys",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestValidateSourceCommit",
+          "package": "github.com/apstndb/spanalyzer/survey/spannersys",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestDecodeCaptureStrictness/duplicate_key",
+          "package": "github.com/apstndb/spanalyzer/survey/spannersys",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestDecodeCaptureStrictness/trailing_value",
+          "package": "github.com/apstndb/spanalyzer/survey/spannersys",
+          "action": "pass",
+          "elapsed": 0.01
+        },
+        {
+          "test": "TestExportManifestFailsClosed/duplicate_required_target",
+          "package": "github.com/apstndb/spanalyzer/survey/spannersys",
+          "action": "pass",
+          "elapsed": 0.02
+        },
+        {
+          "test": "TestDecodeCaptureStrictness/unknown_field",
+          "package": "github.com/apstndb/spanalyzer/survey/spannersys",
+          "action": "pass",
+          "elapsed": 0.02
+        },
+        {
+          "test": "TestDecodeCaptureStrictness/stale_hash",
+          "package": "github.com/apstndb/spanalyzer/survey/spannersys",
+          "action": "pass",
+          "elapsed": 0.02
+        },
+        {
+          "test": "TestDecodeCaptureStrictness/ordinal_gap",
+          "package": "github.com/apstndb/spanalyzer/survey/spannersys",
+          "action": "pass",
+          "elapsed": 0.02
+        },
+        {
+          "test": "TestDecodeCaptureStrictness/destination_identifier",
+          "package": "github.com/apstndb/spanalyzer/survey/spannersys",
+          "action": "pass",
+          "elapsed": 0.02
+        },
+        {
+          "test": "TestDecodeCaptureStrictness/noncanonical_query",
+          "package": "github.com/apstndb/spanalyzer/survey/spannersys",
+          "action": "pass",
+          "elapsed": 0.02
+        },
+        {
+          "test": "TestDecodeCaptureStrictness/escaped_destination_identifier",
+          "package": "github.com/apstndb/spanalyzer/survey/spannersys",
+          "action": "pass",
+          "elapsed": 0.02
+        },
+        {
+          "test": "TestDecodeCaptureStrictness",
+          "package": "github.com/apstndb/spanalyzer/survey/spannersys",
+          "action": "pass",
+          "elapsed": 0.01
+        },
+        {
+          "test": "TestExportManifestFailsClosed/runtime_version_does_not_match_evidence_path",
+          "package": "github.com/apstndb/spanalyzer/survey/spannersys",
+          "action": "pass",
+          "elapsed": 0.03
+        },
+        {
+          "test": "TestExportManifestFailsClosed/target_type_disagreement",
+          "package": "github.com/apstndb/spanalyzer/survey/spannersys",
+          "action": "pass",
+          "elapsed": 0.03
+        },
+        {
+          "test": "TestExportManifestFailsClosed/target_ordinal_disagreement",
+          "package": "github.com/apstndb/spanalyzer/survey/spannersys",
+          "action": "pass",
+          "elapsed": 0.03
+        },
+        {
+          "test": "TestExportManifestFailsClosed/unknown_advertised_column",
+          "package": "github.com/apstndb/spanalyzer/survey/spannersys",
+          "action": "pass",
+          "elapsed": 0.03
+        },
+        {
+          "test": "TestExportManifestFailsClosed/target_presence_disagreement",
+          "package": "github.com/apstndb/spanalyzer/survey/spannersys",
+          "action": "pass",
+          "elapsed": 0.03
+        },
+        {
+          "test": "TestExportManifestFailsClosed",
+          "package": "github.com/apstndb/spanalyzer/survey/spannersys",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestManifestSchemasValidateEvidenceAndExport/capture_schema",
+          "package": "github.com/apstndb/spanalyzer/survey/spannersys",
+          "action": "pass",
+          "elapsed": 0.01
+        },
+        {
+          "test": "TestExportManifest",
+          "package": "github.com/apstndb/spanalyzer/survey/spannersys",
+          "action": "pass",
+          "elapsed": 0.06
+        },
+        {
+          "test": "TestManifestSchemasValidateEvidenceAndExport/manifest_schema",
+          "package": "github.com/apstndb/spanalyzer/survey/spannersys",
+          "action": "pass",
+          "elapsed": 0.03
+        },
+        {
+          "test": "TestManifestSchemasValidateEvidenceAndExport",
+          "package": "github.com/apstndb/spanalyzer/survey/spannersys",
+          "action": "pass",
+          "elapsed": 0.03
+        },
+        {
+          "test": null,
+          "package": "github.com/apstndb/spanalyzer/survey/spannersys",
+          "action": "pass",
+          "elapsed": 1.509
+        },
+        {
+          "test": "TestParseSchemaType/BOOL",
+          "package": "github.com/apstndb/spanalyzer/survey/spannertype",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestParseSchemaType/INT64",
+          "package": "github.com/apstndb/spanalyzer/survey/spannertype",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestParseSchemaType/FLOAT32",
+          "package": "github.com/apstndb/spanalyzer/survey/spannertype",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestParseSchemaType/FLOAT64",
+          "package": "github.com/apstndb/spanalyzer/survey/spannertype",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestParseSchemaType/NUMERIC",
+          "package": "github.com/apstndb/spanalyzer/survey/spannertype",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestParseSchemaType/STRING(MAX)",
+          "package": "github.com/apstndb/spanalyzer/survey/spannertype",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestParseSchemaType/STRING(100)",
+          "package": "github.com/apstndb/spanalyzer/survey/spannertype",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestParseSchemaType/BYTES(MAX)",
+          "package": "github.com/apstndb/spanalyzer/survey/spannertype",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestParseSchemaType/BYTES(256)",
+          "package": "github.com/apstndb/spanalyzer/survey/spannertype",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestParseSchemaType/DATE",
+          "package": "github.com/apstndb/spanalyzer/survey/spannertype",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestParseSchemaType/TIMESTAMP",
+          "package": "github.com/apstndb/spanalyzer/survey/spannertype",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestParseSchemaType/JSON",
+          "package": "github.com/apstndb/spanalyzer/survey/spannertype",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestParseSchemaType/ARRAY<INT64>",
+          "package": "github.com/apstndb/spanalyzer/survey/spannertype",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestParseSchemaType/ARRAY<STRING(MAX)>",
+          "package": "github.com/apstndb/spanalyzer/survey/spannertype",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestParseSchemaType/ARRAY<FLOAT64>",
+          "package": "github.com/apstndb/spanalyzer/survey/spannertype",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestParseSchemaType/PROTO<examples.shipping.Order>",
+          "package": "github.com/apstndb/spanalyzer/survey/spannertype",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestParseSchemaType/ENUM<examples.shipping.Order.Status>",
+          "package": "github.com/apstndb/spanalyzer/survey/spannertype",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestParseSchemaType/ARRAY<PROTO<examples.shipping.Order>>",
+          "package": "github.com/apstndb/spanalyzer/survey/spannertype",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestParseSchemaType/ARRAY<ENUM<examples.shipping.Order.Status>>",
+          "package": "github.com/apstndb/spanalyzer/survey/spannertype",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestParseSchemaType",
+          "package": "github.com/apstndb/spanalyzer/survey/spannertype",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestParseSchemaType_Roundtrip/BOOL",
+          "package": "github.com/apstndb/spanalyzer/survey/spannertype",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestParseSchemaType_Roundtrip/INT64",
+          "package": "github.com/apstndb/spanalyzer/survey/spannertype",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestParseSchemaType_Roundtrip/FLOAT64",
+          "package": "github.com/apstndb/spanalyzer/survey/spannertype",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestParseSchemaType_Roundtrip/STRING(MAX)",
+          "package": "github.com/apstndb/spanalyzer/survey/spannertype",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestParseSchemaType_Roundtrip/STRING(255)",
+          "package": "github.com/apstndb/spanalyzer/survey/spannertype",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestParseSchemaType_Roundtrip/BYTES(MAX)",
+          "package": "github.com/apstndb/spanalyzer/survey/spannertype",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestParseSchemaType_Roundtrip/DATE",
+          "package": "github.com/apstndb/spanalyzer/survey/spannertype",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestParseSchemaType_Roundtrip/TIMESTAMP",
+          "package": "github.com/apstndb/spanalyzer/survey/spannertype",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestParseSchemaType_Roundtrip/JSON",
+          "package": "github.com/apstndb/spanalyzer/survey/spannertype",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestParseSchemaType_Roundtrip/NUMERIC",
+          "package": "github.com/apstndb/spanalyzer/survey/spannertype",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestParseSchemaType_Roundtrip/ARRAY<INT64>",
+          "package": "github.com/apstndb/spanalyzer/survey/spannertype",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestParseSchemaType_Roundtrip/ARRAY<STRING(MAX)>",
+          "package": "github.com/apstndb/spanalyzer/survey/spannertype",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestParseSchemaType_Roundtrip",
+          "package": "github.com/apstndb/spanalyzer/survey/spannertype",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestParseSchemaType_Error",
+          "package": "github.com/apstndb/spanalyzer/survey/spannertype",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestParseSchemaType_TypeAssertion",
+          "package": "github.com/apstndb/spanalyzer/survey/spannertype",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestParseFunctionType/INTERVAL",
+          "package": "github.com/apstndb/spanalyzer/survey/spannertype",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestParseFunctionType/STRING",
+          "package": "github.com/apstndb/spanalyzer/survey/spannertype",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestParseFunctionType/BYTES",
+          "package": "github.com/apstndb/spanalyzer/survey/spannertype",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestParseFunctionType/STRUCT<value_INT64>",
+          "package": "github.com/apstndb/spanalyzer/survey/spannertype",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestParseFunctionType/ARRAY<STRUCT<value_INT64>>",
+          "package": "github.com/apstndb/spanalyzer/survey/spannertype",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestParseFunctionType/PROTO<examples.Message>",
+          "package": "github.com/apstndb/spanalyzer/survey/spannertype",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestParseFunctionType",
+          "package": "github.com/apstndb/spanalyzer/survey/spannertype",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": null,
+          "package": "github.com/apstndb/spanalyzer/survey/spannertype",
+          "action": "pass",
+          "elapsed": 1.767
+        },
+        {
+          "test": "TestDecode/valid",
+          "package": "github.com/apstndb/spanalyzer/survey/internal/strictjson",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestDecode/duplicate",
+          "package": "github.com/apstndb/spanalyzer/survey/internal/strictjson",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestDecode/unknown",
+          "package": "github.com/apstndb/spanalyzer/survey/internal/strictjson",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestDecode/multiple",
+          "package": "github.com/apstndb/spanalyzer/survey/internal/strictjson",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestDecode",
+          "package": "github.com/apstndb/spanalyzer/survey/internal/strictjson",
+          "action": "pass",
+          "elapsed": 0.01
+        },
+        {
+          "test": null,
+          "package": "github.com/apstndb/spanalyzer/survey/internal/strictjson",
+          "action": "pass",
+          "elapsed": 1.877
+        },
+        {
+          "test": "TestRoundtripGenericOptions",
+          "package": "github.com/apstndb/spanalyzer/survey/astconv",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestRoundtrip_ColumnScopedPrivileges",
+          "package": "github.com/apstndb/spanalyzer/survey/astconv",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestToRolesDDL_SuppressesInheritedColumnRows",
+          "package": "github.com/apstndb/spanalyzer/survey/astconv",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestFromDDLStatements_Revoke",
+          "package": "github.com/apstndb/spanalyzer/survey/astconv",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestFromDDLStatements_RevokeTablePrivilegeLeavesColumnGrant",
+          "package": "github.com/apstndb/spanalyzer/survey/astconv",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestFromDDLStatements_RevokeSchemaUsageIsScopedToGranteeAndSchema",
+          "package": "github.com/apstndb/spanalyzer/survey/astconv",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestRoundtrip_NamedSchemaTableGrant",
+          "package": "github.com/apstndb/spanalyzer/survey/astconv",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestFromDDLStatements_NamedSchemaRevokeIsQualified",
+          "package": "github.com/apstndb/spanalyzer/survey/astconv",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestRoundtrip_NamedSchemaChangeStreamAndTableFunctionGrants",
+          "package": "github.com/apstndb/spanalyzer/survey/astconv",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestToRolesDDL_InvalidMetadataReturnsErrors/unknown_table_privilege",
+          "package": "github.com/apstndb/spanalyzer/survey/astconv",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestToRolesDDL_InvalidMetadataReturnsErrors/unknown_column_privilege",
+          "package": "github.com/apstndb/spanalyzer/survey/astconv",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestToRolesDDL_InvalidMetadataReturnsErrors",
+          "package": "github.com/apstndb/spanalyzer/survey/astconv",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestRoundtrip_RemoteFunctionMetadata",
+          "package": "github.com/apstndb/spanalyzer/survey/astconv",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestToFunctionsDDL_PrefersSpannerType",
+          "package": "github.com/apstndb/spanalyzer/survey/astconv",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestToFunctionsDDL_UsesFunctionTypeGrammar",
+          "package": "github.com/apstndb/spanalyzer/survey/astconv",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestToFunctionsDDL_LiveRemoteMetadataWithoutSyntaxDetailsReturnsError",
+          "package": "github.com/apstndb/spanalyzer/survey/astconv",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestToFunctionsDDL_RemoteClauseMetadataFallback",
+          "package": "github.com/apstndb/spanalyzer/survey/astconv",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestToFunctionsDDL_NamedSchemaFunction",
+          "package": "github.com/apstndb/spanalyzer/survey/astconv",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestToFunctionsDDL_InconsistentSchemasReturnError",
+          "package": "github.com/apstndb/spanalyzer/survey/astconv",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestToRolesDDL_ModelGrantUnsupported",
+          "package": "github.com/apstndb/spanalyzer/survey/astconv",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestClassifyCanonicalDDL_ConstraintColumnParseClass",
+          "package": "github.com/apstndb/spanalyzer/survey/infoschem",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestClassifyCanonicalDDL_UnparsedFamilyIgnoresIdentifierTokens",
+          "package": "github.com/apstndb/spanalyzer/survey/infoschem",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestClassifyCanonicalDDL_QuotedConstraintColumnParses",
+          "package": "github.com/apstndb/spanalyzer/survey/infoschem",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestClassifyCanonicalDDL_ExactAllowlistMatch",
+          "package": "github.com/apstndb/spanalyzer/survey/infoschem",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestClassifyCanonicalDDL_HashMismatchIsUnexpected",
+          "package": "github.com/apstndb/spanalyzer/survey/infoschem",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestClassifyCanonicalDDL_ErrorClassMismatchIsUnexpected",
+          "package": "github.com/apstndb/spanalyzer/survey/infoschem",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestClassifyCanonicalDDL_UnexpectedParseFailure",
+          "package": "github.com/apstndb/spanalyzer/survey/infoschem",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestClassifyCanonicalDDL_FullAccounting",
+          "package": "github.com/apstndb/spanalyzer/survey/infoschem",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestDefaultCanonicalDDLAllowlistIsExact",
+          "package": "github.com/apstndb/spanalyzer/survey/infoschem",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestIsClientClosedTransactionError/closed_transaction",
+          "package": "github.com/apstndb/spanalyzer/survey/infoschem",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestIsClientClosedTransactionError/backend_invalid_argument",
+          "package": "github.com/apstndb/spanalyzer/survey/infoschem",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestIsClientClosedTransactionError/different_code",
+          "package": "github.com/apstndb/spanalyzer/survey/infoschem",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestIsClientClosedTransactionError",
+          "package": "github.com/apstndb/spanalyzer/survey/infoschem",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestBuildCaptureManaged",
+          "package": "github.com/apstndb/spanalyzer/survey/infoschem",
+          "action": "pass",
+          "elapsed": 0.01
+        },
+        {
+          "test": "TestBuildCaptureContainerPathUsesDigestAndPlatform",
+          "package": "github.com/apstndb/spanalyzer/survey/infoschem",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestDecodeCaptureRejectsDestinationIdentifier/literal",
+          "package": "github.com/apstndb/spanalyzer/survey/infoschem",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestDecodeCaptureRejectsDestinationIdentifier/escaped",
+          "package": "github.com/apstndb/spanalyzer/survey/infoschem",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestDecodeCaptureRejectsDestinationIdentifier",
+          "package": "github.com/apstndb/spanalyzer/survey/infoschem",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestValidateCaptureRejectsStaleSurfaceHash",
+          "package": "github.com/apstndb/spanalyzer/survey/infoschem",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestValidateCaptureRejectsRawRollingError",
+          "package": "github.com/apstndb/spanalyzer/survey/infoschem",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestValidateCaptureRejectsQueryabilityAdvertisementMismatch",
+          "package": "github.com/apstndb/spanalyzer/survey/infoschem",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestComputeProducerIdentity",
+          "package": "github.com/apstndb/spanalyzer/survey/infoschem",
+          "action": "pass",
+          "elapsed": 0.01
+        },
+        {
+          "test": "TestCommittedCaptures",
+          "package": "github.com/apstndb/spanalyzer/survey/infoschem",
+          "action": "pass",
+          "elapsed": 0.01
+        },
+        {
+          "test": "TestCommittedCapturesSatisfyJSONSchema",
+          "package": "github.com/apstndb/spanalyzer/survey/infoschem",
+          "action": "pass",
+          "elapsed": 0.01
+        },
+        {
+          "test": "TestInformationSchemaProjectionContracts/projection_source",
+          "package": "github.com/apstndb/spanalyzer/survey/infoschem",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestInformationSchemaProjectionContracts/generated_manifest",
+          "package": "github.com/apstndb/spanalyzer/survey/infoschem",
+          "action": "pass",
+          "elapsed": 0.01
+        },
+        {
+          "test": "TestInformationSchemaProjectionContracts",
+          "package": "github.com/apstndb/spanalyzer/survey/infoschem",
+          "action": "pass",
+          "elapsed": 0.01
+        },
+        {
+          "test": "TestTableMetaRegistryMutationIsolation",
+          "package": "github.com/apstndb/spanalyzer/survey/infoschem",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestAllTableMetas_Count",
+          "package": "github.com/apstndb/spanalyzer/survey/infoschem",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestAllTableMetas_RegistryInvariants",
+          "package": "github.com/apstndb/spanalyzer/survey/infoschem",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestTableMetaByName/COLUMNS",
+          "package": "github.com/apstndb/spanalyzer/survey/infoschem",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestTableMetaByName/TABLES",
+          "package": "github.com/apstndb/spanalyzer/survey/infoschem",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestTableMetaByName/INDEXES",
+          "package": "github.com/apstndb/spanalyzer/survey/infoschem",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestTableMetaByName/VIEWS",
+          "package": "github.com/apstndb/spanalyzer/survey/infoschem",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestTableMetaByName/NONEXISTENT",
+          "package": "github.com/apstndb/spanalyzer/survey/infoschem",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestTableMetaByName",
+          "package": "github.com/apstndb/spanalyzer/survey/infoschem",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestFilterQueryableRollingColumns/queryable",
+          "package": "github.com/apstndb/spanalyzer/survey/infoschem",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestFilterQueryableRollingColumns/advertised_before_query_support",
+          "package": "github.com/apstndb/spanalyzer/survey/infoschem",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestFilterQueryableRollingColumns/backend_reports_unimplemented",
+          "package": "github.com/apstndb/spanalyzer/survey/infoschem",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestFilterQueryableRollingColumns/closed_transaction_is_preserved",
+          "package": "github.com/apstndb/spanalyzer/survey/infoschem",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestFilterQueryableRollingColumns/unrelated_failure_is_preserved",
+          "package": "github.com/apstndb/spanalyzer/survey/infoschem",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestFilterQueryableRollingColumns",
+          "package": "github.com/apstndb/spanalyzer/survey/infoschem",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestFilterQueryableRollingColumns_IgnoresOrdinaryColumns",
+          "package": "github.com/apstndb/spanalyzer/survey/infoschem",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestColumnNames",
+          "package": "github.com/apstndb/spanalyzer/survey/infoschem",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestTableMeta_Query",
+          "package": "github.com/apstndb/spanalyzer/survey/infoschem",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestTableMeta_Query_MissingTable",
+          "package": "github.com/apstndb/spanalyzer/survey/infoschem",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestCanonicalDDL_RealSpanner",
+          "package": "github.com/apstndb/spanalyzer/survey/infoschem",
+          "action": "skip",
+          "elapsed": 0
+        },
+        {
+          "test": "TestRunRejectsUnsupportedTarget",
+          "package": "github.com/apstndb/spanalyzer/survey/cmd/spanner-sys-capture",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestCompareRetainedCaptureDetectsOmniIdentityOverride",
+          "package": "github.com/apstndb/spanalyzer/survey/cmd/spanner-sys-capture",
+          "action": "pass",
+          "elapsed": 0.02
+        },
+        {
+          "test": "TestRunCheckRejectsWrite",
+          "package": "github.com/apstndb/spanalyzer/survey/cmd/spanner-sys-capture",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": null,
+          "package": "github.com/apstndb/spanalyzer/survey/cmd/spanner-sys-capture",
+          "action": "pass",
+          "elapsed": 3.739
+        },
+        {
+          "test": "TestRun/rejects_malformed_commit",
+          "package": "github.com/apstndb/spanalyzer/survey/cmd/spanner-sys-export",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestRun/requires_source_commit",
+          "package": "github.com/apstndb/spanalyzer/survey/cmd/spanner-sys-export",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestRun/rejects_positional_argument",
+          "package": "github.com/apstndb/spanalyzer/survey/cmd/spanner-sys-export",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestRun/help",
+          "package": "github.com/apstndb/spanalyzer/survey/cmd/spanner-sys-export",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestRun/exports_manifest",
+          "package": "github.com/apstndb/spanalyzer/survey/cmd/spanner-sys-export",
+          "action": "pass",
+          "elapsed": 0.03
+        },
+        {
+          "test": "TestRun",
+          "package": "github.com/apstndb/spanalyzer/survey/cmd/spanner-sys-export",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": null,
+          "package": "github.com/apstndb/spanalyzer/survey/cmd/spanner-sys-export",
+          "action": "pass",
+          "elapsed": 3.832
+        },
+        {
+          "test": "TestExpectedPath",
+          "package": "github.com/apstndb/spanalyzer/survey/internal/capturemeta",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestValidateTargetRejectsMutableContainerIdentity",
+          "package": "github.com/apstndb/spanalyzer/survey/internal/capturemeta",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": null,
+          "package": "github.com/apstndb/spanalyzer/survey/internal/capturemeta",
+          "action": "pass",
+          "elapsed": 3.84
+        },
+        {
+          "test": "TestCompareRetainedCapture/unchanged",
+          "package": "github.com/apstndb/spanalyzer/survey/cmd/infoschema-capture",
+          "action": "pass",
+          "elapsed": 0.01
+        },
+        {
+          "test": "TestCompareRetainedCapture/producer_only",
+          "package": "github.com/apstndb/spanalyzer/survey/cmd/infoschema-capture",
+          "action": "pass",
+          "elapsed": 0.01
+        },
+        {
+          "test": "TestCompareRetainedCapture/surface",
+          "package": "github.com/apstndb/spanalyzer/survey/cmd/infoschema-capture",
+          "action": "pass",
+          "elapsed": 0.01
+        },
+        {
+          "test": "TestCompareRetainedCapture",
+          "package": "github.com/apstndb/spanalyzer/survey/cmd/infoschema-capture",
+          "action": "pass",
+          "elapsed": 0.03
+        },
+        {
+          "test": "TestCompareRetainedCaptureDetectsTargetIdentityChange",
+          "package": "github.com/apstndb/spanalyzer/survey/cmd/infoschema-capture",
+          "action": "pass",
+          "elapsed": 0.01
+        },
+        {
+          "test": "TestWriteComparisonReportIsCompactAndMachineReadable",
+          "package": "github.com/apstndb/spanalyzer/survey/cmd/infoschema-capture",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestCaptureTransactionSupportsMultipleQueries",
+          "package": "github.com/apstndb/spanalyzer/survey/cmd/infoschema-capture",
+          "action": "pass",
+          "elapsed": 2.17
+        },
+        {
+          "test": "TestRunRejectsMissingTarget",
+          "package": "github.com/apstndb/spanalyzer/survey/cmd/infoschema-capture",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestRunRejectsWriteAndOutput",
+          "package": "github.com/apstndb/spanalyzer/survey/cmd/infoschema-capture",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestRunCheckRejectsWrite",
+          "package": "github.com/apstndb/spanalyzer/survey/cmd/infoschema-capture",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestSplitTaggedImage",
+          "package": "github.com/apstndb/spanalyzer/survey/cmd/infoschema-capture",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestCreateAtomicallyDoesNotReplace",
+          "package": "github.com/apstndb/spanalyzer/survey/cmd/infoschema-capture",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestCreateAtomicallyConcurrentWriters",
+          "package": "github.com/apstndb/spanalyzer/survey/cmd/infoschema-capture",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestWriteCaptureContainerKeepsFirstEquivalentObservation",
+          "package": "github.com/apstndb/spanalyzer/survey/cmd/infoschema-capture",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestWriteCaptureManagedKeepsFirstEquivalentObservationInSameSecond",
+          "package": "github.com/apstndb/spanalyzer/survey/cmd/infoschema-capture",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestValidateExecutionEnvironment",
+          "package": "github.com/apstndb/spanalyzer/survey/cmd/infoschema-capture",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestResolveRepoRoot",
+          "package": "github.com/apstndb/spanalyzer/survey/cmd/infoschema-capture",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": null,
+          "package": "github.com/apstndb/spanalyzer/survey/cmd/infoschema-capture",
+          "action": "pass",
+          "elapsed": 6.688
+        },
+        {
+          "test": "TestLoadSchema_EmulatorRoundtrip",
+          "package": "github.com/apstndb/spanalyzer/survey/astconv",
+          "action": "pass",
+          "elapsed": 5.54
+        },
+        {
+          "test": "TestRoundtripLocalityGroupPreservesOptionExpressions",
+          "package": "github.com/apstndb/spanalyzer/survey/astconv",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestLocalityGroupsFromInformationSchemaOptions",
+          "package": "github.com/apstndb/spanalyzer/survey/astconv",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestLocalityGroupsFromInformationSchemaNullOptions",
+          "package": "github.com/apstndb/spanalyzer/survey/astconv",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestLocalityGroupsRejectMalformedEmulatorOption",
+          "package": "github.com/apstndb/spanalyzer/survey/astconv",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestRoundtripOptionlessLocalityGroup",
+          "package": "github.com/apstndb/spanalyzer/survey/astconv",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestToDDLStatements_RemainingNamedSchemaObjectsFailExplicitly/change_stream",
+          "package": "github.com/apstndb/spanalyzer/survey/astconv",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestToDDLStatements_RemainingNamedSchemaObjectsFailExplicitly/change_stream_watched_table",
+          "package": "github.com/apstndb/spanalyzer/survey/astconv",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestToDDLStatements_RemainingNamedSchemaObjectsFailExplicitly/interleaved_index",
+          "package": "github.com/apstndb/spanalyzer/survey/astconv",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestToDDLStatements_RemainingNamedSchemaObjectsFailExplicitly/interleaved_search_index",
+          "package": "github.com/apstndb/spanalyzer/survey/astconv",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestToDDLStatements_RemainingNamedSchemaObjectsFailExplicitly/model",
+          "package": "github.com/apstndb/spanalyzer/survey/astconv",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestToDDLStatements_RemainingNamedSchemaObjectsFailExplicitly/property_graph_row",
+          "package": "github.com/apstndb/spanalyzer/survey/astconv",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestToDDLStatements_RemainingNamedSchemaObjectsFailExplicitly/property_graph_metadata",
+          "package": "github.com/apstndb/spanalyzer/survey/astconv",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestToDDLStatements_RemainingNamedSchemaObjectsFailExplicitly/property_graph_element_table",
+          "package": "github.com/apstndb/spanalyzer/survey/astconv",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestToDDLStatements_RemainingNamedSchemaObjectsFailExplicitly/statistics_package",
+          "package": "github.com/apstndb/spanalyzer/survey/astconv",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestToDDLStatements_RemainingNamedSchemaObjectsFailExplicitly",
+          "package": "github.com/apstndb/spanalyzer/survey/astconv",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestRoundtrip_NamedSchemaSupportedObjects",
+          "package": "github.com/apstndb/spanalyzer/survey/astconv",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestRoundtrip_NamedSchemaLeafCollisionsRemainIsolated",
+          "package": "github.com/apstndb/spanalyzer/survey/astconv",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestFromDDLStatements_IndexAndTableSchemasMustMatch/regular_index",
+          "package": "github.com/apstndb/spanalyzer/survey/astconv",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestFromDDLStatements_IndexAndTableSchemasMustMatch/search_index",
+          "package": "github.com/apstndb/spanalyzer/survey/astconv",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestFromDDLStatements_IndexAndTableSchemasMustMatch",
+          "package": "github.com/apstndb/spanalyzer/survey/astconv",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestFromDDLStatements_NamedSchemaInterleavedIndexesFailExplicitly/regular_index",
+          "package": "github.com/apstndb/spanalyzer/survey/astconv",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestFromDDLStatements_NamedSchemaInterleavedIndexesFailExplicitly/search_index",
+          "package": "github.com/apstndb/spanalyzer/survey/astconv",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestFromDDLStatements_NamedSchemaInterleavedIndexesFailExplicitly",
+          "package": "github.com/apstndb/spanalyzer/survey/astconv",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestRoundtrip_CrossSchemaForeignKeyOrdersQualifiedParent",
+          "package": "github.com/apstndb/spanalyzer/survey/astconv",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestRoundtrip_SameLeafNamedForeignKeysRemainIsolated",
+          "package": "github.com/apstndb/spanalyzer/survey/astconv",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestToDDLStatements_NamedVectorIndexStillFailsExplicitly",
+          "package": "github.com/apstndb/spanalyzer/survey/astconv",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestToGraphsDDL_PropertyGraphMetadata",
+          "package": "github.com/apstndb/spanalyzer/survey/astconv",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestToGraphsDDL_EmptyLabelPropertyListMeansNoProperties",
+          "package": "github.com/apstndb/spanalyzer/survey/astconv",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestRoundtrip_PropertyGraphDynamicMetadata",
+          "package": "github.com/apstndb/spanalyzer/survey/astconv",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestRoundtrip_PropertyGraphBackedByView",
+          "package": "github.com/apstndb/spanalyzer/survey/astconv",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestExplicitViewColumnNamesFailsClosed",
+          "package": "github.com/apstndb/spanalyzer/survey/astconv",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestDrift_EmulatorTableMetas",
+          "package": "github.com/apstndb/spanalyzer/survey/infoschem",
+          "action": "pass",
+          "elapsed": 5.49
+        },
+        {
+          "test": "TestDrift_RealTableMetas",
+          "package": "github.com/apstndb/spanalyzer/survey/infoschem",
+          "action": "skip",
+          "elapsed": 0
+        },
+        {
+          "test": "TestRealSpannerDatabaseForDrift/configured",
+          "package": "github.com/apstndb/spanalyzer/survey/infoschem",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestRealSpannerDatabaseForDrift/optional_and_absent",
+          "package": "github.com/apstndb/spanalyzer/survey/infoschem",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestRealSpannerDatabaseForDrift/required_and_absent",
+          "package": "github.com/apstndb/spanalyzer/survey/infoschem",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestRealSpannerDatabaseForDrift",
+          "package": "github.com/apstndb/spanalyzer/survey/infoschem",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestExpressionIndex_RealSpanner",
+          "package": "github.com/apstndb/spanalyzer/survey/infoschem",
+          "action": "skip",
+          "elapsed": 0
+        },
+        {
+          "test": "TestUUIDFixtureFallbackCleanupUsesFreshBoundedContext",
+          "package": "github.com/apstndb/spanalyzer/survey/infoschem",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestUUIDFixtureFallbackCleanupSkipsWhenCreateDidNotComplete",
+          "package": "github.com/apstndb/spanalyzer/survey/infoschem",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestUUIDFixtureFallbackCleanupSkipsAfterExplicitCleanup",
+          "package": "github.com/apstndb/spanalyzer/survey/infoschem",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestUUIDFixtureFallbackCleanupErrorStaysDistinctFromPrimaryFailure",
+          "package": "github.com/apstndb/spanalyzer/survey/infoschem",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestUUID_RealSpanner",
+          "package": "github.com/apstndb/spanalyzer/survey/infoschem",
+          "action": "skip",
+          "elapsed": 0
+        },
+        {
+          "test": null,
+          "package": "github.com/apstndb/spanalyzer/survey/infoschem",
+          "action": "pass",
+          "elapsed": 8.769
+        },
+        {
+          "test": "TestProtoBundle_FromEmulatorSCHEMATA",
+          "package": "github.com/apstndb/spanalyzer/survey/astconv",
+          "action": "pass",
+          "elapsed": 1.71
+        },
+        {
+          "test": "TestExtractProtoBundleTypes",
+          "package": "github.com/apstndb/spanalyzer/survey/astconv",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestToProtoBundleDDL_FromSchemataProtoBundle",
+          "package": "github.com/apstndb/spanalyzer/survey/astconv",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestToProtoBundleDDL_ExplicitTypesOverrideDescriptor",
+          "package": "github.com/apstndb/spanalyzer/survey/astconv",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestToProtoBundleDDL_UnionsSchemataRows",
+          "package": "github.com/apstndb/spanalyzer/survey/astconv",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestToProtoBundleDDL_InvalidDescriptor",
+          "package": "github.com/apstndb/spanalyzer/survey/astconv",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestRoundtrip_SimpleTable",
+          "package": "github.com/apstndb/spanalyzer/survey/astconv",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestRoundtrip_InterleaveTable",
+          "package": "github.com/apstndb/spanalyzer/survey/astconv",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestRoundtrip_Index",
+          "package": "github.com/apstndb/spanalyzer/survey/astconv",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestRoundtrip_SearchIndexFilterAndOrder",
+          "package": "github.com/apstndb/spanalyzer/survey/astconv",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestRoundtrip_View",
+          "package": "github.com/apstndb/spanalyzer/survey/astconv",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestRoundtrip_ChangeStream",
+          "package": "github.com/apstndb/spanalyzer/survey/astconv",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestRoundtrip_ColumnOnUpdate",
+          "package": "github.com/apstndb/spanalyzer/survey/astconv",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestRoundtrip_Sequence",
+          "package": "github.com/apstndb/spanalyzer/survey/astconv",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestRoundtrip_TableOptions",
+          "package": "github.com/apstndb/spanalyzer/survey/astconv",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestRoundtrip_TableOptionsWithColumnOptions",
+          "package": "github.com/apstndb/spanalyzer/survey/astconv",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestRoundtrip_ForeignKey",
+          "package": "github.com/apstndb/spanalyzer/survey/astconv",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestRoundtrip_GeneratedColumn",
+          "package": "github.com/apstndb/spanalyzer/survey/astconv",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestRoundtrip_RowDeletionPolicy",
+          "package": "github.com/apstndb/spanalyzer/survey/astconv",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestRoundtrip_RoleAndGrant",
+          "package": "github.com/apstndb/spanalyzer/survey/astconv",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestRoundtrip_SchemaGrant",
+          "package": "github.com/apstndb/spanalyzer/survey/astconv",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestRoundtrip_LocalityGroup",
+          "package": "github.com/apstndb/spanalyzer/survey/astconv",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestRoundtrip_CheckConstraint",
+          "package": "github.com/apstndb/spanalyzer/survey/astconv",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestRoundtrip_Model",
+          "package": "github.com/apstndb/spanalyzer/survey/astconv",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestRoundtrip_Function",
+          "package": "github.com/apstndb/spanalyzer/survey/astconv",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestRoundtrip_Placement",
+          "package": "github.com/apstndb/spanalyzer/survey/astconv",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestRoundtrip_AlterDatabase",
+          "package": "github.com/apstndb/spanalyzer/survey/astconv",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestRoundtrip_AlterStatistics",
+          "package": "github.com/apstndb/spanalyzer/survey/astconv",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestRoundtrip_AnonymousChecksAndForeignKeys",
+          "package": "github.com/apstndb/spanalyzer/survey/astconv",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestRoundtrip_ForeignKeyPreservesNonPrimaryReferencedColumns",
+          "package": "github.com/apstndb/spanalyzer/survey/astconv",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestRoundtrip_AlterTableAddConstraint",
+          "package": "github.com/apstndb/spanalyzer/survey/astconv",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestFromDDLStatements_AlterTableFailsClosed/target_not_created",
+          "package": "github.com/apstndb/spanalyzer/survey/astconv",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestFromDDLStatements_AlterTableFailsClosed/unsupported_operation",
+          "package": "github.com/apstndb/spanalyzer/survey/astconv",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestFromDDLStatements_AlterTableFailsClosed",
+          "package": "github.com/apstndb/spanalyzer/survey/astconv",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestToTablesDDL_CompositeForeignKeyUsesReferencedKeyOrder",
+          "package": "github.com/apstndb/spanalyzer/survey/astconv",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestToTablesDDL_ForeignKeyCycleReturnsError",
+          "package": "github.com/apstndb/spanalyzer/survey/astconv",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestToTablesDDL_DoesNotGuessReferencedTableFromConstraintName",
+          "package": "github.com/apstndb/spanalyzer/survey/astconv",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestToTablesDDL_CompositeForeignKeyWithoutOrdinalMetadataReturnsError",
+          "package": "github.com/apstndb/spanalyzer/survey/astconv",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestToTablesDDL_QualifiedSystemTableDoesNotHideUserTable",
+          "package": "github.com/apstndb/spanalyzer/survey/astconv",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestToTablesDDL_RowDeletionPolicyErrorIncludesContext",
+          "package": "github.com/apstndb/spanalyzer/survey/astconv",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestRoundtrip_OmittedPrimaryKeyRemainsOmitted",
+          "package": "github.com/apstndb/spanalyzer/survey/astconv",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestRoundtrip_ZeroColumnPrimaryKeyPreservesSingletonSemantics",
+          "package": "github.com/apstndb/spanalyzer/survey/astconv",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestToTablesDDL_LiveZeroColumnPrimaryKeyMetadata/managed_and_omni",
+          "package": "github.com/apstndb/spanalyzer/survey/astconv",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestToTablesDDL_LiveZeroColumnPrimaryKeyMetadata/emulator_v1_5_56",
+          "package": "github.com/apstndb/spanalyzer/survey/astconv",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestToTablesDDL_LiveZeroColumnPrimaryKeyMetadata",
+          "package": "github.com/apstndb/spanalyzer/survey/astconv",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestToTablesDDL_RestoresIdentityColumnKind/BIT_REVERSED_POSITIVE",
+          "package": "github.com/apstndb/spanalyzer/survey/astconv",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestToTablesDDL_RestoresIdentityColumnKind/BIT_REVERSED_POSITIVE_SEQUENCE",
+          "package": "github.com/apstndb/spanalyzer/survey/astconv",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestToTablesDDL_RestoresIdentityColumnKind",
+          "package": "github.com/apstndb/spanalyzer/survey/astconv",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestRoundtrip_AnonymousPrimaryKey",
+          "package": "github.com/apstndb/spanalyzer/survey/astconv",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestRoundtrip_AllInSchemaGrants",
+          "package": "github.com/apstndb/spanalyzer/survey/astconv",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestRoundtrip_ModelColumnsAndOptions",
+          "package": "github.com/apstndb/spanalyzer/survey/astconv",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestRoundtrip_SelfReferentialForeignKey",
+          "package": "github.com/apstndb/spanalyzer/survey/astconv",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestToRolesDDL_AllSchemaGrantValidation",
+          "package": "github.com/apstndb/spanalyzer/survey/astconv",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestRoundtrip_PlacementKey",
+          "package": "github.com/apstndb/spanalyzer/survey/astconv",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestToDDLStatements_PlacementKeyMissingColumnReturnsError",
+          "package": "github.com/apstndb/spanalyzer/survey/astconv",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestRoundtrip_SequenceGrants",
+          "package": "github.com/apstndb/spanalyzer/survey/astconv",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestFromDDLStatements_RevokeSequenceGrantsIsScoped",
+          "package": "github.com/apstndb/spanalyzer/survey/astconv",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestToRolesDDL_InvalidSequenceGrantReturnsError",
+          "package": "github.com/apstndb/spanalyzer/survey/astconv",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestRoundtripVectorIndexFilter",
+          "package": "github.com/apstndb/spanalyzer/survey/astconv",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestToVectorIndexesDDLRejectsMultipleKeyColumns",
+          "package": "github.com/apstndb/spanalyzer/survey/astconv",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestToVectorIndexesDDLRejectsInvalidFilter",
+          "package": "github.com/apstndb/spanalyzer/survey/astconv",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": "TestToDDLStatementsRejectsExpressionIndex",
+          "package": "github.com/apstndb/spanalyzer/survey/astconv",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "test": null,
+          "package": "github.com/apstndb/spanalyzer/survey/astconv",
+          "action": "pass",
+          "elapsed": 9.768
+        }
+      ]
+    },
+    "release-probes-final": {
+      "observed_exit_code": 0,
+      "outcomes": [
+        {
+          "test": "TestGoogleSQLRelease/OmittedPrimaryKeyAndReconstruction",
+          "package": "command-line-arguments",
+          "action": "pass",
+          "elapsed": 3.11
+        },
+        {
+          "test": "TestGoogleSQLRelease/ExplicitEmptyPrimaryKeyRemainsSingleton",
+          "package": "command-line-arguments",
+          "action": "pass",
+          "elapsed": 0.04
+        },
+        {
+          "test": "TestGoogleSQLRelease/DistinctFrom/equal",
+          "package": "command-line-arguments",
+          "action": "pass",
+          "elapsed": 0.09
+        },
+        {
+          "test": "TestGoogleSQLRelease/DistinctFrom/unequal",
+          "package": "command-line-arguments",
+          "action": "pass",
+          "elapsed": 0.09
+        },
+        {
+          "test": "TestGoogleSQLRelease/DistinctFrom/both_null",
+          "package": "command-line-arguments",
+          "action": "pass",
+          "elapsed": 0.09
+        },
+        {
+          "test": "TestGoogleSQLRelease/DistinctFrom/one_null",
+          "package": "command-line-arguments",
+          "action": "pass",
+          "elapsed": 0.08
+        },
+        {
+          "test": "TestGoogleSQLRelease/DistinctFrom/nan_equal",
+          "package": "command-line-arguments",
+          "action": "pass",
+          "elapsed": 0.08
+        },
+        {
+          "test": "TestGoogleSQLRelease/DistinctFrom/nan_number",
+          "package": "command-line-arguments",
+          "action": "pass",
+          "elapsed": 0.08
+        },
+        {
+          "test": "TestGoogleSQLRelease/DistinctFrom",
+          "package": "command-line-arguments",
+          "action": "pass",
+          "elapsed": 0.52
+        },
+        {
+          "test": "TestGoogleSQLRelease/PendingCommitTimestampStoredInIndex",
+          "package": "command-line-arguments",
+          "action": "pass",
+          "elapsed": 0.08
+        },
+        {
+          "test": "TestGoogleSQLRelease/ChangeStreamAfterColumnDrop",
+          "package": "command-line-arguments",
+          "action": "pass",
+          "elapsed": 0.08
+        },
+        {
+          "test": "TestGoogleSQLRelease/ChangeStreamAfterTableDrop",
+          "package": "command-line-arguments",
+          "action": "pass",
+          "elapsed": 0.05
+        },
+        {
+          "test": "TestGoogleSQLRelease/CloudQueueDDLObservation",
+          "package": "command-line-arguments",
+          "action": "pass",
+          "elapsed": 0.03
+        },
+        {
+          "test": "TestGoogleSQLRelease",
+          "package": "command-line-arguments",
+          "action": "pass",
+          "elapsed": 5.77
+        },
+        {
+          "test": "TestPostgreSQLRelease/OmittedPrimaryKey",
+          "package": "command-line-arguments",
+          "action": "pass",
+          "elapsed": 6.99
+        },
+        {
+          "test": "TestPostgreSQLRelease/DistinctFrom/equal",
+          "package": "command-line-arguments",
+          "action": "pass",
+          "elapsed": 0.23
+        },
+        {
+          "test": "TestPostgreSQLRelease/DistinctFrom/unequal",
+          "package": "command-line-arguments",
+          "action": "pass",
+          "elapsed": 0.21
+        },
+        {
+          "test": "TestPostgreSQLRelease/DistinctFrom/both_null",
+          "package": "command-line-arguments",
+          "action": "pass",
+          "elapsed": 0.21
+        },
+        {
+          "test": "TestPostgreSQLRelease/DistinctFrom/one_null",
+          "package": "command-line-arguments",
+          "action": "pass",
+          "elapsed": 0.21
+        },
+        {
+          "test": "TestPostgreSQLRelease/DistinctFrom/nan_equal",
+          "package": "command-line-arguments",
+          "action": "pass",
+          "elapsed": 0.23
+        },
+        {
+          "test": "TestPostgreSQLRelease/DistinctFrom/nan_number",
+          "package": "command-line-arguments",
+          "action": "pass",
+          "elapsed": 0.22
+        },
+        {
+          "test": "TestPostgreSQLRelease/DistinctFrom",
+          "package": "command-line-arguments",
+          "action": "pass",
+          "elapsed": 1.32
+        },
+        {
+          "test": "TestPostgreSQLRelease/SetAndDropNotNull",
+          "package": "command-line-arguments",
+          "action": "pass",
+          "elapsed": 0.19
+        },
+        {
+          "test": "TestPostgreSQLRelease/PartitionedDMLParameters",
+          "package": "command-line-arguments",
+          "action": "pass",
+          "elapsed": 0.17
+        },
+        {
+          "test": "TestPostgreSQLRelease/TableSample",
+          "package": "command-line-arguments",
+          "action": "pass",
+          "elapsed": 0.3
+        },
+        {
+          "test": "TestPostgreSQLRelease",
+          "package": "command-line-arguments",
+          "action": "pass",
+          "elapsed": 10.54
+        },
+        {
+          "test": null,
+          "package": "command-line-arguments",
+          "action": "pass",
+          "elapsed": 17.909
+        }
+      ]
+    },
+    "release-probes-r3": {
+      "observed_exit_code": 1,
+      "outcomes": [
+        {
+          "test": "TestGoogleSQLRelease/OmittedPrimaryKeyAndReconstruction",
+          "package": "command-line-arguments",
+          "action": "pass",
+          "elapsed": 3.09
+        },
+        {
+          "test": "TestGoogleSQLRelease",
+          "package": "command-line-arguments",
+          "action": "pass",
+          "elapsed": 4.98
+        },
+        {
+          "test": "TestChangeStreamExplicitToAllTableDrop/Batch",
+          "package": "command-line-arguments",
+          "action": "fail",
+          "elapsed": 1.71
+        },
+        {
+          "test": "TestChangeStreamExplicitToAllTableDrop/Separate",
+          "package": "command-line-arguments",
+          "action": "fail",
+          "elapsed": 1.64
+        },
+        {
+          "test": "TestChangeStreamExplicitToAllTableDrop",
+          "package": "command-line-arguments",
+          "action": "fail",
+          "elapsed": 3.36
+        },
+        {
+          "test": null,
+          "package": "command-line-arguments",
+          "action": "fail",
+          "elapsed": 9.905
+        }
+      ]
+    },
+    "subset-probe-1.5.57": {
+      "observed_exit_code": 1,
+      "outcomes": [
+        {
+          "test": "TestChangeStreamSubsetToAllTableDrop/CreateSubset",
+          "package": "command-line-arguments",
+          "action": "fail",
+          "elapsed": 2.1
+        },
+        {
+          "test": "TestChangeStreamSubsetToAllTableDrop/AlterToSubset",
+          "package": "command-line-arguments",
+          "action": "fail",
+          "elapsed": 1.73
+        },
+        {
+          "test": "TestChangeStreamSubsetToAllTableDrop",
+          "package": "command-line-arguments",
+          "action": "fail",
+          "elapsed": 3.82
+        },
+        {
+          "test": null,
+          "package": "command-line-arguments",
+          "action": "fail",
+          "elapsed": 5.329
+        }
+      ]
+    },
+    "subset-probe-1.5.56": {
+      "observed_exit_code": 1,
+      "outcomes": [
+        {
+          "test": "TestChangeStreamSubsetToAllTableDrop/CreateSubset",
+          "package": "command-line-arguments",
+          "action": "fail",
+          "elapsed": 11.72
+        },
+        {
+          "test": "TestChangeStreamSubsetToAllTableDrop/AlterToSubset",
+          "package": "command-line-arguments",
+          "action": "fail",
+          "elapsed": 1.73
+        },
+        {
+          "test": "TestChangeStreamSubsetToAllTableDrop",
+          "package": "command-line-arguments",
+          "action": "fail",
+          "elapsed": 13.44
+        },
+        {
+          "test": null,
+          "package": "command-line-arguments",
+          "action": "fail",
+          "elapsed": 14.808
+        }
+      ]
+    }
+  }
+}

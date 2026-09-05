@@ -75,6 +75,16 @@ remains the sole analyzer projection; Omni and Emulator observations are
 comparison evidence and do not implicitly intersect or demote the
 managed-primary surface.
 
+## Runtime investigations
+
+Canonical Emulator and Spanner Omni verification findings live in
+[Runtime verification](../research/runtime-verification/index.md). Notes bind
+claims to exact runtime identities, cases and retained results. Existing
+producer captures stay under `survey/`; selected release logs and probe source
+may be retained beside a Research Note with artifact hashes and documented
+redactions. Coordination handoffs link to the notes. Recovered historical
+reports remain distinct from direct captures and fresh execution receipts.
+
 ## Legacy repository disposition
 
 The survey began as an unpublished local Git repository. Commit

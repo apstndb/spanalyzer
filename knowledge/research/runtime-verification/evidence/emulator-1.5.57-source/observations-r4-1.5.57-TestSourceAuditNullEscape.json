@@ -1,0 +1,24 @@
+[
+  {
+    "name": "null_escape_pre_control",
+    "sql": "SELECT 1::text",
+    "code": "OK",
+    "values": [
+      "1"
+    ]
+  },
+  {
+    "name": "isolated_like_null_escape",
+    "sql": "SELECT ('a' LIKE 'a' ESCAPE NULL)::text",
+    "code": "InvalidArgument",
+    "error": "spanner: code = \"InvalidArgument\", desc = \"Invalid escape character: NULL. Currently only backslash constant '\\\\' is supported.\", requestID = \"1.d9d05d944ed55629.1.3.4.1\""
+  },
+  {
+    "name": "null_escape_post_control",
+    "sql": "SELECT 1::text",
+    "code": "OK",
+    "values": [
+      "1"
+    ]
+  }
+]

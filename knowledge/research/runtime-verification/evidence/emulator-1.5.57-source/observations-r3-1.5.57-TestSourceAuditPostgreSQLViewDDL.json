@@ -1,0 +1,24 @@
+[
+  {
+    "name": "unnest_view",
+    "sql": "CREATE VIEW unnest_view SQL SECURITY INVOKER AS SELECT unnest(ARRAY[1,2]) AS value",
+    "code": "OK"
+  },
+  {
+    "name": "query_unnest_view",
+    "sql": "SELECT value::text FROM unnest_view ORDER BY value",
+    "code": "OK",
+    "values": [
+      "1",
+      "2"
+    ]
+  },
+  {
+    "name": "dump_pg_unnest_view",
+    "sql": "",
+    "code": "OK",
+    "values": [
+      "CREATE VIEW unnest_view WITH (security_invoker) AS SELECT value FROM unnest(ARRAY['1'::bigint, '2'::bigint]) \"$array\"(value)"
+    ]
+  }
+]

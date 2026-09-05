@@ -1,0 +1,632 @@
+[
+  {
+    "path": ".devcontainer/devcontainer.json",
+    "classification": "unannounced development setup",
+    "summary": "Builds the development container from build/docker/devcontainer.dockerfile with repository context instead of using the published development image. Runtime emulator behavior is not changed.",
+    "lane": "primary"
+  },
+  {
+    "path": "MODULE.bazel",
+    "classification": "unannounced build toolchain",
+    "summary": "Go SDK pin changes from 1.25.11 to 1.25.13; no other dependency changes in this file.",
+    "lane": "primary"
+  },
+  {
+    "path": "backend/actions/BUILD",
+    "classification": "implementation-only",
+    "summary": "Adds dependencies required by pending-commit-timestamp index maintenance.",
+    "lane": "query"
+  },
+  {
+    "path": "backend/actions/context.h",
+    "classification": "implementation-only",
+    "summary": "Adds ReadOnlyStore pending-commit-timestamp query contract.",
+    "lane": "query"
+  },
+  {
+    "path": "backend/actions/index.cc",
+    "classification": "announced user-visible",
+    "summary": "Allows internal base-row read for stored PCT values; rejects PCT index-key update/delete cases.",
+    "lane": "query"
+  },
+  {
+    "path": "backend/actions/index_test.cc",
+    "classification": "test-only",
+    "summary": "Unit coverage for pending PCT on an index key during update and delete.",
+    "lane": "query"
+  },
+  {
+    "path": "backend/query/BUILD",
+    "classification": "implementation-only",
+    "summary": "Adds logging/check dependency for query build target.",
+    "lane": "query"
+  },
+  {
+    "path": "backend/query/analyzer_options.cc",
+    "classification": "announced user-visible",
+    "summary": "Enables GoogleSQL FEATURE_IS_DISTINCT.",
+    "lane": "query"
+  },
+  {
+    "path": "backend/query/catalog_test.cc",
+    "classification": "test-only",
+    "summary": "Tests pg_catalog.pg_tables; production catalog change is outside this exclusive source slice.",
+    "lane": "query"
+  },
+  {
+    "path": "backend/query/feature_filter/gsql_supported_functions.cc",
+    "classification": "announced user-visible",
+    "summary": "Allowlists internal IS DISTINCT and IS NOT DISTINCT functions.",
+    "lane": "query"
+  },
+  {
+    "path": "backend/query/pg_catalog.cc",
+    "classification": "unannounced serialization/error-boundary change",
+    "summary": "Adds pg_catalog-qualified full names for SQLBuilder. Direct queries already work; persisted views still fail dependency validation.",
+    "lane": "postgres"
+  },
+  {
+    "path": "backend/query/query_engine.cc",
+    "classification": "announced user-visible",
+    "summary": "Uses PostgreSQL analyzer for PostgreSQL partitioned-DML validation.",
+    "lane": "query"
+  },
+  {
+    "path": "backend/query/query_engine_test.cc",
+    "classification": "test-only",
+    "summary": "Basic two-dialect IS DISTINCT result-type/value coverage.",
+    "lane": "query"
+  },
+  {
+    "path": "backend/schema/builders/database_options_builder.h",
+    "classification": "unannounced_user_visible",
+    "summary": "Adds score_version builder/editor storage used by ALTER DATABASE option.",
+    "lane": "schema"
+  },
+  {
+    "path": "backend/schema/builders/queue_builder.h",
+    "classification": "dormant_unreachable",
+    "summary": "New Queue builder is not registered in builders build targets or called by DDL/updater paths.",
+    "lane": "schema"
+  },
+  {
+    "path": "backend/schema/catalog/BUILD",
+    "classification": "build_plumbing",
+    "summary": "Adds test dependencies only; the schema library still omits queue.cc and queue.h.",
+    "lane": "schema"
+  },
+  {
+    "path": "backend/schema/catalog/column.cc",
+    "classification": "dormant_unreachable",
+    "summary": "Allows null owning table in FullName/DeepClone, apparently for Queue-owned columns; no live Queue owner path exists.",
+    "lane": "schema"
+  },
+  {
+    "path": "backend/schema/catalog/database_options.h",
+    "classification": "unannounced_user_visible",
+    "summary": "Adds typed score_version optional and getter, with no downstream readers found.",
+    "lane": "schema"
+  },
+  {
+    "path": "backend/schema/catalog/queue.cc",
+    "classification": "dormant_unreachable",
+    "summary": "New Queue catalog implementation is unbuilt and not owned by Schema.",
+    "lane": "schema"
+  },
+  {
+    "path": "backend/schema/catalog/queue.h",
+    "classification": "dormant_unreachable",
+    "summary": "New Queue schema node is not reachable through public DDL or schema traversal.",
+    "lane": "schema"
+  },
+  {
+    "path": "backend/schema/catalog/schema.cc",
+    "classification": "unannounced_user_visible",
+    "summary": "Schema dump now preserves hidden columns, needed to retain implicit rowid in PostgreSQL DDL; database option dump still stringifies score_version incorrectly.",
+    "lane": "schema"
+  },
+  {
+    "path": "backend/schema/catalog/schema_test.cc",
+    "classification": "build_plumbing",
+    "summary": "Include-only test-file change; no test body or behavior changed.",
+    "lane": "schema"
+  },
+  {
+    "path": "backend/schema/ddl/operations.proto",
+    "classification": "mechanical_noop",
+    "summary": "Whitespace-only change; it adds no Queue DDL statement.",
+    "lane": "schema"
+  },
+  {
+    "path": "backend/schema/parser/ddl_parser.cc",
+    "classification": "announced_user_visible",
+    "summary": "Injects implicit rowid for no-PK tables and adds unannounced score_version integer/NULL option parsing.",
+    "lane": "schema"
+  },
+  {
+    "path": "backend/schema/parser/ddl_parser.h",
+    "classification": "unannounced_user_visible",
+    "summary": "Exports score_version option constant used by parser/updater.",
+    "lane": "schema"
+  },
+  {
+    "path": "backend/schema/parser/ddl_parser.jjt",
+    "classification": "mechanical_noop",
+    "summary": "Whitespace-only grammar change; no Queue production or DDL behavior added.",
+    "lane": "schema"
+  },
+  {
+    "path": "backend/schema/parser/ddl_parser_test.cc",
+    "classification": "test_only_coverage",
+    "summary": "Covers score_version parsing and feature-flagged no-PK parser output.",
+    "lane": "schema"
+  },
+  {
+    "path": "backend/schema/parser/ddl_reserved_words.cc",
+    "classification": "mechanical_noop",
+    "summary": "Removes a duplicate REMOTE entry while another remains; reserved-word set is unchanged.",
+    "lane": "schema"
+  },
+  {
+    "path": "backend/schema/printer/print_ddl.cc",
+    "classification": "implementation_detail",
+    "summary": "Local option-name copy is no semantic change; existing printer still assumes database options are strings, relevant to score_version round-trip risk.",
+    "lane": "schema"
+  },
+  {
+    "path": "backend/schema/updater/schema_updater.cc",
+    "classification": "announced_user_visible",
+    "summary": "Executes PostgreSQL nullability operations, handles stale Change Stream tracked objects, rejects implicit-rowid collisions, forwards no-PK flag, and stores score_version.",
+    "lane": "schema"
+  },
+  {
+    "path": "backend/schema/updater/schema_updater_tests/change_stream_test.cc",
+    "classification": "test_only_coverage",
+    "summary": "Covers altering Change Streams after tracked column/table removal.",
+    "lane": "schema"
+  },
+  {
+    "path": "backend/schema/updater/schema_updater_tests/table.cc",
+    "classification": "test_only_coverage",
+    "summary": "Covers injected rowid/collision and typed nullability changes.",
+    "lane": "schema"
+  },
+  {
+    "path": "backend/schema/validators/column_validator.cc",
+    "classification": "dormant_unreachable",
+    "summary": "Owner-name and column-span changes support null-table Queue scaffolding; no reachable Queue column validation path found.",
+    "lane": "schema"
+  },
+  {
+    "path": "backend/schema/validators/queue_validator.cc",
+    "classification": "dormant_unreachable",
+    "summary": "Defines intended Queue validation but is unbuilt, uncalled, and references absent Queue-specific error helpers.",
+    "lane": "schema"
+  },
+  {
+    "path": "backend/schema/validators/queue_validator.h",
+    "classification": "dormant_unreachable",
+    "summary": "New Queue validator declaration is absent from validator build targets.",
+    "lane": "schema"
+  },
+  {
+    "path": "backend/schema/validators/table_validator.cc",
+    "classification": "mechanical_noop",
+    "summary": "Indentation-only change in table deletion validation.",
+    "lane": "schema"
+  },
+  {
+    "path": "backend/transaction/actions.cc",
+    "classification": "implementation-only",
+    "summary": "Forwards transaction store PCT state to action context.",
+    "lane": "query"
+  },
+  {
+    "path": "backend/transaction/actions.h",
+    "classification": "implementation-only",
+    "summary": "Declares action-context PCT forwarding override.",
+    "lane": "query"
+  },
+  {
+    "path": "backend/transaction/commit_timestamp.cc",
+    "classification": "implementation-only",
+    "summary": "Exposes tracker membership query while preserving cumulative tracked-column state.",
+    "lane": "query"
+  },
+  {
+    "path": "backend/transaction/commit_timestamp.h",
+    "classification": "implementation-only",
+    "summary": "Declares tracker membership query.",
+    "lane": "query"
+  },
+  {
+    "path": "backend/transaction/resolve.cc",
+    "classification": "implementation-only",
+    "summary": "Replaces deprecated unused-function annotation; no query behavior change.",
+    "lane": "query"
+  },
+  {
+    "path": "backend/transaction/transaction_store.cc",
+    "classification": "implementation-only",
+    "summary": "Forwards tracker PCT state through TransactionStore.",
+    "lane": "query"
+  },
+  {
+    "path": "backend/transaction/transaction_store.h",
+    "classification": "implementation-only",
+    "summary": "Declares TransactionStore PCT state query.",
+    "lane": "query"
+  },
+  {
+    "path": "binaries/gateway_main.go",
+    "classification": "whitespace only",
+    "summary": "Only blank lines added; diff is empty under -w --ignore-blank-lines.",
+    "lane": "primary"
+  },
+  {
+    "path": "common/errors.cc",
+    "classification": "unannounced_user_visible",
+    "summary": "Adds score_version to unsupported ALTER DATABASE option help text.",
+    "lane": "schema"
+  },
+  {
+    "path": "common/feature_flags.h",
+    "classification": "implementation-only",
+    "summary": "Returns flag snapshot under lock and adds default-on tables-without-primary-keys flag.",
+    "lane": "query"
+  },
+  {
+    "path": "common/limits.h",
+    "classification": "announced_user_visible",
+    "summary": "Raises table limit 2560 to 5000; derived database index limit becomes 10000.",
+    "lane": "schema"
+  },
+  {
+    "path": "gateway/gateway.go",
+    "classification": "whitespace only",
+    "summary": "Only blank lines added; diff is empty under -w --ignore-blank-lines.",
+    "lane": "primary"
+  },
+  {
+    "path": "tests/common/actions.h",
+    "classification": "test-only",
+    "summary": "Adds test-double support for pending PCT state.",
+    "lane": "query"
+  },
+  {
+    "path": "tests/conformance/cases/ann_test.cc",
+    "classification": "test-only",
+    "summary": "Refactors vector-index ALTER/DROP fixture; no ANN distance validator source change.",
+    "lane": "query"
+  },
+  {
+    "path": "tests/conformance/cases/change_streams_read_write.cc",
+    "classification": "test-only",
+    "summary": "Adds record-time schema coverage around DROP COLUMN; does not reach the null-guard repair. No new record-shape behavior established.",
+    "lane": "query"
+  },
+  {
+    "path": "tests/conformance/cases/commit_timestamps.cc",
+    "classification": "test-only",
+    "summary": "Conformance negative case: delete after PCT update on indexed timestamp is INVALID_ARGUMENT.",
+    "lane": "query"
+  },
+  {
+    "path": "tests/conformance/cases/information_schema.cc",
+    "classification": "test_only_coverage",
+    "summary": "Refactors query construction only; expected database-option rows are unchanged and do not cover score_version.",
+    "lane": "schema"
+  },
+  {
+    "path": "tests/conformance/cases/limits.cc",
+    "classification": "test_only_coverage",
+    "summary": "Updates disabled stress-test counts for announced table/index limits.",
+    "lane": "schema"
+  },
+  {
+    "path": "tests/conformance/cases/partitioned_dml.cc",
+    "classification": "test-only",
+    "summary": "Conformance coverage for parameterized partitioned DML in both dialects.",
+    "lane": "query"
+  },
+  {
+    "path": "tests/conformance/cases/primary_keys.cc",
+    "classification": "test_only_coverage",
+    "summary": "Covers no-PK rowid generation, hidden SELECT-star behavior, DML and explicit rowid insertion in both dialects.",
+    "lane": "schema"
+  },
+  {
+    "path": "tests/conformance/cases/query.cc",
+    "classification": "test-only",
+    "summary": "IS DISTINCT matrix: scalar types, NULL, NaN, parameters, composites, table predicates.",
+    "lane": "query"
+  },
+  {
+    "path": "tests/conformance/cases/read_your_writes.cc",
+    "classification": "test-only",
+    "summary": "Positive stored/INCLUDE PCT covering-index update and forced-index read coverage.",
+    "lane": "query"
+  },
+  {
+    "path": "tests/conformance/cases/schema_changes.cc",
+    "classification": "test_only_coverage",
+    "summary": "Normalizes ephemeral database IDs in DDL comparison output; no product behavior change.",
+    "lane": "schema"
+  },
+  {
+    "path": "tests/conformance/cases/tablesample.cc",
+    "classification": "test-only",
+    "summary": "Adds dialect-parameterized TABLESAMPLE conformance coverage and restriction assertions.",
+    "lane": "postgres"
+  },
+  {
+    "path": "tests/conformance/data/schema_changes/pg/ddl.alter_table.test",
+    "classification": "test-only",
+    "summary": "Confirms announced SET/DROP NOT NULL normalized DDL.",
+    "lane": "postgres"
+  },
+  {
+    "path": "tests/conformance/data/schema_changes/pg/ddl.create_table.test",
+    "classification": "test-only",
+    "summary": "Confirms announced synthesized hidden rowid primary key.",
+    "lane": "postgres"
+  },
+  {
+    "path": "tests/conformance/data/schemas/primary_keys.test",
+    "classification": "test_only_coverage",
+    "summary": "Adds no-PK table fixtures for GoogleSQL and PostgreSQL conformance tests.",
+    "lane": "schema"
+  },
+  {
+    "path": "tests/conformance/data/schemas/read_your_writes.test",
+    "classification": "test-only",
+    "summary": "Adds val and unique index with PCT only as STORING/INCLUDE column.",
+    "lane": "query"
+  },
+  {
+    "path": "tests/conformance/data/schemas/tablesample.test",
+    "classification": "test-only",
+    "summary": "New GoogleSQL schema fixture used by cross-dialect TABLESAMPLE test.",
+    "lane": "postgres"
+  },
+  {
+    "path": "third_party/spanner_pg/catalog/builtin_expression_functions.cc",
+    "classification": "announced",
+    "summary": "Registers T_DistinctExpr as the is-distinct function.",
+    "lane": "postgres"
+  },
+  {
+    "path": "third_party/spanner_pg/catalog/catalog_wrappers.cc",
+    "classification": "implementation/refactor",
+    "summary": "Bridges parser sampling checks to engine catalog methods.",
+    "lane": "postgres"
+  },
+  {
+    "path": "third_party/spanner_pg/catalog/catalog_wrappers_test.cc",
+    "classification": "test-only",
+    "summary": "Tests the exact supported sampling allowlist.",
+    "lane": "postgres"
+  },
+  {
+    "path": "third_party/spanner_pg/catalog/engine_system_catalog.cc",
+    "classification": "implementation/refactor",
+    "summary": "Adds engine sampling-method registry operations.",
+    "lane": "postgres"
+  },
+  {
+    "path": "third_party/spanner_pg/catalog/engine_system_catalog.h",
+    "classification": "implementation/refactor",
+    "summary": "Declares sampling registry API and storage.",
+    "lane": "postgres"
+  },
+  {
+    "path": "third_party/spanner_pg/catalog/engine_system_catalog_test.cc",
+    "classification": "test-only",
+    "summary": "Tests sampling registry ordering and rejection.",
+    "lane": "postgres"
+  },
+  {
+    "path": "third_party/spanner_pg/catalog/spangres_system_catalog.cc",
+    "classification": "announced",
+    "summary": "Registers only bernoulli and spanner.reservoir for the emulator engine.",
+    "lane": "postgres"
+  },
+  {
+    "path": "third_party/spanner_pg/ddl/ddl_test.cc",
+    "classification": "test-only",
+    "summary": "Adds expected unsupported-column-compression diagnostic coverage.",
+    "lane": "postgres"
+  },
+  {
+    "path": "third_party/spanner_pg/ddl/pg_parse_tree_validator.cc",
+    "classification": "unannounced exposed behavior",
+    "summary": "Returns InvalidArgument for COMPRESSION rather than a RET_CHECK failure.",
+    "lane": "postgres"
+  },
+  {
+    "path": "third_party/spanner_pg/ddl/pg_to_spanner_ddl_translator.cc",
+    "classification": "unannounced error-boundary change",
+    "summary": "Remote-UDF all-string arrays pass translation but no public array option survives schema validation; mixed arrays get an element-type error. Other edits modernize optional values.",
+    "lane": "postgres"
+  },
+  {
+    "path": "third_party/spanner_pg/ddl/spangres_direct_schema_printer_impl.cc",
+    "classification": "library printer only",
+    "summary": "Preserves IF EXISTS when directly printing DROP SEQUENCE. GetDatabaseDdl emits CREATE statements only; ordinary DROP execution already supported.",
+    "lane": "postgres"
+  },
+  {
+    "path": "third_party/spanner_pg/ddl/translation_utils.cc",
+    "classification": "implementation/refactor",
+    "summary": "Mechanical std::nullopt substitutions only.",
+    "lane": "postgres"
+  },
+  {
+    "path": "third_party/spanner_pg/interface/BUILD",
+    "classification": "implementation/refactor",
+    "summary": "Exposes SQL builder target to tests needed by view translation coverage.",
+    "lane": "postgres"
+  },
+  {
+    "path": "third_party/spanner_pg/interface/catalog_wrappers.h",
+    "classification": "implementation/refactor",
+    "summary": "Declares C sampling catalog bridge.",
+    "lane": "postgres"
+  },
+  {
+    "path": "third_party/spanner_pg/interface/emulator_parser.cc",
+    "classification": "dormant/unreachable",
+    "summary": "Adds optional named-catalog flag for table-level expressions; production caller leaves false.",
+    "lane": "postgres"
+  },
+  {
+    "path": "third_party/spanner_pg/interface/emulator_parser.h",
+    "classification": "dormant/unreachable",
+    "summary": "Exports optional named-catalog flag with false default.",
+    "lane": "postgres"
+  },
+  {
+    "path": "third_party/spanner_pg/interface/spangres_translator.cc",
+    "classification": "mixed deparser output change and dormant additions",
+    "summary": "Deparses after forward rewriting, visibly changing UNNEST view DDL. New statement-hint rewriter is blocked by public PG view grammar; named-catalog quoting remains opt-in with no production caller.",
+    "lane": "postgres"
+  },
+  {
+    "path": "third_party/spanner_pg/interface/spangres_translator.h",
+    "classification": "dormant/unreachable",
+    "summary": "Changes internal expression wrapper signature for named catalogs.",
+    "lane": "postgres"
+  },
+  {
+    "path": "third_party/spanner_pg/interface/spangres_translator_interface.h",
+    "classification": "dormant/unreachable",
+    "summary": "Adds builder/getter API for named-catalog expression analysis.",
+    "lane": "postgres"
+  },
+  {
+    "path": "third_party/spanner_pg/src/backend/access/tablesample/BUILD",
+    "classification": "implementation/refactor",
+    "summary": "Links reservoir method handler into the vendored build.",
+    "lane": "postgres"
+  },
+  {
+    "path": "third_party/spanner_pg/src/backend/access/tablesample/Makefile",
+    "classification": "implementation/refactor",
+    "summary": "Builds reservoir handler outside copybara stripping.",
+    "lane": "postgres"
+  },
+  {
+    "path": "third_party/spanner_pg/src/backend/access/tablesample/bernoulli.c",
+    "classification": "announced",
+    "summary": "Changes BERNOULLI handler argument type from float4 to float8.",
+    "lane": "postgres"
+  },
+  {
+    "path": "third_party/spanner_pg/src/backend/access/tablesample/spanner_reservoir.c",
+    "classification": "announced",
+    "summary": "Adds SPANNER.RESERVOIR handler metadata; sampling execution remains in the engine.",
+    "lane": "postgres"
+  },
+  {
+    "path": "third_party/spanner_pg/src/backend/catalog/BUILD",
+    "classification": "implementation/refactor",
+    "summary": "Makes generated catalog headers visible to parser/utility consumers.",
+    "lane": "postgres"
+  },
+  {
+    "path": "third_party/spanner_pg/src/backend/nodes/serializer_deserializer_test.cc",
+    "classification": "test-only",
+    "summary": "Adds serialization tests for TABLESAMPLE parse nodes.",
+    "lane": "postgres"
+  },
+  {
+    "path": "third_party/spanner_pg/src/backend/parser/BUILD",
+    "classification": "implementation/refactor",
+    "summary": "Adds parser dependencies needed by sampling catalog checks.",
+    "lane": "postgres"
+  },
+  {
+    "path": "third_party/spanner_pg/src/backend/parser/analyze.c",
+    "classification": "unannounced exposed behavior",
+    "summary": "Skips empty-array statement hints returned as NULL.",
+    "lane": "postgres"
+  },
+  {
+    "path": "third_party/spanner_pg/src/backend/parser/gram.y",
+    "classification": "unannounced exposed behavior",
+    "summary": "Allows array expressions as hint values.",
+    "lane": "postgres"
+  },
+  {
+    "path": "third_party/spanner_pg/src/backend/parser/parse_clause.c",
+    "classification": "announced",
+    "summary": "Validates TABLESAMPLE against engine allowlist, rejects REPEATABLE, and preserves supported argument forms.",
+    "lane": "postgres"
+  },
+  {
+    "path": "third_party/spanner_pg/src/backend/parser/parse_relation.c",
+    "classification": "unannounced exposed behavior",
+    "summary": "Drops empty-array table hints and safely transforms optional hint values.",
+    "lane": "postgres"
+  },
+  {
+    "path": "third_party/spanner_pg/src/backend/utils/Gen_fmgrtab.pl",
+    "classification": "implementation/refactor",
+    "summary": "Supports merging multiple catalog data files when generating fmgr tables.",
+    "lane": "postgres"
+  },
+  {
+    "path": "third_party/spanner_pg/src/backend/utils/adt/BUILD",
+    "classification": "implementation/refactor",
+    "summary": "Adds dependencies required by JSONB INT8 subscript source.",
+    "lane": "postgres"
+  },
+  {
+    "path": "third_party/spanner_pg/src/backend/utils/adt/jsonbsubs.c",
+    "classification": "unannounced error-boundary change",
+    "summary": "Numeric subscripts move INT4 to INT8, but public bracket queries remain unsupported: InvalidArgument becomes Unimplemented. Existing ->> wraparound is unchanged.",
+    "lane": "postgres"
+  },
+  {
+    "path": "third_party/spanner_pg/src/include/BUILD",
+    "classification": "implementation/refactor",
+    "summary": "Updates visibility labels and adds bootstrap fmgr data input.",
+    "lane": "postgres"
+  },
+  {
+    "path": "third_party/spanner_pg/src/spangres/stub_catalog_wrappers.c",
+    "classification": "implementation/refactor",
+    "summary": "Adds aborting test stubs for sampling bridge functions.",
+    "lane": "postgres"
+  },
+  {
+    "path": "third_party/spanner_pg/src/timezone/localtime.c",
+    "classification": "implementation/refactor",
+    "summary": "Registers TLS destructor for per-thread GMT state.",
+    "lane": "postgres"
+  },
+  {
+    "path": "third_party/spanner_pg/transformer/forward_expr.cc",
+    "classification": "unannounced exposed behavior",
+    "summary": "Dispatches announced DistinctExpr and explicitly rejects IN-subquery types without equality.",
+    "lane": "postgres"
+  },
+  {
+    "path": "third_party/spanner_pg/transformer/forward_function.cc",
+    "classification": "unannounced exposed behavior",
+    "summary": "Rejects NULL LIKE escape before string use; contains DistinctExpr implementation.",
+    "lane": "postgres"
+  },
+  {
+    "path": "third_party/spanner_pg/transformer/forward_query.cc",
+    "classification": "announced",
+    "summary": "Builds ResolvedSampleScan and enforces TABLESAMPLE unit, type, null, and range restrictions.",
+    "lane": "postgres"
+  },
+  {
+    "path": "third_party/spanner_pg/transformer/forward_transformer.h",
+    "classification": "implementation/refactor",
+    "summary": "Declares TABLESAMPLE and forced-cast transformer helpers.",
+    "lane": "postgres"
+  }
+]

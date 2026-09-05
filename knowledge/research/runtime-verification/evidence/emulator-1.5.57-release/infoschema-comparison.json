@@ -1,0 +1,29 @@
+{
+  "baseline_target": {
+    "kind": "emulator",
+    "image": {
+      "family": "gcr.io/cloud-spanner-emulator/emulator",
+      "tag": "1.5.56",
+      "digest": "sha256:5b1e3607fe8574fb04144eeabfa54120559fb01968ffe3ffc0a9a8f6776fc454",
+      "platform": "linux/arm64"
+    }
+  },
+  "candidate_target": {
+    "kind": "emulator",
+    "image": {
+      "family": "gcr.io/cloud-spanner-emulator/emulator",
+      "tag": "1.5.57",
+      "digest": "sha256:4987860c9f8ecf1fffbbcdac115cb88cb9d1a42bd966c235a9ab843aea34fbd1",
+      "platform": "linux/amd64"
+    }
+  },
+  "baseline_surface_sha256": "74894aba5bf3006fd3c85df5a1f1c2e14361bcb5c86424895623fb4ad80118a7",
+  "candidate_surface_sha256": "74894aba5bf3006fd3c85df5a1f1c2e14361bcb5c86424895623fb4ad80118a7",
+  "surface_equal": true,
+  "changed_top_level_fields": [
+    "target",
+    "observed_at",
+    "producer_source_sha256",
+    "invocation_sha256"
+  ]
+}

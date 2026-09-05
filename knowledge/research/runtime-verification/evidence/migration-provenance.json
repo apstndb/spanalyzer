@@ -1,0 +1,274 @@
+{
+  "recorded_at": "2026-09-05",
+  "purpose": "Migration of existing runtime research into OKF; no fresh emulator, Omni, or managed run performed by this migration.",
+  "artifacts": [
+    {
+      "source_artifact": ".cursor/handoffs/cloud-spanner-emulator-1.5.57-20260905-codex/release.json",
+      "source_sha256": "cf222d2cc145d600ec63f44287fab3218a356df88e9baa6086d50cd3ac9b8859",
+      "retained_path": "knowledge/research/runtime-verification/evidence/emulator-1.5.57-release/release.json",
+      "retained_sha256": "cf222d2cc145d600ec63f44287fab3218a356df88e9baa6086d50cd3ac9b8859",
+      "transformation": "none"
+    },
+    {
+      "source_artifact": ".cursor/handoffs/cloud-spanner-emulator-1.5.57-20260905-codex/release-registry-observation.json",
+      "source_sha256": "5171ca2dc83e25a934a9f64ff80bd26621239c46a4680e410f7d4f3c9cd28a2b",
+      "retained_path": "knowledge/research/runtime-verification/evidence/emulator-1.5.57-release/release-registry-observation.json",
+      "retained_sha256": "5171ca2dc83e25a934a9f64ff80bd26621239c46a4680e410f7d4f3c9cd28a2b",
+      "transformation": "none"
+    },
+    {
+      "source_artifact": ".cursor/handoffs/cloud-spanner-emulator-1.5.57-20260905-codex/infoschema-1.5.57.json",
+      "source_sha256": "2880ca57eed050cf23d97ec3397120d3f8bad22329cef35709d86d394164019f",
+      "retained_path": "knowledge/research/runtime-verification/evidence/emulator-1.5.57-release/infoschema-1.5.57.json",
+      "retained_sha256": "2880ca57eed050cf23d97ec3397120d3f8bad22329cef35709d86d394164019f",
+      "transformation": "none"
+    },
+    {
+      "source_artifact": ".cursor/handoffs/cloud-spanner-emulator-1.5.57-20260905-codex/infoschema-comparison.json",
+      "source_sha256": "4ba67b447a1468295d54470839dc00efb17b095e4085aca8304a8d25bc1ae640",
+      "retained_path": "knowledge/research/runtime-verification/evidence/emulator-1.5.57-release/infoschema-comparison.json",
+      "retained_sha256": "4ba67b447a1468295d54470839dc00efb17b095e4085aca8304a8d25bc1ae640",
+      "transformation": "none"
+    },
+    {
+      "source_artifact": ".cursor/handoffs/cloud-spanner-emulator-1.5.57-20260905-codex/verification-summary.json",
+      "source_sha256": "e8962517b5c34d3fc55fdb1a3254cc810f05278db2f62e5d4e7ad0491e2412cc",
+      "retained_path": "knowledge/research/runtime-verification/evidence/emulator-1.5.57-release/verification-summary.json",
+      "retained_sha256": "e8962517b5c34d3fc55fdb1a3254cc810f05278db2f62e5d4e7ad0491e2412cc",
+      "transformation": "none"
+    },
+    {
+      "source_artifact": ".cursor/handoffs/cloud-spanner-emulator-1.5.57-20260905-codex/release-probes-final.jsonl",
+      "source_sha256": "70ea5b01d4d89937d52c88595912db46e26daa968cc3b9a6c04164271ed2c78c",
+      "retained_path": "knowledge/research/runtime-verification/evidence/emulator-1.5.57-release/release-probes-final.jsonl",
+      "retained_sha256": "70ea5b01d4d89937d52c88595912db46e26daa968cc3b9a6c04164271ed2c78c",
+      "transformation": "Curated fields or portable local-path replacement; original SHA256 retained."
+    },
+    {
+      "source_artifact": ".cursor/handoffs/cloud-spanner-emulator-1.5.57-20260905-codex/release-probes-r3.jsonl",
+      "source_sha256": "24cfeabff585b5b33a31a4b51aef90e6eda11fac386c5cbb10e73da9dc2be676",
+      "retained_path": "knowledge/research/runtime-verification/evidence/emulator-1.5.57-release/release-probes-r3.jsonl",
+      "retained_sha256": "24cfeabff585b5b33a31a4b51aef90e6eda11fac386c5cbb10e73da9dc2be676",
+      "transformation": "Curated fields or portable local-path replacement; original SHA256 retained."
+    },
+    {
+      "source_artifact": ".cursor/handoffs/cloud-spanner-emulator-1.5.57-20260905-codex/subset-probe-1.5.56.jsonl",
+      "source_sha256": "fc8629289134992144bbc299ee09d68b5004c9f4a656816a815b8050da30ead9",
+      "retained_path": "knowledge/research/runtime-verification/evidence/emulator-1.5.57-release/subset-probe-1.5.56.jsonl",
+      "retained_sha256": "fc8629289134992144bbc299ee09d68b5004c9f4a656816a815b8050da30ead9",
+      "transformation": "Curated fields or portable local-path replacement; original SHA256 retained."
+    },
+    {
+      "source_artifact": ".cursor/handoffs/cloud-spanner-emulator-1.5.57-20260905-codex/subset-probe-1.5.57.jsonl",
+      "source_sha256": "e5de6b5e7645a0e34c1ddef776ccc069998d7f2db83ac65c97456f5bdbd58308",
+      "retained_path": "knowledge/research/runtime-verification/evidence/emulator-1.5.57-release/subset-probe-1.5.57.jsonl",
+      "retained_sha256": "e5de6b5e7645a0e34c1ddef776ccc069998d7f2db83ac65c97456f5bdbd58308",
+      "transformation": "Curated fields or portable local-path replacement; original SHA256 retained."
+    },
+    {
+      "source_artifact": ".cursor/handoffs/cloud-spanner-emulator-1.5.57-20260905-codex/survey-tests-r2.jsonl",
+      "source_sha256": "08d6a5d1ced6ee07bef96b53997927ca550abf245a5aa57ee27fcaeb0dee6418",
+      "retained_path": "knowledge/research/runtime-verification/evidence/emulator-1.5.57-release/survey-tests-r2.jsonl",
+      "retained_sha256": "08d6a5d1ced6ee07bef96b53997927ca550abf245a5aa57ee27fcaeb0dee6418",
+      "transformation": "Curated fields or portable local-path replacement; original SHA256 retained."
+    },
+    {
+      "source_artifact": ".cursor/handoffs/cloud-spanner-emulator-1.5.57-20260905-codex/release_probe_test.go",
+      "source_sha256": "13ddcbe6b34438af6334725f1b90dabc0b6290cd558c9a086d6df46bf2f7f4d0",
+      "retained_path": "knowledge/research/runtime-verification/evidence/emulator-1.5.57-release/release_probe_test.go.txt",
+      "retained_sha256": "13ddcbe6b34438af6334725f1b90dabc0b6290cd558c9a086d6df46bf2f7f4d0",
+      "transformation": "Curated fields or portable local-path replacement; original SHA256 retained."
+    },
+    {
+      "source_artifact": ".cursor/handoffs/cloud-spanner-emulator-1.5.57-source-audit-20260905-codex/observations-1.5.56-TestSourceAuditGoogleSQL.json",
+      "source_sha256": "2e2cf9de462751db61c73b07e944165f9ecb0e8b33e58d600420a57813f9e0b2",
+      "retained_path": "knowledge/research/runtime-verification/evidence/emulator-1.5.57-source/observations-1.5.56-TestSourceAuditGoogleSQL.json",
+      "retained_sha256": "2e2cf9de462751db61c73b07e944165f9ecb0e8b33e58d600420a57813f9e0b2",
+      "transformation": "none"
+    },
+    {
+      "source_artifact": ".cursor/handoffs/cloud-spanner-emulator-1.5.57-source-audit-20260905-codex/observations-r2-1.5.57-TestSourceAuditGoogleSQL.json",
+      "source_sha256": "1d1440558e9685223bd232837fcf0369c641dd3f9cf9b818b461f25c826bf99e",
+      "retained_path": "knowledge/research/runtime-verification/evidence/emulator-1.5.57-source/observations-r2-1.5.57-TestSourceAuditGoogleSQL.json",
+      "retained_sha256": "1d1440558e9685223bd232837fcf0369c641dd3f9cf9b818b461f25c826bf99e",
+      "transformation": "none"
+    },
+    {
+      "source_artifact": ".cursor/handoffs/cloud-spanner-emulator-1.5.57-source-audit-20260905-codex/observations-r2-1.5.56-TestSourceAuditPostgreSQL.json",
+      "source_sha256": "f11ab7d78359be3fd28a156a9e0fab1c804c6021706d81250664a2a18666bf0b",
+      "retained_path": "knowledge/research/runtime-verification/evidence/emulator-1.5.57-source/observations-r2-1.5.56-TestSourceAuditPostgreSQL.json",
+      "retained_sha256": "f11ab7d78359be3fd28a156a9e0fab1c804c6021706d81250664a2a18666bf0b",
+      "transformation": "none"
+    },
+    {
+      "source_artifact": ".cursor/handoffs/cloud-spanner-emulator-1.5.57-source-audit-20260905-codex/observations-1.5.57-TestSourceAuditPostgreSQL.json",
+      "source_sha256": "46930f813570274f34a9fc43c785bb0c94b1d0ad5e323e45797fc0dc02c0ae1c",
+      "retained_path": "knowledge/research/runtime-verification/evidence/emulator-1.5.57-source/observations-1.5.57-TestSourceAuditPostgreSQL.json",
+      "retained_sha256": "46930f813570274f34a9fc43c785bb0c94b1d0ad5e323e45797fc0dc02c0ae1c",
+      "transformation": "none"
+    },
+    {
+      "source_artifact": ".cursor/handoffs/cloud-spanner-emulator-1.5.57-source-audit-20260905-codex/observations-r2-1.5.56-TestSourceAuditPostgreSQLHints.json",
+      "source_sha256": "36b2703dd1b2e31bb22b2d5093a3d5fc2af517887bae64344be07183239b70ad",
+      "retained_path": "knowledge/research/runtime-verification/evidence/emulator-1.5.57-source/observations-r2-1.5.56-TestSourceAuditPostgreSQLHints.json",
+      "retained_sha256": "36b2703dd1b2e31bb22b2d5093a3d5fc2af517887bae64344be07183239b70ad",
+      "transformation": "none"
+    },
+    {
+      "source_artifact": ".cursor/handoffs/cloud-spanner-emulator-1.5.57-source-audit-20260905-codex/observations-r2-1.5.57-TestSourceAuditPostgreSQLHints.json",
+      "source_sha256": "2b4c6ae2bb5458d43f26736f502eb88bd77f5bfd0f36bfadd7c13b52173aaa54",
+      "retained_path": "knowledge/research/runtime-verification/evidence/emulator-1.5.57-source/observations-r2-1.5.57-TestSourceAuditPostgreSQLHints.json",
+      "retained_sha256": "2b4c6ae2bb5458d43f26736f502eb88bd77f5bfd0f36bfadd7c13b52173aaa54",
+      "transformation": "none"
+    },
+    {
+      "source_artifact": ".cursor/handoffs/cloud-spanner-emulator-1.5.57-source-audit-20260905-codex/observations-r3-1.5.56-TestSourceAuditPostgreSQLViewDDL.json",
+      "source_sha256": "0f404dbb43a05f7ca803020240323722e34169429ef2e25926b8943cd39c86c3",
+      "retained_path": "knowledge/research/runtime-verification/evidence/emulator-1.5.57-source/observations-r3-1.5.56-TestSourceAuditPostgreSQLViewDDL.json",
+      "retained_sha256": "0f404dbb43a05f7ca803020240323722e34169429ef2e25926b8943cd39c86c3",
+      "transformation": "none"
+    },
+    {
+      "source_artifact": ".cursor/handoffs/cloud-spanner-emulator-1.5.57-source-audit-20260905-codex/observations-r3-1.5.57-TestSourceAuditPostgreSQLViewDDL.json",
+      "source_sha256": "6da3e89d291e3a22eece57f9521a1459b185b60f86bfd066dcccb16d2494048a",
+      "retained_path": "knowledge/research/runtime-verification/evidence/emulator-1.5.57-source/observations-r3-1.5.57-TestSourceAuditPostgreSQLViewDDL.json",
+      "retained_sha256": "6da3e89d291e3a22eece57f9521a1459b185b60f86bfd066dcccb16d2494048a",
+      "transformation": "none"
+    },
+    {
+      "source_artifact": ".cursor/handoffs/cloud-spanner-emulator-1.5.57-source-audit-20260905-codex/observations-r4-1.5.56-TestSourceAuditNullEscape.json",
+      "source_sha256": "2346fc051f098f7f39763f5ea4a31bf44aef4ec172fb25927a0a16f587f7aa5f",
+      "retained_path": "knowledge/research/runtime-verification/evidence/emulator-1.5.57-source/observations-r4-1.5.56-TestSourceAuditNullEscape.json",
+      "retained_sha256": "2346fc051f098f7f39763f5ea4a31bf44aef4ec172fb25927a0a16f587f7aa5f",
+      "transformation": "none"
+    },
+    {
+      "source_artifact": ".cursor/handoffs/cloud-spanner-emulator-1.5.57-source-audit-20260905-codex/observations-r4-1.5.57-TestSourceAuditNullEscape.json",
+      "source_sha256": "b9950a4fdd393fc802fb5abfc88cf14d291daa6089439f6602fc1acfb6eac672",
+      "retained_path": "knowledge/research/runtime-verification/evidence/emulator-1.5.57-source/observations-r4-1.5.57-TestSourceAuditNullEscape.json",
+      "retained_sha256": "b9950a4fdd393fc802fb5abfc88cf14d291daa6089439f6602fc1acfb6eac672",
+      "transformation": "none"
+    },
+    {
+      "source_artifact": ".cursor/handoffs/cloud-spanner-emulator-1.5.57-source-audit-20260905-codex/verification-summary.json",
+      "source_sha256": "d2b891a824b65c1757b44a9513ec2de70b6ac1bf82bedc737da8c920a11cc2f7",
+      "retained_path": "knowledge/research/runtime-verification/evidence/emulator-1.5.57-source/verification-summary.json",
+      "retained_sha256": "d2b891a824b65c1757b44a9513ec2de70b6ac1bf82bedc737da8c920a11cc2f7",
+      "transformation": "none"
+    },
+    {
+      "source_artifact": ".cursor/handoffs/cloud-spanner-emulator-1.5.57-source-audit-20260905-codex/source-identity.json",
+      "source_sha256": "5ba41ae92a1c1059fe8e144c48dd093cc940eca555a8f7d7f647cf9df1fa9dc4",
+      "retained_path": "knowledge/research/runtime-verification/evidence/emulator-1.5.57-source/source-identity.json",
+      "retained_sha256": "5ba41ae92a1c1059fe8e144c48dd093cc940eca555a8f7d7f647cf9df1fa9dc4",
+      "transformation": "none"
+    },
+    {
+      "source_artifact": ".cursor/handoffs/cloud-spanner-emulator-1.5.57-source-audit-20260905-codex/changed-source-hashes.json",
+      "source_sha256": "b18bbd700c4164dc26d4a208d3700bd5e1718016c32f95046db8a20f19723126",
+      "retained_path": "knowledge/research/runtime-verification/evidence/emulator-1.5.57-source/changed-source-hashes.json",
+      "retained_sha256": "b18bbd700c4164dc26d4a208d3700bd5e1718016c32f95046db8a20f19723126",
+      "transformation": "none"
+    },
+    {
+      "source_artifact": ".cursor/handoffs/cloud-spanner-emulator-1.5.57-source-audit-20260905-codex/r4-baseline-null-escape-container-state.json",
+      "source_sha256": "2d30b0bd36ac4623f9b0d6498a9d977998b8a1248a586f74c905db217f9524d5",
+      "retained_path": "knowledge/research/runtime-verification/evidence/emulator-1.5.57-source/r4-baseline-null-escape-container-state.json",
+      "retained_sha256": "2d30b0bd36ac4623f9b0d6498a9d977998b8a1248a586f74c905db217f9524d5",
+      "transformation": "none"
+    },
+    {
+      "source_artifact": ".cursor/handoffs/cloud-spanner-emulator-1.5.57-source-audit-20260905-codex/r4-baseline-null-escape-container.log",
+      "source_sha256": "4200ba9c8c282aa0491b80c83081edf8547ac2800d232bd1ab5cf3ba6533903e",
+      "retained_path": "knowledge/research/runtime-verification/evidence/emulator-1.5.57-source/r4-baseline-null-escape-container.log",
+      "retained_sha256": "4200ba9c8c282aa0491b80c83081edf8547ac2800d232bd1ab5cf3ba6533903e",
+      "transformation": "none"
+    },
+    {
+      "source_artifact": ".cursor/handoffs/cloud-spanner-emulator-1.5.57-source-audit-20260905-codex/probes-r4-1.5.56.jsonl",
+      "source_sha256": "3d4791c3528898c3b8d0595ab71db4bdaad383327b79b1d1b3b0df3f120d3056",
+      "retained_path": "knowledge/research/runtime-verification/evidence/emulator-1.5.57-source/probes-r4-1.5.56.jsonl",
+      "retained_sha256": "3d4791c3528898c3b8d0595ab71db4bdaad383327b79b1d1b3b0df3f120d3056",
+      "transformation": "Curated fields or portable local-path replacement; original SHA256 retained."
+    },
+    {
+      "source_artifact": ".cursor/handoffs/cloud-spanner-emulator-1.5.57-source-audit-20260905-codex/probes-r4-1.5.57.jsonl",
+      "source_sha256": "aa82f4b2f9e1922d56874c959834be2fb00097add0f379421508839a75b9e75c",
+      "retained_path": "knowledge/research/runtime-verification/evidence/emulator-1.5.57-source/probes-r4-1.5.57.jsonl",
+      "retained_sha256": "aa82f4b2f9e1922d56874c959834be2fb00097add0f379421508839a75b9e75c",
+      "transformation": "Curated fields or portable local-path replacement; original SHA256 retained."
+    },
+    {
+      "source_artifact": ".cursor/handoffs/cloud-spanner-emulator-1.5.57-source-audit-20260905-codex/source_audit_probe_test.go",
+      "source_sha256": "1d47c08b9fc0db6262151332ef4a9252097ae71e4cc0e2fd5635280542a38ce5",
+      "retained_path": "knowledge/research/runtime-verification/evidence/emulator-1.5.57-source/source_audit_probe_test.go.txt",
+      "retained_sha256": "1d47c08b9fc0db6262151332ef4a9252097ae71e4cc0e2fd5635280542a38ce5",
+      "transformation": "none"
+    },
+    {
+      "source_artifact": ".cursor/handoffs/cloud-spanner-emulator-1.5.57-source-audit-20260905-codex/source_audit_probe_v1.go.txt",
+      "source_sha256": "e5e56b14956849069cb3a3e13f37213a7457f56303958b1c474fbead71416a3d",
+      "retained_path": "knowledge/research/runtime-verification/evidence/emulator-1.5.57-source/source_audit_probe_v1.go.txt",
+      "retained_sha256": "e5e56b14956849069cb3a3e13f37213a7457f56303958b1c474fbead71416a3d",
+      "transformation": "none"
+    },
+    {
+      "source_artifact": ".cursor/handoffs/cloud-spanner-emulator-1.5.57-source-audit-20260905-codex/source_audit_probe_v2.go.txt",
+      "source_sha256": "cdf5610a04e2bd92cbc1e8f1572cf38e6d91995c94ed4a1bba6ff0434b6ad559",
+      "retained_path": "knowledge/research/runtime-verification/evidence/emulator-1.5.57-source/source_audit_probe_v2.go.txt",
+      "retained_sha256": "cdf5610a04e2bd92cbc1e8f1572cf38e6d91995c94ed4a1bba6ff0434b6ad559",
+      "transformation": "none"
+    },
+    {
+      "source_artifact": ".cursor/handoffs/cloud-spanner-emulator-1.5.57-source-audit-20260905-codex/source_audit_probe_v3.go.txt",
+      "source_sha256": "e5cc3d244d4722333e43f7403ab033aae048f662f04b964f6cb9a6e81ad396c1",
+      "retained_path": "knowledge/research/runtime-verification/evidence/emulator-1.5.57-source/source_audit_probe_v3.go.txt",
+      "retained_sha256": "e5cc3d244d4722333e43f7403ab033aae048f662f04b964f6cb9a6e81ad396c1",
+      "transformation": "none"
+    },
+    {
+      "source_artifact": ".cursor/handoffs/cloud-spanner-emulator-1.5.57-source-audit-20260905-codex/coverage-all.json",
+      "source_sha256": "01a46fd986de2dafa910d5219e83e0a97a9fcb060962ebbff2ff960a2f984d2b",
+      "retained_path": "knowledge/research/runtime-verification/evidence/emulator-1.5.57-source/coverage-all.json",
+      "retained_sha256": "afdff56f8da22f93f90b5242a73b82b47c13de560cfb2215b03776aabf6364d1",
+      "transformation": "Curated fields or portable local-path replacement; original SHA256 retained."
+    },
+    {
+      "source_artifact": ".cursor/handoffs/cloud-spanner-emulator-1.5.57-20260905-codex/README.md",
+      "source_sha256": "15320e7931d7c766677f427b333c296247dc5249ea696e8a2a970fbd8b9ea589",
+      "disposition": "Findings retained in Research Notes; operational coordination remains historical.",
+      "archived_source_artifact": ".cursor/handoffs/cloud-spanner-emulator-1.5.57-20260905-codex/README.md.pre-okf-migration.txt"
+    },
+    {
+      "source_artifact": ".cursor/handoffs/cloud-spanner-emulator-1.5.57-source-audit-20260905-codex/README.md",
+      "source_sha256": "7e037aa19312c1b0fcfd5f207ede53352f4e1115034cff729c28aac130f81c2c",
+      "disposition": "Findings retained in Research Notes; operational coordination remains historical.",
+      "archived_source_artifact": ".cursor/handoffs/cloud-spanner-emulator-1.5.57-source-audit-20260905-codex/README.md.pre-okf-migration.txt"
+    },
+    {
+      "source_artifact": ".cursor/handoffs/spanalyzer-improvements-20260905.md",
+      "source_sha256": "9b938aee35c712361cde5497aecc3142c97d8c65b8f9f181ad621c6f3f341f6f",
+      "disposition": "Findings retained in Research Notes; operational coordination remains historical."
+    },
+    {
+      "source_artifact": "IMPROVEMENT_PLAN.md",
+      "source_sha256": "0ea3670033ed863615717d82f5c1a2ec33aa6c21d9398efe2e747c0dfc8ffa19",
+      "disposition": "Findings retained in Research Notes; operational coordination remains historical."
+    },
+    {
+      "source_artifact": "tools/spanner-query-plan-shape/graph_derived_property_omni_test.go",
+      "source_sha256": "b48c871d6d57f9cd7452feb6c24664519fbb491c8ccacc2a2cc2b4ef94477e0c",
+      "retained_path": "knowledge/research/runtime-verification/evidence/spanner-omni-2026.r2.1-beta/graph_derived_property_omni_test.go.txt",
+      "retained_sha256": "b48c871d6d57f9cd7452feb6c24664519fbb491c8ccacc2a2cc2b4ef94477e0c",
+      "transformation": "none; historical producer case retained as text to preserve exact bytes independently of ongoing implementation"
+    }
+  ],
+  "canonical_notes": [
+    "knowledge/research/runtime-verification/cloud-spanner-emulator-1.5.57-source-audit.md",
+    "knowledge/research/runtime-verification/cloud-spanner-emulator-1.5.57-verification.md",
+    "knowledge/research/runtime-verification/spanner-omni-2026.r2.1-beta-managed-plan-comparison-20260824.md",
+    "knowledge/research/runtime-verification/spanner-omni-2026.r2.1-beta-verification.md"
+  ],
+  "historical_entry_points": "Original emulator handoff READMEs now redirect to OKF. Exact pre-migration README and manifest bytes remain read-only .pre-okf-migration.txt receipts in those ignored directories.",
+  "existing_producer_captures": "Existing survey capture bodies remain under survey/ and are linked from the Research Notes, without duplicate writable copies."
+}

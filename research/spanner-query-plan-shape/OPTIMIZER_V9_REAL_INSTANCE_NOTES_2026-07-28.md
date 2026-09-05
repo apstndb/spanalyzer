@@ -3,7 +3,7 @@
 Implementation update (2026-08-24): Spanner Omni `2026.r2.1-beta` supports
 optimizer version 9. The planned probes below are now implemented by the
 `optimizer_v9` selector; see
-[`OMNI_R2_1_MANAGED_DIFF_2026-08-24.md`](OMNI_R2_1_MANAGED_DIFF_2026-08-24.md)
+[Spanner Omni r2.1 and managed PLAN comparison](../../knowledge/research/runtime-verification/spanner-omni-2026.r2.1-beta-managed-plan-comparison-20260824.md)
 for the fresh managed/Omni comparison.
 
 Purpose: preserve the first observed evidence of optimizer version 9 behavior

@@ -1,0 +1,206 @@
+//go:build integration
+
+// Temporary untracked source-audit probe. Retain with the local handoff.
+package releaseprobe_test
+
+import (
+	"context"
+	"encoding/json"
+	"fmt"
+	"os"
+	"strings"
+	"testing"
+	"time"
+
+	"cloud.google.com/go/spanner"
+	databasepb "cloud.google.com/go/spanner/admin/database/apiv1/databasepb"
+	"github.com/apstndb/spanemuboost"
+	"google.golang.org/api/iterator"
+)
+
+type observation struct {
+	Name   string `json:"name"`
+	SQL    string `json:"sql"`
+	Code   string `json:"code"`
+	Error  string `json:"error,omitempty"`
+	Values []any  `json:"values,omitempty"`
+}
+
+func recordDDL(t *testing.T, env *spanemuboost.RuntimeEnv, name, sql string) observation {
+	t.Helper()
+	err := ddl(t.Context(), env, sql)
+	o := observation{Name: name, SQL: sql, Code: spanner.ErrCode(err).String()}
+	if err != nil {
+		o.Error = err.Error()
+	}
+	t.Logf("observation=%+v", o)
+	return o
+}
+
+func recordQuery(t *testing.T, env *spanemuboost.RuntimeEnv, name, sql string) observation {
+	t.Helper()
+	o := observation{Name: name, SQL: sql, Code: "OK"}
+	ctx, cancel := context.WithTimeout(t.Context(), 15*time.Second)
+	defer cancel()
+	it := env.Client.Single().Query(ctx, spanner.NewStatement(sql))
+	defer it.Stop()
+	for {
+		row, err := it.Next()
+		if err == iterator.Done {
+			break
+		}
+		if err != nil {
+			o.Code = spanner.ErrCode(err).String()
+			o.Error = err.Error()
+			break
+		}
+		var value spanner.NullString
+		if err := row.Column(0, &value); err != nil {
+			t.Fatal(err)
+		}
+		if value.Valid {
+			o.Values = append(o.Values, value.StringVal)
+		} else {
+			o.Values = append(o.Values, nil)
+		}
+	}
+	t.Logf("observation=%+v", o)
+	return o
+}
+
+func saveObservations(t *testing.T, observations []observation) {
+	t.Helper()
+	prefix := os.Getenv("AUDIT_OBSERVATION_PREFIX")
+	if prefix == "" {
+		t.Fatal("AUDIT_OBSERVATION_PREFIX required")
+	}
+	payload, err := json.MarshalIndent(observations, "", "  ")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(prefix+"-"+t.Name()+".json", append(payload, '\n'), 0600); err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestSourceAuditGoogleSQL(t *testing.T) {
+	env := runtimeEnv(t, databasepb.DatabaseDialect_GOOGLE_STANDARD_SQL)
+	db := env.DatabasePath()[strings.LastIndex(env.DatabasePath(), "/")+1:]
+	var out []observation
+	out = append(out, recordQuery(t, env, "control", "SELECT CAST(1 AS STRING)"))
+	for _, value := range []string{"1", "-1", "9223372036854775807", "NULL", "'1'"} {
+		sql := fmt.Sprintf("ALTER DATABASE `%s` SET OPTIONS (score_version = %s)", db, value)
+		got := recordDDL(t, env, "score_version_"+value, sql)
+		out = append(out, got)
+		if got.Code == "OK" {
+			response, err := env.DatabaseClient.GetDatabaseDdl(t.Context(), &databasepb.GetDatabaseDdlRequest{Database: env.DatabasePath()})
+			o := observation{Name: "dump_score_version_" + value, Code: spanner.ErrCode(err).String()}
+			if err != nil {
+				o.Error = err.Error()
+			} else {
+				for _, statement := range response.Statements {
+					o.Values = append(o.Values, statement)
+				}
+			}
+			t.Logf("observation=%+v", o)
+			out = append(out, o)
+			if value == "1" && err == nil {
+				for _, statement := range response.Statements {
+					if strings.Contains(statement, "score_version") {
+						out = append(out, recordDDL(t, env, "roundtrip_score_version_1", statement))
+						quoted := strings.Replace(statement, "ALTER DATABASE "+db+" ", "ALTER DATABASE `"+db+"` ", 1)
+						out = append(out, recordDDL(t, env, "roundtrip_score_version_1_quoted_db", quoted))
+						out = append(out, recordQuery(t, env, "score_version_metadata_count", "SELECT CAST(COUNT(*) AS STRING) FROM INFORMATION_SCHEMA.DATABASE_OPTIONS WHERE OPTION_NAME = 'score_version'"))
+					}
+				}
+			}
+		}
+	}
+	saveObservations(t, out)
+}
+
+func TestSourceAuditPostgreSQL(t *testing.T) {
+	env := runtimeEnv(t, databasepb.DatabaseDialect_POSTGRESQL)
+	var out []observation
+	out = append(out, recordQuery(t, env, "control", "SELECT 1::text"))
+	for _, value := range []string{"1", "-1", "2147483648", "4294967296", "4294967297", "-4294967296"} {
+		out = append(out, recordQuery(t, env, "jsonb_brackets_"+value, `SELECT (('["a","b"]'::jsonb)[`+value+`])::text`))
+		out = append(out, recordQuery(t, env, "jsonb_arrowtext_"+value, `SELECT '["a","b"]'::jsonb ->> `+value))
+	}
+	out = append(out, recordDDL(t, env, "compression", "CREATE TABLE compression_probe(id bigint PRIMARY KEY, v text COMPRESSION pglz)"))
+	for _, sql := range []string{
+		"SELECT count(*)::text FROM pg_catalog.pg_type",
+		"SELECT count(*)::text FROM pg_catalog.pg_tables",
+		"SELECT count(*)::text FROM pg_type",
+	} {
+		out = append(out, recordQuery(t, env, "catalog_query", sql))
+	}
+	out = append(out, recordDDL(t, env, "catalog_view", "CREATE VIEW catalog_view SQL SECURITY INVOKER AS SELECT tablename FROM pg_catalog.pg_tables"))
+	out = append(out, recordQuery(t, env, "query_catalog_view", "SELECT count(*)::text FROM catalog_view"))
+	out = append(out, recordDDL(t, env, "unnest_view", "CREATE VIEW unnest_view SQL SECURITY INVOKER AS SELECT unnest(ARRAY[1,2]) AS value"))
+	out = append(out, recordQuery(t, env, "query_unnest_view", "SELECT value::text FROM unnest_view ORDER BY value"))
+	if os.Getenv("AUDIT_SKIP_NULL_ESCAPE") != "1" {
+		out = append(out, recordQuery(t, env, "like_null_escape", "SELECT ('a' LIKE 'a' ESCAPE NULL)::text"))
+	}
+	out = append(out, recordQuery(t, env, "post_probe_control", "SELECT 1::text"))
+	saveObservations(t, out)
+}
+
+func TestSourceAuditPostgreSQLHints(t *testing.T) {
+	env := runtimeEnv(t, databasepb.DatabaseDialect_POSTGRESQL)
+	var out []observation
+	mustDDL(t, env, "CREATE TABLE hint_table(id bigint PRIMARY KEY, value text)")
+	mustDML(t, env, "INSERT INTO hint_table VALUES(1,'a')")
+	for _, tc := range []struct{ name, sql string }{
+		{"scalar_statement_hint", "/*@ scan_method='row' */ SELECT 1::text"},
+		{"empty_statement_array_hint", "/*@ scan_method=[] */ SELECT 1::text"},
+		{"empty_statement_typed_array_hint", "/*@ scan_method=ARRAY[] */ SELECT 1::text"},
+		{"populated_statement_array_hint", "/*@ scan_method=['row'] */ SELECT 1::text"},
+		{"empty_table_array_hint", "SELECT id::text FROM hint_table /*@ force_index=[] */"},
+		{"empty_unknown_statement_array_hint", "/*@ unknown_hint=[] */ SELECT 1::text"},
+		{"populated_unknown_statement_array_hint", "/*@ unknown_hint=['x'] */ SELECT 1::text"},
+		{"nonnull_like_escape", `SELECT ('a' LIKE 'a' ESCAPE '\')::text`},
+		{"jsonb_in_subquery", `SELECT ('{"a":1}'::jsonb IN (SELECT '{"a":1}'::jsonb))::text`},
+	} {
+		out = append(out, recordQuery(t, env, tc.name, tc.sql))
+	}
+	for _, tc := range []struct{ name, sql string }{
+		{"statement_hint_view", "CREATE VIEW hint_view SQL SECURITY INVOKER AS /*@ scan_method='row' */ SELECT id, value FROM hint_table"},
+		{"empty_array_hint_view", "CREATE VIEW empty_hint_view SQL SECURITY INVOKER AS /*@ scan_method=[] */ SELECT id, value FROM hint_table"},
+		{"remote_string_option", `CREATE FUNCTION remote_string(x bigint) RETURNS bigint VOLATILE LANGUAGE REMOTE AS $${"endpoint":"http://127.0.0.1:1"}$$`},
+		{"remote_string_array", `CREATE FUNCTION remote_array(x bigint) RETURNS bigint VOLATILE LANGUAGE REMOTE AS $${"endpoint":"http://127.0.0.1:1","endpoints":["http://127.0.0.1:1"]}$$`},
+		{"remote_mixed_array", `CREATE FUNCTION remote_mixed(x bigint) RETURNS bigint VOLATILE LANGUAGE REMOTE AS $${"endpoint":"http://127.0.0.1:1","endpoints":["http://127.0.0.1:1",1]}$$`},
+	} {
+		out = append(out, recordDDL(t, env, tc.name, tc.sql))
+	}
+	out = append(out, recordQuery(t, env, "query_hint_view", "SELECT id::text FROM hint_view"))
+	response, err := env.DatabaseClient.GetDatabaseDdl(t.Context(), &databasepb.GetDatabaseDdlRequest{Database: env.DatabasePath()})
+	o := observation{Name: "dump_pg_hints", Code: spanner.ErrCode(err).String()}
+	if err != nil {
+		o.Error = err.Error()
+	} else {
+		for _, sql := range response.Statements {
+			o.Values = append(o.Values, sql)
+		}
+	}
+	out = append(out, o)
+	saveObservations(t, out)
+}
+
+func TestSourceAuditPostgreSQLViewDDL(t *testing.T) {
+	env := runtimeEnv(t, databasepb.DatabaseDialect_POSTGRESQL)
+	var out []observation
+	out = append(out, recordDDL(t, env, "unnest_view", "CREATE VIEW unnest_view SQL SECURITY INVOKER AS SELECT unnest(ARRAY[1,2]) AS value"))
+	out = append(out, recordQuery(t, env, "query_unnest_view", "SELECT value::text FROM unnest_view ORDER BY value"))
+	response, err := env.DatabaseClient.GetDatabaseDdl(t.Context(), &databasepb.GetDatabaseDdlRequest{Database: env.DatabasePath()})
+	o := observation{Name: "dump_pg_unnest_view", Code: spanner.ErrCode(err).String()}
+	if err != nil {
+		o.Error = err.Error()
+	} else {
+		for _, sql := range response.Statements {
+			o.Values = append(o.Values, sql)
+		}
+	}
+	out = append(out, o)
+	saveObservations(t, out)
+}
