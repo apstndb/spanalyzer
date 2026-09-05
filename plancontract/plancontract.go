@@ -262,30 +262,53 @@ func ReadFile(path string) (File, error) {
 	if err := yaml.UnmarshalWithOptions(data, &contracts, yaml.DisallowUnknownField()); err != nil {
 		return File{}, err
 	}
+	if err := Validate(contracts); err != nil {
+		return File{}, err
+	}
+	return contracts, nil
+}
+
+// Validate checks document identity, predicate semantics, and CEL syntax and
+// types without a plan report or backend. Dynamic CEL results are checked for
+// a boolean value during evaluation. A valid contract may still be unevaluated
+// when its target is absent or failed.
+func Validate(contracts File) error {
+	_, err := compileContracts(contracts)
+	return err
+}
+
+type compiledContract struct {
+	Contract
+	predicates []resolvedPredicate
+	program    cel.Program
+}
+
+func compileContracts(contracts File) ([]compiledContract, error) {
 	if strings.TrimSpace(contracts.Version) != FileVersionV1Alpha {
-		return File{}, fmt.Errorf("unsupported plan contracts version %q; use version: %s", contracts.Version, FileVersionV1Alpha)
+		return nil, fmt.Errorf("unsupported plan contracts version %q; use version: %s", contracts.Version, FileVersionV1Alpha)
 	}
 	if len(contracts.Contracts) == 0 {
-		return File{}, fmt.Errorf("plan contracts file must contain at least one contract")
+		return nil, fmt.Errorf("plan contracts file must contain at least one contract")
 	}
+	compiled := make([]compiledContract, 0, len(contracts.Contracts))
 	seen := map[string]bool{}
 	for _, contract := range contracts.Contracts {
 		name := strings.TrimSpace(contract.Name)
 		if name == "" {
-			return File{}, fmt.Errorf("plan contract name is required")
+			return nil, fmt.Errorf("plan contract name is required")
 		}
 		if !identifierRegexp.MatchString(name) {
-			return File{}, fmt.Errorf("plan contract name %q must match ^%s$", name, IdentifierPattern)
+			return nil, fmt.Errorf("plan contract name %q must match ^%s$", name, IdentifierPattern)
 		}
 		if seen[name] {
-			return File{}, fmt.Errorf("plan_contract.duplicate_contract_name: duplicate plan contract name %q", name)
+			return nil, fmt.Errorf("plan_contract.duplicate_contract_name: duplicate plan contract name %q", name)
 		}
 		target := strings.TrimSpace(contract.Target)
 		if target == "" {
-			return File{}, fmt.Errorf("plan contract %s target is required", name)
+			return nil, fmt.Errorf("plan contract %s target is required", name)
 		}
 		if !targetIDRegexp.MatchString(target) {
-			return File{}, fmt.Errorf("plan contract %s target %q must match %s", name, target, TargetIDPattern)
+			return nil, fmt.Errorf("plan contract %s target %q must match %s", name, target, TargetIDPattern)
 		}
 		forbidSeen := map[string]bool{}
 		for _, predicate := range contract.Forbid {
@@ -294,19 +317,37 @@ func ReadFile(path string) (File, error) {
 				continue
 			}
 			if forbidSeen[family] {
-				return File{}, fmt.Errorf("plan_contract.duplicate_forbid_operator_family: plan contract %s has duplicate forbid.operator_family %q", name, family)
+				return nil, fmt.Errorf("plan_contract.duplicate_forbid_operator_family: plan contract %s has duplicate forbid.operator_family %q", name, family)
 			}
 			forbidSeen[family] = true
 		}
+		resolved, err := predicates(contract)
+		if err != nil {
+			return nil, fmt.Errorf("plan contract %s: %w", name, err)
+		}
+		var program cel.Program
+		if expression := strings.TrimSpace(contract.CEL); expression != "" {
+			program, err = compileCELProgram(expression)
+			if err != nil {
+				return nil, fmt.Errorf("plan contract %s cel: %w", name, err)
+			}
+		}
+		compiled = append(compiled, compiledContract{Contract: contract, predicates: resolved, program: program})
 		seen[name] = true
 	}
-	return contracts, nil
+	return compiled, nil
 }
 
 // Evaluate evaluates contracts against a plan report projection.
 func Evaluate(report Report, contracts File) (ApplyResult, error) {
+	// Validate the complete input before target lookup; unavailable targets must
+	// not hide malformed contracts. Reuse the compiled programs in evaluation.
+	compiled, err := compileContracts(contracts)
+	if err != nil {
+		return ApplyResult{}, err
+	}
 	evaluations := make([]Evaluation, 0, len(contracts.Contracts))
-	for _, contract := range contracts.Contracts {
+	for _, contract := range compiled {
 		evaluation, err := evaluateContract(report, contract)
 		if err != nil {
 			return ApplyResult{}, err
@@ -323,7 +364,7 @@ func Evaluate(report Report, contracts File) (ApplyResult, error) {
 	}, nil
 }
 
-func evaluateContract(report Report, contract Contract) (Evaluation, error) {
+func evaluateContract(report Report, contract compiledContract) (Evaluation, error) {
 	if strings.TrimSpace(contract.Name) == "" {
 		return Evaluation{}, fmt.Errorf("plan contract name is required")
 	}
@@ -331,9 +372,9 @@ func evaluateContract(report Report, contract Contract) (Evaluation, error) {
 		Name:      contract.Name,
 		TargetID:  strings.TrimSpace(contract.Target),
 		Status:    StatusPass,
-		Stability: stabilityFor(contract),
+		Stability: stabilityFor(contract.Contract),
 	}
-	query, ok, err := findTarget(report, contract)
+	query, ok, err := findTarget(report, contract.Contract)
 	if err != nil {
 		return Evaluation{}, fmt.Errorf("plan contract %s: %w", contract.Name, err)
 	}
@@ -351,20 +392,11 @@ func evaluateContract(report Report, contract Contract) (Evaluation, error) {
 		baseEvaluation.Error = fmt.Sprintf("target is not an analyzed Spanner target: status=%s error=%q", query.Status, query.Error)
 		return baseEvaluation, nil
 	}
-	predicates, err := predicates(contract)
-	if err != nil {
-		return Evaluation{}, fmt.Errorf("plan contract %s: %w", contract.Name, err)
-	}
 	evaluation := baseEvaluation
 	evaluation.Query = query.Name
 	evaluation.TargetID = queryTargetID(query)
 	evaluation.Scope = query.Scope
-	if expression := strings.TrimSpace(contract.CEL); expression != "" {
-		if err := validateCELExpression(expression); err != nil {
-			return Evaluation{}, fmt.Errorf("plan contract %s cel: %w", contract.Name, err)
-		}
-	}
-	for _, predicate := range predicates {
+	for _, predicate := range contract.predicates {
 		result, err := evaluatePredicate(query, predicate)
 		if err != nil {
 			return Evaluation{}, err
@@ -375,7 +407,7 @@ func evaluateContract(report Report, contract Contract) (Evaluation, error) {
 		evaluation.Results = append(evaluation.Results, result)
 	}
 	if expression := strings.TrimSpace(contract.CEL); expression != "" {
-		matched, err := evaluateCEL(report, query, expression)
+		matched, err := evaluateCEL(report, query, contract.program)
 		if err != nil {
 			return Evaluation{}, fmt.Errorf("plan contract %s cel: %w", contract.Name, err)
 		}
@@ -579,14 +611,39 @@ func referencedMetadataDerivedOperatorFields(expression string, identifiers map[
 }
 
 func validateCELExpression(expression string) error {
-	identifiers, parsed := referencedCELIdentifiers(expression)
-	if parsed && identifiers["execution_stats"] {
-		return fmt.Errorf("execution_stats is not supported; plan contracts target structural PLAN output, not PROFILE execution statistics")
+	_, err := compileCELProgram(expression)
+	return err
+}
+
+func compileCELProgram(expression string) (cel.Program, error) {
+	env, err := newCELEnv()
+	if err != nil {
+		return nil, err
 	}
-	if !parsed && referencesIdentifier(strings.ToLower(expression), "execution_stats") {
-		return fmt.Errorf("execution_stats is not supported; plan contracts target structural PLAN output, not PROFILE execution statistics")
+	ast, issues := env.Compile(expression)
+	if issues != nil && issues.Err() != nil {
+		// Preserve the structural-PLAN diagnostic even when a PROFILE field
+		// reference also fails CEL type checking.
+		if referencesIdentifier(strings.ToLower(expression), "execution_stats") {
+			return nil, fmt.Errorf("execution_stats is not supported; plan contracts target structural PLAN output, not PROFILE execution statistics")
+		}
+		return nil, issues.Err()
 	}
-	return nil
+	checked, err := cel.AstToCheckedExpr(ast)
+	if err != nil {
+		return nil, err
+	}
+	identifiers := map[string]bool{}
+	collectCELIdentifiers(checked.GetExpr(), identifiers)
+	if identifiers["execution_stats"] {
+		return nil, fmt.Errorf("execution_stats is not supported; plan contracts target structural PLAN output, not PROFILE execution statistics")
+	}
+	// Normalized inputs include dynamic fields, whose result type cannot be
+	// known until evaluation. Keep those supported and check their runtime value.
+	if resultType := ast.OutputType(); !cel.BoolType.IsExactType(resultType) && !cel.DynType.IsExactType(resultType) {
+		return nil, fmt.Errorf("expression must evaluate to bool, got %s", resultType)
+	}
+	return env.Program(ast)
 }
 
 func referencedCELIdentifiers(expression string) (map[string]bool, bool) {
@@ -797,19 +854,7 @@ func predicates(contract Contract) ([]resolvedPredicate, error) {
 	return predicates, nil
 }
 
-func evaluateCEL(report Report, query Query, expression string) (bool, error) {
-	env, err := newCELEnv()
-	if err != nil {
-		return false, err
-	}
-	ast, issues := env.Compile(expression)
-	if issues != nil && issues.Err() != nil {
-		return false, issues.Err()
-	}
-	program, err := env.Program(ast)
-	if err != nil {
-		return false, err
-	}
+func evaluateCEL(report Report, query Query, program cel.Program) (bool, error) {
 	value, _, err := program.Eval(celActivation(report, query))
 	if err != nil {
 		return false, err

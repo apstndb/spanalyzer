@@ -78,6 +78,21 @@ func runPlanReport(args []string, stdout, stderr io.Writer) error {
 		return err
 	}
 	baseDir := filepath.Dir(*configPath)
+	// Reject malformed contracts before SQL analysis or starting a backend.
+	var contracts planContractsFile
+	var contractDigest, resolvedContractsPath string
+	if strings.TrimSpace(*contractsPath) != "" {
+		resolvedContractsPath = resolveOutputPath(baseDir, *contractsPath)
+		contracts, err = readPlanContracts(resolvedContractsPath)
+		if err != nil {
+			return err
+		}
+		contractDigest, err = planReportFileDigest(resolvedContractsPath)
+		if err != nil {
+			return err
+		}
+	}
+
 	plan, err := querygen.BuildQueryCodegenPlan(config, baseDir)
 	if err != nil {
 		return err
@@ -99,15 +114,6 @@ func runPlanReport(args []string, stdout, stderr io.Writer) error {
 	}
 	report.Input.ConfigSHA256 = configDigest
 	if strings.TrimSpace(*contractsPath) != "" {
-		resolvedContractsPath := resolveOutputPath(baseDir, *contractsPath)
-		contractDigest, err := planReportFileDigest(resolvedContractsPath)
-		if err != nil {
-			return err
-		}
-		contracts, err := readPlanContracts(resolvedContractsPath)
-		if err != nil {
-			return err
-		}
 		if err := applyPlanContracts(&report, contracts); err != nil {
 			return err
 		}

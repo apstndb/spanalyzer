@@ -457,6 +457,12 @@ SELECT 1 AS value
 `plan-report` also has an experimental contract check mode. Plan contracts live
 in a separate `v1alpha-plan-contracts` YAML file so the main
 `spanner-query-gen.yaml` stays focused on DDL, SQL, DTOs, and write helpers.
+Contracts are validated before SQL analysis or backend startup. Invalid modes,
+operator families, or CEL syntax/types are errors even when a target is absent
+or has failed. Valid contracts with unavailable targets remain `not_evaluated`.
+Library callers can use `plancontract.Validate` without collecting a plan;
+`ReadFile` and `Evaluate` enforce the same validation boundary. Dynamic CEL
+results still require a boolean value at evaluation time.
 
 ```yaml
 version: v1alpha-plan-contracts
