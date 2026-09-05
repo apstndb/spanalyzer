@@ -352,8 +352,8 @@ func planReportBackendIdentityJSONSchema() map[string]interface{} {
 		"version":      sentinelOrPatternSchema("not_recorded", `^[0-9A-Za-z._:+/-]+$`, "Backend version, or not_recorded when unavailable."),
 		"image_digest": sentinelOrPatternSchema("not_recorded", `^sha256:[a-f0-9]{64}$`, "Backend image digest, or not_recorded when unavailable."),
 		"source": enumSchema(
-			[]interface{}{"spanemuboost", "manual", "not_recorded"},
-			"Backend identity provenance. manual means the caller supplied the value as an assertion, not observed evidence.",
+			[]interface{}{"runtime_targets", "manual", "external_unverified"},
+			"Backend identity provenance. runtime_targets is the exact Omni image configured from runtime_targets.json for a command-owned cold start, not an observation of a running container. manual means the caller supplied the value as an assertion for an attached endpoint, not observed evidence. external_unverified means an attached endpoint had no caller identity assertion.",
 		),
 	})
 	schema["allOf"] = []interface{}{
@@ -374,7 +374,7 @@ func planReportBackendIdentityJSONSchema() map[string]interface{} {
 		},
 		map[string]interface{}{
 			"if": map[string]interface{}{
-				"properties": map[string]interface{}{"source": map[string]interface{}{"const": "not_recorded"}},
+				"properties": map[string]interface{}{"source": map[string]interface{}{"const": "external_unverified"}},
 				"required":   []interface{}{"source"},
 			},
 			"then": map[string]interface{}{
@@ -382,6 +382,19 @@ func planReportBackendIdentityJSONSchema() map[string]interface{} {
 					"version":      map[string]interface{}{"const": "not_recorded"},
 					"image_digest": map[string]interface{}{"const": "not_recorded"},
 				},
+			},
+		},
+		map[string]interface{}{
+			"if": map[string]interface{}{
+				"properties": map[string]interface{}{"source": map[string]interface{}{"const": "runtime_targets"}},
+				"required":   []interface{}{"source"},
+			},
+			"then": map[string]interface{}{
+				"properties": map[string]interface{}{
+					"version":      map[string]interface{}{"not": map[string]interface{}{"const": "not_recorded"}},
+					"image_digest": map[string]interface{}{"pattern": `^sha256:[a-f0-9]{64}$`},
+				},
+				"required": []interface{}{"version", "image_digest"},
 			},
 		},
 	}

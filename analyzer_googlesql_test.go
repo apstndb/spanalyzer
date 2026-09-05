@@ -1319,8 +1319,7 @@ CREATE PROPERTY GRAPH MyGraph
 		t.Fatalf("len(rowType.Fields) = %d, want %d", got, want)
 	}
 	assertField(t, rowType.Fields[0], "SingerId", spannerpb.TypeCode_INT64)
-	// Derived properties are JSON.
-	assertField(t, rowType.Fields[1], "FullName", spannerpb.TypeCode_JSON)
+	assertField(t, rowType.Fields[1], "FullName", spannerpb.TypeCode_STRING)
 }
 
 func TestAnalyzerRowTypeForDMLReturning(t *testing.T) {

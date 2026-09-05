@@ -46,7 +46,7 @@ deliberate deferrals.
   obtained from any source; this command consumes it for plan-report.
 - `cmd/spanner-query-gen` is itself a nested Go module so that spanemuboost,
   testcontainers, and the Docker client stay out of the root analyzer
-  module's requirements (see the repository README for the four-module
+  module's requirements (see the repository README for the five-module
   layout).
 
 ## Recent Design Drift Resolved
@@ -113,11 +113,12 @@ deliberate deferrals.
   Requested optimizer options and pinning absence are recorded; effective
   optimizer version/statistics package are currently `not_recorded` because the
   backend source split is not captured yet.
-- Backend identity records `not_recorded` for Omni version and image digest by
-  default with `source: spanemuboost`. `plan-report` can also record manually
-  supplied `--backend-version` and `--backend-image-digest` values with
-  `source: manual` as caller assertions, not observed backend evidence, until
-  the backend runtime exposes stable automatic identity fields.
+- Backend identity records a command-owned Omni cold-start pin as
+  `source: runtime_targets`. An attached Omni endpoint records `source: manual`
+  when `--backend-version` / `--backend-image-digest` are supplied, or
+  `source: external_unverified` with `not_recorded` version and digest when they
+  are omitted. These are configured or asserted values, not observed container
+  image evidence.
 - Plan contracts are review contracts for a described plan environment, not
   production performance guarantees. They do not use PROFILE execution stats.
 - The normalized operator-family catalog is bounded, registry-driven, and

@@ -15,12 +15,25 @@ import (
 	"github.com/cloudspannerecosystem/memefish/ast"
 )
 
+const uuidFixtureCleanupTimeout = 5 * time.Minute
+
 const uuidFixtureTable = "UUIDDefaultProbe"
 
 const uuidFixtureDDL = `CREATE TABLE UUIDDefaultProbe (
   Id UUID NOT NULL DEFAULT (NEW_UUID()),
   Payload STRING(MAX),
 ) PRIMARY KEY (Id)`
+
+func updateUUIDFixtureDDL(ctx context.Context, admin *database.DatabaseAdminClient, databaseName, statement string) error {
+	op, err := admin.UpdateDatabaseDdl(ctx, &databasepb.UpdateDatabaseDdlRequest{
+		Database:   databaseName,
+		Statements: []string{statement},
+	})
+	if err != nil {
+		return err
+	}
+	return op.Wait(ctx)
+}
 
 func verifyUUIDFixture(ctx context.Context, t *testing.T, client *spanner.Client, tableName string) {
 	t.Helper()
@@ -130,25 +143,16 @@ func TestUUID_RealSpanner(t *testing.T) {
 			t.Errorf("close managed-Spanner database admin client: %v", err)
 		}
 	}()
-	update := func(statement string) error {
-		op, err := admin.UpdateDatabaseDdl(ctx, &databasepb.UpdateDatabaseDdlRequest{
-			Database:   databaseName,
-			Statements: []string{statement},
-		})
-		if err != nil {
-			return err
-		}
-		return op.Wait(ctx)
+	update := func(opCtx context.Context, statement string) error {
+		return updateUUIDFixtureDDL(opCtx, admin, databaseName, statement)
 	}
-	if err := update(ddl); err != nil {
+	if err := update(ctx, ddl); err != nil {
 		t.Fatalf("create managed-Spanner UUID fixture: %v", err)
 	}
 	created := true
 	defer func() {
-		if created {
-			if err := update("DROP TABLE " + tableName); err != nil {
-				t.Errorf("drop managed-Spanner UUID fixture: %v", err)
-			}
+		if err := runUUIDFixtureFallbackCleanup(&created, tableName, uuidFixtureCleanupTimeout, update); err != nil {
+			t.Errorf("drop managed-Spanner UUID fixture: %v", err)
 		}
 	}()
 
@@ -159,7 +163,7 @@ func TestUUID_RealSpanner(t *testing.T) {
 	defer client.Close()
 	verifyUUIDFixture(ctx, t, client, tableName)
 
-	if err := update("DROP TABLE " + tableName); err != nil {
+	if err := update(ctx, uuidFixtureDropStatement(tableName)); err != nil {
 		t.Fatalf("drop managed-Spanner UUID fixture: %v", err)
 	}
 	created = false

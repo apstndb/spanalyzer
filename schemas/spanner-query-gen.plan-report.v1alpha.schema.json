@@ -35,7 +35,7 @@
           "if": {
             "properties": {
               "source": {
-                "const": "not_recorded"
+                "const": "external_unverified"
               }
             },
             "required": [
@@ -51,6 +51,34 @@
                 "const": "not_recorded"
               }
             }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "source": {
+                "const": "runtime_targets"
+              }
+            },
+            "required": [
+              "source"
+            ]
+          },
+          "then": {
+            "properties": {
+              "image_digest": {
+                "pattern": "^sha256:[a-f0-9]{64}$"
+              },
+              "version": {
+                "not": {
+                  "const": "not_recorded"
+                }
+              }
+            },
+            "required": [
+              "version",
+              "image_digest"
+            ]
           }
         }
       ],
@@ -76,11 +104,11 @@
           ]
         },
         "source": {
-          "description": "Backend identity provenance. manual means the caller supplied the value as an assertion, not observed evidence.",
+          "description": "Backend identity provenance. runtime_targets is the exact Omni image configured from runtime_targets.json for a command-owned cold start, not an observation of a running container. manual means the caller supplied the value as an assertion for an attached endpoint, not observed evidence. external_unverified means an attached endpoint had no caller identity assertion.",
           "enum": [
-            "spanemuboost",
+            "runtime_targets",
             "manual",
-            "not_recorded"
+            "external_unverified"
           ]
         },
         "version": {

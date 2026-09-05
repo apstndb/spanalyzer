@@ -189,6 +189,107 @@ type FieldSchema struct {
 	}
 }
 
+func TestGenerateGoStructDuplicateNestedTypeFailsClosed(t *testing.T) {
+	var firstErr string
+	for i := 0; i < 5; i++ {
+		code, err := generateGoStruct([]goResultField{
+			{
+				Name:   "info",
+				Kind:   "STRUCT",
+				Fields: []goResultField{{Name: "n", Kind: "STRING"}},
+			},
+			{
+				Name:   "Info",
+				Kind:   "STRUCT",
+				Fields: []goResultField{{Name: "n", Kind: "STRING"}},
+			},
+		}, GoStructOptions{PackageName: "result", StructName: "Row", Target: GoStructTargetSpanner})
+		if err == nil {
+			t.Fatalf("generateGoStruct() error = nil, want nested type collision\n%s", code)
+		}
+		if code != "" {
+			t.Fatalf("generateGoStruct() returned source on error:\n%s", code)
+		}
+		if !strings.Contains(err.Error(), "generated symbol RowInfo") {
+			t.Fatalf("error = %v, want RowInfo", err)
+		}
+		if !strings.Contains(err.Error(), "field info") || !strings.Contains(err.Error(), "field Info") {
+			t.Fatalf("error = %v, want dual field origins", err)
+		}
+		if firstErr == "" {
+			firstErr = err.Error()
+		} else if err.Error() != firstErr {
+			t.Fatalf("generateGoStruct collision diagnostic is not deterministic:\nfirst: %s\nlater: %s", firstErr, err.Error())
+		}
+	}
+
+	code, err := GenerateGoStructFromSpannerStructType(&spannerpb.StructType{
+		Fields: []*spannerpb.StructType_Field{
+			{
+				Name: "info",
+				Type: &spannerpb.Type{
+					Code: spannerpb.TypeCode_STRUCT,
+					StructType: &spannerpb.StructType{Fields: []*spannerpb.StructType_Field{
+						{Name: "n", Type: &spannerpb.Type{Code: spannerpb.TypeCode_STRING}},
+					}},
+				},
+			},
+			{
+				Name: "Info",
+				Type: &spannerpb.Type{
+					Code: spannerpb.TypeCode_STRUCT,
+					StructType: &spannerpb.StructType{Fields: []*spannerpb.StructType_Field{
+						{Name: "n", Type: &spannerpb.Type{Code: spannerpb.TypeCode_STRING}},
+					}},
+				},
+			},
+		},
+	}, GoStructOptions{PackageName: "result", StructName: "Row", Target: GoStructTargetSpanner})
+	if err == nil {
+		t.Fatalf("GenerateGoStructFromSpannerStructType() error = nil, want nested type collision\n%s", code)
+	}
+	if code != "" {
+		t.Fatalf("GenerateGoStructFromSpannerStructType() returned source on error:\n%s", code)
+	}
+	if err.Error() != firstErr {
+		t.Fatalf("public Go-struct path error = %v, want %s", err, firstErr)
+	}
+}
+
+func TestGenerateGoStructsWithExtraDuplicateRootAndNestedTypeFailsClosed(t *testing.T) {
+	var firstErr string
+	for i := 0; i < 5; i++ {
+		code, err := generateGoStructsWithExtra([]namedGoStruct{
+			{
+				Name: "Row",
+				Fields: []goResultField{{
+					Name:   "info",
+					Kind:   "STRUCT",
+					Fields: []goResultField{{Name: "n", Kind: "STRING"}},
+				}},
+			},
+			{Name: "RowInfo", Fields: []goResultField{{Name: "id", Kind: "INT64"}}},
+		}, GoStructOptions{PackageName: "result", StructName: "QueryRow", Target: GoStructTargetSpanner}, nil, nil, "")
+		if err == nil {
+			t.Fatalf("generateGoStructsWithExtra() error = nil, want type collision\n%s", code)
+		}
+		if code != "" {
+			t.Fatalf("generateGoStructsWithExtra() returned source on error:\n%s", code)
+		}
+		if !strings.Contains(err.Error(), "generated symbol RowInfo") {
+			t.Fatalf("error = %v, want RowInfo", err)
+		}
+		if !strings.Contains(err.Error(), "generated struct Row nested struct RowInfo field info") || !strings.Contains(err.Error(), "generated struct RowInfo") {
+			t.Fatalf("error = %v, want dual struct origins", err)
+		}
+		if firstErr == "" {
+			firstErr = err.Error()
+		} else if err.Error() != firstErr {
+			t.Fatalf("generateGoStructsWithExtra collision diagnostic is not deterministic:\nfirst: %s\nlater: %s", firstErr, err.Error())
+		}
+	}
+}
+
 func TestGenerateGoStructsWithExtraReportsFormatError(t *testing.T) {
 	_, err := generateGoStructsWithExtra(
 		nil,

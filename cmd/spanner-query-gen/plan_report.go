@@ -14,6 +14,7 @@ import (
 	"os"
 	"path/filepath"
 	"reflect"
+	"regexp"
 	"sort"
 	"strings"
 	"time"
@@ -41,8 +42,8 @@ func runPlanReport(args []string, stdout, stderr io.Writer) error {
 	stable := fs.Bool("stable", false, "omit volatile metadata from report output")
 	optimizerVersion := fs.String("optimizer-version", "", "Spanner optimizer version to pass to AnalyzeQuery")
 	optimizerStatisticsPackage := fs.String("optimizer-statistics-package", "", "Spanner optimizer statistics package to pass to AnalyzeQuery")
-	backendVersion := fs.String("backend-version", "", "backend version to record in backend_identity")
-	backendImageDigest := fs.String("backend-image-digest", "", "backend container image digest to record in backend_identity, for example sha256:<64 hex chars>")
+	backendVersion := fs.String("backend-version", "", "attached-endpoint identity assertion, or a cold-start check that must match the configured Omni pin tag")
+	backendImageDigest := fs.String("backend-image-digest", "", "attached-endpoint identity assertion, or a cold-start check that must match the configured Omni pin digest, for example sha256:<64 hex chars>")
 	requireTargets := fs.Bool("require-targets", false, "fail when no Spanner query targets are available")
 	requireOptimizerPinning := fs.Bool("require-optimizer-pinning", false, "fail when optimizer version or statistics package is not pinned")
 	contractsPath := fs.String("contracts", "", "experimental plan contracts YAML file")
@@ -156,13 +157,17 @@ const (
 	planContractStatusFail         = plancontract.StatusFail
 	planContractStatusNotEvaluated = plancontract.StatusNotEvaluated
 
-	planReportVersionV1Alpha        = "v1alpha-plan-report-v1"
-	planReportOperatorTreeVersion   = "v1alpha.3"
-	planReportFamilyMappingVersion  = "v1alpha.2"
-	planContractFileVersionV1Alpha  = plancontract.FileVersionV1Alpha
-	planContractEvaluatorVersionV1  = plancontract.EvaluatorVersionV1
-	planContractStabilityNormalized = plancontract.StabilityNormalized
-	planContractStabilityRawPlan    = plancontract.StabilityRawPlan
+	planReportVersionV1Alpha      = "v1alpha-plan-report-v1"
+	planReportOperatorTreeVersion = "v1alpha.3"
+
+	planReportIdentitySourceRuntimeTargets     = "runtime_targets"
+	planReportIdentitySourceManual             = "manual"
+	planReportIdentitySourceExternalUnverified = "external_unverified"
+	planReportFamilyMappingVersion             = "v1alpha.2"
+	planContractFileVersionV1Alpha             = plancontract.FileVersionV1Alpha
+	planContractEvaluatorVersionV1             = plancontract.EvaluatorVersionV1
+	planContractStabilityNormalized            = plancontract.StabilityNormalized
+	planContractStabilityRawPlan               = plancontract.StabilityRawPlan
 
 	planContractEvaluationModeNone       = plancontract.EvaluationModeNone
 	planContractEvaluationModeReportOnly = plancontract.EvaluationModeReportOnly
@@ -344,14 +349,41 @@ type planReportOptimizerEnvironment = plancontract.OptimizerEnvironment
 type planReportOptimizerEffective = plancontract.OptimizerEffective
 
 func buildPlanReport(ctx context.Context, config querygen.QueryCodegenConfig, plan *querygen.QueryCodegenPlan, baseDir string, opts planReportOptions) (planReport, error) {
-	runtime, err := spanemuboost.NewLazyRuntimeFromEnvOrStart(spanemuboost.BackendOmni)
+	if !planReportNeedsRuntime(config, plan) {
+		opts.Identity = attachedPlanReportIdentity(emptyDefault(opts.Backend, "omni"), opts.Identity)
+		return buildPlanReportWithRuntime(ctx, config, plan, baseDir, opts, nil)
+	}
+	selected, err := selectPlanReportRuntime(opts, baseDir, defaultPlanReportRuntimeDeps())
 	if err != nil {
 		return planReport{}, err
 	}
-	defer func() {
-		_ = runtime.Close()
-	}()
-	return buildPlanReportWithRuntime(ctx, config, plan, baseDir, opts, runtime)
+	if selected.Close {
+		defer func() {
+			_ = closePlanReportRuntime(selected.Runtime)
+		}()
+	}
+	opts.Identity = selected.Identity
+	return buildPlanReportWithRuntime(ctx, config, plan, baseDir, opts, selected.Runtime)
+}
+
+func planReportNeedsRuntime(config querygen.QueryCodegenConfig, plan *querygen.QueryCodegenPlan) bool {
+	if plan == nil {
+		return false
+	}
+	schemas := queryCodegenSchemasByName(config.Schemas)
+	configQueries := queryCodegenQueriesByName(config.Queries)
+	for _, query := range plan.Queries {
+		configQuery := configQueries[query.Name]
+		catalog := query.Catalog
+		if !planReportFederatedQueryIsZero(configQuery.Federated) {
+			catalog = configQuery.Federated.SpannerSource
+		}
+		schema, ok := schemas[catalog]
+		if ok && schema.Dialect == "spanner" {
+			return true
+		}
+	}
+	return false
 }
 
 func buildPlanReportWithRuntime(ctx context.Context, config querygen.QueryCodegenConfig, plan *querygen.QueryCodegenPlan, baseDir string, opts planReportOptions, runtime spanemuboost.RuntimeHandle) (planReport, error) {
@@ -372,7 +404,7 @@ func buildPlanReportWithRuntime(ctx context.Context, config querygen.QueryCodege
 			Kind:        opts.Backend,
 			Version:     "not_recorded",
 			ImageDigest: "not_recorded",
-			Source:      "spanemuboost",
+			Source:      planReportIdentitySourceExternalUnverified,
 		},
 		Normalization: defaultPlanReportNormalization(),
 		TargetSummary: planReportTargetSummary{
@@ -624,7 +656,6 @@ func planReportBackendIdentityFromFlags(backend, version, imageDigest string) (p
 			Kind:        backend,
 			Version:     "not_recorded",
 			ImageDigest: "not_recorded",
-			Source:      "spanemuboost",
 		}, nil
 	}
 	if imageDigest != "" {
@@ -636,7 +667,7 @@ func planReportBackendIdentityFromFlags(backend, version, imageDigest string) (p
 		Kind:        backend,
 		Version:     planReportValueOrNotRecorded(version),
 		ImageDigest: planReportValueOrNotRecorded(imageDigest),
-		Source:      "manual",
+		Source:      planReportIdentitySourceManual,
 	}, nil
 }
 
@@ -1085,21 +1116,57 @@ func validatePlanReportInvariants(report planReport) error {
 }
 
 func validatePlanReportBackendIdentity(identity planReportBackendIdentity) error {
+	if identity.Kind != "omni" {
+		return fmt.Errorf("plan-report invariant violation: unsupported backend_identity.kind %q", identity.Kind)
+	}
+	if err := validatePlanReportIdentityVersion(identity.Version); err != nil {
+		return err
+	}
+	if err := validatePlanReportIdentityDigest(identity.ImageDigest); err != nil {
+		return err
+	}
 	versionNotRecorded := strings.EqualFold(identity.Version, "not_recorded")
 	digestNotRecorded := strings.EqualFold(identity.ImageDigest, "not_recorded")
 	switch identity.Source {
-	case "spanemuboost":
-		return nil
-	case "manual":
+	case planReportIdentitySourceRuntimeTargets:
+		if versionNotRecorded || digestNotRecorded {
+			return fmt.Errorf("plan-report invariant violation: backend_identity.source runtime_targets requires version and image_digest to be recorded")
+		}
+	case planReportIdentitySourceManual:
 		if versionNotRecorded && digestNotRecorded {
 			return fmt.Errorf("plan-report invariant violation: backend_identity.source manual requires version or image_digest to be recorded")
 		}
-	case "not_recorded":
+	case planReportIdentitySourceExternalUnverified:
 		if !versionNotRecorded || !digestNotRecorded {
-			return fmt.Errorf("plan-report invariant violation: backend_identity.source not_recorded requires version and image_digest to be not_recorded")
+			return fmt.Errorf("plan-report invariant violation: backend_identity.source external_unverified requires version and image_digest to be not_recorded")
 		}
 	default:
 		return fmt.Errorf("plan-report invariant violation: unsupported backend_identity.source %q", identity.Source)
+	}
+	return nil
+}
+
+var planReportIdentityVersionPattern = regexp.MustCompile(`^[0-9A-Za-z._:+/-]+$`)
+
+func validatePlanReportIdentityVersion(version string) error {
+	if strings.EqualFold(version, "not_recorded") {
+		return nil
+	}
+	if version == "" || !planReportIdentityVersionPattern.MatchString(version) {
+		return fmt.Errorf("plan-report invariant violation: backend_identity.version %q is invalid", version)
+	}
+	return nil
+}
+
+func validatePlanReportIdentityDigest(digest string) error {
+	if strings.EqualFold(digest, "not_recorded") {
+		return nil
+	}
+	if digest == "" {
+		return fmt.Errorf("plan-report invariant violation: backend_identity.image_digest is empty")
+	}
+	if err := validatePlanReportImageDigest(digest); err != nil {
+		return fmt.Errorf("plan-report invariant violation: backend_identity.image_digest: %w", err)
 	}
 	return nil
 }
@@ -1197,6 +1264,9 @@ func writePlanReportMarkdown(w io.Writer, report planReport) error {
 	fmt.Fprintf(&b, "- Report version: `%s`\n", report.ReportVersion)
 	fmt.Fprintf(&b, "- Status: `%s`\n", report.Status)
 	fmt.Fprintf(&b, "- Backend: `%s`\n", report.Backend)
+	fmt.Fprintf(&b, "- Backend identity source: `%s`\n", report.BackendIdentity.Source)
+	fmt.Fprintf(&b, "- Backend version: `%s`\n", report.BackendIdentity.Version)
+	fmt.Fprintf(&b, "- Backend image digest: `%s`\n", report.BackendIdentity.ImageDigest)
 	if report.Input.ConfigSHA256 != "" {
 		fmt.Fprintf(&b, "- Config SHA-256: `%s`\n", report.Input.ConfigSHA256)
 	}

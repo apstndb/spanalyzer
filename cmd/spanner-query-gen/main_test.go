@@ -552,7 +552,7 @@ func TestPlanReportWarningsAreSerializedWhenEmpty(t *testing.T) {
 		Backend:          "omni",
 		Input:            planReportInput{ConfigSHA256: strings.Repeat("0", 64)},
 		PlanSource:       planReportPlanSource{Backend: "omni", API: "analyze_query", RenderTool: "spannerplan"},
-		BackendIdentity:  planReportBackendIdentity{Kind: "omni", Version: "not_recorded", ImageDigest: "not_recorded", Source: "spanemuboost"},
+		BackendIdentity:  planReportBackendIdentity{Kind: "omni", Version: "not_recorded", ImageDigest: "not_recorded", Source: "external_unverified"},
 		Normalization:    defaultPlanReportNormalization(),
 		TargetSummary:    planReportTargetSummary{Excluded: []planReportExcludedTarget{}},
 		Format:           "CURRENT",
@@ -806,13 +806,13 @@ func TestPlanReportSchemaContractConditionals(t *testing.T) {
 		t.Fatalf("contract evaluation mode contract_evaluations.minItems = %v, want %v", got, want)
 	}
 	backendIdentity := defs["backend_identity"].(map[string]interface{})
-	if got, want := len(backendIdentity["allOf"].([]interface{})), 2; got != want {
+	if got, want := len(backendIdentity["allOf"].([]interface{})), 3; got != want {
 		t.Fatalf("backend_identity allOf length = %d, want %d", got, want)
 	}
 	backendIdentityProperties := backendIdentity["properties"].(map[string]interface{})
 	source := backendIdentityProperties["source"].(map[string]interface{})
-	if got := source["description"].(string); !strings.Contains(got, "caller supplied the value as an assertion") {
-		t.Fatalf("backend_identity.source description = %q, want caller assertion wording", got)
+	if got := source["description"].(string); !strings.Contains(got, "caller supplied the value as an assertion") || !strings.Contains(got, "runtime_targets") || !strings.Contains(got, "external_unverified") {
+		t.Fatalf("backend_identity.source description = %q, want provenance wording", got)
 	}
 	manualClause := backendIdentity["allOf"].([]interface{})[0].(map[string]interface{})
 	manualThen := manualClause["then"].(map[string]interface{})
@@ -824,14 +824,20 @@ func TestPlanReportSchemaContractConditionals(t *testing.T) {
 	if got := manualNotProperties["image_digest"].(map[string]interface{})["const"]; got != "not_recorded" {
 		t.Fatalf("backend_identity manual image_digest forbidden const = %v, want not_recorded", got)
 	}
-	notRecordedClause := backendIdentity["allOf"].([]interface{})[1].(map[string]interface{})
-	notRecordedThen := notRecordedClause["then"].(map[string]interface{})
-	notRecordedProperties := notRecordedThen["properties"].(map[string]interface{})
-	if got := notRecordedProperties["version"].(map[string]interface{})["const"]; got != "not_recorded" {
-		t.Fatalf("backend_identity not_recorded version const = %v, want not_recorded", got)
+	externalClause := backendIdentity["allOf"].([]interface{})[1].(map[string]interface{})
+	externalThen := externalClause["then"].(map[string]interface{})
+	externalProperties := externalThen["properties"].(map[string]interface{})
+	if got := externalProperties["version"].(map[string]interface{})["const"]; got != "not_recorded" {
+		t.Fatalf("backend_identity external_unverified version const = %v, want not_recorded", got)
 	}
-	if got := notRecordedProperties["image_digest"].(map[string]interface{})["const"]; got != "not_recorded" {
-		t.Fatalf("backend_identity not_recorded image_digest const = %v, want not_recorded", got)
+	if got := externalProperties["image_digest"].(map[string]interface{})["const"]; got != "not_recorded" {
+		t.Fatalf("backend_identity external_unverified image_digest const = %v, want not_recorded", got)
+	}
+	runtimeTargetsClause := backendIdentity["allOf"].([]interface{})[2].(map[string]interface{})
+	runtimeTargetsThen := runtimeTargetsClause["then"].(map[string]interface{})
+	runtimeTargetsProperties := runtimeTargetsThen["properties"].(map[string]interface{})
+	if _, ok := runtimeTargetsProperties["image_digest"].(map[string]interface{})["pattern"]; !ok {
+		t.Fatalf("backend_identity runtime_targets image_digest missing pattern: %#v", runtimeTargetsProperties["image_digest"])
 	}
 	stability := defs["contract_stability"].(map[string]interface{})
 	if got, want := len(stability["allOf"].([]interface{})), 2; got != want {
@@ -1862,7 +1868,7 @@ func TestWritePlanReportOutputs(t *testing.T) {
 		},
 		Format:           "CURRENT",
 		RenderMode:       "PLAN",
-		BackendIdentity:  planReportBackendIdentity{Kind: "omni", Version: "not_recorded", ImageDigest: "not_recorded", Source: "spanemuboost"},
+		BackendIdentity:  planReportBackendIdentity{Kind: "omni", Version: "not_recorded", ImageDigest: "not_recorded", Source: "external_unverified"},
 		ContractEvalMode: planContractEvaluationModeNone,
 		Normalization:    defaultPlanReportNormalization(),
 		TargetSummary: planReportTargetSummary{
@@ -1923,6 +1929,9 @@ func TestWritePlanReportOutputs(t *testing.T) {
 				"# Spanner Query Plan Report",
 				"- Report version: `v1alpha-plan-report-v1`",
 				"- Status: `ok`",
+				"- Backend identity source: `external_unverified`",
+				"- Backend version: `not_recorded`",
+				"- Backend image digest: `not_recorded`",
 				"Config SHA-256:",
 				"Contract evaluation mode: `none`",
 				"## ListSingers",
@@ -1939,6 +1948,7 @@ func TestWritePlanReportOutputs(t *testing.T) {
 			output: "yaml",
 			want: []string{
 				"status: ok",
+				"source: external_unverified",
 				"config_sha256:",
 				"contract_evaluation_mode: none",
 				"cel_input_defaults:",
@@ -1961,6 +1971,7 @@ func TestWritePlanReportOutputs(t *testing.T) {
 			output: "json",
 			want: []string{
 				`"status": "ok"`,
+				`"source": "external_unverified"`,
 				`"config_sha256":`,
 				`"contract_evaluation_mode": "none"`,
 				`"cel_input_defaults":`,
@@ -2019,7 +2030,7 @@ func TestWritePlanReportRejectsContractSummaryInvariantViolation(t *testing.T) {
 		ReportVersion:    planReportVersionV1Alpha,
 		Status:           planReportStatusOK,
 		Backend:          "omni",
-		BackendIdentity:  planReportBackendIdentity{Kind: "omni", Version: "not_recorded", ImageDigest: "not_recorded", Source: "spanemuboost"},
+		BackendIdentity:  planReportBackendIdentity{Kind: "omni", Version: "not_recorded", ImageDigest: "not_recorded", Source: "external_unverified"},
 		ContractEvalMode: planContractEvaluationModeReportOnly,
 		Normalization:    defaultPlanReportNormalization(),
 		TargetSummary: planReportTargetSummary{
@@ -2069,9 +2080,34 @@ func TestWritePlanReportRejectsBackendIdentityInvariantViolation(t *testing.T) {
 			want:     "backend_identity.source manual requires version or image_digest",
 		},
 		{
-			name:     "not_recorded with recorded version",
-			identity: planReportBackendIdentity{Kind: "omni", Version: "2026.r1-beta", ImageDigest: "not_recorded", Source: "not_recorded"},
-			want:     "backend_identity.source not_recorded requires version and image_digest",
+			name:     "external_unverified with recorded version",
+			identity: planReportBackendIdentity{Kind: "omni", Version: "2026.r1-beta", ImageDigest: "not_recorded", Source: "external_unverified"},
+			want:     "backend_identity.source external_unverified requires version and image_digest",
+		},
+		{
+			name:     "runtime_targets with not_recorded digest",
+			identity: planReportBackendIdentity{Kind: "omni", Version: "2026.r2.1-beta", ImageDigest: "not_recorded", Source: "runtime_targets"},
+			want:     "backend_identity.source runtime_targets requires version and image_digest",
+		},
+		{
+			name:     "runtime_targets with empty version",
+			identity: planReportBackendIdentity{Kind: "omni", Version: "", ImageDigest: "sha256:" + strings.Repeat("a", 64), Source: "runtime_targets"},
+			want:     "backend_identity.version",
+		},
+		{
+			name:     "manual with empty version and not_recorded digest",
+			identity: planReportBackendIdentity{Kind: "omni", Version: "", ImageDigest: "not_recorded", Source: "manual"},
+			want:     "backend_identity.version",
+		},
+		{
+			name:     "external_unverified with empty version",
+			identity: planReportBackendIdentity{Kind: "omni", Version: "", ImageDigest: "not_recorded", Source: "external_unverified"},
+			want:     "backend_identity.version",
+		},
+		{
+			name:     "unsupported kind",
+			identity: planReportBackendIdentity{Kind: "emulator", Version: "not_recorded", ImageDigest: "not_recorded", Source: "external_unverified"},
+			want:     "backend_identity.kind",
 		},
 	}
 	for _, tt := range tests {
@@ -2082,6 +2118,64 @@ func TestWritePlanReportRejectsBackendIdentityInvariantViolation(t *testing.T) {
 			err := writePlanReport(&stdout, "yaml", report)
 			if err == nil || !strings.Contains(err.Error(), tt.want) {
 				t.Fatalf("writePlanReport() error = %v, want substring %q", err, tt.want)
+			}
+		})
+	}
+}
+
+func TestWritePlanReportIdentityProvenanceStates(t *testing.T) {
+	digest := "sha256:" + strings.Repeat("a", 64)
+	tests := []struct {
+		name     string
+		identity planReportBackendIdentity
+		want     []string
+	}{
+		{
+			name: "runtime_targets",
+			identity: planReportBackendIdentity{
+				Kind:        "omni",
+				Version:     "2026.r2.1-beta",
+				ImageDigest: digest,
+				Source:      planReportIdentitySourceRuntimeTargets,
+			},
+			want: []string{"runtime_targets", "2026.r2.1-beta", digest},
+		},
+		{
+			name: "manual",
+			identity: planReportBackendIdentity{
+				Kind:        "omni",
+				Version:     "2026.r1-beta",
+				ImageDigest: digest,
+				Source:      planReportIdentitySourceManual,
+			},
+			want: []string{"manual", "2026.r1-beta", digest},
+		},
+		{
+			name: "external_unverified",
+			identity: planReportBackendIdentity{
+				Kind:        "omni",
+				Version:     "not_recorded",
+				ImageDigest: "not_recorded",
+				Source:      planReportIdentitySourceExternalUnverified,
+			},
+			want: []string{"external_unverified", "not_recorded"},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			report := newPlanReportInvariantTestReport(t)
+			report.BackendIdentity = tt.identity
+			for _, output := range []string{"markdown", "yaml", "json"} {
+				var stdout bytes.Buffer
+				if err := writePlanReport(&stdout, output, report); err != nil {
+					t.Fatalf("writePlanReport(%s) error = %v", output, err)
+				}
+				body := stdout.String()
+				for _, want := range tt.want {
+					if !strings.Contains(body, want) {
+						t.Fatalf("writePlanReport(%s) missing %q:\n%s", output, want, body)
+					}
+				}
 			}
 		})
 	}
@@ -2179,7 +2273,7 @@ func newPlanReportInvariantTestReport(t testing.TB) planReport {
 		ReportVersion:    planReportVersionV1Alpha,
 		Status:           planReportStatusOK,
 		Backend:          "omni",
-		BackendIdentity:  planReportBackendIdentity{Kind: "omni", Version: "not_recorded", ImageDigest: "not_recorded", Source: "spanemuboost"},
+		BackendIdentity:  planReportBackendIdentity{Kind: "omni", Version: "not_recorded", ImageDigest: "not_recorded", Source: "external_unverified"},
 		ContractEvalMode: planContractEvaluationModeNone,
 		Normalization:    defaultPlanReportNormalization(),
 		TargetSummary: planReportTargetSummary{
@@ -4677,8 +4771,8 @@ func TestPlanReportBackendIdentityFromFlags(t *testing.T) {
 	if err != nil {
 		t.Fatalf("planReportBackendIdentityFromFlags(empty) error = %v", err)
 	}
-	if got, want := identity.Source, "spanemuboost"; got != want {
-		t.Fatalf("empty source = %q, want %q", got, want)
+	if got, want := identity.Source, ""; got != want {
+		t.Fatalf("empty source = %q, want empty assertion", got)
 	}
 	if got, want := identity.Version, "not_recorded"; got != want {
 		t.Fatalf("empty version = %q, want %q", got, want)

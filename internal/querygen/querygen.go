@@ -339,7 +339,7 @@ func GenerateQueryCode(config QueryCodegenConfig, baseDir string) (string, error
 	var builderCode bytes.Buffer
 	var builderImports []string
 	var querySpecs []resolvedQuerySpec
-	for _, query := range config.Queries {
+	for i, query := range config.Queries {
 		if query.Name == "" {
 			return "", fmt.Errorf("query name is required")
 		}
@@ -370,13 +370,12 @@ func GenerateQueryCode(config QueryCodegenConfig, baseDir string) (string, error
 			return "", fmt.Errorf("query %s result_struct %s: %w", query.Name, structName, err)
 		}
 		structs[structName] = merged
-		sourceName, _ := querySourceName(schemas, query)
-		methodPrefix := exportedIdentifier(query.Name, "Query")
-		var builderFunc, paramsType string
-		if queryHasOptionalMarkers(query) {
-			builderFunc = "Build" + methodPrefix + "SQL"
-			paramsType = methodPrefix + "Params"
-			code, imports, err := emitQueryGoBuilder(query, builderFunc, paramsType)
+		spec, err := newResolvedQuerySpec(schemas, query, structName, i)
+		if err != nil {
+			return "", err
+		}
+		if spec.BuilderFunc != "" {
+			code, imports, err := emitQueryGoBuilder(query, spec.BuilderFunc, spec.ParamsType)
 			if err != nil {
 				return "", fmt.Errorf("query %s: %w", query.Name, err)
 			}
@@ -388,18 +387,16 @@ func GenerateQueryCode(config QueryCodegenConfig, baseDir string) (string, error
 		} else {
 			constants = append(constants, queryGoConstants(query)...)
 		}
-		querySpecs = append(querySpecs, resolvedQuerySpec{
-			Name:         query.Name,
-			MethodPrefix: methodPrefix,
-			ResultStruct: structName,
-			ResultMode:   queryResultMode(query),
-			Params:       query.Params,
-			Dialect:      emptyDefault(schemas[sourceName].Dialect, "spanner"),
-			BuilderFunc:  builderFunc,
-			ParamsType:   paramsType,
-		})
+		querySpecs = append(querySpecs, spec)
 	}
-	writeImports, writeCode, err := generateWriteCode(schemas, config.Writes, baseDir, structs)
+	writeStructFields, writeSpecs, err := planWriteSpecs(schemas, config.Writes, baseDir, structs)
+	if err != nil {
+		return "", err
+	}
+	if err := validateGeneratedPackageNamespace(querySpecs, writeSpecs, structs, writeStructFields, options.Target); err != nil {
+		return "", err
+	}
+	writeImports, writeCode, err := emitWriteCode(writeStructFields, writeSpecs)
 	if err != nil {
 		return "", err
 	}
@@ -433,14 +430,17 @@ func GenerateQueryCode(config QueryCodegenConfig, baseDir string) (string, error
 }
 
 type resolvedQuerySpec struct {
-	Name         string
-	MethodPrefix string
-	ResultStruct string
-	ResultMode   string
-	Params       []QueryCodegenParam
-	Dialect      string
-	BuilderFunc  string
-	ParamsType   string
+	Index         int
+	Name          string
+	MethodPrefix  string
+	ResultStruct  string
+	ResultMode    string
+	Params        []QueryCodegenParam
+	Dialect       string
+	BuilderFunc   string
+	ParamsType    string
+	SQLConstName  string
+	ConstantNames []string
 }
 
 func writeQueryMethods(b *bytes.Buffer, spec resolvedQuerySpec, imports map[string]struct{}) {
@@ -538,7 +538,10 @@ func spannerStatementExpr(spec resolvedQuerySpec, constName string) string {
 func writeSpannerMethods(b *bytes.Buffer, spec resolvedQuerySpec, imports map[string]struct{}) {
 	imports["context"] = struct{}{}
 	imports["cloud.google.com/go/spanner"] = struct{}{}
-	constName := spec.MethodPrefix + "SQL"
+	constName := spec.SQLConstName
+	if constName == "" {
+		constName = spec.MethodPrefix + "SQL"
+	}
 	paramsArg := spannerMethodParamsArg(spec)
 	paramsForward := spannerMethodParamsForward(spec)
 	switch spec.ResultMode {
@@ -615,10 +618,20 @@ func writeSpannerMethods(b *bytes.Buffer, spec resolvedQuerySpec, imports map[st
 	}
 }
 
+func writeBigQueryQuerySetup(b *bytes.Buffer, spec resolvedQuerySpec, constName string) {
+	fmt.Fprintf(b, "\tq := client.Query(%s)\n", constName)
+	if queryMethodHasParams(spec) {
+		b.WriteString("\tq.Parameters = params\n")
+	}
+}
+
 func writeBigQueryMethods(b *bytes.Buffer, spec resolvedQuerySpec, imports map[string]struct{}) {
 	imports["context"] = struct{}{}
 	imports["cloud.google.com/go/bigquery"] = struct{}{}
-	constName := spec.MethodPrefix + "SQL"
+	constName := spec.SQLConstName
+	if constName == "" {
+		constName = spec.MethodPrefix + "SQL"
+	}
 	paramsArg := ""
 	paramsForward := ""
 	if queryMethodHasParams(spec) {
@@ -630,10 +643,7 @@ func writeBigQueryMethods(b *bytes.Buffer, spec resolvedQuerySpec, imports map[s
 		imports["google.golang.org/api/iterator"] = struct{}{}
 		fmt.Fprintf(b, "// %s returns a BigQuery row iterator.\n", spec.MethodPrefix)
 		fmt.Fprintf(b, "func %s(ctx context.Context, client *bigquery.Client%s) (*bigquery.RowIterator, error) {\n", spec.MethodPrefix, paramsArg)
-		fmt.Fprintf(b, "\tq := client.Query(%s)\n", constName)
-		if queryMethodHasParams(spec) {
-			b.WriteString("\tq.Parameters = params\n")
-		}
+		writeBigQueryQuerySetup(b, spec, constName)
 		b.WriteString("\treturn q.Read(ctx)\n")
 		b.WriteString("}\n")
 		fmt.Fprintf(b, "// %sAll returns all BigQuery rows as a slice.\n", spec.MethodPrefix)
@@ -660,7 +670,8 @@ func writeBigQueryMethods(b *bytes.Buffer, spec resolvedQuerySpec, imports map[s
 		imports["google.golang.org/api/iterator"] = struct{}{}
 		fmt.Fprintf(b, "// %s returns a single BigQuery row.\n", spec.MethodPrefix)
 		fmt.Fprintf(b, "func %s(ctx context.Context, client *bigquery.Client%s) (*%s, error) {\n", spec.MethodPrefix, paramsArg, spec.ResultStruct)
-		fmt.Fprintf(b, "\tit, err := %s(ctx, client%s)\n", spec.MethodPrefix, paramsForward)
+		writeBigQueryQuerySetup(b, spec, constName)
+		b.WriteString("\tit, err := q.Read(ctx)\n")
 		b.WriteString("\tif err != nil {\n")
 		b.WriteString("\t\treturn nil, err\n")
 		b.WriteString("\t}\n")
@@ -689,12 +700,15 @@ func writeBigQueryMethods(b *bytes.Buffer, spec resolvedQuerySpec, imports map[s
 
 func queryCodegenSchemas(config QueryCodegenConfig) (map[string]QueryCodegenSchema, error) {
 	schemas := map[string]QueryCodegenSchema{}
-	for _, schema := range config.Schemas {
+	for i, schema := range config.Schemas {
 		if schema.Name == "" {
 			return nil, fmt.Errorf("schema name is required")
 		}
 		if _, ok := schemas[schema.Name]; ok {
 			return nil, fmt.Errorf("duplicate schema %q", schema.Name)
+		}
+		if err := validateUniqueExternalQueryConnectionIDs(schema, directExternalQueryConnectionOrigin(i)); err != nil {
+			return nil, err
 		}
 		schemas[schema.Name] = schema
 	}
@@ -704,25 +718,66 @@ func queryCodegenSchemas(config QueryCodegenConfig) (map[string]QueryCodegenSche
 	return schemas, nil
 }
 
+type externalQueryConnectionOriginFunc func(list string, index int, conn QueryCodegenExternalSchema) string
+
+func directExternalQueryConnectionOrigin(schemaIndex int) externalQueryConnectionOriginFunc {
+	return func(list string, index int, _ QueryCodegenExternalSchema) string {
+		return fmt.Sprintf("schemas[%d].%s[%d]", schemaIndex, list, index)
+	}
+}
+
+func duplicateExternalQueryConnectionIDError(id, firstSource, firstOrigin, secondSource, secondOrigin string) error {
+	return fmt.Errorf("duplicate BigQuery EXTERNAL_QUERY connection ID %q maps to %s from %s and %s from %s", id, firstSource, firstOrigin, secondSource, secondOrigin)
+}
+
+func normalizeExternalQueryConnection(external QueryCodegenExternalSchema) QueryCodegenExternalSchema {
+	if external.SpannerSource == "" {
+		external.SpannerSource = external.Schema
+	}
+	if external.Schema == "" {
+		external.Schema = external.SpannerSource
+	}
+	return external
+}
+
+func validateUniqueExternalQueryConnectionIDs(schema QueryCodegenSchema, originFor externalQueryConnectionOriginFunc) error {
+	type claimedConnection struct {
+		source string
+		origin string
+	}
+	seen := map[string]claimedConnection{}
+	claim := func(list string, index int, external QueryCodegenExternalSchema) error {
+		external = normalizeExternalQueryConnection(external)
+		if external.Connection == "" || external.SpannerSource == "" {
+			return nil
+		}
+		origin := originFor(list, index, external)
+		if previous, ok := seen[external.Connection]; ok {
+			return duplicateExternalQueryConnectionIDError(external.Connection, previous.source, previous.origin, external.SpannerSource, origin)
+		}
+		seen[external.Connection] = claimedConnection{source: external.SpannerSource, origin: origin}
+		return nil
+	}
+	for i, external := range schema.ExternalSchemas {
+		if err := claim("external_schemas", i, external); err != nil {
+			return err
+		}
+	}
+	for i, external := range schema.ExternalQueryConnections {
+		if err := claim("external_query_connections", i, external); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 func queryCodegenExternalQueryConnections(schema QueryCodegenSchema) []QueryCodegenExternalSchema {
 	out := make([]QueryCodegenExternalSchema, 0, len(schema.ExternalSchemas)+len(schema.ExternalQueryConnections))
 	for _, external := range schema.ExternalSchemas {
-		if external.SpannerSource == "" {
-			external.SpannerSource = external.Schema
-		}
-		if external.Schema == "" {
-			external.Schema = external.SpannerSource
-		}
-		out = append(out, external)
+		out = append(out, normalizeExternalQueryConnection(external))
 	}
 	for _, external := range schema.ExternalQueryConnections {
-		if external.SpannerSource == "" {
-			external.SpannerSource = external.Schema
-		}
-		if external.Schema == "" {
-			external.Schema = external.SpannerSource
-		}
-		out = append(out, external)
+		out = append(out, normalizeExternalQueryConnection(external))
 	}
 	return out
 }
@@ -806,6 +861,7 @@ func BuildQueryCodegenPlan(config QueryCodegenConfig, baseDir string) (*QueryCod
 		return nil, err
 	}
 	structs := map[string][]goResultField{}
+	var querySpecs []resolvedQuerySpec
 	plan := &QueryCodegenPlan{
 		PlanVersion: 1,
 		Generator: QueryCodegenPlanGenerator{
@@ -827,7 +883,7 @@ func BuildQueryCodegenPlan(config QueryCodegenConfig, baseDir string) (*QueryCod
 	}
 	plan.CatalogBindings = catalogBindings
 	applyCatalogBindingSeverityOverrides(plan.CatalogBindings, config.RuleSeverity)
-	for _, query := range config.Queries {
+	for i, query := range config.Queries {
 		if query.Name == "" {
 			return nil, fmt.Errorf("query name is required")
 		}
@@ -881,6 +937,11 @@ func BuildQueryCodegenPlan(config QueryCodegenConfig, baseDir string) (*QueryCod
 				planVariants = nil
 			}
 		}
+		spec, specErr := newResolvedQuerySpec(schemas, query, structName, i)
+		if specErr != nil {
+			return nil, specErr
+		}
+		querySpecs = append(querySpecs, spec)
 		plan.Queries = append(plan.Queries, QueryCodegenPlanQuery{
 			Name:            query.Name,
 			Catalog:         sourceName,
@@ -929,6 +990,13 @@ func BuildQueryCodegenPlan(config QueryCodegenConfig, baseDir string) (*QueryCod
 	sort.Slice(plan.Structs, func(i, j int) bool {
 		return plan.Structs[i].Name < plan.Structs[j].Name
 	})
+	target := GoStructTarget(strings.ToLower(string(config.Client)))
+	if target == "" {
+		target = GoStructTargetBoth
+	}
+	if err := validateGeneratedPackageNamespace(querySpecs, writeSpecs, structs, writeStructFields, target); err != nil {
+		return nil, err
+	}
 	return plan, nil
 }
 
@@ -1706,6 +1774,11 @@ func queryHasOptionalMarkers(query QueryCodegenQuery) bool {
 }
 
 func buildCodegenExternalAnalyzers(schemas map[string]QueryCodegenSchema, schema QueryCodegenSchema, baseDir string) (map[string]*Analyzer, error) {
+	if err := validateUniqueExternalQueryConnectionIDs(schema, func(list string, index int, _ QueryCodegenExternalSchema) string {
+		return fmt.Sprintf("schema %s %s[%d]", schema.Name, list, index)
+	}); err != nil {
+		return nil, err
+	}
 	analyzers := map[string]*Analyzer{}
 	for _, external := range queryCodegenExternalQueryConnections(schema) {
 		if external.Connection == "" || external.SpannerSource == "" {
@@ -2027,12 +2100,21 @@ func codegenFederatedQuerySQL(schemas map[string]QueryCodegenSchema, bigQuerySch
 }
 
 func resolveFederatedSpannerSchemaName(bigQuerySchema QueryCodegenSchema, query QueryCodegenFederatedQuery) (string, error) {
+	if err := validateUniqueExternalQueryConnectionIDs(bigQuerySchema, func(list string, index int, _ QueryCodegenExternalSchema) string {
+		return fmt.Sprintf("schema %s %s[%d]", bigQuerySchema.Name, list, index)
+	}); err != nil {
+		return "", err
+	}
 	externalSchemaName := ""
 	for _, external := range queryCodegenExternalQueryConnections(bigQuerySchema) {
-		if external.Connection == query.Connection {
-			externalSchemaName = external.SpannerSource
-			break
+		if external.Connection != query.Connection {
+			continue
 		}
+		if external.Connection == "" || external.SpannerSource == "" {
+			return "", fmt.Errorf("external query connection entries require connection and spanner_source")
+		}
+		externalSchemaName = external.SpannerSource
+		break
 	}
 	if externalSchemaName == "" {
 		return "", fmt.Errorf("no external query connection entry for connection %q", query.Connection)
@@ -2228,18 +2310,14 @@ func readCodegenDDL(schema QueryCodegenSchema, baseDir string) (string, string, 
 	return path, string(ddl), nil
 }
 
-func generateWriteCode(schemas map[string]QueryCodegenSchema, writes []QueryCodegenWrite, baseDir string, sharedStructFields map[string][]goResultField) ([]string, string, error) {
-	if len(writes) == 0 {
+func emitWriteCode(writeStructFields map[string][]goResultField, writeSpecs []resolvedWriteSpec) ([]string, string, error) {
+	if len(writeStructFields) == 0 && len(writeSpecs) == 0 {
 		return nil, "", nil
 	}
 	writeGen := &goStructGenerator{
-		target:  GoStructTargetSpanner,
-		imports: map[string]string{},
-		used:    map[string]bool{},
-	}
-	writeStructFields, writeSpecs, err := planWriteSpecs(schemas, writes, baseDir, sharedStructFields)
-	if err != nil {
-		return nil, "", err
+		target:      GoStructTargetSpanner,
+		imports:     map[string]string{},
+		usedOrigins: map[string]string{},
 	}
 	structNames := make([]string, 0, len(writeStructFields))
 	for name := range writeStructFields {
@@ -2251,7 +2329,10 @@ func generateWriteCode(schemas map[string]QueryCodegenSchema, writes []QueryCode
 		if i > 0 {
 			b.WriteByte('\n')
 		}
-		writeGeneratedStruct(&b, writeGen.buildStruct(name, writeStructFields[name]))
+		writeGeneratedStruct(&b, writeGen.buildStruct(name, "generated struct "+name, writeStructFields[name]))
+	}
+	if writeGen.err != nil {
+		return nil, "", writeGen.err
 	}
 	for _, nested := range writeGen.structs {
 		b.WriteByte('\n')
@@ -2272,11 +2353,12 @@ func generateWriteCode(schemas map[string]QueryCodegenSchema, writes []QueryCode
 func planWriteSpecs(schemas map[string]QueryCodegenSchema, writes []QueryCodegenWrite, baseDir string, sharedStructFields map[string][]goResultField) (map[string][]goResultField, []resolvedWriteSpec, error) {
 	writeStructFields := map[string][]goResultField{}
 	writeSpecs := make([]resolvedWriteSpec, 0, len(writes))
-	for _, write := range writes {
+	for i, write := range writes {
 		spec, err := resolveWriteSpec(schemas, write, baseDir)
 		if err != nil {
 			return nil, nil, err
 		}
+		spec.Index = i
 		structFields := writeStructFields
 		if existing, ok := sharedStructFields[spec.InputStruct]; ok {
 			if err := validateSharedWriteInputFields(spec, existing); err != nil {
@@ -2312,6 +2394,7 @@ func validateSharedWriteInputFields(spec resolvedWriteSpec, fields []goResultFie
 }
 
 type resolvedWriteSpec struct {
+	Index           int
 	Name            string
 	MethodPrefix    string
 	Catalog         string
@@ -2504,7 +2587,6 @@ func attachWriteSpecNames(specs []resolvedWriteSpec, writeStructFields, sharedSt
 		}
 		fieldNamesByStruct[spec.InputStruct] = goFieldNameMap(fields)
 	}
-	usedSymbols := map[string]string{}
 	out := make([]resolvedWriteSpec, len(specs))
 	copy(out, specs)
 	for i := range out {
@@ -2516,27 +2598,8 @@ func attachWriteSpecNames(specs []resolvedWriteSpec, writeStructFields, sharedSt
 			}
 		}
 		spec.ParamNames = writeParamNameMap(spec.InputColumns)
-		for _, symbol := range writeSymbols(*spec) {
-			if previous := usedSymbols[symbol]; previous != "" {
-				return nil, fmt.Errorf("write %s generates duplicate symbol %s already used by write %s", spec.Name, symbol, previous)
-			}
-			usedSymbols[symbol] = spec.Name
-		}
 	}
 	return out, nil
-}
-
-func writeSymbols(spec resolvedWriteSpec) []string {
-	out := make([]string, 0, len(spec.Methods)*2)
-	for _, method := range spec.Methods {
-		switch method {
-		case "mutation":
-			out = append(out, spec.MethodPrefix+"Mutation")
-		case "dml":
-			out = append(out, spec.MethodPrefix+"DML", spec.MethodPrefix+"DMLStatement")
-		}
-	}
-	return out
 }
 
 func writeParamNameMap(columns []*Column) map[string]string {

@@ -3,6 +3,7 @@ package querygen
 import (
 	"errors"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -3931,5 +3932,331 @@ CREATE TABLE Singers (
 	}
 	if !strings.Contains(code, "Query(ctx context.Context, statement spanner.Statement) *spanner.RowIterator") {
 		t.Fatalf("generated interface method missing:\n%s", code)
+	}
+}
+
+func TestGenerateQueryCodeBigQueryResultModesCompileAndCardinality(t *testing.T) {
+	dir := t.TempDir()
+	writeTestFile(t, filepath.Join(dir, "bigquery.sql"), `
+CREATE TABLE mydataset.events (
+  event_id INT64
+);
+`)
+	code, err := GenerateQueryCode(QueryCodegenConfig{
+		Package: "db",
+		Client:  GoStructTargetBigQuery,
+		Schemas: []QueryCodegenSchema{{Name: "warehouse", Dialect: "bigquery", DDL: "bigquery.sql"}},
+		Queries: []QueryCodegenQuery{
+			{
+				Name:         "ListEvents",
+				Catalog:      "warehouse",
+				SQL:          "SELECT event_id FROM mydataset.events",
+				Result:       "many",
+				ResultStruct: "EventRow",
+			},
+			{
+				Name:         "ListEventsByType",
+				Catalog:      "warehouse",
+				SQL:          "SELECT event_id FROM mydataset.events WHERE event_id = @id",
+				Params:       []QueryCodegenParam{{Name: "id", Type: "INT64"}},
+				Result:       "many",
+				ResultStruct: "EventRow",
+			},
+			{
+				Name:         "GetEvent",
+				Catalog:      "warehouse",
+				SQL:          "SELECT event_id FROM mydataset.events",
+				Result:       "one",
+				ResultStruct: "EventRow",
+			},
+			{
+				Name:         "GetEventByID",
+				Catalog:      "warehouse",
+				SQL:          "SELECT event_id FROM mydataset.events WHERE event_id = @id",
+				Params:       []QueryCodegenParam{{Name: "id", Type: "INT64"}},
+				Result:       "one",
+				ResultStruct: "EventRow",
+			},
+			{
+				Name:         "FindEvent",
+				Catalog:      "warehouse",
+				SQL:          "SELECT event_id FROM mydataset.events",
+				Result:       "maybe_one",
+				ResultStruct: "EventRow",
+			},
+			{
+				Name:         "FindEventByID",
+				Catalog:      "warehouse",
+				SQL:          "SELECT event_id FROM mydataset.events WHERE event_id = @id",
+				Params:       []QueryCodegenParam{{Name: "id", Type: "INT64"}},
+				Result:       "maybe_one",
+				ResultStruct: "EventRow",
+			},
+		},
+	}, dir)
+	if err != nil {
+		t.Fatalf("GenerateQueryCode() error = %v", err)
+	}
+
+	for _, want := range []string{
+		"func ListEvents(ctx context.Context, client *bigquery.Client) (*bigquery.RowIterator, error) {",
+		"func ListEventsAll(ctx context.Context, client *bigquery.Client) ([]*EventRow, error) {",
+		"it, err := ListEvents(ctx, client)",
+		"func ListEventsByType(ctx context.Context, client *bigquery.Client, params []bigquery.QueryParameter) (*bigquery.RowIterator, error) {",
+		"q.Parameters = params",
+		"func GetEvent(ctx context.Context, client *bigquery.Client) (*EventRow, error) {",
+		"q := client.Query(GetEventSQL)",
+		"func GetEventByID(ctx context.Context, client *bigquery.Client, params []bigquery.QueryParameter) (*EventRow, error) {",
+		"q := client.Query(GetEventByIDSQL)",
+		"func FindEvent(ctx context.Context, client *bigquery.Client) (*EventRow, error) {",
+		"q := client.Query(FindEventSQL)",
+		"func FindEventByID(ctx context.Context, client *bigquery.Client, params []bigquery.QueryParameter) (*EventRow, error) {",
+		"q := client.Query(FindEventByIDSQL)",
+	} {
+		if !strings.Contains(code, want) {
+			t.Fatalf("generated code missing %q:\n%s", want, code)
+		}
+	}
+	for _, unwanted := range []string{
+		"it, err := GetEvent(ctx, client)",
+		"it, err := GetEventByID(ctx, client, params)",
+		"it, err := FindEvent(ctx, client)",
+		"it, err := FindEventByID(ctx, client, params)",
+	} {
+		if strings.Contains(code, unwanted) {
+			t.Fatalf("generated one/maybe_one still calls itself:\n%s\n--- code ---\n%s", unwanted, code)
+		}
+	}
+
+	genDir := t.TempDir()
+	writeGeneratedLoadTestFile(t, filepath.Join(genDir, "go.mod"), `module generatedquerytest
+
+go 1.22
+
+require (
+	cloud.google.com/go/bigquery v0.0.0
+	google.golang.org/api v0.0.0
+)
+
+replace cloud.google.com/go/bigquery => ./bigquerystub
+
+replace google.golang.org/api => ./googleapi
+`)
+	writeGeneratedLoadTestFile(t, filepath.Join(genDir, "generated.go"), code)
+	writeGeneratedLoadTestFile(t, filepath.Join(genDir, "generated_test.go"), `package db
+
+import (
+	"context"
+	"errors"
+	"strings"
+	"testing"
+
+	"cloud.google.com/go/bigquery"
+	"google.golang.org/api/iterator"
+)
+
+func TestGeneratedBigQueryManyStillUsesIteratorHelper(t *testing.T) {
+	client := &bigquery.Client{NextResults: []error{nil, nil}}
+	rows, err := ListEventsAll(context.Background(), client)
+	if err != nil {
+		t.Fatalf("ListEventsAll() error = %v", err)
+	}
+	if len(rows) != 2 {
+		t.Fatalf("ListEventsAll() rows = %d, want 2", len(rows))
+	}
+	if client.LastSQL != ListEventsSQL {
+		t.Fatalf("ListEvents SQL = %q, want %q", client.LastSQL, ListEventsSQL)
+	}
+}
+
+func TestGeneratedBigQueryParameterForwarding(t *testing.T) {
+	params := []bigquery.QueryParameter{{Name: "id", Value: int64(7)}}
+	client := &bigquery.Client{NextResults: []error{nil}}
+	if _, err := GetEventByID(context.Background(), client, params); err != nil {
+		t.Fatalf("GetEventByID() error = %v", err)
+	}
+	if client.LastSQL != GetEventByIDSQL {
+		t.Fatalf("GetEventByID SQL = %q, want %q", client.LastSQL, GetEventByIDSQL)
+	}
+	if len(client.LastParams) != 1 || client.LastParams[0].Name != "id" {
+		t.Fatalf("GetEventByID params = %#v, want id=7", client.LastParams)
+	}
+	client.NextResults = nil
+	if _, err := ListEventsByType(context.Background(), client, params); err != nil {
+		t.Fatalf("ListEventsByType() error = %v", err)
+	}
+	if len(client.LastParams) != 1 || client.LastParams[0].Name != "id" {
+		t.Fatalf("ListEventsByType params = %#v, want forwarded", client.LastParams)
+	}
+}
+
+func TestGeneratedBigQueryOneCardinality(t *testing.T) {
+	t.Run("zero rows", func(t *testing.T) {
+		_, err := GetEvent(context.Background(), &bigquery.Client{})
+		if err != iterator.Done {
+			t.Fatalf("GetEvent() error = %v, want iterator.Done", err)
+		}
+	})
+	t.Run("one row", func(t *testing.T) {
+		row, err := GetEvent(context.Background(), &bigquery.Client{NextResults: []error{nil}})
+		if err != nil {
+			t.Fatalf("GetEvent() error = %v", err)
+		}
+		if row == nil {
+			t.Fatal("GetEvent() row = nil, want non-nil")
+		}
+	})
+	t.Run("two rows", func(t *testing.T) {
+		_, err := GetEvent(context.Background(), &bigquery.Client{NextResults: []error{nil, nil}})
+		if err == nil || !strings.Contains(err.Error(), "expected at most one row") {
+			t.Fatalf("GetEvent() error = %v, want multiple-row error", err)
+		}
+	})
+	t.Run("first next error", func(t *testing.T) {
+		want := errors.New("read failed")
+		_, err := GetEvent(context.Background(), &bigquery.Client{NextResults: []error{want}})
+		if err != want {
+			t.Fatalf("GetEvent() error = %v, want %v", err, want)
+		}
+	})
+	t.Run("second next error", func(t *testing.T) {
+		want := errors.New("second failed")
+		_, err := GetEvent(context.Background(), &bigquery.Client{NextResults: []error{nil, want}})
+		if err != want {
+			t.Fatalf("GetEvent() error = %v, want %v", err, want)
+		}
+	})
+	t.Run("read error", func(t *testing.T) {
+		want := errors.New("read setup failed")
+		_, err := GetEvent(context.Background(), &bigquery.Client{ReadErr: want})
+		if err != want {
+			t.Fatalf("GetEvent() error = %v, want %v", err, want)
+		}
+	})
+}
+
+func TestGeneratedBigQueryMaybeOneCardinality(t *testing.T) {
+	t.Run("zero rows", func(t *testing.T) {
+		row, err := FindEvent(context.Background(), &bigquery.Client{})
+		if err != nil || row != nil {
+			t.Fatalf("FindEvent() = (%v, %v), want (nil, nil)", row, err)
+		}
+	})
+	t.Run("one row", func(t *testing.T) {
+		row, err := FindEvent(context.Background(), &bigquery.Client{NextResults: []error{nil}})
+		if err != nil {
+			t.Fatalf("FindEvent() error = %v", err)
+		}
+		if row == nil {
+			t.Fatal("FindEvent() row = nil, want non-nil")
+		}
+	})
+	t.Run("two rows", func(t *testing.T) {
+		_, err := FindEvent(context.Background(), &bigquery.Client{NextResults: []error{nil, nil}})
+		if err == nil || !strings.Contains(err.Error(), "expected at most one row") {
+			t.Fatalf("FindEvent() error = %v, want multiple-row error", err)
+		}
+	})
+	t.Run("first next error", func(t *testing.T) {
+		want := errors.New("read failed")
+		_, err := FindEvent(context.Background(), &bigquery.Client{NextResults: []error{want}})
+		if err != want {
+			t.Fatalf("FindEvent() error = %v, want %v", err, want)
+		}
+	})
+}
+`)
+	stubDir := filepath.Join(genDir, "bigquerystub")
+	if err := os.Mkdir(stubDir, 0o755); err != nil {
+		t.Fatalf("Mkdir(bigquerystub) error = %v", err)
+	}
+	writeGeneratedLoadTestFile(t, filepath.Join(stubDir, "go.mod"), `module cloud.google.com/go/bigquery
+
+go 1.22
+`)
+	writeGeneratedLoadTestFile(t, filepath.Join(stubDir, "bigquery.go"), `package bigquery
+
+import (
+	"context"
+
+	"google.golang.org/api/iterator"
+)
+
+type Value interface{}
+
+type NullInt64 struct {
+	Int64 int64
+	Valid bool
+}
+
+type QueryParameter struct {
+	Name  string
+	Value interface{}
+}
+
+type Client struct {
+	LastSQL     string
+	LastParams  []QueryParameter
+	ReadErr     error
+	NextResults []error
+}
+
+func (c *Client) Query(sql string) *Query {
+	c.LastSQL = sql
+	return &Query{client: c}
+}
+
+type Query struct {
+	client     *Client
+	Parameters []QueryParameter
+}
+
+func (q *Query) Read(ctx context.Context) (*RowIterator, error) {
+	q.client.LastParams = q.Parameters
+	if q.client.ReadErr != nil {
+		return nil, q.client.ReadErr
+	}
+	return &RowIterator{client: q.client}, nil
+}
+
+type RowIterator struct {
+	client *Client
+	i      int
+}
+
+func (it *RowIterator) Next(dst interface{}) error {
+	if it.i >= len(it.client.NextResults) {
+		return iterator.Done
+	}
+	err := it.client.NextResults[it.i]
+	it.i++
+	return err
+}
+`)
+	apiDir := filepath.Join(genDir, "googleapi", "iterator")
+	if err := os.MkdirAll(apiDir, 0o755); err != nil {
+		t.Fatalf("MkdirAll(googleapi/iterator) error = %v", err)
+	}
+	writeGeneratedLoadTestFile(t, filepath.Join(genDir, "googleapi", "go.mod"), `module google.golang.org/api
+
+go 1.22
+`)
+	writeGeneratedLoadTestFile(t, filepath.Join(apiDir, "iterator.go"), `package iterator
+
+import "errors"
+
+var Done = errors.New("no more items in iterator")
+`)
+
+	cmd := exec.Command("go", "test", "./...")
+	cmd.Dir = genDir
+	cmd.Env = append(os.Environ(),
+		"GOCACHE="+filepath.Join(genDir, "gocache"),
+		"GOTOOLCHAIN=local",
+		"GOWORK=off",
+	)
+	output, err := cmd.CombinedOutput()
+	if err != nil {
+		t.Fatalf("go test generated BigQuery result modes: %v\n--- generated.go ---\n%s\n--- output ---\n%s", err, code, output)
 	}
 }

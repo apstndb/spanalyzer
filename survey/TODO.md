@@ -1,5 +1,16 @@
 # TODO
 
+## Use a fresh UUID cleanup context (2026-09-02)
+
+- [x] Give deferred UUID fixture DROP a fresh bounded background context so a
+  canceled or expired primary test context cannot prevent cleanup.
+
+## Make canonical DDL coverage fail closed (2026-08-31)
+
+- [x] Count every `GetDatabaseDdl` statement as parsed or exact SHA-256 plus
+  error-class allowlisted. Unexpected parse failures fail the managed
+  canonical test with sanitized family, full digest, and error class only.
+
 ## Complete expression-index probes while memefish support is pending (2026-08-28)
 
 - [x] Add retained plan-probe cases and structural expectations for automatic,

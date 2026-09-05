@@ -237,7 +237,7 @@ func (c QueryCodegenV1AlphaConfig) Normalize() (QueryCodegenConfig, error) {
 	writeNames := map[string]bool{}
 	connectionBindings := map[string]QueryCodegenV1AlphaExternalQueryConnection{}
 	externalDatasetKeys := map[string]int{}
-	for _, catalog := range c.Catalogs {
+	for i, catalog := range c.Catalogs {
 		if err := requireUniqueV1AlphaName("catalog", catalog.Name, catalogNames); err != nil {
 			return QueryCodegenConfig{}, err
 		}
@@ -273,6 +273,13 @@ func (c QueryCodegenV1AlphaConfig) Normalize() (QueryCodegenConfig, error) {
 				SpannerSource: connection.SpannerCatalog,
 				Schema:        connection.SpannerCatalog,
 			})
+		}
+		catalogIndex := i
+		if err := validateUniqueExternalQueryConnectionIDs(schema, func(_ string, index int, _ QueryCodegenExternalSchema) string {
+			name := catalog.Bindings.ExternalQueryConnections[index].Name
+			return fmt.Sprintf("catalogs[%d].bindings.external_query_connections[%d] (%s)", catalogIndex, index, name)
+		}); err != nil {
+			return QueryCodegenConfig{}, err
 		}
 		datasetNames := map[string]bool{}
 		for _, dataset := range catalog.Bindings.SpannerExternalDatasets {

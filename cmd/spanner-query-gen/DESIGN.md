@@ -364,10 +364,12 @@ environment; it is not a universal production performance guarantee. Hint
 recommendations should be emitted as remediation text only and must not rewrite
 user SQL or config automatically.
 Reports should include the plan source (`api: analyze_query`,
-`render_tool: spannerplan`), backend identity fields even when the version and
-image digest are still `not_recorded`, `backend_identity.source` for the
-identity acquisition path, target inclusion/exclusion details, and
-operator-tree/operator-family normalization versions. They should also include
+`render_tool: spannerplan`), backend identity fields, and
+`backend_identity.source` for the identity acquisition path
+(`runtime_targets` for a configured cold-start pin, `manual` for an attached
+endpoint assertion, `external_unverified` when an attached endpoint has no
+assertion). Version and image digest may still be `not_recorded` for
+unverified attached runtimes. They should also include
 `report_version`, `contract_file_version`, and
 `contract_evaluator_version` when contracts are evaluated. Each target should
 have a canonical target ID such as `query/ScanSingerIDsFast` or
@@ -375,9 +377,11 @@ have a canonical target ID such as `query/ScanSingerIDsFast` or
 remains unambiguous if future report targets include outer SQL, writes, or DML.
 v1alpha query, write, catalog, binding, suppression, and contract names are
 identifiers (`[A-Za-z_][A-Za-z0-9_]*`) so target IDs do not need escaping.
-When the backend runtime cannot expose stable version or image digest fields,
-`plan-report` can record manually supplied `--backend-version` and
-`--backend-image-digest` values with `backend_identity.source: manual`.
+When attaching to an endpoint, `plan-report` can record manually supplied
+`--backend-version` and `--backend-image-digest` values with
+`backend_identity.source: manual`. A command-owned cold start records the
+exact `runtime_targets.json` pin instead of copying those flags over the
+configured image.
 Digest definitions are:
 
 - `sql_sha256`: rendered/generated SQL bytes for the target query.

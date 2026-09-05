@@ -3,7 +3,6 @@ package infoschem_test
 import (
 	"context"
 	"os"
-	"reflect"
 	"sort"
 	"strings"
 	"testing"
@@ -13,8 +12,7 @@ import (
 	database "cloud.google.com/go/spanner/admin/database/apiv1"
 	databasepb "cloud.google.com/go/spanner/admin/database/apiv1/databasepb"
 	"github.com/apstndb/spanalyzer/survey/astconv"
-	"github.com/cloudspannerecosystem/memefish"
-	"github.com/cloudspannerecosystem/memefish/ast"
+	"github.com/apstndb/spanalyzer/survey/infoschem"
 	"google.golang.org/grpc/status"
 )
 
@@ -23,6 +21,7 @@ import (
 // aggregate AST-family counts so database object identifiers never enter test
 // output. Count equality is not required because INFORMATION_SCHEMA cannot
 // recover every GetDatabaseDdl surface and can expose generated schema state.
+// This comparison is read-only; it does not create or drop fixtures.
 func TestCanonicalDDL_RealSpanner(t *testing.T) {
 	if os.Getenv("REQUIRE_REAL_SPANNER_CANONICAL") != "1" {
 		t.Skip("skipping managed-Spanner canonical comparison; run mise run test-canonical-real")
@@ -48,15 +47,17 @@ func TestCanonicalDDL_RealSpanner(t *testing.T) {
 		t.Fatalf("GetDatabaseDdl failed (code=%s)", status.Code(err))
 	}
 
-	canonicalCounts := make(map[string]int)
-	parseErrors := 0
-	for _, sql := range canonical.Statements {
-		ddl, err := memefish.ParseDDL("", sql)
-		if err != nil {
-			parseErrors++
-			continue
-		}
-		canonicalCounts[ddlFamily(ddl)]++
+	classified := infoschem.ClassifyCanonicalDDL(canonical.Statements, infoschem.DefaultCanonicalDDLAllowlist())
+	for _, fail := range classified.Unexpected {
+		t.Errorf("canonical DDL unexpected_parse family=%s sha256=%s error_class=%s", fail.Family, fail.SHA256, fail.ErrorClass)
+	}
+	if classified.Parsed+classified.Allowlisted != classified.Total {
+		t.Errorf(
+			"canonical DDL accounting parsed=%d allowlisted=%d total=%d",
+			classified.Parsed,
+			classified.Allowlisted,
+			classified.Total,
+		)
 	}
 
 	client, err := spanner.NewClient(ctx, databaseName)
@@ -75,11 +76,11 @@ func TestCanonicalDDL_RealSpanner(t *testing.T) {
 	}
 	generatedCounts := make(map[string]int)
 	for _, ddl := range generated {
-		generatedCounts[ddlFamily(ddl)]++
+		generatedCounts[infoschem.DDLFamilyName(ddl)]++
 	}
 
 	families := make(map[string]bool)
-	for name := range canonicalCounts {
+	for name := range classified.ParsedFamilies {
 		families[name] = true
 	}
 	for name := range generatedCounts {
@@ -92,22 +93,19 @@ func TestCanonicalDDL_RealSpanner(t *testing.T) {
 	sort.Strings(names)
 
 	t.Logf(
-		"canonical DDL diagnostic_metrics canonical_total=%d canonical_parse_errors=%d generated_total=%d",
-		len(canonical.Statements),
-		parseErrors,
+		"canonical DDL diagnostic_metrics canonical_total=%d canonical_parse_errors=%d canonical_allowlisted=%d generated_total=%d",
+		classified.Total,
+		len(classified.Unexpected),
+		classified.Allowlisted,
 		len(generated),
 	)
 	for _, name := range names {
 		t.Logf(
 			"canonical DDL diagnostic_family family=%s canonical=%d generated=%d delta=%+d",
 			name,
-			canonicalCounts[name],
+			classified.ParsedFamilies[name],
 			generatedCounts[name],
-			generatedCounts[name]-canonicalCounts[name],
+			generatedCounts[name]-classified.ParsedFamilies[name],
 		)
 	}
-}
-
-func ddlFamily(ddl ast.DDL) string {
-	return strings.TrimPrefix(reflect.TypeOf(ddl).String(), "*ast.")
 }

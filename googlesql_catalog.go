@@ -5,6 +5,7 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/cloudspannerecosystem/memefish/token"
 	googlesql "github.com/goccy/go-googlesql"
 )
 
@@ -439,6 +440,7 @@ func (c *GoogleSQLCatalog) newGoogleSQLPropertyGraph(graph *PropertyGraph) (*goo
 		addedLabels:          map[string]bool{},
 		nodeTables:           map[string]googlesql.GraphNodeTableNode{},
 	}
+	nodes := make([]*googlesql.SimpleGraphNodeTable, 0, len(graph.NodeTables))
 	for _, elem := range graph.NodeTables {
 		node, err := state.addNodeTable(elem)
 		if err != nil {
@@ -446,23 +448,27 @@ func (c *GoogleSQLCatalog) newGoogleSQLPropertyGraph(graph *PropertyGraph) (*goo
 		}
 		state.nodeTables[graphElementName(elem)] = node
 		state.nodeTables[elem.Name] = node
-		if err := state.addGraphDeclarationsAndLabels(); err != nil {
-			return nil, err
-		}
-		if err := out.AddNodeTable(node); err != nil {
-			return nil, err
-		}
+		nodes = append(nodes, node)
 	}
+	edges := make([]*googlesql.SimpleGraphEdgeTable, 0, len(graph.EdgeTables))
 	for _, elem := range graph.EdgeTables {
 		edge, err := state.addEdgeTable(elem)
 		if err != nil {
 			return nil, fmt.Errorf("property graph %s edge table %s: %w", graph.Name, elem.Name, err)
 		}
-		if err := state.addGraphDeclarationsAndLabels(); err != nil {
-			return nil, err
+		edges = append(edges, edge)
+	}
+	if err := state.addGraphDeclarationsAndLabels(); err != nil {
+		return nil, err
+	}
+	for i, node := range nodes {
+		if err := out.AddNodeTable(node); err != nil {
+			return nil, fmt.Errorf("property graph %s node table %s: %w", graph.Name, graph.NodeTables[i].Name, err)
 		}
+	}
+	for i, edge := range edges {
 		if err := out.AddEdgeTable(edge); err != nil {
-			return nil, err
+			return nil, fmt.Errorf("property graph %s edge table %s: %w", graph.Name, graph.EdgeTables[i].Name, err)
 		}
 	}
 	return out, nil
@@ -477,6 +483,7 @@ type propertyGraphBuildState struct {
 	addedDeclarations    map[string]bool
 	addedLabels          map[string]bool
 	nodeTables           map[string]googlesql.GraphNodeTableNode
+	keptOutputs          []*googlesql.AnalyzerOutput
 }
 
 type graphPropertyDeclaration struct {
@@ -587,7 +594,7 @@ func (s *propertyGraphBuildState) labelsAndDefinitions(table *Table, elem *Graph
 	definitions := []googlesql.GraphPropertyDefinitionNode{}
 	defined := map[string]bool{}
 	for _, label := range labels {
-		bindings, err := s.propertyBindings(table, label.Properties)
+		bindings, err := s.propertyBindings(elem, table, label.Properties)
 		if err != nil {
 			return nil, nil, err
 		}
@@ -620,7 +627,7 @@ func (s *propertyGraphBuildState) labelsAndDefinitions(table *Table, elem *Graph
 	return outLabels, definitions, nil
 }
 
-func (s *propertyGraphBuildState) propertyBindings(table *Table, props *GraphProperties) ([]graphPropertyBinding, error) {
+func (s *propertyGraphBuildState) propertyBindings(elem *GraphElement, table *Table, props *GraphProperties) ([]graphPropertyBinding, error) {
 	if props == nil || props.NoProperties {
 		return nil, nil
 	}
@@ -633,7 +640,7 @@ func (s *propertyGraphBuildState) propertyBindings(table *Table, props *GraphPro
 			}
 			typ, err := s.catalog.TypeSpecToGoogleSQLType(col.Type)
 			if err != nil {
-				return nil, fmt.Errorf("property %s: %w", col.Name, err)
+				return nil, fmt.Errorf("property graph %s element %s property %s: %w", s.graphName(), graphElementName(elem), col.Name, err)
 			}
 			bindings = append(bindings, graphPropertyBinding{name: col.Name, expr: col.Name, typ: typ})
 		}
@@ -648,24 +655,78 @@ func (s *propertyGraphBuildState) propertyBindings(table *Table, props *GraphPro
 		if col != nil {
 			typ, err := s.catalog.TypeSpecToGoogleSQLType(col.Type)
 			if err != nil {
-				return nil, fmt.Errorf("property %s: %w", prop.Name, err)
+				return nil, fmt.Errorf("property graph %s element %s property %s: %w", s.graphName(), graphElementName(elem), prop.Name, err)
 			}
 			bindings = append(bindings, graphPropertyBinding{name: prop.Name, expr: prop.SQL, typ: typ})
-		} else {
-			// Arbitrary expressions result in JSON properties in Spanner.
-			typ, err := s.catalog.TypeFactory.GetJson()
-			if err != nil {
-				return nil, err
-			}
-			bindings = append(bindings, graphPropertyBinding{name: prop.Name, expr: prop.SQL, typ: typ})
+			continue
 		}
+		typ, err := s.derivedPropertyType(elem, table, prop)
+		if err != nil {
+			return nil, err
+		}
+		bindings = append(bindings, graphPropertyBinding{name: prop.Name, expr: prop.SQL, typ: typ})
 	}
 	return bindings, nil
+}
+
+func (s *propertyGraphBuildState) derivedPropertyType(elem *GraphElement, table *Table, prop *GraphDerivedProperty) (googlesql.Googlesql_TypeNode, error) {
+	sql := fmt.Sprintf("SELECT (%s) FROM %s", prop.SQL, quoteObjectName(table.Name))
+	out, err := s.catalog.Helper().AnalyzeStatement(sql)
+	if err != nil {
+		return nil, fmt.Errorf("property graph %s element %s property %s: analyze derived expression: %w", s.graphName(), graphElementName(elem), prop.Name, err)
+	}
+	s.keptOutputs = append(s.keptOutputs, out)
+	stmt, err := out.ResolvedStatement()
+	if err != nil {
+		return nil, fmt.Errorf("property graph %s element %s property %s: resolve derived expression: %w", s.graphName(), graphElementName(elem), prop.Name, err)
+	}
+	query, ok := stmt.(*googlesql.ResolvedQueryStmt)
+	if !ok {
+		return nil, fmt.Errorf("property graph %s element %s property %s: derived expression resolved to %T, want query", s.graphName(), graphElementName(elem), prop.Name, stmt)
+	}
+	n, err := query.OutputColumnListSize()
+	if err != nil {
+		return nil, fmt.Errorf("property graph %s element %s property %s: derived expression output: %w", s.graphName(), graphElementName(elem), prop.Name, err)
+	}
+	if n != 1 {
+		return nil, fmt.Errorf("property graph %s element %s property %s: derived expression output columns = %d, want 1", s.graphName(), graphElementName(elem), prop.Name, n)
+	}
+	outCol, err := query.OutputColumnList2(0)
+	if err != nil {
+		return nil, fmt.Errorf("property graph %s element %s property %s: derived expression output column: %w", s.graphName(), graphElementName(elem), prop.Name, err)
+	}
+	resolvedCol, err := outCol.Column()
+	if err != nil {
+		return nil, fmt.Errorf("property graph %s element %s property %s: derived expression column: %w", s.graphName(), graphElementName(elem), prop.Name, err)
+	}
+	typ, err := resolvedCol.Type()
+	if err != nil {
+		return nil, fmt.Errorf("property graph %s element %s property %s: derived expression type: %w", s.graphName(), graphElementName(elem), prop.Name, err)
+	}
+	if typ == nil {
+		return nil, fmt.Errorf("property graph %s element %s property %s: derived expression type is nil", s.graphName(), graphElementName(elem), prop.Name)
+	}
+	return typ, nil
+}
+
+func (s *propertyGraphBuildState) graphName() string {
+	if len(s.graphNamePath) == 0 {
+		return ""
+	}
+	return s.graphNamePath[len(s.graphNamePath)-1]
 }
 
 func (s *propertyGraphBuildState) propertyDeclaration(name string, typ googlesql.Googlesql_TypeNode) (googlesql.GraphPropertyDeclarationNode, error) {
 	key := strings.ToLower(name)
 	if existing := s.propertyDeclarations[key]; existing != nil {
+		compatible, err := googleSQLTypesCompatible(existing.typ, typ)
+		if err != nil {
+			return nil, fmt.Errorf("property graph %s property %s: compare types: %w", s.graphName(), name, err)
+		}
+		if !compatible {
+			oldType, newType := googleSQLTypeDebug(existing.typ), googleSQLTypeDebug(typ)
+			return nil, fmt.Errorf("property graph %s property %s has incompatible types %s and %s", s.graphName(), name, oldType, newType)
+		}
 		return existing.decl, nil
 	}
 	decl, err := googlesql.NewSimpleGraphPropertyDeclaration(name, s.graphNamePath, typ)
@@ -674,6 +735,31 @@ func (s *propertyGraphBuildState) propertyDeclaration(name string, typ googlesql
 	}
 	s.propertyDeclarations[key] = &graphPropertyDeclaration{typ: typ, decl: decl}
 	return decl, nil
+}
+
+func googleSQLTypesCompatible(left, right googlesql.Googlesql_TypeNode) (bool, error) {
+	if left == nil || right == nil {
+		return false, fmt.Errorf("nil GoogleSQL type")
+	}
+	equal, err := left.Equals(right)
+	if err != nil {
+		return false, err
+	}
+	if equal {
+		return true, nil
+	}
+	return left.Equivalent(right)
+}
+
+func googleSQLTypeDebug(typ googlesql.Googlesql_TypeNode) string {
+	if typ == nil {
+		return "unknown"
+	}
+	key, err := typ.DebugString(false)
+	if err != nil || key == "" {
+		return "unknown"
+	}
+	return key
 }
 
 func (s *propertyGraphBuildState) label(name string, propertyDeclarations []googlesql.GraphPropertyDeclarationNode) (googlesql.GraphElementLabelNode, error) {
@@ -747,6 +833,17 @@ func (s *propertyGraphBuildState) nodeTableReference(edgeTable *Table, endpoint 
 		return nil, err
 	}
 	return googlesql.NewSimpleGraphNodeTableReference(node, edgeCols, nodeCols)
+}
+
+func quoteObjectName(name ObjectName) string {
+	if len(name.Parts) == 0 {
+		return token.QuoteSQLIdent(name.String())
+	}
+	parts := make([]string, len(name.Parts))
+	for i, part := range name.Parts {
+		parts[i] = token.QuoteSQLIdent(part)
+	}
+	return strings.Join(parts, ".")
 }
 
 func graphElementName(elem *GraphElement) string {

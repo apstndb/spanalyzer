@@ -33,7 +33,7 @@ and contract evaluation live in the reusable
 [`github.com/apstndb/spanalyzer/plancontract`](../../plancontract) nested
 module and are consumed by `plan-report`; that module also works against
 plans obtained outside this command. See the repository README for the
-four-module layout.
+five-module layout.
 
 ## Documentation Map
 
@@ -52,6 +52,10 @@ four-module layout.
 
 ## Usage
 
+Run these examples from the repository root. The generation and check commands
+use the same output override; without it, checks use the config-relative
+`go.out` path instead.
+
 ```sh
 go run ./cmd/spanner-query-gen generate \
   --config testdata/querygen.yaml \
@@ -59,10 +63,12 @@ go run ./cmd/spanner-query-gen generate \
 
 go run ./cmd/spanner-query-gen generate \
   --config testdata/querygen.yaml \
+  --out /tmp/querydemo.sql.go \
   --check
 
 go run ./cmd/spanner-query-gen check \
-  --config testdata/querygen.yaml
+  --config testdata/querygen.yaml \
+  --out /tmp/querydemo.sql.go
 
 go run ./cmd/spanner-query-gen explain-plan \
   --config testdata/querygen.yaml \
@@ -137,9 +143,13 @@ In v1alpha, `--require-optimizer-pinning` checks optimizer options requested by
 Moving aliases are not pins: optimizer versions `latest`, `latest_version`,
 and `default_version`, and optimizer statistics package `latest`, cause
 `--require-optimizer-pinning` to fail just like an omitted value.
-`--backend-version` and `--backend-image-digest` can record manually pinned
-backend identity evidence when the runtime cannot expose it directly; when they
-are omitted, version and image digest remain `not_recorded`.
+`--backend-version` and `--backend-image-digest` are identity assertions.
+A command-owned Omni cold start records the exact `runtime_targets.json` pin as
+`backend_identity.source: runtime_targets`; conflicting flags are rejected.
+An attached Omni endpoint preserves those flags as `source: manual`. When an
+attached endpoint has no flags, the report records `source: external_unverified`
+with version and image digest `not_recorded`. The report never claims
+spanemuboost observed a running container image digest.
 Top-level `plan-report` status describes artifact production. It does not mean
 every query target was successfully planned. Use `target_summary.planned`,
 `target_summary.errors`, `target_summary.skipped`, and `queries[].status` for
@@ -233,9 +243,9 @@ Usage of spanner-query-gen plan-report:
   -backend string
         runtime backend: omni (default "omni")
   -backend-image-digest string
-        backend container image digest to record in backend_identity, for example sha256:<64 hex chars>
+        attached-endpoint identity assertion, or a cold-start check that must match the configured Omni pin digest, for example sha256:<64 hex chars>
   -backend-version string
-        backend version to record in backend_identity
+        attached-endpoint identity assertion, or a cold-start check that must match the configured Omni pin tag
   -check
         evaluate --contracts and fail when a contract is violated
   -config string
@@ -492,14 +502,17 @@ direct `forbid.operator_family` rules, CEL inputs, normalized topology fields,
 
 Machine-readable reports include `plan_source.api: analyze_query`,
 `plan_source.render_tool: spannerplan`, backend identity fields with
-`source: spanemuboost` when collected from the runtime defaults or
+`source: runtime_targets` for a command-owned Omni cold-start pin,
 `source: manual` when `--backend-version` / `--backend-image-digest` supplied
-caller assertions, canonical target IDs such as `query/ScanSingerIDsFast` and
-`query/ExternalQuerySingerIDs#inner`, target inclusion/exclusion details, and
-normalization versions for the operator tree digest and operator-family mapping.
+caller assertions on an attached endpoint, or `source: external_unverified`
+when an attached endpoint has no assertion, canonical target IDs such as
+`query/ScanSingerIDsFast` and `query/ExternalQuerySingerIDs#inner`, target
+inclusion/exclusion details, and normalization versions for the operator tree
+digest and operator-family mapping.
 `source: manual` is recorded as self-reported provenance, not as observed
-backend evidence; `source: not_recorded` means both backend identity fields are
-`not_recorded`.
+backend evidence; `source: external_unverified` means both backend identity
+fields are `not_recorded`. `source: runtime_targets` is the configured pin, not
+an observation of a running container.
 They also include `normalization.cel_input_defaults`, which records the replay
 defaults used by CEL evaluation for absent optional fields in `operators[]` and
 `operator_edges[]` in canonical order. CEL expressions that use raw

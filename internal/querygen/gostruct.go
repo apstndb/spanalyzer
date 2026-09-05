@@ -179,9 +179,9 @@ func generateGoStructsWithExtra(structs []namedGoStruct, options GoStructOptions
 		return "", err
 	}
 	gen := &goStructGenerator{
-		target:  options.Target,
-		imports: map[string]string{},
-		used:    map[string]bool{},
+		target:      options.Target,
+		imports:     map[string]string{},
+		usedOrigins: map[string]string{},
 	}
 	roots := make([]generatedStruct, 0, len(structs))
 	for _, st := range structs {
@@ -189,7 +189,11 @@ func generateGoStructsWithExtra(structs []namedGoStruct, options GoStructOptions
 		if name == "" {
 			name = options.StructName
 		}
-		roots = append(roots, gen.buildStruct(exportedIdentifier(name, "QueryRow"), st.Fields))
+		exported := exportedIdentifier(name, "QueryRow")
+		roots = append(roots, gen.buildStruct(exported, "generated struct "+exported, st.Fields))
+	}
+	if gen.err != nil {
+		return "", gen.err
 	}
 	if gen.needsBigQueryLoad {
 		gen.imports["cloud.google.com/go/bigquery"] = ""
@@ -263,13 +267,8 @@ func generateGoStructsWithExtra(structs []namedGoStruct, options GoStructOptions
 
 func writeGoConstants(b *bytes.Buffer, constants []generatedGoConst) {
 	b.WriteString("const (\n")
-	used := map[string]bool{}
 	for i, constant := range constants {
-		name := exportedIdentifier(constant.Name, fmt.Sprintf("Query%dSQL", i+1))
-		if !strings.HasSuffix(name, "SQL") {
-			name += "SQL"
-		}
-		name = uniqueIdentifier(name, used)
+		name := emittedSQLConstantName(constant.Name, fmt.Sprintf("Query%dSQL", i+1))
 		fmt.Fprintf(b, "\t%s = %s\n", name, strconv.Quote(constant.Value))
 	}
 	b.WriteString(")\n")
@@ -279,20 +278,29 @@ type goStructGenerator struct {
 	target            GoStructTarget
 	imports           map[string]string
 	structs           []generatedStruct
-	used              map[string]bool
+	usedOrigins       map[string]string
+	err               error
 	needsBigQueryLoad bool
 	needsNullValue    bool
 	needsAssignValue  bool
 	needsValueSlice   bool
 }
 
-func (g *goStructGenerator) buildStruct(name string, fields []goResultField) generatedStruct {
-	st := generatedStruct{Name: g.uniqueTypeName(name)}
+func (g *goStructGenerator) buildStruct(name, origin string, fields []goResultField) generatedStruct {
+	exported := exportedIdentifier(name, "GeneratedStruct")
+	if origin == "" {
+		origin = "generated struct " + exported
+	}
+	st := generatedStruct{Name: g.uniqueTypeName(exported, origin)}
 	usedFields := map[string]bool{}
 	for i, field := range fields {
 		fieldName := exportedIdentifier(field.Name, fmt.Sprintf("Field%d", i+1))
 		nestedName := st.Name + fieldName
-		for _, out := range g.generatedFields(field, fieldName, nestedName) {
+		nestedOrigin := origin + " nested struct " + exportedIdentifier(nestedName, "GeneratedStruct")
+		if field.Name != "" {
+			nestedOrigin += " field " + field.Name
+		}
+		for _, out := range g.generatedFields(field, fieldName, nestedName, nestedOrigin) {
 			out.Name = uniqueIdentifier(out.Name, usedFields)
 			usedFields[out.Name] = true
 			st.Fields = append(st.Fields, out)
@@ -301,17 +309,17 @@ func (g *goStructGenerator) buildStruct(name string, fields []goResultField) gen
 	return st
 }
 
-func (g *goStructGenerator) generatedFields(field goResultField, fieldName, nestedName string) []generatedField {
+func (g *goStructGenerator) generatedFields(field goResultField, fieldName, nestedName, nestedOrigin string) []generatedField {
 	switch g.target {
 	case GoStructTargetBigQuery:
-		typ := g.typeForClient(field, "bigquery", nestedName)
+		typ := g.typeForClient(field, "bigquery", nestedName, nestedOrigin)
 		return []generatedField{{Name: fieldName, Type: typ.Expr, Tags: map[string]string{"bigquery": field.Name}, SourceName: field.Name}}
 	case GoStructTargetSpanner:
-		typ := g.typeForClient(field, "spanner", nestedName)
+		typ := g.typeForClient(field, "spanner", nestedName, nestedOrigin)
 		return []generatedField{{Name: fieldName, Type: typ.Expr, Tags: map[string]string{"spanner": field.Name}, SourceName: field.Name}}
 	default:
 		g.needsBigQueryLoad = true
-		typ := g.typeForClient(field, "both", nestedName)
+		typ := g.typeForClient(field, "both", nestedName, nestedOrigin)
 		loadKind := "value"
 		if field.Repeated && isStructLikeGoResultField(field) {
 			loadKind = "struct_slice"
@@ -346,16 +354,16 @@ func isStructLikeGoResultField(field goResultField) bool {
 	return false
 }
 
-func (g *goStructGenerator) typeForClient(field goResultField, client, nestedName string) goType {
+func (g *goStructGenerator) typeForClient(field goResultField, client, nestedName, origin string) goType {
 	if field.Repeated {
 		elem := field
 		elem.Repeated = false
 		elem.Nullable = false
-		typ := g.typeForClient(elem, client, nestedName)
+		typ := g.typeForClient(elem, client, nestedName, origin)
 		return goType{Expr: "[]" + typ.Expr}
 	}
 	if field.Kind == "STRUCT" {
-		st := g.buildStruct(nestedName, field.Fields)
+		st := g.buildStruct(nestedName, origin, field.Fields)
 		g.structs = append(g.structs, st)
 		if field.Nullable {
 			return goType{Expr: "*" + st.Name}
@@ -579,9 +587,19 @@ func (g *goStructGenerator) imported(path, expr string) goType {
 	return goType{Expr: expr}
 }
 
-func (g *goStructGenerator) uniqueTypeName(name string) string {
+func (g *goStructGenerator) uniqueTypeName(name, origin string) string {
 	name = exportedIdentifier(name, "GeneratedStruct")
-	return uniqueIdentifier(name, g.used)
+	if g.usedOrigins == nil {
+		g.usedOrigins = map[string]string{}
+	}
+	if previous, ok := g.usedOrigins[name]; ok {
+		if g.err == nil {
+			g.err = fmt.Errorf("generated symbol %s is emitted by both %s and %s", name, previous, origin)
+		}
+		return name
+	}
+	g.usedOrigins[name] = origin
+	return name
 }
 
 func writeGeneratedStruct(b *bytes.Buffer, st generatedStruct) {
