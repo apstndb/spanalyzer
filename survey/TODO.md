@@ -1,5 +1,7 @@
 # TODO
 
+## Reconstruction correctness (2026-09-09)
+
 - [x] Skip the built-in `default` locality group in `toLocalityGroupsDDL` and
   document that `ALTER LOCALITY GROUP default` is not recoverable.
 - [x] Skip `IS_DEFAULT` placements and their options in `toPlacementsDDL`.
@@ -9,6 +11,7 @@
   `enable_key_visualizer` keys.
 - [x] Account for allowlisted canonical families in diagnostic counts and mark
   documented expected deltas.
+- [x] Set `GOWORK=off` on survey mise live-test tasks.
 - [ ] Confirm whether `GetDatabaseDdl` retains
   `ALTER STATISTICS ... SET OPTIONS (allow_gc = false)` pins. A managed
   database with one `ALLOW_GC=false` package returned zero `ALTER STATISTICS`

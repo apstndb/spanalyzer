@@ -8,15 +8,17 @@ run = "go test ./..."
 
 [tasks.test-drift-emulator]
 description = "Run drift test against Cloud Spanner Emulator"
+env = { GOWORK = "off" }
 run = "go test -v -run TestDrift_EmulatorTableMetas ./infoschem"
 
 [tasks.test-drift-omni]
 description = "Run drift test against Spanner Omni"
+env = { GOWORK = "off" }
 run = "go test -v -run TestDrift_OmniTableMetas ./infoschem"
 
 [tasks.test-drift-real]
 description = "Required real-Spanner drift gate (fails unless TEST_REAL_SPANNER_DATABASE is configured)"
-env = { REQUIRE_REAL_SPANNER_DRIFT = "1" }
+env = { GOWORK = "off", REQUIRE_REAL_SPANNER_DRIFT = "1" }
 run = "go test -v -run TestDrift_RealTableMetas ./infoschem"
 
 [tasks.capture-infoschema-managed]
@@ -71,22 +73,22 @@ run = "go run ./cmd/spanner-sys-capture check --target omni --repo-root .."
 
 [tasks.test-uuid-real]
 description = "Managed-Spanner UUID metadata and reconstruction fixture"
-env = { REQUIRE_REAL_SPANNER_UUID = "1" }
+env = { GOWORK = "off", REQUIRE_REAL_SPANNER_UUID = "1" }
 run = "go test -v -run TestUUID_RealSpanner ./infoschem"
 
 [tasks.test-canonical-real]
 description = "Read-only managed-Spanner canonical DDL aggregate comparison"
-env = { REQUIRE_REAL_SPANNER_CANONICAL = "1" }
+env = { GOWORK = "off", REQUIRE_REAL_SPANNER_CANONICAL = "1" }
 run = "go test -v -run TestCanonicalDDL_RealSpanner ./infoschem"
 
 [tasks.test-expression-index-real]
 description = "Cleanup-safe managed-Spanner expression-index metadata and syntax fixture"
-env = { REQUIRE_REAL_SPANNER_EXPRESSION_INDEX = "1" }
+env = { GOWORK = "off", REQUIRE_REAL_SPANNER_EXPRESSION_INDEX = "1" }
 run = "go test -v -run TestExpressionIndex_RealSpanner ./infoschem"
 
 [tasks.test-managed-current]
 description = "Run current managed-Spanner verification tests; mutation fixtures create collision-safe temporary objects and clean them up"
-env = { REQUIRE_REAL_SPANNER_CANONICAL = "1", REQUIRE_REAL_SPANNER_DRIFT = "1", REQUIRE_REAL_SPANNER_EXPRESSION_INDEX = "1", REQUIRE_REAL_SPANNER_UUID = "1" }
+env = { GOWORK = "off", REQUIRE_REAL_SPANNER_CANONICAL = "1", REQUIRE_REAL_SPANNER_DRIFT = "1", REQUIRE_REAL_SPANNER_EXPRESSION_INDEX = "1", REQUIRE_REAL_SPANNER_UUID = "1" }
 run = "go test -count=1 -v -run 'Test(CanonicalDDL_RealSpanner|Drift_RealTableMetas|ExpressionIndex_RealSpanner|UUID_RealSpanner)$' ./infoschem"
 
 [tasks.run-roundtrip]
