@@ -235,6 +235,15 @@ enumerating a fixed allowlist. This includes custom full-text dictionary table
 options, `columnar_policy` on database/table/index objects, and database
 schema-drop-protection options.
 
+Database options are preserved the same way, except two `DATABASE_OPTIONS`
+keys that `GetDatabaseDdl` is observed not to emit: `database_dialect` (a
+read-only dialect marker, never DDL-settable) and `enable_key_visualizer`
+(observed 2026-09-09: a managed database with
+`DATABASE_OPTIONS.enable_key_visualizer = TRUE` returned an `ALTER DATABASE`
+statement containing only `default_sequence_kind`). Those two keys are
+dropped on reconstruction; every other name, including schema-drop-protection
+options, is preserved.
+
 A 2026-08-25 managed-Spanner probe returned these live `TABLE_OPTIONS` shapes:
 
 - `fulltext_dictionary_table`: `BOOL`, value `TRUE`

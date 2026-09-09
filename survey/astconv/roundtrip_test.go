@@ -1205,6 +1205,12 @@ func TestRoundtrip_AlterDatabase(t *testing.T) {
 		t.Fatalf("FromDDLStatements: %v", err)
 	}
 
+	if schema.DatabaseName != "my_db" {
+		t.Errorf("DatabaseName = %q, want my_db", schema.DatabaseName)
+	}
+	if len(schema.Schemata) != 0 {
+		t.Errorf("Schemata = %d, want 0 (ALTER DATABASE must not write CatalogName)", len(schema.Schemata))
+	}
 	if len(schema.DatabaseOptions) != 1 {
 		t.Fatalf("expected 1 database option, got %d", len(schema.DatabaseOptions))
 	}

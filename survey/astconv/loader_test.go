@@ -9,6 +9,27 @@ import (
 	"github.com/cloudspannerecosystem/memefish/ast"
 )
 
+func TestDatabaseIDFromResource(t *testing.T) {
+	tests := []struct {
+		name     string
+		resource string
+		want     string
+	}{
+		{name: "full resource", resource: "projects/P/instances/I/databases/D", want: "D"},
+		{name: "bare id", resource: "D", want: "D"},
+		{name: "empty", resource: "", want: ""},
+		{name: "whitespace", resource: "  ", want: ""},
+		{name: "trailing slash", resource: "projects/P/instances/I/databases/D/", want: "D"},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := databaseIDFromResource(tt.resource); got != tt.want {
+				t.Errorf("databaseIDFromResource(%q) = %q, want %q", tt.resource, got, tt.want)
+			}
+		})
+	}
+}
+
 var loaderSampleDDLs = []string{
 	"CREATE SCHEMA app",
 

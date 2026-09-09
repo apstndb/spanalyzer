@@ -3,6 +3,7 @@ package astconv
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"cloud.google.com/go/spanner"
 	"github.com/apstndb/spanalyzer/survey/infoschem"
@@ -20,7 +21,12 @@ func LoadSchema(ctx context.Context, client *spanner.Client) (*Schema, error) {
 		return nil, fmt.Errorf("discover columns: %w", err)
 	}
 	infoschem.WarnUnknownColumns(discovered)
-	return loadSchemaWithTxn(ctx, txn, discovered)
+	schema, err := loadSchemaWithTxn(ctx, txn, discovered)
+	if err != nil {
+		return nil, err
+	}
+	schema.DatabaseName = databaseIDFromResource(client.DatabaseName())
+	return schema, nil
 }
 
 // LoadSchemaFromDiscovered populates an astconv.Schema from a fresh discovery
@@ -35,7 +41,26 @@ func LoadSchemaFromDiscovered(ctx context.Context, client *spanner.Client, disco
 		return nil, fmt.Errorf("discover columns in schema read transaction: %w", err)
 	}
 	infoschem.WarnUnknownColumns(effectiveDiscovered)
-	return loadSchemaWithTxn(ctx, txn, effectiveDiscovered)
+	schema, err := loadSchemaWithTxn(ctx, txn, effectiveDiscovered)
+	if err != nil {
+		return nil, err
+	}
+	schema.DatabaseName = databaseIDFromResource(client.DatabaseName())
+	return schema, nil
+}
+
+// databaseIDFromResource returns the database ID from a Spanner database
+// resource name such as projects/P/instances/I/databases/D. A bare ID is
+// returned unchanged. Empty input yields "".
+func databaseIDFromResource(resource string) string {
+	resource = strings.Trim(strings.TrimSpace(resource), "/")
+	if resource == "" {
+		return ""
+	}
+	if i := strings.LastIndex(resource, "/"); i >= 0 {
+		return resource[i+1:]
+	}
+	return resource
 }
 
 // loadSchemaWithTxn populates an astconv.Schema using the supplied transaction.

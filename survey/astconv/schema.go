@@ -37,6 +37,10 @@ type Schema struct {
 	Placements             []*infoschem.Placement
 	PlacementOptions       []*infoschem.PlacementOption
 	Schemata               []*infoschem.Schema
+	// DatabaseName is the AST-facing database identity used by ALTER DATABASE.
+	// It is never recoverable from INFORMATION_SCHEMA; the loader fills it from
+	// the Spanner client's database resource name.
+	DatabaseName           string
 	DatabaseOptions        []*infoschem.DatabaseOption
 	SpannerStatistics      []*infoschem.SpannerStatistic
 	Roles                  []*infoschem.Role

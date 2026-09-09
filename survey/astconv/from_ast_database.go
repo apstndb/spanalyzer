@@ -6,23 +6,11 @@ import (
 )
 
 func fromAlterDatabase(s *Schema, ad *ast.AlterDatabase) error {
+	if ad.Name != nil && ad.Name.Name != "" {
+		s.DatabaseName = ad.Name.Name
+	}
 	if ad.Options == nil {
 		return nil
-	}
-
-	// Make sure we have a schema entry with CatalogName set so toDatabaseDDL can find it
-	var found bool
-	for _, sch := range s.Schemata {
-		if sch.CatalogName != "" {
-			sch.CatalogName = ad.Name.Name
-			found = true
-			break
-		}
-	}
-	if !found {
-		s.Schemata = append(s.Schemata, &infoschem.Schema{
-			CatalogName: ad.Name.Name,
-		})
 	}
 
 	for _, opt := range ad.Options.Records {

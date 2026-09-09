@@ -4,6 +4,9 @@
   document that `ALTER LOCALITY GROUP default` is not recoverable.
 - [x] Skip `IS_DEFAULT` placements and their options in `toPlacementsDDL`.
 - [x] Emit `ALTER STATISTICS` only for `AllowGC == false`.
+- [x] Populate `Schema.DatabaseName` from the client resource and from
+  `ALTER DATABASE`; omit only the non-canonical `database_dialect` and
+  `enable_key_visualizer` keys.
 - [ ] Confirm whether `GetDatabaseDdl` retains
   `ALTER STATISTICS ... SET OPTIONS (allow_gc = false)` pins. A managed
   database with one `ALLOW_GC=false` package returned zero `ALTER STATISTICS`
