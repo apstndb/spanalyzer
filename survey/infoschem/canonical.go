@@ -45,7 +45,10 @@ type CanonicalClassification struct {
 	Parsed         int
 	Allowlisted    int
 	ParsedFamilies map[string]int
-	Unexpected     []CanonicalParseFailure
+	// AllowlistedFamilies counts unparsed families for exact-allowlist matches.
+	// These statements are not counted in ParsedFamilies.
+	AllowlistedFamilies map[string]int
+	Unexpected          []CanonicalParseFailure
 }
 
 // DefaultCanonicalDDLAllowlist is the managed-gate exception list. Keep it
@@ -66,8 +69,9 @@ func ClassifyCanonicalDDL(statements []string, allowlist []CanonicalAllowlistEnt
 		allowed[entry.SHA256] = entry.ErrorClass
 	}
 	out := CanonicalClassification{
-		Total:          len(statements),
-		ParsedFamilies: map[string]int{},
+		Total:               len(statements),
+		ParsedFamilies:      map[string]int{},
+		AllowlistedFamilies: map[string]int{},
 	}
 	for _, sql := range statements {
 		sum := sha256.Sum256([]byte(sql))
@@ -83,6 +87,7 @@ func ClassifyCanonicalDDL(statements []string, allowlist []CanonicalAllowlistEnt
 		family := unparsedDDLFamily(sql)
 		if wantClass, ok := allowed[digest]; ok && wantClass == class {
 			out.Allowlisted++
+			out.AllowlistedFamilies[family]++
 			continue
 		}
 		out.Unexpected = append(out.Unexpected, CanonicalParseFailure{

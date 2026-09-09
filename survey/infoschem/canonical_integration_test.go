@@ -2,6 +2,7 @@ package infoschem_test
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"sort"
 	"strings"
@@ -15,6 +16,13 @@ import (
 	"github.com/apstndb/spanalyzer/survey/infoschem"
 	"google.golang.org/grpc/status"
 )
+
+// expectedCanonicalFamilyDeltas names families whose canonical-versus-generated
+// count difference is documented. Reasons are for maintainers and must not be
+// logged; the integration test emits only expected=true.
+var expectedCanonicalFamilyDeltas = map[string]string{
+	"AlterTable": "canonical ALTER TABLE ADD CONSTRAINT is folded into CREATE TABLE",
+}
 
 // TestCanonicalDDL_RealSpanner verifies that the current managed database can
 // pass through LoadSchema and ToDDLStatements. It deliberately reports only
@@ -83,6 +91,9 @@ func TestCanonicalDDL_RealSpanner(t *testing.T) {
 	for name := range classified.ParsedFamilies {
 		families[name] = true
 	}
+	for name := range classified.AllowlistedFamilies {
+		families[name] = true
+	}
 	for name := range generatedCounts {
 		families[name] = true
 	}
@@ -100,12 +111,21 @@ func TestCanonicalDDL_RealSpanner(t *testing.T) {
 		len(generated),
 	)
 	for _, name := range names {
-		t.Logf(
+		canonicalCount := classified.ParsedFamilies[name] + classified.AllowlistedFamilies[name]
+		delta := generatedCounts[name] - canonicalCount
+		line := fmt.Sprintf(
 			"canonical DDL diagnostic_family family=%s canonical=%d generated=%d delta=%+d",
 			name,
-			classified.ParsedFamilies[name],
+			canonicalCount,
 			generatedCounts[name],
-			generatedCounts[name]-classified.ParsedFamilies[name],
+			delta,
 		)
+		if n := classified.AllowlistedFamilies[name]; n != 0 {
+			line += fmt.Sprintf(" canonical_allowlisted=%d", n)
+		}
+		if _, expected := expectedCanonicalFamilyDeltas[name]; expected {
+			line += " expected=true"
+		}
+		t.Log(line)
 	}
 }

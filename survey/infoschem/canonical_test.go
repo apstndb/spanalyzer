@@ -96,6 +96,9 @@ func TestClassifyCanonicalDDL_ExactAllowlistMatch(t *testing.T) {
 	if len(got.ParsedFamilies) != 0 {
 		t.Fatalf("allowlisted statement counted as parsed family data: %#v", got.ParsedFamilies)
 	}
+	if got.AllowlistedFamilies["CreateTable"] != 1 {
+		t.Fatalf("allowlisted families = %#v, want CreateTable=1", got.AllowlistedFamilies)
+	}
 }
 
 func TestClassifyCanonicalDDL_HashMismatchIsUnexpected(t *testing.T) {
@@ -158,6 +161,9 @@ func TestClassifyCanonicalDDL_FullAccounting(t *testing.T) {
 	}
 	if got.ParsedFamilies["CreateTable"] != 1 {
 		t.Fatalf("parsed families = %#v, want only the successful statement", got.ParsedFamilies)
+	}
+	if got.AllowlistedFamilies["CreateTable"] != 1 {
+		t.Fatalf("allowlisted families = %#v, want CreateTable=1", got.AllowlistedFamilies)
 	}
 }
 
