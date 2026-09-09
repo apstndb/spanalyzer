@@ -1111,6 +1111,9 @@ func TestRoundtrip_Placement(t *testing.T) {
 	if schema.Placements[0].PlacementName != "regional_placement" {
 		t.Errorf("PlacementName = %q, want regional_placement", schema.Placements[0].PlacementName)
 	}
+	if schema.Placements[0].IsDefault {
+		t.Error("AST-originated placement IsDefault = true, want false")
+	}
 
 	reconDDLs, err := schema.ToDDLStatements()
 	if err != nil {
@@ -1130,6 +1133,62 @@ func TestRoundtrip_Placement(t *testing.T) {
 	}
 	if !found {
 		t.Error("regional_placement not found in reconstructed DDL")
+	}
+}
+
+func TestToPlacementsDDL_SkipsDefaultPlacement(t *testing.T) {
+	schema := &Schema{
+		Placements: []*infoschem.Placement{
+			{PlacementName: "default_placement", IsDefault: true},
+			{PlacementName: "regional_placement", IsDefault: false},
+		},
+		PlacementOptions: []*infoschem.PlacementOption{
+			{
+				PlacementName: "default_placement",
+				OptionName:    "default_leader",
+				OptionType:    "STRING",
+				OptionValue:   "'us-central1'",
+			},
+			{
+				PlacementName: "regional_placement",
+				OptionName:    "default_leader",
+				OptionType:    "STRING",
+				OptionValue:   "'us-east1'",
+			},
+		},
+	}
+
+	ddls, err := schema.ToDDLStatements()
+	if err != nil {
+		t.Fatalf("ToDDLStatements: %v", err)
+	}
+	if got := len(ddls); got != 1 {
+		t.Fatalf("DDL statements = %d, want 1", got)
+	}
+	placement, ok := ddls[0].(*ast.CreatePlacement)
+	if !ok {
+		t.Fatalf("DDL type = %T, want *ast.CreatePlacement", ddls[0])
+	}
+	if placement.Name.Name != "regional_placement" {
+		t.Fatalf("emitted placement = %q, want regional_placement", placement.Name.Name)
+	}
+	if placement.Options == nil || len(placement.Options.Records) != 1 {
+		t.Fatalf("regional_placement options = %#v, want 1", placement.Options)
+	}
+
+	stmt, err := memefish.ParseDDL("", `CREATE PLACEMENT regional_placement OPTIONS (default_leader = 'us-east1')`)
+	if err != nil {
+		t.Fatalf("ParseDDL: %v", err)
+	}
+	fromSchema, err := FromDDLStatements([]ast.DDL{stmt})
+	if err != nil {
+		t.Fatalf("FromDDLStatements: %v", err)
+	}
+	if len(fromSchema.Placements) != 1 {
+		t.Fatalf("AST placements = %d, want 1", len(fromSchema.Placements))
+	}
+	if fromSchema.Placements[0].IsDefault {
+		t.Error("fromCreatePlacement IsDefault = true, want false")
 	}
 }
 

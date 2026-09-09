@@ -12,6 +12,9 @@ func (s *Schema) toPlacementsDDL() ([]ast.DDL, error) {
 
 	var ddls []ast.DDL
 	for _, p := range s.Placements {
+		if p.IsDefault {
+			continue
+		}
 		cp := &ast.CreatePlacement{
 			Name: ident(p.PlacementName),
 		}

@@ -14,12 +14,18 @@ func (s *Schema) toLocalityGroupsDDL() ([]ast.DDL, error) {
 	groupNames := make(map[string]bool)
 	orderedNames := make([]string, 0, len(s.LocalityGroups)+len(s.LocalityGroupOptions))
 	for _, group := range s.LocalityGroups {
+		if isBuiltinDefaultLocalityGroup(group.LocalityGroupName) {
+			continue
+		}
 		if !groupNames[group.LocalityGroupName] {
 			groupNames[group.LocalityGroupName] = true
 			orderedNames = append(orderedNames, group.LocalityGroupName)
 		}
 	}
 	for _, opt := range s.LocalityGroupOptions {
+		if isBuiltinDefaultLocalityGroup(opt.LocalityGroupName) {
+			continue
+		}
 		if !groupNames[opt.LocalityGroupName] {
 			groupNames[opt.LocalityGroupName] = true
 			orderedNames = append(orderedNames, opt.LocalityGroupName)
@@ -52,4 +58,8 @@ func (s *Schema) toLocalityGroupsDDL() ([]ast.DDL, error) {
 		ddls = append(ddls, clg)
 	}
 	return ddls, nil
+}
+
+func isBuiltinDefaultLocalityGroup(name string) bool {
+	return strings.EqualFold(name, "default")
 }

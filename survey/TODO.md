@@ -1,5 +1,9 @@
 # TODO
 
+- [x] Skip the built-in `default` locality group in `toLocalityGroupsDDL` and
+  document that `ALTER LOCALITY GROUP default` is not recoverable.
+- [x] Skip `IS_DEFAULT` placements and their options in `toPlacementsDDL`.
+
 ## Use a fresh UUID cleanup context (2026-09-02)
 
 - [x] Give deferred UUID fixture DROP a fresh bounded background context so a

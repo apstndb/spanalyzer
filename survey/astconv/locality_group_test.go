@@ -127,6 +127,69 @@ func TestLocalityGroupsRejectMalformedEmulatorOption(t *testing.T) {
 	}
 }
 
+func TestToLocalityGroupsDDL_SkipsBuiltinDefaultGroup(t *testing.T) {
+	schema := &Schema{
+		LocalityGroupOptions: []*infoschem.LocalityGroupOption{
+			{
+				LocalityGroupName: "default",
+				OptionName:        "storage",
+				OptionValue:       strPtr("'ssd'"),
+			},
+			{
+				LocalityGroupName: "default",
+				OptionName:        "ssd_to_hdd_spill_timespan",
+			},
+			{
+				LocalityGroupName: "archive",
+				OptionName:        "storage",
+				OptionValue:       strPtr("'hdd'"),
+			},
+			{
+				LocalityGroupName: "archive",
+				OptionName:        "ssd_to_hdd_spill_timespan",
+			},
+		},
+	}
+
+	ddls, err := schema.ToDDLStatements()
+	if err != nil {
+		t.Fatalf("ToDDLStatements: %v", err)
+	}
+	if got := len(ddls); got != 1 {
+		t.Fatalf("DDL statements = %d, want 1", got)
+	}
+	group, ok := ddls[0].(*ast.CreateLocalityGroup)
+	if !ok {
+		t.Fatalf("DDL type = %T, want *ast.CreateLocalityGroup", ddls[0])
+	}
+	if group.Name.Name != "archive" {
+		t.Fatalf("emitted locality group = %q, want archive", group.Name.Name)
+	}
+	if group.Options == nil || len(group.Options.Records) != 1 {
+		t.Fatalf("archive options = %#v, want only non-NULL storage", group.Options)
+	}
+
+	stmt, err := memefish.ParseDDL("", "CREATE LOCALITY GROUP archive OPTIONS (storage = 'hdd')")
+	if err != nil {
+		t.Fatalf("ParseDDL: %v", err)
+	}
+	roundtrip, err := FromDDLStatements([]ast.DDL{stmt})
+	if err != nil {
+		t.Fatalf("FromDDLStatements: %v", err)
+	}
+	recon, err := roundtrip.ToDDLStatements()
+	if err != nil {
+		t.Fatalf("ToDDLStatements: %v", err)
+	}
+	if got := len(recon); got != 1 {
+		t.Fatalf("round-trip DDL statements = %d, want 1", got)
+	}
+	gotGroup, ok := recon[0].(*ast.CreateLocalityGroup)
+	if !ok || gotGroup.Name.Name != "archive" {
+		t.Fatalf("round-trip locality group = %#v, want archive", recon[0])
+	}
+}
+
 func TestRoundtripOptionlessLocalityGroup(t *testing.T) {
 	stmt, err := memefish.ParseDDL("", "CREATE LOCALITY GROUP archive")
 	if err != nil {

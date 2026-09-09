@@ -69,6 +69,24 @@ probe reached semantic/configuration validation (`InvalidArgument` without a
 `Syntax error:` marker), confirming that the service parser accepts the syntax;
 the configured instance did not allow the table to be created.
 
+### Built-in `default` locality group — not recoverable
+
+The built-in locality group named `default` cannot be created. The Spanner
+GoogleSQL DDL reference only allows:
+
+```sql
+ALTER LOCALITY GROUP `default` SET OPTIONS (...)
+```
+
+`INFORMATION_SCHEMA.LOCALITY_GROUP_OPTIONS` still contains rows for this group
+(typically `storage` non-NULL and `ssd_to_hdd_spill_timespan` NULL). Those rows
+cannot distinguish an explicit option value from the implicit service default,
+so reconstruction cannot recover a faithful statement. `toLocalityGroupsDDL`
+therefore never emits `CREATE LOCALITY GROUP` for the built-in `default` group
+(compared case-insensitively) and drops its options. User-created locality
+groups, including optionless groups preserved in `Schema.LocalityGroups`, are
+unchanged.
+
 ### Scalar-expression indexes — live metadata, no memefish AST
 
 Managed Spanner and the pinned Spanner Omni runtime accepted GoogleSQL index
