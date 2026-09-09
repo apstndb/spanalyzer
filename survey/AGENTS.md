@@ -17,9 +17,10 @@ The same `infoschem` structs can be populated by querying a live database (real 
 and converted back to DDL via `astconv`.
 
 Scope is bounded by what `GetDatabaseDdl` (`gcloud spanner databases ddl describe`) emits:
-primarily `CREATE` statements, `GRANT`, `ALTER DATABASE`, and `ALTER STATISTICS`. Managed
+primarily `CREATE` statements, `GRANT`, and `ALTER DATABASE`. Managed
 Spanner can also retain `ALTER TABLE ... ADD CONSTRAINT`; AST-to-schema conversion folds its
-check or foreign-key constraint into the target table metadata. Other `ALTER` operations and
+check or foreign-key constraint into the target table metadata. Whether
+`GetDatabaseDdl` retains `ALTER STATISTICS` pins is unconfirmed. Other `ALTER` operations and
 all `DROP`/`RENAME` statements are intentionally out of scope. Items that cannot be expressed
 (no memefish AST node, or INFORMATION_SCHEMA loses information) are tracked in
 `UNSUPPORTED_DDL.md` with linked upstream issues — keep that file current when changing

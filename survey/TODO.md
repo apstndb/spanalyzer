@@ -3,6 +3,11 @@
 - [x] Skip the built-in `default` locality group in `toLocalityGroupsDDL` and
   document that `ALTER LOCALITY GROUP default` is not recoverable.
 - [x] Skip `IS_DEFAULT` placements and their options in `toPlacementsDDL`.
+- [x] Emit `ALTER STATISTICS` only for `AllowGC == false`.
+- [ ] Confirm whether `GetDatabaseDdl` retains
+  `ALTER STATISTICS ... SET OPTIONS (allow_gc = false)` pins. A managed
+  database with one `ALLOW_GC=false` package returned zero `ALTER STATISTICS`
+  statements.
 
 ## Use a fresh UUID cleanup context (2026-09-02)
 

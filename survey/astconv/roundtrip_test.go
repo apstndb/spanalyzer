@@ -1276,3 +1276,34 @@ func TestRoundtrip_AlterStatistics(t *testing.T) {
 		t.Error("ALTER STATISTICS my_stats not found in reconstructed DDL")
 	}
 }
+
+func TestToStatisticsDDL_EmitsOnlyAllowGCFalse(t *testing.T) {
+	schema := &Schema{
+		SpannerStatistics: []*infoschem.SpannerStatistic{
+			{PackageName: "auto_pkg", AllowGC: true},
+			{PackageName: "pinned_pkg", AllowGC: false},
+		},
+	}
+
+	ddls, err := schema.ToDDLStatements()
+	if err != nil {
+		t.Fatalf("ToDDLStatements: %v", err)
+	}
+	if got := len(ddls); got != 1 {
+		t.Fatalf("DDL statements = %d, want 1", got)
+	}
+	stat, ok := ddls[0].(*ast.AlterStatistics)
+	if !ok {
+		t.Fatalf("DDL type = %T, want *ast.AlterStatistics", ddls[0])
+	}
+	if stat.Name.Name != "pinned_pkg" {
+		t.Fatalf("emitted package = %q, want pinned_pkg", stat.Name.Name)
+	}
+	if stat.Options == nil || len(stat.Options.Records) != 1 {
+		t.Fatalf("statistics options = %#v, want allow_gc = false", stat.Options)
+	}
+	bl, ok := stat.Options.Records[0].Value.(*ast.BoolLiteral)
+	if !ok || stat.Options.Records[0].Name.Name != "allow_gc" || bl.Value {
+		t.Errorf("statistics option = %s, want allow_gc = false", stat.Options.SQL())
+	}
+}

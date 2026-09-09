@@ -349,4 +349,6 @@ DDL statements:
 
 - `*_PRIVILEGES` tables — show effective permissions, not DDL
 - `COLUMN_COLUMN_USAGE` — tracks generated column dependencies
-- `SPANNER_STATISTICS` — handled via `ALTER STATISTICS`
+- `SPANNER_STATISTICS` — reconstructed as `ALTER STATISTICS` only for packages
+  with `ALLOW_GC = false`; default `ALLOW_GC = true` rows are omitted. Whether
+  `GetDatabaseDdl` retains those pins is unconfirmed.

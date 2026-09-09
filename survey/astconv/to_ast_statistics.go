@@ -12,10 +12,13 @@ func (s *Schema) toStatisticsDDL() ([]ast.DDL, error) {
 		if stat.SchemaName != "" {
 			return nil, fmt.Errorf("unsupported named-schema statistics package %q", tableDisplayName(stat.SchemaName, stat.PackageName))
 		}
+		if stat.AllowGC {
+			continue
+		}
 		ddls = append(ddls, &ast.AlterStatistics{
 			Name: ident(stat.PackageName),
 			Options: mkOptions(
-				optionsDef("allow_gc", boolval(stat.AllowGC)),
+				optionsDef("allow_gc", boolval(false)),
 			),
 		})
 	}
