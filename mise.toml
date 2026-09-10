@@ -13,6 +13,37 @@ run = [
   "GOWORK=off mise -C survey x -- golangci-lint run --timeout=5m",
 ]
 
+[tasks.check-mod-tidy]
+description = "Fail if go mod tidy would change any module files"
+run = '''
+mise x -- go mod tidy
+(cd plancontract && mise x -- go mod tidy)
+(cd cmd/spanner-query-gen && mise x -- go mod tidy)
+(cd survey && GOWORK=off mise x -- go mod tidy)
+(cd tools && mise x -- go mod tidy)
+# go.work.sum is intentionally untracked and ignored because
+# workspace download steps append entries to it on CI.
+git diff --exit-code -- go.mod go.sum plancontract/go.mod plancontract/go.sum cmd/spanner-query-gen/go.mod cmd/spanner-query-gen/go.sum survey/go.mod survey/go.sum tools/go.mod tools/go.sum
+'''
+
+[tasks.govulncheck]
+description = "Run govulncheck on all five Go modules"
+run = [
+  "mise x -- govulncheck ./...",
+  "mise -C plancontract x -- govulncheck ./...",
+  "mise -C cmd/spanner-query-gen x -- govulncheck ./...",
+  "mise -C tools x -- govulncheck ./...",
+  "GOWORK=off mise -C survey x -- govulncheck ./...",
+]
+
+[tasks.pre-push]
+description = "Push gate matching CI tidy, lint, and govulncheck"
+run = [
+  "mise run check-mod-tidy",
+  "mise run lint",
+  "mise run govulncheck",
+]
+
 [tasks.hooks-install]
 description = "Activate the repository-managed Git hooks for this clone"
 run = '''
@@ -30,6 +61,7 @@ description = "Verify that the repository-managed Git hooks are active"
 run = '''
 test "$(git config --local --get core.hooksPath)" = ".githooks"
 test -x .githooks/pre-push
+grep -q 'mise run pre-push' .githooks/pre-push
 '''
 
 [tasks.verify-root-module]

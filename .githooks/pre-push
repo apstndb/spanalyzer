@@ -9,5 +9,5 @@ command -v mise >/dev/null 2>&1 || {
 repo_root=$(git rev-parse --show-toplevel)
 cd "$repo_root"
 
-echo "pre-push: running repository lint gate"
-exec mise run lint
+echo "pre-push: running repository push gate (tidy, lint, govulncheck)"
+exec mise run pre-push

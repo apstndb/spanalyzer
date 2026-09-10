@@ -52,7 +52,10 @@ The repository root owns read-only verification tasks across all five modules
 and the currently pinned target runtimes:
 
 ```sh
-mise run lint               # all five Go modules; also used by CI and pre-push
+mise run lint               # all five Go modules
+mise run check-mod-tidy     # fail if go mod tidy would change module files
+mise run govulncheck        # all five Go modules
+mise run pre-push           # tidy + lint + govulncheck; Git hook entry point
 mise run verify-local       # modules, generated evidence, OKF, Markdown policy
 mise run verify-containers  # exact Emulator/Omni manifests; no evidence writes
 mise run verify-managed     # point-in-time checks against TEST_REAL_SPANNER_DATABASE
@@ -65,10 +68,11 @@ Activate the versioned pre-push hook once in each clone:
 mise run hooks-install
 ```
 
-The hook runs the same `mise run lint` gate as CI and blocks a push when any
-module fails linting. Git does not activate repository hooks on clone, so the
-installation step is intentionally explicit. `git push --no-verify` can still
-bypass a local hook; CI remains the authoritative shared gate.
+The hook runs `mise run pre-push`, the same tidy, lint, and govulncheck gates
+as CI, and blocks a push when any of them fail. Git does not activate
+repository hooks on clone, so the installation step is intentionally explicit.
+`git push --no-verify` can still bypass a local hook; CI remains the
+authoritative shared gate.
 
 [`runtime_targets.json`](runtime_targets.json) is the single source of truth
 for the descriptive tags and platform-specific OCI manifest digests used by
