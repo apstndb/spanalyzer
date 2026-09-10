@@ -18,7 +18,7 @@ func TestToDDLStatementsRejectsExpressionIndex(t *testing.T) {
 			TableName:  "Venues",
 			IndexName:  "VenuesByCity",
 			IndexType:  "INDEX",
-			IndexState: strPtr("READ_WRITE"),
+			IndexState: new("READ_WRITE"),
 		}},
 		IndexColumns: []*infoschem.IndexColumn{{
 			TableName:       "Venues",

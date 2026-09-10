@@ -274,10 +274,10 @@ func propertyGraphTestSchema() *Schema {
 			{TableName: "Own", ColumnName: "account_id", OrdinalPosition: 2, SpannerType: "INT64"},
 		},
 		IndexColumns: []*infoschem.IndexColumn{
-			{TableName: "Account", IndexName: "PRIMARY_KEY", OrdinalPosition: int64Ptr(1), ColumnName: "id"},
-			{TableName: "Person", IndexName: "PRIMARY_KEY", OrdinalPosition: int64Ptr(1), ColumnName: "id"},
-			{TableName: "Own", IndexName: "PRIMARY_KEY", OrdinalPosition: int64Ptr(1), ColumnName: "id"},
-			{TableName: "Own", IndexName: "PRIMARY_KEY", OrdinalPosition: int64Ptr(2), ColumnName: "account_id"},
+			{TableName: "Account", IndexName: "PRIMARY_KEY", OrdinalPosition: new(int64(1)), ColumnName: "id"},
+			{TableName: "Person", IndexName: "PRIMARY_KEY", OrdinalPosition: new(int64(1)), ColumnName: "id"},
+			{TableName: "Own", IndexName: "PRIMARY_KEY", OrdinalPosition: new(int64(1)), ColumnName: "id"},
+			{TableName: "Own", IndexName: "PRIMARY_KEY", OrdinalPosition: new(int64(2)), ColumnName: "account_id"},
 		},
 	}
 }

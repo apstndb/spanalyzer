@@ -106,8 +106,7 @@ func descriptorsFromRegistry(registry map[string]reflect.Type) ([]tableDescripto
 
 		columns := make([]columnDescriptor, 0, rowType.NumField())
 		seen := make(map[string]bool, rowType.NumField())
-		for i := 0; i < rowType.NumField(); i++ {
-			field := rowType.Field(i)
+		for field := range rowType.Fields() {
 			if field.PkgPath != "" {
 				return nil, fmt.Errorf("SPANNER_SYS.%s field %s is not exported", tableName, field.Name)
 			}
@@ -186,8 +185,7 @@ func describeType(t reflect.Type, structStack map[reflect.Type]bool) (typeDescri
 
 		fields := make([]structFieldDescriptor, 0, t.NumField())
 		seen := make(map[string]bool, t.NumField())
-		for i := 0; i < t.NumField(); i++ {
-			field := t.Field(i)
+		for field := range t.Fields() {
 			if field.PkgPath != "" {
 				return typeDescriptor{}, fmt.Errorf("struct %s field %s is not exported", t, field.Name)
 			}

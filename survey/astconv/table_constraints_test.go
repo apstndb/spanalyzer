@@ -445,7 +445,7 @@ func TestToTablesDDL_LiveZeroColumnPrimaryKeyMetadata(t *testing.T) {
 				IndexName:  "PRIMARY_KEY",
 				IndexType:  "PRIMARY_KEY",
 				IsUnique:   true,
-				IndexState: strPtr("READ_WRITE"),
+				IndexState: new("READ_WRITE"),
 			}},
 		},
 	} {
@@ -495,7 +495,7 @@ func TestToTablesDDL_RestoresIdentityColumnKind(t *testing.T) {
 						ColumnName:      "EventId",
 						OrdinalPosition: 1,
 						SpannerType:     "INT64",
-						IsIdentity:      strPtr("YES"),
+						IsIdentity:      new("YES"),
 						IdentityKind:    &identityKind,
 					},
 				},

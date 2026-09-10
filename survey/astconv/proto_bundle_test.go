@@ -13,19 +13,19 @@ func TestExtractProtoBundleTypes(t *testing.T) {
 	raw := mustMarshalFileDescriptorSet(t, &descriptorpb.FileDescriptorSet{
 		File: []*descriptorpb.FileDescriptorProto{
 			{
-				Package: proto.String("examples.shipping"),
+				Package: new("examples.shipping"),
 				EnumType: []*descriptorpb.EnumDescriptorProto{
-					{Name: proto.String("ShippingSpeed")},
+					{Name: new("ShippingSpeed")},
 				},
 				MessageType: []*descriptorpb.DescriptorProto{
 					{
-						Name: proto.String("Order"),
+						Name: new("Order"),
 						EnumType: []*descriptorpb.EnumDescriptorProto{
-							{Name: proto.String("Status")},
+							{Name: new("Status")},
 						},
 						NestedType: []*descriptorpb.DescriptorProto{
-							{Name: proto.String("Address")},
-							{Name: proto.String("Item")},
+							{Name: new("Address")},
+							{Name: new("Item")},
 						},
 					},
 				},
@@ -54,19 +54,19 @@ func TestToProtoBundleDDL_FromSchemataProtoBundle(t *testing.T) {
 	raw := mustMarshalFileDescriptorSet(t, &descriptorpb.FileDescriptorSet{
 		File: []*descriptorpb.FileDescriptorProto{
 			{
-				Package: proto.String("examples.shipping"),
+				Package: new("examples.shipping"),
 				EnumType: []*descriptorpb.EnumDescriptorProto{
-					{Name: proto.String("ShippingSpeed")},
+					{Name: new("ShippingSpeed")},
 				},
 				MessageType: []*descriptorpb.DescriptorProto{
 					{
-						Name: proto.String("Order"),
+						Name: new("Order"),
 						EnumType: []*descriptorpb.EnumDescriptorProto{
-							{Name: proto.String("Status")},
+							{Name: new("Status")},
 						},
 						NestedType: []*descriptorpb.DescriptorProto{
-							{Name: proto.String("Address")},
-							{Name: proto.String("Item")},
+							{Name: new("Address")},
+							{Name: new("Item")},
 						},
 					},
 				},
@@ -122,10 +122,10 @@ func TestToProtoBundleDDL_UnionsSchemataRows(t *testing.T) {
 	defaultRaw := mustMarshalFileDescriptorSet(t, &descriptorpb.FileDescriptorSet{
 		File: []*descriptorpb.FileDescriptorProto{
 			{
-				Package: proto.String("examples"),
+				Package: new("examples"),
 				MessageType: []*descriptorpb.DescriptorProto{
-					{Name: proto.String("Shared")},
-					{Name: proto.String("DefaultOnly")},
+					{Name: new("Shared")},
+					{Name: new("DefaultOnly")},
 				},
 			},
 		},
@@ -133,10 +133,10 @@ func TestToProtoBundleDDL_UnionsSchemataRows(t *testing.T) {
 	namedRaw := mustMarshalFileDescriptorSet(t, &descriptorpb.FileDescriptorSet{
 		File: []*descriptorpb.FileDescriptorProto{
 			{
-				Package: proto.String("examples"),
+				Package: new("examples"),
 				MessageType: []*descriptorpb.DescriptorProto{
-					{Name: proto.String("Shared")},
-					{Name: proto.String("NamedOnly")},
+					{Name: new("Shared")},
+					{Name: new("NamedOnly")},
 				},
 			},
 		},

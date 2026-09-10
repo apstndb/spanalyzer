@@ -42,7 +42,7 @@ func fromCreateIndex(s *Schema, ci *ast.CreateIndex) error {
 		IndexType:      "INDEX",
 		IsUnique:       ci.Unique,
 		IsNullFiltered: ci.NullFiltered,
-		IndexState:     strPtr("READ_WRITE"),
+		IndexState:     new("READ_WRITE"),
 	}
 
 	if ci.InterleaveIn != nil {
@@ -79,7 +79,7 @@ func fromCreateIndex(s *Schema, ci *ast.CreateIndex) error {
 			IndexType:       "INDEX",
 			ColumnName:      key.Name.Name,
 			OrdinalPosition: &ordinal,
-			ColumnOrdering:  strPtr(ordering),
+			ColumnOrdering:  new(ordering),
 		})
 	}
 
@@ -130,7 +130,7 @@ func fromCreateSearchIndex(s *Schema, csi *ast.CreateSearchIndex) error {
 		TableName:   tableName,
 		IndexName:   indexName,
 		IndexType:   "SEARCH",
-		IndexState:  strPtr("READ_WRITE"),
+		IndexState:  new("READ_WRITE"),
 	}
 
 	if csi.Interleave != nil {
@@ -150,7 +150,7 @@ func fromCreateSearchIndex(s *Schema, csi *ast.CreateSearchIndex) error {
 	}
 
 	if csi.Where != nil {
-		idx.Filter = strPtr(csi.Where.Expr.SQL())
+		idx.Filter = new(csi.Where.Expr.SQL())
 	}
 
 	if csi.Options != nil {
@@ -179,7 +179,7 @@ func fromCreateSearchIndex(s *Schema, csi *ast.CreateSearchIndex) error {
 			IndexType:       "SEARCH",
 			ColumnName:      tlp.Name,
 			OrdinalPosition: &ordinal,
-			ColumnOrdering:  strPtr("ASC"),
+			ColumnOrdering:  new("ASC"),
 		})
 	}
 

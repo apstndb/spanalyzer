@@ -49,7 +49,7 @@ func TestLocalityGroupsFromInformationSchemaOptions(t *testing.T) {
 			{
 				LocalityGroupName: "archive",
 				OptionName:        "storage",
-				OptionValue:       strPtr("'hdd'"),
+				OptionValue:       new("'hdd'"),
 			},
 		},
 	}
@@ -74,7 +74,7 @@ func TestLocalityGroupsFromInformationSchemaNullOptions(t *testing.T) {
 			{
 				LocalityGroupName: "archive",
 				OptionName:        "storage",
-				OptionValue:       strPtr("'ssd'"),
+				OptionValue:       new("'ssd'"),
 			},
 			{
 				LocalityGroupName: "archive",
@@ -116,7 +116,7 @@ func TestLocalityGroupsRejectMalformedEmulatorOption(t *testing.T) {
 			{
 				LocalityGroupName: "archive",
 				OptionName:        "inflash",
-				OptionValue:       strPtr("BOOL"),
+				OptionValue:       new("BOOL"),
 			},
 		},
 	}
@@ -133,7 +133,7 @@ func TestToLocalityGroupsDDL_SkipsBuiltinDefaultGroup(t *testing.T) {
 			{
 				LocalityGroupName: "default",
 				OptionName:        "storage",
-				OptionValue:       strPtr("'ssd'"),
+				OptionValue:       new("'ssd'"),
 			},
 			{
 				LocalityGroupName: "default",
@@ -142,7 +142,7 @@ func TestToLocalityGroupsDDL_SkipsBuiltinDefaultGroup(t *testing.T) {
 			{
 				LocalityGroupName: "archive",
 				OptionName:        "storage",
-				OptionValue:       strPtr("'hdd'"),
+				OptionValue:       new("'hdd'"),
 			},
 			{
 				LocalityGroupName: "archive",

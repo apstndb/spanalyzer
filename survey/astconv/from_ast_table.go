@@ -22,7 +22,7 @@ func fromCreateTable(s *Schema, ct *ast.CreateTable) error {
 		TableSchema:  tableSchema,
 		TableName:    tableName,
 		TableType:    "BASE TABLE",
-		SpannerState: strPtr("COMMITTED"),
+		SpannerState: new("COMMITTED"),
 	}
 
 	// Parent table (interleave)
@@ -41,17 +41,17 @@ func fromCreateTable(s *Schema, ct *ast.CreateTable) error {
 				tableDisplayName(tableSchema, tableName),
 			)
 		}
-		t.ParentTableName = strPtr(parentName)
+		t.ParentTableName = new(parentName)
 		switch ct.Cluster.OnDelete {
 		case ast.OnDeleteCascade:
-			t.OnDeleteAction = strPtr("CASCADE")
+			t.OnDeleteAction = new("CASCADE")
 		case ast.OnDeleteNoAction:
-			t.OnDeleteAction = strPtr("NO ACTION")
+			t.OnDeleteAction = new("NO ACTION")
 		}
 		if ct.Cluster.Enforced {
-			t.InterleaveType = strPtr("IN PARENT")
+			t.InterleaveType = new("IN PARENT")
 		} else {
-			t.InterleaveType = strPtr("IN")
+			t.InterleaveType = new("IN")
 		}
 	}
 
@@ -59,7 +59,7 @@ func fromCreateTable(s *Schema, ct *ast.CreateTable) error {
 	if ct.RowDeletionPolicy != nil {
 		rdp := ct.RowDeletionPolicy.RowDeletionPolicy
 		expr := fmt.Sprintf("OLDER_THAN(%s, INTERVAL %s DAY)", rdp.ColumnName.SQL(), rdp.NumDays.SQL())
-		t.RowDeletionPolicyExpression = strPtr(expr)
+		t.RowDeletionPolicyExpression = new(expr)
 	}
 
 	s.Tables = append(s.Tables, t)
@@ -130,7 +130,7 @@ func fromCreateTable(s *Schema, ct *ast.CreateTable) error {
 			IndexName:   "PRIMARY_KEY",
 			IndexType:   "PRIMARY_KEY",
 			IsUnique:    true,
-			IndexState:  strPtr("READ_WRITE"),
+			IndexState:  new("READ_WRITE"),
 		})
 	}
 
@@ -147,7 +147,7 @@ func fromCreateTable(s *Schema, ct *ast.CreateTable) error {
 			IndexType:       "PRIMARY_KEY",
 			ColumnName:      pk.Name.Name,
 			OrdinalPosition: &ordinal,
-			ColumnOrdering:  strPtr(ordering),
+			ColumnOrdering:  new(ordering),
 		})
 		s.KeyColumnUsage = append(s.KeyColumnUsage, &infoschem.KeyColumnUsage{
 			ConstraintSchema: tableSchema,
@@ -233,7 +233,7 @@ func fromTableConstraint(
 			ConstraintSchema: tableSchema,
 			ConstraintName:   constraintName,
 			CheckClause:      c.Expr.SQL(),
-			SpannerState:     strPtr("COMMITTED"),
+			SpannerState:     new("COMMITTED"),
 		})
 		return nil
 	case *ast.ForeignKey:
@@ -283,7 +283,7 @@ func fromTableConstraint(
 			MatchOption:            "SIMPLE",
 			UpdateRule:             "NO ACTION",
 			DeleteRule:             deleteRule,
-			SpannerState:           strPtr("COMMITTED"),
+			SpannerState:           new("COMMITTED"),
 		})
 
 		for j, fkCol := range c.Columns {
@@ -353,11 +353,11 @@ func fromColumnDef(tableSchema, tableName string, cd *ast.ColumnDef, ordinal int
 		TableName:       tableName,
 		ColumnName:      cd.Name.Name,
 		OrdinalPosition: ordinal,
-		DataType:        strPtr(dataType),
+		DataType:        new(dataType),
 		IsNullable:      isNullable,
 		SpannerType:     spannerType,
 		IsGenerated:     "NEVER",
-		SpannerState:    strPtr("COMMITTED"),
+		SpannerState:    new("COMMITTED"),
 	}
 
 	// Hidden
@@ -368,35 +368,35 @@ func fromColumnDef(tableSchema, tableName string, cd *ast.ColumnDef, ordinal int
 	// Default semantics
 	switch ds := cd.DefaultSemantics.(type) {
 	case *ast.ColumnDefaultExpr:
-		col.ColumnDefault = strPtr(ds.Expr.SQL())
+		col.ColumnDefault = new(ds.Expr.SQL())
 		if ds.OnUpdate != nil {
-			col.OnUpdateExpression = strPtr(ds.OnUpdate.Expr.SQL())
+			col.OnUpdateExpression = new(ds.OnUpdate.Expr.SQL())
 		}
 	case *ast.GeneratedColumnExpr:
 		col.IsGenerated = "ALWAYS"
 		expr := ds.Expr.SQL()
-		col.GenerationExpression = strPtr(expr)
+		col.GenerationExpression = new(expr)
 		if ds.Stored != token.InvalidPos {
-			col.IsStored = strPtr("YES")
+			col.IsStored = new("YES")
 		} else {
-			col.IsStored = strPtr("NO")
+			col.IsStored = new("NO")
 		}
 	case *ast.IdentityColumn:
-		col.IsIdentity = strPtr("YES")
-		col.IdentityGeneration = strPtr("BY DEFAULT")
+		col.IsIdentity = new("YES")
+		col.IdentityGeneration = new("BY DEFAULT")
 		for _, p := range ds.Params {
 			switch param := p.(type) {
 			case *ast.SkipRange:
-				col.IdentitySkipRangeMin = strPtr(param.Min.Value)
-				col.IdentitySkipRangeMax = strPtr(param.Max.Value)
+				col.IdentitySkipRangeMin = new(param.Min.Value)
+				col.IdentitySkipRangeMax = new(param.Max.Value)
 			case *ast.StartCounterWith:
-				col.IdentityStartWithCounter = strPtr(param.Counter.Value)
+				col.IdentityStartWithCounter = new(param.Counter.Value)
 			case *ast.BitReversedPositive:
-				col.IdentityKind = strPtr("BIT_REVERSED_POSITIVE")
+				col.IdentityKind = new("BIT_REVERSED_POSITIVE")
 			}
 		}
 	case *ast.AutoIncrement:
-		col.ColumnDefault = strPtr("AUTO_INCREMENT")
+		col.ColumnDefault = new("AUTO_INCREMENT")
 	}
 
 	return col

@@ -62,7 +62,7 @@ func fromCreateFunction(s *Schema, cf *ast.CreateFunction) error {
 			OrdinalPosition: int64(i + 1),
 		}
 		if p.Name != nil {
-			param.ParameterName = strPtr(p.Name.Name)
+			param.ParameterName = new(p.Name.Name)
 		}
 		if p.Type != nil {
 			dt := p.Type.SQL()

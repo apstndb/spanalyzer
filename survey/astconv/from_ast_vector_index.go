@@ -13,10 +13,10 @@ func fromCreateVectorIndex(s *Schema, cvi *ast.CreateVectorIndex) error {
 		TableName:  tableName,
 		IndexName:  indexName,
 		IndexType:  "VECTOR_INDEX",
-		IndexState: strPtr("READ_WRITE"),
+		IndexState: new("READ_WRITE"),
 	}
 	if cvi.Where != nil {
-		idx.Filter = strPtr(cvi.Where.Expr.SQL())
+		idx.Filter = new(cvi.Where.Expr.SQL())
 	}
 
 	s.Indexes = append(s.Indexes, idx)
@@ -29,7 +29,7 @@ func fromCreateVectorIndex(s *Schema, cvi *ast.CreateVectorIndex) error {
 		IndexType:       "VECTOR_INDEX",
 		ColumnName:      cvi.ColumnName.Name,
 		OrdinalPosition: &ordinal,
-		ColumnOrdering:  strPtr("ASC"),
+		ColumnOrdering:  new("ASC"),
 	})
 
 	// Storing columns

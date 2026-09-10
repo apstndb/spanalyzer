@@ -362,16 +362,16 @@ func TestToFunctionsDDL_PrefersSpannerType(t *testing.T) {
 				RoutineName:  "ExactTypes",
 				RoutineType:  "FUNCTION",
 				SpannerType:  &routineType,
-				DataType:     strPtr("ARRAY"),
+				DataType:     new("ARRAY"),
 			},
 		},
 		Parameters: []*infoschem.Parameter{
 			{
 				SpecificName:    "ExactTypes",
 				OrdinalPosition: 1,
-				ParameterName:   strPtr("values"),
+				ParameterName:   new("values"),
 				SpannerType:     &parameterType,
-				DataType:        strPtr("ARRAY"),
+				DataType:        new("ARRAY"),
 			},
 		},
 	}
@@ -413,7 +413,7 @@ func TestToFunctionsDDL_UsesFunctionTypeGrammar(t *testing.T) {
 			{
 				SpecificName:    "FunctionTypes",
 				OrdinalPosition: 1,
-				ParameterName:   strPtr("value"),
+				ParameterName:   new("value"),
 				SpannerType:     &parameterType,
 			},
 		},

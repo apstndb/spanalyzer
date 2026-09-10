@@ -275,8 +275,8 @@ func quoteIdentifiers(columns []string) string {
 
 func structColumns(rowType reflect.Type) map[string]bool {
 	columns := make(map[string]bool, rowType.NumField())
-	for i := 0; i < rowType.NumField(); i++ {
-		if name := rowType.Field(i).Tag.Get("spanner"); name != "" {
+	for field := range rowType.Fields() {
+		if name := field.Tag.Get("spanner"); name != "" {
 			columns[name] = true
 		}
 	}
@@ -285,8 +285,8 @@ func structColumns(rowType reflect.Type) map[string]bool {
 
 func orderedStructColumns(rowType reflect.Type) []string {
 	columns := make([]string, 0, rowType.NumField())
-	for i := 0; i < rowType.NumField(); i++ {
-		if name := rowType.Field(i).Tag.Get("spanner"); name != "" {
+	for field := range rowType.Fields() {
+		if name := field.Tag.Get("spanner"); name != "" {
 			columns = append(columns, name)
 		}
 	}

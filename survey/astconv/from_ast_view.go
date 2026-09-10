@@ -47,7 +47,7 @@ func fromCreateView(s *Schema, cv *ast.CreateView) error {
 		TableSchema:  viewSchema,
 		TableName:    viewName,
 		TableType:    "VIEW",
-		SpannerState: strPtr("COMMITTED"),
+		SpannerState: new("COMMITTED"),
 	})
 
 	return nil

@@ -6,7 +6,6 @@ import (
 
 	"cloud.google.com/go/spanner"
 	"github.com/apstndb/spanemuboost"
-	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/descriptorpb"
 )
 
@@ -41,30 +40,30 @@ func exampleShippingFileDescriptorSet(t *testing.T) *descriptorpb.FileDescriptor
 	return &descriptorpb.FileDescriptorSet{
 		File: []*descriptorpb.FileDescriptorProto{
 			{
-				Name:    proto.String("shipping.proto"),
-				Syntax:  proto.String("proto3"),
-				Package: proto.String("examples.shipping"),
+				Name:    new("shipping.proto"),
+				Syntax:  new("proto3"),
+				Package: new("examples.shipping"),
 				EnumType: []*descriptorpb.EnumDescriptorProto{
 					{
-						Name: proto.String("ShippingSpeed"),
+						Name: new("ShippingSpeed"),
 						Value: []*descriptorpb.EnumValueDescriptorProto{
-							{Name: proto.String("SHIPPING_SPEED_UNSPECIFIED"), Number: proto.Int32(0)},
+							{Name: new("SHIPPING_SPEED_UNSPECIFIED"), Number: new(int32(0))},
 						},
 					},
 				},
 				MessageType: []*descriptorpb.DescriptorProto{
 					{
-						Name: proto.String("Order"),
+						Name: new("Order"),
 						EnumType: []*descriptorpb.EnumDescriptorProto{
 							{
-								Name: proto.String("Status"),
+								Name: new("Status"),
 								Value: []*descriptorpb.EnumValueDescriptorProto{
-									{Name: proto.String("STATUS_UNSPECIFIED"), Number: proto.Int32(0)},
+									{Name: new("STATUS_UNSPECIFIED"), Number: new(int32(0))},
 								},
 							},
 						},
 						NestedType: []*descriptorpb.DescriptorProto{
-							{Name: proto.String("Address")},
+							{Name: new("Address")},
 						},
 					},
 				},
