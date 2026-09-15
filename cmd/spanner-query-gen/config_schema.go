@@ -26,6 +26,9 @@ func runConfigSchema(args []string, stdout, stderr io.Writer) error {
 		return err
 	}
 
+	if fs.NArg() != 0 {
+		return fmt.Errorf("unexpected positional arguments: %v", fs.Args())
+	}
 	data, err := configSchemaBytes(*output)
 	if err != nil {
 		return err
@@ -45,6 +48,9 @@ func runPlanReportSchema(args []string, stdout, stderr io.Writer) error {
 		return err
 	}
 
+	if fs.NArg() != 0 {
+		return fmt.Errorf("unexpected positional arguments: %v", fs.Args())
+	}
 	data, err := planReportSchemaBytes(*output)
 	if err != nil {
 		return err
@@ -64,6 +70,9 @@ func runPlanContractSchema(args []string, stdout, stderr io.Writer) error {
 		return err
 	}
 
+	if fs.NArg() != 0 {
+		return fmt.Errorf("unexpected positional arguments: %v", fs.Args())
+	}
 	data, err := planContractSchemaBytes(*output)
 	if err != nil {
 		return err

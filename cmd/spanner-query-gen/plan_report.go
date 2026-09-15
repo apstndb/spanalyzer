@@ -54,6 +54,9 @@ func runPlanReport(args []string, stdout, stderr io.Writer) error {
 		}
 		return err
 	}
+	if fs.NArg() != 0 {
+		return fmt.Errorf("unexpected positional arguments: %v", fs.Args())
+	}
 	if strings.ToLower(strings.TrimSpace(*backend)) != "omni" {
 		return fmt.Errorf("unsupported --backend %q; use omni", *backend)
 	}
