@@ -1,0 +1,6968 @@
+{
+  "omni": {
+    "identity": {
+      "at": "2026-09-15T17:29:15Z",
+      "backend": "omni",
+      "image": "us-docker.pkg.dev/spanner-omni/images/spanner-omni@sha256:ed31d9ee72eeee69cac78566eb3a6e72ee389b26234735f0ef449774cc006741",
+      "kind": "identity",
+      "prefix": "JoinProbe1789493355"
+    },
+    "cleanup": [
+      {
+        "at": "2026-09-15T17:31:24Z",
+        "error": "",
+        "kind": "ddl",
+        "label": "cleanup-index-JoinProbe1789493355R",
+        "sql": "DROP INDEX JoinProbe1789493355RByK"
+      },
+      {
+        "at": "2026-09-15T17:31:26Z",
+        "error": "",
+        "kind": "ddl",
+        "label": "cleanup-index-JoinProbe1789493355L",
+        "sql": "DROP INDEX JoinProbe1789493355LByK"
+      },
+      {
+        "at": "2026-09-15T17:31:29Z",
+        "error": "",
+        "kind": "ddl",
+        "label": "cleanup-right",
+        "sql": "DROP TABLE JoinProbe1789493355R"
+      },
+      {
+        "at": "2026-09-15T17:31:32Z",
+        "error": "",
+        "kind": "ddl",
+        "label": "cleanup-left",
+        "sql": "DROP TABLE JoinProbe1789493355L"
+      }
+    ],
+    "complete": true,
+    "records": 124,
+    "cells": [
+      {
+        "plan_record_line": 9,
+        "execute_record_line": 10,
+        "label": "v1/full/hash",
+        "sql": "@{OPTIMIZER_VERSION=1} SELECT l.Id, r.Id FROM JoinProbe1789493355L l FULL JOIN@{JOIN_METHOD=HASH_JOIN} JoinProbe1789493355R r ON l.K=r.K",
+        "plan_error": "",
+        "execute_error": "",
+        "expected_rows": 9,
+        "actual_rows": 9,
+        "result_match": true,
+        "operators": [
+          {
+            "index": 1,
+            "name": "Union All",
+            "metadata": {
+              "execution_method": "Row"
+            },
+            "children": [
+              {
+                "childIndex": 2
+              },
+              {
+                "childIndex": 30
+              },
+              {
+                "childIndex": 59,
+                "variable": "Id_2"
+              },
+              {
+                "childIndex": 60,
+                "variable": "Id_3"
+              }
+            ]
+          },
+          {
+            "index": 3,
+            "name": "Hash Join",
+            "metadata": {
+              "execution_method": "Row",
+              "join_type": "BUILD_OUTER"
+            },
+            "children": [
+              {
+                "childIndex": 4,
+                "type": "Build"
+              },
+              {
+                "childIndex": 12,
+                "type": "Probe"
+              },
+              {
+                "childIndex": 23,
+                "type": "Condition"
+              },
+              {
+                "childIndex": 26,
+                "type": "Build",
+                "variable": "Id'2"
+              },
+              {
+                "childIndex": 27,
+                "type": "Probe",
+                "variable": "v1"
+              }
+            ]
+          },
+          {
+            "index": 31,
+            "name": "Hash Join",
+            "metadata": {
+              "execution_method": "Row",
+              "join_type": "BUILD_ANTI_SEMI"
+            },
+            "children": [
+              {
+                "childIndex": 32,
+                "type": "Build"
+              },
+              {
+                "childIndex": 42,
+                "type": "Probe"
+              },
+              {
+                "childIndex": 52,
+                "type": "Condition"
+              },
+              {
+                "childIndex": 55,
+                "type": "Build",
+                "variable": "Id_1'2"
+              },
+              {
+                "childIndex": 56,
+                "type": "Build",
+                "variable": "v2'"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "plan_record_line": 11,
+        "execute_record_line": 12,
+        "label": "v1/full/merge",
+        "sql": "@{OPTIMIZER_VERSION=1} SELECT l.Id, r.Id FROM JoinProbe1789493355L l FULL JOIN@{JOIN_METHOD=MERGE_JOIN} JoinProbe1789493355R r ON l.K=r.K",
+        "plan_error": "",
+        "execute_error": "",
+        "expected_rows": 9,
+        "actual_rows": 9,
+        "result_match": true,
+        "operators": [
+          {
+            "index": 1,
+            "name": "Merge Join",
+            "metadata": {
+              "execution_method": "Row",
+              "join_configuration": "MANY_TO_MANY",
+              "join_type": "FULL_OUTER"
+            },
+            "children": [
+              {
+                "childIndex": 2,
+                "type": "Left"
+              },
+              {
+                "childIndex": 8,
+                "type": "Right"
+              },
+              {
+                "childIndex": 14,
+                "type": "Condition"
+              },
+              {
+                "childIndex": 17,
+                "type": "Left",
+                "variable": "Id_2"
+              },
+              {
+                "childIndex": 18,
+                "type": "Right",
+                "variable": "Id_3"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "plan_record_line": 13,
+        "execute_record_line": 14,
+        "label": "v2/full/hash",
+        "sql": "@{OPTIMIZER_VERSION=2} SELECT l.Id, r.Id FROM JoinProbe1789493355L l FULL JOIN@{JOIN_METHOD=HASH_JOIN} JoinProbe1789493355R r ON l.K=r.K",
+        "plan_error": "",
+        "execute_error": "",
+        "expected_rows": 9,
+        "actual_rows": 9,
+        "result_match": true,
+        "operators": [
+          {
+            "index": 1,
+            "name": "Union All",
+            "metadata": {
+              "execution_method": "Row"
+            },
+            "children": [
+              {
+                "childIndex": 2
+              },
+              {
+                "childIndex": 30
+              },
+              {
+                "childIndex": 59,
+                "variable": "Id_2"
+              },
+              {
+                "childIndex": 60,
+                "variable": "Id_3"
+              }
+            ]
+          },
+          {
+            "index": 3,
+            "name": "Hash Join",
+            "metadata": {
+              "execution_method": "Row",
+              "join_type": "BUILD_OUTER"
+            },
+            "children": [
+              {
+                "childIndex": 4,
+                "type": "Build"
+              },
+              {
+                "childIndex": 12,
+                "type": "Probe"
+              },
+              {
+                "childIndex": 23,
+                "type": "Condition"
+              },
+              {
+                "childIndex": 26,
+                "type": "Build",
+                "variable": "Id'2"
+              },
+              {
+                "childIndex": 27,
+                "type": "Probe",
+                "variable": "v1"
+              }
+            ]
+          },
+          {
+            "index": 31,
+            "name": "Hash Join",
+            "metadata": {
+              "execution_method": "Row",
+              "join_type": "BUILD_ANTI_SEMI"
+            },
+            "children": [
+              {
+                "childIndex": 32,
+                "type": "Build"
+              },
+              {
+                "childIndex": 42,
+                "type": "Probe"
+              },
+              {
+                "childIndex": 52,
+                "type": "Condition"
+              },
+              {
+                "childIndex": 55,
+                "type": "Build",
+                "variable": "Id_1'2"
+              },
+              {
+                "childIndex": 56,
+                "type": "Build",
+                "variable": "v2'"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "plan_record_line": 15,
+        "execute_record_line": 16,
+        "label": "v2/full/merge",
+        "sql": "@{OPTIMIZER_VERSION=2} SELECT l.Id, r.Id FROM JoinProbe1789493355L l FULL JOIN@{JOIN_METHOD=MERGE_JOIN} JoinProbe1789493355R r ON l.K=r.K",
+        "plan_error": "",
+        "execute_error": "",
+        "expected_rows": 9,
+        "actual_rows": 9,
+        "result_match": true,
+        "operators": [
+          {
+            "index": 1,
+            "name": "Merge Join",
+            "metadata": {
+              "execution_method": "Row",
+              "join_configuration": "MANY_TO_MANY",
+              "join_type": "FULL_OUTER"
+            },
+            "children": [
+              {
+                "childIndex": 2,
+                "type": "Left"
+              },
+              {
+                "childIndex": 8,
+                "type": "Right"
+              },
+              {
+                "childIndex": 14,
+                "type": "Condition"
+              },
+              {
+                "childIndex": 17,
+                "type": "Left",
+                "variable": "Id_2"
+              },
+              {
+                "childIndex": 18,
+                "type": "Right",
+                "variable": "Id_3"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "plan_record_line": 17,
+        "execute_record_line": 18,
+        "label": "v3/full/hash",
+        "sql": "@{OPTIMIZER_VERSION=3} SELECT l.Id, r.Id FROM JoinProbe1789493355L l FULL JOIN@{JOIN_METHOD=HASH_JOIN} JoinProbe1789493355R r ON l.K=r.K",
+        "plan_error": "",
+        "execute_error": "",
+        "expected_rows": 9,
+        "actual_rows": 9,
+        "result_match": true,
+        "operators": [
+          {
+            "index": 1,
+            "name": "Union All",
+            "metadata": {
+              "execution_method": "Row"
+            },
+            "children": [
+              {
+                "childIndex": 2
+              },
+              {
+                "childIndex": 30
+              },
+              {
+                "childIndex": 59,
+                "variable": "Id_2"
+              },
+              {
+                "childIndex": 60,
+                "variable": "Id_3"
+              }
+            ]
+          },
+          {
+            "index": 3,
+            "name": "Hash Join",
+            "metadata": {
+              "execution_method": "Row",
+              "join_type": "BUILD_OUTER"
+            },
+            "children": [
+              {
+                "childIndex": 4,
+                "type": "Build"
+              },
+              {
+                "childIndex": 12,
+                "type": "Probe"
+              },
+              {
+                "childIndex": 23,
+                "type": "Condition"
+              },
+              {
+                "childIndex": 26,
+                "type": "Build",
+                "variable": "Id'2"
+              },
+              {
+                "childIndex": 27,
+                "type": "Probe",
+                "variable": "v1"
+              }
+            ]
+          },
+          {
+            "index": 31,
+            "name": "Hash Join",
+            "metadata": {
+              "execution_method": "Row",
+              "join_type": "BUILD_ANTI_SEMI"
+            },
+            "children": [
+              {
+                "childIndex": 32,
+                "type": "Build"
+              },
+              {
+                "childIndex": 42,
+                "type": "Probe"
+              },
+              {
+                "childIndex": 52,
+                "type": "Condition"
+              },
+              {
+                "childIndex": 55,
+                "type": "Build",
+                "variable": "Id_1'2"
+              },
+              {
+                "childIndex": 56,
+                "type": "Build",
+                "variable": "v2'"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "plan_record_line": 19,
+        "execute_record_line": 20,
+        "label": "v3/full/merge",
+        "sql": "@{OPTIMIZER_VERSION=3} SELECT l.Id, r.Id FROM JoinProbe1789493355L l FULL JOIN@{JOIN_METHOD=MERGE_JOIN} JoinProbe1789493355R r ON l.K=r.K",
+        "plan_error": "",
+        "execute_error": "",
+        "expected_rows": 9,
+        "actual_rows": 9,
+        "result_match": true,
+        "operators": [
+          {
+            "index": 1,
+            "name": "Merge Join",
+            "metadata": {
+              "execution_method": "Row",
+              "join_configuration": "MANY_TO_MANY",
+              "join_type": "FULL_OUTER"
+            },
+            "children": [
+              {
+                "childIndex": 2,
+                "type": "Left"
+              },
+              {
+                "childIndex": 8,
+                "type": "Right"
+              },
+              {
+                "childIndex": 14,
+                "type": "Condition"
+              },
+              {
+                "childIndex": 17,
+                "type": "Left",
+                "variable": "Id_2"
+              },
+              {
+                "childIndex": 18,
+                "type": "Right",
+                "variable": "Id_3"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "plan_record_line": 21,
+        "execute_record_line": 22,
+        "label": "v4/full/hash",
+        "sql": "@{OPTIMIZER_VERSION=4} SELECT l.Id, r.Id FROM JoinProbe1789493355L l FULL JOIN@{JOIN_METHOD=HASH_JOIN} JoinProbe1789493355R r ON l.K=r.K",
+        "plan_error": "",
+        "execute_error": "",
+        "expected_rows": 9,
+        "actual_rows": 9,
+        "result_match": true,
+        "operators": [
+          {
+            "index": 1,
+            "name": "Union All",
+            "metadata": {
+              "execution_method": "Row"
+            },
+            "children": [
+              {
+                "childIndex": 2
+              },
+              {
+                "childIndex": 30
+              },
+              {
+                "childIndex": 59,
+                "variable": "Id_2"
+              },
+              {
+                "childIndex": 60,
+                "variable": "Id_3"
+              }
+            ]
+          },
+          {
+            "index": 3,
+            "name": "Hash Join",
+            "metadata": {
+              "execution_method": "Row",
+              "join_type": "BUILD_OUTER"
+            },
+            "children": [
+              {
+                "childIndex": 4,
+                "type": "Build"
+              },
+              {
+                "childIndex": 12,
+                "type": "Probe"
+              },
+              {
+                "childIndex": 23,
+                "type": "Condition"
+              },
+              {
+                "childIndex": 26,
+                "type": "Build",
+                "variable": "Id'2"
+              },
+              {
+                "childIndex": 27,
+                "type": "Probe",
+                "variable": "v1"
+              }
+            ]
+          },
+          {
+            "index": 31,
+            "name": "Hash Join",
+            "metadata": {
+              "execution_method": "Row",
+              "join_type": "BUILD_ANTI_SEMI"
+            },
+            "children": [
+              {
+                "childIndex": 32,
+                "type": "Build"
+              },
+              {
+                "childIndex": 42,
+                "type": "Probe"
+              },
+              {
+                "childIndex": 52,
+                "type": "Condition"
+              },
+              {
+                "childIndex": 55,
+                "type": "Build",
+                "variable": "Id_1'2"
+              },
+              {
+                "childIndex": 56,
+                "type": "Build",
+                "variable": "v2'"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "plan_record_line": 23,
+        "execute_record_line": 24,
+        "label": "v4/full/merge",
+        "sql": "@{OPTIMIZER_VERSION=4} SELECT l.Id, r.Id FROM JoinProbe1789493355L l FULL JOIN@{JOIN_METHOD=MERGE_JOIN} JoinProbe1789493355R r ON l.K=r.K",
+        "plan_error": "",
+        "execute_error": "",
+        "expected_rows": 9,
+        "actual_rows": 9,
+        "result_match": true,
+        "operators": [
+          {
+            "index": 1,
+            "name": "Merge Join",
+            "metadata": {
+              "execution_method": "Row",
+              "join_configuration": "MANY_TO_MANY",
+              "join_type": "FULL_OUTER"
+            },
+            "children": [
+              {
+                "childIndex": 2,
+                "type": "Left"
+              },
+              {
+                "childIndex": 8,
+                "type": "Right"
+              },
+              {
+                "childIndex": 14,
+                "type": "Condition"
+              },
+              {
+                "childIndex": 17,
+                "type": "Left",
+                "variable": "Id_2"
+              },
+              {
+                "childIndex": 18,
+                "type": "Right",
+                "variable": "Id_3"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "plan_record_line": 25,
+        "execute_record_line": 26,
+        "label": "v5/full/hash",
+        "sql": "@{OPTIMIZER_VERSION=5} SELECT l.Id, r.Id FROM JoinProbe1789493355L l FULL JOIN@{JOIN_METHOD=HASH_JOIN} JoinProbe1789493355R r ON l.K=r.K",
+        "plan_error": "",
+        "execute_error": "",
+        "expected_rows": 9,
+        "actual_rows": 9,
+        "result_match": true,
+        "operators": [
+          {
+            "index": 1,
+            "name": "Union All",
+            "metadata": {
+              "execution_method": "Row"
+            },
+            "children": [
+              {
+                "childIndex": 2
+              },
+              {
+                "childIndex": 30
+              },
+              {
+                "childIndex": 59,
+                "variable": "Id_2"
+              },
+              {
+                "childIndex": 60,
+                "variable": "Id_3"
+              }
+            ]
+          },
+          {
+            "index": 3,
+            "name": "Hash Join",
+            "metadata": {
+              "execution_method": "Row",
+              "join_type": "BUILD_OUTER"
+            },
+            "children": [
+              {
+                "childIndex": 4,
+                "type": "Build"
+              },
+              {
+                "childIndex": 12,
+                "type": "Probe"
+              },
+              {
+                "childIndex": 23,
+                "type": "Condition"
+              },
+              {
+                "childIndex": 26,
+                "type": "Build",
+                "variable": "Id'2"
+              },
+              {
+                "childIndex": 27,
+                "type": "Probe",
+                "variable": "v1"
+              }
+            ]
+          },
+          {
+            "index": 31,
+            "name": "Hash Join",
+            "metadata": {
+              "execution_method": "Row",
+              "join_type": "BUILD_ANTI_SEMI"
+            },
+            "children": [
+              {
+                "childIndex": 32,
+                "type": "Build"
+              },
+              {
+                "childIndex": 42,
+                "type": "Probe"
+              },
+              {
+                "childIndex": 52,
+                "type": "Condition"
+              },
+              {
+                "childIndex": 55,
+                "type": "Build",
+                "variable": "Id_1'2"
+              },
+              {
+                "childIndex": 56,
+                "type": "Build",
+                "variable": "v2'"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "plan_record_line": 27,
+        "execute_record_line": 28,
+        "label": "v5/full/merge",
+        "sql": "@{OPTIMIZER_VERSION=5} SELECT l.Id, r.Id FROM JoinProbe1789493355L l FULL JOIN@{JOIN_METHOD=MERGE_JOIN} JoinProbe1789493355R r ON l.K=r.K",
+        "plan_error": "",
+        "execute_error": "",
+        "expected_rows": 9,
+        "actual_rows": 9,
+        "result_match": true,
+        "operators": [
+          {
+            "index": 1,
+            "name": "Merge Join",
+            "metadata": {
+              "execution_method": "Row",
+              "join_configuration": "MANY_TO_MANY",
+              "join_type": "FULL_OUTER"
+            },
+            "children": [
+              {
+                "childIndex": 2,
+                "type": "Left"
+              },
+              {
+                "childIndex": 8,
+                "type": "Right"
+              },
+              {
+                "childIndex": 14,
+                "type": "Condition"
+              },
+              {
+                "childIndex": 17,
+                "type": "Left",
+                "variable": "Id_2"
+              },
+              {
+                "childIndex": 18,
+                "type": "Right",
+                "variable": "Id_3"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "plan_record_line": 29,
+        "execute_record_line": 30,
+        "label": "v6/full/hash",
+        "sql": "@{OPTIMIZER_VERSION=6} SELECT l.Id, r.Id FROM JoinProbe1789493355L l FULL JOIN@{JOIN_METHOD=HASH_JOIN} JoinProbe1789493355R r ON l.K=r.K",
+        "plan_error": "",
+        "execute_error": "",
+        "expected_rows": 9,
+        "actual_rows": 9,
+        "result_match": true,
+        "operators": [
+          {
+            "index": 1,
+            "name": "Union All",
+            "metadata": {
+              "execution_method": "Row"
+            },
+            "children": [
+              {
+                "childIndex": 2
+              },
+              {
+                "childIndex": 30
+              },
+              {
+                "childIndex": 59,
+                "variable": "Id_2"
+              },
+              {
+                "childIndex": 60,
+                "variable": "Id_3"
+              }
+            ]
+          },
+          {
+            "index": 3,
+            "name": "Hash Join",
+            "metadata": {
+              "execution_method": "Row",
+              "join_type": "BUILD_OUTER"
+            },
+            "children": [
+              {
+                "childIndex": 4,
+                "type": "Build"
+              },
+              {
+                "childIndex": 12,
+                "type": "Probe"
+              },
+              {
+                "childIndex": 23,
+                "type": "Condition"
+              },
+              {
+                "childIndex": 26,
+                "type": "Build",
+                "variable": "Id'2"
+              },
+              {
+                "childIndex": 27,
+                "type": "Probe",
+                "variable": "v1"
+              }
+            ]
+          },
+          {
+            "index": 31,
+            "name": "Hash Join",
+            "metadata": {
+              "execution_method": "Row",
+              "join_type": "BUILD_ANTI_SEMI"
+            },
+            "children": [
+              {
+                "childIndex": 32,
+                "type": "Build"
+              },
+              {
+                "childIndex": 42,
+                "type": "Probe"
+              },
+              {
+                "childIndex": 52,
+                "type": "Condition"
+              },
+              {
+                "childIndex": 55,
+                "type": "Build",
+                "variable": "Id_1'2"
+              },
+              {
+                "childIndex": 56,
+                "type": "Build",
+                "variable": "v2'"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "plan_record_line": 31,
+        "execute_record_line": 32,
+        "label": "v6/full/merge",
+        "sql": "@{OPTIMIZER_VERSION=6} SELECT l.Id, r.Id FROM JoinProbe1789493355L l FULL JOIN@{JOIN_METHOD=MERGE_JOIN} JoinProbe1789493355R r ON l.K=r.K",
+        "plan_error": "",
+        "execute_error": "",
+        "expected_rows": 9,
+        "actual_rows": 9,
+        "result_match": true,
+        "operators": [
+          {
+            "index": 1,
+            "name": "Merge Join",
+            "metadata": {
+              "execution_method": "Row",
+              "join_configuration": "MANY_TO_MANY",
+              "join_type": "FULL_OUTER"
+            },
+            "children": [
+              {
+                "childIndex": 2,
+                "type": "Left"
+              },
+              {
+                "childIndex": 8,
+                "type": "Right"
+              },
+              {
+                "childIndex": 14,
+                "type": "Condition"
+              },
+              {
+                "childIndex": 17,
+                "type": "Left",
+                "variable": "Id_2"
+              },
+              {
+                "childIndex": 18,
+                "type": "Right",
+                "variable": "Id_3"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "plan_record_line": 33,
+        "execute_record_line": 34,
+        "label": "v7/full/hash",
+        "sql": "@{OPTIMIZER_VERSION=7} SELECT l.Id, r.Id FROM JoinProbe1789493355L l FULL JOIN@{JOIN_METHOD=HASH_JOIN} JoinProbe1789493355R r ON l.K=r.K",
+        "plan_error": "",
+        "execute_error": "",
+        "expected_rows": 9,
+        "actual_rows": 9,
+        "result_match": true,
+        "operators": [
+          {
+            "index": 1,
+            "name": "Hash Join",
+            "metadata": {
+              "execution_method": "Row",
+              "join_type": "BUILD_PROBE_OUTER"
+            },
+            "children": [
+              {
+                "childIndex": 2,
+                "type": "Build"
+              },
+              {
+                "childIndex": 8,
+                "type": "Probe"
+              },
+              {
+                "childIndex": 14,
+                "type": "Condition"
+              },
+              {
+                "childIndex": 17,
+                "type": "Build",
+                "variable": "Id_2"
+              },
+              {
+                "childIndex": 18,
+                "type": "Probe",
+                "variable": "Id_3"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "plan_record_line": 35,
+        "execute_record_line": 36,
+        "label": "v7/full/merge",
+        "sql": "@{OPTIMIZER_VERSION=7} SELECT l.Id, r.Id FROM JoinProbe1789493355L l FULL JOIN@{JOIN_METHOD=MERGE_JOIN} JoinProbe1789493355R r ON l.K=r.K",
+        "plan_error": "",
+        "execute_error": "",
+        "expected_rows": 9,
+        "actual_rows": 9,
+        "result_match": true,
+        "operators": [
+          {
+            "index": 1,
+            "name": "Merge Join",
+            "metadata": {
+              "execution_method": "Row",
+              "join_configuration": "MANY_TO_MANY",
+              "join_type": "FULL_OUTER"
+            },
+            "children": [
+              {
+                "childIndex": 2,
+                "type": "Left"
+              },
+              {
+                "childIndex": 8,
+                "type": "Right"
+              },
+              {
+                "childIndex": 14,
+                "type": "Condition"
+              },
+              {
+                "childIndex": 17,
+                "type": "Left",
+                "variable": "Id_2"
+              },
+              {
+                "childIndex": 18,
+                "type": "Right",
+                "variable": "Id_3"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "plan_record_line": 37,
+        "execute_record_line": 38,
+        "label": "v8/full/hash",
+        "sql": "@{OPTIMIZER_VERSION=8} SELECT l.Id, r.Id FROM JoinProbe1789493355L l FULL JOIN@{JOIN_METHOD=HASH_JOIN} JoinProbe1789493355R r ON l.K=r.K",
+        "plan_error": "",
+        "execute_error": "",
+        "expected_rows": 9,
+        "actual_rows": 9,
+        "result_match": true,
+        "operators": [
+          {
+            "index": 1,
+            "name": "Hash Join",
+            "metadata": {
+              "execution_method": "Row",
+              "join_type": "BUILD_PROBE_OUTER"
+            },
+            "children": [
+              {
+                "childIndex": 2,
+                "type": "Build"
+              },
+              {
+                "childIndex": 8,
+                "type": "Probe"
+              },
+              {
+                "childIndex": 14,
+                "type": "Condition"
+              },
+              {
+                "childIndex": 17,
+                "type": "Build",
+                "variable": "Id_2"
+              },
+              {
+                "childIndex": 18,
+                "type": "Probe",
+                "variable": "Id_3"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "plan_record_line": 39,
+        "execute_record_line": 40,
+        "label": "v8/full/merge",
+        "sql": "@{OPTIMIZER_VERSION=8} SELECT l.Id, r.Id FROM JoinProbe1789493355L l FULL JOIN@{JOIN_METHOD=MERGE_JOIN} JoinProbe1789493355R r ON l.K=r.K",
+        "plan_error": "",
+        "execute_error": "",
+        "expected_rows": 9,
+        "actual_rows": 9,
+        "result_match": true,
+        "operators": [
+          {
+            "index": 1,
+            "name": "Merge Join",
+            "metadata": {
+              "execution_method": "Row",
+              "join_configuration": "MANY_TO_MANY",
+              "join_type": "FULL_OUTER"
+            },
+            "children": [
+              {
+                "childIndex": 2,
+                "type": "Left"
+              },
+              {
+                "childIndex": 8,
+                "type": "Right"
+              },
+              {
+                "childIndex": 14,
+                "type": "Condition"
+              },
+              {
+                "childIndex": 17,
+                "type": "Left",
+                "variable": "Id_2"
+              },
+              {
+                "childIndex": 18,
+                "type": "Right",
+                "variable": "Id_3"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "plan_record_line": 41,
+        "execute_record_line": 42,
+        "label": "v9/inner/hash",
+        "sql": "@{OPTIMIZER_VERSION=9} SELECT l.Id, r.Id FROM JoinProbe1789493355L l INNER JOIN@{JOIN_METHOD=HASH_JOIN} JoinProbe1789493355R r ON l.K=r.K",
+        "plan_error": "",
+        "execute_error": "",
+        "expected_rows": 5,
+        "actual_rows": 5,
+        "result_match": true,
+        "operators": [
+          {
+            "index": 1,
+            "name": "Hash Join",
+            "metadata": {
+              "execution_method": "Row",
+              "join_type": "INNER"
+            },
+            "children": [
+              {
+                "childIndex": 2,
+                "type": "Build"
+              },
+              {
+                "childIndex": 10,
+                "type": "Probe"
+              },
+              {
+                "childIndex": 21,
+                "type": "Condition"
+              },
+              {
+                "childIndex": 24,
+                "type": "Build",
+                "variable": "Id'"
+              },
+              {
+                "childIndex": 25,
+                "type": "Probe",
+                "variable": "Id_1'"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "plan_record_line": 43,
+        "execute_record_line": 44,
+        "label": "v9/inner/apply",
+        "sql": "@{OPTIMIZER_VERSION=9} SELECT l.Id, r.Id FROM JoinProbe1789493355L l INNER JOIN@{JOIN_METHOD=APPLY_JOIN, BATCH_MODE=FALSE} JoinProbe1789493355R r ON l.K=r.K",
+        "plan_error": "",
+        "execute_error": "",
+        "expected_rows": 5,
+        "actual_rows": 5,
+        "result_match": true,
+        "operators": [
+          {
+            "index": 3,
+            "name": "Cross Apply",
+            "metadata": {
+              "execution_method": "Row"
+            },
+            "children": [
+              {
+                "childIndex": 4
+              },
+              {
+                "childIndex": 7,
+                "type": "Map"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "plan_record_line": 45,
+        "execute_record_line": 46,
+        "label": "v9/inner/distributed_apply",
+        "sql": "@{OPTIMIZER_VERSION=9} SELECT l.Id, r.Id FROM JoinProbe1789493355L l INNER JOIN@{JOIN_METHOD=APPLY_JOIN, BATCH_MODE=TRUE} JoinProbe1789493355R r ON l.K=r.K",
+        "plan_error": "",
+        "execute_error": "",
+        "expected_rows": 5,
+        "actual_rows": 5,
+        "result_match": true,
+        "operators": [
+          {
+            "index": 3,
+            "name": "Distributed Cross Apply",
+            "metadata": {
+              "execution_method": "Batch",
+              "subquery_cluster_node": "12"
+            },
+            "children": [
+              {
+                "childIndex": 4
+              },
+              {
+                "childIndex": 12,
+                "type": "Map"
+              },
+              {
+                "childIndex": 34,
+                "type": "Split Range"
+              },
+              {
+                "childIndex": 37,
+                "type": "Batch",
+                "variable": "restored_Id'"
+              },
+              {
+                "childIndex": 38,
+                "type": "Batch",
+                "variable": "K'"
+              },
+              {
+                "childIndex": 39,
+                "type": "Batch",
+                "variable": "batched___row_id'"
+              },
+              {
+                "childIndex": 40,
+                "type": "Map",
+                "variable": "Id_1'"
+              }
+            ]
+          },
+          {
+            "index": 13,
+            "name": "Cross Apply",
+            "metadata": {
+              "execution_method": "Row"
+            },
+            "children": [
+              {
+                "childIndex": 14
+              },
+              {
+                "childIndex": 21,
+                "type": "Map"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "plan_record_line": 47,
+        "execute_record_line": 48,
+        "label": "v9/inner/merge",
+        "sql": "@{OPTIMIZER_VERSION=9} SELECT l.Id, r.Id FROM JoinProbe1789493355L l INNER JOIN@{JOIN_METHOD=MERGE_JOIN} JoinProbe1789493355R r ON l.K=r.K",
+        "plan_error": "",
+        "execute_error": "",
+        "expected_rows": 5,
+        "actual_rows": 5,
+        "result_match": true,
+        "operators": [
+          {
+            "index": 1,
+            "name": "Merge Join",
+            "metadata": {
+              "execution_method": "Row",
+              "join_configuration": "MANY_TO_MANY",
+              "join_type": "INNER"
+            },
+            "children": [
+              {
+                "childIndex": 2,
+                "type": "Left"
+              },
+              {
+                "childIndex": 8,
+                "type": "Right"
+              },
+              {
+                "childIndex": 14,
+                "type": "Condition"
+              },
+              {
+                "childIndex": 17,
+                "type": "Left",
+                "variable": "Id'"
+              },
+              {
+                "childIndex": 18,
+                "type": "Right",
+                "variable": "Id_1'"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "plan_record_line": 49,
+        "execute_record_line": 50,
+        "label": "v9/inner/push",
+        "sql": "@{OPTIMIZER_VERSION=9} SELECT l.Id, r.Id FROM JoinProbe1789493355L l INNER JOIN@{JOIN_METHOD=PUSH_BROADCAST_HASH_JOIN} JoinProbe1789493355R r ON l.K=r.K",
+        "plan_error": "",
+        "execute_error": "",
+        "expected_rows": 5,
+        "actual_rows": 5,
+        "result_match": true,
+        "operators": [
+          {
+            "index": 2,
+            "name": "Push Broadcast Hash Join",
+            "metadata": {
+              "execution_method": "Row",
+              "subquery_cluster_node": "12"
+            },
+            "children": [
+              {
+                "childIndex": 3
+              },
+              {
+                "childIndex": 12,
+                "type": "Map"
+              },
+              {
+                "childIndex": 31,
+                "type": "Split Range"
+              },
+              {
+                "childIndex": 34,
+                "type": "Batch",
+                "variable": "batched___row_id'"
+              }
+            ]
+          },
+          {
+            "index": 12,
+            "name": "Hash Join",
+            "metadata": {
+              "execution_method": "Row",
+              "join_type": "INNER"
+            },
+            "children": [
+              {
+                "childIndex": 13,
+                "type": "Build"
+              },
+              {
+                "childIndex": 21,
+                "type": "Probe"
+              },
+              {
+                "childIndex": 25,
+                "type": "Condition"
+              },
+              {
+                "childIndex": 28,
+                "type": "Build",
+                "variable": "batched_Id'"
+              },
+              {
+                "childIndex": 29,
+                "type": "Build",
+                "variable": "batched_K'"
+              },
+              {
+                "childIndex": 30,
+                "type": "Build",
+                "variable": "batched___row_id'2"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "plan_record_line": 51,
+        "execute_record_line": 52,
+        "label": "v9/left/hash",
+        "sql": "@{OPTIMIZER_VERSION=9} SELECT l.Id, r.Id FROM JoinProbe1789493355L l LEFT JOIN@{JOIN_METHOD=HASH_JOIN} JoinProbe1789493355R r ON l.K=r.K",
+        "plan_error": "",
+        "execute_error": "",
+        "expected_rows": 7,
+        "actual_rows": 7,
+        "result_match": true,
+        "operators": [
+          {
+            "index": 1,
+            "name": "Hash Join",
+            "metadata": {
+              "execution_method": "Row",
+              "join_type": "BUILD_OUTER"
+            },
+            "children": [
+              {
+                "childIndex": 2,
+                "type": "Build"
+              },
+              {
+                "childIndex": 10,
+                "type": "Probe"
+              },
+              {
+                "childIndex": 21,
+                "type": "Condition"
+              },
+              {
+                "childIndex": 24,
+                "type": "Build",
+                "variable": "Id'"
+              },
+              {
+                "childIndex": 25,
+                "type": "Probe",
+                "variable": "Id_2"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "plan_record_line": 53,
+        "execute_record_line": 54,
+        "label": "v9/left/apply",
+        "sql": "@{OPTIMIZER_VERSION=9} SELECT l.Id, r.Id FROM JoinProbe1789493355L l LEFT JOIN@{JOIN_METHOD=APPLY_JOIN, BATCH_MODE=FALSE} JoinProbe1789493355R r ON l.K=r.K",
+        "plan_error": "",
+        "execute_error": "",
+        "expected_rows": 7,
+        "actual_rows": 7,
+        "result_match": true,
+        "operators": [
+          {
+            "index": 3,
+            "name": "Outer Apply",
+            "metadata": {
+              "execution_method": "Row"
+            },
+            "children": [
+              {
+                "childIndex": 4
+              },
+              {
+                "childIndex": 7,
+                "type": "Map"
+              },
+              {
+                "childIndex": 24,
+                "variable": "Id_2"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "plan_record_line": 55,
+        "execute_record_line": 56,
+        "label": "v9/left/distributed_apply",
+        "sql": "@{OPTIMIZER_VERSION=9} SELECT l.Id, r.Id FROM JoinProbe1789493355L l LEFT JOIN@{JOIN_METHOD=APPLY_JOIN, BATCH_MODE=TRUE} JoinProbe1789493355R r ON l.K=r.K",
+        "plan_error": "",
+        "execute_error": "",
+        "expected_rows": 7,
+        "actual_rows": 7,
+        "result_match": true,
+        "operators": [
+          {
+            "index": 2,
+            "name": "Distributed Outer Apply",
+            "metadata": {
+              "execution_method": "Row",
+              "subquery_cluster_node": "13"
+            },
+            "children": [
+              {
+                "childIndex": 3
+              },
+              {
+                "childIndex": 13,
+                "type": "Map"
+              },
+              {
+                "childIndex": 32,
+                "type": "Split Range"
+              },
+              {
+                "childIndex": 35,
+                "type": "Batch",
+                "variable": "Id'"
+              },
+              {
+                "childIndex": 36,
+                "type": "Batch",
+                "variable": "K'"
+              },
+              {
+                "childIndex": 37,
+                "type": "Batch",
+                "variable": "batched___row_id'"
+              },
+              {
+                "childIndex": 38,
+                "type": "Map",
+                "variable": "Id_2"
+              }
+            ]
+          },
+          {
+            "index": 13,
+            "name": "Cross Apply",
+            "metadata": {
+              "execution_method": "Row"
+            },
+            "children": [
+              {
+                "childIndex": 14
+              },
+              {
+                "childIndex": 19,
+                "type": "Map"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "plan_record_line": 57,
+        "execute_record_line": 58,
+        "label": "v9/left/merge",
+        "sql": "@{OPTIMIZER_VERSION=9} SELECT l.Id, r.Id FROM JoinProbe1789493355L l LEFT JOIN@{JOIN_METHOD=MERGE_JOIN} JoinProbe1789493355R r ON l.K=r.K",
+        "plan_error": "",
+        "execute_error": "",
+        "expected_rows": 7,
+        "actual_rows": 7,
+        "result_match": true,
+        "operators": [
+          {
+            "index": 1,
+            "name": "Merge Join",
+            "metadata": {
+              "execution_method": "Row",
+              "join_configuration": "MANY_TO_MANY",
+              "join_type": "LEFT_OUTER"
+            },
+            "children": [
+              {
+                "childIndex": 2,
+                "type": "Left"
+              },
+              {
+                "childIndex": 8,
+                "type": "Right"
+              },
+              {
+                "childIndex": 14,
+                "type": "Condition"
+              },
+              {
+                "childIndex": 17,
+                "type": "Left",
+                "variable": "Id'"
+              },
+              {
+                "childIndex": 18,
+                "type": "Right",
+                "variable": "Id_2"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "plan_record_line": 59,
+        "execute_record_line": 60,
+        "label": "v9/left/push",
+        "sql": "@{OPTIMIZER_VERSION=9} SELECT l.Id, r.Id FROM JoinProbe1789493355L l LEFT JOIN@{JOIN_METHOD=PUSH_BROADCAST_HASH_JOIN} JoinProbe1789493355R r ON l.K=r.K",
+        "plan_error": "",
+        "execute_error": "",
+        "expected_rows": 7,
+        "actual_rows": 7,
+        "result_match": true,
+        "operators": [
+          {
+            "index": 2,
+            "name": "Push Broadcast Hash Join Outer Apply",
+            "metadata": {
+              "execution_method": "Row",
+              "subquery_cluster_node": "13"
+            },
+            "children": [
+              {
+                "childIndex": 3
+              },
+              {
+                "childIndex": 13,
+                "type": "Map"
+              },
+              {
+                "childIndex": 28,
+                "type": "Split Range"
+              },
+              {
+                "childIndex": 31,
+                "type": "Batch",
+                "variable": "Id'"
+              },
+              {
+                "childIndex": 32,
+                "type": "Batch",
+                "variable": "K'"
+              },
+              {
+                "childIndex": 33,
+                "type": "Batch",
+                "variable": "batched___row_id'"
+              },
+              {
+                "childIndex": 34,
+                "type": "Map",
+                "variable": "Id_2"
+              }
+            ]
+          },
+          {
+            "index": 13,
+            "name": "Hash Join",
+            "metadata": {
+              "execution_method": "Row",
+              "join_type": "INNER"
+            },
+            "children": [
+              {
+                "childIndex": 14,
+                "type": "Build"
+              },
+              {
+                "childIndex": 18,
+                "type": "Probe"
+              },
+              {
+                "childIndex": 22,
+                "type": "Condition"
+              },
+              {
+                "childIndex": 25,
+                "type": "Build",
+                "variable": "batched_Id'"
+              },
+              {
+                "childIndex": 26,
+                "type": "Build",
+                "variable": "batched_K'"
+              },
+              {
+                "childIndex": 27,
+                "type": "Build",
+                "variable": "batched___row_id'2"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "plan_record_line": 61,
+        "execute_record_line": 62,
+        "label": "v9/right/hash",
+        "sql": "@{OPTIMIZER_VERSION=9} SELECT l.Id, r.Id FROM JoinProbe1789493355L l RIGHT JOIN@{JOIN_METHOD=HASH_JOIN} JoinProbe1789493355R r ON l.K=r.K",
+        "plan_error": "",
+        "execute_error": "",
+        "expected_rows": 7,
+        "actual_rows": 7,
+        "result_match": true,
+        "operators": [
+          {
+            "index": 1,
+            "name": "Hash Join",
+            "metadata": {
+              "execution_method": "Row",
+              "join_type": "PROBE_OUTER"
+            },
+            "children": [
+              {
+                "childIndex": 2,
+                "type": "Build"
+              },
+              {
+                "childIndex": 8,
+                "type": "Probe"
+              },
+              {
+                "childIndex": 14,
+                "type": "Condition"
+              },
+              {
+                "childIndex": 17,
+                "type": "Build",
+                "variable": "Id_2"
+              },
+              {
+                "childIndex": 18,
+                "type": "Probe",
+                "variable": "Id_1'"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "plan_record_line": 63,
+        "execute_record_line": 64,
+        "label": "v9/right/apply",
+        "sql": "@{OPTIMIZER_VERSION=9} SELECT l.Id, r.Id FROM JoinProbe1789493355L l RIGHT JOIN@{JOIN_METHOD=APPLY_JOIN, BATCH_MODE=FALSE} JoinProbe1789493355R r ON l.K=r.K",
+        "plan_error": "",
+        "execute_error": "",
+        "expected_rows": 7,
+        "actual_rows": 7,
+        "result_match": true,
+        "operators": [
+          {
+            "index": 3,
+            "name": "Outer Apply",
+            "metadata": {
+              "execution_method": "Row"
+            },
+            "children": [
+              {
+                "childIndex": 4
+              },
+              {
+                "childIndex": 7,
+                "type": "Map"
+              },
+              {
+                "childIndex": 24,
+                "variable": "Id_2"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "plan_record_line": 65,
+        "execute_record_line": 66,
+        "label": "v9/right/distributed_apply",
+        "sql": "@{OPTIMIZER_VERSION=9} SELECT l.Id, r.Id FROM JoinProbe1789493355L l RIGHT JOIN@{JOIN_METHOD=APPLY_JOIN, BATCH_MODE=TRUE} JoinProbe1789493355R r ON l.K=r.K",
+        "plan_error": "",
+        "execute_error": "",
+        "expected_rows": 7,
+        "actual_rows": 7,
+        "result_match": true,
+        "operators": [
+          {
+            "index": 2,
+            "name": "Distributed Outer Apply",
+            "metadata": {
+              "execution_method": "Row",
+              "subquery_cluster_node": "13"
+            },
+            "children": [
+              {
+                "childIndex": 3
+              },
+              {
+                "childIndex": 13,
+                "type": "Map"
+              },
+              {
+                "childIndex": 32,
+                "type": "Split Range"
+              },
+              {
+                "childIndex": 35,
+                "type": "Batch",
+                "variable": "Id_1'"
+              },
+              {
+                "childIndex": 36,
+                "type": "Batch",
+                "variable": "K_1'"
+              },
+              {
+                "childIndex": 37,
+                "type": "Batch",
+                "variable": "batched___row_id'"
+              },
+              {
+                "childIndex": 38,
+                "type": "Map",
+                "variable": "Id_2"
+              }
+            ]
+          },
+          {
+            "index": 13,
+            "name": "Cross Apply",
+            "metadata": {
+              "execution_method": "Row"
+            },
+            "children": [
+              {
+                "childIndex": 14
+              },
+              {
+                "childIndex": 19,
+                "type": "Map"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "plan_record_line": 67,
+        "execute_record_line": 68,
+        "label": "v9/right/merge",
+        "sql": "@{OPTIMIZER_VERSION=9} SELECT l.Id, r.Id FROM JoinProbe1789493355L l RIGHT JOIN@{JOIN_METHOD=MERGE_JOIN} JoinProbe1789493355R r ON l.K=r.K",
+        "plan_error": "",
+        "execute_error": "",
+        "expected_rows": 7,
+        "actual_rows": 7,
+        "result_match": true,
+        "operators": [
+          {
+            "index": 1,
+            "name": "Merge Join",
+            "metadata": {
+              "execution_method": "Row",
+              "join_configuration": "MANY_TO_MANY",
+              "join_type": "LEFT_OUTER"
+            },
+            "children": [
+              {
+                "childIndex": 2,
+                "type": "Left"
+              },
+              {
+                "childIndex": 8,
+                "type": "Right"
+              },
+              {
+                "childIndex": 14,
+                "type": "Condition"
+              },
+              {
+                "childIndex": 17,
+                "type": "Left",
+                "variable": "Id_1'"
+              },
+              {
+                "childIndex": 18,
+                "type": "Right",
+                "variable": "Id_2"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "plan_record_line": 69,
+        "execute_record_line": 70,
+        "label": "v9/right/push",
+        "sql": "@{OPTIMIZER_VERSION=9} SELECT l.Id, r.Id FROM JoinProbe1789493355L l RIGHT JOIN@{JOIN_METHOD=PUSH_BROADCAST_HASH_JOIN} JoinProbe1789493355R r ON l.K=r.K",
+        "plan_error": "",
+        "execute_error": "",
+        "expected_rows": 7,
+        "actual_rows": 7,
+        "result_match": true,
+        "operators": [
+          {
+            "index": 2,
+            "name": "Push Broadcast Hash Join Outer Apply",
+            "metadata": {
+              "execution_method": "Row",
+              "subquery_cluster_node": "13"
+            },
+            "children": [
+              {
+                "childIndex": 3
+              },
+              {
+                "childIndex": 13,
+                "type": "Map"
+              },
+              {
+                "childIndex": 26,
+                "type": "Split Range"
+              },
+              {
+                "childIndex": 29,
+                "type": "Batch",
+                "variable": "Id_1'"
+              },
+              {
+                "childIndex": 30,
+                "type": "Batch",
+                "variable": "K_1'"
+              },
+              {
+                "childIndex": 31,
+                "type": "Batch",
+                "variable": "batched___row_id'"
+              },
+              {
+                "childIndex": 32,
+                "type": "Map",
+                "variable": "Id_2"
+              }
+            ]
+          },
+          {
+            "index": 13,
+            "name": "Hash Join",
+            "metadata": {
+              "execution_method": "Row",
+              "join_type": "INNER"
+            },
+            "children": [
+              {
+                "childIndex": 14,
+                "type": "Build"
+              },
+              {
+                "childIndex": 18,
+                "type": "Probe"
+              },
+              {
+                "childIndex": 22,
+                "type": "Condition"
+              },
+              {
+                "childIndex": 25,
+                "type": "Build",
+                "variable": "Id'"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "plan_record_line": 71,
+        "execute_record_line": 72,
+        "label": "v9/full/hash",
+        "sql": "@{OPTIMIZER_VERSION=9} SELECT l.Id, r.Id FROM JoinProbe1789493355L l FULL JOIN@{JOIN_METHOD=HASH_JOIN} JoinProbe1789493355R r ON l.K=r.K",
+        "plan_error": "",
+        "execute_error": "",
+        "expected_rows": 9,
+        "actual_rows": 9,
+        "result_match": true,
+        "operators": [
+          {
+            "index": 1,
+            "name": "Hash Join",
+            "metadata": {
+              "execution_method": "Row",
+              "join_type": "BUILD_PROBE_OUTER"
+            },
+            "children": [
+              {
+                "childIndex": 2,
+                "type": "Build"
+              },
+              {
+                "childIndex": 8,
+                "type": "Probe"
+              },
+              {
+                "childIndex": 14,
+                "type": "Condition"
+              },
+              {
+                "childIndex": 17,
+                "type": "Build",
+                "variable": "Id_2"
+              },
+              {
+                "childIndex": 18,
+                "type": "Probe",
+                "variable": "Id_3"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "plan_record_line": 73,
+        "execute_record_line": 74,
+        "label": "v9/full/apply",
+        "sql": "@{OPTIMIZER_VERSION=9} SELECT l.Id, r.Id FROM JoinProbe1789493355L l FULL JOIN@{JOIN_METHOD=APPLY_JOIN, BATCH_MODE=FALSE} JoinProbe1789493355R r ON l.K=r.K",
+        "plan_error": "",
+        "execute_error": "",
+        "expected_rows": 9,
+        "actual_rows": 9,
+        "result_match": true,
+        "operators": [
+          {
+            "index": 1,
+            "name": "Union All",
+            "metadata": {
+              "execution_method": "Row"
+            },
+            "children": [
+              {
+                "childIndex": 2
+              },
+              {
+                "childIndex": 30
+              },
+              {
+                "childIndex": 58,
+                "variable": "Id_2"
+              },
+              {
+                "childIndex": 59,
+                "variable": "Id_3"
+              }
+            ]
+          },
+          {
+            "index": 5,
+            "name": "Outer Apply",
+            "metadata": {
+              "execution_method": "Row"
+            },
+            "children": [
+              {
+                "childIndex": 6
+              },
+              {
+                "childIndex": 9,
+                "type": "Map"
+              },
+              {
+                "childIndex": 26,
+                "variable": "v1"
+              }
+            ]
+          },
+          {
+            "index": 34,
+            "name": "Anti-Semi Apply",
+            "metadata": {
+              "execution_method": "Row"
+            },
+            "children": [
+              {
+                "childIndex": 35
+              },
+              {
+                "childIndex": 38,
+                "type": "Map"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "plan_record_line": 75,
+        "execute_record_line": 76,
+        "label": "v9/full/distributed_apply",
+        "sql": "@{OPTIMIZER_VERSION=9} SELECT l.Id, r.Id FROM JoinProbe1789493355L l FULL JOIN@{JOIN_METHOD=APPLY_JOIN, BATCH_MODE=TRUE} JoinProbe1789493355R r ON l.K=r.K",
+        "plan_error": "",
+        "execute_error": "",
+        "expected_rows": 9,
+        "actual_rows": 9,
+        "result_match": true,
+        "operators": [
+          {
+            "index": 1,
+            "name": "Union All",
+            "metadata": {
+              "execution_method": "Row"
+            },
+            "children": [
+              {
+                "childIndex": 2
+              },
+              {
+                "childIndex": 44
+              },
+              {
+                "childIndex": 86,
+                "variable": "Id_2"
+              },
+              {
+                "childIndex": 87,
+                "variable": "Id_3"
+              }
+            ]
+          },
+          {
+            "index": 4,
+            "name": "Distributed Outer Apply",
+            "metadata": {
+              "execution_method": "Row",
+              "subquery_cluster_node": "15"
+            },
+            "children": [
+              {
+                "childIndex": 5
+              },
+              {
+                "childIndex": 15,
+                "type": "Map"
+              },
+              {
+                "childIndex": 34,
+                "type": "Split Range"
+              },
+              {
+                "childIndex": 37,
+                "type": "Batch",
+                "variable": "Id'2"
+              },
+              {
+                "childIndex": 38,
+                "type": "Batch",
+                "variable": "K'2"
+              },
+              {
+                "childIndex": 39,
+                "type": "Batch",
+                "variable": "batched___row_id'"
+              },
+              {
+                "childIndex": 40,
+                "type": "Map",
+                "variable": "v1"
+              }
+            ]
+          },
+          {
+            "index": 15,
+            "name": "Cross Apply",
+            "metadata": {
+              "execution_method": "Row"
+            },
+            "children": [
+              {
+                "childIndex": 16
+              },
+              {
+                "childIndex": 21,
+                "type": "Map"
+              }
+            ]
+          },
+          {
+            "index": 47,
+            "name": "Distributed Anti Semi Apply",
+            "metadata": {
+              "execution_method": "Row",
+              "subquery_cluster_node": "58"
+            },
+            "children": [
+              {
+                "childIndex": 48
+              },
+              {
+                "childIndex": 58,
+                "type": "Map"
+              },
+              {
+                "childIndex": 76,
+                "type": "Split Range"
+              },
+              {
+                "childIndex": 79,
+                "type": "Batch",
+                "variable": "Id_1'2"
+              },
+              {
+                "childIndex": 80,
+                "type": "Batch",
+                "variable": "K_1'2"
+              },
+              {
+                "childIndex": 81,
+                "type": "Batch",
+                "variable": "batched___row_id'3"
+              }
+            ]
+          },
+          {
+            "index": 58,
+            "name": "Semi Apply",
+            "metadata": {
+              "execution_method": "Row"
+            },
+            "children": [
+              {
+                "childIndex": 59
+              },
+              {
+                "childIndex": 64,
+                "type": "Map"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "plan_record_line": 77,
+        "execute_record_line": 78,
+        "label": "v9/full/merge",
+        "sql": "@{OPTIMIZER_VERSION=9} SELECT l.Id, r.Id FROM JoinProbe1789493355L l FULL JOIN@{JOIN_METHOD=MERGE_JOIN} JoinProbe1789493355R r ON l.K=r.K",
+        "plan_error": "",
+        "execute_error": "",
+        "expected_rows": 9,
+        "actual_rows": 9,
+        "result_match": true,
+        "operators": [
+          {
+            "index": 1,
+            "name": "Merge Join",
+            "metadata": {
+              "execution_method": "Row",
+              "join_configuration": "MANY_TO_MANY",
+              "join_type": "FULL_OUTER"
+            },
+            "children": [
+              {
+                "childIndex": 2,
+                "type": "Left"
+              },
+              {
+                "childIndex": 8,
+                "type": "Right"
+              },
+              {
+                "childIndex": 14,
+                "type": "Condition"
+              },
+              {
+                "childIndex": 17,
+                "type": "Left",
+                "variable": "Id_2"
+              },
+              {
+                "childIndex": 18,
+                "type": "Right",
+                "variable": "Id_3"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "plan_record_line": 79,
+        "execute_record_line": 80,
+        "label": "v9/full/push",
+        "sql": "@{OPTIMIZER_VERSION=9} SELECT l.Id, r.Id FROM JoinProbe1789493355L l FULL JOIN@{JOIN_METHOD=PUSH_BROADCAST_HASH_JOIN} JoinProbe1789493355R r ON l.K=r.K",
+        "plan_error": "",
+        "execute_error": "",
+        "expected_rows": 9,
+        "actual_rows": 9,
+        "result_match": true,
+        "operators": [
+          {
+            "index": 1,
+            "name": "Union All",
+            "metadata": {
+              "execution_method": "Row"
+            },
+            "children": [
+              {
+                "childIndex": 2
+              },
+              {
+                "childIndex": 40
+              },
+              {
+                "childIndex": 78,
+                "variable": "Id_2"
+              },
+              {
+                "childIndex": 79,
+                "variable": "Id_3"
+              }
+            ]
+          },
+          {
+            "index": 4,
+            "name": "Push Broadcast Hash Join Outer Apply",
+            "metadata": {
+              "execution_method": "Row",
+              "subquery_cluster_node": "15"
+            },
+            "children": [
+              {
+                "childIndex": 5
+              },
+              {
+                "childIndex": 15,
+                "type": "Map"
+              },
+              {
+                "childIndex": 30,
+                "type": "Split Range"
+              },
+              {
+                "childIndex": 33,
+                "type": "Batch",
+                "variable": "Id'2"
+              },
+              {
+                "childIndex": 34,
+                "type": "Batch",
+                "variable": "K'2"
+              },
+              {
+                "childIndex": 35,
+                "type": "Batch",
+                "variable": "batched___row_id'"
+              },
+              {
+                "childIndex": 36,
+                "type": "Map",
+                "variable": "v1"
+              }
+            ]
+          },
+          {
+            "index": 15,
+            "name": "Hash Join",
+            "metadata": {
+              "execution_method": "Row",
+              "join_type": "INNER"
+            },
+            "children": [
+              {
+                "childIndex": 16,
+                "type": "Build"
+              },
+              {
+                "childIndex": 20,
+                "type": "Probe"
+              },
+              {
+                "childIndex": 24,
+                "type": "Condition"
+              },
+              {
+                "childIndex": 27,
+                "type": "Build",
+                "variable": "batched_Id'"
+              },
+              {
+                "childIndex": 28,
+                "type": "Build",
+                "variable": "batched_K'"
+              },
+              {
+                "childIndex": 29,
+                "type": "Build",
+                "variable": "batched___row_id'4"
+              }
+            ]
+          },
+          {
+            "index": 43,
+            "name": "Push Broadcast Hash Join Anti Semi Apply",
+            "metadata": {
+              "execution_method": "Row",
+              "subquery_cluster_node": "54"
+            },
+            "children": [
+              {
+                "childIndex": 44
+              },
+              {
+                "childIndex": 54,
+                "type": "Map"
+              },
+              {
+                "childIndex": 68,
+                "type": "Split Range"
+              },
+              {
+                "childIndex": 71,
+                "type": "Batch",
+                "variable": "Id_1'2"
+              },
+              {
+                "childIndex": 72,
+                "type": "Batch",
+                "variable": "K_1'2"
+              },
+              {
+                "childIndex": 73,
+                "type": "Batch",
+                "variable": "batched___row_id'3"
+              }
+            ]
+          },
+          {
+            "index": 54,
+            "name": "Hash Join",
+            "metadata": {
+              "execution_method": "Row",
+              "join_type": "INNER"
+            },
+            "children": [
+              {
+                "childIndex": 55,
+                "type": "Build"
+              },
+              {
+                "childIndex": 59,
+                "type": "Probe"
+              },
+              {
+                "childIndex": 62,
+                "type": "Condition"
+              },
+              {
+                "childIndex": 65,
+                "type": "Build",
+                "variable": "batched_Id_1'2"
+              },
+              {
+                "childIndex": 66,
+                "type": "Build",
+                "variable": "batched_K_1'2"
+              },
+              {
+                "childIndex": 67,
+                "type": "Build",
+                "variable": "batched___row_id'5"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "plan_record_line": 81,
+        "execute_record_line": 82,
+        "label": "v9/in/hash",
+        "sql": "@{OPTIMIZER_VERSION=9, JOIN_METHOD=HASH_JOIN} SELECT l.Id FROM JoinProbe1789493355L l WHERE l.K IN (SELECT r.K FROM JoinProbe1789493355R r)",
+        "plan_error": "",
+        "execute_error": "",
+        "expected_rows": 3,
+        "actual_rows": 3,
+        "result_match": true,
+        "operators": [
+          {
+            "index": 1,
+            "name": "Hash Join",
+            "metadata": {
+              "execution_method": "Row",
+              "join_type": "BUILD_SEMI"
+            },
+            "children": [
+              {
+                "childIndex": 2,
+                "type": "Build"
+              },
+              {
+                "childIndex": 10,
+                "type": "Probe"
+              },
+              {
+                "childIndex": 20,
+                "type": "Condition"
+              },
+              {
+                "childIndex": 23,
+                "type": "Build",
+                "variable": "Id'"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "plan_record_line": 83,
+        "execute_record_line": 84,
+        "label": "v9/in/apply",
+        "sql": "@{OPTIMIZER_VERSION=9, JOIN_METHOD=APPLY_JOIN, BATCH_MODE=FALSE} SELECT l.Id FROM JoinProbe1789493355L l WHERE l.K IN (SELECT r.K FROM JoinProbe1789493355R r)",
+        "plan_error": "",
+        "execute_error": "",
+        "expected_rows": 3,
+        "actual_rows": 3,
+        "result_match": true,
+        "operators": [
+          {
+            "index": 3,
+            "name": "Semi Apply",
+            "metadata": {
+              "execution_method": "Row"
+            },
+            "children": [
+              {
+                "childIndex": 4
+              },
+              {
+                "childIndex": 7,
+                "type": "Map"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "plan_record_line": 85,
+        "execute_record_line": 86,
+        "label": "v9/in/distributed_apply",
+        "sql": "@{OPTIMIZER_VERSION=9, JOIN_METHOD=APPLY_JOIN, BATCH_MODE=TRUE} SELECT l.Id FROM JoinProbe1789493355L l WHERE l.K IN (SELECT r.K FROM JoinProbe1789493355R r)",
+        "plan_error": "",
+        "execute_error": "",
+        "expected_rows": 3,
+        "actual_rows": 3,
+        "result_match": true,
+        "operators": [
+          {
+            "index": 2,
+            "name": "Distributed Semi Apply",
+            "metadata": {
+              "execution_method": "Row",
+              "subquery_cluster_node": "13"
+            },
+            "children": [
+              {
+                "childIndex": 3
+              },
+              {
+                "childIndex": 13,
+                "type": "Map"
+              },
+              {
+                "childIndex": 31,
+                "type": "Split Range"
+              },
+              {
+                "childIndex": 34,
+                "type": "Batch",
+                "variable": "Id'"
+              },
+              {
+                "childIndex": 35,
+                "type": "Batch",
+                "variable": "K'"
+              },
+              {
+                "childIndex": 36,
+                "type": "Batch",
+                "variable": "batched___row_id'"
+              }
+            ]
+          },
+          {
+            "index": 13,
+            "name": "Semi Apply",
+            "metadata": {
+              "execution_method": "Row"
+            },
+            "children": [
+              {
+                "childIndex": 14
+              },
+              {
+                "childIndex": 19,
+                "type": "Map"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "plan_record_line": 87,
+        "execute_record_line": 88,
+        "label": "v9/in/merge",
+        "sql": "@{OPTIMIZER_VERSION=9, JOIN_METHOD=MERGE_JOIN} SELECT l.Id FROM JoinProbe1789493355L l WHERE l.K IN (SELECT r.K FROM JoinProbe1789493355R r)",
+        "plan_error": "",
+        "execute_error": "",
+        "expected_rows": 3,
+        "actual_rows": 3,
+        "result_match": true,
+        "operators": [
+          {
+            "index": 1,
+            "name": "Merge Join",
+            "metadata": {
+              "execution_method": "Row",
+              "join_configuration": "ONE_TO_MANY",
+              "join_type": "LEFT_SEMI"
+            },
+            "children": [
+              {
+                "childIndex": 2,
+                "type": "Left"
+              },
+              {
+                "childIndex": 8,
+                "type": "Right"
+              },
+              {
+                "childIndex": 13,
+                "type": "Condition"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "plan_record_line": 89,
+        "execute_record_line": 90,
+        "label": "v9/in/push",
+        "sql": "@{OPTIMIZER_VERSION=9, JOIN_METHOD=PUSH_BROADCAST_HASH_JOIN} SELECT l.Id FROM JoinProbe1789493355L l WHERE l.K IN (SELECT r.K FROM JoinProbe1789493355R r)",
+        "plan_error": "",
+        "execute_error": "",
+        "expected_rows": 3,
+        "actual_rows": 3,
+        "result_match": true,
+        "operators": [
+          {
+            "index": 2,
+            "name": "Push Broadcast Hash Join Semi Apply",
+            "metadata": {
+              "execution_method": "Row",
+              "subquery_cluster_node": "13"
+            },
+            "children": [
+              {
+                "childIndex": 3
+              },
+              {
+                "childIndex": 13,
+                "type": "Map"
+              },
+              {
+                "childIndex": 27,
+                "type": "Split Range"
+              },
+              {
+                "childIndex": 30,
+                "type": "Batch",
+                "variable": "Id'"
+              },
+              {
+                "childIndex": 31,
+                "type": "Batch",
+                "variable": "K'"
+              },
+              {
+                "childIndex": 32,
+                "type": "Batch",
+                "variable": "batched___row_id'"
+              }
+            ]
+          },
+          {
+            "index": 13,
+            "name": "Hash Join",
+            "metadata": {
+              "execution_method": "Row",
+              "join_type": "INNER"
+            },
+            "children": [
+              {
+                "childIndex": 14,
+                "type": "Build"
+              },
+              {
+                "childIndex": 18,
+                "type": "Probe"
+              },
+              {
+                "childIndex": 21,
+                "type": "Condition"
+              },
+              {
+                "childIndex": 24,
+                "type": "Build",
+                "variable": "batched_Id'"
+              },
+              {
+                "childIndex": 25,
+                "type": "Build",
+                "variable": "batched_K'"
+              },
+              {
+                "childIndex": 26,
+                "type": "Build",
+                "variable": "batched___row_id'2"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "plan_record_line": 91,
+        "execute_record_line": 92,
+        "label": "v9/exists/hash",
+        "sql": "@{OPTIMIZER_VERSION=9, JOIN_METHOD=HASH_JOIN} SELECT l.Id FROM JoinProbe1789493355L l WHERE EXISTS (SELECT 1 FROM JoinProbe1789493355R r WHERE l.K=r.K)",
+        "plan_error": "",
+        "execute_error": "",
+        "expected_rows": 3,
+        "actual_rows": 3,
+        "result_match": true,
+        "operators": [
+          {
+            "index": 1,
+            "name": "Hash Join",
+            "metadata": {
+              "execution_method": "Row",
+              "join_type": "BUILD_SEMI"
+            },
+            "children": [
+              {
+                "childIndex": 2,
+                "type": "Build"
+              },
+              {
+                "childIndex": 10,
+                "type": "Probe"
+              },
+              {
+                "childIndex": 20,
+                "type": "Condition"
+              },
+              {
+                "childIndex": 23,
+                "type": "Build",
+                "variable": "Id'"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "plan_record_line": 93,
+        "execute_record_line": 94,
+        "label": "v9/exists/apply",
+        "sql": "@{OPTIMIZER_VERSION=9, JOIN_METHOD=APPLY_JOIN, BATCH_MODE=FALSE} SELECT l.Id FROM JoinProbe1789493355L l WHERE EXISTS (SELECT 1 FROM JoinProbe1789493355R r WHERE l.K=r.K)",
+        "plan_error": "",
+        "execute_error": "",
+        "expected_rows": 3,
+        "actual_rows": 3,
+        "result_match": true,
+        "operators": [
+          {
+            "index": 3,
+            "name": "Semi Apply",
+            "metadata": {
+              "execution_method": "Row"
+            },
+            "children": [
+              {
+                "childIndex": 4
+              },
+              {
+                "childIndex": 7,
+                "type": "Map"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "plan_record_line": 95,
+        "execute_record_line": 96,
+        "label": "v9/exists/distributed_apply",
+        "sql": "@{OPTIMIZER_VERSION=9, JOIN_METHOD=APPLY_JOIN, BATCH_MODE=TRUE} SELECT l.Id FROM JoinProbe1789493355L l WHERE EXISTS (SELECT 1 FROM JoinProbe1789493355R r WHERE l.K=r.K)",
+        "plan_error": "",
+        "execute_error": "",
+        "expected_rows": 3,
+        "actual_rows": 3,
+        "result_match": true,
+        "operators": [
+          {
+            "index": 2,
+            "name": "Distributed Semi Apply",
+            "metadata": {
+              "execution_method": "Row",
+              "subquery_cluster_node": "13"
+            },
+            "children": [
+              {
+                "childIndex": 3
+              },
+              {
+                "childIndex": 13,
+                "type": "Map"
+              },
+              {
+                "childIndex": 31,
+                "type": "Split Range"
+              },
+              {
+                "childIndex": 34,
+                "type": "Batch",
+                "variable": "Id'"
+              },
+              {
+                "childIndex": 35,
+                "type": "Batch",
+                "variable": "K'"
+              },
+              {
+                "childIndex": 36,
+                "type": "Batch",
+                "variable": "batched___row_id'"
+              }
+            ]
+          },
+          {
+            "index": 13,
+            "name": "Semi Apply",
+            "metadata": {
+              "execution_method": "Row"
+            },
+            "children": [
+              {
+                "childIndex": 14
+              },
+              {
+                "childIndex": 19,
+                "type": "Map"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "plan_record_line": 97,
+        "execute_record_line": 98,
+        "label": "v9/exists/merge",
+        "sql": "@{OPTIMIZER_VERSION=9, JOIN_METHOD=MERGE_JOIN} SELECT l.Id FROM JoinProbe1789493355L l WHERE EXISTS (SELECT 1 FROM JoinProbe1789493355R r WHERE l.K=r.K)",
+        "plan_error": "",
+        "execute_error": "",
+        "expected_rows": 3,
+        "actual_rows": 3,
+        "result_match": true,
+        "operators": [
+          {
+            "index": 1,
+            "name": "Merge Join",
+            "metadata": {
+              "execution_method": "Row",
+              "join_configuration": "ONE_TO_MANY",
+              "join_type": "LEFT_SEMI"
+            },
+            "children": [
+              {
+                "childIndex": 2,
+                "type": "Left"
+              },
+              {
+                "childIndex": 8,
+                "type": "Right"
+              },
+              {
+                "childIndex": 13,
+                "type": "Condition"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "plan_record_line": 99,
+        "execute_record_line": 100,
+        "label": "v9/exists/push",
+        "sql": "@{OPTIMIZER_VERSION=9, JOIN_METHOD=PUSH_BROADCAST_HASH_JOIN} SELECT l.Id FROM JoinProbe1789493355L l WHERE EXISTS (SELECT 1 FROM JoinProbe1789493355R r WHERE l.K=r.K)",
+        "plan_error": "",
+        "execute_error": "",
+        "expected_rows": 3,
+        "actual_rows": 3,
+        "result_match": true,
+        "operators": [
+          {
+            "index": 2,
+            "name": "Push Broadcast Hash Join Semi Apply",
+            "metadata": {
+              "execution_method": "Row",
+              "subquery_cluster_node": "13"
+            },
+            "children": [
+              {
+                "childIndex": 3
+              },
+              {
+                "childIndex": 13,
+                "type": "Map"
+              },
+              {
+                "childIndex": 27,
+                "type": "Split Range"
+              },
+              {
+                "childIndex": 30,
+                "type": "Batch",
+                "variable": "Id'"
+              },
+              {
+                "childIndex": 31,
+                "type": "Batch",
+                "variable": "K'"
+              },
+              {
+                "childIndex": 32,
+                "type": "Batch",
+                "variable": "batched___row_id'"
+              }
+            ]
+          },
+          {
+            "index": 13,
+            "name": "Hash Join",
+            "metadata": {
+              "execution_method": "Row",
+              "join_type": "INNER"
+            },
+            "children": [
+              {
+                "childIndex": 14,
+                "type": "Build"
+              },
+              {
+                "childIndex": 18,
+                "type": "Probe"
+              },
+              {
+                "childIndex": 21,
+                "type": "Condition"
+              },
+              {
+                "childIndex": 24,
+                "type": "Build",
+                "variable": "batched_Id'"
+              },
+              {
+                "childIndex": 25,
+                "type": "Build",
+                "variable": "batched_K'"
+              },
+              {
+                "childIndex": 26,
+                "type": "Build",
+                "variable": "batched___row_id'2"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "plan_record_line": 101,
+        "execute_record_line": 102,
+        "label": "v9/not_in/hash",
+        "sql": "@{OPTIMIZER_VERSION=9, JOIN_METHOD=HASH_JOIN} SELECT l.Id FROM JoinProbe1789493355L l WHERE l.K NOT IN (SELECT r.K FROM JoinProbe1789493355R r)",
+        "plan_error": "",
+        "execute_error": "",
+        "expected_rows": 0,
+        "actual_rows": 0,
+        "result_match": true,
+        "operators": [
+          {
+            "index": 1,
+            "name": "Hash Join",
+            "metadata": {
+              "execution_method": "Row",
+              "join_type": "BUILD_ANTI_SEMI"
+            },
+            "children": [
+              {
+                "childIndex": 2,
+                "type": "Build"
+              },
+              {
+                "childIndex": 8,
+                "type": "Probe"
+              },
+              {
+                "childIndex": 13,
+                "type": "Condition"
+              },
+              {
+                "childIndex": 16,
+                "type": "Residual Condition"
+              },
+              {
+                "childIndex": 24,
+                "type": "Build",
+                "variable": "Id'"
+              },
+              {
+                "childIndex": 25,
+                "type": "Build",
+                "variable": "K'"
+              },
+              {
+                "childIndex": 26,
+                "type": "Probe",
+                "variable": "K_1'"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "plan_record_line": 103,
+        "execute_record_line": 104,
+        "label": "v9/not_in/apply",
+        "sql": "@{OPTIMIZER_VERSION=9, JOIN_METHOD=APPLY_JOIN, BATCH_MODE=FALSE} SELECT l.Id FROM JoinProbe1789493355L l WHERE l.K NOT IN (SELECT r.K FROM JoinProbe1789493355R r)",
+        "plan_error": "",
+        "execute_error": "",
+        "expected_rows": 0,
+        "actual_rows": 0,
+        "result_match": true,
+        "operators": [
+          {
+            "index": 3,
+            "name": "Anti-Semi Apply",
+            "metadata": {
+              "execution_method": "Row"
+            },
+            "children": [
+              {
+                "childIndex": 4
+              },
+              {
+                "childIndex": 7,
+                "type": "Map"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "plan_record_line": 105,
+        "execute_record_line": 106,
+        "label": "v9/not_in/distributed_apply",
+        "sql": "@{OPTIMIZER_VERSION=9, JOIN_METHOD=APPLY_JOIN, BATCH_MODE=TRUE} SELECT l.Id FROM JoinProbe1789493355L l WHERE l.K NOT IN (SELECT r.K FROM JoinProbe1789493355R r)",
+        "plan_error": "",
+        "execute_error": "",
+        "expected_rows": 0,
+        "actual_rows": 0,
+        "result_match": true,
+        "operators": [
+          {
+            "index": 2,
+            "name": "Distributed Anti Semi Apply",
+            "metadata": {
+              "execution_method": "Row",
+              "subquery_cluster_node": "13"
+            },
+            "children": [
+              {
+                "childIndex": 3
+              },
+              {
+                "childIndex": 13,
+                "type": "Map"
+              },
+              {
+                "childIndex": 31,
+                "type": "Split Range"
+              },
+              {
+                "childIndex": 32,
+                "type": "Batch",
+                "variable": "Id'"
+              },
+              {
+                "childIndex": 33,
+                "type": "Batch",
+                "variable": "K'"
+              },
+              {
+                "childIndex": 34,
+                "type": "Batch",
+                "variable": "batched___row_id'"
+              }
+            ]
+          },
+          {
+            "index": 13,
+            "name": "Semi Apply",
+            "metadata": {
+              "execution_method": "Row"
+            },
+            "children": [
+              {
+                "childIndex": 14
+              },
+              {
+                "childIndex": 18,
+                "type": "Map"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "plan_record_line": 107,
+        "execute_record_line": 108,
+        "label": "v9/not_in/merge",
+        "sql": "@{OPTIMIZER_VERSION=9, JOIN_METHOD=MERGE_JOIN} SELECT l.Id FROM JoinProbe1789493355L l WHERE l.K NOT IN (SELECT r.K FROM JoinProbe1789493355R r)",
+        "plan_error": "",
+        "execute_error": "",
+        "expected_rows": 0,
+        "actual_rows": 0,
+        "result_match": true,
+        "operators": [
+          {
+            "index": 1,
+            "name": "Merge Join",
+            "metadata": {
+              "execution_method": "Row",
+              "join_configuration": "MANY_TO_MANY",
+              "join_type": "LEFT_ANTI_SEMI"
+            },
+            "children": [
+              {
+                "childIndex": 2,
+                "type": "Left"
+              },
+              {
+                "childIndex": 8,
+                "type": "Right"
+              },
+              {
+                "childIndex": 13,
+                "type": "Condition"
+              },
+              {
+                "childIndex": 16,
+                "type": "Residual Condition"
+              },
+              {
+                "childIndex": 24,
+                "type": "Left",
+                "variable": "Id'"
+              },
+              {
+                "childIndex": 25,
+                "type": "Left",
+                "variable": "K'"
+              },
+              {
+                "childIndex": 26,
+                "type": "Right",
+                "variable": "K_1'"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "plan_record_line": 109,
+        "execute_record_line": 110,
+        "label": "v9/not_in/push",
+        "sql": "@{OPTIMIZER_VERSION=9, JOIN_METHOD=PUSH_BROADCAST_HASH_JOIN} SELECT l.Id FROM JoinProbe1789493355L l WHERE l.K NOT IN (SELECT r.K FROM JoinProbe1789493355R r)",
+        "plan_error": "",
+        "execute_error": "",
+        "expected_rows": 0,
+        "actual_rows": 0,
+        "result_match": true,
+        "operators": [
+          {
+            "index": 2,
+            "name": "Push Broadcast Hash Join Anti Semi Apply",
+            "metadata": {
+              "execution_method": "Row",
+              "subquery_cluster_node": "13"
+            },
+            "children": [
+              {
+                "childIndex": 3
+              },
+              {
+                "childIndex": 13,
+                "type": "Map"
+              },
+              {
+                "childIndex": 35,
+                "type": "Split Range"
+              },
+              {
+                "childIndex": 36,
+                "type": "Batch",
+                "variable": "Id'"
+              },
+              {
+                "childIndex": 37,
+                "type": "Batch",
+                "variable": "K'"
+              },
+              {
+                "childIndex": 38,
+                "type": "Batch",
+                "variable": "batched___row_id'"
+              }
+            ]
+          },
+          {
+            "index": 13,
+            "name": "Hash Join",
+            "metadata": {
+              "execution_method": "Row",
+              "join_type": "INNER"
+            },
+            "children": [
+              {
+                "childIndex": 14,
+                "type": "Build"
+              },
+              {
+                "childIndex": 18,
+                "type": "Probe"
+              },
+              {
+                "childIndex": 21,
+                "type": "Condition"
+              },
+              {
+                "childIndex": 24,
+                "type": "Residual Condition"
+              },
+              {
+                "childIndex": 32,
+                "type": "Build",
+                "variable": "batched_Id'"
+              },
+              {
+                "childIndex": 33,
+                "type": "Build",
+                "variable": "batched_K'"
+              },
+              {
+                "childIndex": 34,
+                "type": "Build",
+                "variable": "batched___row_id'2"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "plan_record_line": 111,
+        "execute_record_line": 112,
+        "label": "v9/not_exists/hash",
+        "sql": "@{OPTIMIZER_VERSION=9, JOIN_METHOD=HASH_JOIN} SELECT l.Id FROM JoinProbe1789493355L l WHERE NOT EXISTS (SELECT 1 FROM JoinProbe1789493355R r WHERE l.K=r.K)",
+        "plan_error": "",
+        "execute_error": "",
+        "expected_rows": 2,
+        "actual_rows": 2,
+        "result_match": true,
+        "operators": [
+          {
+            "index": 1,
+            "name": "Hash Join",
+            "metadata": {
+              "execution_method": "Row",
+              "join_type": "BUILD_ANTI_SEMI"
+            },
+            "children": [
+              {
+                "childIndex": 2,
+                "type": "Build"
+              },
+              {
+                "childIndex": 10,
+                "type": "Probe"
+              },
+              {
+                "childIndex": 20,
+                "type": "Condition"
+              },
+              {
+                "childIndex": 23,
+                "type": "Build",
+                "variable": "Id'"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "plan_record_line": 113,
+        "execute_record_line": 114,
+        "label": "v9/not_exists/apply",
+        "sql": "@{OPTIMIZER_VERSION=9, JOIN_METHOD=APPLY_JOIN, BATCH_MODE=FALSE} SELECT l.Id FROM JoinProbe1789493355L l WHERE NOT EXISTS (SELECT 1 FROM JoinProbe1789493355R r WHERE l.K=r.K)",
+        "plan_error": "",
+        "execute_error": "",
+        "expected_rows": 2,
+        "actual_rows": 2,
+        "result_match": true,
+        "operators": [
+          {
+            "index": 3,
+            "name": "Anti-Semi Apply",
+            "metadata": {
+              "execution_method": "Row"
+            },
+            "children": [
+              {
+                "childIndex": 4
+              },
+              {
+                "childIndex": 7,
+                "type": "Map"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "plan_record_line": 115,
+        "execute_record_line": 116,
+        "label": "v9/not_exists/distributed_apply",
+        "sql": "@{OPTIMIZER_VERSION=9, JOIN_METHOD=APPLY_JOIN, BATCH_MODE=TRUE} SELECT l.Id FROM JoinProbe1789493355L l WHERE NOT EXISTS (SELECT 1 FROM JoinProbe1789493355R r WHERE l.K=r.K)",
+        "plan_error": "",
+        "execute_error": "",
+        "expected_rows": 2,
+        "actual_rows": 2,
+        "result_match": true,
+        "operators": [
+          {
+            "index": 2,
+            "name": "Distributed Anti Semi Apply",
+            "metadata": {
+              "execution_method": "Row",
+              "subquery_cluster_node": "13"
+            },
+            "children": [
+              {
+                "childIndex": 3
+              },
+              {
+                "childIndex": 13,
+                "type": "Map"
+              },
+              {
+                "childIndex": 31,
+                "type": "Split Range"
+              },
+              {
+                "childIndex": 34,
+                "type": "Batch",
+                "variable": "Id'"
+              },
+              {
+                "childIndex": 35,
+                "type": "Batch",
+                "variable": "K'"
+              },
+              {
+                "childIndex": 36,
+                "type": "Batch",
+                "variable": "batched___row_id'"
+              }
+            ]
+          },
+          {
+            "index": 13,
+            "name": "Semi Apply",
+            "metadata": {
+              "execution_method": "Row"
+            },
+            "children": [
+              {
+                "childIndex": 14
+              },
+              {
+                "childIndex": 19,
+                "type": "Map"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "plan_record_line": 117,
+        "execute_record_line": 118,
+        "label": "v9/not_exists/merge",
+        "sql": "@{OPTIMIZER_VERSION=9, JOIN_METHOD=MERGE_JOIN} SELECT l.Id FROM JoinProbe1789493355L l WHERE NOT EXISTS (SELECT 1 FROM JoinProbe1789493355R r WHERE l.K=r.K)",
+        "plan_error": "",
+        "execute_error": "",
+        "expected_rows": 2,
+        "actual_rows": 2,
+        "result_match": true,
+        "operators": [
+          {
+            "index": 1,
+            "name": "Merge Join",
+            "metadata": {
+              "execution_method": "Row",
+              "join_configuration": "ONE_TO_MANY",
+              "join_type": "LEFT_ANTI_SEMI"
+            },
+            "children": [
+              {
+                "childIndex": 2,
+                "type": "Left"
+              },
+              {
+                "childIndex": 8,
+                "type": "Right"
+              },
+              {
+                "childIndex": 13,
+                "type": "Condition"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "plan_record_line": 119,
+        "execute_record_line": 120,
+        "label": "v9/not_exists/push",
+        "sql": "@{OPTIMIZER_VERSION=9, JOIN_METHOD=PUSH_BROADCAST_HASH_JOIN} SELECT l.Id FROM JoinProbe1789493355L l WHERE NOT EXISTS (SELECT 1 FROM JoinProbe1789493355R r WHERE l.K=r.K)",
+        "plan_error": "",
+        "execute_error": "",
+        "expected_rows": 2,
+        "actual_rows": 2,
+        "result_match": true,
+        "operators": [
+          {
+            "index": 2,
+            "name": "Push Broadcast Hash Join Anti Semi Apply",
+            "metadata": {
+              "execution_method": "Row",
+              "subquery_cluster_node": "13"
+            },
+            "children": [
+              {
+                "childIndex": 3
+              },
+              {
+                "childIndex": 13,
+                "type": "Map"
+              },
+              {
+                "childIndex": 27,
+                "type": "Split Range"
+              },
+              {
+                "childIndex": 30,
+                "type": "Batch",
+                "variable": "Id'"
+              },
+              {
+                "childIndex": 31,
+                "type": "Batch",
+                "variable": "K'"
+              },
+              {
+                "childIndex": 32,
+                "type": "Batch",
+                "variable": "batched___row_id'"
+              }
+            ]
+          },
+          {
+            "index": 13,
+            "name": "Hash Join",
+            "metadata": {
+              "execution_method": "Row",
+              "join_type": "INNER"
+            },
+            "children": [
+              {
+                "childIndex": 14,
+                "type": "Build"
+              },
+              {
+                "childIndex": 18,
+                "type": "Probe"
+              },
+              {
+                "childIndex": 21,
+                "type": "Condition"
+              },
+              {
+                "childIndex": 24,
+                "type": "Build",
+                "variable": "batched_Id'"
+              },
+              {
+                "childIndex": 25,
+                "type": "Build",
+                "variable": "batched_K'"
+              },
+              {
+                "childIndex": 26,
+                "type": "Build",
+                "variable": "batched___row_id'2"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "managed": {
+    "identity": {
+      "at": "2026-09-15T17:29:33Z",
+      "backend": "managed",
+      "image": "",
+      "kind": "identity",
+      "prefix": "JoinProbe1789493373"
+    },
+    "cleanup": [
+      {
+        "at": "2026-09-15T17:34:18Z",
+        "error": "",
+        "kind": "ddl",
+        "label": "cleanup-index-JoinProbe1789493373R",
+        "sql": "DROP INDEX JoinProbe1789493373RByK"
+      },
+      {
+        "at": "2026-09-15T17:34:38Z",
+        "error": "",
+        "kind": "ddl",
+        "label": "cleanup-index-JoinProbe1789493373L",
+        "sql": "DROP INDEX JoinProbe1789493373LByK"
+      },
+      {
+        "at": "2026-09-15T17:34:52Z",
+        "error": "",
+        "kind": "ddl",
+        "label": "cleanup-right",
+        "sql": "DROP TABLE JoinProbe1789493373R"
+      },
+      {
+        "at": "2026-09-15T17:35:07Z",
+        "error": "",
+        "kind": "ddl",
+        "label": "cleanup-left",
+        "sql": "DROP TABLE JoinProbe1789493373L"
+      }
+    ],
+    "complete": true,
+    "records": 123,
+    "cells": [
+      {
+        "plan_record_line": 8,
+        "execute_record_line": 9,
+        "label": "v1/full/hash",
+        "sql": "@{OPTIMIZER_VERSION=1} SELECT l.Id, r.Id FROM JoinProbe1789493373L l FULL JOIN@{JOIN_METHOD=HASH_JOIN} JoinProbe1789493373R r ON l.K=r.K",
+        "plan_error": "",
+        "execute_error": "",
+        "expected_rows": 9,
+        "actual_rows": 9,
+        "result_match": true,
+        "operators": [
+          {
+            "index": 1,
+            "name": "Union All",
+            "metadata": {
+              "execution_method": "Row"
+            },
+            "children": [
+              {
+                "childIndex": 2
+              },
+              {
+                "childIndex": 30
+              },
+              {
+                "childIndex": 59,
+                "variable": "Id_2"
+              },
+              {
+                "childIndex": 60,
+                "variable": "Id_3"
+              }
+            ]
+          },
+          {
+            "index": 3,
+            "name": "Hash Join",
+            "metadata": {
+              "execution_method": "Row",
+              "join_type": "BUILD_OUTER"
+            },
+            "children": [
+              {
+                "childIndex": 4,
+                "type": "Build"
+              },
+              {
+                "childIndex": 12,
+                "type": "Probe"
+              },
+              {
+                "childIndex": 23,
+                "type": "Condition"
+              },
+              {
+                "childIndex": 26,
+                "type": "Build",
+                "variable": "Id'2"
+              },
+              {
+                "childIndex": 27,
+                "type": "Probe",
+                "variable": "v1"
+              }
+            ]
+          },
+          {
+            "index": 31,
+            "name": "Hash Join",
+            "metadata": {
+              "execution_method": "Row",
+              "join_type": "BUILD_ANTI_SEMI"
+            },
+            "children": [
+              {
+                "childIndex": 32,
+                "type": "Build"
+              },
+              {
+                "childIndex": 42,
+                "type": "Probe"
+              },
+              {
+                "childIndex": 52,
+                "type": "Condition"
+              },
+              {
+                "childIndex": 55,
+                "type": "Build",
+                "variable": "Id_1'2"
+              },
+              {
+                "childIndex": 56,
+                "type": "Build",
+                "variable": "v2'"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "plan_record_line": 10,
+        "execute_record_line": 11,
+        "label": "v1/full/merge",
+        "sql": "@{OPTIMIZER_VERSION=1} SELECT l.Id, r.Id FROM JoinProbe1789493373L l FULL JOIN@{JOIN_METHOD=MERGE_JOIN} JoinProbe1789493373R r ON l.K=r.K",
+        "plan_error": "",
+        "execute_error": "",
+        "expected_rows": 9,
+        "actual_rows": 9,
+        "result_match": true,
+        "operators": [
+          {
+            "index": 1,
+            "name": "Merge Join",
+            "metadata": {
+              "execution_method": "Row",
+              "join_configuration": "MANY_TO_MANY",
+              "join_type": "FULL_OUTER"
+            },
+            "children": [
+              {
+                "childIndex": 2,
+                "type": "Left"
+              },
+              {
+                "childIndex": 8,
+                "type": "Right"
+              },
+              {
+                "childIndex": 14,
+                "type": "Condition"
+              },
+              {
+                "childIndex": 17,
+                "type": "Left",
+                "variable": "Id_2"
+              },
+              {
+                "childIndex": 18,
+                "type": "Right",
+                "variable": "Id_3"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "plan_record_line": 12,
+        "execute_record_line": 13,
+        "label": "v2/full/hash",
+        "sql": "@{OPTIMIZER_VERSION=2} SELECT l.Id, r.Id FROM JoinProbe1789493373L l FULL JOIN@{JOIN_METHOD=HASH_JOIN} JoinProbe1789493373R r ON l.K=r.K",
+        "plan_error": "",
+        "execute_error": "",
+        "expected_rows": 9,
+        "actual_rows": 9,
+        "result_match": true,
+        "operators": [
+          {
+            "index": 1,
+            "name": "Union All",
+            "metadata": {
+              "execution_method": "Row"
+            },
+            "children": [
+              {
+                "childIndex": 2
+              },
+              {
+                "childIndex": 30
+              },
+              {
+                "childIndex": 59,
+                "variable": "Id_2"
+              },
+              {
+                "childIndex": 60,
+                "variable": "Id_3"
+              }
+            ]
+          },
+          {
+            "index": 3,
+            "name": "Hash Join",
+            "metadata": {
+              "execution_method": "Row",
+              "join_type": "BUILD_OUTER"
+            },
+            "children": [
+              {
+                "childIndex": 4,
+                "type": "Build"
+              },
+              {
+                "childIndex": 12,
+                "type": "Probe"
+              },
+              {
+                "childIndex": 23,
+                "type": "Condition"
+              },
+              {
+                "childIndex": 26,
+                "type": "Build",
+                "variable": "Id'2"
+              },
+              {
+                "childIndex": 27,
+                "type": "Probe",
+                "variable": "v1"
+              }
+            ]
+          },
+          {
+            "index": 31,
+            "name": "Hash Join",
+            "metadata": {
+              "execution_method": "Row",
+              "join_type": "BUILD_ANTI_SEMI"
+            },
+            "children": [
+              {
+                "childIndex": 32,
+                "type": "Build"
+              },
+              {
+                "childIndex": 42,
+                "type": "Probe"
+              },
+              {
+                "childIndex": 52,
+                "type": "Condition"
+              },
+              {
+                "childIndex": 55,
+                "type": "Build",
+                "variable": "Id_1'2"
+              },
+              {
+                "childIndex": 56,
+                "type": "Build",
+                "variable": "v2'"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "plan_record_line": 14,
+        "execute_record_line": 15,
+        "label": "v2/full/merge",
+        "sql": "@{OPTIMIZER_VERSION=2} SELECT l.Id, r.Id FROM JoinProbe1789493373L l FULL JOIN@{JOIN_METHOD=MERGE_JOIN} JoinProbe1789493373R r ON l.K=r.K",
+        "plan_error": "",
+        "execute_error": "",
+        "expected_rows": 9,
+        "actual_rows": 9,
+        "result_match": true,
+        "operators": [
+          {
+            "index": 1,
+            "name": "Merge Join",
+            "metadata": {
+              "execution_method": "Row",
+              "join_configuration": "MANY_TO_MANY",
+              "join_type": "FULL_OUTER"
+            },
+            "children": [
+              {
+                "childIndex": 2,
+                "type": "Left"
+              },
+              {
+                "childIndex": 8,
+                "type": "Right"
+              },
+              {
+                "childIndex": 14,
+                "type": "Condition"
+              },
+              {
+                "childIndex": 17,
+                "type": "Left",
+                "variable": "Id_2"
+              },
+              {
+                "childIndex": 18,
+                "type": "Right",
+                "variable": "Id_3"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "plan_record_line": 16,
+        "execute_record_line": 17,
+        "label": "v3/full/hash",
+        "sql": "@{OPTIMIZER_VERSION=3} SELECT l.Id, r.Id FROM JoinProbe1789493373L l FULL JOIN@{JOIN_METHOD=HASH_JOIN} JoinProbe1789493373R r ON l.K=r.K",
+        "plan_error": "",
+        "execute_error": "",
+        "expected_rows": 9,
+        "actual_rows": 9,
+        "result_match": true,
+        "operators": [
+          {
+            "index": 1,
+            "name": "Union All",
+            "metadata": {
+              "execution_method": "Row"
+            },
+            "children": [
+              {
+                "childIndex": 2
+              },
+              {
+                "childIndex": 30
+              },
+              {
+                "childIndex": 59,
+                "variable": "Id_2"
+              },
+              {
+                "childIndex": 60,
+                "variable": "Id_3"
+              }
+            ]
+          },
+          {
+            "index": 3,
+            "name": "Hash Join",
+            "metadata": {
+              "execution_method": "Row",
+              "join_type": "BUILD_OUTER"
+            },
+            "children": [
+              {
+                "childIndex": 4,
+                "type": "Build"
+              },
+              {
+                "childIndex": 12,
+                "type": "Probe"
+              },
+              {
+                "childIndex": 23,
+                "type": "Condition"
+              },
+              {
+                "childIndex": 26,
+                "type": "Build",
+                "variable": "Id'2"
+              },
+              {
+                "childIndex": 27,
+                "type": "Probe",
+                "variable": "v1"
+              }
+            ]
+          },
+          {
+            "index": 31,
+            "name": "Hash Join",
+            "metadata": {
+              "execution_method": "Row",
+              "join_type": "BUILD_ANTI_SEMI"
+            },
+            "children": [
+              {
+                "childIndex": 32,
+                "type": "Build"
+              },
+              {
+                "childIndex": 42,
+                "type": "Probe"
+              },
+              {
+                "childIndex": 52,
+                "type": "Condition"
+              },
+              {
+                "childIndex": 55,
+                "type": "Build",
+                "variable": "Id_1'2"
+              },
+              {
+                "childIndex": 56,
+                "type": "Build",
+                "variable": "v2'"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "plan_record_line": 18,
+        "execute_record_line": 19,
+        "label": "v3/full/merge",
+        "sql": "@{OPTIMIZER_VERSION=3} SELECT l.Id, r.Id FROM JoinProbe1789493373L l FULL JOIN@{JOIN_METHOD=MERGE_JOIN} JoinProbe1789493373R r ON l.K=r.K",
+        "plan_error": "",
+        "execute_error": "",
+        "expected_rows": 9,
+        "actual_rows": 9,
+        "result_match": true,
+        "operators": [
+          {
+            "index": 1,
+            "name": "Merge Join",
+            "metadata": {
+              "execution_method": "Row",
+              "join_configuration": "MANY_TO_MANY",
+              "join_type": "FULL_OUTER"
+            },
+            "children": [
+              {
+                "childIndex": 2,
+                "type": "Left"
+              },
+              {
+                "childIndex": 8,
+                "type": "Right"
+              },
+              {
+                "childIndex": 14,
+                "type": "Condition"
+              },
+              {
+                "childIndex": 17,
+                "type": "Left",
+                "variable": "Id_2"
+              },
+              {
+                "childIndex": 18,
+                "type": "Right",
+                "variable": "Id_3"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "plan_record_line": 20,
+        "execute_record_line": 21,
+        "label": "v4/full/hash",
+        "sql": "@{OPTIMIZER_VERSION=4} SELECT l.Id, r.Id FROM JoinProbe1789493373L l FULL JOIN@{JOIN_METHOD=HASH_JOIN} JoinProbe1789493373R r ON l.K=r.K",
+        "plan_error": "",
+        "execute_error": "",
+        "expected_rows": 9,
+        "actual_rows": 9,
+        "result_match": true,
+        "operators": [
+          {
+            "index": 1,
+            "name": "Union All",
+            "metadata": {
+              "execution_method": "Row"
+            },
+            "children": [
+              {
+                "childIndex": 2
+              },
+              {
+                "childIndex": 30
+              },
+              {
+                "childIndex": 59,
+                "variable": "Id_2"
+              },
+              {
+                "childIndex": 60,
+                "variable": "Id_3"
+              }
+            ]
+          },
+          {
+            "index": 3,
+            "name": "Hash Join",
+            "metadata": {
+              "execution_method": "Row",
+              "join_type": "BUILD_OUTER"
+            },
+            "children": [
+              {
+                "childIndex": 4,
+                "type": "Build"
+              },
+              {
+                "childIndex": 12,
+                "type": "Probe"
+              },
+              {
+                "childIndex": 23,
+                "type": "Condition"
+              },
+              {
+                "childIndex": 26,
+                "type": "Build",
+                "variable": "Id'2"
+              },
+              {
+                "childIndex": 27,
+                "type": "Probe",
+                "variable": "v1"
+              }
+            ]
+          },
+          {
+            "index": 31,
+            "name": "Hash Join",
+            "metadata": {
+              "execution_method": "Row",
+              "join_type": "BUILD_ANTI_SEMI"
+            },
+            "children": [
+              {
+                "childIndex": 32,
+                "type": "Build"
+              },
+              {
+                "childIndex": 42,
+                "type": "Probe"
+              },
+              {
+                "childIndex": 52,
+                "type": "Condition"
+              },
+              {
+                "childIndex": 55,
+                "type": "Build",
+                "variable": "Id_1'2"
+              },
+              {
+                "childIndex": 56,
+                "type": "Build",
+                "variable": "v2'"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "plan_record_line": 22,
+        "execute_record_line": 23,
+        "label": "v4/full/merge",
+        "sql": "@{OPTIMIZER_VERSION=4} SELECT l.Id, r.Id FROM JoinProbe1789493373L l FULL JOIN@{JOIN_METHOD=MERGE_JOIN} JoinProbe1789493373R r ON l.K=r.K",
+        "plan_error": "",
+        "execute_error": "",
+        "expected_rows": 9,
+        "actual_rows": 9,
+        "result_match": true,
+        "operators": [
+          {
+            "index": 1,
+            "name": "Merge Join",
+            "metadata": {
+              "execution_method": "Row",
+              "join_configuration": "MANY_TO_MANY",
+              "join_type": "FULL_OUTER"
+            },
+            "children": [
+              {
+                "childIndex": 2,
+                "type": "Left"
+              },
+              {
+                "childIndex": 8,
+                "type": "Right"
+              },
+              {
+                "childIndex": 14,
+                "type": "Condition"
+              },
+              {
+                "childIndex": 17,
+                "type": "Left",
+                "variable": "Id_2"
+              },
+              {
+                "childIndex": 18,
+                "type": "Right",
+                "variable": "Id_3"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "plan_record_line": 24,
+        "execute_record_line": 25,
+        "label": "v5/full/hash",
+        "sql": "@{OPTIMIZER_VERSION=5} SELECT l.Id, r.Id FROM JoinProbe1789493373L l FULL JOIN@{JOIN_METHOD=HASH_JOIN} JoinProbe1789493373R r ON l.K=r.K",
+        "plan_error": "",
+        "execute_error": "",
+        "expected_rows": 9,
+        "actual_rows": 9,
+        "result_match": true,
+        "operators": [
+          {
+            "index": 1,
+            "name": "Union All",
+            "metadata": {
+              "execution_method": "Row"
+            },
+            "children": [
+              {
+                "childIndex": 2
+              },
+              {
+                "childIndex": 30
+              },
+              {
+                "childIndex": 59,
+                "variable": "Id_2"
+              },
+              {
+                "childIndex": 60,
+                "variable": "Id_3"
+              }
+            ]
+          },
+          {
+            "index": 3,
+            "name": "Hash Join",
+            "metadata": {
+              "execution_method": "Row",
+              "join_type": "BUILD_OUTER"
+            },
+            "children": [
+              {
+                "childIndex": 4,
+                "type": "Build"
+              },
+              {
+                "childIndex": 12,
+                "type": "Probe"
+              },
+              {
+                "childIndex": 23,
+                "type": "Condition"
+              },
+              {
+                "childIndex": 26,
+                "type": "Build",
+                "variable": "Id'2"
+              },
+              {
+                "childIndex": 27,
+                "type": "Probe",
+                "variable": "v1"
+              }
+            ]
+          },
+          {
+            "index": 31,
+            "name": "Hash Join",
+            "metadata": {
+              "execution_method": "Row",
+              "join_type": "BUILD_ANTI_SEMI"
+            },
+            "children": [
+              {
+                "childIndex": 32,
+                "type": "Build"
+              },
+              {
+                "childIndex": 42,
+                "type": "Probe"
+              },
+              {
+                "childIndex": 52,
+                "type": "Condition"
+              },
+              {
+                "childIndex": 55,
+                "type": "Build",
+                "variable": "Id_1'2"
+              },
+              {
+                "childIndex": 56,
+                "type": "Build",
+                "variable": "v2'"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "plan_record_line": 26,
+        "execute_record_line": 27,
+        "label": "v5/full/merge",
+        "sql": "@{OPTIMIZER_VERSION=5} SELECT l.Id, r.Id FROM JoinProbe1789493373L l FULL JOIN@{JOIN_METHOD=MERGE_JOIN} JoinProbe1789493373R r ON l.K=r.K",
+        "plan_error": "",
+        "execute_error": "",
+        "expected_rows": 9,
+        "actual_rows": 9,
+        "result_match": true,
+        "operators": [
+          {
+            "index": 1,
+            "name": "Merge Join",
+            "metadata": {
+              "execution_method": "Row",
+              "join_configuration": "MANY_TO_MANY",
+              "join_type": "FULL_OUTER"
+            },
+            "children": [
+              {
+                "childIndex": 2,
+                "type": "Left"
+              },
+              {
+                "childIndex": 8,
+                "type": "Right"
+              },
+              {
+                "childIndex": 14,
+                "type": "Condition"
+              },
+              {
+                "childIndex": 17,
+                "type": "Left",
+                "variable": "Id_2"
+              },
+              {
+                "childIndex": 18,
+                "type": "Right",
+                "variable": "Id_3"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "plan_record_line": 28,
+        "execute_record_line": 29,
+        "label": "v6/full/hash",
+        "sql": "@{OPTIMIZER_VERSION=6} SELECT l.Id, r.Id FROM JoinProbe1789493373L l FULL JOIN@{JOIN_METHOD=HASH_JOIN} JoinProbe1789493373R r ON l.K=r.K",
+        "plan_error": "",
+        "execute_error": "",
+        "expected_rows": 9,
+        "actual_rows": 9,
+        "result_match": true,
+        "operators": [
+          {
+            "index": 1,
+            "name": "Union All",
+            "metadata": {
+              "execution_method": "Row"
+            },
+            "children": [
+              {
+                "childIndex": 2
+              },
+              {
+                "childIndex": 30
+              },
+              {
+                "childIndex": 59,
+                "variable": "Id_2"
+              },
+              {
+                "childIndex": 60,
+                "variable": "Id_3"
+              }
+            ]
+          },
+          {
+            "index": 3,
+            "name": "Hash Join",
+            "metadata": {
+              "execution_method": "Row",
+              "join_type": "BUILD_OUTER"
+            },
+            "children": [
+              {
+                "childIndex": 4,
+                "type": "Build"
+              },
+              {
+                "childIndex": 12,
+                "type": "Probe"
+              },
+              {
+                "childIndex": 23,
+                "type": "Condition"
+              },
+              {
+                "childIndex": 26,
+                "type": "Build",
+                "variable": "Id'2"
+              },
+              {
+                "childIndex": 27,
+                "type": "Probe",
+                "variable": "v1"
+              }
+            ]
+          },
+          {
+            "index": 31,
+            "name": "Hash Join",
+            "metadata": {
+              "execution_method": "Row",
+              "join_type": "BUILD_ANTI_SEMI"
+            },
+            "children": [
+              {
+                "childIndex": 32,
+                "type": "Build"
+              },
+              {
+                "childIndex": 42,
+                "type": "Probe"
+              },
+              {
+                "childIndex": 52,
+                "type": "Condition"
+              },
+              {
+                "childIndex": 55,
+                "type": "Build",
+                "variable": "Id_1'2"
+              },
+              {
+                "childIndex": 56,
+                "type": "Build",
+                "variable": "v2'"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "plan_record_line": 30,
+        "execute_record_line": 31,
+        "label": "v6/full/merge",
+        "sql": "@{OPTIMIZER_VERSION=6} SELECT l.Id, r.Id FROM JoinProbe1789493373L l FULL JOIN@{JOIN_METHOD=MERGE_JOIN} JoinProbe1789493373R r ON l.K=r.K",
+        "plan_error": "",
+        "execute_error": "",
+        "expected_rows": 9,
+        "actual_rows": 9,
+        "result_match": true,
+        "operators": [
+          {
+            "index": 1,
+            "name": "Merge Join",
+            "metadata": {
+              "execution_method": "Row",
+              "join_configuration": "MANY_TO_MANY",
+              "join_type": "FULL_OUTER"
+            },
+            "children": [
+              {
+                "childIndex": 2,
+                "type": "Left"
+              },
+              {
+                "childIndex": 8,
+                "type": "Right"
+              },
+              {
+                "childIndex": 14,
+                "type": "Condition"
+              },
+              {
+                "childIndex": 17,
+                "type": "Left",
+                "variable": "Id_2"
+              },
+              {
+                "childIndex": 18,
+                "type": "Right",
+                "variable": "Id_3"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "plan_record_line": 32,
+        "execute_record_line": 33,
+        "label": "v7/full/hash",
+        "sql": "@{OPTIMIZER_VERSION=7} SELECT l.Id, r.Id FROM JoinProbe1789493373L l FULL JOIN@{JOIN_METHOD=HASH_JOIN} JoinProbe1789493373R r ON l.K=r.K",
+        "plan_error": "",
+        "execute_error": "",
+        "expected_rows": 9,
+        "actual_rows": 9,
+        "result_match": true,
+        "operators": [
+          {
+            "index": 1,
+            "name": "Hash Join",
+            "metadata": {
+              "execution_method": "Row",
+              "join_type": "BUILD_PROBE_OUTER"
+            },
+            "children": [
+              {
+                "childIndex": 2,
+                "type": "Build"
+              },
+              {
+                "childIndex": 8,
+                "type": "Probe"
+              },
+              {
+                "childIndex": 14,
+                "type": "Condition"
+              },
+              {
+                "childIndex": 17,
+                "type": "Build",
+                "variable": "Id_2"
+              },
+              {
+                "childIndex": 18,
+                "type": "Probe",
+                "variable": "Id_3"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "plan_record_line": 34,
+        "execute_record_line": 35,
+        "label": "v7/full/merge",
+        "sql": "@{OPTIMIZER_VERSION=7} SELECT l.Id, r.Id FROM JoinProbe1789493373L l FULL JOIN@{JOIN_METHOD=MERGE_JOIN} JoinProbe1789493373R r ON l.K=r.K",
+        "plan_error": "",
+        "execute_error": "",
+        "expected_rows": 9,
+        "actual_rows": 9,
+        "result_match": true,
+        "operators": [
+          {
+            "index": 1,
+            "name": "Merge Join",
+            "metadata": {
+              "execution_method": "Row",
+              "join_configuration": "MANY_TO_MANY",
+              "join_type": "FULL_OUTER"
+            },
+            "children": [
+              {
+                "childIndex": 2,
+                "type": "Left"
+              },
+              {
+                "childIndex": 8,
+                "type": "Right"
+              },
+              {
+                "childIndex": 14,
+                "type": "Condition"
+              },
+              {
+                "childIndex": 17,
+                "type": "Left",
+                "variable": "Id_2"
+              },
+              {
+                "childIndex": 18,
+                "type": "Right",
+                "variable": "Id_3"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "plan_record_line": 36,
+        "execute_record_line": 37,
+        "label": "v8/full/hash",
+        "sql": "@{OPTIMIZER_VERSION=8} SELECT l.Id, r.Id FROM JoinProbe1789493373L l FULL JOIN@{JOIN_METHOD=HASH_JOIN} JoinProbe1789493373R r ON l.K=r.K",
+        "plan_error": "",
+        "execute_error": "",
+        "expected_rows": 9,
+        "actual_rows": 9,
+        "result_match": true,
+        "operators": [
+          {
+            "index": 1,
+            "name": "Hash Join",
+            "metadata": {
+              "execution_method": "Row",
+              "join_type": "BUILD_PROBE_OUTER"
+            },
+            "children": [
+              {
+                "childIndex": 2,
+                "type": "Build"
+              },
+              {
+                "childIndex": 8,
+                "type": "Probe"
+              },
+              {
+                "childIndex": 14,
+                "type": "Condition"
+              },
+              {
+                "childIndex": 17,
+                "type": "Build",
+                "variable": "Id_2"
+              },
+              {
+                "childIndex": 18,
+                "type": "Probe",
+                "variable": "Id_3"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "plan_record_line": 38,
+        "execute_record_line": 39,
+        "label": "v8/full/merge",
+        "sql": "@{OPTIMIZER_VERSION=8} SELECT l.Id, r.Id FROM JoinProbe1789493373L l FULL JOIN@{JOIN_METHOD=MERGE_JOIN} JoinProbe1789493373R r ON l.K=r.K",
+        "plan_error": "",
+        "execute_error": "",
+        "expected_rows": 9,
+        "actual_rows": 9,
+        "result_match": true,
+        "operators": [
+          {
+            "index": 1,
+            "name": "Merge Join",
+            "metadata": {
+              "execution_method": "Row",
+              "join_configuration": "MANY_TO_MANY",
+              "join_type": "FULL_OUTER"
+            },
+            "children": [
+              {
+                "childIndex": 2,
+                "type": "Left"
+              },
+              {
+                "childIndex": 8,
+                "type": "Right"
+              },
+              {
+                "childIndex": 14,
+                "type": "Condition"
+              },
+              {
+                "childIndex": 17,
+                "type": "Left",
+                "variable": "Id_2"
+              },
+              {
+                "childIndex": 18,
+                "type": "Right",
+                "variable": "Id_3"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "plan_record_line": 40,
+        "execute_record_line": 41,
+        "label": "v9/inner/hash",
+        "sql": "@{OPTIMIZER_VERSION=9} SELECT l.Id, r.Id FROM JoinProbe1789493373L l INNER JOIN@{JOIN_METHOD=HASH_JOIN} JoinProbe1789493373R r ON l.K=r.K",
+        "plan_error": "",
+        "execute_error": "",
+        "expected_rows": 5,
+        "actual_rows": 5,
+        "result_match": true,
+        "operators": [
+          {
+            "index": 1,
+            "name": "Hash Join",
+            "metadata": {
+              "execution_method": "Row",
+              "join_type": "INNER"
+            },
+            "children": [
+              {
+                "childIndex": 2,
+                "type": "Build"
+              },
+              {
+                "childIndex": 10,
+                "type": "Probe"
+              },
+              {
+                "childIndex": 21,
+                "type": "Condition"
+              },
+              {
+                "childIndex": 24,
+                "type": "Build",
+                "variable": "Id'"
+              },
+              {
+                "childIndex": 25,
+                "type": "Probe",
+                "variable": "Id_1'"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "plan_record_line": 42,
+        "execute_record_line": 43,
+        "label": "v9/inner/apply",
+        "sql": "@{OPTIMIZER_VERSION=9} SELECT l.Id, r.Id FROM JoinProbe1789493373L l INNER JOIN@{JOIN_METHOD=APPLY_JOIN, BATCH_MODE=FALSE} JoinProbe1789493373R r ON l.K=r.K",
+        "plan_error": "",
+        "execute_error": "",
+        "expected_rows": 5,
+        "actual_rows": 5,
+        "result_match": true,
+        "operators": [
+          {
+            "index": 3,
+            "name": "Cross Apply",
+            "metadata": {
+              "execution_method": "Row"
+            },
+            "children": [
+              {
+                "childIndex": 4
+              },
+              {
+                "childIndex": 7,
+                "type": "Map"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "plan_record_line": 44,
+        "execute_record_line": 45,
+        "label": "v9/inner/distributed_apply",
+        "sql": "@{OPTIMIZER_VERSION=9} SELECT l.Id, r.Id FROM JoinProbe1789493373L l INNER JOIN@{JOIN_METHOD=APPLY_JOIN, BATCH_MODE=TRUE} JoinProbe1789493373R r ON l.K=r.K",
+        "plan_error": "",
+        "execute_error": "",
+        "expected_rows": 5,
+        "actual_rows": 5,
+        "result_match": true,
+        "operators": [
+          {
+            "index": 3,
+            "name": "Distributed Cross Apply",
+            "metadata": {
+              "execution_method": "Batch",
+              "subquery_cluster_node": "12"
+            },
+            "children": [
+              {
+                "childIndex": 4
+              },
+              {
+                "childIndex": 12,
+                "type": "Map"
+              },
+              {
+                "childIndex": 34,
+                "type": "Split Range"
+              },
+              {
+                "childIndex": 37,
+                "type": "Batch",
+                "variable": "restored_Id'"
+              },
+              {
+                "childIndex": 38,
+                "type": "Batch",
+                "variable": "K'"
+              },
+              {
+                "childIndex": 39,
+                "type": "Batch",
+                "variable": "batched___row_id'"
+              },
+              {
+                "childIndex": 40,
+                "type": "Map",
+                "variable": "Id_1'"
+              }
+            ]
+          },
+          {
+            "index": 13,
+            "name": "Cross Apply",
+            "metadata": {
+              "execution_method": "Row"
+            },
+            "children": [
+              {
+                "childIndex": 14
+              },
+              {
+                "childIndex": 21,
+                "type": "Map"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "plan_record_line": 46,
+        "execute_record_line": 47,
+        "label": "v9/inner/merge",
+        "sql": "@{OPTIMIZER_VERSION=9} SELECT l.Id, r.Id FROM JoinProbe1789493373L l INNER JOIN@{JOIN_METHOD=MERGE_JOIN} JoinProbe1789493373R r ON l.K=r.K",
+        "plan_error": "",
+        "execute_error": "",
+        "expected_rows": 5,
+        "actual_rows": 5,
+        "result_match": true,
+        "operators": [
+          {
+            "index": 1,
+            "name": "Merge Join",
+            "metadata": {
+              "execution_method": "Row",
+              "join_configuration": "MANY_TO_MANY",
+              "join_type": "INNER"
+            },
+            "children": [
+              {
+                "childIndex": 2,
+                "type": "Left"
+              },
+              {
+                "childIndex": 8,
+                "type": "Right"
+              },
+              {
+                "childIndex": 14,
+                "type": "Condition"
+              },
+              {
+                "childIndex": 17,
+                "type": "Left",
+                "variable": "Id'"
+              },
+              {
+                "childIndex": 18,
+                "type": "Right",
+                "variable": "Id_1'"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "plan_record_line": 48,
+        "execute_record_line": 49,
+        "label": "v9/inner/push",
+        "sql": "@{OPTIMIZER_VERSION=9} SELECT l.Id, r.Id FROM JoinProbe1789493373L l INNER JOIN@{JOIN_METHOD=PUSH_BROADCAST_HASH_JOIN} JoinProbe1789493373R r ON l.K=r.K",
+        "plan_error": "",
+        "execute_error": "",
+        "expected_rows": 5,
+        "actual_rows": 5,
+        "result_match": true,
+        "operators": [
+          {
+            "index": 2,
+            "name": "Push Broadcast Hash Join",
+            "metadata": {
+              "execution_method": "Row",
+              "subquery_cluster_node": "12"
+            },
+            "children": [
+              {
+                "childIndex": 3
+              },
+              {
+                "childIndex": 12,
+                "type": "Map"
+              },
+              {
+                "childIndex": 31,
+                "type": "Split Range"
+              },
+              {
+                "childIndex": 34,
+                "type": "Batch",
+                "variable": "batched___row_id'"
+              }
+            ]
+          },
+          {
+            "index": 12,
+            "name": "Hash Join",
+            "metadata": {
+              "execution_method": "Row",
+              "join_type": "INNER"
+            },
+            "children": [
+              {
+                "childIndex": 13,
+                "type": "Build"
+              },
+              {
+                "childIndex": 21,
+                "type": "Probe"
+              },
+              {
+                "childIndex": 25,
+                "type": "Condition"
+              },
+              {
+                "childIndex": 28,
+                "type": "Build",
+                "variable": "batched_Id'"
+              },
+              {
+                "childIndex": 29,
+                "type": "Build",
+                "variable": "batched_K'"
+              },
+              {
+                "childIndex": 30,
+                "type": "Build",
+                "variable": "batched___row_id'2"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "plan_record_line": 50,
+        "execute_record_line": 51,
+        "label": "v9/left/hash",
+        "sql": "@{OPTIMIZER_VERSION=9} SELECT l.Id, r.Id FROM JoinProbe1789493373L l LEFT JOIN@{JOIN_METHOD=HASH_JOIN} JoinProbe1789493373R r ON l.K=r.K",
+        "plan_error": "",
+        "execute_error": "",
+        "expected_rows": 7,
+        "actual_rows": 7,
+        "result_match": true,
+        "operators": [
+          {
+            "index": 1,
+            "name": "Hash Join",
+            "metadata": {
+              "execution_method": "Row",
+              "join_type": "BUILD_OUTER"
+            },
+            "children": [
+              {
+                "childIndex": 2,
+                "type": "Build"
+              },
+              {
+                "childIndex": 10,
+                "type": "Probe"
+              },
+              {
+                "childIndex": 21,
+                "type": "Condition"
+              },
+              {
+                "childIndex": 24,
+                "type": "Build",
+                "variable": "Id'"
+              },
+              {
+                "childIndex": 25,
+                "type": "Probe",
+                "variable": "Id_2"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "plan_record_line": 52,
+        "execute_record_line": 53,
+        "label": "v9/left/apply",
+        "sql": "@{OPTIMIZER_VERSION=9} SELECT l.Id, r.Id FROM JoinProbe1789493373L l LEFT JOIN@{JOIN_METHOD=APPLY_JOIN, BATCH_MODE=FALSE} JoinProbe1789493373R r ON l.K=r.K",
+        "plan_error": "",
+        "execute_error": "",
+        "expected_rows": 7,
+        "actual_rows": 7,
+        "result_match": true,
+        "operators": [
+          {
+            "index": 3,
+            "name": "Outer Apply",
+            "metadata": {
+              "execution_method": "Row"
+            },
+            "children": [
+              {
+                "childIndex": 4
+              },
+              {
+                "childIndex": 7,
+                "type": "Map"
+              },
+              {
+                "childIndex": 24,
+                "variable": "Id_2"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "plan_record_line": 54,
+        "execute_record_line": 55,
+        "label": "v9/left/distributed_apply",
+        "sql": "@{OPTIMIZER_VERSION=9} SELECT l.Id, r.Id FROM JoinProbe1789493373L l LEFT JOIN@{JOIN_METHOD=APPLY_JOIN, BATCH_MODE=TRUE} JoinProbe1789493373R r ON l.K=r.K",
+        "plan_error": "",
+        "execute_error": "",
+        "expected_rows": 7,
+        "actual_rows": 7,
+        "result_match": true,
+        "operators": [
+          {
+            "index": 2,
+            "name": "Distributed Outer Apply",
+            "metadata": {
+              "execution_method": "Row",
+              "subquery_cluster_node": "13"
+            },
+            "children": [
+              {
+                "childIndex": 3
+              },
+              {
+                "childIndex": 13,
+                "type": "Map"
+              },
+              {
+                "childIndex": 32,
+                "type": "Split Range"
+              },
+              {
+                "childIndex": 35,
+                "type": "Batch",
+                "variable": "Id'"
+              },
+              {
+                "childIndex": 36,
+                "type": "Batch",
+                "variable": "K'"
+              },
+              {
+                "childIndex": 37,
+                "type": "Batch",
+                "variable": "batched___row_id'"
+              },
+              {
+                "childIndex": 38,
+                "type": "Map",
+                "variable": "Id_2"
+              }
+            ]
+          },
+          {
+            "index": 13,
+            "name": "Cross Apply",
+            "metadata": {
+              "execution_method": "Row"
+            },
+            "children": [
+              {
+                "childIndex": 14
+              },
+              {
+                "childIndex": 19,
+                "type": "Map"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "plan_record_line": 56,
+        "execute_record_line": 57,
+        "label": "v9/left/merge",
+        "sql": "@{OPTIMIZER_VERSION=9} SELECT l.Id, r.Id FROM JoinProbe1789493373L l LEFT JOIN@{JOIN_METHOD=MERGE_JOIN} JoinProbe1789493373R r ON l.K=r.K",
+        "plan_error": "",
+        "execute_error": "",
+        "expected_rows": 7,
+        "actual_rows": 7,
+        "result_match": true,
+        "operators": [
+          {
+            "index": 1,
+            "name": "Merge Join",
+            "metadata": {
+              "execution_method": "Row",
+              "join_configuration": "MANY_TO_MANY",
+              "join_type": "LEFT_OUTER"
+            },
+            "children": [
+              {
+                "childIndex": 2,
+                "type": "Left"
+              },
+              {
+                "childIndex": 8,
+                "type": "Right"
+              },
+              {
+                "childIndex": 14,
+                "type": "Condition"
+              },
+              {
+                "childIndex": 17,
+                "type": "Left",
+                "variable": "Id'"
+              },
+              {
+                "childIndex": 18,
+                "type": "Right",
+                "variable": "Id_2"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "plan_record_line": 58,
+        "execute_record_line": 59,
+        "label": "v9/left/push",
+        "sql": "@{OPTIMIZER_VERSION=9} SELECT l.Id, r.Id FROM JoinProbe1789493373L l LEFT JOIN@{JOIN_METHOD=PUSH_BROADCAST_HASH_JOIN} JoinProbe1789493373R r ON l.K=r.K",
+        "plan_error": "",
+        "execute_error": "",
+        "expected_rows": 7,
+        "actual_rows": 7,
+        "result_match": true,
+        "operators": [
+          {
+            "index": 2,
+            "name": "Push Broadcast Hash Join Outer Apply",
+            "metadata": {
+              "execution_method": "Row",
+              "subquery_cluster_node": "13"
+            },
+            "children": [
+              {
+                "childIndex": 3
+              },
+              {
+                "childIndex": 13,
+                "type": "Map"
+              },
+              {
+                "childIndex": 28,
+                "type": "Split Range"
+              },
+              {
+                "childIndex": 31,
+                "type": "Batch",
+                "variable": "Id'"
+              },
+              {
+                "childIndex": 32,
+                "type": "Batch",
+                "variable": "K'"
+              },
+              {
+                "childIndex": 33,
+                "type": "Batch",
+                "variable": "batched___row_id'"
+              },
+              {
+                "childIndex": 34,
+                "type": "Map",
+                "variable": "Id_2"
+              }
+            ]
+          },
+          {
+            "index": 13,
+            "name": "Hash Join",
+            "metadata": {
+              "execution_method": "Row",
+              "join_type": "INNER"
+            },
+            "children": [
+              {
+                "childIndex": 14,
+                "type": "Build"
+              },
+              {
+                "childIndex": 18,
+                "type": "Probe"
+              },
+              {
+                "childIndex": 22,
+                "type": "Condition"
+              },
+              {
+                "childIndex": 25,
+                "type": "Build",
+                "variable": "batched_Id'"
+              },
+              {
+                "childIndex": 26,
+                "type": "Build",
+                "variable": "batched_K'"
+              },
+              {
+                "childIndex": 27,
+                "type": "Build",
+                "variable": "batched___row_id'2"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "plan_record_line": 60,
+        "execute_record_line": 61,
+        "label": "v9/right/hash",
+        "sql": "@{OPTIMIZER_VERSION=9} SELECT l.Id, r.Id FROM JoinProbe1789493373L l RIGHT JOIN@{JOIN_METHOD=HASH_JOIN} JoinProbe1789493373R r ON l.K=r.K",
+        "plan_error": "",
+        "execute_error": "",
+        "expected_rows": 7,
+        "actual_rows": 7,
+        "result_match": true,
+        "operators": [
+          {
+            "index": 1,
+            "name": "Hash Join",
+            "metadata": {
+              "execution_method": "Row",
+              "join_type": "PROBE_OUTER"
+            },
+            "children": [
+              {
+                "childIndex": 2,
+                "type": "Build"
+              },
+              {
+                "childIndex": 8,
+                "type": "Probe"
+              },
+              {
+                "childIndex": 14,
+                "type": "Condition"
+              },
+              {
+                "childIndex": 17,
+                "type": "Build",
+                "variable": "Id_2"
+              },
+              {
+                "childIndex": 18,
+                "type": "Probe",
+                "variable": "Id_1'"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "plan_record_line": 62,
+        "execute_record_line": 63,
+        "label": "v9/right/apply",
+        "sql": "@{OPTIMIZER_VERSION=9} SELECT l.Id, r.Id FROM JoinProbe1789493373L l RIGHT JOIN@{JOIN_METHOD=APPLY_JOIN, BATCH_MODE=FALSE} JoinProbe1789493373R r ON l.K=r.K",
+        "plan_error": "",
+        "execute_error": "",
+        "expected_rows": 7,
+        "actual_rows": 7,
+        "result_match": true,
+        "operators": [
+          {
+            "index": 3,
+            "name": "Outer Apply",
+            "metadata": {
+              "execution_method": "Row"
+            },
+            "children": [
+              {
+                "childIndex": 4
+              },
+              {
+                "childIndex": 7,
+                "type": "Map"
+              },
+              {
+                "childIndex": 24,
+                "variable": "Id_2"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "plan_record_line": 64,
+        "execute_record_line": 65,
+        "label": "v9/right/distributed_apply",
+        "sql": "@{OPTIMIZER_VERSION=9} SELECT l.Id, r.Id FROM JoinProbe1789493373L l RIGHT JOIN@{JOIN_METHOD=APPLY_JOIN, BATCH_MODE=TRUE} JoinProbe1789493373R r ON l.K=r.K",
+        "plan_error": "",
+        "execute_error": "",
+        "expected_rows": 7,
+        "actual_rows": 7,
+        "result_match": true,
+        "operators": [
+          {
+            "index": 2,
+            "name": "Distributed Outer Apply",
+            "metadata": {
+              "execution_method": "Row",
+              "subquery_cluster_node": "13"
+            },
+            "children": [
+              {
+                "childIndex": 3
+              },
+              {
+                "childIndex": 13,
+                "type": "Map"
+              },
+              {
+                "childIndex": 32,
+                "type": "Split Range"
+              },
+              {
+                "childIndex": 35,
+                "type": "Batch",
+                "variable": "Id_1'"
+              },
+              {
+                "childIndex": 36,
+                "type": "Batch",
+                "variable": "K_1'"
+              },
+              {
+                "childIndex": 37,
+                "type": "Batch",
+                "variable": "batched___row_id'"
+              },
+              {
+                "childIndex": 38,
+                "type": "Map",
+                "variable": "Id_2"
+              }
+            ]
+          },
+          {
+            "index": 13,
+            "name": "Cross Apply",
+            "metadata": {
+              "execution_method": "Row"
+            },
+            "children": [
+              {
+                "childIndex": 14
+              },
+              {
+                "childIndex": 19,
+                "type": "Map"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "plan_record_line": 66,
+        "execute_record_line": 67,
+        "label": "v9/right/merge",
+        "sql": "@{OPTIMIZER_VERSION=9} SELECT l.Id, r.Id FROM JoinProbe1789493373L l RIGHT JOIN@{JOIN_METHOD=MERGE_JOIN} JoinProbe1789493373R r ON l.K=r.K",
+        "plan_error": "",
+        "execute_error": "",
+        "expected_rows": 7,
+        "actual_rows": 7,
+        "result_match": true,
+        "operators": [
+          {
+            "index": 1,
+            "name": "Merge Join",
+            "metadata": {
+              "execution_method": "Row",
+              "join_configuration": "MANY_TO_MANY",
+              "join_type": "LEFT_OUTER"
+            },
+            "children": [
+              {
+                "childIndex": 2,
+                "type": "Left"
+              },
+              {
+                "childIndex": 8,
+                "type": "Right"
+              },
+              {
+                "childIndex": 14,
+                "type": "Condition"
+              },
+              {
+                "childIndex": 17,
+                "type": "Left",
+                "variable": "Id_1'"
+              },
+              {
+                "childIndex": 18,
+                "type": "Right",
+                "variable": "Id_2"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "plan_record_line": 68,
+        "execute_record_line": 69,
+        "label": "v9/right/push",
+        "sql": "@{OPTIMIZER_VERSION=9} SELECT l.Id, r.Id FROM JoinProbe1789493373L l RIGHT JOIN@{JOIN_METHOD=PUSH_BROADCAST_HASH_JOIN} JoinProbe1789493373R r ON l.K=r.K",
+        "plan_error": "",
+        "execute_error": "",
+        "expected_rows": 7,
+        "actual_rows": 7,
+        "result_match": true,
+        "operators": [
+          {
+            "index": 2,
+            "name": "Push Broadcast Hash Join Outer Apply",
+            "metadata": {
+              "execution_method": "Row",
+              "subquery_cluster_node": "13"
+            },
+            "children": [
+              {
+                "childIndex": 3
+              },
+              {
+                "childIndex": 13,
+                "type": "Map"
+              },
+              {
+                "childIndex": 26,
+                "type": "Split Range"
+              },
+              {
+                "childIndex": 29,
+                "type": "Batch",
+                "variable": "Id_1'"
+              },
+              {
+                "childIndex": 30,
+                "type": "Batch",
+                "variable": "K_1'"
+              },
+              {
+                "childIndex": 31,
+                "type": "Batch",
+                "variable": "batched___row_id'"
+              },
+              {
+                "childIndex": 32,
+                "type": "Map",
+                "variable": "Id_2"
+              }
+            ]
+          },
+          {
+            "index": 13,
+            "name": "Hash Join",
+            "metadata": {
+              "execution_method": "Row",
+              "join_type": "INNER"
+            },
+            "children": [
+              {
+                "childIndex": 14,
+                "type": "Build"
+              },
+              {
+                "childIndex": 18,
+                "type": "Probe"
+              },
+              {
+                "childIndex": 22,
+                "type": "Condition"
+              },
+              {
+                "childIndex": 25,
+                "type": "Build",
+                "variable": "Id'"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "plan_record_line": 70,
+        "execute_record_line": 71,
+        "label": "v9/full/hash",
+        "sql": "@{OPTIMIZER_VERSION=9} SELECT l.Id, r.Id FROM JoinProbe1789493373L l FULL JOIN@{JOIN_METHOD=HASH_JOIN} JoinProbe1789493373R r ON l.K=r.K",
+        "plan_error": "",
+        "execute_error": "",
+        "expected_rows": 9,
+        "actual_rows": 9,
+        "result_match": true,
+        "operators": [
+          {
+            "index": 1,
+            "name": "Hash Join",
+            "metadata": {
+              "execution_method": "Row",
+              "join_type": "BUILD_PROBE_OUTER"
+            },
+            "children": [
+              {
+                "childIndex": 2,
+                "type": "Build"
+              },
+              {
+                "childIndex": 8,
+                "type": "Probe"
+              },
+              {
+                "childIndex": 14,
+                "type": "Condition"
+              },
+              {
+                "childIndex": 17,
+                "type": "Build",
+                "variable": "Id_2"
+              },
+              {
+                "childIndex": 18,
+                "type": "Probe",
+                "variable": "Id_3"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "plan_record_line": 72,
+        "execute_record_line": 73,
+        "label": "v9/full/apply",
+        "sql": "@{OPTIMIZER_VERSION=9} SELECT l.Id, r.Id FROM JoinProbe1789493373L l FULL JOIN@{JOIN_METHOD=APPLY_JOIN, BATCH_MODE=FALSE} JoinProbe1789493373R r ON l.K=r.K",
+        "plan_error": "",
+        "execute_error": "",
+        "expected_rows": 9,
+        "actual_rows": 9,
+        "result_match": true,
+        "operators": [
+          {
+            "index": 1,
+            "name": "Union All",
+            "metadata": {
+              "execution_method": "Row"
+            },
+            "children": [
+              {
+                "childIndex": 2
+              },
+              {
+                "childIndex": 30
+              },
+              {
+                "childIndex": 58,
+                "variable": "Id_2"
+              },
+              {
+                "childIndex": 59,
+                "variable": "Id_3"
+              }
+            ]
+          },
+          {
+            "index": 5,
+            "name": "Outer Apply",
+            "metadata": {
+              "execution_method": "Row"
+            },
+            "children": [
+              {
+                "childIndex": 6
+              },
+              {
+                "childIndex": 9,
+                "type": "Map"
+              },
+              {
+                "childIndex": 26,
+                "variable": "v1"
+              }
+            ]
+          },
+          {
+            "index": 34,
+            "name": "Anti-Semi Apply",
+            "metadata": {
+              "execution_method": "Row"
+            },
+            "children": [
+              {
+                "childIndex": 35
+              },
+              {
+                "childIndex": 38,
+                "type": "Map"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "plan_record_line": 74,
+        "execute_record_line": 75,
+        "label": "v9/full/distributed_apply",
+        "sql": "@{OPTIMIZER_VERSION=9} SELECT l.Id, r.Id FROM JoinProbe1789493373L l FULL JOIN@{JOIN_METHOD=APPLY_JOIN, BATCH_MODE=TRUE} JoinProbe1789493373R r ON l.K=r.K",
+        "plan_error": "",
+        "execute_error": "",
+        "expected_rows": 9,
+        "actual_rows": 9,
+        "result_match": true,
+        "operators": [
+          {
+            "index": 1,
+            "name": "Union All",
+            "metadata": {
+              "execution_method": "Row"
+            },
+            "children": [
+              {
+                "childIndex": 2
+              },
+              {
+                "childIndex": 44
+              },
+              {
+                "childIndex": 86,
+                "variable": "Id_2"
+              },
+              {
+                "childIndex": 87,
+                "variable": "Id_3"
+              }
+            ]
+          },
+          {
+            "index": 4,
+            "name": "Distributed Outer Apply",
+            "metadata": {
+              "execution_method": "Row",
+              "subquery_cluster_node": "15"
+            },
+            "children": [
+              {
+                "childIndex": 5
+              },
+              {
+                "childIndex": 15,
+                "type": "Map"
+              },
+              {
+                "childIndex": 34,
+                "type": "Split Range"
+              },
+              {
+                "childIndex": 37,
+                "type": "Batch",
+                "variable": "Id'2"
+              },
+              {
+                "childIndex": 38,
+                "type": "Batch",
+                "variable": "K'2"
+              },
+              {
+                "childIndex": 39,
+                "type": "Batch",
+                "variable": "batched___row_id'"
+              },
+              {
+                "childIndex": 40,
+                "type": "Map",
+                "variable": "v1"
+              }
+            ]
+          },
+          {
+            "index": 15,
+            "name": "Cross Apply",
+            "metadata": {
+              "execution_method": "Row"
+            },
+            "children": [
+              {
+                "childIndex": 16
+              },
+              {
+                "childIndex": 21,
+                "type": "Map"
+              }
+            ]
+          },
+          {
+            "index": 47,
+            "name": "Distributed Anti Semi Apply",
+            "metadata": {
+              "execution_method": "Row",
+              "subquery_cluster_node": "58"
+            },
+            "children": [
+              {
+                "childIndex": 48
+              },
+              {
+                "childIndex": 58,
+                "type": "Map"
+              },
+              {
+                "childIndex": 76,
+                "type": "Split Range"
+              },
+              {
+                "childIndex": 79,
+                "type": "Batch",
+                "variable": "Id_1'2"
+              },
+              {
+                "childIndex": 80,
+                "type": "Batch",
+                "variable": "K_1'2"
+              },
+              {
+                "childIndex": 81,
+                "type": "Batch",
+                "variable": "batched___row_id'3"
+              }
+            ]
+          },
+          {
+            "index": 58,
+            "name": "Semi Apply",
+            "metadata": {
+              "execution_method": "Row"
+            },
+            "children": [
+              {
+                "childIndex": 59
+              },
+              {
+                "childIndex": 64,
+                "type": "Map"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "plan_record_line": 76,
+        "execute_record_line": 77,
+        "label": "v9/full/merge",
+        "sql": "@{OPTIMIZER_VERSION=9} SELECT l.Id, r.Id FROM JoinProbe1789493373L l FULL JOIN@{JOIN_METHOD=MERGE_JOIN} JoinProbe1789493373R r ON l.K=r.K",
+        "plan_error": "",
+        "execute_error": "",
+        "expected_rows": 9,
+        "actual_rows": 9,
+        "result_match": true,
+        "operators": [
+          {
+            "index": 1,
+            "name": "Merge Join",
+            "metadata": {
+              "execution_method": "Row",
+              "join_configuration": "MANY_TO_MANY",
+              "join_type": "FULL_OUTER"
+            },
+            "children": [
+              {
+                "childIndex": 2,
+                "type": "Left"
+              },
+              {
+                "childIndex": 8,
+                "type": "Right"
+              },
+              {
+                "childIndex": 14,
+                "type": "Condition"
+              },
+              {
+                "childIndex": 17,
+                "type": "Left",
+                "variable": "Id_2"
+              },
+              {
+                "childIndex": 18,
+                "type": "Right",
+                "variable": "Id_3"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "plan_record_line": 78,
+        "execute_record_line": 79,
+        "label": "v9/full/push",
+        "sql": "@{OPTIMIZER_VERSION=9} SELECT l.Id, r.Id FROM JoinProbe1789493373L l FULL JOIN@{JOIN_METHOD=PUSH_BROADCAST_HASH_JOIN} JoinProbe1789493373R r ON l.K=r.K",
+        "plan_error": "",
+        "execute_error": "",
+        "expected_rows": 9,
+        "actual_rows": 9,
+        "result_match": true,
+        "operators": [
+          {
+            "index": 1,
+            "name": "Union All",
+            "metadata": {
+              "execution_method": "Row"
+            },
+            "children": [
+              {
+                "childIndex": 2
+              },
+              {
+                "childIndex": 40
+              },
+              {
+                "childIndex": 78,
+                "variable": "Id_2"
+              },
+              {
+                "childIndex": 79,
+                "variable": "Id_3"
+              }
+            ]
+          },
+          {
+            "index": 4,
+            "name": "Push Broadcast Hash Join Outer Apply",
+            "metadata": {
+              "execution_method": "Row",
+              "subquery_cluster_node": "15"
+            },
+            "children": [
+              {
+                "childIndex": 5
+              },
+              {
+                "childIndex": 15,
+                "type": "Map"
+              },
+              {
+                "childIndex": 30,
+                "type": "Split Range"
+              },
+              {
+                "childIndex": 33,
+                "type": "Batch",
+                "variable": "Id'2"
+              },
+              {
+                "childIndex": 34,
+                "type": "Batch",
+                "variable": "K'2"
+              },
+              {
+                "childIndex": 35,
+                "type": "Batch",
+                "variable": "batched___row_id'"
+              },
+              {
+                "childIndex": 36,
+                "type": "Map",
+                "variable": "v1"
+              }
+            ]
+          },
+          {
+            "index": 15,
+            "name": "Hash Join",
+            "metadata": {
+              "execution_method": "Row",
+              "join_type": "INNER"
+            },
+            "children": [
+              {
+                "childIndex": 16,
+                "type": "Build"
+              },
+              {
+                "childIndex": 20,
+                "type": "Probe"
+              },
+              {
+                "childIndex": 24,
+                "type": "Condition"
+              },
+              {
+                "childIndex": 27,
+                "type": "Build",
+                "variable": "batched_Id'"
+              },
+              {
+                "childIndex": 28,
+                "type": "Build",
+                "variable": "batched_K'"
+              },
+              {
+                "childIndex": 29,
+                "type": "Build",
+                "variable": "batched___row_id'4"
+              }
+            ]
+          },
+          {
+            "index": 43,
+            "name": "Push Broadcast Hash Join Anti Semi Apply",
+            "metadata": {
+              "execution_method": "Row",
+              "subquery_cluster_node": "54"
+            },
+            "children": [
+              {
+                "childIndex": 44
+              },
+              {
+                "childIndex": 54,
+                "type": "Map"
+              },
+              {
+                "childIndex": 68,
+                "type": "Split Range"
+              },
+              {
+                "childIndex": 71,
+                "type": "Batch",
+                "variable": "Id_1'2"
+              },
+              {
+                "childIndex": 72,
+                "type": "Batch",
+                "variable": "K_1'2"
+              },
+              {
+                "childIndex": 73,
+                "type": "Batch",
+                "variable": "batched___row_id'3"
+              }
+            ]
+          },
+          {
+            "index": 54,
+            "name": "Hash Join",
+            "metadata": {
+              "execution_method": "Row",
+              "join_type": "INNER"
+            },
+            "children": [
+              {
+                "childIndex": 55,
+                "type": "Build"
+              },
+              {
+                "childIndex": 59,
+                "type": "Probe"
+              },
+              {
+                "childIndex": 62,
+                "type": "Condition"
+              },
+              {
+                "childIndex": 65,
+                "type": "Build",
+                "variable": "batched_Id_1'2"
+              },
+              {
+                "childIndex": 66,
+                "type": "Build",
+                "variable": "batched_K_1'2"
+              },
+              {
+                "childIndex": 67,
+                "type": "Build",
+                "variable": "batched___row_id'5"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "plan_record_line": 80,
+        "execute_record_line": 81,
+        "label": "v9/in/hash",
+        "sql": "@{OPTIMIZER_VERSION=9, JOIN_METHOD=HASH_JOIN} SELECT l.Id FROM JoinProbe1789493373L l WHERE l.K IN (SELECT r.K FROM JoinProbe1789493373R r)",
+        "plan_error": "",
+        "execute_error": "",
+        "expected_rows": 3,
+        "actual_rows": 3,
+        "result_match": true,
+        "operators": [
+          {
+            "index": 1,
+            "name": "Hash Join",
+            "metadata": {
+              "execution_method": "Row",
+              "join_type": "BUILD_SEMI"
+            },
+            "children": [
+              {
+                "childIndex": 2,
+                "type": "Build"
+              },
+              {
+                "childIndex": 10,
+                "type": "Probe"
+              },
+              {
+                "childIndex": 20,
+                "type": "Condition"
+              },
+              {
+                "childIndex": 23,
+                "type": "Build",
+                "variable": "Id'"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "plan_record_line": 82,
+        "execute_record_line": 83,
+        "label": "v9/in/apply",
+        "sql": "@{OPTIMIZER_VERSION=9, JOIN_METHOD=APPLY_JOIN, BATCH_MODE=FALSE} SELECT l.Id FROM JoinProbe1789493373L l WHERE l.K IN (SELECT r.K FROM JoinProbe1789493373R r)",
+        "plan_error": "",
+        "execute_error": "",
+        "expected_rows": 3,
+        "actual_rows": 3,
+        "result_match": true,
+        "operators": [
+          {
+            "index": 3,
+            "name": "Semi Apply",
+            "metadata": {
+              "execution_method": "Row"
+            },
+            "children": [
+              {
+                "childIndex": 4
+              },
+              {
+                "childIndex": 7,
+                "type": "Map"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "plan_record_line": 84,
+        "execute_record_line": 85,
+        "label": "v9/in/distributed_apply",
+        "sql": "@{OPTIMIZER_VERSION=9, JOIN_METHOD=APPLY_JOIN, BATCH_MODE=TRUE} SELECT l.Id FROM JoinProbe1789493373L l WHERE l.K IN (SELECT r.K FROM JoinProbe1789493373R r)",
+        "plan_error": "",
+        "execute_error": "",
+        "expected_rows": 3,
+        "actual_rows": 3,
+        "result_match": true,
+        "operators": [
+          {
+            "index": 2,
+            "name": "Distributed Semi Apply",
+            "metadata": {
+              "execution_method": "Row",
+              "subquery_cluster_node": "13"
+            },
+            "children": [
+              {
+                "childIndex": 3
+              },
+              {
+                "childIndex": 13,
+                "type": "Map"
+              },
+              {
+                "childIndex": 31,
+                "type": "Split Range"
+              },
+              {
+                "childIndex": 34,
+                "type": "Batch",
+                "variable": "Id'"
+              },
+              {
+                "childIndex": 35,
+                "type": "Batch",
+                "variable": "K'"
+              },
+              {
+                "childIndex": 36,
+                "type": "Batch",
+                "variable": "batched___row_id'"
+              }
+            ]
+          },
+          {
+            "index": 13,
+            "name": "Semi Apply",
+            "metadata": {
+              "execution_method": "Row"
+            },
+            "children": [
+              {
+                "childIndex": 14
+              },
+              {
+                "childIndex": 19,
+                "type": "Map"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "plan_record_line": 86,
+        "execute_record_line": 87,
+        "label": "v9/in/merge",
+        "sql": "@{OPTIMIZER_VERSION=9, JOIN_METHOD=MERGE_JOIN} SELECT l.Id FROM JoinProbe1789493373L l WHERE l.K IN (SELECT r.K FROM JoinProbe1789493373R r)",
+        "plan_error": "",
+        "execute_error": "",
+        "expected_rows": 3,
+        "actual_rows": 3,
+        "result_match": true,
+        "operators": [
+          {
+            "index": 1,
+            "name": "Merge Join",
+            "metadata": {
+              "execution_method": "Row",
+              "join_configuration": "ONE_TO_MANY",
+              "join_type": "LEFT_SEMI"
+            },
+            "children": [
+              {
+                "childIndex": 2,
+                "type": "Left"
+              },
+              {
+                "childIndex": 8,
+                "type": "Right"
+              },
+              {
+                "childIndex": 13,
+                "type": "Condition"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "plan_record_line": 88,
+        "execute_record_line": 89,
+        "label": "v9/in/push",
+        "sql": "@{OPTIMIZER_VERSION=9, JOIN_METHOD=PUSH_BROADCAST_HASH_JOIN} SELECT l.Id FROM JoinProbe1789493373L l WHERE l.K IN (SELECT r.K FROM JoinProbe1789493373R r)",
+        "plan_error": "",
+        "execute_error": "",
+        "expected_rows": 3,
+        "actual_rows": 3,
+        "result_match": true,
+        "operators": [
+          {
+            "index": 2,
+            "name": "Push Broadcast Hash Join Semi Apply",
+            "metadata": {
+              "execution_method": "Row",
+              "subquery_cluster_node": "13"
+            },
+            "children": [
+              {
+                "childIndex": 3
+              },
+              {
+                "childIndex": 13,
+                "type": "Map"
+              },
+              {
+                "childIndex": 27,
+                "type": "Split Range"
+              },
+              {
+                "childIndex": 30,
+                "type": "Batch",
+                "variable": "Id'"
+              },
+              {
+                "childIndex": 31,
+                "type": "Batch",
+                "variable": "K'"
+              },
+              {
+                "childIndex": 32,
+                "type": "Batch",
+                "variable": "batched___row_id'"
+              }
+            ]
+          },
+          {
+            "index": 13,
+            "name": "Hash Join",
+            "metadata": {
+              "execution_method": "Row",
+              "join_type": "INNER"
+            },
+            "children": [
+              {
+                "childIndex": 14,
+                "type": "Build"
+              },
+              {
+                "childIndex": 18,
+                "type": "Probe"
+              },
+              {
+                "childIndex": 21,
+                "type": "Condition"
+              },
+              {
+                "childIndex": 24,
+                "type": "Build",
+                "variable": "batched_Id'"
+              },
+              {
+                "childIndex": 25,
+                "type": "Build",
+                "variable": "batched_K'"
+              },
+              {
+                "childIndex": 26,
+                "type": "Build",
+                "variable": "batched___row_id'2"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "plan_record_line": 90,
+        "execute_record_line": 91,
+        "label": "v9/exists/hash",
+        "sql": "@{OPTIMIZER_VERSION=9, JOIN_METHOD=HASH_JOIN} SELECT l.Id FROM JoinProbe1789493373L l WHERE EXISTS (SELECT 1 FROM JoinProbe1789493373R r WHERE l.K=r.K)",
+        "plan_error": "",
+        "execute_error": "",
+        "expected_rows": 3,
+        "actual_rows": 3,
+        "result_match": true,
+        "operators": [
+          {
+            "index": 1,
+            "name": "Hash Join",
+            "metadata": {
+              "execution_method": "Row",
+              "join_type": "BUILD_SEMI"
+            },
+            "children": [
+              {
+                "childIndex": 2,
+                "type": "Build"
+              },
+              {
+                "childIndex": 10,
+                "type": "Probe"
+              },
+              {
+                "childIndex": 20,
+                "type": "Condition"
+              },
+              {
+                "childIndex": 23,
+                "type": "Build",
+                "variable": "Id'"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "plan_record_line": 92,
+        "execute_record_line": 93,
+        "label": "v9/exists/apply",
+        "sql": "@{OPTIMIZER_VERSION=9, JOIN_METHOD=APPLY_JOIN, BATCH_MODE=FALSE} SELECT l.Id FROM JoinProbe1789493373L l WHERE EXISTS (SELECT 1 FROM JoinProbe1789493373R r WHERE l.K=r.K)",
+        "plan_error": "",
+        "execute_error": "",
+        "expected_rows": 3,
+        "actual_rows": 3,
+        "result_match": true,
+        "operators": [
+          {
+            "index": 3,
+            "name": "Semi Apply",
+            "metadata": {
+              "execution_method": "Row"
+            },
+            "children": [
+              {
+                "childIndex": 4
+              },
+              {
+                "childIndex": 7,
+                "type": "Map"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "plan_record_line": 94,
+        "execute_record_line": 95,
+        "label": "v9/exists/distributed_apply",
+        "sql": "@{OPTIMIZER_VERSION=9, JOIN_METHOD=APPLY_JOIN, BATCH_MODE=TRUE} SELECT l.Id FROM JoinProbe1789493373L l WHERE EXISTS (SELECT 1 FROM JoinProbe1789493373R r WHERE l.K=r.K)",
+        "plan_error": "",
+        "execute_error": "",
+        "expected_rows": 3,
+        "actual_rows": 3,
+        "result_match": true,
+        "operators": [
+          {
+            "index": 2,
+            "name": "Distributed Semi Apply",
+            "metadata": {
+              "execution_method": "Row",
+              "subquery_cluster_node": "13"
+            },
+            "children": [
+              {
+                "childIndex": 3
+              },
+              {
+                "childIndex": 13,
+                "type": "Map"
+              },
+              {
+                "childIndex": 31,
+                "type": "Split Range"
+              },
+              {
+                "childIndex": 34,
+                "type": "Batch",
+                "variable": "Id'"
+              },
+              {
+                "childIndex": 35,
+                "type": "Batch",
+                "variable": "K'"
+              },
+              {
+                "childIndex": 36,
+                "type": "Batch",
+                "variable": "batched___row_id'"
+              }
+            ]
+          },
+          {
+            "index": 13,
+            "name": "Semi Apply",
+            "metadata": {
+              "execution_method": "Row"
+            },
+            "children": [
+              {
+                "childIndex": 14
+              },
+              {
+                "childIndex": 19,
+                "type": "Map"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "plan_record_line": 96,
+        "execute_record_line": 97,
+        "label": "v9/exists/merge",
+        "sql": "@{OPTIMIZER_VERSION=9, JOIN_METHOD=MERGE_JOIN} SELECT l.Id FROM JoinProbe1789493373L l WHERE EXISTS (SELECT 1 FROM JoinProbe1789493373R r WHERE l.K=r.K)",
+        "plan_error": "",
+        "execute_error": "",
+        "expected_rows": 3,
+        "actual_rows": 3,
+        "result_match": true,
+        "operators": [
+          {
+            "index": 1,
+            "name": "Merge Join",
+            "metadata": {
+              "execution_method": "Row",
+              "join_configuration": "ONE_TO_MANY",
+              "join_type": "LEFT_SEMI"
+            },
+            "children": [
+              {
+                "childIndex": 2,
+                "type": "Left"
+              },
+              {
+                "childIndex": 8,
+                "type": "Right"
+              },
+              {
+                "childIndex": 13,
+                "type": "Condition"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "plan_record_line": 98,
+        "execute_record_line": 99,
+        "label": "v9/exists/push",
+        "sql": "@{OPTIMIZER_VERSION=9, JOIN_METHOD=PUSH_BROADCAST_HASH_JOIN} SELECT l.Id FROM JoinProbe1789493373L l WHERE EXISTS (SELECT 1 FROM JoinProbe1789493373R r WHERE l.K=r.K)",
+        "plan_error": "",
+        "execute_error": "",
+        "expected_rows": 3,
+        "actual_rows": 3,
+        "result_match": true,
+        "operators": [
+          {
+            "index": 2,
+            "name": "Push Broadcast Hash Join Semi Apply",
+            "metadata": {
+              "execution_method": "Row",
+              "subquery_cluster_node": "13"
+            },
+            "children": [
+              {
+                "childIndex": 3
+              },
+              {
+                "childIndex": 13,
+                "type": "Map"
+              },
+              {
+                "childIndex": 27,
+                "type": "Split Range"
+              },
+              {
+                "childIndex": 30,
+                "type": "Batch",
+                "variable": "Id'"
+              },
+              {
+                "childIndex": 31,
+                "type": "Batch",
+                "variable": "K'"
+              },
+              {
+                "childIndex": 32,
+                "type": "Batch",
+                "variable": "batched___row_id'"
+              }
+            ]
+          },
+          {
+            "index": 13,
+            "name": "Hash Join",
+            "metadata": {
+              "execution_method": "Row",
+              "join_type": "INNER"
+            },
+            "children": [
+              {
+                "childIndex": 14,
+                "type": "Build"
+              },
+              {
+                "childIndex": 18,
+                "type": "Probe"
+              },
+              {
+                "childIndex": 21,
+                "type": "Condition"
+              },
+              {
+                "childIndex": 24,
+                "type": "Build",
+                "variable": "batched_Id'"
+              },
+              {
+                "childIndex": 25,
+                "type": "Build",
+                "variable": "batched_K'"
+              },
+              {
+                "childIndex": 26,
+                "type": "Build",
+                "variable": "batched___row_id'2"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "plan_record_line": 100,
+        "execute_record_line": 101,
+        "label": "v9/not_in/hash",
+        "sql": "@{OPTIMIZER_VERSION=9, JOIN_METHOD=HASH_JOIN} SELECT l.Id FROM JoinProbe1789493373L l WHERE l.K NOT IN (SELECT r.K FROM JoinProbe1789493373R r)",
+        "plan_error": "",
+        "execute_error": "",
+        "expected_rows": 0,
+        "actual_rows": 0,
+        "result_match": true,
+        "operators": [
+          {
+            "index": 1,
+            "name": "Hash Join",
+            "metadata": {
+              "execution_method": "Row",
+              "join_type": "BUILD_ANTI_SEMI"
+            },
+            "children": [
+              {
+                "childIndex": 2,
+                "type": "Build"
+              },
+              {
+                "childIndex": 8,
+                "type": "Probe"
+              },
+              {
+                "childIndex": 13,
+                "type": "Condition"
+              },
+              {
+                "childIndex": 16,
+                "type": "Residual Condition"
+              },
+              {
+                "childIndex": 24,
+                "type": "Build",
+                "variable": "Id'"
+              },
+              {
+                "childIndex": 25,
+                "type": "Build",
+                "variable": "K'"
+              },
+              {
+                "childIndex": 26,
+                "type": "Probe",
+                "variable": "K_1'"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "plan_record_line": 102,
+        "execute_record_line": 103,
+        "label": "v9/not_in/apply",
+        "sql": "@{OPTIMIZER_VERSION=9, JOIN_METHOD=APPLY_JOIN, BATCH_MODE=FALSE} SELECT l.Id FROM JoinProbe1789493373L l WHERE l.K NOT IN (SELECT r.K FROM JoinProbe1789493373R r)",
+        "plan_error": "",
+        "execute_error": "",
+        "expected_rows": 0,
+        "actual_rows": 0,
+        "result_match": true,
+        "operators": [
+          {
+            "index": 3,
+            "name": "Anti-Semi Apply",
+            "metadata": {
+              "execution_method": "Row"
+            },
+            "children": [
+              {
+                "childIndex": 4
+              },
+              {
+                "childIndex": 7,
+                "type": "Map"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "plan_record_line": 104,
+        "execute_record_line": 105,
+        "label": "v9/not_in/distributed_apply",
+        "sql": "@{OPTIMIZER_VERSION=9, JOIN_METHOD=APPLY_JOIN, BATCH_MODE=TRUE} SELECT l.Id FROM JoinProbe1789493373L l WHERE l.K NOT IN (SELECT r.K FROM JoinProbe1789493373R r)",
+        "plan_error": "",
+        "execute_error": "",
+        "expected_rows": 0,
+        "actual_rows": 0,
+        "result_match": true,
+        "operators": [
+          {
+            "index": 2,
+            "name": "Distributed Anti Semi Apply",
+            "metadata": {
+              "execution_method": "Row",
+              "subquery_cluster_node": "13"
+            },
+            "children": [
+              {
+                "childIndex": 3
+              },
+              {
+                "childIndex": 13,
+                "type": "Map"
+              },
+              {
+                "childIndex": 31,
+                "type": "Split Range"
+              },
+              {
+                "childIndex": 32,
+                "type": "Batch",
+                "variable": "Id'"
+              },
+              {
+                "childIndex": 33,
+                "type": "Batch",
+                "variable": "K'"
+              },
+              {
+                "childIndex": 34,
+                "type": "Batch",
+                "variable": "batched___row_id'"
+              }
+            ]
+          },
+          {
+            "index": 13,
+            "name": "Semi Apply",
+            "metadata": {
+              "execution_method": "Row"
+            },
+            "children": [
+              {
+                "childIndex": 14
+              },
+              {
+                "childIndex": 18,
+                "type": "Map"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "plan_record_line": 106,
+        "execute_record_line": 107,
+        "label": "v9/not_in/merge",
+        "sql": "@{OPTIMIZER_VERSION=9, JOIN_METHOD=MERGE_JOIN} SELECT l.Id FROM JoinProbe1789493373L l WHERE l.K NOT IN (SELECT r.K FROM JoinProbe1789493373R r)",
+        "plan_error": "",
+        "execute_error": "",
+        "expected_rows": 0,
+        "actual_rows": 0,
+        "result_match": true,
+        "operators": [
+          {
+            "index": 1,
+            "name": "Merge Join",
+            "metadata": {
+              "execution_method": "Row",
+              "join_configuration": "MANY_TO_MANY",
+              "join_type": "LEFT_ANTI_SEMI"
+            },
+            "children": [
+              {
+                "childIndex": 2,
+                "type": "Left"
+              },
+              {
+                "childIndex": 8,
+                "type": "Right"
+              },
+              {
+                "childIndex": 13,
+                "type": "Condition"
+              },
+              {
+                "childIndex": 16,
+                "type": "Residual Condition"
+              },
+              {
+                "childIndex": 24,
+                "type": "Left",
+                "variable": "Id'"
+              },
+              {
+                "childIndex": 25,
+                "type": "Left",
+                "variable": "K'"
+              },
+              {
+                "childIndex": 26,
+                "type": "Right",
+                "variable": "K_1'"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "plan_record_line": 108,
+        "execute_record_line": 109,
+        "label": "v9/not_in/push",
+        "sql": "@{OPTIMIZER_VERSION=9, JOIN_METHOD=PUSH_BROADCAST_HASH_JOIN} SELECT l.Id FROM JoinProbe1789493373L l WHERE l.K NOT IN (SELECT r.K FROM JoinProbe1789493373R r)",
+        "plan_error": "",
+        "execute_error": "",
+        "expected_rows": 0,
+        "actual_rows": 0,
+        "result_match": true,
+        "operators": [
+          {
+            "index": 2,
+            "name": "Push Broadcast Hash Join Anti Semi Apply",
+            "metadata": {
+              "execution_method": "Row",
+              "subquery_cluster_node": "13"
+            },
+            "children": [
+              {
+                "childIndex": 3
+              },
+              {
+                "childIndex": 13,
+                "type": "Map"
+              },
+              {
+                "childIndex": 35,
+                "type": "Split Range"
+              },
+              {
+                "childIndex": 36,
+                "type": "Batch",
+                "variable": "Id'"
+              },
+              {
+                "childIndex": 37,
+                "type": "Batch",
+                "variable": "K'"
+              },
+              {
+                "childIndex": 38,
+                "type": "Batch",
+                "variable": "batched___row_id'"
+              }
+            ]
+          },
+          {
+            "index": 13,
+            "name": "Hash Join",
+            "metadata": {
+              "execution_method": "Row",
+              "join_type": "INNER"
+            },
+            "children": [
+              {
+                "childIndex": 14,
+                "type": "Build"
+              },
+              {
+                "childIndex": 18,
+                "type": "Probe"
+              },
+              {
+                "childIndex": 21,
+                "type": "Condition"
+              },
+              {
+                "childIndex": 24,
+                "type": "Residual Condition"
+              },
+              {
+                "childIndex": 32,
+                "type": "Build",
+                "variable": "batched_Id'"
+              },
+              {
+                "childIndex": 33,
+                "type": "Build",
+                "variable": "batched_K'"
+              },
+              {
+                "childIndex": 34,
+                "type": "Build",
+                "variable": "batched___row_id'2"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "plan_record_line": 110,
+        "execute_record_line": 111,
+        "label": "v9/not_exists/hash",
+        "sql": "@{OPTIMIZER_VERSION=9, JOIN_METHOD=HASH_JOIN} SELECT l.Id FROM JoinProbe1789493373L l WHERE NOT EXISTS (SELECT 1 FROM JoinProbe1789493373R r WHERE l.K=r.K)",
+        "plan_error": "",
+        "execute_error": "",
+        "expected_rows": 2,
+        "actual_rows": 2,
+        "result_match": true,
+        "operators": [
+          {
+            "index": 1,
+            "name": "Hash Join",
+            "metadata": {
+              "execution_method": "Row",
+              "join_type": "BUILD_ANTI_SEMI"
+            },
+            "children": [
+              {
+                "childIndex": 2,
+                "type": "Build"
+              },
+              {
+                "childIndex": 10,
+                "type": "Probe"
+              },
+              {
+                "childIndex": 20,
+                "type": "Condition"
+              },
+              {
+                "childIndex": 23,
+                "type": "Build",
+                "variable": "Id'"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "plan_record_line": 112,
+        "execute_record_line": 113,
+        "label": "v9/not_exists/apply",
+        "sql": "@{OPTIMIZER_VERSION=9, JOIN_METHOD=APPLY_JOIN, BATCH_MODE=FALSE} SELECT l.Id FROM JoinProbe1789493373L l WHERE NOT EXISTS (SELECT 1 FROM JoinProbe1789493373R r WHERE l.K=r.K)",
+        "plan_error": "",
+        "execute_error": "",
+        "expected_rows": 2,
+        "actual_rows": 2,
+        "result_match": true,
+        "operators": [
+          {
+            "index": 3,
+            "name": "Anti-Semi Apply",
+            "metadata": {
+              "execution_method": "Row"
+            },
+            "children": [
+              {
+                "childIndex": 4
+              },
+              {
+                "childIndex": 7,
+                "type": "Map"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "plan_record_line": 114,
+        "execute_record_line": 115,
+        "label": "v9/not_exists/distributed_apply",
+        "sql": "@{OPTIMIZER_VERSION=9, JOIN_METHOD=APPLY_JOIN, BATCH_MODE=TRUE} SELECT l.Id FROM JoinProbe1789493373L l WHERE NOT EXISTS (SELECT 1 FROM JoinProbe1789493373R r WHERE l.K=r.K)",
+        "plan_error": "",
+        "execute_error": "",
+        "expected_rows": 2,
+        "actual_rows": 2,
+        "result_match": true,
+        "operators": [
+          {
+            "index": 2,
+            "name": "Distributed Anti Semi Apply",
+            "metadata": {
+              "execution_method": "Row",
+              "subquery_cluster_node": "13"
+            },
+            "children": [
+              {
+                "childIndex": 3
+              },
+              {
+                "childIndex": 13,
+                "type": "Map"
+              },
+              {
+                "childIndex": 31,
+                "type": "Split Range"
+              },
+              {
+                "childIndex": 34,
+                "type": "Batch",
+                "variable": "Id'"
+              },
+              {
+                "childIndex": 35,
+                "type": "Batch",
+                "variable": "K'"
+              },
+              {
+                "childIndex": 36,
+                "type": "Batch",
+                "variable": "batched___row_id'"
+              }
+            ]
+          },
+          {
+            "index": 13,
+            "name": "Semi Apply",
+            "metadata": {
+              "execution_method": "Row"
+            },
+            "children": [
+              {
+                "childIndex": 14
+              },
+              {
+                "childIndex": 19,
+                "type": "Map"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "plan_record_line": 116,
+        "execute_record_line": 117,
+        "label": "v9/not_exists/merge",
+        "sql": "@{OPTIMIZER_VERSION=9, JOIN_METHOD=MERGE_JOIN} SELECT l.Id FROM JoinProbe1789493373L l WHERE NOT EXISTS (SELECT 1 FROM JoinProbe1789493373R r WHERE l.K=r.K)",
+        "plan_error": "",
+        "execute_error": "",
+        "expected_rows": 2,
+        "actual_rows": 2,
+        "result_match": true,
+        "operators": [
+          {
+            "index": 1,
+            "name": "Merge Join",
+            "metadata": {
+              "execution_method": "Row",
+              "join_configuration": "ONE_TO_MANY",
+              "join_type": "LEFT_ANTI_SEMI"
+            },
+            "children": [
+              {
+                "childIndex": 2,
+                "type": "Left"
+              },
+              {
+                "childIndex": 8,
+                "type": "Right"
+              },
+              {
+                "childIndex": 13,
+                "type": "Condition"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "plan_record_line": 118,
+        "execute_record_line": 119,
+        "label": "v9/not_exists/push",
+        "sql": "@{OPTIMIZER_VERSION=9, JOIN_METHOD=PUSH_BROADCAST_HASH_JOIN} SELECT l.Id FROM JoinProbe1789493373L l WHERE NOT EXISTS (SELECT 1 FROM JoinProbe1789493373R r WHERE l.K=r.K)",
+        "plan_error": "",
+        "execute_error": "",
+        "expected_rows": 2,
+        "actual_rows": 2,
+        "result_match": true,
+        "operators": [
+          {
+            "index": 2,
+            "name": "Push Broadcast Hash Join Anti Semi Apply",
+            "metadata": {
+              "execution_method": "Row",
+              "subquery_cluster_node": "13"
+            },
+            "children": [
+              {
+                "childIndex": 3
+              },
+              {
+                "childIndex": 13,
+                "type": "Map"
+              },
+              {
+                "childIndex": 27,
+                "type": "Split Range"
+              },
+              {
+                "childIndex": 30,
+                "type": "Batch",
+                "variable": "Id'"
+              },
+              {
+                "childIndex": 31,
+                "type": "Batch",
+                "variable": "K'"
+              },
+              {
+                "childIndex": 32,
+                "type": "Batch",
+                "variable": "batched___row_id'"
+              }
+            ]
+          },
+          {
+            "index": 13,
+            "name": "Hash Join",
+            "metadata": {
+              "execution_method": "Row",
+              "join_type": "INNER"
+            },
+            "children": [
+              {
+                "childIndex": 14,
+                "type": "Build"
+              },
+              {
+                "childIndex": 18,
+                "type": "Probe"
+              },
+              {
+                "childIndex": 21,
+                "type": "Condition"
+              },
+              {
+                "childIndex": 24,
+                "type": "Build",
+                "variable": "batched_Id'"
+              },
+              {
+                "childIndex": 25,
+                "type": "Build",
+                "variable": "batched_K'"
+              },
+              {
+                "childIndex": 26,
+                "type": "Build",
+                "variable": "batched___row_id'2"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

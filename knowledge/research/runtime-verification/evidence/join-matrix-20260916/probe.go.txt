@@ -1,0 +1,215 @@
+package main
+
+import (
+	"context"
+	"crypto/sha256"
+	"encoding/json"
+	"fmt"
+	"os"
+	"sort"
+	"strings"
+	"time"
+
+	"cloud.google.com/go/spanner"
+	database "cloud.google.com/go/spanner/admin/database/apiv1"
+	dbpb "cloud.google.com/go/spanner/admin/database/apiv1/databasepb"
+	"github.com/apstndb/spanemuboost"
+	"google.golang.org/api/iterator"
+	"google.golang.org/protobuf/encoding/protojson"
+)
+
+var ctx context.Context
+var client *spanner.Client
+var admin *database.DatabaseAdminClient
+var db, prefix string
+var out = json.NewEncoder(os.Stdout)
+
+func emit(v map[string]any) { v["at"] = time.Now().UTC().Format(time.RFC3339); out.Encode(v) }
+func clean(e error) string {
+	if e == nil {
+		return ""
+	}
+	s := strings.ReplaceAll(e.Error(), db, "<database>")
+	for _, k := range []string{"SPANNER_PROJECT_ID", "SPANNER_INSTANCE_ID", "SPANNER_DATABASE_ID"} {
+		if v := os.Getenv(k); v != "" {
+			s = strings.ReplaceAll(s, v, "<redacted>")
+		}
+	}
+	return s
+}
+func ddl(label, sql string) bool {
+	c, cancel := context.WithTimeout(context.Background(), 8*time.Minute)
+	defer cancel()
+	op, e := admin.UpdateDatabaseDdl(c, &dbpb.UpdateDatabaseDdlRequest{Database: db, Statements: []string{sql}})
+	if e == nil {
+		e = op.Wait(c)
+	}
+	emit(map[string]any{"kind": "ddl", "label": label, "sql": sql, "error": clean(e)})
+	return e == nil
+}
+func query(label, sql string, plan bool) {
+	c, cancel := context.WithTimeout(ctx, 45*time.Second)
+	defer cancel()
+	tx := client.Single()
+	defer tx.Close()
+	v := map[string]any{"kind": "query", "label": label, "sql": sql, "plan_requested": plan}
+	if plan {
+		p, e := tx.AnalyzeQuery(c, spanner.Statement{SQL: sql})
+		v["error"] = clean(e)
+		if e == nil {
+			b, _ := protojson.Marshal(p)
+			v["plan"] = json.RawMessage(b)
+		}
+	} else {
+		it := tx.Query(c, spanner.Statement{SQL: sql})
+		defer it.Stop()
+		var ids []string
+		var e error
+		for {
+			var r *spanner.Row
+			r, e = it.Next()
+			if e != nil {
+				break
+			}
+			var id string
+			if label == "preflight" {
+				e = r.Columns(&id)
+			} else {
+				var li, ri spanner.NullInt64
+				form := strings.Split(label, "/")[1]
+				row := map[string]any{}
+				if form == "inner" || form == "left" || form == "right" || form == "full" {
+					e = r.Columns(&li, &ri)
+					row["r"] = nil
+					if ri.Valid {
+						row["r"] = ri.Int64
+					}
+				} else {
+					e = r.Columns(&li)
+				}
+				row["l"] = nil
+				if li.Valid {
+					row["l"] = li.Int64
+				}
+				b, _ := json.Marshal(row)
+				id = string(b)
+			}
+			if e != nil {
+				break
+			}
+			ids = append(ids, id)
+		}
+		if e == iterator.Done {
+			e = nil
+		}
+		sort.Strings(ids)
+		b, _ := json.Marshal(ids)
+		v["rows"] = len(ids)
+		v["result"] = ids
+		v["result_sha256"] = fmt.Sprintf("%x", sha256.Sum256(b))
+		v["error"] = clean(e)
+	}
+	emit(v)
+}
+func main() {
+	ctx = context.Background()
+	backend := os.Args[1]
+	prefix = fmt.Sprintf("JoinProbe%d", time.Now().Unix())
+	emit(map[string]any{"kind": "identity", "backend": backend, "image": os.Getenv("PROBE_IMAGE"), "prefix": prefix})
+	if backend == "managed" {
+		if os.Getenv("SPANNER_EMULATOR_HOST") != "" {
+			panic("emulator override")
+		}
+		db = fmt.Sprintf("projects/%s/instances/%s/databases/%s", os.Getenv("SPANNER_PROJECT_ID"), os.Getenv("SPANNER_INSTANCE_ID"), os.Getenv("SPANNER_DATABASE_ID"))
+		var e error
+		client, e = spanner.NewClient(ctx, db)
+		if e != nil {
+			panic(clean(e))
+		}
+		defer client.Close()
+		admin, e = database.NewDatabaseAdminClient(ctx)
+		if e != nil {
+			panic(clean(e))
+		}
+		defer admin.Close()
+	} else {
+		opts := []spanemuboost.Option{spanemuboost.WithContainerImage(os.Getenv("PROBE_IMAGE")), spanemuboost.WithRandomDatabaseID(), spanemuboost.ForceSchemaTeardown()}
+		b := spanemuboost.Backend(backend)
+		if backend == "postgres" {
+			b = spanemuboost.BackendEmulator
+			opts = append(opts, spanemuboost.WithDatabaseDialect(dbpb.DatabaseDialect_POSTGRESQL))
+		}
+		env, e := spanemuboost.RunWithClients(ctx, b, opts...)
+		if e != nil {
+			panic(clean(e))
+		}
+		defer env.Close()
+		client = env.Client
+		admin = env.DatabaseClient
+		db = env.DatabasePath()
+		p, e := spanemuboost.RuntimePlatform(ctx, env.Runtime())
+		emit(map[string]any{"kind": "platform", "platform": p, "error": clean(e)})
+	}
+	query("preflight", "SELECT 'ready'", false)
+	joins()
+}
+
+func joins() {
+	left, right := prefix+"L", prefix+"R"
+	if !ddl("create-left", "CREATE TABLE "+left+" (Id INT64 NOT NULL, K INT64) PRIMARY KEY(Id)") {
+		return
+	}
+	defer ddl("cleanup-left", "DROP TABLE "+left)
+	if !ddl("create-right", "CREATE TABLE "+right+" (Id INT64 NOT NULL, K INT64) PRIMARY KEY(Id)") {
+		return
+	}
+	defer ddl("cleanup-right", "DROP TABLE "+right)
+	for _, table := range []string{left, right} {
+		idx := table + "ByK"
+		if !ddl("create-index-"+table, "CREATE INDEX "+idx+" ON "+table+"(K)") {
+			return
+		}
+		defer ddl("cleanup-index-"+table, "DROP INDEX "+idx)
+	}
+	var ms []*spanner.Mutation
+	for i, k := range []any{int64(10), int64(20), int64(20), int64(30), nil} {
+		ms = append(ms, spanner.Insert(left, []string{"Id", "K"}, []any{int64(i + 1), k}))
+	}
+	for i, k := range []any{int64(10), int64(20), int64(20), int64(40), nil} {
+		ms = append(ms, spanner.Insert(right, []string{"Id", "K"}, []any{int64(i + 101), k}))
+	}
+	_, err := client.Apply(ctx, ms)
+	emit(map[string]any{"kind": "seed", "error": clean(err), "left_keys": []any{10, 20, 20, 30, nil}, "right_keys": []any{10, 20, 20, 40, nil}})
+	if err != nil {
+		return
+	}
+	methods := []struct{ name, hint string }{{"hash", "JOIN_METHOD=HASH_JOIN"}, {"apply", "JOIN_METHOD=APPLY_JOIN, BATCH_MODE=FALSE"}, {"distributed_apply", "JOIN_METHOD=APPLY_JOIN, BATCH_MODE=TRUE"}, {"merge", "JOIN_METHOD=MERGE_JOIN"}, {"push", "JOIN_METHOD=PUSH_BROADCAST_HASH_JOIN"}}
+	forms := []struct{ name, sql string }{
+		{"inner", "SELECT l.Id, r.Id FROM " + left + " l INNER JOIN@{HINT} " + right + " r ON l.K=r.K"},
+		{"left", "SELECT l.Id, r.Id FROM " + left + " l LEFT JOIN@{HINT} " + right + " r ON l.K=r.K"},
+		{"right", "SELECT l.Id, r.Id FROM " + left + " l RIGHT JOIN@{HINT} " + right + " r ON l.K=r.K"},
+		{"full", "SELECT l.Id, r.Id FROM " + left + " l FULL JOIN@{HINT} " + right + " r ON l.K=r.K"},
+		{"in", "@{HINT} SELECT l.Id FROM " + left + " l WHERE l.K IN (SELECT r.K FROM " + right + " r)"},
+		{"exists", "@{HINT} SELECT l.Id FROM " + left + " l WHERE EXISTS (SELECT 1 FROM " + right + " r WHERE l.K=r.K)"},
+		{"not_in", "@{HINT} SELECT l.Id FROM " + left + " l WHERE l.K NOT IN (SELECT r.K FROM " + right + " r)"},
+		{"not_exists", "@{HINT} SELECT l.Id FROM " + left + " l WHERE NOT EXISTS (SELECT 1 FROM " + right + " r WHERE l.K=r.K)"},
+	}
+	for _, version := range []string{"1", "2", "3", "4", "5", "6", "7", "8", "9"} {
+		for _, f := range forms {
+			for _, m := range methods {
+				if version != "9" && !(f.name == "full" && (m.name == "hash" || m.name == "merge")) {
+					continue
+				}
+				sql := strings.ReplaceAll(f.sql, "HINT", m.hint)
+				if strings.HasPrefix(sql, "@{") {
+					sql = strings.Replace(sql, "@{", "@{OPTIMIZER_VERSION="+version+", ", 1)
+				} else {
+					sql = "@{OPTIMIZER_VERSION=" + version + "} " + sql
+				}
+				label := "v" + version + "/" + f.name + "/" + m.name
+				query(label, sql, true)
+				query(label, sql, false)
+			}
+		}
+	}
+}
