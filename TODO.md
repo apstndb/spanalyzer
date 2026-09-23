@@ -109,8 +109,10 @@ These change the generated API, so they should be decided together before any
 config/output freeze (v1 freeze is deliberately deferred).
 
 - [ ] **Derive query result struct nullability from DDL for `kind: table` and
-  `kind: index`.** Write input structs already use DDL `NOT NULL` to choose
-  `int64` vs `spanner.NullInt64`; result structs always emit `spanner.Null*`.
+  `kind: index`.** Write input structs follow DDL `NOT NULL`, including
+  primary keys that omit it: those fields stay nullable (`spanner.NullInt64`
+  or the common `NullValue`) and their DML predicates use
+  `IS NOT DISTINCT FROM`. Result structs always emit nullable types.
   Shorthand kinds project bare table columns, so nullability is derivable.
   Decide whether `kind: sql` stays conservative and whether that split is
   acceptable for DTO reuse.

@@ -1166,7 +1166,7 @@ func planColumnCapabilities(columns []*Column) []QueryCodegenPlanColumnCapabilit
 	for _, column := range columns {
 		out = append(out, QueryCodegenPlanColumnCapability{
 			Name:                 column.Name,
-			Nullable:             !column.NotNull && !column.PrimaryKey,
+			Nullable:             !column.NotNull,
 			PrimaryKey:           column.PrimaryKey,
 			Hidden:               column.Hidden,
 			InsertValue:          columnInsertable(column),
@@ -2528,7 +2528,9 @@ func goResultFieldFromColumn(column *Column) (goResultField, error) {
 		return goResultField{}, err
 	}
 	field := goResultFieldFromSpanner(column.Name, typ)
-	field.Nullable = !column.NotNull && !column.PrimaryKey
+	// Spanner allows NULL in a primary key when the column omits NOT NULL.
+	// Nullability follows that DDL constraint, not key membership.
+	field.Nullable = !column.NotNull
 	return field, nil
 }
 
@@ -2628,7 +2630,12 @@ func writeDMLSQL(spec resolvedWriteSpec) string {
 func writeWhereSQL(spec resolvedWriteSpec, keys []*Column) string {
 	parts := make([]string, 0, len(keys))
 	for _, column := range keys {
-		parts = append(parts, quoteGoogleSQLIdent(column.Name)+" = @"+writeParamName(spec, column))
+		op := " = "
+		if !column.NotNull {
+			// NULL = NULL is unknown, so a nullable key needs a NULL-safe comparison.
+			op = " IS NOT DISTINCT FROM "
+		}
+		parts = append(parts, quoteGoogleSQLIdent(column.Name)+op+"@"+writeParamName(spec, column))
 	}
 	return strings.Join(parts, " AND ")
 }
