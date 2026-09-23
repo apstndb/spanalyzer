@@ -1847,6 +1847,81 @@ CREATE TABLE Singers (
 	}
 }
 
+func TestGenerateQueryCodeNullablePrimaryKey(t *testing.T) {
+	dir := t.TempDir()
+	writeTestFile(t, filepath.Join(dir, "schema.sql"), "CREATE TABLE T (Id INT64) PRIMARY KEY (Id)\n")
+	code, err := GenerateQueryCode(QueryCodegenConfig{
+		Package: "db",
+		Client:  GoStructTargetSpanner,
+		Schemas: []QueryCodegenSchema{{Name: "app", Dialect: "spanner", DDL: "schema.sql"}},
+		Writes: []QueryCodegenWrite{{
+			Name:        "DeleteT",
+			Catalog:     "app",
+			Table:       "T",
+			Operation:   "delete",
+			InputStruct: "Key",
+		}},
+	}, dir)
+	if err != nil {
+		t.Fatalf("GenerateQueryCode() error = %v", err)
+	}
+	for _, want := range []string{
+		"Id spanner.NullInt64",
+		`return spanner.Delete("T", spanner.Key{w.Id})`,
+		"WHERE `Id` IS NOT DISTINCT FROM @Id",
+	} {
+		if !strings.Contains(code, want) {
+			t.Fatalf("generated code missing %q:\n%s", want, code)
+		}
+	}
+	if strings.Contains(code, "WHERE `Id` = @Id") {
+		t.Fatalf("nullable key still uses equality:\n%s", code)
+	}
+}
+
+func TestGenerateQueryCodeMixedPrimaryKeyNullability(t *testing.T) {
+	dir := t.TempDir()
+	writeTestFile(t, filepath.Join(dir, "schema.sql"), `
+CREATE TABLE T (Tenant INT64 NOT NULL, Id INT64, Value STRING(MAX))
+PRIMARY KEY (Tenant, Id);
+`)
+	for _, operation := range []string{"update", "delete"} {
+		t.Run(operation, func(t *testing.T) {
+			write := QueryCodegenWrite{
+				Name: "ChangeT", Catalog: "app", Table: "T",
+				Operation: operation, InputStruct: "Input",
+			}
+			if operation == "update" {
+				write.Update = QueryCodegenWriteUpdate{Columns: []string{"Value"}}
+			}
+			config := QueryCodegenConfig{
+				Package: "db", Client: GoStructTargetSpanner,
+				Schemas: []QueryCodegenSchema{{Name: "app", Dialect: "spanner", DDL: "schema.sql"}},
+				Writes:  []QueryCodegenWrite{write},
+			}
+			code, err := GenerateQueryCode(config, dir)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if !strings.Contains(code, "WHERE `Tenant` = @Tenant AND `Id` IS NOT DISTINCT FROM @Id") {
+				t.Fatalf("mixed key predicate missing:\n%s", code)
+			}
+			compileGeneratedPackage(t, code)
+			plan, err := BuildQueryCodegenPlan(config, dir)
+			if err != nil {
+				t.Fatal(err)
+			}
+			caps := map[string]QueryCodegenPlanColumnCapability{}
+			for _, capability := range plan.Writes[0].ColumnCapabilities {
+				caps[capability.Name] = capability
+			}
+			if !caps["Id"].PrimaryKey || !caps["Id"].Nullable || !caps["Tenant"].PrimaryKey || caps["Tenant"].Nullable {
+				t.Fatalf("incorrect key capabilities: %+v", caps)
+			}
+		})
+	}
+}
+
 func TestGenerateQueryCodeWriteUpdateMaskIsRequired(t *testing.T) {
 	dir := t.TempDir()
 	writeTestFile(t, filepath.Join(dir, "schema.sql"), `

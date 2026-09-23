@@ -808,6 +808,10 @@ type Statement struct {
 }
 type Mutation struct{}
 type NullString struct{ StringVal string; Valid bool }
+type NullInt64 struct{ Int64 int64; Valid bool }
+type Key []interface{}
+func Delete(table string, key Key) *Mutation { return &Mutation{} }
+func Update(table string, cols []string, vals []interface{}) *Mutation { return &Mutation{} }
 func Insert(table string, cols []string, vals []interface{}) *Mutation { return &Mutation{} }
 func InsertOrUpdate(table string, cols []string, vals []interface{}) *Mutation { return &Mutation{} }
 type ReadWriteTransaction struct{}
