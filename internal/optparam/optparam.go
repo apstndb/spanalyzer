@@ -41,6 +41,9 @@ import (
 	"regexp"
 	"sort"
 	"strings"
+
+	"github.com/cloudspannerecosystem/memefish"
+	"github.com/cloudspannerecosystem/memefish/token"
 )
 
 // maxEnumeratedVariants bounds the codegen-time Cartesian product. Each
@@ -260,27 +263,37 @@ func markerExpectedMode(markerKind string) (Mode, SegmentKind, error) {
 	}
 }
 
-// rewriteNullIsNull replaces every "= @name" inside body with
-// "IS NOT DISTINCT FROM @name". It is whitespace-tolerant around the "="
-// token but requires at least one occurrence — otherwise the marker is
-// almost certainly authored incorrectly.
+// rewriteNullIsNull replaces comparison tokens "= @name" with
+// "IS NOT DISTINCT FROM @name". The memefish lexer decides which equals
+// signs are code tokens, so strings, quoted identifiers, and comments,
+// including hash comments, stay byte-for-byte. At least one real comparison
+// is required.
 func rewriteNullIsNull(body, name string) (string, error) {
-	pattern := regexp.MustCompile(`(?i)=\s*@` + regexp.QuoteMeta(name) + `\b`)
-	matches := pattern.FindAllStringIndex(body, -1)
+	tokens, err := lexSQLFragment(body)
+	if err != nil {
+		return "", err
+	}
 	var b strings.Builder
 	last := 0
 	replaced := false
-	for _, match := range matches {
-		start, end := match[0], match[1]
-		if start > 0 && strings.ContainsRune("<>!=", rune(body[start-1])) {
+	for i, tok := range tokens {
+		if tok.Kind != "=" || i+1 >= len(tokens) || !sqlParamToken(tokens[i+1], name) {
 			continue
 		}
+		start := int(tok.Pos)
+		param := tokens[i+1]
+		between := body[int(tok.End):int(param.Pos)]
 		b.WriteString(body[last:start])
 		if start > 0 && !isSQLSpace(body[start-1]) {
 			b.WriteByte(' ')
 		}
-		b.WriteString("IS NOT DISTINCT FROM @" + name)
-		last = end
+		b.WriteString("IS NOT DISTINCT FROM")
+		if !containsSQLSpace(between) {
+			b.WriteByte(' ')
+		}
+		b.WriteString(between)
+		b.WriteString("@" + name)
+		last = int(param.End)
 		replaced = true
 	}
 	if !replaced {
@@ -288,6 +301,36 @@ func rewriteNullIsNull(body, name string) (string, error) {
 	}
 	b.WriteString(body[last:])
 	return b.String(), nil
+}
+
+func lexSQLFragment(body string) ([]token.Token, error) {
+	lexer := &memefish.Lexer{File: &token.File{Buffer: body}}
+	var tokens []token.Token
+	for {
+		if err := lexer.NextToken(); err != nil {
+			return nil, fmt.Errorf("null_is_null body: %w", err)
+		}
+		if lexer.Token.Kind == token.TokenBad {
+			return nil, fmt.Errorf("null_is_null body: invalid SQL token at %d", lexer.Token.Pos)
+		}
+		if lexer.Token.Kind == token.TokenEOF {
+			return tokens, nil
+		}
+		tokens = append(tokens, lexer.Token)
+	}
+}
+
+func sqlParamToken(tok token.Token, name string) bool {
+	return tok.Kind == token.TokenParam && strings.EqualFold(tok.AsString, name)
+}
+
+func containsSQLSpace(s string) bool {
+	for i := 0; i < len(s); i++ {
+		if isSQLSpace(s[i]) {
+			return true
+		}
+	}
+	return false
 }
 
 func isSQLSpace(b byte) bool {
