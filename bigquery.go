@@ -6,10 +6,10 @@ import (
 	"regexp"
 	"sort"
 	"strings"
-	"unicode"
-	"unicode/utf8"
 
 	"cloud.google.com/go/spanner/apiv1/spannerpb"
+	"github.com/cloudspannerecosystem/memefish"
+	"github.com/cloudspannerecosystem/memefish/token"
 	googlesql "github.com/goccy/go-googlesql"
 )
 
@@ -1681,204 +1681,81 @@ type externalQueryCall struct {
 }
 
 func findExternalQueryCalls(sql string) ([]externalQueryCall, error) {
+	tokens, err := lexGoogleSQL(sql)
+	if err != nil {
+		return nil, err
+	}
 	var calls []externalQueryCall
-	for i := 0; i < len(sql); {
-		if next := skipGoogleSQLTrivia(sql, i); next != i {
-			i = next
+	for i := 0; i < len(tokens); i++ {
+		if tokens[i].Kind != token.TokenIdent || !strings.EqualFold(tokens[i].AsString, "EXTERNAL_QUERY") {
 			continue
 		}
-		if sql[i] == '\'' || sql[i] == '"' {
-			next, err := scanGoogleSQLString(sql, i)
-			if err != nil {
-				return nil, err
-			}
-			i = next
+		if i+1 >= len(tokens) || tokens[i+1].Kind != "(" {
 			continue
 		}
-		if !strings.HasPrefix(strings.ToUpper(sql[i:]), "EXTERNAL_QUERY") || !externalQueryBoundary(sql, i, i+len("EXTERNAL_QUERY")) {
-			_, size := utf8.DecodeRuneInString(sql[i:])
-			if size == 0 {
-				size = 1
-			}
-			i += size
-			continue
-		}
-		open := i + len("EXTERNAL_QUERY")
-		for open < len(sql) && unicode.IsSpace(rune(sql[open])) {
-			open++
-		}
-		if open >= len(sql) || sql[open] != '(' {
-			i = open
-			continue
-		}
-		close, args, err := parseExternalQueryArguments(sql, open)
+		end, args, next, err := externalQueryArguments(sql, tokens, i+1)
 		if err != nil {
 			return nil, err
 		}
-		calls = append(calls, externalQueryCall{start: i, end: close + 1, args: args})
-		i = close + 1
+		calls = append(calls, externalQueryCall{start: int(tokens[i].Pos), end: end, args: args})
+		i = next
 	}
 	return calls, nil
 }
 
-func externalQueryBoundary(sql string, start, end int) bool {
-	if start > 0 && isGoogleSQLIdentRune(rune(sql[start-1])) {
-		return false
-	}
-	return end >= len(sql) || !isGoogleSQLIdentRune(rune(sql[end]))
-}
-
-func isGoogleSQLIdentRune(r rune) bool {
-	return r == '_' || r == '$' || unicode.IsLetter(r) || unicode.IsDigit(r)
-}
-
-func parseExternalQueryArguments(sql string, open int) (int, []string, error) {
-	depth := 1
-	argStart := open + 1
+func externalQueryArguments(sql string, tokens []token.Token, open int) (int, []string, int, error) {
+	depth := 0
+	argStart := int(tokens[open].End)
 	var args []string
-	for i := open + 1; i < len(sql); {
-		if next := skipGoogleSQLTrivia(sql, i); next != i {
-			i = next
-			continue
-		}
-		switch sql[i] {
-		case '\'', '"':
-			next, err := scanGoogleSQLString(sql, i)
-			if err != nil {
-				return 0, nil, err
-			}
-			i = next
-			continue
-		case '(':
+	for i := open; i < len(tokens); i++ {
+		switch tokens[i].Kind {
+		case "(":
 			depth++
-		case ')':
+		case ")":
 			depth--
 			if depth == 0 {
-				args = append(args, strings.TrimSpace(sql[argStart:i]))
-				return i, args, nil
+				args = append(args, strings.TrimSpace(sql[argStart:int(tokens[i].Pos)]))
+				return int(tokens[i].End), args, i, nil
 			}
-		case ',':
+		case ",":
 			if depth == 1 {
-				args = append(args, strings.TrimSpace(sql[argStart:i]))
-				argStart = i + 1
+				args = append(args, strings.TrimSpace(sql[argStart:int(tokens[i].Pos)]))
+				argStart = int(tokens[i].End)
 			}
 		}
-		i++
 	}
-	return 0, nil, fmt.Errorf("unterminated EXTERNAL_QUERY call")
+	return 0, nil, 0, fmt.Errorf("unterminated EXTERNAL_QUERY call")
 }
 
-func skipGoogleSQLTrivia(sql string, i int) int {
-	if strings.HasPrefix(sql[i:], "--") {
-		if end := strings.IndexByte(sql[i:], '\n'); end >= 0 {
-			return i + end + 1
+func lexGoogleSQL(sql string) ([]token.Token, error) {
+	lexer := &memefish.Lexer{File: &token.File{Buffer: sql}}
+	var tokens []token.Token
+	for {
+		if err := lexer.NextToken(); err != nil {
+			return nil, err
 		}
-		return len(sql)
+		if lexer.Token.Kind == token.TokenBad {
+			return nil, fmt.Errorf("invalid GoogleSQL token at %d", lexer.Token.Pos)
+		}
+		if lexer.Token.Kind == token.TokenEOF {
+			return tokens, nil
+		}
+		tokens = append(tokens, lexer.Token)
 	}
-	if strings.HasPrefix(sql[i:], "/*") {
-		if end := strings.Index(sql[i+2:], "*/"); end >= 0 {
-			return i + 2 + end + 2
-		}
-		return len(sql)
-	}
-	return i
-}
-
-func scanGoogleSQLString(sql string, start int) (int, error) {
-	quote := sql[start]
-	triple := strings.HasPrefix(sql[start:], strings.Repeat(string(quote), 3))
-	if triple {
-		endToken := strings.Repeat(string(quote), 3)
-		if end := strings.Index(sql[start+3:], endToken); end >= 0 {
-			return start + 3 + end + 3, nil
-		}
-		return 0, fmt.Errorf("unterminated triple-quoted string literal")
-	}
-	for i := start + 1; i < len(sql); i++ {
-		if sql[i] == '\\' {
-			i++
-			continue
-		}
-		if sql[i] == quote {
-			if i+1 < len(sql) && sql[i+1] == quote {
-				i++
-				continue
-			}
-			return i + 1, nil
-		}
-	}
-	return 0, fmt.Errorf("unterminated string literal")
 }
 
 func decodeGoogleSQLStringLiteral(lit string) (string, error) {
 	lit = strings.TrimSpace(lit)
-	if len(lit) == 0 {
-		return "", fmt.Errorf("empty string literal")
+	tokens, err := lexGoogleSQL(lit)
+	if err != nil {
+		return "", err
 	}
-	raw := false
-	if len(lit) >= 2 && (lit[0] == 'r' || lit[0] == 'R') && (lit[1] == '\'' || lit[1] == '"') {
-		raw = true
-		lit = lit[1:]
-	}
-	if strings.HasPrefix(lit, "'''") || strings.HasPrefix(lit, `"""`) {
-		quote := lit[:3]
-		if !strings.HasSuffix(lit, quote) || len(lit) < 6 {
-			return "", fmt.Errorf("invalid triple-quoted string literal")
-		}
-		body := lit[3 : len(lit)-3]
-		if raw {
-			return body, nil
-		}
-		return unescapeGoogleSQLString(body), nil
-	}
-	if lit[0] != '\'' && lit[0] != '"' {
+	// Comments around an argument are trivia, just like whitespace. Require a
+	// single string token, not a byte-exact token span covering that trivia.
+	if len(tokens) != 1 || tokens[0].Kind != token.TokenString {
 		return "", fmt.Errorf("want string literal, got %q", lit)
 	}
-	if len(lit) < 2 || lit[len(lit)-1] != lit[0] {
-		return "", fmt.Errorf("invalid string literal")
-	}
-	body := lit[1 : len(lit)-1]
-	if raw {
-		return body, nil
-	}
-	return unescapeGoogleSQLString(body), nil
-}
-
-var googleSQLSimpleEscapes = map[byte]byte{
-	'a':  '\a',
-	'b':  '\b',
-	'f':  '\f',
-	'n':  '\n',
-	'r':  '\r',
-	't':  '\t',
-	'v':  '\v',
-	'\\': '\\',
-	'?':  '?',
-	'\'': '\'',
-	'"':  '"',
-	'`':  '`',
-}
-
-func unescapeGoogleSQLString(s string) string {
-	var b strings.Builder
-	for i := 0; i < len(s); i++ {
-		if s[i] == '\'' && i+1 < len(s) && s[i+1] == '\'' {
-			b.WriteByte('\'')
-			i++
-			continue
-		}
-		if s[i] != '\\' || i+1 >= len(s) {
-			b.WriteByte(s[i])
-			continue
-		}
-		i++
-		if repl, ok := googleSQLSimpleEscapes[s[i]]; ok {
-			b.WriteByte(repl)
-			continue
-		}
-		b.WriteByte(s[i])
-	}
-	return b.String()
+	return tokens[0].AsString, nil
 }
 
 func bigQueryTypedEmptySubquery(rowType *spannerpb.StructType) (string, error) {
