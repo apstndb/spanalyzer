@@ -64,6 +64,49 @@ func TestNullIsNull_DoesNotRewriteMultiCharOperators(t *testing.T) {
 	}
 }
 
+func TestNullIsNull_PreservesStringsIdentifiersAndComments(t *testing.T) {
+	body := " '= @p' = `= @p` AND 1 = @p -- = @p\n AND /* = @p */ 2 = @P"
+	got, err := rewriteNullIsNull(body, "p")
+	if err != nil {
+		t.Fatalf("rewriteNullIsNull() error = %v", err)
+	}
+	want := " '= @p' = `= @p` AND 1 IS NOT DISTINCT FROM @p -- = @p\n AND /* = @p */ 2 IS NOT DISTINCT FROM @p"
+	if got != want {
+		t.Fatalf("rewriteNullIsNull() = %q, want %q", got, want)
+	}
+}
+
+func TestNullIsNull_UsesLexerBoundaries(t *testing.T) {
+	body := "# = @p\n `x`` = @p` = @p /* = @p */ AND '''= @p''' = @P"
+	got, err := rewriteNullIsNull(body, "p")
+	if err != nil {
+		t.Fatalf("rewriteNullIsNull() error = %v", err)
+	}
+	want := "# = @p\n `x`` = @p` IS NOT DISTINCT FROM @p /* = @p */ AND '''= @p''' IS NOT DISTINCT FROM @p"
+	if got != want {
+		t.Fatalf("rewriteNullIsNull() = %q, want %q", got, want)
+	}
+}
+
+func TestNullIsNull_PreservesCommentGapsAndLiteralPrefixes(t *testing.T) {
+	for _, gap := range []string{"/**/", "/* comment */", " -- comment\n", " # comment\n"} {
+		body := `r"= @p" || b'= @p' || r"""= @p""" =` + gap + `@p`
+		got, err := rewriteNullIsNull(body, "p")
+		if err != nil {
+			t.Fatal(err)
+		}
+		if !strings.HasSuffix(got, gap+"@p") || !strings.Contains(got, `r"= @p" || b'= @p'`) || strings.Count(got, "IS NOT DISTINCT FROM") != 1 {
+			t.Fatalf("rewrite did not preserve comment/literals: %q", got)
+		}
+	}
+}
+
+func TestNullIsNull_InvalidLiteralIsNotRewritten(t *testing.T) {
+	if _, err := rewriteNullIsNull(`"\xZZ" = @p`, "p"); err == nil {
+		t.Fatal("rewriteNullIsNull() accepted an invalid hex escape")
+	}
+}
+
 func TestNullIsNull_RewritesNoSpaceEquality(t *testing.T) {
 	got, err := rewriteNullIsNull("AND Status=@status", "status")
 	if err != nil {
@@ -86,6 +129,19 @@ WHERE TRUE
 	}
 	if got := len(result.Variants); got != 1 {
 		t.Fatalf("null_is_null should not multiply variants, got %d", got)
+	}
+}
+
+func TestNullIsNull_MarkerDoesNotRewriteStringLiteral(t *testing.T) {
+	sql := `SELECT 1 WHERE '= @p' = /*?null_is_null:p*/ '= @p' AND 1 = @p /*?end*/`
+	segs, err := SegmentTemplate(sql, []Param{{Name: "p", Type: "INT64", Mode: ModeNullIsNull}})
+	if err != nil {
+		t.Fatalf("SegmentTemplate: %v", err)
+	}
+	got := ComposeVariant(segs, Presence{})
+	want := `SELECT 1 WHERE '= @p' =  '= @p' AND 1 IS NOT DISTINCT FROM @p `
+	if got != want {
+		t.Fatalf("ComposeVariant() = %q, want %q", got, want)
 	}
 }
 
