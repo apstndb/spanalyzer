@@ -88,7 +88,7 @@ func resolveQueryCodegen(config QueryCodegenConfig, baseDir string) (*resolvedCo
 		queries = append(queries, resolvedCodegenQuery{query: query, fields: fields, variants: variants, spec: spec})
 		querySpecs = append(querySpecs, spec)
 	}
-	writeStructFields, writeSpecs, err := planWriteSpecs(schemas, config.Writes, baseDir, structs)
+	writeStructFields, writeSpecs, err := planWriteSpecs(schemas, config.Writes, baseDir, structs, options.Target)
 	if err != nil {
 		return nil, err
 	}

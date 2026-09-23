@@ -624,3 +624,32 @@ func writeGeneratedLoadTestFile(t *testing.T, path, content string) {
 		t.Fatalf("WriteFile(%s) error = %v", path, err)
 	}
 }
+
+func TestGenerateGoStructReservesLoadMethodName(t *testing.T) {
+	code, err := generateGoStruct([]goResultField{{
+		Name:     "load",
+		Kind:     "INT64",
+		Nullable: true,
+	}, {
+		Name: "nested", Kind: "STRUCT", Nullable: true,
+		Fields: []goResultField{{Name: "load", Kind: "INT64", Nullable: true}},
+	}}, GoStructOptions{PackageName: "result", StructName: "Row", Target: GoStructTargetBoth})
+	if err != nil {
+		t.Fatalf("generateGoStruct() error = %v", err)
+	}
+	for _, want := range []string{
+		"Load2 ",
+		`spanner:"load"`,
+		"func (r *Row) Load(",
+		"r.Load2.LoadBigQuery",
+		"func (r *RowNested) Load(",
+	} {
+		if !strings.Contains(code, want) {
+			t.Fatalf("generated code missing %q:\n%s", want, code)
+		}
+	}
+	if strings.Contains(code, "\tLoad ") {
+		t.Fatalf("field kept the Load method name:\n%s", code)
+	}
+	compileGeneratedPackage(t, code)
+}

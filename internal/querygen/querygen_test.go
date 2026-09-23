@@ -4370,3 +4370,61 @@ var Done = errors.New("no more items in iterator")
 		t.Fatalf("go test generated BigQuery result modes: %v\n--- generated.go ---\n%s\n--- output ---\n%s", err, code, output)
 	}
 }
+
+func TestGenerateQueryCodeReservesWriteReceiverMethodNames(t *testing.T) {
+	dir := t.TempDir()
+	writeTestFile(t, filepath.Join(dir, "schema.sql"), "CREATE TABLE T (DeleteTMutation INT64 NOT NULL) PRIMARY KEY (DeleteTMutation)\n")
+	code, err := GenerateQueryCode(QueryCodegenConfig{
+		Package: "db",
+		Client:  GoStructTargetSpanner,
+		Schemas: []QueryCodegenSchema{{Name: "app", Dialect: "spanner", DDL: "schema.sql"}},
+		Writes: []QueryCodegenWrite{{
+			Name:        "DeleteT",
+			Catalog:     "app",
+			Table:       "T",
+			Operation:   "delete",
+			InputStruct: "Key",
+			Methods:     []string{"mutation"},
+		}},
+	}, dir)
+	if err != nil {
+		t.Fatalf("GenerateQueryCode() error = %v", err)
+	}
+	for _, want := range []string{
+		"DeleteTMutation2 int64",
+		"func (w *Key) DeleteTMutation()",
+		"spanner.Key{w.DeleteTMutation2}",
+		`spanner:"DeleteTMutation"`,
+	} {
+		if !strings.Contains(code, want) {
+			t.Fatalf("generated code missing %q:\n%s", want, code)
+		}
+	}
+}
+
+func TestGenerateQueryCodeSharedReceiverFieldNames(t *testing.T) {
+	for _, target := range []GoStructTarget{GoStructTargetSpanner, GoStructTargetBoth} {
+		t.Run(string(target), func(t *testing.T) {
+			dir := t.TempDir()
+			writeTestFile(t, filepath.Join(dir, "schema.sql"), `CREATE TABLE T (load INT64 NOT NULL, Load2 INT64 NOT NULL, DeleteTMutation INT64 NOT NULL, DeleteTDMLStatement INT64 NOT NULL) PRIMARY KEY (load, Load2, DeleteTMutation, DeleteTDMLStatement);`)
+			code, err := GenerateQueryCode(QueryCodegenConfig{
+				Package: "db", Client: target,
+				Schemas: []QueryCodegenSchema{{Name: "app", Dialect: "spanner", DDL: "schema.sql"}},
+				Queries: []QueryCodegenQuery{{Name: "ReadT", Catalog: "app", SQL: "SELECT * FROM T", ResultStruct: "Row"}},
+				Writes:  []QueryCodegenWrite{{Name: "DeleteT", Catalog: "app", Table: "T", Operation: "delete", InputStruct: "Row", Methods: []string{"mutation", "dml"}}},
+			}, dir)
+			if err != nil {
+				t.Fatal(err)
+			}
+			compileGeneratedPackage(t, code)
+			for _, want := range []string{"w.DeleteTMutation2", "w.DeleteTDMLStatement2", `spanner:"DeleteTMutation"`, `spanner:"load"`} {
+				if !strings.Contains(code, want) {
+					t.Fatalf("missing %q:\n%s", want, code)
+				}
+			}
+			if target == GoStructTargetBoth && (!strings.Contains(code, "w.Load2") || !strings.Contains(code, "w.Load22")) {
+				t.Fatalf("shared Load field mapping mismatch:\n%s", code)
+			}
+		})
+	}
+}
