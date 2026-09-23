@@ -626,6 +626,7 @@ func (c *BigQueryGoogleSQLCatalog) addSpannerExternalDataset(dataset, spannerSou
 		tableKeys = append(tableKeys, key)
 	}
 	sort.Strings(tableKeys)
+	stage := newExternalDatasetStage(c)
 	for _, key := range tableKeys {
 		table := catalog.Tables[key]
 		if len(table.Name.Parts) != 1 {
@@ -637,7 +638,7 @@ func (c *BigQueryGoogleSQLCatalog) addSpannerExternalDataset(dataset, spannerSou
 			binding.ProjectedTables = append(binding.ProjectedTables, projected)
 			continue
 		}
-		projected, err := c.addSpannerExternalDatasetTable(datasetRef, table)
+		projected, err := c.stageSpannerExternalDatasetTable(stage, datasetRef, table)
 		if err != nil {
 			return nil, fmt.Errorf("external dataset %s table %s: %w", datasetRef.Path, table.Name, err)
 		}
@@ -648,6 +649,9 @@ func (c *BigQueryGoogleSQLCatalog) addSpannerExternalDataset(dataset, spannerSou
 		}
 		binding.Warnings = append(binding.Warnings, externalDatasetProjectionWarnings(projected)...)
 		binding.ProjectedTables = append(binding.ProjectedTables, projected)
+	}
+	if err := stage.publish(c); err != nil {
+		return nil, fmt.Errorf("external dataset %s: %w", datasetRef.Path, err)
 	}
 	c.spannerExternalDatasetBindings = append(c.spannerExternalDatasetBindings, *binding)
 	return binding, nil
@@ -1033,7 +1037,130 @@ func splitBigQueryPath(path string) []string {
 	return strings.Split(path, ".")
 }
 
-func (c *BigQueryGoogleSQLCatalog) addSpannerExternalDatasetTable(datasetRef BigQueryDatasetReference, table *Table) (BigQuerySpannerExternalDatasetTable, error) {
+// externalDatasetStage constructs tables and missing namespaces off-catalog and
+// checks all table/alias collisions before publishing. SimpleCatalog has no
+// rollback API, so validation must not call its mutating namespace helpers.
+// As with other catalog registration, concurrent mutation is not supported.
+type externalDatasetStage struct {
+	root        *googlesql.SimpleCatalog
+	typeFactory *googlesql.TypeFactory
+	catalogs    map[string]*googlesql.SimpleCatalog
+	namespaces  []externalDatasetNamespace
+	tables      []externalDatasetTable
+	names       map[*googlesql.SimpleCatalog]map[string]*googlesql.SimpleTable
+}
+
+type externalDatasetNamespace struct {
+	parent, child *googlesql.SimpleCatalog
+	name          string
+}
+
+type externalDatasetTable struct {
+	parent *googlesql.SimpleCatalog
+	name   string
+	table  *googlesql.SimpleTable
+}
+
+func newExternalDatasetStage(c *BigQueryGoogleSQLCatalog) *externalDatasetStage {
+	catalogs := make(map[string]*googlesql.SimpleCatalog, len(c.simpleCatalogs))
+	for name, catalog := range c.simpleCatalogs {
+		catalogs[name] = catalog
+	}
+	return &externalDatasetStage{
+		root: c.SimpleCatalog, typeFactory: c.TypeFactory, catalogs: catalogs,
+		names: map[*googlesql.SimpleCatalog]map[string]*googlesql.SimpleTable{},
+	}
+}
+
+func (s *externalDatasetStage) parent(name ObjectName) (*googlesql.SimpleCatalog, error) {
+	parent := s.root
+	for i, part := range name.Parts[:len(name.Parts)-1] {
+		key := strings.Join(name.Parts[:i+1], ".")
+		var child *googlesql.SimpleCatalog
+		for existing, catalog := range s.catalogs {
+			if strings.EqualFold(existing, key) {
+				child = catalog
+				break
+			}
+		}
+		if child == nil {
+			// Account for namespaces installed directly through SimpleCatalog,
+			// which are not represented in our namespace cache. Do not attempt
+			// to replace them or publish any part of this dataset.
+			names, err := parent.CatalogNames()
+			if err != nil {
+				return nil, err
+			}
+			for _, existing := range names {
+				if strings.EqualFold(existing, part) {
+					return nil, fmt.Errorf("bigquery catalog namespace collision for %s", key)
+				}
+			}
+			child, err = googlesql.NewSimpleCatalog(part, s.typeFactory)
+			if err != nil {
+				return nil, err
+			}
+			s.namespaces = append(s.namespaces, externalDatasetNamespace{parent, child, part})
+		}
+		s.catalogs[key] = child
+		parent = child
+	}
+	return parent, nil
+}
+
+func (s *externalDatasetStage) addTable(name ObjectName, table *googlesql.SimpleTable) error {
+	parent, err := s.parent(name)
+	if err != nil {
+		return err
+	}
+	leaf := name.Parts[len(name.Parts)-1]
+	if err := s.reserveTable(parent, leaf, name.String(), table); err != nil {
+		return err
+	}
+	if name.String() != leaf {
+		return s.reserveTable(s.root, name.String(), name.String(), table)
+	}
+	return nil
+}
+
+func (s *externalDatasetStage) reserveTable(parent *googlesql.SimpleCatalog, name, fullName string, table *googlesql.SimpleTable) error {
+	if err := ensureSimpleCatalogTableAbsent(parent, name, fullName); err != nil {
+		return err
+	}
+	if s.names[parent] == nil {
+		s.names[parent] = map[string]*googlesql.SimpleTable{}
+	}
+	key := strings.ToLower(name)
+	if previous := s.names[parent][key]; previous != nil {
+		if previous == table {
+			return nil // The same projected table may have coincident aliases.
+		}
+		return fmt.Errorf("bigquery catalog table collision for %s: conflicting pending projections", fullName)
+	}
+	s.names[parent][key] = table
+	s.tables = append(s.tables, externalDatasetTable{parent, name, table})
+	return nil
+}
+
+func (s *externalDatasetStage) publish(c *BigQueryGoogleSQLCatalog) error {
+	// All semantic checks and native table/column construction are complete.
+	// Native API failures during publication cannot be rolled back; no input
+	// validation is deferred to this phase.
+	for _, namespace := range s.namespaces {
+		if err := namespace.parent.AddCatalog2(namespace.name, namespace.child); err != nil {
+			return err
+		}
+	}
+	for _, table := range s.tables {
+		if err := table.parent.AddTable2(table.name, table.table); err != nil {
+			return err
+		}
+	}
+	c.simpleCatalogs = s.catalogs
+	return nil
+}
+
+func (c *BigQueryGoogleSQLCatalog) stageSpannerExternalDatasetTable(stage *externalDatasetStage, datasetRef BigQueryDatasetReference, table *Table) (BigQuerySpannerExternalDatasetTable, error) {
 	projected := BigQuerySpannerExternalDatasetTable{
 		SourceTable:               table.Name.String(),
 		SpannerTable:              table.Name.String(),
@@ -1052,47 +1179,19 @@ func (c *BigQueryGoogleSQLCatalog) addSpannerExternalDatasetTable(datasetRef Big
 	projectedName := ObjectName{Parts: append(datasetRef.parts(), tableName)}
 	projected.Name = projectedName.String()
 	projected.BigQueryTable = projected.Name
-	parentCatalog, leafName, err := simpleCatalogForObjectName(c.SimpleCatalog, c.simpleCatalogs, projectedName)
-	if err != nil {
-		return projected, err
-	}
+	leafName := tableName
 	gsTable, err := googlesql.NewSimpleTable(leafName, 0)
 	if err != nil {
 		return projected, err
 	}
-	if projected.Name != leafName {
-		if err := gsTable.SetFullName(projected.Name); err != nil {
-			return projected, err
-		}
-	}
-	if err := ensureSimpleCatalogTableAbsent(parentCatalog, leafName, projected.Name); err != nil {
+	if err := gsTable.SetFullName(projected.Name); err != nil {
 		return projected, err
-	}
-	if projected.Name != leafName {
-		if err := ensureSimpleCatalogTableAbsent(c.SimpleCatalog, projected.Name, projected.Name); err != nil {
-			return projected, err
-		}
 	}
 	if err := gsTable.SetAllowDuplicateColumnNames(false); err != nil {
 		return projected, err
 	}
 	if err := gsTable.SetAllowAnonymousColumnName(true); err != nil {
 		return projected, err
-	}
-	if datasetRef.Project != "" {
-		aliasName := ObjectName{Parts: []string{datasetRef.Dataset, tableName}}
-		if aliasName.String() != projected.Name {
-			aliasParentCatalog, aliasLeafName, err := simpleCatalogForObjectName(c.SimpleCatalog, c.simpleCatalogs, aliasName)
-			if err != nil {
-				return projected, err
-			}
-			if err := ensureSimpleCatalogTableAbsent(aliasParentCatalog, aliasLeafName, aliasName.String()); err != nil {
-				return projected, err
-			}
-			if err := ensureSimpleCatalogTableAbsent(c.SimpleCatalog, aliasName.String(), aliasName.String()); err != nil {
-				return projected, err
-			}
-		}
 	}
 	seenColumns := map[string]string{}
 	for _, column := range table.Columns {
@@ -1118,54 +1217,16 @@ func (c *BigQueryGoogleSQLCatalog) addSpannerExternalDatasetTable(datasetRef Big
 			return projected, err
 		}
 	}
-	hasAlias := projected.Name != leafName || datasetRef.Project != ""
-	if hasAlias {
-		if err := parentCatalog.AddTable(gsTable); err != nil {
+	if err := stage.addTable(projectedName, gsTable); err != nil {
+		return projected, err
+	}
+	if datasetRef.Project != "" {
+		aliasName := ObjectName{Parts: []string{datasetRef.Dataset, tableName}}
+		if err := stage.addTable(aliasName, gsTable); err != nil {
 			return projected, err
-		}
-		if projected.Name != leafName {
-			if err := c.SimpleCatalog.AddTable2(projected.Name, gsTable); err != nil {
-				return projected, err
-			}
-		}
-		if datasetRef.Project != "" {
-			aliasName := ObjectName{Parts: []string{datasetRef.Dataset, tableName}}
-			if aliasName.String() != projected.Name {
-				if err := c.addTableAlias(aliasName, gsTable); err != nil {
-					return projected, err
-				}
-			}
-		}
-	} else {
-		if err := parentCatalog.AddOwnedTable(gsTable); err != nil {
-			return projected, err
-		}
-		if projected.Name != leafName {
-			if err := c.SimpleCatalog.AddTable2(projected.Name, gsTable); err != nil {
-				return projected, err
-			}
 		}
 	}
 	return projected, nil
-}
-
-func (c *BigQueryGoogleSQLCatalog) addTableAlias(name ObjectName, table *googlesql.SimpleTable) error {
-	parentCatalog, _, err := simpleCatalogForObjectName(c.SimpleCatalog, c.simpleCatalogs, name)
-	if err != nil {
-		return err
-	}
-	if err := ensureSimpleCatalogTableAbsent(parentCatalog, name.Parts[len(name.Parts)-1], name.String()); err != nil {
-		return err
-	}
-	if name.String() != name.Parts[len(name.Parts)-1] {
-		if err := ensureSimpleCatalogTableAbsent(c.SimpleCatalog, name.String(), name.String()); err != nil {
-			return err
-		}
-	}
-	if err := parentCatalog.AddTable(table); err != nil {
-		return err
-	}
-	return c.SimpleCatalog.AddTable2(name.String(), table)
 }
 
 func ensureSimpleCatalogTableAbsent(catalog *googlesql.SimpleCatalog, tableName, fullName string) error {
