@@ -1922,6 +1922,41 @@ PRIMARY KEY (Tenant, Id);
 	}
 }
 
+func TestGenerateQueryCodeNotNullArrayKeepsNullableElements(t *testing.T) {
+	dir := t.TempDir()
+	writeTestFile(t, filepath.Join(dir, "schema.sql"), "CREATE TABLE T (Id INT64 NOT NULL, Ids ARRAY<INT64> NOT NULL) PRIMARY KEY (Id)\n")
+	for _, test := range []struct {
+		client GoStructTarget
+		want   string
+	}{
+		{client: GoStructTargetSpanner, want: "Ids []spanner.NullInt64"},
+		{client: GoStructTargetBoth, want: "Ids []spanner.NullInt64"},
+	} {
+		code, err := GenerateQueryCode(QueryCodegenConfig{
+			Package: "db",
+			Client:  test.client,
+			Schemas: []QueryCodegenSchema{{Name: "app", Dialect: "spanner", DDL: "schema.sql"}},
+			Writes: []QueryCodegenWrite{{
+				Name:        "InsertT",
+				Catalog:     "app",
+				Table:       "T",
+				Operation:   "insert",
+				InputStruct: "Row",
+				Insert:      QueryCodegenWriteInsert{Columns: []string{"Id", "Ids"}},
+			}},
+		}, dir)
+		if err != nil {
+			t.Fatalf("client %s: GenerateQueryCode() error = %v", test.client, err)
+		}
+		if !strings.Contains(code, test.want) {
+			t.Fatalf("client %s: generated code missing %q:\n%s", test.client, test.want, code)
+		}
+		if strings.Contains(code, "Ids []int64") {
+			t.Fatalf("client %s: NOT NULL array dropped element nullability:\n%s", test.client, code)
+		}
+	}
+}
+
 func TestGenerateQueryCodeWriteUpdateMaskIsRequired(t *testing.T) {
 	dir := t.TempDir()
 	writeTestFile(t, filepath.Join(dir, "schema.sql"), `

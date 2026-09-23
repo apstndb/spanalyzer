@@ -74,7 +74,7 @@ func TestGenerateGoStructFromSpannerStructTypeSpanner(t *testing.T) {
 		`spanner:"SingerId"`,
 		"Name     spanner.NullString",
 		`spanner:"Name"`,
-		"Scores   []float64",
+		"Scores   []spanner.NullFloat64",
 		`spanner:"Scores"`,
 	} {
 		if !strings.Contains(code, want) {
@@ -449,6 +449,172 @@ func TestSpannerAndBigQuery(t *testing.T) {
 	output, err := cmd.CombinedOutput()
 	if err != nil {
 		t.Fatalf("go test generated package: %v\n%s\n--- generated ---\n%s", err, output, code)
+	}
+}
+
+func TestGeneratedSpannerArrayDecodesNullElements(t *testing.T) {
+	code, err := GenerateGoStructFromSpannerStructType(&spannerpb.StructType{
+		Fields: []*spannerpb.StructType_Field{{
+			Name: "ids",
+			Type: &spannerpb.Type{Code: spannerpb.TypeCode_ARRAY, ArrayElementType: &spannerpb.Type{Code: spannerpb.TypeCode_INT64}},
+		}},
+	}, GoStructOptions{PackageName: "result", StructName: "Row", Target: GoStructTargetSpanner})
+	if err != nil {
+		t.Fatalf("GenerateGoStructFromSpannerStructType() error = %v", err)
+	}
+	if !strings.Contains(code, "[]spanner.NullInt64") {
+		t.Fatalf("generated array lost element nullability:\n%s", code)
+	}
+	genDir := t.TempDir()
+	writeGeneratedLoadTestFile(t, filepath.Join(genDir, "generated.go"), code)
+	writeGeneratedLoadTestFile(t, filepath.Join(genDir, "generated_test.go"), `package result
+
+import (
+	"testing"
+
+	"cloud.google.com/go/spanner"
+)
+
+func TestNullElement(t *testing.T) {
+	row, err := spanner.NewRow([]string{"ids"}, []interface{}{[]spanner.NullInt64{{Int64: 42, Valid: true}, {}}})
+	if err != nil {
+		t.Fatal(err)
+	}
+	var dst Row
+	if err := row.ToStruct(&dst); err != nil {
+		t.Fatal(err)
+	}
+	if len(dst.Ids) != 2 || !dst.Ids[0].Valid || dst.Ids[0].Int64 != 42 || dst.Ids[1].Valid {
+		t.Fatalf("Ids = %+v", dst.Ids)
+	}
+}
+`)
+	writeGeneratedLoadTestFile(t, filepath.Join(genDir, "go.mod"), generatedClientGoMod)
+	writeGeneratedLoadTestFile(t, filepath.Join(genDir, "go.sum"), generatedClientGoSum)
+	cmd := exec.Command("go", "test", ".")
+	cmd.Dir = genDir
+	cmd.Env = append(os.Environ(), "GOTOOLCHAIN=local", "GOWORK=off")
+	output, err := cmd.CombinedOutput()
+	if err != nil {
+		t.Fatalf("go test generated package: %v\n%s\n--- generated ---\n%s", err, output, code)
+	}
+}
+
+func TestGeneratedBothTargetArrayDecodesNullElements(t *testing.T) {
+	code, err := generateGoStruct([]goResultField{{
+		Name:     "ids",
+		Kind:     "INT64",
+		Nullable: true,
+		Repeated: true,
+	}}, GoStructOptions{PackageName: "result", StructName: "Row", Target: GoStructTargetBoth})
+	if err != nil {
+		t.Fatalf("generateGoStruct() error = %v", err)
+	}
+	if !strings.Contains(code, "NullValueList[int64]") {
+		t.Fatalf("both-target array lost element nullability:\n%s", code)
+	}
+
+	genDir := t.TempDir()
+	writeGeneratedLoadTestFile(t, filepath.Join(genDir, "go.mod"), generatedClientGoMod)
+	writeGeneratedLoadTestFile(t, filepath.Join(genDir, "go.sum"), generatedClientGoSum)
+	writeGeneratedLoadTestFile(t, filepath.Join(genDir, "generated.go"), code)
+	writeGeneratedLoadTestFile(t, filepath.Join(genDir, "generated_test.go"), `package result
+
+import (
+	"testing"
+
+	"cloud.google.com/go/spanner"
+	"cloud.google.com/go/bigquery"
+)
+
+func TestNullElement(t *testing.T) {
+	element, err := spanner.NewRow([]string{"ids"}, []interface{}{[]spanner.NullInt64{{Int64: 42, Valid: true}, {}}})
+	if err != nil {
+		t.Fatal(err)
+	}
+	var withNull Row
+	if err := element.ToStruct(&withNull); err != nil {
+		t.Fatal(err)
+	}
+	if len(withNull.Ids) != 2 || !withNull.Ids[0].Valid || withNull.Ids[0].Value != 42 || withNull.Ids[1].Valid {
+		t.Fatalf("NULL element = %+v", withNull.Ids)
+	}
+	empty, err := spanner.NewRow([]string{"ids"}, []interface{}{[]spanner.NullInt64{}})
+	if err != nil {
+		t.Fatal(err)
+	}
+	var emptyRow Row
+	if err := empty.ToStruct(&emptyRow); err != nil {
+		t.Fatal(err)
+	}
+	if emptyRow.Ids == nil || len(emptyRow.Ids) != 0 {
+		t.Fatalf("empty array = %#v", emptyRow.Ids)
+	}
+	nullArray, err := spanner.NewRow([]string{"ids"}, []interface{}{[]spanner.NullInt64(nil)})
+	if err != nil {
+		t.Fatal(err)
+	}
+	var nullRow Row
+	if err := nullArray.ToStruct(&nullRow); err != nil {
+		t.Fatal(err)
+	}
+	if nullRow.Ids != nil {
+		t.Fatalf("NULL array = %#v, want nil", nullRow.Ids)
+	}
+	var loaded Row
+	if err := loaded.Load([]bigquery.Value{[]bigquery.Value{int64(7), nil}}, bigquery.Schema{{Name: "ids"}}); err != nil {
+		t.Fatal(err)
+	}
+	if len(loaded.Ids) != 2 || !loaded.Ids[0].Valid || loaded.Ids[0].Value != 7 || loaded.Ids[1].Valid {
+		t.Fatalf("BigQuery array = %#v", loaded.Ids)
+	}
+}
+`)
+	cmd := exec.Command("go", "test", ".")
+	cmd.Dir = genDir
+	cmd.Env = append(os.Environ(), "GOTOOLCHAIN=local", "GOWORK=off")
+	output, err := cmd.CombinedOutput()
+	if err != nil {
+		t.Fatalf("go test generated package: %v\n%s\n--- generated ---\n%s", err, output, code)
+	}
+}
+
+func TestGeneratedBothTargetNullableStructArrayLoads(t *testing.T) {
+	code, err := generateGoStruct([]goResultField{{
+		Name: "records", Kind: "STRUCT", Repeated: true, Nullable: true,
+		Fields: []goResultField{{Name: "id", Kind: "INT64", Nullable: true}},
+	}}, GoStructOptions{PackageName: "result", StructName: "Row", Target: GoStructTargetBoth})
+	if err != nil {
+		t.Fatal(err)
+	}
+	genDir := t.TempDir()
+	writeGeneratedLoadTestFile(t, filepath.Join(genDir, "go.mod"), generatedClientGoMod)
+	writeGeneratedLoadTestFile(t, filepath.Join(genDir, "go.sum"), generatedClientGoSum)
+	writeGeneratedLoadTestFile(t, filepath.Join(genDir, "generated.go"), code)
+	writeGeneratedLoadTestFile(t, filepath.Join(genDir, "generated_test.go"), `package result
+
+import (
+	"testing"
+	"cloud.google.com/go/bigquery"
+)
+
+func TestLoadStructArray(t *testing.T) {
+	var dst Row
+	values := []bigquery.Value{[]bigquery.Value{[]bigquery.Value{int64(7)}, nil}}
+	schema := bigquery.Schema{{Name: "records", Schema: bigquery.Schema{{Name: "id"}}}}
+	if err := dst.Load(values, schema); err != nil {
+		t.Fatal(err)
+	}
+	if len(dst.Records) != 2 || dst.Records[0] == nil || !dst.Records[0].Id.Valid || dst.Records[0].Id.Value != 7 || dst.Records[1] != nil {
+		t.Fatalf("records = %#v", dst.Records)
+	}
+}
+`)
+	cmd := exec.Command("go", "test", ".")
+	cmd.Dir = genDir
+	cmd.Env = append(os.Environ(), "GOTOOLCHAIN=local", "GOWORK=off")
+	if output, err := cmd.CombinedOutput(); err != nil {
+		t.Fatalf("generated struct array: %v\n%s", err, output)
 	}
 }
 
