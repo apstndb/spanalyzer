@@ -2,6 +2,8 @@ package spanalyzer
 
 import (
 	"os"
+	"reflect"
+	"sort"
 	"strings"
 	"testing"
 
@@ -546,6 +548,141 @@ func TestBigQueryAnalyzerSpannerExternalDatasetProjectionPolicies(t *testing.T) 
 	})
 	if err == nil || !strings.Contains(err.Error(), "named Spanner schemas are not visible") {
 		t.Fatalf("AddSpannerExternalDatasetWithOptions() error = %v, want named-schema policy error", err)
+	}
+}
+
+func TestRejectedExternalDatasetIsNotQueryable(t *testing.T) {
+	analyzer, err := NewBigQueryAnalyzerFromDDL("bigquery.sql", "")
+	if err != nil {
+		t.Fatalf("NewBigQueryAnalyzerFromDDL() error = %v", err)
+	}
+	rejected, err := BuildSchemaCatalog("rejected.sql", `
+CREATE PROTO BUNDLE (example.Message);
+CREATE TABLE Good (Id INT64) PRIMARY KEY (Id);
+CREATE TABLE Bad (Id INT64, P example.Message) PRIMARY KEY (Id);
+`)
+	if err != nil {
+		t.Fatalf("BuildSchemaCatalog() error = %v", err)
+	}
+	beforeCatalogs, _ := analyzer.googleSQL.SimpleCatalog.CatalogNames()
+	_, err = analyzer.AddSpannerExternalDatasetWithOptions("ext", "app", rejected, BigQuerySpannerExternalDatasetOptions{
+		UnsupportedColumns: "error",
+	})
+	if err == nil || !strings.Contains(err.Error(), "unsupported Spanner column") {
+		t.Fatalf("registration error = %v, want unsupported column", err)
+	}
+	afterCatalogs, _ := analyzer.googleSQL.SimpleCatalog.CatalogNames()
+	sort.Strings(beforeCatalogs)
+	sort.Strings(afterCatalogs)
+	if !reflect.DeepEqual(beforeCatalogs, afterCatalogs) {
+		t.Fatalf("rejected registration changed namespaces: before=%v after=%v", beforeCatalogs, afterCatalogs)
+	}
+	for _, sql := range []string{"SELECT Id FROM ext.Good", "SELECT Id FROM ext.Bad"} {
+		if _, qerr := analyzer.TableSchemaForStatement(sql); qerr == nil {
+			t.Fatalf("TableSchemaForStatement(%s) succeeded after rejected registration", sql)
+		}
+	}
+	corrected, err := BuildSchemaCatalog("corrected.sql", "CREATE TABLE Good (Id INT64) PRIMARY KEY (Id)\n")
+	if err != nil {
+		t.Fatalf("BuildSchemaCatalog(corrected) error = %v", err)
+	}
+	if _, err := analyzer.AddSpannerExternalDataset("ext", "app", corrected); err != nil {
+		t.Fatalf("retry registration error = %v", err)
+	}
+	schema, err := analyzer.TableSchemaForStatement("SELECT Id FROM ext.Good")
+	if err != nil {
+		t.Fatalf("TableSchemaForStatement(corrected) error = %v", err)
+	}
+	if len(schema.Fields) != 1 {
+		t.Fatalf("corrected schema = %+v", schema.Fields)
+	}
+}
+
+func TestExternalDatasetValidationLeavesCatalogUnchanged(t *testing.T) {
+	for _, tc := range []struct {
+		name, ddl, rejectedDDL, want string
+		options                      BigQuerySpannerExternalDatasetOptions
+		unmanagedNamespace           bool
+	}{
+		{name: "late unsupported column", rejectedDDL: `CREATE PROTO BUNDLE (example.Message); CREATE TABLE ZBad (Id INT64, P example.Message) PRIMARY KEY (Id);`, options: BigQuerySpannerExternalDatasetOptions{UnsupportedColumns: "error"}, want: "unsupported Spanner column"},
+		{name: "late named schema", rejectedDDL: `CREATE SCHEMA Z; CREATE TABLE Z.Bad (Id INT64) PRIMARY KEY (Id);`, options: BigQuerySpannerExternalDatasetOptions{NamedSchemaPolicy: "error"}, want: "named Spanner schemas"},
+		{name: "late duplicate columns", rejectedDDL: `CREATE TABLE ZBad (Id INT64, Foo STRING(MAX), foo STRING(MAX)) PRIMARY KEY (Id);`, want: "column names are case-insensitive"},
+		{name: "existing qualified table", ddl: "CREATE TABLE `project`.ext.ZBad (Id INT64);", rejectedDDL: `CREATE TABLE ZBad (Id INT64) PRIMARY KEY (Id);`, want: "table collision"},
+		{name: "existing short alias", ddl: "CREATE TABLE ext.ZBad (Id INT64);", rejectedDDL: `CREATE TABLE ZBad (Id INT64) PRIMARY KEY (Id);`, want: "table collision"},
+		{name: "existing case variant", ddl: "CREATE TABLE EXT.zbad (Id INT64);", rejectedDDL: `CREATE TABLE ZBad (Id INT64) PRIMARY KEY (Id);`, want: "table collision"},
+		{name: "unmanaged namespace", unmanagedNamespace: true, want: "namespace collision"},
+		{name: "pending alias collision", rejectedDDL: "CREATE TABLE `ext.AGood` (Id INT64) PRIMARY KEY (Id);", options: BigQuerySpannerExternalDatasetOptions{DefaultProject: "ext"}, want: "conflicting pending projections"},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			analyzer, err := NewBigQueryAnalyzerFromDDL("bigquery.sql", tc.ddl)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if tc.unmanagedNamespace {
+				if _, err := analyzer.googleSQL.SimpleCatalog.MakeOwnedSimpleCatalog("ext"); err != nil {
+					t.Fatal(err)
+				}
+			}
+			snapshot := func() map[string][]string {
+				t.Helper()
+				result := map[string][]string{}
+				for path, catalog := range analyzer.googleSQL.simpleCatalogs {
+					tables, err := catalog.TableNames()
+					if err != nil {
+						t.Fatal(err)
+					}
+					namespaces, err := catalog.CatalogNames()
+					if err != nil {
+						t.Fatal(err)
+					}
+					sort.Strings(tables)
+					sort.Strings(namespaces)
+					result[path+":tables"] = tables
+					result[path+":namespaces"] = namespaces
+				}
+				return result
+			}
+			before := snapshot()
+			rejected, err := BuildSchemaCatalog("rejected.sql", `CREATE TABLE AGood (Id INT64) PRIMARY KEY (Id);`+tc.rejectedDDL)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if tc.options.DefaultProject == "" {
+				tc.options.DefaultProject = "project"
+			}
+			_, err = analyzer.AddSpannerExternalDatasetWithOptions("ext", "app", rejected, tc.options)
+			if err == nil || !strings.Contains(err.Error(), tc.want) {
+				t.Fatalf("registration error=%v; want %q", err, tc.want)
+			}
+			if after := snapshot(); !reflect.DeepEqual(before, after) {
+				t.Fatalf("rejected registration mutated catalog: before=%v after=%v", before, after)
+			}
+			if len(analyzer.googleSQL.spannerExternalDatasetBindings) != 0 {
+				t.Fatal("rejected registration added a binding")
+			}
+			for _, sql := range []string{"SELECT Id FROM ext.AGood", "SELECT Id FROM `project`.ext.AGood", "SELECT Id FROM `project.ext.AGood`"} {
+				if _, err := analyzer.TableSchemaForStatement(sql); err == nil {
+					t.Fatalf("rejected table remained queryable: %s", sql)
+				}
+			}
+			corrected, err := BuildSchemaCatalog("corrected.sql", `CREATE TABLE AGood (Id INT64) PRIMARY KEY (Id);`)
+			if err != nil {
+				t.Fatal(err)
+			}
+			dataset := "ext"
+			if tc.unmanagedNamespace {
+				dataset = "other"
+			}
+			if _, err := analyzer.AddSpannerExternalDatasetWithOptions(dataset, "app", corrected, tc.options); err != nil {
+				t.Fatalf("corrected retry: %v", err)
+			}
+			if _, err := analyzer.TableSchemaForStatement("SELECT Id FROM `" + tc.options.DefaultProject + "`." + dataset + ".AGood"); err != nil {
+				t.Fatalf("query after retry: %v", err)
+			}
+			if _, err := analyzer.TableSchemaForStatement("SELECT Id FROM " + dataset + ".AGood"); err != nil {
+				t.Fatalf("alias query after retry: %v", err)
+			}
+		})
 	}
 }
 

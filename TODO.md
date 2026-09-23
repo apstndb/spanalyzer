@@ -46,8 +46,7 @@ architecture.
   dead textual-rewrite paths, avoid mutable per-analyzer `EXTERNAL_QUERY`
   prepared state where concurrent analysis can race, dedupe duplicate
   argument validation, implement or reject the full GoogleSQL string escape
-  set, apply external-dataset registration atomically so a rejected schema
-  cannot leave a partially mutated live catalog, and make ambiguous
+  set, and make ambiguous
   `ML.PREDICT` model fallback fail loudly when multiple models are registered.
 - [ ] **Finish unifying proto descriptor and type-resolution passes.**
   Descriptor sets loaded from multiple files now dedupe identical descriptor
