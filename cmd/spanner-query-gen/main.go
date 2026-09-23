@@ -95,6 +95,11 @@ func runGenerate(args []string, stdout, stderr io.Writer, forceCheck bool) error
 		}
 		return err
 	}
+	// flag parsing stops at the first positional argument. Reject leftovers
+	// before generation so a later --check cannot be silently ignored.
+	if fs.NArg() != 0 {
+		return fmt.Errorf("unexpected positional arguments: %v", fs.Args())
+	}
 
 	config, err := readConfig(*configPath)
 	if err != nil {
@@ -123,6 +128,9 @@ func runExplainPlan(args []string, stdout, stderr io.Writer) error {
 			return nil
 		}
 		return err
+	}
+	if fs.NArg() != 0 {
+		return fmt.Errorf("unexpected positional arguments: %v", fs.Args())
 	}
 
 	config, err := readConfig(*configPath)
@@ -540,6 +548,9 @@ func runVet(args []string, stdout, stderr io.Writer) error {
 			return nil
 		}
 		return err
+	}
+	if fs.NArg() != 0 {
+		return fmt.Errorf("unexpected positional arguments: %v", fs.Args())
 	}
 	config, err := readConfig(*configPath)
 	if err != nil {
