@@ -299,6 +299,9 @@ func activeSupportSymbols(target GoStructTarget, querySpecs []resolvedQuerySpec,
 	if gen.needsNullValue {
 		out = append(out, "NullValue", "loadBigQueryNullValueSlice")
 	}
+	if gen.needsNullValueList {
+		out = append(out, "NullValueList")
+	}
 	if gen.needsAssignValue || gen.needsNullValue {
 		out = append(out, "assignBigQueryValue")
 	}

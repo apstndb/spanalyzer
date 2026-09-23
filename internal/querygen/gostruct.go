@@ -28,6 +28,11 @@ type GoStructOptions struct {
 	Target      GoStructTarget
 }
 
+// GenerateGoStructFromSpannerStructType emits a DTO for a Spanner row type.
+// Spanner and shared targets preserve nullable ARRAY elements, independently of
+// the array's nullability. A nil slice represents a NULL array; a non-nil empty
+// slice represents an empty array. Shared scalar arrays use NullValueList[T],
+// and nullable STRUCT elements use pointers.
 func GenerateGoStructFromSpannerStructType(rowType *spannerpb.StructType, options GoStructOptions) (string, error) {
 	if rowType == nil {
 		return "", fmt.Errorf("nil Spanner struct type")
@@ -54,7 +59,7 @@ type goResultField struct {
 	Name     string
 	Kind     string
 	Repeated bool
-	Nullable bool
+	Nullable bool // Element nullability when Repeated is true; field nullability otherwise.
 	Fields   []goResultField
 }
 
@@ -135,7 +140,9 @@ func goResultFieldFromSpanner(name string, typ *spannerpb.Type) goResultField {
 	case spannerpb.TypeCode_ARRAY:
 		elem := goResultFieldFromSpanner(name, typ.ArrayElementType)
 		elem.Repeated = true
-		elem.Nullable = false
+		// Nullable stays the element nullability. Spanner array elements can
+		// be NULL independently of the array value itself, which a nil slice
+		// already represents.
 		return elem
 	case spannerpb.TypeCode_STRUCT:
 		field.Kind = "STRUCT"
@@ -215,6 +222,10 @@ func generateGoStructsWithExtra(structs []namedGoStruct, options GoStructOptions
 			gen.imports[path] = ""
 		}
 	}
+	if gen.needsNullValueList {
+		gen.imports["fmt"] = ""
+		gen.imports["google.golang.org/protobuf/types/known/structpb"] = ""
+	}
 	for _, path := range extraImports {
 		gen.imports[path] = ""
 	}
@@ -257,6 +268,10 @@ func generateGoStructsWithExtra(structs []namedGoStruct, options GoStructOptions
 		b.WriteByte('\n')
 		writeNullValueSupport(&b)
 	}
+	if gen.needsNullValueList {
+		b.WriteByte('\n')
+		writeNullValueListSupport(&b)
+	}
 	if gen.needsAssignValue && !gen.needsNullValue {
 		b.WriteByte('\n')
 		writeAssignBigQueryValueSupport(&b)
@@ -291,15 +306,16 @@ func writeGoConstants(b *bytes.Buffer, constants []generatedGoConst) {
 }
 
 type goStructGenerator struct {
-	target            GoStructTarget
-	imports           map[string]string
-	structs           []generatedStruct
-	usedOrigins       map[string]string
-	err               error
-	needsBigQueryLoad bool
-	needsNullValue    bool
-	needsAssignValue  bool
-	needsValueSlice   bool
+	target             GoStructTarget
+	imports            map[string]string
+	structs            []generatedStruct
+	usedOrigins        map[string]string
+	err                error
+	needsBigQueryLoad  bool
+	needsNullValue     bool
+	needsNullValueList bool
+	needsAssignValue   bool
+	needsValueSlice    bool
 }
 
 func (g *goStructGenerator) buildStruct(name, origin string, fields []goResultField) generatedStruct {
@@ -339,7 +355,7 @@ func (g *goStructGenerator) generatedFields(field goResultField, fieldName, nest
 		loadKind := "value"
 		if field.Repeated && isStructLikeGoResultField(field) {
 			loadKind = "struct_slice"
-		} else if field.Repeated && strings.HasPrefix(typ.Expr, "[]NullValue[") {
+		} else if field.Repeated && strings.HasPrefix(typ.Expr, "NullValueList[") {
 			loadKind = "nullable_slice"
 		} else if field.Repeated {
 			loadKind = "slice"
@@ -374,8 +390,18 @@ func (g *goStructGenerator) typeForClient(field goResultField, client, nestedNam
 	if field.Repeated {
 		elem := field
 		elem.Repeated = false
-		elem.Nullable = false
+		// BigQuery ARRAY elements cannot be NULL. Spanner elements can, so
+		// keep the element flag for Spanner and the shared DTO.
+		if client == "bigquery" {
+			elem.Nullable = false
+		}
 		typ := g.typeForClient(elem, client, nestedName, origin)
+		if client == "both" && strings.HasPrefix(typ.Expr, "NullValue[") {
+			// The Spanner client rejects []NullValue[T] as an ARRAY destination.
+			// A named slice implements Decoder, so the client calls DecodeSpanner.
+			g.needsNullValueList = true
+			return goType{Expr: "NullValueList[" + strings.TrimSuffix(strings.TrimPrefix(typ.Expr, "NullValue["), "]") + "]"}
+		}
 		return goType{Expr: "[]" + typ.Expr}
 	}
 	if field.Kind == "STRUCT" {
@@ -648,7 +674,7 @@ func writeBigQueryLoadMethod(b *bytes.Buffer, st generatedStruct) {
 			fmt.Fprintf(b, "\t\t\t\treturn fmt.Errorf(%q, err)\n", field.SourceName+": %w")
 			b.WriteString("\t\t\t}\n")
 		case "nullable_slice":
-			fmt.Fprintf(b, "\t\t\tif err := loadBigQueryNullValueSlice(&r.%s, values[i]); err != nil {\n", field.Name)
+			fmt.Fprintf(b, "\t\t\tif err := r.%s.LoadBigQuery(values[i]); err != nil {\n", field.Name)
 			fmt.Fprintf(b, "\t\t\t\treturn fmt.Errorf(%q, err)\n", field.SourceName+": %w")
 			b.WriteString("\t\t\t}\n")
 		case "slice":
@@ -709,10 +735,17 @@ func writeBigQueryStructSliceLoad(b *bytes.Buffer, field generatedField) {
 	b.WriteString("\t\t\t}\n")
 	fmt.Fprintf(b, "\t\t\tr.%s = make([]%s, len(records))\n", field.Name, elemType)
 	b.WriteString("\t\t\tfor j, record := range records {\n")
+	if strings.HasPrefix(elemType, "*") {
+		// Shared Spanner DTOs preserve nullable STRUCT elements as pointers.
+		b.WriteString("\t\t\t\tif record == nil {\n\t\t\t\t\tcontinue\n\t\t\t\t}\n")
+	}
 	b.WriteString("\t\t\t\tnestedValues, ok := record.([]bigquery.Value)\n")
 	b.WriteString("\t\t\t\tif !ok {\n")
 	fmt.Fprintf(b, "\t\t\t\t\treturn fmt.Errorf(%q, j, record)\n", field.SourceName+"[%d]: cannot decode %T")
 	b.WriteString("\t\t\t\t}\n")
+	if strings.HasPrefix(elemType, "*") {
+		fmt.Fprintf(b, "\t\t\t\tr.%s[j] = new(%s)\n", field.Name, strings.TrimPrefix(elemType, "*"))
+	}
 	fmt.Fprintf(b, "\t\t\t\tif err := r.%s[j].Load(nestedValues, field.Schema); err != nil {\n", field.Name)
 	fmt.Fprintf(b, "\t\t\t\t\treturn fmt.Errorf(%q, j, err)\n", field.SourceName+"[%d]: %w")
 	b.WriteString("\t\t\t\t}\n")
@@ -947,6 +980,70 @@ func decodeSpannerFloat(input interface{}) (interface{}, error) {
 }
 
 `)
+}
+
+func writeNullValueListSupport(b *bytes.Buffer) {
+	b.WriteString("type NullValueList[T any] []NullValue[T]\n\n")
+	b.WriteString("func (n *NullValueList[T]) LoadBigQuery(value bigquery.Value) error {\n")
+	b.WriteString("\tif value == nil {\n")
+	b.WriteString("\t\t*n = nil\n")
+	b.WriteString("\t\treturn nil\n")
+	b.WriteString("\t}\n")
+	b.WriteString("\tvalues, ok := value.([]bigquery.Value)\n")
+	b.WriteString("\tif !ok {\n")
+	b.WriteString("\t\treturn fmt.Errorf(\"cannot decode %T\", value)\n")
+	b.WriteString("\t}\n")
+	b.WriteString("\tout := make(NullValueList[T], len(values))\n")
+	b.WriteString("\tfor i, value := range values {\n")
+	b.WriteString("\t\tif err := out[i].LoadBigQuery(value); err != nil {\n")
+	b.WriteString("\t\t\treturn fmt.Errorf(\"[%d]: %w\", i, err)\n")
+	b.WriteString("\t\t}\n")
+	b.WriteString("\t}\n")
+	b.WriteString("\t*n = out\n")
+	b.WriteString("\treturn nil\n")
+	b.WriteString("}\n\n")
+	b.WriteString("func (n *NullValueList[T]) DecodeSpanner(input interface{}) error {\n")
+	b.WriteString("\tif input == nil {\n")
+	b.WriteString("\t\t*n = nil\n")
+	b.WriteString("\t\treturn nil\n")
+	b.WriteString("\t}\n")
+	b.WriteString("\tswitch v := input.(type) {\n")
+	b.WriteString("\tcase *string:\n")
+	b.WriteString("\t\tif v == nil {\n")
+	b.WriteString("\t\t\t*n = nil\n")
+	b.WriteString("\t\t\treturn nil\n")
+	b.WriteString("\t\t}\n")
+	b.WriteString("\t}\n")
+	b.WriteString("\tlist, ok := input.(*structpb.ListValue)\n")
+	b.WriteString("\tif !ok {\n")
+	b.WriteString("\t\treturn fmt.Errorf(\"cannot decode %T\", input)\n")
+	b.WriteString("\t}\n")
+	b.WriteString("\tif list == nil {\n")
+	b.WriteString("\t\t*n = nil\n")
+	b.WriteString("\t\treturn nil\n")
+	b.WriteString("\t}\n")
+	b.WriteString("\tout := make(NullValueList[T], len(list.Values))\n")
+	b.WriteString("\tfor i, value := range list.Values {\n")
+	b.WriteString("\t\tvar elem interface{}\n")
+	b.WriteString("\t\tswitch kind := value.GetKind().(type) {\n")
+	b.WriteString("\t\tcase *structpb.Value_NullValue:\n")
+	b.WriteString("\t\t\telem = nil\n")
+	b.WriteString("\t\tcase *structpb.Value_StringValue:\n")
+	b.WriteString("\t\t\telem = kind.StringValue\n")
+	b.WriteString("\t\tcase *structpb.Value_NumberValue:\n")
+	b.WriteString("\t\t\telem = kind.NumberValue\n")
+	b.WriteString("\t\tcase *structpb.Value_BoolValue:\n")
+	b.WriteString("\t\t\telem = kind.BoolValue\n")
+	b.WriteString("\t\tdefault:\n")
+	b.WriteString("\t\t\treturn fmt.Errorf(\"cannot decode array element %T\", value.GetKind())\n")
+	b.WriteString("\t\t}\n")
+	b.WriteString("\t\tif err := out[i].DecodeSpanner(elem); err != nil {\n")
+	b.WriteString("\t\t\treturn fmt.Errorf(\"[%d]: %w\", i, err)\n")
+	b.WriteString("\t\t}\n")
+	b.WriteString("\t}\n")
+	b.WriteString("\t*n = out\n")
+	b.WriteString("\treturn nil\n")
+	b.WriteString("}\n")
 }
 
 func writeAssignBigQueryValueSupport(b *bytes.Buffer) {

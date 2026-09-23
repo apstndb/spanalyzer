@@ -74,8 +74,7 @@ architecture.
 - [ ] **Finish querygen and optparam structural cleanup.** Generation and
   plan projection now share SQL resolution, analysis, DTO merging, write
   planning, and namespace validation. Dedupe table
-  and index key-prefix predicate assembly, decide nullable ARRAY element
-  policy for query results, escape GoogleSQL string literals and identifiers
+  and index key-prefix predicate assembly, escape GoogleSQL string literals and identifiers
   according to dialect rules, escape generated struct-tag values, introduce
   one package-wide symbol
   allocator for top-level and nested generated declarations, compile complete

@@ -2528,9 +2528,11 @@ func goResultFieldFromColumn(column *Column) (goResultField, error) {
 		return goResultField{}, err
 	}
 	field := goResultFieldFromSpanner(column.Name, typ)
-	// Spanner allows NULL in a primary key when the column omits NOT NULL.
-	// Nullability follows that DDL constraint, not key membership.
-	field.Nullable = !column.NotNull
+	// NOT NULL on an ARRAY constrains the array, not its elements.
+	// Scalar primary-key nullability follows NOT NULL, not key membership.
+	if !field.Repeated {
+		field.Nullable = !column.NotNull
+	}
 	return field, nil
 }
 

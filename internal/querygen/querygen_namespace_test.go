@@ -21,6 +21,12 @@ CREATE TABLE mydataset.events (
   event_id INT64
 );
 `)
+	writeTestFile(t, filepath.Join(dir, "array.sql"), `
+CREATE TABLE T (
+  Id INT64 NOT NULL,
+  Ids ARRAY<INT64> NOT NULL
+) PRIMARY KEY (Id);
+`)
 
 	spanner := QueryCodegenSchema{Name: "spanner", Dialect: "spanner", DDL: "schema.sql"}
 	tests := []struct {
@@ -141,6 +147,23 @@ CREATE TABLE mydataset.events (
 			},
 			symbol:  "NullValue",
 			origins: []string{"generated support NullValue", "queries[0] (NullValue) function"},
+		},
+		{
+			name: "generated array support versus result struct",
+			config: QueryCodegenConfig{
+				Package: "db",
+				Client:  GoStructTargetBoth,
+				Schemas: []QueryCodegenSchema{{
+					Name:    "app",
+					Dialect: "spanner",
+					DDL:     "array.sql",
+				}},
+				Queries: []QueryCodegenQuery{
+					{Name: "GetIds", Catalog: "app", SQL: "SELECT Ids FROM T", ResultStruct: "NullValueList"},
+				},
+			},
+			symbol:  "NullValueList",
+			origins: []string{"generated support NullValueList", "queries[0] (GetIds) result struct"},
 		},
 		{
 			name: "case folding collision",
