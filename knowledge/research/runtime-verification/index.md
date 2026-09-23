@@ -7,6 +7,8 @@ source evidence, results and unverified boundaries travel with each note.
 
 | Runtime and observation scope | Research Note |
 | --- | --- |
+| Omni and managed Spanner, 2026-09-16 | [Join type and method matrix](join-type-method-matrix.md): per-cell raw plans and result checks for Hash, Apply, Distributed Apply, Merge, push broadcast, semi and anti-semi forms |
+| Emulator 1.5.58, Omni and managed Spanner, 2026-09-15 | [Index choice and release checks](fts-index-choice-and-emulator-1.5.58-20260915.md): competing secondary/n-gram indexes, version boundaries, result equivalence and DDL fixes |
 | Emulator 1.5.56 and Omni 2026.r2.1-beta, 2026-09-06 | [Catalog identity](catalog-identity-20260906.md): creation uniqueness, exact DDL references, query lookup, and synonym divergence |
 | Emulator 1.5.57, 2026-09-05 | [Release verification](cloud-spanner-emulator-1.5.57-verification.md): announced changes, survey results and metadata |
 | Emulator 1.5.56 to 1.5.57, 2026-09-05 | [Source audit](cloud-spanner-emulator-1.5.57-source-audit.md): all 105 changed files and unannounced behavior |

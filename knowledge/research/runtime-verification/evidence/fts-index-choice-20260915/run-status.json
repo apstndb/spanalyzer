@@ -1,0 +1,29 @@
+{
+  "source_head": "5be6f475fecb82b3e891722a0fea3f224cbab037",
+  "runs": {
+    "emulator": {
+      "exit_code": 0
+    },
+    "emulator-default": {
+      "exit_code": 0
+    },
+    "postgres": {
+      "exit_code": 0
+    },
+    "omni": {
+      "exit_code": 0
+    },
+    "managed": {
+      "exit_code": 0
+    }
+  },
+  "retention_transforms": [
+    "Database target coordinates redacted in producer errors",
+    "Request IDs removed from query errors"
+  ],
+  "scope": "Collector exit status does not mean each probe was accepted; inspect per-statement errors.",
+  "verification": {
+    "exit_code": 0,
+    "result": "PASS: all 440 query records have expected status; successful results match expected counts and hashes across three runtimes; fixture cleanup DDL succeeded."
+  }
+}

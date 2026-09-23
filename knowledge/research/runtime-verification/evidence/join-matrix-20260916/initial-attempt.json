@@ -1,0 +1,78 @@
+{
+  "omni": {
+    "excluded_from_matrix": true,
+    "reason": "Unsupported auxiliary STRUCT-to-JSON conversion prevented JOIN planning.",
+    "example_sql": "@{OPTIMIZER_VERSION=1} SELECT TO_JSON_STRING(STRUCT(l.Id AS l, r.Id AS r)) FROM JoinProbe1789493183L l FULL JOIN@{JOIN_METHOD=HASH_JOIN} JoinProbe1789493183R r ON l.K=r.K",
+    "example_error": "spanner: code = \"Unimplemented\", desc = \"Unsupported function: TO_JSON_STRING is not supported on values of type STRUCT<l INT64, r INT64>\"",
+    "rejected_requests": 112,
+    "collector_exit_code": 0,
+    "cleanup": [
+      {
+        "at": "2026-09-15T17:28:29Z",
+        "error": "",
+        "kind": "ddl",
+        "label": "cleanup-index-JoinProbe1789493183R",
+        "sql": "DROP INDEX JoinProbe1789493183RByK"
+      },
+      {
+        "at": "2026-09-15T17:28:31Z",
+        "error": "",
+        "kind": "ddl",
+        "label": "cleanup-index-JoinProbe1789493183L",
+        "sql": "DROP INDEX JoinProbe1789493183LByK"
+      },
+      {
+        "at": "2026-09-15T17:28:35Z",
+        "error": "",
+        "kind": "ddl",
+        "label": "cleanup-right",
+        "sql": "DROP TABLE JoinProbe1789493183R"
+      },
+      {
+        "at": "2026-09-15T17:28:39Z",
+        "error": "",
+        "kind": "ddl",
+        "label": "cleanup-left",
+        "sql": "DROP TABLE JoinProbe1789493183L"
+      }
+    ]
+  },
+  "managed": {
+    "excluded_from_matrix": true,
+    "reason": "Unsupported auxiliary STRUCT-to-JSON conversion prevented JOIN planning.",
+    "example_sql": "@{OPTIMIZER_VERSION=1} SELECT TO_JSON_STRING(STRUCT(l.Id AS l, r.Id AS r)) FROM JoinProbe1789493186L l FULL JOIN@{JOIN_METHOD=HASH_JOIN} JoinProbe1789493186R r ON l.K=r.K",
+    "example_error": "spanner: code = \"Unimplemented\", desc = \"Unsupported function: TO_JSON_STRING is not supported on values of type STRUCT<l INT64, r INT64>\"",
+    "rejected_requests": 112,
+    "collector_exit_code": 0,
+    "cleanup": [
+      {
+        "at": "2026-09-15T17:30:22Z",
+        "error": "",
+        "kind": "ddl",
+        "label": "cleanup-index-JoinProbe1789493186R",
+        "sql": "DROP INDEX JoinProbe1789493186RByK"
+      },
+      {
+        "at": "2026-09-15T17:30:42Z",
+        "error": "",
+        "kind": "ddl",
+        "label": "cleanup-index-JoinProbe1789493186L",
+        "sql": "DROP INDEX JoinProbe1789493186LByK"
+      },
+      {
+        "at": "2026-09-15T17:31:12Z",
+        "error": "",
+        "kind": "ddl",
+        "label": "cleanup-right",
+        "sql": "DROP TABLE JoinProbe1789493186R"
+      },
+      {
+        "at": "2026-09-15T17:31:36Z",
+        "error": "",
+        "kind": "ddl",
+        "label": "cleanup-left",
+        "sql": "DROP TABLE JoinProbe1789493186L"
+      }
+    ]
+  }
+}

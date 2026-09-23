@@ -1,0 +1,11 @@
+{"at":"2026-09-15T14:13:37Z","backend":"postgres","image":"gcr.io/cloud-spanner-emulator/emulator@sha256:e5bb3535cb3c1e821802531efd9a1d29bbf9804db57a4ae36731764926e3bcb8","kind":"identity","prefix":"FtsProbe1789481617"}
+{"at":"2026-09-15T14:13:40Z","error":"","kind":"platform","platform":"linux/amd64"}
+{"at":"2026-09-15T14:13:52Z","error":"","kind":"query","label":"preflight","plan_requested":false,"result_sha256":"080a9ed428559ef602668b4c00f114f1a11c3f6b02a435f0bdc154578e4d7f22","rows":1,"sql":"SELECT 1"}
+{"at":"2026-09-15T14:13:52Z","error":"","kind":"ddl","label":"pg-setup","sql":"CREATE TABLE fts_pg_probe (id bigint NOT NULL, bar bigint NOT NULL, baz bigint, PRIMARY KEY(id))"}
+{"at":"2026-09-15T14:13:52Z","error":"rpc error: code = Unimplemented desc = Cannot null-filter column bar that is not in the index  pg_invalid.","kind":"ddl","label":"pg-nonindex-null-filter","sql":"CREATE INDEX pg_invalid ON fts_pg_probe (baz) WHERE bar IS NOT NULL"}
+{"at":"2026-09-15T14:13:52Z","error":"","kind":"ddl","label":"pg-valid-null-filter","sql":"CREATE INDEX pg_valid ON fts_pg_probe (baz) WHERE baz IS NOT NULL"}
+{"at":"2026-09-15T14:13:52Z","error":"","kind":"ddl","label":"pg-unique","sql":"CREATE UNIQUE INDEX pg_unique ON fts_pg_probe(bar)"}
+{"at":"2026-09-15T14:13:52Z","error":"rpc error: code = FailedPrecondition desc = Changing NOT NULL constraints on column bar is not allowed because it affects index pg_unique.","kind":"ddl","label":"pg-unique-nullability","sql":"ALTER TABLE fts_pg_probe ALTER COLUMN bar DROP NOT NULL"}
+{"at":"2026-09-15T14:13:52Z","error":"","kind":"ddl","label":"pg-unique-cleanup","sql":"DROP INDEX pg_unique"}
+{"at":"2026-09-15T14:13:52Z","error":"","kind":"ddl","label":"pg-valid-cleanup","sql":"DROP INDEX pg_valid"}
+{"at":"2026-09-15T14:13:52Z","error":"","kind":"ddl","label":"pg-cleanup","sql":"DROP TABLE fts_pg_probe"}
