@@ -62,6 +62,16 @@ mise run verify-managed     # point-in-time checks against TEST_REAL_SPANNER_DAT
 mise run verify-current     # local + containers + managed
 ```
 
+When using an active Colima Docker context, pass both the host socket and the
+container-side socket to testcontainers. A working `docker info` alone does not
+ensure that testcontainers can discover the daemon or mount its cleanup socket:
+
+```sh
+DOCKER_HOST="$(docker context inspect --format '{{.Endpoints.docker.Host}}')" \
+TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE=/var/run/docker.sock \
+mise run verify-containers
+```
+
 Activate the versioned pre-push hook once in each clone:
 
 ```sh

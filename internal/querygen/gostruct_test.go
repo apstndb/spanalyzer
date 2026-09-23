@@ -1,6 +1,7 @@
 package querygen
 
 import (
+	_ "embed"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -9,6 +10,12 @@ import (
 
 	"cloud.google.com/go/spanner/apiv1/spannerpb"
 )
+
+//go:embed testdata/spannerclient.mod
+var generatedClientGoMod string
+
+//go:embed testdata/spannerclient.sum
+var generatedClientGoSum string
 
 func TestGenerateGoStructFromBigQueryTableSchemaBoth(t *testing.T) {
 	code, err := GenerateGoStructFromBigQueryTableSchema(&BigQueryTableSchema{
@@ -303,6 +310,145 @@ func TestGenerateGoStructsWithExtraReportsFormatError(t *testing.T) {
 	}
 	if !strings.Contains(err.Error(), "gofmt generated source") {
 		t.Fatalf("generateGoStructsWithExtra() error = %v, want gofmt context", err)
+	}
+}
+
+func TestGeneratedDefaultDTODecodesSpannerClientRow(t *testing.T) {
+	code, err := generateGoStruct([]goResultField{
+		{Name: "id", Kind: "INT64", Nullable: true},
+		{Name: "missing", Kind: "INT64", Nullable: true},
+		{Name: "f64", Kind: "FLOAT64", Nullable: true},
+		{Name: "nan", Kind: "FLOAT64", Nullable: true},
+		{Name: "posinf", Kind: "FLOAT64", Nullable: true},
+		{Name: "neginf", Kind: "FLOAT64", Nullable: true},
+		{Name: "f32", Kind: "FLOAT32", Nullable: true},
+		{Name: "ok", Kind: "BOOL", Nullable: true},
+		{Name: "name", Kind: "STRING", Nullable: true},
+		{Name: "payload", Kind: "BYTES", Nullable: true},
+		{Name: "ts", Kind: "TIMESTAMP", Nullable: true},
+		{Name: "d", Kind: "DATE", Nullable: true},
+		{Name: "tm", Kind: "TIME", Nullable: true},
+		{Name: "dt", Kind: "DATETIME", Nullable: true},
+		{Name: "num", Kind: "NUMERIC", Nullable: true},
+	}, GoStructOptions{PackageName: "result", StructName: "Row", Target: GoStructTargetBoth})
+	if err != nil {
+		t.Fatalf("generateGoStruct() error = %v", err)
+	}
+	for _, want := range []string{"NullValue[int64]", "NullValue[[]byte]", "NullValue[time.Time]", "NullValue[civil.Date]", "NullValue[*big.Rat]", `spanner:"id"`} {
+		if !strings.Contains(code, want) {
+			t.Fatalf("generated DTO missing %q:\n%s", want, code)
+		}
+	}
+
+	genDir := t.TempDir()
+	writeGeneratedLoadTestFile(t, filepath.Join(genDir, "go.mod"), generatedClientGoMod)
+	writeGeneratedLoadTestFile(t, filepath.Join(genDir, "go.sum"), generatedClientGoSum)
+	writeGeneratedLoadTestFile(t, filepath.Join(genDir, "generated.go"), code)
+	writeGeneratedLoadTestFile(t, filepath.Join(genDir, "generated_test.go"), `package result
+
+import (
+	"bytes"
+	"math"
+	"math/big"
+	"testing"
+	"time"
+
+	"cloud.google.com/go/bigquery"
+	"cloud.google.com/go/civil"
+	"cloud.google.com/go/spanner"
+	sppb "cloud.google.com/go/spanner/apiv1/spannerpb"
+	"google.golang.org/protobuf/types/known/structpb"
+)
+
+func TestSpannerAndBigQuery(t *testing.T) {
+	when := time.Date(2026, 9, 23, 1, 2, 3, 0, time.UTC)
+	date := civil.Date{Year: 2026, Month: 9, Day: 23}
+	clock := civil.Time{Hour: 1, Minute: 2, Second: 3}
+	dateTime := civil.DateTime{Date: date, Time: clock}
+	num := big.NewRat(3, 2)
+	payload := []byte{1, 2, 3}
+	row, err := spanner.NewRow(
+		[]string{"id", "missing", "f64", "nan", "posinf", "neginf", "f32", "ok", "name", "payload", "ts", "d", "num"},
+		[]interface{}{int64(42), (*string)(nil), 1.5, math.NaN(), math.Inf(1), math.Inf(-1), float32(1.25), true, "ok", payload, when, date, num},
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var dst Row
+	if err := row.ToStruct(&dst); err != nil {
+		t.Fatal(err)
+	}
+	if !dst.Id.Valid || dst.Id.Value != 42 {
+		t.Fatalf("Id = %+v", dst.Id)
+	}
+	if dst.Missing.Valid {
+		t.Fatalf("Missing = %+v, want NULL", dst.Missing)
+	}
+	if !dst.F64.Valid || dst.F64.Value != 1.5 {
+		t.Fatalf("F64 = %+v", dst.F64)
+	}
+	if !dst.Nan.Valid || !math.IsNaN(dst.Nan.Value) {
+		t.Fatalf("Nan = %+v", dst.Nan)
+	}
+	if !dst.Posinf.Valid || !math.IsInf(dst.Posinf.Value, 1) {
+		t.Fatalf("Posinf = %+v", dst.Posinf)
+	}
+	if !dst.Neginf.Valid || !math.IsInf(dst.Neginf.Value, -1) {
+		t.Fatalf("Neginf = %+v", dst.Neginf)
+	}
+	if !dst.F32.Valid || dst.F32.Value != 1.25 {
+		t.Fatalf("F32 = %+v", dst.F32)
+	}
+	if !dst.Ok.Valid || !dst.Ok.Value {
+		t.Fatalf("Ok = %+v", dst.Ok)
+	}
+	if !dst.Name.Valid || dst.Name.Value != "ok" {
+		t.Fatalf("Name = %+v", dst.Name)
+	}
+	if !dst.Payload.Valid || !bytes.Equal(dst.Payload.Value, payload) {
+		t.Fatalf("Payload = %+v", dst.Payload)
+	}
+	if !dst.Ts.Valid || !dst.Ts.Value.Equal(when) {
+		t.Fatalf("Ts = %+v", dst.Ts)
+	}
+	if !dst.D.Valid || dst.D.Value != date {
+		t.Fatalf("D = %+v", dst.D)
+	}
+	// NewRow encodes civil.Time as a struct. TIME and DATETIME arrive on the
+	// wire as strings, so use the same client entry point ToStruct uses.
+	// Spanner v1.91.0 has no TIME or DATETIME type codes. Those values still
+	// arrive at DecodeSpanner as strings, which STRING delivers.
+	if err := (spanner.GenericColumnValue{Type: &sppb.Type{Code: sppb.TypeCode_STRING}, Value: structpb.NewStringValue("01:02:03")}).Decode(&dst.Tm); err != nil {
+		t.Fatal(err)
+	}
+	if err := (spanner.GenericColumnValue{Type: &sppb.Type{Code: sppb.TypeCode_STRING}, Value: structpb.NewStringValue("2026-09-23t01:02:03")}).Decode(&dst.Dt); err != nil {
+		t.Fatal(err)
+	}
+	if !dst.Tm.Valid || dst.Tm.Value != clock {
+		t.Fatalf("Tm = %+v", dst.Tm)
+	}
+	if !dst.Dt.Valid || dst.Dt.Value != dateTime {
+		t.Fatalf("Dt = %+v", dst.Dt)
+	}
+	if !dst.Num.Valid || dst.Num.Value.Cmp(num) != 0 {
+		t.Fatalf("Num = %+v", dst.Num)
+	}
+
+	var loaded Row
+	if err := loaded.Load([]bigquery.Value{int64(42), nil}, bigquery.Schema{{Name: "id"}, {Name: "missing"}}); err != nil {
+		t.Fatal(err)
+	}
+	if !loaded.Id.Valid || loaded.Id.Value != 42 || loaded.Missing.Valid {
+		t.Fatalf("BigQuery load = %+v", loaded)
+	}
+}
+`)
+	cmd := exec.Command("go", "test", ".")
+	cmd.Dir = genDir
+	cmd.Env = append(os.Environ(), "GOWORK=off", "GOTOOLCHAIN=local")
+	output, err := cmd.CombinedOutput()
+	if err != nil {
+		t.Fatalf("go test generated package: %v\n%s\n--- generated ---\n%s", err, output, code)
 	}
 }
 

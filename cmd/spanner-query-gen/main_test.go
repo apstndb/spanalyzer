@@ -26,6 +26,49 @@ func TestRunRequiresSubcommand(t *testing.T) {
 	}
 }
 
+func TestRunRejectsPositionalArguments(t *testing.T) {
+	for _, command := range []string{
+		"generate", "check", "explain-plan", "plan-report", "vet",
+		"config-schema", "plan-report-schema", "plan-contract-schema",
+	} {
+		for _, args := range [][]string{{"unexpected"}, {"--", "unexpected"}, {"unexpected", "--help"}} {
+			t.Run(command+"/"+strings.Join(args, "_"), func(t *testing.T) {
+				var stdout, stderr bytes.Buffer
+				err := run(append([]string{command}, args...), &stdout, &stderr)
+				if err == nil || !strings.Contains(err.Error(), "unexpected positional arguments") {
+					t.Fatalf("run() error = %v, want unexpected positional arguments", err)
+				}
+				if stdout.Len() != 0 {
+					t.Fatalf("invalid arguments produced stdout: %s", stdout.String())
+				}
+			})
+		}
+	}
+}
+
+func TestRunGenerateRejectsIgnoredCheckWithoutWriting(t *testing.T) {
+	outPath := filepath.Join(t.TempDir(), "generated.go")
+	const original = "// Preserve existing output.\n"
+	if err := os.WriteFile(outPath, []byte(original), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	var stdout, stderr bytes.Buffer
+	err := run([]string{
+		"generate", "--config", "../../testdata/querygen.yaml", "--out", outPath,
+		"unexpected", "--check",
+	}, &stdout, &stderr)
+	if err == nil || !strings.Contains(err.Error(), "unexpected positional arguments") {
+		t.Errorf("run() error = %v, want unexpected positional arguments", err)
+	}
+	got, err := os.ReadFile(outPath)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if string(got) != original {
+		t.Errorf("invalid generate invocation overwrote the existing output")
+	}
+}
+
 func TestRunHelp(t *testing.T) {
 	var stdout bytes.Buffer
 	var stderr bytes.Buffer

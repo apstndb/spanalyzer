@@ -1,0 +1,219 @@
+package main
+
+import (
+	"context"
+	"crypto/sha256"
+	"encoding/json"
+	"fmt"
+	"os"
+	"sort"
+	"strings"
+	"time"
+
+	"cloud.google.com/go/spanner"
+	database "cloud.google.com/go/spanner/admin/database/apiv1"
+	dbpb "cloud.google.com/go/spanner/admin/database/apiv1/databasepb"
+	"github.com/apstndb/spanemuboost"
+	"google.golang.org/api/iterator"
+	"google.golang.org/protobuf/encoding/protojson"
+)
+
+var ctx context.Context
+var client *spanner.Client
+var admin *database.DatabaseAdminClient
+var db, prefix string
+var out = json.NewEncoder(os.Stdout)
+
+func emit(v map[string]any) { v["at"] = time.Now().UTC().Format(time.RFC3339); out.Encode(v) }
+func clean(e error) string {
+	if e == nil {
+		return ""
+	}
+	s := strings.ReplaceAll(e.Error(), db, "<database>")
+	for _, k := range []string{"SPANNER_PROJECT_ID", "SPANNER_INSTANCE_ID", "SPANNER_DATABASE_ID"} {
+		if v := os.Getenv(k); v != "" {
+			s = strings.ReplaceAll(s, v, "<redacted>")
+		}
+	}
+	return s
+}
+func ddl(label, sql string) bool {
+	c, cancel := context.WithTimeout(context.Background(), 3*time.Minute)
+	defer cancel()
+	op, e := admin.UpdateDatabaseDdl(c, &dbpb.UpdateDatabaseDdlRequest{Database: db, Statements: []string{sql}})
+	if e == nil {
+		e = op.Wait(c)
+	}
+	emit(map[string]any{"kind": "ddl", "label": label, "sql": sql, "error": clean(e)})
+	return e == nil
+}
+func query(label, sql string, plan bool) {
+	c, cancel := context.WithTimeout(ctx, 45*time.Second)
+	defer cancel()
+	tx := client.Single()
+	defer tx.Close()
+	v := map[string]any{"kind": "query", "label": label, "sql": sql, "plan_requested": plan}
+	if plan {
+		p, e := tx.AnalyzeQuery(c, spanner.Statement{SQL: sql})
+		v["error"] = clean(e)
+		if e == nil {
+			b, _ := protojson.Marshal(p)
+			v["plan"] = json.RawMessage(b)
+		}
+	} else {
+		it := tx.Query(c, spanner.Statement{SQL: sql})
+		defer it.Stop()
+		var ids []int64
+		var e error
+		for {
+			var r *spanner.Row
+			r, e = it.Next()
+			if e != nil {
+				break
+			}
+			var id int64
+			if e = r.Columns(&id); e != nil {
+				break
+			}
+			ids = append(ids, id)
+		}
+		if e == iterator.Done {
+			e = nil
+		}
+		sort.Slice(ids, func(i, j int) bool { return ids[i] < ids[j] })
+		b, _ := json.Marshal(ids)
+		v["rows"] = len(ids)
+		v["result_sha256"] = fmt.Sprintf("%x", sha256.Sum256(b))
+		v["error"] = clean(e)
+	}
+	emit(v)
+}
+func main() {
+	ctx = context.Background()
+	backend := os.Args[1]
+	prefix = fmt.Sprintf("FtsProbe%d", time.Now().Unix())
+	emit(map[string]any{"kind": "identity", "backend": backend, "image": os.Getenv("PROBE_IMAGE"), "prefix": prefix})
+	if backend == "managed" {
+		if os.Getenv("SPANNER_EMULATOR_HOST") != "" {
+			panic("emulator override")
+		}
+		db = fmt.Sprintf("projects/%s/instances/%s/databases/%s", os.Getenv("SPANNER_PROJECT_ID"), os.Getenv("SPANNER_INSTANCE_ID"), os.Getenv("SPANNER_DATABASE_ID"))
+		var e error
+		client, e = spanner.NewClient(ctx, db)
+		if e != nil {
+			panic(clean(e))
+		}
+		defer client.Close()
+		admin, e = database.NewDatabaseAdminClient(ctx)
+		if e != nil {
+			panic(clean(e))
+		}
+		defer admin.Close()
+	} else {
+		opts := []spanemuboost.Option{spanemuboost.WithContainerImage(os.Getenv("PROBE_IMAGE")), spanemuboost.WithRandomDatabaseID(), spanemuboost.ForceSchemaTeardown()}
+		b := spanemuboost.Backend(backend)
+		if backend == "postgres" {
+			b = spanemuboost.BackendEmulator
+			opts = append(opts, spanemuboost.WithDatabaseDialect(dbpb.DatabaseDialect_POSTGRESQL))
+		}
+		env, e := spanemuboost.RunWithClients(ctx, b, opts...)
+		if e != nil {
+			panic(clean(e))
+		}
+		defer env.Close()
+		client = env.Client
+		admin = env.DatabaseClient
+		db = env.DatabasePath()
+		p, e := spanemuboost.RuntimePlatform(ctx, env.Runtime())
+		emit(map[string]any{"kind": "platform", "platform": p, "error": clean(e)})
+	}
+	query("preflight", "SELECT 1", false)
+	if backend == "postgres" {
+		pg()
+		return
+	}
+	release()
+	table := prefix + "Docs"
+	secondary := prefix + "Title"
+	search := prefix + "Ngrams"
+	if !ddl("create-documents", fmt.Sprintf("CREATE TABLE %s (Id INT64 NOT NULL, Title STRING(MAX), Tokens TOKENLIST AS (TOKENIZE_NGRAMS(LOWER(Title), ngram_size_min=>3, ngram_size_max=>4)) HIDDEN) PRIMARY KEY(Id)", table)) {
+		return
+	}
+	defer ddl("cleanup-documents", "DROP TABLE "+table)
+	if ddl("create-secondary", fmt.Sprintf("CREATE INDEX %s ON %s(Title)", secondary, table)) {
+		defer ddl("cleanup-secondary", "DROP INDEX "+secondary)
+	}
+	if ddl("create-search", fmt.Sprintf("CREATE SEARCH INDEX %s ON %s(Tokens) STORING(Title)", search, table)) {
+		defer ddl("cleanup-search", "DROP SEARCH INDEX "+search)
+	}
+	var mutations []*spanner.Mutation
+	for i := 0; i < 10000; i++ {
+		title := fmt.Sprintf("banana common %05d", i)
+		if i%10 == 0 {
+			title = fmt.Sprintf("apple common %05d", i)
+		}
+		if i%1000 == 0 {
+			title = fmt.Sprintf("apple rarexyz %05d", i)
+		}
+		mutations = append(mutations, spanner.Insert(table, []string{"Id", "Title"}, []any{int64(i), title}))
+	}
+	for start := 0; start < len(mutations); start += 1000 {
+		_, e := client.Apply(ctx, mutations[start:start+1000])
+		if e != nil {
+			emit(map[string]any{"kind": "seed", "error": clean(e)})
+			return
+		}
+	}
+	emit(map[string]any{"kind": "seed", "rows": 10000})
+	predicates := []string{"STARTS_WITH(Title, 'apple')", "STARTS_WITH(Title, 'apple rarexyz')", "Title LIKE '%rarexyz%'", "Title LIKE 'apple%'", "Title LIKE '%common%'"}
+	for _, v := range []string{"4", "5", "6", "8", "9"} {
+		for pi, p := range predicates {
+			for _, access := range []string{"auto", secondary, search, "_BASE_TABLE"} {
+				hint := ""
+				if access != "auto" {
+					hint = "@{FORCE_INDEX=" + access + "}"
+				}
+				sql := fmt.Sprintf("@{OPTIMIZER_VERSION=%s} SELECT Id FROM %s%s WHERE %s", v, table, hint, p)
+				label := fmt.Sprintf("v%s/p%d/%s", v, pi, access)
+				query(label, sql, true)
+				query(label, sql, false)
+			}
+		}
+	}
+}
+func release() {
+	a := prefix + "Case"
+	if ddl("case-setup", "CREATE TABLE "+a+" (Id INT64 NOT NULL, MyColumn STRING(MAX) NOT NULL) PRIMARY KEY(Id)") {
+		defer ddl("case-cleanup", "DROP TABLE "+a)
+		ddl("case-alter-wrong", "ALTER TABLE "+a+" ALTER COLUMN MYCOLUMN STRING(MAX)")
+		ddl("case-drop-wrong", "ALTER TABLE "+a+" DROP COLUMN MYCOLUMN")
+		ddl("case-alter-exact", "ALTER TABLE "+a+" ALTER COLUMN MyColumn STRING(MAX)")
+		ddl("case-drop-exact", "ALTER TABLE "+a+" DROP COLUMN MyColumn")
+	}
+	u := prefix + "Unique"
+	idx := prefix + "UniqueIndex"
+	if ddl("unique-setup", "CREATE TABLE "+u+" (Id INT64 NOT NULL, Val INT64 NOT NULL) PRIMARY KEY(Id)") {
+		defer ddl("unique-cleanup", "DROP TABLE "+u)
+		if ddl("unique-index", "CREATE UNIQUE INDEX "+idx+" ON "+u+"(Val)") {
+			defer ddl("unique-index-cleanup", "DROP INDEX "+idx)
+			ddl("unique-nullability", "ALTER TABLE "+u+" ALTER COLUMN Val INT64")
+		}
+	}
+}
+func pg() {
+	table := "fts_pg_probe"
+	if !ddl("pg-setup", "CREATE TABLE "+table+" (id bigint NOT NULL, bar bigint NOT NULL, baz bigint, PRIMARY KEY(id))") {
+		return
+	}
+	defer ddl("pg-cleanup", "DROP TABLE "+table)
+	if ddl("pg-nonindex-null-filter", "CREATE INDEX pg_invalid ON "+table+" (baz) WHERE bar IS NOT NULL") {
+		defer ddl("pg-invalid-cleanup", "DROP INDEX pg_invalid")
+	}
+	if ddl("pg-valid-null-filter", "CREATE INDEX pg_valid ON "+table+" (baz) WHERE baz IS NOT NULL") {
+		defer ddl("pg-valid-cleanup", "DROP INDEX pg_valid")
+	}
+	if ddl("pg-unique", "CREATE UNIQUE INDEX pg_unique ON "+table+"(bar)") {
+		defer ddl("pg-unique-cleanup", "DROP INDEX pg_unique")
+		ddl("pg-unique-nullability", "ALTER TABLE "+table+" ALTER COLUMN bar DROP NOT NULL")
+	}
+}

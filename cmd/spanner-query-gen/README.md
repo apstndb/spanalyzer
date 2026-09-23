@@ -99,6 +99,10 @@ If neither config `go.out` nor `--out` is set, generated Go code is written to
 stdout. Use `--out -` to force stdout. `check` is equivalent to
 `generate --check`.
 
+Subcommands accept flags only. Unexpected positional arguments are rejected
+before reading configuration, writing output, or starting a runtime. Pass boolean
+flag values with `=`, for example `--check=false`; `--check false` is rejected.
+
 Query DTOs, SQL constants, and basic runtime query free functions are the
 baseline generated output for declared queries. Optional Spanner queries emit a
 typed `<Name>Params` struct plus `Build<Name>SQL` helper instead of a single SQL
