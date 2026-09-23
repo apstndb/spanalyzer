@@ -758,17 +758,23 @@ func compileGeneratedPackage(t *testing.T, code string) {
 	if err := os.MkdirAll(filepath.Join(genDir, "googleapi", "iterator"), 0o755); err != nil {
 		t.Fatalf("mkdir iterator: %v", err)
 	}
+	if err := os.MkdirAll(filepath.Join(genDir, "civilstub"), 0o755); err != nil {
+		t.Fatalf("mkdir civilstub: %v", err)
+	}
 	writeGeneratedLoadTestFile(t, filepath.Join(genDir, "go.mod"), `module generatednamespacetest
 
 go 1.22
 
 require (
 	cloud.google.com/go/bigquery v0.0.0
+	cloud.google.com/go/civil v0.0.0
 	cloud.google.com/go/spanner v0.0.0
 	google.golang.org/api v0.0.0
 )
 
 replace cloud.google.com/go/bigquery => ./bigquerystub
+
+replace cloud.google.com/go/civil => ./civilstub
 
 replace cloud.google.com/go/spanner => ./spannerstub
 
@@ -813,6 +819,17 @@ func InsertOrUpdate(table string, cols []string, vals []interface{}) *Mutation {
 type ReadWriteTransaction struct{}
 func (tx *ReadWriteTransaction) Query(ctx context.Context, stmt Statement) *RowIterator { return &RowIterator{} }
 func (tx *ReadWriteTransaction) Update(ctx context.Context, stmt Statement) (int64, error) { return 0, nil }
+`)
+	writeGeneratedLoadTestFile(t, filepath.Join(genDir, "civilstub", "go.mod"), "module cloud.google.com/go/civil\n\ngo 1.22\n")
+	writeGeneratedLoadTestFile(t, filepath.Join(genDir, "civilstub", "civil.go"), `package civil
+
+type Date struct{}
+type Time struct{}
+type DateTime struct{}
+
+func ParseDate(string) (Date, error) { return Date{}, nil }
+func ParseTime(string) (Time, error) { return Time{}, nil }
+func ParseDateTime(string) (DateTime, error) { return DateTime{}, nil }
 `)
 	writeGeneratedLoadTestFile(t, filepath.Join(genDir, "googleapi", "go.mod"), "module google.golang.org/api\n\ngo 1.22\n")
 	writeGeneratedLoadTestFile(t, filepath.Join(genDir, "googleapi", "iterator", "iterator.go"), `package iterator

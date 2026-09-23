@@ -199,6 +199,22 @@ func generateGoStructsWithExtra(structs []namedGoStruct, options GoStructOptions
 		gen.imports["cloud.google.com/go/bigquery"] = ""
 		gen.imports["fmt"] = ""
 	}
+	if gen.needsNullValue {
+		// DecodeSpanner receives Spanner wire values, not the Go values
+		// LoadBigQuery sees. The helper references these packages even when
+		// the current struct uses only one of the nullable kinds.
+		for _, path := range []string{
+			"cloud.google.com/go/civil",
+			"encoding/base64",
+			"fmt",
+			"math",
+			"math/big",
+			"strconv",
+			"time",
+		} {
+			gen.imports[path] = ""
+		}
+	}
 	for _, path := range extraImports {
 		gen.imports[path] = ""
 	}
@@ -721,8 +737,13 @@ func writeNullValueSupport(b *bytes.Buffer) {
 	b.WriteString("\treturn n.set(value)\n")
 	b.WriteString("}\n\n")
 	b.WriteString("func (n *NullValue[T]) DecodeSpanner(input interface{}) error {\n")
-	b.WriteString("\treturn n.set(input)\n")
+	b.WriteString("\tdecoded, err := decodeSpannerNullValue[T](input)\n")
+	b.WriteString("\tif err != nil {\n")
+	b.WriteString("\t\treturn err\n")
+	b.WriteString("\t}\n")
+	b.WriteString("\treturn n.set(decoded)\n")
 	b.WriteString("}\n\n")
+	writeDecodeSpannerNullValue(b)
 	b.WriteString("func (n *NullValue[T]) set(value interface{}) error {\n")
 	b.WriteString("\tif value == nil {\n")
 	b.WriteString("\t\tvar zero T\n")
@@ -757,6 +778,175 @@ func writeNullValueSupport(b *bytes.Buffer) {
 	b.WriteString("\treturn nil\n")
 	b.WriteString("}\n\n")
 	writeAssignBigQueryValueSupport(b)
+}
+
+func writeDecodeSpannerNullValue(b *bytes.Buffer) {
+	// Spanner's Decoder callback receives protobuf generic values: INT64 is a
+	// decimal string, FLOAT specials are strings, BYTES are base64, and NULL
+	// is a typed nil pointer. BigQuery still passes native Go values to set.
+	b.WriteString(`func decodeSpannerNullValue[T any](input interface{}) (interface{}, error) {
+	if input == nil {
+		return nil, nil
+	}
+	switch v := input.(type) {
+	case *string:
+		if v == nil {
+			return nil, nil
+		}
+	case *bool:
+		if v == nil {
+			return nil, nil
+		}
+	case *float64:
+		if v == nil {
+			return nil, nil
+		}
+	}
+	var zero T
+	switch any(zero).(type) {
+	case int64:
+		switch v := input.(type) {
+		case int64:
+			return v, nil
+		case string:
+			parsed, err := strconv.ParseInt(v, 10, 64)
+			if err != nil {
+				return nil, fmt.Errorf("cannot decode %q as int64: %w", v, err)
+			}
+			return parsed, nil
+		default:
+			return nil, fmt.Errorf("cannot decode %T", input)
+		}
+	case float32:
+		parsed, err := decodeSpannerFloat(input)
+		if err != nil || parsed == nil {
+			return parsed, err
+		}
+		return float32(parsed.(float64)), nil
+	case float64:
+		return decodeSpannerFloat(input)
+	case bool:
+		v, ok := input.(bool)
+		if !ok {
+			return nil, fmt.Errorf("cannot decode %T", input)
+		}
+		return v, nil
+	case string:
+		v, ok := input.(string)
+		if !ok {
+			return nil, fmt.Errorf("cannot decode %T", input)
+		}
+		return v, nil
+	case []byte:
+		switch v := input.(type) {
+		case []byte:
+			return append([]byte(nil), v...), nil
+		case string:
+			decoded, err := base64.StdEncoding.DecodeString(v)
+			if err != nil {
+				return nil, fmt.Errorf("cannot decode bytes: %w", err)
+			}
+			return decoded, nil
+		default:
+			return nil, fmt.Errorf("cannot decode %T", input)
+		}
+	case time.Time:
+		switch v := input.(type) {
+		case time.Time:
+			return v, nil
+		case string:
+			parsed, err := time.Parse(time.RFC3339Nano, v)
+			if err != nil {
+				return nil, fmt.Errorf("cannot decode %q as timestamp: %w", v, err)
+			}
+			return parsed, nil
+		default:
+			return nil, fmt.Errorf("cannot decode %T", input)
+		}
+	case civil.Date:
+		switch v := input.(type) {
+		case civil.Date:
+			return v, nil
+		case string:
+			parsed, err := civil.ParseDate(v)
+			if err != nil {
+				return nil, fmt.Errorf("cannot decode %q as date: %w", v, err)
+			}
+			return parsed, nil
+		default:
+			return nil, fmt.Errorf("cannot decode %T", input)
+		}
+	case civil.Time:
+		switch v := input.(type) {
+		case civil.Time:
+			return v, nil
+		case string:
+			parsed, err := civil.ParseTime(v)
+			if err != nil {
+				return nil, fmt.Errorf("cannot decode %q as time: %w", v, err)
+			}
+			return parsed, nil
+		default:
+			return nil, fmt.Errorf("cannot decode %T", input)
+		}
+	case civil.DateTime:
+		switch v := input.(type) {
+		case civil.DateTime:
+			return v, nil
+		case string:
+			parsed, err := civil.ParseDateTime(v)
+			if err != nil {
+				return nil, fmt.Errorf("cannot decode %q as datetime: %w", v, err)
+			}
+			return parsed, nil
+		default:
+			return nil, fmt.Errorf("cannot decode %T", input)
+		}
+	case *big.Rat:
+		switch v := input.(type) {
+		case *big.Rat:
+			return v, nil
+		case string:
+			parsed := new(big.Rat)
+			if _, ok := parsed.SetString(v); !ok {
+				return nil, fmt.Errorf("cannot decode %q as numeric", v)
+			}
+			return parsed, nil
+		default:
+			return nil, fmt.Errorf("cannot decode %T", input)
+		}
+	default:
+		return input, nil
+	}
+}
+
+func decodeSpannerFloat(input interface{}) (interface{}, error) {
+	switch v := input.(type) {
+	case float64:
+		return v, nil
+	case float32:
+		return float64(v), nil
+	case string:
+		switch v {
+		case "NaN":
+			return math.NaN(), nil
+		case "Infinity":
+			return math.Inf(1), nil
+		case "-Infinity":
+			return math.Inf(-1), nil
+		default:
+			parsed, err := strconv.ParseFloat(v, 64)
+			if err != nil {
+				return nil, fmt.Errorf("cannot decode %q as float: %w", v, err)
+			}
+			return parsed, nil
+		}
+	default:
+		return nil, fmt.Errorf("cannot decode %T", input)
+	}
+}
+
+`)
 }
 
 func writeAssignBigQueryValueSupport(b *bytes.Buffer) {
