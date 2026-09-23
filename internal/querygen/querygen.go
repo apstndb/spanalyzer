@@ -370,8 +370,9 @@ func GenerateQueryCode(config QueryCodegenConfig, baseDir string) (string, error
 	}
 	sort.Strings(names)
 	namedStructs := make([]namedGoStruct, 0, len(names))
+	reservedByStruct := writeReceiverMethodNames(writeSpecs)
 	for _, name := range names {
-		namedStructs = append(namedStructs, namedGoStruct{Name: name, Fields: structs[name]})
+		namedStructs = append(namedStructs, namedGoStruct{Name: name, Fields: structs[name], ReservedReceiverNames: reservedByStruct[name]})
 	}
 	return generateGoStructsWithExtra(namedStructs, options, constants, allImports, writeCode+builderCode.String()+queryMethods.String())
 }
@@ -2225,11 +2226,13 @@ func emitWriteCode(writeStructFields map[string][]goResultField, writeSpecs []re
 		structNames = append(structNames, name)
 	}
 	sort.Strings(structNames)
+	reservedByStruct := writeReceiverMethodNames(writeSpecs)
 	var b bytes.Buffer
 	for i, name := range structNames {
 		if i > 0 {
 			b.WriteByte('\n')
 		}
+		writeGen.reservedReceiverNames = reservedByStruct[name]
 		writeGeneratedStruct(&b, writeGen.buildStruct(name, "generated struct "+name, writeStructFields[name]))
 	}
 	if writeGen.err != nil {
@@ -2251,7 +2254,7 @@ func emitWriteCode(writeStructFields map[string][]goResultField, writeSpecs []re
 	return imports, b.String(), nil
 }
 
-func planWriteSpecs(schemas map[string]QueryCodegenSchema, writes []QueryCodegenWrite, baseDir string, sharedStructFields map[string][]goResultField) (map[string][]goResultField, []resolvedWriteSpec, error) {
+func planWriteSpecs(schemas map[string]QueryCodegenSchema, writes []QueryCodegenWrite, baseDir string, sharedStructFields map[string][]goResultField, target GoStructTarget) (map[string][]goResultField, []resolvedWriteSpec, error) {
 	writeStructFields := map[string][]goResultField{}
 	writeSpecs := make([]resolvedWriteSpec, 0, len(writes))
 	for i, write := range writes {
@@ -2274,7 +2277,7 @@ func planWriteSpecs(schemas map[string]QueryCodegenSchema, writes []QueryCodegen
 		structFields[spec.InputStruct] = merged
 		writeSpecs = append(writeSpecs, spec)
 	}
-	writeSpecs, err := attachWriteSpecNames(writeSpecs, writeStructFields, sharedStructFields)
+	writeSpecs, err := attachWriteSpecNames(writeSpecs, writeStructFields, sharedStructFields, target)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -2473,10 +2476,11 @@ func resolveWriteMethods(operation string, methods []string, explicit bool) ([]s
 	return out, nil
 }
 
-func attachWriteSpecNames(specs []resolvedWriteSpec, writeStructFields, sharedStructFields map[string][]goResultField) ([]resolvedWriteSpec, error) {
+func attachWriteSpecNames(specs []resolvedWriteSpec, writeStructFields, sharedStructFields map[string][]goResultField, target GoStructTarget) ([]resolvedWriteSpec, error) {
 	fieldNamesByStruct := map[string]map[string]string{}
+	reserved := writeReceiverMethodNames(specs)
 	for name, fields := range writeStructFields {
-		fieldNamesByStruct[name] = goFieldNameMap(fields)
+		fieldNamesByStruct[name] = goFieldNameMap(fields, receiverFieldReservations(GoStructTargetSpanner, reserved[name]))
 	}
 	for _, spec := range specs {
 		if _, ok := fieldNamesByStruct[spec.InputStruct]; ok {
@@ -2486,7 +2490,7 @@ func attachWriteSpecNames(specs []resolvedWriteSpec, writeStructFields, sharedSt
 		if !ok {
 			return nil, fmt.Errorf("write %s input_struct %s was not planned", spec.Name, spec.InputStruct)
 		}
-		fieldNamesByStruct[spec.InputStruct] = goFieldNameMap(fields)
+		fieldNamesByStruct[spec.InputStruct] = goFieldNameMap(fields, receiverFieldReservations(target, reserved[spec.InputStruct]))
 	}
 	out := make([]resolvedWriteSpec, len(specs))
 	copy(out, specs)
@@ -2512,8 +2516,31 @@ func writeParamNameMap(columns []*Column) map[string]string {
 	return out
 }
 
-func goFieldNameMap(fields []goResultField) map[string]string {
+func writeReceiverMethodNames(specs []resolvedWriteSpec) map[string]map[string]bool {
+	out := map[string]map[string]bool{}
+	for _, spec := range specs {
+		names := out[spec.InputStruct]
+		if names == nil {
+			names = map[string]bool{}
+			out[spec.InputStruct] = names
+		}
+		for _, method := range spec.Methods {
+			switch method {
+			case "mutation":
+				names[spec.MethodPrefix+"Mutation"] = true
+			case "dml":
+				names[spec.MethodPrefix+"DMLStatement"] = true
+			}
+		}
+	}
+	return out
+}
+
+func goFieldNameMap(fields []goResultField, reserved map[string]bool) map[string]string {
 	used := map[string]bool{}
+	for name := range reserved {
+		used[name] = true
+	}
 	out := map[string]string{}
 	for i, field := range fields {
 		name := exportedIdentifier(field.Name, fmt.Sprintf("Field%d", i+1))

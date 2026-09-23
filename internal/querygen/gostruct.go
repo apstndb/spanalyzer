@@ -69,8 +69,9 @@ type generatedStruct struct {
 }
 
 type namedGoStruct struct {
-	Name   string
-	Fields []goResultField
+	Name                  string
+	Fields                []goResultField
+	ReservedReceiverNames map[string]bool
 }
 
 type generatedGoConst struct {
@@ -197,6 +198,7 @@ func generateGoStructsWithExtra(structs []namedGoStruct, options GoStructOptions
 			name = options.StructName
 		}
 		exported := exportedIdentifier(name, "QueryRow")
+		gen.reservedReceiverNames = st.ReservedReceiverNames
 		roots = append(roots, gen.buildStruct(exported, "generated struct "+exported, st.Fields))
 	}
 	if gen.err != nil {
@@ -306,16 +308,17 @@ func writeGoConstants(b *bytes.Buffer, constants []generatedGoConst) {
 }
 
 type goStructGenerator struct {
-	target             GoStructTarget
-	imports            map[string]string
-	structs            []generatedStruct
-	usedOrigins        map[string]string
-	err                error
-	needsBigQueryLoad  bool
-	needsNullValue     bool
-	needsNullValueList bool
-	needsAssignValue   bool
-	needsValueSlice    bool
+	target                GoStructTarget
+	imports               map[string]string
+	structs               []generatedStruct
+	usedOrigins           map[string]string
+	err                   error
+	needsBigQueryLoad     bool
+	needsNullValue        bool
+	needsNullValueList    bool
+	needsAssignValue      bool
+	needsValueSlice       bool
+	reservedReceiverNames map[string]bool
 }
 
 func (g *goStructGenerator) buildStruct(name, origin string, fields []goResultField) generatedStruct {
@@ -324,7 +327,10 @@ func (g *goStructGenerator) buildStruct(name, origin string, fields []goResultFi
 		origin = "generated struct " + exported
 	}
 	st := generatedStruct{Name: g.uniqueTypeName(exported, origin)}
-	usedFields := map[string]bool{}
+	// Reservations belong to this receiver only; nested structs reserve their
+	// own generated Load method but do not inherit root write methods.
+	usedFields := receiverFieldReservations(g.target, g.reservedReceiverNames)
+	g.reservedReceiverNames = nil
 	for i, field := range fields {
 		fieldName := exportedIdentifier(field.Name, fmt.Sprintf("Field%d", i+1))
 		nestedName := st.Name + fieldName
@@ -339,6 +345,19 @@ func (g *goStructGenerator) buildStruct(name, origin string, fields []goResultFi
 		}
 	}
 	return st
+}
+
+// Use the same reservations for struct declarations and write-method field
+// references so a DTO shared with query results gets identical Go names.
+func receiverFieldReservations(target GoStructTarget, methods map[string]bool) map[string]bool {
+	used := map[string]bool{}
+	if target == GoStructTargetBoth {
+		used["Load"] = true
+	}
+	for name := range methods {
+		used[name] = true
+	}
+	return used
 }
 
 func (g *goStructGenerator) generatedFields(field goResultField, fieldName, nestedName, nestedOrigin string) []generatedField {
