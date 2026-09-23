@@ -526,10 +526,22 @@ func buildColumnDef(c *infoschem.Column, colOpts map[string][]*infoschem.ColumnO
 	return cd, nil
 }
 
-// parseOptionValue converts an INFORMATION_SCHEMA option value to an ast.Expr.
+// parseOptionValue converts an option value to an ast.Expr.
+// AST conversion stores SQL() text; live metadata can also contain unquoted
+// STRING values. Only interpret a SQL literal when its kind agrees with the
+// declared option type. In particular, raw STRING values such as 123, true,
+// [1], and NULL must remain strings.
 func parseOptionValue(optionType, optionValue string) ast.Expr {
+	if expr, ok := parseOptionSQLLiteral(optionValue); ok {
+		kind := inferOptionType(expr)
+		if strings.EqualFold(optionType, kind) ||
+			(kind == "ARRAY" && strings.HasPrefix(strings.ToUpper(optionType), "ARRAY<")) ||
+			(kind == "STRING" && optionType == "") {
+			return expr
+		}
+	}
 	switch {
-	case optionValue == "NULL":
+	case !strings.EqualFold(optionType, "STRING") && optionValue == "NULL":
 		return nullval()
 	case strings.EqualFold(optionType, "BOOL"):
 		return boolval(strings.EqualFold(optionValue, "TRUE"))
@@ -538,9 +550,25 @@ func parseOptionValue(optionType, optionValue string) ast.Expr {
 	case strings.EqualFold(optionType, "FLOAT64"):
 		return &ast.FloatLiteral{Value: optionValue}
 	default:
-		// STRING type - value is stored with quotes in INFORMATION_SCHEMA
-		v := strings.Trim(optionValue, "'\"")
-		return strval(v)
+		// Do not strip delimiters or decode escapes from raw metadata.
+		// Valid quoted STRING literals were decoded by memefish above.
+		return strval(optionValue)
+	}
+}
+
+func parseOptionSQLLiteral(optionValue string) (ast.Expr, bool) {
+	expr, err := memefish.ParseExpr("", optionValue)
+	if err != nil {
+		return nil, false
+	}
+	switch expr.(type) {
+	case *ast.StringLiteral, *ast.BytesLiteral, *ast.IntLiteral, *ast.FloatLiteral, *ast.BoolLiteral, *ast.NullLiteral, *ast.ArrayLiteral:
+		return expr, true
+	case *ast.UnaryExpr:
+		kind := inferOptionType(expr)
+		return expr, kind == "INT64" || kind == "FLOAT64"
+	default:
+		return nil, false
 	}
 }
 

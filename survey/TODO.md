@@ -1,5 +1,13 @@
 # TODO
 
+## Preserve option values (2026-09-23)
+
+- [x] Preserve arrays, escaped strings, and signed numeric literals when
+  round-tripping DDL options.
+- [x] Respect declared metadata types when raw strings resemble SQL literals;
+  distinguish AST NULL from a STRING whose content is `NULL`.
+- [x] Run focused option regressions, survey tests, and repository gates.
+
 ## Reconstruction correctness (2026-09-09)
 
 - [x] Skip the built-in `default` locality group in `toLocalityGroupsDDL` and

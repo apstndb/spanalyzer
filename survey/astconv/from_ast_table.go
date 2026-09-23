@@ -417,7 +417,7 @@ func simplifyDataType(spannerType string) string {
 
 // inferOptionType infers the option type from an AST expression.
 func inferOptionType(expr ast.Expr) string {
-	switch expr.(type) {
+	switch expr := expr.(type) {
 	case *ast.BoolLiteral:
 		return "BOOL"
 	case *ast.IntLiteral:
@@ -425,6 +425,17 @@ func inferOptionType(expr ast.Expr) string {
 	case *ast.FloatLiteral:
 		return "FLOAT64"
 	case *ast.NullLiteral:
+		// AST-only marker: preserve explicit SQL NULL without confusing it
+		// with live STRING metadata whose unquoted content is "NULL".
+		return "NULL"
+	case *ast.BytesLiteral:
+		return "BYTES"
+	case *ast.ArrayLiteral:
+		return "ARRAY"
+	case *ast.UnaryExpr:
+		if expr.Op == "+" || expr.Op == "-" {
+			return inferOptionType(expr.Expr)
+		}
 		return "STRING"
 	default:
 		return "STRING"
