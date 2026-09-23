@@ -778,6 +778,51 @@ FROM EXTERNAL_QUERY(
 	}
 }
 
+func TestBigQueryAnalyzerExternalQueryLexicalForms(t *testing.T) {
+	spannerAnalyzer, err := NewAnalyzerFromDDL("empty.sql", "")
+	if err != nil {
+		t.Fatalf("NewAnalyzerFromDDL() error = %v", err)
+	}
+	bigQueryAnalyzer, err := NewBigQueryAnalyzerFromDDL("bigquery.sql", "")
+	if err != nil {
+		t.Fatalf("NewBigQueryAnalyzerFromDDL() error = %v", err)
+	}
+	bigQueryAnalyzer.SetExternalQueryAnalyzers(map[string]*Analyzer{"conn": spannerAnalyzer})
+	for _, sql := range []string{
+		"SELECT * FROM EXTERNAL_QUERY(/* connection */ 'conn' /* done */, -- SQL\n 'SELECT 1 AS n' # done\n)",
+		"SELECT * FROM `EXTERNAL_QUERY`('conn', 'SELECT 1 AS n')",
+		"SELECT * FROM EXTERNAL_QUERY('conn', 'SELECT 1 AS n')",
+		"SELECT * FROM EXTERNAL_QUERY /* comment */ ('conn', 'SELECT 1 AS n')",
+		"SELECT * FROM EXTERNAL_QUERY # comment\n('conn', 'SELECT 1 AS n')",
+		"SELECT * FROM EXTERNAL_QUERY('conn', '\\x53ELECT 1 AS n')",
+		"SELECT * FROM EXTERNAL_QUERY('conn', '\\123ELECT 1 AS n')",
+		"SELECT * FROM EXTERNAL_QUERY('conn', '\\u0053ELECT 1 AS n')",
+		"SELECT * FROM EXTERNAL_QUERY('conn', '\\U00000053ELECT 1 AS n')",
+		"SELECT * FROM EXTERNAL_QUERY('conn', r'SELECT 1 AS n')",
+		"SELECT * FROM EXTERNAL_QUERY('conn', '''SELECT 1 AS n''')",
+		"SELECT 1 AS n # EXTERNAL_QUERY('conn', 'SELECT missing AS z')",
+	} {
+		schema, err := bigQueryAnalyzer.TableSchemaForStatement(sql)
+		if err != nil {
+			t.Fatalf("TableSchemaForStatement(%s) error = %v", sql, err)
+		}
+		if len(schema.Fields) != 1 {
+			t.Fatalf("TableSchemaForStatement(%s) fields = %+v", sql, schema.Fields)
+		}
+		assertBigQueryField(t, schema.Fields[0], "n", "INTEGER", "NULLABLE")
+	}
+	for _, sql := range []string{
+		"SELECT * FROM EXTERNAL_QUERY('conn', '\\x5')",
+		"SELECT * FROM EXTERNAL_QUERY('conn', '\\xZZ')",
+		"SELECT * FROM EXTERNAL_QUERY('conn', '\\12ELECT 1 AS n')",
+		"SELECT * FROM EXTERNAL_QUERY('conn', '\\UFFFFFFFF')",
+	} {
+		if _, err := bigQueryAnalyzer.TableSchemaForStatement(sql); err == nil {
+			t.Fatalf("TableSchemaForStatement(%s) accepted invalid literal", sql)
+		}
+	}
+}
+
 func TestBigQueryAnalyzerExternalQueryConnectionsUseDifferentSpannerSchemas(t *testing.T) {
 	spannerAnalyzerA, err := NewAnalyzerFromDDL("a.sql", `
 CREATE TABLE Orders (
@@ -1174,5 +1219,19 @@ FROM EXTERNAL_QUERY('my-project.us.example-db', 'SELECT CustomerId FROM Orders')
 	defer analyzer.googleSQL.clearExternalQueryTVFCalls()
 	if got, want := len(analyzer.googleSQL.externalQueryRowTypes["my-project.us.example-db"]), 1; got != want {
 		t.Fatalf("externalQueryRowTypes entries = %d, want %d (identical inner SQL must collapse)", got, want)
+	}
+}
+
+func TestDecodeExternalQueryStringLiteralRejectsMalformedEscapes(t *testing.T) {
+	for _, literal := range []string{`'\x5'`, `'\xZZ'`, `'\12'`, `'\uD800'`, `'\U00110000'`, `'\z'`, `'unterminated`, `b'bytes'`, `'value' || 'expression'`} {
+		if got, err := decodeGoogleSQLStringLiteral(literal); err == nil {
+			t.Errorf("decodeGoogleSQLStringLiteral(%s) = %q without error", literal, got)
+		}
+	}
+	for _, literal := range []string{`'\x53'`, `'\123'`, `'\u0053'`, `'\U00000053'`, `/* before */ r'S' /* after */`, `'''S'''`} {
+		got, err := decodeGoogleSQLStringLiteral(literal)
+		if err != nil || got != "S" {
+			t.Errorf("decodeGoogleSQLStringLiteral(%s) = %q, %v", literal, got, err)
+		}
 	}
 }
