@@ -26,6 +26,7 @@ require (
 	github.com/Microsoft/go-winio v0.6.2 // indirect
 	github.com/antlr4-go/antlr/v4 v4.13.1 // indirect
 	github.com/apstndb/go-tabwrap v0.1.3 // indirect
+	github.com/apstndb/protoyaml v0.1.1 // indirect
 	github.com/cenkalti/backoff/v4 v4.3.0 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/clipperhouse/displaywidth v0.11.0 // indirect
@@ -111,7 +112,7 @@ require (
 require (
 	cloud.google.com/go/spanner v1.95.1
 	github.com/apstndb/spanalyzer/plancontract v0.1.0
-	github.com/apstndb/spannerplan v0.1.11
+	github.com/apstndb/spannerplan v0.3.2
 	github.com/goccy/go-yaml v1.19.2
 	github.com/samber/lo v1.53.0 // indirect
 	golang.org/x/net v0.58.0 // indirect
