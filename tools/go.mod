@@ -6,7 +6,7 @@ require (
 	cloud.google.com/go v0.123.0
 	cloud.google.com/go/spanner v1.95.1
 	github.com/apstndb/spanalyzer v0.2.1
-	github.com/apstndb/spanemuboost v0.4.8
+	github.com/apstndb/spanemuboost v0.4.9
 	github.com/apstndb/spannerplan v0.3.2
 	github.com/cloudspannerecosystem/memefish v0.8.1
 	github.com/goccy/go-yaml v1.19.2
@@ -55,6 +55,7 @@ require (
 	github.com/go-ole/go-ole v1.3.0 // indirect
 	github.com/goccy/go-googlesql v0.4.0 // indirect
 	github.com/goccy/googlesqlwasm2go v0.2.0 // indirect
+	github.com/golang/groupcache v0.0.0-20241129210726-2c02b8208cf8 // indirect
 	github.com/google/s2a-go v0.1.9 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/googleapis/enterprise-certificate-proxy v0.3.20 // indirect
@@ -68,7 +69,7 @@ require (
 	github.com/moby/docker-image-spec v1.3.1 // indirect
 	github.com/moby/go-archive v0.3.0 // indirect
 	github.com/moby/moby/api v1.56.0 // indirect
-	github.com/moby/moby/client v0.5.0 // indirect
+	github.com/moby/moby/client v0.6.0 // indirect
 	github.com/moby/patternmatcher v0.6.1 // indirect
 	github.com/moby/sys/sequential v0.7.0 // indirect
 	github.com/moby/sys/user v0.4.1 // indirect
