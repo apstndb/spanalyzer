@@ -115,7 +115,7 @@ require (
 	github.com/apstndb/spannerplan v0.3.2
 	github.com/goccy/go-yaml v1.19.2
 	github.com/samber/lo v1.53.0 // indirect
-	golang.org/x/net v0.58.0 // indirect
+	golang.org/x/net v0.60.0 // indirect
 	golang.org/x/sys v0.48.0 // indirect
 	golang.org/x/text v0.42.0 // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20260630182238-925bb5da69e7 // indirect
