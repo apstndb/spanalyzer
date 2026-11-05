@@ -67,7 +67,7 @@ func TestInformationSchemaManifestProjection(t *testing.T) {
 			t.Fatalf("definition %q has %d columns, manifest projects %d", definition.name, len(definition.columns), definitionColumn)
 		}
 	}
-	if got, want := projectedColumns, 308; got != want {
+	if got, want := projectedColumns, 310; got != want {
 		t.Errorf("projected column count = %d, want %d", got, want)
 	}
 	if got, want := rollingColumns, 2; got != want {

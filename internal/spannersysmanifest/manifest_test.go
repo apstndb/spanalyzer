@@ -12,10 +12,10 @@ func TestDecodeRepositoryManifest(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Decode() error = %v", err)
 	}
-	if got, want := document.Source.Commit, "91908d001349f844aac070cc6518119c0e3c36c0"; got != want {
+	if got, want := document.Source.Commit, "a9e779d0236a9d4a53c757cc74bd63b5175d67f0"; got != want {
 		t.Fatalf("source commit = %q, want %q", got, want)
 	}
-	if got, want := document.ContentSHA256, "2b337e1dc3d935c39249c139a1847200c0959dd280d41a286d76d80fb5b3e3a2"; got != want {
+	if got, want := document.ContentSHA256, "430fc11a13992c9e24022e37d9d1ff5e8ab8838707e50c099e5574488a4176e0"; got != want {
 		t.Fatalf("content SHA-256 = %q, want %q", got, want)
 	}
 
@@ -37,10 +37,10 @@ func TestDecodeRepositoryManifest(t *testing.T) {
 			}
 		}
 	}
-	if got, want := tableCount, 51; got != want {
+	if got, want := tableCount, 53; got != want {
 		t.Errorf("table count = %d, want %d", got, want)
 	}
-	if got, want := columnCount, 547; got != want {
+	if got, want := columnCount, 632; got != want {
 		t.Errorf("column count = %d, want %d", got, want)
 	}
 	if got, want := projectedTables, 50; got != want {
@@ -49,7 +49,7 @@ func TestDecodeRepositoryManifest(t *testing.T) {
 	if got, want := projectedColumns, 539; got != want {
 		t.Errorf("projected column count = %d, want %d", got, want)
 	}
-	if got, want := absentColumns, 8; got != want {
+	if got, want := absentColumns, 93; got != want {
 		t.Errorf("absent column count = %d, want %d", got, want)
 	}
 	if got, want := len(document.Documentation), 11; got != want {
@@ -103,7 +103,7 @@ func TestDecodeRejectsMalformedManifest(t *testing.T) {
 			name: "target disagreement",
 			data: func(t *testing.T) []byte {
 				document := decodedWithoutValidation(t, original)
-				document.Tables[0].Columns[0].Observations[1].SpannerType = "BYTES(MAX)"
+				findColumn(t, document, "ACTIVE_PARTITIONED_DMLS", "TEXT").Observations[1].SpannerType = "BYTES(MAX)"
 				return encodeWithContentHash(t, document)
 			},
 			wantError: "target omni type",
@@ -112,8 +112,9 @@ func TestDecodeRejectsMalformedManifest(t *testing.T) {
 			name: "noncontiguous ordinal",
 			data: func(t *testing.T) []byte {
 				document := decodedWithoutValidation(t, original)
-				for index := range document.Tables[0].Columns[1].Observations {
-					document.Tables[0].Columns[1].Observations[index].OrdinalPosition = 1
+				column := findColumn(t, document, "ACTIVE_PARTITIONED_DMLS", "TEXT_FINGERPRINT")
+				for index := range column.Observations {
+					column.Observations[index].OrdinalPosition = 1
 				}
 				return encodeWithContentHash(t, document)
 			},

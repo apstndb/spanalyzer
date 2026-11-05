@@ -15,7 +15,7 @@ func TestSpannerSysManifestProjection(t *testing.T) {
 	if err != nil {
 		t.Fatalf("parseSpannerSysManifest() error = %v", err)
 	}
-	if got, want := len(manifest.Tables), 51; got != want {
+	if got, want := len(manifest.Tables), 53; got != want {
 		t.Fatalf("manifest table count = %d, want %d", got, want)
 	}
 	if got, want := len(definitions), 50; got != want {
@@ -76,7 +76,7 @@ func TestSpannerSysManifestProjection(t *testing.T) {
 	if got, want := projectedColumns, 539; got != want {
 		t.Errorf("projected column count = %d, want %d", got, want)
 	}
-	if got, want := absentColumns, 8; got != want {
+	if got, want := absentColumns, 93; got != want {
 		t.Errorf("absent column count = %d, want %d", got, want)
 	}
 }

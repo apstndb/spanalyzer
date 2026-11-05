@@ -9,7 +9,7 @@ import (
 	"testing"
 )
 
-const repositorySourceCommit = "91908d001349f844aac070cc6518119c0e3c36c0"
+const repositorySourceCommit = "a9e779d0236a9d4a53c757cc74bd63b5175d67f0"
 
 func TestRunValidatesRepositoryManifest(t *testing.T) {
 	if err := run([]string{"--repo-root", "../.."}); err != nil {

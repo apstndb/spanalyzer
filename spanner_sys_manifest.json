@@ -1,9 +1,9 @@
 {
-  "schema_version": "v0alpha1",
+  "schema_version": "v0alpha2",
   "source": {
-    "repository": "github.com/apstndb/spanner-emulator-survey",
-    "commit": "91908d001349f844aac070cc6518119c0e3c36c0",
-    "path": "spannersys"
+    "repository": "github.com/apstndb/spanalyzer",
+    "commit": "a9e779d0236a9d4a53c757cc74bd63b5175d67f0",
+    "path": "survey/spannersys"
   },
   "required_targets": [
     "managed",
@@ -142,8 +142,147 @@
       "conflicts_with_live": true
     }
   ],
-  "content_sha256": "2b337e1dc3d935c39249c139a1847200c0959dd280d41a286d76d80fb5b3e3a2",
+  "content_sha256": "430fc11a13992c9e24022e37d9d1ff5e8ab8838707e50c099e5574488a4176e0",
   "tables": [
+    {
+      "name": "ACTIVE_BATCH_OPERATIONS",
+      "evidence_status": "absent_both",
+      "project": false,
+      "columns": [
+        {
+          "name": "TEXT",
+          "type": {
+            "kind": "scalar",
+            "scalar": "STRING(MAX)"
+          },
+          "decoder_nullable": true,
+          "canonical_spanner_type": "STRING(MAX)",
+          "observations": [],
+          "evidence_status": "absent_both",
+          "project": false
+        },
+        {
+          "name": "QUERY_ID",
+          "type": {
+            "kind": "scalar",
+            "scalar": "STRING(MAX)"
+          },
+          "decoder_nullable": true,
+          "canonical_spanner_type": "STRING(MAX)",
+          "observations": [],
+          "evidence_status": "absent_both",
+          "project": false
+        },
+        {
+          "name": "NUM_PARTITIONS_TOTAL",
+          "type": {
+            "kind": "scalar",
+            "scalar": "INT64"
+          },
+          "decoder_nullable": true,
+          "canonical_spanner_type": "INT64",
+          "observations": [],
+          "evidence_status": "absent_both",
+          "project": false
+        },
+        {
+          "name": "NUM_PARTITIONS_COMPLETE",
+          "type": {
+            "kind": "scalar",
+            "scalar": "INT64"
+          },
+          "decoder_nullable": true,
+          "canonical_spanner_type": "INT64",
+          "observations": [],
+          "evidence_status": "absent_both",
+          "project": false
+        },
+        {
+          "name": "NUM_TRIVIAL_PARTITIONS_COMPLETE",
+          "type": {
+            "kind": "scalar",
+            "scalar": "INT64"
+          },
+          "decoder_nullable": true,
+          "canonical_spanner_type": "INT64",
+          "observations": [],
+          "evidence_status": "absent_both",
+          "project": false
+        },
+        {
+          "name": "PROGRESS",
+          "type": {
+            "kind": "scalar",
+            "scalar": "STRING(MAX)"
+          },
+          "decoder_nullable": true,
+          "canonical_spanner_type": "STRING(MAX)",
+          "observations": [],
+          "evidence_status": "absent_both",
+          "project": false
+        },
+        {
+          "name": "ROWS_PROCESSED",
+          "type": {
+            "kind": "scalar",
+            "scalar": "INT64"
+          },
+          "decoder_nullable": true,
+          "canonical_spanner_type": "INT64",
+          "observations": [],
+          "evidence_status": "absent_both",
+          "project": false
+        },
+        {
+          "name": "STATUS",
+          "type": {
+            "kind": "scalar",
+            "scalar": "STRING(MAX)"
+          },
+          "decoder_nullable": true,
+          "canonical_spanner_type": "STRING(MAX)",
+          "observations": [],
+          "evidence_status": "absent_both",
+          "project": false
+        },
+        {
+          "name": "RESULT",
+          "type": {
+            "kind": "scalar",
+            "scalar": "STRING(MAX)"
+          },
+          "decoder_nullable": true,
+          "canonical_spanner_type": "STRING(MAX)",
+          "observations": [],
+          "evidence_status": "absent_both",
+          "project": false
+        },
+        {
+          "name": "START_TIMESTAMP",
+          "type": {
+            "kind": "scalar",
+            "scalar": "TIMESTAMP"
+          },
+          "decoder_nullable": true,
+          "canonical_spanner_type": "TIMESTAMP",
+          "observations": [],
+          "evidence_status": "absent_both",
+          "project": false
+        },
+        {
+          "name": "LAST_UPDATE_TIMESTAMP",
+          "type": {
+            "kind": "scalar",
+            "scalar": "TIMESTAMP"
+          },
+          "decoder_nullable": true,
+          "canonical_spanner_type": "TIMESTAMP",
+          "observations": [],
+          "evidence_status": "absent_both",
+          "project": false
+        }
+      ]
+    },
     {
       "name": "ACTIVE_PARTITIONED_DMLS",
       "evidence_status": "observed_both",
@@ -500,6 +639,145 @@
           ],
           "evidence_status": "observed_both",
           "project": true
+        }
+      ]
+    },
+    {
+      "name": "BATCH_OPERATIONS",
+      "evidence_status": "absent_both",
+      "project": false,
+      "columns": [
+        {
+          "name": "TEXT",
+          "type": {
+            "kind": "scalar",
+            "scalar": "STRING(MAX)"
+          },
+          "decoder_nullable": true,
+          "canonical_spanner_type": "STRING(MAX)",
+          "observations": [],
+          "evidence_status": "absent_both",
+          "project": false
+        },
+        {
+          "name": "QUERY_ID",
+          "type": {
+            "kind": "scalar",
+            "scalar": "STRING(MAX)"
+          },
+          "decoder_nullable": true,
+          "canonical_spanner_type": "STRING(MAX)",
+          "observations": [],
+          "evidence_status": "absent_both",
+          "project": false
+        },
+        {
+          "name": "NUM_PARTITIONS_TOTAL",
+          "type": {
+            "kind": "scalar",
+            "scalar": "INT64"
+          },
+          "decoder_nullable": true,
+          "canonical_spanner_type": "INT64",
+          "observations": [],
+          "evidence_status": "absent_both",
+          "project": false
+        },
+        {
+          "name": "NUM_PARTITIONS_COMPLETE",
+          "type": {
+            "kind": "scalar",
+            "scalar": "INT64"
+          },
+          "decoder_nullable": true,
+          "canonical_spanner_type": "INT64",
+          "observations": [],
+          "evidence_status": "absent_both",
+          "project": false
+        },
+        {
+          "name": "NUM_TRIVIAL_PARTITIONS_COMPLETE",
+          "type": {
+            "kind": "scalar",
+            "scalar": "INT64"
+          },
+          "decoder_nullable": true,
+          "canonical_spanner_type": "INT64",
+          "observations": [],
+          "evidence_status": "absent_both",
+          "project": false
+        },
+        {
+          "name": "PROGRESS",
+          "type": {
+            "kind": "scalar",
+            "scalar": "STRING(MAX)"
+          },
+          "decoder_nullable": true,
+          "canonical_spanner_type": "STRING(MAX)",
+          "observations": [],
+          "evidence_status": "absent_both",
+          "project": false
+        },
+        {
+          "name": "ROWS_PROCESSED",
+          "type": {
+            "kind": "scalar",
+            "scalar": "INT64"
+          },
+          "decoder_nullable": true,
+          "canonical_spanner_type": "INT64",
+          "observations": [],
+          "evidence_status": "absent_both",
+          "project": false
+        },
+        {
+          "name": "STATUS",
+          "type": {
+            "kind": "scalar",
+            "scalar": "STRING(MAX)"
+          },
+          "decoder_nullable": true,
+          "canonical_spanner_type": "STRING(MAX)",
+          "observations": [],
+          "evidence_status": "absent_both",
+          "project": false
+        },
+        {
+          "name": "RESULT",
+          "type": {
+            "kind": "scalar",
+            "scalar": "STRING(MAX)"
+          },
+          "decoder_nullable": true,
+          "canonical_spanner_type": "STRING(MAX)",
+          "observations": [],
+          "evidence_status": "absent_both",
+          "project": false
+        },
+        {
+          "name": "START_TIMESTAMP",
+          "type": {
+            "kind": "scalar",
+            "scalar": "TIMESTAMP"
+          },
+          "decoder_nullable": true,
+          "canonical_spanner_type": "TIMESTAMP",
+          "observations": [],
+          "evidence_status": "absent_both",
+          "project": false
+        },
+        {
+          "name": "LAST_UPDATE_TIMESTAMP",
+          "type": {
+            "kind": "scalar",
+            "scalar": "TIMESTAMP"
+          },
+          "decoder_nullable": true,
+          "canonical_spanner_type": "TIMESTAMP",
+          "observations": [],
+          "evidence_status": "absent_both",
+          "project": false
         }
       ]
     },
@@ -1323,6 +1601,94 @@
           ],
           "evidence_status": "observed_both",
           "project": true
+        },
+        {
+          "name": "LOCK_WAIT_DISTRIBUTION",
+          "type": {
+            "kind": "array",
+            "element": {
+              "kind": "struct",
+              "fields": [
+                {
+                  "name": "COUNT",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "INT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "MEAN",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "FLOAT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "SUM_OF_SQUARED_DEVIATION",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "FLOAT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "NUM_FINITE_BUCKETS",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "INT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "GROWTH_FACTOR",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "FLOAT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "SCALE",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "FLOAT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "BUCKET_COUNTS",
+                  "type": {
+                    "kind": "array",
+                    "element": {
+                      "kind": "scalar",
+                      "scalar": "INT64"
+                    }
+                  },
+                  "decoder_nullable": false
+                }
+              ]
+            },
+            "element_decoder_nullable": true
+          },
+          "decoder_nullable": false,
+          "canonical_spanner_type": "ARRAY\u003cSTRUCT\u003cCOUNT INT64, MEAN FLOAT64, SUM_OF_SQUARED_DEVIATION FLOAT64, NUM_FINITE_BUCKETS INT64, GROWTH_FACTOR FLOAT64, SCALE FLOAT64, BUCKET_COUNTS ARRAY\u003cINT64\u003e\u003e\u003e",
+          "observations": [],
+          "evidence_status": "absent_both",
+          "project": false
+        },
+        {
+          "name": "LOCK_WAIT_DISTRIBUTION_JSON_STRING",
+          "type": {
+            "kind": "scalar",
+            "scalar": "STRING(MAX)"
+          },
+          "decoder_nullable": true,
+          "canonical_spanner_type": "STRING(MAX)",
+          "observations": [],
+          "evidence_status": "absent_both",
+          "project": false
         }
       ]
     },
@@ -1474,6 +1840,94 @@
           ],
           "evidence_status": "observed_both",
           "project": true
+        },
+        {
+          "name": "LOCK_WAIT_DISTRIBUTION",
+          "type": {
+            "kind": "array",
+            "element": {
+              "kind": "struct",
+              "fields": [
+                {
+                  "name": "COUNT",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "INT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "MEAN",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "FLOAT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "SUM_OF_SQUARED_DEVIATION",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "FLOAT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "NUM_FINITE_BUCKETS",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "INT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "GROWTH_FACTOR",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "FLOAT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "SCALE",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "FLOAT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "BUCKET_COUNTS",
+                  "type": {
+                    "kind": "array",
+                    "element": {
+                      "kind": "scalar",
+                      "scalar": "INT64"
+                    }
+                  },
+                  "decoder_nullable": false
+                }
+              ]
+            },
+            "element_decoder_nullable": true
+          },
+          "decoder_nullable": false,
+          "canonical_spanner_type": "ARRAY\u003cSTRUCT\u003cCOUNT INT64, MEAN FLOAT64, SUM_OF_SQUARED_DEVIATION FLOAT64, NUM_FINITE_BUCKETS INT64, GROWTH_FACTOR FLOAT64, SCALE FLOAT64, BUCKET_COUNTS ARRAY\u003cINT64\u003e\u003e\u003e",
+          "observations": [],
+          "evidence_status": "absent_both",
+          "project": false
+        },
+        {
+          "name": "LOCK_WAIT_DISTRIBUTION_JSON_STRING",
+          "type": {
+            "kind": "scalar",
+            "scalar": "STRING(MAX)"
+          },
+          "decoder_nullable": true,
+          "canonical_spanner_type": "STRING(MAX)",
+          "observations": [],
+          "evidence_status": "absent_both",
+          "project": false
         }
       ]
     },
@@ -1625,6 +2079,94 @@
           ],
           "evidence_status": "observed_both",
           "project": true
+        },
+        {
+          "name": "LOCK_WAIT_DISTRIBUTION",
+          "type": {
+            "kind": "array",
+            "element": {
+              "kind": "struct",
+              "fields": [
+                {
+                  "name": "COUNT",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "INT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "MEAN",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "FLOAT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "SUM_OF_SQUARED_DEVIATION",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "FLOAT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "NUM_FINITE_BUCKETS",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "INT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "GROWTH_FACTOR",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "FLOAT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "SCALE",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "FLOAT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "BUCKET_COUNTS",
+                  "type": {
+                    "kind": "array",
+                    "element": {
+                      "kind": "scalar",
+                      "scalar": "INT64"
+                    }
+                  },
+                  "decoder_nullable": false
+                }
+              ]
+            },
+            "element_decoder_nullable": true
+          },
+          "decoder_nullable": false,
+          "canonical_spanner_type": "ARRAY\u003cSTRUCT\u003cCOUNT INT64, MEAN FLOAT64, SUM_OF_SQUARED_DEVIATION FLOAT64, NUM_FINITE_BUCKETS INT64, GROWTH_FACTOR FLOAT64, SCALE FLOAT64, BUCKET_COUNTS ARRAY\u003cINT64\u003e\u003e\u003e",
+          "observations": [],
+          "evidence_status": "absent_both",
+          "project": false
+        },
+        {
+          "name": "LOCK_WAIT_DISTRIBUTION_JSON_STRING",
+          "type": {
+            "kind": "scalar",
+            "scalar": "STRING(MAX)"
+          },
+          "decoder_nullable": true,
+          "canonical_spanner_type": "STRING(MAX)",
+          "observations": [],
+          "evidence_status": "absent_both",
+          "project": false
         }
       ]
     },
@@ -1678,6 +2220,94 @@
           ],
           "evidence_status": "observed_both",
           "project": true
+        },
+        {
+          "name": "LOCK_WAIT_DISTRIBUTION",
+          "type": {
+            "kind": "array",
+            "element": {
+              "kind": "struct",
+              "fields": [
+                {
+                  "name": "COUNT",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "INT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "MEAN",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "FLOAT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "SUM_OF_SQUARED_DEVIATION",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "FLOAT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "NUM_FINITE_BUCKETS",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "INT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "GROWTH_FACTOR",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "FLOAT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "SCALE",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "FLOAT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "BUCKET_COUNTS",
+                  "type": {
+                    "kind": "array",
+                    "element": {
+                      "kind": "scalar",
+                      "scalar": "INT64"
+                    }
+                  },
+                  "decoder_nullable": false
+                }
+              ]
+            },
+            "element_decoder_nullable": true
+          },
+          "decoder_nullable": false,
+          "canonical_spanner_type": "ARRAY\u003cSTRUCT\u003cCOUNT INT64, MEAN FLOAT64, SUM_OF_SQUARED_DEVIATION FLOAT64, NUM_FINITE_BUCKETS INT64, GROWTH_FACTOR FLOAT64, SCALE FLOAT64, BUCKET_COUNTS ARRAY\u003cINT64\u003e\u003e\u003e",
+          "observations": [],
+          "evidence_status": "absent_both",
+          "project": false
+        },
+        {
+          "name": "LOCK_WAIT_DISTRIBUTION_JSON_STRING",
+          "type": {
+            "kind": "scalar",
+            "scalar": "STRING(MAX)"
+          },
+          "decoder_nullable": true,
+          "canonical_spanner_type": "STRING(MAX)",
+          "observations": [],
+          "evidence_status": "absent_both",
+          "project": false
         }
       ]
     },
@@ -1731,6 +2361,94 @@
           ],
           "evidence_status": "observed_both",
           "project": true
+        },
+        {
+          "name": "LOCK_WAIT_DISTRIBUTION",
+          "type": {
+            "kind": "array",
+            "element": {
+              "kind": "struct",
+              "fields": [
+                {
+                  "name": "COUNT",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "INT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "MEAN",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "FLOAT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "SUM_OF_SQUARED_DEVIATION",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "FLOAT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "NUM_FINITE_BUCKETS",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "INT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "GROWTH_FACTOR",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "FLOAT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "SCALE",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "FLOAT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "BUCKET_COUNTS",
+                  "type": {
+                    "kind": "array",
+                    "element": {
+                      "kind": "scalar",
+                      "scalar": "INT64"
+                    }
+                  },
+                  "decoder_nullable": false
+                }
+              ]
+            },
+            "element_decoder_nullable": true
+          },
+          "decoder_nullable": false,
+          "canonical_spanner_type": "ARRAY\u003cSTRUCT\u003cCOUNT INT64, MEAN FLOAT64, SUM_OF_SQUARED_DEVIATION FLOAT64, NUM_FINITE_BUCKETS INT64, GROWTH_FACTOR FLOAT64, SCALE FLOAT64, BUCKET_COUNTS ARRAY\u003cINT64\u003e\u003e\u003e",
+          "observations": [],
+          "evidence_status": "absent_both",
+          "project": false
+        },
+        {
+          "name": "LOCK_WAIT_DISTRIBUTION_JSON_STRING",
+          "type": {
+            "kind": "scalar",
+            "scalar": "STRING(MAX)"
+          },
+          "decoder_nullable": true,
+          "canonical_spanner_type": "STRING(MAX)",
+          "observations": [],
+          "evidence_status": "absent_both",
+          "project": false
         }
       ]
     },
@@ -1784,6 +2502,94 @@
           ],
           "evidence_status": "observed_both",
           "project": true
+        },
+        {
+          "name": "LOCK_WAIT_DISTRIBUTION",
+          "type": {
+            "kind": "array",
+            "element": {
+              "kind": "struct",
+              "fields": [
+                {
+                  "name": "COUNT",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "INT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "MEAN",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "FLOAT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "SUM_OF_SQUARED_DEVIATION",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "FLOAT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "NUM_FINITE_BUCKETS",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "INT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "GROWTH_FACTOR",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "FLOAT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "SCALE",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "FLOAT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "BUCKET_COUNTS",
+                  "type": {
+                    "kind": "array",
+                    "element": {
+                      "kind": "scalar",
+                      "scalar": "INT64"
+                    }
+                  },
+                  "decoder_nullable": false
+                }
+              ]
+            },
+            "element_decoder_nullable": true
+          },
+          "decoder_nullable": false,
+          "canonical_spanner_type": "ARRAY\u003cSTRUCT\u003cCOUNT INT64, MEAN FLOAT64, SUM_OF_SQUARED_DEVIATION FLOAT64, NUM_FINITE_BUCKETS INT64, GROWTH_FACTOR FLOAT64, SCALE FLOAT64, BUCKET_COUNTS ARRAY\u003cINT64\u003e\u003e\u003e",
+          "observations": [],
+          "evidence_status": "absent_both",
+          "project": false
+        },
+        {
+          "name": "LOCK_WAIT_DISTRIBUTION_JSON_STRING",
+          "type": {
+            "kind": "scalar",
+            "scalar": "STRING(MAX)"
+          },
+          "decoder_nullable": true,
+          "canonical_spanner_type": "STRING(MAX)",
+          "observations": [],
+          "evidence_status": "absent_both",
+          "project": false
         }
       ]
     },
@@ -3253,6 +4059,182 @@
           ],
           "evidence_status": "observed_both",
           "project": true
+        },
+        {
+          "name": "CPU_SECONDS_DISTRIBUTION",
+          "type": {
+            "kind": "array",
+            "element": {
+              "kind": "struct",
+              "fields": [
+                {
+                  "name": "COUNT",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "INT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "MEAN",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "FLOAT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "SUM_OF_SQUARED_DEVIATION",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "FLOAT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "NUM_FINITE_BUCKETS",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "INT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "GROWTH_FACTOR",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "FLOAT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "SCALE",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "FLOAT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "BUCKET_COUNTS",
+                  "type": {
+                    "kind": "array",
+                    "element": {
+                      "kind": "scalar",
+                      "scalar": "INT64"
+                    }
+                  },
+                  "decoder_nullable": false
+                }
+              ]
+            },
+            "element_decoder_nullable": true
+          },
+          "decoder_nullable": false,
+          "canonical_spanner_type": "ARRAY\u003cSTRUCT\u003cCOUNT INT64, MEAN FLOAT64, SUM_OF_SQUARED_DEVIATION FLOAT64, NUM_FINITE_BUCKETS INT64, GROWTH_FACTOR FLOAT64, SCALE FLOAT64, BUCKET_COUNTS ARRAY\u003cINT64\u003e\u003e\u003e",
+          "observations": [],
+          "evidence_status": "absent_both",
+          "project": false
+        },
+        {
+          "name": "CPU_SECONDS_DISTRIBUTION_JSON_STRING",
+          "type": {
+            "kind": "scalar",
+            "scalar": "STRING(MAX)"
+          },
+          "decoder_nullable": true,
+          "canonical_spanner_type": "STRING(MAX)",
+          "observations": [],
+          "evidence_status": "absent_both",
+          "project": false
+        },
+        {
+          "name": "ROW_SCANNED_DISTRIBUTION",
+          "type": {
+            "kind": "array",
+            "element": {
+              "kind": "struct",
+              "fields": [
+                {
+                  "name": "COUNT",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "INT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "MEAN",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "FLOAT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "SUM_OF_SQUARED_DEVIATION",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "FLOAT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "NUM_FINITE_BUCKETS",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "INT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "GROWTH_FACTOR",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "FLOAT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "SCALE",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "FLOAT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "BUCKET_COUNTS",
+                  "type": {
+                    "kind": "array",
+                    "element": {
+                      "kind": "scalar",
+                      "scalar": "INT64"
+                    }
+                  },
+                  "decoder_nullable": false
+                }
+              ]
+            },
+            "element_decoder_nullable": true
+          },
+          "decoder_nullable": false,
+          "canonical_spanner_type": "ARRAY\u003cSTRUCT\u003cCOUNT INT64, MEAN FLOAT64, SUM_OF_SQUARED_DEVIATION FLOAT64, NUM_FINITE_BUCKETS INT64, GROWTH_FACTOR FLOAT64, SCALE FLOAT64, BUCKET_COUNTS ARRAY\u003cINT64\u003e\u003e\u003e",
+          "observations": [],
+          "evidence_status": "absent_both",
+          "project": false
+        },
+        {
+          "name": "ROW_SCANNED_DISTRIBUTION_JSON_STRING",
+          "type": {
+            "kind": "scalar",
+            "scalar": "STRING(MAX)"
+          },
+          "decoder_nullable": true,
+          "canonical_spanner_type": "STRING(MAX)",
+          "observations": [],
+          "evidence_status": "absent_both",
+          "project": false
         }
       ]
     },
@@ -4066,6 +5048,182 @@
           ],
           "evidence_status": "observed_both",
           "project": true
+        },
+        {
+          "name": "CPU_SECONDS_DISTRIBUTION",
+          "type": {
+            "kind": "array",
+            "element": {
+              "kind": "struct",
+              "fields": [
+                {
+                  "name": "COUNT",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "INT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "MEAN",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "FLOAT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "SUM_OF_SQUARED_DEVIATION",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "FLOAT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "NUM_FINITE_BUCKETS",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "INT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "GROWTH_FACTOR",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "FLOAT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "SCALE",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "FLOAT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "BUCKET_COUNTS",
+                  "type": {
+                    "kind": "array",
+                    "element": {
+                      "kind": "scalar",
+                      "scalar": "INT64"
+                    }
+                  },
+                  "decoder_nullable": false
+                }
+              ]
+            },
+            "element_decoder_nullable": true
+          },
+          "decoder_nullable": false,
+          "canonical_spanner_type": "ARRAY\u003cSTRUCT\u003cCOUNT INT64, MEAN FLOAT64, SUM_OF_SQUARED_DEVIATION FLOAT64, NUM_FINITE_BUCKETS INT64, GROWTH_FACTOR FLOAT64, SCALE FLOAT64, BUCKET_COUNTS ARRAY\u003cINT64\u003e\u003e\u003e",
+          "observations": [],
+          "evidence_status": "absent_both",
+          "project": false
+        },
+        {
+          "name": "CPU_SECONDS_DISTRIBUTION_JSON_STRING",
+          "type": {
+            "kind": "scalar",
+            "scalar": "STRING(MAX)"
+          },
+          "decoder_nullable": true,
+          "canonical_spanner_type": "STRING(MAX)",
+          "observations": [],
+          "evidence_status": "absent_both",
+          "project": false
+        },
+        {
+          "name": "ROW_SCANNED_DISTRIBUTION",
+          "type": {
+            "kind": "array",
+            "element": {
+              "kind": "struct",
+              "fields": [
+                {
+                  "name": "COUNT",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "INT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "MEAN",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "FLOAT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "SUM_OF_SQUARED_DEVIATION",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "FLOAT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "NUM_FINITE_BUCKETS",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "INT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "GROWTH_FACTOR",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "FLOAT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "SCALE",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "FLOAT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "BUCKET_COUNTS",
+                  "type": {
+                    "kind": "array",
+                    "element": {
+                      "kind": "scalar",
+                      "scalar": "INT64"
+                    }
+                  },
+                  "decoder_nullable": false
+                }
+              ]
+            },
+            "element_decoder_nullable": true
+          },
+          "decoder_nullable": false,
+          "canonical_spanner_type": "ARRAY\u003cSTRUCT\u003cCOUNT INT64, MEAN FLOAT64, SUM_OF_SQUARED_DEVIATION FLOAT64, NUM_FINITE_BUCKETS INT64, GROWTH_FACTOR FLOAT64, SCALE FLOAT64, BUCKET_COUNTS ARRAY\u003cINT64\u003e\u003e\u003e",
+          "observations": [],
+          "evidence_status": "absent_both",
+          "project": false
+        },
+        {
+          "name": "ROW_SCANNED_DISTRIBUTION_JSON_STRING",
+          "type": {
+            "kind": "scalar",
+            "scalar": "STRING(MAX)"
+          },
+          "decoder_nullable": true,
+          "canonical_spanner_type": "STRING(MAX)",
+          "observations": [],
+          "evidence_status": "absent_both",
+          "project": false
         }
       ]
     },
@@ -4879,6 +6037,182 @@
           ],
           "evidence_status": "observed_both",
           "project": true
+        },
+        {
+          "name": "CPU_SECONDS_DISTRIBUTION",
+          "type": {
+            "kind": "array",
+            "element": {
+              "kind": "struct",
+              "fields": [
+                {
+                  "name": "COUNT",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "INT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "MEAN",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "FLOAT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "SUM_OF_SQUARED_DEVIATION",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "FLOAT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "NUM_FINITE_BUCKETS",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "INT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "GROWTH_FACTOR",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "FLOAT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "SCALE",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "FLOAT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "BUCKET_COUNTS",
+                  "type": {
+                    "kind": "array",
+                    "element": {
+                      "kind": "scalar",
+                      "scalar": "INT64"
+                    }
+                  },
+                  "decoder_nullable": false
+                }
+              ]
+            },
+            "element_decoder_nullable": true
+          },
+          "decoder_nullable": false,
+          "canonical_spanner_type": "ARRAY\u003cSTRUCT\u003cCOUNT INT64, MEAN FLOAT64, SUM_OF_SQUARED_DEVIATION FLOAT64, NUM_FINITE_BUCKETS INT64, GROWTH_FACTOR FLOAT64, SCALE FLOAT64, BUCKET_COUNTS ARRAY\u003cINT64\u003e\u003e\u003e",
+          "observations": [],
+          "evidence_status": "absent_both",
+          "project": false
+        },
+        {
+          "name": "CPU_SECONDS_DISTRIBUTION_JSON_STRING",
+          "type": {
+            "kind": "scalar",
+            "scalar": "STRING(MAX)"
+          },
+          "decoder_nullable": true,
+          "canonical_spanner_type": "STRING(MAX)",
+          "observations": [],
+          "evidence_status": "absent_both",
+          "project": false
+        },
+        {
+          "name": "ROW_SCANNED_DISTRIBUTION",
+          "type": {
+            "kind": "array",
+            "element": {
+              "kind": "struct",
+              "fields": [
+                {
+                  "name": "COUNT",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "INT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "MEAN",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "FLOAT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "SUM_OF_SQUARED_DEVIATION",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "FLOAT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "NUM_FINITE_BUCKETS",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "INT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "GROWTH_FACTOR",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "FLOAT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "SCALE",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "FLOAT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "BUCKET_COUNTS",
+                  "type": {
+                    "kind": "array",
+                    "element": {
+                      "kind": "scalar",
+                      "scalar": "INT64"
+                    }
+                  },
+                  "decoder_nullable": false
+                }
+              ]
+            },
+            "element_decoder_nullable": true
+          },
+          "decoder_nullable": false,
+          "canonical_spanner_type": "ARRAY\u003cSTRUCT\u003cCOUNT INT64, MEAN FLOAT64, SUM_OF_SQUARED_DEVIATION FLOAT64, NUM_FINITE_BUCKETS INT64, GROWTH_FACTOR FLOAT64, SCALE FLOAT64, BUCKET_COUNTS ARRAY\u003cINT64\u003e\u003e\u003e",
+          "observations": [],
+          "evidence_status": "absent_both",
+          "project": false
+        },
+        {
+          "name": "ROW_SCANNED_DISTRIBUTION_JSON_STRING",
+          "type": {
+            "kind": "scalar",
+            "scalar": "STRING(MAX)"
+          },
+          "decoder_nullable": true,
+          "canonical_spanner_type": "STRING(MAX)",
+          "observations": [],
+          "evidence_status": "absent_both",
+          "project": false
         }
       ]
     },
@@ -5502,6 +6836,182 @@
           ],
           "evidence_status": "observed_both",
           "project": true
+        },
+        {
+          "name": "CPU_SECONDS_DISTRIBUTION",
+          "type": {
+            "kind": "array",
+            "element": {
+              "kind": "struct",
+              "fields": [
+                {
+                  "name": "COUNT",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "INT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "MEAN",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "FLOAT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "SUM_OF_SQUARED_DEVIATION",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "FLOAT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "NUM_FINITE_BUCKETS",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "INT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "GROWTH_FACTOR",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "FLOAT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "SCALE",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "FLOAT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "BUCKET_COUNTS",
+                  "type": {
+                    "kind": "array",
+                    "element": {
+                      "kind": "scalar",
+                      "scalar": "INT64"
+                    }
+                  },
+                  "decoder_nullable": false
+                }
+              ]
+            },
+            "element_decoder_nullable": true
+          },
+          "decoder_nullable": false,
+          "canonical_spanner_type": "ARRAY\u003cSTRUCT\u003cCOUNT INT64, MEAN FLOAT64, SUM_OF_SQUARED_DEVIATION FLOAT64, NUM_FINITE_BUCKETS INT64, GROWTH_FACTOR FLOAT64, SCALE FLOAT64, BUCKET_COUNTS ARRAY\u003cINT64\u003e\u003e\u003e",
+          "observations": [],
+          "evidence_status": "absent_both",
+          "project": false
+        },
+        {
+          "name": "CPU_SECONDS_DISTRIBUTION_JSON_STRING",
+          "type": {
+            "kind": "scalar",
+            "scalar": "STRING(MAX)"
+          },
+          "decoder_nullable": true,
+          "canonical_spanner_type": "STRING(MAX)",
+          "observations": [],
+          "evidence_status": "absent_both",
+          "project": false
+        },
+        {
+          "name": "ROW_SCANNED_DISTRIBUTION",
+          "type": {
+            "kind": "array",
+            "element": {
+              "kind": "struct",
+              "fields": [
+                {
+                  "name": "COUNT",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "INT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "MEAN",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "FLOAT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "SUM_OF_SQUARED_DEVIATION",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "FLOAT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "NUM_FINITE_BUCKETS",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "INT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "GROWTH_FACTOR",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "FLOAT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "SCALE",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "FLOAT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "BUCKET_COUNTS",
+                  "type": {
+                    "kind": "array",
+                    "element": {
+                      "kind": "scalar",
+                      "scalar": "INT64"
+                    }
+                  },
+                  "decoder_nullable": false
+                }
+              ]
+            },
+            "element_decoder_nullable": true
+          },
+          "decoder_nullable": false,
+          "canonical_spanner_type": "ARRAY\u003cSTRUCT\u003cCOUNT INT64, MEAN FLOAT64, SUM_OF_SQUARED_DEVIATION FLOAT64, NUM_FINITE_BUCKETS INT64, GROWTH_FACTOR FLOAT64, SCALE FLOAT64, BUCKET_COUNTS ARRAY\u003cINT64\u003e\u003e\u003e",
+          "observations": [],
+          "evidence_status": "absent_both",
+          "project": false
+        },
+        {
+          "name": "ROW_SCANNED_DISTRIBUTION_JSON_STRING",
+          "type": {
+            "kind": "scalar",
+            "scalar": "STRING(MAX)"
+          },
+          "decoder_nullable": true,
+          "canonical_spanner_type": "STRING(MAX)",
+          "observations": [],
+          "evidence_status": "absent_both",
+          "project": false
         }
       ]
     },
@@ -6125,6 +7635,182 @@
           ],
           "evidence_status": "observed_both",
           "project": true
+        },
+        {
+          "name": "CPU_SECONDS_DISTRIBUTION",
+          "type": {
+            "kind": "array",
+            "element": {
+              "kind": "struct",
+              "fields": [
+                {
+                  "name": "COUNT",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "INT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "MEAN",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "FLOAT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "SUM_OF_SQUARED_DEVIATION",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "FLOAT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "NUM_FINITE_BUCKETS",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "INT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "GROWTH_FACTOR",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "FLOAT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "SCALE",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "FLOAT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "BUCKET_COUNTS",
+                  "type": {
+                    "kind": "array",
+                    "element": {
+                      "kind": "scalar",
+                      "scalar": "INT64"
+                    }
+                  },
+                  "decoder_nullable": false
+                }
+              ]
+            },
+            "element_decoder_nullable": true
+          },
+          "decoder_nullable": false,
+          "canonical_spanner_type": "ARRAY\u003cSTRUCT\u003cCOUNT INT64, MEAN FLOAT64, SUM_OF_SQUARED_DEVIATION FLOAT64, NUM_FINITE_BUCKETS INT64, GROWTH_FACTOR FLOAT64, SCALE FLOAT64, BUCKET_COUNTS ARRAY\u003cINT64\u003e\u003e\u003e",
+          "observations": [],
+          "evidence_status": "absent_both",
+          "project": false
+        },
+        {
+          "name": "CPU_SECONDS_DISTRIBUTION_JSON_STRING",
+          "type": {
+            "kind": "scalar",
+            "scalar": "STRING(MAX)"
+          },
+          "decoder_nullable": true,
+          "canonical_spanner_type": "STRING(MAX)",
+          "observations": [],
+          "evidence_status": "absent_both",
+          "project": false
+        },
+        {
+          "name": "ROW_SCANNED_DISTRIBUTION",
+          "type": {
+            "kind": "array",
+            "element": {
+              "kind": "struct",
+              "fields": [
+                {
+                  "name": "COUNT",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "INT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "MEAN",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "FLOAT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "SUM_OF_SQUARED_DEVIATION",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "FLOAT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "NUM_FINITE_BUCKETS",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "INT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "GROWTH_FACTOR",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "FLOAT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "SCALE",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "FLOAT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "BUCKET_COUNTS",
+                  "type": {
+                    "kind": "array",
+                    "element": {
+                      "kind": "scalar",
+                      "scalar": "INT64"
+                    }
+                  },
+                  "decoder_nullable": false
+                }
+              ]
+            },
+            "element_decoder_nullable": true
+          },
+          "decoder_nullable": false,
+          "canonical_spanner_type": "ARRAY\u003cSTRUCT\u003cCOUNT INT64, MEAN FLOAT64, SUM_OF_SQUARED_DEVIATION FLOAT64, NUM_FINITE_BUCKETS INT64, GROWTH_FACTOR FLOAT64, SCALE FLOAT64, BUCKET_COUNTS ARRAY\u003cINT64\u003e\u003e\u003e",
+          "observations": [],
+          "evidence_status": "absent_both",
+          "project": false
+        },
+        {
+          "name": "ROW_SCANNED_DISTRIBUTION_JSON_STRING",
+          "type": {
+            "kind": "scalar",
+            "scalar": "STRING(MAX)"
+          },
+          "decoder_nullable": true,
+          "canonical_spanner_type": "STRING(MAX)",
+          "observations": [],
+          "evidence_status": "absent_both",
+          "project": false
         }
       ]
     },
@@ -6748,6 +8434,182 @@
           ],
           "evidence_status": "observed_both",
           "project": true
+        },
+        {
+          "name": "CPU_SECONDS_DISTRIBUTION",
+          "type": {
+            "kind": "array",
+            "element": {
+              "kind": "struct",
+              "fields": [
+                {
+                  "name": "COUNT",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "INT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "MEAN",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "FLOAT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "SUM_OF_SQUARED_DEVIATION",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "FLOAT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "NUM_FINITE_BUCKETS",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "INT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "GROWTH_FACTOR",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "FLOAT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "SCALE",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "FLOAT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "BUCKET_COUNTS",
+                  "type": {
+                    "kind": "array",
+                    "element": {
+                      "kind": "scalar",
+                      "scalar": "INT64"
+                    }
+                  },
+                  "decoder_nullable": false
+                }
+              ]
+            },
+            "element_decoder_nullable": true
+          },
+          "decoder_nullable": false,
+          "canonical_spanner_type": "ARRAY\u003cSTRUCT\u003cCOUNT INT64, MEAN FLOAT64, SUM_OF_SQUARED_DEVIATION FLOAT64, NUM_FINITE_BUCKETS INT64, GROWTH_FACTOR FLOAT64, SCALE FLOAT64, BUCKET_COUNTS ARRAY\u003cINT64\u003e\u003e\u003e",
+          "observations": [],
+          "evidence_status": "absent_both",
+          "project": false
+        },
+        {
+          "name": "CPU_SECONDS_DISTRIBUTION_JSON_STRING",
+          "type": {
+            "kind": "scalar",
+            "scalar": "STRING(MAX)"
+          },
+          "decoder_nullable": true,
+          "canonical_spanner_type": "STRING(MAX)",
+          "observations": [],
+          "evidence_status": "absent_both",
+          "project": false
+        },
+        {
+          "name": "ROW_SCANNED_DISTRIBUTION",
+          "type": {
+            "kind": "array",
+            "element": {
+              "kind": "struct",
+              "fields": [
+                {
+                  "name": "COUNT",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "INT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "MEAN",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "FLOAT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "SUM_OF_SQUARED_DEVIATION",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "FLOAT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "NUM_FINITE_BUCKETS",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "INT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "GROWTH_FACTOR",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "FLOAT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "SCALE",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "FLOAT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "BUCKET_COUNTS",
+                  "type": {
+                    "kind": "array",
+                    "element": {
+                      "kind": "scalar",
+                      "scalar": "INT64"
+                    }
+                  },
+                  "decoder_nullable": false
+                }
+              ]
+            },
+            "element_decoder_nullable": true
+          },
+          "decoder_nullable": false,
+          "canonical_spanner_type": "ARRAY\u003cSTRUCT\u003cCOUNT INT64, MEAN FLOAT64, SUM_OF_SQUARED_DEVIATION FLOAT64, NUM_FINITE_BUCKETS INT64, GROWTH_FACTOR FLOAT64, SCALE FLOAT64, BUCKET_COUNTS ARRAY\u003cINT64\u003e\u003e\u003e",
+          "observations": [],
+          "evidence_status": "absent_both",
+          "project": false
+        },
+        {
+          "name": "ROW_SCANNED_DISTRIBUTION_JSON_STRING",
+          "type": {
+            "kind": "scalar",
+            "scalar": "STRING(MAX)"
+          },
+          "decoder_nullable": true,
+          "canonical_spanner_type": "STRING(MAX)",
+          "observations": [],
+          "evidence_status": "absent_both",
+          "project": false
         }
       ]
     },
@@ -8906,6 +10768,18 @@
           ],
           "evidence_status": "observed_both",
           "project": true
+        },
+        {
+          "name": "LATENCY_IMPACT_CORRELATION_SCORE",
+          "type": {
+            "kind": "scalar",
+            "scalar": "STRING(MAX)"
+          },
+          "decoder_nullable": true,
+          "canonical_spanner_type": "STRING(MAX)",
+          "observations": [],
+          "evidence_status": "absent_both",
+          "project": false
         }
       ]
     },
@@ -9057,6 +10931,18 @@
           ],
           "evidence_status": "observed_both",
           "project": true
+        },
+        {
+          "name": "LATENCY_IMPACT_CORRELATION_SCORE",
+          "type": {
+            "kind": "scalar",
+            "scalar": "STRING(MAX)"
+          },
+          "decoder_nullable": true,
+          "canonical_spanner_type": "STRING(MAX)",
+          "observations": [],
+          "evidence_status": "absent_both",
+          "project": false
         }
       ]
     },
@@ -9208,6 +11094,18 @@
           ],
           "evidence_status": "observed_both",
           "project": true
+        },
+        {
+          "name": "LATENCY_IMPACT_CORRELATION_SCORE",
+          "type": {
+            "kind": "scalar",
+            "scalar": "STRING(MAX)"
+          },
+          "decoder_nullable": true,
+          "canonical_spanner_type": "STRING(MAX)",
+          "observations": [],
+          "evidence_status": "absent_both",
+          "project": false
         }
       ]
     },
@@ -10350,7 +12248,7 @@
             "kind": "scalar",
             "scalar": "FLOAT64"
           },
-          "decoder_nullable": false,
+          "decoder_nullable": true,
           "canonical_spanner_type": "FLOAT64",
           "observations": [
             {
@@ -10373,7 +12271,7 @@
             "kind": "scalar",
             "scalar": "FLOAT64"
           },
-          "decoder_nullable": false,
+          "decoder_nullable": true,
           "canonical_spanner_type": "FLOAT64",
           "observations": [
             {
@@ -10781,6 +12679,182 @@
           ],
           "evidence_status": "observed_both",
           "project": true
+        },
+        {
+          "name": "COMMIT_LATENCY_DISTRIBUTION",
+          "type": {
+            "kind": "array",
+            "element": {
+              "kind": "struct",
+              "fields": [
+                {
+                  "name": "COUNT",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "INT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "MEAN",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "FLOAT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "SUM_OF_SQUARED_DEVIATION",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "FLOAT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "NUM_FINITE_BUCKETS",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "INT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "GROWTH_FACTOR",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "FLOAT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "SCALE",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "FLOAT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "BUCKET_COUNTS",
+                  "type": {
+                    "kind": "array",
+                    "element": {
+                      "kind": "scalar",
+                      "scalar": "INT64"
+                    }
+                  },
+                  "decoder_nullable": false
+                }
+              ]
+            },
+            "element_decoder_nullable": true
+          },
+          "decoder_nullable": false,
+          "canonical_spanner_type": "ARRAY\u003cSTRUCT\u003cCOUNT INT64, MEAN FLOAT64, SUM_OF_SQUARED_DEVIATION FLOAT64, NUM_FINITE_BUCKETS INT64, GROWTH_FACTOR FLOAT64, SCALE FLOAT64, BUCKET_COUNTS ARRAY\u003cINT64\u003e\u003e\u003e",
+          "observations": [],
+          "evidence_status": "absent_both",
+          "project": false
+        },
+        {
+          "name": "COMMIT_LATENCY_DISTRIBUTION_JSON_STRING",
+          "type": {
+            "kind": "scalar",
+            "scalar": "STRING(MAX)"
+          },
+          "decoder_nullable": true,
+          "canonical_spanner_type": "STRING(MAX)",
+          "observations": [],
+          "evidence_status": "absent_both",
+          "project": false
+        },
+        {
+          "name": "PARTICIPANTS_DISTRIBUTION",
+          "type": {
+            "kind": "array",
+            "element": {
+              "kind": "struct",
+              "fields": [
+                {
+                  "name": "COUNT",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "INT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "MEAN",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "FLOAT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "SUM_OF_SQUARED_DEVIATION",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "FLOAT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "NUM_FINITE_BUCKETS",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "INT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "GROWTH_FACTOR",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "FLOAT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "SCALE",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "FLOAT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "BUCKET_COUNTS",
+                  "type": {
+                    "kind": "array",
+                    "element": {
+                      "kind": "scalar",
+                      "scalar": "INT64"
+                    }
+                  },
+                  "decoder_nullable": false
+                }
+              ]
+            },
+            "element_decoder_nullable": true
+          },
+          "decoder_nullable": false,
+          "canonical_spanner_type": "ARRAY\u003cSTRUCT\u003cCOUNT INT64, MEAN FLOAT64, SUM_OF_SQUARED_DEVIATION FLOAT64, NUM_FINITE_BUCKETS INT64, GROWTH_FACTOR FLOAT64, SCALE FLOAT64, BUCKET_COUNTS ARRAY\u003cINT64\u003e\u003e\u003e",
+          "observations": [],
+          "evidence_status": "absent_both",
+          "project": false
+        },
+        {
+          "name": "PARTICIPANTS_DISTRIBUTION_JSON_STRING",
+          "type": {
+            "kind": "scalar",
+            "scalar": "STRING(MAX)"
+          },
+          "decoder_nullable": true,
+          "canonical_spanner_type": "STRING(MAX)",
+          "observations": [],
+          "evidence_status": "absent_both",
+          "project": false
         }
       ]
     },
@@ -10988,7 +13062,7 @@
             "kind": "scalar",
             "scalar": "FLOAT64"
           },
-          "decoder_nullable": false,
+          "decoder_nullable": true,
           "canonical_spanner_type": "FLOAT64",
           "observations": [
             {
@@ -11011,7 +13085,7 @@
             "kind": "scalar",
             "scalar": "FLOAT64"
           },
-          "decoder_nullable": false,
+          "decoder_nullable": true,
           "canonical_spanner_type": "FLOAT64",
           "observations": [
             {
@@ -11419,6 +13493,182 @@
           ],
           "evidence_status": "observed_both",
           "project": true
+        },
+        {
+          "name": "COMMIT_LATENCY_DISTRIBUTION",
+          "type": {
+            "kind": "array",
+            "element": {
+              "kind": "struct",
+              "fields": [
+                {
+                  "name": "COUNT",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "INT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "MEAN",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "FLOAT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "SUM_OF_SQUARED_DEVIATION",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "FLOAT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "NUM_FINITE_BUCKETS",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "INT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "GROWTH_FACTOR",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "FLOAT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "SCALE",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "FLOAT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "BUCKET_COUNTS",
+                  "type": {
+                    "kind": "array",
+                    "element": {
+                      "kind": "scalar",
+                      "scalar": "INT64"
+                    }
+                  },
+                  "decoder_nullable": false
+                }
+              ]
+            },
+            "element_decoder_nullable": true
+          },
+          "decoder_nullable": false,
+          "canonical_spanner_type": "ARRAY\u003cSTRUCT\u003cCOUNT INT64, MEAN FLOAT64, SUM_OF_SQUARED_DEVIATION FLOAT64, NUM_FINITE_BUCKETS INT64, GROWTH_FACTOR FLOAT64, SCALE FLOAT64, BUCKET_COUNTS ARRAY\u003cINT64\u003e\u003e\u003e",
+          "observations": [],
+          "evidence_status": "absent_both",
+          "project": false
+        },
+        {
+          "name": "COMMIT_LATENCY_DISTRIBUTION_JSON_STRING",
+          "type": {
+            "kind": "scalar",
+            "scalar": "STRING(MAX)"
+          },
+          "decoder_nullable": true,
+          "canonical_spanner_type": "STRING(MAX)",
+          "observations": [],
+          "evidence_status": "absent_both",
+          "project": false
+        },
+        {
+          "name": "PARTICIPANTS_DISTRIBUTION",
+          "type": {
+            "kind": "array",
+            "element": {
+              "kind": "struct",
+              "fields": [
+                {
+                  "name": "COUNT",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "INT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "MEAN",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "FLOAT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "SUM_OF_SQUARED_DEVIATION",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "FLOAT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "NUM_FINITE_BUCKETS",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "INT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "GROWTH_FACTOR",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "FLOAT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "SCALE",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "FLOAT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "BUCKET_COUNTS",
+                  "type": {
+                    "kind": "array",
+                    "element": {
+                      "kind": "scalar",
+                      "scalar": "INT64"
+                    }
+                  },
+                  "decoder_nullable": false
+                }
+              ]
+            },
+            "element_decoder_nullable": true
+          },
+          "decoder_nullable": false,
+          "canonical_spanner_type": "ARRAY\u003cSTRUCT\u003cCOUNT INT64, MEAN FLOAT64, SUM_OF_SQUARED_DEVIATION FLOAT64, NUM_FINITE_BUCKETS INT64, GROWTH_FACTOR FLOAT64, SCALE FLOAT64, BUCKET_COUNTS ARRAY\u003cINT64\u003e\u003e\u003e",
+          "observations": [],
+          "evidence_status": "absent_both",
+          "project": false
+        },
+        {
+          "name": "PARTICIPANTS_DISTRIBUTION_JSON_STRING",
+          "type": {
+            "kind": "scalar",
+            "scalar": "STRING(MAX)"
+          },
+          "decoder_nullable": true,
+          "canonical_spanner_type": "STRING(MAX)",
+          "observations": [],
+          "evidence_status": "absent_both",
+          "project": false
         }
       ]
     },
@@ -11626,7 +13876,7 @@
             "kind": "scalar",
             "scalar": "FLOAT64"
           },
-          "decoder_nullable": false,
+          "decoder_nullable": true,
           "canonical_spanner_type": "FLOAT64",
           "observations": [
             {
@@ -11649,7 +13899,7 @@
             "kind": "scalar",
             "scalar": "FLOAT64"
           },
-          "decoder_nullable": false,
+          "decoder_nullable": true,
           "canonical_spanner_type": "FLOAT64",
           "observations": [
             {
@@ -12057,6 +14307,182 @@
           ],
           "evidence_status": "observed_both",
           "project": true
+        },
+        {
+          "name": "COMMIT_LATENCY_DISTRIBUTION",
+          "type": {
+            "kind": "array",
+            "element": {
+              "kind": "struct",
+              "fields": [
+                {
+                  "name": "COUNT",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "INT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "MEAN",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "FLOAT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "SUM_OF_SQUARED_DEVIATION",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "FLOAT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "NUM_FINITE_BUCKETS",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "INT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "GROWTH_FACTOR",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "FLOAT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "SCALE",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "FLOAT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "BUCKET_COUNTS",
+                  "type": {
+                    "kind": "array",
+                    "element": {
+                      "kind": "scalar",
+                      "scalar": "INT64"
+                    }
+                  },
+                  "decoder_nullable": false
+                }
+              ]
+            },
+            "element_decoder_nullable": true
+          },
+          "decoder_nullable": false,
+          "canonical_spanner_type": "ARRAY\u003cSTRUCT\u003cCOUNT INT64, MEAN FLOAT64, SUM_OF_SQUARED_DEVIATION FLOAT64, NUM_FINITE_BUCKETS INT64, GROWTH_FACTOR FLOAT64, SCALE FLOAT64, BUCKET_COUNTS ARRAY\u003cINT64\u003e\u003e\u003e",
+          "observations": [],
+          "evidence_status": "absent_both",
+          "project": false
+        },
+        {
+          "name": "COMMIT_LATENCY_DISTRIBUTION_JSON_STRING",
+          "type": {
+            "kind": "scalar",
+            "scalar": "STRING(MAX)"
+          },
+          "decoder_nullable": true,
+          "canonical_spanner_type": "STRING(MAX)",
+          "observations": [],
+          "evidence_status": "absent_both",
+          "project": false
+        },
+        {
+          "name": "PARTICIPANTS_DISTRIBUTION",
+          "type": {
+            "kind": "array",
+            "element": {
+              "kind": "struct",
+              "fields": [
+                {
+                  "name": "COUNT",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "INT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "MEAN",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "FLOAT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "SUM_OF_SQUARED_DEVIATION",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "FLOAT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "NUM_FINITE_BUCKETS",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "INT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "GROWTH_FACTOR",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "FLOAT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "SCALE",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "FLOAT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "BUCKET_COUNTS",
+                  "type": {
+                    "kind": "array",
+                    "element": {
+                      "kind": "scalar",
+                      "scalar": "INT64"
+                    }
+                  },
+                  "decoder_nullable": false
+                }
+              ]
+            },
+            "element_decoder_nullable": true
+          },
+          "decoder_nullable": false,
+          "canonical_spanner_type": "ARRAY\u003cSTRUCT\u003cCOUNT INT64, MEAN FLOAT64, SUM_OF_SQUARED_DEVIATION FLOAT64, NUM_FINITE_BUCKETS INT64, GROWTH_FACTOR FLOAT64, SCALE FLOAT64, BUCKET_COUNTS ARRAY\u003cINT64\u003e\u003e\u003e",
+          "observations": [],
+          "evidence_status": "absent_both",
+          "project": false
+        },
+        {
+          "name": "PARTICIPANTS_DISTRIBUTION_JSON_STRING",
+          "type": {
+            "kind": "scalar",
+            "scalar": "STRING(MAX)"
+          },
+          "decoder_nullable": true,
+          "canonical_spanner_type": "STRING(MAX)",
+          "observations": [],
+          "evidence_status": "absent_both",
+          "project": false
         }
       ]
     },
@@ -12163,7 +14589,7 @@
             "kind": "scalar",
             "scalar": "FLOAT64"
           },
-          "decoder_nullable": false,
+          "decoder_nullable": true,
           "canonical_spanner_type": "FLOAT64",
           "observations": [
             {
@@ -12186,7 +14612,7 @@
             "kind": "scalar",
             "scalar": "FLOAT64"
           },
-          "decoder_nullable": false,
+          "decoder_nullable": true,
           "canonical_spanner_type": "FLOAT64",
           "observations": [
             {
@@ -12571,6 +14997,182 @@
           ],
           "evidence_status": "observed_both",
           "project": true
+        },
+        {
+          "name": "COMMIT_LATENCY_DISTRIBUTION",
+          "type": {
+            "kind": "array",
+            "element": {
+              "kind": "struct",
+              "fields": [
+                {
+                  "name": "COUNT",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "INT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "MEAN",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "FLOAT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "SUM_OF_SQUARED_DEVIATION",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "FLOAT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "NUM_FINITE_BUCKETS",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "INT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "GROWTH_FACTOR",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "FLOAT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "SCALE",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "FLOAT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "BUCKET_COUNTS",
+                  "type": {
+                    "kind": "array",
+                    "element": {
+                      "kind": "scalar",
+                      "scalar": "INT64"
+                    }
+                  },
+                  "decoder_nullable": false
+                }
+              ]
+            },
+            "element_decoder_nullable": true
+          },
+          "decoder_nullable": false,
+          "canonical_spanner_type": "ARRAY\u003cSTRUCT\u003cCOUNT INT64, MEAN FLOAT64, SUM_OF_SQUARED_DEVIATION FLOAT64, NUM_FINITE_BUCKETS INT64, GROWTH_FACTOR FLOAT64, SCALE FLOAT64, BUCKET_COUNTS ARRAY\u003cINT64\u003e\u003e\u003e",
+          "observations": [],
+          "evidence_status": "absent_both",
+          "project": false
+        },
+        {
+          "name": "COMMIT_LATENCY_DISTRIBUTION_JSON_STRING",
+          "type": {
+            "kind": "scalar",
+            "scalar": "STRING(MAX)"
+          },
+          "decoder_nullable": true,
+          "canonical_spanner_type": "STRING(MAX)",
+          "observations": [],
+          "evidence_status": "absent_both",
+          "project": false
+        },
+        {
+          "name": "PARTICIPANTS_DISTRIBUTION",
+          "type": {
+            "kind": "array",
+            "element": {
+              "kind": "struct",
+              "fields": [
+                {
+                  "name": "COUNT",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "INT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "MEAN",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "FLOAT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "SUM_OF_SQUARED_DEVIATION",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "FLOAT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "NUM_FINITE_BUCKETS",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "INT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "GROWTH_FACTOR",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "FLOAT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "SCALE",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "FLOAT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "BUCKET_COUNTS",
+                  "type": {
+                    "kind": "array",
+                    "element": {
+                      "kind": "scalar",
+                      "scalar": "INT64"
+                    }
+                  },
+                  "decoder_nullable": false
+                }
+              ]
+            },
+            "element_decoder_nullable": true
+          },
+          "decoder_nullable": false,
+          "canonical_spanner_type": "ARRAY\u003cSTRUCT\u003cCOUNT INT64, MEAN FLOAT64, SUM_OF_SQUARED_DEVIATION FLOAT64, NUM_FINITE_BUCKETS INT64, GROWTH_FACTOR FLOAT64, SCALE FLOAT64, BUCKET_COUNTS ARRAY\u003cINT64\u003e\u003e\u003e",
+          "observations": [],
+          "evidence_status": "absent_both",
+          "project": false
+        },
+        {
+          "name": "PARTICIPANTS_DISTRIBUTION_JSON_STRING",
+          "type": {
+            "kind": "scalar",
+            "scalar": "STRING(MAX)"
+          },
+          "decoder_nullable": true,
+          "canonical_spanner_type": "STRING(MAX)",
+          "observations": [],
+          "evidence_status": "absent_both",
+          "project": false
         }
       ]
     },
@@ -12677,7 +15279,7 @@
             "kind": "scalar",
             "scalar": "FLOAT64"
           },
-          "decoder_nullable": false,
+          "decoder_nullable": true,
           "canonical_spanner_type": "FLOAT64",
           "observations": [
             {
@@ -12700,7 +15302,7 @@
             "kind": "scalar",
             "scalar": "FLOAT64"
           },
-          "decoder_nullable": false,
+          "decoder_nullable": true,
           "canonical_spanner_type": "FLOAT64",
           "observations": [
             {
@@ -13085,6 +15687,182 @@
           ],
           "evidence_status": "observed_both",
           "project": true
+        },
+        {
+          "name": "COMMIT_LATENCY_DISTRIBUTION",
+          "type": {
+            "kind": "array",
+            "element": {
+              "kind": "struct",
+              "fields": [
+                {
+                  "name": "COUNT",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "INT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "MEAN",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "FLOAT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "SUM_OF_SQUARED_DEVIATION",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "FLOAT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "NUM_FINITE_BUCKETS",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "INT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "GROWTH_FACTOR",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "FLOAT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "SCALE",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "FLOAT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "BUCKET_COUNTS",
+                  "type": {
+                    "kind": "array",
+                    "element": {
+                      "kind": "scalar",
+                      "scalar": "INT64"
+                    }
+                  },
+                  "decoder_nullable": false
+                }
+              ]
+            },
+            "element_decoder_nullable": true
+          },
+          "decoder_nullable": false,
+          "canonical_spanner_type": "ARRAY\u003cSTRUCT\u003cCOUNT INT64, MEAN FLOAT64, SUM_OF_SQUARED_DEVIATION FLOAT64, NUM_FINITE_BUCKETS INT64, GROWTH_FACTOR FLOAT64, SCALE FLOAT64, BUCKET_COUNTS ARRAY\u003cINT64\u003e\u003e\u003e",
+          "observations": [],
+          "evidence_status": "absent_both",
+          "project": false
+        },
+        {
+          "name": "COMMIT_LATENCY_DISTRIBUTION_JSON_STRING",
+          "type": {
+            "kind": "scalar",
+            "scalar": "STRING(MAX)"
+          },
+          "decoder_nullable": true,
+          "canonical_spanner_type": "STRING(MAX)",
+          "observations": [],
+          "evidence_status": "absent_both",
+          "project": false
+        },
+        {
+          "name": "PARTICIPANTS_DISTRIBUTION",
+          "type": {
+            "kind": "array",
+            "element": {
+              "kind": "struct",
+              "fields": [
+                {
+                  "name": "COUNT",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "INT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "MEAN",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "FLOAT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "SUM_OF_SQUARED_DEVIATION",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "FLOAT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "NUM_FINITE_BUCKETS",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "INT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "GROWTH_FACTOR",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "FLOAT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "SCALE",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "FLOAT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "BUCKET_COUNTS",
+                  "type": {
+                    "kind": "array",
+                    "element": {
+                      "kind": "scalar",
+                      "scalar": "INT64"
+                    }
+                  },
+                  "decoder_nullable": false
+                }
+              ]
+            },
+            "element_decoder_nullable": true
+          },
+          "decoder_nullable": false,
+          "canonical_spanner_type": "ARRAY\u003cSTRUCT\u003cCOUNT INT64, MEAN FLOAT64, SUM_OF_SQUARED_DEVIATION FLOAT64, NUM_FINITE_BUCKETS INT64, GROWTH_FACTOR FLOAT64, SCALE FLOAT64, BUCKET_COUNTS ARRAY\u003cINT64\u003e\u003e\u003e",
+          "observations": [],
+          "evidence_status": "absent_both",
+          "project": false
+        },
+        {
+          "name": "PARTICIPANTS_DISTRIBUTION_JSON_STRING",
+          "type": {
+            "kind": "scalar",
+            "scalar": "STRING(MAX)"
+          },
+          "decoder_nullable": true,
+          "canonical_spanner_type": "STRING(MAX)",
+          "observations": [],
+          "evidence_status": "absent_both",
+          "project": false
         }
       ]
     },
@@ -13191,7 +15969,7 @@
             "kind": "scalar",
             "scalar": "FLOAT64"
           },
-          "decoder_nullable": false,
+          "decoder_nullable": true,
           "canonical_spanner_type": "FLOAT64",
           "observations": [
             {
@@ -13214,7 +15992,7 @@
             "kind": "scalar",
             "scalar": "FLOAT64"
           },
-          "decoder_nullable": false,
+          "decoder_nullable": true,
           "canonical_spanner_type": "FLOAT64",
           "observations": [
             {
@@ -13599,6 +16377,182 @@
           ],
           "evidence_status": "observed_both",
           "project": true
+        },
+        {
+          "name": "COMMIT_LATENCY_DISTRIBUTION",
+          "type": {
+            "kind": "array",
+            "element": {
+              "kind": "struct",
+              "fields": [
+                {
+                  "name": "COUNT",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "INT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "MEAN",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "FLOAT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "SUM_OF_SQUARED_DEVIATION",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "FLOAT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "NUM_FINITE_BUCKETS",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "INT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "GROWTH_FACTOR",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "FLOAT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "SCALE",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "FLOAT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "BUCKET_COUNTS",
+                  "type": {
+                    "kind": "array",
+                    "element": {
+                      "kind": "scalar",
+                      "scalar": "INT64"
+                    }
+                  },
+                  "decoder_nullable": false
+                }
+              ]
+            },
+            "element_decoder_nullable": true
+          },
+          "decoder_nullable": false,
+          "canonical_spanner_type": "ARRAY\u003cSTRUCT\u003cCOUNT INT64, MEAN FLOAT64, SUM_OF_SQUARED_DEVIATION FLOAT64, NUM_FINITE_BUCKETS INT64, GROWTH_FACTOR FLOAT64, SCALE FLOAT64, BUCKET_COUNTS ARRAY\u003cINT64\u003e\u003e\u003e",
+          "observations": [],
+          "evidence_status": "absent_both",
+          "project": false
+        },
+        {
+          "name": "COMMIT_LATENCY_DISTRIBUTION_JSON_STRING",
+          "type": {
+            "kind": "scalar",
+            "scalar": "STRING(MAX)"
+          },
+          "decoder_nullable": true,
+          "canonical_spanner_type": "STRING(MAX)",
+          "observations": [],
+          "evidence_status": "absent_both",
+          "project": false
+        },
+        {
+          "name": "PARTICIPANTS_DISTRIBUTION",
+          "type": {
+            "kind": "array",
+            "element": {
+              "kind": "struct",
+              "fields": [
+                {
+                  "name": "COUNT",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "INT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "MEAN",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "FLOAT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "SUM_OF_SQUARED_DEVIATION",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "FLOAT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "NUM_FINITE_BUCKETS",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "INT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "GROWTH_FACTOR",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "FLOAT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "SCALE",
+                  "type": {
+                    "kind": "scalar",
+                    "scalar": "FLOAT64"
+                  },
+                  "decoder_nullable": false
+                },
+                {
+                  "name": "BUCKET_COUNTS",
+                  "type": {
+                    "kind": "array",
+                    "element": {
+                      "kind": "scalar",
+                      "scalar": "INT64"
+                    }
+                  },
+                  "decoder_nullable": false
+                }
+              ]
+            },
+            "element_decoder_nullable": true
+          },
+          "decoder_nullable": false,
+          "canonical_spanner_type": "ARRAY\u003cSTRUCT\u003cCOUNT INT64, MEAN FLOAT64, SUM_OF_SQUARED_DEVIATION FLOAT64, NUM_FINITE_BUCKETS INT64, GROWTH_FACTOR FLOAT64, SCALE FLOAT64, BUCKET_COUNTS ARRAY\u003cINT64\u003e\u003e\u003e",
+          "observations": [],
+          "evidence_status": "absent_both",
+          "project": false
+        },
+        {
+          "name": "PARTICIPANTS_DISTRIBUTION_JSON_STRING",
+          "type": {
+            "kind": "scalar",
+            "scalar": "STRING(MAX)"
+          },
+          "decoder_nullable": true,
+          "canonical_spanner_type": "STRING(MAX)",
+          "observations": [],
+          "evidence_status": "absent_both",
+          "project": false
         }
       ]
     },

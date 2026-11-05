@@ -17,9 +17,9 @@ import (
 )
 
 const (
-	SchemaVersion    = "v0alpha1"
-	SourceRepository = "github.com/apstndb/spanner-emulator-survey"
-	SourcePath       = "spannersys"
+	SchemaVersion    = "v0alpha2"
+	SourceRepository = "github.com/apstndb/spanalyzer"
+	SourcePath       = "survey/spannersys"
 	CaptureQuery     = "SELECT TABLE_NAME, COLUMN_NAME, SPANNER_TYPE, ORDINAL_POSITION\n" +
 		"FROM INFORMATION_SCHEMA.COLUMNS\n" +
 		"WHERE TABLE_SCHEMA = 'SPANNER_SYS'\n" +

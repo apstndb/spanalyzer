@@ -116,7 +116,11 @@ type registry with matching managed and Omni observations, explicit
 default-deny entries, capture provenance, and documentation-conflict sidecars.
 Its producer-owned JSON Schema and redacted managed/Omni captures are retained
 in the nested [`survey`](../../survey/) module. Spanalyzer validates the
-consumed prerelease contract without creating a second schema authority.
+consumed prerelease contract without creating a second schema authority. The active
+[manifest v0alpha2 schema](../../survey/schemas/spanner-sys-manifest.v0alpha2.schema.json)
+identifies the in-repository exporter; the existing v0alpha1 schema remains
+historical. The newer managed captures describe current registry coverage,
+while the SYS analyzer projection keeps its selected common observations.
 
 ## Survey provenance and evidence
 
