@@ -20,7 +20,7 @@ func TestRun(t *testing.T) {
 			name:       "exports manifest",
 			args:       []string{"--source-commit", strings.Repeat("a", 40)},
 			wantCode:   0,
-			wantStdout: `"schema_version": "v0alpha1"`,
+			wantStdout: `"schema_version": "v0alpha2"`,
 		},
 		{
 			name:       "requires source commit",

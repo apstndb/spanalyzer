@@ -1,8 +1,13 @@
 package spannersys
 
 import (
+	"errors"
 	"reflect"
+	"slices"
 	"testing"
+
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 func TestTableRegistry(t *testing.T) {
@@ -10,8 +15,8 @@ func TestTableRegistry(t *testing.T) {
 	if err != nil {
 		t.Fatalf("tableRegistry: %v", err)
 	}
-	if got := len(registry); got != 51 {
-		t.Fatalf("registered tables = %d, want 51", got)
+	if got := len(registry); got != 53 {
+		t.Fatalf("registered tables = %d, want 53", got)
 	}
 
 	for tableName, rowType := range registry {
@@ -68,6 +73,7 @@ func TestAuditReportHasDrift(t *testing.T) {
 	}{
 		{name: "none"},
 		{name: "known absent is not drift", report: AuditReport{KnownAbsentColumns: map[string][]string{"KNOWN": {"ABSENT"}}}},
+		{name: "advertised not queryable is not drift", report: AuditReport{AdvertisedNotQueryable: map[string][]string{"QUERY_STATS_TOP_MINUTE": {"CPU_SECONDS_DISTRIBUTION"}}}},
 		{name: "unknown table", report: AuditReport{UnknownTables: []string{"NEW_STATS"}}, want: true},
 		{name: "unknown column", report: AuditReport{UnknownColumns: map[string][]string{"QUERY_STATS_TOP_MINUTE": {"NEW_METRIC"}}}, want: true},
 		{name: "ordinal mismatch", report: AuditReport{OrdinalMismatches: []ColumnOrdinalMismatch{{TableName: "KNOWN", ColumnName: "B"}}}, want: true},
@@ -183,5 +189,91 @@ func TestQuoteIdentifiersQualifiesColumns(t *testing.T) {
 	want := "t.`GENERATION_TIME`, t.`QUERY_RECOMMENDATIONS`"
 	if got != want {
 		t.Errorf("quoteIdentifiers() = %q, want %q", got, want)
+	}
+}
+
+func TestExcludeUnqueryableSelectedColumns(t *testing.T) {
+	tests := []struct {
+		name      string
+		probe     func(table, column string) error
+		wantKept  []string
+		wantExcl  []string
+		wantErr   bool
+		wantRetry bool
+	}{
+		{
+			name:     "all queryable",
+			wantKept: []string{"COL_A", "COL_B"},
+		},
+		{
+			name: "one excluded",
+			probe: func(_, column string) error {
+				if column == "COL_B" {
+					return status.Error(codes.InvalidArgument, "Name COL_B not found inside t")
+				}
+				return nil
+			},
+			wantKept:  []string{"COL_A"},
+			wantExcl:  []string{"COL_B"},
+			wantRetry: true,
+		},
+		{
+			name:    "non-InvalidArgument probe error propagates",
+			probe:   func(_, _ string) error { return errors.New("transport failed") },
+			wantErr: true,
+		},
+		{
+			name: "closed-transaction error propagates",
+			probe: func(_, _ string) error {
+				return status.Error(codes.InvalidArgument, closedTransactionErr)
+			},
+			wantErr: true,
+		},
+		{
+			name:     "nothing excluded means no retry",
+			wantKept: []string{"COL_A", "COL_B"},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			probe := tt.probe
+			if probe == nil {
+				probe = func(_, _ string) error { return nil }
+			}
+			calls := 0
+			kept, excluded, err := excludeUnqueryableSelectedColumns("QUERY_STATS_TOP_MINUTE", []string{"COL_A", "COL_B"}, func(table, column string) error {
+				calls++
+				if table != "QUERY_STATS_TOP_MINUTE" {
+					t.Fatalf("probe table = %q, want QUERY_STATS_TOP_MINUTE", table)
+				}
+				return probe(table, column)
+			})
+			if (err != nil) != tt.wantErr {
+				t.Fatalf("excludeUnqueryableSelectedColumns() error = %v, wantErr %v", err, tt.wantErr)
+			}
+			if tt.wantErr {
+				if calls < 1 {
+					t.Fatalf("probe calls = %d, want at least 1", calls)
+				}
+				if kept != nil || excluded != nil {
+					t.Errorf("kept, excluded = %v, %v, want nil, nil on error", kept, excluded)
+				}
+				return
+			}
+			if calls != 2 {
+				t.Fatalf("probe calls = %d, want 2", calls)
+			}
+			if !slices.Equal(kept, tt.wantKept) {
+				t.Errorf("kept = %v, want %v", kept, tt.wantKept)
+			}
+			if !slices.Equal(excluded, tt.wantExcl) {
+				t.Errorf("excluded = %v, want %v", excluded, tt.wantExcl)
+			}
+			gotRetry := len(excluded) > 0 && err == nil
+			if gotRetry != tt.wantRetry {
+				t.Errorf("retry = %t, want %t", gotRetry, tt.wantRetry)
+			}
+		})
 	}
 }

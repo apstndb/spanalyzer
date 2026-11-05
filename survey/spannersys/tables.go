@@ -47,6 +47,23 @@ type ActivePartitionedDML struct {
 	LastUpdateTimestamp          time.Time `spanner:"LAST_UPDATE_TIMESTAMP"`
 }
 
+// BatchOperation represents SPANNER_SYS.ACTIVE_BATCH_OPERATIONS and
+// SPANNER_SYS.BATCH_OPERATIONS, which share the observed eleven-column shape.
+// Nullable decoder fields preserve unfinished operation results and timestamps.
+type BatchOperation struct {
+	Text                         *string    `spanner:"TEXT"`
+	QueryID                      *string    `spanner:"QUERY_ID"`
+	NumPartitionsTotal           *int64     `spanner:"NUM_PARTITIONS_TOTAL"`
+	NumPartitionsComplete        *int64     `spanner:"NUM_PARTITIONS_COMPLETE"`
+	NumTrivialPartitionsComplete *int64     `spanner:"NUM_TRIVIAL_PARTITIONS_COMPLETE"`
+	Progress                     *string    `spanner:"PROGRESS"`
+	RowsProcessed                *int64     `spanner:"ROWS_PROCESSED"`
+	Status                       *string    `spanner:"STATUS"`
+	Result                       *string    `spanner:"RESULT"`
+	StartTimestamp               *time.Time `spanner:"START_TIMESTAMP"`
+	LastUpdateTimestamp          *time.Time `spanner:"LAST_UPDATE_TIMESTAMP"`
+}
+
 // QueryRecommendation represents SPANNER_SYS.QUERY_RECOMMENDATIONS.
 type QueryRecommendation struct {
 	GenerationTime       time.Time `spanner:"GENERATION_TIME"`
@@ -207,6 +224,10 @@ type QueryStatsTop struct {
 	AvgColumnarReadShare                  *float64               `spanner:"AVG_COLUMNAR_READ_SHARE"`
 	QueryOptimizerVersions                []int64                `spanner:"QUERY_OPTIMIZER_VERSIONS"`
 	StatisticsPackageNames                []string               `spanner:"STATISTICS_PACKAGE_NAMES"`
+	CPUSecondsDistribution                []*LatencyDistribution `spanner:"CPU_SECONDS_DISTRIBUTION"`
+	CPUSecondsDistributionJSONString      *string                `spanner:"CPU_SECONDS_DISTRIBUTION_JSON_STRING"`
+	RowScannedDistribution                []*LatencyDistribution `spanner:"ROW_SCANNED_DISTRIBUTION"`
+	RowScannedDistributionJSONString      *string                `spanner:"ROW_SCANNED_DISTRIBUTION_JSON_STRING"`
 }
 
 // QueryStatsTotal represents SPANNER_SYS.QUERY_STATS_TOTAL_{MINUTE,10MINUTE,HOUR}.
@@ -235,6 +256,10 @@ type QueryStatsTotal struct {
 	AvgDiskIOCost                         float64                `spanner:"AVG_DISK_IO_COST"`
 	LatencyDistributionJSONString         *string                `spanner:"LATENCY_DISTRIBUTION_JSON_STRING"`
 	AvgColumnarReadShare                  *float64               `spanner:"AVG_COLUMNAR_READ_SHARE"`
+	CPUSecondsDistribution                []*LatencyDistribution `spanner:"CPU_SECONDS_DISTRIBUTION"`
+	CPUSecondsDistributionJSONString      *string                `spanner:"CPU_SECONDS_DISTRIBUTION_JSON_STRING"`
+	RowScannedDistribution                []*LatencyDistribution `spanner:"ROW_SCANNED_DISTRIBUTION"`
+	RowScannedDistributionJSONString      *string                `spanner:"ROW_SCANNED_DISTRIBUTION_JSON_STRING"`
 }
 
 // ReadStatsTop represents SPANNER_SYS.READ_STATS_TOP_{MINUTE,10MINUTE,HOUR}.
@@ -271,66 +296,78 @@ type ReadStatsTotal struct {
 
 // TxnStatsTop represents SPANNER_SYS.TXN_STATS_TOP_{MINUTE,10MINUTE,HOUR}.
 type TxnStatsTop struct {
-	IntervalEnd                        time.Time              `spanner:"INTERVAL_END"`
-	Fprint                             int64                  `spanner:"FPRINT"`
-	ReadColumns                        []string               `spanner:"READ_COLUMNS"`
-	WriteConstructiveColumns           []string               `spanner:"WRITE_CONSTRUCTIVE_COLUMNS"`
-	WriteDeleteTables                  []string               `spanner:"WRITE_DELETE_TABLES"`
-	CommitAttemptCount                 int64                  `spanner:"COMMIT_ATTEMPT_COUNT"`
-	CommitFailedPreconditionCount      int64                  `spanner:"COMMIT_FAILED_PRECONDITION_COUNT"`
-	CommitAbortCount                   int64                  `spanner:"COMMIT_ABORT_COUNT"`
-	AvgParticipants                    float64                `spanner:"AVG_PARTICIPANTS"`
-	AvgTotalLatencySeconds             float64                `spanner:"AVG_TOTAL_LATENCY_SECONDS"`
-	AvgCommitLatencySeconds            float64                `spanner:"AVG_COMMIT_LATENCY_SECONDS"`
-	AvgBytes                           float64                `spanner:"AVG_BYTES"`
-	CommitRetryCount                   int64                  `spanner:"COMMIT_RETRY_COUNT"`
-	TransactionTag                     *string                `spanner:"TRANSACTION_TAG"`
-	OperationsByTable                  []*OperationsByTable   `spanner:"OPERATIONS_BY_TABLE"`
-	TotalLatencyDistribution           []*LatencyDistribution `spanner:"TOTAL_LATENCY_DISTRIBUTION"`
-	AttemptCount                       int64                  `spanner:"ATTEMPT_COUNT"`
-	SerializablePessimisticTxnCount    int64                  `spanner:"SERIALIZABLE_PESSIMISTIC_TXN_COUNT"`
-	RepeatableReadOptimisticTxnCount   int64                  `spanner:"REPEATABLE_READ_OPTIMISTIC_TXN_COUNT"`
-	OperationsByTableJSONString        *string                `spanner:"OPERATIONS_BY_TABLE_JSON_STRING"`
-	TotalLatencyDistributionJSONString *string                `spanner:"TOTAL_LATENCY_DISTRIBUTION_JSON_STRING"`
-	SerializableOptimisticTxnCount     int64                  `spanner:"SERIALIZABLE_OPTIMISTIC_TXN_COUNT"`
-	RepeatableReadPessimisticTxnCount  int64                  `spanner:"REPEATABLE_READ_PESSIMISTIC_TXN_COUNT"`
+	IntervalEnd                         time.Time              `spanner:"INTERVAL_END"`
+	Fprint                              int64                  `spanner:"FPRINT"`
+	ReadColumns                         []string               `spanner:"READ_COLUMNS"`
+	WriteConstructiveColumns            []string               `spanner:"WRITE_CONSTRUCTIVE_COLUMNS"`
+	WriteDeleteTables                   []string               `spanner:"WRITE_DELETE_TABLES"`
+	CommitAttemptCount                  int64                  `spanner:"COMMIT_ATTEMPT_COUNT"`
+	CommitFailedPreconditionCount       int64                  `spanner:"COMMIT_FAILED_PRECONDITION_COUNT"`
+	CommitAbortCount                    int64                  `spanner:"COMMIT_ABORT_COUNT"`
+	AvgParticipants                     *float64               `spanner:"AVG_PARTICIPANTS"`
+	AvgTotalLatencySeconds              *float64               `spanner:"AVG_TOTAL_LATENCY_SECONDS"`
+	AvgCommitLatencySeconds             float64                `spanner:"AVG_COMMIT_LATENCY_SECONDS"`
+	AvgBytes                            float64                `spanner:"AVG_BYTES"`
+	CommitRetryCount                    int64                  `spanner:"COMMIT_RETRY_COUNT"`
+	TransactionTag                      *string                `spanner:"TRANSACTION_TAG"`
+	OperationsByTable                   []*OperationsByTable   `spanner:"OPERATIONS_BY_TABLE"`
+	TotalLatencyDistribution            []*LatencyDistribution `spanner:"TOTAL_LATENCY_DISTRIBUTION"`
+	AttemptCount                        int64                  `spanner:"ATTEMPT_COUNT"`
+	SerializablePessimisticTxnCount     int64                  `spanner:"SERIALIZABLE_PESSIMISTIC_TXN_COUNT"`
+	RepeatableReadOptimisticTxnCount    int64                  `spanner:"REPEATABLE_READ_OPTIMISTIC_TXN_COUNT"`
+	OperationsByTableJSONString         *string                `spanner:"OPERATIONS_BY_TABLE_JSON_STRING"`
+	TotalLatencyDistributionJSONString  *string                `spanner:"TOTAL_LATENCY_DISTRIBUTION_JSON_STRING"`
+	SerializableOptimisticTxnCount      int64                  `spanner:"SERIALIZABLE_OPTIMISTIC_TXN_COUNT"`
+	RepeatableReadPessimisticTxnCount   int64                  `spanner:"REPEATABLE_READ_PESSIMISTIC_TXN_COUNT"`
+	CommitLatencyDistribution           []*LatencyDistribution `spanner:"COMMIT_LATENCY_DISTRIBUTION"`
+	CommitLatencyDistributionJSONString *string                `spanner:"COMMIT_LATENCY_DISTRIBUTION_JSON_STRING"`
+	ParticipantsDistribution            []*LatencyDistribution `spanner:"PARTICIPANTS_DISTRIBUTION"`
+	ParticipantsDistributionJSONString  *string                `spanner:"PARTICIPANTS_DISTRIBUTION_JSON_STRING"`
 }
 
 // TxnStatsTotal represents SPANNER_SYS.TXN_STATS_TOTAL_{MINUTE,10MINUTE,HOUR}.
 type TxnStatsTotal struct {
-	IntervalEnd                        time.Time              `spanner:"INTERVAL_END"`
-	CommitAttemptCount                 int64                  `spanner:"COMMIT_ATTEMPT_COUNT"`
-	CommitFailedPreconditionCount      int64                  `spanner:"COMMIT_FAILED_PRECONDITION_COUNT"`
-	CommitAbortCount                   int64                  `spanner:"COMMIT_ABORT_COUNT"`
-	AvgParticipants                    float64                `spanner:"AVG_PARTICIPANTS"`
-	AvgTotalLatencySeconds             float64                `spanner:"AVG_TOTAL_LATENCY_SECONDS"`
-	AvgCommitLatencySeconds            float64                `spanner:"AVG_COMMIT_LATENCY_SECONDS"`
-	AvgBytes                           float64                `spanner:"AVG_BYTES"`
-	CommitRetryCount                   int64                  `spanner:"COMMIT_RETRY_COUNT"`
-	OperationsByTable                  []*OperationsByTable   `spanner:"OPERATIONS_BY_TABLE"`
-	TotalLatencyDistribution           []*LatencyDistribution `spanner:"TOTAL_LATENCY_DISTRIBUTION"`
-	AttemptCount                       int64                  `spanner:"ATTEMPT_COUNT"`
-	SerializablePessimisticTxnCount    int64                  `spanner:"SERIALIZABLE_PESSIMISTIC_TXN_COUNT"`
-	RepeatableReadOptimisticTxnCount   int64                  `spanner:"REPEATABLE_READ_OPTIMISTIC_TXN_COUNT"`
-	OperationsByTableJSONString        *string                `spanner:"OPERATIONS_BY_TABLE_JSON_STRING"`
-	TotalLatencyDistributionJSONString *string                `spanner:"TOTAL_LATENCY_DISTRIBUTION_JSON_STRING"`
-	SerializableOptimisticTxnCount     int64                  `spanner:"SERIALIZABLE_OPTIMISTIC_TXN_COUNT"`
-	RepeatableReadPessimisticTxnCount  int64                  `spanner:"REPEATABLE_READ_PESSIMISTIC_TXN_COUNT"`
+	IntervalEnd                         time.Time              `spanner:"INTERVAL_END"`
+	CommitAttemptCount                  int64                  `spanner:"COMMIT_ATTEMPT_COUNT"`
+	CommitFailedPreconditionCount       int64                  `spanner:"COMMIT_FAILED_PRECONDITION_COUNT"`
+	CommitAbortCount                    int64                  `spanner:"COMMIT_ABORT_COUNT"`
+	AvgParticipants                     *float64               `spanner:"AVG_PARTICIPANTS"`
+	AvgTotalLatencySeconds              *float64               `spanner:"AVG_TOTAL_LATENCY_SECONDS"`
+	AvgCommitLatencySeconds             float64                `spanner:"AVG_COMMIT_LATENCY_SECONDS"`
+	AvgBytes                            float64                `spanner:"AVG_BYTES"`
+	CommitRetryCount                    int64                  `spanner:"COMMIT_RETRY_COUNT"`
+	OperationsByTable                   []*OperationsByTable   `spanner:"OPERATIONS_BY_TABLE"`
+	TotalLatencyDistribution            []*LatencyDistribution `spanner:"TOTAL_LATENCY_DISTRIBUTION"`
+	AttemptCount                        int64                  `spanner:"ATTEMPT_COUNT"`
+	SerializablePessimisticTxnCount     int64                  `spanner:"SERIALIZABLE_PESSIMISTIC_TXN_COUNT"`
+	RepeatableReadOptimisticTxnCount    int64                  `spanner:"REPEATABLE_READ_OPTIMISTIC_TXN_COUNT"`
+	OperationsByTableJSONString         *string                `spanner:"OPERATIONS_BY_TABLE_JSON_STRING"`
+	TotalLatencyDistributionJSONString  *string                `spanner:"TOTAL_LATENCY_DISTRIBUTION_JSON_STRING"`
+	SerializableOptimisticTxnCount      int64                  `spanner:"SERIALIZABLE_OPTIMISTIC_TXN_COUNT"`
+	RepeatableReadPessimisticTxnCount   int64                  `spanner:"REPEATABLE_READ_PESSIMISTIC_TXN_COUNT"`
+	CommitLatencyDistribution           []*LatencyDistribution `spanner:"COMMIT_LATENCY_DISTRIBUTION"`
+	CommitLatencyDistributionJSONString *string                `spanner:"COMMIT_LATENCY_DISTRIBUTION_JSON_STRING"`
+	ParticipantsDistribution            []*LatencyDistribution `spanner:"PARTICIPANTS_DISTRIBUTION"`
+	ParticipantsDistributionJSONString  *string                `spanner:"PARTICIPANTS_DISTRIBUTION_JSON_STRING"`
 }
 
 // LockStatsTop represents SPANNER_SYS.LOCK_STATS_TOP_{MINUTE,10MINUTE,HOUR}.
 type LockStatsTop struct {
-	IntervalEnd                  time.Time            `spanner:"INTERVAL_END"`
-	RowRangeStartKey             []byte               `spanner:"ROW_RANGE_START_KEY"`
-	LockWaitSeconds              float64              `spanner:"LOCK_WAIT_SECONDS"`
-	SampleLockRequests           []*LockSampleRequest `spanner:"SAMPLE_LOCK_REQUESTS"`
-	SampleLockRequestsJSONString *string              `spanner:"SAMPLE_LOCK_REQUESTS_JSON_STRING"`
+	IntervalEnd                    time.Time              `spanner:"INTERVAL_END"`
+	RowRangeStartKey               []byte                 `spanner:"ROW_RANGE_START_KEY"`
+	LockWaitSeconds                float64                `spanner:"LOCK_WAIT_SECONDS"`
+	SampleLockRequests             []*LockSampleRequest   `spanner:"SAMPLE_LOCK_REQUESTS"`
+	SampleLockRequestsJSONString   *string                `spanner:"SAMPLE_LOCK_REQUESTS_JSON_STRING"`
+	LockWaitDistribution           []*LatencyDistribution `spanner:"LOCK_WAIT_DISTRIBUTION"`
+	LockWaitDistributionJSONString *string                `spanner:"LOCK_WAIT_DISTRIBUTION_JSON_STRING"`
 }
 
 // LockStatsTotal represents SPANNER_SYS.LOCK_STATS_TOTAL_{MINUTE,10MINUTE,HOUR}.
 type LockStatsTotal struct {
-	IntervalEnd          time.Time `spanner:"INTERVAL_END"`
-	TotalLockWaitSeconds float64   `spanner:"TOTAL_LOCK_WAIT_SECONDS"`
+	IntervalEnd                    time.Time              `spanner:"INTERVAL_END"`
+	TotalLockWaitSeconds           float64                `spanner:"TOTAL_LOCK_WAIT_SECONDS"`
+	LockWaitDistribution           []*LatencyDistribution `spanner:"LOCK_WAIT_DISTRIBUTION"`
+	LockWaitDistributionJSONString *string                `spanner:"LOCK_WAIT_DISTRIBUTION_JSON_STRING"`
 }
 
 // ColumnOperationsStats represents SPANNER_SYS.COLUMN_OPERATIONS_STATS_{MINUTE,10MINUTE,HOUR}.
@@ -355,12 +392,13 @@ type TableOperationsStats struct {
 
 // SplitStatsTop represents SPANNER_SYS.SPLIT_STATS_TOP_{MINUTE,10MINUTE,HOUR}.
 type SplitStatsTop struct {
-	IntervalEnd         time.Time `spanner:"INTERVAL_END"`
-	SplitStart          string    `spanner:"SPLIT_START"`
-	SplitLimit          string    `spanner:"SPLIT_LIMIT"`
-	AffectedTables      []string  `spanner:"AFFECTED_TABLES"`
-	CPUUsageScore       int64     `spanner:"CPU_USAGE_SCORE"`
-	UnsplittableReasons []string  `spanner:"UNSPLITTABLE_REASONS"`
+	IntervalEnd                   time.Time `spanner:"INTERVAL_END"`
+	SplitStart                    string    `spanner:"SPLIT_START"`
+	SplitLimit                    string    `spanner:"SPLIT_LIMIT"`
+	AffectedTables                []string  `spanner:"AFFECTED_TABLES"`
+	CPUUsageScore                 int64     `spanner:"CPU_USAGE_SCORE"`
+	UnsplittableReasons           []string  `spanner:"UNSPLITTABLE_REASONS"`
+	LatencyImpactCorrelationScore *string   `spanner:"LATENCY_IMPACT_CORRELATION_SCORE"`
 }
 
 // QueryProfilesTop represents SPANNER_SYS.QUERY_PROFILES_TOP_{MINUTE,10MINUTE,HOUR}.

@@ -2,29 +2,40 @@ package spannersys
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"reflect"
+	"regexp"
 	"sort"
 	"strings"
 
 	"cloud.google.com/go/spanner"
+	"google.golang.org/api/iterator"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
+
+const closedTransactionErr = "cannot use a closed transaction"
 
 // AuditReport summarizes one complete live SPANNER_SYS surface checked by
 // Audit. Registry entries missing from that successful observation are kept as
 // known absent, separately from unknown advertised tables or columns.
+// AdvertisedNotQueryable lists columns advertised by INFORMATION_SCHEMA that
+// the owning view rejected in this transaction; they remain counted in
+// AdvertisedColumns and are not drift.
 type AuditReport struct {
-	RegisteredTables   int
-	AdvertisedTables   int
-	AdvertisedColumns  int
-	CheckedTables      int
-	DecodedRows        int
-	ObservedColumns    []ColumnObservation
-	UnknownTables      []string
-	UnknownColumns     map[string][]string
-	KnownAbsentColumns map[string][]string
-	OrdinalMismatches  []ColumnOrdinalMismatch
-	TypeMismatches     []ColumnTypeMismatch
+	RegisteredTables       int
+	AdvertisedTables       int
+	AdvertisedColumns      int
+	CheckedTables          int
+	DecodedRows            int
+	ObservedColumns        []ColumnObservation
+	UnknownTables          []string
+	UnknownColumns         map[string][]string
+	KnownAbsentColumns     map[string][]string
+	AdvertisedNotQueryable map[string][]string
+	OrdinalMismatches      []ColumnOrdinalMismatch
+	TypeMismatches         []ColumnTypeMismatch
 }
 
 // ColumnObservation is one complete SPANNER_SYS column-metadata tuple returned
@@ -67,13 +78,24 @@ func (r *AuditReport) HasDrift() bool {
 // the package structs in the same relative order. It also selects at most one
 // row from each advertised known table and decodes it into the corresponding
 // struct. Empty tables still receive a queryability check.
+//
+// Discovery and the per-table probes share one read-only transaction. During a
+// managed-service rollout, consecutive single-use reads can be served by
+// replicas that disagree about which columns exist, so a column advertised by
+// discovery could otherwise be rejected by the probe that selects it. On
+// InvalidArgument, Audit probes each selected column in that transaction,
+// retries without advertised-but-not-queryable columns, and records them in
+// AdvertisedNotQueryable without treating them as drift.
 func Audit(ctx context.Context, client *spanner.Client) (*AuditReport, error) {
 	registry, err := tableRegistry()
 	if err != nil {
 		return nil, err
 	}
 
-	discovered, err := discoverColumns(ctx, client)
+	txn := client.ReadOnlyTransaction()
+	defer txn.Close()
+
+	discovered, err := discoverSurfaceCaptureColumns(ctx, txn)
 	if err != nil {
 		return nil, fmt.Errorf("discover SPANNER_SYS columns: %w", err)
 	}
@@ -109,50 +131,132 @@ func Audit(ctx context.Context, client *spanner.Client) (*AuditReport, error) {
 			continue
 		}
 
-		query := fmt.Sprintf(
-			"SELECT %s FROM SPANNER_SYS.`%s` AS t LIMIT 1",
-			quoteIdentifiers(selected),
-			tableName,
-		)
-		iter := client.Single().Query(ctx, spanner.NewStatement(query))
-		destination := reflect.New(reflect.SliceOf(rowType))
-		err := spanner.SelectAll(iter, destination.Interface(), spanner.WithLenient())
-		iter.Stop()
+		decoded, excluded, err := decodeOneRowExcludingUnqueryable(ctx, txn, tableName, rowType, selected)
 		if err != nil {
 			return report, fmt.Errorf("query and decode SPANNER_SYS.%s: %w", tableName, err)
 		}
+		if len(excluded) > 0 {
+			if report.AdvertisedNotQueryable == nil {
+				report.AdvertisedNotQueryable = make(map[string][]string)
+			}
+			report.AdvertisedNotQueryable[tableName] = excluded
+		}
 		report.CheckedTables++
-		report.DecodedRows += destination.Elem().Len()
+		report.DecodedRows += decoded
 	}
 
 	return report, nil
 }
 
-func discoverColumns(ctx context.Context, client *spanner.Client) ([]ColumnObservation, error) {
-	type columnRow struct {
-		TableName       string `spanner:"TABLE_NAME"`
-		ColumnName      string `spanner:"COLUMN_NAME"`
-		SpannerType     string `spanner:"SPANNER_TYPE"`
-		OrdinalPosition int64  `spanner:"ORDINAL_POSITION"`
-	}
+// rejectedNamePatterns match the GoogleSQL name-resolution errors Spanner
+// returns when a selected column does not exist in the owning view. A match is
+// honored only for a column this audit actually selected.
+var rejectedNamePatterns = []*regexp.Regexp{
+	regexp.MustCompile(`Unrecognized name: ([A-Za-z_][A-Za-z0-9_]*)`),
+	regexp.MustCompile(`Name ([A-Za-z_][A-Za-z0-9_]*) not found inside`),
+}
 
-	iter := client.Single().Query(ctx, spanner.NewStatement(columnDiscoveryQuery))
-	defer iter.Stop()
-
-	var rows []columnRow
-	if err := spanner.SelectAll(iter, &rows); err != nil {
-		return nil, err
+// columnsNamedByRejection returns the selected columns that an InvalidArgument
+// rejection explicitly names, in selection order. During a managed-service
+// rollout each request can be served by a server with a different view of a
+// SPANNER_SYS table, so an individual per-column probe can succeed while the
+// multi-column statement is rejected; the rejection is then the only
+// request-consistent evidence of which column is not queryable.
+func columnsNamedByRejection(err error, selected []string) []string {
+	if err == nil || spanner.ErrCode(err) != codes.InvalidArgument || isClientClosedTransactionError(err) {
+		return nil
 	}
-	discovered := make([]ColumnObservation, 0, len(rows))
-	for _, row := range rows {
-		discovered = append(discovered, ColumnObservation{
-			TableName:       row.TableName,
-			ColumnName:      row.ColumnName,
-			SpannerType:     row.SpannerType,
-			OrdinalPosition: int(row.OrdinalPosition),
+	message := status.Convert(err).Message()
+	named := make(map[string]bool)
+	for _, pattern := range rejectedNamePatterns {
+		for _, match := range pattern.FindAllStringSubmatch(message, -1) {
+			named[match[1]] = true
+		}
+	}
+	var result []string
+	for _, column := range selected {
+		if named[column] {
+			result = append(result, column)
+		}
+	}
+	return result
+}
+
+// decodeOneRowExcludingUnqueryable selects at most one row of the given
+// columns and decodes it into rowType. When the service rejects the statement
+// with InvalidArgument, the columns the rejection names are excluded; if it
+// names none, every remaining column is probed with the same statement shape
+// and the columns the owning view rejects are excluded. The selection is then
+// retried. Each round excludes at least one column, so the loop is bounded by
+// the number of selected columns. It returns the decoded row count and the
+// sorted excluded column names.
+func decodeOneRowExcludingUnqueryable(
+	ctx context.Context,
+	txn *spanner.ReadOnlyTransaction,
+	tableName string,
+	rowType reflect.Type,
+	selected []string,
+) (int, []string, error) {
+	var excluded []string
+	for {
+		if len(selected) == 0 {
+			return 0, excluded, nil
+		}
+		query := fmt.Sprintf(
+			"SELECT %s FROM SPANNER_SYS.`%s` AS t LIMIT 1",
+			quoteIdentifiers(selected),
+			tableName,
+		)
+		iter := txn.Query(ctx, spanner.NewStatement(query))
+		destination := reflect.New(reflect.SliceOf(rowType))
+		err := spanner.SelectAll(iter, destination.Interface(), spanner.WithLenient())
+		iter.Stop()
+		if err == nil {
+			return destination.Elem().Len(), excluded, nil
+		}
+		if spanner.ErrCode(err) != codes.InvalidArgument || isClientClosedTransactionError(err) {
+			return 0, excluded, err
+		}
+		kept, roundExcluded, probeErr := excludeRejectedOrUnqueryable(tableName, selected, err, func(table, column string) error {
+			return probeSpannerSysColumn(ctx, txn, table, column)
 		})
+		if probeErr != nil {
+			return 0, excluded, probeErr
+		}
+		if len(roundExcluded) == 0 {
+			if len(excluded) > 0 {
+				return 0, excluded, fmt.Errorf("still rejected after excluding %v: %w", excluded, err)
+			}
+			return 0, excluded, err
+		}
+		excluded = append(excluded, roundExcluded...)
+		sort.Strings(excluded)
+		selected = kept
 	}
-	return discovered, nil
+}
+
+// excludeRejectedOrUnqueryable prefers the columns named by the rejection and
+// falls back to individual probes when the rejection names none of them.
+func excludeRejectedOrUnqueryable(
+	tableName string,
+	selected []string,
+	rejection error,
+	probe func(table, column string) error,
+) (kept, excluded []string, err error) {
+	if named := columnsNamedByRejection(rejection, selected); len(named) > 0 {
+		namedSet := make(map[string]bool, len(named))
+		for _, column := range named {
+			namedSet[column] = true
+		}
+		for _, column := range selected {
+			if !namedSet[column] {
+				kept = append(kept, column)
+			}
+		}
+		sort.Strings(named)
+		return kept, named, nil
+	}
+	return excludeUnqueryableSelectedColumns(tableName, selected, probe)
 }
 
 func buildAuditReport(
@@ -294,7 +398,7 @@ func orderedStructColumns(rowType reflect.Type) []string {
 }
 
 func tableRegistry() (map[string]reflect.Type, error) {
-	registry := make(map[string]reflect.Type, 51)
+	registry := make(map[string]reflect.Type, 53)
 	add := func(name string, row any) error {
 		rowType := reflect.TypeOf(row)
 		if rowType.Kind() != reflect.Struct {
@@ -314,6 +418,8 @@ func tableRegistry() (map[string]reflect.Type, error) {
 		{"ACTIVE_QUERIES_SUMMARY", ActiveQueriesSummary{}},
 		{"OLDEST_ACTIVE_QUERIES", OldestActiveQuery{}},
 		{"ACTIVE_PARTITIONED_DMLS", ActivePartitionedDML{}},
+		{"ACTIVE_BATCH_OPERATIONS", BatchOperation{}},
+		{"BATCH_OPERATIONS", BatchOperation{}},
 		{"QUERY_RECOMMENDATIONS", QueryRecommendation{}},
 		{"ROW_DELETION_POLICIES", RowDeletionPolicy{}},
 		{"SCHEMA_RECOMMENDATIONS", SchemaRecommendation{}},
@@ -359,4 +465,50 @@ func tableRegistry() (map[string]reflect.Type, error) {
 	}
 
 	return registry, nil
+}
+
+func excludeUnqueryableSelectedColumns(
+	tableName string,
+	selected []string,
+	probe func(table, column string) error,
+) (kept, excluded []string, err error) {
+	for _, column := range selected {
+		if err := probe(tableName, column); err != nil {
+			if isClientClosedTransactionError(err) {
+				return nil, nil, fmt.Errorf("probe %s.%s: %w", tableName, column, err)
+			}
+			switch spanner.ErrCode(err) {
+			case codes.InvalidArgument, codes.Unimplemented:
+				excluded = append(excluded, column)
+			default:
+				return nil, nil, fmt.Errorf("probe %s.%s: %w", tableName, column, err)
+			}
+			continue
+		}
+		kept = append(kept, column)
+	}
+	sort.Strings(excluded)
+	return kept, excluded, nil
+}
+
+// probeSpannerSysColumn selects one column with the same statement shape as
+// the table probe. LIMIT 0 is deliberately not used: the stats views can
+// accept a LIMIT 0 name resolution while still rejecting the column once a
+// row is read, so the probe must exercise the same path as the real query.
+func probeSpannerSysColumn(ctx context.Context, txn *spanner.ReadOnlyTransaction, tableName, columnName string) error {
+	query := fmt.Sprintf("SELECT t.`%s` FROM SPANNER_SYS.`%s` AS t LIMIT 1", columnName, tableName)
+	iter := txn.Query(ctx, spanner.NewStatement(query))
+	defer iter.Stop()
+	_, err := iter.Next()
+	if errors.Is(err, iterator.Done) {
+		return nil
+	}
+	return err
+}
+
+// isClientClosedTransactionError prevents a local transaction-lifecycle error
+// from being mistaken for a backend rollout where a column is advertised
+// before its owning view accepts it.
+func isClientClosedTransactionError(err error) bool {
+	return spanner.ErrCode(err) == codes.InvalidArgument && status.Convert(err).Message() == closedTransactionErr
 }

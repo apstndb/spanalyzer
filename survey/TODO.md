@@ -1,5 +1,15 @@
 # TODO
 
+## Refresh managed catalogs (2026-11-05)
+
+- [ ] Register both batch-operation tables and the currently observed query,
+  transaction, lock and split distribution fields, including nullable decoders.
+- [ ] Retain current managed captures, update INFORMATION_SCHEMA selection and
+  exact managed/Omni drift expectations, and preserve historical captures.
+- [ ] Regenerate the common SYS manifest without inventing cross-engine evidence.
+- [ ] Run focused/unit, managed and required repository gates, then push the
+  isolated catalog-update branch.
+
 ## Preserve option values (2026-09-23)
 
 - [x] Preserve arrays, escaped strings, and signed numeric literals when

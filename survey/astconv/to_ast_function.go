@@ -50,6 +50,9 @@ func (s *Schema) toFunctionsDDL() ([]ast.DDL, error) {
 
 	var ddls []ast.DDL
 	for _, r := range s.Routines {
+		// Queue-generated TABLE FUNCTION entries have no independent CREATE
+		// FUNCTION DDL. Their owning QUEUE is rejected by toTablesDDL until
+		// queue reconstruction is supported; see UNSUPPORTED_DDL.md.
 		if r.RoutineType != "FUNCTION" {
 			continue
 		}
