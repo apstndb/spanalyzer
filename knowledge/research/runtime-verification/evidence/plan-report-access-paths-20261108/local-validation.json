@@ -1,0 +1,184 @@
+{
+  "at": "2026-11-07T17:35:47.281322+00:00",
+  "source_base": "300c760dbeb6215643799312da53c382f6101d6f",
+  "source_status": "dirty local implementation; production source equals retained live producer snapshot",
+  "module_tests": [
+    {
+      "name": "root",
+      "argv": [
+        "/Users/apstndb/.local/share/mise/installs/go/1.26.10/bin/go",
+        "test",
+        "./..."
+      ],
+      "cwd": "/Users/apstndb/work/spanner-analyzer/.worktrees/cross-engine-docs-20261005",
+      "exit_code": 0,
+      "at": "2026-11-07T17:14:18.873249+00:00",
+      "log": "final-root.log"
+    },
+    {
+      "name": "plancontract",
+      "argv": [
+        "/Users/apstndb/.local/share/mise/installs/go/1.26.10/bin/go",
+        "test",
+        "./..."
+      ],
+      "cwd": "/Users/apstndb/work/spanner-analyzer/.worktrees/cross-engine-docs-20261005/plancontract",
+      "exit_code": 0,
+      "at": "2026-11-07T17:14:20.859123+00:00",
+      "log": "final-plancontract.log"
+    },
+    {
+      "name": "querygen",
+      "argv": [
+        "/Users/apstndb/.local/share/mise/installs/go/1.26.10/bin/go",
+        "test",
+        "./..."
+      ],
+      "cwd": "/Users/apstndb/work/spanner-analyzer/.worktrees/cross-engine-docs-20261005/cmd/spanner-query-gen",
+      "exit_code": 0,
+      "at": "2026-11-07T17:22:27.624692+00:00",
+      "log": "complete-querygen.log"
+    },
+    {
+      "name": "tools-tests",
+      "argv": [
+        "/Users/apstndb/.local/share/mise/installs/go/1.26.10/bin/go",
+        "test",
+        "./..."
+      ],
+      "cwd": "/Users/apstndb/work/spanner-analyzer/.worktrees/cross-engine-docs-20261005/tools",
+      "exit_code": 0,
+      "log": "complete-check-tools-tests.log",
+      "at": "2026-11-07T17:33:56.704891+00:00"
+    },
+    {
+      "name": "survey-short",
+      "argv": [
+        "/Users/apstndb/.local/share/mise/installs/go/1.26.10/bin/go",
+        "test",
+        "-count=1",
+        "-short",
+        "./..."
+      ],
+      "cwd": "/Users/apstndb/work/spanner-analyzer/.worktrees/cross-engine-docs-20261005/survey",
+      "exit_code": 0,
+      "log": "final-check-survey-short.log",
+      "at": "2026-11-07T17:32:19.502336+00:00"
+    }
+  ],
+  "pre_push": {
+    "argv": [
+      "mise",
+      "run",
+      "pre-push"
+    ],
+    "cwd": "/Users/apstndb/work/spanner-analyzer/.worktrees/cross-engine-docs-20261005",
+    "exit_code": 0,
+    "at": "2026-11-07T17:28:10.181746+00:00",
+    "log": "pre-push.log"
+  },
+  "survey_boundary": "The declared local gate uses -short with GOWORK=off. A separate full survey attempt could not access the Docker socket in the sandbox and created no runtime. The feature live Omni test is recorded separately.",
+  "planvocab": "Only normalization-source integrity hash refreshed; operators and common_metadata unchanged",
+  "prior_artifacts_unchanged": 63,
+  "generated_checks": [
+    {
+      "name": "planvocab",
+      "argv": [
+        "/Users/apstndb/.local/share/mise/installs/go/1.26.10/bin/go",
+        "run",
+        "./planvocab-gen",
+        "--check"
+      ],
+      "cwd": "/Users/apstndb/work/spanner-analyzer/.worktrees/cross-engine-docs-20261005/tools",
+      "exit_code": 0,
+      "log": "complete-check-planvocab.log",
+      "at": "2026-11-07T17:33:56.767111+00:00"
+    },
+    {
+      "name": "infoschema",
+      "argv": [
+        "/Users/apstndb/.local/share/mise/installs/go/1.26.10/bin/go",
+        "run",
+        "./infoschema-survey-check"
+      ],
+      "cwd": "/Users/apstndb/work/spanner-analyzer/.worktrees/cross-engine-docs-20261005/tools",
+      "exit_code": 0,
+      "log": "complete-check-infoschema.log",
+      "at": "2026-11-07T17:33:58.058957+00:00"
+    },
+    {
+      "name": "spannersys",
+      "argv": [
+        "/Users/apstndb/.local/share/mise/installs/go/1.26.10/bin/go",
+        "run",
+        "./spannersys-survey-check"
+      ],
+      "cwd": "/Users/apstndb/work/spanner-analyzer/.worktrees/cross-engine-docs-20261005/tools",
+      "exit_code": 0,
+      "log": "complete-check-spannersys.log",
+      "at": "2026-11-07T17:33:58.503100+00:00"
+    },
+    {
+      "name": "okf",
+      "argv": [
+        "/Users/apstndb/.local/share/mise/installs/go/1.26.10/bin/go",
+        "run",
+        "./okf-check",
+        "--repo-root",
+        "..",
+        "--gate",
+        "all",
+        "--publication-manifest",
+        "/Users/apstndb/tmp/apstndb/spanalyzer/plan-access-paths-20261108/candidate-publication.json"
+      ],
+      "cwd": "/Users/apstndb/work/spanner-analyzer/.worktrees/cross-engine-docs-20261005/tools",
+      "exit_code": 0,
+      "log": "passed-check-okf.log",
+      "at": "2026-11-07T17:34:41.253604+00:00"
+    },
+    {
+      "name": "language",
+      "argv": [
+        "/Users/apstndb/.local/share/mise/installs/go/1.26.10/bin/go",
+        "run",
+        "./markdown-language-check",
+        "--repo-root",
+        ".."
+      ],
+      "cwd": "/Users/apstndb/work/spanner-analyzer/.worktrees/cross-engine-docs-20261005/tools",
+      "exit_code": 0,
+      "log": "passed-check-language.log",
+      "at": "2026-11-07T17:34:41.743802+00:00"
+    }
+  ],
+  "gofmt": {
+    "exit_code": 0,
+    "files": [
+      "cmd/spanner-query-gen/config_schema.go",
+      "cmd/spanner-query-gen/main_test.go",
+      "cmd/spanner-query-gen/plan_access_path_schema.go",
+      "cmd/spanner-query-gen/plan_report.go",
+      "cmd/spanner-query-gen/plan_report_analyzer.go",
+      "cmd/spanner-query-gen/plan_report_annotations.go",
+      "cmd/spanner-query-gen/plan_report_feedback_omni_test.go",
+      "cmd/spanner-query-gen/plan_report_feedback_test.go",
+      "cmd/spanner-query-gen/plan_report_param_struct.go",
+      "internal/querygen/querygen.go",
+      "internal/querygen/querygen_config.go",
+      "internal/querygen/querygen_test.go",
+      "internal/querygen/report_plan.go",
+      "internal/querygen/report_plan_test.go",
+      "plancontract/access_paths.go",
+      "plancontract/access_paths_cel.go",
+      "plancontract/access_paths_test.go",
+      "plancontract/normalize.go",
+      "plancontract/plancontract.go"
+    ],
+    "output": ""
+  },
+  "git_diff_check": {
+    "exit_code": 0,
+    "output": ""
+  },
+  "runtime_source_reconciliation_verified": true
+}

@@ -1,12 +1,15 @@
 # Runtime verification
 
-Environment-scoped Cloud Spanner Emulator and Spanner Omni investigations live
+Environment-scoped managed Spanner, Cloud Spanner Emulator and Spanner Omni investigations live
 here as canonical Research Notes. Coordination handoffs may link here, but do
 not own the verification findings. Runtime identity, date, SQL or case scope,
 source evidence, results and unverified boundaries travel with each note.
 
 | Runtime and observation scope | Research Note |
 | --- | --- |
+| Managed Spanner, 2026-11-08 | [Managed revalidation and documentation audit](managed-revalidation-20261108.md): all three new mirror commits, search pagination, queue batch defaults and unchanged catalog surfaces |
+| Emulator 1.5.59 and Omni r4 LTS.2 / r5.1, 2026-11-08 | [Runtime upgrades and compatibility verification](runtime-upgrades-20261108.md): new defaults, explicit r5 selection, expression-index metadata loss and a Remote Function PLAN regression candidate |
+| Omni 2026.r2.1-beta, 2026-11-08 | [Scan-local PLAN contracts and partial collection](plan-report-access-paths-omni-20261108.md): seek/residual evidence, optional targets, structured parameters, annotations and non-executing DML |
 | Omni and managed Spanner, 2026-09-16 | [Join type and method matrix](join-type-method-matrix.md): per-cell raw plans and result checks for Hash, Apply, Distributed Apply, Merge, push broadcast, semi and anti-semi forms |
 | Emulator 1.5.58, Omni and managed Spanner, 2026-09-15 | [Index choice and release checks](fts-index-choice-and-emulator-1.5.58-20260915.md): competing secondary/n-gram indexes, version boundaries, result equivalence and DDL fixes |
 | Emulator 1.5.56 and Omni 2026.r2.1-beta, 2026-09-06 | [Catalog identity](catalog-identity-20260906.md): creation uniqueness, exact DDL references, query lookup, and synonym divergence |

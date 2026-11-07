@@ -77,9 +77,26 @@ summary status is `fail`.
 - `query/ScanSingerIDsFast`: a regular configured query target.
 - `query/ExternalQuerySingerIDs#inner`: the Spanner inner SQL of a configured
   `kind: external_query` target.
+- `write/RemoveSinger`: the SQL DML helper of a configured write. Mutation-only
+  writes are skipped because they have no SQL PLAN.
+- `query/ListSingers/variant/<label>`: a noncanonical optional SQL shape. The
+  suffix is the unpadded base64url encoding of the reported variant label. Copy
+  the reported ID rather than deriving it from enumeration order.
 
 Configured query and contract names are v1alpha identifiers
 (`[A-Za-z_][A-Za-z0-9_]*`) so target IDs do not need escaping.
+
+Optional queries produce every enumerated shape. The canonical all-on shape
+keeps `query/Name`; other shapes have distinct variant IDs. `variant` records
+its readable label, present/absent parameters and allowlisted ORDER BY choices.
+Omitted parameters are absent from the backend statement. A contract selecting
+the canonical ID does not automatically cover every other shape.
+
+DML queries use `result.cardinality: row_count` or `row_set`; only row_count
+can omit `result.struct`. `row_set` describes DML THEN RETURN output. Both use
+read-write `AnalyzeQuery` in PLAN mode and explicitly roll back. Reporting never
+executes their mutations. The operator family `row_count` is a separate backend
+operator concept, not the config's DML result mode.
 
 Contract names must be unique within one contract file. Runtime validation
 rejects duplicate names because report consumers may use
@@ -858,6 +875,95 @@ contract_evaluations:
     replayable_from_report: true
 ```
 
+## Logical access paths and predicates
+
+`access_paths[]` joins a Scan with its unique direct Filter Scan wrapper. Its
+condition roots belong to those two nodes; predicates from another scan, a join
+or an arbitrary ancestor are not silently assigned to it. Ambiguous or unpaired
+ancestor filters make `conditions_complete` false. Check that flag before making
+an absence claim about residual conditions.
+
+Each path includes scan/filter indexes, the case-preserving `scan_target`,
+`scan_type`, `scan_target_kind`, `base_table`, and `full_scan`. The catalog adds
+declared `key_columns`, `declared_key_count`, stored columns and null-filtered
+index facts for tables and regular secondary indexes. Missing schema facts are
+empty or null; they are not inferred from a synthetic target name. Index key
+counts exclude implicit base-table primary-key suffixes.
+
+`has_seek_condition`, `has_residual_condition`, `has_timestamp_condition` and
+`has_search_condition` come from typed child links. Their corresponding
+`*_conditions` entries retain each condition root's index, verbatim backend
+`expression`, and proven scan-local `columns`. `seek_columns` and
+`residual_columns` combine that column evidence. References are resolved through
+the owning scan's bindings, so a foreign join variable or a string literal is
+not guessed to be a local column. Empty column evidence does not prove that a
+predicate has no columns when a binding is unavailable.
+
+`seekable_key_size` preserves raw metadata. `range_seekable_key_size` is a
+positive integer or null. In particular, zero never means "no seek": an equality
+prefix with a later key left residual can also report zero. Use typed condition
+signals and column evidence to prove that the required predicates participate.
+Backend expression spellings remain optimizer/version sensitive; prefer column
+and topology checks over whole-expression text equality when possible.
+
+For example, these two paths can coexist in one plan:
+
+```yaml
+version: v1alpha-plan-contracts
+contracts:
+- name: ScopedSeekAndFullScan
+  target: query/LatestEvents
+  cel: |
+    access_paths.exists(p,
+      p.scan_target == "Events" && p.conditions_complete &&
+      p.has_seek_condition && "Shard" in p.seek_columns &&
+      "CreatedAt" in p.seek_columns) &&
+    access_paths.exists(p,
+      p.scan_target == "Surrogates" && p.conditions_complete &&
+      p.full_scan && !p.has_seek_condition)
+- name: LaterKeyRemainsResidual
+  target: query/EventsByShardAndId
+  cel: |
+    access_paths.exists(p,
+      p.scan_target == "Events" && p.conditions_complete &&
+      "Shard" in p.seek_columns && "Id" in p.residual_columns)
+```
+
+To reject residuals on one reviewed scan, require a matching complete path and
+`!p.has_residual_condition` in that same `exists` clause. This only describes
+scan-owned residual links; it does not assert that the entire query has no
+separate Filter operator. A whole-query `no_full_scan` contract is unsuitable
+when a different, intentionally small table is fully scanned.
+
+The access-path compatibility marker is
+`normalization.access_paths_version: v1alpha.1`. Operator and child-edge
+`expression` fields also preserve the backend short descriptions. Expressions
+participate in `operator_tree_sha256`, whose input revision is now `v1alpha.4`.
+ANN root/leaf components retain their backend scan kinds; logical ANN coalescing
+and search/vector catalog enrichment remain follow-up work. A centroid scan's
+full-scan flag must not be interpreted as a full scan of application base rows.
+
+`--annotate seekability` enriches the rendered metadata with `k/N` on a private
+plan copy. It does not change CEL inputs, raw metadata or digests. Zero, unknown
+key counts and k greater than the declared key count retain their raw values.
+The annotation uses the pinned stock renderer and needs no external workspace
+replacement.
+
+## Partial reports
+
+Static per-query analysis errors, catalog/DDL setup failures, parameter encoding
+errors and backend PLAN errors are retained as `status: error` for their targets.
+Other eligible targets continue. A failed catalog startup is cached once for
+that batch, so dependent targets do not repeatedly create databases. Error and
+skipped targets have no successful normalization payload. Malformed config or
+contracts and invalid global runtime selection still fail before collection.
+
+Generation and `explain-plan` keep their strict whole-config validation.
+`plan-report` uses the same resolver per target with the required catalog
+dependency closure, so an unrelated missing DDL file cannot discard a valid
+query. Reporting errors does not make a target satisfy its contracts: `--check`
+continues to fail for an unavailable contracted target.
+
 ## CEL Inputs
 
 CEL contracts are useful for query-specific checks that are too narrow or too
@@ -871,6 +977,7 @@ Current CEL variables:
 - `query`
 - `operators`
 - `operator_edges`
+- `access_paths`
 - `operator_families`
 - `operator_family_counts`
 - `optimizer`
@@ -914,7 +1021,10 @@ For `operators[]`, optional string metadata includes `execution_method`,
 Optional
 boolean metadata fields such as `scalar_aggregate` and `full_scan` default to
 `false`. For
-`operator_edges[]`, optional string fields include `type` and `variable`.
+`operator_edges[]`, optional string fields include `type`, `variable` and
+`expression`. `operators[].expression` also defaults to an empty string.
+Access-path fields are explicit in serialized reports; unknown numeric facts
+remain null in CEL rather than being coerced to zero.
 
 `scan_type` uses normalized spelling such as `table_scan`, `index_scan`,
 `batch_scan`, `search_index_scan`, `vector_index_metadata_scan`,

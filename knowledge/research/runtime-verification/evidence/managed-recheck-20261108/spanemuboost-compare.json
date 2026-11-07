@@ -1,0 +1,345 @@
+{
+  "url": "https://api.github.com/repos/apstndb/spanemuboost/compare/v0.4.10-alpha.1...v0.4.10",
+  "html_url": "https://github.com/apstndb/spanemuboost/compare/v0.4.10-alpha.1...v0.4.10",
+  "permalink_url": "https://github.com/apstndb/spanemuboost/compare/apstndb:3fd0016...apstndb:62a784a",
+  "diff_url": "https://github.com/apstndb/spanemuboost/compare/v0.4.10-alpha.1...v0.4.10.diff",
+  "patch_url": "https://github.com/apstndb/spanemuboost/compare/v0.4.10-alpha.1...v0.4.10.patch",
+  "base_commit": {
+    "sha": "3fd00169a00eff4dcfa1ff41a9a6cec3449f0acb",
+    "node_id": "C_kwDONct01doAKDNmZDAwMTY5YTAwZWZmNGRjZmExZmY0MWE5YTZjZWMzNDQ5ZjBhY2I",
+    "commit": {
+      "author": {
+        "name": "apstndb",
+        "email": "803393+apstndb@users.noreply.github.com",
+        "date": "2026-10-06T08:27:00Z"
+      },
+      "committer": {
+        "name": "GitHub",
+        "email": "noreply@github.com",
+        "date": "2026-10-06T08:27:00Z"
+      },
+      "message": "Default Omni to r4 LTS and select startup from image tags (#87)\n\nDefault Spanner Omni to 2026.r4-lts and add the listen address needed for forwarded-port access. Select flagless startup automatically for image tags identifying 2026.r1 through 2026.r3, and expose --image in the CLI for selecting another version.\n\nRetain the native image entrypoint and existing container customizer precedence. Document image-name matching, tagged digests and the experimental Omni compatibility boundary.\n\nValidation: focused tests, full race tests, build, lint and whitespace checks passed locally. All four checks passed on ce27de80ed563db65447720d26cd9e588aaad195, including Docker and rootless Podman smoke coverage for r2.1, r3 and r4 LTS.",
+      "tree": {
+        "sha": "1d96a95f14b8c3ea8300b18136e9cf78d56b92d8",
+        "url": "https://api.github.com/repos/apstndb/spanemuboost/git/trees/1d96a95f14b8c3ea8300b18136e9cf78d56b92d8"
+      },
+      "url": "https://api.github.com/repos/apstndb/spanemuboost/git/commits/3fd00169a00eff4dcfa1ff41a9a6cec3449f0acb",
+      "comment_count": 0,
+      "verification": {
+        "verified": true,
+        "reason": "valid",
+        "signature": "-----BEGIN PGP SIGNATURE-----\n\nwsFcBAABCAAQBQJqxLDUCRC1aQ7uu5UhlAAAsrwQAIyjT8rg08SxUIgyzRGkyn8h\n2uGExsRo85HIBa2fFsUGaeUuadl0OSoULXZnLmiOMlbSFM2std9NSh6RaiGei/Rg\nVCmjMKH7DBjt3WdmSXiagGMS6MePxPfENTp0xsJcQyjez4NAQTMrmA55BS8F81WP\nwA2XX/Kj2/m18XGENqCYcStMaDWiBJP6Edmr6bAfzqXUi6XwgPNUziu1GTptWgE3\nU5PUedjocnFc2VxAAh9lFryhhUkiirLruYghWZItZCbNpsgOT8aBIcs6J90xmw3N\nQCkM20+SvY+dehNaSFpUu4N7laHsI6arZs+TdVnS0N8J0LLzEnTZ2BYSlP52fA6z\nd+IgJ5YyDZpuYsXPai74vmcN2+ffGyUt6QCRKTxP911q7k8RTvzGzMinKv9cE/tz\nNzEH/LstylAaBYYBVAl8Me5cYrtxF93ziLHwPU1eyrHgym0Gan2GiqDAAONVe7oK\n9WQ6PvMDI2gNTEoQ7rvSOTSsSx4iQmH8noWb1bA+vvzPxAMJcapgqPVLVoicu6Kk\n9Hxo0+ivhzIA0iaD/e80CT9U4GIH0wYBerAXT12ZiO+yWjwMDYq1TSXOL7YJ7H2d\nu+8NTXlhmpmJ2949wFYBp1fTymAXvQO1nsbcx2geS+YnNka1QO+tm4jOcDKeCOWo\nm9OGp9y5taWKW62WvapF\n=cz7q\n-----END PGP SIGNATURE-----\n",
+        "payload": "tree 1d96a95f14b8c3ea8300b18136e9cf78d56b92d8\nparent 67ee006d3ca0dc1bbdf8e6705dce77be06dbf43f\nauthor apstndb <803393+apstndb@users.noreply.github.com> 1791275220 +0900\ncommitter GitHub <noreply@github.com> 1791275220 +0900\n\nDefault Omni to r4 LTS and select startup from image tags (#87)\n\nDefault Spanner Omni to 2026.r4-lts and add the listen address needed for forwarded-port access. Select flagless startup automatically for image tags identifying 2026.r1 through 2026.r3, and expose --image in the CLI for selecting another version.\n\nRetain the native image entrypoint and existing container customizer precedence. Document image-name matching, tagged digests and the experimental Omni compatibility boundary.\n\nValidation: focused tests, full race tests, build, lint and whitespace checks passed locally. All four checks passed on ce27de80ed563db65447720d26cd9e588aaad195, including Docker and rootless Podman smoke coverage for r2.1, r3 and r4 LTS.",
+        "verified_at": "2026-10-06T08:27:00Z"
+      }
+    },
+    "url": "https://api.github.com/repos/apstndb/spanemuboost/commits/3fd00169a00eff4dcfa1ff41a9a6cec3449f0acb",
+    "html_url": "https://github.com/apstndb/spanemuboost/commit/3fd00169a00eff4dcfa1ff41a9a6cec3449f0acb",
+    "comments_url": "https://api.github.com/repos/apstndb/spanemuboost/commits/3fd00169a00eff4dcfa1ff41a9a6cec3449f0acb/comments",
+    "author": {
+      "login": "apstndb",
+      "id": 803393,
+      "node_id": "MDQ6VXNlcjgwMzM5Mw==",
+      "avatar_url": "https://avatars.githubusercontent.com/u/803393?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/apstndb",
+      "html_url": "https://github.com/apstndb",
+      "followers_url": "https://api.github.com/users/apstndb/followers",
+      "following_url": "https://api.github.com/users/apstndb/following{/other_user}",
+      "gists_url": "https://api.github.com/users/apstndb/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/apstndb/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/apstndb/subscriptions",
+      "organizations_url": "https://api.github.com/users/apstndb/orgs",
+      "repos_url": "https://api.github.com/users/apstndb/repos",
+      "events_url": "https://api.github.com/users/apstndb/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/apstndb/received_events",
+      "type": "User",
+      "user_view_type": "public",
+      "site_admin": false
+    },
+    "committer": {
+      "login": "web-flow",
+      "id": 19864447,
+      "node_id": "MDQ6VXNlcjE5ODY0NDQ3",
+      "avatar_url": "https://avatars.githubusercontent.com/u/19864447?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/web-flow",
+      "html_url": "https://github.com/web-flow",
+      "followers_url": "https://api.github.com/users/web-flow/followers",
+      "following_url": "https://api.github.com/users/web-flow/following{/other_user}",
+      "gists_url": "https://api.github.com/users/web-flow/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/web-flow/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/web-flow/subscriptions",
+      "organizations_url": "https://api.github.com/users/web-flow/orgs",
+      "repos_url": "https://api.github.com/users/web-flow/repos",
+      "events_url": "https://api.github.com/users/web-flow/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/web-flow/received_events",
+      "type": "User",
+      "user_view_type": "public",
+      "site_admin": false
+    },
+    "parents": [
+      {
+        "sha": "67ee006d3ca0dc1bbdf8e6705dce77be06dbf43f",
+        "url": "https://api.github.com/repos/apstndb/spanemuboost/commits/67ee006d3ca0dc1bbdf8e6705dce77be06dbf43f",
+        "html_url": "https://github.com/apstndb/spanemuboost/commit/67ee006d3ca0dc1bbdf8e6705dce77be06dbf43f"
+      }
+    ]
+  },
+  "merge_base_commit": {
+    "sha": "3fd00169a00eff4dcfa1ff41a9a6cec3449f0acb",
+    "node_id": "C_kwDONct01doAKDNmZDAwMTY5YTAwZWZmNGRjZmExZmY0MWE5YTZjZWMzNDQ5ZjBhY2I",
+    "commit": {
+      "author": {
+        "name": "apstndb",
+        "email": "803393+apstndb@users.noreply.github.com",
+        "date": "2026-10-06T08:27:00Z"
+      },
+      "committer": {
+        "name": "GitHub",
+        "email": "noreply@github.com",
+        "date": "2026-10-06T08:27:00Z"
+      },
+      "message": "Default Omni to r4 LTS and select startup from image tags (#87)\n\nDefault Spanner Omni to 2026.r4-lts and add the listen address needed for forwarded-port access. Select flagless startup automatically for image tags identifying 2026.r1 through 2026.r3, and expose --image in the CLI for selecting another version.\n\nRetain the native image entrypoint and existing container customizer precedence. Document image-name matching, tagged digests and the experimental Omni compatibility boundary.\n\nValidation: focused tests, full race tests, build, lint and whitespace checks passed locally. All four checks passed on ce27de80ed563db65447720d26cd9e588aaad195, including Docker and rootless Podman smoke coverage for r2.1, r3 and r4 LTS.",
+      "tree": {
+        "sha": "1d96a95f14b8c3ea8300b18136e9cf78d56b92d8",
+        "url": "https://api.github.com/repos/apstndb/spanemuboost/git/trees/1d96a95f14b8c3ea8300b18136e9cf78d56b92d8"
+      },
+      "url": "https://api.github.com/repos/apstndb/spanemuboost/git/commits/3fd00169a00eff4dcfa1ff41a9a6cec3449f0acb",
+      "comment_count": 0,
+      "verification": {
+        "verified": true,
+        "reason": "valid",
+        "signature": "-----BEGIN PGP SIGNATURE-----\n\nwsFcBAABCAAQBQJqxLDUCRC1aQ7uu5UhlAAAsrwQAIyjT8rg08SxUIgyzRGkyn8h\n2uGExsRo85HIBa2fFsUGaeUuadl0OSoULXZnLmiOMlbSFM2std9NSh6RaiGei/Rg\nVCmjMKH7DBjt3WdmSXiagGMS6MePxPfENTp0xsJcQyjez4NAQTMrmA55BS8F81WP\nwA2XX/Kj2/m18XGENqCYcStMaDWiBJP6Edmr6bAfzqXUi6XwgPNUziu1GTptWgE3\nU5PUedjocnFc2VxAAh9lFryhhUkiirLruYghWZItZCbNpsgOT8aBIcs6J90xmw3N\nQCkM20+SvY+dehNaSFpUu4N7laHsI6arZs+TdVnS0N8J0LLzEnTZ2BYSlP52fA6z\nd+IgJ5YyDZpuYsXPai74vmcN2+ffGyUt6QCRKTxP911q7k8RTvzGzMinKv9cE/tz\nNzEH/LstylAaBYYBVAl8Me5cYrtxF93ziLHwPU1eyrHgym0Gan2GiqDAAONVe7oK\n9WQ6PvMDI2gNTEoQ7rvSOTSsSx4iQmH8noWb1bA+vvzPxAMJcapgqPVLVoicu6Kk\n9Hxo0+ivhzIA0iaD/e80CT9U4GIH0wYBerAXT12ZiO+yWjwMDYq1TSXOL7YJ7H2d\nu+8NTXlhmpmJ2949wFYBp1fTymAXvQO1nsbcx2geS+YnNka1QO+tm4jOcDKeCOWo\nm9OGp9y5taWKW62WvapF\n=cz7q\n-----END PGP SIGNATURE-----\n",
+        "payload": "tree 1d96a95f14b8c3ea8300b18136e9cf78d56b92d8\nparent 67ee006d3ca0dc1bbdf8e6705dce77be06dbf43f\nauthor apstndb <803393+apstndb@users.noreply.github.com> 1791275220 +0900\ncommitter GitHub <noreply@github.com> 1791275220 +0900\n\nDefault Omni to r4 LTS and select startup from image tags (#87)\n\nDefault Spanner Omni to 2026.r4-lts and add the listen address needed for forwarded-port access. Select flagless startup automatically for image tags identifying 2026.r1 through 2026.r3, and expose --image in the CLI for selecting another version.\n\nRetain the native image entrypoint and existing container customizer precedence. Document image-name matching, tagged digests and the experimental Omni compatibility boundary.\n\nValidation: focused tests, full race tests, build, lint and whitespace checks passed locally. All four checks passed on ce27de80ed563db65447720d26cd9e588aaad195, including Docker and rootless Podman smoke coverage for r2.1, r3 and r4 LTS.",
+        "verified_at": "2026-10-06T08:27:00Z"
+      }
+    },
+    "url": "https://api.github.com/repos/apstndb/spanemuboost/commits/3fd00169a00eff4dcfa1ff41a9a6cec3449f0acb",
+    "html_url": "https://github.com/apstndb/spanemuboost/commit/3fd00169a00eff4dcfa1ff41a9a6cec3449f0acb",
+    "comments_url": "https://api.github.com/repos/apstndb/spanemuboost/commits/3fd00169a00eff4dcfa1ff41a9a6cec3449f0acb/comments",
+    "author": {
+      "login": "apstndb",
+      "id": 803393,
+      "node_id": "MDQ6VXNlcjgwMzM5Mw==",
+      "avatar_url": "https://avatars.githubusercontent.com/u/803393?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/apstndb",
+      "html_url": "https://github.com/apstndb",
+      "followers_url": "https://api.github.com/users/apstndb/followers",
+      "following_url": "https://api.github.com/users/apstndb/following{/other_user}",
+      "gists_url": "https://api.github.com/users/apstndb/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/apstndb/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/apstndb/subscriptions",
+      "organizations_url": "https://api.github.com/users/apstndb/orgs",
+      "repos_url": "https://api.github.com/users/apstndb/repos",
+      "events_url": "https://api.github.com/users/apstndb/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/apstndb/received_events",
+      "type": "User",
+      "user_view_type": "public",
+      "site_admin": false
+    },
+    "committer": {
+      "login": "web-flow",
+      "id": 19864447,
+      "node_id": "MDQ6VXNlcjE5ODY0NDQ3",
+      "avatar_url": "https://avatars.githubusercontent.com/u/19864447?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/web-flow",
+      "html_url": "https://github.com/web-flow",
+      "followers_url": "https://api.github.com/users/web-flow/followers",
+      "following_url": "https://api.github.com/users/web-flow/following{/other_user}",
+      "gists_url": "https://api.github.com/users/web-flow/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/web-flow/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/web-flow/subscriptions",
+      "organizations_url": "https://api.github.com/users/web-flow/orgs",
+      "repos_url": "https://api.github.com/users/web-flow/repos",
+      "events_url": "https://api.github.com/users/web-flow/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/web-flow/received_events",
+      "type": "User",
+      "user_view_type": "public",
+      "site_admin": false
+    },
+    "parents": [
+      {
+        "sha": "67ee006d3ca0dc1bbdf8e6705dce77be06dbf43f",
+        "url": "https://api.github.com/repos/apstndb/spanemuboost/commits/67ee006d3ca0dc1bbdf8e6705dce77be06dbf43f",
+        "html_url": "https://github.com/apstndb/spanemuboost/commit/67ee006d3ca0dc1bbdf8e6705dce77be06dbf43f"
+      }
+    ]
+  },
+  "status": "ahead",
+  "ahead_by": 1,
+  "behind_by": 0,
+  "total_commits": 1,
+  "commits": [
+    {
+      "sha": "62a784a09d51c85c10c648e49a4b5bd99cb2aba0",
+      "node_id": "C_kwDONct01doAKDYyYTc4NGEwOWQ1MWM4NWMxMGM2NDhlNDlhNGI1YmQ5OWNiMmFiYTA",
+      "commit": {
+        "author": {
+          "name": "apstndb",
+          "email": "803393+apstndb@users.noreply.github.com",
+          "date": "2026-11-07T18:32:01Z"
+        },
+        "committer": {
+          "name": "GitHub",
+          "email": "noreply@github.com",
+          "date": "2026-11-07T18:32:01Z"
+        },
+        "message": "Update Emulator to 1.5.59 and Omni to 2026.r5\n\nUpdate both default runtime images and align documentation, CLI help, and startup expectations. Local race, lint, build, Omni smoke including legacy images, and hosted build-and-test, lint, Docker Omni, and rootless Podman smoke checks passed.",
+        "tree": {
+          "sha": "2e9f5c661128f91c98d4a8759e0daa2f2ae8bd98",
+          "url": "https://api.github.com/repos/apstndb/spanemuboost/git/trees/2e9f5c661128f91c98d4a8759e0daa2f2ae8bd98"
+        },
+        "url": "https://api.github.com/repos/apstndb/spanemuboost/git/commits/62a784a09d51c85c10c648e49a4b5bd99cb2aba0",
+        "comment_count": 0,
+        "verification": {
+          "verified": true,
+          "reason": "valid",
+          "signature": "-----BEGIN PGP SIGNATURE-----\n\nwsFcBAABCAAQBQJq726hCRC1aQ7uu5UhlAAABD4QAFywyTiVCSvjovSOSy4EnMet\n/wBdr8GAlf0XGiKFfwPjyg2TkDDWa689f75hkwG43kzCb5uPitr/mzClnrzckwm4\naJBnTOCUvePKRMlnanbC1E5MuCyS4re1H3FHK+27Y3kU7XYbZNMHNHcXauhyvNJJ\nQn5Vfm9H1BiWHFFvU44sthYoaxfp1CxTkRXg6gudKzmJdlSilsTJ+/EmWkOscPIM\nFJrMN0ntTH66GXaNO5fO3yFd3gyURXXkHRLh5nGzQhfa/8tbWtZsb1BW5K6vaEDh\nq7BaQN/3N0e2R3Z9KvHNhBtJwvHCoRJCAVsmX/AGoHO7+pRVVG8TuR5jbcKQH8CC\n9Ymp3mCrBcMTHTlwi1qnyCc9deRQ5HccJY49SNUfGa9zlwPNl9M0wNIfIr+WgUV1\nF6lq5FKLf3HMP/8wd7/Dv8ufr+DNNKq3Pnrfs7wjBAwgUp7zUELcADql8U9B7wTR\nXGZGcmMTDpARkBbpw/ymcY7qIh4mlmUqK4Gr3ggz8iLxJprdXa+KNiHMq8AfSf1h\nHo+PC4KHbW1n9pjCaEXXVl5IT/G/Yk/VLcazz2KKh8paxQvhIjoUGa8KTcX29toy\nAGXccQCqQODbpjiK3R5yYiECX7HG1a3s4Y0fIyHIyQ7prChohJkhjC1hnGSfj1Sz\nX16He1GtVZEfRQqizzrl\n=w2St\n-----END PGP SIGNATURE-----\n",
+          "payload": "tree 2e9f5c661128f91c98d4a8759e0daa2f2ae8bd98\nparent 3fd00169a00eff4dcfa1ff41a9a6cec3449f0acb\nauthor apstndb <803393+apstndb@users.noreply.github.com> 1794076321 +0900\ncommitter GitHub <noreply@github.com> 1794076321 +0900\n\nUpdate Emulator to 1.5.59 and Omni to 2026.r5\n\nUpdate both default runtime images and align documentation, CLI help, and startup expectations. Local race, lint, build, Omni smoke including legacy images, and hosted build-and-test, lint, Docker Omni, and rootless Podman smoke checks passed.",
+          "verified_at": "2026-11-07T18:32:01Z"
+        }
+      },
+      "url": "https://api.github.com/repos/apstndb/spanemuboost/commits/62a784a09d51c85c10c648e49a4b5bd99cb2aba0",
+      "html_url": "https://github.com/apstndb/spanemuboost/commit/62a784a09d51c85c10c648e49a4b5bd99cb2aba0",
+      "comments_url": "https://api.github.com/repos/apstndb/spanemuboost/commits/62a784a09d51c85c10c648e49a4b5bd99cb2aba0/comments",
+      "author": {
+        "login": "apstndb",
+        "id": 803393,
+        "node_id": "MDQ6VXNlcjgwMzM5Mw==",
+        "avatar_url": "https://avatars.githubusercontent.com/u/803393?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/apstndb",
+        "html_url": "https://github.com/apstndb",
+        "followers_url": "https://api.github.com/users/apstndb/followers",
+        "following_url": "https://api.github.com/users/apstndb/following{/other_user}",
+        "gists_url": "https://api.github.com/users/apstndb/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/apstndb/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/apstndb/subscriptions",
+        "organizations_url": "https://api.github.com/users/apstndb/orgs",
+        "repos_url": "https://api.github.com/users/apstndb/repos",
+        "events_url": "https://api.github.com/users/apstndb/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/apstndb/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "committer": {
+        "login": "web-flow",
+        "id": 19864447,
+        "node_id": "MDQ6VXNlcjE5ODY0NDQ3",
+        "avatar_url": "https://avatars.githubusercontent.com/u/19864447?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/web-flow",
+        "html_url": "https://github.com/web-flow",
+        "followers_url": "https://api.github.com/users/web-flow/followers",
+        "following_url": "https://api.github.com/users/web-flow/following{/other_user}",
+        "gists_url": "https://api.github.com/users/web-flow/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/web-flow/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/web-flow/subscriptions",
+        "organizations_url": "https://api.github.com/users/web-flow/orgs",
+        "repos_url": "https://api.github.com/users/web-flow/repos",
+        "events_url": "https://api.github.com/users/web-flow/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/web-flow/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "parents": [
+        {
+          "sha": "3fd00169a00eff4dcfa1ff41a9a6cec3449f0acb",
+          "url": "https://api.github.com/repos/apstndb/spanemuboost/commits/3fd00169a00eff4dcfa1ff41a9a6cec3449f0acb",
+          "html_url": "https://github.com/apstndb/spanemuboost/commit/3fd00169a00eff4dcfa1ff41a9a6cec3449f0acb"
+        }
+      ]
+    }
+  ],
+  "files": [
+    {
+      "sha": "d36f3c304e219e28875664cdf977c2aaae5a2795",
+      "filename": "README.md",
+      "status": "modified",
+      "additions": 1,
+      "deletions": 1,
+      "changes": 2,
+      "blob_url": "https://github.com/apstndb/spanemuboost/blob/62a784a09d51c85c10c648e49a4b5bd99cb2aba0/README.md",
+      "raw_url": "https://github.com/apstndb/spanemuboost/raw/62a784a09d51c85c10c648e49a4b5bd99cb2aba0/README.md",
+      "contents_url": "https://api.github.com/repos/apstndb/spanemuboost/contents/README.md?ref=62a784a09d51c85c10c648e49a4b5bd99cb2aba0",
+      "patch": "@@ -76,7 +76,7 @@ database accumulation matters.\n \n ### Spanner Omni (experimental)\n \n-Omni defaults to `2026.r4-lts`. Use `WithContainerImage(...)` to select another\n+Omni defaults to `2026.r5`. Use `WithContainerImage(...)` to select another\n image. Startup automatically selects flagless arguments for tags containing\n 2026.r1 through r3 and GA arguments for other references. See [package documentation](https://pkg.go.dev/github.com/apstndb/spanemuboost#hdr-Omni_image_selection)\n for image selection and custom startup arguments."
+    },
+    {
+      "sha": "0b1c86e6619dce8432425473f77dc68eb7c77259",
+      "filename": "cmd/spanemuboost/main.go",
+      "status": "modified",
+      "additions": 1,
+      "deletions": 1,
+      "changes": 2,
+      "blob_url": "https://github.com/apstndb/spanemuboost/blob/62a784a09d51c85c10c648e49a4b5bd99cb2aba0/cmd%2Fspanemuboost%2Fmain.go",
+      "raw_url": "https://github.com/apstndb/spanemuboost/raw/62a784a09d51c85c10c648e49a4b5bd99cb2aba0/cmd%2Fspanemuboost%2Fmain.go",
+      "contents_url": "https://api.github.com/repos/apstndb/spanemuboost/contents/cmd%2Fspanemuboost%2Fmain.go?ref=62a784a09d51c85c10c648e49a4b5bd99cb2aba0",
+      "patch": "@@ -66,7 +66,7 @@ Examples:\n   spanemuboost stop --endpoint-file /tmp/omni-endpoint.json\n   SPANEMUBOOST_ENDPOINT_FILE=/tmp/omni-endpoint.json go test ./...\n \n-Omni defaults to 2026.r4-lts. Startup arguments are selected automatically:\n+Omni defaults to 2026.r5. Startup arguments are selected automatically:\n tags containing 2026.r1 through r3 (or 2026-r1 through r3) omit the listen\n flag, including tagged digests. Other references use --listen-addresses=0.0.0.0.\n --image accepts --image value and --image=value."
+    },
+    {
+      "sha": "d5843962d6a923d6394ec0a65399ac87e501a0db",
+      "filename": "doc.go",
+      "status": "modified",
+      "additions": 2,
+      "deletions": 2,
+      "changes": 4,
+      "blob_url": "https://github.com/apstndb/spanemuboost/blob/62a784a09d51c85c10c648e49a4b5bd99cb2aba0/doc.go",
+      "raw_url": "https://github.com/apstndb/spanemuboost/raw/62a784a09d51c85c10c648e49a4b5bd99cb2aba0/doc.go",
+      "contents_url": "https://api.github.com/repos/apstndb/spanemuboost/contents/doc.go?ref=62a784a09d51c85c10c648e49a4b5bd99cb2aba0",
+      "patch": "@@ -15,13 +15,13 @@\n //\n // # Omni image selection\n //\n-// [BackendOmni] defaults to the Developer image 2026.r4-lts. Automatic image\n+// [BackendOmni] defaults to the Developer image 2026.r5. Automatic image\n // selection is the default: tags containing 2026.r1 through r3 (also spelled\n // 2026-r1 through r3) use the flagless start-single-server command. The suffix\n // need not be beta, and a tag is used even when followed by a digest. All\n // other references use --listen-addresses=0.0.0.0 for container port forwarding.\n // Later beta releases use these GA defaults too. Omni support remains\n-// experimental regardless of the image's LTS designation.\n+// experimental regardless of the upstream image's release designation.\n //\n // Select another image with [WithContainerImage]:\n //"
+    },
+    {
+      "sha": "0752f632413aadbd641eb1a1b6c8c05b8b004392",
+      "filename": "docs/omni-runtime-environments.md",
+      "status": "modified",
+      "additions": 1,
+      "deletions": 1,
+      "changes": 2,
+      "blob_url": "https://github.com/apstndb/spanemuboost/blob/62a784a09d51c85c10c648e49a4b5bd99cb2aba0/docs%2Fomni-runtime-environments.md",
+      "raw_url": "https://github.com/apstndb/spanemuboost/raw/62a784a09d51c85c10c648e49a4b5bd99cb2aba0/docs%2Fomni-runtime-environments.md",
+      "contents_url": "https://api.github.com/repos/apstndb/spanemuboost/contents/docs%2Fomni-runtime-environments.md?ref=62a784a09d51c85c10c648e49a4b5bd99cb2aba0",
+      "patch": "@@ -7,7 +7,7 @@ Historical environment checks below: 2026-05-19.\n \n ## Current startup configuration\n \n-The Omni default is the Developer image `2026.r4-lts`, with automatic startup\n+The Omni default is the Developer image `2026.r5`, with automatic startup\n selection from the image tag. Tags containing `2026.r1` through `2026.r3`\n (or `2026-r1` through `2026-r3`) use the flagless `start-single-server`\n command, regardless of the suffix. Version tokens are delimited so `r30` does"
+    },
+    {
+      "sha": "5d7f0f76be1f0786a629490027b9ec0883c1a3c1",
+      "filename": "omni.go",
+      "status": "modified",
+      "additions": 1,
+      "deletions": 1,
+      "changes": 2,
+      "blob_url": "https://github.com/apstndb/spanemuboost/blob/62a784a09d51c85c10c648e49a4b5bd99cb2aba0/omni.go",
+      "raw_url": "https://github.com/apstndb/spanemuboost/raw/62a784a09d51c85c10c648e49a4b5bd99cb2aba0/omni.go",
+      "contents_url": "https://api.github.com/repos/apstndb/spanemuboost/contents/omni.go?ref=62a784a09d51c85c10c648e49a4b5bd99cb2aba0",
+      "patch": "@@ -23,7 +23,7 @@ import (\n )\n \n const (\n-\tdefaultOmniImage      = \"us-docker.pkg.dev/spanner-omni/images/spanner-omni:2026.r4-lts\"\n+\tdefaultOmniImage      = \"us-docker.pkg.dev/spanner-omni/images/spanner-omni:2026.r5\"\n \tdefaultOmniProjectID  = \"default\"\n \tdefaultOmniInstanceID = \"default\"\n \tomniStartupTimeout    = 5 * time.Minute"
+    },
+    {
+      "sha": "5c27dcfffb55f6cbc09bdc01969b8948480ceb31",
+      "filename": "omni_startup_test.go",
+      "status": "modified",
+      "additions": 6,
+      "deletions": 6,
+      "changes": 12,
+      "blob_url": "https://github.com/apstndb/spanemuboost/blob/62a784a09d51c85c10c648e49a4b5bd99cb2aba0/omni_startup_test.go",
+      "raw_url": "https://github.com/apstndb/spanemuboost/raw/62a784a09d51c85c10c648e49a4b5bd99cb2aba0/omni_startup_test.go",
+      "contents_url": "https://api.github.com/repos/apstndb/spanemuboost/contents/omni_startup_test.go?ref=62a784a09d51c85c10c648e49a4b5bd99cb2aba0",
+      "patch": "@@ -27,7 +27,7 @@ func captureOmniRequest(t *testing.T, options ...Option) testcontainers.GenericC\n }\n \n func TestOmniStartupConfiguration(t *testing.T) {\n-\tconst ltsImage = \"us-docker.pkg.dev/spanner-omni/images/spanner-omni:2026.r4-lts\"\n+\tconst latestImage = \"us-docker.pkg.dev/spanner-omni/images/spanner-omni:2026.r5\"\n \tconst oldImage = \"us-docker.pkg.dev/spanner-omni/images/spanner-omni:2026.r3-beta\"\n \tconst customImage = \"example.invalid/omni@sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef\"\n \tgaCmd := []string{\"start-single-server\", \"--listen-addresses=0.0.0.0\"}\n@@ -39,7 +39,7 @@ func TestOmniStartupConfiguration(t *testing.T) {\n \t\tcmd        []string\n \t\tentrypoint []string\n \t}{\n-\t\t{\"LTS default\", nil, ltsImage, gaCmd, nil},\n+\t\t{\"latest default\", nil, latestImage, gaCmd, nil},\n \t\t{\"pre-GA beta selected automatically\", []Option{WithContainerImage(oldImage)}, oldImage, legacyCmd, nil},\n \t\t{\"pre-GA tagged digest selected automatically\", []Option{WithContainerImage(oldImage + \"@sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef\")}, oldImage + \"@sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef\", legacyCmd, nil},\n \t\t{\"digest defaults to GA\", []Option{WithContainerImage(customImage)}, customImage, gaCmd, nil},\n@@ -48,9 +48,9 @@ func TestOmniStartupConfiguration(t *testing.T) {\n \t\t\treturn nil\n \t\t}))}, oldImage, legacyCmd, nil},\n \t\t{\"image-only customizer selects GA\", []Option{WithContainerImage(oldImage), WithContainerCustomizers(testcontainers.CustomizeRequestOption(func(r *testcontainers.GenericContainerRequest) error {\n-\t\t\tr.Image = ltsImage\n+\t\t\tr.Image = latestImage\n \t\t\treturn nil\n-\t\t}))}, ltsImage, gaCmd, nil},\n+\t\t}))}, latestImage, gaCmd, nil},\n \t\t{\"in-place command customizer wins\", []Option{WithContainerCustomizers(testcontainers.CustomizeRequestOption(func(r *testcontainers.GenericContainerRequest) error {\n \t\t\tr.Image = oldImage\n \t\t\tr.Cmd[1] = \"--log-errors-inline\"\n@@ -69,11 +69,11 @@ func TestOmniStartupConfiguration(t *testing.T) {\n \t\t{\"command customizer wins\", []Option{WithContainerCustomizers(testcontainers.CustomizeRequestOption(func(r *testcontainers.GenericContainerRequest) error {\n \t\t\tr.Cmd = []string{\"custom-subcommand\", \"custom-arg\"}\n \t\t\treturn nil\n-\t\t}))}, ltsImage, []string{\"custom-subcommand\", \"custom-arg\"}, nil},\n+\t\t}))}, latestImage, []string{\"custom-subcommand\", \"custom-arg\"}, nil},\n \t\t{\"entrypoint customizer wins\", []Option{WithContainerCustomizers(testcontainers.CustomizeRequestOption(func(r *testcontainers.GenericContainerRequest) error {\n \t\t\tr.Entrypoint = []string{\"custom-entrypoint\"}\n \t\t\treturn nil\n-\t\t}))}, ltsImage, gaCmd, []string{\"custom-entrypoint\"}},\n+\t\t}))}, latestImage, gaCmd, []string{\"custom-entrypoint\"}},\n \t} {\n \t\tt.Run(tt.name, func(t *testing.T) {\n \t\t\treq := captureOmniRequest(t, tt.options...)"
+    },
+    {
+      "sha": "ddfd1d7974a3bc7cd2c8d88f37ee08b2a46c2d60",
+      "filename": "spanemuboost.go",
+      "status": "modified",
+      "additions": 1,
+      "deletions": 1,
+      "changes": 2,
+      "blob_url": "https://github.com/apstndb/spanemuboost/blob/62a784a09d51c85c10c648e49a4b5bd99cb2aba0/spanemuboost.go",
+      "raw_url": "https://github.com/apstndb/spanemuboost/raw/62a784a09d51c85c10c648e49a4b5bd99cb2aba0/spanemuboost.go",
+      "contents_url": "https://api.github.com/repos/apstndb/spanemuboost/contents/spanemuboost.go?ref=62a784a09d51c85c10c648e49a4b5bd99cb2aba0",
+      "patch": "@@ -15,7 +15,7 @@ import (\n )\n \n const (\n-\tDefaultEmulatorImage = \"gcr.io/cloud-spanner-emulator/emulator:1.5.58\"\n+\tDefaultEmulatorImage = \"gcr.io/cloud-spanner-emulator/emulator:1.5.59\"\n \tDefaultProjectID     = \"emulator-project\"\n \tDefaultInstanceID    = \"emulator-instance\"\n \tDefaultDatabaseID    = \"emulator-database\""
+    }
+  ]
+}

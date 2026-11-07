@@ -558,13 +558,13 @@ func validateV1AlphaQueryShape(q QueryCodegenV1AlphaQuery) error {
 	if err := requireV1AlphaIdentifierReference("query "+q.Name+" binding", q.Binding); err != nil {
 		return err
 	}
-	if strings.TrimSpace(q.Result.Struct) == "" {
+	if strings.TrimSpace(q.Result.Struct) == "" && !strings.EqualFold(q.Result.Cardinality, "row_count") {
 		return fmt.Errorf("query %s result.struct is required", q.Name)
 	}
 	switch strings.ToLower(strings.TrimSpace(q.Result.Cardinality)) {
-	case "", "one", "maybe_one", "many":
+	case "", "one", "maybe_one", "many", "row_count", "row_set":
 	default:
-		return fmt.Errorf("query %s result.cardinality %q is not supported; use one, maybe_one, or many", q.Name, q.Result.Cardinality)
+		return fmt.Errorf("query %s result.cardinality %q is not supported; use one, maybe_one, many, row_count, or row_set", q.Name, q.Result.Cardinality)
 	}
 	switch strings.ToLower(strings.TrimSpace(q.Result.Required.Policy)) {
 	case "", "override", "strict":

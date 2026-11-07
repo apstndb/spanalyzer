@@ -1,0 +1,18 @@
+[
+  {
+    "label": "connectivity",
+    "sql": "SELECT 1 AS connectivity"
+  },
+  {
+    "label": "LOCK_STATS_TOP_MINUTE-corrected-scalar",
+    "sql": "SELECT INTERVAL_END,LOCK_WAIT_SECONDS FROM SPANNER_SYS.LOCK_STATS_TOP_MINUTE LIMIT 1"
+  },
+  {
+    "label": "LOCK_STATS_TOP_10MINUTE-corrected-scalar",
+    "sql": "SELECT INTERVAL_END,LOCK_WAIT_SECONDS FROM SPANNER_SYS.LOCK_STATS_TOP_10MINUTE LIMIT 1"
+  },
+  {
+    "label": "LOCK_STATS_TOP_HOUR-corrected-scalar",
+    "sql": "SELECT INTERVAL_END,LOCK_WAIT_SECONDS FROM SPANNER_SYS.LOCK_STATS_TOP_HOUR LIMIT 1"
+  }
+]

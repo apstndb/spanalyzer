@@ -1,0 +1,9 @@
+=== RUN   TestCanonicalDDL_RealSpanner
+    canonical_integration_test.go:106: canonical DDL diagnostic_metrics canonical_total=0 canonical_parse_errors=0 canonical_allowlisted=0 generated_total=0
+--- PASS: TestCanonicalDDL_RealSpanner (2.99s)
+=== RUN   TestDrift_RealTableMetas
+    drift_test.go:118: SPANNER_SYS contract_metrics target=real_spanner registered_tables=53 advertised_tables=52 advertised_columns=624 known_absent_columns=8 has_drift=false
+    drift_test.go:118: SPANNER_SYS diagnostic_metrics target=real_spanner checked_tables=52 decoded_rows=17 advertised_not_queryable=0
+--- PASS: TestDrift_RealTableMetas (10.42s)
+PASS
+ok  	github.com/apstndb/spanalyzer/survey/infoschem	14.020s

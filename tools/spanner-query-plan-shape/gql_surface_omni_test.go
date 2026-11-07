@@ -221,6 +221,8 @@ func TestIntegrationGQLCompositionalSurfaceOnOmni(t *testing.T) {
 			wantExistsAggregates = 3
 		} else if version == 5 {
 			wantExistsAggregates = 1
+		} else if selectedOmniR5() {
+			wantExistsAggregates = 3
 		}
 		if got := countPlanNodes(existsMatchPlan, "Aggregate", ""); got != wantExistsAggregates {
 			t.Errorf("short EXISTS v%d Aggregate count = %d, want %d", version, got, wantExistsAggregates)

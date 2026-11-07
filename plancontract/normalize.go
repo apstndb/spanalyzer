@@ -55,6 +55,7 @@ func NormalizeOperators(plan *spannerpb.QueryPlan) []Operator {
 		out = append(out, Operator{
 			Index:               node.GetIndex(),
 			DisplayName:         node.GetDisplayName(),
+			Expression:          node.GetShortRepresentation().GetDescription(),
 			Family:              familyByIndex[node.GetIndex()],
 			ExecutionMethod:     OperatorMetadataString(node, "execution_method"),
 			IteratorType:        OperatorMetadataString(node, "iterator_type"),
@@ -85,6 +86,10 @@ func NormalizeOperatorEdges(plan *spannerpb.QueryPlan) []OperatorEdge {
 		return nil
 	}
 	edges := make([]OperatorEdge, 0)
+	byIndex := map[int32]*spannerpb.PlanNode{}
+	for _, node := range plan.GetPlanNodes() {
+		byIndex[node.GetIndex()] = node
+	}
 	for _, node := range sortedPlanNodes(plan) {
 		for _, link := range node.GetChildLinks() {
 			edges = append(edges, OperatorEdge{
@@ -92,6 +97,7 @@ func NormalizeOperatorEdges(plan *spannerpb.QueryPlan) []OperatorEdge {
 				ChildIndex:  link.GetChildIndex(),
 				Type:        link.GetType(),
 				Variable:    link.GetVariable(),
+				Expression:  byIndex[link.GetChildIndex()].GetShortRepresentation().GetDescription(),
 			})
 		}
 	}
@@ -213,6 +219,7 @@ func OperatorTreeDigest(plan *spannerpb.QueryPlan) string {
 		Index               int32             `json:"index"`
 		Family              string            `json:"family"`
 		DisplayName         string            `json:"display_name"`
+		Expression          string            `json:"expression"`
 		ExecutionMethod     string            `json:"execution_method"`
 		IteratorType        string            `json:"iterator_type"`
 		ScanMethod          string            `json:"scan_method"`
@@ -241,6 +248,7 @@ func OperatorTreeDigest(plan *spannerpb.QueryPlan) string {
 			Index:               node.GetIndex(),
 			Family:              nodeOperatorFamily(node, operatorContexts[node.GetIndex()]),
 			DisplayName:         node.GetDisplayName(),
+			Expression:          node.GetShortRepresentation().GetDescription(),
 			ExecutionMethod:     OperatorMetadataString(node, "execution_method"),
 			IteratorType:        OperatorMetadataString(node, "iterator_type"),
 			ScanMethod:          OperatorMetadataString(node, "scan_method"),

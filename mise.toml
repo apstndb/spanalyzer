@@ -122,6 +122,11 @@ description = "Run both Omni integration packages against one pinned shared runt
 dir = "tools"
 run = "go run ./omni-integration-runner --repo-root .."
 
+[tasks.verify-omni-r5-integration]
+description = "Run both Omni integration packages against the pinned r5 alternative"
+dir = "tools"
+run = "go run ./omni-integration-runner --repo-root .. --omni-version 2026.r5.1"
+
 [tasks.verify-containers]
 description = "Run pinned Emulator and Omni checks without writing evidence"
 run = [

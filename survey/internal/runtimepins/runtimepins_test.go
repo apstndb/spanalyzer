@@ -22,10 +22,10 @@ func TestImageForPlatform(t *testing.T) {
 		platform string
 		contains string
 	}{
-		{name: "emulator amd64", kind: "emulator", platform: "linux/amd64", contains: "emulator:1.5.56@sha256:24c921"},
-		{name: "emulator arm64", kind: "emulator", platform: "linux/arm64", contains: "emulator:1.5.56@sha256:5b1e36"},
-		{name: "omni amd64", kind: "omni", platform: "linux/amd64", contains: "spanner-omni:2026.r2.1-beta@sha256:48631b"},
-		{name: "omni arm64", kind: "omni", platform: "linux/arm64", contains: "spanner-omni:2026.r2.1-beta@sha256:ed31d9"},
+		{name: "emulator amd64", kind: "emulator", platform: "linux/amd64", contains: "emulator:1.5.59@sha256:f9212d"},
+		{name: "emulator arm64", kind: "emulator", platform: "linux/arm64", contains: "emulator:1.5.59@sha256:969af6"},
+		{name: "omni amd64", kind: "omni", platform: "linux/amd64", contains: "spanner-omni:2026.r4-lts.2@sha256:5c585b"},
+		{name: "omni arm64", kind: "omni", platform: "linux/arm64", contains: "spanner-omni:2026.r4-lts.2@sha256:b607b1"},
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {

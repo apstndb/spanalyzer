@@ -1,0 +1,33 @@
+package main
+import (
+ "context"
+ "encoding/json"
+ "fmt"
+ "cloud.google.com/go/spanner"
+ "github.com/apstndb/spanemuboost"
+ "github.com/apstndb/spanalyzer/survey/astconv"
+)
+func main() {
+ ctx:=context.Background()
+ env,err:=spanemuboost.RunWithClients(ctx,spanemuboost.BackendEmulator,
+  spanemuboost.WithContainerImage("gcr.io/cloud-spanner-emulator/emulator:1.5.59@sha256:969af6a9349948fbfb4a826c18e160e258a4005f7c759f8e7f2dcec369cccba8"),
+  spanemuboost.WithSetupDDLs([]string{
+   "CREATE TABLE ExpressionProbe (Id INT64 NOT NULL, Data JSON) PRIMARY KEY (Id)",
+   "CREATE INDEX ExpressionProbeByValue ON ExpressionProbe((JSON_VALUE(Data.value)))",
+  }))
+ if err!=nil {panic(err)}
+ defer env.Close()
+ iter:=env.Client.Single().Query(ctx,spanner.NewStatement("SELECT INDEX_NAME, COLUMN_NAME, ORDINAL_POSITION, COLUMN_ORDERING, SPANNER_TYPE FROM INFORMATION_SCHEMA.INDEX_COLUMNS WHERE TABLE_NAME='ExpressionProbe' ORDER BY INDEX_NAME, ORDINAL_POSITION"))
+ defer iter.Stop()
+ err=iter.Do(func(row *spanner.Row)error{
+  var index,column,typ string
+  var ordinal spanner.NullInt64
+  var ordering spanner.NullString
+  if err:=row.Columns(&index,&column,&ordinal,&ordering,&typ);err!=nil{return err}
+  data,err:=json.Marshal(map[string]any{"index":index,"column":column,"ordinal":ordinal,"ordering":ordering,"type":typ});if err!=nil{return err};fmt.Println(string(data));return nil
+ })
+ if err!=nil {panic(err)}
+ schema,err:=astconv.LoadSchema(ctx,env.Client);if err!=nil{panic(err)}
+ ddls,err:=schema.ToDDLStatements();fmt.Printf("reconstruction_error=%v\n",err)
+ for _,ddl:=range ddls {fmt.Println(ddl.SQL())}
+}

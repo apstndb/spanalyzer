@@ -50,39 +50,8 @@ func TestExpressionIndex_RealSpanner(t *testing.T) {
 		client,
 		databaseName,
 		fmt.Sprintf("ExpressionIndexProbe_%d", time.Now().UnixNano()),
+		true,
 	)
-}
-
-func verifyExpressionIndexRejected(
-	ctx context.Context,
-	t *testing.T,
-	admin *database.DatabaseAdminClient,
-	databaseName string,
-	tableName string,
-) {
-	t.Helper()
-
-	if err := updateExpressionIndexDDL(ctx, admin, databaseName, expressionIndexTableDDL(tableName)); err != nil {
-		t.Fatalf("create expression-index rejection fixture table: %v", err)
-	}
-	defer func() {
-		if err := updateExpressionIndexDDL(ctx, admin, databaseName, "DROP TABLE "+tableName); err != nil {
-			t.Errorf("drop expression-index rejection fixture table: %v", err)
-		}
-	}()
-
-	indexName := tableName + "ByCity"
-	err := updateExpressionIndexDDL(ctx, admin, databaseName, fmt.Sprintf(
-		"CREATE INDEX %s ON %s((JSON_VALUE(VenueData.address.city)))",
-		indexName,
-		tableName,
-	))
-	if err == nil {
-		t.Fatal("expression-index DDL succeeded, want pinned Emulator syntax rejection")
-	}
-	if status.Code(err) != codes.InvalidArgument || !strings.Contains(strings.ToLower(err.Error()), "syntax error") {
-		t.Fatalf("expression-index rejection = %v, want InvalidArgument syntax error", err)
-	}
 }
 
 func verifyExpressionIndexAccepted(
@@ -92,6 +61,7 @@ func verifyExpressionIndexAccepted(
 	client *spanner.Client,
 	databaseName string,
 	tableName string,
+	expectExpressionMetadata bool,
 ) {
 	t.Helper()
 
@@ -190,15 +160,26 @@ func verifyExpressionIndexAccepted(
 		createdIndexes = append(createdIndexes, volatileName)
 		t.Fatal("non-deterministic expression index succeeded, want semantic rejection")
 	}
-	if status.Code(volatileErr) != codes.InvalidArgument || !strings.Contains(strings.ToLower(volatileErr.Error()), "non-deterministic expression") {
+	if (status.Code(volatileErr) != codes.InvalidArgument && status.Code(volatileErr) != codes.FailedPrecondition) || !strings.Contains(strings.ToLower(volatileErr.Error()), "non-deterministic") {
 		t.Errorf("non-deterministic expression-index error = %v, want semantic rejection", volatileErr)
 	}
 
-	rows := loadExpressionIndexColumns(ctx, t, client, tableName)
-	assertExpressionIndexRows(t, rows, cityIndex, mixedIndex, noWrapIndex)
-	assertExpressionIndexColumnsAreNotTableColumns(ctx, t, client, tableName)
-	assertExpressionIndexCanonicalDDL(ctx, t, admin, databaseName, tableName, cityIndex, noWrapIndex)
-	assertExpressionIndexReconstructionFailsClosed(ctx, t, client, cityIndex)
+	discovered, err := infoschem.DiscoverColumns(ctx, client)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got := discovered["INDEX_COLUMNS"]["EXPRESSION"]; got != expectExpressionMetadata {
+		t.Fatalf("INDEX_COLUMNS.EXPRESSION available=%t, want %t", got, expectExpressionMetadata)
+	}
+	rows := loadExpressionIndexColumns(ctx, t, client, tableName, expectExpressionMetadata)
+	if expectExpressionMetadata {
+		assertExpressionIndexRows(t, rows, cityIndex, mixedIndex, noWrapIndex)
+		assertExpressionIndexColumnsAreNotTableColumns(ctx, t, client, tableName)
+	} else if len(rows) != 1 || rows[0].IndexName != mixedIndex || rows[0].ColumnName != "VenueName" {
+		t.Errorf("Emulator expression-index key metadata = %+v, want only the ordinary mixed key", rows)
+	}
+	assertExpressionIndexCanonicalDDL(ctx, t, admin, databaseName, tableName, cityIndex, noWrapIndex, expectExpressionMetadata)
+	assertExpressionIndexReconstructionFailsClosed(ctx, t, client, cityIndex, expectExpressionMetadata)
 	if err := cleanup(ctx); err != nil {
 		t.Fatalf("cleanup expression-index fixture: %v", err)
 	}
@@ -234,12 +215,17 @@ func loadExpressionIndexColumns(
 	t *testing.T,
 	client *spanner.Client,
 	tableName string,
+	hasExpressionMetadata bool,
 ) []*infoschem.IndexColumn {
 	t.Helper()
+	expressionColumn := "EXPRESSION"
+	if !hasExpressionMetadata {
+		expressionColumn = "CAST(NULL AS STRING) AS EXPRESSION"
+	}
 	iter := client.Single().Query(ctx, spanner.Statement{
 		SQL: `SELECT TABLE_SCHEMA, TABLE_NAME, INDEX_NAME, INDEX_TYPE, COLUMN_NAME,
                      ORDINAL_POSITION, COLUMN_ORDERING, IS_NULLABLE, SPANNER_TYPE,
-                     EXPRESSION
+                     ` + expressionColumn + `
                 FROM INFORMATION_SCHEMA.INDEX_COLUMNS
                WHERE TABLE_SCHEMA = '' AND TABLE_NAME = @table_name
                  AND INDEX_NAME != 'PRIMARY_KEY'
@@ -344,6 +330,7 @@ func assertExpressionIndexCanonicalDDL(
 	tableName string,
 	cityIndex string,
 	noWrapIndex string,
+	hasExpressionMetadata bool,
 ) {
 	t.Helper()
 	response, err := admin.GetDatabaseDdl(ctx, &databasepb.GetDatabaseDdlRequest{Database: databaseName})
@@ -359,7 +346,16 @@ func assertExpressionIndexCanonicalDDL(
 		for _, statement := range response.Statements {
 			if strings.Contains(statement, "CREATE INDEX "+indexName+" ON "+tableName) {
 				found = true
-				if !strings.Contains(statement, expression) {
+				if !hasExpressionMetadata {
+					// The pinned Emulator also loses these keys in GetDatabaseDdl.
+					// Record that upstream gap; reconstruction is independently
+					// required to reject the incomplete metadata above.
+					wantIncomplete := "CREATE INDEX " + indexName + " ON " + tableName + "()"
+					if strings.TrimSpace(statement) != wantIncomplete {
+						t.Errorf("Emulator expression-index serialization = %q, want known incomplete %q", statement, wantIncomplete)
+					}
+					t.Logf("known Emulator expression-key serialization gap: %s", statement)
+				} else if !strings.Contains(statement, expression) {
 					t.Errorf("canonical DDL for %s = %q, want expression fragment %q", indexName, statement, expression)
 				}
 				break
@@ -376,13 +372,14 @@ func assertExpressionIndexReconstructionFailsClosed(
 	t *testing.T,
 	client *spanner.Client,
 	cityIndex string,
+	hasExpressionMetadata bool,
 ) {
 	t.Helper()
 	loaded, err := astconv.LoadSchema(ctx, client)
 	if err != nil {
 		t.Fatalf("LoadSchema with expression index: %v", err)
 	}
-	partial := &astconv.Schema{}
+	partial := &astconv.Schema{Columns: loaded.Columns}
 	for _, index := range loaded.Indexes {
 		if index.IndexName == cityIndex {
 			partial.Indexes = append(partial.Indexes, index)
@@ -393,8 +390,12 @@ func assertExpressionIndexReconstructionFailsClosed(
 			partial.IndexColumns = append(partial.IndexColumns, column)
 		}
 	}
-	if len(partial.Indexes) != 1 || len(partial.IndexColumns) != 1 {
-		t.Fatalf("loaded expression index has indexes=%d columns=%d, want 1/1", len(partial.Indexes), len(partial.IndexColumns))
+	wantKeys := 0
+	if hasExpressionMetadata {
+		wantKeys = 1
+	}
+	if len(partial.Indexes) != 1 || len(partial.IndexColumns) != wantKeys {
+		t.Fatalf("loaded expression index has indexes=%d columns=%d, want 1/%d", len(partial.Indexes), len(partial.IndexColumns), wantKeys)
 	}
 	_, err = partial.ToDDLStatements()
 	if err == nil || !strings.Contains(err.Error(), "unsupported expression index") {

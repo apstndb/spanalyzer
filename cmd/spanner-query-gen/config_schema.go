@@ -261,7 +261,8 @@ func planReportJSONSchema() map[string]interface{} {
 				"render_tool": enumSchema([]interface{}{"spannerplan"}, "Human-readable plan renderer."),
 			}),
 			"backend_identity": planReportBackendIdentityJSONSchema(),
-			"normalization": objectSchema([]interface{}{"operator_tree_version", "operator_family_mapping_version", "cel_input_defaults"}, map[string]interface{}{
+			"normalization": objectSchema([]interface{}{"operator_tree_version", "operator_family_mapping_version", "access_paths_version", "cel_input_defaults"}, map[string]interface{}{
+				"access_paths_version":            stringSchema("Access-path normalization compatibility revision."),
 				"operator_tree_version":           stringSchema("Normalized operator tree digest input version."),
 				"operator_family_mapping_version": stringSchema("Operator family mapping version."),
 				"cel_input_defaults":              map[string]interface{}{"$ref": "#/$defs/cel_input_defaults"},
@@ -288,10 +289,13 @@ func planReportJSONSchema() map[string]interface{} {
 				"scope":   planReportScopeSchema("Plan-report target scope."),
 				"reason":  patternStringSchema(`^[a-z][a-z0-9_]*(\.[a-z0-9_]+)+$`, "Machine-readable namespaced exclusion reason."),
 			}),
-			"query": planReportQueryJSONSchema(),
+			"query":       planReportQueryJSONSchema(),
+			"access_path": planAccessPathJSONSchema(),
+			"variant":     planReportVariantJSONSchema(),
 			"operator": objectSchema([]interface{}{"index", "display_name", "family", "child_indexes", "descendant_indexes", "subtree_family_counts"}, map[string]interface{}{
 				"index":                 nonNegativeIntegerSchema("PlanNode index."),
 				"display_name":          stringSchema("PlanNode display name."),
+				"expression":            stringSchema("Verbatim backend short representation."),
 				"family":                map[string]interface{}{"$ref": "#/$defs/concrete_operator_family"},
 				"execution_method":      stringSchema("Normalized execution_method metadata."),
 				"iterator_type":         stringSchema("Normalized iterator_type metadata."),
@@ -318,6 +322,7 @@ func planReportJSONSchema() map[string]interface{} {
 				"child_index":  nonNegativeIntegerSchema("Child PlanNode index."),
 				"type":         stringSchema("PlanNode child-link type."),
 				"variable":     stringSchema("PlanNode child-link variable."),
+				"expression":   stringSchema("Verbatim child short representation."),
 			}),
 			"optimizer": objectSchema([]interface{}{"requested", "effective"}, map[string]interface{}{
 				"requested": objectSchema([]interface{}{"version", "statistics_package"}, map[string]interface{}{
@@ -416,7 +421,7 @@ func planReportQueryJSONSchema() map[string]interface{} {
 		"name":                    identifierSchema("Configured query name."),
 		"catalog":                 stringSchema("Spanner catalog used for analysis."),
 		"scope":                   planReportScopeSchema("Plan-report target scope."),
-		"kind":                    enumSchema([]interface{}{"sql", "table", "index", "external_query"}, "Configured query kind."),
+		"kind":                    enumSchema([]interface{}{"sql", "table", "index", "external_query", "write"}, "Configured query kind."),
 		"status":                  enumSchema([]interface{}{"ok", "skipped", "error"}, "Per-query analysis status. Status ok means plan fields are valid. Status error or skipped means only the input identity fields and error field are reliable; plan normalization fields must not be interpreted as a successful plan."),
 		"sql":                     stringSchema("Analyzed SQL text."),
 		"sql_sha256":              sha256Schema("SHA-256 of analyzed SQL bytes."),
@@ -427,6 +432,8 @@ func planReportQueryJSONSchema() map[string]interface{} {
 		"operator_family_counts":  completeOperatorFamilyIntegerMapSchema("Normalized operator family counts observed in the query plan. Contains every operator_family enum value, including derived umbrella families; absent families are represented by 0."),
 		"normalized_operators":    arraySchemaAllowEmpty(map[string]interface{}{"$ref": "#/$defs/operator"}),
 		"operator_edges":          arraySchemaAllowEmpty(map[string]interface{}{"$ref": "#/$defs/operator_edge"}),
+		"access_paths":            arraySchemaAllowEmpty(map[string]interface{}{"$ref": "#/$defs/access_path"}),
+		"variant":                 map[string]interface{}{"$ref": "#/$defs/variant"},
 		"plan":                    stringSchema("Rendered human-readable query plan."),
 		"error":                   stringSchema("Target acquisition error or skip message."),
 		"optimizer_not_pinned":    boolSchema("Whether this query used unpinned optimizer settings."),
@@ -434,7 +441,7 @@ func planReportQueryJSONSchema() map[string]interface{} {
 		"classification_warnings": arraySchemaAllowEmpty(map[string]interface{}{"$ref": "#/$defs/diagnostic"}),
 	})
 	schema["allOf"] = []interface{}{
-		planReportQueryStatusRequiredClause("ok", []interface{}{"sql", "sql_sha256", "ddl_sha256", "operator_tree_sha256", "operator_families", "operator_family_counts", "normalized_operators", "operator_edges", "plan"}, nil),
+		planReportQueryStatusRequiredClause("ok", []interface{}{"sql", "sql_sha256", "ddl_sha256", "operator_tree_sha256", "operator_families", "operator_family_counts", "normalized_operators", "operator_edges", "access_paths", "plan"}, nil),
 		planReportQueryStatusRequiredClause("error", []interface{}{"error"}, planReportQuerySuccessOnlyFields()),
 		planReportQueryStatusRequiredClause("skipped", []interface{}{"error"}, planReportQuerySuccessOnlyFields()),
 	}
@@ -464,6 +471,7 @@ func planReportQuerySuccessOnlyFields() []string {
 		"operator_family_counts",
 		"normalized_operators",
 		"operator_edges",
+		"access_paths",
 		"plan",
 		"classification_warnings",
 	}
@@ -803,19 +811,15 @@ func v1AlphaConfigJSONSchema() map[string]interface{} {
 			}),
 			"query": querySchema(),
 			"query_param": objectSchema([]interface{}{"name", "type"}, map[string]interface{}{
-				"name":  stringSchema("GoogleSQL parameter name without the leading @."),
-				"type":  stringSchema("GoogleSQL parameter type used when analyzer inference needs explicit input."),
-				"scope": enumSchema([]interface{}{"inner", "outer"}, "Optional external_query parameter scope. Omit for regular queries."),
+				"name":     stringSchema("GoogleSQL parameter name without the leading @."),
+				"type":     stringSchema("GoogleSQL parameter type used when analyzer inference needs explicit input."),
+				"scope":    enumSchema([]interface{}{"inner", "outer"}, "Optional external_query parameter scope. Omit for regular queries."),
+				"optional": enumSchema([]interface{}{"required", "null_is_null", "omit_when_null", "omit_when_empty", "orderby_choice"}, "Optional SQL rewrite mode."),
+				"choices":  map[string]interface{}{"type": "object", "additionalProperties": map[string]interface{}{"type": "string"}},
+				"default":  stringSchema("Default allowlisted ORDER BY choice."),
 			}),
-			"query_result": objectSchema([]interface{}{"struct"}, map[string]interface{}{
-				"cardinality": enumSchema([]interface{}{"one", "maybe_one", "many"}, "Row-returning query result cardinality. Defaults to many."),
-				"struct":      stringSchema("Generated or shared result struct name."),
-				"required": objectSchema(nil, map[string]interface{}{
-					"policy": enumSchema([]interface{}{"override", "strict"}, "Requiredness override policy."),
-					"fields": stringArraySchema("Result fields required by user override."),
-				}),
-			}),
-			"write": writeSchema(),
+			"query_result": queryResultJSONSchema(),
+			"write":        writeSchema(),
 			"rules": objectSchema(nil, map[string]interface{}{
 				"suppressions": arraySchema(map[string]interface{}{"$ref": "#/$defs/rule_suppression"}),
 			}),
@@ -1115,7 +1119,7 @@ func targetIDSchema(description string) map[string]interface{} {
 }
 
 func planReportScopeSchema(description string) map[string]interface{} {
-	return enumSchema([]interface{}{"query", "external_query.inner"}, description)
+	return enumSchema([]interface{}{"query", "external_query.inner", "write"}, description)
 }
 
 func patternStringSchema(pattern, description string) map[string]interface{} {

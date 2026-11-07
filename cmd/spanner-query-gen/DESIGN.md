@@ -1235,6 +1235,33 @@ looking up targets, and the CLI validates the contract file before SQL analysis
 or backend startup. Missing or failed targets affect evaluation availability,
 not whether a contract definition is well formed.
 
+## PLAN collection and access-path boundary
+
+`BuildQueryCodegenReportPlan` composes strict querygen resolution per target and
+catalog dependency closure; generation and explanation keep whole-config
+validation. Static failures remain target records. The CLI's injectable
+`planReportAnalyzer` owns acquisition, with one shared client or startup error
+per catalog. DML uses read-write AnalyzeQuery and explicit rollback; mutation
+helpers have no SQL PLAN target.
+
+Optional shapes are expanded by `ExpandPlanReportQueries`. The canonical shape
+keeps the base target ID; other shapes use deterministic encoded labels and
+omit absent bind parameters. The developer `spanner-query-plan-shape` tool
+currently has no querygen-config input to wire; a future adapter should reuse
+this expansion function rather than inventing a second variant protocol.
+
+`plancontract.NormalizeAccessPaths` accepts an already-collected QueryPlan and
+small schema-fact DTOs. It never imports the frontend, DDL parser or container
+packages. Scan-local Reference bindings supply conservative column evidence;
+verbatim expressions remain distinct from parsed SQL semantics. The command
+supplies table/index key and coverage facts from its existing catalog.
+
+The access-path revision is v1alpha.1 and expression-aware digest revision is
+v1alpha.4. Pre-stable normalization changes require new explicit revision IDs.
+Seekability annotations operate on a cloned plan through the stock renderer;
+raw normalization and digests always use the original plan. Physical ANN
+components are identified but logical ANN grouping remains separate work.
+
 ## CLI UX
 
 The CLI should feel like a normal generator with explicit subcommands:

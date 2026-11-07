@@ -9,6 +9,7 @@ import (
 	"strings"
 	"testing"
 
+	"cloud.google.com/go/spanner"
 	"cloud.google.com/go/spanner/apiv1/spannerpb"
 	"google.golang.org/protobuf/proto"
 )
@@ -91,9 +92,27 @@ func TestIntegrationAggregateFunctionAggTypesVersionMatrixOnOmni(t *testing.T) {
 				t.Errorf("%s v%d lacks the non-Agg ARRAY_TO_STRING finalization", label, version)
 			}
 
+			// Current LTS and r5 support APPROX_COUNT_DISTINCT independently of
+			// optimizer version. Check both a real aggregate plan and execution;
+			// the earlier beta's unsupported-function expectation is historical.
+			approx := cases["aggregate-function/unsupported/approx-count-distinct"]
+			approx.SQL = withOptimizerVersionStatementHint(approx.SQL, version)
+			approxPlan, err := analyzePlan(t.Context(), clients.Client, approx)
+			if err != nil || len(aggregateAggTypes(approxPlan)) == 0 {
+				t.Fatalf("APPROX_COUNT_DISTINCT v%d plan: %v, aggregates=%v", version, err, aggregateAggTypes(approxPlan))
+			}
+			rows := clients.Client.Single().Query(t.Context(), spanner.NewStatement(approx.SQL))
+			row, err := rows.Next()
+			rows.Stop()
+			if err != nil {
+				t.Fatalf("APPROX_COUNT_DISTINCT v%d execution: %v", version, err)
+			}
+			var count int64
+			if err := row.Column(0, &count); err != nil || count != 0 {
+				t.Fatalf("APPROX_COUNT_DISTINCT v%d empty-table count = %d, error=%v", version, count, err)
+			}
 			for label, wantError := range map[string]string{
-				"aggregate-function/unsupported/approx-count-distinct": "Unsupported aggregate function: approx_count_distinct",
-				"aggregate-function/unsupported/corr":                  "Unsupported aggregate function: corr",
+				"aggregate-function/unsupported/corr": "Unsupported aggregate function: corr",
 			} {
 				query := cases[label]
 				query.SQL = withOptimizerVersionStatementHint(query.SQL, version)

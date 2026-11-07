@@ -12,7 +12,6 @@ import (
 	"path/filepath"
 	"regexp"
 	"runtime"
-	"slices"
 	"strings"
 )
 
@@ -29,10 +28,16 @@ type registry struct {
 }
 
 type target struct {
-	Kind        string     `json:"kind"`
-	ImageFamily string     `json:"image_family"`
-	Tag         string     `json:"tag"`
-	Platforms   []platform `json:"platforms"`
+	Kind         string     `json:"kind"`
+	ImageFamily  string     `json:"image_family"`
+	Tag          string     `json:"tag"`
+	Platforms    []platform `json:"platforms"`
+	Alternatives []version  `json:"alternatives,omitempty"`
+}
+
+type version struct {
+	Tag       string     `json:"tag"`
+	Platforms []platform `json:"platforms"`
 }
 
 type platform struct {
@@ -63,8 +68,20 @@ func ImageForHost(repoRoot, kind string) (string, error) {
 	return ImageForPlatform(repoRoot, kind, "linux/"+runtime.GOARCH)
 }
 
+// ImageForHostVersion selects a default or alternative version for the host.
+// An empty tag selects the default; unregistered versions fail closed.
+func ImageForHostVersion(repoRoot, kind, tag string) (string, error) {
+	return ImageForVersion(repoRoot, kind, tag, "linux/"+runtime.GOARCH)
+}
+
 // ImageForPlatform returns image_family:tag@digest for one pinned target.
 func ImageForPlatform(repoRoot, kind, wantedPlatform string) (string, error) {
+	return ImageForVersion(repoRoot, kind, "", wantedPlatform)
+}
+
+// ImageForVersion returns a platform manifest from the same registry as the
+// default pin. Explicit selection never changes the default for other callers.
+func ImageForVersion(repoRoot, kind, tag, wantedPlatform string) (string, error) {
 	file, err := os.Open(filepath.Join(repoRoot, registryFile))
 	if err != nil {
 		return "", fmt.Errorf("open runtime target registry: %w", err)
@@ -88,7 +105,8 @@ func ImageForPlatform(repoRoot, kind, wantedPlatform string) (string, error) {
 	if len(document.Targets) != 2 {
 		return "", fmt.Errorf("runtime target count = %d, want 2", len(document.Targets))
 	}
-	images := make(map[string]map[string]string, len(document.Targets))
+	images := make(map[string]map[string]map[string]string, len(document.Targets))
+	defaults := make(map[string]string, len(document.Targets))
 	for _, candidate := range document.Targets {
 		if _, duplicate := images[candidate.Kind]; duplicate {
 			return "", fmt.Errorf("duplicate runtime target kind %q", candidate.Kind)
@@ -99,28 +117,45 @@ func ImageForPlatform(repoRoot, kind, wantedPlatform string) (string, error) {
 		if candidate.ImageFamily == "" || strings.ContainsAny(candidate.ImageFamily, "@\n\r\t ") || !tagPattern.MatchString(candidate.Tag) {
 			return "", fmt.Errorf("runtime target %q has an invalid image family or tag", candidate.Kind)
 		}
-		if len(candidate.Platforms) != 2 {
-			return "", fmt.Errorf("runtime target %q platform count = %d, want 2", candidate.Kind, len(candidate.Platforms))
-		}
-		images[candidate.Kind] = make(map[string]string, len(candidate.Platforms))
-		seenPlatforms := make([]string, 0, len(candidate.Platforms))
-		for _, pinned := range candidate.Platforms {
-			if slices.Contains(seenPlatforms, pinned.Platform) {
-				return "", fmt.Errorf("runtime target %q has duplicate platform %q", candidate.Kind, pinned.Platform)
+		defaults[candidate.Kind] = candidate.Tag
+		images[candidate.Kind] = map[string]map[string]string{}
+		versions := append([]version{{Tag: candidate.Tag, Platforms: candidate.Platforms}}, candidate.Alternatives...)
+		for _, current := range versions {
+			if !tagPattern.MatchString(current.Tag) {
+				return "", fmt.Errorf("runtime target %q has invalid version tag %q", candidate.Kind, current.Tag)
 			}
-			seenPlatforms = append(seenPlatforms, pinned.Platform)
-			if pinned.Platform != "linux/amd64" && pinned.Platform != "linux/arm64" {
-				return "", fmt.Errorf("runtime target %q has unsupported platform %q", candidate.Kind, pinned.Platform)
+			if _, duplicate := images[candidate.Kind][current.Tag]; duplicate {
+				return "", fmt.Errorf("runtime target %q has duplicate version %q", candidate.Kind, current.Tag)
 			}
-			if !digestPattern.MatchString(pinned.Digest) {
-				return "", fmt.Errorf("runtime target %q platform %q has invalid digest %q", candidate.Kind, pinned.Platform, pinned.Digest)
+			if len(current.Platforms) != 2 {
+				return "", fmt.Errorf("runtime target %q version %q platform count = %d, want 2", candidate.Kind, current.Tag, len(current.Platforms))
 			}
-			images[candidate.Kind][pinned.Platform] = candidate.ImageFamily + ":" + candidate.Tag + "@" + pinned.Digest
+			platforms := make(map[string]string, len(current.Platforms))
+			for _, pinned := range current.Platforms {
+				if _, duplicate := platforms[pinned.Platform]; duplicate {
+					return "", fmt.Errorf("runtime target %q has duplicate platform %q", candidate.Kind, pinned.Platform)
+				}
+				if pinned.Platform != "linux/amd64" && pinned.Platform != "linux/arm64" {
+					return "", fmt.Errorf("runtime target %q has unsupported platform %q", candidate.Kind, pinned.Platform)
+				}
+				if !digestPattern.MatchString(pinned.Digest) {
+					return "", fmt.Errorf("runtime target %q platform %q has invalid digest %q", candidate.Kind, pinned.Platform, pinned.Digest)
+				}
+				platforms[pinned.Platform] = candidate.ImageFamily + ":" + current.Tag + "@" + pinned.Digest
+			}
+			images[candidate.Kind][current.Tag] = platforms
 		}
 	}
-	platforms, ok := images[kind]
+	versions, ok := images[kind]
 	if !ok {
 		return "", fmt.Errorf("runtime target kind %q is not pinned", kind)
+	}
+	if tag == "" {
+		tag = defaults[kind]
+	}
+	platforms, ok := versions[tag]
+	if !ok {
+		return "", fmt.Errorf("runtime target %q version %q is not pinned", kind, tag)
 	}
 	image, ok := platforms[wantedPlatform]
 	if !ok {

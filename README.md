@@ -91,6 +91,22 @@ with retained evidence and emit compact JSON; they do not create new captures.
 The two Omni plan suites share one runtime in `verify-containers`, avoiding a
 second cold container startup.
 
+The current defaults are Emulator `1.5.59` and Omni `2026.r4-lts.2`. The
+three container-consuming modules use spanemuboost `v0.4.10`, whose
+Omni startup support remains experimental. Omni `2026.r5.1` is an explicitly
+selectable alternative in the same registry, with its own platform digests:
+
+```sh
+mise run verify-omni-integration
+mise run verify-omni-r5-integration
+# Equivalent explicit selection from the tools module:
+go run ./omni-integration-runner --repo-root .. --omni-version 2026.r5.1
+```
+
+Selecting the alternative does not change the default. Unknown version names
+fail before a container is started. Each report records the selected tagged
+manifest reference; an available image tag alone is not runtime verification.
+
 ## Documentation map
 
 - [`knowledge/`](knowledge/index.md): the OKF v0.2 entry point for the

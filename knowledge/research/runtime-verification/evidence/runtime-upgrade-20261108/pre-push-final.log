@@ -1,0 +1,64 @@
+[pre-push] $ mise run check-mod-tidy
+[check-mod-tidy] $ mise x -- go mod tidy
+[pre-push] $ mise run lint
+[lint] $ mise x -- golangci-lint run --timeout=5m
+0 issues.
+[lint] $ mise -C plancontract x -- golangci-lint run --timeout=5m
+0 issues.
+[lint] $ mise -C cmd/spanner-query-gen x -- golangci-lint run --timeout=5m
+0 issues.
+[lint] $ mise -C tools x -- golangci-lint run --timeout=5m
+0 issues.
+[lint] $ GOWORK=off mise -C survey x -- golangci-lint run --timeout=5m
+0 issues.
+[pre-push] $ mise run govulncheck
+[govulncheck] $ mise x -- govulncheck ./...
+=== Symbol Results ===
+
+No vulnerabilities found.
+
+Your code is affected by 0 vulnerabilities.
+This scan also found 0 vulnerabilities in packages you import and 2
+vulnerabilities in modules you require, but your code doesn't appear to call
+these vulnerabilities.
+Use '-show verbose' for more details.
+[govulncheck] $ mise -C plancontract x -- govulncheck ./...
+=== Symbol Results ===
+
+No vulnerabilities found.
+
+Your code is affected by 0 vulnerabilities.
+This scan also found 0 vulnerabilities in packages you import and 3
+vulnerabilities in modules you require, but your code doesn't appear to call
+these vulnerabilities.
+Use '-show verbose' for more details.
+[govulncheck] $ mise -C cmd/spanner-query-gen x -- govulncheck ./...
+=== Symbol Results ===
+
+No vulnerabilities found.
+
+Your code is affected by 0 vulnerabilities.
+This scan also found 0 vulnerabilities in packages you import and 4
+vulnerabilities in modules you require, but your code doesn't appear to call
+these vulnerabilities.
+Use '-show verbose' for more details.
+[govulncheck] $ mise -C tools x -- govulncheck ./...
+=== Symbol Results ===
+
+No vulnerabilities found.
+
+Your code is affected by 0 vulnerabilities.
+This scan also found 0 vulnerabilities in packages you import and 3
+vulnerabilities in modules you require, but your code doesn't appear to call
+these vulnerabilities.
+Use '-show verbose' for more details.
+[govulncheck] $ GOWORK=off mise -C survey x -- govulncheck ./...
+=== Symbol Results ===
+
+No vulnerabilities found.
+
+Your code is affected by 0 vulnerabilities.
+This scan also found 0 vulnerabilities in packages you import and 3
+vulnerabilities in modules you require, but your code doesn't appear to call
+these vulnerabilities.
+Use '-show verbose' for more details.

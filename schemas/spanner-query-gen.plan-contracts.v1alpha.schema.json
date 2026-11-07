@@ -165,7 +165,7 @@
     "target": {
       "description": "Canonical target ID, for example query/ListSingers or query/ExternalQuery#inner.",
       "minLength": 1,
-      "pattern": "^query/[A-Za-z_][A-Za-z0-9_]*(#inner)?$",
+      "pattern": "^(query|write)/[A-Za-z_][A-Za-z0-9_]*(/variant/[A-Za-z0-9_-]+)?(#inner)?$",
       "type": "string"
     }
   },

@@ -204,21 +204,27 @@ type QueryCodegenPlanDigest struct {
 }
 
 type QueryCodegenPlanQuery struct {
-	Name            string                           `json:"name" yaml:"name"`
-	Catalog         string                           `json:"catalog" yaml:"catalog"`
-	Kind            string                           `json:"kind" yaml:"kind"`
-	Result          string                           `json:"result" yaml:"result"`
-	OrderBy         string                           `json:"order_by,omitempty" yaml:"order_by,omitempty"`
-	SQL             string                           `json:"sql" yaml:"sql"`
-	SQLSHA256       string                           `json:"sql_sha256" yaml:"sql_sha256"`
-	ResultStruct    string                           `json:"result_struct" yaml:"result_struct"`
-	Constants       []QueryCodegenPlanConstant       `json:"constants,omitempty" yaml:"constants,omitempty"`
-	Params          []QueryCodegenParam              `json:"params,omitempty" yaml:"params,omitempty"`
-	StarExpansion   *QueryCodegenPlanStarExpansion   `json:"star_expansion,omitempty" yaml:"star_expansion,omitempty"`
-	Relations       []QueryCodegenPlanRelation       `json:"relations,omitempty" yaml:"relations,omitempty"`
-	VetSuppressions []QueryCodegenPlanVetSuppression `json:"vet_suppressions,omitempty" yaml:"vet_suppressions,omitempty"`
-	Warnings        []QueryCodegenPlanWarning        `json:"warnings,omitempty" yaml:"warnings,omitempty"`
-	Fields          []QueryCodegenPlanField          `json:"fields,omitempty" yaml:"fields,omitempty"`
+	ReportVariant          *QueryCodegenPlanQueryVariant `json:"report_variant,omitempty" yaml:"report_variant,omitempty"`
+	ReportVariantCanonical bool                          `json:"report_variant_canonical,omitempty" yaml:"report_variant_canonical,omitempty"`
+	// Report-only failures preserve target identity without weakening generation.
+	PlanningError    string                           `json:"planning_error,omitempty" yaml:"planning_error,omitempty"`
+	ReportSkipReason string                           `json:"report_skip_reason,omitempty" yaml:"report_skip_reason,omitempty"`
+	ReportScope      string                           `json:"report_scope,omitempty" yaml:"report_scope,omitempty"`
+	Name             string                           `json:"name" yaml:"name"`
+	Catalog          string                           `json:"catalog" yaml:"catalog"`
+	Kind             string                           `json:"kind" yaml:"kind"`
+	Result           string                           `json:"result" yaml:"result"`
+	OrderBy          string                           `json:"order_by,omitempty" yaml:"order_by,omitempty"`
+	SQL              string                           `json:"sql" yaml:"sql"`
+	SQLSHA256        string                           `json:"sql_sha256" yaml:"sql_sha256"`
+	ResultStruct     string                           `json:"result_struct" yaml:"result_struct"`
+	Constants        []QueryCodegenPlanConstant       `json:"constants,omitempty" yaml:"constants,omitempty"`
+	Params           []QueryCodegenParam              `json:"params,omitempty" yaml:"params,omitempty"`
+	StarExpansion    *QueryCodegenPlanStarExpansion   `json:"star_expansion,omitempty" yaml:"star_expansion,omitempty"`
+	Relations        []QueryCodegenPlanRelation       `json:"relations,omitempty" yaml:"relations,omitempty"`
+	VetSuppressions  []QueryCodegenPlanVetSuppression `json:"vet_suppressions,omitempty" yaml:"vet_suppressions,omitempty"`
+	Warnings         []QueryCodegenPlanWarning        `json:"warnings,omitempty" yaml:"warnings,omitempty"`
+	Fields           []QueryCodegenPlanField          `json:"fields,omitempty" yaml:"fields,omitempty"`
 	// Variants is the per-shape plan-contract entry produced by
 	// optparam.BuildPlanVariants. It is populated only for queries
 	// that use one or more optional markers. The top-level SQL /

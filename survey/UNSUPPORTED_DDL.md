@@ -109,8 +109,16 @@ as user DDL. memefish v0.8.1 has no index-expression AST node, so
 `ToDDLStatements` returns an explicit error whenever an index key has a
 non-NULL `EXPRESSION`.
 
-The pinned Cloud Spanner Emulator rejects the documented expression-key form
-as a syntax error. Current managed Spanner and Omni also reject `DESC` after a
+Emulator `1.5.59` accepts the expression-key DDL but lacks
+`INDEX_COLUMNS.EXPRESSION` and omits expression keys from `INDEX_COLUMNS`.
+It exposes generated hidden columns in `COLUMNS`, and `GetDatabaseDdl` loses
+the expression keys as well, returning an empty key list for an expression-only
+index. The converter rejects these incomplete expression-index records instead
+of emitting empty or truncated indexes. An explicit ordinary index on a hidden
+generated column with complete key metadata is still representable. The older
+`1.5.56` syntax-rejection result remains historical evidence.
+
+Current managed Spanner and Omni also reject `DESC` after a
 GoogleSQL expression key even though the DDL grammar displays an ordering
 suffix. A non-deterministic key such as `CURRENT_TIMESTAMP()` reaches semantic
 validation and is rejected as non-deterministic. These runtime observations

@@ -310,8 +310,13 @@ func TestIntegrationGoogleSQLSurfaceVersionMatrixOnOmni(t *testing.T) {
 		if _, err := analyze(t, matchRecognize, version); err == nil || !strings.Contains(err.Error(), "Syntax error:") {
 			t.Errorf("MATCH_RECOGNIZE v%d error = %v, want stable syntax error", version, err)
 		}
-		if _, err := analyze(t, secureContext, version); err == nil || !strings.Contains(err.Error(), "Unsupported built-in function: SECURE_CONTEXT") {
-			t.Errorf("SECURE_CONTEXT v%d error = %v, want stable unsupported-function error", version, err)
+		secureContextError := "Unsupported built-in function: SECURE_CONTEXT"
+		if selectedOmniR5() {
+			// r5 recognizes the function and validates its secure parameter.
+			secureContextError = "Missing secure parameter: key"
+		}
+		if _, err := analyze(t, secureContext, version); err == nil || !strings.Contains(err.Error(), secureContextError) {
+			t.Errorf("SECURE_CONTEXT v%d error = %v, want %q", version, err, secureContextError)
 		}
 	}
 

@@ -1,0 +1,53 @@
+2026/11/08 04:22:57 github.com/testcontainers/testcontainers-go - Connected to docker: 
+  Server Version: 29.2.1
+  API Version: 1.53
+  Operating System: Ubuntu 24.04.4 LTS
+  Total Memory: 7922 MB
+  Testcontainers for Go Version: v0.44.0
+  Resolved Docker Host: unix:///Users/apstndb/.colima/default/docker.sock
+  Resolved Docker Socket Path: /var/run/docker.sock
+  Test SessionID: fccd6182b90f11d978cfc73fd4030ff6a95ef9eba89377731d7eb5d1cbfdc12f
+  Test ProcessID: 9fa5899a-e84f-4fe0-a2fa-5d1c66e3bdb0
+2026/11/08 04:22:57 🐳 Creating container for image us-docker.pkg.dev/spanner-omni/images/spanner-omni:2026.r5.1@sha256:b918acd3c785bd13733d7dca6e6c029ef4ab8d7b63a0cd28800210a9bf976516
+2026/11/08 04:22:57 🐳 Creating container for image testcontainers/ryuk:0.14.0
+2026/11/08 04:22:57 ✅ Container created: 63b3ed4737cc
+2026/11/08 04:22:57 🐳 Starting container: 63b3ed4737cc
+2026/11/08 04:22:57 ✅ Container started: 63b3ed4737cc
+2026/11/08 04:22:57 ⏳ Waiting for container id 63b3ed4737cc image: testcontainers/ryuk:0.14.0. Waiting for: all of: [log message "Started", port 8080/tcp to be listening]
+2026/11/08 04:22:57 Shell not found in container
+2026/11/08 04:22:57 🔔 Container is ready: 63b3ed4737cc
+2026/11/08 04:22:57 ✅ Container created: b6cbedbbc7c8
+2026/11/08 04:22:57 🐳 Starting container: b6cbedbbc7c8
+2026/11/08 04:22:57 ✅ Container started: b6cbedbbc7c8
+2026/11/08 04:22:57 ⏳ Waiting for container id b6cbedbbc7c8 image: us-docker.pkg.dev/spanner-omni/images/spanner-omni:2026.r5.1@sha256:b918acd3c785bd13733d7dca6e6c029ef4ab8d7b63a0cd28800210a9bf976516. Waiting for: all of: [log message "Spanner is ready", first exposed port to be accessible externally]
+2026/11/08 04:23:03 🔔 Container is ready: b6cbedbbc7c8
+--- FAIL: TestIntegrationRemoteFunctionPlansOnOmni (1.59s)
+    remote_function_omni_test.go:25: AnalyzeQuery(remote-function/literal-input, v1) error = spanner: code = "Internal", desc = "", requestID = "<redacted>"
+    remote_function_omni_test.go:25: AnalyzeQuery(remote-function/literal-input, v2) error = spanner: code = "Internal", desc = "", requestID = "<redacted>"
+    remote_function_omni_test.go:25: AnalyzeQuery(remote-function/literal-input, v3) error = spanner: code = "Internal", desc = "", requestID = "<redacted>"
+    remote_function_omni_test.go:25: AnalyzeQuery(remote-function/literal-input, v4) error = spanner: code = "Internal", desc = "", requestID = "<redacted>"
+    remote_function_omni_test.go:25: AnalyzeQuery(remote-function/literal-input, v5) error = spanner: code = "Internal", desc = "", requestID = "<redacted>"
+    remote_function_omni_test.go:25: AnalyzeQuery(remote-function/literal-input, v6) error = spanner: code = "Internal", desc = "", requestID = "<redacted>"
+    remote_function_omni_test.go:25: AnalyzeQuery(remote-function/literal-input, v7) error = spanner: code = "Internal", desc = "", requestID = "<redacted>"
+    remote_function_omni_test.go:25: AnalyzeQuery(remote-function/literal-input, v8) error = spanner: code = "Internal", desc = "", requestID = "<redacted>"
+    remote_function_omni_test.go:25: AnalyzeQuery(remote-function/literal-input, v9) error = spanner: code = "Internal", desc = "", requestID = "<redacted>"
+    remote_function_omni_test.go:25: AnalyzeQuery(remote-function/table-input, v1) error = spanner: code = "Internal", desc = "", requestID = "<redacted>"
+    remote_function_omni_test.go:25: AnalyzeQuery(remote-function/table-input, v2) error = spanner: code = "Internal", desc = "", requestID = "<redacted>"
+    remote_function_omni_test.go:25: AnalyzeQuery(remote-function/table-input, v3) error = spanner: code = "Internal", desc = "", requestID = "<redacted>"
+    remote_function_omni_test.go:25: AnalyzeQuery(remote-function/table-input, v4) error = spanner: code = "Internal", desc = "", requestID = "<redacted>"
+    remote_function_omni_test.go:25: AnalyzeQuery(remote-function/table-input, v5) error = spanner: code = "Internal", desc = "", requestID = "<redacted>"
+    remote_function_omni_test.go:25: AnalyzeQuery(remote-function/table-input, v6) error = spanner: code = "Internal", desc = "", requestID = "<redacted>"
+    remote_function_omni_test.go:25: AnalyzeQuery(remote-function/table-input, v7) error = spanner: code = "Internal", desc = "", requestID = "<redacted>"
+    remote_function_omni_test.go:25: AnalyzeQuery(remote-function/table-input, v8) error = spanner: code = "Internal", desc = "", requestID = "<redacted>"
+    remote_function_omni_test.go:25: AnalyzeQuery(remote-function/table-input, v9) error = spanner: code = "Internal", desc = "", requestID = "<redacted>"
+FAIL
+FAIL	github.com/apstndb/spanalyzer/tools/spanner-query-plan-shape	79.199s
+FAIL
+ok  	github.com/apstndb/spanalyzer/cmd/spanner-query-gen	2.656s
+ok  	github.com/apstndb/spanalyzer/cmd/spanner-query-gen/internal/runtimepins	0.241s [no tests to run]
+2026/11/08 04:24:34 🐳 Stopping container: b6cbedbbc7c8
+2026/11/08 04:24:44 ✅ Container stopped: b6cbedbbc7c8
+2026/11/08 04:24:44 🐳 Terminating container: b6cbedbbc7c8
+2026/11/08 04:24:44 🚫 Container terminated: b6cbedbbc7c8
+run plan-shape integration: exit status 1
+exit status 1

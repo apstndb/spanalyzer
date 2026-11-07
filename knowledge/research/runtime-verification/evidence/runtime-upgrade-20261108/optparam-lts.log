@@ -1,0 +1,408 @@
+Omni image: us-docker.pkg.dev/spanner-omni/images/spanner-omni:2026.r4-lts.2@sha256:b607b10bee3c1903f0a7f88f99bece67cb0dd9d9a028aee64226fc311bd78dae
+
+=== fixture omit_when_null:first_name+status ===
+template:
+SELECT SingerId, FirstName, LastName, Status FROM Singers
+WHERE TRUE
+  /*?optional:first_name*/ AND FirstName = @first_name /*?end*/
+  /*?optional:status*/ AND Status = @status /*?end*/
+verified row type: (SingerId:INT64, FirstName:STRING, LastName:STRING, Status:STRING)
+variants: 4
+2026/11/08 03:51:54 github.com/testcontainers/testcontainers-go - Connected to docker: 
+  Server Version: 29.2.1
+  API Version: 1.53
+  Operating System: Ubuntu 24.04.4 LTS
+  Total Memory: 7922 MB
+  Testcontainers for Go Version: v0.44.0
+  Resolved Docker Host: unix:///Users/apstndb/.colima/default/docker.sock
+  Resolved Docker Socket Path: /var/run/docker.sock
+  Test SessionID: ce41837949d45ad231a54089fb506ddb72ceb2e671840f6ca863263e6ce11fbf
+  Test ProcessID: a2325947-67ec-48bf-abb9-5ba0e8d52d57
+2026/11/08 03:51:54 🐳 Creating container for image us-docker.pkg.dev/spanner-omni/images/spanner-omni:2026.r4-lts.2@sha256:b607b10bee3c1903f0a7f88f99bece67cb0dd9d9a028aee64226fc311bd78dae
+2026/11/08 03:51:54 🐳 Creating container for image testcontainers/ryuk:0.14.0
+2026/11/08 03:51:54 ✅ Container created: bd45f4871fe8
+2026/11/08 03:51:54 🐳 Starting container: bd45f4871fe8
+2026/11/08 03:51:54 ✅ Container started: bd45f4871fe8
+2026/11/08 03:51:54 ⏳ Waiting for container id bd45f4871fe8 image: testcontainers/ryuk:0.14.0. Waiting for: all of: [log message "Started", port 8080/tcp to be listening]
+2026/11/08 03:51:54 Shell not found in container
+2026/11/08 03:51:54 🔔 Container is ready: bd45f4871fe8
+2026/11/08 03:51:54 ✅ Container created: 6edc297b2ead
+2026/11/08 03:51:54 🐳 Starting container: 6edc297b2ead
+2026/11/08 03:51:55 ✅ Container started: 6edc297b2ead
+2026/11/08 03:51:55 ⏳ Waiting for container id 6edc297b2ead image: us-docker.pkg.dev/spanner-omni/images/spanner-omni:2026.r4-lts.2@sha256:b607b10bee3c1903f0a7f88f99bece67cb0dd9d9a028aee64226fc311bd78dae. Waiting for: all of: [log message "Spanner is ready", first exposed port to be accessible externally]
+2026/11/08 03:52:01 🔔 Container is ready: 6edc297b2ead
+
+--- variant (none) ---
+SELECT SingerId, FirstName, LastName, Status FROM Singers
+WHERE TRUE
++----+--------------------------------------------------------------------------+
+| ID | Operator                                                                 |
++----+--------------------------------------------------------------------------+
+|  0 | Distributed Union on Singers <Row>                                       |
+|  1 | +- Local Distributed Union <Row>                                         |
+|  2 |    +- Serialize Result <Row>                                             |
+|  3 |       +- Table Scan on Singers <Row> (Full scan, scan_method: Automatic) |
++----+--------------------------------------------------------------------------+
+
+
+--- variant first_name ---
+SELECT SingerId, FirstName, LastName, Status FROM Singers
+WHERE TRUE
+   AND FirstName = @first_name
++-----+-----------------------------------------------------------------------------------+
+| ID  | Operator                                                                          |
++-----+-----------------------------------------------------------------------------------+
+|  *0 | Distributed Union on SingersByFirstName <Row>                                     |
+|  *1 | +- Distributed Cross Apply <Row>                                                  |
+|   2 |    +- [Input] Create Batch <Batch>                                                |
+|   3 |    |  +- RowToDataBlock                                                           |
+|   4 |    |     +- Local Distributed Union <Row>                                         |
+|  *5 |    |        +- Filter Scan <Row> (seekable_key_size: 0)                           |
+|  *6 |    |           +- Index Scan on SingersByFirstName <Row> (scan_method: Automatic) |
+|  18 |    +- [Map] Serialize Result <Row>                                                |
+|  19 |       +- Cross Apply <Row>                                                        |
+|  20 |          +- [Input] KeyRangeAccumulator <Row>                                     |
+|  21 |          |  +- DataBlockToRow                                                     |
+|  22 |          |     +- Batch Scan on $v2 <Batch> (scan_method: Batch)                  |
+|  25 |          +- [Map] Local Distributed Union <Row>                                   |
+|  26 |             +- Filter Scan <Row> (seekable_key_size: 0)                           |
+| *27 |                +- Table Scan on Singers <Row> (scan_method: Row)                  |
++-----+-----------------------------------------------------------------------------------+
+Predicates(identified by ID):
+  0: Split Range: ($FirstName = @first_name)
+  1: Split Range: ($SingerId' = $SingerId)
+  5: Residual Condition: ($FirstName = @first_name)
+  6: Seek Condition: IS_NOT_DISTINCT_FROM($FirstName, @first_name)
+ 27: Seek Condition: ($SingerId' = $batched_SingerId')
+
+
+--- variant first_name+status ---
+SELECT SingerId, FirstName, LastName, Status FROM Singers
+WHERE TRUE
+   AND FirstName = @first_name 
+   AND Status = @status
++-----+-----------------------------------------------------------------------------------+
+| ID  | Operator                                                                          |
++-----+-----------------------------------------------------------------------------------+
+|  *0 | Distributed Union on SingersByFirstName <Row>                                     |
+|  *1 | +- Distributed Cross Apply <Row>                                                  |
+|   2 |    +- [Input] Create Batch <Batch>                                                |
+|   3 |    |  +- RowToDataBlock                                                           |
+|   4 |    |     +- Local Distributed Union <Row>                                         |
+|  *5 |    |        +- Filter Scan <Row> (seekable_key_size: 0)                           |
+|  *6 |    |           +- Index Scan on SingersByFirstName <Row> (scan_method: Automatic) |
+|  18 |    +- [Map] Serialize Result <Row>                                                |
+|  19 |       +- Cross Apply <Row>                                                        |
+|  20 |          +- [Input] KeyRangeAccumulator <Row>                                     |
+|  21 |          |  +- DataBlockToRow                                                     |
+|  22 |          |     +- Batch Scan on $v2 <Batch> (scan_method: Batch)                  |
+|  25 |          +- [Map] Local Distributed Union <Row>                                   |
+| *26 |             +- Filter Scan <Row> (seekable_key_size: 0)                           |
+| *27 |                +- Table Scan on Singers <Row> (scan_method: Row)                  |
++-----+-----------------------------------------------------------------------------------+
+Predicates(identified by ID):
+  0: Split Range: ($FirstName = @first_name)
+  1: Split Range: ($SingerId' = $SingerId)
+  5: Residual Condition: ($FirstName = @first_name)
+  6: Seek Condition: IS_NOT_DISTINCT_FROM($FirstName, @first_name)
+ 26: Residual Condition: ($Status = @status)
+ 27: Seek Condition: ($SingerId' = $batched_SingerId')
+
+
+--- variant status ---
+SELECT SingerId, FirstName, LastName, Status FROM Singers
+WHERE TRUE
+  
+   AND Status = @status
++-----+--------------------------------------------------------------------------------+
+| ID  | Operator                                                                       |
++-----+--------------------------------------------------------------------------------+
+|  *0 | Distributed Union on SingersByStatus <Row>                                     |
+|  *1 | +- Distributed Cross Apply <Row>                                               |
+|   2 |    +- [Input] Create Batch <Batch>                                             |
+|   3 |    |  +- RowToDataBlock                                                        |
+|   4 |    |     +- Local Distributed Union <Row>                                      |
+|  *5 |    |        +- Filter Scan <Row> (seekable_key_size: 0)                        |
+|  *6 |    |           +- Index Scan on SingersByStatus <Row> (scan_method: Automatic) |
+|  18 |    +- [Map] Serialize Result <Row>                                             |
+|  19 |       +- Cross Apply <Row>                                                     |
+|  20 |          +- [Input] KeyRangeAccumulator <Row>                                  |
+|  21 |          |  +- DataBlockToRow                                                  |
+|  22 |          |     +- Batch Scan on $v2 <Batch> (scan_method: Batch)               |
+|  25 |          +- [Map] Local Distributed Union <Row>                                |
+|  26 |             +- Filter Scan <Row> (seekable_key_size: 0)                        |
+| *27 |                +- Table Scan on Singers <Row> (scan_method: Row)               |
++-----+--------------------------------------------------------------------------------+
+Predicates(identified by ID):
+  0: Split Range: ($Status = @status)
+  1: Split Range: ($SingerId' = $SingerId)
+  5: Residual Condition: ($Status = @status)
+  6: Seek Condition: IS_NOT_DISTINCT_FROM($Status, @status)
+ 27: Seek Condition: ($SingerId' = $batched_SingerId')
+
+
+=== fixture omit_when_empty:ids ===
+template:
+SELECT SingerId, FirstName FROM Singers
+WHERE TRUE
+  /*?empty:ids*/ AND SingerId IN UNNEST(@ids) /*?end*/
+verified row type: (SingerId:INT64, FirstName:STRING)
+variants: 2
+
+--- variant (none) ---
+SELECT SingerId, FirstName FROM Singers
+WHERE TRUE
++----+-------------------------------------------------------------------------------------+
+| ID | Operator                                                                            |
++----+-------------------------------------------------------------------------------------+
+|  0 | Distributed Union on SingersByFirstName <Row>                                       |
+|  1 | +- Local Distributed Union <Row>                                                    |
+|  2 |    +- Serialize Result <Row>                                                        |
+|  3 |       +- Index Scan on SingersByFirstName <Row> (Full scan, scan_method: Automatic) |
++----+-------------------------------------------------------------------------------------+
+
+
+--- variant ids ---
+SELECT SingerId, FirstName FROM Singers
+WHERE TRUE
+   AND SingerId IN UNNEST(@ids)
++----+------------------------------------------------------------+
+| ID | Operator                                                   |
++----+------------------------------------------------------------+
+| *0 | Distributed Union on Singers <Row>                         |
+|  1 | +- Local Distributed Union <Row>                           |
+|  2 |    +- Serialize Result <Row>                               |
+|  3 |       +- Filter Scan <Row> (seekable_key_size: 1)          |
+| *4 |          +- Table Scan on Singers <Row> (scan_method: Row) |
++----+------------------------------------------------------------+
+Predicates(identified by ID):
+ 0: Split Range: ($SingerId IN @ids(array))
+ 4: Seek Condition: ($SingerId IN @ids(array))
+
+
+=== fixture orderby:sort ===
+template:
+SELECT SingerId, FirstName, LastName FROM Singers
+/*?orderby:sort*/ ORDER BY SingerId /*?end*/
+LIMIT 100
+verified row type: (SingerId:INT64, FirstName:STRING, LastName:STRING)
+variants: 2
+
+--- variant sort=id_asc ---
+SELECT SingerId, FirstName, LastName FROM Singers
+ORDER BY SingerId ASC
+LIMIT 100
++----+--------------------------------------------------------------------------+
+| ID | Operator                                                                 |
++----+--------------------------------------------------------------------------+
+|  0 | Global Limit <Row>                                                       |
+|  1 | +- Distributed Union on Singers <Row>                                    |
+|  2 |    +- Serialize Result <Row>                                             |
+|  3 |       +- Local Limit <Row>                                               |
+|  4 |          +- Local Distributed Union <Row>                                |
+|  5 |             +- Table Scan on Singers <Row> (Full scan, scan_method: Row) |
++----+--------------------------------------------------------------------------+
+
+
+--- variant sort=name_asc ---
+SELECT SingerId, FirstName, LastName FROM Singers
+ORDER BY LastName, FirstName
+LIMIT 100
++----+--------------------------------------------------------------------------------+
+| ID | Operator                                                                       |
++----+--------------------------------------------------------------------------------+
+|  0 | Global Limit <Row>                                                             |
+|  1 | +- Distributed Union on Singers <Row> (preserve_subquery_order: true)          |
+|  2 |    +- Serialize Result <Row>                                                   |
+|  3 |       +- Local Sort Limit <Row>                                                |
+|  4 |          +- Local Distributed Union <Row>                                      |
+|  5 |             +- Table Scan on Singers <Row> (Full scan, scan_method: Automatic) |
++----+--------------------------------------------------------------------------------+
+
+
+=== fixture null_is_null:status ===
+template:
+SELECT SingerId, Status FROM Singers
+WHERE TRUE
+  /*?null_is_null:status*/ AND Status = @status /*?end*/
+verified row type: (SingerId:INT64, Status:STRING)
+variants: 1
+
+--- variant (none) ---
+SELECT SingerId, Status FROM Singers
+WHERE TRUE
+   AND Status IS NOT DISTINCT FROM @status
++----+--------------------------------------------------------------------------+
+| ID | Operator                                                                 |
++----+--------------------------------------------------------------------------+
+| *0 | Distributed Union on SingersByStatus <Row>                               |
+|  1 | +- Local Distributed Union <Row>                                         |
+|  2 |    +- Serialize Result <Row>                                             |
+|  3 |       +- Filter Scan <Row> (seekable_key_size: 0)                        |
+| *4 |          +- Index Scan on SingersByStatus <Row> (scan_method: Automatic) |
++----+--------------------------------------------------------------------------+
+Predicates(identified by ID):
+ 0: Split Range: IS_NOT_DISTINCT_FROM($Status, @status)
+ 4: Seek Condition: IS_NOT_DISTINCT_FROM($Status, @status)
+
+
+=== fixture firstName/required (as written) ===
+template:
+SELECT * FROM Singers WHERE FirstName = @firstName
+verified row type: (SingerId:INT64, FirstName:STRING, LastName:STRING, Status:STRING)
+variants: 1
+
+--- variant (none) ---
+SELECT * FROM Singers WHERE FirstName = @firstName
++-----+-----------------------------------------------------------------------------------+
+| ID  | Operator                                                                          |
++-----+-----------------------------------------------------------------------------------+
+|  *0 | Distributed Union on SingersByFirstName <Row>                                     |
+|  *1 | +- Distributed Cross Apply <Row>                                                  |
+|   2 |    +- [Input] Create Batch <Batch>                                                |
+|   3 |    |  +- RowToDataBlock                                                           |
+|   4 |    |     +- Local Distributed Union <Row>                                         |
+|  *5 |    |        +- Filter Scan <Row> (seekable_key_size: 0)                           |
+|  *6 |    |           +- Index Scan on SingersByFirstName <Row> (scan_method: Automatic) |
+|  18 |    +- [Map] Serialize Result <Row>                                                |
+|  19 |       +- Cross Apply <Row>                                                        |
+|  20 |          +- [Input] KeyRangeAccumulator <Row>                                     |
+|  21 |          |  +- DataBlockToRow                                                     |
+|  22 |          |     +- Batch Scan on $v2 <Batch> (scan_method: Batch)                  |
+|  25 |          +- [Map] Local Distributed Union <Row>                                   |
+|  26 |             +- Filter Scan <Row> (seekable_key_size: 0)                           |
+| *27 |                +- Table Scan on Singers <Row> (scan_method: Row)                  |
++-----+-----------------------------------------------------------------------------------+
+Predicates(identified by ID):
+  0: Split Range: ($FirstName = @firstname)
+  1: Split Range: ($SingerId' = $SingerId)
+  5: Residual Condition: ($FirstName = @firstname)
+  6: Seek Condition: IS_NOT_DISTINCT_FROM($FirstName, @firstname)
+ 27: Seek Condition: ($SingerId' = $batched_SingerId')
+
+
+=== fixture firstName/null_is_null ===
+template:
+SELECT * FROM Singers
+WHERE /*?null_is_null:firstName*/ FirstName = @firstName /*?end*/
+verified row type: (SingerId:INT64, FirstName:STRING, LastName:STRING, Status:STRING)
+variants: 1
+
+--- variant (none) ---
+SELECT * FROM Singers
+WHERE  FirstName IS NOT DISTINCT FROM @firstName
++-----+-----------------------------------------------------------------------------------+
+| ID  | Operator                                                                          |
++-----+-----------------------------------------------------------------------------------+
+|  *0 | Distributed Union on SingersByFirstName <Row>                                     |
+|  *1 | +- Distributed Cross Apply <Row>                                                  |
+|   2 |    +- [Input] Create Batch <Batch>                                                |
+|   3 |    |  +- RowToDataBlock                                                           |
+|   4 |    |     +- Local Distributed Union <Row>                                         |
+|   5 |    |        +- Filter Scan <Row> (seekable_key_size: 0)                           |
+|  *6 |    |           +- Index Scan on SingersByFirstName <Row> (scan_method: Automatic) |
+|  14 |    +- [Map] Serialize Result <Row>                                                |
+|  15 |       +- Cross Apply <Row>                                                        |
+|  16 |          +- [Input] KeyRangeAccumulator <Row>                                     |
+|  17 |          |  +- DataBlockToRow                                                     |
+|  18 |          |     +- Batch Scan on $v2 <Batch> (scan_method: Batch)                  |
+|  21 |          +- [Map] Local Distributed Union <Row>                                   |
+|  22 |             +- Filter Scan <Row> (seekable_key_size: 0)                           |
+| *23 |                +- Table Scan on Singers <Row> (scan_method: Row)                  |
++-----+-----------------------------------------------------------------------------------+
+Predicates(identified by ID):
+  0: Split Range: IS_NOT_DISTINCT_FROM($FirstName, @firstname)
+  1: Split Range: ($SingerId' = $SingerId)
+  6: Seek Condition: IS_NOT_DISTINCT_FROM($FirstName, @firstname)
+ 23: Seek Condition: ($SingerId' = $batched_SingerId')
+
+
+=== fixture firstName/omit_when_null ===
+template:
+SELECT * FROM Singers
+WHERE TRUE
+  /*?optional:firstName*/ AND FirstName = @firstName /*?end*/
+verified row type: (SingerId:INT64, FirstName:STRING, LastName:STRING, Status:STRING)
+variants: 2
+
+--- variant (none) ---
+SELECT * FROM Singers
+WHERE TRUE
++----+--------------------------------------------------------------------------+
+| ID | Operator                                                                 |
++----+--------------------------------------------------------------------------+
+|  0 | Distributed Union on Singers <Row>                                       |
+|  1 | +- Local Distributed Union <Row>                                         |
+|  2 |    +- Serialize Result <Row>                                             |
+|  3 |       +- Table Scan on Singers <Row> (Full scan, scan_method: Automatic) |
++----+--------------------------------------------------------------------------+
+
+
+--- variant firstName ---
+SELECT * FROM Singers
+WHERE TRUE
+   AND FirstName = @firstName
++-----+-----------------------------------------------------------------------------------+
+| ID  | Operator                                                                          |
++-----+-----------------------------------------------------------------------------------+
+|  *0 | Distributed Union on SingersByFirstName <Row>                                     |
+|  *1 | +- Distributed Cross Apply <Row>                                                  |
+|   2 |    +- [Input] Create Batch <Batch>                                                |
+|   3 |    |  +- RowToDataBlock                                                           |
+|   4 |    |     +- Local Distributed Union <Row>                                         |
+|  *5 |    |        +- Filter Scan <Row> (seekable_key_size: 0)                           |
+|  *6 |    |           +- Index Scan on SingersByFirstName <Row> (scan_method: Automatic) |
+|  18 |    +- [Map] Serialize Result <Row>                                                |
+|  19 |       +- Cross Apply <Row>                                                        |
+|  20 |          +- [Input] KeyRangeAccumulator <Row>                                     |
+|  21 |          |  +- DataBlockToRow                                                     |
+|  22 |          |     +- Batch Scan on $v2 <Batch> (scan_method: Batch)                  |
+|  25 |          +- [Map] Local Distributed Union <Row>                                   |
+|  26 |             +- Filter Scan <Row> (seekable_key_size: 0)                           |
+| *27 |                +- Table Scan on Singers <Row> (scan_method: Row)                  |
++-----+-----------------------------------------------------------------------------------+
+Predicates(identified by ID):
+  0: Split Range: ($FirstName = @firstname)
+  1: Split Range: ($SingerId' = $SingerId)
+  5: Residual Condition: ($FirstName = @firstname)
+  6: Seek Condition: IS_NOT_DISTINCT_FROM($FirstName, @firstname)
+ 27: Seek Condition: ($SingerId' = $batched_SingerId')
+
+
+=== fixture firstName/manual_is_not_distinct_from ===
+template:
+SELECT * FROM Singers WHERE FirstName = @firstName OR (FirstName IS NULL AND @firstName IS NULL)
+verified row type: (SingerId:INT64, FirstName:STRING, LastName:STRING, Status:STRING)
+variants: 1
+
+--- variant (none) ---
+SELECT * FROM Singers WHERE FirstName = @firstName OR (FirstName IS NULL AND @firstName IS NULL)
++-----+-----------------------------------------------------------------------------------+
+| ID  | Operator                                                                          |
++-----+-----------------------------------------------------------------------------------+
+|  *0 | Distributed Union on SingersByFirstName <Row>                                     |
+|  *1 | +- Distributed Cross Apply <Row>                                                  |
+|   2 |    +- [Input] Create Batch <Batch>                                                |
+|   3 |    |  +- RowToDataBlock                                                           |
+|   4 |    |     +- Local Distributed Union <Row>                                         |
+|   5 |    |        +- Filter Scan <Row> (seekable_key_size: 0)                           |
+|  *6 |    |           +- Index Scan on SingersByFirstName <Row> (scan_method: Automatic) |
+|  14 |    +- [Map] Serialize Result <Row>                                                |
+|  15 |       +- Cross Apply <Row>                                                        |
+|  16 |          +- [Input] KeyRangeAccumulator <Row>                                     |
+|  17 |          |  +- DataBlockToRow                                                     |
+|  18 |          |     +- Batch Scan on $v2 <Batch> (scan_method: Batch)                  |
+|  21 |          +- [Map] Local Distributed Union <Row>                                   |
+|  22 |             +- Filter Scan <Row> (seekable_key_size: 0)                           |
+| *23 |                +- Table Scan on Singers <Row> (scan_method: Row)                  |
++-----+-----------------------------------------------------------------------------------+
+Predicates(identified by ID):
+  0: Split Range: IS_NOT_DISTINCT_FROM($FirstName, @firstname)
+  1: Split Range: ($SingerId' = $SingerId)
+  6: Seek Condition: IS_NOT_DISTINCT_FROM($FirstName, @firstname)
+ 23: Seek Condition: ($SingerId' = $batched_SingerId')
+
+2026/11/08 03:52:07 🐳 Stopping container: 6edc297b2ead
+2026/11/08 03:52:17 ✅ Container stopped: 6edc297b2ead
+2026/11/08 03:52:17 🐳 Terminating container: 6edc297b2ead
+2026/11/08 03:52:17 🚫 Container terminated: 6edc297b2ead

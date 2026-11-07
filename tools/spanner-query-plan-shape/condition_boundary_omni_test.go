@@ -40,8 +40,11 @@ func TestIntegrationConditionBoundariesVersionMatrixOnOmni(t *testing.T) {
 				plans[label] = analyze(t, label, version)
 			}
 
-			assertCondition(t, plans["condition-boundary/scan/equality-literal"], "Distributed Union", "Split Range", "($SongName = 'Alpha')")
-			assertCondition(t, plans["condition-boundary/scan/equality-literal"], "Scan", "Seek Condition", "IS_NOT_DISTINCT_FROM($SongName, 'Alpha')")
+			// Current Omni can lift this equality literal into an automatic
+			// parameter. Preserve the exact predicate and owner checks for both
+			// backend representations instead of stripping arbitrary parameters.
+			assertConditionOneOf(t, plans["condition-boundary/scan/equality-literal"], "Distributed Union", "Split Range", "($SongName = 'Alpha')", "($SongName = @_auto_p0_string_)")
+			assertConditionOneOf(t, plans["condition-boundary/scan/equality-literal"], "Scan", "Seek Condition", "IS_NOT_DISTINCT_FROM($SongName, 'Alpha')", "IS_NOT_DISTINCT_FROM($SongName, @_auto_p0_string_)")
 			assertCondition(t, plans["condition-boundary/scan/range-literal"], "Scan", "Seek Condition", "(($SongName >= 'A') AND ($SongName < 'B'))")
 			assertCondition(t, plans["condition-boundary/scan/starts-with-literal"], "Scan", "Seek Condition", "STARTS_WITH($SongName, 'A')")
 			assertCondition(t, plans["condition-boundary/scan/starts-with-parameter"], "Scan", "Seek Condition", "STARTS_WITH($SongName, @prefix)")
@@ -180,8 +183,13 @@ func assertScanHasConditions(t *testing.T, plan *spannerpb.QueryPlan, target str
 
 func assertCondition(t *testing.T, plan *spannerpb.QueryPlan, parentName, linkType, want string) {
 	t.Helper()
+	assertConditionOneOf(t, plan, parentName, linkType, want)
+}
+
+func assertConditionOneOf(t *testing.T, plan *spannerpb.QueryPlan, parentName, linkType string, want ...string) {
+	t.Helper()
 	got := conditionExpressions(plan, parentName, linkType)
-	if !slices.Contains(got, want) {
+	if !slices.ContainsFunc(want, func(expression string) bool { return slices.Contains(got, expression) }) {
 		t.Errorf("%s %s expressions = %q, want %q", parentName, linkType, got, want)
 	}
 }

@@ -1,0 +1,828 @@
+{
+  "dialect": "pg",
+  "steps": [
+    {
+      "label": "fixture-connectivity",
+      "kind": "query",
+      "sql": "SELECT 1 AS connectivity",
+      "family": "extension"
+    },
+    {
+      "label": "score-fixture",
+      "family": "score",
+      "kind": "ddl",
+      "sql": "CREATE TABLE ScoreDocs (id bigint NOT NULL PRIMARY KEY, body text, bodytokens spanner.tokenlist GENERATED ALWAYS AS (spanner.tokenize_fulltext(body)) VIRTUAL HIDDEN)"
+    },
+    {
+      "label": "score-search-index",
+      "family": "score",
+      "kind": "ddl",
+      "sql": "CREATE SEARCH INDEX ScoreIndex ON ScoreDocs(BodyTokens)",
+      "requires": [
+        "score-fixture"
+      ]
+    },
+    {
+      "label": "score-insert",
+      "family": "score",
+      "kind": "dml",
+      "sql": "",
+      "statements": [
+        "INSERT INTO ScoreDocs(Id,Body) VALUES (1,'cat cat dog'),(2,'cat dog'),(3,'dog')"
+      ],
+      "requires": [
+        "score-fixture"
+      ]
+    },
+    {
+      "label": "score-unpinned",
+      "family": "score",
+      "kind": "query",
+      "sql": "SELECT Id, spanner.score(BodyTokens,'cat') AS default_score, spanner.score(BodyTokens,'cat', options => '{\"version\": 1}'::jsonb) AS version1_score, spanner.score(BodyTokens,'cat', options => '{\"version\": 2}'::jsonb) AS version2_score FROM ScoreDocs WHERE spanner.search(BodyTokens,'cat') ORDER BY Id",
+      "requires": [
+        "score-insert",
+        "score-search-index"
+      ]
+    },
+    {
+      "label": "score-set-db-1",
+      "family": "score",
+      "kind": "ddl",
+      "sql": "ALTER DATABASE {{DATABASE}} SET \"spanner.score_version\" = 1"
+    },
+    {
+      "label": "score-pinned-db-1",
+      "family": "score",
+      "kind": "query",
+      "sql": "SELECT Id, spanner.score(BodyTokens,'cat') AS default_score, spanner.score(BodyTokens,'cat', options => '{\"version\": 1}'::jsonb) AS version1_score, spanner.score(BodyTokens,'cat', options => '{\"version\": 2}'::jsonb) AS version2_score FROM ScoreDocs WHERE spanner.search(BodyTokens,'cat') ORDER BY Id",
+      "requires": [
+        "score-insert",
+        "score-search-index",
+        "score-set-db-1"
+      ]
+    },
+    {
+      "label": "score-set-db-2",
+      "family": "score",
+      "kind": "ddl",
+      "sql": "ALTER DATABASE {{DATABASE}} SET \"spanner.score_version\" = 2"
+    },
+    {
+      "label": "score-pinned-db-2",
+      "family": "score",
+      "kind": "query",
+      "sql": "SELECT Id, spanner.score(BodyTokens,'cat') AS default_score, spanner.score(BodyTokens,'cat', options => '{\"version\": 1}'::jsonb) AS version1_score, spanner.score(BodyTokens,'cat', options => '{\"version\": 2}'::jsonb) AS version2_score FROM ScoreDocs WHERE spanner.search(BodyTokens,'cat') ORDER BY Id",
+      "requires": [
+        "score-insert",
+        "score-search-index",
+        "score-set-db-2"
+      ]
+    },
+    {
+      "label": "score-explicit-independent",
+      "family": "score",
+      "kind": "query",
+      "sql": "SELECT Id, spanner.score(BodyTokens,'cat', options => '{\"version\": 1}'::jsonb) AS version1_score, spanner.score(BodyTokens,'cat', options => '{\"version\": 2}'::jsonb) AS version2_score FROM ScoreDocs WHERE spanner.search(BodyTokens,'cat') ORDER BY Id",
+      "requires": [
+        "score-insert",
+        "score-search-index"
+      ]
+    },
+    {
+      "label": "bucket-pg-query",
+      "family": "bucket",
+      "kind": "query",
+      "sql": "SELECT EXTRACT(EPOCH FROM '2026-10-31 00:59:59.9Z'::timestamptz - '1970-01-01Z'::timestamptz)::bigint / 3600 AS near_hour, EXTRACT(EPOCH FROM '2026-10-31 01:00:00Z'::timestamptz - '1970-01-01Z'::timestamptz)::bigint / 3600 AS on_hour"
+    },
+    {
+      "label": "bucket-pg-boundaries",
+      "family": "bucket-boundary",
+      "kind": "query",
+      "sql": "SELECT t, EXTRACT(EPOCH FROM t - '1970-01-01Z'::timestamptz)::bigint / 3600 AS documented_hour, FLOOR(EXTRACT(EPOCH FROM t - '1970-01-01Z'::timestamptz) / 3600)::bigint AS floored_hour FROM (SELECT '1969-12-31 23:59:59Z'::timestamptz AS t UNION ALL SELECT '2026-10-31 00:00:00Z'::timestamptz UNION ALL SELECT '2026-10-31 00:59:59.4Z'::timestamptz UNION ALL SELECT '2026-10-31 00:59:59.9Z'::timestamptz UNION ALL SELECT '2026-10-31 01:00:00Z'::timestamptz) q ORDER BY t"
+    },
+    {
+      "label": "pg-jsonb-sort",
+      "kind": "query",
+      "sql": "SELECT x FROM (SELECT '2'::jsonb x UNION ALL SELECT '1'::jsonb UNION ALL SELECT 'null'::jsonb) q ORDER BY x",
+      "family": "json"
+    },
+    {
+      "label": "pg-jsonb-count",
+      "kind": "query",
+      "sql": "SELECT COUNT(x) AS n FROM (SELECT '1'::jsonb x) q",
+      "family": "json"
+    },
+    {
+      "label": "json-table",
+      "kind": "ddl",
+      "sql": "CREATE TABLE JsonDocs (Id bigint PRIMARY KEY, Doc jsonb, Tokens spanner.tokenlist GENERATED ALWAYS AS (spanner.tokenize_jsonb(Doc)) VIRTUAL HIDDEN)",
+      "family": "json-search"
+    },
+    {
+      "label": "json-index",
+      "kind": "ddl",
+      "sql": "CREATE SEARCH INDEX JsonSearch ON JsonDocs(Tokens)",
+      "family": "json-search",
+      "requires": [
+        "json-table"
+      ]
+    },
+    {
+      "label": "json-insert",
+      "kind": "dml",
+      "sql": "",
+      "family": "json-search",
+      "statements": [
+        "INSERT INTO JsonDocs(Id,Doc) VALUES (1,'{\"kind\":\"active\",\"n\":1}'::jsonb),(2,'{\"kind\":\"pending\",\"n\":2}'::jsonb),(3,'{\"kind\":\"active\",\"n\":3}'::jsonb)"
+      ],
+      "requires": [
+        "json-index"
+      ]
+    },
+    {
+      "label": "json-search-equal-auto",
+      "kind": "query",
+      "sql": "SELECT Id FROM JsonDocs WHERE Doc->'kind'='\"active\"'::jsonb ORDER BY Id",
+      "family": "json-search",
+      "profile": true,
+      "requires": [
+        "json-insert"
+      ]
+    },
+    {
+      "label": "json-search-equal-search",
+      "kind": "query",
+      "sql": "SELECT Id FROM JsonDocs/*@ FORCE_INDEX=JsonSearch */ WHERE Doc->'kind'='\"active\"'::jsonb ORDER BY Id",
+      "family": "json-search",
+      "profile": true,
+      "requires": [
+        "json-insert"
+      ]
+    },
+    {
+      "label": "json-search-equal-base",
+      "kind": "query",
+      "sql": "SELECT Id FROM JsonDocs/*@ FORCE_INDEX=_BASE_TABLE */ WHERE Doc->'kind'='\"active\"'::jsonb ORDER BY Id",
+      "family": "json-search",
+      "profile": true,
+      "requires": [
+        "json-insert"
+      ]
+    },
+    {
+      "label": "json-search-in-auto",
+      "kind": "query",
+      "sql": "SELECT Id FROM JsonDocs WHERE Doc->'kind' IN ('\"active\"'::jsonb,'\"pending\"'::jsonb) ORDER BY Id",
+      "family": "json-search",
+      "profile": true,
+      "requires": [
+        "json-insert"
+      ]
+    },
+    {
+      "label": "json-search-in-search",
+      "kind": "query",
+      "sql": "SELECT Id FROM JsonDocs/*@ FORCE_INDEX=JsonSearch */ WHERE Doc->'kind' IN ('\"active\"'::jsonb,'\"pending\"'::jsonb) ORDER BY Id",
+      "family": "json-search",
+      "profile": true,
+      "requires": [
+        "json-insert"
+      ]
+    },
+    {
+      "label": "json-search-in-base",
+      "kind": "query",
+      "sql": "SELECT Id FROM JsonDocs/*@ FORCE_INDEX=_BASE_TABLE */ WHERE Doc->'kind' IN ('\"active\"'::jsonb,'\"pending\"'::jsonb) ORDER BY Id",
+      "family": "json-search",
+      "profile": true,
+      "requires": [
+        "json-insert"
+      ]
+    },
+    {
+      "label": "json-search-whole-auto",
+      "kind": "query",
+      "sql": "SELECT Id FROM JsonDocs WHERE Doc='{\"n\":1,\"kind\":\"active\"}'::jsonb ORDER BY Id",
+      "family": "json-search",
+      "profile": true,
+      "requires": [
+        "json-insert"
+      ]
+    },
+    {
+      "label": "json-search-whole-search",
+      "kind": "query",
+      "sql": "SELECT Id FROM JsonDocs/*@ FORCE_INDEX=JsonSearch */ WHERE Doc='{\"n\":1,\"kind\":\"active\"}'::jsonb ORDER BY Id",
+      "family": "json-search",
+      "profile": true,
+      "requires": [
+        "json-insert"
+      ]
+    },
+    {
+      "label": "json-search-whole-base",
+      "kind": "query",
+      "sql": "SELECT Id FROM JsonDocs/*@ FORCE_INDEX=_BASE_TABLE */ WHERE Doc='{\"n\":1,\"kind\":\"active\"}'::jsonb ORDER BY Id",
+      "family": "json-search",
+      "profile": true,
+      "requires": [
+        "json-insert"
+      ]
+    },
+    {
+      "label": "pg-stats-metadata",
+      "kind": "query",
+      "sql": "SELECT table_name,column_name,data_type FROM information_schema.columns WHERE table_schema='spanner_sys' AND column_name IN ('avg_columnar_read_share','cpu_seconds_distribution','cpu_seconds_distribution_json_string','row_scanned_distribution','row_scanned_distribution_json_string') ORDER BY table_name,column_name",
+      "family": "new-stats"
+    },
+    {
+      "label": "pg-stats-query_stats_top_minute",
+      "kind": "query",
+      "sql": "SELECT avg_columnar_read_share,cpu_seconds_distribution_json_string,row_scanned_distribution_json_string FROM spanner_sys.query_stats_top_minute LIMIT 1",
+      "family": "new-stats"
+    },
+    {
+      "label": "pg-stats-query_stats_top_minute-cpu_seconds_distribution",
+      "kind": "query",
+      "sql": "SELECT spanner_sys.distribution_percentile(cpu_seconds_distribution_json_string,99.0) AS p99 FROM spanner_sys.query_stats_top_minute LIMIT 1",
+      "family": "new-stats"
+    },
+    {
+      "label": "pg-stats-query_stats_top_minute-row_scanned_distribution",
+      "kind": "query",
+      "sql": "SELECT spanner_sys.distribution_percentile(row_scanned_distribution_json_string,99.0) AS p99 FROM spanner_sys.query_stats_top_minute LIMIT 1",
+      "family": "new-stats"
+    },
+    {
+      "label": "pg-stats-query_stats_top_10minute",
+      "kind": "query",
+      "sql": "SELECT avg_columnar_read_share,cpu_seconds_distribution_json_string,row_scanned_distribution_json_string FROM spanner_sys.query_stats_top_10minute LIMIT 1",
+      "family": "new-stats"
+    },
+    {
+      "label": "pg-stats-query_stats_top_10minute-cpu_seconds_distribution",
+      "kind": "query",
+      "sql": "SELECT spanner_sys.distribution_percentile(cpu_seconds_distribution_json_string,99.0) AS p99 FROM spanner_sys.query_stats_top_10minute LIMIT 1",
+      "family": "new-stats"
+    },
+    {
+      "label": "pg-stats-query_stats_top_10minute-row_scanned_distribution",
+      "kind": "query",
+      "sql": "SELECT spanner_sys.distribution_percentile(row_scanned_distribution_json_string,99.0) AS p99 FROM spanner_sys.query_stats_top_10minute LIMIT 1",
+      "family": "new-stats"
+    },
+    {
+      "label": "pg-stats-query_stats_top_hour",
+      "kind": "query",
+      "sql": "SELECT avg_columnar_read_share,cpu_seconds_distribution_json_string,row_scanned_distribution_json_string FROM spanner_sys.query_stats_top_hour LIMIT 1",
+      "family": "new-stats"
+    },
+    {
+      "label": "pg-stats-query_stats_top_hour-cpu_seconds_distribution",
+      "kind": "query",
+      "sql": "SELECT spanner_sys.distribution_percentile(cpu_seconds_distribution_json_string,99.0) AS p99 FROM spanner_sys.query_stats_top_hour LIMIT 1",
+      "family": "new-stats"
+    },
+    {
+      "label": "pg-stats-query_stats_top_hour-row_scanned_distribution",
+      "kind": "query",
+      "sql": "SELECT spanner_sys.distribution_percentile(row_scanned_distribution_json_string,99.0) AS p99 FROM spanner_sys.query_stats_top_hour LIMIT 1",
+      "family": "new-stats"
+    },
+    {
+      "label": "pg-stats-query_stats_total_minute",
+      "kind": "query",
+      "sql": "SELECT avg_columnar_read_share,cpu_seconds_distribution_json_string,row_scanned_distribution_json_string FROM spanner_sys.query_stats_total_minute LIMIT 1",
+      "family": "new-stats"
+    },
+    {
+      "label": "pg-stats-query_stats_total_minute-cpu_seconds_distribution",
+      "kind": "query",
+      "sql": "SELECT spanner_sys.distribution_percentile(cpu_seconds_distribution_json_string,99.0) AS p99 FROM spanner_sys.query_stats_total_minute LIMIT 1",
+      "family": "new-stats"
+    },
+    {
+      "label": "pg-stats-query_stats_total_minute-row_scanned_distribution",
+      "kind": "query",
+      "sql": "SELECT spanner_sys.distribution_percentile(row_scanned_distribution_json_string,99.0) AS p99 FROM spanner_sys.query_stats_total_minute LIMIT 1",
+      "family": "new-stats"
+    },
+    {
+      "label": "pg-stats-query_stats_total_10minute",
+      "kind": "query",
+      "sql": "SELECT avg_columnar_read_share,cpu_seconds_distribution_json_string,row_scanned_distribution_json_string FROM spanner_sys.query_stats_total_10minute LIMIT 1",
+      "family": "new-stats"
+    },
+    {
+      "label": "pg-stats-query_stats_total_10minute-cpu_seconds_distribution",
+      "kind": "query",
+      "sql": "SELECT spanner_sys.distribution_percentile(cpu_seconds_distribution_json_string,99.0) AS p99 FROM spanner_sys.query_stats_total_10minute LIMIT 1",
+      "family": "new-stats"
+    },
+    {
+      "label": "pg-stats-query_stats_total_10minute-row_scanned_distribution",
+      "kind": "query",
+      "sql": "SELECT spanner_sys.distribution_percentile(row_scanned_distribution_json_string,99.0) AS p99 FROM spanner_sys.query_stats_total_10minute LIMIT 1",
+      "family": "new-stats"
+    },
+    {
+      "label": "pg-stats-query_stats_total_hour",
+      "kind": "query",
+      "sql": "SELECT avg_columnar_read_share,cpu_seconds_distribution_json_string,row_scanned_distribution_json_string FROM spanner_sys.query_stats_total_hour LIMIT 1",
+      "family": "new-stats"
+    },
+    {
+      "label": "pg-stats-query_stats_total_hour-cpu_seconds_distribution",
+      "kind": "query",
+      "sql": "SELECT spanner_sys.distribution_percentile(cpu_seconds_distribution_json_string,99.0) AS p99 FROM spanner_sys.query_stats_total_hour LIMIT 1",
+      "family": "new-stats"
+    },
+    {
+      "label": "pg-stats-query_stats_total_hour-row_scanned_distribution",
+      "kind": "query",
+      "sql": "SELECT spanner_sys.distribution_percentile(row_scanned_distribution_json_string,99.0) AS p99 FROM spanner_sys.query_stats_total_hour LIMIT 1",
+      "family": "new-stats"
+    },
+    {
+      "label": "pg-stats-struct-negative",
+      "kind": "query",
+      "sql": "SELECT cpu_seconds_distribution FROM spanner_sys.query_stats_total_minute LIMIT 0",
+      "family": "new-stats"
+    },
+    {
+      "label": "set-null-schema",
+      "kind": "ddl",
+      "sql": "",
+      "family": "set-null",
+      "statements": [
+        "CREATE TABLE NullParent (Id bigint PRIMARY KEY)",
+        "CREATE TABLE NullChild (Id bigint PRIMARY KEY, ParentId bigint, CONSTRAINT ParentFk FOREIGN KEY(ParentId) REFERENCES NullParent(Id) ON DELETE SET NULL)"
+      ]
+    },
+    {
+      "label": "set-null-insert",
+      "kind": "dml",
+      "sql": "",
+      "family": "set-null",
+      "statements": [
+        "INSERT INTO NullParent(Id) VALUES(1)",
+        "INSERT INTO NullChild(Id,ParentId) VALUES(1,1)"
+      ],
+      "requires": [
+        "set-null-schema"
+      ]
+    },
+    {
+      "label": "set-null-delete",
+      "kind": "dml",
+      "sql": "",
+      "family": "set-null",
+      "statements": [
+        "DELETE FROM NullParent WHERE Id=1"
+      ],
+      "requires": [
+        "set-null-insert"
+      ]
+    },
+    {
+      "label": "set-null-result",
+      "kind": "query",
+      "sql": "SELECT Id,ParentId FROM NullChild",
+      "family": "set-null",
+      "requires": [
+        "set-null-delete"
+      ]
+    },
+    {
+      "label": "score-pagination-insert",
+      "kind": "dml",
+      "sql": "",
+      "family": "mirror-20261108",
+      "statements": [
+        "INSERT INTO ScoreDocs(Id,Body) VALUES (4,'cat cat cat banana'),(5,'cat banana'),(6,'cat dog dog dog'),(7,'cat')"
+      ],
+      "requires": [
+        "score-insert"
+      ]
+    },
+    {
+      "label": "pagination-v1-full",
+      "kind": "query",
+      "sql": "SELECT Id, spanner.score(BodyTokens,$1, options=>$2) AS score FROM ScoreDocs WHERE spanner.search(BodyTokens,$1) ORDER BY score DESC,Id",
+      "family": "ranked-pagination",
+      "params": {
+        "p1": "cat",
+        "p2": {
+          "version": 1
+        }
+      },
+      "param_types": {
+        "p2": "JSONB"
+      },
+      "requires": [
+        "score-pagination-insert",
+        "score-search-index"
+      ]
+    },
+    {
+      "label": "pagination-v1-offset-0",
+      "kind": "query",
+      "sql": "SELECT Id, spanner.score(BodyTokens,$1, options=>$2) AS score FROM ScoreDocs WHERE spanner.search(BodyTokens,$1) ORDER BY score DESC,Id LIMIT $3 OFFSET $4",
+      "family": "ranked-pagination",
+      "params": {
+        "p1": "cat",
+        "p2": {
+          "version": 1
+        },
+        "p3": 2,
+        "p4": 0
+      },
+      "param_types": {
+        "p2": "JSONB",
+        "p3": "INT64",
+        "p4": "INT64"
+      },
+      "requires": [
+        "score-pagination-insert",
+        "score-search-index"
+      ]
+    },
+    {
+      "label": "pagination-v1-offset-2",
+      "kind": "query",
+      "sql": "SELECT Id, spanner.score(BodyTokens,$1, options=>$2) AS score FROM ScoreDocs WHERE spanner.search(BodyTokens,$1) ORDER BY score DESC,Id LIMIT $3 OFFSET $4",
+      "family": "ranked-pagination",
+      "params": {
+        "p1": "cat",
+        "p2": {
+          "version": 1
+        },
+        "p3": 2,
+        "p4": 2
+      },
+      "param_types": {
+        "p2": "JSONB",
+        "p3": "INT64",
+        "p4": "INT64"
+      },
+      "requires": [
+        "score-pagination-insert",
+        "score-search-index"
+      ]
+    },
+    {
+      "label": "pagination-v1-offset-4",
+      "kind": "query",
+      "sql": "SELECT Id, spanner.score(BodyTokens,$1, options=>$2) AS score FROM ScoreDocs WHERE spanner.search(BodyTokens,$1) ORDER BY score DESC,Id LIMIT $3 OFFSET $4",
+      "family": "ranked-pagination",
+      "params": {
+        "p1": "cat",
+        "p2": {
+          "version": 1
+        },
+        "p3": 2,
+        "p4": 4
+      },
+      "param_types": {
+        "p2": "JSONB",
+        "p3": "INT64",
+        "p4": "INT64"
+      },
+      "requires": [
+        "score-pagination-insert",
+        "score-search-index"
+      ]
+    },
+    {
+      "label": "pagination-v2-full",
+      "kind": "query",
+      "sql": "SELECT Id, spanner.score(BodyTokens,$1, options=>$2) AS score FROM ScoreDocs WHERE spanner.search(BodyTokens,$1) ORDER BY score DESC,Id",
+      "family": "ranked-pagination",
+      "params": {
+        "p1": "cat",
+        "p2": {
+          "version": 2
+        }
+      },
+      "param_types": {
+        "p2": "JSONB"
+      },
+      "requires": [
+        "score-pagination-insert",
+        "score-search-index"
+      ]
+    },
+    {
+      "label": "pagination-v2-offset-0",
+      "kind": "query",
+      "sql": "SELECT Id, spanner.score(BodyTokens,$1, options=>$2) AS score FROM ScoreDocs WHERE spanner.search(BodyTokens,$1) ORDER BY score DESC,Id LIMIT $3 OFFSET $4",
+      "family": "ranked-pagination",
+      "params": {
+        "p1": "cat",
+        "p2": {
+          "version": 2
+        },
+        "p3": 2,
+        "p4": 0
+      },
+      "param_types": {
+        "p2": "JSONB",
+        "p3": "INT64",
+        "p4": "INT64"
+      },
+      "requires": [
+        "score-pagination-insert",
+        "score-search-index"
+      ]
+    },
+    {
+      "label": "pagination-v2-offset-2",
+      "kind": "query",
+      "sql": "SELECT Id, spanner.score(BodyTokens,$1, options=>$2) AS score FROM ScoreDocs WHERE spanner.search(BodyTokens,$1) ORDER BY score DESC,Id LIMIT $3 OFFSET $4",
+      "family": "ranked-pagination",
+      "params": {
+        "p1": "cat",
+        "p2": {
+          "version": 2
+        },
+        "p3": 2,
+        "p4": 2
+      },
+      "param_types": {
+        "p2": "JSONB",
+        "p3": "INT64",
+        "p4": "INT64"
+      },
+      "requires": [
+        "score-pagination-insert",
+        "score-search-index"
+      ]
+    },
+    {
+      "label": "pagination-v2-offset-4",
+      "kind": "query",
+      "sql": "SELECT Id, spanner.score(BodyTokens,$1, options=>$2) AS score FROM ScoreDocs WHERE spanner.search(BodyTokens,$1) ORDER BY score DESC,Id LIMIT $3 OFFSET $4",
+      "family": "ranked-pagination",
+      "params": {
+        "p1": "cat",
+        "p2": {
+          "version": 2
+        },
+        "p3": 2,
+        "p4": 4
+      },
+      "param_types": {
+        "p2": "JSONB",
+        "p3": "INT64",
+        "p4": "INT64"
+      },
+      "requires": [
+        "score-pagination-insert",
+        "score-search-index"
+      ]
+    },
+    {
+      "label": "pagination-set-db-1",
+      "kind": "ddl",
+      "sql": "ALTER DATABASE {{DATABASE}} SET spanner.default_search_scorer_version=1",
+      "family": "ranked-pagination"
+    },
+    {
+      "label": "pagination-db-1-default",
+      "kind": "query",
+      "sql": "SELECT Id, spanner.score(BodyTokens,$1) AS score FROM ScoreDocs WHERE spanner.search(BodyTokens,$1) ORDER BY score DESC,Id",
+      "family": "ranked-pagination",
+      "params": {
+        "p1": "cat"
+      },
+      "param_types": {},
+      "requires": [
+        "score-pagination-insert",
+        "score-search-index",
+        "pagination-set-db-1"
+      ]
+    },
+    {
+      "label": "pagination-db-1-pinned-v1",
+      "kind": "query",
+      "sql": "SELECT Id, spanner.score(BodyTokens,$1, options=>$2) AS score FROM ScoreDocs WHERE spanner.search(BodyTokens,$1) ORDER BY score DESC,Id",
+      "family": "ranked-pagination",
+      "params": {
+        "p1": "cat",
+        "p2": {
+          "version": 1
+        }
+      },
+      "param_types": {
+        "p2": "JSONB"
+      },
+      "requires": [
+        "score-pagination-insert",
+        "score-search-index",
+        "pagination-set-db-1"
+      ]
+    },
+    {
+      "label": "pagination-db-1-pinned-v2",
+      "kind": "query",
+      "sql": "SELECT Id, spanner.score(BodyTokens,$1, options=>$2) AS score FROM ScoreDocs WHERE spanner.search(BodyTokens,$1) ORDER BY score DESC,Id",
+      "family": "ranked-pagination",
+      "params": {
+        "p1": "cat",
+        "p2": {
+          "version": 2
+        }
+      },
+      "param_types": {
+        "p2": "JSONB"
+      },
+      "requires": [
+        "score-pagination-insert",
+        "score-search-index",
+        "pagination-set-db-1"
+      ]
+    },
+    {
+      "label": "pagination-set-db-2",
+      "kind": "ddl",
+      "sql": "ALTER DATABASE {{DATABASE}} SET spanner.default_search_scorer_version=2",
+      "family": "ranked-pagination"
+    },
+    {
+      "label": "pagination-db-2-default",
+      "kind": "query",
+      "sql": "SELECT Id, spanner.score(BodyTokens,$1) AS score FROM ScoreDocs WHERE spanner.search(BodyTokens,$1) ORDER BY score DESC,Id",
+      "family": "ranked-pagination",
+      "params": {
+        "p1": "cat"
+      },
+      "param_types": {},
+      "requires": [
+        "score-pagination-insert",
+        "score-search-index",
+        "pagination-set-db-2"
+      ]
+    },
+    {
+      "label": "pagination-db-2-pinned-v1",
+      "kind": "query",
+      "sql": "SELECT Id, spanner.score(BodyTokens,$1, options=>$2) AS score FROM ScoreDocs WHERE spanner.search(BodyTokens,$1) ORDER BY score DESC,Id",
+      "family": "ranked-pagination",
+      "params": {
+        "p1": "cat",
+        "p2": {
+          "version": 1
+        }
+      },
+      "param_types": {
+        "p2": "JSONB"
+      },
+      "requires": [
+        "score-pagination-insert",
+        "score-search-index",
+        "pagination-set-db-2"
+      ]
+    },
+    {
+      "label": "pagination-db-2-pinned-v2",
+      "kind": "query",
+      "sql": "SELECT Id, spanner.score(BodyTokens,$1, options=>$2) AS score FROM ScoreDocs WHERE spanner.search(BodyTokens,$1) ORDER BY score DESC,Id",
+      "family": "ranked-pagination",
+      "params": {
+        "p1": "cat",
+        "p2": {
+          "version": 2
+        }
+      },
+      "param_types": {
+        "p2": "JSONB"
+      },
+      "requires": [
+        "score-pagination-insert",
+        "score-search-index",
+        "pagination-set-db-2"
+      ]
+    },
+    {
+      "label": "batch-omitted-create",
+      "kind": "ddl",
+      "sql": "CREATE QUEUE batchomitted(id varchar(36) NOT NULL,payload bytea NOT NULL,PRIMARY KEY(id))",
+      "family": "queue-batches"
+    },
+    {
+      "label": "batch-omitted-insert",
+      "kind": "dml",
+      "sql": "",
+      "family": "queue-batches",
+      "statements": [
+        "INSERT INTO batchomitted(Id,Payload,deliver_time) VALUES ('000',CAST('x' AS bytea),CURRENT_TIMESTAMP),('001',CAST('x' AS bytea),CURRENT_TIMESTAMP),('002',CAST('x' AS bytea),CURRENT_TIMESTAMP),('003',CAST('x' AS bytea),CURRENT_TIMESTAMP),('004',CAST('x' AS bytea),CURRENT_TIMESTAMP),('005',CAST('x' AS bytea),CURRENT_TIMESTAMP),('006',CAST('x' AS bytea),CURRENT_TIMESTAMP),('007',CAST('x' AS bytea),CURRENT_TIMESTAMP),('008',CAST('x' AS bytea),CURRENT_TIMESTAMP),('009',CAST('x' AS bytea),CURRENT_TIMESTAMP),('010',CAST('x' AS bytea),CURRENT_TIMESTAMP),('011',CAST('x' AS bytea),CURRENT_TIMESTAMP),('012',CAST('x' AS bytea),CURRENT_TIMESTAMP),('013',CAST('x' AS bytea),CURRENT_TIMESTAMP),('014',CAST('x' AS bytea),CURRENT_TIMESTAMP),('015',CAST('x' AS bytea),CURRENT_TIMESTAMP),('016',CAST('x' AS bytea),CURRENT_TIMESTAMP),('017',CAST('x' AS bytea),CURRENT_TIMESTAMP),('018',CAST('x' AS bytea),CURRENT_TIMESTAMP),('019',CAST('x' AS bytea),CURRENT_TIMESTAMP),('020',CAST('x' AS bytea),CURRENT_TIMESTAMP),('021',CAST('x' AS bytea),CURRENT_TIMESTAMP),('022',CAST('x' AS bytea),CURRENT_TIMESTAMP),('023',CAST('x' AS bytea),CURRENT_TIMESTAMP),('024',CAST('x' AS bytea),CURRENT_TIMESTAMP),('025',CAST('x' AS bytea),CURRENT_TIMESTAMP),('026',CAST('x' AS bytea),CURRENT_TIMESTAMP),('027',CAST('x' AS bytea),CURRENT_TIMESTAMP),('028',CAST('x' AS bytea),CURRENT_TIMESTAMP),('029',CAST('x' AS bytea),CURRENT_TIMESTAMP),('030',CAST('x' AS bytea),CURRENT_TIMESTAMP),('031',CAST('x' AS bytea),CURRENT_TIMESTAMP),('032',CAST('x' AS bytea),CURRENT_TIMESTAMP),('033',CAST('x' AS bytea),CURRENT_TIMESTAMP),('034',CAST('x' AS bytea),CURRENT_TIMESTAMP),('035',CAST('x' AS bytea),CURRENT_TIMESTAMP),('036',CAST('x' AS bytea),CURRENT_TIMESTAMP),('037',CAST('x' AS bytea),CURRENT_TIMESTAMP),('038',CAST('x' AS bytea),CURRENT_TIMESTAMP),('039',CAST('x' AS bytea),CURRENT_TIMESTAMP)"
+      ],
+      "requires": [
+        "batch-omitted-create"
+      ]
+    },
+    {
+      "label": "batch-omitted-receive",
+      "kind": "query",
+      "sql": "SELECT Id,spanner_last_batch_message AS batch_end FROM spanner.receive_batchomitted(max_duration=>'5s')",
+      "family": "queue-batches",
+      "timeout_seconds": 20,
+      "requires": [
+        "batch-omitted-insert"
+      ]
+    },
+    {
+      "label": "batch-null-create",
+      "kind": "ddl",
+      "sql": "CREATE QUEUE batchnull(id varchar(36) NOT NULL,payload bytea NOT NULL,PRIMARY KEY(id))",
+      "family": "queue-batches"
+    },
+    {
+      "label": "batch-null-insert",
+      "kind": "dml",
+      "sql": "",
+      "family": "queue-batches",
+      "statements": [
+        "INSERT INTO batchnull(Id,Payload,deliver_time) VALUES ('000',CAST('x' AS bytea),CURRENT_TIMESTAMP),('001',CAST('x' AS bytea),CURRENT_TIMESTAMP),('002',CAST('x' AS bytea),CURRENT_TIMESTAMP),('003',CAST('x' AS bytea),CURRENT_TIMESTAMP),('004',CAST('x' AS bytea),CURRENT_TIMESTAMP),('005',CAST('x' AS bytea),CURRENT_TIMESTAMP),('006',CAST('x' AS bytea),CURRENT_TIMESTAMP),('007',CAST('x' AS bytea),CURRENT_TIMESTAMP),('008',CAST('x' AS bytea),CURRENT_TIMESTAMP),('009',CAST('x' AS bytea),CURRENT_TIMESTAMP),('010',CAST('x' AS bytea),CURRENT_TIMESTAMP),('011',CAST('x' AS bytea),CURRENT_TIMESTAMP),('012',CAST('x' AS bytea),CURRENT_TIMESTAMP),('013',CAST('x' AS bytea),CURRENT_TIMESTAMP),('014',CAST('x' AS bytea),CURRENT_TIMESTAMP),('015',CAST('x' AS bytea),CURRENT_TIMESTAMP),('016',CAST('x' AS bytea),CURRENT_TIMESTAMP),('017',CAST('x' AS bytea),CURRENT_TIMESTAMP),('018',CAST('x' AS bytea),CURRENT_TIMESTAMP),('019',CAST('x' AS bytea),CURRENT_TIMESTAMP),('020',CAST('x' AS bytea),CURRENT_TIMESTAMP),('021',CAST('x' AS bytea),CURRENT_TIMESTAMP),('022',CAST('x' AS bytea),CURRENT_TIMESTAMP),('023',CAST('x' AS bytea),CURRENT_TIMESTAMP),('024',CAST('x' AS bytea),CURRENT_TIMESTAMP),('025',CAST('x' AS bytea),CURRENT_TIMESTAMP),('026',CAST('x' AS bytea),CURRENT_TIMESTAMP),('027',CAST('x' AS bytea),CURRENT_TIMESTAMP),('028',CAST('x' AS bytea),CURRENT_TIMESTAMP),('029',CAST('x' AS bytea),CURRENT_TIMESTAMP),('030',CAST('x' AS bytea),CURRENT_TIMESTAMP),('031',CAST('x' AS bytea),CURRENT_TIMESTAMP),('032',CAST('x' AS bytea),CURRENT_TIMESTAMP),('033',CAST('x' AS bytea),CURRENT_TIMESTAMP),('034',CAST('x' AS bytea),CURRENT_TIMESTAMP),('035',CAST('x' AS bytea),CURRENT_TIMESTAMP),('036',CAST('x' AS bytea),CURRENT_TIMESTAMP),('037',CAST('x' AS bytea),CURRENT_TIMESTAMP),('038',CAST('x' AS bytea),CURRENT_TIMESTAMP),('039',CAST('x' AS bytea),CURRENT_TIMESTAMP)"
+      ],
+      "requires": [
+        "batch-null-create"
+      ]
+    },
+    {
+      "label": "batch-null-receive",
+      "kind": "query",
+      "sql": "SELECT Id,spanner_last_batch_message AS batch_end FROM spanner.receive_batchnull(max_duration=>'5s',max_batch_size=>NULL)",
+      "family": "queue-batches",
+      "timeout_seconds": 20,
+      "requires": [
+        "batch-null-insert"
+      ]
+    },
+    {
+      "label": "batch-twenty-create",
+      "kind": "ddl",
+      "sql": "CREATE QUEUE batchtwenty(id varchar(36) NOT NULL,payload bytea NOT NULL,PRIMARY KEY(id))",
+      "family": "queue-batches"
+    },
+    {
+      "label": "batch-twenty-insert",
+      "kind": "dml",
+      "sql": "",
+      "family": "queue-batches",
+      "statements": [
+        "INSERT INTO batchtwenty(Id,Payload,deliver_time) VALUES ('000',CAST('x' AS bytea),CURRENT_TIMESTAMP),('001',CAST('x' AS bytea),CURRENT_TIMESTAMP),('002',CAST('x' AS bytea),CURRENT_TIMESTAMP),('003',CAST('x' AS bytea),CURRENT_TIMESTAMP),('004',CAST('x' AS bytea),CURRENT_TIMESTAMP),('005',CAST('x' AS bytea),CURRENT_TIMESTAMP),('006',CAST('x' AS bytea),CURRENT_TIMESTAMP),('007',CAST('x' AS bytea),CURRENT_TIMESTAMP),('008',CAST('x' AS bytea),CURRENT_TIMESTAMP),('009',CAST('x' AS bytea),CURRENT_TIMESTAMP),('010',CAST('x' AS bytea),CURRENT_TIMESTAMP),('011',CAST('x' AS bytea),CURRENT_TIMESTAMP),('012',CAST('x' AS bytea),CURRENT_TIMESTAMP),('013',CAST('x' AS bytea),CURRENT_TIMESTAMP),('014',CAST('x' AS bytea),CURRENT_TIMESTAMP),('015',CAST('x' AS bytea),CURRENT_TIMESTAMP),('016',CAST('x' AS bytea),CURRENT_TIMESTAMP),('017',CAST('x' AS bytea),CURRENT_TIMESTAMP),('018',CAST('x' AS bytea),CURRENT_TIMESTAMP),('019',CAST('x' AS bytea),CURRENT_TIMESTAMP),('020',CAST('x' AS bytea),CURRENT_TIMESTAMP),('021',CAST('x' AS bytea),CURRENT_TIMESTAMP),('022',CAST('x' AS bytea),CURRENT_TIMESTAMP),('023',CAST('x' AS bytea),CURRENT_TIMESTAMP),('024',CAST('x' AS bytea),CURRENT_TIMESTAMP),('025',CAST('x' AS bytea),CURRENT_TIMESTAMP),('026',CAST('x' AS bytea),CURRENT_TIMESTAMP),('027',CAST('x' AS bytea),CURRENT_TIMESTAMP),('028',CAST('x' AS bytea),CURRENT_TIMESTAMP),('029',CAST('x' AS bytea),CURRENT_TIMESTAMP),('030',CAST('x' AS bytea),CURRENT_TIMESTAMP),('031',CAST('x' AS bytea),CURRENT_TIMESTAMP),('032',CAST('x' AS bytea),CURRENT_TIMESTAMP),('033',CAST('x' AS bytea),CURRENT_TIMESTAMP),('034',CAST('x' AS bytea),CURRENT_TIMESTAMP),('035',CAST('x' AS bytea),CURRENT_TIMESTAMP),('036',CAST('x' AS bytea),CURRENT_TIMESTAMP),('037',CAST('x' AS bytea),CURRENT_TIMESTAMP),('038',CAST('x' AS bytea),CURRENT_TIMESTAMP),('039',CAST('x' AS bytea),CURRENT_TIMESTAMP)"
+      ],
+      "requires": [
+        "batch-twenty-create"
+      ]
+    },
+    {
+      "label": "batch-twenty-receive",
+      "kind": "query",
+      "sql": "SELECT Id,spanner_last_batch_message AS batch_end FROM spanner.receive_batchtwenty(max_duration=>'5s',max_batch_size=>20)",
+      "family": "queue-batches",
+      "timeout_seconds": 20,
+      "requires": [
+        "batch-twenty-insert"
+      ]
+    },
+    {
+      "label": "geo-sequence",
+      "kind": "ddl",
+      "sql": "CREATE SEQUENCE GeoUserIdSequence BIT_REVERSED_POSITIVE",
+      "family": "geo-sequence"
+    },
+    {
+      "label": "geo-parent",
+      "kind": "ddl",
+      "sql": "CREATE TABLE GeoLocations(Location varchar(1024) NOT NULL PLACEMENT KEY,PRIMARY KEY(Location))",
+      "family": "geo-sequence"
+    },
+    {
+      "label": "geo-child",
+      "kind": "ddl",
+      "sql": "CREATE TABLE GeoUsers(Location varchar(1024) NOT NULL,UserId bigint NOT NULL DEFAULT(nextval('GeoUserIdSequence')),Name varchar,PRIMARY KEY(Location,UserId)) INTERLEAVE IN PARENT GeoLocations ON DELETE CASCADE",
+      "family": "geo-sequence",
+      "requires": [
+        "geo-sequence",
+        "geo-parent"
+      ]
+    },
+    {
+      "label": "geo-next-id",
+      "kind": "query",
+      "sql": "SELECT nextval('GeoUserIdSequence') AS id",
+      "family": "geo-sequence",
+      "requires": [
+        "geo-sequence"
+      ]
+    },
+    {
+      "label": "final-ddl-export",
+      "kind": "ddl-export",
+      "sql": "",
+      "family": "mirror-20261108"
+    }
+  ]
+}

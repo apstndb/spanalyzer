@@ -1,0 +1,10 @@
+{
+  "omni_source_hashes_verified": true,
+  "post_run_case_id_changes": [
+    "tools/spanner-query-plan-shape/aggregate_function_cases.go",
+    "tools/spanner-query-plan-shape/aggregate_function_omni_test.go"
+  ],
+  "classification": "Historical APPROX_COUNT_DISTINCT case identifier restored in both definition and lookup; SQL and runtime assertions unchanged. Later survey-only production changes are validated separately.",
+  "base": "300c760dbeb6215643799312da53c382f6101d6f",
+  "retained_sources": "knowledge/research/runtime-verification/evidence/runtime-upgrade-20261108/omni-producer-source"
+}

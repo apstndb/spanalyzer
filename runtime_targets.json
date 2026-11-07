@@ -5,30 +5,45 @@
     {
       "kind": "emulator",
       "image_family": "gcr.io/cloud-spanner-emulator/emulator",
-      "tag": "1.5.56",
+      "tag": "1.5.59",
       "platforms": [
         {
           "platform": "linux/amd64",
-          "digest": "sha256:24c921c60e277e1ecfe50188169bf1aa818c8603d96842c827d4d1920206811c"
+          "digest": "sha256:f9212d99a52ee9bf39b6e4b397eab09b90d87327dca7a985110801456b40dc9d"
         },
         {
           "platform": "linux/arm64",
-          "digest": "sha256:5b1e3607fe8574fb04144eeabfa54120559fb01968ffe3ffc0a9a8f6776fc454"
+          "digest": "sha256:969af6a9349948fbfb4a826c18e160e258a4005f7c759f8e7f2dcec369cccba8"
         }
       ]
     },
     {
       "kind": "omni",
       "image_family": "us-docker.pkg.dev/spanner-omni/images/spanner-omni",
-      "tag": "2026.r2.1-beta",
+      "tag": "2026.r4-lts.2",
       "platforms": [
         {
           "platform": "linux/amd64",
-          "digest": "sha256:48631bc2f3999358368a81042c7974abb131e05c04d246206fb7b82eae41789f"
+          "digest": "sha256:5c585b2e7d0a25730abf7db86dab75e47070de01d0de074e8d653ecbf84a50ef"
         },
         {
           "platform": "linux/arm64",
-          "digest": "sha256:ed31d9ee72eeee69cac78566eb3a6e72ee389b26234735f0ef449774cc006741"
+          "digest": "sha256:b607b10bee3c1903f0a7f88f99bece67cb0dd9d9a028aee64226fc311bd78dae"
+        }
+      ],
+      "alternatives": [
+        {
+          "tag": "2026.r5.1",
+          "platforms": [
+            {
+              "platform": "linux/amd64",
+              "digest": "sha256:9a811aa0230d43a8dcf20fa053699a1c08f15b24c39a1e7db6966e59d516d9bd"
+            },
+            {
+              "platform": "linux/arm64",
+              "digest": "sha256:b918acd3c785bd13733d7dca6e6c029ef4ab8d7b63a0cd28800210a9bf976516"
+            }
+          ]
         }
       ]
     }

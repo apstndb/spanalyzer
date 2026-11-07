@@ -66,10 +66,9 @@ architecture.
 - [ ] **Refactor `plan-report` around testable boundaries.** Split the large
   command file into command, collection, rendering, and type files; replace
   historical one-line forwarding helpers with direct plancontract calls; and
-  extract a small `planAnalyzer` interface so target iteration, skip/error
-  handling, report assembly, annotation, and invariant validation can be tested
-  without an Omni container. Catalog-open/DDL failures should become per-target
-  errors when possible instead of discarding the entire partial report.
+  consolidate report assembly and invariant validation. The injected analyzer
+  and per-target/static/catalog error isolation are already implemented; keep
+  their unit-test boundary while splitting the remaining rendering code.
 - [ ] **Finish querygen and optparam structural cleanup.** Generation and
   plan projection now share SQL resolution, analysis, DTO merging, write
   planning, and namespace validation. Dedupe table
@@ -135,15 +134,13 @@ config/output freeze (v1 freeze is deliberately deferred).
   spanemuboost database creation, and records the deterministic merged
   descriptor digest. Add a tagged Omni case that creates a PROTO BUNDLE and
   successfully analyzes a proto-field query end to end.
-- [ ] **Normalize logical scan access paths.** Join each Filter Scan wrapper
-  with its unique Scan child into `access_paths[]`: target and base-table
-  identity, scan kind, full-scan state, Seek/Residual/Timestamp/Search signals,
-  nullable range `seekable_key_size`, declared keys, and catalog-aware index
-  coverage. Do not infer point-seek depth from `seekable_key_size=0`, which is
-  also reported for full scans. Coalesce a `VectorIndexRootScan` plus its
-  batch-driven `VectorIndexLeafScan` into one logical ANN access path; do not
-  interpret the root centroid table's `Full scan: true` as a full base-row
-  scan. Represent any later base-table back join separately.
+- [ ] **Complete advanced scan access paths.** The scan/Filter Scan view,
+  condition expressions, local column bindings and regular-index catalog facts
+  are implemented. Add search/vector catalog facts and coalesce a
+  VectorIndexRootScan with its batch-driven VectorIndexLeafScan into one
+  logical ANN path. Do not interpret the centroid table's full-scan flag as
+  a full base-row scan; keep later base-table back joins separate.
+
 - [ ] **Add non-vacuous positive plan predicates.** Start with
   `require.operator_family` plus `min_count` and matched indexes. Forbidding
   `hash_aggregate` does not prove a Stream Aggregate exists, and join
@@ -177,23 +174,6 @@ config/output freeze (v1 freeze is deliberately deferred).
   is blocking and the distribution wrapper is not, keeping plan-wide counts
   at one while fixing subtree scoping. Changes observable
   operator_family_counts, so decide deliberately (v1alpha allows it).
-- [ ] **Extend plan-report to DML targets.** Mechanics proven:
-  `ReadWriteTransaction.AnalyzeQuery` returns DML plans in PLAN mode without
-  executing, and plancontract classifies them warning-free
-  (`TestIntegrationDMLOperatorFamilyCoverageOnOmni`). Remaining design work
-  is the target surface: whether `writes[]` helpers and/or DML `queries[]`
-  (row_count / row_set modes are rejected by the public v1alpha config)
-  become targets with `write/<name>`-style IDs, plus README and schema
-  updates. The RowCount / MiniBatch* operators are unrelated to DML despite
-  the `row_count` config-mode naming (they are undocumented SELECT back-join
-  operators seen only on Cloud Spanner optimizer v5; see
-  `research/spanner-query-plan-shape/OPERATOR_VERIFICATION_FOLLOWUP.md`).
-- [ ] **Wire optional-parameter Variants into the plan probes.**
-  `tools/spanner-query-plan-shape` does not consume the `Variants` slice, and
-  `plan-report` analyzes only the canonical all-on variant (verified live:
-  two `omit_when_null` params produced one report target instead of four).
-  `tools/optparam-plan-probe` already contains the per-variant acquisition
-  loop that could be ported.
 - [ ] **Support applying database options in the Omni plan probes once Omni
   accepts them.** Needed to verify
   `use_unenforced_foreign_key_for_query_optimization` (for example a
@@ -229,27 +209,13 @@ are out of scope.
   `7b5d032`; they were removed from the active CLI on 2026-07-12 because the
   external workspace replacement made every GitHub Actions job fail on a
   fresh runner.
-- [ ] **Upstream the spannerplan RowAnnotator hook and restore standalone
-  module closure before restoring annotations.** First merge and tag the two
-  spannerplan hook changes. Then restore the `--annotate` prototype from
-  commit `7b5d032`; it also uses
-  `plancontract.DerivedOperatorFamiliesForOperator` and
-  `ProtoDescriptorSet.FileDescriptorSet`, which are absent from the root and
-  plancontract versions pinned by the command module.
-  Tag the root and plancontract changes, bump all command requirements, and
-  add `GOWORK=off` CI for every nested module before restoring the CLI surface.
-- [ ] **Restore seekability annotation in plan-report after the dependency
-  gate above.** The validated `plan-report --annotate seekability` prototype
-  replaces the rendered `seekable_key_size` value in place with `k/N`,
-  where N is the declared key column count of the scanned table or index
-  from the catalog DDL, avoiding a duplicate row suffix. Declared keys
-  only: the implicit base-table primary key suffix of secondary indexes is
-  not counted, so key-joining probes can in principle render k greater
-  than N. The ambiguous value 0 is intentionally left unannotated:
-  verified on Omni 2026.r1-beta, `seekable_key_size` counts the key prefix
-  of a range-bounded seek, so both full scans and perfect point seeks
-  (all-equality key conditions, literal or parameter) report 0 (see
-  `research/spanner-query-plan-shape/QUERY_EXECUTION_OPERATORS_OBSERVATIONS.md`).
+- [ ] **Upstream the spannerplan RowAnnotator hook before restoring family
+  annotations.** The seekability flag now uses a private plan clone with the
+  stock renderer and needs no hook. Family labels still need an additive row
+  hook. Restore their prototype from commit `7b5d032` only with standalone
+  dependency closure; align released module requirements and add `GOWORK=off`
+  CI coverage before publishing that surface.
+
 - [ ] **Restore operator-family annotations in rendered reports after the
   dependency gate above.** The validated `plan-report --annotate families`
   prototype renders

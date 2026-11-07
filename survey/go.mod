@@ -5,7 +5,7 @@ go 1.26.0
 require (
 	cloud.google.com/go v0.123.0
 	cloud.google.com/go/spanner v1.95.1
-	github.com/apstndb/spanemuboost v0.4.8
+	github.com/apstndb/spanemuboost v0.4.10
 	github.com/cloudspannerecosystem/memefish v0.8.1
 	github.com/distribution/reference v0.6.0
 	github.com/moby/moby/client v0.5.0
