@@ -1,0 +1,104 @@
+from pathlib import Path
+import collections, json, uuid
+
+out = Path('/Users/apstndb/tmp/apstndb/spanalyzer/managed-and-main-20261108/evidence')
+old = Path('/Users/apstndb/tmp/apstndb/spanalyzer/managed-recheck-20261105/evidence')
+checks = []
+def check(name, ok):
+    checks.append({'name': name, 'pass': bool(ok)})
+def read(path):
+    return [json.loads(line) for line in path.read_text().splitlines()]
+def index(path):
+    return {v['label']: v for v in read(path)}
+def ids(rows):
+    return [v.get('Id', v.get('id')) for v in rows]
+def pages(by, dialect, prefix):
+    for version in [1, 2]:
+        full = by[f'pagination-v{version}-full']
+        check(f'{prefix}-{dialect}-v{version}-full', full['code'] == 'OK' and len(full['rows']) == 6)
+        result = []
+        for offset in [0, 2, 4]:
+            row = by[f'pagination-v{version}-offset-{offset}']
+            check(f'{prefix}-{dialect}-v{version}-offset-{offset}', row['code'] == 'OK' and row['rows'] == full['rows'][offset:offset+2])
+            result.extend(row['rows'])
+        check(f'{prefix}-{dialect}-v{version}-pages-cover-once', result == full['rows'] and len(set(ids(result))) == 6)
+        check(f'{prefix}-{dialect}-v{version}-total-order', full['rows'] == sorted(full['rows'], key=lambda r: (-r['score'], int(r.get('Id', r.get('id'))))))
+def batches(by, dialect, prefix):
+    observations = {}
+    for mode, maximum in [('omitted', 30), ('null', 30), ('twenty', 20)]:
+        row = by[f'batch-{mode}-receive']
+        if row['code'] != 'OK':
+            observations[mode] = {'code': row['code'], 'error': row['error']}
+            continue
+        size = 0; sizes = []
+        for value in row['rows']:
+            size += 1
+            if value['batch_end']:
+                sizes.append(size); size = 0
+        check(f'{prefix}-{dialect}-{mode}-all-messages-once', sorted(ids(row['rows'])) == [f'{v:03}' for v in range(40)])
+        check(f'{prefix}-{dialect}-{mode}-batch-boundaries', size == 0 and bool(sizes) and max(sizes) == maximum and all(0 < n <= maximum for n in sizes))
+        observations[mode] = {'code': 'OK', 'messages': len(row['rows']), 'sizes': sizes}
+    return observations
+
+observations = {}
+for dialect in ['google', 'pg']:
+    rows = read(out / (dialect + '.jsonl')); by = {v['label']: v for v in rows}
+    cases = json.loads((out / (dialect + '-cases.json')).read_text())['steps']
+    check(dialect + '-all-initial-steps-recorded', [v['label'] for v in rows[1:-2]] == [v['label'] for v in cases])
+    check(dialect + '-owned-database-absent', by['create-database']['code'] == 'OK' and by['drop-database']['code'] == 'OK' and by['database-absent']['code'] == 'NotFound')
+    check(dialect + '-no-transport-failure', not any(v['code'] in ['DeadlineExceeded','Unavailable','Unauthenticated','Unknown'] for v in rows))
+    prior = index(old / (dialect + '.jsonl'))
+    for label, before in prior.items():
+        if label in ['create-database','drop-database','database-absent'] or (dialect == 'google' and label.startswith('volatile-')):
+            continue
+        check(dialect + '-baseline-code-' + label, by[label]['code'] == before['code'])
+    for predicate, expected in [('equal',['1','3']), ('in',['1','2','3']), ('whole',['1'])]:
+        for mode in ['auto','search','base']:
+            row = by['json-search-' + predicate + '-' + mode]
+            check(dialect + '-json-' + predicate + '-' + mode, row['code'] == 'OK' and ids(row['rows']) == expected)
+            types = [n.get('metadata',{}).get('scan_type') for n in row.get('plan',{}).get('planNodes',[])]
+            check(dialect + '-json-plan-' + predicate + '-' + mode, ('TableScan' in types and 'SearchIndexScan' not in types) if mode == 'base' else 'SearchIndexScan' in types)
+    check(dialect + '-set-null', by['set-null-result']['rows'] == ([{'Id':'1','ParentId':None}] if dialect == 'google' else [{'id':'1','parentid':None}]))
+    pages(by, dialect, 'initial')
+    observations[dialect] = {'initial_batches': batches(by, dialect, 'initial'), 'code_counts': dict(collections.Counter(v['code'] for v in rows))}
+    if dialect == 'google':
+        for version in [1,2]:
+            row = by[f'score-pinned-db-{version}']
+            check(f'google-database-default-{version}', by[f'score-set-db-{version}']['code'] == 'OK' and all(v['default_score'] == v[f'version{version}_score'] for v in row['rows']))
+        for mode in ['default','false','true']:
+            first = by[f'volatile-read-{mode}-1']['rows']; second = by[f'volatile-read-{mode}-2']['rows']
+            check('volatile-' + mode + '-ordered', [v['id'] for v in first] == ['1','2','3'] and [v['id'] for v in second] == ['1','2','3'])
+            check('volatile-' + mode + '-varies', all(a['v'] != b['v'] for a,b in zip(first,second)))
+            check('volatile-' + mode + '-uuid', all(uuid.UUID(v['v']).version == 4 for v in first + second))
+        expected = {'filter-number':[{'id':'1'},{'id':'3'}], 'filter-pattern':[{'id':'1'},{'id':'3'}], 'filter-string-negative':[], 'group':[{'age':'27','n':'1'},{'age':'43','n':'2'}], 'order':[{'id':'2','age':'27'},{'id':'1','age':'43'},{'id':'3','age':'43'}], 'distinct':[{'age':'27'},{'age':'43'}], 'compare-properties':[{'a':'1','b':'3'}], 'filter-bool':[{'id':'1'},{'id':'3'}]}
+        for label, values in expected.items():
+            check('dynamic-' + label, by['dynamic-' + label]['code'] == 'OK' and by['dynamic-' + label]['rows'] == values)
+        check('dynamic-bare-bool-negative', by['dynamic-bare-bool-negative']['code'] == 'InvalidArgument' and 'returns JSON' in by['dynamic-bare-bool-negative']['error'])
+    repair = out / 'repair' / (dialect + '.jsonl')
+    if repair.exists():
+        rr = read(repair); rb = {v['label']: v for v in rr}; rc = json.loads((repair.parent / (dialect + '-cases.json')).read_text())['steps']
+        check(dialect + '-repair-complete', [v['label'] for v in rr[1:-2]] == [v['label'] for v in rc])
+        check(dialect + '-repair-owned-absent', rb['create-database']['code'] == 'OK' and rb['drop-database']['code'] == 'OK' and rb['database-absent']['code'] == 'NotFound')
+        pages(rb, dialect, 'repair')
+        observations[dialect]['repair_batches'] = batches(rb, dialect, 'repair')
+        for mode in ['null','twenty'] + (['omitted'] if dialect == 'google' else []):
+            check(dialect + '-repair-' + mode + '-receiver-executes', rb['batch-' + mode + '-receive']['code'] == 'OK')
+        if dialect == 'pg':
+            check('pg-repair-omitted-argument-rejected', rb['batch-omitted-receive']['code'] == 'InvalidArgument' and 'does not exist' in rb['batch-omitted-receive']['error'])
+        for label in ['seq-control','seq-table','seq-insert','seq-read']:
+            check(dialect + '-repair-' + label, rb[label]['code'] == 'OK')
+        values = rb['seq-read']['rows']
+        check(dialect + '-positive-sequence-id', len(values) == 1 and int(values[0].get('Id',values[0].get('id'))) > 0 and values[0].get('Label',values[0].get('label')) == 'rw-control')
+        if dialect == 'google':
+            for default in [1,2]:
+                check(f'repair-google-db-{default}-setter', rb[f'pagination-set-db-{default}']['code'] == 'OK')
+                check(f'repair-google-db-{default}-default', rb[f'pagination-db-{default}-default']['rows'] == rb[f'pagination-v{default}-full']['rows'])
+                for pinned in [1,2]:
+                    check(f'repair-google-db-{default}-pinned-{pinned}', rb[f'pagination-db-{default}-pinned-v{pinned}']['rows'] == rb[f'pagination-v{pinned}-full']['rows'])
+
+failures = [v for v in checks if not v['pass']]
+summary = {'status':'pass' if not failures else 'fail', 'checks':len(checks), 'failures':failures, 'assertions':checks, 'observations':observations, 'boundary':'Passing assertions validate bounded outcomes and ownership. Initial misconfigured probes and known engine rejections remain retained; they do not become a fully passing live integration suite.'}
+(out / 'fixture-assertions.json').write_text(json.dumps(summary,indent=2) + '\n')
+print(summary['status'], len(checks), 'checks', len(failures), 'failures')
+print(failures)
+assert not failures

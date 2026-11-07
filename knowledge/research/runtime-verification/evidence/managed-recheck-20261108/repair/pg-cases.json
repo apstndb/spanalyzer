@@ -1,0 +1,352 @@
+{
+  "dialect": "pg",
+  "steps": [
+    {
+      "label": "fixture-connectivity",
+      "kind": "query",
+      "sql": "SELECT 1 AS connectivity",
+      "family": "extension"
+    },
+    {
+      "label": "score-fixture",
+      "family": "score",
+      "kind": "ddl",
+      "sql": "CREATE TABLE ScoreDocs (id bigint NOT NULL PRIMARY KEY, body text, bodytokens spanner.tokenlist GENERATED ALWAYS AS (spanner.tokenize_fulltext(body)) VIRTUAL HIDDEN)"
+    },
+    {
+      "label": "score-search-index",
+      "family": "score",
+      "kind": "ddl",
+      "sql": "CREATE SEARCH INDEX ScoreIndex ON ScoreDocs(BodyTokens)",
+      "requires": [
+        "score-fixture"
+      ]
+    },
+    {
+      "label": "score-insert",
+      "family": "score",
+      "kind": "dml",
+      "sql": "",
+      "statements": [
+        "INSERT INTO ScoreDocs(Id,Body) VALUES (1,'cat cat dog'),(2,'cat dog'),(3,'dog')"
+      ],
+      "requires": [
+        "score-fixture"
+      ]
+    },
+    {
+      "label": "score-pagination-insert",
+      "kind": "dml",
+      "sql": "",
+      "family": "mirror-20261108",
+      "statements": [
+        "INSERT INTO ScoreDocs(Id,Body) VALUES (4,'cat cat cat banana'),(5,'cat banana'),(6,'cat dog dog dog'),(7,'cat')"
+      ],
+      "requires": [
+        "score-insert"
+      ]
+    },
+    {
+      "label": "pagination-v1-full",
+      "kind": "query",
+      "sql": "SELECT Id, spanner.score(BodyTokens,$1, options=>$2) AS score FROM ScoreDocs WHERE spanner.search(BodyTokens,$1) ORDER BY score DESC,Id",
+      "family": "ranked-pagination",
+      "params": {
+        "p1": "cat",
+        "p2": {
+          "version": 1
+        }
+      },
+      "param_types": {
+        "p2": "JSONB"
+      },
+      "requires": [
+        "score-pagination-insert",
+        "score-search-index"
+      ]
+    },
+    {
+      "label": "pagination-v1-offset-0",
+      "kind": "query",
+      "sql": "SELECT Id, spanner.score(BodyTokens,$1, options=>$2) AS score FROM ScoreDocs WHERE spanner.search(BodyTokens,$1) ORDER BY score DESC,Id LIMIT $3 OFFSET $4",
+      "family": "ranked-pagination",
+      "params": {
+        "p1": "cat",
+        "p2": {
+          "version": 1
+        },
+        "p3": 2,
+        "p4": 0
+      },
+      "param_types": {
+        "p2": "JSONB",
+        "p3": "INT64",
+        "p4": "INT64"
+      },
+      "requires": [
+        "score-pagination-insert",
+        "score-search-index"
+      ]
+    },
+    {
+      "label": "pagination-v1-offset-2",
+      "kind": "query",
+      "sql": "SELECT Id, spanner.score(BodyTokens,$1, options=>$2) AS score FROM ScoreDocs WHERE spanner.search(BodyTokens,$1) ORDER BY score DESC,Id LIMIT $3 OFFSET $4",
+      "family": "ranked-pagination",
+      "params": {
+        "p1": "cat",
+        "p2": {
+          "version": 1
+        },
+        "p3": 2,
+        "p4": 2
+      },
+      "param_types": {
+        "p2": "JSONB",
+        "p3": "INT64",
+        "p4": "INT64"
+      },
+      "requires": [
+        "score-pagination-insert",
+        "score-search-index"
+      ]
+    },
+    {
+      "label": "pagination-v1-offset-4",
+      "kind": "query",
+      "sql": "SELECT Id, spanner.score(BodyTokens,$1, options=>$2) AS score FROM ScoreDocs WHERE spanner.search(BodyTokens,$1) ORDER BY score DESC,Id LIMIT $3 OFFSET $4",
+      "family": "ranked-pagination",
+      "params": {
+        "p1": "cat",
+        "p2": {
+          "version": 1
+        },
+        "p3": 2,
+        "p4": 4
+      },
+      "param_types": {
+        "p2": "JSONB",
+        "p3": "INT64",
+        "p4": "INT64"
+      },
+      "requires": [
+        "score-pagination-insert",
+        "score-search-index"
+      ]
+    },
+    {
+      "label": "pagination-v2-full",
+      "kind": "query",
+      "sql": "SELECT Id, spanner.score(BodyTokens,$1, options=>$2) AS score FROM ScoreDocs WHERE spanner.search(BodyTokens,$1) ORDER BY score DESC,Id",
+      "family": "ranked-pagination",
+      "params": {
+        "p1": "cat",
+        "p2": {
+          "version": 2
+        }
+      },
+      "param_types": {
+        "p2": "JSONB"
+      },
+      "requires": [
+        "score-pagination-insert",
+        "score-search-index"
+      ]
+    },
+    {
+      "label": "pagination-v2-offset-0",
+      "kind": "query",
+      "sql": "SELECT Id, spanner.score(BodyTokens,$1, options=>$2) AS score FROM ScoreDocs WHERE spanner.search(BodyTokens,$1) ORDER BY score DESC,Id LIMIT $3 OFFSET $4",
+      "family": "ranked-pagination",
+      "params": {
+        "p1": "cat",
+        "p2": {
+          "version": 2
+        },
+        "p3": 2,
+        "p4": 0
+      },
+      "param_types": {
+        "p2": "JSONB",
+        "p3": "INT64",
+        "p4": "INT64"
+      },
+      "requires": [
+        "score-pagination-insert",
+        "score-search-index"
+      ]
+    },
+    {
+      "label": "pagination-v2-offset-2",
+      "kind": "query",
+      "sql": "SELECT Id, spanner.score(BodyTokens,$1, options=>$2) AS score FROM ScoreDocs WHERE spanner.search(BodyTokens,$1) ORDER BY score DESC,Id LIMIT $3 OFFSET $4",
+      "family": "ranked-pagination",
+      "params": {
+        "p1": "cat",
+        "p2": {
+          "version": 2
+        },
+        "p3": 2,
+        "p4": 2
+      },
+      "param_types": {
+        "p2": "JSONB",
+        "p3": "INT64",
+        "p4": "INT64"
+      },
+      "requires": [
+        "score-pagination-insert",
+        "score-search-index"
+      ]
+    },
+    {
+      "label": "pagination-v2-offset-4",
+      "kind": "query",
+      "sql": "SELECT Id, spanner.score(BodyTokens,$1, options=>$2) AS score FROM ScoreDocs WHERE spanner.search(BodyTokens,$1) ORDER BY score DESC,Id LIMIT $3 OFFSET $4",
+      "family": "ranked-pagination",
+      "params": {
+        "p1": "cat",
+        "p2": {
+          "version": 2
+        },
+        "p3": 2,
+        "p4": 4
+      },
+      "param_types": {
+        "p2": "JSONB",
+        "p3": "INT64",
+        "p4": "INT64"
+      },
+      "requires": [
+        "score-pagination-insert",
+        "score-search-index"
+      ]
+    },
+    {
+      "label": "batch-omitted-create",
+      "kind": "ddl",
+      "sql": "CREATE QUEUE batchomitted(id varchar(36) NOT NULL,payload bytea NOT NULL,PRIMARY KEY(id))",
+      "family": "queue-batches"
+    },
+    {
+      "label": "batch-omitted-insert",
+      "kind": "dml",
+      "sql": "",
+      "family": "queue-batches",
+      "statements": [
+        "INSERT INTO batchomitted(Id,Payload,deliver_time) VALUES ('000',CAST('x' AS bytea),CURRENT_TIMESTAMP),('001',CAST('x' AS bytea),CURRENT_TIMESTAMP),('002',CAST('x' AS bytea),CURRENT_TIMESTAMP),('003',CAST('x' AS bytea),CURRENT_TIMESTAMP),('004',CAST('x' AS bytea),CURRENT_TIMESTAMP),('005',CAST('x' AS bytea),CURRENT_TIMESTAMP),('006',CAST('x' AS bytea),CURRENT_TIMESTAMP),('007',CAST('x' AS bytea),CURRENT_TIMESTAMP),('008',CAST('x' AS bytea),CURRENT_TIMESTAMP),('009',CAST('x' AS bytea),CURRENT_TIMESTAMP),('010',CAST('x' AS bytea),CURRENT_TIMESTAMP),('011',CAST('x' AS bytea),CURRENT_TIMESTAMP),('012',CAST('x' AS bytea),CURRENT_TIMESTAMP),('013',CAST('x' AS bytea),CURRENT_TIMESTAMP),('014',CAST('x' AS bytea),CURRENT_TIMESTAMP),('015',CAST('x' AS bytea),CURRENT_TIMESTAMP),('016',CAST('x' AS bytea),CURRENT_TIMESTAMP),('017',CAST('x' AS bytea),CURRENT_TIMESTAMP),('018',CAST('x' AS bytea),CURRENT_TIMESTAMP),('019',CAST('x' AS bytea),CURRENT_TIMESTAMP),('020',CAST('x' AS bytea),CURRENT_TIMESTAMP),('021',CAST('x' AS bytea),CURRENT_TIMESTAMP),('022',CAST('x' AS bytea),CURRENT_TIMESTAMP),('023',CAST('x' AS bytea),CURRENT_TIMESTAMP),('024',CAST('x' AS bytea),CURRENT_TIMESTAMP),('025',CAST('x' AS bytea),CURRENT_TIMESTAMP),('026',CAST('x' AS bytea),CURRENT_TIMESTAMP),('027',CAST('x' AS bytea),CURRENT_TIMESTAMP),('028',CAST('x' AS bytea),CURRENT_TIMESTAMP),('029',CAST('x' AS bytea),CURRENT_TIMESTAMP),('030',CAST('x' AS bytea),CURRENT_TIMESTAMP),('031',CAST('x' AS bytea),CURRENT_TIMESTAMP),('032',CAST('x' AS bytea),CURRENT_TIMESTAMP),('033',CAST('x' AS bytea),CURRENT_TIMESTAMP),('034',CAST('x' AS bytea),CURRENT_TIMESTAMP),('035',CAST('x' AS bytea),CURRENT_TIMESTAMP),('036',CAST('x' AS bytea),CURRENT_TIMESTAMP),('037',CAST('x' AS bytea),CURRENT_TIMESTAMP),('038',CAST('x' AS bytea),CURRENT_TIMESTAMP),('039',CAST('x' AS bytea),CURRENT_TIMESTAMP)"
+      ],
+      "requires": [
+        "batch-omitted-create"
+      ]
+    },
+    {
+      "label": "batch-omitted-receive",
+      "kind": "query",
+      "sql": "SELECT Id,spanner_last_batch_message AS batch_end FROM spanner.receive_batchomitted(priority=>NULL,max_duration=>'5s')",
+      "family": "queue-batches",
+      "timeout_seconds": 20,
+      "requires": [
+        "batch-omitted-insert"
+      ]
+    },
+    {
+      "label": "batch-null-create",
+      "kind": "ddl",
+      "sql": "CREATE QUEUE batchnull(id varchar(36) NOT NULL,payload bytea NOT NULL,PRIMARY KEY(id))",
+      "family": "queue-batches"
+    },
+    {
+      "label": "batch-null-insert",
+      "kind": "dml",
+      "sql": "",
+      "family": "queue-batches",
+      "statements": [
+        "INSERT INTO batchnull(Id,Payload,deliver_time) VALUES ('000',CAST('x' AS bytea),CURRENT_TIMESTAMP),('001',CAST('x' AS bytea),CURRENT_TIMESTAMP),('002',CAST('x' AS bytea),CURRENT_TIMESTAMP),('003',CAST('x' AS bytea),CURRENT_TIMESTAMP),('004',CAST('x' AS bytea),CURRENT_TIMESTAMP),('005',CAST('x' AS bytea),CURRENT_TIMESTAMP),('006',CAST('x' AS bytea),CURRENT_TIMESTAMP),('007',CAST('x' AS bytea),CURRENT_TIMESTAMP),('008',CAST('x' AS bytea),CURRENT_TIMESTAMP),('009',CAST('x' AS bytea),CURRENT_TIMESTAMP),('010',CAST('x' AS bytea),CURRENT_TIMESTAMP),('011',CAST('x' AS bytea),CURRENT_TIMESTAMP),('012',CAST('x' AS bytea),CURRENT_TIMESTAMP),('013',CAST('x' AS bytea),CURRENT_TIMESTAMP),('014',CAST('x' AS bytea),CURRENT_TIMESTAMP),('015',CAST('x' AS bytea),CURRENT_TIMESTAMP),('016',CAST('x' AS bytea),CURRENT_TIMESTAMP),('017',CAST('x' AS bytea),CURRENT_TIMESTAMP),('018',CAST('x' AS bytea),CURRENT_TIMESTAMP),('019',CAST('x' AS bytea),CURRENT_TIMESTAMP),('020',CAST('x' AS bytea),CURRENT_TIMESTAMP),('021',CAST('x' AS bytea),CURRENT_TIMESTAMP),('022',CAST('x' AS bytea),CURRENT_TIMESTAMP),('023',CAST('x' AS bytea),CURRENT_TIMESTAMP),('024',CAST('x' AS bytea),CURRENT_TIMESTAMP),('025',CAST('x' AS bytea),CURRENT_TIMESTAMP),('026',CAST('x' AS bytea),CURRENT_TIMESTAMP),('027',CAST('x' AS bytea),CURRENT_TIMESTAMP),('028',CAST('x' AS bytea),CURRENT_TIMESTAMP),('029',CAST('x' AS bytea),CURRENT_TIMESTAMP),('030',CAST('x' AS bytea),CURRENT_TIMESTAMP),('031',CAST('x' AS bytea),CURRENT_TIMESTAMP),('032',CAST('x' AS bytea),CURRENT_TIMESTAMP),('033',CAST('x' AS bytea),CURRENT_TIMESTAMP),('034',CAST('x' AS bytea),CURRENT_TIMESTAMP),('035',CAST('x' AS bytea),CURRENT_TIMESTAMP),('036',CAST('x' AS bytea),CURRENT_TIMESTAMP),('037',CAST('x' AS bytea),CURRENT_TIMESTAMP),('038',CAST('x' AS bytea),CURRENT_TIMESTAMP),('039',CAST('x' AS bytea),CURRENT_TIMESTAMP)"
+      ],
+      "requires": [
+        "batch-null-create"
+      ]
+    },
+    {
+      "label": "batch-null-receive",
+      "kind": "query",
+      "sql": "SELECT Id,spanner_last_batch_message AS batch_end FROM spanner.receive_batchnull(max_batch_size=>NULL,priority=>NULL,max_duration=>'5s')",
+      "family": "queue-batches",
+      "timeout_seconds": 20,
+      "requires": [
+        "batch-null-insert"
+      ]
+    },
+    {
+      "label": "batch-twenty-create",
+      "kind": "ddl",
+      "sql": "CREATE QUEUE batchtwenty(id varchar(36) NOT NULL,payload bytea NOT NULL,PRIMARY KEY(id))",
+      "family": "queue-batches"
+    },
+    {
+      "label": "batch-twenty-insert",
+      "kind": "dml",
+      "sql": "",
+      "family": "queue-batches",
+      "statements": [
+        "INSERT INTO batchtwenty(Id,Payload,deliver_time) VALUES ('000',CAST('x' AS bytea),CURRENT_TIMESTAMP),('001',CAST('x' AS bytea),CURRENT_TIMESTAMP),('002',CAST('x' AS bytea),CURRENT_TIMESTAMP),('003',CAST('x' AS bytea),CURRENT_TIMESTAMP),('004',CAST('x' AS bytea),CURRENT_TIMESTAMP),('005',CAST('x' AS bytea),CURRENT_TIMESTAMP),('006',CAST('x' AS bytea),CURRENT_TIMESTAMP),('007',CAST('x' AS bytea),CURRENT_TIMESTAMP),('008',CAST('x' AS bytea),CURRENT_TIMESTAMP),('009',CAST('x' AS bytea),CURRENT_TIMESTAMP),('010',CAST('x' AS bytea),CURRENT_TIMESTAMP),('011',CAST('x' AS bytea),CURRENT_TIMESTAMP),('012',CAST('x' AS bytea),CURRENT_TIMESTAMP),('013',CAST('x' AS bytea),CURRENT_TIMESTAMP),('014',CAST('x' AS bytea),CURRENT_TIMESTAMP),('015',CAST('x' AS bytea),CURRENT_TIMESTAMP),('016',CAST('x' AS bytea),CURRENT_TIMESTAMP),('017',CAST('x' AS bytea),CURRENT_TIMESTAMP),('018',CAST('x' AS bytea),CURRENT_TIMESTAMP),('019',CAST('x' AS bytea),CURRENT_TIMESTAMP),('020',CAST('x' AS bytea),CURRENT_TIMESTAMP),('021',CAST('x' AS bytea),CURRENT_TIMESTAMP),('022',CAST('x' AS bytea),CURRENT_TIMESTAMP),('023',CAST('x' AS bytea),CURRENT_TIMESTAMP),('024',CAST('x' AS bytea),CURRENT_TIMESTAMP),('025',CAST('x' AS bytea),CURRENT_TIMESTAMP),('026',CAST('x' AS bytea),CURRENT_TIMESTAMP),('027',CAST('x' AS bytea),CURRENT_TIMESTAMP),('028',CAST('x' AS bytea),CURRENT_TIMESTAMP),('029',CAST('x' AS bytea),CURRENT_TIMESTAMP),('030',CAST('x' AS bytea),CURRENT_TIMESTAMP),('031',CAST('x' AS bytea),CURRENT_TIMESTAMP),('032',CAST('x' AS bytea),CURRENT_TIMESTAMP),('033',CAST('x' AS bytea),CURRENT_TIMESTAMP),('034',CAST('x' AS bytea),CURRENT_TIMESTAMP),('035',CAST('x' AS bytea),CURRENT_TIMESTAMP),('036',CAST('x' AS bytea),CURRENT_TIMESTAMP),('037',CAST('x' AS bytea),CURRENT_TIMESTAMP),('038',CAST('x' AS bytea),CURRENT_TIMESTAMP),('039',CAST('x' AS bytea),CURRENT_TIMESTAMP)"
+      ],
+      "requires": [
+        "batch-twenty-create"
+      ]
+    },
+    {
+      "label": "batch-twenty-receive",
+      "kind": "query",
+      "sql": "SELECT Id,spanner_last_batch_message AS batch_end FROM spanner.receive_batchtwenty(max_batch_size=>20,priority=>NULL,max_duration=>'5s')",
+      "family": "queue-batches",
+      "timeout_seconds": 20,
+      "requires": [
+        "batch-twenty-insert"
+      ]
+    },
+    {
+      "label": "seq-control",
+      "family": "sequence-rw-control",
+      "kind": "ddl",
+      "sql": "CREATE SEQUENCE SeqControl BIT_REVERSED_POSITIVE",
+      "requires": []
+    },
+    {
+      "label": "seq-table",
+      "family": "sequence-rw-and-unbounded-placement-control",
+      "kind": "ddl",
+      "sql": "",
+      "requires": [
+        "seq-control"
+      ],
+      "statements": [
+        "CREATE TABLE SeqRows(Id bigint NOT NULL DEFAULT(nextval('SeqControl')),Label text,PRIMARY KEY(Id))",
+        "CREATE TABLE GeoLocationsFixed(Location text NOT NULL PLACEMENT KEY,PRIMARY KEY(Location))",
+        "CREATE TABLE GeoUsersFixed(Location text NOT NULL,UserId bigint NOT NULL DEFAULT(nextval('SeqControl')),PRIMARY KEY(Location,UserId)) INTERLEAVE IN PARENT GeoLocationsFixed ON DELETE CASCADE"
+      ]
+    },
+    {
+      "label": "seq-insert",
+      "family": "sequence-rw-control",
+      "kind": "dml",
+      "sql": "",
+      "requires": [
+        "seq-table"
+      ],
+      "statements": [
+        "INSERT INTO SeqRows(Label) VALUES('rw-control')"
+      ]
+    },
+    {
+      "label": "seq-read",
+      "family": "sequence-rw-control",
+      "kind": "query",
+      "sql": "SELECT Id,Label FROM SeqRows",
+      "requires": [
+        "seq-insert"
+      ]
+    }
+  ]
+}

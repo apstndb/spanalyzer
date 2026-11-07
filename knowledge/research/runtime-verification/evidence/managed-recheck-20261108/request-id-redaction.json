@@ -1,0 +1,59 @@
+{
+  "scope": "Finalization after both initial and repair executions; original producer bytes and outputs remain in the local durable task area. JSON is decoded before matching because encoded quotes escaped the streaming wrapper pattern.",
+  "files": [
+    {
+      "path": "assertions.json",
+      "input_sha256": "90c37cb00b8125ccc8bec3d914542c6b1bce20f5b2620b4d93fd841665cb2643",
+      "retained_sha256": "3cd166f6df8161e1265a6add52c4b1ece34f4b17fff8ec75f162287588bf68af",
+      "transformation": "Mask SDK requestID in decoded JSON error fields; query results and status codes are unchanged."
+    },
+    {
+      "path": "fixture-assertions.json",
+      "input_sha256": "81a8c9398edc4eeb03c710ceebf46eb0d13005b13f3a8ae721da41d03c0c7bc2",
+      "retained_sha256": "b12a3f8208d5d7cb835f08d8035e1b8cfcb331dbb995886d8b3b7a52fa732a1a",
+      "transformation": "Mask SDK requestID in decoded JSON error fields; query results and status codes are unchanged."
+    },
+    {
+      "path": "google.jsonl",
+      "input_sha256": "561385d442f4d78fe41815222526254722910970b23812fc42bd3ad3d63cdc2e",
+      "retained_sha256": "74069baad43479b4fd66cdedd73760e08f09ac90691a69d1cb324d402ba6c3e7",
+      "transformation": "Mask SDK requestID in decoded JSON error fields; query results and status codes are unchanged."
+    },
+    {
+      "path": "histogram-controls.jsonl",
+      "input_sha256": "b7c66f50ef043b16abb42c5fe9604b426fb14839c52ef8e6e3d32152a3e35008",
+      "retained_sha256": "31d62288952b1f941c9b8725a748275bb547912b1d3abd0d9b8e6a1e645df47c",
+      "transformation": "Mask SDK requestID in decoded JSON error fields; query results and status codes are unchanged."
+    },
+    {
+      "path": "observed-histogram.jsonl",
+      "input_sha256": "772e6751dfe93263118b8e6ac158d36dd203460d38a251462927b46f31ec28c9",
+      "retained_sha256": "0727e5b18050f5c9531f6d2955fc4781b3958e725da68b19e06b3dd6af92b327",
+      "transformation": "Mask SDK requestID in decoded JSON error fields; query results and status codes are unchanged."
+    },
+    {
+      "path": "pg.jsonl",
+      "input_sha256": "159a111505d3286e29f116b677ac16a4af5c6cf79f50f418eb53aea223522daa",
+      "retained_sha256": "07ffaacd1b56c05617660218e5b54b7d062075e46355ae6ae3dc1af70d038cc1",
+      "transformation": "Mask SDK requestID in decoded JSON error fields; query results and status codes are unchanged."
+    },
+    {
+      "path": "readonly.jsonl",
+      "input_sha256": "3134c504716c6a4ea143b2ecdca10a2a8311bd84119b47f2082cdfdebd12d94c",
+      "retained_sha256": "a958b4d85ca5b5fc4108adef5fc32dedc471d087b19226d27518881843b9fca7",
+      "transformation": "Mask SDK requestID in decoded JSON error fields; query results and status codes are unchanged."
+    },
+    {
+      "path": "repair/pg.jsonl",
+      "input_sha256": "501e43d2cd430c3557405dbe56d08691820486edf53e118f80c496684a8f8193",
+      "retained_sha256": "9092ab0a4a12a15e9ec412cbc03c1963840e1d56e52f174944ad826ce20f0af7",
+      "transformation": "Mask SDK requestID in decoded JSON error fields; query results and status codes are unchanged."
+    },
+    {
+      "path": "statistics.jsonl",
+      "input_sha256": "2d4f3a8f9570dd2dee8e3f8498d02f9ea64ede59fa804596b44a9422a0dda72b",
+      "retained_sha256": "c89a62498b093044c445f8ea63f9ee463fb9b36ee74f42716295897dc323402d",
+      "transformation": "Mask SDK requestID in decoded JSON error fields; query results and status codes are unchanged."
+    }
+  ]
+}

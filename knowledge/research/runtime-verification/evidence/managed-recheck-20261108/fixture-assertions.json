@@ -1,6 +1,6 @@
 {
   "status": "pass",
-  "checks": 211,
+  "checks": 273,
   "failures": [],
   "assertions": [
     {
@@ -512,6 +512,150 @@
       "pass": true
     },
     {
+      "name": "google-repair-complete",
+      "pass": true
+    },
+    {
+      "name": "google-repair-owned-absent",
+      "pass": true
+    },
+    {
+      "name": "repair-google-v1-full",
+      "pass": true
+    },
+    {
+      "name": "repair-google-v1-offset-0",
+      "pass": true
+    },
+    {
+      "name": "repair-google-v1-offset-2",
+      "pass": true
+    },
+    {
+      "name": "repair-google-v1-offset-4",
+      "pass": true
+    },
+    {
+      "name": "repair-google-v1-pages-cover-once",
+      "pass": true
+    },
+    {
+      "name": "repair-google-v1-total-order",
+      "pass": true
+    },
+    {
+      "name": "repair-google-v2-full",
+      "pass": true
+    },
+    {
+      "name": "repair-google-v2-offset-0",
+      "pass": true
+    },
+    {
+      "name": "repair-google-v2-offset-2",
+      "pass": true
+    },
+    {
+      "name": "repair-google-v2-offset-4",
+      "pass": true
+    },
+    {
+      "name": "repair-google-v2-pages-cover-once",
+      "pass": true
+    },
+    {
+      "name": "repair-google-v2-total-order",
+      "pass": true
+    },
+    {
+      "name": "repair-google-omitted-all-messages-once",
+      "pass": true
+    },
+    {
+      "name": "repair-google-omitted-batch-boundaries",
+      "pass": true
+    },
+    {
+      "name": "repair-google-null-all-messages-once",
+      "pass": true
+    },
+    {
+      "name": "repair-google-null-batch-boundaries",
+      "pass": true
+    },
+    {
+      "name": "repair-google-twenty-all-messages-once",
+      "pass": true
+    },
+    {
+      "name": "repair-google-twenty-batch-boundaries",
+      "pass": true
+    },
+    {
+      "name": "google-repair-null-receiver-executes",
+      "pass": true
+    },
+    {
+      "name": "google-repair-twenty-receiver-executes",
+      "pass": true
+    },
+    {
+      "name": "google-repair-omitted-receiver-executes",
+      "pass": true
+    },
+    {
+      "name": "google-repair-seq-control",
+      "pass": true
+    },
+    {
+      "name": "google-repair-seq-table",
+      "pass": true
+    },
+    {
+      "name": "google-repair-seq-insert",
+      "pass": true
+    },
+    {
+      "name": "google-repair-seq-read",
+      "pass": true
+    },
+    {
+      "name": "google-positive-sequence-id",
+      "pass": true
+    },
+    {
+      "name": "repair-google-db-1-setter",
+      "pass": true
+    },
+    {
+      "name": "repair-google-db-1-default",
+      "pass": true
+    },
+    {
+      "name": "repair-google-db-1-pinned-1",
+      "pass": true
+    },
+    {
+      "name": "repair-google-db-1-pinned-2",
+      "pass": true
+    },
+    {
+      "name": "repair-google-db-2-setter",
+      "pass": true
+    },
+    {
+      "name": "repair-google-db-2-default",
+      "pass": true
+    },
+    {
+      "name": "repair-google-db-2-pinned-1",
+      "pass": true
+    },
+    {
+      "name": "repair-google-db-2-pinned-2",
+      "pass": true
+    },
+    {
       "name": "pg-all-initial-steps-recorded",
       "pass": true
     },
@@ -846,6 +990,110 @@
     {
       "name": "initial-pg-v2-total-order",
       "pass": true
+    },
+    {
+      "name": "pg-repair-complete",
+      "pass": true
+    },
+    {
+      "name": "pg-repair-owned-absent",
+      "pass": true
+    },
+    {
+      "name": "repair-pg-v1-full",
+      "pass": true
+    },
+    {
+      "name": "repair-pg-v1-offset-0",
+      "pass": true
+    },
+    {
+      "name": "repair-pg-v1-offset-2",
+      "pass": true
+    },
+    {
+      "name": "repair-pg-v1-offset-4",
+      "pass": true
+    },
+    {
+      "name": "repair-pg-v1-pages-cover-once",
+      "pass": true
+    },
+    {
+      "name": "repair-pg-v1-total-order",
+      "pass": true
+    },
+    {
+      "name": "repair-pg-v2-full",
+      "pass": true
+    },
+    {
+      "name": "repair-pg-v2-offset-0",
+      "pass": true
+    },
+    {
+      "name": "repair-pg-v2-offset-2",
+      "pass": true
+    },
+    {
+      "name": "repair-pg-v2-offset-4",
+      "pass": true
+    },
+    {
+      "name": "repair-pg-v2-pages-cover-once",
+      "pass": true
+    },
+    {
+      "name": "repair-pg-v2-total-order",
+      "pass": true
+    },
+    {
+      "name": "repair-pg-null-all-messages-once",
+      "pass": true
+    },
+    {
+      "name": "repair-pg-null-batch-boundaries",
+      "pass": true
+    },
+    {
+      "name": "repair-pg-twenty-all-messages-once",
+      "pass": true
+    },
+    {
+      "name": "repair-pg-twenty-batch-boundaries",
+      "pass": true
+    },
+    {
+      "name": "pg-repair-null-receiver-executes",
+      "pass": true
+    },
+    {
+      "name": "pg-repair-twenty-receiver-executes",
+      "pass": true
+    },
+    {
+      "name": "pg-repair-omitted-argument-rejected",
+      "pass": true
+    },
+    {
+      "name": "pg-repair-seq-control",
+      "pass": true
+    },
+    {
+      "name": "pg-repair-seq-table",
+      "pass": true
+    },
+    {
+      "name": "pg-repair-seq-insert",
+      "pass": true
+    },
+    {
+      "name": "pg-repair-seq-read",
+      "pass": true
+    },
+    {
+      "name": "pg-positive-sequence-id",
+      "pass": true
     }
   ],
   "observations": {
@@ -881,21 +1129,47 @@
         "InvalidArgument": 8,
         "NOT_RUN": 6,
         "NotFound": 1
+      },
+      "repair_batches": {
+        "omitted": {
+          "code": "OK",
+          "messages": 40,
+          "sizes": [
+            30,
+            10
+          ]
+        },
+        "null": {
+          "code": "OK",
+          "messages": 40,
+          "sizes": [
+            10,
+            30
+          ]
+        },
+        "twenty": {
+          "code": "OK",
+          "messages": 40,
+          "sizes": [
+            20,
+            20
+          ]
+        }
       }
     },
     "pg": {
       "initial_batches": {
         "omitted": {
           "code": "InvalidArgument",
-          "error": "spanner: code = \"InvalidArgument\", desc = \"[ERROR] function spanner.receive_batchomitted(max_duration => unknown) does not exist\\\\nHint: No function matches the given name and argument types. You might need to add explicit type casts.\", requestID = \"1.601c53228521da7d.1.1.103.1\""
+          "error": "spanner: code = \"InvalidArgument\", desc = \"[ERROR] function spanner.receive_batchomitted(max_duration => unknown) does not exist\\\\nHint: No function matches the given name and argument types. You might need to add explicit type casts.\", requestID = \"<redacted>\""
         },
         "null": {
           "code": "InvalidArgument",
-          "error": "spanner: code = \"InvalidArgument\", desc = \"[ERROR] function spanner.receive_batchnull(max_duration => unknown, max_batch_size => unknown) does not exist\\\\nHint: No function matches the given name and argument types. You might need to add explicit type casts.\", requestID = \"1.601c53228521da7d.1.3.106.1\""
+          "error": "spanner: code = \"InvalidArgument\", desc = \"[ERROR] function spanner.receive_batchnull(max_duration => unknown, max_batch_size => unknown) does not exist\\\\nHint: No function matches the given name and argument types. You might need to add explicit type casts.\", requestID = \"<redacted>\""
         },
         "twenty": {
           "code": "InvalidArgument",
-          "error": "spanner: code = \"InvalidArgument\", desc = \"[ERROR] function spanner.receive_batchtwenty(max_duration => unknown, max_batch_size => bigint) does not exist\\\\nHint: No function matches the given name and argument types. You might need to add explicit type casts.\", requestID = \"1.601c53228521da7d.1.1.109.1\""
+          "error": "spanner: code = \"InvalidArgument\", desc = \"[ERROR] function spanner.receive_batchtwenty(max_duration => unknown, max_batch_size => bigint) does not exist\\\\nHint: No function matches the given name and argument types. You might need to add explicit type casts.\", requestID = \"<redacted>\""
         }
       },
       "code_counts": {
@@ -904,6 +1178,28 @@
         "NOT_RUN": 9,
         "Unimplemented": 1,
         "NotFound": 1
+      },
+      "repair_batches": {
+        "omitted": {
+          "code": "InvalidArgument",
+          "error": "spanner: code = \"InvalidArgument\", desc = \"[ERROR] function spanner.receive_batchomitted(priority => unknown, max_duration => unknown) does not exist\\\\nHint: No function matches the given name and argument types. You might need to add explicit type casts.\", requestID = \"<redacted>\""
+        },
+        "null": {
+          "code": "OK",
+          "messages": 40,
+          "sizes": [
+            30,
+            10
+          ]
+        },
+        "twenty": {
+          "code": "OK",
+          "messages": 40,
+          "sizes": [
+            20,
+            20
+          ]
+        }
       }
     }
   },

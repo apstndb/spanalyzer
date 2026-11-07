@@ -1,0 +1,32 @@
+from pathlib import Path
+import hashlib, json, re
+
+root = Path('/Users/apstndb/work/spanner-analyzer/.worktrees/cross-engine-docs-20261005/knowledge/research/runtime-verification/evidence/managed-recheck-20261108')
+records = []
+def redact(value):
+    if isinstance(value, list):
+        return [redact(v) for v in value]
+    if isinstance(value, dict):
+        return {k: re.sub(r'requestID = "[^"]*"', 'requestID = "<redacted>"', v) if k == 'error' and isinstance(v,str) else redact(v) for k,v in value.items()}
+    return value
+for path in sorted(root.rglob('*')):
+    if not path.is_file() or path.suffix not in ['.json','.jsonl']:
+        continue
+    original = path.read_bytes()
+    if not original:
+        continue
+    if path.suffix == '.jsonl':
+        before = [json.loads(line) for line in original.decode().splitlines()]
+        after = redact(before)
+        content = ''.join(json.dumps(v) + '\n' for v in after)
+    else:
+        before = json.loads(original)
+        after = redact(before)
+        content = json.dumps(after,indent=2) + '\n'
+    if before == after:
+        continue
+    path.write_text(content)
+    records.append({'path':str(path.relative_to(root)),'input_sha256':hashlib.sha256(original).hexdigest(),'retained_sha256':hashlib.sha256(path.read_bytes()).hexdigest(),'transformation':'Mask SDK requestID in decoded JSON error fields; query results and status codes are unchanged.'})
+receipt = root / 'request-id-redaction.json'
+receipt.write_text(json.dumps({'scope':'Finalization after both initial and repair executions; original producer bytes and outputs remain in the local durable task area. JSON is decoded before matching because encoded quotes escaped the streaming wrapper pattern.','files':records},indent=2) + '\n')
+print('Decoded error fields redacted in',len(records),'retained files')

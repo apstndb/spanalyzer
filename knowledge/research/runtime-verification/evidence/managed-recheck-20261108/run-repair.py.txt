@@ -1,0 +1,41 @@
+from pathlib import Path
+import datetime, hashlib, json, os, re, subprocess
+
+root = Path('/Users/apstndb/work/spanner-analyzer/.worktrees/cross-engine-docs-20261005')
+scratch = root / '.tmp/managed-and-main-20261108'
+task = Path('/Users/apstndb/tmp/apstndb/spanalyzer/managed-and-main-20261108')
+out = task / 'evidence/repair'
+assert not os.getenv('SPANNER_EMULATOR_HOST')
+keys = ['SPANNER_PROJECT_ID', 'SPANNER_INSTANCE_ID', 'SPANNER_DATABASE_ID']
+assert all(os.getenv(k) for k in keys)
+assert sum(len(json.loads((out / (v + '-cases.json')).read_text())['steps']) for v in ['google', 'pg']) == 60
+def clean(s):
+    for value in sorted([os.environ[k] for k in keys], key=len, reverse=True):
+        s = s.replace(value, '<redacted>')
+    s = re.sub(r'projects/[^/\s"\']+/instances/[^/\s"\']+/databases/[^/\s"\']+', '<database>', s)
+    s = re.sub(r'recheck1108[gp]-[a-f0-9]+', '<owned-database>', s)
+    return re.sub(r'requestID = "[^"]*"', 'requestID = "<redacted>"', s)
+receipts = []
+for dialect in ['google', 'pg']:
+    # A durable exclusive marker prevents an accidental third lifecycle on retry.
+    marker = out / (dialect + '-lifecycle-started.json')
+    with marker.open('x') as f:
+        json.dump({'authorization': 'Additional repair lifecycles require separate explicit user authorization; exactly two new databases.', 'started_at': datetime.datetime.now(datetime.timezone.utc).isoformat()}, f)
+    args = [str(scratch / 'managed'), str(out / (dialect + '-cases.json'))]
+    rows = []
+    started = datetime.datetime.now(datetime.timezone.utc).isoformat()
+    with (out / (dialect + '.jsonl')).open('x') as log, (scratch / (dialect + '-raw.stderr')).open('w+') as err:
+        p = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=err, text=True)
+        for line in p.stdout:
+            row = json.loads(clean(line)); rows.append(row)
+            log.write(json.dumps(row) + '\n'); log.flush()
+            print(dialect, row['label'], row['code'], flush=True)
+        code = p.wait(); err.seek(0)
+        (out / (dialect + '.stderr')).write_text(clean(err.read()))
+    (scratch / (dialect + '-raw.stderr')).unlink()
+    receipts.append(dict(dialect=dialect, argv=args, exit_code=code, started_at=started, completed_at=datetime.datetime.now(datetime.timezone.utc).isoformat(), binary_sha256=hashlib.sha256((scratch / 'managed').read_bytes()).hexdigest(), source_sha256=hashlib.sha256((scratch / 'module/managed.go').read_bytes()).hexdigest(), authorization='November 8 additional repair approval: exactly two fresh owned databases; initial owned databases are already absent.'))
+    (out / 'fixture-commands.json').write_text(json.dumps(receipts, indent=2) + '\n')
+    codes = {r['label']: r['code'] for r in rows}
+    assert code == 0 and codes.get('create-database') == 'OK' and codes.get('drop-database') == 'OK' and codes.get('database-absent') == 'NotFound', 'Inspect lifecycle before any further creation'
+    assert not any(r['code'] in ['DeadlineExceeded','Unavailable'] for r in rows), 'Transport result is inconclusive; inspect before proceeding'
+print('Completed exactly two authorized lifecycles; both databases confirmed absent', flush=True)

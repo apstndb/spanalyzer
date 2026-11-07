@@ -23,6 +23,15 @@ sources:
   - id: pg-fixture
     resource: evidence/managed-recheck-20261108/pg.jsonl
     title: PostgreSQL fixture outcomes
+  - id: google-repair
+    resource: evidence/managed-recheck-20261108/repair/google.jsonl
+    title: Corrected GoogleSQL default-switch, queue and read-write sequence controls
+  - id: pg-repair
+    resource: evidence/managed-recheck-20261108/repair/pg.jsonl
+    title: Full-signature PostgreSQL receivers and TEXT placement-key positive control
+  - id: finalization
+    resource: evidence/managed-recheck-20261108/request-id-redaction.json
+    title: Explicit decoded-JSON error-field redaction and integrity mapping
   - id: pagination
     resource: https://docs.cloud.google.com/spanner/docs/full-text-search/paginate-search-results
     title: Ranked search pagination and scorer version state
@@ -127,42 +136,59 @@ outcomes are not counted as unexpected integration successes or failures.
 ## Owned fixture results
 
 The initial GoogleSQL and PostgreSQL fixtures record all 201 planned steps:
-186 execute and 15 are blocked by a prerequisite. Both owned databases are
-deleted and independently return `NotFound`. Together with the read-only
-checks, 409 bounded classification assertions pass. This is not a claim that
-every probe succeeds.
+186 are attempted and 15 are blocked by a prerequisite. Both owned databases are
+deleted and independently return `NotFound`. A separately authorized repair
+pair then attempts all 60 corrected/control steps; those two databases also
+return `NotFound` after deletion. Across all phases, 471 bounded classification
+assertions pass. There are 396 case records, of which 381 are attempted and the
+original 15 remain blocked. This is not a claim that every probe succeeds.
 
 | Scope | Observed result |
 | --- | --- |
 | Ranked search, both dialects | Explicit versions 1 and 2 and parameterized two-row offset pages work. Concatenating the three pages reproduces the complete six-row ranking exactly once, including primary-key ordering of equal scores. |
-| Scorer defaults | The existing GoogleSQL controls accept `score_version=1` and `2` and change the default score accordingly. PostgreSQL still rejects the documented `spanner.score_version` database option. |
+| Scorer defaults | GoogleSQL accepts `score_version=1` and `2`. Under each default, unpinned six-row results match that version, while query-pinned versions 1 and 2 independently match their original full results. PostgreSQL still rejects the documented `spanner.score_version` database option. |
 | Queue batches, GoogleSQL | Omitted and NULL `max_batch_size` both produce batches of at most 30, including an observed 30-row batch; explicit 20 produces two 20-row batches. All 40 messages arrive once. A batch may be smaller than its maximum. |
+| Queue batches, PostgreSQL | With the complete three-argument signature, NULL produces 30/10 batches and explicit 20 produces 20/20; all 40 messages arrive once. Omitting `max_batch_size` still fails function resolution even when `priority` and `max_duration` are supplied. |
 | Dynamic graph properties | Numeric and boolean literal filters, pattern filters, grouping, ordering, DISTINCT and property-to-property equality succeed. A numeric property does not match a string literal. A bare JSON boolean WHERE condition is rejected. |
 | GQL and views | Column propagation modes and ordered top-two controls agree with the prior behavior. All three volatile-view option modes accept `GENERATE_UUID()` properties and return new UUIDs on later reads. The explicit false option still permits this local volatile function. |
 | Search and statistics | JSON equality/IN/whole-document predicates return the same rows using automatic, forced search-index and forced base-table plans. All six PostgreSQL statistics projections execute, while the STRUCT-column negative control is rejected. |
 | Referential action | Deleting the parent sets the child foreign key to SQL NULL in both dialects. |
-| Placement sequences | The GoogleSQL placement-key parent and interleaved sequence-default child DDL succeeds. The new PostgreSQL example's bounded `varchar(1024)` placement key is rejected: the service requires TEXT or unbounded VARCHAR. |
+| Placement sequences | GoogleSQL placement-key parent and interleaved sequence-default child DDL succeeds. PostgreSQL rejects the new example's bounded `varchar(1024)`, while the TEXT parent and interleaved child positive control succeeds. Separate ordinary tables generate positive sequence-default keys through read-write INSERTs in both dialects. |
 
 The PostgreSQL placement example is a new documentation defect candidate.
-It is distinct from support for sequences in ordinary PostgreSQL tables.
+It is distinct from support for sequences in ordinary PostgreSQL tables. The
+generic queue omission guidance also needs a dialect qualification: the
+observed PostgreSQL receiver requires explicit arguments, with NULL selecting
+the default batch size. The complete working receiver shape is:
 
-Three initial probe limitations are retained explicitly. The added pagination
+```sql
+SELECT id, spanner_last_batch_message
+FROM spanner.receive_batchnull(
+  max_batch_size => NULL, priority => NULL, max_duration => '5s');
+```
+
+Three initial probe mistakes are retained explicitly. The added pagination
 default-switch cases mistakenly use `default_search_scorer_version`, rather
 than the documented `score_version`, so their six dependent reads per dialect
 do not execute. The initial PostgreSQL queue calls omit `priority`, leaving
 the full-signature positive control untested. A standalone sequence-allocation
 SELECT uses a read-only transaction and is rejected because allocation
 requires a read-write transaction. These are harness limitations, not evidence
-of unsupported scorer pinning, queues or sequence allocation. Corrected
-minimal fixtures are prepared separately; their execution is pending separate
-authorization.
+of unsupported scorer pinning, queues or sequence allocation. The corrected
+minimal fixtures now supply the missing positive controls above. PostgreSQL's
+remaining omitted-argument rejection is isolated from the original missing
+`priority` error. The fixed search corpus changes scores but retains the same
+ranking across versions; no actual scorer rollout or changed-ranking event is
+reproduced.
 
 ## Runtime and evidence boundaries
 
-The user authorized exactly two fresh database lifecycles, one per dialect.
+The user first authorized two fresh database lifecycles, one per dialect, and
+then separately authorized the additional two-database repair pair. All four
+created databases are confirmed absent.
 Only databases whose creation completes successfully in this producer may be
-deleted. Exclusive retained start markers prevent an accidental third
-lifecycle on retry. The base database and any older interrupted fixtures are
+deleted. Exclusive retained start markers prevent accidental extra lifecycles
+on retry. The base database and any older interrupted fixtures are
 outside the mutation scope.
 
 The pagination checks use a fixed data set. They do not simulate a managed
