@@ -1,0 +1,18 @@
+{
+  "argv": [
+    "/Users/apstndb/.local/share/mise/installs/go/1.26.10/bin/go",
+    "test",
+    "-race",
+    "-count=1",
+    "-v",
+    "-timeout=15m",
+    "-tags=integration,omni",
+    "-run",
+    "^TestIntegration.*OnEmulator$",
+    "./..."
+  ],
+  "exit_code": 0,
+  "started_at": "2026-11-07T18:26:25.565475+00:00",
+  "completed_at": "2026-11-07T18:26:45.273588+00:00",
+  "log": "emulator-integration.log"
+}

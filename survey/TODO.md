@@ -1,5 +1,15 @@
 # TODO
 
+## Refresh container runtimes (2026-11-08)
+
+- [x] Upgrade spanemuboost to v0.4.10-alpha.1 and pin Emulator 1.5.59 and
+  default Omni 2026.r4-lts.2, with a pinned Omni 2026.r5.1 selection.
+- [x] Run independent module, Emulator round-trip/drift and both Omni checks;
+  retain runtime identities and document compatibility changes. LTS and the
+  generator pass; r5 Remote Function PLAN failures remain a recorded upstream
+  regression candidate. Expression-index metadata loss in Emulator fails closed
+  during reconstruction.
+
 ## Refresh managed catalogs (2026-11-05)
 
 - [x] Register both batch-operation tables and the currently observed query,

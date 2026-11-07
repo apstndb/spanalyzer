@@ -1,5 +1,290 @@
 {
   "$defs": {
+    "access_path": {
+      "additionalProperties": false,
+      "properties": {
+        "base_table": {
+          "description": "Catalog-resolved base table, or empty when unknown.",
+          "minLength": 1,
+          "type": "string"
+        },
+        "conditions_complete": {
+          "description": "Observed scan signal; conditions_complete requires an unambiguous wrapper pairing.",
+          "type": "boolean"
+        },
+        "declared_key_count": {
+          "minimum": 0,
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "filter_index": {
+          "minimum": 0,
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "full_scan": {
+          "description": "Observed scan signal; conditions_complete requires an unambiguous wrapper pairing.",
+          "type": "boolean"
+        },
+        "has_residual_condition": {
+          "description": "Observed scan signal; conditions_complete requires an unambiguous wrapper pairing.",
+          "type": "boolean"
+        },
+        "has_search_condition": {
+          "description": "Observed scan signal; conditions_complete requires an unambiguous wrapper pairing.",
+          "type": "boolean"
+        },
+        "has_seek_condition": {
+          "description": "Observed scan signal; conditions_complete requires an unambiguous wrapper pairing.",
+          "type": "boolean"
+        },
+        "has_timestamp_condition": {
+          "description": "Observed scan signal; conditions_complete requires an unambiguous wrapper pairing.",
+          "type": "boolean"
+        },
+        "key_columns": {
+          "description": "Column evidence; empty does not prove no columns when bindings are unavailable.",
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
+        "null_filtered": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "range_seekable_key_size": {
+          "minimum": 1,
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "residual_columns": {
+          "description": "Column evidence; empty does not prove no columns when bindings are unavailable.",
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
+        "residual_conditions": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "columns": {
+                "description": "Column references proven by this scan's Reference bindings.",
+                "items": {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "type": "array",
+                "uniqueItems": true
+              },
+              "expression": {
+                "description": "Verbatim backend short description; empty when unavailable.",
+                "minLength": 1,
+                "type": "string"
+              },
+              "index": {
+                "description": "Immediate condition child PlanNode index.",
+                "minimum": 0,
+                "type": "integer"
+              }
+            },
+            "required": [
+              "index",
+              "expression",
+              "columns"
+            ],
+            "type": "object"
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
+        "scan_index": {
+          "description": "Owning Scan PlanNode index.",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "scan_target": {
+          "description": "Raw scan target identity.",
+          "minLength": 1,
+          "type": "string"
+        },
+        "scan_target_kind": {
+          "description": "Catalog target kind, explicit vector component kind, or unknown.",
+          "minLength": 1,
+          "type": "string"
+        },
+        "scan_type": {
+          "description": "Normalized backend scan type.",
+          "minLength": 1,
+          "type": "string"
+        },
+        "search_conditions": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "columns": {
+                "description": "Column references proven by this scan's Reference bindings.",
+                "items": {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "type": "array",
+                "uniqueItems": true
+              },
+              "expression": {
+                "description": "Verbatim backend short description; empty when unavailable.",
+                "minLength": 1,
+                "type": "string"
+              },
+              "index": {
+                "description": "Immediate condition child PlanNode index.",
+                "minimum": 0,
+                "type": "integer"
+              }
+            },
+            "required": [
+              "index",
+              "expression",
+              "columns"
+            ],
+            "type": "object"
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
+        "seek_columns": {
+          "description": "Column evidence; empty does not prove no columns when bindings are unavailable.",
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
+        "seek_conditions": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "columns": {
+                "description": "Column references proven by this scan's Reference bindings.",
+                "items": {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "type": "array",
+                "uniqueItems": true
+              },
+              "expression": {
+                "description": "Verbatim backend short description; empty when unavailable.",
+                "minLength": 1,
+                "type": "string"
+              },
+              "index": {
+                "description": "Immediate condition child PlanNode index.",
+                "minimum": 0,
+                "type": "integer"
+              }
+            },
+            "required": [
+              "index",
+              "expression",
+              "columns"
+            ],
+            "type": "object"
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
+        "seekable_key_size": {
+          "description": "Raw range-key metadata; zero does not mean no seek.",
+          "minLength": 1,
+          "type": "string"
+        },
+        "stored_columns": {
+          "description": "Column evidence; empty does not prove no columns when bindings are unavailable.",
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
+        "timestamp_conditions": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "columns": {
+                "description": "Column references proven by this scan's Reference bindings.",
+                "items": {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "type": "array",
+                "uniqueItems": true
+              },
+              "expression": {
+                "description": "Verbatim backend short description; empty when unavailable.",
+                "minLength": 1,
+                "type": "string"
+              },
+              "index": {
+                "description": "Immediate condition child PlanNode index.",
+                "minimum": 0,
+                "type": "integer"
+              }
+            },
+            "required": [
+              "index",
+              "expression",
+              "columns"
+            ],
+            "type": "object"
+          },
+          "type": "array",
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "base_table",
+        "conditions_complete",
+        "declared_key_count",
+        "filter_index",
+        "full_scan",
+        "has_residual_condition",
+        "has_search_condition",
+        "has_seek_condition",
+        "has_timestamp_condition",
+        "key_columns",
+        "null_filtered",
+        "range_seekable_key_size",
+        "residual_columns",
+        "residual_conditions",
+        "scan_index",
+        "scan_target",
+        "scan_target_kind",
+        "scan_type",
+        "search_conditions",
+        "seek_columns",
+        "seek_conditions",
+        "seekable_key_size",
+        "stored_columns",
+        "timestamp_conditions"
+      ],
+      "type": "object"
+    },
     "backend_identity": {
       "additionalProperties": false,
       "allOf": [
@@ -411,7 +696,8 @@
           "description": "Resolved target scope.",
           "enum": [
             "query",
-            "external_query.inner"
+            "external_query.inner",
+            "write"
           ]
         },
         "stability": {
@@ -428,7 +714,7 @@
         "target_id": {
           "description": "Canonical target ID resolved for the contract.",
           "minLength": 1,
-          "pattern": "^query/[A-Za-z_][A-Za-z0-9_]*(#inner)?$",
+          "pattern": "^(query|write)/[A-Za-z_][A-Za-z0-9_]*(/variant/[A-Za-z0-9_-]+)?(#inner)?$",
           "type": "string"
         }
       },
@@ -1139,7 +1425,7 @@
         "id": {
           "description": "Canonical target ID.",
           "minLength": 1,
-          "pattern": "^query/[A-Za-z_][A-Za-z0-9_]*(#inner)?$",
+          "pattern": "^(query|write)/[A-Za-z_][A-Za-z0-9_]*(/variant/[A-Za-z0-9_-]+)?(#inner)?$",
           "type": "string"
         },
         "query": {
@@ -1157,7 +1443,8 @@
           "description": "Plan-report target scope.",
           "enum": [
             "query",
-            "external_query.inner"
+            "external_query.inner",
+            "write"
           ]
         }
       },
@@ -1198,6 +1485,11 @@
     "normalization": {
       "additionalProperties": false,
       "properties": {
+        "access_paths_version": {
+          "description": "Access-path normalization compatibility revision.",
+          "minLength": 1,
+          "type": "string"
+        },
         "cel_input_defaults": {
           "$ref": "#/$defs/cel_input_defaults"
         },
@@ -1215,6 +1507,7 @@
       "required": [
         "operator_tree_version",
         "operator_family_mapping_version",
+        "access_paths_version",
         "cel_input_defaults"
       ],
       "type": "object"
@@ -1259,6 +1552,11 @@
         },
         "execution_method": {
           "description": "Normalized execution_method metadata.",
+          "minLength": 1,
+          "type": "string"
+        },
+        "expression": {
+          "description": "Verbatim backend short representation.",
           "minLength": 1,
           "type": "string"
         },
@@ -1727,6 +2025,11 @@
           "minimum": 0,
           "type": "integer"
         },
+        "expression": {
+          "description": "Verbatim child short representation.",
+          "minLength": 1,
+          "type": "string"
+        },
         "parent_index": {
           "description": "Parent PlanNode index.",
           "minimum": 0,
@@ -1954,6 +2257,7 @@
               "operator_family_counts",
               "normalized_operators",
               "operator_edges",
+              "access_paths",
               "plan"
             ]
           }
@@ -1995,6 +2299,11 @@
                 {
                   "required": [
                     "operator_edges"
+                  ]
+                },
+                {
+                  "required": [
+                    "access_paths"
                   ]
                 },
                 {
@@ -2055,6 +2364,11 @@
                 },
                 {
                   "required": [
+                    "access_paths"
+                  ]
+                },
+                {
+                  "required": [
                     "plan"
                   ]
                 },
@@ -2072,6 +2386,13 @@
         }
       ],
       "properties": {
+        "access_paths": {
+          "items": {
+            "$ref": "#/$defs/access_path"
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
         "catalog": {
           "description": "Spanner catalog used for analysis.",
           "minLength": 1,
@@ -2101,7 +2422,8 @@
             "sql",
             "table",
             "index",
-            "external_query"
+            "external_query",
+            "write"
           ]
         },
         "name": {
@@ -2541,7 +2863,8 @@
           "description": "Plan-report target scope.",
           "enum": [
             "query",
-            "external_query.inner"
+            "external_query.inner",
+            "write"
           ]
         },
         "sql": {
@@ -2566,8 +2889,11 @@
         "target_id": {
           "description": "Canonical target ID, for example query/ListSingers or query/ExternalQuery#inner.",
           "minLength": 1,
-          "pattern": "^query/[A-Za-z_][A-Za-z0-9_]*(#inner)?$",
+          "pattern": "^(query|write)/[A-Za-z_][A-Za-z0-9_]*(/variant/[A-Za-z0-9_-]+)?(#inner)?$",
           "type": "string"
+        },
+        "variant": {
+          "$ref": "#/$defs/variant"
         }
       },
       "required": [
@@ -2658,6 +2984,57 @@
         "errors",
         "skipped",
         "excluded"
+      ],
+      "type": "object"
+    },
+    "variant": {
+      "additionalProperties": false,
+      "properties": {
+        "absent_params": {
+          "description": "Omitted optional parameters.",
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
+        "choice_assignments": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "type": "object"
+        },
+        "label": {
+          "description": "Human-readable optional SQL shape.",
+          "minLength": 1,
+          "type": "string"
+        },
+        "present_params": {
+          "description": "Present optional parameters.",
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
+        "sql": {
+          "description": "Resolved variant SQL.",
+          "minLength": 1,
+          "type": "string"
+        },
+        "sql_sha256": {
+          "description": "SHA-256 of variant SQL.",
+          "minLength": 1,
+          "pattern": "^[a-f0-9]{64}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "label",
+        "sql",
+        "sql_sha256"
       ],
       "type": "object"
     }

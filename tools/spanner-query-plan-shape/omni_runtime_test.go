@@ -12,6 +12,7 @@ import (
 )
 
 var planProbeOmniRuntime spanemuboost.RuntimeHandle
+var planProbeOmniImage string
 
 func TestMain(m *testing.M) {
 	if os.Getenv("SPANEMUBOOST_ENABLE_OMNI_TESTS") == "" {
@@ -26,6 +27,7 @@ func TestMain(m *testing.M) {
 			os.Exit(1)
 		}
 	}
+	planProbeOmniImage = image
 	runtime, err := spanemuboost.NewLazyRuntimeFromEnvOrStart(
 		spanemuboost.BackendOmni,
 		spanemuboost.WithContainerImage(image),
@@ -43,6 +45,13 @@ func TestMain(m *testing.M) {
 		}
 	}
 	os.Exit(code)
+}
+
+// selectedOmniR5 identifies the explicit r5 test profile, not an observation
+// of an arbitrary attached endpoint's engine version.
+func selectedOmniR5() bool {
+	reference, _, _ := strings.Cut(planProbeOmniImage, "@")
+	return strings.HasSuffix(reference, ":2026.r5.1")
 }
 
 func openOmniClients(t *testing.T, ddls []string, options ...spanemuboost.Option) *spanemuboost.Clients {

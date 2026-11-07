@@ -1,0 +1,53 @@
+[
+  {
+    "name": "capture-infoschema-emulator",
+    "argv": [
+      "/Users/apstndb/.local/share/mise/installs/go/1.26.10/bin/go",
+      "run",
+      "./cmd/infoschema-capture",
+      "--target",
+      "emulator",
+      "--write",
+      "--repo-root",
+      ".."
+    ],
+    "exit_code": 0,
+    "started_at": "2026-11-07T18:28:51.312812+00:00",
+    "completed_at": "2026-11-07T18:28:55.276684+00:00",
+    "log": "capture-infoschema-emulator.log"
+  },
+  {
+    "name": "capture-infoschema-omni",
+    "argv": [
+      "/Users/apstndb/.local/share/mise/installs/go/1.26.10/bin/go",
+      "run",
+      "./cmd/infoschema-capture",
+      "--target",
+      "omni",
+      "--write",
+      "--repo-root",
+      ".."
+    ],
+    "exit_code": 0,
+    "started_at": "2026-11-07T18:28:55.277135+00:00",
+    "completed_at": "2026-11-07T18:29:19.834441+00:00",
+    "log": "capture-infoschema-omni.log"
+  },
+  {
+    "name": "capture-spanner-sys-omni",
+    "argv": [
+      "/Users/apstndb/.local/share/mise/installs/go/1.26.10/bin/go",
+      "run",
+      "./cmd/spanner-sys-capture",
+      "--target",
+      "omni",
+      "--write",
+      "--repo-root",
+      ".."
+    ],
+    "exit_code": 0,
+    "started_at": "2026-11-07T18:29:19.834786+00:00",
+    "completed_at": "2026-11-07T18:29:45.723359+00:00",
+    "log": "capture-spanner-sys-omni.log"
+  }
+]

@@ -1,0 +1,152 @@
+{
+  "base": "293fe78b6da4b70bfe8f693161c5fc784f0364a8",
+  "head": "fa8645afd32f27de73bd1fca7c29e89fbc027245",
+  "observed_at": "2026-11-07T19:22:08.804017+00:00",
+  "commit_count": 3,
+  "document_path_count": 10,
+  "commits": [
+    {
+      "sha": "d3a69819bdad28dd976c4fb2bf64b7b01f98ab59",
+      "date": "2026-11-05T18:01:53Z",
+      "message": "docs: auto-update 2026-11-05 [skip ci]",
+      "files": [
+        "metadata.yaml"
+      ]
+    },
+    {
+      "sha": "a14b9ad57306e22b369848c4839a430239dc02ce",
+      "date": "2026-11-06T18:01:56Z",
+      "message": "docs: auto-update 2026-11-06 [skip ci]",
+      "files": [
+        "docs/docs.cloud.google.com/spanner/docs/getting-started/java.md",
+        "docs/docs.cloud.google.com/spanner/docs/metrics.md",
+        "docs/docs.cloud.google.com/spanner/docs/pg-jdbc-connect.md",
+        "docs/docs.cloud.google.com/spanner/docs/pgadapter-get.md",
+        "docs/docs.cloud.google.com/spanner/docs/queues/queues-using.md",
+        "docs/docs.cloud.google.com/spanner/docs/reference/libraries.md",
+        "docs/docs.cloud.google.com/spanner/docs/release-notes.md",
+        "docs/docs.cloud.google.com/spanner/docs/sequence-tasks.md",
+        "logs/urls.txt",
+        "metadata.yaml"
+      ]
+    },
+    {
+      "sha": "fa8645afd32f27de73bd1fca7c29e89fbc027245",
+      "date": "2026-11-07T18:01:27Z",
+      "message": "docs: auto-update 2026-11-07 [skip ci]",
+      "files": [
+        "docs/docs.cloud.google.com/spanner/docs/full-text-search/paginate-search-results.md",
+        "docs/docs.cloud.google.com/spanner/docs/full-text-search/ranked-search.md",
+        "logs/urls.txt",
+        "metadata.yaml"
+      ]
+    }
+  ],
+  "files": [
+    {
+      "path": "docs/docs.cloud.google.com/spanner/docs/getting-started/java.md",
+      "url": "https://docs.cloud.google.com/spanner/docs/getting-started/java",
+      "semantic_changes": [
+        "Java client example 6.125.0 to 6.126.0; no SQL runtime change"
+      ],
+      "official_update_time": "2026-11-05T17:28:35Z",
+      "official_content_sha256": "d0a7fb850e2295f598035baa66fb6a6f42b4122cb8e25491456ebbd417d0366a"
+    },
+    {
+      "path": "docs/docs.cloud.google.com/spanner/docs/reference/libraries.md",
+      "url": "https://docs.cloud.google.com/spanner/docs/reference/libraries",
+      "semantic_changes": [
+        "Java client example 6.125.0 to 6.126.0; no SQL runtime change"
+      ],
+      "official_update_time": "2026-11-05T17:28:36Z",
+      "official_content_sha256": "c522abe6ded72503758ba56b8332b741d64900156f5aa689367b82045127a0c2"
+    },
+    {
+      "path": "docs/docs.cloud.google.com/spanner/docs/pg-jdbc-connect.md",
+      "url": "https://docs.cloud.google.com/spanner/docs/pg-jdbc-connect",
+      "semantic_changes": [
+        "PGAdapter example 0.56.1 to 0.56.2",
+        "The PostgreSQL driver dependency is also incorrectly assigned 0.56.2; Maven Central contains no such driver version; the prior example already used the same mismatched PGAdapter numbering"
+      ],
+      "official_update_time": "2026-11-05T17:28:28Z",
+      "official_content_sha256": "c91b83c1edb3490c7d9de4bcfb9d58e208f8cf06f23f46a5f741e87a8a2473a5"
+    },
+    {
+      "path": "docs/docs.cloud.google.com/spanner/docs/pgadapter-get.md",
+      "url": "https://docs.cloud.google.com/spanner/docs/pgadapter-get",
+      "semantic_changes": [
+        "PGAdapter example 0.56.1 to 0.56.2"
+      ],
+      "official_update_time": "2026-11-05T17:28:28Z",
+      "official_content_sha256": "e270c84a991d2bbfa7c695ed6469c72eaaed4f99e6cb682ccefd4f7a11409511"
+    },
+    {
+      "path": "docs/docs.cloud.google.com/spanner/docs/metrics.md",
+      "url": "https://docs.cloud.google.com/spanner/docs/metrics",
+      "semantic_changes": [
+        "query_stat/total/cpu_time and read_stat/total/execution_count visibility delay 150 to 210 seconds",
+        "Four queue metrics change BETA to GA: active_receive_tvf_queries, buffered_in_flight_messages, buffered_ready_messages, message_payload_sizes",
+        "Generated-table timestamp updated; no runtime metric ingestion-latency measurement claimed"
+      ],
+      "official_update_time": "2026-11-05T22:47:51Z",
+      "official_content_sha256": "0990791ee1f8dbd312bda3638cffa3ceaebf5ade71ecbcb11c0fb9c0f59616e8"
+    },
+    {
+      "path": "docs/docs.cloud.google.com/spanner/docs/queues/queues-using.md",
+      "url": "https://docs.cloud.google.com/spanner/docs/queues/queues-using",
+      "semantic_changes": [
+        "Omitted or NULL max_batch_size defaults to 30; test omitted, NULL and explicit 20 with independent owned queues in both dialects"
+      ],
+      "official_update_time": "2026-11-05T22:57:26Z",
+      "official_content_sha256": "fcf7158b784df3b88e968ac25e6014f8c5aa9836c8511ee2b04fd2683faa478c"
+    },
+    {
+      "path": "docs/docs.cloud.google.com/spanner/docs/release-notes.md",
+      "url": "https://docs.cloud.google.com/spanner/docs/release-notes",
+      "semantic_changes": [
+        "Two enhancements were added retrospectively to the October 30 entry, not a November 6 release: graph views invoking remote functions and JSON dynamic-property comparisons/grouping/ordering",
+        "Use local volatile-column controls; no real remote endpoint is available and no remote service is deployed"
+      ],
+      "official_update_time": "2026-11-05T17:28:36Z",
+      "official_content_sha256": "f7c9991d31f27ed54f19c4d9e75265faf709613599d2024fefdbf760948a81e2"
+    },
+    {
+      "path": "docs/docs.cloud.google.com/spanner/docs/sequence-tasks.md",
+      "url": "https://docs.cloud.google.com/spanner/docs/sequence-tasks",
+      "semantic_changes": [
+        "Sequences on placement-key parent and interleaved child tables, with bit-reversed sequence defaults, GoogleSQL and PostgreSQL examples",
+        "Check the documented DDL and sequence generation; no multi-placement provisioning, insertion routing or tail-latency benchmark is claimed",
+        "UUID recommendation and default-placement coordination are documentation-only performance guidance"
+      ],
+      "official_update_time": "2026-11-05T22:00:57Z",
+      "official_content_sha256": "bd870a0f897ff9806562170484008218c264288f4c9207d5927127593eb0192b"
+    },
+    {
+      "path": "docs/docs.cloud.google.com/spanner/docs/full-text-search/paginate-search-results.md",
+      "url": "https://docs.cloud.google.com/spanner/docs/full-text-search/paginate-search-results",
+      "semantic_changes": [
+        "Pages are independent queries; concurrent changes can skip or repeat rows",
+        "Key-based pagination is the general recommendation, except ranked SCORE queries use offsets because score predicates are not seekable",
+        "Order score DESC plus primary-key tie breaker; parameterized LIMIT/OFFSET",
+        "Pin scorer version in query options and carry version plus offset in pagination state",
+        "Explicit query scorer overrides database default; scorer changes can reorder results; validate pinned pages against complete sorted results and both database defaults where accepted"
+      ],
+      "official_update_time": "2026-11-06T19:35:31Z",
+      "official_content_sha256": "42db3ed314a4ca4ea55a6c276c0b2627a7957f84716b021b2be0d8147d052597"
+    },
+    {
+      "path": "docs/docs.cloud.google.com/spanner/docs/full-text-search/ranked-search.md",
+      "url": "https://docs.cloud.google.com/spanner/docs/full-text-search/ranked-search",
+      "semantic_changes": [
+        "Cross-link and warning about scorer-version changes during pagination"
+      ],
+      "official_update_time": "2026-11-06T19:35:31Z",
+      "official_content_sha256": "dc2871f693bfbdad67c43c412c46947177128db5c984a0e856151a26fd6f0c4c"
+    }
+  ],
+  "bookkeeping_paths": [
+    "logs/urls.txt",
+    "metadata.yaml"
+  ],
+  "scope": "All three commits and all ten changed documentation paths inspected; full pinned before/after bodies and raw current official documents retained in the local durable task directory."
+}

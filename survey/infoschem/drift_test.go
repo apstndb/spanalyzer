@@ -47,7 +47,7 @@ func TestDrift_EmulatorTableMetas(t *testing.T) {
 
 	_ = verifyTableMetas(ctx, t, env.Client, "emulator")
 	verifyUUIDFixture(ctx, t, env.Client, uuidFixtureTable)
-	verifyExpressionIndexRejected(ctx, t, env.DatabaseClient, env.DatabasePath(), "ExpressionIndexProbe")
+	verifyExpressionIndexAccepted(ctx, t, env.DatabaseClient, env.Client, env.DatabasePath(), "ExpressionIndexProbe", false)
 }
 
 func TestDrift_OmniTableMetas(t *testing.T) {
@@ -75,7 +75,7 @@ func TestDrift_OmniTableMetas(t *testing.T) {
 	verifyOmittedChangeStreamRetention(t, schema, "DefaultRetentionProbe")
 	verifyUUIDFixture(ctx, t, env.Client, uuidFixtureTable)
 	verifySpannerSys(ctx, t, env.Client, "omni")
-	verifyExpressionIndexAccepted(ctx, t, env.DatabaseClient, env.Client, env.DatabasePath(), "ExpressionIndexProbe")
+	verifyExpressionIndexAccepted(ctx, t, env.DatabaseClient, env.Client, env.DatabasePath(), "ExpressionIndexProbe", true)
 }
 
 func pinnedRuntimeImage(t *testing.T, kind string) string {

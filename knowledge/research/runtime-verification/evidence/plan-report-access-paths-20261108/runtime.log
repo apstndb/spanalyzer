@@ -1,0 +1,47 @@
+=== RUN   TestIntegrationPlanReportFeedbackOnOmni
+2026/11/08 02:08:58 github.com/testcontainers/testcontainers-go - Connected to docker: 
+  Server Version: 29.2.1
+  API Version: 1.53
+  Operating System: Ubuntu 24.04.4 LTS
+  Total Memory: 7922 MB
+  Testcontainers for Go Version: v0.44.0
+  Resolved Docker Host: unix:///Users/apstndb/.colima/default/docker.sock
+  Resolved Docker Socket Path: /var/run/docker.sock
+  Test SessionID: cbb182c45e35fd5565ee23df49eaa56122434c72d1f337f0c1da8b5777d866de
+  Test ProcessID: 4bc6af4b-3f08-4dcf-8fe2-c785baeace38
+2026/11/08 02:08:58 🐳 Creating container for image us-docker.pkg.dev/spanner-omni/images/spanner-omni:2026.r2.1-beta@sha256:ed31d9ee72eeee69cac78566eb3a6e72ee389b26234735f0ef449774cc006741
+2026/11/08 02:08:58 🐳 Creating container for image testcontainers/ryuk:0.14.0
+2026/11/08 02:08:58 ✅ Container created: cedd563d2977
+2026/11/08 02:08:58 🐳 Starting container: cedd563d2977
+2026/11/08 02:08:58 ✅ Container started: cedd563d2977
+2026/11/08 02:08:58 ⏳ Waiting for container id cedd563d2977 image: testcontainers/ryuk:0.14.0. Waiting for: all of: [log message "Started", port 8080/tcp to be listening]
+2026/11/08 02:08:58 Shell not found in container
+2026/11/08 02:08:58 🔔 Container is ready: cedd563d2977
+2026/11/08 02:08:58 ✅ Container created: 2323daf056bd
+2026/11/08 02:08:58 🐳 Starting container: 2323daf056bd
+2026/11/08 02:08:58 ✅ Container started: 2323daf056bd
+2026/11/08 02:08:58 ⏳ Waiting for container id 2323daf056bd image: us-docker.pkg.dev/spanner-omni/images/spanner-omni:2026.r2.1-beta@sha256:ed31d9ee72eeee69cac78566eb3a6e72ee389b26234735f0ef449774cc006741. Waiting for: all of: [log message "Spanner is ready", first exposed port to be accessible externally]
+2026/11/08 02:10:16 🔔 Container is ready: 2323daf056bd
+=== RUN   TestIntegrationPlanReportFeedbackOnOmni/NestedStructArrayParameter
+=== RUN   TestIntegrationPlanReportFeedbackOnOmni/LeadingKeyAndRange
+    plan_report_feedback_omni_test.go:105: access paths: [{ScanIndex:4 FilterIndex:0xd964993720 ScanTarget:Events ScanType:table_scan ScanTargetKind:table BaseTable:Events FullScan:false ConditionsComplete:true HasSeekCondition:true HasResidualCondition:true HasTimestampCondition:false HasSearchCondition:false SeekConditions:[{Index:18 Expression:($Shard = @shard) AND ($CreatedAt >= @start) Columns:[CreatedAt Shard]}] ResidualConditions:[{Index:19 Expression:($Owner = @owner) Columns:[Owner]}] TimestampConditions:[] SearchConditions:[] SeekColumns:[CreatedAt Shard] ResidualColumns:[Owner] SeekableKeySize:2 RangeSeekableKeySize:0xd964993728 DeclaredKeyCount:<nil> KeyColumns:[] StoredColumns:[] NullFiltered:<nil>}]
+=== RUN   TestIntegrationPlanReportFeedbackOnOmni/SkippedMiddleKey
+    plan_report_feedback_omni_test.go:105: access paths: [{ScanIndex:4 FilterIndex:0xd965a3fd6c ScanTarget:Events ScanType:table_scan ScanTargetKind:table BaseTable:Events FullScan:false ConditionsComplete:true HasSeekCondition:true HasResidualCondition:true HasTimestampCondition:false HasSearchCondition:false SeekConditions:[{Index:13 Expression:($Shard = @shard) Columns:[Shard]}] ResidualConditions:[{Index:14 Expression:($Id = @id) Columns:[Id]}] TimestampConditions:[] SearchConditions:[] SeekColumns:[Shard] ResidualColumns:[Id] SeekableKeySize:0 RangeSeekableKeySize:<nil> DeclaredKeyCount:<nil> KeyColumns:[] StoredColumns:[] NullFiltered:<nil>}]
+=== RUN   TestIntegrationPlanReportFeedbackOnOmni/SurrogateNonKeyFilters
+    plan_report_feedback_omni_test.go:105: access paths: [{ScanIndex:4 FilterIndex:0xd964993e50 ScanTarget:Surrogates ScanType:table_scan ScanTargetKind:table BaseTable:Surrogates FullScan:true ConditionsComplete:true HasSeekCondition:false HasResidualCondition:true HasTimestampCondition:false HasSearchCondition:false SeekConditions:[] ResidualConditions:[{Index:15 Expression:(($Owner = @owner) AND ($CreatedAt >= @start)) Columns:[CreatedAt Owner]}] TimestampConditions:[] SearchConditions:[] SeekColumns:[] ResidualColumns:[CreatedAt Owner] SeekableKeySize:0 RangeSeekableKeySize:<nil> DeclaredKeyCount:<nil> KeyColumns:[] StoredColumns:[] NullFiltered:<nil>}]
+=== RUN   TestIntegrationPlanReportFeedbackOnOmni/MixedSeekAndFullScan
+    plan_report_feedback_omni_test.go:105: access paths: [{ScanIndex:6 FilterIndex:<nil> ScanTarget:Surrogates ScanType:table_scan ScanTargetKind:table BaseTable:Surrogates FullScan:true ConditionsComplete:true HasSeekCondition:false HasResidualCondition:false HasTimestampCondition:false HasSearchCondition:false SeekConditions:[] ResidualConditions:[] TimestampConditions:[] SearchConditions:[] SeekColumns:[] ResidualColumns:[] SeekableKeySize: RangeSeekableKeySize:<nil> DeclaredKeyCount:<nil> KeyColumns:[] StoredColumns:[] NullFiltered:<nil>} {ScanIndex:18 FilterIndex:0xd96528402c ScanTarget:Events ScanType:table_scan ScanTargetKind:table BaseTable:Events FullScan:false ConditionsComplete:true HasSeekCondition:true HasResidualCondition:false HasTimestampCondition:false HasSearchCondition:false SeekConditions:[{Index:28 Expression:($Shard = @shard) AND ($CreatedAt >= @start) Columns:[CreatedAt Shard]}] ResidualConditions:[] TimestampConditions:[] SearchConditions:[] SeekColumns:[CreatedAt Shard] ResidualColumns:[] SeekableKeySize:2 RangeSeekableKeySize:0xd965284040 DeclaredKeyCount:<nil> KeyColumns:[] StoredColumns:[] NullFiltered:<nil>}]
+=== RUN   TestIntegrationPlanReportFeedbackOnOmni/EndToEndReportCollection
+2026/11/08 02:10:17 🐳 Stopping container: 2323daf056bd
+2026/11/08 02:10:27 ✅ Container stopped: 2323daf056bd
+2026/11/08 02:10:27 🐳 Terminating container: 2323daf056bd
+2026/11/08 02:10:27 🚫 Container terminated: 2323daf056bd
+--- PASS: TestIntegrationPlanReportFeedbackOnOmni (89.39s)
+    --- PASS: TestIntegrationPlanReportFeedbackOnOmni/NestedStructArrayParameter (0.01s)
+    --- PASS: TestIntegrationPlanReportFeedbackOnOmni/LeadingKeyAndRange (0.00s)
+    --- PASS: TestIntegrationPlanReportFeedbackOnOmni/SkippedMiddleKey (0.00s)
+    --- PASS: TestIntegrationPlanReportFeedbackOnOmni/SurrogateNonKeyFilters (0.00s)
+    --- PASS: TestIntegrationPlanReportFeedbackOnOmni/MixedSeekAndFullScan (0.01s)
+    --- PASS: TestIntegrationPlanReportFeedbackOnOmni/EndToEndReportCollection (0.14s)
+PASS
+ok  	github.com/apstndb/spanalyzer/cmd/spanner-query-gen	90.795s

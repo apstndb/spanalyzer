@@ -1,0 +1,142 @@
+[
+  {
+    "name": "root",
+    "argv": [
+      "/Users/apstndb/.local/share/mise/installs/go/1.26.10/bin/go",
+      "test",
+      "-race",
+      "-count=1",
+      "-shuffle=on",
+      "./..."
+    ],
+    "module": ".",
+    "exit_code": 0,
+    "expected_exit_code": 0,
+    "started_at": "2026-11-07T19:17:44.862217+00:00",
+    "completed_at": "2026-11-07T19:18:32.447731+00:00",
+    "log": "root.log"
+  },
+  {
+    "name": "plancontract",
+    "argv": [
+      "/Users/apstndb/.local/share/mise/installs/go/1.26.10/bin/go",
+      "test",
+      "-race",
+      "-count=1",
+      "-shuffle=on",
+      "./..."
+    ],
+    "module": "plancontract",
+    "exit_code": 0,
+    "expected_exit_code": 0,
+    "started_at": "2026-11-07T19:18:32.448323+00:00",
+    "completed_at": "2026-11-07T19:18:35.733321+00:00",
+    "log": "plancontract.log"
+  },
+  {
+    "name": "querygen",
+    "argv": [
+      "/Users/apstndb/.local/share/mise/installs/go/1.26.10/bin/go",
+      "test",
+      "-race",
+      "-count=1",
+      "-shuffle=on",
+      "./..."
+    ],
+    "module": "cmd/spanner-query-gen",
+    "exit_code": 0,
+    "expected_exit_code": 0,
+    "started_at": "2026-11-07T19:18:35.733775+00:00",
+    "completed_at": "2026-11-07T19:18:46.297723+00:00",
+    "log": "querygen.log"
+  },
+  {
+    "name": "tools",
+    "argv": [
+      "/Users/apstndb/.local/share/mise/installs/go/1.26.10/bin/go",
+      "test",
+      "-race",
+      "-count=1",
+      "-shuffle=on",
+      "./..."
+    ],
+    "module": "tools",
+    "exit_code": 0,
+    "expected_exit_code": 0,
+    "started_at": "2026-11-07T19:18:46.298005+00:00",
+    "completed_at": "2026-11-07T19:18:51.894719+00:00",
+    "log": "tools.log"
+  },
+  {
+    "name": "survey",
+    "argv": [
+      "/Users/apstndb/.local/share/mise/installs/go/1.26.10/bin/go",
+      "test",
+      "-race",
+      "-count=1",
+      "-shuffle=on",
+      "./..."
+    ],
+    "module": "survey",
+    "exit_code": 0,
+    "expected_exit_code": 0,
+    "started_at": "2026-11-07T19:18:51.895082+00:00",
+    "completed_at": "2026-11-07T19:21:08.798310+00:00",
+    "log": "survey.log"
+  },
+  {
+    "name": "emulator-codegen",
+    "argv": [
+      "/Users/apstndb/.local/share/mise/installs/go/1.26.10/bin/go",
+      "test",
+      "-race",
+      "-count=1",
+      "-tags=integration",
+      "-run",
+      "^TestIntegrationQueryCodegenGeneratedSpannerQueriesRunOnEmulator$",
+      "./..."
+    ],
+    "module": "cmd/spanner-query-gen",
+    "exit_code": 0,
+    "expected_exit_code": 0,
+    "started_at": "2026-11-07T19:21:08.798936+00:00",
+    "completed_at": "2026-11-07T19:21:20.057587+00:00",
+    "log": "emulator-codegen.log"
+  },
+  {
+    "name": "omni-lts",
+    "argv": [
+      "/Users/apstndb/.local/share/mise/installs/go/1.26.10/bin/go",
+      "run",
+      "./omni-integration-runner",
+      "--repo-root",
+      ".."
+    ],
+    "module": "tools",
+    "exit_code": 0,
+    "expected_exit_code": 0,
+    "started_at": "2026-11-07T19:21:20.057842+00:00",
+    "completed_at": "2026-11-07T19:22:56.094615+00:00",
+    "log": "omni-lts.log",
+    "report": "omni-lts-stdout.json"
+  },
+  {
+    "name": "omni-r5",
+    "argv": [
+      "/Users/apstndb/.local/share/mise/installs/go/1.26.10/bin/go",
+      "run",
+      "./omni-integration-runner",
+      "--repo-root",
+      "..",
+      "--omni-version",
+      "2026.r5.1"
+    ],
+    "module": "tools",
+    "exit_code": 1,
+    "expected_exit_code": 1,
+    "started_at": "2026-11-07T19:22:56.095071+00:00",
+    "completed_at": "2026-11-07T19:24:44.542996+00:00",
+    "log": "omni-r5.log",
+    "report": "omni-r5-stdout.json"
+  }
+]

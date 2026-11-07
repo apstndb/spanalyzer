@@ -1,0 +1,357 @@
+{
+  "status": "local_gates_pass_with_r5_remote_function_runtime_failure",
+  "module_tests": [
+    {
+      "module": "root",
+      "argv": [
+        "/Users/apstndb/.local/share/mise/installs/go/1.26.10/bin/go",
+        "test",
+        "-race",
+        "-count=1",
+        "-shuffle=on",
+        "./..."
+      ],
+      "exit_code": 0,
+      "log": "race-root.log",
+      "completed_at": "2026-11-07T18:26:24.402045+00:00"
+    },
+    {
+      "module": "plancontract",
+      "argv": [
+        "/Users/apstndb/.local/share/mise/installs/go/1.26.10/bin/go",
+        "test",
+        "-race",
+        "-count=1",
+        "-shuffle=on",
+        "./..."
+      ],
+      "exit_code": 0,
+      "log": "race-plancontract.log",
+      "completed_at": "2026-11-07T18:26:32.644648+00:00"
+    },
+    {
+      "module": "querygen",
+      "argv": [
+        "/Users/apstndb/.local/share/mise/installs/go/1.26.10/bin/go",
+        "test",
+        "-race",
+        "-count=1",
+        "-shuffle=on",
+        "./..."
+      ],
+      "exit_code": 0,
+      "log": "race-querygen.log",
+      "completed_at": "2026-11-07T18:26:46.408198+00:00"
+    },
+    {
+      "module": "survey",
+      "receipt": "survey-final.json",
+      "exit_code": 0
+    },
+    {
+      "name": "tools-race",
+      "argv": [
+        "/Users/apstndb/.local/share/mise/installs/go/1.26.10/bin/go",
+        "test",
+        "-race",
+        "-count=1",
+        "-shuffle=on",
+        "./..."
+      ],
+      "exit_code": 0,
+      "at": "2026-11-07T18:54:03.786531+00:00",
+      "log": "complete-tools-race.log",
+      "module": "tools"
+    }
+  ],
+  "pre_push": {
+    "argv": [
+      "mise",
+      "run",
+      "pre-push"
+    ],
+    "exit_code": 0,
+    "started_at": "2026-11-07T18:53:56.070264+00:00",
+    "completed_at": "2026-11-07T18:54:16.331342+00:00",
+    "log": "pre-push-complete.log",
+    "temporary_index": "Dependency differences compared using a temporary index; the actual index is unchanged."
+  },
+  "omni": [
+    {
+      "name": "omni-lts-final",
+      "argv": [
+        "/Users/apstndb/.local/share/mise/installs/go/1.26.10/bin/go",
+        "run",
+        "./omni-integration-runner",
+        "--repo-root",
+        "..",
+        "--timeout",
+        "35m"
+      ],
+      "exit_code": 0,
+      "started_at": "2026-11-07T18:32:55.324993+00:00",
+      "completed_at": "2026-11-07T18:34:28.758380+00:00",
+      "producer_sources_unchanged": true,
+      "changed_sources": [],
+      "report": "omni-lts-final-report.json",
+      "log": "omni-lts-final.log"
+    },
+    {
+      "name": "omni-r5-final",
+      "argv": [
+        "/Users/apstndb/.local/share/mise/installs/go/1.26.10/bin/go",
+        "run",
+        "./omni-integration-runner",
+        "--repo-root",
+        "..",
+        "--omni-version",
+        "2026.r5.1",
+        "--timeout",
+        "35m"
+      ],
+      "exit_code": 1,
+      "started_at": "2026-11-07T18:34:28.758676+00:00",
+      "completed_at": "2026-11-07T18:36:02.121490+00:00",
+      "producer_sources_unchanged": true,
+      "changed_sources": [],
+      "report": "omni-r5-final-report.json",
+      "log": "omni-r5-final.log"
+    }
+  ],
+  "capture_checks": [
+    {
+      "name": "check-infoschema-emulator",
+      "argv": [
+        "/Users/apstndb/.local/share/mise/installs/go/1.26.10/bin/go",
+        "run",
+        "./cmd/infoschema-capture",
+        "check",
+        "--target",
+        "emulator",
+        "--repo-root",
+        ".."
+      ],
+      "exit_code": 0,
+      "started_at": "2026-11-07T18:34:08.971988+00:00",
+      "completed_at": "2026-11-07T18:34:11.176174+00:00",
+      "log": "check-infoschema-emulator.log"
+    },
+    {
+      "name": "check-infoschema-omni",
+      "argv": [
+        "/Users/apstndb/.local/share/mise/installs/go/1.26.10/bin/go",
+        "run",
+        "./cmd/infoschema-capture",
+        "check",
+        "--target",
+        "omni",
+        "--repo-root",
+        ".."
+      ],
+      "exit_code": 0,
+      "started_at": "2026-11-07T18:34:11.176622+00:00",
+      "completed_at": "2026-11-07T18:34:33.829961+00:00",
+      "log": "check-infoschema-omni.log"
+    },
+    {
+      "name": "check-spanner-sys-omni",
+      "argv": [
+        "/Users/apstndb/.local/share/mise/installs/go/1.26.10/bin/go",
+        "run",
+        "./cmd/spanner-sys-capture",
+        "check",
+        "--target",
+        "omni",
+        "--repo-root",
+        ".."
+      ],
+      "exit_code": 0,
+      "started_at": "2026-11-07T18:34:33.830478+00:00",
+      "completed_at": "2026-11-07T18:34:55.029582+00:00",
+      "log": "check-spanner-sys-omni.log"
+    }
+  ],
+  "scope": "Native linux/arm64 local runtimes; amd64 manifests verified only; no managed execution.",
+  "generated_checks": [
+    {
+      "name": "planvocab",
+      "argv": [
+        "/Users/apstndb/.local/share/mise/installs/go/1.26.10/bin/go",
+        "run",
+        "./planvocab-gen",
+        "--check"
+      ],
+      "exit_code": 0,
+      "at": "2026-11-07T18:47:02.797446+00:00",
+      "log": "passed-planvocab.log"
+    },
+    {
+      "name": "infoschema-manifest",
+      "argv": [
+        "/Users/apstndb/.local/share/mise/installs/go/1.26.10/bin/go",
+        "run",
+        "./infoschema-survey-check"
+      ],
+      "exit_code": 0,
+      "at": "2026-11-07T18:47:04.161284+00:00",
+      "log": "passed-infoschema-manifest.log"
+    },
+    {
+      "name": "spannersys-manifest",
+      "argv": [
+        "/Users/apstndb/.local/share/mise/installs/go/1.26.10/bin/go",
+        "run",
+        "./spannersys-survey-check"
+      ],
+      "exit_code": 0,
+      "at": "2026-11-07T18:47:04.494015+00:00",
+      "log": "passed-spannersys-manifest.log"
+    },
+    {
+      "name": "okf",
+      "argv": [
+        "/Users/apstndb/.local/share/mise/installs/go/1.26.10/bin/go",
+        "run",
+        "./okf-check",
+        "--repo-root",
+        "..",
+        "--gate",
+        "all"
+      ],
+      "exit_code": 0,
+      "at": "2026-11-07T18:48:20.985149+00:00",
+      "log": "verified-okf.log"
+    },
+    {
+      "name": "language",
+      "argv": [
+        "/Users/apstndb/.local/share/mise/installs/go/1.26.10/bin/go",
+        "run",
+        "./markdown-language-check",
+        "--repo-root",
+        ".."
+      ],
+      "exit_code": 0,
+      "at": "2026-11-07T18:48:21.059144+00:00",
+      "log": "verified-language.log"
+    }
+  ],
+  "at": "2026-11-07T18:55:37.284778+00:00",
+  "gofmt": {
+    "exit_code": 0,
+    "files": 40
+  },
+  "whitespace": {
+    "exit_code": 0
+  },
+  "post_command_wiring_checks": [
+    {
+      "name": "tools-race",
+      "argv": [
+        "/Users/apstndb/.local/share/mise/installs/go/1.26.10/bin/go",
+        "test",
+        "-race",
+        "-count=1",
+        "-shuffle=on",
+        "./..."
+      ],
+      "exit_code": 0,
+      "at": "2026-11-07T18:54:03.786531+00:00",
+      "log": "complete-tools-race.log"
+    },
+    {
+      "name": "survey-short",
+      "argv": [
+        "/Users/apstndb/.local/share/mise/installs/go/1.26.10/bin/go",
+        "test",
+        "-race",
+        "-count=1",
+        "-short",
+        "./..."
+      ],
+      "exit_code": 0,
+      "at": "2026-11-07T18:54:13.339268+00:00",
+      "log": "complete-survey-short.log"
+    },
+    {
+      "name": "planvocab",
+      "argv": [
+        "/Users/apstndb/.local/share/mise/installs/go/1.26.10/bin/go",
+        "run",
+        "./planvocab-gen",
+        "--check"
+      ],
+      "exit_code": 0,
+      "at": "2026-11-07T18:54:13.420276+00:00",
+      "log": "complete-planvocab.log"
+    },
+    {
+      "name": "okf",
+      "argv": [
+        "/Users/apstndb/.local/share/mise/installs/go/1.26.10/bin/go",
+        "run",
+        "./okf-check",
+        "--repo-root",
+        "..",
+        "--gate",
+        "all"
+      ],
+      "exit_code": 0,
+      "at": "2026-11-07T18:54:13.591356+00:00",
+      "log": "complete-okf.log"
+    },
+    {
+      "name": "language",
+      "argv": [
+        "/Users/apstndb/.local/share/mise/installs/go/1.26.10/bin/go",
+        "run",
+        "./markdown-language-check",
+        "--repo-root",
+        ".."
+      ],
+      "exit_code": 0,
+      "at": "2026-11-07T18:54:13.671004+00:00",
+      "log": "complete-language.log"
+    }
+  ],
+  "supplemental_probes": [
+    {
+      "name": "roundtrip-demo",
+      "argv": [
+        "/Users/apstndb/.local/share/mise/installs/go/1.26.10/bin/go",
+        "run",
+        "./cmd/roundtrip"
+      ],
+      "exit_code": 0,
+      "started_at": "2026-11-07T18:51:43.142862+00:00",
+      "completed_at": "2026-11-07T18:51:48.226811+00:00",
+      "log": "roundtrip-demo.log"
+    },
+    {
+      "name": "optparam-lts",
+      "argv": [
+        "/Users/apstndb/.local/share/mise/installs/go/1.26.10/bin/go",
+        "run",
+        "./optparam-plan-probe"
+      ],
+      "exit_code": 0,
+      "started_at": "2026-11-07T18:51:48.227432+00:00",
+      "completed_at": "2026-11-07T18:52:17.335069+00:00",
+      "log": "optparam-lts.log"
+    },
+    {
+      "name": "optparam-r5",
+      "argv": [
+        "/Users/apstndb/.local/share/mise/installs/go/1.26.10/bin/go",
+        "run",
+        "./optparam-plan-probe",
+        "--omni-version",
+        "2026.r5.1"
+      ],
+      "exit_code": 0,
+      "started_at": "2026-11-07T18:52:17.335577+00:00",
+      "completed_at": "2026-11-07T18:52:44.001609+00:00",
+      "log": "optparam-r5.log"
+    }
+  ]
+}

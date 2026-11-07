@@ -1,0 +1,21 @@
+{
+  "schema_version": "v0alpha1",
+  "status": "failed",
+  "source_head": "04d7019616ef4728dd72c5db9ac163fb4c56506a",
+  "source_dirty": true,
+  "image": "us-docker.pkg.dev/spanner-omni/images/spanner-omni:2026.r5.1@sha256:b918acd3c785bd13733d7dca6e6c029ef4ab8d7b63a0cd28800210a9bf976516",
+  "runtime_start_ms": 6796,
+  "total_duration_ms": 107452,
+  "steps": [
+    {
+      "name": "plan-shape",
+      "status": "failed",
+      "duration_ms": 82131
+    },
+    {
+      "name": "query-generator",
+      "status": "ok",
+      "duration_ms": 8320
+    }
+  ]
+}

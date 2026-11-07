@@ -514,10 +514,31 @@
     "query_param": {
       "additionalProperties": false,
       "properties": {
+        "choices": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "type": "object"
+        },
+        "default": {
+          "description": "Default allowlisted ORDER BY choice.",
+          "minLength": 1,
+          "type": "string"
+        },
         "name": {
           "description": "GoogleSQL parameter name without the leading @.",
           "minLength": 1,
           "type": "string"
+        },
+        "optional": {
+          "description": "Optional SQL rewrite mode.",
+          "enum": [
+            "required",
+            "null_is_null",
+            "omit_when_null",
+            "omit_when_empty",
+            "orderby_choice"
+          ]
         },
         "scope": {
           "description": "Optional external_query parameter scope. Omit for regular queries.",
@@ -540,13 +561,35 @@
     },
     "query_result": {
       "additionalProperties": false,
+      "allOf": [
+        {
+          "else": {
+            "required": [
+              "struct"
+            ]
+          },
+          "if": {
+            "properties": {
+              "cardinality": {
+                "const": "row_count"
+              }
+            },
+            "required": [
+              "cardinality"
+            ]
+          },
+          "then": {}
+        }
+      ],
       "properties": {
         "cardinality": {
-          "description": "Row-returning query result cardinality. Defaults to many.",
+          "description": "Read cardinality or DML result mode. Defaults to many.",
           "enum": [
             "one",
             "maybe_one",
-            "many"
+            "many",
+            "row_count",
+            "row_set"
           ]
         },
         "required": {
@@ -573,14 +616,11 @@
           "type": "object"
         },
         "struct": {
-          "description": "Generated or shared result struct name.",
+          "description": "Generated or shared result struct; not required for row_count.",
           "minLength": 1,
           "type": "string"
         }
       },
-      "required": [
-        "struct"
-      ],
       "type": "object"
     },
     "rule_suppression": {

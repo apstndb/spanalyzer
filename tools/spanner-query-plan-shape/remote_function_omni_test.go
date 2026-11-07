@@ -22,7 +22,8 @@ func TestIntegrationRemoteFunctionPlansOnOmni(t *testing.T) {
 		for version := firstOptimizerVersion; version <= latestOptimizerVersion; version++ {
 			plan, err := analyzeVersionedSearchGraphPlan(t, clients.Client, cases[label], version)
 			if err != nil {
-				t.Fatalf("AnalyzeQuery(%s, v%d) error = %v", label, version, err)
+				t.Errorf("AnalyzeQuery(%s, v%d) error = %v", label, version, err)
+				continue
 			}
 			if got := countPlanNodesWithMetadata(plan, "TVF", map[string]string{"Name": "spanalyzer_remote.remote_add"}); got != 1 {
 				t.Errorf("%s v%d remote-function TVF count = %d, want 1", label, version, got)
@@ -33,6 +34,9 @@ func TestIntegrationRemoteFunctionPlansOnOmni(t *testing.T) {
 				t.Errorf("%s v%d plan differs from v1", label, version)
 			}
 		}
+	}
+	if t.Failed() {
+		return
 	}
 
 	literal, err := analyzeVersionedSearchGraphPlan(t, clients.Client, cases["remote-function/literal-input"], latestOptimizerVersion)

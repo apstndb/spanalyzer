@@ -58,6 +58,7 @@ func run(ctx context.Context, args []string, stdout, stderr io.Writer) error {
 	flags := flag.NewFlagSet("omni-integration-runner", flag.ContinueOnError)
 	flags.SetOutput(stderr)
 	repoRootFlag := flags.String("repo-root", "", "spanalyzer repository root (auto-detected when omitted)")
+	omniVersion := flags.String("omni-version", "", "pinned Omni version to test; empty uses the registry default")
 	timeout := flags.Duration("timeout", 35*time.Minute, "overall runtime and integration timeout")
 	if err := flags.Parse(args); err != nil {
 		return err
@@ -69,7 +70,7 @@ func run(ctx context.Context, args []string, stdout, stderr io.Writer) error {
 	if err != nil {
 		return err
 	}
-	image, err := runtimepins.ImageForHost(repoRoot, "omni")
+	image, err := runtimepins.ImageForHostVersion(repoRoot, "omni", strings.TrimSpace(*omniVersion))
 	if err != nil {
 		return fmt.Errorf("resolve pinned Spanner Omni image: %w", err)
 	}
@@ -124,6 +125,7 @@ func run(ctx context.Context, args []string, stdout, stderr io.Writer) error {
 		RuntimeStartMS: runtimeStartDuration.Milliseconds(),
 	}
 	steps := integrationSteps(repoRoot)
+	var stepErrors []error
 	for _, current := range steps {
 		started := time.Now()
 		err := runStep(ctx, current, endpointPath, image, stderr)
@@ -131,14 +133,14 @@ func run(ctx context.Context, args []string, stdout, stderr io.Writer) error {
 		if err != nil {
 			entry.Status = "failed"
 			result.Status = "failed"
-			result.Steps = append(result.Steps, entry)
-			result.TotalDurationMS = time.Since(totalStart).Milliseconds()
-			if encodeErr := writeReport(stdout, result); encodeErr != nil {
-				return errors.Join(err, encodeErr)
-			}
-			return err
+			stepErrors = append(stepErrors, err)
 		}
 		result.Steps = append(result.Steps, entry)
+		// The suites own separate databases. Retain both results when one
+		// fails, while never starting more work after cancellation.
+		if ctx.Err() != nil {
+			break
+		}
 	}
 	closeErr := runtime.Close()
 	closed = true
@@ -148,9 +150,9 @@ func run(ctx context.Context, args []string, stdout, stderr io.Writer) error {
 		closeErr = fmt.Errorf("close shared Spanner Omni runtime: %w", closeErr)
 	}
 	if reportErr := writeReport(stdout, result); reportErr != nil {
-		return errors.Join(closeErr, reportErr)
+		return errors.Join(append(stepErrors, closeErr, reportErr)...)
 	}
-	return closeErr
+	return errors.Join(append(stepErrors, closeErr)...)
 }
 
 func integrationSteps(repoRoot string) []step {

@@ -1,0 +1,1071 @@
+-test.shuffle 1794076907423782000
+=== RUN   TestToFunctionsDDL_UsesFunctionTypeGrammar
+--- PASS: TestToFunctionsDDL_UsesFunctionTypeGrammar (0.00s)
+=== RUN   TestRoundtrip_TableOptions
+--- PASS: TestRoundtrip_TableOptions (0.00s)
+=== RUN   TestToDatabaseDDL_LiveShapedFiltersNonCanonicalOptions
+--- PASS: TestToDatabaseDDL_LiveShapedFiltersNonCanonicalOptions (0.00s)
+=== RUN   TestFromDDLStatements_RevokeSequenceGrantsIsScoped
+--- PASS: TestFromDDLStatements_RevokeSequenceGrantsIsScoped (0.00s)
+=== RUN   TestFromDDLStatements_Revoke
+--- PASS: TestFromDDLStatements_Revoke (0.00s)
+=== RUN   TestRoundtrip_ForeignKeyPreservesNonPrimaryReferencedColumns
+--- PASS: TestRoundtrip_ForeignKeyPreservesNonPrimaryReferencedColumns (0.00s)
+=== RUN   TestExtractProtoBundleTypes
+--- PASS: TestExtractProtoBundleTypes (0.00s)
+=== RUN   TestLoadSchema_EmulatorRoundtrip
+2026/11/08 03:41:47 github.com/testcontainers/testcontainers-go - Connected to docker: 
+  Server Version: 29.2.1
+  API Version: 1.53
+  Operating System: Ubuntu 24.04.4 LTS
+  Total Memory: 7922 MB
+  Testcontainers for Go Version: v0.44.0
+  Resolved Docker Host: unix:///Users/apstndb/.colima/default/docker.sock
+  Resolved Docker Socket Path: /var/run/docker.sock
+  Test SessionID: 78f02d5b0d8dbee24659d6261945ef3e793d54133f96c56c464b02f9e9c44a45
+  Test ProcessID: f0a58bd4-18d3-483b-9eba-4e89de05c32d
+2026/11/08 03:41:47 🐳 Creating container for image gcr.io/cloud-spanner-emulator/emulator:1.5.59@sha256:969af6a9349948fbfb4a826c18e160e258a4005f7c759f8e7f2dcec369cccba8
+2026/11/08 03:41:47 ⏳ Waiting for Reaper "4d4a8681" to be ready
+2026/11/08 03:41:47 🔥 Reaper obtained from Docker for this test session 4d4a8681
+2026/11/08 03:41:47 ✅ Container created: e9939b1a8ffc
+2026/11/08 03:41:47 🐳 Starting container: e9939b1a8ffc
+2026/11/08 03:41:47 ✅ Container started: e9939b1a8ffc
+2026/11/08 03:41:47 ⏳ Waiting for container id e9939b1a8ffc image: gcr.io/cloud-spanner-emulator/emulator:1.5.59@sha256:969af6a9349948fbfb4a826c18e160e258a4005f7c759f8e7f2dcec369cccba8. Waiting for: all of: [port 9010/tcp to be listening, log message "Cloud Spanner emulator running"]
+2026/11/08 03:41:47 Shell not found in container
+2026/11/08 03:41:48 🔔 Container is ready: e9939b1a8ffc
+2026/11/08 03:41:49 🐳 Stopping container: e9939b1a8ffc
+2026/11/08 03:41:49 ✅ Container stopped: e9939b1a8ffc
+2026/11/08 03:41:49 🐳 Terminating container: e9939b1a8ffc
+2026/11/08 03:41:49 🚫 Container terminated: e9939b1a8ffc
+--- PASS: TestLoadSchema_EmulatorRoundtrip (1.74s)
+=== RUN   TestRoundtrip_ZeroColumnPrimaryKeyPreservesSingletonSemantics
+--- PASS: TestRoundtrip_ZeroColumnPrimaryKeyPreservesSingletonSemantics (0.00s)
+=== RUN   TestRoundtripLocalityGroupPreservesOptionExpressions
+--- PASS: TestRoundtripLocalityGroupPreservesOptionExpressions (0.00s)
+=== RUN   TestToRolesDDL_ModelGrantUnsupported
+--- PASS: TestToRolesDDL_ModelGrantUnsupported (0.00s)
+=== RUN   TestToStatisticsDDL_EmitsOnlyAllowGCFalse
+--- PASS: TestToStatisticsDDL_EmitsOnlyAllowGCFalse (0.00s)
+=== RUN   TestLocalityGroupsFromInformationSchemaOptions
+--- PASS: TestLocalityGroupsFromInformationSchemaOptions (0.00s)
+=== RUN   TestFromDDLStatements_AlterTableFailsClosed
+=== RUN   TestFromDDLStatements_AlterTableFailsClosed/target_not_created
+=== RUN   TestFromDDLStatements_AlterTableFailsClosed/unsupported_operation
+--- PASS: TestFromDDLStatements_AlterTableFailsClosed (0.00s)
+    --- PASS: TestFromDDLStatements_AlterTableFailsClosed/target_not_created (0.00s)
+    --- PASS: TestFromDDLStatements_AlterTableFailsClosed/unsupported_operation (0.00s)
+=== RUN   TestRoundtrip_Model
+--- PASS: TestRoundtrip_Model (0.00s)
+=== RUN   TestRoundtrip_AnonymousChecksAndForeignKeys
+--- PASS: TestRoundtrip_AnonymousChecksAndForeignKeys (0.00s)
+=== RUN   TestModelOptionRoundTripPreservesArraysAndEscapes
+=== RUN   TestModelOptionRoundTripPreservesArraysAndEscapes/array
+=== RUN   TestModelOptionRoundTripPreservesArraysAndEscapes/escaped_backslash
+--- PASS: TestModelOptionRoundTripPreservesArraysAndEscapes (0.00s)
+    --- PASS: TestModelOptionRoundTripPreservesArraysAndEscapes/array (0.00s)
+    --- PASS: TestModelOptionRoundTripPreservesArraysAndEscapes/escaped_backslash (0.00s)
+=== RUN   TestToFunctionsDDL_InconsistentSchemasReturnError
+--- PASS: TestToFunctionsDDL_InconsistentSchemasReturnError (0.00s)
+=== RUN   TestProtoBundle_FromEmulatorSCHEMATA
+2026/11/08 03:41:49 🐳 Creating container for image gcr.io/cloud-spanner-emulator/emulator:1.5.59@sha256:969af6a9349948fbfb4a826c18e160e258a4005f7c759f8e7f2dcec369cccba8
+2026/11/08 03:41:49 ✅ Container created: e4c0bde0556d
+2026/11/08 03:41:49 🐳 Starting container: e4c0bde0556d
+2026/11/08 03:41:49 ✅ Container started: e4c0bde0556d
+2026/11/08 03:41:49 ⏳ Waiting for container id e4c0bde0556d image: gcr.io/cloud-spanner-emulator/emulator:1.5.59@sha256:969af6a9349948fbfb4a826c18e160e258a4005f7c759f8e7f2dcec369cccba8. Waiting for: all of: [port 9010/tcp to be listening, log message "Cloud Spanner emulator running"]
+2026/11/08 03:41:49 Shell not found in container
+2026/11/08 03:41:50 🔔 Container is ready: e4c0bde0556d
+2026/11/08 03:41:50 🐳 Stopping container: e4c0bde0556d
+2026/11/08 03:41:50 ✅ Container stopped: e4c0bde0556d
+2026/11/08 03:41:50 🐳 Terminating container: e4c0bde0556d
+2026/11/08 03:41:50 🚫 Container terminated: e4c0bde0556d
+--- PASS: TestProtoBundle_FromEmulatorSCHEMATA (1.29s)
+=== RUN   TestRoundtrip_InterleaveTable
+--- PASS: TestRoundtrip_InterleaveTable (0.00s)
+=== RUN   TestFromDDLStatements_RevokeSchemaUsageIsScopedToGranteeAndSchema
+--- PASS: TestFromDDLStatements_RevokeSchemaUsageIsScopedToGranteeAndSchema (0.00s)
+=== RUN   TestToFunctionsDDL_NamedSchemaFunction
+--- PASS: TestToFunctionsDDL_NamedSchemaFunction (0.00s)
+=== RUN   TestToDDLStatements_RemainingNamedSchemaObjectsFailExplicitly
+=== RUN   TestToDDLStatements_RemainingNamedSchemaObjectsFailExplicitly/change_stream
+=== RUN   TestToDDLStatements_RemainingNamedSchemaObjectsFailExplicitly/change_stream_watched_table
+=== RUN   TestToDDLStatements_RemainingNamedSchemaObjectsFailExplicitly/interleaved_index
+=== RUN   TestToDDLStatements_RemainingNamedSchemaObjectsFailExplicitly/interleaved_search_index
+=== RUN   TestToDDLStatements_RemainingNamedSchemaObjectsFailExplicitly/model
+=== RUN   TestToDDLStatements_RemainingNamedSchemaObjectsFailExplicitly/property_graph_row
+=== RUN   TestToDDLStatements_RemainingNamedSchemaObjectsFailExplicitly/property_graph_metadata
+=== RUN   TestToDDLStatements_RemainingNamedSchemaObjectsFailExplicitly/property_graph_element_table
+=== RUN   TestToDDLStatements_RemainingNamedSchemaObjectsFailExplicitly/statistics_package
+--- PASS: TestToDDLStatements_RemainingNamedSchemaObjectsFailExplicitly (0.00s)
+    --- PASS: TestToDDLStatements_RemainingNamedSchemaObjectsFailExplicitly/change_stream (0.00s)
+    --- PASS: TestToDDLStatements_RemainingNamedSchemaObjectsFailExplicitly/change_stream_watched_table (0.00s)
+    --- PASS: TestToDDLStatements_RemainingNamedSchemaObjectsFailExplicitly/interleaved_index (0.00s)
+    --- PASS: TestToDDLStatements_RemainingNamedSchemaObjectsFailExplicitly/interleaved_search_index (0.00s)
+    --- PASS: TestToDDLStatements_RemainingNamedSchemaObjectsFailExplicitly/model (0.00s)
+    --- PASS: TestToDDLStatements_RemainingNamedSchemaObjectsFailExplicitly/property_graph_row (0.00s)
+    --- PASS: TestToDDLStatements_RemainingNamedSchemaObjectsFailExplicitly/property_graph_metadata (0.00s)
+    --- PASS: TestToDDLStatements_RemainingNamedSchemaObjectsFailExplicitly/property_graph_element_table (0.00s)
+    --- PASS: TestToDDLStatements_RemainingNamedSchemaObjectsFailExplicitly/statistics_package (0.00s)
+=== RUN   TestToProtoBundleDDL_UnionsSchemataRows
+--- PASS: TestToProtoBundleDDL_UnionsSchemataRows (0.00s)
+=== RUN   TestRoundtrip_LocalityGroup
+--- PASS: TestRoundtrip_LocalityGroup (0.00s)
+=== RUN   TestToLocalityGroupsDDL_NilIsInheritedKeepsCurrentBehavior
+--- PASS: TestToLocalityGroupsDDL_NilIsInheritedKeepsCurrentBehavior (0.00s)
+=== RUN   TestToProtoBundleDDL_ExplicitTypesOverrideDescriptor
+--- PASS: TestToProtoBundleDDL_ExplicitTypesOverrideDescriptor (0.00s)
+=== RUN   TestRoundtrip_ForeignKey
+--- PASS: TestRoundtrip_ForeignKey (0.00s)
+=== RUN   TestFromDDLStatements_NamedSchemaInterleavedIndexesFailExplicitly
+=== RUN   TestFromDDLStatements_NamedSchemaInterleavedIndexesFailExplicitly/regular_index
+=== RUN   TestFromDDLStatements_NamedSchemaInterleavedIndexesFailExplicitly/search_index
+--- PASS: TestFromDDLStatements_NamedSchemaInterleavedIndexesFailExplicitly (0.00s)
+    --- PASS: TestFromDDLStatements_NamedSchemaInterleavedIndexesFailExplicitly/regular_index (0.00s)
+    --- PASS: TestFromDDLStatements_NamedSchemaInterleavedIndexesFailExplicitly/search_index (0.00s)
+=== RUN   TestRoundtrip_PropertyGraphBackedByView
+--- PASS: TestRoundtrip_PropertyGraphBackedByView (0.00s)
+=== RUN   TestToTablesDDL_CompositeForeignKeyUsesReferencedKeyOrder
+--- PASS: TestToTablesDDL_CompositeForeignKeyUsesReferencedKeyOrder (0.00s)
+=== RUN   TestRoundtrip_GeneratedColumn
+--- PASS: TestRoundtrip_GeneratedColumn (0.00s)
+=== RUN   TestToFunctionsDDL_RemoteClauseMetadataFallback
+--- PASS: TestToFunctionsDDL_RemoteClauseMetadataFallback (0.00s)
+=== RUN   TestRoundtrip_SequenceGrants
+--- PASS: TestRoundtrip_SequenceGrants (0.00s)
+=== RUN   TestRoundtrip_NamedSchemaSupportedObjects
+--- PASS: TestRoundtrip_NamedSchemaSupportedObjects (0.00s)
+=== RUN   TestToTablesDDL_LiveZeroColumnPrimaryKeyMetadata
+=== RUN   TestToTablesDDL_LiveZeroColumnPrimaryKeyMetadata/managed_and_omni
+=== RUN   TestToTablesDDL_LiveZeroColumnPrimaryKeyMetadata/emulator_v1_5_56
+--- PASS: TestToTablesDDL_LiveZeroColumnPrimaryKeyMetadata (0.00s)
+    --- PASS: TestToTablesDDL_LiveZeroColumnPrimaryKeyMetadata/managed_and_omni (0.00s)
+    --- PASS: TestToTablesDDL_LiveZeroColumnPrimaryKeyMetadata/emulator_v1_5_56 (0.00s)
+=== RUN   TestRoundtrip_CheckConstraint
+--- PASS: TestRoundtrip_CheckConstraint (0.00s)
+=== RUN   TestRoundtrip_AnonymousPrimaryKey
+--- PASS: TestRoundtrip_AnonymousPrimaryKey (0.00s)
+=== RUN   TestToRolesDDL_InvalidMetadataReturnsErrors
+=== RUN   TestToRolesDDL_InvalidMetadataReturnsErrors/unknown_table_privilege
+=== RUN   TestToRolesDDL_InvalidMetadataReturnsErrors/unknown_column_privilege
+--- PASS: TestToRolesDDL_InvalidMetadataReturnsErrors (0.00s)
+    --- PASS: TestToRolesDDL_InvalidMetadataReturnsErrors/unknown_table_privilege (0.00s)
+    --- PASS: TestToRolesDDL_InvalidMetadataReturnsErrors/unknown_column_privilege (0.00s)
+=== RUN   TestFromDDLStatements_IndexAndTableSchemasMustMatch
+=== RUN   TestFromDDLStatements_IndexAndTableSchemasMustMatch/regular_index
+=== RUN   TestFromDDLStatements_IndexAndTableSchemasMustMatch/search_index
+--- PASS: TestFromDDLStatements_IndexAndTableSchemasMustMatch (0.00s)
+    --- PASS: TestFromDDLStatements_IndexAndTableSchemasMustMatch/regular_index (0.00s)
+    --- PASS: TestFromDDLStatements_IndexAndTableSchemasMustMatch/search_index (0.00s)
+=== RUN   TestToTablesDDL_ForeignKeyCycleReturnsError
+--- PASS: TestToTablesDDL_ForeignKeyCycleReturnsError (0.00s)
+=== RUN   TestRoundtrip_RemoteFunctionMetadata
+--- PASS: TestRoundtrip_RemoteFunctionMetadata (0.00s)
+=== RUN   TestToVectorIndexesDDLRejectsInvalidFilter
+--- PASS: TestToVectorIndexesDDLRejectsInvalidFilter (0.00s)
+=== RUN   TestToGraphsDDL_EmptyLabelPropertyListMeansNoProperties
+--- PASS: TestToGraphsDDL_EmptyLabelPropertyListMeansNoProperties (0.00s)
+=== RUN   TestRoundtrip_ColumnOnUpdate
+--- PASS: TestRoundtrip_ColumnOnUpdate (0.00s)
+=== RUN   TestToDDLStatementsRejectsExpressionIndex
+=== PAUSE TestToDDLStatementsRejectsExpressionIndex
+=== RUN   TestRoundtrip_SearchIndexFilterAndOrder
+--- PASS: TestRoundtrip_SearchIndexFilterAndOrder (0.00s)
+=== RUN   TestBuildColumnDef_SkipsInheritedLocalityGroupKeepsAllowCommitTimestamp
+--- PASS: TestBuildColumnDef_SkipsInheritedLocalityGroupKeepsAllowCommitTimestamp (0.00s)
+=== RUN   TestRoundtrip_PlacementKey
+--- PASS: TestRoundtrip_PlacementKey (0.00s)
+=== RUN   TestToTablesDDL_CompositeForeignKeyWithoutOrdinalMetadataReturnsError
+--- PASS: TestToTablesDDL_CompositeForeignKeyWithoutOrdinalMetadataReturnsError (0.00s)
+=== RUN   TestRoundtrip_TableOptionsWithColumnOptions
+--- PASS: TestRoundtrip_TableOptionsWithColumnOptions (0.00s)
+=== RUN   TestRoundtrip_SimpleTable
+--- PASS: TestRoundtrip_SimpleTable (0.00s)
+=== RUN   TestRoundtrip_View
+--- PASS: TestRoundtrip_View (0.00s)
+=== RUN   TestRoundtrip_CrossSchemaForeignKeyOrdersQualifiedParent
+--- PASS: TestRoundtrip_CrossSchemaForeignKeyOrdersQualifiedParent (0.00s)
+=== RUN   TestToDDLStatements_PlacementKeyMissingColumnReturnsError
+--- PASS: TestToDDLStatements_PlacementKeyMissingColumnReturnsError (0.00s)
+=== RUN   TestDatabaseIDFromResource
+=== RUN   TestDatabaseIDFromResource/full_resource
+=== RUN   TestDatabaseIDFromResource/bare_id
+=== RUN   TestDatabaseIDFromResource/empty
+=== RUN   TestDatabaseIDFromResource/whitespace
+=== RUN   TestDatabaseIDFromResource/trailing_slash
+--- PASS: TestDatabaseIDFromResource (0.00s)
+    --- PASS: TestDatabaseIDFromResource/full_resource (0.00s)
+    --- PASS: TestDatabaseIDFromResource/bare_id (0.00s)
+    --- PASS: TestDatabaseIDFromResource/empty (0.00s)
+    --- PASS: TestDatabaseIDFromResource/whitespace (0.00s)
+    --- PASS: TestDatabaseIDFromResource/trailing_slash (0.00s)
+=== RUN   TestBuildColumnDef_NilIsInheritedKeepsCurrentBehavior
+--- PASS: TestBuildColumnDef_NilIsInheritedKeepsCurrentBehavior (0.00s)
+=== RUN   TestExplicitHiddenGeneratedKeyIsNotRejectedByNameAlone
+--- PASS: TestExplicitHiddenGeneratedKeyIsNotRejectedByNameAlone (0.00s)
+=== RUN   TestRoundtrip_SelfReferentialForeignKey
+--- PASS: TestRoundtrip_SelfReferentialForeignKey (0.00s)
+=== RUN   TestFromDDLStatements_NamedSchemaRevokeIsQualified
+--- PASS: TestFromDDLStatements_NamedSchemaRevokeIsQualified (0.00s)
+=== RUN   TestLocalityGroupsFromInformationSchemaNullOptions
+--- PASS: TestLocalityGroupsFromInformationSchemaNullOptions (0.00s)
+=== RUN   TestFromDDLStatements_RevokeTablePrivilegeLeavesColumnGrant
+--- PASS: TestFromDDLStatements_RevokeTablePrivilegeLeavesColumnGrant (0.00s)
+=== RUN   TestRoundtrip_Index
+--- PASS: TestRoundtrip_Index (0.00s)
+=== RUN   TestToRolesDDL_InvalidSequenceGrantReturnsError
+--- PASS: TestToRolesDDL_InvalidSequenceGrantReturnsError (0.00s)
+=== RUN   TestExplicitViewColumnNamesFailsClosed
+--- PASS: TestExplicitViewColumnNamesFailsClosed (0.00s)
+=== RUN   TestRoundtrip_NamedSchemaChangeStreamAndTableFunctionGrants
+--- PASS: TestRoundtrip_NamedSchemaChangeStreamAndTableFunctionGrants (0.00s)
+=== RUN   TestRoundtrip_ChangeStream
+--- PASS: TestRoundtrip_ChangeStream (0.00s)
+=== RUN   TestRoundtrip_Sequence
+--- PASS: TestRoundtrip_Sequence (0.00s)
+=== RUN   TestOptionStringMetadataPreservesContent
+=== RUN   TestOptionStringMetadataPreservesContent/123
+=== RUN   TestOptionStringMetadataPreservesContent/true
+=== RUN   TestOptionStringMetadataPreservesContent/false
+=== RUN   TestOptionStringMetadataPreservesContent/[1]
+=== RUN   TestOptionStringMetadataPreservesContent/NULL
+=== RUN   TestOptionStringMetadataPreservesContent/-42
+=== RUN   TestOptionStringMetadataPreservesContent/1.5
+=== RUN   TestOptionStringMetadataPreservesContent/a\b
+=== RUN   TestOptionStringMetadataPreservesContent/'leading
+=== RUN   TestOptionStringMetadataPreservesContent/trailing'
+--- PASS: TestOptionStringMetadataPreservesContent (0.00s)
+    --- PASS: TestOptionStringMetadataPreservesContent/123 (0.00s)
+    --- PASS: TestOptionStringMetadataPreservesContent/true (0.00s)
+    --- PASS: TestOptionStringMetadataPreservesContent/false (0.00s)
+    --- PASS: TestOptionStringMetadataPreservesContent/[1] (0.00s)
+    --- PASS: TestOptionStringMetadataPreservesContent/NULL (0.00s)
+    --- PASS: TestOptionStringMetadataPreservesContent/-42 (0.00s)
+    --- PASS: TestOptionStringMetadataPreservesContent/1.5 (0.00s)
+    --- PASS: TestOptionStringMetadataPreservesContent/a\b (0.00s)
+    --- PASS: TestOptionStringMetadataPreservesContent/'leading (0.00s)
+    --- PASS: TestOptionStringMetadataPreservesContent/trailing' (0.00s)
+=== RUN   TestToPlacementsDDL_SkipsDefaultPlacement
+--- PASS: TestToPlacementsDDL_SkipsDefaultPlacement (0.00s)
+=== RUN   TestRoundtrip_ColumnScopedPrivileges
+--- PASS: TestRoundtrip_ColumnScopedPrivileges (0.00s)
+=== RUN   TestRoundtrip_AlterStatistics
+--- PASS: TestRoundtrip_AlterStatistics (0.00s)
+=== RUN   TestRoundtrip_ModelColumnsAndOptions
+--- PASS: TestRoundtrip_ModelColumnsAndOptions (0.00s)
+=== RUN   TestToDatabaseDDL_GenericNonDenylistedOptionEmitted
+--- PASS: TestToDatabaseDDL_GenericNonDenylistedOptionEmitted (0.00s)
+=== RUN   TestToProtoBundleDDL_FromSchemataProtoBundle
+--- PASS: TestToProtoBundleDDL_FromSchemataProtoBundle (0.00s)
+=== RUN   TestToFunctionsDDL_LiveRemoteMetadataWithoutSyntaxDetailsReturnsError
+--- PASS: TestToFunctionsDDL_LiveRemoteMetadataWithoutSyntaxDetailsReturnsError (0.00s)
+=== RUN   TestToVectorIndexesDDLRejectsMultipleKeyColumns
+--- PASS: TestToVectorIndexesDDLRejectsMultipleKeyColumns (0.00s)
+=== RUN   TestRoundtrip_OmittedPrimaryKeyRemainsOmitted
+--- PASS: TestRoundtrip_OmittedPrimaryKeyRemainsOmitted (0.00s)
+=== RUN   TestToRolesDDL_SuppressesInheritedColumnRows
+--- PASS: TestToRolesDDL_SuppressesInheritedColumnRows (0.00s)
+=== RUN   TestRoundtrip_AlterDatabase
+--- PASS: TestRoundtrip_AlterDatabase (0.00s)
+=== RUN   TestToFunctionsDDL_PrefersSpannerType
+--- PASS: TestToFunctionsDDL_PrefersSpannerType (0.00s)
+=== RUN   TestRoundtrip_AlterTableAddConstraint
+--- PASS: TestRoundtrip_AlterTableAddConstraint (0.00s)
+=== RUN   TestToTablesDDL_RestoresIdentityColumnKind
+=== RUN   TestToTablesDDL_RestoresIdentityColumnKind/BIT_REVERSED_POSITIVE
+=== RUN   TestToTablesDDL_RestoresIdentityColumnKind/BIT_REVERSED_POSITIVE_SEQUENCE
+--- PASS: TestToTablesDDL_RestoresIdentityColumnKind (0.00s)
+    --- PASS: TestToTablesDDL_RestoresIdentityColumnKind/BIT_REVERSED_POSITIVE (0.00s)
+    --- PASS: TestToTablesDDL_RestoresIdentityColumnKind/BIT_REVERSED_POSITIVE_SEQUENCE (0.00s)
+=== RUN   TestLocalityGroupsRejectMalformedEmulatorOption
+--- PASS: TestLocalityGroupsRejectMalformedEmulatorOption (0.00s)
+=== RUN   TestRoundtripGenericOptions
+--- PASS: TestRoundtripGenericOptions (0.00s)
+=== RUN   TestRoundtrip_Placement
+--- PASS: TestRoundtrip_Placement (0.00s)
+=== RUN   TestRoundtrip_NamedSchemaTableGrant
+--- PASS: TestRoundtrip_NamedSchemaTableGrant (0.00s)
+=== RUN   TestToGraphsDDL_PropertyGraphMetadata
+--- PASS: TestToGraphsDDL_PropertyGraphMetadata (0.00s)
+=== RUN   TestToDatabaseDDL_MissingNameWithSettableOptionReturnsError
+--- PASS: TestToDatabaseDDL_MissingNameWithSettableOptionReturnsError (0.00s)
+=== RUN   TestToRolesDDL_AllSchemaGrantValidation
+--- PASS: TestToRolesDDL_AllSchemaGrantValidation (0.00s)
+=== RUN   TestToTablesDDL_DoesNotGuessReferencedTableFromConstraintName
+--- PASS: TestToTablesDDL_DoesNotGuessReferencedTableFromConstraintName (0.00s)
+=== RUN   TestBuildColumnDef_EmitsExplicitLocalityGroup
+--- PASS: TestBuildColumnDef_EmitsExplicitLocalityGroup (0.00s)
+=== RUN   TestRoundtripOptionlessLocalityGroup
+--- PASS: TestRoundtripOptionlessLocalityGroup (0.00s)
+=== RUN   TestRoundtripVectorIndexFilter
+--- PASS: TestRoundtripVectorIndexFilter (0.00s)
+=== RUN   TestToProtoBundleDDL_InvalidDescriptor
+--- PASS: TestToProtoBundleDDL_InvalidDescriptor (0.00s)
+=== RUN   TestToDatabaseDDL_OnlyNonCanonicalOptionsEmitsNothing
+--- PASS: TestToDatabaseDDL_OnlyNonCanonicalOptionsEmitsNothing (0.00s)
+=== RUN   TestBuildColumnDef_OmitsOptionsWhenEveryRowIsInherited
+--- PASS: TestBuildColumnDef_OmitsOptionsWhenEveryRowIsInherited (0.00s)
+=== RUN   TestToDDLStatements_NamedVectorIndexStillFailsExplicitly
+--- PASS: TestToDDLStatements_NamedVectorIndexStillFailsExplicitly (0.00s)
+=== RUN   TestOptionLiteralRoundTrip
+=== RUN   TestOptionLiteralRoundTrip/'123'
+=== RUN   TestOptionLiteralRoundTrip/'true'
+=== RUN   TestOptionLiteralRoundTrip/'[1]'
+=== RUN   TestOptionLiteralRoundTrip/'NULL'
+=== RUN   TestOptionLiteralRoundTrip/'a\\b'
+=== RUN   TestOptionLiteralRoundTrip/'it\'s_quoted'
+=== RUN   TestOptionLiteralRoundTrip/r'a\b'
+=== RUN   TestOptionLiteralRoundTrip/'''first_second'''
+=== RUN   TestOptionLiteralRoundTrip/b'\x41'
+=== RUN   TestOptionLiteralRoundTrip/-42
+=== RUN   TestOptionLiteralRoundTrip/+42
+=== RUN   TestOptionLiteralRoundTrip/-1.5
+=== RUN   TestOptionLiteralRoundTrip/true
+=== RUN   TestOptionLiteralRoundTrip/NULL
+=== RUN   TestOptionLiteralRoundTrip/[]
+=== RUN   TestOptionLiteralRoundTrip/['a\\b',_'it\'s_quoted',_NULL]
+=== RUN   TestOptionLiteralRoundTrip/[-1,_2,_NULL]
+=== RUN   TestOptionLiteralRoundTrip/ARRAY<STRING>['a']
+--- PASS: TestOptionLiteralRoundTrip (0.00s)
+    --- PASS: TestOptionLiteralRoundTrip/'123' (0.00s)
+    --- PASS: TestOptionLiteralRoundTrip/'true' (0.00s)
+    --- PASS: TestOptionLiteralRoundTrip/'[1]' (0.00s)
+    --- PASS: TestOptionLiteralRoundTrip/'NULL' (0.00s)
+    --- PASS: TestOptionLiteralRoundTrip/'a\\b' (0.00s)
+    --- PASS: TestOptionLiteralRoundTrip/'it\'s_quoted' (0.00s)
+    --- PASS: TestOptionLiteralRoundTrip/r'a\b' (0.00s)
+    --- PASS: TestOptionLiteralRoundTrip/'''first_second''' (0.00s)
+    --- PASS: TestOptionLiteralRoundTrip/b'\x41' (0.00s)
+    --- PASS: TestOptionLiteralRoundTrip/-42 (0.00s)
+    --- PASS: TestOptionLiteralRoundTrip/+42 (0.00s)
+    --- PASS: TestOptionLiteralRoundTrip/-1.5 (0.00s)
+    --- PASS: TestOptionLiteralRoundTrip/true (0.00s)
+    --- PASS: TestOptionLiteralRoundTrip/NULL (0.00s)
+    --- PASS: TestOptionLiteralRoundTrip/[] (0.00s)
+    --- PASS: TestOptionLiteralRoundTrip/['a\\b',_'it\'s_quoted',_NULL] (0.00s)
+    --- PASS: TestOptionLiteralRoundTrip/[-1,_2,_NULL] (0.00s)
+    --- PASS: TestOptionLiteralRoundTrip/ARRAY<STRING>['a'] (0.00s)
+=== RUN   TestToTablesDDL_QualifiedSystemTableDoesNotHideUserTable
+--- PASS: TestToTablesDDL_QualifiedSystemTableDoesNotHideUserTable (0.00s)
+=== RUN   TestToLocalityGroupsDDL_SkipsInheritedStorageEmitsExplicit
+--- PASS: TestToLocalityGroupsDDL_SkipsInheritedStorageEmitsExplicit (0.00s)
+=== RUN   TestRoundtrip_Function
+--- PASS: TestRoundtrip_Function (0.00s)
+=== RUN   TestToLocalityGroupsDDL_SkipsBuiltinDefaultGroup
+--- PASS: TestToLocalityGroupsDDL_SkipsBuiltinDefaultGroup (0.00s)
+=== RUN   TestRoundtrip_SameLeafNamedForeignKeysRemainIsolated
+--- PASS: TestRoundtrip_SameLeafNamedForeignKeysRemainIsolated (0.00s)
+=== RUN   TestToTablesDDL_RowDeletionPolicyErrorIncludesContext
+--- PASS: TestToTablesDDL_RowDeletionPolicyErrorIncludesContext (0.00s)
+=== RUN   TestRoundtrip_AllInSchemaGrants
+--- PASS: TestRoundtrip_AllInSchemaGrants (0.00s)
+=== RUN   TestRoundtrip_PropertyGraphDynamicMetadata
+--- PASS: TestRoundtrip_PropertyGraphDynamicMetadata (0.00s)
+=== RUN   TestExpressionIndexWithoutKeyMetadataFailsClosed
+--- PASS: TestExpressionIndexWithoutKeyMetadataFailsClosed (0.00s)
+=== RUN   TestRoundtrip_NamedSchemaLeafCollisionsRemainIsolated
+--- PASS: TestRoundtrip_NamedSchemaLeafCollisionsRemainIsolated (0.00s)
+=== RUN   TestRoundtrip_RoleAndGrant
+--- PASS: TestRoundtrip_RoleAndGrant (0.00s)
+=== RUN   TestRoundtrip_SchemaGrant
+--- PASS: TestRoundtrip_SchemaGrant (0.00s)
+=== RUN   TestRoundtrip_RowDeletionPolicy
+--- PASS: TestRoundtrip_RowDeletionPolicy (0.00s)
+=== CONT  TestToDDLStatementsRejectsExpressionIndex
+--- PASS: TestToDDLStatementsRejectsExpressionIndex (0.00s)
+PASS
+ok  	github.com/apstndb/spanalyzer/survey/astconv	5.111s
+-test.shuffle 1794076907029207000
+=== RUN   TestValidateExecutionEnvironment
+--- PASS: TestValidateExecutionEnvironment (0.00s)
+=== RUN   TestWriteCaptureContainerKeepsFirstEquivalentObservation
+--- PASS: TestWriteCaptureContainerKeepsFirstEquivalentObservation (0.00s)
+=== RUN   TestWriteCaptureManagedKeepsFirstEquivalentObservationInSameSecond
+--- PASS: TestWriteCaptureManagedKeepsFirstEquivalentObservationInSameSecond (0.00s)
+=== RUN   TestCreateAtomicallyDoesNotReplace
+--- PASS: TestCreateAtomicallyDoesNotReplace (0.00s)
+=== RUN   TestCompareRetainedCaptureDetectsTargetIdentityChange
+--- PASS: TestCompareRetainedCaptureDetectsTargetIdentityChange (0.06s)
+=== RUN   TestCompareRetainedCapture
+=== RUN   TestCompareRetainedCapture/unchanged
+=== RUN   TestCompareRetainedCapture/producer_only
+=== RUN   TestCompareRetainedCapture/surface
+--- PASS: TestCompareRetainedCapture (0.12s)
+    --- PASS: TestCompareRetainedCapture/unchanged (0.04s)
+    --- PASS: TestCompareRetainedCapture/producer_only (0.04s)
+    --- PASS: TestCompareRetainedCapture/surface (0.04s)
+=== RUN   TestRunCheckRejectsWrite
+--- PASS: TestRunCheckRejectsWrite (0.00s)
+=== RUN   TestCreateAtomicallyConcurrentWriters
+--- PASS: TestCreateAtomicallyConcurrentWriters (0.00s)
+=== RUN   TestWriteComparisonReportIsCompactAndMachineReadable
+--- PASS: TestWriteComparisonReportIsCompactAndMachineReadable (0.00s)
+=== RUN   TestResolveRepoRoot
+--- PASS: TestResolveRepoRoot (0.00s)
+=== RUN   TestCaptureTransactionSupportsMultipleQueries
+2026/11/08 03:41:47 github.com/testcontainers/testcontainers-go - Connected to docker: 
+  Server Version: 29.2.1
+  API Version: 1.53
+  Operating System: Ubuntu 24.04.4 LTS
+  Total Memory: 7922 MB
+  Testcontainers for Go Version: v0.44.0
+  Resolved Docker Host: unix:///Users/apstndb/.colima/default/docker.sock
+  Resolved Docker Socket Path: /var/run/docker.sock
+  Test SessionID: 78f02d5b0d8dbee24659d6261945ef3e793d54133f96c56c464b02f9e9c44a45
+  Test ProcessID: 59e9aa4a-6a3c-4807-b865-4523f89fcf5d
+2026/11/08 03:41:47 🐳 Creating container for image gcr.io/cloud-spanner-emulator/emulator:1.5.59@sha256:969af6a9349948fbfb4a826c18e160e258a4005f7c759f8e7f2dcec369cccba8
+2026/11/08 03:41:47 🐳 Creating container for image testcontainers/ryuk:0.14.0
+2026/11/08 03:41:47 ✅ Container created: 4d4a8681eeed
+2026/11/08 03:41:47 🐳 Starting container: 4d4a8681eeed
+2026/11/08 03:41:47 ✅ Container started: 4d4a8681eeed
+2026/11/08 03:41:47 ⏳ Waiting for container id 4d4a8681eeed image: testcontainers/ryuk:0.14.0. Waiting for: all of: [log message "Started", port 8080/tcp to be listening]
+2026/11/08 03:41:47 Shell not found in container
+2026/11/08 03:41:47 🔔 Container is ready: 4d4a8681eeed
+2026/11/08 03:41:47 ✅ Container created: 7541a831ffa8
+2026/11/08 03:41:47 🐳 Starting container: 7541a831ffa8
+2026/11/08 03:41:47 ✅ Container started: 7541a831ffa8
+2026/11/08 03:41:47 ⏳ Waiting for container id 7541a831ffa8 image: gcr.io/cloud-spanner-emulator/emulator:1.5.59@sha256:969af6a9349948fbfb4a826c18e160e258a4005f7c759f8e7f2dcec369cccba8. Waiting for: all of: [port 9010/tcp to be listening, log message "Cloud Spanner emulator running"]
+2026/11/08 03:41:47 Shell not found in container
+2026/11/08 03:41:48 🔔 Container is ready: 7541a831ffa8
+2026/11/08 03:41:48 🐳 Stopping container: 7541a831ffa8
+2026/11/08 03:41:48 ✅ Container stopped: 7541a831ffa8
+2026/11/08 03:41:48 🐳 Terminating container: 7541a831ffa8
+2026/11/08 03:41:48 🚫 Container terminated: 7541a831ffa8
+--- PASS: TestCaptureTransactionSupportsMultipleQueries (1.66s)
+=== RUN   TestSplitTaggedImage
+--- PASS: TestSplitTaggedImage (0.00s)
+=== RUN   TestRunRejectsMissingTarget
+--- PASS: TestRunRejectsMissingTarget (0.00s)
+=== RUN   TestRunRejectsWriteAndOutput
+--- PASS: TestRunRejectsWriteAndOutput (0.00s)
+PASS
+ok  	github.com/apstndb/spanalyzer/survey/cmd/infoschema-capture	3.518s
+?   	github.com/apstndb/spanalyzer/survey/cmd/roundtrip	[no test files]
+-test.shuffle 1794076909474186000
+=== RUN   TestCompareRetainedCaptureDetectsOmniIdentityOverride
+--- PASS: TestCompareRetainedCaptureDetectsOmniIdentityOverride (0.03s)
+=== RUN   TestRunCheckRejectsWrite
+--- PASS: TestRunCheckRejectsWrite (0.00s)
+=== RUN   TestRunRejectsUnsupportedTarget
+--- PASS: TestRunRejectsUnsupportedTarget (0.00s)
+PASS
+ok  	github.com/apstndb/spanalyzer/survey/cmd/spanner-sys-capture	4.132s
+-test.shuffle 1794076908495698000
+=== RUN   TestRun
+=== PAUSE TestRun
+=== CONT  TestRun
+=== RUN   TestRun/exports_manifest
+=== PAUSE TestRun/exports_manifest
+=== RUN   TestRun/requires_source_commit
+=== PAUSE TestRun/requires_source_commit
+=== RUN   TestRun/rejects_positional_argument
+=== PAUSE TestRun/rejects_positional_argument
+=== RUN   TestRun/rejects_malformed_commit
+=== PAUSE TestRun/rejects_malformed_commit
+=== RUN   TestRun/help
+=== PAUSE TestRun/help
+=== CONT  TestRun/exports_manifest
+=== CONT  TestRun/rejects_positional_argument
+=== CONT  TestRun/rejects_malformed_commit
+=== CONT  TestRun/help
+=== CONT  TestRun/requires_source_commit
+--- PASS: TestRun (0.00s)
+    --- PASS: TestRun/rejects_positional_argument (0.00s)
+    --- PASS: TestRun/rejects_malformed_commit (0.00s)
+    --- PASS: TestRun/help (0.00s)
+    --- PASS: TestRun/requires_source_commit (0.00s)
+    --- PASS: TestRun/exports_manifest (0.08s)
+PASS
+ok  	github.com/apstndb/spanalyzer/survey/cmd/spanner-sys-export	3.203s
+-test.shuffle 1794076910108058000
+=== RUN   TestDrift_EmulatorTableMetas
+2026/11/08 03:41:50 github.com/testcontainers/testcontainers-go - Connected to docker: 
+  Server Version: 29.2.1
+  API Version: 1.53
+  Operating System: Ubuntu 24.04.4 LTS
+  Total Memory: 7922 MB
+  Testcontainers for Go Version: v0.44.0
+  Resolved Docker Host: unix:///Users/apstndb/.colima/default/docker.sock
+  Resolved Docker Socket Path: /var/run/docker.sock
+  Test SessionID: 78f02d5b0d8dbee24659d6261945ef3e793d54133f96c56c464b02f9e9c44a45
+  Test ProcessID: cd156eed-7fa5-48fa-b829-39f28f1bdbac
+2026/11/08 03:41:50 🐳 Creating container for image gcr.io/cloud-spanner-emulator/emulator:1.5.59@sha256:969af6a9349948fbfb4a826c18e160e258a4005f7c759f8e7f2dcec369cccba8
+2026/11/08 03:41:50 ⏳ Waiting for Reaper "4d4a8681" to be ready
+2026/11/08 03:41:50 🔥 Reaper obtained from Docker for this test session 4d4a8681
+2026/11/08 03:41:50 ✅ Container created: b3f22455a340
+2026/11/08 03:41:50 🐳 Starting container: b3f22455a340
+2026/11/08 03:41:50 ✅ Container started: b3f22455a340
+2026/11/08 03:41:50 ⏳ Waiting for container id b3f22455a340 image: gcr.io/cloud-spanner-emulator/emulator:1.5.59@sha256:969af6a9349948fbfb4a826c18e160e258a4005f7c759f8e7f2dcec369cccba8. Waiting for: all of: [port 9010/tcp to be listening, log message "Cloud Spanner emulator running"]
+2026/11/08 03:41:50 Shell not found in container
+2026/11/08 03:41:51 🔔 Container is ready: b3f22455a340
+    drift_test.go:50: known Emulator expression-key serialization gap: CREATE INDEX ExpressionIndexProbeByCity ON ExpressionIndexProbe()
+    drift_test.go:50: known Emulator expression-key serialization gap: CREATE INDEX ExpressionIndexProbeByCityNoWrap ON ExpressionIndexProbe()
+2026/11/08 03:41:51 🐳 Stopping container: b3f22455a340
+2026/11/08 03:41:52 ✅ Container stopped: b3f22455a340
+2026/11/08 03:41:52 🐳 Terminating container: b3f22455a340
+2026/11/08 03:41:52 🚫 Container terminated: b3f22455a340
+--- PASS: TestDrift_EmulatorTableMetas (1.90s)
+=== RUN   TestAcceptSpannerSysSurface
+=== RUN   TestAcceptSpannerSysSurface/omni_pinned
+=== RUN   TestAcceptSpannerSysSurface/omni_post-rollout_rejected
+=== RUN   TestAcceptSpannerSysSurface/omni_legacy_known-absent_rejected
+=== RUN   TestAcceptSpannerSysSurface/real_current
+=== RUN   TestAcceptSpannerSysSurface/real_historical_rejected
+=== RUN   TestAcceptSpannerSysSurface/real_mixed_rejected
+=== RUN   TestAcceptSpannerSysSurface/real_old_pin_rejected
+=== RUN   TestAcceptSpannerSysSurface/unknown_target
+--- PASS: TestAcceptSpannerSysSurface (0.00s)
+    --- PASS: TestAcceptSpannerSysSurface/omni_pinned (0.00s)
+    --- PASS: TestAcceptSpannerSysSurface/omni_post-rollout_rejected (0.00s)
+    --- PASS: TestAcceptSpannerSysSurface/omni_legacy_known-absent_rejected (0.00s)
+    --- PASS: TestAcceptSpannerSysSurface/real_current (0.00s)
+    --- PASS: TestAcceptSpannerSysSurface/real_historical_rejected (0.00s)
+    --- PASS: TestAcceptSpannerSysSurface/real_mixed_rejected (0.00s)
+    --- PASS: TestAcceptSpannerSysSurface/real_old_pin_rejected (0.00s)
+    --- PASS: TestAcceptSpannerSysSurface/unknown_target (0.00s)
+=== RUN   TestCommittedCapturesSatisfyJSONSchema
+--- PASS: TestCommittedCapturesSatisfyJSONSchema (0.08s)
+=== RUN   TestBuildCaptureManaged
+--- PASS: TestBuildCaptureManaged (0.00s)
+=== RUN   TestIsClientClosedTransactionError
+=== RUN   TestIsClientClosedTransactionError/closed_transaction
+=== RUN   TestIsClientClosedTransactionError/backend_invalid_argument
+=== RUN   TestIsClientClosedTransactionError/different_code
+--- PASS: TestIsClientClosedTransactionError (0.00s)
+    --- PASS: TestIsClientClosedTransactionError/closed_transaction (0.00s)
+    --- PASS: TestIsClientClosedTransactionError/backend_invalid_argument (0.00s)
+    --- PASS: TestIsClientClosedTransactionError/different_code (0.00s)
+=== RUN   TestValidateCaptureRejectsStaleSurfaceHash
+--- PASS: TestValidateCaptureRejectsStaleSurfaceHash (0.00s)
+=== RUN   TestClassifyCanonicalDDL_FullAccounting
+--- PASS: TestClassifyCanonicalDDL_FullAccounting (0.00s)
+=== RUN   TestCommittedCaptures
+--- PASS: TestCommittedCaptures (0.06s)
+=== RUN   TestUUIDFixtureFallbackCleanupSkipsWhenCreateDidNotComplete
+--- PASS: TestUUIDFixtureFallbackCleanupSkipsWhenCreateDidNotComplete (0.00s)
+=== RUN   TestUUIDFixtureFallbackCleanupSkipsAfterExplicitCleanup
+--- PASS: TestUUIDFixtureFallbackCleanupSkipsAfterExplicitCleanup (0.00s)
+=== RUN   TestClassifyCanonicalDDL_UnexpectedParseFailure
+--- PASS: TestClassifyCanonicalDDL_UnexpectedParseFailure (0.00s)
+=== RUN   TestBuildCaptureContainerPathUsesDigestAndPlatform
+--- PASS: TestBuildCaptureContainerPathUsesDigestAndPlatform (0.00s)
+=== RUN   TestTableMeta_Query
+--- PASS: TestTableMeta_Query (0.00s)
+=== RUN   TestCanonicalDDL_RealSpanner
+    canonical_integration_test.go:35: skipping managed-Spanner canonical comparison; run mise run test-canonical-real
+--- SKIP: TestCanonicalDDL_RealSpanner (0.00s)
+=== RUN   TestAllTableMetas_RegistryInvariants
+--- PASS: TestAllTableMetas_RegistryInvariants (0.00s)
+=== RUN   TestDefaultCanonicalDDLAllowlistIsExact
+--- PASS: TestDefaultCanonicalDDLAllowlistIsExact (0.00s)
+=== RUN   TestRealSpannerDatabaseForDrift
+=== RUN   TestRealSpannerDatabaseForDrift/configured
+=== RUN   TestRealSpannerDatabaseForDrift/optional_and_absent
+=== RUN   TestRealSpannerDatabaseForDrift/required_and_absent
+--- PASS: TestRealSpannerDatabaseForDrift (0.00s)
+    --- PASS: TestRealSpannerDatabaseForDrift/configured (0.00s)
+    --- PASS: TestRealSpannerDatabaseForDrift/optional_and_absent (0.00s)
+    --- PASS: TestRealSpannerDatabaseForDrift/required_and_absent (0.00s)
+=== RUN   TestClassifyCanonicalDDL_ErrorClassMismatchIsUnexpected
+--- PASS: TestClassifyCanonicalDDL_ErrorClassMismatchIsUnexpected (0.00s)
+=== RUN   TestTableMetaByName
+=== RUN   TestTableMetaByName/COLUMNS
+=== RUN   TestTableMetaByName/TABLES
+=== RUN   TestTableMetaByName/INDEXES
+=== RUN   TestTableMetaByName/VIEWS
+=== RUN   TestTableMetaByName/NONEXISTENT
+--- PASS: TestTableMetaByName (0.00s)
+    --- PASS: TestTableMetaByName/COLUMNS (0.00s)
+    --- PASS: TestTableMetaByName/TABLES (0.00s)
+    --- PASS: TestTableMetaByName/INDEXES (0.00s)
+    --- PASS: TestTableMetaByName/VIEWS (0.00s)
+    --- PASS: TestTableMetaByName/NONEXISTENT (0.00s)
+=== RUN   TestClassifyCanonicalDDL_QuotedConstraintColumnParses
+--- PASS: TestClassifyCanonicalDDL_QuotedConstraintColumnParses (0.00s)
+=== RUN   TestValidateCaptureRejectsRawRollingError
+--- PASS: TestValidateCaptureRejectsRawRollingError (0.00s)
+=== RUN   TestDecodeCaptureRejectsDestinationIdentifier
+=== RUN   TestDecodeCaptureRejectsDestinationIdentifier/literal
+=== RUN   TestDecodeCaptureRejectsDestinationIdentifier/escaped
+--- PASS: TestDecodeCaptureRejectsDestinationIdentifier (0.00s)
+    --- PASS: TestDecodeCaptureRejectsDestinationIdentifier/literal (0.00s)
+    --- PASS: TestDecodeCaptureRejectsDestinationIdentifier/escaped (0.00s)
+=== RUN   TestDrift_RealTableMetas
+    drift_test.go:107: skipping real Spanner drift test; set TEST_REAL_SPANNER_DATABASE
+--- SKIP: TestDrift_RealTableMetas (0.00s)
+=== RUN   TestAllTableMetas_Count
+--- PASS: TestAllTableMetas_Count (0.00s)
+=== RUN   TestUUIDFixtureFallbackCleanupUsesFreshBoundedContext
+--- PASS: TestUUIDFixtureFallbackCleanupUsesFreshBoundedContext (0.00s)
+=== RUN   TestValidateCaptureRejectsQueryabilityAdvertisementMismatch
+--- PASS: TestValidateCaptureRejectsQueryabilityAdvertisementMismatch (0.00s)
+=== RUN   TestColumnNames
+--- PASS: TestColumnNames (0.00s)
+=== RUN   TestFilterQueryableRollingColumns_IgnoresOrdinaryColumns
+--- PASS: TestFilterQueryableRollingColumns_IgnoresOrdinaryColumns (0.00s)
+=== RUN   TestDrift_OmniTableMetas
+2026/11/08 03:41:52 🐳 Creating container for image us-docker.pkg.dev/spanner-omni/images/spanner-omni:2026.r4-lts.2@sha256:b607b10bee3c1903f0a7f88f99bece67cb0dd9d9a028aee64226fc311bd78dae
+2026/11/08 03:41:52 ✅ Container created: 551683e3887b
+2026/11/08 03:41:52 🐳 Starting container: 551683e3887b
+2026/11/08 03:41:52 ✅ Container started: 551683e3887b
+2026/11/08 03:41:52 ⏳ Waiting for container id 551683e3887b image: us-docker.pkg.dev/spanner-omni/images/spanner-omni:2026.r4-lts.2@sha256:b607b10bee3c1903f0a7f88f99bece67cb0dd9d9a028aee64226fc311bd78dae. Waiting for: all of: [log message "Spanner is ready", first exposed port to be accessible externally]
+2026/11/08 03:41:58 🔔 Container is ready: 551683e3887b
+    drift_test.go:77: SPANNER_SYS contract_metrics target=omni registered_tables=53 advertised_tables=51 advertised_columns=598 known_absent_columns=34 has_drift=false
+    drift_test.go:77: SPANNER_SYS diagnostic_metrics target=omni checked_tables=51 decoded_rows=3 advertised_not_queryable=0
+2026/11/08 03:44:17 🐳 Stopping container: 551683e3887b
+2026/11/08 03:44:28 ✅ Container stopped: 551683e3887b
+2026/11/08 03:44:28 🐳 Terminating container: 551683e3887b
+2026/11/08 03:44:28 🚫 Container terminated: 551683e3887b
+--- PASS: TestDrift_OmniTableMetas (155.92s)
+=== RUN   TestClassifyCanonicalDDL_ConstraintColumnParseClass
+--- PASS: TestClassifyCanonicalDDL_ConstraintColumnParseClass (0.00s)
+=== RUN   TestComputeProducerIdentity
+--- PASS: TestComputeProducerIdentity (0.01s)
+=== RUN   TestUUIDFixtureFallbackCleanupErrorStaysDistinctFromPrimaryFailure
+--- PASS: TestUUIDFixtureFallbackCleanupErrorStaysDistinctFromPrimaryFailure (0.00s)
+=== RUN   TestUUID_RealSpanner
+    uuid_integration_test.go:122: skipping managed-Spanner UUID fixture; run mise run test-uuid-real
+--- SKIP: TestUUID_RealSpanner (0.00s)
+=== RUN   TestClassifyCanonicalDDL_ExactAllowlistMatch
+--- PASS: TestClassifyCanonicalDDL_ExactAllowlistMatch (0.00s)
+=== RUN   TestTableMeta_Query_MissingTable
+--- PASS: TestTableMeta_Query_MissingTable (0.00s)
+=== RUN   TestClassifyCanonicalDDL_UnparsedFamilyIgnoresIdentifierTokens
+--- PASS: TestClassifyCanonicalDDL_UnparsedFamilyIgnoresIdentifierTokens (0.00s)
+=== RUN   TestExpressionIndex_RealSpanner
+    expression_index_integration_test.go:22: skipping managed-Spanner expression-index fixture; run mise run test-expression-index-real
+--- SKIP: TestExpressionIndex_RealSpanner (0.00s)
+=== RUN   TestClassifyCanonicalDDL_HashMismatchIsUnexpected
+--- PASS: TestClassifyCanonicalDDL_HashMismatchIsUnexpected (0.00s)
+=== RUN   TestFilterQueryableRollingColumns
+=== RUN   TestFilterQueryableRollingColumns/queryable
+=== RUN   TestFilterQueryableRollingColumns/advertised_before_query_support
+=== RUN   TestFilterQueryableRollingColumns/backend_reports_unimplemented
+=== RUN   TestFilterQueryableRollingColumns/closed_transaction_is_preserved
+=== RUN   TestFilterQueryableRollingColumns/unrelated_failure_is_preserved
+--- PASS: TestFilterQueryableRollingColumns (0.00s)
+    --- PASS: TestFilterQueryableRollingColumns/queryable (0.00s)
+    --- PASS: TestFilterQueryableRollingColumns/advertised_before_query_support (0.00s)
+    --- PASS: TestFilterQueryableRollingColumns/backend_reports_unimplemented (0.00s)
+    --- PASS: TestFilterQueryableRollingColumns/closed_transaction_is_preserved (0.00s)
+    --- PASS: TestFilterQueryableRollingColumns/unrelated_failure_is_preserved (0.00s)
+=== RUN   TestTableMetaRegistryMutationIsolation
+--- PASS: TestTableMetaRegistryMutationIsolation (0.00s)
+=== RUN   TestInformationSchemaProjectionContracts
+=== RUN   TestInformationSchemaProjectionContracts/projection_source
+=== RUN   TestInformationSchemaProjectionContracts/generated_manifest
+--- PASS: TestInformationSchemaProjectionContracts (0.04s)
+    --- PASS: TestInformationSchemaProjectionContracts/projection_source (0.01s)
+    --- PASS: TestInformationSchemaProjectionContracts/generated_manifest (0.04s)
+PASS
+ok  	github.com/apstndb/spanalyzer/survey/infoschem	162.762s
+-test.shuffle 1794076907974998000
+=== RUN   TestValidateExecutionEnvironment
+--- PASS: TestValidateExecutionEnvironment (0.00s)
+=== RUN   TestSplitTaggedImage
+--- PASS: TestSplitTaggedImage (0.00s)
+PASS
+ok  	github.com/apstndb/spanalyzer/survey/internal/captureenv	2.603s
+-test.shuffle 1794076908828115000
+=== RUN   TestValidateTargetRejectsMutableContainerIdentity
+--- PASS: TestValidateTargetRejectsMutableContainerIdentity (0.00s)
+=== RUN   TestExpectedPath
+--- PASS: TestExpectedPath (0.00s)
+PASS
+ok  	github.com/apstndb/spanalyzer/survey/internal/capturemeta	3.452s
+-test.shuffle 1794076910785585000
+=== RUN   TestRuntimeTargetsSatisfyJSONSchema
+--- PASS: TestRuntimeTargetsSatisfyJSONSchema (0.01s)
+=== RUN   TestImageForPlatformRejectsUnknownTarget
+--- PASS: TestImageForPlatformRejectsUnknownTarget (0.00s)
+=== RUN   TestImageForPlatform
+=== RUN   TestImageForPlatform/emulator_amd64
+=== RUN   TestImageForPlatform/emulator_arm64
+=== RUN   TestImageForPlatform/omni_amd64
+=== RUN   TestImageForPlatform/omni_arm64
+--- PASS: TestImageForPlatform (0.00s)
+    --- PASS: TestImageForPlatform/emulator_amd64 (0.00s)
+    --- PASS: TestImageForPlatform/emulator_arm64 (0.00s)
+    --- PASS: TestImageForPlatform/omni_amd64 (0.00s)
+    --- PASS: TestImageForPlatform/omni_arm64 (0.00s)
+PASS
+ok  	github.com/apstndb/spanalyzer/survey/internal/runtimepins	5.420s
+-test.shuffle 1794076911128433000
+=== RUN   TestDecode
+=== RUN   TestDecode/valid
+=== RUN   TestDecode/duplicate
+=== RUN   TestDecode/unknown
+=== RUN   TestDecode/multiple
+--- PASS: TestDecode (0.00s)
+    --- PASS: TestDecode/valid (0.00s)
+    --- PASS: TestDecode/duplicate (0.00s)
+    --- PASS: TestDecode/unknown (0.00s)
+    --- PASS: TestDecode/multiple (0.00s)
+PASS
+ok  	github.com/apstndb/spanalyzer/survey/internal/strictjson	5.756s
+-test.shuffle 1794076911705208000
+=== RUN   TestTableRegistry
+--- PASS: TestTableRegistry (0.00s)
+=== RUN   TestDescriptorsFromRegistryRejectsUnsupportedShapes
+=== RUN   TestDescriptorsFromRegistryRejectsUnsupportedShapes/nil_row_type
+=== RUN   TestDescriptorsFromRegistryRejectsUnsupportedShapes/non_struct_row
+=== RUN   TestDescriptorsFromRegistryRejectsUnsupportedShapes/missing_top-level_tag
+=== RUN   TestDescriptorsFromRegistryRejectsUnsupportedShapes/duplicate_top-level_tag
+=== RUN   TestDescriptorsFromRegistryRejectsUnsupportedShapes/unexported_top-level_field
+=== RUN   TestDescriptorsFromRegistryRejectsUnsupportedShapes/missing_nested_tag
+=== RUN   TestDescriptorsFromRegistryRejectsUnsupportedShapes/duplicate_nested_tag
+=== RUN   TestDescriptorsFromRegistryRejectsUnsupportedShapes/unexported_nested_field
+=== RUN   TestDescriptorsFromRegistryRejectsUnsupportedShapes/nested_array
+=== RUN   TestDescriptorsFromRegistryRejectsUnsupportedShapes/recursive_struct
+=== RUN   TestDescriptorsFromRegistryRejectsUnsupportedShapes/empty_struct
+=== RUN   TestDescriptorsFromRegistryRejectsUnsupportedShapes/map
+=== RUN   TestDescriptorsFromRegistryRejectsUnsupportedShapes/named_scalar
+--- PASS: TestDescriptorsFromRegistryRejectsUnsupportedShapes (0.00s)
+    --- PASS: TestDescriptorsFromRegistryRejectsUnsupportedShapes/nil_row_type (0.00s)
+    --- PASS: TestDescriptorsFromRegistryRejectsUnsupportedShapes/non_struct_row (0.00s)
+    --- PASS: TestDescriptorsFromRegistryRejectsUnsupportedShapes/missing_top-level_tag (0.00s)
+    --- PASS: TestDescriptorsFromRegistryRejectsUnsupportedShapes/duplicate_top-level_tag (0.00s)
+    --- PASS: TestDescriptorsFromRegistryRejectsUnsupportedShapes/unexported_top-level_field (0.00s)
+    --- PASS: TestDescriptorsFromRegistryRejectsUnsupportedShapes/missing_nested_tag (0.00s)
+    --- PASS: TestDescriptorsFromRegistryRejectsUnsupportedShapes/duplicate_nested_tag (0.00s)
+    --- PASS: TestDescriptorsFromRegistryRejectsUnsupportedShapes/unexported_nested_field (0.00s)
+    --- PASS: TestDescriptorsFromRegistryRejectsUnsupportedShapes/nested_array (0.00s)
+    --- PASS: TestDescriptorsFromRegistryRejectsUnsupportedShapes/recursive_struct (0.00s)
+    --- PASS: TestDescriptorsFromRegistryRejectsUnsupportedShapes/empty_struct (0.00s)
+    --- PASS: TestDescriptorsFromRegistryRejectsUnsupportedShapes/map (0.00s)
+    --- PASS: TestDescriptorsFromRegistryRejectsUnsupportedShapes/named_scalar (0.00s)
+=== RUN   TestRowDecodeActivePartitionedDML
+--- PASS: TestRowDecodeActivePartitionedDML (0.00s)
+=== RUN   TestIntervalQueriesValidateIntervals
+=== RUN   TestIntervalQueriesValidateIntervals/lock_stats_top
+=== RUN   TestIntervalQueriesValidateIntervals/table_operations_stats
+=== RUN   TestIntervalQueriesValidateIntervals/query_stats_total
+=== RUN   TestIntervalQueriesValidateIntervals/read_stats_top
+=== RUN   TestIntervalQueriesValidateIntervals/lock_stats_total
+=== RUN   TestIntervalQueriesValidateIntervals/column_operations_stats
+=== RUN   TestIntervalQueriesValidateIntervals/split_stats_top
+=== RUN   TestIntervalQueriesValidateIntervals/query_profiles_stats_top
+=== RUN   TestIntervalQueriesValidateIntervals/query_stats_top
+=== RUN   TestIntervalQueriesValidateIntervals/read_stats_total
+=== RUN   TestIntervalQueriesValidateIntervals/transaction_stats_top
+=== RUN   TestIntervalQueriesValidateIntervals/transaction_stats_total
+--- PASS: TestIntervalQueriesValidateIntervals (0.00s)
+    --- PASS: TestIntervalQueriesValidateIntervals/lock_stats_top (0.00s)
+    --- PASS: TestIntervalQueriesValidateIntervals/table_operations_stats (0.00s)
+    --- PASS: TestIntervalQueriesValidateIntervals/query_stats_total (0.00s)
+    --- PASS: TestIntervalQueriesValidateIntervals/read_stats_top (0.00s)
+    --- PASS: TestIntervalQueriesValidateIntervals/lock_stats_total (0.00s)
+    --- PASS: TestIntervalQueriesValidateIntervals/column_operations_stats (0.00s)
+    --- PASS: TestIntervalQueriesValidateIntervals/split_stats_top (0.00s)
+    --- PASS: TestIntervalQueriesValidateIntervals/query_profiles_stats_top (0.00s)
+    --- PASS: TestIntervalQueriesValidateIntervals/query_stats_top (0.00s)
+    --- PASS: TestIntervalQueriesValidateIntervals/read_stats_total (0.00s)
+    --- PASS: TestIntervalQueriesValidateIntervals/transaction_stats_top (0.00s)
+    --- PASS: TestIntervalQueriesValidateIntervals/transaction_stats_total (0.00s)
+=== RUN   TestColumnsNamedByRejection
+=== RUN   TestColumnsNamedByRejection/not_found_inside_alias_form
+=== RUN   TestColumnsNamedByRejection/unrecognized_name_form
+=== RUN   TestColumnsNamedByRejection/named_column_was_not_selected
+=== RUN   TestColumnsNamedByRejection/non_InvalidArgument_code
+=== RUN   TestColumnsNamedByRejection/closed_transaction_is_not_a_rejection
+=== RUN   TestColumnsNamedByRejection/plain_error
+--- PASS: TestColumnsNamedByRejection (0.00s)
+    --- PASS: TestColumnsNamedByRejection/not_found_inside_alias_form (0.00s)
+    --- PASS: TestColumnsNamedByRejection/unrecognized_name_form (0.00s)
+    --- PASS: TestColumnsNamedByRejection/named_column_was_not_selected (0.00s)
+    --- PASS: TestColumnsNamedByRejection/non_InvalidArgument_code (0.00s)
+    --- PASS: TestColumnsNamedByRejection/closed_transaction_is_not_a_rejection (0.00s)
+    --- PASS: TestColumnsNamedByRejection/plain_error (0.00s)
+=== RUN   TestRowDecodeOperationsByTable
+--- PASS: TestRowDecodeOperationsByTable (0.00s)
+=== RUN   TestQuoteIdentifiersQualifiesColumns
+--- PASS: TestQuoteIdentifiersQualifiesColumns (0.00s)
+=== RUN   TestSurfaceCaptureSatisfiesJSONSchema
+--- PASS: TestSurfaceCaptureSatisfiesJSONSchema (0.00s)
+=== RUN   TestGraphOperationExecutionStatusQuery
+--- PASS: TestGraphOperationExecutionStatusQuery (0.00s)
+=== RUN   TestLoadLegacySurfaceBaseline
+--- PASS: TestLoadLegacySurfaceBaseline (0.02s)
+=== RUN   TestBuildAuditReportRetainsMetadataAndSeparatesKnownAbsence
+--- PASS: TestBuildAuditReportRetainsMetadataAndSeparatesKnownAbsence (0.00s)
+=== RUN   TestVectorIndexStatsQuery
+--- PASS: TestVectorIndexStatsQuery (0.00s)
+=== RUN   TestCanonicalSpannerTypeRejectsMalformedDescriptors
+=== RUN   TestCanonicalSpannerTypeRejectsMalformedDescriptors/unknown_kind
+=== RUN   TestCanonicalSpannerTypeRejectsMalformedDescriptors/unknown_scalar
+=== RUN   TestCanonicalSpannerTypeRejectsMalformedDescriptors/scalar_with_element
+=== RUN   TestCanonicalSpannerTypeRejectsMalformedDescriptors/array_without_element
+=== RUN   TestCanonicalSpannerTypeRejectsMalformedDescriptors/nested_array
+=== RUN   TestCanonicalSpannerTypeRejectsMalformedDescriptors/empty_struct
+=== RUN   TestCanonicalSpannerTypeRejectsMalformedDescriptors/empty_field_name
+=== RUN   TestCanonicalSpannerTypeRejectsMalformedDescriptors/duplicate_field
+--- PASS: TestCanonicalSpannerTypeRejectsMalformedDescriptors (0.00s)
+    --- PASS: TestCanonicalSpannerTypeRejectsMalformedDescriptors/unknown_kind (0.00s)
+    --- PASS: TestCanonicalSpannerTypeRejectsMalformedDescriptors/unknown_scalar (0.00s)
+    --- PASS: TestCanonicalSpannerTypeRejectsMalformedDescriptors/scalar_with_element (0.00s)
+    --- PASS: TestCanonicalSpannerTypeRejectsMalformedDescriptors/array_without_element (0.00s)
+    --- PASS: TestCanonicalSpannerTypeRejectsMalformedDescriptors/nested_array (0.00s)
+    --- PASS: TestCanonicalSpannerTypeRejectsMalformedDescriptors/empty_struct (0.00s)
+    --- PASS: TestCanonicalSpannerTypeRejectsMalformedDescriptors/empty_field_name (0.00s)
+    --- PASS: TestCanonicalSpannerTypeRejectsMalformedDescriptors/duplicate_field (0.00s)
+=== RUN   TestAuditReportHasDrift
+=== RUN   TestAuditReportHasDrift/none
+=== RUN   TestAuditReportHasDrift/known_absent_is_not_drift
+=== RUN   TestAuditReportHasDrift/advertised_not_queryable_is_not_drift
+=== RUN   TestAuditReportHasDrift/unknown_table
+=== RUN   TestAuditReportHasDrift/unknown_column
+=== RUN   TestAuditReportHasDrift/ordinal_mismatch
+=== RUN   TestAuditReportHasDrift/type_mismatch
+--- PASS: TestAuditReportHasDrift (0.00s)
+    --- PASS: TestAuditReportHasDrift/none (0.00s)
+    --- PASS: TestAuditReportHasDrift/known_absent_is_not_drift (0.00s)
+    --- PASS: TestAuditReportHasDrift/advertised_not_queryable_is_not_drift (0.00s)
+    --- PASS: TestAuditReportHasDrift/unknown_table (0.00s)
+    --- PASS: TestAuditReportHasDrift/unknown_column (0.00s)
+    --- PASS: TestAuditReportHasDrift/ordinal_mismatch (0.00s)
+    --- PASS: TestAuditReportHasDrift/type_mismatch (0.00s)
+=== RUN   TestRowDecodeTableSizesStatsPerLocalityGroup
+--- PASS: TestRowDecodeTableSizesStatsPerLocalityGroup (0.00s)
+=== RUN   TestBuildAuditReportChecksActivePartitionedDMLTypes
+--- PASS: TestBuildAuditReportChecksActivePartitionedDMLTypes (0.00s)
+=== RUN   TestRegistryDescriptorsCoverKnownSurface
+--- PASS: TestRegistryDescriptorsCoverKnownSurface (0.00s)
+=== RUN   TestRegistryDescriptorsRetainDecoderNullabilitySeparately
+--- PASS: TestRegistryDescriptorsRetainDecoderNullabilitySeparately (0.00s)
+=== RUN   TestExportManifest
+=== PAUSE TestExportManifest
+=== RUN   TestManifestSchemasValidateEvidenceAndExport
+=== PAUSE TestManifestSchemasValidateEvidenceAndExport
+=== RUN   TestValidateSourceCommit
+=== PAUSE TestValidateSourceCommit
+=== RUN   TestDecodeCaptureStrictness
+=== PAUSE TestDecodeCaptureStrictness
+=== RUN   TestComputeSurfaceCaptureProducerIdentity
+--- PASS: TestComputeSurfaceCaptureProducerIdentity (0.00s)
+=== RUN   TestExcludeRejectedOrUnqueryablePrefersRejectionOverProbes
+--- PASS: TestExcludeRejectedOrUnqueryablePrefersRejectionOverProbes (0.00s)
+=== RUN   TestCompareLiveTypesRejectsInvalidDescriptors
+--- PASS: TestCompareLiveTypesRejectsInvalidDescriptors (0.00s)
+=== RUN   TestCompareLiveTypes
+--- PASS: TestCompareLiveTypes (0.00s)
+=== RUN   TestBatchOperationDecodesUnfinishedResult
+--- PASS: TestBatchOperationDecodesUnfinishedResult (0.00s)
+=== RUN   TestBuildAuditReportDetectsRelativeOrderDrift
+--- PASS: TestBuildAuditReportDetectsRelativeOrderDrift (0.00s)
+=== RUN   TestExcludeUnqueryableSelectedColumns
+=== RUN   TestExcludeUnqueryableSelectedColumns/all_queryable
+=== RUN   TestExcludeUnqueryableSelectedColumns/one_excluded
+=== RUN   TestExcludeUnqueryableSelectedColumns/non-InvalidArgument_probe_error_propagates
+=== RUN   TestExcludeUnqueryableSelectedColumns/closed-transaction_error_propagates
+=== RUN   TestExcludeUnqueryableSelectedColumns/nothing_excluded_means_no_retry
+--- PASS: TestExcludeUnqueryableSelectedColumns (0.00s)
+    --- PASS: TestExcludeUnqueryableSelectedColumns/all_queryable (0.00s)
+    --- PASS: TestExcludeUnqueryableSelectedColumns/one_excluded (0.00s)
+    --- PASS: TestExcludeUnqueryableSelectedColumns/non-InvalidArgument_probe_error_propagates (0.00s)
+    --- PASS: TestExcludeUnqueryableSelectedColumns/closed-transaction_error_propagates (0.00s)
+    --- PASS: TestExcludeUnqueryableSelectedColumns/nothing_excluded_means_no_retry (0.00s)
+=== RUN   TestLockDistributionDecodesStructPointers
+--- PASS: TestLockDistributionDecodesStructPointers (0.00s)
+=== RUN   TestExportManifestFailsClosed
+=== PAUSE TestExportManifestFailsClosed
+=== RUN   TestSurfaceCaptureRoundTripAndPath
+--- PASS: TestSurfaceCaptureRoundTripAndPath (0.00s)
+=== RUN   TestBuildAuditReportCompleteEmptySurfaceIsKnownAbsent
+--- PASS: TestBuildAuditReportCompleteEmptySurfaceIsKnownAbsent (0.00s)
+=== RUN   TestDecodeSurfaceCaptureRejectsDestinationIdentifier
+=== RUN   TestDecodeSurfaceCaptureRejectsDestinationIdentifier/literal
+=== RUN   TestDecodeSurfaceCaptureRejectsDestinationIdentifier/escaped
+--- PASS: TestDecodeSurfaceCaptureRejectsDestinationIdentifier (0.00s)
+    --- PASS: TestDecodeSurfaceCaptureRejectsDestinationIdentifier/literal (0.00s)
+    --- PASS: TestDecodeSurfaceCaptureRejectsDestinationIdentifier/escaped (0.00s)
+=== RUN   TestRegistryDescriptorsAreFreshAndDeterministic
+--- PASS: TestRegistryDescriptorsAreFreshAndDeterministic (0.00s)
+=== RUN   TestTransactionAveragesDecodeNullAndZero
+--- PASS: TestTransactionAveragesDecodeNullAndZero (0.00s)
+=== RUN   TestExcludeRejectedOrUnqueryableFallsBackToProbes
+--- PASS: TestExcludeRejectedOrUnqueryableFallsBackToProbes (0.00s)
+=== CONT  TestExportManifestFailsClosed
+=== CONT  TestExportManifest
+=== CONT  TestValidateSourceCommit
+=== CONT  TestManifestSchemasValidateEvidenceAndExport
+=== CONT  TestDecodeCaptureStrictness
+=== RUN   TestExportManifestFailsClosed/missing_required_target
+=== RUN   TestValidateSourceCommit/lowercase_hex
+=== RUN   TestDecodeCaptureStrictness/unknown_field
+=== PAUSE TestDecodeCaptureStrictness/unknown_field
+=== RUN   TestDecodeCaptureStrictness/duplicate_key
+=== PAUSE TestDecodeCaptureStrictness/duplicate_key
+=== PAUSE TestExportManifestFailsClosed/missing_required_target
+=== PAUSE TestValidateSourceCommit/lowercase_hex
+=== RUN   TestDecodeCaptureStrictness/trailing_value
+=== PAUSE TestDecodeCaptureStrictness/trailing_value
+=== RUN   TestValidateSourceCommit/empty
+=== RUN   TestDecodeCaptureStrictness/destination_identifier
+=== PAUSE TestDecodeCaptureStrictness/destination_identifier
+=== PAUSE TestValidateSourceCommit/empty
+=== RUN   TestExportManifestFailsClosed/duplicate_required_target
+=== RUN   TestValidateSourceCommit/short
+=== PAUSE TestValidateSourceCommit/short
+=== RUN   TestDecodeCaptureStrictness/escaped_destination_identifier
+=== PAUSE TestDecodeCaptureStrictness/escaped_destination_identifier
+=== RUN   TestDecodeCaptureStrictness/stale_hash
+=== RUN   TestValidateSourceCommit/uppercase
+=== PAUSE TestDecodeCaptureStrictness/stale_hash
+=== PAUSE TestValidateSourceCommit/uppercase
+=== PAUSE TestExportManifestFailsClosed/duplicate_required_target
+=== RUN   TestDecodeCaptureStrictness/noncanonical_query
+=== RUN   TestExportManifestFailsClosed/unknown_advertised_column
+=== RUN   TestValidateSourceCommit/nonhex
+=== PAUSE TestDecodeCaptureStrictness/noncanonical_query
+=== PAUSE TestValidateSourceCommit/nonhex
+=== PAUSE TestExportManifestFailsClosed/unknown_advertised_column
+=== CONT  TestValidateSourceCommit/nonhex
+=== RUN   TestExportManifestFailsClosed/runtime_version_does_not_match_evidence_path
+=== CONT  TestValidateSourceCommit/lowercase_hex
+=== CONT  TestValidateSourceCommit/uppercase
+=== CONT  TestValidateSourceCommit/short
+=== CONT  TestValidateSourceCommit/empty
+=== RUN   TestDecodeCaptureStrictness/ordinal_gap
+=== PAUSE TestExportManifestFailsClosed/runtime_version_does_not_match_evidence_path
+=== PAUSE TestDecodeCaptureStrictness/ordinal_gap
+=== RUN   TestExportManifestFailsClosed/target_presence_disagreement
+=== CONT  TestDecodeCaptureStrictness/duplicate_key
+=== PAUSE TestExportManifestFailsClosed/target_presence_disagreement
+=== CONT  TestDecodeCaptureStrictness/noncanonical_query
+=== CONT  TestDecodeCaptureStrictness/ordinal_gap
+=== RUN   TestExportManifestFailsClosed/target_type_disagreement
+=== CONT  TestDecodeCaptureStrictness/unknown_field
+=== CONT  TestDecodeCaptureStrictness/destination_identifier
+=== CONT  TestDecodeCaptureStrictness/trailing_value
+=== CONT  TestDecodeCaptureStrictness/escaped_destination_identifier
+=== PAUSE TestExportManifestFailsClosed/target_type_disagreement
+=== RUN   TestExportManifestFailsClosed/target_ordinal_disagreement
+--- PASS: TestValidateSourceCommit (0.00s)
+    --- PASS: TestValidateSourceCommit/lowercase_hex (0.00s)
+    --- PASS: TestValidateSourceCommit/nonhex (0.00s)
+    --- PASS: TestValidateSourceCommit/short (0.00s)
+    --- PASS: TestValidateSourceCommit/uppercase (0.00s)
+    --- PASS: TestValidateSourceCommit/empty (0.00s)
+=== CONT  TestDecodeCaptureStrictness/stale_hash
+=== PAUSE TestExportManifestFailsClosed/target_ordinal_disagreement
+=== CONT  TestExportManifestFailsClosed/unknown_advertised_column
+=== CONT  TestExportManifestFailsClosed/target_type_disagreement
+=== CONT  TestExportManifestFailsClosed/target_ordinal_disagreement
+=== CONT  TestExportManifestFailsClosed/target_presence_disagreement
+=== CONT  TestExportManifestFailsClosed/duplicate_required_target
+=== CONT  TestExportManifestFailsClosed/runtime_version_does_not_match_evidence_path
+=== CONT  TestExportManifestFailsClosed/missing_required_target
+--- PASS: TestDecodeCaptureStrictness (0.00s)
+    --- PASS: TestDecodeCaptureStrictness/duplicate_key (0.00s)
+    --- PASS: TestDecodeCaptureStrictness/trailing_value (0.02s)
+    --- PASS: TestDecodeCaptureStrictness/unknown_field (0.03s)
+    --- PASS: TestDecodeCaptureStrictness/noncanonical_query (0.06s)
+    --- PASS: TestDecodeCaptureStrictness/ordinal_gap (0.06s)
+    --- PASS: TestDecodeCaptureStrictness/escaped_destination_identifier (0.06s)
+    --- PASS: TestDecodeCaptureStrictness/stale_hash (0.06s)
+    --- PASS: TestDecodeCaptureStrictness/destination_identifier (0.07s)
+=== RUN   TestManifestSchemasValidateEvidenceAndExport/capture_schema
+=== PAUSE TestManifestSchemasValidateEvidenceAndExport/capture_schema
+=== RUN   TestManifestSchemasValidateEvidenceAndExport/manifest_schema
+=== PAUSE TestManifestSchemasValidateEvidenceAndExport/manifest_schema
+=== CONT  TestManifestSchemasValidateEvidenceAndExport/capture_schema
+=== CONT  TestManifestSchemasValidateEvidenceAndExport/manifest_schema
+--- PASS: TestExportManifestFailsClosed (0.00s)
+    --- PASS: TestExportManifestFailsClosed/missing_required_target (0.00s)
+    --- PASS: TestExportManifestFailsClosed/duplicate_required_target (0.03s)
+    --- PASS: TestExportManifestFailsClosed/unknown_advertised_column (0.09s)
+    --- PASS: TestExportManifestFailsClosed/runtime_version_does_not_match_evidence_path (0.09s)
+    --- PASS: TestExportManifestFailsClosed/target_ordinal_disagreement (0.10s)
+    --- PASS: TestExportManifestFailsClosed/target_type_disagreement (0.10s)
+    --- PASS: TestExportManifestFailsClosed/target_presence_disagreement (0.10s)
+--- PASS: TestManifestSchemasValidateEvidenceAndExport (0.10s)
+    --- PASS: TestManifestSchemasValidateEvidenceAndExport/capture_schema (0.03s)
+    --- PASS: TestManifestSchemasValidateEvidenceAndExport/manifest_schema (0.11s)
+--- PASS: TestExportManifest (0.31s)
+PASS
+ok  	github.com/apstndb/spanalyzer/survey/spannersys	6.689s
+-test.shuffle 1794076910403973000
+=== RUN   TestParseSchemaType_TypeAssertion
+--- PASS: TestParseSchemaType_TypeAssertion (0.00s)
+=== RUN   TestParseFunctionType
+=== RUN   TestParseFunctionType/INTERVAL
+=== RUN   TestParseFunctionType/STRING
+=== RUN   TestParseFunctionType/BYTES
+=== RUN   TestParseFunctionType/STRUCT<value_INT64>
+=== RUN   TestParseFunctionType/ARRAY<STRUCT<value_INT64>>
+=== RUN   TestParseFunctionType/PROTO<examples.Message>
+--- PASS: TestParseFunctionType (0.00s)
+    --- PASS: TestParseFunctionType/INTERVAL (0.00s)
+    --- PASS: TestParseFunctionType/STRING (0.00s)
+    --- PASS: TestParseFunctionType/BYTES (0.00s)
+    --- PASS: TestParseFunctionType/STRUCT<value_INT64> (0.00s)
+    --- PASS: TestParseFunctionType/ARRAY<STRUCT<value_INT64>> (0.00s)
+    --- PASS: TestParseFunctionType/PROTO<examples.Message> (0.00s)
+=== RUN   TestParseSchemaType_Roundtrip
+=== RUN   TestParseSchemaType_Roundtrip/BOOL
+=== RUN   TestParseSchemaType_Roundtrip/INT64
+=== RUN   TestParseSchemaType_Roundtrip/FLOAT64
+=== RUN   TestParseSchemaType_Roundtrip/STRING(MAX)
+=== RUN   TestParseSchemaType_Roundtrip/STRING(255)
+=== RUN   TestParseSchemaType_Roundtrip/BYTES(MAX)
+=== RUN   TestParseSchemaType_Roundtrip/DATE
+=== RUN   TestParseSchemaType_Roundtrip/TIMESTAMP
+=== RUN   TestParseSchemaType_Roundtrip/JSON
+=== RUN   TestParseSchemaType_Roundtrip/NUMERIC
+=== RUN   TestParseSchemaType_Roundtrip/ARRAY<INT64>
+=== RUN   TestParseSchemaType_Roundtrip/ARRAY<STRING(MAX)>
+--- PASS: TestParseSchemaType_Roundtrip (0.00s)
+    --- PASS: TestParseSchemaType_Roundtrip/BOOL (0.00s)
+    --- PASS: TestParseSchemaType_Roundtrip/INT64 (0.00s)
+    --- PASS: TestParseSchemaType_Roundtrip/FLOAT64 (0.00s)
+    --- PASS: TestParseSchemaType_Roundtrip/STRING(MAX) (0.00s)
+    --- PASS: TestParseSchemaType_Roundtrip/STRING(255) (0.00s)
+    --- PASS: TestParseSchemaType_Roundtrip/BYTES(MAX) (0.00s)
+    --- PASS: TestParseSchemaType_Roundtrip/DATE (0.00s)
+    --- PASS: TestParseSchemaType_Roundtrip/TIMESTAMP (0.00s)
+    --- PASS: TestParseSchemaType_Roundtrip/JSON (0.00s)
+    --- PASS: TestParseSchemaType_Roundtrip/NUMERIC (0.00s)
+    --- PASS: TestParseSchemaType_Roundtrip/ARRAY<INT64> (0.00s)
+    --- PASS: TestParseSchemaType_Roundtrip/ARRAY<STRING(MAX)> (0.00s)
+=== RUN   TestParseSchemaType_Error
+--- PASS: TestParseSchemaType_Error (0.00s)
+=== RUN   TestParseSchemaType
+=== RUN   TestParseSchemaType/BOOL
+=== RUN   TestParseSchemaType/INT64
+=== RUN   TestParseSchemaType/FLOAT32
+=== RUN   TestParseSchemaType/FLOAT64
+=== RUN   TestParseSchemaType/NUMERIC
+=== RUN   TestParseSchemaType/STRING(MAX)
+=== RUN   TestParseSchemaType/STRING(100)
+=== RUN   TestParseSchemaType/BYTES(MAX)
+=== RUN   TestParseSchemaType/BYTES(256)
+=== RUN   TestParseSchemaType/DATE
+=== RUN   TestParseSchemaType/TIMESTAMP
+=== RUN   TestParseSchemaType/JSON
+=== RUN   TestParseSchemaType/ARRAY<INT64>
+=== RUN   TestParseSchemaType/ARRAY<STRING(MAX)>
+=== RUN   TestParseSchemaType/ARRAY<FLOAT64>
+=== RUN   TestParseSchemaType/PROTO<examples.shipping.Order>
+=== RUN   TestParseSchemaType/ENUM<examples.shipping.Order.Status>
+=== RUN   TestParseSchemaType/ARRAY<PROTO<examples.shipping.Order>>
+=== RUN   TestParseSchemaType/ARRAY<ENUM<examples.shipping.Order.Status>>
+--- PASS: TestParseSchemaType (0.00s)
+    --- PASS: TestParseSchemaType/BOOL (0.00s)
+    --- PASS: TestParseSchemaType/INT64 (0.00s)
+    --- PASS: TestParseSchemaType/FLOAT32 (0.00s)
+    --- PASS: TestParseSchemaType/FLOAT64 (0.00s)
+    --- PASS: TestParseSchemaType/NUMERIC (0.00s)
+    --- PASS: TestParseSchemaType/STRING(MAX) (0.00s)
+    --- PASS: TestParseSchemaType/STRING(100) (0.00s)
+    --- PASS: TestParseSchemaType/BYTES(MAX) (0.00s)
+    --- PASS: TestParseSchemaType/BYTES(256) (0.00s)
+    --- PASS: TestParseSchemaType/DATE (0.00s)
+    --- PASS: TestParseSchemaType/TIMESTAMP (0.00s)
+    --- PASS: TestParseSchemaType/JSON (0.00s)
+    --- PASS: TestParseSchemaType/ARRAY<INT64> (0.00s)
+    --- PASS: TestParseSchemaType/ARRAY<STRING(MAX)> (0.00s)
+    --- PASS: TestParseSchemaType/ARRAY<FLOAT64> (0.00s)
+    --- PASS: TestParseSchemaType/PROTO<examples.shipping.Order> (0.00s)
+    --- PASS: TestParseSchemaType/ENUM<examples.shipping.Order.Status> (0.00s)
+    --- PASS: TestParseSchemaType/ARRAY<PROTO<examples.shipping.Order>> (0.00s)
+    --- PASS: TestParseSchemaType/ARRAY<ENUM<examples.shipping.Order.Status>> (0.00s)
+PASS
+ok  	github.com/apstndb/spanalyzer/survey/spannertype	5.029s

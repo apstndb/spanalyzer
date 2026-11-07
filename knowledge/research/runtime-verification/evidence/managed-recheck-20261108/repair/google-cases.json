@@ -1,0 +1,479 @@
+{
+  "dialect": "google",
+  "steps": [
+    {
+      "label": "fixture-connectivity",
+      "kind": "query",
+      "sql": "SELECT 1 AS connectivity",
+      "family": "extension"
+    },
+    {
+      "label": "score-fixture",
+      "family": "score",
+      "kind": "ddl",
+      "sql": "CREATE TABLE ScoreDocs (Id INT64 NOT NULL, Body STRING(MAX), BodyTokens TOKENLIST AS (TOKENIZE_FULLTEXT(Body)) HIDDEN) PRIMARY KEY(Id)"
+    },
+    {
+      "label": "score-search-index",
+      "family": "score",
+      "kind": "ddl",
+      "sql": "CREATE SEARCH INDEX ScoreIndex ON ScoreDocs(BodyTokens)",
+      "requires": [
+        "score-fixture"
+      ]
+    },
+    {
+      "label": "score-insert",
+      "family": "score",
+      "kind": "dml",
+      "sql": "",
+      "statements": [
+        "INSERT INTO ScoreDocs(Id,Body) VALUES (1,'cat cat dog'),(2,'cat dog'),(3,'dog')"
+      ],
+      "requires": [
+        "score-fixture"
+      ]
+    },
+    {
+      "label": "score-pagination-insert",
+      "kind": "dml",
+      "sql": "",
+      "family": "mirror-20261108",
+      "statements": [
+        "INSERT INTO ScoreDocs(Id,Body) VALUES (4,'cat cat cat banana'),(5,'cat banana'),(6,'cat dog dog dog'),(7,'cat')"
+      ],
+      "requires": [
+        "score-insert"
+      ]
+    },
+    {
+      "label": "pagination-v1-full",
+      "kind": "query",
+      "sql": "SELECT Id, SCORE(BodyTokens,@p, options=>JSON_OBJECT('version', @score_version)) AS score FROM ScoreDocs WHERE SEARCH(BodyTokens,@p) ORDER BY score DESC,Id",
+      "family": "ranked-pagination",
+      "params": {
+        "p": "cat",
+        "page_size": 2,
+        "offset": 0,
+        "score_version": 1
+      },
+      "param_types": {
+        "page_size": "INT64",
+        "offset": "INT64",
+        "score_version": "INT64"
+      },
+      "requires": [
+        "score-pagination-insert",
+        "score-search-index"
+      ]
+    },
+    {
+      "label": "pagination-v1-offset-0",
+      "kind": "query",
+      "sql": "SELECT Id, SCORE(BodyTokens,@p, options=>JSON_OBJECT('version', @score_version)) AS score FROM ScoreDocs WHERE SEARCH(BodyTokens,@p) ORDER BY score DESC,Id LIMIT @page_size OFFSET @offset",
+      "family": "ranked-pagination",
+      "params": {
+        "p": "cat",
+        "page_size": 2,
+        "offset": 0,
+        "score_version": 1
+      },
+      "param_types": {
+        "page_size": "INT64",
+        "offset": "INT64",
+        "score_version": "INT64"
+      },
+      "requires": [
+        "score-pagination-insert",
+        "score-search-index"
+      ]
+    },
+    {
+      "label": "pagination-v1-offset-2",
+      "kind": "query",
+      "sql": "SELECT Id, SCORE(BodyTokens,@p, options=>JSON_OBJECT('version', @score_version)) AS score FROM ScoreDocs WHERE SEARCH(BodyTokens,@p) ORDER BY score DESC,Id LIMIT @page_size OFFSET @offset",
+      "family": "ranked-pagination",
+      "params": {
+        "p": "cat",
+        "page_size": 2,
+        "offset": 2,
+        "score_version": 1
+      },
+      "param_types": {
+        "page_size": "INT64",
+        "offset": "INT64",
+        "score_version": "INT64"
+      },
+      "requires": [
+        "score-pagination-insert",
+        "score-search-index"
+      ]
+    },
+    {
+      "label": "pagination-v1-offset-4",
+      "kind": "query",
+      "sql": "SELECT Id, SCORE(BodyTokens,@p, options=>JSON_OBJECT('version', @score_version)) AS score FROM ScoreDocs WHERE SEARCH(BodyTokens,@p) ORDER BY score DESC,Id LIMIT @page_size OFFSET @offset",
+      "family": "ranked-pagination",
+      "params": {
+        "p": "cat",
+        "page_size": 2,
+        "offset": 4,
+        "score_version": 1
+      },
+      "param_types": {
+        "page_size": "INT64",
+        "offset": "INT64",
+        "score_version": "INT64"
+      },
+      "requires": [
+        "score-pagination-insert",
+        "score-search-index"
+      ]
+    },
+    {
+      "label": "pagination-v2-full",
+      "kind": "query",
+      "sql": "SELECT Id, SCORE(BodyTokens,@p, options=>JSON_OBJECT('version', @score_version)) AS score FROM ScoreDocs WHERE SEARCH(BodyTokens,@p) ORDER BY score DESC,Id",
+      "family": "ranked-pagination",
+      "params": {
+        "p": "cat",
+        "page_size": 2,
+        "offset": 0,
+        "score_version": 2
+      },
+      "param_types": {
+        "page_size": "INT64",
+        "offset": "INT64",
+        "score_version": "INT64"
+      },
+      "requires": [
+        "score-pagination-insert",
+        "score-search-index"
+      ]
+    },
+    {
+      "label": "pagination-v2-offset-0",
+      "kind": "query",
+      "sql": "SELECT Id, SCORE(BodyTokens,@p, options=>JSON_OBJECT('version', @score_version)) AS score FROM ScoreDocs WHERE SEARCH(BodyTokens,@p) ORDER BY score DESC,Id LIMIT @page_size OFFSET @offset",
+      "family": "ranked-pagination",
+      "params": {
+        "p": "cat",
+        "page_size": 2,
+        "offset": 0,
+        "score_version": 2
+      },
+      "param_types": {
+        "page_size": "INT64",
+        "offset": "INT64",
+        "score_version": "INT64"
+      },
+      "requires": [
+        "score-pagination-insert",
+        "score-search-index"
+      ]
+    },
+    {
+      "label": "pagination-v2-offset-2",
+      "kind": "query",
+      "sql": "SELECT Id, SCORE(BodyTokens,@p, options=>JSON_OBJECT('version', @score_version)) AS score FROM ScoreDocs WHERE SEARCH(BodyTokens,@p) ORDER BY score DESC,Id LIMIT @page_size OFFSET @offset",
+      "family": "ranked-pagination",
+      "params": {
+        "p": "cat",
+        "page_size": 2,
+        "offset": 2,
+        "score_version": 2
+      },
+      "param_types": {
+        "page_size": "INT64",
+        "offset": "INT64",
+        "score_version": "INT64"
+      },
+      "requires": [
+        "score-pagination-insert",
+        "score-search-index"
+      ]
+    },
+    {
+      "label": "pagination-v2-offset-4",
+      "kind": "query",
+      "sql": "SELECT Id, SCORE(BodyTokens,@p, options=>JSON_OBJECT('version', @score_version)) AS score FROM ScoreDocs WHERE SEARCH(BodyTokens,@p) ORDER BY score DESC,Id LIMIT @page_size OFFSET @offset",
+      "family": "ranked-pagination",
+      "params": {
+        "p": "cat",
+        "page_size": 2,
+        "offset": 4,
+        "score_version": 2
+      },
+      "param_types": {
+        "page_size": "INT64",
+        "offset": "INT64",
+        "score_version": "INT64"
+      },
+      "requires": [
+        "score-pagination-insert",
+        "score-search-index"
+      ]
+    },
+    {
+      "label": "pagination-set-db-1",
+      "kind": "ddl",
+      "sql": "ALTER DATABASE {{DATABASE}} SET OPTIONS(score_version=1)",
+      "family": "ranked-pagination"
+    },
+    {
+      "label": "pagination-db-1-default",
+      "kind": "query",
+      "sql": "SELECT Id, SCORE(BodyTokens,@p) AS score FROM ScoreDocs WHERE SEARCH(BodyTokens,@p) ORDER BY score DESC,Id",
+      "family": "ranked-pagination",
+      "params": {
+        "p": "cat",
+        "page_size": 2,
+        "offset": 0
+      },
+      "param_types": {
+        "page_size": "INT64",
+        "offset": "INT64"
+      },
+      "requires": [
+        "score-pagination-insert",
+        "score-search-index",
+        "pagination-set-db-1"
+      ]
+    },
+    {
+      "label": "pagination-db-1-pinned-v1",
+      "kind": "query",
+      "sql": "SELECT Id, SCORE(BodyTokens,@p, options=>JSON_OBJECT('version', @score_version)) AS score FROM ScoreDocs WHERE SEARCH(BodyTokens,@p) ORDER BY score DESC,Id",
+      "family": "ranked-pagination",
+      "params": {
+        "p": "cat",
+        "page_size": 2,
+        "offset": 0,
+        "score_version": 1
+      },
+      "param_types": {
+        "page_size": "INT64",
+        "offset": "INT64",
+        "score_version": "INT64"
+      },
+      "requires": [
+        "score-pagination-insert",
+        "score-search-index",
+        "pagination-set-db-1"
+      ]
+    },
+    {
+      "label": "pagination-db-1-pinned-v2",
+      "kind": "query",
+      "sql": "SELECT Id, SCORE(BodyTokens,@p, options=>JSON_OBJECT('version', @score_version)) AS score FROM ScoreDocs WHERE SEARCH(BodyTokens,@p) ORDER BY score DESC,Id",
+      "family": "ranked-pagination",
+      "params": {
+        "p": "cat",
+        "page_size": 2,
+        "offset": 0,
+        "score_version": 2
+      },
+      "param_types": {
+        "page_size": "INT64",
+        "offset": "INT64",
+        "score_version": "INT64"
+      },
+      "requires": [
+        "score-pagination-insert",
+        "score-search-index",
+        "pagination-set-db-1"
+      ]
+    },
+    {
+      "label": "pagination-set-db-2",
+      "kind": "ddl",
+      "sql": "ALTER DATABASE {{DATABASE}} SET OPTIONS(score_version=2)",
+      "family": "ranked-pagination"
+    },
+    {
+      "label": "pagination-db-2-default",
+      "kind": "query",
+      "sql": "SELECT Id, SCORE(BodyTokens,@p) AS score FROM ScoreDocs WHERE SEARCH(BodyTokens,@p) ORDER BY score DESC,Id",
+      "family": "ranked-pagination",
+      "params": {
+        "p": "cat",
+        "page_size": 2,
+        "offset": 0
+      },
+      "param_types": {
+        "page_size": "INT64",
+        "offset": "INT64"
+      },
+      "requires": [
+        "score-pagination-insert",
+        "score-search-index",
+        "pagination-set-db-2"
+      ]
+    },
+    {
+      "label": "pagination-db-2-pinned-v1",
+      "kind": "query",
+      "sql": "SELECT Id, SCORE(BodyTokens,@p, options=>JSON_OBJECT('version', @score_version)) AS score FROM ScoreDocs WHERE SEARCH(BodyTokens,@p) ORDER BY score DESC,Id",
+      "family": "ranked-pagination",
+      "params": {
+        "p": "cat",
+        "page_size": 2,
+        "offset": 0,
+        "score_version": 1
+      },
+      "param_types": {
+        "page_size": "INT64",
+        "offset": "INT64",
+        "score_version": "INT64"
+      },
+      "requires": [
+        "score-pagination-insert",
+        "score-search-index",
+        "pagination-set-db-2"
+      ]
+    },
+    {
+      "label": "pagination-db-2-pinned-v2",
+      "kind": "query",
+      "sql": "SELECT Id, SCORE(BodyTokens,@p, options=>JSON_OBJECT('version', @score_version)) AS score FROM ScoreDocs WHERE SEARCH(BodyTokens,@p) ORDER BY score DESC,Id",
+      "family": "ranked-pagination",
+      "params": {
+        "p": "cat",
+        "page_size": 2,
+        "offset": 0,
+        "score_version": 2
+      },
+      "param_types": {
+        "page_size": "INT64",
+        "offset": "INT64",
+        "score_version": "INT64"
+      },
+      "requires": [
+        "score-pagination-insert",
+        "score-search-index",
+        "pagination-set-db-2"
+      ]
+    },
+    {
+      "label": "batch-omitted-create",
+      "kind": "ddl",
+      "sql": "CREATE QUEUE BatchOmitted(Id STRING(36) NOT NULL, Payload BYTES(MAX) NOT NULL) PRIMARY KEY(Id)",
+      "family": "queue-batches"
+    },
+    {
+      "label": "batch-omitted-insert",
+      "kind": "dml",
+      "sql": "",
+      "family": "queue-batches",
+      "statements": [
+        "INSERT INTO BatchOmitted(Id,Payload,DeliverTime) VALUES ('000',b'x',CURRENT_TIMESTAMP()),('001',b'x',CURRENT_TIMESTAMP()),('002',b'x',CURRENT_TIMESTAMP()),('003',b'x',CURRENT_TIMESTAMP()),('004',b'x',CURRENT_TIMESTAMP()),('005',b'x',CURRENT_TIMESTAMP()),('006',b'x',CURRENT_TIMESTAMP()),('007',b'x',CURRENT_TIMESTAMP()),('008',b'x',CURRENT_TIMESTAMP()),('009',b'x',CURRENT_TIMESTAMP()),('010',b'x',CURRENT_TIMESTAMP()),('011',b'x',CURRENT_TIMESTAMP()),('012',b'x',CURRENT_TIMESTAMP()),('013',b'x',CURRENT_TIMESTAMP()),('014',b'x',CURRENT_TIMESTAMP()),('015',b'x',CURRENT_TIMESTAMP()),('016',b'x',CURRENT_TIMESTAMP()),('017',b'x',CURRENT_TIMESTAMP()),('018',b'x',CURRENT_TIMESTAMP()),('019',b'x',CURRENT_TIMESTAMP()),('020',b'x',CURRENT_TIMESTAMP()),('021',b'x',CURRENT_TIMESTAMP()),('022',b'x',CURRENT_TIMESTAMP()),('023',b'x',CURRENT_TIMESTAMP()),('024',b'x',CURRENT_TIMESTAMP()),('025',b'x',CURRENT_TIMESTAMP()),('026',b'x',CURRENT_TIMESTAMP()),('027',b'x',CURRENT_TIMESTAMP()),('028',b'x',CURRENT_TIMESTAMP()),('029',b'x',CURRENT_TIMESTAMP()),('030',b'x',CURRENT_TIMESTAMP()),('031',b'x',CURRENT_TIMESTAMP()),('032',b'x',CURRENT_TIMESTAMP()),('033',b'x',CURRENT_TIMESTAMP()),('034',b'x',CURRENT_TIMESTAMP()),('035',b'x',CURRENT_TIMESTAMP()),('036',b'x',CURRENT_TIMESTAMP()),('037',b'x',CURRENT_TIMESTAMP()),('038',b'x',CURRENT_TIMESTAMP()),('039',b'x',CURRENT_TIMESTAMP())"
+      ],
+      "requires": [
+        "batch-omitted-create"
+      ]
+    },
+    {
+      "label": "batch-omitted-receive",
+      "kind": "query",
+      "sql": "SELECT Id,SpannerLastBatchMessage AS batch_end FROM RECEIVE_BatchOmitted(max_duration=>'5s')",
+      "family": "queue-batches",
+      "timeout_seconds": 20,
+      "requires": [
+        "batch-omitted-insert"
+      ]
+    },
+    {
+      "label": "batch-null-create",
+      "kind": "ddl",
+      "sql": "CREATE QUEUE BatchNull(Id STRING(36) NOT NULL, Payload BYTES(MAX) NOT NULL) PRIMARY KEY(Id)",
+      "family": "queue-batches"
+    },
+    {
+      "label": "batch-null-insert",
+      "kind": "dml",
+      "sql": "",
+      "family": "queue-batches",
+      "statements": [
+        "INSERT INTO BatchNull(Id,Payload,DeliverTime) VALUES ('000',b'x',CURRENT_TIMESTAMP()),('001',b'x',CURRENT_TIMESTAMP()),('002',b'x',CURRENT_TIMESTAMP()),('003',b'x',CURRENT_TIMESTAMP()),('004',b'x',CURRENT_TIMESTAMP()),('005',b'x',CURRENT_TIMESTAMP()),('006',b'x',CURRENT_TIMESTAMP()),('007',b'x',CURRENT_TIMESTAMP()),('008',b'x',CURRENT_TIMESTAMP()),('009',b'x',CURRENT_TIMESTAMP()),('010',b'x',CURRENT_TIMESTAMP()),('011',b'x',CURRENT_TIMESTAMP()),('012',b'x',CURRENT_TIMESTAMP()),('013',b'x',CURRENT_TIMESTAMP()),('014',b'x',CURRENT_TIMESTAMP()),('015',b'x',CURRENT_TIMESTAMP()),('016',b'x',CURRENT_TIMESTAMP()),('017',b'x',CURRENT_TIMESTAMP()),('018',b'x',CURRENT_TIMESTAMP()),('019',b'x',CURRENT_TIMESTAMP()),('020',b'x',CURRENT_TIMESTAMP()),('021',b'x',CURRENT_TIMESTAMP()),('022',b'x',CURRENT_TIMESTAMP()),('023',b'x',CURRENT_TIMESTAMP()),('024',b'x',CURRENT_TIMESTAMP()),('025',b'x',CURRENT_TIMESTAMP()),('026',b'x',CURRENT_TIMESTAMP()),('027',b'x',CURRENT_TIMESTAMP()),('028',b'x',CURRENT_TIMESTAMP()),('029',b'x',CURRENT_TIMESTAMP()),('030',b'x',CURRENT_TIMESTAMP()),('031',b'x',CURRENT_TIMESTAMP()),('032',b'x',CURRENT_TIMESTAMP()),('033',b'x',CURRENT_TIMESTAMP()),('034',b'x',CURRENT_TIMESTAMP()),('035',b'x',CURRENT_TIMESTAMP()),('036',b'x',CURRENT_TIMESTAMP()),('037',b'x',CURRENT_TIMESTAMP()),('038',b'x',CURRENT_TIMESTAMP()),('039',b'x',CURRENT_TIMESTAMP())"
+      ],
+      "requires": [
+        "batch-null-create"
+      ]
+    },
+    {
+      "label": "batch-null-receive",
+      "kind": "query",
+      "sql": "SELECT Id,SpannerLastBatchMessage AS batch_end FROM RECEIVE_BatchNull(max_duration=>'5s',max_batch_size=>NULL)",
+      "family": "queue-batches",
+      "timeout_seconds": 20,
+      "requires": [
+        "batch-null-insert"
+      ]
+    },
+    {
+      "label": "batch-twenty-create",
+      "kind": "ddl",
+      "sql": "CREATE QUEUE BatchTwenty(Id STRING(36) NOT NULL, Payload BYTES(MAX) NOT NULL) PRIMARY KEY(Id)",
+      "family": "queue-batches"
+    },
+    {
+      "label": "batch-twenty-insert",
+      "kind": "dml",
+      "sql": "",
+      "family": "queue-batches",
+      "statements": [
+        "INSERT INTO BatchTwenty(Id,Payload,DeliverTime) VALUES ('000',b'x',CURRENT_TIMESTAMP()),('001',b'x',CURRENT_TIMESTAMP()),('002',b'x',CURRENT_TIMESTAMP()),('003',b'x',CURRENT_TIMESTAMP()),('004',b'x',CURRENT_TIMESTAMP()),('005',b'x',CURRENT_TIMESTAMP()),('006',b'x',CURRENT_TIMESTAMP()),('007',b'x',CURRENT_TIMESTAMP()),('008',b'x',CURRENT_TIMESTAMP()),('009',b'x',CURRENT_TIMESTAMP()),('010',b'x',CURRENT_TIMESTAMP()),('011',b'x',CURRENT_TIMESTAMP()),('012',b'x',CURRENT_TIMESTAMP()),('013',b'x',CURRENT_TIMESTAMP()),('014',b'x',CURRENT_TIMESTAMP()),('015',b'x',CURRENT_TIMESTAMP()),('016',b'x',CURRENT_TIMESTAMP()),('017',b'x',CURRENT_TIMESTAMP()),('018',b'x',CURRENT_TIMESTAMP()),('019',b'x',CURRENT_TIMESTAMP()),('020',b'x',CURRENT_TIMESTAMP()),('021',b'x',CURRENT_TIMESTAMP()),('022',b'x',CURRENT_TIMESTAMP()),('023',b'x',CURRENT_TIMESTAMP()),('024',b'x',CURRENT_TIMESTAMP()),('025',b'x',CURRENT_TIMESTAMP()),('026',b'x',CURRENT_TIMESTAMP()),('027',b'x',CURRENT_TIMESTAMP()),('028',b'x',CURRENT_TIMESTAMP()),('029',b'x',CURRENT_TIMESTAMP()),('030',b'x',CURRENT_TIMESTAMP()),('031',b'x',CURRENT_TIMESTAMP()),('032',b'x',CURRENT_TIMESTAMP()),('033',b'x',CURRENT_TIMESTAMP()),('034',b'x',CURRENT_TIMESTAMP()),('035',b'x',CURRENT_TIMESTAMP()),('036',b'x',CURRENT_TIMESTAMP()),('037',b'x',CURRENT_TIMESTAMP()),('038',b'x',CURRENT_TIMESTAMP()),('039',b'x',CURRENT_TIMESTAMP())"
+      ],
+      "requires": [
+        "batch-twenty-create"
+      ]
+    },
+    {
+      "label": "batch-twenty-receive",
+      "kind": "query",
+      "sql": "SELECT Id,SpannerLastBatchMessage AS batch_end FROM RECEIVE_BatchTwenty(max_duration=>'5s',max_batch_size=>20)",
+      "family": "queue-batches",
+      "timeout_seconds": 20,
+      "requires": [
+        "batch-twenty-insert"
+      ]
+    },
+    {
+      "label": "seq-control",
+      "family": "sequence-rw-control",
+      "kind": "ddl",
+      "sql": "CREATE SEQUENCE SeqControl OPTIONS(sequence_kind='bit_reversed_positive')",
+      "requires": []
+    },
+    {
+      "label": "seq-table",
+      "family": "sequence-rw-control",
+      "kind": "ddl",
+      "sql": "CREATE TABLE SeqRows(Id INT64 NOT NULL DEFAULT(GET_NEXT_SEQUENCE_VALUE(SEQUENCE SeqControl)),Label STRING(MAX)) PRIMARY KEY(Id)",
+      "requires": [
+        "seq-control"
+      ]
+    },
+    {
+      "label": "seq-insert",
+      "family": "sequence-rw-control",
+      "kind": "dml",
+      "sql": "",
+      "requires": [
+        "seq-table"
+      ],
+      "statements": [
+        "INSERT INTO SeqRows(Label) VALUES('rw-control')"
+      ]
+    },
+    {
+      "label": "seq-read",
+      "family": "sequence-rw-control",
+      "kind": "query",
+      "sql": "SELECT Id,Label FROM SeqRows",
+      "requires": [
+        "seq-insert"
+      ]
+    }
+  ]
+}

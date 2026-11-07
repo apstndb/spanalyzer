@@ -1,0 +1,816 @@
+diff --git a/cmd/spanner-query-gen/config_schema.go b/cmd/spanner-query-gen/config_schema.go
+index 272ddbb..4965a36 100644
+--- a/cmd/spanner-query-gen/config_schema.go
++++ b/cmd/spanner-query-gen/config_schema.go
+@@ -261,7 +261,8 @@ func planReportJSONSchema() map[string]interface{} {
+ 				"render_tool": enumSchema([]interface{}{"spannerplan"}, "Human-readable plan renderer."),
+ 			}),
+ 			"backend_identity": planReportBackendIdentityJSONSchema(),
+-			"normalization": objectSchema([]interface{}{"operator_tree_version", "operator_family_mapping_version", "cel_input_defaults"}, map[string]interface{}{
++			"normalization": objectSchema([]interface{}{"operator_tree_version", "operator_family_mapping_version", "access_paths_version", "cel_input_defaults"}, map[string]interface{}{
++				"access_paths_version":            stringSchema("Access-path normalization compatibility revision."),
+ 				"operator_tree_version":           stringSchema("Normalized operator tree digest input version."),
+ 				"operator_family_mapping_version": stringSchema("Operator family mapping version."),
+ 				"cel_input_defaults":              map[string]interface{}{"$ref": "#/$defs/cel_input_defaults"},
+@@ -288,10 +289,13 @@ func planReportJSONSchema() map[string]interface{} {
+ 				"scope":   planReportScopeSchema("Plan-report target scope."),
+ 				"reason":  patternStringSchema(`^[a-z][a-z0-9_]*(\.[a-z0-9_]+)+$`, "Machine-readable namespaced exclusion reason."),
+ 			}),
+-			"query": planReportQueryJSONSchema(),
++			"query":       planReportQueryJSONSchema(),
++			"access_path": planAccessPathJSONSchema(),
++			"variant":     planReportVariantJSONSchema(),
+ 			"operator": objectSchema([]interface{}{"index", "display_name", "family", "child_indexes", "descendant_indexes", "subtree_family_counts"}, map[string]interface{}{
+ 				"index":                 nonNegativeIntegerSchema("PlanNode index."),
+ 				"display_name":          stringSchema("PlanNode display name."),
++				"expression":            stringSchema("Verbatim backend short representation."),
+ 				"family":                map[string]interface{}{"$ref": "#/$defs/concrete_operator_family"},
+ 				"execution_method":      stringSchema("Normalized execution_method metadata."),
+ 				"iterator_type":         stringSchema("Normalized iterator_type metadata."),
+@@ -318,6 +322,7 @@ func planReportJSONSchema() map[string]interface{} {
+ 				"child_index":  nonNegativeIntegerSchema("Child PlanNode index."),
+ 				"type":         stringSchema("PlanNode child-link type."),
+ 				"variable":     stringSchema("PlanNode child-link variable."),
++				"expression":   stringSchema("Verbatim child short representation."),
+ 			}),
+ 			"optimizer": objectSchema([]interface{}{"requested", "effective"}, map[string]interface{}{
+ 				"requested": objectSchema([]interface{}{"version", "statistics_package"}, map[string]interface{}{
+@@ -416,7 +421,7 @@ func planReportQueryJSONSchema() map[string]interface{} {
+ 		"name":                    identifierSchema("Configured query name."),
+ 		"catalog":                 stringSchema("Spanner catalog used for analysis."),
+ 		"scope":                   planReportScopeSchema("Plan-report target scope."),
+-		"kind":                    enumSchema([]interface{}{"sql", "table", "index", "external_query"}, "Configured query kind."),
++		"kind":                    enumSchema([]interface{}{"sql", "table", "index", "external_query", "write"}, "Configured query kind."),
+ 		"status":                  enumSchema([]interface{}{"ok", "skipped", "error"}, "Per-query analysis status. Status ok means plan fields are valid. Status error or skipped means only the input identity fields and error field are reliable; plan normalization fields must not be interpreted as a successful plan."),
+ 		"sql":                     stringSchema("Analyzed SQL text."),
+ 		"sql_sha256":              sha256Schema("SHA-256 of analyzed SQL bytes."),
+@@ -427,6 +432,8 @@ func planReportQueryJSONSchema() map[string]interface{} {
+ 		"operator_family_counts":  completeOperatorFamilyIntegerMapSchema("Normalized operator family counts observed in the query plan. Contains every operator_family enum value, including derived umbrella families; absent families are represented by 0."),
+ 		"normalized_operators":    arraySchemaAllowEmpty(map[string]interface{}{"$ref": "#/$defs/operator"}),
+ 		"operator_edges":          arraySchemaAllowEmpty(map[string]interface{}{"$ref": "#/$defs/operator_edge"}),
++		"access_paths":            arraySchemaAllowEmpty(map[string]interface{}{"$ref": "#/$defs/access_path"}),
++		"variant":                 map[string]interface{}{"$ref": "#/$defs/variant"},
+ 		"plan":                    stringSchema("Rendered human-readable query plan."),
+ 		"error":                   stringSchema("Target acquisition error or skip message."),
+ 		"optimizer_not_pinned":    boolSchema("Whether this query used unpinned optimizer settings."),
+@@ -434,7 +441,7 @@ func planReportQueryJSONSchema() map[string]interface{} {
+ 		"classification_warnings": arraySchemaAllowEmpty(map[string]interface{}{"$ref": "#/$defs/diagnostic"}),
+ 	})
+ 	schema["allOf"] = []interface{}{
+-		planReportQueryStatusRequiredClause("ok", []interface{}{"sql", "sql_sha256", "ddl_sha256", "operator_tree_sha256", "operator_families", "operator_family_counts", "normalized_operators", "operator_edges", "plan"}, nil),
++		planReportQueryStatusRequiredClause("ok", []interface{}{"sql", "sql_sha256", "ddl_sha256", "operator_tree_sha256", "operator_families", "operator_family_counts", "normalized_operators", "operator_edges", "access_paths", "plan"}, nil),
+ 		planReportQueryStatusRequiredClause("error", []interface{}{"error"}, planReportQuerySuccessOnlyFields()),
+ 		planReportQueryStatusRequiredClause("skipped", []interface{}{"error"}, planReportQuerySuccessOnlyFields()),
+ 	}
+@@ -464,6 +471,7 @@ func planReportQuerySuccessOnlyFields() []string {
+ 		"operator_family_counts",
+ 		"normalized_operators",
+ 		"operator_edges",
++		"access_paths",
+ 		"plan",
+ 		"classification_warnings",
+ 	}
+@@ -803,19 +811,15 @@ func v1AlphaConfigJSONSchema() map[string]interface{} {
+ 			}),
+ 			"query": querySchema(),
+ 			"query_param": objectSchema([]interface{}{"name", "type"}, map[string]interface{}{
+-				"name":  stringSchema("GoogleSQL parameter name without the leading @."),
+-				"type":  stringSchema("GoogleSQL parameter type used when analyzer inference needs explicit input."),
+-				"scope": enumSchema([]interface{}{"inner", "outer"}, "Optional external_query parameter scope. Omit for regular queries."),
++				"name":     stringSchema("GoogleSQL parameter name without the leading @."),
++				"type":     stringSchema("GoogleSQL parameter type used when analyzer inference needs explicit input."),
++				"scope":    enumSchema([]interface{}{"inner", "outer"}, "Optional external_query parameter scope. Omit for regular queries."),
++				"optional": enumSchema([]interface{}{"required", "null_is_null", "omit_when_null", "omit_when_empty", "orderby_choice"}, "Optional SQL rewrite mode."),
++				"choices":  map[string]interface{}{"type": "object", "additionalProperties": map[string]interface{}{"type": "string"}},
++				"default":  stringSchema("Default allowlisted ORDER BY choice."),
+ 			}),
+-			"query_result": objectSchema([]interface{}{"struct"}, map[string]interface{}{
+-				"cardinality": enumSchema([]interface{}{"one", "maybe_one", "many"}, "Row-returning query result cardinality. Defaults to many."),
+-				"struct":      stringSchema("Generated or shared result struct name."),
+-				"required": objectSchema(nil, map[string]interface{}{
+-					"policy": enumSchema([]interface{}{"override", "strict"}, "Requiredness override policy."),
+-					"fields": stringArraySchema("Result fields required by user override."),
+-				}),
+-			}),
+-			"write": writeSchema(),
++			"query_result": queryResultJSONSchema(),
++			"write":        writeSchema(),
+ 			"rules": objectSchema(nil, map[string]interface{}{
+ 				"suppressions": arraySchema(map[string]interface{}{"$ref": "#/$defs/rule_suppression"}),
+ 			}),
+@@ -1115,7 +1119,7 @@ func targetIDSchema(description string) map[string]interface{} {
+ }
+ 
+ func planReportScopeSchema(description string) map[string]interface{} {
+-	return enumSchema([]interface{}{"query", "external_query.inner"}, description)
++	return enumSchema([]interface{}{"query", "external_query.inner", "write"}, description)
+ }
+ 
+ func patternStringSchema(pattern, description string) map[string]interface{} {
+diff --git a/cmd/spanner-query-gen/main_test.go b/cmd/spanner-query-gen/main_test.go
+index 8ff2355..76315e2 100644
+--- a/cmd/spanner-query-gen/main_test.go
++++ b/cmd/spanner-query-gen/main_test.go
+@@ -210,7 +210,7 @@ func TestRunConfigSchemaKeepsExecAndConflictOutOfPublicV1Alpha(t *testing.T) {
+ 	queryResult := defs["query_result"].(map[string]interface{})
+ 	resultProperties := queryResult["properties"].(map[string]interface{})
+ 	cardinality := resultProperties["cardinality"].(map[string]interface{})
+-	if got, want := strings.Join(interfaceStrings(cardinality["enum"].([]interface{})), ","), "one,maybe_one,many"; got != want {
++	if got, want := strings.Join(interfaceStrings(cardinality["enum"].([]interface{})), ","), "one,maybe_one,many,row_count,row_set"; got != want {
+ 		t.Fatalf("query_result.cardinality enum = %q, want %q", got, want)
+ 	}
+ 	write := defs["write"].(map[string]interface{})
+@@ -1235,6 +1235,7 @@ func TestPlanReportSchemaErrorAndSkippedQueriesForbidPlanFields(t *testing.T) {
+ 		"operator_family_counts",
+ 		"normalized_operators",
+ 		"operator_edges",
++		"access_paths",
+ 		"plan",
+ 		"classification_warnings",
+ 	}
+@@ -1884,7 +1885,7 @@ func TestPlanReportOptimizerEnvironmentPinned(t *testing.T) {
+ 
+ func TestDefaultPlanReportNormalizationCELInputDefaults(t *testing.T) {
+ 	normalization := defaultPlanReportNormalization()
+-	if got, want := normalization.OperatorTreeVersion, "v1alpha.3"; got != want {
++	if got, want := normalization.OperatorTreeVersion, "v1alpha.4"; got != want {
+ 		t.Fatalf("operator tree version = %q, want %q", got, want)
+ 	}
+ 	if got, want := normalization.OperatorFamilyMappingVersion, "v1alpha.2"; got != want {
+@@ -4315,7 +4316,7 @@ contracts:
+ `), 0644); err != nil {
+ 		t.Fatalf("WriteFile() error = %v", err)
+ 	}
+-	if _, err := readPlanContracts(path); err == nil || !strings.Contains(err.Error(), "target \"LookupSingerByName\" must match ^query/") {
++	if _, err := readPlanContracts(path); err == nil || !strings.Contains(err.Error(), "target \"LookupSingerByName\" must match "+planContractTargetIDPattern) {
+ 		t.Fatalf("readPlanContracts() error = %v, want target pattern error", err)
+ 	}
+ }
+@@ -4748,7 +4749,7 @@ func TestBuildPlanReportNoTargets(t *testing.T) {
+ 	if got, want := report.BackendIdentity.Version, "not_recorded"; got != want {
+ 		t.Fatalf("plan-report backend version = %q, want %q", got, want)
+ 	}
+-	if got, want := report.Normalization.OperatorTreeVersion, "v1alpha.3"; got != want {
++	if got, want := report.Normalization.OperatorTreeVersion, "v1alpha.4"; got != want {
+ 		t.Fatalf("plan-report operator tree version = %q, want %q", got, want)
+ 	}
+ 	if got, want := report.Optimizer.Requested.Version, "8"; got != want {
+@@ -4985,12 +4986,10 @@ func TestPlanReportParamValuesOnlyOrderByChoiceReturnsNil(t *testing.T) {
+ 	}
+ }
+ 
+-func TestPlanReportParamValuesRejectUnsupportedType(t *testing.T) {
+-	_, err := planReportParamValues([]querygen.QueryCodegenParam{
+-		{Name: "payload", Type: "STRUCT<id INT64>"},
+-	})
+-	if err == nil || !strings.Contains(err.Error(), "unsupported plan-report parameter type STRUCT") {
+-		t.Fatalf("planReportParamValues() error = %v, want unsupported STRUCT error", err)
++func TestPlanReportParamValuesSupportStruct(t *testing.T) {
++	values, err := planReportParamValues([]querygen.QueryCodegenParam{{Name: "payload", Type: "STRUCT<id INT64>"}})
++	if err != nil || values["payload"] == nil {
++		t.Fatalf("STRUCT value = %v, %v", values, err)
+ 	}
+ }
+ 
+diff --git a/cmd/spanner-query-gen/plan_report.go b/cmd/spanner-query-gen/plan_report.go
+index 9632bdb..90f19c4 100644
+--- a/cmd/spanner-query-gen/plan_report.go
++++ b/cmd/spanner-query-gen/plan_report.go
+@@ -3,6 +3,7 @@ package main
+ import (
+ 	"context"
+ 	"crypto/sha256"
++	"encoding/base64"
+ 	"encoding/hex"
+ 	"encoding/json"
+ 	"errors"
+@@ -38,6 +39,7 @@ func runPlanReport(args []string, stdout, stderr io.Writer) error {
+ 	output := fs.String("output", "markdown", "report output format: markdown, yaml, or json")
+ 	backend := fs.String("backend", "omni", "runtime backend: omni")
+ 	renderFormat := fs.String("format", "current", "spannerplan tree format: current, traditional, or compact")
++	annotate := fs.String("annotate", "", "rendered-plan annotation: seekability")
+ 	wrapWidth := fs.Int("wrap-width", 0, "maximum rendered plan width; 0 disables wrapping")
+ 	stable := fs.Bool("stable", false, "omit volatile metadata from report output")
+ 	optimizerVersion := fs.String("optimizer-version", "", "Spanner optimizer version to pass to AnalyzeQuery")
+@@ -63,6 +65,9 @@ func runPlanReport(args []string, stdout, stderr io.Writer) error {
+ 	if *checkContracts && strings.TrimSpace(*contractsPath) == "" {
+ 		return fmt.Errorf("--check requires --contracts")
+ 	}
++	if strings.TrimSpace(*annotate) != "" && strings.TrimSpace(*annotate) != "seekability" {
++		return fmt.Errorf("unsupported --annotate %q; use seekability", *annotate)
++	}
+ 	format, err := reference.ParseFormat(*renderFormat)
+ 	if err != nil {
+ 		return err
+@@ -96,17 +101,15 @@ func runPlanReport(args []string, stdout, stderr io.Writer) error {
+ 		}
+ 	}
+ 
+-	plan, err := querygen.BuildQueryCodegenPlan(config, baseDir)
+-	if err != nil {
+-		return err
+-	}
++	plan := querygen.BuildQueryCodegenReportPlan(config, baseDir)
+ 	report, err := buildPlanReport(context.Background(), config, plan, baseDir, planReportOptions{
+-		Backend:    strings.ToLower(strings.TrimSpace(*backend)),
+-		Format:     format,
+-		RenderMode: reference.RenderModePlan,
+-		WrapWidth:  *wrapWidth,
+-		Stable:     *stable,
+-		Identity:   identity,
++		Backend:             strings.ToLower(strings.TrimSpace(*backend)),
++		Format:              format,
++		RenderMode:          reference.RenderModePlan,
++		WrapWidth:           *wrapWidth,
++		AnnotateSeekability: strings.TrimSpace(*annotate) == "seekability",
++		Stable:              *stable,
++		Identity:            identity,
+ 		Optimizer: planReportOptimizerEnvironment{
+ 			Version:           strings.TrimSpace(*optimizerVersion),
+ 			StatisticsPackage: strings.TrimSpace(*optimizerStatisticsPackage),
+@@ -149,13 +152,14 @@ func runPlanReport(args []string, stdout, stderr io.Writer) error {
+ }
+ 
+ type planReportOptions struct {
+-	Backend    string
+-	Format     reference.Format
+-	RenderMode reference.RenderMode
+-	WrapWidth  int
+-	Stable     bool
+-	Identity   planReportBackendIdentity
+-	Optimizer  planReportOptimizerEnvironment
++	AnnotateSeekability bool
++	Backend             string
++	Format              reference.Format
++	RenderMode          reference.RenderMode
++	WrapWidth           int
++	Stable              bool
++	Identity            planReportBackendIdentity
++	Optimizer           planReportOptimizerEnvironment
+ }
+ 
+ const (
+@@ -167,7 +171,7 @@ const (
+ 	planContractStatusNotEvaluated = plancontract.StatusNotEvaluated
+ 
+ 	planReportVersionV1Alpha      = "v1alpha-plan-report-v1"
+-	planReportOperatorTreeVersion = "v1alpha.3"
++	planReportOperatorTreeVersion = "v1alpha.4"
+ 
+ 	planReportIdentitySourceRuntimeTargets     = "runtime_targets"
+ 	planReportIdentitySourceManual             = "manual"
+@@ -235,6 +239,7 @@ type planReportBackendIdentity struct {
+ }
+ 
+ type planReportNormalization struct {
++	AccessPathsVersion           string                     `json:"access_paths_version" yaml:"access_paths_version"`
+ 	OperatorTreeVersion          string                     `json:"operator_tree_version" yaml:"operator_tree_version"`
+ 	OperatorFamilyMappingVersion string                     `json:"operator_family_mapping_version" yaml:"operator_family_mapping_version"`
+ 	CELInputDefaults             planReportCELInputDefaults `json:"cel_input_defaults" yaml:"cel_input_defaults"`
+@@ -263,50 +268,54 @@ type planReportExcludedTarget struct {
+ }
+ 
+ type planReportQuery struct {
+-	TargetID              string                   `json:"target_id" yaml:"target_id"`
+-	Name                  string                   `json:"name" yaml:"name"`
+-	Catalog               string                   `json:"catalog" yaml:"catalog"`
+-	Scope                 string                   `json:"scope,omitempty" yaml:"scope,omitempty"`
+-	Kind                  string                   `json:"kind" yaml:"kind"`
+-	Status                string                   `json:"status" yaml:"status"`
+-	SQL                   string                   `json:"sql,omitempty" yaml:"sql,omitempty"`
+-	SQLSHA256             string                   `json:"sql_sha256,omitempty" yaml:"sql_sha256,omitempty"`
+-	DDLSHA256             string                   `json:"ddl_sha256,omitempty" yaml:"ddl_sha256,omitempty"`
+-	ProtoDescriptorSHA256 string                   `json:"proto_descriptor_sha256,omitempty" yaml:"proto_descriptor_sha256,omitempty"`
+-	OperatorTreeSHA256    string                   `json:"operator_tree_sha256,omitempty" yaml:"operator_tree_sha256,omitempty"`
+-	OperatorFamilies      []string                 `json:"operator_families,omitempty" yaml:"operator_families,omitempty"`
+-	OperatorFamilyCounts  map[string]int           `json:"operator_family_counts,omitempty" yaml:"operator_family_counts,omitempty"`
+-	NormalizedOperators   []planReportOperator     `json:"normalized_operators,omitempty" yaml:"normalized_operators,omitempty"`
+-	OperatorEdges         []planReportOperatorEdge `json:"operator_edges,omitempty" yaml:"operator_edges,omitempty"`
+-	Plan                  string                   `json:"plan,omitempty" yaml:"plan,omitempty"`
+-	Error                 string                   `json:"error,omitempty" yaml:"error,omitempty"`
+-	OptimizerNotPinned    bool                     `json:"optimizer_not_pinned,omitempty" yaml:"optimizer_not_pinned,omitempty"`
+-	PlanEnvironmentNotes  []string                 `json:"plan_environment_notes,omitempty" yaml:"plan_environment_notes,omitempty"`
+-	ClassificationNotes   []planReportDiagnostic   `json:"classification_warnings,omitempty" yaml:"classification_warnings,omitempty"`
+-	RawPlan               *spannerpb.QueryPlan     `json:"-" yaml:"-"`
++	Variant               *querygen.QueryCodegenPlanQueryVariant `json:"variant,omitempty" yaml:"variant,omitempty"`
++	TargetID              string                                 `json:"target_id" yaml:"target_id"`
++	Name                  string                                 `json:"name" yaml:"name"`
++	Catalog               string                                 `json:"catalog" yaml:"catalog"`
++	Scope                 string                                 `json:"scope,omitempty" yaml:"scope,omitempty"`
++	Kind                  string                                 `json:"kind" yaml:"kind"`
++	Status                string                                 `json:"status" yaml:"status"`
++	SQL                   string                                 `json:"sql,omitempty" yaml:"sql,omitempty"`
++	SQLSHA256             string                                 `json:"sql_sha256,omitempty" yaml:"sql_sha256,omitempty"`
++	DDLSHA256             string                                 `json:"ddl_sha256,omitempty" yaml:"ddl_sha256,omitempty"`
++	ProtoDescriptorSHA256 string                                 `json:"proto_descriptor_sha256,omitempty" yaml:"proto_descriptor_sha256,omitempty"`
++	OperatorTreeSHA256    string                                 `json:"operator_tree_sha256,omitempty" yaml:"operator_tree_sha256,omitempty"`
++	OperatorFamilies      []string                               `json:"operator_families,omitempty" yaml:"operator_families,omitempty"`
++	OperatorFamilyCounts  map[string]int                         `json:"operator_family_counts,omitempty" yaml:"operator_family_counts,omitempty"`
++	NormalizedOperators   []planReportOperator                   `json:"normalized_operators,omitempty" yaml:"normalized_operators,omitempty"`
++	OperatorEdges         []planReportOperatorEdge               `json:"operator_edges,omitempty" yaml:"operator_edges,omitempty"`
++	AccessPaths           []plancontract.AccessPath              `json:"access_paths,omitempty" yaml:"access_paths,omitempty"`
++	Plan                  string                                 `json:"plan,omitempty" yaml:"plan,omitempty"`
++	Error                 string                                 `json:"error,omitempty" yaml:"error,omitempty"`
++	OptimizerNotPinned    bool                                   `json:"optimizer_not_pinned,omitempty" yaml:"optimizer_not_pinned,omitempty"`
++	PlanEnvironmentNotes  []string                               `json:"plan_environment_notes,omitempty" yaml:"plan_environment_notes,omitempty"`
++	ClassificationNotes   []planReportDiagnostic                 `json:"classification_warnings,omitempty" yaml:"classification_warnings,omitempty"`
++	RawPlan               *spannerpb.QueryPlan                   `json:"-" yaml:"-"`
+ }
+ 
+ type serializedPlanReportQuery struct {
+-	TargetID              string                 `json:"target_id" yaml:"target_id"`
+-	Name                  string                 `json:"name" yaml:"name"`
+-	Catalog               string                 `json:"catalog" yaml:"catalog"`
+-	Scope                 string                 `json:"scope,omitempty" yaml:"scope,omitempty"`
+-	Kind                  string                 `json:"kind" yaml:"kind"`
+-	Status                string                 `json:"status" yaml:"status"`
+-	SQL                   string                 `json:"sql,omitempty" yaml:"sql,omitempty"`
+-	SQLSHA256             string                 `json:"sql_sha256,omitempty" yaml:"sql_sha256,omitempty"`
+-	DDLSHA256             string                 `json:"ddl_sha256,omitempty" yaml:"ddl_sha256,omitempty"`
+-	ProtoDescriptorSHA256 string                 `json:"proto_descriptor_sha256,omitempty" yaml:"proto_descriptor_sha256,omitempty"`
+-	OperatorTreeSHA256    string                 `json:"operator_tree_sha256,omitempty" yaml:"operator_tree_sha256,omitempty"`
+-	OperatorFamilies      []string               `json:"operator_families,omitempty" yaml:"operator_families,omitempty"`
+-	OperatorFamilyCounts  map[string]int         `json:"operator_family_counts,omitempty" yaml:"operator_family_counts,omitempty"`
+-	NormalizedOperators   []planReportOperator   `json:"normalized_operators,omitempty" yaml:"normalized_operators,omitempty"`
+-	OperatorEdges         interface{}            `json:"operator_edges,omitempty" yaml:"operator_edges,omitempty"`
+-	Plan                  string                 `json:"plan,omitempty" yaml:"plan,omitempty"`
+-	Error                 string                 `json:"error,omitempty" yaml:"error,omitempty"`
+-	OptimizerNotPinned    bool                   `json:"optimizer_not_pinned,omitempty" yaml:"optimizer_not_pinned,omitempty"`
+-	PlanEnvironmentNotes  []string               `json:"plan_environment_notes,omitempty" yaml:"plan_environment_notes,omitempty"`
+-	ClassificationNotes   []planReportDiagnostic `json:"classification_warnings,omitempty" yaml:"classification_warnings,omitempty"`
++	Variant               *querygen.QueryCodegenPlanQueryVariant `json:"variant,omitempty" yaml:"variant,omitempty"`
++	TargetID              string                                 `json:"target_id" yaml:"target_id"`
++	Name                  string                                 `json:"name" yaml:"name"`
++	Catalog               string                                 `json:"catalog" yaml:"catalog"`
++	Scope                 string                                 `json:"scope,omitempty" yaml:"scope,omitempty"`
++	Kind                  string                                 `json:"kind" yaml:"kind"`
++	Status                string                                 `json:"status" yaml:"status"`
++	SQL                   string                                 `json:"sql,omitempty" yaml:"sql,omitempty"`
++	SQLSHA256             string                                 `json:"sql_sha256,omitempty" yaml:"sql_sha256,omitempty"`
++	DDLSHA256             string                                 `json:"ddl_sha256,omitempty" yaml:"ddl_sha256,omitempty"`
++	ProtoDescriptorSHA256 string                                 `json:"proto_descriptor_sha256,omitempty" yaml:"proto_descriptor_sha256,omitempty"`
++	OperatorTreeSHA256    string                                 `json:"operator_tree_sha256,omitempty" yaml:"operator_tree_sha256,omitempty"`
++	OperatorFamilies      []string                               `json:"operator_families,omitempty" yaml:"operator_families,omitempty"`
++	OperatorFamilyCounts  map[string]int                         `json:"operator_family_counts,omitempty" yaml:"operator_family_counts,omitempty"`
++	NormalizedOperators   []planReportOperator                   `json:"normalized_operators,omitempty" yaml:"normalized_operators,omitempty"`
++	OperatorEdges         interface{}                            `json:"operator_edges,omitempty" yaml:"operator_edges,omitempty"`
++	AccessPaths           interface{}                            `json:"access_paths,omitempty" yaml:"access_paths,omitempty"`
++	Plan                  string                                 `json:"plan,omitempty" yaml:"plan,omitempty"`
++	Error                 string                                 `json:"error,omitempty" yaml:"error,omitempty"`
++	OptimizerNotPinned    bool                                   `json:"optimizer_not_pinned,omitempty" yaml:"optimizer_not_pinned,omitempty"`
++	PlanEnvironmentNotes  []string                               `json:"plan_environment_notes,omitempty" yaml:"plan_environment_notes,omitempty"`
++	ClassificationNotes   []planReportDiagnostic                 `json:"classification_warnings,omitempty" yaml:"classification_warnings,omitempty"`
+ }
+ 
+ func (q planReportQuery) MarshalJSON() ([]byte, error) {
+@@ -318,15 +327,21 @@ func (q planReportQuery) MarshalYAML() (interface{}, error) {
+ }
+ 
+ func (q planReportQuery) serialized() serializedPlanReportQuery {
+-	var operatorEdges interface{}
++	var operatorEdges, accessPaths interface{}
+ 	if q.Status == "ok" {
+ 		edges := q.OperatorEdges
+ 		if edges == nil {
+ 			edges = []planReportOperatorEdge{}
+ 		}
+ 		operatorEdges = edges
++		paths := q.AccessPaths
++		if paths == nil {
++			paths = []plancontract.AccessPath{}
++		}
++		accessPaths = paths
+ 	}
+ 	return serializedPlanReportQuery{
++		Variant:               q.Variant,
+ 		TargetID:              q.TargetID,
+ 		Name:                  q.Name,
+ 		Catalog:               q.Catalog,
+@@ -342,6 +357,7 @@ func (q planReportQuery) serialized() serializedPlanReportQuery {
+ 		OperatorFamilyCounts:  q.OperatorFamilyCounts,
+ 		NormalizedOperators:   q.NormalizedOperators,
+ 		OperatorEdges:         operatorEdges,
++		AccessPaths:           accessPaths,
+ 		Plan:                  q.Plan,
+ 		Error:                 q.Error,
+ 		OptimizerNotPinned:    q.OptimizerNotPinned,
+@@ -382,6 +398,9 @@ func planReportNeedsRuntime(config querygen.QueryCodegenConfig, plan *querygen.Q
+ 	schemas := queryCodegenSchemasByName(config.Schemas)
+ 	configQueries := queryCodegenQueriesByName(config.Queries)
+ 	for _, query := range plan.Queries {
++		if query.PlanningError != "" || query.ReportSkipReason != "" {
++			continue
++		}
+ 		configQuery := configQueries[query.Name]
+ 		catalog := query.Catalog
+ 		if !planReportFederatedQueryIsZero(configQuery.Federated) {
+@@ -396,6 +415,10 @@ func planReportNeedsRuntime(config querygen.QueryCodegenConfig, plan *querygen.Q
+ }
+ 
+ func buildPlanReportWithRuntime(ctx context.Context, config querygen.QueryCodegenConfig, plan *querygen.QueryCodegenPlan, baseDir string, opts planReportOptions, runtime spanemuboost.RuntimeHandle) (planReport, error) {
++	return buildPlanReportWithAnalyzer(ctx, config, plan, baseDir, opts, runtime, openPlanReportAnalyzer)
++}
++
++func buildPlanReportWithAnalyzer(ctx context.Context, config querygen.QueryCodegenConfig, plan *querygen.QueryCodegenPlan, baseDir string, opts planReportOptions, runtime spanemuboost.RuntimeHandle, open planReportOpenAnalyzer) (planReport, error) {
+ 	report := planReport{
+ 		ReportVersion:    planReportVersionV1Alpha,
+ 		Status:           planReportStatusOK,
+@@ -427,7 +450,9 @@ func buildPlanReportWithRuntime(ctx context.Context, config querygen.QueryCodege
+ 	}
+ 	schemas := queryCodegenSchemasByName(config.Schemas)
+ 	configQueries := queryCodegenQueriesByName(config.Queries)
+-	clientsBySource := map[string]*spanemuboost.Clients{}
++	clientsBySource := map[string]planReportAnalyzer{}
++	openErrorsBySource := map[string]error{}
++	scanTargetsBySource := map[string][]plancontract.ScanTarget{}
+ 	protoDescriptorsBySource := map[string]*spanalyzer.ProtoDescriptorSet{}
+ 	protoDescriptorDigestsBySource := map[string]string{}
+ 	defer func() {
+@@ -437,12 +462,15 @@ func buildPlanReportWithRuntime(ctx context.Context, config querygen.QueryCodege
+ 	}()
+ 
+ 	targets := 0
+-	for _, query := range plan.Queries {
++	for _, query := range querygen.ExpandPlanReportQueries(plan.Queries) {
+ 		configQuery := configQueries[query.Name]
+ 		catalog := query.Catalog
+ 		sql := query.SQL
+ 		params := query.Params
+ 		scope := "query"
++		if query.ReportScope != "" {
++			scope = query.ReportScope
++		}
+ 		if !planReportFederatedQueryIsZero(configQuery.Federated) {
+ 			catalog = configQuery.Federated.SpannerSource
+ 			sql = configQuery.Federated.InnerSQL
+@@ -450,7 +478,8 @@ func buildPlanReportWithRuntime(ctx context.Context, config querygen.QueryCodege
+ 			scope = "external_query.inner"
+ 		}
+ 		reportQuery := planReportQuery{
+-			TargetID:  planReportTargetID(query.Name, scope),
++			Variant:   query.ReportVariant,
++			TargetID:  planReportVariantTargetID(query.Name, scope, query.ReportVariant, query.ReportVariantCanonical),
+ 			Name:      query.Name,
+ 			Catalog:   catalog,
+ 			Scope:     scope,
+@@ -476,6 +505,19 @@ func buildPlanReportWithRuntime(ctx context.Context, config querygen.QueryCodege
+ 			continue
+ 		}
+ 		targets++
++		if query.PlanningError != "" || query.ReportSkipReason != "" {
++			if query.PlanningError != "" {
++				reportQuery.Status = "error"
++				reportQuery.Error = query.PlanningError
++				report.TargetSummary.Errors++
++			} else {
++				reportQuery.Status = "skipped"
++				reportQuery.Error = query.ReportSkipReason
++				report.TargetSummary.Skipped++
++			}
++			report.Queries = append(report.Queries, reportQuery)
++			continue
++		}
+ 		ddlDigest, err := planReportDDLDigest(schema, baseDir)
+ 		if err != nil {
+ 			reportQuery.Status = "error"
+@@ -515,11 +557,23 @@ func buildPlanReportWithRuntime(ctx context.Context, config querygen.QueryCodege
+ 		if reportQuery.OptimizerNotPinned {
+ 			reportQuery.PlanEnvironmentNotes = append(reportQuery.PlanEnvironmentNotes, "plan environment does not pin both optimizer version and statistics package to fixed values")
+ 		}
++		if openError := openErrorsBySource[catalog]; openError != nil {
++			reportQuery.Status = "error"
++			reportQuery.Error = openError.Error()
++			report.TargetSummary.Errors++
++			report.Queries = append(report.Queries, reportQuery)
++			continue
++		}
+ 		clients, ok := clientsBySource[catalog]
+ 		if !ok {
+-			started, err := openPlanReportClients(ctx, runtime, schema, baseDir, descriptors, report.Optimizer)
++			started, err := open(ctx, runtime, schema, baseDir, descriptors, report.Optimizer)
+ 			if err != nil {
+-				return report, fmt.Errorf("open Omni database for catalog %s: %w", catalog, err)
++				openErrorsBySource[catalog] = fmt.Errorf("open Omni database for catalog %s: %w", catalog, err)
++				reportQuery.Status = "error"
++				reportQuery.Error = openErrorsBySource[catalog].Error()
++				report.TargetSummary.Errors++
++				report.Queries = append(report.Queries, reportQuery)
++				continue
+ 			}
+ 			clients = started
+ 			clientsBySource[catalog] = clients
+@@ -534,7 +588,7 @@ func buildPlanReportWithRuntime(ctx context.Context, config querygen.QueryCodege
+ 			continue
+ 		}
+ 		stmt.Params = values
+-		queryPlan, err := clients.Client.Single().AnalyzeQuery(ctx, stmt)
++		queryPlan, err := clients.AnalyzePlan(ctx, stmt, query.Result == "row_count" || query.Result == "row_set")
+ 		if err != nil {
+ 			reportQuery.Status = "error"
+ 			reportQuery.Error = err.Error()
+@@ -542,7 +596,23 @@ func buildPlanReportWithRuntime(ctx context.Context, config querygen.QueryCodege
+ 			report.Queries = append(report.Queries, reportQuery)
+ 			continue
+ 		}
+-		rendered, err := reference.RenderTreeTable(queryPlan.GetPlanNodes(), opts.RenderMode, opts.Format, opts.WrapWidth)
++		normalizedOperators := planReportOperators(queryPlan)
++		operatorEdges := planReportOperatorEdges(queryPlan)
++		targetsForSchema, loaded := scanTargetsBySource[catalog]
++		if !loaded {
++			var err error
++			targetsForSchema, err = planReportSchemaScanTargets(schema, baseDir)
++			if err != nil {
++				reportQuery.Status = "error"
++				reportQuery.Error = err.Error()
++				report.TargetSummary.Errors++
++				report.Queries = append(report.Queries, reportQuery)
++				continue
++			}
++			scanTargetsBySource[catalog] = targetsForSchema
++		}
++		accessPaths := plancontract.NormalizeAccessPaths(queryPlan, targetsForSchema)
++		rendered, err := renderPlanReportTree(queryPlan, accessPaths, opts)
+ 		if err != nil {
+ 			reportQuery.Status = "error"
+ 			reportQuery.Error = err.Error()
+@@ -550,8 +620,10 @@ func buildPlanReportWithRuntime(ctx context.Context, config querygen.QueryCodege
+ 			report.Queries = append(report.Queries, reportQuery)
+ 			continue
+ 		}
+-		reportQuery.NormalizedOperators = planReportOperators(queryPlan)
+-		reportQuery.OperatorEdges = planReportOperatorEdges(queryPlan)
++
++		reportQuery.NormalizedOperators = normalizedOperators
++		reportQuery.OperatorEdges = operatorEdges
++		reportQuery.AccessPaths = accessPaths
+ 		reportQuery.OperatorFamilies = planReportOperatorFamilies(reportQuery.NormalizedOperators)
+ 		reportQuery.OperatorFamilyCounts = planReportOperatorFamilyCounts(reportQuery.NormalizedOperators)
+ 		reportQuery.OperatorTreeSHA256 = planReportOperatorTreeDigest(queryPlan)
+@@ -578,6 +650,7 @@ func defaultPlanReportNormalization() planReportNormalization {
+ 		// concrete compatibility markers. Bump them whenever digest inputs or
+ 		// operator-family semantics change so stored reports are not compared
+ 		// across different normalization algorithms.
++		AccessPathsVersion:           plancontract.AccessPathNormalizationVersion,
+ 		OperatorTreeVersion:          planReportOperatorTreeVersion,
+ 		OperatorFamilyMappingVersion: planReportFamilyMappingVersion,
+ 		CELInputDefaults: planReportCELInputDefaults{
+@@ -766,6 +839,8 @@ func planReportTargetID(queryName, scope string) string {
+ 	switch planContractScope(scope) {
+ 	case "external_query.inner":
+ 		return "query/" + queryName + "#inner"
++	case "write":
++		return "write/" + queryName
+ 	default:
+ 		return "query/" + queryName
+ 	}
+@@ -871,6 +946,10 @@ func planReportParamValue(spec *spanalyzer.TypeSpec) (interface{}, error) {
+ 		return civil.Date{Year: 2026, Month: time.May, Day: 6}, nil
+ 	case spannerpb.TypeCode_TIMESTAMP:
+ 		return time.Unix(0, 0).UTC(), nil
++	case spannerpb.TypeCode_JSON:
++		return spanner.NullJSON{Value: map[string]interface{}{"value": 1}, Valid: true}, nil
++	case spannerpb.TypeCode_STRUCT:
++		return planReportGenericParamValue(spec)
+ 	case spannerpb.TypeCode_ARRAY:
+ 		return planReportArrayParamValue(spec.ArrayElement)
+ 	default:
+@@ -883,6 +962,8 @@ func planReportArrayParamValue(element *spanalyzer.TypeSpec) (interface{}, error
+ 		return nil, fmt.Errorf("nil array element type")
+ 	}
+ 	switch element.Code {
++	case spannerpb.TypeCode_STRUCT, spannerpb.TypeCode_NUMERIC, spannerpb.TypeCode_JSON:
++		return planReportGenericParamValue(&spanalyzer.TypeSpec{Code: spannerpb.TypeCode_ARRAY, ArrayElement: element})
+ 	case spannerpb.TypeCode_BOOL:
+ 		return []bool{true}, nil
+ 	case spannerpb.TypeCode_INT64:
+@@ -985,6 +1066,7 @@ func planContractReport(report planReport) plancontract.Report {
+ 			OperatorFamilyCounts:  query.OperatorFamilyCounts,
+ 			NormalizedOperators:   query.NormalizedOperators,
+ 			OperatorEdges:         query.OperatorEdges,
++			AccessPaths:           query.AccessPaths,
+ 			Error:                 query.Error,
+ 			OptimizerNotPinned:    query.OptimizerNotPinned,
+ 			PlanEnvironmentNotes:  query.PlanEnvironmentNotes,
+@@ -1459,3 +1541,16 @@ func planReportOperatorFamily(node *spannerpb.PlanNode) string {
+ func planReportOperatorMetadataString(node *spannerpb.PlanNode, key string) string {
+ 	return plancontract.OperatorMetadataString(node, key)
+ }
++
++func planReportVariantTargetID(name, scope string, variant *querygen.QueryCodegenPlanQueryVariant, canonical bool) string {
++	id := planReportTargetID(name, scope)
++	if variant == nil || canonical {
++		return id
++	}
++	suffix := ""
++	if strings.HasSuffix(id, "#inner") {
++		id = strings.TrimSuffix(id, "#inner")
++		suffix = "#inner"
++	}
++	return id + "/variant/" + base64.RawURLEncoding.EncodeToString([]byte(variant.Label)) + suffix
++}
+diff --git a/internal/querygen/querygen.go b/internal/querygen/querygen.go
+index 681d3d2..19705ab 100644
+--- a/internal/querygen/querygen.go
++++ b/internal/querygen/querygen.go
+@@ -204,21 +204,27 @@ type QueryCodegenPlanDigest struct {
+ }
+ 
+ type QueryCodegenPlanQuery struct {
+-	Name            string                           `json:"name" yaml:"name"`
+-	Catalog         string                           `json:"catalog" yaml:"catalog"`
+-	Kind            string                           `json:"kind" yaml:"kind"`
+-	Result          string                           `json:"result" yaml:"result"`
+-	OrderBy         string                           `json:"order_by,omitempty" yaml:"order_by,omitempty"`
+-	SQL             string                           `json:"sql" yaml:"sql"`
+-	SQLSHA256       string                           `json:"sql_sha256" yaml:"sql_sha256"`
+-	ResultStruct    string                           `json:"result_struct" yaml:"result_struct"`
+-	Constants       []QueryCodegenPlanConstant       `json:"constants,omitempty" yaml:"constants,omitempty"`
+-	Params          []QueryCodegenParam              `json:"params,omitempty" yaml:"params,omitempty"`
+-	StarExpansion   *QueryCodegenPlanStarExpansion   `json:"star_expansion,omitempty" yaml:"star_expansion,omitempty"`
+-	Relations       []QueryCodegenPlanRelation       `json:"relations,omitempty" yaml:"relations,omitempty"`
+-	VetSuppressions []QueryCodegenPlanVetSuppression `json:"vet_suppressions,omitempty" yaml:"vet_suppressions,omitempty"`
+-	Warnings        []QueryCodegenPlanWarning        `json:"warnings,omitempty" yaml:"warnings,omitempty"`
+-	Fields          []QueryCodegenPlanField          `json:"fields,omitempty" yaml:"fields,omitempty"`
++	ReportVariant          *QueryCodegenPlanQueryVariant `json:"report_variant,omitempty" yaml:"report_variant,omitempty"`
++	ReportVariantCanonical bool                          `json:"report_variant_canonical,omitempty" yaml:"report_variant_canonical,omitempty"`
++	// Report-only failures preserve target identity without weakening generation.
++	PlanningError    string                           `json:"planning_error,omitempty" yaml:"planning_error,omitempty"`
++	ReportSkipReason string                           `json:"report_skip_reason,omitempty" yaml:"report_skip_reason,omitempty"`
++	ReportScope      string                           `json:"report_scope,omitempty" yaml:"report_scope,omitempty"`
++	Name             string                           `json:"name" yaml:"name"`
++	Catalog          string                           `json:"catalog" yaml:"catalog"`
++	Kind             string                           `json:"kind" yaml:"kind"`
++	Result           string                           `json:"result" yaml:"result"`
++	OrderBy          string                           `json:"order_by,omitempty" yaml:"order_by,omitempty"`
++	SQL              string                           `json:"sql" yaml:"sql"`
++	SQLSHA256        string                           `json:"sql_sha256" yaml:"sql_sha256"`
++	ResultStruct     string                           `json:"result_struct" yaml:"result_struct"`
++	Constants        []QueryCodegenPlanConstant       `json:"constants,omitempty" yaml:"constants,omitempty"`
++	Params           []QueryCodegenParam              `json:"params,omitempty" yaml:"params,omitempty"`
++	StarExpansion    *QueryCodegenPlanStarExpansion   `json:"star_expansion,omitempty" yaml:"star_expansion,omitempty"`
++	Relations        []QueryCodegenPlanRelation       `json:"relations,omitempty" yaml:"relations,omitempty"`
++	VetSuppressions  []QueryCodegenPlanVetSuppression `json:"vet_suppressions,omitempty" yaml:"vet_suppressions,omitempty"`
++	Warnings         []QueryCodegenPlanWarning        `json:"warnings,omitempty" yaml:"warnings,omitempty"`
++	Fields           []QueryCodegenPlanField          `json:"fields,omitempty" yaml:"fields,omitempty"`
+ 	// Variants is the per-shape plan-contract entry produced by
+ 	// optparam.BuildPlanVariants. It is populated only for queries
+ 	// that use one or more optional markers. The top-level SQL /
+diff --git a/internal/querygen/querygen_config.go b/internal/querygen/querygen_config.go
+index bf02cc2..c92ec34 100644
+--- a/internal/querygen/querygen_config.go
++++ b/internal/querygen/querygen_config.go
+@@ -558,13 +558,13 @@ func validateV1AlphaQueryShape(q QueryCodegenV1AlphaQuery) error {
+ 	if err := requireV1AlphaIdentifierReference("query "+q.Name+" binding", q.Binding); err != nil {
+ 		return err
+ 	}
+-	if strings.TrimSpace(q.Result.Struct) == "" {
++	if strings.TrimSpace(q.Result.Struct) == "" && !strings.EqualFold(q.Result.Cardinality, "row_count") {
+ 		return fmt.Errorf("query %s result.struct is required", q.Name)
+ 	}
+ 	switch strings.ToLower(strings.TrimSpace(q.Result.Cardinality)) {
+-	case "", "one", "maybe_one", "many":
++	case "", "one", "maybe_one", "many", "row_count", "row_set":
+ 	default:
+-		return fmt.Errorf("query %s result.cardinality %q is not supported; use one, maybe_one, or many", q.Name, q.Result.Cardinality)
++		return fmt.Errorf("query %s result.cardinality %q is not supported; use one, maybe_one, many, row_count, or row_set", q.Name, q.Result.Cardinality)
+ 	}
+ 	switch strings.ToLower(strings.TrimSpace(q.Result.Required.Policy)) {
+ 	case "", "override", "strict":
+diff --git a/internal/querygen/querygen_test.go b/internal/querygen/querygen_test.go
+index 593da4d..6b0c6ab 100644
+--- a/internal/querygen/querygen_test.go
++++ b/internal/querygen/querygen_test.go
+@@ -1095,7 +1095,7 @@ queries:
+     cardinality: exec
+     struct: Row
+ `,
+-			wantErr: `query RunDML result.cardinality "exec" is not supported; use one, maybe_one, or many`,
++			wantErr: `query RunDML result.cardinality "exec" is not supported; use one, maybe_one, many, row_count, or row_set`,
+ 		},
+ 		{
+ 			name: "missing result struct",
+diff --git a/plancontract/normalize.go b/plancontract/normalize.go
+index b25730f..cf26551 100644
+--- a/plancontract/normalize.go
++++ b/plancontract/normalize.go
+@@ -55,6 +55,7 @@ func NormalizeOperators(plan *spannerpb.QueryPlan) []Operator {
+ 		out = append(out, Operator{
+ 			Index:               node.GetIndex(),
+ 			DisplayName:         node.GetDisplayName(),
++			Expression:          node.GetShortRepresentation().GetDescription(),
+ 			Family:              familyByIndex[node.GetIndex()],
+ 			ExecutionMethod:     OperatorMetadataString(node, "execution_method"),
+ 			IteratorType:        OperatorMetadataString(node, "iterator_type"),
+@@ -85,6 +86,10 @@ func NormalizeOperatorEdges(plan *spannerpb.QueryPlan) []OperatorEdge {
+ 		return nil
+ 	}
+ 	edges := make([]OperatorEdge, 0)
++	byIndex := map[int32]*spannerpb.PlanNode{}
++	for _, node := range plan.GetPlanNodes() {
++		byIndex[node.GetIndex()] = node
++	}
+ 	for _, node := range sortedPlanNodes(plan) {
+ 		for _, link := range node.GetChildLinks() {
+ 			edges = append(edges, OperatorEdge{
+@@ -92,6 +97,7 @@ func NormalizeOperatorEdges(plan *spannerpb.QueryPlan) []OperatorEdge {
+ 				ChildIndex:  link.GetChildIndex(),
+ 				Type:        link.GetType(),
+ 				Variable:    link.GetVariable(),
++				Expression:  byIndex[link.GetChildIndex()].GetShortRepresentation().GetDescription(),
+ 			})
+ 		}
+ 	}
+@@ -213,6 +219,7 @@ func OperatorTreeDigest(plan *spannerpb.QueryPlan) string {
+ 		Index               int32             `json:"index"`
+ 		Family              string            `json:"family"`
+ 		DisplayName         string            `json:"display_name"`
++		Expression          string            `json:"expression"`
+ 		ExecutionMethod     string            `json:"execution_method"`
+ 		IteratorType        string            `json:"iterator_type"`
+ 		ScanMethod          string            `json:"scan_method"`
+@@ -241,6 +248,7 @@ func OperatorTreeDigest(plan *spannerpb.QueryPlan) string {
+ 			Index:               node.GetIndex(),
+ 			Family:              nodeOperatorFamily(node, operatorContexts[node.GetIndex()]),
+ 			DisplayName:         node.GetDisplayName(),
++			Expression:          node.GetShortRepresentation().GetDescription(),
+ 			ExecutionMethod:     OperatorMetadataString(node, "execution_method"),
+ 			IteratorType:        OperatorMetadataString(node, "iterator_type"),
+ 			ScanMethod:          OperatorMetadataString(node, "scan_method"),
+diff --git a/plancontract/plancontract.go b/plancontract/plancontract.go
+index ec7f6e9..3390f9c 100644
+--- a/plancontract/plancontract.go
++++ b/plancontract/plancontract.go
+@@ -43,7 +43,7 @@ const (
+ 
+ const (
+ 	IdentifierPattern = `[A-Za-z_][A-Za-z0-9_]*`
+-	TargetIDPattern   = `^query/` + IdentifierPattern + `(#inner)?$`
++	TargetIDPattern   = `^(query|write)/` + IdentifierPattern + `(/variant/[A-Za-z0-9_-]+)?(#inner)?$`
+ )
+ 
+ var (
+@@ -141,6 +141,7 @@ type Query struct {
+ 	OperatorFamilyCounts  map[string]int
+ 	NormalizedOperators   []Operator
+ 	OperatorEdges         []OperatorEdge
++	AccessPaths           []AccessPath
+ 	Error                 string
+ 	OptimizerNotPinned    bool
+ 	PlanEnvironmentNotes  []string
+@@ -152,6 +153,7 @@ type Query struct {
+ type Operator struct {
+ 	Index               int32          `json:"index" yaml:"index"`
+ 	DisplayName         string         `json:"display_name" yaml:"display_name"`
++	Expression          string         `json:"expression,omitempty" yaml:"expression,omitempty"`
+ 	Family              string         `json:"family" yaml:"family"`
+ 	ExecutionMethod     string         `json:"execution_method,omitempty" yaml:"execution_method,omitempty"`
+ 	IteratorType        string         `json:"iterator_type,omitempty" yaml:"iterator_type,omitempty"`
+@@ -180,6 +182,7 @@ type OperatorEdge struct {
+ 	ChildIndex  int32  `json:"child_index" yaml:"child_index"`
+ 	Type        string `json:"type,omitempty" yaml:"type,omitempty"`
+ 	Variable    string `json:"variable,omitempty" yaml:"variable,omitempty"`
++	Expression  string `json:"expression,omitempty" yaml:"expression,omitempty"`
+ }
+ 
+ // Diagnostic records plan normalization or classification warnings.
+@@ -881,6 +884,7 @@ func newCELEnv() (*cel.Env, error) {
+ 		cel.Variable("query", cel.DynType),
+ 		cel.Variable("operators", cel.ListType(cel.DynType)),
+ 		cel.Variable("operator_edges", cel.ListType(cel.DynType)),
++		cel.Variable("access_paths", cel.ListType(cel.DynType)),
+ 		cel.Variable("operator_families", cel.ListType(cel.StringType)),
+ 		cel.Variable("operator_family_counts", cel.MapType(cel.StringType, cel.IntType)),
+ 		cel.Variable("optimizer", cel.DynType),
+@@ -899,6 +903,7 @@ func celActivation(report Report, query Query) map[string]interface{} {
+ 		"query":                  celQuery(query),
+ 		"operators":              celOperators(query.NormalizedOperators),
+ 		"operator_edges":         celOperatorEdges(query.OperatorEdges),
++		"access_paths":           celAccessPaths(query.AccessPaths),
+ 		"operator_families":      query.OperatorFamilies,
+ 		"operator_family_counts": OperatorFamilyCountsOrEmpty(query.OperatorFamilyCounts),
+ 		"optimizer": map[string]interface{}{
+@@ -941,6 +946,7 @@ func celOperators(operators []Operator) []map[string]interface{} {
+ 		out = append(out, map[string]interface{}{
+ 			"index":                 operator.Index,
+ 			"display_name":          operator.DisplayName,
++			"expression":            operator.Expression,
+ 			"family":                operator.Family,
+ 			"execution_method":      operator.ExecutionMethod,
+ 			"iterator_type":         operator.IteratorType,
+@@ -974,6 +980,7 @@ func celOperatorEdges(edges []OperatorEdge) []map[string]interface{} {
+ 			"child_index":  edge.ChildIndex,
+ 			"type":         edge.Type,
+ 			"variable":     edge.Variable,
++			"expression":   edge.Expression,
+ 		})
+ 	}
+ 	return out
+@@ -1007,6 +1014,8 @@ func TargetID(queryName, scope string) string {
+ 	switch Scope(scope) {
+ 	case "external_query.inner":
+ 		return "query/" + queryName + "#inner"
++	case "write":
++		return "write/" + queryName
+ 	default:
+ 		return "query/" + queryName
+ 	}

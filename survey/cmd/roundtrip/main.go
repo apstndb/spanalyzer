@@ -12,6 +12,7 @@ import (
 	"sort"
 
 	"github.com/apstndb/spanalyzer/survey/astconv"
+	"github.com/apstndb/spanalyzer/survey/internal/runtimepins"
 	"github.com/apstndb/spanemuboost"
 )
 
@@ -70,9 +71,18 @@ var sampleDDLs = []string{
 func main() {
 	ctx := context.Background()
 
-	fmt.Println("Starting Spanner emulator via spanemuboost...")
+	root, err := runtimepins.FindRepositoryRoot(".")
+	if err != nil {
+		log.Fatal(err)
+	}
+	image, err := runtimepins.ImageForHost(root, "emulator")
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Printf("Starting Spanner emulator via spanemuboost: %s\n", image)
 	env, err := spanemuboost.RunEmulatorWithClients(
 		ctx,
+		spanemuboost.WithContainerImage(image),
 		spanemuboost.WithSetupDDLs(sampleDDLs),
 	)
 	if err != nil {

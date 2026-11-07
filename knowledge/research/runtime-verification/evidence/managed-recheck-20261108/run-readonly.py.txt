@@ -1,0 +1,49 @@
+from pathlib import Path
+import datetime, hashlib, json, os, re, shutil, subprocess, sys
+
+root = Path('/Users/apstndb/work/spanner-analyzer/.worktrees/cross-engine-docs-20261005')
+scratch = root / '.tmp/managed-and-main-20261108'
+out = Path('/Users/apstndb/tmp/apstndb/spanalyzer/managed-and-main-20261108/evidence')
+keys = ['SPANNER_PROJECT_ID', 'SPANNER_INSTANCE_ID', 'SPANNER_DATABASE_ID']
+env = os.environ.copy()
+assert all(env.get(k) for k in keys)
+assert not env.get('SPANNER_EMULATOR_HOST')
+env['TEST_REAL_SPANNER_DATABASE'] = 'projects/{SPANNER_PROJECT_ID}/instances/{SPANNER_INSTANCE_ID}/databases/{SPANNER_DATABASE_ID}'.format(**env)
+go_root = '/Users/apstndb/.local/share/mise/installs/go/1.26.10'
+env.update(GOWORK='off', GOFLAGS='-mod=readonly', GOROOT=go_root, GOTOOLCHAIN='local', GOCACHE='/Users/apstndb/work/spanner-analyzer/.tmp/managed-recheck-20260925/go-cache')
+env['PATH'] = go_root + '/bin:' + env['PATH']
+def clean(s):
+    for v in sorted([env['TEST_REAL_SPANNER_DATABASE']] + [env[k] for k in keys], key=len, reverse=True):
+        s = s.replace(v, '<redacted>')
+    s = re.sub(r'projects/[^/\s"\']+/instances/[^/\s"\']+/databases/[^/\s"\']+', '<database>', s)
+    return re.sub(r'requestID = "[^"]*"', 'requestID = "<redacted>"', s)
+phase = sys.argv[1]
+if phase == 'build':
+    args = [go_root + '/bin/go', 'build', '-o', str(scratch / 'query'), 'query.go']
+    cwd = scratch / 'module'
+elif phase == 'drift-canonical':
+    env.update(REQUIRE_REAL_SPANNER_DRIFT='1', REQUIRE_REAL_SPANNER_CANONICAL='1')
+    args = [go_root + '/bin/go', 'test', '-count=1', '-v', '-run', '^Test(Drift_RealTableMetas|CanonicalDDL_RealSpanner)$', './infoschem']
+    cwd = root / 'survey'
+else:
+    cases = json.loads((out / (phase + '-cases.json')).read_text())
+    assert cases and cases[0]['sql'] == 'SELECT 1 AS connectivity'
+    assert all(re.match(r'^\s*(SELECT|WITH|FROM|GRAPH)\b', c['sql'], re.I) and not re.search(r'\bRECEIVE_', c['sql'], re.I) for c in cases)
+    args = [str(scratch / 'query'), str(out / (phase + '-cases.json'))]
+    cwd = root
+started = datetime.datetime.now(datetime.timezone.utc).isoformat()
+r = subprocess.run(args, cwd=cwd, env=env, capture_output=True, text=True, timeout=1800)
+(out / (phase + ('.log' if phase in ['build', 'drift-canonical'] else '.jsonl'))).write_text(clean(r.stdout))
+(out / (phase + '.stderr')).write_text(clean(r.stderr))
+receipt = dict(argv=args, started_at=started, completed_at=datetime.datetime.now(datetime.timezone.utc).isoformat(), exit_code=r.returncode, scope='Existing dedicated managed database; read-only queries and schema inspection. No DDL, DML or cloud resource lifecycle operations.', connection='Existing user-level mise profile; identifiers redacted')
+receipt['producer_hashes'] = {n: hashlib.sha256((scratch / 'module' / n).read_bytes()).hexdigest() for n in ['query.go', 'go.mod', 'go.sum']}
+receipt['binary_sha256'] = hashlib.sha256((scratch / 'query').read_bytes()).hexdigest()
+(out / (phase + '-command.json')).write_text(json.dumps(receipt, indent=2) + '\n')
+print(phase, 'exit', r.returncode)
+if phase not in ['build', 'drift-canonical']:
+    rows = [json.loads(v) for v in clean(r.stdout).splitlines()]
+    print('Results', len(rows), 'non-OK', [(v['label'],v['code']) for v in rows if v['code'] != 'OK'])
+    assert len(rows) == len(cases) and rows[0]['rows'] == [{'connectivity': '1'}]
+else:
+    print(clean(r.stdout[-1400:]))
+assert r.returncode == 0, clean(r.stderr[-1800:])

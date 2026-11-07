@@ -1,0 +1,136 @@
+Starting Spanner emulator via spanemuboost: gcr.io/cloud-spanner-emulator/emulator:1.5.59@sha256:969af6a9349948fbfb4a826c18e160e258a4005f7c759f8e7f2dcec369cccba8
+2026/11/08 03:51:46 github.com/testcontainers/testcontainers-go - Connected to docker: 
+  Server Version: 29.2.1
+  API Version: 1.53
+  Operating System: Ubuntu 24.04.4 LTS
+  Total Memory: 7922 MB
+  Testcontainers for Go Version: v0.44.0
+  Resolved Docker Host: unix:///Users/apstndb/.colima/default/docker.sock
+  Resolved Docker Socket Path: /var/run/docker.sock
+  Test SessionID: d7aa34a3fa7ee4694aa45ddab5e652792022b3b29ab0b73466dc81fb7a16a954
+  Test ProcessID: b2f0e2a8-1498-4645-a056-cbe2649b6745
+2026/11/08 03:51:46 🐳 Creating container for image gcr.io/cloud-spanner-emulator/emulator:1.5.59@sha256:969af6a9349948fbfb4a826c18e160e258a4005f7c759f8e7f2dcec369cccba8
+2026/11/08 03:51:46 🐳 Creating container for image testcontainers/ryuk:0.14.0
+2026/11/08 03:51:46 ✅ Container created: 70867a09b2d5
+2026/11/08 03:51:46 🐳 Starting container: 70867a09b2d5
+2026/11/08 03:51:46 ✅ Container started: 70867a09b2d5
+2026/11/08 03:51:46 ⏳ Waiting for container id 70867a09b2d5 image: testcontainers/ryuk:0.14.0. Waiting for: all of: [log message "Started", port 8080/tcp to be listening]
+2026/11/08 03:51:46 Shell not found in container
+2026/11/08 03:51:46 🔔 Container is ready: 70867a09b2d5
+2026/11/08 03:51:46 ✅ Container created: d6c5112d9ed8
+2026/11/08 03:51:46 🐳 Starting container: d6c5112d9ed8
+2026/11/08 03:51:46 ✅ Container started: d6c5112d9ed8
+2026/11/08 03:51:46 ⏳ Waiting for container id d6c5112d9ed8 image: gcr.io/cloud-spanner-emulator/emulator:1.5.59@sha256:969af6a9349948fbfb4a826c18e160e258a4005f7c759f8e7f2dcec369cccba8. Waiting for: all of: [port 9010/tcp to be listening, log message "Cloud Spanner emulator running"]
+2026/11/08 03:51:46 Shell not found in container
+2026/11/08 03:51:47 🔔 Container is ready: d6c5112d9ed8
+Emulator ready: localhost:32887
+
+=== INFORMATION_SCHEMA Summary ===
+  Tables:               37
+  Columns:              227
+  Indexes:              38
+  Index Columns:        128
+  Table Constraints:    215
+  Check Constraints:    180
+  Views:                1
+  Change Streams:       1
+  Sequences:            1
+  Models:               0
+  Property Graphs:      0
+  Locality Group Opts:  0
+
+--- Tables ---
+  Accounts [BASE TABLE]
+  Albums [BASE TABLE] (INTERLEAVE IN Singers)
+  CHANGE_STREAMS [VIEW]
+  CHANGE_STREAM_COLUMNS [VIEW]
+  CHANGE_STREAM_OPTIONS [VIEW]
+  CHANGE_STREAM_TABLES [VIEW]
+  CHECK_CONSTRAINTS [VIEW]
+  COLUMNS [VIEW]
+  COLUMN_COLUMN_USAGE [VIEW]
+  COLUMN_OPTIONS [VIEW]
+  CONSTRAINT_COLUMN_USAGE [VIEW]
+  CONSTRAINT_TABLE_USAGE [VIEW]
+  DATABASE_OPTIONS [VIEW]
+  Events [BASE TABLE]
+  INDEXES [VIEW]
+  INDEX_COLUMNS [VIEW]
+  KEY_COLUMN_USAGE [VIEW]
+  LOCALITY_GROUP_OPTIONS [VIEW]
+  MODELS [VIEW]
+  MODEL_COLUMNS [VIEW]
+  MODEL_COLUMN_OPTIONS [VIEW]
+  MODEL_OPTIONS [VIEW]
+  PLACEMENTS [VIEW]
+  PLACEMENT_OPTIONS [VIEW]
+  PROPERTY_GRAPHS [VIEW]
+  REFERENTIAL_CONSTRAINTS [VIEW]
+  SCHEMATA [VIEW]
+  SEQUENCES [VIEW]
+  SEQUENCE_OPTIONS [VIEW]
+  SPANNER_STATISTICS [VIEW]
+  SUPPORTED_OPTIMIZER_VERSIONS [VIEW]
+  SingerNames [VIEW]
+  Singers [BASE TABLE]
+  Songs [BASE TABLE] (INTERLEAVE IN Albums)
+  TABLES [VIEW]
+  TABLE_CONSTRAINTS [VIEW]
+  VIEWS [VIEW]
+
+=== Generated DDL ===
+
+CREATE TABLE Accounts (
+  AccountId INT64 NOT NULL,
+  Balance INT64 NOT NULL,
+  CONSTRAINT BalancePositive CHECK (Balance >= 0)
+) PRIMARY KEY (AccountId ASC);
+
+CREATE TABLE Singers (
+  SingerId INT64 NOT NULL,
+  FirstName STRING(1024),
+  LastName STRING(1024),
+  SingerInfo BYTES(MAX),
+  BirthDate DATE
+) PRIMARY KEY (SingerId ASC);
+
+CREATE TABLE Albums (
+  SingerId INT64 NOT NULL,
+  AlbumId INT64 NOT NULL,
+  AlbumTitle STRING(MAX),
+  MarketingBudget INT64
+) PRIMARY KEY (SingerId ASC, AlbumId ASC),
+  INTERLEAVE IN PARENT Singers ON DELETE CASCADE;
+
+CREATE TABLE Events (
+  EventId INT64 NOT NULL,
+  EventName STRING(MAX),
+  StartTime TIMESTAMP NOT NULL,
+  CreatedAt TIMESTAMP NOT NULL OPTIONS (allow_commit_timestamp = true)
+) PRIMARY KEY (EventId ASC);
+
+CREATE TABLE Songs (
+  SingerId INT64 NOT NULL,
+  AlbumId INT64 NOT NULL,
+  TrackId INT64 NOT NULL,
+  SongName STRING(MAX),
+  Duration INT64
+) PRIMARY KEY (SingerId ASC, AlbumId ASC, TrackId ASC),
+  INTERLEAVE IN PARENT Albums ON DELETE CASCADE;
+
+CREATE NULL_FILTERED INDEX AlbumsByAlbumTitle ON Albums(AlbumTitle ASC) STORING (MarketingBudget);
+
+CREATE INDEX SongsBySongName ON Songs(SongName ASC);
+
+CREATE UNIQUE INDEX SongsBySingerAlbumSongNameDesc ON Songs(SingerId ASC, AlbumId ASC, SongName DESC), INTERLEAVE IN Albums;
+
+CREATE VIEW SingerNames SQL SECURITY INVOKER AS SELECT Singers.SingerId, Singers.FirstName, Singers.LastName FROM Singers;
+
+CREATE CHANGE STREAM SingerChangeStream FOR Singers;
+
+CREATE SEQUENCE SingerIdSeq BIT_REVERSED_POSITIVE;
+
+2026/11/08 03:51:48 🐳 Stopping container: d6c5112d9ed8
+2026/11/08 03:51:48 ✅ Container stopped: d6c5112d9ed8
+2026/11/08 03:51:48 🐳 Terminating container: d6c5112d9ed8
+2026/11/08 03:51:48 🚫 Container terminated: d6c5112d9ed8

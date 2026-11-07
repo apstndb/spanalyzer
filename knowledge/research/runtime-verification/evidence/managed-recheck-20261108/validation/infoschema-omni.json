@@ -1,0 +1,66 @@
+{
+  "schema_version": "v0alpha1",
+  "status": "producer_changed_only",
+  "material_change": false,
+  "current": {
+    "target": {
+      "kind": "omni",
+      "image": {
+        "family": "us-docker.pkg.dev/spanner-omni/images/spanner-omni",
+        "tag": "2026.r4-lts.2",
+        "digest": "sha256:b607b10bee3c1903f0a7f88f99bece67cb0dd9d9a028aee64226fc311bd78dae",
+        "platform": "linux/arm64"
+      }
+    },
+    "observed_at": "2026-11-07T19:29:24.463573Z",
+    "surface_sha256": "89b4ab9e231d7d61bf417669b6f5d29d1715c3999058b905f60698bc1047c6b0",
+    "column_count": 310,
+    "rolling_queryability": [
+      {
+        "table_name": "INDEXES",
+        "column_name": "SEARCH_UNNEST",
+        "status": "queryable"
+      },
+      {
+        "table_name": "INDEX_COLUMNS",
+        "column_name": "EXPRESSION",
+        "status": "queryable"
+      }
+    ],
+    "producer_source_sha256": "0e6bf6401be367bc8b73ef0badee78011b2f2dad46f71f7d2708d48a5c4ffccb",
+    "invocation_sha256": "394c27273867ee16446472b5131b47283bcdb06d902be6a30c98982a205aa676"
+  },
+  "retained": {
+    "path": "survey/infoschem/evidence/omni/b607b10bee3c1903f0a7f88f99bece67cb0dd9d9a028aee64226fc311bd78dae/linux-arm64-89b4ab9e231d.json",
+    "target": {
+      "kind": "omni",
+      "image": {
+        "family": "us-docker.pkg.dev/spanner-omni/images/spanner-omni",
+        "tag": "2026.r4-lts.2",
+        "digest": "sha256:b607b10bee3c1903f0a7f88f99bece67cb0dd9d9a028aee64226fc311bd78dae",
+        "platform": "linux/arm64"
+      }
+    },
+    "observed_at": "2026-11-07T18:29:09.749758Z",
+    "surface_sha256": "89b4ab9e231d7d61bf417669b6f5d29d1715c3999058b905f60698bc1047c6b0",
+    "column_count": 310,
+    "rolling_queryability": [
+      {
+        "table_name": "INDEXES",
+        "column_name": "SEARCH_UNNEST",
+        "status": "queryable"
+      },
+      {
+        "table_name": "INDEX_COLUMNS",
+        "column_name": "EXPRESSION",
+        "status": "queryable"
+      }
+    ],
+    "producer_source_sha256": "6fb89429a4dad11f0caa0a4d8803df453df9e767cd0c19c2062902bfeb5940c3",
+    "invocation_sha256": "394c27273867ee16446472b5131b47283bcdb06d902be6a30c98982a205aa676"
+  },
+  "producer_change": {
+    "source_changed": true,
+    "invocation_changed": false
+  }
+}

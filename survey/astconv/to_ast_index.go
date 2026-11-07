@@ -3,6 +3,7 @@ package astconv
 import (
 	"fmt"
 	"sort"
+	"strconv"
 	"strings"
 
 	"github.com/apstndb/spanalyzer/survey/infoschem"
@@ -59,6 +60,29 @@ func (s *Schema) toIndexesDDL() ([]ast.DDL, error) {
 
 		switch idx.IndexType {
 		case "INDEX":
+			// Emulator 1.5.59 exposes generated hidden expression columns but
+			// omits their INDEX_COLUMNS rows and EXPRESSION metadata. Without
+			// this guard reconstruction can emit an empty or truncated index.
+			// See the Emulator boundary in UNSUPPORTED_DDL.md.
+			for _, column := range s.Columns {
+				if column.TableSchema != idx.TableSchema || column.TableName != idx.TableName || !column.IsHidden || column.GenerationExpression == nil {
+					continue
+				}
+				position, matches := strings.CutPrefix(column.ColumnName, "_ExpressionIndex_"+idx.IndexName+"_")
+				if !matches {
+					continue
+				}
+				if _, err := strconv.ParseUint(position, 10, 32); err != nil {
+					continue
+				}
+				found := false
+				for _, keyColumn := range cols {
+					found = found || keyColumn.ColumnName == column.ColumnName
+				}
+				if !found {
+					return nil, fmt.Errorf("unsupported expression index %q on table %q: generated hidden column %q has no index-column metadata", idx.IndexName, tableDisplayName(idx.TableSchema, idx.TableName), column.ColumnName)
+				}
+			}
 			ddl, err := buildCreateIndex(idx, cols, opts)
 			if err != nil {
 				return nil, err

@@ -1,0 +1,36 @@
+{
+  "$schema": "schemas/runtime-targets.v0alpha1.schema.json",
+  "schema_version": "v0alpha1",
+  "targets": [
+    {
+      "kind": "emulator",
+      "image_family": "gcr.io/cloud-spanner-emulator/emulator",
+      "tag": "1.5.56",
+      "platforms": [
+        {
+          "platform": "linux/amd64",
+          "digest": "sha256:24c921c60e277e1ecfe50188169bf1aa818c8603d96842c827d4d1920206811c"
+        },
+        {
+          "platform": "linux/arm64",
+          "digest": "sha256:5b1e3607fe8574fb04144eeabfa54120559fb01968ffe3ffc0a9a8f6776fc454"
+        }
+      ]
+    },
+    {
+      "kind": "omni",
+      "image_family": "us-docker.pkg.dev/spanner-omni/images/spanner-omni",
+      "tag": "2026.r2.1-beta",
+      "platforms": [
+        {
+          "platform": "linux/amd64",
+          "digest": "sha256:48631bc2f3999358368a81042c7974abb131e05c04d246206fb7b82eae41789f"
+        },
+        {
+          "platform": "linux/arm64",
+          "digest": "sha256:ed31d9ee72eeee69cac78566eb3a6e72ee389b26234735f0ef449774cc006741"
+        }
+      ]
+    }
+  ]
+}

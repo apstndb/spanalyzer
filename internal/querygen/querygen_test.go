@@ -1095,7 +1095,7 @@ queries:
     cardinality: exec
     struct: Row
 `,
-			wantErr: `query RunDML result.cardinality "exec" is not supported; use one, maybe_one, or many`,
+			wantErr: `query RunDML result.cardinality "exec" is not supported; use one, maybe_one, many, row_count, or row_set`,
 		},
 		{
 			name: "missing result struct",

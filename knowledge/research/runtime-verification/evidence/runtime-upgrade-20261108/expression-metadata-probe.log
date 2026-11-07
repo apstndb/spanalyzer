@@ -1,0 +1,36 @@
+2026/11/08 03:36:49 github.com/testcontainers/testcontainers-go - Connected to docker: 
+  Server Version: 29.2.1
+  API Version: 1.53
+  Operating System: Ubuntu 24.04.4 LTS
+  Total Memory: 7922 MB
+  Testcontainers for Go Version: v0.44.0
+  Resolved Docker Host: unix:///Users/apstndb/.colima/default/docker.sock
+  Resolved Docker Socket Path: /var/run/docker.sock
+  Test SessionID: a4f259e2c0482cd10ddfe9cabfc87b5b337fcf09240bd788e7908a3b740e7793
+  Test ProcessID: bff90e86-a4f6-4bb8-9268-2536664e50f5
+2026/11/08 03:36:49 🐳 Creating container for image gcr.io/cloud-spanner-emulator/emulator:1.5.59@sha256:969af6a9349948fbfb4a826c18e160e258a4005f7c759f8e7f2dcec369cccba8
+2026/11/08 03:36:49 🐳 Creating container for image testcontainers/ryuk:0.14.0
+2026/11/08 03:36:49 ✅ Container created: 0a87e757947d
+2026/11/08 03:36:49 🐳 Starting container: 0a87e757947d
+2026/11/08 03:36:49 ✅ Container started: 0a87e757947d
+2026/11/08 03:36:49 ⏳ Waiting for container id 0a87e757947d image: testcontainers/ryuk:0.14.0. Waiting for: all of: [log message "Started", port 8080/tcp to be listening]
+2026/11/08 03:36:49 Shell not found in container
+2026/11/08 03:36:49 🔔 Container is ready: 0a87e757947d
+2026/11/08 03:36:49 ✅ Container created: 43d22b13c438
+2026/11/08 03:36:49 🐳 Starting container: 43d22b13c438
+2026/11/08 03:36:49 ✅ Container started: 43d22b13c438
+2026/11/08 03:36:49 ⏳ Waiting for container id 43d22b13c438 image: gcr.io/cloud-spanner-emulator/emulator:1.5.59@sha256:969af6a9349948fbfb4a826c18e160e258a4005f7c759f8e7f2dcec369cccba8. Waiting for: all of: [port 9010/tcp to be listening, log message "Cloud Spanner emulator running"]
+2026/11/08 03:36:49 Shell not found in container
+2026/11/08 03:36:50 🔔 Container is ready: 43d22b13c438
+{"column":"Id","index":"PRIMARY_KEY","ordering":"ASC","ordinal":1,"type":"INT64"}
+reconstruction_error=<nil>
+CREATE TABLE ExpressionProbe (
+  Id INT64 NOT NULL,
+  Data JSON,
+  _ExpressionIndex_ExpressionProbeByValue_0 STRING(MAX) AS (JSON_VALUE(Data.value)) HIDDEN
+) PRIMARY KEY (Id ASC)
+CREATE INDEX ExpressionProbeByValue ON ExpressionProbe()
+2026/11/08 03:36:50 🐳 Stopping container: 43d22b13c438
+2026/11/08 03:36:50 ✅ Container stopped: 43d22b13c438
+2026/11/08 03:36:50 🐳 Terminating container: 43d22b13c438
+2026/11/08 03:36:50 🚫 Container terminated: 43d22b13c438

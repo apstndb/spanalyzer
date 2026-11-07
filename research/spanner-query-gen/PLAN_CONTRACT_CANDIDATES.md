@@ -14,7 +14,7 @@ This note translates Spanner query-plan review practices into possible
 contracts target PLAN output only. They intentionally do not use PROFILE
 execution statistics such as rows scanned, rows returned, latency, or CPU.
 
-## Candidate Status (2026-06-12)
+## Candidate Status (updated 2026-11-08)
 
 The implemented surface is documented in
 [`cmd/spanner-query-gen/PLAN_CONTRACTS.md`](../../cmd/spanner-query-gen/PLAN_CONTRACTS.md);
@@ -26,10 +26,10 @@ this table tracks where each candidate below stands.
 | `no_full_scan_without_timestamp_condition` | Promoted (predefined) |
 | `require_timestamp_condition` | Promoted (predefined) |
 | `require_scan_target` | Candidate |
-| `require_seekable_scan` | Blocked on a normalized logical `access_paths[]` view; `seekable_key_size=0` is ambiguous between full scans and point seeks |
-| `no_residual_condition` | Blocked on a normalized logical `access_paths[]` view |
-| `no_back_join` | Blocked on index-to-base-table schema mapping |
-| `index_only_scan` | Blocked on index-to-base-table schema mapping |
+| `require_seekable_scan` | Expressible through scan-scoped `access_paths` CEL; predefined target-filter policy remains a candidate |
+| `no_residual_condition` | Expressible through `conditions_complete` and `has_residual_condition`; predefined target filters remain a candidate |
+| `no_back_join` | Regular-index base-table mapping is available; reliable back-join lineage and coverage rules remain candidates |
+| `index_only_scan` | Regular-index base-table mapping is available; reliable back-join lineage and coverage rules remain candidates |
 | `require_order_preserving` | Candidate |
 | `require_stream_aggregate` | Candidate; forbidding `hash_aggregate` is insufficient because a plan with no aggregate passes vacuously. Today require at least one `stream_aggregate` and reject both `hash_aggregate` and fallback `aggregate` in CEL. |
 | `no_distributed_join` | Covered today via direct `forbid` rules on the distributed join families |
@@ -467,6 +467,14 @@ Implementation notes:
 
 ### `require_seekable_scan`
 
+November 8 implementation update: `access_paths` now joins the unique direct
+wrapper and scan, retains seek/residual expressions and local column bindings,
+and exposes catalog facts. Use the scoped CEL examples in
+[Plan Contracts](../../cmd/spanner-query-gen/PLAN_CONTRACTS.md#logical-access-paths-and-predicates).
+The topology discussion below records why flat-operator joins were insufficient;
+its proposed normalized view is no longer a blocker for those CEL checks.
+
+
 Intent: verify that filters are applied as seek conditions rather than merely
 as residual filters after scanning.
 
@@ -714,35 +722,21 @@ Implemented normalized topology additions:
 - `operators[].subtree_family_counts`: operator-family counts for the subtree,
   including the operator itself.
 
-Recommended next normalized additions:
+Implemented access-path additions now have their canonical description in
+[Plan Contracts](../../cmd/spanner-query-gen/PLAN_CONTRACTS.md#logical-access-paths-and-predicates):
 
-- `access_paths[]`, joining a Filter Scan wrapper to its unique Scan child and
-  exposing filter/scan indexes, target, target kind, base table, full-scan
-  state, seek/residual/timestamp/search signals, nullable numeric
-  `range_seekable_key_size`, declared key count, and catalog-aware index
-  coverage. Do not infer point-seek depth from `seekable_key_size=0`. Treat a
-  vector root scan plus its batch-driven leaf scan as one logical ANN access
-  path, with a later base-table lookup represented separately.
+- Scan/unique direct Filter Scan pairing and a completeness flag for ambiguity.
+- Seek/residual/timestamp/search condition roots and verbatim expressions.
+- Conservative scan-local column references, positive nullable range-key size,
+  and table/regular-index identity, key, stored-column and null-filter facts.
 
-- `relational_children`: child indexes filtered to relational operators.
-- `order_preserving` metadata when present.
-- extracted `order_keys` and `aggregate_keys` from `Key`, `MajorKey`, and
-  `MinorKey` child links.
-- normalized `has_residual_condition` and `has_timestamp_condition` belong on
-  each access path, ideally with the referenced commit timestamp column when
-  that can be extracted safely.
-- `scan_target_kind`: `table`, `secondary_index`, `search_index`,
-  `vector_index_root`, `vector_index_leaf`, `batch`, or `unknown`.
-- `base_table`: for table scans this is the table itself; for index scans this
-  is resolved from the schema catalog.
-- index coverage metadata from the schema catalog: key columns, stored columns,
-  and null-filtered/null-filtering attributes where available.
-- nullable numeric `range_seekable_key_size` in addition to the raw string.
+Remaining extensions include relational-only child lists, order-preservation
+metadata, extracted order/aggregate keys, search/vector catalog metadata, and
+logical ANN root/leaf grouping. Reliable back-join or index-only predicates also
+need source lineage; the mere presence of an index path and a base-table path
+can describe a legitimate self-join. Current ANN output retains physical kinds
+and must not equate a centroid full scan with a full base-row scan.
 
-Adding these keeps most advanced contracts in CEL while making them readable
-and less dependent on raw `spannerpb.PlanNode` shape. It also avoids false
-positives for contracts such as `no_back_join`, where plan topology alone is not
-enough.
 
 ## Explicitly Out Of Scope For PLAN Contracts
 

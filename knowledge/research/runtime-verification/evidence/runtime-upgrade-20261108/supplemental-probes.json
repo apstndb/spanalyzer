@@ -1,0 +1,40 @@
+[
+  {
+    "name": "roundtrip-demo",
+    "argv": [
+      "/Users/apstndb/.local/share/mise/installs/go/1.26.10/bin/go",
+      "run",
+      "./cmd/roundtrip"
+    ],
+    "exit_code": 0,
+    "started_at": "2026-11-07T18:51:43.142862+00:00",
+    "completed_at": "2026-11-07T18:51:48.226811+00:00",
+    "log": "roundtrip-demo.log"
+  },
+  {
+    "name": "optparam-lts",
+    "argv": [
+      "/Users/apstndb/.local/share/mise/installs/go/1.26.10/bin/go",
+      "run",
+      "./optparam-plan-probe"
+    ],
+    "exit_code": 0,
+    "started_at": "2026-11-07T18:51:48.227432+00:00",
+    "completed_at": "2026-11-07T18:52:17.335069+00:00",
+    "log": "optparam-lts.log"
+  },
+  {
+    "name": "optparam-r5",
+    "argv": [
+      "/Users/apstndb/.local/share/mise/installs/go/1.26.10/bin/go",
+      "run",
+      "./optparam-plan-probe",
+      "--omni-version",
+      "2026.r5.1"
+    ],
+    "exit_code": 0,
+    "started_at": "2026-11-07T18:52:17.335577+00:00",
+    "completed_at": "2026-11-07T18:52:44.001609+00:00",
+    "log": "optparam-r5.log"
+  }
+]

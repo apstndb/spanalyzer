@@ -1,0 +1,28 @@
+2026/11/08 04:29:15 github.com/testcontainers/testcontainers-go - Connected to docker: 
+  Server Version: 29.2.1
+  API Version: 1.53
+  Operating System: Ubuntu 24.04.4 LTS
+  Total Memory: 7922 MB
+  Testcontainers for Go Version: v0.44.0
+  Resolved Docker Host: unix:///Users/apstndb/.colima/default/docker.sock
+  Resolved Docker Socket Path: /var/run/docker.sock
+  Test SessionID: 9d666d17832f70aa311999532f539e81e0bbc2dbd965c5be2fea843931a502bf
+  Test ProcessID: 28c1fe7d-18d5-4efc-8685-d831d944efca
+2026/11/08 04:29:15 🐳 Creating container for image gcr.io/cloud-spanner-emulator/emulator:1.5.59@sha256:969af6a9349948fbfb4a826c18e160e258a4005f7c759f8e7f2dcec369cccba8
+2026/11/08 04:29:15 🐳 Creating container for image testcontainers/ryuk:0.14.0
+2026/11/08 04:29:15 ✅ Container created: cb7d1ee5ca7f
+2026/11/08 04:29:15 🐳 Starting container: cb7d1ee5ca7f
+2026/11/08 04:29:15 ✅ Container started: cb7d1ee5ca7f
+2026/11/08 04:29:15 ⏳ Waiting for container id cb7d1ee5ca7f image: testcontainers/ryuk:0.14.0. Waiting for: all of: [log message "Started", port 8080/tcp to be listening]
+2026/11/08 04:29:15 Shell not found in container
+2026/11/08 04:29:15 🔔 Container is ready: cb7d1ee5ca7f
+2026/11/08 04:29:15 ✅ Container created: 01c8ab70809a
+2026/11/08 04:29:15 🐳 Starting container: 01c8ab70809a
+2026/11/08 04:29:15 ✅ Container started: 01c8ab70809a
+2026/11/08 04:29:15 ⏳ Waiting for container id 01c8ab70809a image: gcr.io/cloud-spanner-emulator/emulator:1.5.59@sha256:969af6a9349948fbfb4a826c18e160e258a4005f7c759f8e7f2dcec369cccba8. Waiting for: all of: [port 9010/tcp to be listening, log message "Cloud Spanner emulator running"]
+2026/11/08 04:29:15 Shell not found in container
+2026/11/08 04:29:16 🔔 Container is ready: 01c8ab70809a
+2026/11/08 04:29:16 🐳 Stopping container: 01c8ab70809a
+2026/11/08 04:29:16 ✅ Container stopped: 01c8ab70809a
+2026/11/08 04:29:16 🐳 Terminating container: 01c8ab70809a
+2026/11/08 04:29:16 🚫 Container terminated: 01c8ab70809a

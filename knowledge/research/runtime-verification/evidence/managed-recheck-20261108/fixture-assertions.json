@@ -1,0 +1,1207 @@
+{
+  "status": "pass",
+  "checks": 273,
+  "failures": [],
+  "assertions": [
+    {
+      "name": "google-all-initial-steps-recorded",
+      "pass": true
+    },
+    {
+      "name": "google-owned-database-absent",
+      "pass": true
+    },
+    {
+      "name": "google-no-transport-failure",
+      "pass": true
+    },
+    {
+      "name": "google-baseline-code-fixture-connectivity",
+      "pass": true
+    },
+    {
+      "name": "google-baseline-code-score-fixture",
+      "pass": true
+    },
+    {
+      "name": "google-baseline-code-score-search-index",
+      "pass": true
+    },
+    {
+      "name": "google-baseline-code-score-insert",
+      "pass": true
+    },
+    {
+      "name": "google-baseline-code-score-unpinned",
+      "pass": true
+    },
+    {
+      "name": "google-baseline-code-score-set-db-1",
+      "pass": true
+    },
+    {
+      "name": "google-baseline-code-score-pinned-db-1",
+      "pass": true
+    },
+    {
+      "name": "google-baseline-code-score-set-db-2",
+      "pass": true
+    },
+    {
+      "name": "google-baseline-code-score-pinned-db-2",
+      "pass": true
+    },
+    {
+      "name": "google-baseline-code-score-explicit-independent",
+      "pass": true
+    },
+    {
+      "name": "google-baseline-code-bucket-fixture",
+      "pass": true
+    },
+    {
+      "name": "google-baseline-code-bucket-index-seconds",
+      "pass": true
+    },
+    {
+      "name": "google-baseline-code-bucket-index-hour",
+      "pass": true
+    },
+    {
+      "name": "google-baseline-code-bucket-index-none",
+      "pass": true
+    },
+    {
+      "name": "google-baseline-code-bucket-insert",
+      "pass": true
+    },
+    {
+      "name": "google-baseline-code-bucket-values-start",
+      "pass": true
+    },
+    {
+      "name": "google-baseline-code-bucket-update-same-hour",
+      "pass": true
+    },
+    {
+      "name": "google-baseline-code-bucket-values-same-hour",
+      "pass": true
+    },
+    {
+      "name": "google-baseline-code-bucket-update-next-hour",
+      "pass": true
+    },
+    {
+      "name": "google-baseline-code-bucket-values-next-hour",
+      "pass": true
+    },
+    {
+      "name": "google-baseline-code-queue-fixture",
+      "pass": true
+    },
+    {
+      "name": "google-baseline-code-tvf-star-plain",
+      "pass": true
+    },
+    {
+      "name": "google-baseline-code-tvf-star-as",
+      "pass": true
+    },
+    {
+      "name": "google-baseline-code-tvf-star-bare",
+      "pass": true
+    },
+    {
+      "name": "google-baseline-code-graph-node-table",
+      "pass": true
+    },
+    {
+      "name": "google-baseline-code-graph-create",
+      "pass": true
+    },
+    {
+      "name": "google-baseline-code-gql-left-common",
+      "pass": true
+    },
+    {
+      "name": "google-baseline-code-schema-readback",
+      "pass": true
+    },
+    {
+      "name": "google-baseline-code-select-led-select",
+      "pass": true
+    },
+    {
+      "name": "google-baseline-code-select-led-where",
+      "pass": true
+    },
+    {
+      "name": "google-baseline-code-select-led-aggregate",
+      "pass": true
+    },
+    {
+      "name": "google-baseline-code-from-only",
+      "pass": true
+    },
+    {
+      "name": "google-baseline-code-gql-mode-full",
+      "pass": true
+    },
+    {
+      "name": "google-baseline-code-gql-mode-full-outer",
+      "pass": true
+    },
+    {
+      "name": "google-baseline-code-gql-mode-outer",
+      "pass": true
+    },
+    {
+      "name": "google-baseline-code-gql-mode-left",
+      "pass": true
+    },
+    {
+      "name": "google-baseline-code-gql-mode-left-outer",
+      "pass": true
+    },
+    {
+      "name": "google-baseline-code-gql-mode-inner",
+      "pass": true
+    },
+    {
+      "name": "google-baseline-code-graph-insert",
+      "pass": true
+    },
+    {
+      "name": "google-baseline-code-gql-return-order",
+      "pass": true
+    },
+    {
+      "name": "google-baseline-code-gql-return-order-limit",
+      "pass": true
+    },
+    {
+      "name": "google-baseline-code-gql-standalone-order-limit",
+      "pass": true
+    },
+    {
+      "name": "google-baseline-code-gql-cross-next-order-limit",
+      "pass": true
+    },
+    {
+      "name": "google-baseline-code-queue-case-Payload",
+      "pass": true
+    },
+    {
+      "name": "google-baseline-code-queue-case-payload",
+      "pass": true
+    },
+    {
+      "name": "google-baseline-code-queue-case-PAYLOAD",
+      "pass": true
+    },
+    {
+      "name": "google-baseline-code-queue-case-PaYlOaD",
+      "pass": true
+    },
+    {
+      "name": "google-baseline-code-search-enhanced",
+      "pass": true
+    },
+    {
+      "name": "google-baseline-code-search-enhanced-required",
+      "pass": true
+    },
+    {
+      "name": "google-baseline-code-json-table",
+      "pass": true
+    },
+    {
+      "name": "google-baseline-code-json-index",
+      "pass": true
+    },
+    {
+      "name": "google-baseline-code-json-insert",
+      "pass": true
+    },
+    {
+      "name": "google-baseline-code-json-search-equal-auto",
+      "pass": true
+    },
+    {
+      "name": "google-baseline-code-json-search-equal-search",
+      "pass": true
+    },
+    {
+      "name": "google-baseline-code-json-search-equal-base",
+      "pass": true
+    },
+    {
+      "name": "google-baseline-code-json-search-in-auto",
+      "pass": true
+    },
+    {
+      "name": "google-baseline-code-json-search-in-search",
+      "pass": true
+    },
+    {
+      "name": "google-baseline-code-json-search-in-base",
+      "pass": true
+    },
+    {
+      "name": "google-baseline-code-json-search-whole-auto",
+      "pass": true
+    },
+    {
+      "name": "google-baseline-code-json-search-whole-search",
+      "pass": true
+    },
+    {
+      "name": "google-baseline-code-json-search-whole-base",
+      "pass": true
+    },
+    {
+      "name": "google-baseline-code-gql-standalone-corrected",
+      "pass": true
+    },
+    {
+      "name": "google-baseline-code-gql-next-corrected",
+      "pass": true
+    },
+    {
+      "name": "google-baseline-code-set-null-schema",
+      "pass": true
+    },
+    {
+      "name": "google-baseline-code-set-null-insert",
+      "pass": true
+    },
+    {
+      "name": "google-baseline-code-set-null-delete",
+      "pass": true
+    },
+    {
+      "name": "google-baseline-code-set-null-result",
+      "pass": true
+    },
+    {
+      "name": "google-json-equal-auto",
+      "pass": true
+    },
+    {
+      "name": "google-json-plan-equal-auto",
+      "pass": true
+    },
+    {
+      "name": "google-json-equal-search",
+      "pass": true
+    },
+    {
+      "name": "google-json-plan-equal-search",
+      "pass": true
+    },
+    {
+      "name": "google-json-equal-base",
+      "pass": true
+    },
+    {
+      "name": "google-json-plan-equal-base",
+      "pass": true
+    },
+    {
+      "name": "google-json-in-auto",
+      "pass": true
+    },
+    {
+      "name": "google-json-plan-in-auto",
+      "pass": true
+    },
+    {
+      "name": "google-json-in-search",
+      "pass": true
+    },
+    {
+      "name": "google-json-plan-in-search",
+      "pass": true
+    },
+    {
+      "name": "google-json-in-base",
+      "pass": true
+    },
+    {
+      "name": "google-json-plan-in-base",
+      "pass": true
+    },
+    {
+      "name": "google-json-whole-auto",
+      "pass": true
+    },
+    {
+      "name": "google-json-plan-whole-auto",
+      "pass": true
+    },
+    {
+      "name": "google-json-whole-search",
+      "pass": true
+    },
+    {
+      "name": "google-json-plan-whole-search",
+      "pass": true
+    },
+    {
+      "name": "google-json-whole-base",
+      "pass": true
+    },
+    {
+      "name": "google-json-plan-whole-base",
+      "pass": true
+    },
+    {
+      "name": "google-set-null",
+      "pass": true
+    },
+    {
+      "name": "initial-google-v1-full",
+      "pass": true
+    },
+    {
+      "name": "initial-google-v1-offset-0",
+      "pass": true
+    },
+    {
+      "name": "initial-google-v1-offset-2",
+      "pass": true
+    },
+    {
+      "name": "initial-google-v1-offset-4",
+      "pass": true
+    },
+    {
+      "name": "initial-google-v1-pages-cover-once",
+      "pass": true
+    },
+    {
+      "name": "initial-google-v1-total-order",
+      "pass": true
+    },
+    {
+      "name": "initial-google-v2-full",
+      "pass": true
+    },
+    {
+      "name": "initial-google-v2-offset-0",
+      "pass": true
+    },
+    {
+      "name": "initial-google-v2-offset-2",
+      "pass": true
+    },
+    {
+      "name": "initial-google-v2-offset-4",
+      "pass": true
+    },
+    {
+      "name": "initial-google-v2-pages-cover-once",
+      "pass": true
+    },
+    {
+      "name": "initial-google-v2-total-order",
+      "pass": true
+    },
+    {
+      "name": "initial-google-omitted-all-messages-once",
+      "pass": true
+    },
+    {
+      "name": "initial-google-omitted-batch-boundaries",
+      "pass": true
+    },
+    {
+      "name": "initial-google-null-all-messages-once",
+      "pass": true
+    },
+    {
+      "name": "initial-google-null-batch-boundaries",
+      "pass": true
+    },
+    {
+      "name": "initial-google-twenty-all-messages-once",
+      "pass": true
+    },
+    {
+      "name": "initial-google-twenty-batch-boundaries",
+      "pass": true
+    },
+    {
+      "name": "google-database-default-1",
+      "pass": true
+    },
+    {
+      "name": "google-database-default-2",
+      "pass": true
+    },
+    {
+      "name": "volatile-default-ordered",
+      "pass": true
+    },
+    {
+      "name": "volatile-default-varies",
+      "pass": true
+    },
+    {
+      "name": "volatile-default-uuid",
+      "pass": true
+    },
+    {
+      "name": "volatile-false-ordered",
+      "pass": true
+    },
+    {
+      "name": "volatile-false-varies",
+      "pass": true
+    },
+    {
+      "name": "volatile-false-uuid",
+      "pass": true
+    },
+    {
+      "name": "volatile-true-ordered",
+      "pass": true
+    },
+    {
+      "name": "volatile-true-varies",
+      "pass": true
+    },
+    {
+      "name": "volatile-true-uuid",
+      "pass": true
+    },
+    {
+      "name": "dynamic-filter-number",
+      "pass": true
+    },
+    {
+      "name": "dynamic-filter-pattern",
+      "pass": true
+    },
+    {
+      "name": "dynamic-filter-string-negative",
+      "pass": true
+    },
+    {
+      "name": "dynamic-group",
+      "pass": true
+    },
+    {
+      "name": "dynamic-order",
+      "pass": true
+    },
+    {
+      "name": "dynamic-distinct",
+      "pass": true
+    },
+    {
+      "name": "dynamic-compare-properties",
+      "pass": true
+    },
+    {
+      "name": "dynamic-filter-bool",
+      "pass": true
+    },
+    {
+      "name": "dynamic-bare-bool-negative",
+      "pass": true
+    },
+    {
+      "name": "google-repair-complete",
+      "pass": true
+    },
+    {
+      "name": "google-repair-owned-absent",
+      "pass": true
+    },
+    {
+      "name": "repair-google-v1-full",
+      "pass": true
+    },
+    {
+      "name": "repair-google-v1-offset-0",
+      "pass": true
+    },
+    {
+      "name": "repair-google-v1-offset-2",
+      "pass": true
+    },
+    {
+      "name": "repair-google-v1-offset-4",
+      "pass": true
+    },
+    {
+      "name": "repair-google-v1-pages-cover-once",
+      "pass": true
+    },
+    {
+      "name": "repair-google-v1-total-order",
+      "pass": true
+    },
+    {
+      "name": "repair-google-v2-full",
+      "pass": true
+    },
+    {
+      "name": "repair-google-v2-offset-0",
+      "pass": true
+    },
+    {
+      "name": "repair-google-v2-offset-2",
+      "pass": true
+    },
+    {
+      "name": "repair-google-v2-offset-4",
+      "pass": true
+    },
+    {
+      "name": "repair-google-v2-pages-cover-once",
+      "pass": true
+    },
+    {
+      "name": "repair-google-v2-total-order",
+      "pass": true
+    },
+    {
+      "name": "repair-google-omitted-all-messages-once",
+      "pass": true
+    },
+    {
+      "name": "repair-google-omitted-batch-boundaries",
+      "pass": true
+    },
+    {
+      "name": "repair-google-null-all-messages-once",
+      "pass": true
+    },
+    {
+      "name": "repair-google-null-batch-boundaries",
+      "pass": true
+    },
+    {
+      "name": "repair-google-twenty-all-messages-once",
+      "pass": true
+    },
+    {
+      "name": "repair-google-twenty-batch-boundaries",
+      "pass": true
+    },
+    {
+      "name": "google-repair-null-receiver-executes",
+      "pass": true
+    },
+    {
+      "name": "google-repair-twenty-receiver-executes",
+      "pass": true
+    },
+    {
+      "name": "google-repair-omitted-receiver-executes",
+      "pass": true
+    },
+    {
+      "name": "google-repair-seq-control",
+      "pass": true
+    },
+    {
+      "name": "google-repair-seq-table",
+      "pass": true
+    },
+    {
+      "name": "google-repair-seq-insert",
+      "pass": true
+    },
+    {
+      "name": "google-repair-seq-read",
+      "pass": true
+    },
+    {
+      "name": "google-positive-sequence-id",
+      "pass": true
+    },
+    {
+      "name": "repair-google-db-1-setter",
+      "pass": true
+    },
+    {
+      "name": "repair-google-db-1-default",
+      "pass": true
+    },
+    {
+      "name": "repair-google-db-1-pinned-1",
+      "pass": true
+    },
+    {
+      "name": "repair-google-db-1-pinned-2",
+      "pass": true
+    },
+    {
+      "name": "repair-google-db-2-setter",
+      "pass": true
+    },
+    {
+      "name": "repair-google-db-2-default",
+      "pass": true
+    },
+    {
+      "name": "repair-google-db-2-pinned-1",
+      "pass": true
+    },
+    {
+      "name": "repair-google-db-2-pinned-2",
+      "pass": true
+    },
+    {
+      "name": "pg-all-initial-steps-recorded",
+      "pass": true
+    },
+    {
+      "name": "pg-owned-database-absent",
+      "pass": true
+    },
+    {
+      "name": "pg-no-transport-failure",
+      "pass": true
+    },
+    {
+      "name": "pg-baseline-code-fixture-connectivity",
+      "pass": true
+    },
+    {
+      "name": "pg-baseline-code-score-fixture",
+      "pass": true
+    },
+    {
+      "name": "pg-baseline-code-score-search-index",
+      "pass": true
+    },
+    {
+      "name": "pg-baseline-code-score-insert",
+      "pass": true
+    },
+    {
+      "name": "pg-baseline-code-score-unpinned",
+      "pass": true
+    },
+    {
+      "name": "pg-baseline-code-score-set-db-1",
+      "pass": true
+    },
+    {
+      "name": "pg-baseline-code-score-pinned-db-1",
+      "pass": true
+    },
+    {
+      "name": "pg-baseline-code-score-set-db-2",
+      "pass": true
+    },
+    {
+      "name": "pg-baseline-code-score-pinned-db-2",
+      "pass": true
+    },
+    {
+      "name": "pg-baseline-code-score-explicit-independent",
+      "pass": true
+    },
+    {
+      "name": "pg-baseline-code-bucket-pg-query",
+      "pass": true
+    },
+    {
+      "name": "pg-baseline-code-bucket-pg-boundaries",
+      "pass": true
+    },
+    {
+      "name": "pg-baseline-code-pg-jsonb-sort",
+      "pass": true
+    },
+    {
+      "name": "pg-baseline-code-pg-jsonb-count",
+      "pass": true
+    },
+    {
+      "name": "pg-baseline-code-json-table",
+      "pass": true
+    },
+    {
+      "name": "pg-baseline-code-json-index",
+      "pass": true
+    },
+    {
+      "name": "pg-baseline-code-json-insert",
+      "pass": true
+    },
+    {
+      "name": "pg-baseline-code-json-search-equal-auto",
+      "pass": true
+    },
+    {
+      "name": "pg-baseline-code-json-search-equal-search",
+      "pass": true
+    },
+    {
+      "name": "pg-baseline-code-json-search-equal-base",
+      "pass": true
+    },
+    {
+      "name": "pg-baseline-code-json-search-in-auto",
+      "pass": true
+    },
+    {
+      "name": "pg-baseline-code-json-search-in-search",
+      "pass": true
+    },
+    {
+      "name": "pg-baseline-code-json-search-in-base",
+      "pass": true
+    },
+    {
+      "name": "pg-baseline-code-json-search-whole-auto",
+      "pass": true
+    },
+    {
+      "name": "pg-baseline-code-json-search-whole-search",
+      "pass": true
+    },
+    {
+      "name": "pg-baseline-code-json-search-whole-base",
+      "pass": true
+    },
+    {
+      "name": "pg-baseline-code-pg-stats-metadata",
+      "pass": true
+    },
+    {
+      "name": "pg-baseline-code-pg-stats-query_stats_top_minute",
+      "pass": true
+    },
+    {
+      "name": "pg-baseline-code-pg-stats-query_stats_top_minute-cpu_seconds_distribution",
+      "pass": true
+    },
+    {
+      "name": "pg-baseline-code-pg-stats-query_stats_top_minute-row_scanned_distribution",
+      "pass": true
+    },
+    {
+      "name": "pg-baseline-code-pg-stats-query_stats_top_10minute",
+      "pass": true
+    },
+    {
+      "name": "pg-baseline-code-pg-stats-query_stats_top_10minute-cpu_seconds_distribution",
+      "pass": true
+    },
+    {
+      "name": "pg-baseline-code-pg-stats-query_stats_top_10minute-row_scanned_distribution",
+      "pass": true
+    },
+    {
+      "name": "pg-baseline-code-pg-stats-query_stats_top_hour",
+      "pass": true
+    },
+    {
+      "name": "pg-baseline-code-pg-stats-query_stats_top_hour-cpu_seconds_distribution",
+      "pass": true
+    },
+    {
+      "name": "pg-baseline-code-pg-stats-query_stats_top_hour-row_scanned_distribution",
+      "pass": true
+    },
+    {
+      "name": "pg-baseline-code-pg-stats-query_stats_total_minute",
+      "pass": true
+    },
+    {
+      "name": "pg-baseline-code-pg-stats-query_stats_total_minute-cpu_seconds_distribution",
+      "pass": true
+    },
+    {
+      "name": "pg-baseline-code-pg-stats-query_stats_total_minute-row_scanned_distribution",
+      "pass": true
+    },
+    {
+      "name": "pg-baseline-code-pg-stats-query_stats_total_10minute",
+      "pass": true
+    },
+    {
+      "name": "pg-baseline-code-pg-stats-query_stats_total_10minute-cpu_seconds_distribution",
+      "pass": true
+    },
+    {
+      "name": "pg-baseline-code-pg-stats-query_stats_total_10minute-row_scanned_distribution",
+      "pass": true
+    },
+    {
+      "name": "pg-baseline-code-pg-stats-query_stats_total_hour",
+      "pass": true
+    },
+    {
+      "name": "pg-baseline-code-pg-stats-query_stats_total_hour-cpu_seconds_distribution",
+      "pass": true
+    },
+    {
+      "name": "pg-baseline-code-pg-stats-query_stats_total_hour-row_scanned_distribution",
+      "pass": true
+    },
+    {
+      "name": "pg-baseline-code-pg-stats-struct-negative",
+      "pass": true
+    },
+    {
+      "name": "pg-baseline-code-set-null-schema",
+      "pass": true
+    },
+    {
+      "name": "pg-baseline-code-set-null-insert",
+      "pass": true
+    },
+    {
+      "name": "pg-baseline-code-set-null-delete",
+      "pass": true
+    },
+    {
+      "name": "pg-baseline-code-set-null-result",
+      "pass": true
+    },
+    {
+      "name": "pg-json-equal-auto",
+      "pass": true
+    },
+    {
+      "name": "pg-json-plan-equal-auto",
+      "pass": true
+    },
+    {
+      "name": "pg-json-equal-search",
+      "pass": true
+    },
+    {
+      "name": "pg-json-plan-equal-search",
+      "pass": true
+    },
+    {
+      "name": "pg-json-equal-base",
+      "pass": true
+    },
+    {
+      "name": "pg-json-plan-equal-base",
+      "pass": true
+    },
+    {
+      "name": "pg-json-in-auto",
+      "pass": true
+    },
+    {
+      "name": "pg-json-plan-in-auto",
+      "pass": true
+    },
+    {
+      "name": "pg-json-in-search",
+      "pass": true
+    },
+    {
+      "name": "pg-json-plan-in-search",
+      "pass": true
+    },
+    {
+      "name": "pg-json-in-base",
+      "pass": true
+    },
+    {
+      "name": "pg-json-plan-in-base",
+      "pass": true
+    },
+    {
+      "name": "pg-json-whole-auto",
+      "pass": true
+    },
+    {
+      "name": "pg-json-plan-whole-auto",
+      "pass": true
+    },
+    {
+      "name": "pg-json-whole-search",
+      "pass": true
+    },
+    {
+      "name": "pg-json-plan-whole-search",
+      "pass": true
+    },
+    {
+      "name": "pg-json-whole-base",
+      "pass": true
+    },
+    {
+      "name": "pg-json-plan-whole-base",
+      "pass": true
+    },
+    {
+      "name": "pg-set-null",
+      "pass": true
+    },
+    {
+      "name": "initial-pg-v1-full",
+      "pass": true
+    },
+    {
+      "name": "initial-pg-v1-offset-0",
+      "pass": true
+    },
+    {
+      "name": "initial-pg-v1-offset-2",
+      "pass": true
+    },
+    {
+      "name": "initial-pg-v1-offset-4",
+      "pass": true
+    },
+    {
+      "name": "initial-pg-v1-pages-cover-once",
+      "pass": true
+    },
+    {
+      "name": "initial-pg-v1-total-order",
+      "pass": true
+    },
+    {
+      "name": "initial-pg-v2-full",
+      "pass": true
+    },
+    {
+      "name": "initial-pg-v2-offset-0",
+      "pass": true
+    },
+    {
+      "name": "initial-pg-v2-offset-2",
+      "pass": true
+    },
+    {
+      "name": "initial-pg-v2-offset-4",
+      "pass": true
+    },
+    {
+      "name": "initial-pg-v2-pages-cover-once",
+      "pass": true
+    },
+    {
+      "name": "initial-pg-v2-total-order",
+      "pass": true
+    },
+    {
+      "name": "pg-repair-complete",
+      "pass": true
+    },
+    {
+      "name": "pg-repair-owned-absent",
+      "pass": true
+    },
+    {
+      "name": "repair-pg-v1-full",
+      "pass": true
+    },
+    {
+      "name": "repair-pg-v1-offset-0",
+      "pass": true
+    },
+    {
+      "name": "repair-pg-v1-offset-2",
+      "pass": true
+    },
+    {
+      "name": "repair-pg-v1-offset-4",
+      "pass": true
+    },
+    {
+      "name": "repair-pg-v1-pages-cover-once",
+      "pass": true
+    },
+    {
+      "name": "repair-pg-v1-total-order",
+      "pass": true
+    },
+    {
+      "name": "repair-pg-v2-full",
+      "pass": true
+    },
+    {
+      "name": "repair-pg-v2-offset-0",
+      "pass": true
+    },
+    {
+      "name": "repair-pg-v2-offset-2",
+      "pass": true
+    },
+    {
+      "name": "repair-pg-v2-offset-4",
+      "pass": true
+    },
+    {
+      "name": "repair-pg-v2-pages-cover-once",
+      "pass": true
+    },
+    {
+      "name": "repair-pg-v2-total-order",
+      "pass": true
+    },
+    {
+      "name": "repair-pg-null-all-messages-once",
+      "pass": true
+    },
+    {
+      "name": "repair-pg-null-batch-boundaries",
+      "pass": true
+    },
+    {
+      "name": "repair-pg-twenty-all-messages-once",
+      "pass": true
+    },
+    {
+      "name": "repair-pg-twenty-batch-boundaries",
+      "pass": true
+    },
+    {
+      "name": "pg-repair-null-receiver-executes",
+      "pass": true
+    },
+    {
+      "name": "pg-repair-twenty-receiver-executes",
+      "pass": true
+    },
+    {
+      "name": "pg-repair-omitted-argument-rejected",
+      "pass": true
+    },
+    {
+      "name": "pg-repair-seq-control",
+      "pass": true
+    },
+    {
+      "name": "pg-repair-seq-table",
+      "pass": true
+    },
+    {
+      "name": "pg-repair-seq-insert",
+      "pass": true
+    },
+    {
+      "name": "pg-repair-seq-read",
+      "pass": true
+    },
+    {
+      "name": "pg-positive-sequence-id",
+      "pass": true
+    }
+  ],
+  "observations": {
+    "google": {
+      "initial_batches": {
+        "omitted": {
+          "code": "OK",
+          "messages": 40,
+          "sizes": [
+            10,
+            30
+          ]
+        },
+        "null": {
+          "code": "OK",
+          "messages": 40,
+          "sizes": [
+            30,
+            10
+          ]
+        },
+        "twenty": {
+          "code": "OK",
+          "messages": 40,
+          "sizes": [
+            20,
+            20
+          ]
+        }
+      },
+      "code_counts": {
+        "OK": 108,
+        "InvalidArgument": 8,
+        "NOT_RUN": 6,
+        "NotFound": 1
+      },
+      "repair_batches": {
+        "omitted": {
+          "code": "OK",
+          "messages": 40,
+          "sizes": [
+            30,
+            10
+          ]
+        },
+        "null": {
+          "code": "OK",
+          "messages": 40,
+          "sizes": [
+            10,
+            30
+          ]
+        },
+        "twenty": {
+          "code": "OK",
+          "messages": 40,
+          "sizes": [
+            20,
+            20
+          ]
+        }
+      }
+    },
+    "pg": {
+      "initial_batches": {
+        "omitted": {
+          "code": "InvalidArgument",
+          "error": "spanner: code = \"InvalidArgument\", desc = \"[ERROR] function spanner.receive_batchomitted(max_duration => unknown) does not exist\\\\nHint: No function matches the given name and argument types. You might need to add explicit type casts.\", requestID = \"<redacted>\""
+        },
+        "null": {
+          "code": "InvalidArgument",
+          "error": "spanner: code = \"InvalidArgument\", desc = \"[ERROR] function spanner.receive_batchnull(max_duration => unknown, max_batch_size => unknown) does not exist\\\\nHint: No function matches the given name and argument types. You might need to add explicit type casts.\", requestID = \"<redacted>\""
+        },
+        "twenty": {
+          "code": "InvalidArgument",
+          "error": "spanner: code = \"InvalidArgument\", desc = \"[ERROR] function spanner.receive_batchtwenty(max_duration => unknown, max_batch_size => bigint) does not exist\\\\nHint: No function matches the given name and argument types. You might need to add explicit type casts.\", requestID = \"<redacted>\""
+        }
+      },
+      "code_counts": {
+        "OK": 63,
+        "InvalidArgument": 10,
+        "NOT_RUN": 9,
+        "Unimplemented": 1,
+        "NotFound": 1
+      },
+      "repair_batches": {
+        "omitted": {
+          "code": "InvalidArgument",
+          "error": "spanner: code = \"InvalidArgument\", desc = \"[ERROR] function spanner.receive_batchomitted(priority => unknown, max_duration => unknown) does not exist\\\\nHint: No function matches the given name and argument types. You might need to add explicit type casts.\", requestID = \"<redacted>\""
+        },
+        "null": {
+          "code": "OK",
+          "messages": 40,
+          "sizes": [
+            30,
+            10
+          ]
+        },
+        "twenty": {
+          "code": "OK",
+          "messages": 40,
+          "sizes": [
+            20,
+            20
+          ]
+        }
+      }
+    }
+  },
+  "boundary": "Passing assertions validate bounded outcomes and ownership. Initial misconfigured probes and known engine rejections remain retained; they do not become a fully passing live integration suite."
+}

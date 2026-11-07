@@ -1,0 +1,27 @@
+2026/11/08 04:29:35 github.com/testcontainers/testcontainers-go - Connected to docker: 
+  Server Version: 29.2.1
+  API Version: 1.53
+  Operating System: Ubuntu 24.04.4 LTS
+  Total Memory: 7922 MB
+  Testcontainers for Go Version: v0.44.0
+  Resolved Docker Host: unix:///Users/apstndb/.colima/default/docker.sock
+  Resolved Docker Socket Path: /var/run/docker.sock
+  Test SessionID: 97babf40c9365c1b970253ee068642f168cd515b79ba65bb0a4eee86ef6c3446
+  Test ProcessID: 21e7e4b3-68b2-4457-b047-3a1b125c6df6
+2026/11/08 04:29:35 🐳 Creating container for image us-docker.pkg.dev/spanner-omni/images/spanner-omni:2026.r4-lts.2@sha256:b607b10bee3c1903f0a7f88f99bece67cb0dd9d9a028aee64226fc311bd78dae
+2026/11/08 04:29:35 🐳 Creating container for image testcontainers/ryuk:0.14.0
+2026/11/08 04:29:35 ✅ Container created: ffda1d1f4034
+2026/11/08 04:29:35 🐳 Starting container: ffda1d1f4034
+2026/11/08 04:29:36 ✅ Container started: ffda1d1f4034
+2026/11/08 04:29:36 ⏳ Waiting for container id ffda1d1f4034 image: testcontainers/ryuk:0.14.0. Waiting for: all of: [log message "Started", port 8080/tcp to be listening]
+2026/11/08 04:29:36 Shell not found in container
+2026/11/08 04:29:36 🔔 Container is ready: ffda1d1f4034
+2026/11/08 04:29:36 ✅ Container created: 82b81c7916ae
+2026/11/08 04:29:36 🐳 Starting container: 82b81c7916ae
+2026/11/08 04:29:36 ✅ Container started: 82b81c7916ae
+2026/11/08 04:29:36 ⏳ Waiting for container id 82b81c7916ae image: us-docker.pkg.dev/spanner-omni/images/spanner-omni:2026.r4-lts.2@sha256:b607b10bee3c1903f0a7f88f99bece67cb0dd9d9a028aee64226fc311bd78dae. Waiting for: all of: [log message "Spanner is ready", first exposed port to be accessible externally]
+2026/11/08 04:29:42 🔔 Container is ready: 82b81c7916ae
+2026/11/08 04:29:43 🐳 Stopping container: 82b81c7916ae
+2026/11/08 04:29:53 ✅ Container stopped: 82b81c7916ae
+2026/11/08 04:29:53 🐳 Terminating container: 82b81c7916ae
+2026/11/08 04:29:53 🚫 Container terminated: 82b81c7916ae

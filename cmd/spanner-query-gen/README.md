@@ -244,6 +244,8 @@ Current `plan-report --help` output:
 
 ```text
 Usage of spanner-query-gen plan-report:
+  -annotate string
+        rendered-plan annotation: seekability
   -backend string
         runtime backend: omni (default "omni")
   -backend-image-digest string
@@ -409,6 +411,18 @@ published endpoint when `SPANEMUBOOST_ENDPOINT_FILE` or `SPANEMUBOOST_OMNI_URI`
 is set and otherwise falls back to testcontainers. When an Omni endpoint is
 configured, the Docker health check is skipped so tests can run without a local
 container runtime.
+
+`plan-report` retains invalid SQL targets as errors while collecting other
+queries. It acquires all optional SQL variants, DML queries configured with
+`result.cardinality: row_count` or `row_set`, and generated DML write helpers.
+DML collection is PLAN-only and explicitly rolls back. `row_count` needs no
+result struct; other result modes retain their row-struct requirement.
+
+Reports and CEL expose scan-local `access_paths`, including seek/residual
+expressions, proven column references and catalog key facts. Add
+`--annotate seekability` to render positive range-key metadata as `k/N` without
+changing raw plans or contract inputs. See [Plan Contracts](PLAN_CONTRACTS.md#logical-access-paths-and-predicates)
+for scoped checks, variant IDs and the partial-report boundary.
 
 `plan-report` uses the same Omni plan source for review artifacts. It also
 attaches to `SPANEMUBOOST_ENDPOINT_FILE` or `SPANEMUBOOST_OMNI_URI` when set:

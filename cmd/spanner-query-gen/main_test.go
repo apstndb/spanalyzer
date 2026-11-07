@@ -210,7 +210,7 @@ func TestRunConfigSchemaKeepsExecAndConflictOutOfPublicV1Alpha(t *testing.T) {
 	queryResult := defs["query_result"].(map[string]interface{})
 	resultProperties := queryResult["properties"].(map[string]interface{})
 	cardinality := resultProperties["cardinality"].(map[string]interface{})
-	if got, want := strings.Join(interfaceStrings(cardinality["enum"].([]interface{})), ","), "one,maybe_one,many"; got != want {
+	if got, want := strings.Join(interfaceStrings(cardinality["enum"].([]interface{})), ","), "one,maybe_one,many,row_count,row_set"; got != want {
 		t.Fatalf("query_result.cardinality enum = %q, want %q", got, want)
 	}
 	write := defs["write"].(map[string]interface{})
@@ -742,7 +742,7 @@ func TestRunPlanReportSchemaContractEvaluationResolvedTargetRequired(t *testing.
 		t.Fatalf("contract_evaluation.target_id pattern = %v, want %v", got, want)
 	}
 	scope := properties["scope"].(map[string]interface{})
-	if got, want := scope["enum"].([]interface{}), []interface{}{"query", "external_query.inner"}; !reflect.DeepEqual(got, want) {
+	if got, want := scope["enum"].([]interface{}), []interface{}{"query", "external_query.inner", "write"}; !reflect.DeepEqual(got, want) {
 		t.Fatalf("contract_evaluation.scope enum = %v, want %v", got, want)
 	}
 	if _, ok := properties["backend"]; ok {
@@ -1100,7 +1100,7 @@ func TestPlanReportSchemaTargetIDsAndScopesAreCanonical(t *testing.T) {
 		t.Fatalf("query.name pattern = %v, want %v", got, want)
 	}
 	queryScope := queryProperties["scope"].(map[string]interface{})
-	if got, want := queryScope["enum"].([]interface{}), []interface{}{"query", "external_query.inner"}; !reflect.DeepEqual(got, want) {
+	if got, want := queryScope["enum"].([]interface{}), []interface{}{"query", "external_query.inner", "write"}; !reflect.DeepEqual(got, want) {
 		t.Fatalf("query.scope enum = %v, want %v", got, want)
 	}
 	contractEvaluation := defs["contract_evaluation"].(map[string]interface{})
@@ -1126,7 +1126,7 @@ func TestPlanReportSchemaTargetIDsAndScopesAreCanonical(t *testing.T) {
 		t.Fatalf("excluded_target.id pattern = %v, want %v", got, want)
 	}
 	excludedScope := excludedProperties["scope"].(map[string]interface{})
-	if got, want := excludedScope["enum"].([]interface{}), []interface{}{"query", "external_query.inner"}; !reflect.DeepEqual(got, want) {
+	if got, want := excludedScope["enum"].([]interface{}), []interface{}{"query", "external_query.inner", "write"}; !reflect.DeepEqual(got, want) {
 		t.Fatalf("excluded_target.scope enum = %v, want %v", got, want)
 	}
 	excludedReason := excludedProperties["reason"].(map[string]interface{})
@@ -1235,6 +1235,7 @@ func TestPlanReportSchemaErrorAndSkippedQueriesForbidPlanFields(t *testing.T) {
 		"operator_family_counts",
 		"normalized_operators",
 		"operator_edges",
+		"access_paths",
 		"plan",
 		"classification_warnings",
 	}
@@ -1884,7 +1885,7 @@ func TestPlanReportOptimizerEnvironmentPinned(t *testing.T) {
 
 func TestDefaultPlanReportNormalizationCELInputDefaults(t *testing.T) {
 	normalization := defaultPlanReportNormalization()
-	if got, want := normalization.OperatorTreeVersion, "v1alpha.3"; got != want {
+	if got, want := normalization.OperatorTreeVersion, "v1alpha.4"; got != want {
 		t.Fatalf("operator tree version = %q, want %q", got, want)
 	}
 	if got, want := normalization.OperatorFamilyMappingVersion, "v1alpha.2"; got != want {
@@ -4315,7 +4316,7 @@ contracts:
 `), 0644); err != nil {
 		t.Fatalf("WriteFile() error = %v", err)
 	}
-	if _, err := readPlanContracts(path); err == nil || !strings.Contains(err.Error(), "target \"LookupSingerByName\" must match ^query/") {
+	if _, err := readPlanContracts(path); err == nil || !strings.Contains(err.Error(), "target \"LookupSingerByName\" must match "+planContractTargetIDPattern) {
 		t.Fatalf("readPlanContracts() error = %v, want target pattern error", err)
 	}
 }
@@ -4748,7 +4749,7 @@ func TestBuildPlanReportNoTargets(t *testing.T) {
 	if got, want := report.BackendIdentity.Version, "not_recorded"; got != want {
 		t.Fatalf("plan-report backend version = %q, want %q", got, want)
 	}
-	if got, want := report.Normalization.OperatorTreeVersion, "v1alpha.3"; got != want {
+	if got, want := report.Normalization.OperatorTreeVersion, "v1alpha.4"; got != want {
 		t.Fatalf("plan-report operator tree version = %q, want %q", got, want)
 	}
 	if got, want := report.Optimizer.Requested.Version, "8"; got != want {
@@ -4985,12 +4986,10 @@ func TestPlanReportParamValuesOnlyOrderByChoiceReturnsNil(t *testing.T) {
 	}
 }
 
-func TestPlanReportParamValuesRejectUnsupportedType(t *testing.T) {
-	_, err := planReportParamValues([]querygen.QueryCodegenParam{
-		{Name: "payload", Type: "STRUCT<id INT64>"},
-	})
-	if err == nil || !strings.Contains(err.Error(), "unsupported plan-report parameter type STRUCT") {
-		t.Fatalf("planReportParamValues() error = %v, want unsupported STRUCT error", err)
+func TestPlanReportParamValuesSupportStruct(t *testing.T) {
+	values, err := planReportParamValues([]querygen.QueryCodegenParam{{Name: "payload", Type: "STRUCT<id INT64>"}})
+	if err != nil || values["payload"] == nil {
+		t.Fatalf("STRUCT value = %v, %v", values, err)
 	}
 }
 

@@ -43,7 +43,7 @@ const (
 
 const (
 	IdentifierPattern = `[A-Za-z_][A-Za-z0-9_]*`
-	TargetIDPattern   = `^query/` + IdentifierPattern + `(#inner)?$`
+	TargetIDPattern   = `^(query|write)/` + IdentifierPattern + `(/variant/[A-Za-z0-9_-]+)?(#inner)?$`
 )
 
 var (
@@ -141,6 +141,7 @@ type Query struct {
 	OperatorFamilyCounts  map[string]int
 	NormalizedOperators   []Operator
 	OperatorEdges         []OperatorEdge
+	AccessPaths           []AccessPath
 	Error                 string
 	OptimizerNotPinned    bool
 	PlanEnvironmentNotes  []string
@@ -152,6 +153,7 @@ type Query struct {
 type Operator struct {
 	Index               int32          `json:"index" yaml:"index"`
 	DisplayName         string         `json:"display_name" yaml:"display_name"`
+	Expression          string         `json:"expression,omitempty" yaml:"expression,omitempty"`
 	Family              string         `json:"family" yaml:"family"`
 	ExecutionMethod     string         `json:"execution_method,omitempty" yaml:"execution_method,omitempty"`
 	IteratorType        string         `json:"iterator_type,omitempty" yaml:"iterator_type,omitempty"`
@@ -180,6 +182,7 @@ type OperatorEdge struct {
 	ChildIndex  int32  `json:"child_index" yaml:"child_index"`
 	Type        string `json:"type,omitempty" yaml:"type,omitempty"`
 	Variable    string `json:"variable,omitempty" yaml:"variable,omitempty"`
+	Expression  string `json:"expression,omitempty" yaml:"expression,omitempty"`
 }
 
 // Diagnostic records plan normalization or classification warnings.
@@ -881,6 +884,7 @@ func newCELEnv() (*cel.Env, error) {
 		cel.Variable("query", cel.DynType),
 		cel.Variable("operators", cel.ListType(cel.DynType)),
 		cel.Variable("operator_edges", cel.ListType(cel.DynType)),
+		cel.Variable("access_paths", cel.ListType(cel.DynType)),
 		cel.Variable("operator_families", cel.ListType(cel.StringType)),
 		cel.Variable("operator_family_counts", cel.MapType(cel.StringType, cel.IntType)),
 		cel.Variable("optimizer", cel.DynType),
@@ -899,6 +903,7 @@ func celActivation(report Report, query Query) map[string]interface{} {
 		"query":                  celQuery(query),
 		"operators":              celOperators(query.NormalizedOperators),
 		"operator_edges":         celOperatorEdges(query.OperatorEdges),
+		"access_paths":           celAccessPaths(query.AccessPaths),
 		"operator_families":      query.OperatorFamilies,
 		"operator_family_counts": OperatorFamilyCountsOrEmpty(query.OperatorFamilyCounts),
 		"optimizer": map[string]interface{}{
@@ -941,6 +946,7 @@ func celOperators(operators []Operator) []map[string]interface{} {
 		out = append(out, map[string]interface{}{
 			"index":                 operator.Index,
 			"display_name":          operator.DisplayName,
+			"expression":            operator.Expression,
 			"family":                operator.Family,
 			"execution_method":      operator.ExecutionMethod,
 			"iterator_type":         operator.IteratorType,
@@ -974,6 +980,7 @@ func celOperatorEdges(edges []OperatorEdge) []map[string]interface{} {
 			"child_index":  edge.ChildIndex,
 			"type":         edge.Type,
 			"variable":     edge.Variable,
+			"expression":   edge.Expression,
 		})
 	}
 	return out
@@ -1007,6 +1014,8 @@ func TargetID(queryName, scope string) string {
 	switch Scope(scope) {
 	case "external_query.inner":
 		return "query/" + queryName + "#inner"
+	case "write":
+		return "write/" + queryName
 	default:
 		return "query/" + queryName
 	}

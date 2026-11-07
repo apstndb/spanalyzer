@@ -1,0 +1,18 @@
+{
+  "argv": [
+    "/Users/apstndb/.local/share/mise/installs/go/1.26.10/bin/go",
+    "test",
+    "-count=1",
+    "-v",
+    "-tags=integration,omni",
+    "-run",
+    "^TestIntegrationPlanReportFeedbackOnOmni$",
+    "-timeout=10m",
+    "."
+  ],
+  "exit_code": 0,
+  "started_at": "2026-11-07T17:08:50.696432+00:00",
+  "completed_at": "2026-11-07T17:10:27.657348+00:00",
+  "producer_snapshot_sha256": "6d45a6fee06c87384d7e5cdd25b702d451eb76ff73d3c563df6e76bfb6fc8b0e",
+  "target": "runtime_targets.json pinned Omni 2026.r2.1-beta; optimizer 9; owned fresh local container"
+}

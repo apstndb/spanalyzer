@@ -1,0 +1,28 @@
+{
+  "production_sources_match_runtime_snapshot": true,
+  "post_runtime_changes": [
+    "cmd/spanner-query-gen/main_test.go"
+  ],
+  "classification": "Only three unit-test expectations now accept the write scope; production and live-test code unchanged.",
+  "final_source_sha256": {
+    "cmd/spanner-query-gen/config_schema.go": "0c24a9c94e8b7df8276a85f8cebabb39e656e41efd7efa956e67e4f8ba841295",
+    "cmd/spanner-query-gen/main_test.go": "216844ea7d83100acde4a157600c5f72f2ca8a9c9478a3e030855dd435157ae2",
+    "cmd/spanner-query-gen/plan_access_path_schema.go": "748054da570ba2e5705274b174a93e805d4267b50ed97cf9db335a34e4adbfe3",
+    "cmd/spanner-query-gen/plan_report.go": "3fb5c5e960999f9de80893da9342b46c9aa21f4b65d5b1394525ac4383e3ebbf",
+    "cmd/spanner-query-gen/plan_report_analyzer.go": "55264df88f9d5235bc197a37006d8c4c5dafc64fd15adb77df2fd31286a0a291",
+    "cmd/spanner-query-gen/plan_report_annotations.go": "8ac5b0d756b5c1d751d903d8cb069c72edb286f9bcd95de719298ccf1d21d2c7",
+    "cmd/spanner-query-gen/plan_report_feedback_omni_test.go": "b3e1a42f5dac1c7acfecfe2689f3baac060327f75b960aff0a5fc1b346e4062a",
+    "cmd/spanner-query-gen/plan_report_feedback_test.go": "62ba07eb260afb9ff921e5ec6f194dab0b89704d40f5070f87b4bdd975ecaa55",
+    "cmd/spanner-query-gen/plan_report_param_struct.go": "00727ee239768f6a2c315595bfb7d46d971caa47c1dd0320265955590161cf65",
+    "internal/querygen/querygen.go": "71e3b9ad4633fe7928509b740edb8e3ff41d8f1c3a33af4fa9a1cfef189b80b5",
+    "internal/querygen/querygen_config.go": "48b53094d6f5070fc14f1a3abcb723c451044029232b41d78eee13bf6f566f35",
+    "internal/querygen/querygen_test.go": "79ba0b252e76747810970fc099ab71b8518b526b5d6afab02617af4191985905",
+    "internal/querygen/report_plan.go": "07dd7bf716928b15fee4d2e7c7e181a37c9e4a6eb11c5a8ab24871e30babbd4f",
+    "internal/querygen/report_plan_test.go": "fbf600db4448709677f0dac83185e1c2edbf9a2b78db363b5e7814dfcf8ac965",
+    "plancontract/access_paths.go": "c7b11c9365857031c487353de0fafb9ffa9604fd74afbbdf9d7a54c0e58c3c0c",
+    "plancontract/access_paths_cel.go": "9c53d7ba9656470fffcfab320083ba7d3f1a94a1fc02a134f4c56b4ba6c0427d",
+    "plancontract/access_paths_test.go": "0211cdebbcb43562cdbccbe3f9d116690256ece2ebe54902cbe26ce1f4964280",
+    "plancontract/normalize.go": "ebdbdd3d2be5030f9d905b4636eb4b3acec862818b8775be2998d7263c2b2c9d",
+    "plancontract/plancontract.go": "f2cae5fd07f8a67972e8eb0bb432b010866568efa6299d8a1cd6659d2dfdfd74"
+  }
+}

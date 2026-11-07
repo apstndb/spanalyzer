@@ -1,0 +1,1248 @@
+{
+  "dialect": "google",
+  "steps": [
+    {
+      "label": "fixture-connectivity",
+      "kind": "query",
+      "sql": "SELECT 1 AS connectivity",
+      "family": "extension"
+    },
+    {
+      "label": "score-fixture",
+      "family": "score",
+      "kind": "ddl",
+      "sql": "CREATE TABLE ScoreDocs (Id INT64 NOT NULL, Body STRING(MAX), BodyTokens TOKENLIST AS (TOKENIZE_FULLTEXT(Body)) HIDDEN) PRIMARY KEY(Id)"
+    },
+    {
+      "label": "score-search-index",
+      "family": "score",
+      "kind": "ddl",
+      "sql": "CREATE SEARCH INDEX ScoreIndex ON ScoreDocs(BodyTokens)",
+      "requires": [
+        "score-fixture"
+      ]
+    },
+    {
+      "label": "score-insert",
+      "family": "score",
+      "kind": "dml",
+      "sql": "",
+      "statements": [
+        "INSERT INTO ScoreDocs(Id,Body) VALUES (1,'cat cat dog'),(2,'cat dog'),(3,'dog')"
+      ],
+      "requires": [
+        "score-fixture"
+      ]
+    },
+    {
+      "label": "score-unpinned",
+      "family": "score",
+      "kind": "query",
+      "sql": "SELECT Id, SCORE(BodyTokens,'cat') AS default_score, SCORE(BodyTokens,'cat', options => JSON '{\"version\": 1}') AS version1_score, SCORE(BodyTokens,'cat', options => JSON '{\"version\": 2}') AS version2_score FROM ScoreDocs WHERE SEARCH(BodyTokens,'cat') ORDER BY Id",
+      "requires": [
+        "score-insert",
+        "score-search-index"
+      ]
+    },
+    {
+      "label": "score-set-db-1",
+      "family": "score",
+      "kind": "ddl",
+      "sql": "ALTER DATABASE {{DATABASE}} SET OPTIONS (score_version = 1)"
+    },
+    {
+      "label": "score-pinned-db-1",
+      "family": "score",
+      "kind": "query",
+      "sql": "SELECT Id, SCORE(BodyTokens,'cat') AS default_score, SCORE(BodyTokens,'cat', options => JSON '{\"version\": 1}') AS version1_score, SCORE(BodyTokens,'cat', options => JSON '{\"version\": 2}') AS version2_score FROM ScoreDocs WHERE SEARCH(BodyTokens,'cat') ORDER BY Id",
+      "requires": [
+        "score-insert",
+        "score-search-index",
+        "score-set-db-1"
+      ]
+    },
+    {
+      "label": "score-set-db-2",
+      "family": "score",
+      "kind": "ddl",
+      "sql": "ALTER DATABASE {{DATABASE}} SET OPTIONS (score_version = 2)"
+    },
+    {
+      "label": "score-pinned-db-2",
+      "family": "score",
+      "kind": "query",
+      "sql": "SELECT Id, SCORE(BodyTokens,'cat') AS default_score, SCORE(BodyTokens,'cat', options => JSON '{\"version\": 1}') AS version1_score, SCORE(BodyTokens,'cat', options => JSON '{\"version\": 2}') AS version2_score FROM ScoreDocs WHERE SEARCH(BodyTokens,'cat') ORDER BY Id",
+      "requires": [
+        "score-insert",
+        "score-search-index",
+        "score-set-db-2"
+      ]
+    },
+    {
+      "label": "score-explicit-independent",
+      "family": "score",
+      "kind": "query",
+      "sql": "SELECT Id, SCORE(BodyTokens,'cat', options => JSON '{\"version\": 1}') AS version1_score, SCORE(BodyTokens,'cat', options => JSON '{\"version\": 2}') AS version2_score FROM ScoreDocs WHERE SEARCH(BodyTokens,'cat') ORDER BY Id",
+      "requires": [
+        "score-insert",
+        "score-search-index"
+      ]
+    },
+    {
+      "label": "bucket-fixture",
+      "family": "bucket",
+      "kind": "ddl",
+      "sql": "CREATE TABLE BucketFixed (Id INT64 NOT NULL, Body STRING(MAX), UpdatedAt TIMESTAMP NOT NULL, UpdatedSeconds INT64 NOT NULL AS (UNIX_SECONDS(UpdatedAt)) STORED, HourBucket INT64 NOT NULL AS (UNIX_SECONDS(TIMESTAMP_TRUNC(UpdatedAt,HOUR))) STORED, BodyTokens TOKENLIST AS (TOKENIZE_FULLTEXT(Body)) HIDDEN) PRIMARY KEY(Id)"
+    },
+    {
+      "label": "bucket-index-seconds",
+      "family": "bucket",
+      "kind": "ddl",
+      "sql": "CREATE SEARCH INDEX FixedIndexseconds ON BucketFixed(BodyTokens) ORDER BY UpdatedSeconds DESC",
+      "requires": [
+        "bucket-fixture"
+      ]
+    },
+    {
+      "label": "bucket-index-hour",
+      "family": "bucket",
+      "kind": "ddl",
+      "sql": "CREATE SEARCH INDEX FixedIndexhour ON BucketFixed(BodyTokens) ORDER BY HourBucket DESC",
+      "requires": [
+        "bucket-fixture"
+      ]
+    },
+    {
+      "label": "bucket-index-none",
+      "family": "bucket",
+      "kind": "ddl",
+      "sql": "CREATE SEARCH INDEX FixedIndexnone ON BucketFixed(BodyTokens)",
+      "requires": [
+        "bucket-fixture"
+      ]
+    },
+    {
+      "label": "bucket-insert",
+      "family": "bucket",
+      "kind": "dml",
+      "sql": "",
+      "statements": [
+        "INSERT INTO BucketFixed(Id,Body,UpdatedAt) VALUES (1,'cat cat dog',TIMESTAMP '2026-10-31 00:01:00Z')"
+      ],
+      "requires": [
+        "bucket-fixture"
+      ]
+    },
+    {
+      "label": "bucket-values-start",
+      "family": "bucket",
+      "kind": "query",
+      "sql": "SELECT Id,UpdatedSeconds,HourBucket FROM BucketFixed",
+      "requires": [
+        "bucket-insert"
+      ]
+    },
+    {
+      "label": "bucket-update-same-hour",
+      "family": "bucket",
+      "kind": "dml",
+      "sql": "",
+      "statements": [
+        "UPDATE BucketFixed SET UpdatedAt=TIMESTAMP '2026-10-31 00:59:00Z' WHERE Id=1"
+      ],
+      "requires": [
+        "bucket-insert"
+      ]
+    },
+    {
+      "label": "bucket-values-same-hour",
+      "family": "bucket",
+      "kind": "query",
+      "sql": "SELECT Id,UpdatedSeconds,HourBucket FROM BucketFixed",
+      "requires": [
+        "bucket-update-same-hour"
+      ]
+    },
+    {
+      "label": "bucket-update-next-hour",
+      "family": "bucket",
+      "kind": "dml",
+      "sql": "",
+      "statements": [
+        "UPDATE BucketFixed SET UpdatedAt=TIMESTAMP '2026-10-31 01:00:00Z' WHERE Id=1"
+      ],
+      "requires": [
+        "bucket-insert"
+      ]
+    },
+    {
+      "label": "bucket-values-next-hour",
+      "family": "bucket",
+      "kind": "query",
+      "sql": "SELECT Id,UpdatedSeconds,HourBucket FROM BucketFixed",
+      "requires": [
+        "bucket-update-next-hour"
+      ]
+    },
+    {
+      "label": "queue-fixture",
+      "family": "queue",
+      "kind": "ddl",
+      "sql": "CREATE QUEUE AliasQueue (Id STRING(36) NOT NULL, Payload BYTES(MAX) NOT NULL) PRIMARY KEY(Id)"
+    },
+    {
+      "label": "tvf-star-plain",
+      "family": "tvf",
+      "kind": "query",
+      "sql": "SELECT * FROM RENEWLEASE_AliasQueue(lease_tokens=>ARRAY<STRING>[])",
+      "requires": [
+        "queue-fixture"
+      ]
+    },
+    {
+      "label": "tvf-star-as",
+      "family": "tvf",
+      "kind": "query",
+      "sql": "SELECT * FROM RENEWLEASE_AliasQueue(lease_tokens=>ARRAY<STRING>[]) AS r",
+      "requires": [
+        "queue-fixture"
+      ]
+    },
+    {
+      "label": "tvf-star-bare",
+      "family": "tvf",
+      "kind": "query",
+      "sql": "SELECT * FROM RENEWLEASE_AliasQueue(lease_tokens=>ARRAY<STRING>[]) r",
+      "requires": [
+        "queue-fixture"
+      ]
+    },
+    {
+      "label": "graph-node-table",
+      "family": "graph",
+      "kind": "ddl",
+      "sql": "CREATE TABLE PropNodes (Id INT64 NOT NULL) PRIMARY KEY(Id)"
+    },
+    {
+      "label": "graph-create",
+      "family": "graph",
+      "kind": "ddl",
+      "sql": "CREATE PROPERTY GRAPH ProbeGraph NODE TABLES (PropNodes)",
+      "requires": [
+        "graph-node-table"
+      ]
+    },
+    {
+      "label": "gql-left-common",
+      "family": "gql",
+      "kind": "query",
+      "sql": "GRAPH ProbeGraph RETURN 1 AS a, 9 AS left_only LEFT OUTER UNION ALL RETURN 2 AS a, 8 AS right_only",
+      "requires": [
+        "graph-create"
+      ]
+    },
+    {
+      "label": "schema-readback",
+      "family": "schema",
+      "kind": "ddl-export",
+      "sql": ""
+    },
+    {
+      "label": "select-led-select",
+      "family": "pipe-isolation",
+      "kind": "query",
+      "sql": "SELECT 1 AS x |> SELECT x"
+    },
+    {
+      "label": "select-led-where",
+      "family": "pipe-isolation",
+      "kind": "query",
+      "sql": "SELECT 1 AS x |> WHERE x=1"
+    },
+    {
+      "label": "select-led-aggregate",
+      "family": "pipe-isolation",
+      "kind": "query",
+      "sql": "SELECT 1 AS x |> AGGREGATE SUM(x) AS n"
+    },
+    {
+      "label": "from-only",
+      "family": "pipe-isolation",
+      "kind": "query",
+      "sql": "FROM (SELECT 1 AS x)"
+    },
+    {
+      "label": "gql-mode-full",
+      "kind": "query",
+      "sql": "GRAPH ProbeGraph RETURN 1 AS a, 9 AS left_only FULL UNION ALL RETURN 2 AS a, 8 AS right_only",
+      "family": "gql-propagation",
+      "requires": [
+        "graph-create"
+      ]
+    },
+    {
+      "label": "gql-mode-full-outer",
+      "kind": "query",
+      "sql": "GRAPH ProbeGraph RETURN 1 AS a, 9 AS left_only FULL OUTER UNION ALL RETURN 2 AS a, 8 AS right_only",
+      "family": "gql-propagation",
+      "requires": [
+        "graph-create"
+      ]
+    },
+    {
+      "label": "gql-mode-outer",
+      "kind": "query",
+      "sql": "GRAPH ProbeGraph RETURN 1 AS a, 9 AS left_only OUTER UNION ALL RETURN 2 AS a, 8 AS right_only",
+      "family": "gql-propagation",
+      "requires": [
+        "graph-create"
+      ]
+    },
+    {
+      "label": "gql-mode-left",
+      "kind": "query",
+      "sql": "GRAPH ProbeGraph RETURN 1 AS a, 9 AS left_only LEFT UNION ALL RETURN 2 AS a, 8 AS right_only",
+      "family": "gql-propagation",
+      "requires": [
+        "graph-create"
+      ]
+    },
+    {
+      "label": "gql-mode-left-outer",
+      "kind": "query",
+      "sql": "GRAPH ProbeGraph RETURN 1 AS a, 9 AS left_only LEFT OUTER UNION ALL RETURN 2 AS a, 8 AS right_only",
+      "family": "gql-propagation",
+      "requires": [
+        "graph-create"
+      ]
+    },
+    {
+      "label": "gql-mode-inner",
+      "kind": "query",
+      "sql": "GRAPH ProbeGraph RETURN 1 AS a, 9 AS left_only INNER UNION ALL RETURN 2 AS a, 8 AS right_only",
+      "family": "gql-propagation",
+      "requires": [
+        "graph-create"
+      ]
+    },
+    {
+      "label": "graph-insert",
+      "kind": "dml",
+      "sql": "",
+      "family": "extension",
+      "statements": [
+        "INSERT INTO PropNodes(Id) VALUES (3),(1),(2)"
+      ],
+      "requires": [
+        "graph-create"
+      ]
+    },
+    {
+      "label": "gql-return-order",
+      "kind": "query",
+      "sql": "GRAPH ProbeGraph MATCH (n) RETURN n.Id AS id ORDER BY id",
+      "family": "gql-order",
+      "requires": [
+        "graph-insert"
+      ]
+    },
+    {
+      "label": "gql-return-order-limit",
+      "kind": "query",
+      "sql": "GRAPH ProbeGraph MATCH (n) RETURN n.Id AS id ORDER BY id LIMIT 2",
+      "family": "gql-order",
+      "requires": [
+        "graph-insert"
+      ]
+    },
+    {
+      "label": "gql-standalone-order-limit",
+      "kind": "query",
+      "sql": "GRAPH ProbeGraph MATCH (n) RETURN n.Id AS id NEXT ORDER BY id LIMIT 2",
+      "family": "gql-order",
+      "requires": [
+        "graph-insert"
+      ]
+    },
+    {
+      "label": "gql-cross-next-order-limit",
+      "kind": "query",
+      "sql": "GRAPH ProbeGraph MATCH (n) RETURN n.Id AS id ORDER BY id NEXT LIMIT 2",
+      "family": "gql-order",
+      "requires": [
+        "graph-insert"
+      ]
+    },
+    {
+      "label": "queue-case-Payload",
+      "kind": "ddl",
+      "sql": "CREATE QUEUE CaseQueue0 (Id STRING(36) NOT NULL, Payload BYTES(MAX) NOT NULL) PRIMARY KEY(Id)",
+      "family": "queue-case"
+    },
+    {
+      "label": "queue-case-payload",
+      "kind": "ddl",
+      "sql": "CREATE QUEUE CaseQueue1 (Id STRING(36) NOT NULL, payload BYTES(MAX) NOT NULL) PRIMARY KEY(Id)",
+      "family": "queue-case"
+    },
+    {
+      "label": "queue-case-PAYLOAD",
+      "kind": "ddl",
+      "sql": "CREATE QUEUE CaseQueue2 (Id STRING(36) NOT NULL, PAYLOAD BYTES(MAX) NOT NULL) PRIMARY KEY(Id)",
+      "family": "queue-case"
+    },
+    {
+      "label": "queue-case-PaYlOaD",
+      "kind": "ddl",
+      "sql": "CREATE QUEUE CaseQueue3 (Id STRING(36) NOT NULL, PaYlOaD BYTES(MAX) NOT NULL) PRIMARY KEY(Id)",
+      "family": "queue-case"
+    },
+    {
+      "label": "search-enhanced",
+      "kind": "query",
+      "sql": "SELECT Id FROM ScoreDocs WHERE SEARCH(BodyTokens,'cat',enhance_query=>true) ORDER BY Id",
+      "family": "differences",
+      "requires": [
+        "score-insert",
+        "score-search-index"
+      ]
+    },
+    {
+      "label": "search-enhanced-required",
+      "kind": "query",
+      "sql": "@{require_enhance_query=true} SELECT Id FROM ScoreDocs WHERE SEARCH(BodyTokens,'cat',enhance_query=>true) ORDER BY Id",
+      "family": "differences",
+      "requires": [
+        "score-insert",
+        "score-search-index"
+      ]
+    },
+    {
+      "label": "json-table",
+      "kind": "ddl",
+      "sql": "CREATE TABLE JsonDocs (Id INT64 NOT NULL, Doc JSON, Tokens TOKENLIST AS (TOKENIZE_JSON(Doc)) HIDDEN) PRIMARY KEY(Id)",
+      "family": "json-search"
+    },
+    {
+      "label": "json-index",
+      "kind": "ddl",
+      "sql": "CREATE SEARCH INDEX JsonSearch ON JsonDocs(Tokens)",
+      "family": "json-search",
+      "requires": [
+        "json-table"
+      ]
+    },
+    {
+      "label": "json-insert",
+      "kind": "dml",
+      "sql": "",
+      "family": "json-search",
+      "statements": [
+        "INSERT INTO JsonDocs(Id,Doc) VALUES (1,JSON '{\"kind\":\"active\",\"n\":1}'),(2,JSON '{\"kind\":\"pending\",\"n\":2}'),(3,JSON '{\"kind\":\"active\",\"n\":3}')"
+      ],
+      "requires": [
+        "json-index"
+      ]
+    },
+    {
+      "label": "json-search-equal-auto",
+      "kind": "query",
+      "sql": "SELECT Id FROM JsonDocs WHERE Doc.kind=JSON '\"active\"' ORDER BY Id",
+      "family": "json-search",
+      "profile": true,
+      "requires": [
+        "json-insert"
+      ]
+    },
+    {
+      "label": "json-search-equal-search",
+      "kind": "query",
+      "sql": "SELECT Id FROM JsonDocs@{FORCE_INDEX=JsonSearch} WHERE Doc.kind=JSON '\"active\"' ORDER BY Id",
+      "family": "json-search",
+      "profile": true,
+      "requires": [
+        "json-insert"
+      ]
+    },
+    {
+      "label": "json-search-equal-base",
+      "kind": "query",
+      "sql": "SELECT Id FROM JsonDocs@{FORCE_INDEX=_BASE_TABLE} WHERE Doc.kind=JSON '\"active\"' ORDER BY Id",
+      "family": "json-search",
+      "profile": true,
+      "requires": [
+        "json-insert"
+      ]
+    },
+    {
+      "label": "json-search-in-auto",
+      "kind": "query",
+      "sql": "SELECT Id FROM JsonDocs WHERE Doc.kind IN (JSON '\"active\"',JSON '\"pending\"') ORDER BY Id",
+      "family": "json-search",
+      "profile": true,
+      "requires": [
+        "json-insert"
+      ]
+    },
+    {
+      "label": "json-search-in-search",
+      "kind": "query",
+      "sql": "SELECT Id FROM JsonDocs@{FORCE_INDEX=JsonSearch} WHERE Doc.kind IN (JSON '\"active\"',JSON '\"pending\"') ORDER BY Id",
+      "family": "json-search",
+      "profile": true,
+      "requires": [
+        "json-insert"
+      ]
+    },
+    {
+      "label": "json-search-in-base",
+      "kind": "query",
+      "sql": "SELECT Id FROM JsonDocs@{FORCE_INDEX=_BASE_TABLE} WHERE Doc.kind IN (JSON '\"active\"',JSON '\"pending\"') ORDER BY Id",
+      "family": "json-search",
+      "profile": true,
+      "requires": [
+        "json-insert"
+      ]
+    },
+    {
+      "label": "json-search-whole-auto",
+      "kind": "query",
+      "sql": "SELECT Id FROM JsonDocs WHERE Doc=JSON '{\"n\":1,\"kind\":\"active\"}' ORDER BY Id",
+      "family": "json-search",
+      "profile": true,
+      "requires": [
+        "json-insert"
+      ]
+    },
+    {
+      "label": "json-search-whole-search",
+      "kind": "query",
+      "sql": "SELECT Id FROM JsonDocs@{FORCE_INDEX=JsonSearch} WHERE Doc=JSON '{\"n\":1,\"kind\":\"active\"}' ORDER BY Id",
+      "family": "json-search",
+      "profile": true,
+      "requires": [
+        "json-insert"
+      ]
+    },
+    {
+      "label": "json-search-whole-base",
+      "kind": "query",
+      "sql": "SELECT Id FROM JsonDocs@{FORCE_INDEX=_BASE_TABLE} WHERE Doc=JSON '{\"n\":1,\"kind\":\"active\"}' ORDER BY Id",
+      "family": "json-search",
+      "profile": true,
+      "requires": [
+        "json-insert"
+      ]
+    },
+    {
+      "label": "gql-standalone-corrected",
+      "kind": "query",
+      "sql": "GRAPH ProbeGraph MATCH(n) ORDER BY n.Id LIMIT 2 RETURN n.Id AS id",
+      "family": "gql-order",
+      "requires": [
+        "graph-insert"
+      ]
+    },
+    {
+      "label": "gql-next-corrected",
+      "kind": "query",
+      "sql": "GRAPH ProbeGraph MATCH(n) RETURN n.Id AS id ORDER BY id NEXT LIMIT 2 RETURN id",
+      "family": "gql-order",
+      "requires": [
+        "graph-insert"
+      ]
+    },
+    {
+      "label": "volatile-view",
+      "kind": "ddl",
+      "sql": "CREATE VIEW VolatileView SQL SECURITY INVOKER AS SELECT n.Id, GENERATE_UUID() AS V FROM PropNodes AS n",
+      "family": "volatile-view",
+      "requires": [
+        "graph-insert"
+      ]
+    },
+    {
+      "label": "volatile-graph-default",
+      "kind": "ddl",
+      "sql": "CREATE PROPERTY GRAPH Volatiledefault NODE TABLES(VolatileView KEY(Id))",
+      "family": "volatile-view",
+      "requires": [
+        "volatile-view"
+      ]
+    },
+    {
+      "label": "volatile-read-default-1",
+      "kind": "query",
+      "sql": "GRAPH Volatiledefault MATCH(n) RETURN n.Id AS id,n.V AS v ORDER BY id",
+      "family": "volatile-view",
+      "requires": [
+        "volatile-graph-default"
+      ]
+    },
+    {
+      "label": "volatile-read-default-2",
+      "kind": "query",
+      "sql": "GRAPH Volatiledefault MATCH(n) RETURN n.Id AS id,n.V AS v ORDER BY id",
+      "family": "volatile-view",
+      "requires": [
+        "volatile-graph-default"
+      ]
+    },
+    {
+      "label": "volatile-graph-false",
+      "kind": "ddl",
+      "sql": "CREATE PROPERTY GRAPH Volatilefalse NODE TABLES(VolatileView KEY(Id)) OPTIONS(allow_view_with_volatile_column=false)",
+      "family": "volatile-view",
+      "requires": [
+        "volatile-view"
+      ]
+    },
+    {
+      "label": "volatile-read-false-1",
+      "kind": "query",
+      "sql": "GRAPH Volatilefalse MATCH(n) RETURN n.Id AS id,n.V AS v ORDER BY id",
+      "family": "volatile-view",
+      "requires": [
+        "volatile-graph-false"
+      ]
+    },
+    {
+      "label": "volatile-read-false-2",
+      "kind": "query",
+      "sql": "GRAPH Volatilefalse MATCH(n) RETURN n.Id AS id,n.V AS v ORDER BY id",
+      "family": "volatile-view",
+      "requires": [
+        "volatile-graph-false"
+      ]
+    },
+    {
+      "label": "volatile-graph-true",
+      "kind": "ddl",
+      "sql": "CREATE PROPERTY GRAPH Volatiletrue NODE TABLES(VolatileView KEY(Id)) OPTIONS(allow_view_with_volatile_column=true)",
+      "family": "volatile-view",
+      "requires": [
+        "volatile-view"
+      ]
+    },
+    {
+      "label": "volatile-read-true-1",
+      "kind": "query",
+      "sql": "GRAPH Volatiletrue MATCH(n) RETURN n.Id AS id,n.V AS v ORDER BY id",
+      "family": "volatile-view",
+      "requires": [
+        "volatile-graph-true"
+      ]
+    },
+    {
+      "label": "volatile-read-true-2",
+      "kind": "query",
+      "sql": "GRAPH Volatiletrue MATCH(n) RETURN n.Id AS id,n.V AS v ORDER BY id",
+      "family": "volatile-view",
+      "requires": [
+        "volatile-graph-true"
+      ]
+    },
+    {
+      "label": "set-null-schema",
+      "kind": "ddl",
+      "sql": "",
+      "family": "set-null",
+      "statements": [
+        "CREATE TABLE NullParent (Id INT64 NOT NULL) PRIMARY KEY(Id)",
+        "CREATE TABLE NullChild (Id INT64 NOT NULL, ParentId INT64, CONSTRAINT ParentFk FOREIGN KEY(ParentId) REFERENCES NullParent(Id) ON DELETE SET NULL) PRIMARY KEY(Id)"
+      ]
+    },
+    {
+      "label": "set-null-insert",
+      "kind": "dml",
+      "sql": "",
+      "family": "set-null",
+      "statements": [
+        "INSERT INTO NullParent(Id) VALUES(1)",
+        "INSERT INTO NullChild(Id,ParentId) VALUES(1,1)"
+      ],
+      "requires": [
+        "set-null-schema"
+      ]
+    },
+    {
+      "label": "set-null-delete",
+      "kind": "dml",
+      "sql": "",
+      "family": "set-null",
+      "statements": [
+        "DELETE FROM NullParent WHERE Id=1"
+      ],
+      "requires": [
+        "set-null-insert"
+      ]
+    },
+    {
+      "label": "set-null-result",
+      "kind": "query",
+      "sql": "SELECT Id,ParentId FROM NullChild",
+      "family": "set-null",
+      "requires": [
+        "set-null-delete"
+      ]
+    },
+    {
+      "label": "score-pagination-insert",
+      "kind": "dml",
+      "sql": "",
+      "family": "mirror-20261108",
+      "statements": [
+        "INSERT INTO ScoreDocs(Id,Body) VALUES (4,'cat cat cat banana'),(5,'cat banana'),(6,'cat dog dog dog'),(7,'cat')"
+      ],
+      "requires": [
+        "score-insert"
+      ]
+    },
+    {
+      "label": "pagination-v1-full",
+      "kind": "query",
+      "sql": "SELECT Id, SCORE(BodyTokens,@p, options=>JSON_OBJECT('version', @score_version)) AS score FROM ScoreDocs WHERE SEARCH(BodyTokens,@p) ORDER BY score DESC,Id",
+      "family": "ranked-pagination",
+      "params": {
+        "p": "cat",
+        "page_size": 2,
+        "offset": 0,
+        "score_version": 1
+      },
+      "param_types": {
+        "page_size": "INT64",
+        "offset": "INT64",
+        "score_version": "INT64"
+      },
+      "requires": [
+        "score-pagination-insert",
+        "score-search-index"
+      ]
+    },
+    {
+      "label": "pagination-v1-offset-0",
+      "kind": "query",
+      "sql": "SELECT Id, SCORE(BodyTokens,@p, options=>JSON_OBJECT('version', @score_version)) AS score FROM ScoreDocs WHERE SEARCH(BodyTokens,@p) ORDER BY score DESC,Id LIMIT @page_size OFFSET @offset",
+      "family": "ranked-pagination",
+      "params": {
+        "p": "cat",
+        "page_size": 2,
+        "offset": 0,
+        "score_version": 1
+      },
+      "param_types": {
+        "page_size": "INT64",
+        "offset": "INT64",
+        "score_version": "INT64"
+      },
+      "requires": [
+        "score-pagination-insert",
+        "score-search-index"
+      ]
+    },
+    {
+      "label": "pagination-v1-offset-2",
+      "kind": "query",
+      "sql": "SELECT Id, SCORE(BodyTokens,@p, options=>JSON_OBJECT('version', @score_version)) AS score FROM ScoreDocs WHERE SEARCH(BodyTokens,@p) ORDER BY score DESC,Id LIMIT @page_size OFFSET @offset",
+      "family": "ranked-pagination",
+      "params": {
+        "p": "cat",
+        "page_size": 2,
+        "offset": 2,
+        "score_version": 1
+      },
+      "param_types": {
+        "page_size": "INT64",
+        "offset": "INT64",
+        "score_version": "INT64"
+      },
+      "requires": [
+        "score-pagination-insert",
+        "score-search-index"
+      ]
+    },
+    {
+      "label": "pagination-v1-offset-4",
+      "kind": "query",
+      "sql": "SELECT Id, SCORE(BodyTokens,@p, options=>JSON_OBJECT('version', @score_version)) AS score FROM ScoreDocs WHERE SEARCH(BodyTokens,@p) ORDER BY score DESC,Id LIMIT @page_size OFFSET @offset",
+      "family": "ranked-pagination",
+      "params": {
+        "p": "cat",
+        "page_size": 2,
+        "offset": 4,
+        "score_version": 1
+      },
+      "param_types": {
+        "page_size": "INT64",
+        "offset": "INT64",
+        "score_version": "INT64"
+      },
+      "requires": [
+        "score-pagination-insert",
+        "score-search-index"
+      ]
+    },
+    {
+      "label": "pagination-v2-full",
+      "kind": "query",
+      "sql": "SELECT Id, SCORE(BodyTokens,@p, options=>JSON_OBJECT('version', @score_version)) AS score FROM ScoreDocs WHERE SEARCH(BodyTokens,@p) ORDER BY score DESC,Id",
+      "family": "ranked-pagination",
+      "params": {
+        "p": "cat",
+        "page_size": 2,
+        "offset": 0,
+        "score_version": 2
+      },
+      "param_types": {
+        "page_size": "INT64",
+        "offset": "INT64",
+        "score_version": "INT64"
+      },
+      "requires": [
+        "score-pagination-insert",
+        "score-search-index"
+      ]
+    },
+    {
+      "label": "pagination-v2-offset-0",
+      "kind": "query",
+      "sql": "SELECT Id, SCORE(BodyTokens,@p, options=>JSON_OBJECT('version', @score_version)) AS score FROM ScoreDocs WHERE SEARCH(BodyTokens,@p) ORDER BY score DESC,Id LIMIT @page_size OFFSET @offset",
+      "family": "ranked-pagination",
+      "params": {
+        "p": "cat",
+        "page_size": 2,
+        "offset": 0,
+        "score_version": 2
+      },
+      "param_types": {
+        "page_size": "INT64",
+        "offset": "INT64",
+        "score_version": "INT64"
+      },
+      "requires": [
+        "score-pagination-insert",
+        "score-search-index"
+      ]
+    },
+    {
+      "label": "pagination-v2-offset-2",
+      "kind": "query",
+      "sql": "SELECT Id, SCORE(BodyTokens,@p, options=>JSON_OBJECT('version', @score_version)) AS score FROM ScoreDocs WHERE SEARCH(BodyTokens,@p) ORDER BY score DESC,Id LIMIT @page_size OFFSET @offset",
+      "family": "ranked-pagination",
+      "params": {
+        "p": "cat",
+        "page_size": 2,
+        "offset": 2,
+        "score_version": 2
+      },
+      "param_types": {
+        "page_size": "INT64",
+        "offset": "INT64",
+        "score_version": "INT64"
+      },
+      "requires": [
+        "score-pagination-insert",
+        "score-search-index"
+      ]
+    },
+    {
+      "label": "pagination-v2-offset-4",
+      "kind": "query",
+      "sql": "SELECT Id, SCORE(BodyTokens,@p, options=>JSON_OBJECT('version', @score_version)) AS score FROM ScoreDocs WHERE SEARCH(BodyTokens,@p) ORDER BY score DESC,Id LIMIT @page_size OFFSET @offset",
+      "family": "ranked-pagination",
+      "params": {
+        "p": "cat",
+        "page_size": 2,
+        "offset": 4,
+        "score_version": 2
+      },
+      "param_types": {
+        "page_size": "INT64",
+        "offset": "INT64",
+        "score_version": "INT64"
+      },
+      "requires": [
+        "score-pagination-insert",
+        "score-search-index"
+      ]
+    },
+    {
+      "label": "pagination-set-db-1",
+      "kind": "ddl",
+      "sql": "ALTER DATABASE {{DATABASE}} SET OPTIONS(default_search_scorer_version=1)",
+      "family": "ranked-pagination"
+    },
+    {
+      "label": "pagination-db-1-default",
+      "kind": "query",
+      "sql": "SELECT Id, SCORE(BodyTokens,@p) AS score FROM ScoreDocs WHERE SEARCH(BodyTokens,@p) ORDER BY score DESC,Id",
+      "family": "ranked-pagination",
+      "params": {
+        "p": "cat",
+        "page_size": 2,
+        "offset": 0
+      },
+      "param_types": {
+        "page_size": "INT64",
+        "offset": "INT64"
+      },
+      "requires": [
+        "score-pagination-insert",
+        "score-search-index",
+        "pagination-set-db-1"
+      ]
+    },
+    {
+      "label": "pagination-db-1-pinned-v1",
+      "kind": "query",
+      "sql": "SELECT Id, SCORE(BodyTokens,@p, options=>JSON_OBJECT('version', @score_version)) AS score FROM ScoreDocs WHERE SEARCH(BodyTokens,@p) ORDER BY score DESC,Id",
+      "family": "ranked-pagination",
+      "params": {
+        "p": "cat",
+        "page_size": 2,
+        "offset": 0,
+        "score_version": 1
+      },
+      "param_types": {
+        "page_size": "INT64",
+        "offset": "INT64",
+        "score_version": "INT64"
+      },
+      "requires": [
+        "score-pagination-insert",
+        "score-search-index",
+        "pagination-set-db-1"
+      ]
+    },
+    {
+      "label": "pagination-db-1-pinned-v2",
+      "kind": "query",
+      "sql": "SELECT Id, SCORE(BodyTokens,@p, options=>JSON_OBJECT('version', @score_version)) AS score FROM ScoreDocs WHERE SEARCH(BodyTokens,@p) ORDER BY score DESC,Id",
+      "family": "ranked-pagination",
+      "params": {
+        "p": "cat",
+        "page_size": 2,
+        "offset": 0,
+        "score_version": 2
+      },
+      "param_types": {
+        "page_size": "INT64",
+        "offset": "INT64",
+        "score_version": "INT64"
+      },
+      "requires": [
+        "score-pagination-insert",
+        "score-search-index",
+        "pagination-set-db-1"
+      ]
+    },
+    {
+      "label": "pagination-set-db-2",
+      "kind": "ddl",
+      "sql": "ALTER DATABASE {{DATABASE}} SET OPTIONS(default_search_scorer_version=2)",
+      "family": "ranked-pagination"
+    },
+    {
+      "label": "pagination-db-2-default",
+      "kind": "query",
+      "sql": "SELECT Id, SCORE(BodyTokens,@p) AS score FROM ScoreDocs WHERE SEARCH(BodyTokens,@p) ORDER BY score DESC,Id",
+      "family": "ranked-pagination",
+      "params": {
+        "p": "cat",
+        "page_size": 2,
+        "offset": 0
+      },
+      "param_types": {
+        "page_size": "INT64",
+        "offset": "INT64"
+      },
+      "requires": [
+        "score-pagination-insert",
+        "score-search-index",
+        "pagination-set-db-2"
+      ]
+    },
+    {
+      "label": "pagination-db-2-pinned-v1",
+      "kind": "query",
+      "sql": "SELECT Id, SCORE(BodyTokens,@p, options=>JSON_OBJECT('version', @score_version)) AS score FROM ScoreDocs WHERE SEARCH(BodyTokens,@p) ORDER BY score DESC,Id",
+      "family": "ranked-pagination",
+      "params": {
+        "p": "cat",
+        "page_size": 2,
+        "offset": 0,
+        "score_version": 1
+      },
+      "param_types": {
+        "page_size": "INT64",
+        "offset": "INT64",
+        "score_version": "INT64"
+      },
+      "requires": [
+        "score-pagination-insert",
+        "score-search-index",
+        "pagination-set-db-2"
+      ]
+    },
+    {
+      "label": "pagination-db-2-pinned-v2",
+      "kind": "query",
+      "sql": "SELECT Id, SCORE(BodyTokens,@p, options=>JSON_OBJECT('version', @score_version)) AS score FROM ScoreDocs WHERE SEARCH(BodyTokens,@p) ORDER BY score DESC,Id",
+      "family": "ranked-pagination",
+      "params": {
+        "p": "cat",
+        "page_size": 2,
+        "offset": 0,
+        "score_version": 2
+      },
+      "param_types": {
+        "page_size": "INT64",
+        "offset": "INT64",
+        "score_version": "INT64"
+      },
+      "requires": [
+        "score-pagination-insert",
+        "score-search-index",
+        "pagination-set-db-2"
+      ]
+    },
+    {
+      "label": "batch-omitted-create",
+      "kind": "ddl",
+      "sql": "CREATE QUEUE BatchOmitted(Id STRING(36) NOT NULL, Payload BYTES(MAX) NOT NULL) PRIMARY KEY(Id)",
+      "family": "queue-batches"
+    },
+    {
+      "label": "batch-omitted-insert",
+      "kind": "dml",
+      "sql": "",
+      "family": "queue-batches",
+      "statements": [
+        "INSERT INTO BatchOmitted(Id,Payload,DeliverTime) VALUES ('000',b'x',CURRENT_TIMESTAMP()),('001',b'x',CURRENT_TIMESTAMP()),('002',b'x',CURRENT_TIMESTAMP()),('003',b'x',CURRENT_TIMESTAMP()),('004',b'x',CURRENT_TIMESTAMP()),('005',b'x',CURRENT_TIMESTAMP()),('006',b'x',CURRENT_TIMESTAMP()),('007',b'x',CURRENT_TIMESTAMP()),('008',b'x',CURRENT_TIMESTAMP()),('009',b'x',CURRENT_TIMESTAMP()),('010',b'x',CURRENT_TIMESTAMP()),('011',b'x',CURRENT_TIMESTAMP()),('012',b'x',CURRENT_TIMESTAMP()),('013',b'x',CURRENT_TIMESTAMP()),('014',b'x',CURRENT_TIMESTAMP()),('015',b'x',CURRENT_TIMESTAMP()),('016',b'x',CURRENT_TIMESTAMP()),('017',b'x',CURRENT_TIMESTAMP()),('018',b'x',CURRENT_TIMESTAMP()),('019',b'x',CURRENT_TIMESTAMP()),('020',b'x',CURRENT_TIMESTAMP()),('021',b'x',CURRENT_TIMESTAMP()),('022',b'x',CURRENT_TIMESTAMP()),('023',b'x',CURRENT_TIMESTAMP()),('024',b'x',CURRENT_TIMESTAMP()),('025',b'x',CURRENT_TIMESTAMP()),('026',b'x',CURRENT_TIMESTAMP()),('027',b'x',CURRENT_TIMESTAMP()),('028',b'x',CURRENT_TIMESTAMP()),('029',b'x',CURRENT_TIMESTAMP()),('030',b'x',CURRENT_TIMESTAMP()),('031',b'x',CURRENT_TIMESTAMP()),('032',b'x',CURRENT_TIMESTAMP()),('033',b'x',CURRENT_TIMESTAMP()),('034',b'x',CURRENT_TIMESTAMP()),('035',b'x',CURRENT_TIMESTAMP()),('036',b'x',CURRENT_TIMESTAMP()),('037',b'x',CURRENT_TIMESTAMP()),('038',b'x',CURRENT_TIMESTAMP()),('039',b'x',CURRENT_TIMESTAMP())"
+      ],
+      "requires": [
+        "batch-omitted-create"
+      ]
+    },
+    {
+      "label": "batch-omitted-receive",
+      "kind": "query",
+      "sql": "SELECT Id,SpannerLastBatchMessage AS batch_end FROM RECEIVE_BatchOmitted(max_duration=>'5s')",
+      "family": "queue-batches",
+      "timeout_seconds": 20,
+      "requires": [
+        "batch-omitted-insert"
+      ]
+    },
+    {
+      "label": "batch-null-create",
+      "kind": "ddl",
+      "sql": "CREATE QUEUE BatchNull(Id STRING(36) NOT NULL, Payload BYTES(MAX) NOT NULL) PRIMARY KEY(Id)",
+      "family": "queue-batches"
+    },
+    {
+      "label": "batch-null-insert",
+      "kind": "dml",
+      "sql": "",
+      "family": "queue-batches",
+      "statements": [
+        "INSERT INTO BatchNull(Id,Payload,DeliverTime) VALUES ('000',b'x',CURRENT_TIMESTAMP()),('001',b'x',CURRENT_TIMESTAMP()),('002',b'x',CURRENT_TIMESTAMP()),('003',b'x',CURRENT_TIMESTAMP()),('004',b'x',CURRENT_TIMESTAMP()),('005',b'x',CURRENT_TIMESTAMP()),('006',b'x',CURRENT_TIMESTAMP()),('007',b'x',CURRENT_TIMESTAMP()),('008',b'x',CURRENT_TIMESTAMP()),('009',b'x',CURRENT_TIMESTAMP()),('010',b'x',CURRENT_TIMESTAMP()),('011',b'x',CURRENT_TIMESTAMP()),('012',b'x',CURRENT_TIMESTAMP()),('013',b'x',CURRENT_TIMESTAMP()),('014',b'x',CURRENT_TIMESTAMP()),('015',b'x',CURRENT_TIMESTAMP()),('016',b'x',CURRENT_TIMESTAMP()),('017',b'x',CURRENT_TIMESTAMP()),('018',b'x',CURRENT_TIMESTAMP()),('019',b'x',CURRENT_TIMESTAMP()),('020',b'x',CURRENT_TIMESTAMP()),('021',b'x',CURRENT_TIMESTAMP()),('022',b'x',CURRENT_TIMESTAMP()),('023',b'x',CURRENT_TIMESTAMP()),('024',b'x',CURRENT_TIMESTAMP()),('025',b'x',CURRENT_TIMESTAMP()),('026',b'x',CURRENT_TIMESTAMP()),('027',b'x',CURRENT_TIMESTAMP()),('028',b'x',CURRENT_TIMESTAMP()),('029',b'x',CURRENT_TIMESTAMP()),('030',b'x',CURRENT_TIMESTAMP()),('031',b'x',CURRENT_TIMESTAMP()),('032',b'x',CURRENT_TIMESTAMP()),('033',b'x',CURRENT_TIMESTAMP()),('034',b'x',CURRENT_TIMESTAMP()),('035',b'x',CURRENT_TIMESTAMP()),('036',b'x',CURRENT_TIMESTAMP()),('037',b'x',CURRENT_TIMESTAMP()),('038',b'x',CURRENT_TIMESTAMP()),('039',b'x',CURRENT_TIMESTAMP())"
+      ],
+      "requires": [
+        "batch-null-create"
+      ]
+    },
+    {
+      "label": "batch-null-receive",
+      "kind": "query",
+      "sql": "SELECT Id,SpannerLastBatchMessage AS batch_end FROM RECEIVE_BatchNull(max_duration=>'5s',max_batch_size=>NULL)",
+      "family": "queue-batches",
+      "timeout_seconds": 20,
+      "requires": [
+        "batch-null-insert"
+      ]
+    },
+    {
+      "label": "batch-twenty-create",
+      "kind": "ddl",
+      "sql": "CREATE QUEUE BatchTwenty(Id STRING(36) NOT NULL, Payload BYTES(MAX) NOT NULL) PRIMARY KEY(Id)",
+      "family": "queue-batches"
+    },
+    {
+      "label": "batch-twenty-insert",
+      "kind": "dml",
+      "sql": "",
+      "family": "queue-batches",
+      "statements": [
+        "INSERT INTO BatchTwenty(Id,Payload,DeliverTime) VALUES ('000',b'x',CURRENT_TIMESTAMP()),('001',b'x',CURRENT_TIMESTAMP()),('002',b'x',CURRENT_TIMESTAMP()),('003',b'x',CURRENT_TIMESTAMP()),('004',b'x',CURRENT_TIMESTAMP()),('005',b'x',CURRENT_TIMESTAMP()),('006',b'x',CURRENT_TIMESTAMP()),('007',b'x',CURRENT_TIMESTAMP()),('008',b'x',CURRENT_TIMESTAMP()),('009',b'x',CURRENT_TIMESTAMP()),('010',b'x',CURRENT_TIMESTAMP()),('011',b'x',CURRENT_TIMESTAMP()),('012',b'x',CURRENT_TIMESTAMP()),('013',b'x',CURRENT_TIMESTAMP()),('014',b'x',CURRENT_TIMESTAMP()),('015',b'x',CURRENT_TIMESTAMP()),('016',b'x',CURRENT_TIMESTAMP()),('017',b'x',CURRENT_TIMESTAMP()),('018',b'x',CURRENT_TIMESTAMP()),('019',b'x',CURRENT_TIMESTAMP()),('020',b'x',CURRENT_TIMESTAMP()),('021',b'x',CURRENT_TIMESTAMP()),('022',b'x',CURRENT_TIMESTAMP()),('023',b'x',CURRENT_TIMESTAMP()),('024',b'x',CURRENT_TIMESTAMP()),('025',b'x',CURRENT_TIMESTAMP()),('026',b'x',CURRENT_TIMESTAMP()),('027',b'x',CURRENT_TIMESTAMP()),('028',b'x',CURRENT_TIMESTAMP()),('029',b'x',CURRENT_TIMESTAMP()),('030',b'x',CURRENT_TIMESTAMP()),('031',b'x',CURRENT_TIMESTAMP()),('032',b'x',CURRENT_TIMESTAMP()),('033',b'x',CURRENT_TIMESTAMP()),('034',b'x',CURRENT_TIMESTAMP()),('035',b'x',CURRENT_TIMESTAMP()),('036',b'x',CURRENT_TIMESTAMP()),('037',b'x',CURRENT_TIMESTAMP()),('038',b'x',CURRENT_TIMESTAMP()),('039',b'x',CURRENT_TIMESTAMP())"
+      ],
+      "requires": [
+        "batch-twenty-create"
+      ]
+    },
+    {
+      "label": "batch-twenty-receive",
+      "kind": "query",
+      "sql": "SELECT Id,SpannerLastBatchMessage AS batch_end FROM RECEIVE_BatchTwenty(max_duration=>'5s',max_batch_size=>20)",
+      "family": "queue-batches",
+      "timeout_seconds": 20,
+      "requires": [
+        "batch-twenty-insert"
+      ]
+    },
+    {
+      "label": "geo-sequence",
+      "kind": "ddl",
+      "sql": "CREATE SEQUENCE GeoUserIdSequence OPTIONS(sequence_kind='bit_reversed_positive')",
+      "family": "geo-sequence"
+    },
+    {
+      "label": "geo-parent",
+      "kind": "ddl",
+      "sql": "CREATE TABLE GeoLocations(Location STRING(MAX) NOT NULL PLACEMENT KEY) PRIMARY KEY(Location)",
+      "family": "geo-sequence"
+    },
+    {
+      "label": "geo-child",
+      "kind": "ddl",
+      "sql": "CREATE TABLE GeoUsers(Location STRING(MAX) NOT NULL,UserId INT64 NOT NULL DEFAULT(GET_NEXT_SEQUENCE_VALUE(SEQUENCE GeoUserIdSequence)),Name STRING(MAX)) PRIMARY KEY(Location,UserId),INTERLEAVE IN PARENT GeoLocations ON DELETE CASCADE",
+      "family": "geo-sequence",
+      "requires": [
+        "geo-sequence",
+        "geo-parent"
+      ]
+    },
+    {
+      "label": "geo-next-id",
+      "kind": "query",
+      "sql": "SELECT GET_NEXT_SEQUENCE_VALUE(SEQUENCE GeoUserIdSequence) AS id",
+      "family": "geo-sequence",
+      "requires": [
+        "geo-sequence"
+      ]
+    },
+    {
+      "label": "dynamic-table",
+      "kind": "ddl",
+      "sql": "CREATE TABLE DynamicNodes(Id INT64 NOT NULL, Label STRING(MAX), Props JSON) PRIMARY KEY(Id)",
+      "family": "dynamic-properties"
+    },
+    {
+      "label": "dynamic-insert",
+      "kind": "dml",
+      "sql": "",
+      "family": "dynamic-properties",
+      "statements": [
+        "INSERT INTO DynamicNodes(Id,Label,Props) VALUES(1,'person',JSON '{\"age\":43,\"name\":\"Alice\",\"active\":true}'),(2,'person',JSON '{\"age\":27,\"name\":\"Bob\",\"active\":false}'),(3,'person',JSON '{\"age\":43,\"name\":\"Carol\",\"active\":true}')"
+      ],
+      "requires": [
+        "dynamic-table"
+      ]
+    },
+    {
+      "label": "dynamic-graph",
+      "kind": "ddl",
+      "sql": "CREATE PROPERTY GRAPH DynamicGraph NODE TABLES(DynamicNodes DYNAMIC LABEL(Label) DYNAMIC PROPERTIES(Props))",
+      "family": "dynamic-properties",
+      "requires": [
+        "dynamic-table"
+      ]
+    },
+    {
+      "label": "dynamic-filter-number",
+      "kind": "query",
+      "sql": "GRAPH DynamicGraph MATCH(n:person) WHERE n.age=43 RETURN n.Id AS id ORDER BY id",
+      "family": "dynamic-properties",
+      "requires": [
+        "dynamic-graph",
+        "dynamic-insert"
+      ]
+    },
+    {
+      "label": "dynamic-filter-pattern",
+      "kind": "query",
+      "sql": "GRAPH DynamicGraph MATCH(n:person {age:43}) RETURN n.Id AS id ORDER BY id",
+      "family": "dynamic-properties",
+      "requires": [
+        "dynamic-graph",
+        "dynamic-insert"
+      ]
+    },
+    {
+      "label": "dynamic-filter-string-negative",
+      "kind": "query",
+      "sql": "GRAPH DynamicGraph MATCH(n:person {age:'43'}) RETURN n.Id AS id ORDER BY id",
+      "family": "dynamic-properties",
+      "requires": [
+        "dynamic-graph",
+        "dynamic-insert"
+      ]
+    },
+    {
+      "label": "dynamic-group",
+      "kind": "query",
+      "sql": "GRAPH DynamicGraph MATCH(n:person) RETURN n.age AS age,COUNT(*) AS n ORDER BY age",
+      "family": "dynamic-properties",
+      "requires": [
+        "dynamic-graph",
+        "dynamic-insert"
+      ]
+    },
+    {
+      "label": "dynamic-order",
+      "kind": "query",
+      "sql": "GRAPH DynamicGraph MATCH(n:person) RETURN n.Id AS id,n.age AS age ORDER BY age,id",
+      "family": "dynamic-properties",
+      "requires": [
+        "dynamic-graph",
+        "dynamic-insert"
+      ]
+    },
+    {
+      "label": "dynamic-distinct",
+      "kind": "query",
+      "sql": "GRAPH DynamicGraph MATCH(n:person) RETURN DISTINCT n.age AS age ORDER BY age",
+      "family": "dynamic-properties",
+      "requires": [
+        "dynamic-graph",
+        "dynamic-insert"
+      ]
+    },
+    {
+      "label": "dynamic-compare-properties",
+      "kind": "query",
+      "sql": "GRAPH DynamicGraph MATCH(a:person),(b:person) WHERE a.Id<b.Id AND a.age=b.age RETURN a.Id AS a,b.Id AS b ORDER BY a,b",
+      "family": "dynamic-properties",
+      "requires": [
+        "dynamic-graph",
+        "dynamic-insert"
+      ]
+    },
+    {
+      "label": "dynamic-filter-bool",
+      "kind": "query",
+      "sql": "GRAPH DynamicGraph MATCH(n:person) WHERE n.active=true RETURN n.Id AS id ORDER BY id",
+      "family": "dynamic-properties",
+      "requires": [
+        "dynamic-graph",
+        "dynamic-insert"
+      ]
+    },
+    {
+      "label": "dynamic-bare-bool-negative",
+      "kind": "query",
+      "sql": "GRAPH DynamicGraph MATCH(n:person) WHERE n.active RETURN n.Id AS id",
+      "family": "dynamic-properties",
+      "requires": [
+        "dynamic-graph",
+        "dynamic-insert"
+      ]
+    },
+    {
+      "label": "final-ddl-export",
+      "kind": "ddl-export",
+      "sql": "",
+      "family": "mirror-20261108"
+    }
+  ]
+}

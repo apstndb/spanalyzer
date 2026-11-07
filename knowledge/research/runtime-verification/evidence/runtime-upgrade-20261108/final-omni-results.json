@@ -1,0 +1,42 @@
+[
+  {
+    "name": "omni-lts-final",
+    "argv": [
+      "/Users/apstndb/.local/share/mise/installs/go/1.26.10/bin/go",
+      "run",
+      "./omni-integration-runner",
+      "--repo-root",
+      "..",
+      "--timeout",
+      "35m"
+    ],
+    "exit_code": 0,
+    "started_at": "2026-11-07T18:32:55.324993+00:00",
+    "completed_at": "2026-11-07T18:34:28.758380+00:00",
+    "producer_sources_unchanged": true,
+    "changed_sources": [],
+    "report": "omni-lts-final-report.json",
+    "log": "omni-lts-final.log"
+  },
+  {
+    "name": "omni-r5-final",
+    "argv": [
+      "/Users/apstndb/.local/share/mise/installs/go/1.26.10/bin/go",
+      "run",
+      "./omni-integration-runner",
+      "--repo-root",
+      "..",
+      "--omni-version",
+      "2026.r5.1",
+      "--timeout",
+      "35m"
+    ],
+    "exit_code": 1,
+    "started_at": "2026-11-07T18:34:28.758676+00:00",
+    "completed_at": "2026-11-07T18:36:02.121490+00:00",
+    "producer_sources_unchanged": true,
+    "changed_sources": [],
+    "report": "omni-r5-final-report.json",
+    "log": "omni-r5-final.log"
+  }
+]

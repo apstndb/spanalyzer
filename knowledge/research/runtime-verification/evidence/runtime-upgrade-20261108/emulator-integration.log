@@ -1,0 +1,41 @@
+=== RUN   TestIntegrationQueryCodegenGeneratedSpannerQueriesRunOnEmulator
+2026/11/08 03:26:42 github.com/testcontainers/testcontainers-go - Connected to docker: 
+  Server Version: 29.2.1
+  API Version: 1.53
+  Operating System: Ubuntu 24.04.4 LTS
+  Total Memory: 7922 MB
+  Testcontainers for Go Version: v0.44.0
+  Resolved Docker Host: unix:///Users/apstndb/.colima/default/docker.sock
+  Resolved Docker Socket Path: /var/run/docker.sock
+  Test SessionID: 9b2434db2e39f4961555ef8de14e319957be0d6c516536d4fd0fc481fd1e14b8
+  Test ProcessID: 7ae95221-86f0-4fe5-b898-e34c344512de
+2026/11/08 03:26:42 🐳 Creating container for image gcr.io/cloud-spanner-emulator/emulator:1.5.59@sha256:969af6a9349948fbfb4a826c18e160e258a4005f7c759f8e7f2dcec369cccba8
+2026/11/08 03:26:42 🐳 Creating container for image testcontainers/ryuk:0.14.0
+2026/11/08 03:26:42 ✅ Container created: f529b0892b6e
+2026/11/08 03:26:42 🐳 Starting container: f529b0892b6e
+2026/11/08 03:26:42 ✅ Container started: f529b0892b6e
+2026/11/08 03:26:42 ⏳ Waiting for container id f529b0892b6e image: testcontainers/ryuk:0.14.0. Waiting for: all of: [log message "Started", port 8080/tcp to be listening]
+2026/11/08 03:26:42 Shell not found in container
+2026/11/08 03:26:42 🔔 Container is ready: f529b0892b6e
+2026/11/08 03:26:42 ✅ Container created: ba0b3b4a9b52
+2026/11/08 03:26:42 🐳 Starting container: ba0b3b4a9b52
+2026/11/08 03:26:42 ✅ Container started: ba0b3b4a9b52
+2026/11/08 03:26:42 ⏳ Waiting for container id ba0b3b4a9b52 image: gcr.io/cloud-spanner-emulator/emulator:1.5.59@sha256:969af6a9349948fbfb4a826c18e160e258a4005f7c759f8e7f2dcec369cccba8. Waiting for: all of: [port 9010/tcp to be listening, log message "Cloud Spanner emulator running"]
+2026/11/08 03:26:42 Shell not found in container
+2026/11/08 03:26:43 🔔 Container is ready: ba0b3b4a9b52
+=== RUN   TestIntegrationQueryCodegenGeneratedSpannerQueriesRunOnEmulator/ListSingers
+=== RUN   TestIntegrationQueryCodegenGeneratedSpannerQueriesRunOnEmulator/FindSingersByFirstName
+=== RUN   TestIntegrationQueryCodegenGeneratedSpannerQueriesRunOnEmulator/ActiveSingers
+--- PASS: TestIntegrationQueryCodegenGeneratedSpannerQueriesRunOnEmulator (1.98s)
+    --- PASS: TestIntegrationQueryCodegenGeneratedSpannerQueriesRunOnEmulator/ListSingers (0.01s)
+    --- PASS: TestIntegrationQueryCodegenGeneratedSpannerQueriesRunOnEmulator/FindSingersByFirstName (0.01s)
+    --- PASS: TestIntegrationQueryCodegenGeneratedSpannerQueriesRunOnEmulator/ActiveSingers (0.00s)
+PASS
+2026/11/08 03:26:43 🐳 Stopping container: ba0b3b4a9b52
+2026/11/08 03:26:44 ✅ Container stopped: ba0b3b4a9b52
+2026/11/08 03:26:44 🐳 Terminating container: ba0b3b4a9b52
+2026/11/08 03:26:44 🚫 Container terminated: ba0b3b4a9b52
+ok  	github.com/apstndb/spanalyzer/cmd/spanner-query-gen	5.092s
+testing: warning: no tests to run
+PASS
+ok  	github.com/apstndb/spanalyzer/cmd/spanner-query-gen/internal/runtimepins	1.434s [no tests to run]

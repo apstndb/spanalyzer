@@ -22,6 +22,7 @@ import (
 	"github.com/apstndb/spannerplan/plantree/reference"
 
 	"github.com/apstndb/spanalyzer/internal/optparam"
+	"github.com/apstndb/spanalyzer/tools/internal/runtimepins"
 )
 
 // Fixture bundles a DDL + template + param config for one named probe.
@@ -196,12 +197,22 @@ func main() {
 func run(stdout io.Writer) error {
 	timeout := flag.Duration("timeout", 5*time.Minute, "overall timeout for emulator + plan acquisition")
 	only := flag.String("only", "", "if set, only run the fixture whose name matches this substring")
+	omniVersion := flag.String("omni-version", "", "pinned Omni version; empty uses the repository default")
 	flag.Parse()
 
 	ctx, cancel := context.WithTimeout(context.Background(), *timeout)
 	defer cancel()
 
-	runtime := spanemuboost.NewLazyRuntime(spanemuboost.BackendOmni)
+	root, err := runtimepins.FindRepositoryRoot(".")
+	if err != nil {
+		return err
+	}
+	image, err := runtimepins.ImageForHostVersion(root, "omni", strings.TrimSpace(*omniVersion))
+	if err != nil {
+		return err
+	}
+	_, _ = fmt.Fprintf(stdout, "Omni image: %s\n", image)
+	runtime := spanemuboost.NewLazyRuntime(spanemuboost.BackendOmni, spanemuboost.WithContainerImage(image))
 	defer func() { _ = runtime.Close() }()
 
 	ran := 0

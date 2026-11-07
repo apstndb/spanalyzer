@@ -1,1 +1,5 @@
 *.pb binary
+
+# Raw logs and unified diffs retain literal whitespace for evidence hashes.
+knowledge/research/runtime-verification/evidence/**/*.log -whitespace
+knowledge/research/runtime-verification/evidence/**/*.patch -whitespace

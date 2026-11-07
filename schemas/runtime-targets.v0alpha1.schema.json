@@ -4,7 +4,11 @@
   "title": "Spanalyzer pinned runtime targets v0alpha1",
   "type": "object",
   "additionalProperties": false,
-  "required": ["$schema", "schema_version", "targets"],
+  "required": [
+    "$schema",
+    "schema_version",
+    "targets"
+  ],
   "properties": {
     "$schema": {
       "const": "schemas/runtime-targets.v0alpha1.schema.json"
@@ -19,10 +23,18 @@
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["kind", "image_family", "tag", "platforms"],
+        "required": [
+          "kind",
+          "image_family",
+          "tag",
+          "platforms"
+        ],
         "properties": {
           "kind": {
-            "enum": ["emulator", "omni"]
+            "enum": [
+              "emulator",
+              "omni"
+            ]
           },
           "image_family": {
             "type": "string",
@@ -39,14 +51,62 @@
             "items": {
               "type": "object",
               "additionalProperties": false,
-              "required": ["platform", "digest"],
+              "required": [
+                "platform",
+                "digest"
+              ],
               "properties": {
                 "platform": {
-                  "enum": ["linux/amd64", "linux/arm64"]
+                  "enum": [
+                    "linux/amd64",
+                    "linux/arm64"
+                  ]
                 },
                 "digest": {
                   "type": "string",
                   "pattern": "^sha256:[0-9a-f]{64}$"
+                }
+              }
+            }
+          },
+          "alternatives": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "tag",
+                "platforms"
+              ],
+              "properties": {
+                "tag": {
+                  "type": "string",
+                  "pattern": "^[A-Za-z0-9_][A-Za-z0-9_.-]{0,127}$"
+                },
+                "platforms": {
+                  "type": "array",
+                  "minItems": 2,
+                  "maxItems": 2,
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "platform",
+                      "digest"
+                    ],
+                    "properties": {
+                      "platform": {
+                        "enum": [
+                          "linux/amd64",
+                          "linux/arm64"
+                        ]
+                      },
+                      "digest": {
+                        "type": "string",
+                        "pattern": "^sha256:[0-9a-f]{64}$"
+                      }
+                    }
+                  }
                 }
               }
             }

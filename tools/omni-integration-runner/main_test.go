@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"strings"
 	"testing"
 )
 
@@ -19,6 +20,14 @@ func TestIntegrationSteps(t *testing.T) {
 		if len(current.args) == 0 || current.args[0] != "test" {
 			t.Errorf("step %q arguments = %v", current.name, current.args)
 		}
+	}
+}
+
+func TestUnknownOmniVersionFailsBeforeRuntimeStartup(t *testing.T) {
+	var stdout, stderr bytes.Buffer
+	err := run(context.Background(), []string{"--omni-version", "unregistered"}, &stdout, &stderr)
+	if err == nil || !strings.Contains(err.Error(), `version "unregistered" is not pinned`) {
+		t.Fatalf("run error = %v", err)
 	}
 }
 

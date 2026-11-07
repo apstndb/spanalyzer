@@ -1,0 +1,35 @@
+=== RUN   TestDrift_EmulatorTableMetas
+2026/11/08 03:40:10 github.com/testcontainers/testcontainers-go - Connected to docker: 
+  Server Version: 29.2.1
+  API Version: 1.53
+  Operating System: Ubuntu 24.04.4 LTS
+  Total Memory: 7922 MB
+  Testcontainers for Go Version: v0.44.0
+  Resolved Docker Host: unix:///Users/apstndb/.colima/default/docker.sock
+  Resolved Docker Socket Path: /var/run/docker.sock
+  Test SessionID: 6f655f2ecfea5cf98a2e3c75d9e433d8739deb4d150490d97b8a1719f1b0c005
+  Test ProcessID: 91e2ba91-c2bd-4ef9-a93c-28f058e91fc1
+2026/11/08 03:40:10 🐳 Creating container for image gcr.io/cloud-spanner-emulator/emulator:1.5.59@sha256:969af6a9349948fbfb4a826c18e160e258a4005f7c759f8e7f2dcec369cccba8
+2026/11/08 03:40:10 🐳 Creating container for image testcontainers/ryuk:0.14.0
+2026/11/08 03:40:10 ✅ Container created: 703dffe60ff6
+2026/11/08 03:40:10 🐳 Starting container: 703dffe60ff6
+2026/11/08 03:40:10 ✅ Container started: 703dffe60ff6
+2026/11/08 03:40:10 ⏳ Waiting for container id 703dffe60ff6 image: testcontainers/ryuk:0.14.0. Waiting for: all of: [log message "Started", port 8080/tcp to be listening]
+2026/11/08 03:40:10 Shell not found in container
+2026/11/08 03:40:10 🔔 Container is ready: 703dffe60ff6
+2026/11/08 03:40:10 ✅ Container created: 000b211de2de
+2026/11/08 03:40:10 🐳 Starting container: 000b211de2de
+2026/11/08 03:40:10 ✅ Container started: 000b211de2de
+2026/11/08 03:40:10 ⏳ Waiting for container id 000b211de2de image: gcr.io/cloud-spanner-emulator/emulator:1.5.59@sha256:969af6a9349948fbfb4a826c18e160e258a4005f7c759f8e7f2dcec369cccba8. Waiting for: all of: [port 9010/tcp to be listening, log message "Cloud Spanner emulator running"]
+2026/11/08 03:40:10 Shell not found in container
+2026/11/08 03:40:11 🔔 Container is ready: 000b211de2de
+    drift_test.go:50: canonical DDL for ExpressionIndexProbeByCity = "CREATE INDEX ExpressionIndexProbeByCity ON ExpressionIndexProbe()", want expression fragment "((JSON_VALUE(VenueData.address.city)))"
+    drift_test.go:50: canonical DDL for ExpressionIndexProbeByCityNoWrap = "CREATE INDEX ExpressionIndexProbeByCityNoWrap ON ExpressionIndexProbe()", want expression fragment "(JSON_VALUE(VenueData.address.city))"
+2026/11/08 03:40:12 🐳 Stopping container: 000b211de2de
+2026/11/08 03:40:12 ✅ Container stopped: 000b211de2de
+2026/11/08 03:40:12 🐳 Terminating container: 000b211de2de
+2026/11/08 03:40:12 🚫 Container terminated: 000b211de2de
+--- FAIL: TestDrift_EmulatorTableMetas (2.08s)
+FAIL
+FAIL	github.com/apstndb/spanalyzer/survey/infoschem	2.763s
+FAIL

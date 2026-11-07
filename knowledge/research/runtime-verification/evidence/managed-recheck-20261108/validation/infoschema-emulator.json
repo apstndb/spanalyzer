@@ -1,0 +1,66 @@
+{
+  "schema_version": "v0alpha1",
+  "status": "producer_changed_only",
+  "material_change": false,
+  "current": {
+    "target": {
+      "kind": "emulator",
+      "image": {
+        "family": "gcr.io/cloud-spanner-emulator/emulator",
+        "tag": "1.5.59",
+        "digest": "sha256:969af6a9349948fbfb4a826c18e160e258a4005f7c759f8e7f2dcec369cccba8",
+        "platform": "linux/arm64"
+      }
+    },
+    "observed_at": "2026-11-07T19:29:16.851366Z",
+    "surface_sha256": "e082c284708ced140f9e1e522ec8d99e51573af6771cc7148407e7ca5f3bfeb9",
+    "column_count": 204,
+    "rolling_queryability": [
+      {
+        "table_name": "INDEXES",
+        "column_name": "SEARCH_UNNEST",
+        "status": "not_advertised"
+      },
+      {
+        "table_name": "INDEX_COLUMNS",
+        "column_name": "EXPRESSION",
+        "status": "not_advertised"
+      }
+    ],
+    "producer_source_sha256": "0e6bf6401be367bc8b73ef0badee78011b2f2dad46f71f7d2708d48a5c4ffccb",
+    "invocation_sha256": "394c27273867ee16446472b5131b47283bcdb06d902be6a30c98982a205aa676"
+  },
+  "retained": {
+    "path": "survey/infoschem/evidence/emulator/969af6a9349948fbfb4a826c18e160e258a4005f7c759f8e7f2dcec369cccba8/linux-arm64-e082c284708c.json",
+    "target": {
+      "kind": "emulator",
+      "image": {
+        "family": "gcr.io/cloud-spanner-emulator/emulator",
+        "tag": "1.5.59",
+        "digest": "sha256:969af6a9349948fbfb4a826c18e160e258a4005f7c759f8e7f2dcec369cccba8",
+        "platform": "linux/arm64"
+      }
+    },
+    "observed_at": "2026-11-07T18:28:55.242983Z",
+    "surface_sha256": "e082c284708ced140f9e1e522ec8d99e51573af6771cc7148407e7ca5f3bfeb9",
+    "column_count": 204,
+    "rolling_queryability": [
+      {
+        "table_name": "INDEXES",
+        "column_name": "SEARCH_UNNEST",
+        "status": "not_advertised"
+      },
+      {
+        "table_name": "INDEX_COLUMNS",
+        "column_name": "EXPRESSION",
+        "status": "not_advertised"
+      }
+    ],
+    "producer_source_sha256": "6fb89429a4dad11f0caa0a4d8803df453df9e767cd0c19c2062902bfeb5940c3",
+    "invocation_sha256": "394c27273867ee16446472b5131b47283bcdb06d902be6a30c98982a205aa676"
+  },
+  "producer_change": {
+    "source_changed": true,
+    "invocation_changed": false
+  }
+}

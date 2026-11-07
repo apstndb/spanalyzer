@@ -35,6 +35,8 @@ var aggregateFunctionQueries = []queryCase{
 	{Label: "aggregate-function/control/grouped-count-sum", SQL: `SELECT SingerId, COUNT(*), SUM(Duration) FROM Songs GROUP BY SingerId`},
 	{Label: "aggregate-function/control/group-by-without-agg", SQL: `SELECT SingerId FROM Songs GROUP BY SingerId`},
 	{Label: "aggregate-function/control/select-distinct-without-agg", SQL: `SELECT DISTINCT SongName FROM Songs`},
+	// Keep the historical case ID used by the retained r2 expectation manifest;
+	// current LTS/r5 acceptance is asserted independently in the live test.
 	{Label: "aggregate-function/unsupported/approx-count-distinct", SQL: `SELECT APPROX_COUNT_DISTINCT(SongName) FROM Songs`},
 	{Label: "aggregate-function/unsupported/corr", SQL: `SELECT CORR(Duration, TrackId) FROM Songs`},
 }
