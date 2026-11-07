@@ -518,6 +518,9 @@ func buildColumnDef(c *infoschem.Column, colOpts map[string][]*infoschem.ColumnO
 	if opts := colOpts[c.ColumnName]; len(opts) > 0 {
 		var defs []*ast.OptionsDef
 		for _, opt := range opts {
+			if opt.IsInherited != nil && *opt.IsInherited {
+				continue
+			}
 			defs = append(defs, optionsDef(opt.OptionName, parseOptionValue(opt.OptionType, opt.OptionValue)))
 		}
 		cd.Options = mkOptions(defs...)

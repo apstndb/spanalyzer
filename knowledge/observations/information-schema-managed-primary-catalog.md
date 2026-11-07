@@ -1,12 +1,12 @@
 ---
 type: Observation
 title: INFORMATION_SCHEMA Managed-Primary Catalog Projection
-description: Point-in-time managed selection, digest-pinned Omni and Emulator comparisons, and rolling-column queryability observed on 2026-08-25.
+description: Point-in-time managed selection, digest-pinned Omni and Emulator comparisons, and a managed-primary refresh observed on 2026-11-05.
 tags: [spanner, spanner-omni, emulator, information-schema, catalog]
 status: draft
 sources:
   - id: managed-capture
-    resource: ../../survey/infoschem/evidence/managed/20260825T120538Z-f8b0ea3092e7.json
+    resource: ../../survey/infoschem/evidence/managed/20261105T030544Z-89b4ab9e231d.json
     title: Managed Spanner INFORMATION_SCHEMA capture
   - id: omni-capture
     resource: ../../survey/infoschem/evidence/omni/ed31d9ee72eeee69cac78566eb3a6e72ee389b26234735f0ef449774cc006741/linux-arm64-f8b0ea3092e7.json
@@ -33,7 +33,7 @@ sources:
 
 # INFORMATION_SCHEMA Managed-Primary Catalog Projection
 
-Observed: 2026-08-25
+Observed: current managed selection November 5, 2026; historical container comparisons August 25
 
 Status: **the analyzer projection selects one managed-database observation at
 one read timestamp; it is not a fleet-wide or durable managed Spanner
@@ -50,8 +50,10 @@ probe identities and requires an isolated, read-only survey module build.
 Captures contain no project, instance, database, endpoint, credential, raw
 service error, or user-schema object identifier.
 
-The selected managed database at `2026-08-25T12:05:38.437354Z` advertised 48
-tables and 308 columns. Both rolling columns were queryable in the same
+The selected managed database at `2026-11-05T03:05:44.68463Z` advertised 48
+tables and 310 columns, including IS_INHERITED on COLUMN_OPTIONS and
+LOCALITY_GROUP_OPTIONS. Inherited option rows are retained as metadata and
+omitted from reconstructed user DDL. Both rolling columns were queryable in the same
 read-only transaction:
 
 - `INDEXES.SEARCH_UNNEST`;
@@ -59,8 +61,9 @@ read-only transaction:
 
 Spanner Omni `2026.r2.1-beta` on `linux/arm64`, with platform-manifest digest
 `sha256:ed31d9ee72eeee69cac78566eb3a6e72ee389b26234735f0ef449774cc006741`,
-advertised the same 48 tables, 308 columns, and two queryability outcomes. Its
-semantic surface SHA-256 therefore equals the managed capture:
+advertised 48 tables, 308 columns, and the same two queryability outcomes. Its
+semantic surface SHA-256 equals the historical August managed capture, rather
+than the selected November observation:
 `f8b0ea3092e7601f260d6d9cb59002dcd0cf4fba6283df8a7c04c004e6a664ee`.
 
 Cloud Spanner Emulator `1.5.56` on `linux/arm64`, with platform-manifest digest
@@ -83,7 +86,7 @@ projection.
 
 The generated `v0alpha2`
 [`information_schema_manifest.json`](../../information_schema_manifest.json)
-projects 306 stable observed columns and two registry columns marked `rolling`.
+projects 308 stable observed columns and two registry columns marked `rolling`.
 The explicit `runtime_filtered` policy reflects that advertisement and
 queryability can roll out separately. Nine documentation-only columns remain
 `docs_only_absent` and default-denied, and `SCHEMATA.PROTO_BUNDLE` retains its

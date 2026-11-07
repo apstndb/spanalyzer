@@ -3,21 +3,21 @@
   "source": {
     "repository": "github.com/apstndb/spanalyzer",
     "registry_path": "survey/infoschem",
-    "registry_export_sha256": "2a569cf756e131ba73ef048c956d9c38905c928ed0ff6bdccde3e79bf138cc85",
-    "selected_observation_path": "survey/infoschem/evidence/managed/20260825T120538Z-f8b0ea3092e7.json",
-    "selected_observation_file_sha256": "94e8c662f3e719d2ebe3143f39d0473c5c6f27d7255d3cc1a8ee3d711047802f",
-    "observed_at": "2026-08-25T12:05:38.437354Z",
-    "surface_sha256": "f8b0ea3092e7601f260d6d9cb59002dcd0cf4fba6283df8a7c04c004e6a664ee",
-    "producer_source_sha256": "b0321b75b16fbec130be2e0af15fdc0204ad5d2bb451576102448958bf36f5e3",
-    "invocation_sha256": "172d84c2f8c48372ff2500088d54918b90a88c9b53d90d6f602ce0553c05cb4c",
+    "registry_export_sha256": "bc7e764e7d74055af09e727df6d5fd17403713daac6c3cf6d033468895fb267c",
+    "selected_observation_path": "survey/infoschem/evidence/managed/20261105T030544Z-89b4ab9e231d.json",
+    "selected_observation_file_sha256": "0a0d3c15c9bed923a5a7344e679e4e2d9c4b93d2cb551f84f3c87c7dd0336072",
+    "observed_at": "2026-11-05T03:05:44.68463Z",
+    "surface_sha256": "89b4ab9e231d7d61bf417669b6f5d29d1715c3999058b905f60698bc1047c6b0",
+    "producer_source_sha256": "174eb51cab46fd01643b5d9652be9c433a14e57345711d4976d59de965304984",
+    "invocation_sha256": "394c27273867ee16446472b5131b47283bcdb06d902be6a30c98982a205aa676",
     "projection_source_path": "information_schema_projection_source.json",
-    "projection_source_sha256": "7d5a008d5886a32e6583a72356fd503197712442a42ff4df9de67187ebb3e625"
+    "projection_source_sha256": "57a178642c06fb9bbe252639eb40d1a6c3fb5cc14eb0dbd0cbb58c20ec10b77e"
   },
   "documentation": {
     "url": "https://docs.cloud.google.com/spanner/docs/information-schema",
     "last_updated": "2026-08-15"
   },
-  "content_sha256": "6040e547c6d5153264a4eac3df0b4224ef333b6b456e172ec0f1c55a045a9db7",
+  "content_sha256": "949cc54af9edc4d676cfdc5212420e91ca286e6ea98160ebcce51bce7378bbae",
   "tables": [
     {
       "name": "CHANGE_STREAMS",
@@ -528,6 +528,13 @@
           "name": "OPTION_VALUE",
           "ordinal": 7,
           "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "IS_INHERITED",
+          "ordinal": 8,
+          "raw_type": "BOOL",
           "evidence_status": "live_observed",
           "project": true
         }
@@ -1056,6 +1063,13 @@
           "name": "OPTION_VALUE",
           "ordinal": 3,
           "raw_type": "STRING(MAX)",
+          "evidence_status": "live_observed",
+          "project": true
+        },
+        {
+          "name": "IS_INHERITED",
+          "ordinal": 4,
+          "raw_type": "BOOL",
           "evidence_status": "live_observed",
           "project": true
         }

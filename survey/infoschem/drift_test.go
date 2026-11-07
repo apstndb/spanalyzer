@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"slices"
 	"sort"
 	"strings"
 	"testing"
@@ -117,13 +118,64 @@ func TestDrift_RealTableMetas(t *testing.T) {
 	verifySpannerSys(ctx, t, client, "real_spanner")
 }
 
+// acceptedSpannerSysSurface is one exact advertised SPANNER_SYS surface that
+// verifySpannerSys accepts for a live target. Any other table/column/absent
+// triple is a failure.
+type acceptedSpannerSysSurface struct {
+	tables      int
+	columns     int
+	knownAbsent int
+}
+
+func acceptedSpannerSysSurfaces(target string) []acceptedSpannerSysSurface {
+	switch target {
+	case "omni":
+		// The pinned r2 observation is retained; later r4/r5 samples expose 598.
+		return []acceptedSpannerSysSurface{{tables: 50, columns: 539, knownAbsent: 93}, {tables: 51, columns: 598, knownAbsent: 34}}
+	case "real_spanner":
+		// November 3/5 independent samples match 52/624. Historical surfaces stay
+		// in research evidence instead of weakening this current managed gate.
+		return []acceptedSpannerSysSurface{{tables: 52, columns: 624, knownAbsent: 8}}
+	default:
+		return nil
+	}
+}
+
+func acceptSpannerSysSurface(target string, tables, columns, knownAbsent int) bool {
+	got := acceptedSpannerSysSurface{tables: tables, columns: columns, knownAbsent: knownAbsent}
+	return slices.Contains(acceptedSpannerSysSurfaces(target), got)
+}
+
+func TestAcceptSpannerSysSurface(t *testing.T) {
+	tests := []struct {
+		name        string
+		target      string
+		tables      int
+		columns     int
+		knownAbsent int
+		want        bool
+	}{
+		{name: "omni pinned", target: "omni", tables: 50, columns: 539, knownAbsent: 93, want: true},
+		{name: "omni post-rollout rejected", target: "omni", tables: 50, columns: 587, knownAbsent: 8},
+		{name: "omni legacy known-absent rejected", target: "omni", tables: 50, columns: 539, knownAbsent: 8},
+		{name: "real current", target: "real_spanner", tables: 52, columns: 624, knownAbsent: 8, want: true},
+		{name: "real historical rejected", target: "real_spanner", tables: 50, columns: 539, knownAbsent: 93},
+		{name: "real mixed rejected", target: "real_spanner", tables: 50, columns: 587, knownAbsent: 56},
+		{name: "real old pin rejected", target: "real_spanner", tables: 50, columns: 539, knownAbsent: 8},
+		{name: "unknown target", target: "emulator", tables: 50, columns: 539, knownAbsent: 56},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := acceptSpannerSysSurface(tt.target, tt.tables, tt.columns, tt.knownAbsent); got != tt.want {
+				t.Fatalf("acceptSpannerSysSurface(%q, %d, %d, %d) = %t, want %t",
+					tt.target, tt.tables, tt.columns, tt.knownAbsent, got, tt.want)
+			}
+		})
+	}
+}
+
 func verifySpannerSys(ctx context.Context, t *testing.T, client *spanner.Client, target string) {
 	t.Helper()
-	const (
-		wantAdvertisedTables  = 50
-		wantAdvertisedColumns = 539
-		wantKnownAbsent       = 8
-	)
 
 	report, err := spannersys.Audit(ctx, client)
 	if err != nil {
@@ -133,18 +185,14 @@ func verifySpannerSys(ctx context.Context, t *testing.T, client *spanner.Client,
 	for _, columns := range report.KnownAbsentColumns {
 		knownAbsentColumns += len(columns)
 	}
-	if report.AdvertisedTables != wantAdvertisedTables ||
-		report.AdvertisedColumns != wantAdvertisedColumns ||
-		knownAbsentColumns != wantKnownAbsent {
+	if !acceptSpannerSysSurface(target, report.AdvertisedTables, report.AdvertisedColumns, knownAbsentColumns) {
 		t.Errorf(
-			"SPANNER_SYS surface (%s): got %d tables / %d columns / %d known absent, want %d / %d / %d",
+			"SPANNER_SYS surface (%s): got %d tables / %d columns / %d known absent, accepted %v",
 			target,
 			report.AdvertisedTables,
 			report.AdvertisedColumns,
 			knownAbsentColumns,
-			wantAdvertisedTables,
-			wantAdvertisedColumns,
-			wantKnownAbsent,
+			acceptedSpannerSysSurfaces(target),
 		)
 	}
 	t.Logf(
@@ -158,11 +206,16 @@ func verifySpannerSys(ctx context.Context, t *testing.T, client *spanner.Client,
 	)
 	// Query execution and decoded row counts depend on current database activity;
 	// keep them out of the stable surface-contract record above.
+	advertisedNotQueryable := 0
+	for _, columns := range report.AdvertisedNotQueryable {
+		advertisedNotQueryable += len(columns)
+	}
 	t.Logf(
-		"SPANNER_SYS diagnostic_metrics target=%s checked_tables=%d decoded_rows=%d",
+		"SPANNER_SYS diagnostic_metrics target=%s checked_tables=%d decoded_rows=%d advertised_not_queryable=%d",
 		target,
 		report.CheckedTables,
 		report.DecodedRows,
+		advertisedNotQueryable,
 	)
 	if report.HasDrift() {
 		t.Errorf(

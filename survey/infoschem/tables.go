@@ -109,6 +109,10 @@ type ColumnOption struct {
 	OptionName   string `spanner:"OPTION_NAME"`
 	OptionType   string `spanner:"OPTION_TYPE"`
 	OptionValue  string `spanner:"OPTION_VALUE"`
+	// IsInherited is nil when the column is not advertised by the target or the
+	// service returns NULL. true means the row is inherited from a parent
+	// object's option and is not user DDL.
+	IsInherited *bool `spanner:"IS_INHERITED"`
 }
 
 // ColumnPrivilege represents INFORMATION_SCHEMA.COLUMN_PRIVILEGES (real only).
@@ -216,6 +220,10 @@ type LocalityGroupOption struct {
 	LocalityGroupName string  `spanner:"LOCALITY_GROUP_NAME"`
 	OptionName        string  `spanner:"OPTION_NAME"`
 	OptionValue       *string `spanner:"OPTION_VALUE"`
+	// IsInherited is nil when the column is not advertised by the target or the
+	// service returns NULL. true means the row is inherited from a parent
+	// object's option and is not user DDL.
+	IsInherited *bool `spanner:"IS_INHERITED"`
 	// OptionType is AST-facing metadata. INFORMATION_SCHEMA does not expose it,
 	// so values loaded from the service leave it empty and are treated as strings.
 	OptionType string `spanner:"-"`

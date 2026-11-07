@@ -94,8 +94,8 @@ func TestExportManifest(t *testing.T) {
 			absentColumns = append(absentColumns, table.Name+"."+column.Name)
 		}
 	}
-	if len(document.Tables) != 51 || totalColumns != 547 {
-		t.Errorf("manifest surface = %d tables / %d columns, want 51 / 547", len(document.Tables), totalColumns)
+	if len(document.Tables) != 53 || totalColumns != 632 {
+		t.Errorf("manifest surface = %d tables / %d columns, want 53 / 632", len(document.Tables), totalColumns)
 	}
 	if projectedTables != 50 || projectedColumns != 539 {
 		t.Errorf("projected surface = %d tables / %d columns, want 50 / 539", projectedTables, projectedColumns)
@@ -110,8 +110,15 @@ func TestExportManifest(t *testing.T) {
 		"VECTOR_INDEX_STATS.CLUSTER_SIZE_PERCENTILES",
 		"VECTOR_INDEX_STATS.CLUSTER_AVERAGE_DISTANCE_TO_CENTROID_PERCENTILES",
 	}
-	if !slices.Equal(absentColumns, wantAbsent) {
-		t.Errorf("absent_both columns =\n%v\nwant\n%v", absentColumns, wantAbsent)
+	// The immutable August captures project 539 common columns. Newly known
+	// fields remain denied until replacement observations are selected.
+	if len(absentColumns) != 93 {
+		t.Errorf("absent column count = %d, want 93", len(absentColumns))
+	}
+	for _, name := range wantAbsent {
+		if !slices.Contains(absentColumns, name) {
+			t.Errorf("missing legacy absent column %s", name)
+		}
 	}
 
 	wantContentHash, err := hashJSON(manifestContent{
@@ -394,7 +401,7 @@ func TestManifestSchemasValidateEvidenceAndExport(t *testing.T) {
 		},
 		{
 			name:       "manifest schema",
-			schemaPath: "../schemas/spanner-sys-manifest.v0alpha1.schema.json",
+			schemaPath: "../schemas/spanner-sys-manifest.v0alpha2.schema.json",
 			instances:  [][]byte{manifest},
 		},
 	}

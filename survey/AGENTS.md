@@ -114,15 +114,18 @@ observation is deliberately retained.
   reports relative-order drift, and distinguishes registry-known columns absent
   from a successful target capture from unknown advertised metadata. Missing or
   failed capture data is not an observed absence.
-  The private descriptor extractor derives the complete 51-table / 547-column
+  The private descriptor extractor derives the complete 53-table / 632-column
   structural type surface from the decoder structs. Its canonical renderer keeps pointer
   nullability as decoder evidence only and compares all advertised raw types
   without parsing nested `SPANNER_TYPE` strings.
-  `ExportManifest(sourceCommit)` combines those private descriptors with the
+  `ExportManifest(sourceCommit)` uses the explicit v0alpha2 in-repository producer
+  identity and combines those private descriptors with the
   strict redacted managed and Omni captures embedded from `spannersys/evidence/`.
   It emits the prerelease JSON contract defined under `schemas/`, performs no
   Git lookup or live probe, and fails closed unless every required target has a
-  complete agreeing observation. `cmd/spanner-sys-export` is the corresponding
+  complete agreeing observation. The selected common projection remains 50/539;
+  current managed captures are 52/624 with eight known-absent entries. The
+  superset registers both batch-operation tables and lock/split distributions. `cmd/spanner-sys-export` is the corresponding
   explicit-commit CLI. The parent analyzer pins its bytes without importing
   producer packages into the root module.
   `CaptureSurfaceFromTransaction` and `cmd/spanner-sys-capture` independently

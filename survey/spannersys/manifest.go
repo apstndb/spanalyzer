@@ -9,12 +9,11 @@ import (
 )
 
 const (
-	manifestSchemaVersion = "v0alpha1"
-	// surveyRepository is the immutable legacy producer identity used by the
-	// already-pinned v0alpha1 manifest. New retained runs use the in-repository
-	// producer-revision protocol and will require an explicit schema revision.
-	surveyRepository = "github.com/apstndb/spanner-emulator-survey"
-	surveySourcePath = "spannersys"
+	manifestSchemaVersion = "v0alpha2"
+	// v0alpha2 identifies the in-repository exporter. The immutable August
+	// capture sidecars remain historical inputs to the common projection.
+	surveyRepository = "github.com/apstndb/spanalyzer"
+	surveySourcePath = "survey/spannersys"
 )
 
 type manifestDocument struct {

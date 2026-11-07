@@ -26,6 +26,9 @@ func (s *Schema) toLocalityGroupsDDL() ([]ast.DDL, error) {
 		if isBuiltinDefaultLocalityGroup(opt.LocalityGroupName) {
 			continue
 		}
+		if opt.IsInherited != nil && *opt.IsInherited {
+			continue
+		}
 		if !groupNames[opt.LocalityGroupName] {
 			groupNames[opt.LocalityGroupName] = true
 			orderedNames = append(orderedNames, opt.LocalityGroupName)

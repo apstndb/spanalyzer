@@ -12,8 +12,8 @@ func TestRegistryDescriptorsCoverKnownSurface(t *testing.T) {
 	if err != nil {
 		t.Fatalf("registryDescriptors: %v", err)
 	}
-	if len(tables) != 51 {
-		t.Fatalf("table descriptors = %d, want 51", len(tables))
+	if len(tables) != 53 {
+		t.Fatalf("table descriptors = %d, want 53", len(tables))
 	}
 	registry, err := tableRegistry()
 	if err != nil {
@@ -41,8 +41,8 @@ func TestRegistryDescriptorsCoverKnownSurface(t *testing.T) {
 			shapes[canonical] = true
 		}
 	}
-	if columnCount != 547 {
-		t.Errorf("column descriptors = %d, want 547", columnCount)
+	if columnCount != 632 {
+		t.Errorf("column descriptors = %d, want 632", columnCount)
 	}
 	if !sort.StringsAreSorted(tableNames) {
 		t.Errorf("table descriptors are not sorted: %v", tableNames)

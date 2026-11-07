@@ -199,6 +199,7 @@ var informationSchemaTables = []*TableMeta{
 			col("OPTION_NAME", "STRING(MAX)", 5),
 			col("OPTION_TYPE", "STRING(MAX)", 6),
 			col("OPTION_VALUE", "STRING(MAX)", 7),
+			col("IS_INHERITED", "BOOL", 8),
 		},
 	},
 	{
@@ -313,6 +314,7 @@ var informationSchemaTables = []*TableMeta{
 			col("LOCALITY_GROUP_NAME", "STRING(MAX)", 1),
 			col("OPTION_NAME", "STRING(MAX)", 2),
 			col("OPTION_VALUE", "STRING(MAX)", 3),
+			col("IS_INHERITED", "BOOL", 4),
 		},
 	},
 	{
