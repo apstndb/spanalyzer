@@ -4,8 +4,8 @@
     {
       "path": "assertions.json",
       "input_sha256": "90c37cb00b8125ccc8bec3d914542c6b1bce20f5b2620b4d93fd841665cb2643",
-      "retained_sha256": "3cd166f6df8161e1265a6add52c4b1ece34f4b17fff8ec75f162287588bf68af",
-      "transformation": "Mask SDK requestID in decoded JSON error fields; query results and status codes are unchanged."
+      "retained_sha256": "a1beb85e7574676e7f726650c334037fa8ef6d9cf8978fa59e2041c8888d01ea",
+      "transformation": "Mask SDK requestID in decoded JSON error fields; query results and status codes are unchanged. The final summary also adds an explicit definition of attempted-case counts, without changing outcomes."
     },
     {
       "path": "fixture-assertions.json",
@@ -55,5 +55,6 @@
       "retained_sha256": "c89a62498b093044c445f8ea63f9ee463fb9b36ee74f42716295897dc323402d",
       "transformation": "Mask SDK requestID in decoded JSON error fields; query results and status codes are unchanged."
     }
-  ]
+  ],
+  "finalization_note": "The assertions.json final hash includes the later execution-count-definition clarification. Other retained hashes identify the direct redaction output."
 }
