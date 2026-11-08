@@ -37,6 +37,7 @@ func runPlanReport(args []string, stdout, stderr io.Writer) error {
 	fs.SetOutput(flagOutput(args, stdout, stderr))
 	configPath := fs.String("config", "spanner-query-gen.yaml", "query code generation config file")
 	output := fs.String("output", "markdown", "report output format: markdown, yaml, or json")
+	summary := fs.Bool("summary", false, "emit a lightweight JSON/YAML summary without rendered plans, SQL, or operator graphs")
 	backend := fs.String("backend", "omni", "runtime backend: omni")
 	renderFormat := fs.String("format", "current", "spannerplan tree format: current, traditional, or compact")
 	annotate := fs.String("annotate", "", "rendered-plan annotation: seekability")
@@ -58,6 +59,9 @@ func runPlanReport(args []string, stdout, stderr io.Writer) error {
 	}
 	if fs.NArg() != 0 {
 		return fmt.Errorf("unexpected positional arguments: %v", fs.Args())
+	}
+	if *summary && *output != "json" && *output != "yaml" {
+		return fmt.Errorf("--summary requires --output json or yaml")
 	}
 	if strings.ToLower(strings.TrimSpace(*backend)) != "omni" {
 		return fmt.Errorf("unsupported --backend %q; use omni", *backend)
@@ -109,6 +113,7 @@ func runPlanReport(args []string, stdout, stderr io.Writer) error {
 		WrapWidth:           *wrapWidth,
 		AnnotateSeekability: strings.TrimSpace(*annotate) == "seekability",
 		Stable:              *stable,
+		Summary:             *summary,
 		Identity:            identity,
 		Optimizer: planReportOptimizerEnvironment{
 			Version:           strings.TrimSpace(*optimizerVersion),
@@ -158,6 +163,7 @@ type planReportOptions struct {
 	RenderMode          reference.RenderMode
 	WrapWidth           int
 	Stable              bool
+	Summary             bool
 	Identity            planReportBackendIdentity
 	Optimizer           planReportOptimizerEnvironment
 }
@@ -198,6 +204,7 @@ const (
 )
 
 type planReport struct {
+	Summary             bool                           `json:"-" yaml:"-"`
 	ReportVersion       string                         `json:"report_version" yaml:"report_version"`
 	Status              string                         `json:"status" yaml:"status"`
 	Backend             string                         `json:"backend" yaml:"backend"`
@@ -426,6 +433,7 @@ func buildPlanReportWithAnalyzer(ctx context.Context, config querygen.QueryCodeg
 		Format:           string(opts.Format),
 		RenderMode:       string(opts.RenderMode),
 		Stable:           opts.Stable,
+		Summary:          opts.Summary,
 		ContractEvalMode: planContractEvaluationModeNone,
 		PlanSource: planReportPlanSource{
 			Backend:    opts.Backend,
@@ -553,9 +561,12 @@ func buildPlanReportWithAnalyzer(ctx context.Context, config querygen.QueryCodeg
 		if descriptorsLoaded {
 			reportQuery.ProtoDescriptorSHA256 = protoDescriptorDigestsBySource[catalog]
 		}
-		reportQuery.OptimizerNotPinned = !planReportOptimizerEnvironmentPinned(report.Optimizer.Requested)
+		reportQuery.OptimizerNotPinned = !plancontract.OptimizerVersionPinned(report.Optimizer.Requested.Version)
 		if reportQuery.OptimizerNotPinned {
-			reportQuery.PlanEnvironmentNotes = append(reportQuery.PlanEnvironmentNotes, "plan environment does not pin both optimizer version and statistics package to fixed values")
+			reportQuery.PlanEnvironmentNotes = append(reportQuery.PlanEnvironmentNotes, "requested optimizer version is not pinned to a fixed value")
+		}
+		if !plancontract.OptimizerStatisticsPackagePinned(report.Optimizer.Requested.StatisticsPackage) {
+			reportQuery.PlanEnvironmentNotes = append(reportQuery.PlanEnvironmentNotes, "requested optimizer statistics package is not pinned to a fixed value")
 		}
 		if openError := openErrorsBySource[catalog]; openError != nil {
 			reportQuery.Status = "error"
@@ -589,6 +600,9 @@ func buildPlanReportWithAnalyzer(ctx context.Context, config querygen.QueryCodeg
 		}
 		stmt.Params = values
 		queryPlan, err := clients.AnalyzePlan(ctx, stmt, query.Result == "row_count" || query.Result == "row_set")
+		if err == nil && len(queryPlan.GetPlanNodes()) == 0 {
+			err = fmt.Errorf("AnalyzeQuery returned no plan nodes")
+		}
 		if err != nil {
 			reportQuery.Status = "error"
 			reportQuery.Error = err.Error()
@@ -612,13 +626,16 @@ func buildPlanReportWithAnalyzer(ctx context.Context, config querygen.QueryCodeg
 			scanTargetsBySource[catalog] = targetsForSchema
 		}
 		accessPaths := plancontract.NormalizeAccessPaths(queryPlan, targetsForSchema)
-		rendered, err := renderPlanReportTree(queryPlan, accessPaths, opts)
-		if err != nil {
-			reportQuery.Status = "error"
-			reportQuery.Error = err.Error()
-			report.TargetSummary.Errors++
-			report.Queries = append(report.Queries, reportQuery)
-			continue
+		var rendered string
+		if !opts.Summary {
+			rendered, err = renderPlanReportTree(queryPlan, accessPaths, opts)
+			if err != nil {
+				reportQuery.Status = "error"
+				reportQuery.Error = err.Error()
+				report.TargetSummary.Errors++
+				report.Queries = append(report.Queries, reportQuery)
+				continue
+			}
 		}
 
 		reportQuery.NormalizedOperators = normalizedOperators
@@ -1114,18 +1131,25 @@ func writePlanReport(stdout io.Writer, output string, report planReport) error {
 	if err := validatePlanReportInvariants(report); err != nil {
 		return err
 	}
+	var artifact interface{} = report
+	if report.Summary {
+		if output != "json" && output != "yaml" {
+			return fmt.Errorf("--summary requires --output json or yaml")
+		}
+		artifact = summarizePlanReport(report)
+	}
 	switch output {
 	case "markdown", "md":
 		return writePlanReportMarkdown(stdout, report)
 	case "yaml":
-		data, err := marshalYAMLViaJSON(report)
+		data, err := marshalYAMLViaJSON(artifact)
 		if err != nil {
 			return err
 		}
 		_, err = stdout.Write(data)
 		return err
 	case "json":
-		data, err := marshalIndentedJSON(report)
+		data, err := marshalIndentedJSON(artifact)
 		if err != nil {
 			return err
 		}

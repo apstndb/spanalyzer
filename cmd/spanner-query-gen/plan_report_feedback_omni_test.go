@@ -5,8 +5,10 @@ package main
 import (
 	"bytes"
 	"context"
+	"encoding/json"
 	"os"
 	"path/filepath"
+	"reflect"
 	"slices"
 	"strings"
 	"testing"
@@ -142,7 +144,8 @@ CREATE TABLE Surrogates (Id INT64 NOT NULL, CreatedAt TIMESTAMP, Owner STRING(MA
 		open := func(context.Context, spanemuboost.RuntimeHandle, querygen.QueryCodegenSchema, string, *spanalyzer.ProtoDescriptorSet, planReportOptimizer) (planReportAnalyzer, error) {
 			return feedbackBorrowedPlanAnalyzer{analyzer}, nil
 		}
-		report, err := buildPlanReportWithAnalyzer(t.Context(), config, model, dir, planReportOptions{Backend: "omni", Format: reference.FormatCurrent, RenderMode: reference.RenderModePlan, AnnotateSeekability: true, Optimizer: planReportOptimizerEnvironment{Version: "9"}}, runtime, open)
+		opts := planReportOptions{Backend: "omni", Format: reference.FormatCurrent, RenderMode: reference.RenderModePlan, AnnotateSeekability: true, Optimizer: planReportOptimizerEnvironment{Version: "9"}}
+		report, err := buildPlanReportWithAnalyzer(t.Context(), config, model, dir, opts, runtime, open)
 		if err != nil || report.TargetSummary.Planned != 9 || report.TargetSummary.Errors != 1 || len(report.Queries) != 10 {
 			t.Fatalf("report = %+v, %v", report, err)
 		}
@@ -162,9 +165,73 @@ CREATE TABLE Surrogates (Id INT64 NOT NULL, CreatedAt TIMESTAMP, Owner STRING(MA
 		if !ids["query/Optional"] || !ids["write/Remove"] {
 			t.Fatalf("canonical identities missing: %v", ids)
 		}
-		var output bytes.Buffer
-		if err := writePlanReport(&output, "json", report); err != nil {
+		opts.Summary = true
+		summary, err := buildPlanReportWithAnalyzer(t.Context(), config, model, dir, opts, runtime, open)
+		if err != nil || !reflect.DeepEqual(report.TargetSummary, summary.TargetSummary) {
+			t.Fatalf("summary collection = %+v, %v", summary, err)
+		}
+		contracts := planContractsFile{Version: planContractFileVersionV1Alpha, Contracts: []planContract{{Name: "RangeSeek", Target: "query/Range", CEL: `access_paths.exists(p, p.scan_target == "Events" && "Shard" in p.seek_columns && "CreatedAt" in p.seek_columns)`}}}
+		configJSON, err := marshalIndentedJSON(config)
+		if err != nil {
 			t.Fatal(err)
+		}
+		contractsJSON, err := marshalIndentedJSON(contracts)
+		if err != nil {
+			t.Fatal(err)
+		}
+		for _, artifact := range []*planReport{&report, &summary} {
+			artifact.Input.ConfigSHA256 = planReportDigest(string(configJSON))
+			artifact.Input.ContractFileSHA256 = planReportDigest(string(contractsJSON))
+			if err := applyPlanContracts(artifact, contracts); err != nil {
+				t.Fatal(err)
+			}
+			artifact.ContractEvalMode = planContractEvaluationModeCheck
+			if artifact.ContractSummary.Passed != 1 || strings.Join(planReportOptimizerPinningWarnings(*artifact), ",") != "statistics_package_not_pinned" {
+				t.Fatalf("version-only contract environment: %+v", artifact.ContractSummary)
+			}
+		}
+		if !reflect.DeepEqual(report.ContractEvaluations, summary.ContractEvaluations) {
+			t.Fatal("live summary changed contract evaluation")
+		}
+		for i, query := range summary.Queries {
+			if query.Plan != "" || query.TargetID != report.Queries[i].TargetID || query.OperatorTreeSHA256 != report.Queries[i].OperatorTreeSHA256 || !reflect.DeepEqual(query.AccessPaths, report.Queries[i].AccessPaths) {
+				t.Fatalf("live summary changed plan evidence or rendered a plan: %s", query.TargetID)
+			}
+		}
+		outputs := map[string][]byte{"config.json": configJSON, "contracts.json": contractsJSON, "schema.sql": []byte(ddl)}
+		for name, artifact := range map[string]planReport{"full": report, "summary": summary} {
+			for _, format := range []string{"json", "yaml"} {
+				var output bytes.Buffer
+				if err := writePlanReport(&output, format, artifact); err != nil {
+					t.Fatal(err)
+				}
+				outputs[name+"."+format] = output.Bytes()
+			}
+		}
+		if len(outputs["summary.json"]) >= len(outputs["full.json"]) {
+			t.Fatal("summary did not reduce serialized output size")
+		}
+		// Optional local evidence is emitted only to the caller's task directory.
+		// This public fixture is not the feedback author's private query corpus.
+		if evidenceDir := os.Getenv("SPANALYZER_PLAN_REPORT_EVIDENCE_DIR"); evidenceDir != "" {
+			if err := os.MkdirAll(evidenceDir, 0700); err != nil {
+				t.Fatal(err)
+			}
+			for name, data := range outputs {
+				if err := os.WriteFile(filepath.Join(evidenceDir, name), data, 0600); err != nil {
+					t.Fatal(err)
+				}
+			}
+			sizes, err := json.Marshal(map[string]int{"full_json_bytes": len(outputs["full.json"]), "summary_json_bytes": len(outputs["summary.json"]), "targets": len(report.Queries), "planned": report.TargetSummary.Planned, "errors": report.TargetSummary.Errors})
+			if err != nil {
+				t.Fatal(err)
+			}
+			if err := os.WriteFile(filepath.Join(evidenceDir, "sizes.json"), sizes, 0600); err != nil {
+				t.Fatal(err)
+			}
+		}
+		if planReportContractCheckFailureCount(summary) != 0 {
+			t.Fatal("summary contract check failed")
 		}
 		row, err := clients.Client.Single().ReadRow(t.Context(), "T", spanner.Key{int64(1)}, []string{"Value"})
 		if err != nil {

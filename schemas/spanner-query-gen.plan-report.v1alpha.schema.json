@@ -47,7 +47,7 @@
           "type": "boolean"
         },
         "key_columns": {
-          "description": "Column evidence; empty does not prove no columns when bindings are unavailable.",
+          "description": "Catalog key columns in declared key order; empty when schema facts are unavailable.",
           "items": {
             "minLength": 1,
             "type": "string"
@@ -69,7 +69,7 @@
           ]
         },
         "residual_columns": {
-          "description": "Column evidence; empty does not prove no columns when bindings are unavailable.",
+          "description": "Sorted, duplicate-free set of proven column references, not declared key order. Use membership tests against key_columns for key prefixes; empty does not prove no columns when bindings are unavailable.",
           "items": {
             "minLength": 1,
             "type": "string"
@@ -82,7 +82,7 @@
             "additionalProperties": false,
             "properties": {
               "columns": {
-                "description": "Column references proven by this scan's Reference bindings.",
+                "description": "Sorted, duplicate-free set of column references proven by this scan's Reference bindings.",
                 "items": {
                   "minLength": 1,
                   "type": "string"
@@ -136,7 +136,7 @@
             "additionalProperties": false,
             "properties": {
               "columns": {
-                "description": "Column references proven by this scan's Reference bindings.",
+                "description": "Sorted, duplicate-free set of column references proven by this scan's Reference bindings.",
                 "items": {
                   "minLength": 1,
                   "type": "string"
@@ -166,7 +166,7 @@
           "uniqueItems": true
         },
         "seek_columns": {
-          "description": "Column evidence; empty does not prove no columns when bindings are unavailable.",
+          "description": "Sorted, duplicate-free set of proven column references, not declared key order. Use membership tests against key_columns for key prefixes; empty does not prove no columns when bindings are unavailable.",
           "items": {
             "minLength": 1,
             "type": "string"
@@ -179,7 +179,7 @@
             "additionalProperties": false,
             "properties": {
               "columns": {
-                "description": "Column references proven by this scan's Reference bindings.",
+                "description": "Sorted, duplicate-free set of column references proven by this scan's Reference bindings.",
                 "items": {
                   "minLength": 1,
                   "type": "string"
@@ -214,7 +214,7 @@
           "type": "string"
         },
         "stored_columns": {
-          "description": "Column evidence; empty does not prove no columns when bindings are unavailable.",
+          "description": "Catalog stored columns; empty when schema facts are unavailable.",
           "items": {
             "minLength": 1,
             "type": "string"
@@ -227,7 +227,7 @@
             "additionalProperties": false,
             "properties": {
               "columns": {
-                "description": "Column references proven by this scan's Reference bindings.",
+                "description": "Sorted, duplicate-free set of column references proven by this scan's Reference bindings.",
                 "items": {
                   "minLength": 1,
                   "type": "string"
@@ -2836,7 +2836,7 @@
           "type": "string"
         },
         "optimizer_not_pinned": {
-          "description": "Whether this query used unpinned optimizer settings.",
+          "description": "Whether this query's requested optimizer version is unpinned. Statistics-package pinning is reported separately in environment warnings.",
           "type": "boolean"
         },
         "plan": {

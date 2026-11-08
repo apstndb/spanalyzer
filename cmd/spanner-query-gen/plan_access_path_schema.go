@@ -18,13 +18,15 @@ func planAccessPathJSONSchema() map[string]interface{} {
 	for _, field := range []string{"full_scan", "conditions_complete", "has_seek_condition", "has_residual_condition", "has_timestamp_condition", "has_search_condition"} {
 		properties[field] = boolSchema("Observed scan signal; conditions_complete requires an unambiguous wrapper pairing.")
 	}
-	for _, field := range []string{"seek_columns", "residual_columns", "key_columns", "stored_columns"} {
-		properties[field] = stringListSchema("Column evidence; empty does not prove no columns when bindings are unavailable.")
+	for _, field := range []string{"seek_columns", "residual_columns"} {
+		properties[field] = stringListSchema("Sorted, duplicate-free set of proven column references, not declared key order. Use membership tests against key_columns for key prefixes; empty does not prove no columns when bindings are unavailable.")
 	}
+	properties["key_columns"] = stringListSchema("Catalog key columns in declared key order; empty when schema facts are unavailable.")
+	properties["stored_columns"] = stringListSchema("Catalog stored columns; empty when schema facts are unavailable.")
 	condition := objectSchema([]interface{}{"index", "expression", "columns"}, map[string]interface{}{
 		"index":      nonNegativeIntegerSchema("Immediate condition child PlanNode index."),
 		"expression": stringSchema("Verbatim backend short description; empty when unavailable."),
-		"columns":    stringListSchema("Column references proven by this scan's Reference bindings."),
+		"columns":    stringListSchema("Sorted, duplicate-free set of column references proven by this scan's Reference bindings."),
 	})
 	for _, field := range []string{"seek_conditions", "residual_conditions", "timestamp_conditions", "search_conditions"} {
 		properties[field] = arraySchemaAllowEmpty(condition)

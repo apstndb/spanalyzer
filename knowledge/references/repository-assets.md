@@ -69,7 +69,7 @@ they do not assert that every matching file supports every related claim.
 
 The [`schemas`](../../schemas/) directory contains the machine-readable
 contracts for the mutable `v0alpha1` plan-vocabulary formats and the `v1alpha`
-query-generator configuration, plan-report, and plan-contract formats. The
+query-generator configuration, full plan-report, plan-summary, and plan-contract formats. The
 schema files remain the canonical definitions.
 
 The [`runtime_targets.json`](../../runtime_targets.json) contract centralizes
