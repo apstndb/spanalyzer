@@ -39,10 +39,15 @@ func run(args []string, stdout, stderr io.Writer) int {
 	output := flags.String("output", "", "canonical repository output path (stdout when omitted)")
 	write := flags.Bool("write", false, "write to the canonical repository path")
 	timeout := flags.Duration("timeout", 15*time.Minute, "overall capture timeout")
+	observations := flags.Int("observations", 1, "check-only: sequential read-only observations to compare (1..10)")
 	if err := flags.Parse(args); err != nil {
 		if errors.Is(err, flag.ErrHelp) {
 			return 0
 		}
+		return 2
+	}
+	if err := validateObservationsFlag(checkMode, *observations, flagWasSet(flags, "observations")); err != nil {
+		writeDiagnostic(stderr, "%v\n", err)
 		return 2
 	}
 	if flags.NArg() != 0 {
@@ -90,6 +95,26 @@ func run(args []string, stdout, stderr io.Writer) int {
 
 	ctx, cancel := context.WithTimeout(context.Background(), *timeout)
 	defer cancel()
+	if checkMode {
+		documents, err := captureObservations(ctx, *target, *database, *image, producer, *observations)
+		if err != nil {
+			writeDiagnostic(stderr, "capture INFORMATION_SCHEMA: %v\n", err)
+			return 1
+		}
+		report, err := compareRetainedObservations(root, documents)
+		if err != nil {
+			writeDiagnostic(stderr, "compare retained INFORMATION_SCHEMA capture: %v\n", err)
+			return 1
+		}
+		if err := writeComparisonReport(stdout, report); err != nil {
+			writeDiagnostic(stderr, "write INFORMATION_SCHEMA comparison: %v\n", err)
+			return 1
+		}
+		if report.MaterialChange {
+			return 1
+		}
+		return 0
+	}
 	document, err := capture(ctx, *target, *database, *image, producer)
 	if err != nil {
 		writeDiagnostic(stderr, "capture INFORMATION_SCHEMA: %v\n", err)
@@ -106,21 +131,6 @@ func run(args []string, stdout, stderr io.Writer) int {
 		return 1
 	}
 	canonicalOutput := filepath.Join(root, "survey", "infoschem", filepath.FromSlash(relative))
-	if checkMode {
-		report, err := compareRetainedCapture(root, document)
-		if err != nil {
-			writeDiagnostic(stderr, "compare retained INFORMATION_SCHEMA capture: %v\n", err)
-			return 1
-		}
-		if err := writeComparisonReport(stdout, report); err != nil {
-			writeDiagnostic(stderr, "write INFORMATION_SCHEMA comparison: %v\n", err)
-			return 1
-		}
-		if report.MaterialChange {
-			return 1
-		}
-		return 0
-	}
 	if !*write && *output == "" {
 		if _, err := stdout.Write(data); err != nil {
 			writeDiagnostic(stderr, "write capture: %v\n", err)
@@ -166,14 +176,37 @@ func capture(
 	imageReference string,
 	producer infoschem.ProducerIdentity,
 ) (*infoschem.CaptureDocument, error) {
+	documents, err := captureObservations(ctx, targetKind, database, imageReference, producer, 1)
+	if err != nil {
+		return nil, err
+	}
+	return documents[0], nil
+}
+
+func captureObservations(
+	ctx context.Context,
+	targetKind string,
+	database string,
+	imageReference string,
+	producer infoschem.ProducerIdentity,
+	count int,
+) ([]*infoschem.CaptureDocument, error) {
 	environment, err := captureenv.Open(ctx, targetKind, database, imageReference, captureLabel)
 	if err != nil {
 		return nil, err
 	}
 	defer func() { _ = environment.Close() }()
-	txn := newCaptureTransaction(environment.Client)
-	defer txn.Close()
-	return infoschem.CaptureFromTransaction(ctx, txn, environment.Target, producer)
+	documents := make([]*infoschem.CaptureDocument, 0, count)
+	for range count {
+		txn := newCaptureTransaction(environment.Client)
+		document, err := infoschem.CaptureFromTransaction(ctx, txn, environment.Target, producer)
+		txn.Close()
+		if err != nil {
+			return nil, err
+		}
+		documents = append(documents, document)
+	}
+	return documents, nil
 }
 
 func newCaptureTransaction(client *spanner.Client) *spanner.ReadOnlyTransaction {

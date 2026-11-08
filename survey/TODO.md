@@ -1,5 +1,13 @@
 # TODO
 
+## Catalog observation resilience (2026-11-08)
+
+- [ ] Bound loader fallback to observed optional compatibility flags and keep
+  failed row decodes out of the final schema.
+- [ ] Add column-level comparison deltas and check-only repeated observations.
+- [ ] Batch expression-index fixtures and discover partial-batch cleanup state.
+- [ ] Preserve current registry, runtime pins and manifest expectations.
+
 ## Inspection feedback (2026-11-08)
 
 - [x] Reproduce the ADD ROW DELETION POLICY input gap against current main and

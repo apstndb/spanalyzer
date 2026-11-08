@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"errors"
+	"flag"
 	"fmt"
 	"io"
 	"io/fs"
@@ -15,15 +16,62 @@ import (
 	"github.com/apstndb/spanalyzer/survey/internal/runtimepins"
 )
 
-const comparisonSchemaVersion = "v0alpha1"
+// v0alpha2 adds repeated observations and structured surface deltas.
+const comparisonSchemaVersion = "v0alpha2"
 
 type comparisonReport struct {
-	SchemaVersion  string                   `json:"schema_version"`
-	Status         string                   `json:"status"`
-	MaterialChange bool                     `json:"material_change"`
-	Current        comparisonObservation    `json:"current"`
-	Retained       comparisonObservation    `json:"retained"`
-	ProducerChange *comparisonProducerDelta `json:"producer_change,omitempty"`
+	SchemaVersion  string                     `json:"schema_version"`
+	Status         string                     `json:"status"`
+	MaterialChange bool                       `json:"material_change"`
+	Current        comparisonObservation      `json:"current"`
+	Retained       comparisonObservation      `json:"retained"`
+	ProducerChange *comparisonProducerDelta   `json:"producer_change,omitempty"`
+	SurfaceDelta   *surfaceDelta              `json:"surface_delta,omitempty"`
+	Observations   []comparisonObservationRef `json:"observations,omitempty"`
+}
+
+type comparisonObservationRef struct {
+	ObservedAt    string `json:"observed_at"`
+	SurfaceSHA256 string `json:"surface_sha256"`
+	ColumnCount   int    `json:"column_count"`
+}
+
+type surfaceDelta struct {
+	AddedColumns               []surfaceColumnRef          `json:"added_columns,omitempty"`
+	RemovedColumns             []surfaceColumnRef          `json:"removed_columns,omitempty"`
+	ChangedColumns             []surfaceColumnChange       `json:"changed_columns,omitempty"`
+	RollingQueryabilityChanges []rollingQueryabilityChange `json:"rolling_queryability_changes,omitempty"`
+}
+
+type surfaceColumnRef struct {
+	TableName       string `json:"table_name"`
+	ColumnName      string `json:"column_name"`
+	SpannerType     string `json:"spanner_type"`
+	OrdinalPosition int    `json:"ordinal_position"`
+}
+
+type surfaceColumnChange struct {
+	TableName  string              `json:"table_name"`
+	ColumnName string              `json:"column_name"`
+	Retained   surfaceColumnFields `json:"retained"`
+	Current    surfaceColumnFields `json:"current"`
+}
+
+type surfaceColumnFields struct {
+	SpannerType     string `json:"spanner_type"`
+	OrdinalPosition int    `json:"ordinal_position"`
+}
+
+type rollingQueryabilityChange struct {
+	TableName      string `json:"table_name"`
+	ColumnName     string `json:"column_name"`
+	RetainedStatus string `json:"retained_status"`
+	CurrentStatus  string `json:"current_status"`
+}
+
+type columnIdentity struct {
+	table  string
+	column string
 }
 
 type comparisonObservation struct {
@@ -43,27 +91,80 @@ type comparisonProducerDelta struct {
 }
 
 func compareRetainedCapture(repoRoot string, current *infoschem.CaptureDocument) (*comparisonReport, error) {
-	if current == nil {
-		return nil, errors.New("current capture is nil")
+	return compareRetainedObservations(repoRoot, []*infoschem.CaptureDocument{current})
+}
+
+func compareRetainedObservations(repoRoot string, observations []*infoschem.CaptureDocument) (*comparisonReport, error) {
+	if err := validateObservations(observations); err != nil {
+		return nil, err
 	}
-	retainedPath, retained, targetChanged, err := retainedBaseline(repoRoot, current)
+	retainedPath, retained, targetChanged, err := retainedBaseline(repoRoot, observations[0])
 	if err != nil {
 		return nil, err
 	}
+	return aggregateCheckObservations(retainedPath, retained, targetChanged, observations), nil
+}
+
+func validateObservations(observations []*infoschem.CaptureDocument) error {
+	if len(observations) == 0 {
+		return errors.New("no observations")
+	}
+	for index, observation := range observations {
+		if observation == nil {
+			return fmt.Errorf("observation %d is nil", index)
+		}
+	}
+	return nil
+}
+
+func validateObservationsFlag(checkMode bool, observations int, observationsSet bool) error {
+	if observationsSet && !checkMode {
+		return errors.New("--observations is only valid in check mode")
+	}
+	if checkMode && (observations < 1 || observations > 10) {
+		return fmt.Errorf("--observations must be between 1 and 10, got %d", observations)
+	}
+	return nil
+}
+
+func flagWasSet(flags *flag.FlagSet, name string) bool {
+	found := false
+	flags.Visit(func(item *flag.Flag) {
+		if item.Name == name {
+			found = true
+		}
+	})
+	return found
+}
+
+// aggregateCheckObservations classifies one or more current observations
+// against a retained baseline. It performs no I/O.
+func aggregateCheckObservations(retainedPath string, retained *infoschem.CaptureDocument, targetChanged bool, observations []*infoschem.CaptureDocument) *comparisonReport {
+	current := observations[0]
 	report := &comparisonReport{
 		SchemaVersion: comparisonSchemaVersion,
 		Current:       comparisonObservationFromCapture("", current),
 		Retained:      comparisonObservationFromCapture(retainedPath, retained),
 	}
+	if !observationSurfacesAgree(observations) {
+		report.Status = "surface_inconsistent"
+		report.MaterialChange = true
+		report.Observations = observationSummaries(observations)
+		if differing := firstObservationDifferingFrom(retained.SurfaceSHA256, observations); differing != nil {
+			report.SurfaceDelta = computeSurfaceDelta(retained, differing)
+		}
+		return report
+	}
 	if targetChanged {
 		report.Status = "target_identity_changed"
 		report.MaterialChange = true
-		return report, nil
+		return report
 	}
 	if current.SurfaceSHA256 != retained.SurfaceSHA256 {
 		report.Status = "surface_changed"
 		report.MaterialChange = true
-		return report, nil
+		report.SurfaceDelta = computeSurfaceDelta(retained, current)
+		return report
 	}
 	sourceChanged := current.ProducerSourceSHA256 != retained.ProducerSourceSHA256
 	invocationChanged := current.InvocationSHA256 != retained.InvocationSHA256
@@ -73,10 +174,141 @@ func compareRetainedCapture(repoRoot string, current *infoschem.CaptureDocument)
 			SourceChanged:     sourceChanged,
 			InvocationChanged: invocationChanged,
 		}
-		return report, nil
+		return report
 	}
 	report.Status = "unchanged"
-	return report, nil
+	return report
+}
+
+func observationSurfacesAgree(observations []*infoschem.CaptureDocument) bool {
+	first := observations[0].SurfaceSHA256
+	for _, observation := range observations[1:] {
+		if observation.SurfaceSHA256 != first {
+			return false
+		}
+	}
+	return true
+}
+
+func firstObservationDifferingFrom(surfaceSHA256 string, observations []*infoschem.CaptureDocument) *infoschem.CaptureDocument {
+	for _, observation := range observations {
+		if observation.SurfaceSHA256 != surfaceSHA256 {
+			return observation
+		}
+	}
+	return nil
+}
+
+func observationSummaries(observations []*infoschem.CaptureDocument) []comparisonObservationRef {
+	summaries := make([]comparisonObservationRef, 0, len(observations))
+	for _, observation := range observations {
+		summaries = append(summaries, comparisonObservationRef{
+			ObservedAt:    observation.ObservedAt,
+			SurfaceSHA256: observation.SurfaceSHA256,
+			ColumnCount:   len(observation.Columns),
+		})
+	}
+	return summaries
+}
+
+func computeSurfaceDelta(retained, current *infoschem.CaptureDocument) *surfaceDelta {
+	delta := &surfaceDelta{}
+	retainedColumns := indexCaptureColumns(retained.Columns)
+	currentColumns := indexCaptureColumns(current.Columns)
+	for _, key := range sortedColumnIdentities(retainedColumns, currentColumns) {
+		retainedColumn, retainedOK := retainedColumns[key]
+		currentColumn, currentOK := currentColumns[key]
+		switch {
+		case !retainedOK:
+			delta.AddedColumns = append(delta.AddedColumns, surfaceColumnRefFrom(currentColumn))
+		case !currentOK:
+			delta.RemovedColumns = append(delta.RemovedColumns, surfaceColumnRefFrom(retainedColumn))
+		case retainedColumn.SpannerType != currentColumn.SpannerType || retainedColumn.OrdinalPosition != currentColumn.OrdinalPosition:
+			delta.ChangedColumns = append(delta.ChangedColumns, surfaceColumnChange{
+				TableName:  key.table,
+				ColumnName: key.column,
+				Retained: surfaceColumnFields{
+					SpannerType:     retainedColumn.SpannerType,
+					OrdinalPosition: retainedColumn.OrdinalPosition,
+				},
+				Current: surfaceColumnFields{
+					SpannerType:     currentColumn.SpannerType,
+					OrdinalPosition: currentColumn.OrdinalPosition,
+				},
+			})
+		}
+	}
+	retainedRolling := indexRollingQueryability(retained.RollingQueryability)
+	currentRolling := indexRollingQueryability(current.RollingQueryability)
+	for _, key := range sortedColumnIdentities(retainedRolling, currentRolling) {
+		retainedStatus := rollingStatus(retainedRolling, key)
+		currentStatus := rollingStatus(currentRolling, key)
+		if retainedStatus == currentStatus {
+			continue
+		}
+		delta.RollingQueryabilityChanges = append(delta.RollingQueryabilityChanges, rollingQueryabilityChange{
+			TableName:      key.table,
+			ColumnName:     key.column,
+			RetainedStatus: retainedStatus,
+			CurrentStatus:  currentStatus,
+		})
+	}
+	return delta
+}
+
+func surfaceColumnRefFrom(column infoschem.CaptureColumn) surfaceColumnRef {
+	return surfaceColumnRef{
+		TableName:       column.TableName,
+		ColumnName:      column.ColumnName,
+		SpannerType:     column.SpannerType,
+		OrdinalPosition: column.OrdinalPosition,
+	}
+}
+
+func indexCaptureColumns(columns []infoschem.CaptureColumn) map[columnIdentity]infoschem.CaptureColumn {
+	index := make(map[columnIdentity]infoschem.CaptureColumn, len(columns))
+	for _, column := range columns {
+		index[columnIdentity{table: column.TableName, column: column.ColumnName}] = column
+	}
+	return index
+}
+
+func indexRollingQueryability(results []infoschem.RollingQueryability) map[columnIdentity]infoschem.RollingQueryability {
+	index := make(map[columnIdentity]infoschem.RollingQueryability, len(results))
+	for _, result := range results {
+		index[columnIdentity{table: result.TableName, column: result.ColumnName}] = result
+	}
+	return index
+}
+
+func rollingStatus(index map[columnIdentity]infoschem.RollingQueryability, key columnIdentity) string {
+	result, ok := index[key]
+	if !ok {
+		return ""
+	}
+	return result.Status
+}
+
+func sortedColumnIdentities[T any](left, right map[columnIdentity]T) []columnIdentity {
+	seen := make(map[columnIdentity]bool, len(left)+len(right))
+	keys := make([]columnIdentity, 0, len(left)+len(right))
+	for key := range left {
+		seen[key] = true
+		keys = append(keys, key)
+	}
+	for key := range right {
+		if seen[key] {
+			continue
+		}
+		keys = append(keys, key)
+	}
+	sort.Slice(keys, func(i, j int) bool {
+		if keys[i].table != keys[j].table {
+			return keys[i].table < keys[j].table
+		}
+		return keys[i].column < keys[j].column
+	})
+	return keys
 }
 
 func comparisonObservationFromCapture(path string, capture *infoschem.CaptureDocument) comparisonObservation {

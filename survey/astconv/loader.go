@@ -3,10 +3,13 @@ package astconv
 import (
 	"context"
 	"fmt"
+	"log"
+	"reflect"
 	"strings"
 
 	"cloud.google.com/go/spanner"
 	"github.com/apstndb/spanalyzer/survey/infoschem"
+	"google.golang.org/grpc/codes"
 )
 
 // LoadSchema queries the live database's INFORMATION_SCHEMA under a single
@@ -85,13 +88,90 @@ func loadSchemaWithTxn(ctx context.Context, txn *spanner.ReadOnlyTransaction, di
 			return nil, fmt.Errorf("build query for %s: %w", meta.Name, err)
 		}
 
-		iter := txn.Query(ctx, spanner.NewStatement(query))
-		if err := spanner.SelectAll(iter, destFn(schema), spanner.WithLenient()); err != nil {
+		if err := queryTableExcludingUnqueryable(ctx, txn, meta, discovered, query, destFn(schema)); err != nil {
 			return nil, fmt.Errorf("query %s: %w", meta.Name, err)
 		}
 	}
 
 	return schema, nil
+}
+
+// queryTableExcludingUnqueryable runs one INFORMATION_SCHEMA table query.
+// Retry only known compatibility flags rejected by the service. Dropping
+// arbitrary metadata could remove object identity or schema semantics while
+// claiming a successful reconstruction; all other columns remain fail-closed.
+func queryTableExcludingUnqueryable(
+	ctx context.Context,
+	txn *spanner.ReadOnlyTransaction,
+	meta *infoschem.TableMeta,
+	discovered infoschem.DiscoveredColumns,
+	query string,
+	dest any,
+) error {
+	var excluded []string
+	for {
+		iter := txn.Query(ctx, spanner.NewStatement(query))
+		err := selectSchemaRowsAtomically(iter, dest)
+		if err == nil {
+			return nil
+		}
+		if spanner.ErrCode(err) != codes.InvalidArgument {
+			return err
+		}
+		candidates := compatibilityFlagCandidates(meta.Name, discovered)
+		if len(candidates[meta.Name]) == 0 {
+			if len(excluded) > 0 {
+				return fmt.Errorf("still rejected after excluding %s: %w", strings.Join(excluded, ", "), err)
+			}
+			return err
+		}
+		roundExcluded, probeErr := infoschem.ExcludeUnqueryableColumns(ctx, txn, candidates, meta.Name, err)
+		if probeErr != nil {
+			return probeErr
+		}
+		if len(roundExcluded) == 0 {
+			return err
+		}
+		for _, column := range roundExcluded {
+			delete(discovered[meta.Name], column)
+		}
+		excluded = append(excluded, roundExcluded...)
+		log.Printf("WARNING: %s columns advertised but not queryable (rolling release): %s", meta.Name, strings.Join(roundExcluded, ", "))
+		query, err = meta.Query(discovered)
+		if err != nil {
+			return err
+		}
+	}
+}
+
+// compatibilityFlagCandidates deliberately excludes required identity and
+// semantic columns. IS_INHERITED was observed advertised before query support
+// in these option views; absence has an existing decoder/reconstruction path.
+func compatibilityFlagCandidates(table string, discovered infoschem.DiscoveredColumns) infoschem.DiscoveredColumns {
+	candidates := infoschem.DiscoveredColumns{table: {}}
+	if (table == "COLUMN_OPTIONS" || table == "LOCALITY_GROUP_OPTIONS") && discovered[table]["IS_INHERITED"] {
+		candidates[table]["IS_INHERITED"] = true
+	}
+	return candidates
+}
+
+// SelectAll may append rows before returning an error. Keep failed attempts
+// out of the schema so a compatibility retry cannot duplicate partial rows.
+func selectSchemaRowsAtomically(rows interface {
+	Next() (*spanner.Row, error)
+	Do(func(*spanner.Row) error) error
+	Stop()
+}, dest any) error {
+	value := reflect.ValueOf(dest)
+	if !value.IsValid() || value.Kind() != reflect.Pointer || value.IsNil() || value.Elem().Kind() != reflect.Slice {
+		return fmt.Errorf("schema destination must be a non-nil pointer to slice")
+	}
+	buffer := reflect.New(value.Elem().Type())
+	if err := spanner.SelectAll(rows, buffer.Interface(), spanner.WithLenient()); err != nil {
+		return err
+	}
+	value.Elem().Set(buffer.Elem())
+	return nil
 }
 
 // tableDestinations maps each INFORMATION_SCHEMA table that contributes to DDL
