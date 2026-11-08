@@ -1,0 +1,25 @@
+from pathlib import Path
+from concurrent.futures import ThreadPoolExecutor
+import urllib.request,urllib.parse,json,hashlib,datetime,subprocess
+p=Path('<LOCAL_TASK_ROOT>/apstndb/spanalyzer/docs-delta-20261031/sources');baseline='6d7397601456dc5602c0926d254424f64643a64f';target='1e880188144a326e383778ebc165a63197efbf70';parent='51280d38ddf737240e6ee86b0da9138f6f790c1b';net=json.loads((p/'since-baseline.json').read_text());direct=json.loads((p/'target-commit.json').read_text());jobs=[]
+for a in net['files']:
+ if a['filename'].startswith('docs/'):
+  for name,ref in [('baseline',baseline),('target',target)]:jobs.append((name,ref,a['filename']))
+for a in direct['files']:
+ if a['filename'].startswith('docs/'):jobs.append(('parent',parent,a['filename']))
+def fetch(job):
+ name,ref,path=job;url=f'https://raw.githubusercontent.com/apstndb/spanner-docs-mirror/{ref}/'+urllib.parse.quote(path,safe='/');req=urllib.request.Request(url,headers={'User-Agent':'spanalyzer-doc-delta'})
+ with urllib.request.urlopen(req,timeout=45)as response:raw=response.read()
+ dest=p/name/path.removeprefix('docs/');dest.parent.mkdir(parents=True,exist_ok=True);dest.write_bytes(raw);return{'revision':ref,'path':path,'file':str(dest.relative_to(p)),'url':url,'sha256':hashlib.sha256(raw).hexdigest(),'bytes':len(raw)}
+with ThreadPoolExecutor(max_workers=6)as pool:rows=list(pool.map(fetch,jobs))
+for name,endpoint in [('prior.diff',f'repos/apstndb/spanner-docs-mirror/commits/{parent}'),('net.diff',f'repos/apstndb/spanner-docs-mirror/compare/{baseline}...{target}')]:
+ r=subprocess.run(['gh','api','-H','Accept: application/vnd.github.diff',endpoint],capture_output=True);assert r.returncode==0,r.stderr;(p/name).write_bytes(r.stdout)
+(p/'body-retrieval.json').write_text(json.dumps({'retrieved_at':datetime.datetime.now(datetime.timezone.utc).isoformat(),'snapshots':rows},indent=2)+'\n');print('Retained full snapshots',len(rows),'bytes',sum(a['bytes']for a in rows))
+# Print manageable actual changed lines, excluding only Markdown table alignment lines.
+text=(p/'prior.diff').read_text();sections=text.split('diff --git ')[1:]
+for sec in sections:
+ header=sec.splitlines()[0];print('\nFILE',header)
+ changes=[line for line in sec.splitlines()[1:]if line[:1]in['+','-']and not line.startswith(('+++','---'))]
+ for line in changes:
+  if len(line)>1300:print(line[:450]+' ... [long line retained; inspect separately]')
+  else:print(line)

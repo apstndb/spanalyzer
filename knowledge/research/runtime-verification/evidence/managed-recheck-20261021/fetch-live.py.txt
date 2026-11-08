@@ -1,0 +1,11 @@
+from pathlib import Path
+import datetime,hashlib,json,subprocess
+root=Path('<LOCAL_TASK_ROOT>/apstndb/spanalyzer/managed-recheck-20261021/documents')
+urls={'release-notes.xml':'https://docs.cloud.google.com/feeds/spanner-release-notes.xml','release-notes.html':'https://docs.cloud.google.com/spanner/docs/release-notes','pg-functions.html':'https://docs.cloud.google.com/spanner/docs/reference/postgresql/functions','google-operators.html':'https://docs.cloud.google.com/spanner/docs/reference/standard-sql/operators'}
+rows=[]
+for name,url in urls.items():
+ p=subprocess.run(['curl','--fail','--location','--silent','--show-error','--max-time','50',url],capture_output=True)
+ row={'uri':url,'retrieved_at':datetime.datetime.now(datetime.timezone.utc).isoformat(),'exit_code':p.returncode,'file':name}
+ if not p.returncode:(root/name).write_bytes(p.stdout);row.update(sha256=hashlib.sha256(p.stdout).hexdigest(),bytes=len(p.stdout))
+ rows.append(row)
+(root/'live-retrieval.json').write_text(json.dumps(rows,indent=2)+'\n');print(json.dumps(rows))

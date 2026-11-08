@@ -1,0 +1,47 @@
+"""Keep the first attempt immutable; repair only harness-blocked cases."""
+from pathlib import Path
+import copy,json
+p=Path('<LOCAL_CHECKOUT>/.tmp/managed-recheck-20261029')
+reasons=[{'attempt':'weekly-google','label':'graph-base','cause':'Unqualified Id in three view definitions violates strict name resolution; dependent graph/path cases were NOT_RUN.'},{'attempt':'weekly-google and weekly-pg','label':'fk-reject-generated','cause':'The constraint and table shared a name, so duplicate-name rejection did not test generated-column restrictions.'},{'attempt':'weekly-google','label':'tokenize-float-prefix','cause':'INT64 min/max arguments did not match the FLOAT64 overload; supply typed FLOAT64 bounds and granularity.'}]
+for dialect in ['google','pg']:
+ original=json.loads((p/('weekly-'+dialect+'-plan.json')).read_text());bylabel={s['label']:s for s in original['steps']};steps=[]
+ base=copy.deepcopy(bylabel['fk-base']);base['statements']=base['statements'][:1];steps.append(base)
+ for label in ['fk-generated-control','fk-reject-generated']:
+  s=copy.deepcopy(bylabel[label]);s['sql']=s['sql'].replace('ADD CONSTRAINT FkGenerated FOREIGN KEY','ADD CONSTRAINT FkGeneratedReference FOREIGN KEY');steps.append(s)
+ if dialect=='google':
+  for original_step in original['steps']:
+   if original_step['family']not in ['volatile-graph','path-quantifier']:continue
+   s=copy.deepcopy(original_step)
+   if s['label']=='graph-base':s['statements']=[sql.replace('SELECT Id FROM GNodes','SELECT n.Id FROM GNodes n').replace('SELECT Id,GENERATE_UUID() AS V FROM GNodes','SELECT n.Id,GENERATE_UUID() AS V FROM GNodes n')for sql in s['statements']]
+   steps.append(s)
+  for label,expr,options in [
+    ('tokenize-float-prefix-typed','CAST(1.25 AS FLOAT64)',",comparison_type=>'all',algorithm=>'prefixtree',min=>CAST(-16 AS FLOAT64),max=>CAST(16 AS FLOAT64),granularity=>CAST(0.25 AS FLOAT64)"),
+    ('tokenize-float-default','CAST(1.25 AS FLOAT64)',''),
+    ('tokenize-float-missing-granularity','CAST(1.25 AS FLOAT64)',",comparison_type=>'all',algorithm=>'prefixtree',min=>CAST(-16 AS FLOAT64),max=>CAST(16 AS FLOAT64)"),
+    ('tokenize-numeric-typed-options',"NUMERIC '1.25'",",comparison_type=>'all',algorithm=>'prefixtree',min=>NUMERIC '-16',max=>NUMERIC '16',granularity=>NUMERIC '0.25'")]:
+   steps.append({'label':label,'family':'numeric-type-controls','kind':'query','sql':'SELECT DEBUG_TOKENLIST(TOKENIZE_NUMBER('+expr+options+')) AS tokens','requires':[]})
+ else:
+  for label in ['jsonb-base','jsonb-seed']:steps.append(copy.deepcopy(bylabel[label]))
+  for label,sql,expected in [
+    ('jsonb-distinct-subquery-count','SELECT COUNT(*) AS n FROM (SELECT DISTINCT V FROM JbValues WHERE V IS NOT NULL) AS d',{'n':'19'}),
+    ('jsonb-nonnull-star-count','SELECT COUNT(*) AS n FROM JbValues WHERE V IS NOT NULL',{'n':'21'}),
+    ('jsonb-count-expression','SELECT COUNT(V) AS n FROM JbValues',None)]:
+   s={'label':label,'family':'jsonb-count-controls','kind':'query','sql':sql,'requires':['jsonb-seed']}
+   if expected:s['expected']=expected
+   steps.append(s)
+ result={'dialect':dialect,'scope':'Focused harness repairs and COUNT(jsonb) isolation; initial results remain immutable.','original_plan':'weekly-'+dialect+'-plan.json','repair_reasons':reasons,'steps':steps}
+ (p/('repair-'+dialect+'-plan.json')).write_text(json.dumps(result,indent=2)+'\n')
+ print(dialect,len(steps))
+source=(p/'weekly-delta.go').read_text().replace('weekly-delta-20261029g1','weekly-repair-20261029g1').replace('weekly-delta-20261029p1','weekly-repair-20261029p1')
+(p/'weekly-repair.go').write_text(source)
+runner=(p/'run-weekly.py').read_text().replace('weekly-commands.json','repair-commands.json').replace("'weekly-build'","'repair-build'").replace("'weekly-buildinfo'","'repair-buildinfo'").replace("out/'weekly-delta'","out/'weekly-repair'").replace("out/'weekly-delta.go'","out/'weekly-repair.go'").replace("name='weekly-'+dialect","name='repair-'+dialect")
+wait='''wait_started=time.time()
+while True:
+    prior_path=durable/'evidence/hll-controls-commands.json'
+    prior=json.loads(prior_path.read_text())if prior_path.exists()else[]
+    if any(row['name']=='hll-controls-pg'and row['exit_code']==0 for row in prior):break
+    if time.time()-wait_started>1800:raise SystemExit('Prior fixture cleanup is unconfirmed')
+    time.sleep(5)
+'''
+runner=runner.replace("for name,args in [('repair-build'",wait+"\nfor name,args in [('repair-build'")
+(p/'run-weekly-repairs.py').write_text(runner)

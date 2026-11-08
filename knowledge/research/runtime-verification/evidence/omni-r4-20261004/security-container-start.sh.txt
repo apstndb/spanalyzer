@@ -1,0 +1,12 @@
+set -eu
+umask 077
+S=/google/spanner/bin/spanner
+mkdir -p /probe
+mv /password-input /probe/password
+cd /probe
+$S certificates create-ca --ca-certificate-directory=certs
+cp certs/ca.crt certs/ca-api.crt
+$S certificates create-server --hostnames=localhost,127.0.0.1 --ca-certificate-directory=certs --output-directory=certs
+$S certificates create-server --filename-prefix=api --hostnames=localhost,127.0.0.1 --ca-certificate-directory=certs --output-directory=certs
+$S certificates create-client admin --output-directory=clientcerts --ca-certificate-directory=certs
+exec $S start-single-server --listen-addresses=0.0.0.0 --certificate-directory=/probe/certs --auth-methods=password,client-certificate --password-protocol=opaque --initial-admin-password-file=/probe/password --stop-delay=5s

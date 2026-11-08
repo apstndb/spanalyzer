@@ -1,0 +1,31 @@
+{
+  "dialect": "google",
+  "steps": [
+    {
+      "label": "memory-table",
+      "family": "issue-400",
+      "kind": "ddl",
+      "sql": "CREATE TABLE MemoryRows(id INT64 NOT NULL,payload STRING(MAX)) PRIMARY KEY(id)",
+      "timeout_seconds": 30
+    },
+    {
+      "label": "memory-retention",
+      "family": "issue-403",
+      "kind": "ddl",
+      "sql": "ALTER DATABASE PLACEHOLDER SET OPTIONS(version_retention_period='1s')",
+      "requires": [
+        "memory-table"
+      ],
+      "timeout_seconds": 30
+    },
+    {
+      "label": "memory-lifecycle",
+      "family": "issue-400",
+      "kind": "memory",
+      "requires": [
+        "memory-retention"
+      ],
+      "timeout_seconds": 90
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+import os,pathlib,subprocess,json,time,datetime
+root=pathlib.Path('<LOCAL_CHECKOUT>')
+work=root/'.worktrees/omni-r3-20260926';out=root/'.tmp/omni-r3-20260926'
+env=os.environ.copy();go='<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go'
+env.update(GOROOT=str(pathlib.Path(go).parent.parent),GOTOOLCHAIN='local',GOCACHE=str(root/'.tmp/managed-recheck-20260925/go-cache'),GOFLAGS='-mod=readonly',TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE='/var/run/docker.sock')
+env['PATH']=str(pathlib.Path(go).parent)+':'+env['PATH']
+env['DOCKER_HOST']=subprocess.check_output(['docker','context','inspect','--format','{{.Endpoints.docker.Host}}']).decode().strip()
+for k in ['SPANEMUBOOST_ENDPOINT_FILE','SPANNER_EMULATOR_HOST','TEST_REAL_SPANNER_DATABASE']:env.pop(k,None)
+
+r3='us-docker.pkg.dev/spanner-omni/images/spanner-omni:2026.r3-beta@sha256:8243ce3c748b10371a16f05bc7553465fe978d7349127ad331d02c1d3a9fcc99'
+r2='us-docker.pkg.dev/spanner-omni/images/spanner-omni:2026.r2.1-beta@sha256:ed31d9ee72eeee69cac78566eb3a6e72ee389b26234735f0ef449774cc006741'
+cases=[('queue-build','tools',[go,'build','-o',str(out/'queue-probe'),str(out/'queue-probe.go')],{}),('queue-r3','tools',[str(out/'queue-probe')],{'OMNI_IMAGE':r3}),('queue-r2','tools',[str(out/'queue-probe')],{'OMNI_IMAGE':r2})]
+receipts=[]
+for name,wd,args,extra in cases:
+ child=env.copy();child.pop('GOWORK',None);child.update(extra)
+ start=time.time();started=datetime.datetime.now(datetime.timezone.utc).isoformat();print('Starting '+name,flush=True)
+ with (out/(name+'.stdout')).open('w') as stdout,(out/(name+'.stderr')).open('w') as stderr:
+  p=subprocess.run(args,cwd=work/wd,env=child,stdout=stdout,stderr=stderr)
+ receipt={'name':name,'started_at':started,'exit_code':p.returncode,'elapsed_seconds':round(time.time()-start,2),'cwd':str(work/wd),'args':args,'env_overrides':extra}
+ receipts.append(receipt);(out/'queue-commands.json').write_text(json.dumps(receipts,indent=2)+'\n');print(json.dumps(receipt),flush=True)
+ if name=='queue-build' and p.returncode:break

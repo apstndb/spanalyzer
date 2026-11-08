@@ -1,0 +1,1761 @@
+{
+  "base": "3dcf9df46b1a7bdb261991f0b4197e9b4dda6acf",
+  "head": "6d7397601456dc5602c0926d254424f64643a64f",
+  "commit_count": 6,
+  "net_files": 48,
+  "net_document_files": 45,
+  "union_document_paths": 48,
+  "retained_full_pinned_bodies": 91,
+  "current_official_bodies": 47,
+  "body_comparison": "47/47 current official bodies equal mirror head after removing mirror frontmatter",
+  "commits": [
+    {
+      "sha": "09ce8f56bc5d42e8ef1ac0a4f3e5fff863876cae",
+      "committed_at": "2026-10-23T18:01:59Z",
+      "parents": [
+        "3dcf9df46b1a7bdb261991f0b4197e9b4dda6acf"
+      ],
+      "file_count": 12
+    },
+    {
+      "sha": "7f3624d746587360e1f784dab55cf4536833f826",
+      "committed_at": "2026-10-24T18:01:51Z",
+      "parents": [
+        "09ce8f56bc5d42e8ef1ac0a4f3e5fff863876cae"
+      ],
+      "file_count": 4
+    },
+    {
+      "sha": "e626247a85f8472c6b8a150d3f93427d6442aad9",
+      "committed_at": "2026-10-25T18:01:31Z",
+      "parents": [
+        "7f3624d746587360e1f784dab55cf4536833f826"
+      ],
+      "file_count": 15
+    },
+    {
+      "sha": "46f7b510c2e67a15b7d5eb8be7a520dac1fec142",
+      "committed_at": "2026-10-26T18:02:27Z",
+      "parents": [
+        "e626247a85f8472c6b8a150d3f93427d6442aad9"
+      ],
+      "file_count": 4
+    },
+    {
+      "sha": "bf8fecd08a4332c5c9a2040e2508627b3a058661",
+      "committed_at": "2026-10-27T18:02:01Z",
+      "parents": [
+        "46f7b510c2e67a15b7d5eb8be7a520dac1fec142"
+      ],
+      "file_count": 13
+    },
+    {
+      "sha": "6d7397601456dc5602c0926d254424f64643a64f",
+      "committed_at": "2026-10-28T18:01:51Z",
+      "parents": [
+        "bf8fecd08a4332c5c9a2040e2508627b3a058661"
+      ],
+      "file_count": 15
+    }
+  ],
+  "documents": [
+    {
+      "path": "docs/docs.cloud.google.com/spanner-omni/backups.md",
+      "summary": "Backup/restore interoperability boundary, one external storage per deployment, credentials and backup import guidance.",
+      "verification_group": "source_only",
+      "limits": "No Omni deployment, external bucket or backup transfer in this managed SQL run.",
+      "commits": [
+        {
+          "sha": "09ce8f56bc5d42e8ef1ac0a4f3e5fff863876cae",
+          "committed_at": "2026-10-23T18:01:59Z",
+          "status": "modified",
+          "previous_filename": null
+        }
+      ],
+      "body_receipts": [
+        {
+          "side": "base",
+          "revision": "3dcf9df46b1a7bdb261991f0b4197e9b4dda6acf",
+          "path": "docs/docs.cloud.google.com/spanner-omni/backups.md",
+          "status": 200,
+          "file": "base__docs__docs.cloud.google.com__spanner-omni__backups.md.txt",
+          "sha256": "061534214c752a52225127ff78387a515ce2a38ac32a7e09f9b818700664e538",
+          "bytes": 10684
+        },
+        {
+          "side": "head",
+          "revision": "6d7397601456dc5602c0926d254424f64643a64f",
+          "path": "docs/docs.cloud.google.com/spanner-omni/backups.md",
+          "status": 200,
+          "file": "head__docs__docs.cloud.google.com__spanner-omni__backups.md.txt",
+          "sha256": "bf42360c3dd5204371466f0ef902f87e96ae21540bd893f868a79ed4f4328b73",
+          "bytes": 13980
+        }
+      ]
+    },
+    {
+      "path": "docs/docs.cloud.google.com/spanner-omni/beam.md",
+      "summary": "Link to new managed-to-Omni replication guide.",
+      "verification_group": "source_only",
+      "limits": "No external Beam replication pipeline deployed.",
+      "commits": [
+        {
+          "sha": "09ce8f56bc5d42e8ef1ac0a4f3e5fff863876cae",
+          "committed_at": "2026-10-23T18:01:59Z",
+          "status": "modified",
+          "previous_filename": null
+        }
+      ],
+      "body_receipts": [
+        {
+          "side": "base",
+          "revision": "3dcf9df46b1a7bdb261991f0b4197e9b4dda6acf",
+          "path": "docs/docs.cloud.google.com/spanner-omni/beam.md",
+          "status": 200,
+          "file": "base__docs__docs.cloud.google.com__spanner-omni__beam.md.txt",
+          "sha256": "4eb39163b7a42aeda2af64c43552e6920add1622b483046433e75e4c24f70385",
+          "bytes": 8516
+        },
+        {
+          "side": "head",
+          "revision": "6d7397601456dc5602c0926d254424f64643a64f",
+          "path": "docs/docs.cloud.google.com/spanner-omni/beam.md",
+          "status": 200,
+          "file": "head__docs__docs.cloud.google.com__spanner-omni__beam.md.txt",
+          "sha256": "80576b5a7b0c50bd9e5c5edcb455f2ce58619c483183c838084632a89923ca93",
+          "bytes": 8626
+        }
+      ]
+    },
+    {
+      "path": "docs/docs.cloud.google.com/spanner-omni/replicate-data.md",
+      "summary": "New asynchronous change-stream DR topology, networking, IAM, pipeline and cutover guidance.",
+      "verification_group": "source_only",
+      "limits": "Managed Change Streams controls are repeated, but do not establish replication latency, replay correctness, RPO or RTO.",
+      "commits": [
+        {
+          "sha": "09ce8f56bc5d42e8ef1ac0a4f3e5fff863876cae",
+          "committed_at": "2026-10-23T18:01:59Z",
+          "status": "added",
+          "previous_filename": null
+        }
+      ],
+      "body_receipts": [
+        {
+          "side": "base",
+          "revision": "3dcf9df46b1a7bdb261991f0b4197e9b4dda6acf",
+          "path": "docs/docs.cloud.google.com/spanner-omni/replicate-data.md",
+          "status": 404
+        },
+        {
+          "side": "head",
+          "revision": "6d7397601456dc5602c0926d254424f64643a64f",
+          "path": "docs/docs.cloud.google.com/spanner-omni/replicate-data.md",
+          "status": 200,
+          "file": "head__docs__docs.cloud.google.com__spanner-omni__replicate-data.md.txt",
+          "sha256": "e983f6d57769185c9e159fdd06bc268f6573837097fd8fb6d271a7a62b819102",
+          "bytes": 20711
+        }
+      ]
+    },
+    {
+      "path": "docs/docs.cloud.google.com/spanner-omni/restores.md",
+      "summary": "Backup and replication cross-links.",
+      "verification_group": "source_only",
+      "limits": "No Omni backup/restore performed.",
+      "commits": [
+        {
+          "sha": "09ce8f56bc5d42e8ef1ac0a4f3e5fff863876cae",
+          "committed_at": "2026-10-23T18:01:59Z",
+          "status": "modified",
+          "previous_filename": null
+        }
+      ],
+      "body_receipts": [
+        {
+          "side": "base",
+          "revision": "3dcf9df46b1a7bdb261991f0b4197e9b4dda6acf",
+          "path": "docs/docs.cloud.google.com/spanner-omni/restores.md",
+          "status": 200,
+          "file": "base__docs__docs.cloud.google.com__spanner-omni__restores.md.txt",
+          "sha256": "04c03082caaad71e81d99cfaf4253d5b16f5500133dd1995b39b2ac364b6aed7",
+          "bytes": 4306
+        },
+        {
+          "side": "head",
+          "revision": "6d7397601456dc5602c0926d254424f64643a64f",
+          "path": "docs/docs.cloud.google.com/spanner-omni/restores.md",
+          "status": 200,
+          "file": "head__docs__docs.cloud.google.com__spanner-omni__restores.md.txt",
+          "sha256": "d82b067604c7f0d9e3de1985eff06b38dc458bce699e350577e194f7741d19e4",
+          "bytes": 4525
+        }
+      ]
+    },
+    {
+      "path": "docs/docs.cloud.google.com/spanner/docs.md",
+      "summary": "Documentation navigation links.",
+      "verification_group": "source_only",
+      "limits": "Navigation is not a SQL capability change.",
+      "commits": [
+        {
+          "sha": "e626247a85f8472c6b8a150d3f93427d6442aad9",
+          "committed_at": "2026-10-25T18:01:31Z",
+          "status": "modified",
+          "previous_filename": null
+        }
+      ],
+      "body_receipts": [
+        {
+          "side": "base",
+          "revision": "3dcf9df46b1a7bdb261991f0b4197e9b4dda6acf",
+          "path": "docs/docs.cloud.google.com/spanner/docs.md",
+          "status": 200,
+          "file": "base__docs__docs.cloud.google.com__spanner__docs.md.txt",
+          "sha256": "9253bc4074bd073fdbd01cab08388415d8288c12434266f5e5f68add64b04e16",
+          "bytes": 7142
+        },
+        {
+          "side": "head",
+          "revision": "6d7397601456dc5602c0926d254424f64643a64f",
+          "path": "docs/docs.cloud.google.com/spanner/docs.md",
+          "status": 200,
+          "file": "head__docs__docs.cloud.google.com__spanner__docs.md.txt",
+          "sha256": "5cc5367387e54f478568a174c6196084da17291103718bb21326f4670ae98e71",
+          "bytes": 7241
+        }
+      ]
+    },
+    {
+      "path": "docs/docs.cloud.google.com/spanner/docs/audit-logging.md",
+      "summary": "Knowledge Catalog terminology and links.",
+      "verification_group": "source_only",
+      "limits": "Audit log emission and external catalog integration are not exercised.",
+      "commits": [
+        {
+          "sha": "6d7397601456dc5602c0926d254424f64643a64f",
+          "committed_at": "2026-10-28T18:01:51Z",
+          "status": "modified",
+          "previous_filename": null
+        }
+      ],
+      "body_receipts": [
+        {
+          "side": "base",
+          "revision": "3dcf9df46b1a7bdb261991f0b4197e9b4dda6acf",
+          "path": "docs/docs.cloud.google.com/spanner/docs/audit-logging.md",
+          "status": 200,
+          "file": "base__docs__docs.cloud.google.com__spanner__docs__audit-logging.md.txt",
+          "sha256": "ed1a1a27973422c8633b9f8bdf3969081e4492cc065dc1a5317efdd3665eb133",
+          "bytes": 58392
+        },
+        {
+          "side": "head",
+          "revision": "6d7397601456dc5602c0926d254424f64643a64f",
+          "path": "docs/docs.cloud.google.com/spanner/docs/audit-logging.md",
+          "status": 200,
+          "file": "head__docs__docs.cloud.google.com__spanner__docs__audit-logging.md.txt",
+          "sha256": "255bfe0bf913315f9b53886c1211d7f892299a456a4c7055d02c999d2f38c12e",
+          "bytes": 58489
+        }
+      ]
+    },
+    {
+      "path": "docs/docs.cloud.google.com/spanner/docs/create-manage-databases.md",
+      "summary": "Intermediate commit touch; endpoint bodies equal.",
+      "verification_group": "source_only",
+      "limits": "Per-commit patch retained even though net body comparison is equal.",
+      "commits": [
+        {
+          "sha": "e626247a85f8472c6b8a150d3f93427d6442aad9",
+          "committed_at": "2026-10-25T18:01:31Z",
+          "status": "modified",
+          "previous_filename": null
+        },
+        {
+          "sha": "46f7b510c2e67a15b7d5eb8be7a520dac1fec142",
+          "committed_at": "2026-10-26T18:02:27Z",
+          "status": "modified",
+          "previous_filename": null
+        }
+      ],
+      "body_receipts": [
+        {
+          "side": "base",
+          "revision": "3dcf9df46b1a7bdb261991f0b4197e9b4dda6acf",
+          "path": "docs/docs.cloud.google.com/spanner/docs/create-manage-databases.md",
+          "status": 200,
+          "file": "base__docs__docs.cloud.google.com__spanner__docs__create-manage-databases.md.txt",
+          "sha256": "7716f3ecea6edfa473688c7b420f2aae5f8bd25ab8cf82dd539adfa6066ef0a1",
+          "bytes": 54411
+        },
+        {
+          "side": "head",
+          "revision": "6d7397601456dc5602c0926d254424f64643a64f",
+          "path": "docs/docs.cloud.google.com/spanner/docs/create-manage-databases.md",
+          "status": 200,
+          "file": "head__docs__docs.cloud.google.com__spanner__docs__create-manage-databases.md.txt",
+          "sha256": "7716f3ecea6edfa473688c7b420f2aae5f8bd25ab8cf82dd539adfa6066ef0a1",
+          "bytes": 54411
+        }
+      ]
+    },
+    {
+      "path": "docs/docs.cloud.google.com/spanner/docs/create-manage-saved-queries.md",
+      "summary": "Spanner Studio introduction wording.",
+      "verification_group": "source_only",
+      "limits": "Console saved-query UI is not exercised.",
+      "commits": [
+        {
+          "sha": "09ce8f56bc5d42e8ef1ac0a4f3e5fff863876cae",
+          "committed_at": "2026-10-23T18:01:59Z",
+          "status": "modified",
+          "previous_filename": null
+        }
+      ],
+      "body_receipts": [
+        {
+          "side": "base",
+          "revision": "3dcf9df46b1a7bdb261991f0b4197e9b4dda6acf",
+          "path": "docs/docs.cloud.google.com/spanner/docs/create-manage-saved-queries.md",
+          "status": 200,
+          "file": "base__docs__docs.cloud.google.com__spanner__docs__create-manage-saved-queries.md.txt",
+          "sha256": "a0511070f9c36a3171b1d59fa5b072011ce5772f1e1a25fd14697ac68f59b024",
+          "bytes": 7573
+        },
+        {
+          "side": "head",
+          "revision": "6d7397601456dc5602c0926d254424f64643a64f",
+          "path": "docs/docs.cloud.google.com/spanner/docs/create-manage-saved-queries.md",
+          "status": 200,
+          "file": "head__docs__docs.cloud.google.com__spanner__docs__create-manage-saved-queries.md.txt",
+          "sha256": "29ced94d819b2371f98c73094759b314d0277b8106734bca0c49b4046da70631",
+          "bytes": 7562
+        }
+      ]
+    },
+    {
+      "path": "docs/docs.cloud.google.com/spanner/docs/databoost/databoost-monitor.md",
+      "summary": "Repair angle-bracket placeholders in monitoring examples.",
+      "verification_group": "source_only",
+      "limits": "Live HTML code blocks retained; no Data Boost workload or monitoring API metric read.",
+      "commits": [
+        {
+          "sha": "09ce8f56bc5d42e8ef1ac0a4f3e5fff863876cae",
+          "committed_at": "2026-10-23T18:01:59Z",
+          "status": "modified",
+          "previous_filename": null
+        }
+      ],
+      "body_receipts": [
+        {
+          "side": "base",
+          "revision": "3dcf9df46b1a7bdb261991f0b4197e9b4dda6acf",
+          "path": "docs/docs.cloud.google.com/spanner/docs/databoost/databoost-monitor.md",
+          "status": 200,
+          "file": "base__docs__docs.cloud.google.com__spanner__docs__databoost__databoost-monitor.md.txt",
+          "sha256": "ffef3f6bd165f45344d483cd824c58807cfaa4efec50e96a6750e0f11fa1a7d7",
+          "bytes": 7686
+        },
+        {
+          "side": "head",
+          "revision": "6d7397601456dc5602c0926d254424f64643a64f",
+          "path": "docs/docs.cloud.google.com/spanner/docs/databoost/databoost-monitor.md",
+          "status": 200,
+          "file": "head__docs__docs.cloud.google.com__spanner__docs__databoost__databoost-monitor.md.txt",
+          "sha256": "4b5db8d34dddb32103c803b5461b53b1a9079dfbab7f4fb8560e959d5e428945",
+          "bytes": 7686
+        }
+      ]
+    },
+    {
+      "path": "docs/docs.cloud.google.com/spanner/docs/databoost/databoost-run-queries.md",
+      "summary": "Add Java BigQuery Cloud Resource connection creation example.",
+      "verification_group": "source_only",
+      "limits": "No BigQuery connection, service account or federated workload created.",
+      "commits": [
+        {
+          "sha": "e626247a85f8472c6b8a150d3f93427d6442aad9",
+          "committed_at": "2026-10-25T18:01:31Z",
+          "status": "modified",
+          "previous_filename": null
+        }
+      ],
+      "body_receipts": [
+        {
+          "side": "base",
+          "revision": "3dcf9df46b1a7bdb261991f0b4197e9b4dda6acf",
+          "path": "docs/docs.cloud.google.com/spanner/docs/databoost/databoost-run-queries.md",
+          "status": 200,
+          "file": "base__docs__docs.cloud.google.com__spanner__docs__databoost__databoost-run-queries.md.txt",
+          "sha256": "c44b1dabad5db040c7c04c33f6daad6ac3d649fea9e698d065d73e22026d0416",
+          "bytes": 34779
+        },
+        {
+          "side": "head",
+          "revision": "6d7397601456dc5602c0926d254424f64643a64f",
+          "path": "docs/docs.cloud.google.com/spanner/docs/databoost/databoost-run-queries.md",
+          "status": 200,
+          "file": "head__docs__docs.cloud.google.com__spanner__docs__databoost__databoost-run-queries.md.txt",
+          "sha256": "91cc93082884301e6428fda2f4ea81c01d4d16614ff363684e34cbe0f5c25729",
+          "bytes": 37933
+        }
+      ]
+    },
+    {
+      "path": "docs/docs.cloud.google.com/spanner/docs/dc-integration.md",
+      "summary": "Replace Data Catalog tags with Knowledge Catalog aspects, Dataplex lookup/update/export/import and move synchronization guidance.",
+      "verification_group": "source_only",
+      "limits": "No external catalog synchronization, aspect mutation, IAM change or instance move.",
+      "commits": [
+        {
+          "sha": "bf8fecd08a4332c5c9a2040e2508627b3a058661",
+          "committed_at": "2026-10-27T18:02:01Z",
+          "status": "modified",
+          "previous_filename": null
+        }
+      ],
+      "body_receipts": [
+        {
+          "side": "base",
+          "revision": "3dcf9df46b1a7bdb261991f0b4197e9b4dda6acf",
+          "path": "docs/docs.cloud.google.com/spanner/docs/dc-integration.md",
+          "status": 200,
+          "file": "base__docs__docs.cloud.google.com__spanner__docs__dc-integration.md.txt",
+          "sha256": "812ecacf636917cfbd2819560cb5472df651f62ddb24a66e2c3e85a190a8b700",
+          "bytes": 14660
+        },
+        {
+          "side": "head",
+          "revision": "6d7397601456dc5602c0926d254424f64643a64f",
+          "path": "docs/docs.cloud.google.com/spanner/docs/dc-integration.md",
+          "status": 200,
+          "file": "head__docs__docs.cloud.google.com__spanner__docs__dc-integration.md.txt",
+          "sha256": "f46c1e3a1af8dc4b25a7989f9d248f66cecf9e111c25101ad493b9a7ff7070b5",
+          "bytes": 18091
+        }
+      ]
+    },
+    {
+      "path": "docs/docs.cloud.google.com/spanner/docs/deadline-exceeded.md",
+      "summary": "Updated troubleshooting page link.",
+      "verification_group": "source_only",
+      "limits": "Link maintenance.",
+      "commits": [
+        {
+          "sha": "e626247a85f8472c6b8a150d3f93427d6442aad9",
+          "committed_at": "2026-10-25T18:01:31Z",
+          "status": "modified",
+          "previous_filename": null
+        }
+      ],
+      "body_receipts": [
+        {
+          "side": "base",
+          "revision": "3dcf9df46b1a7bdb261991f0b4197e9b4dda6acf",
+          "path": "docs/docs.cloud.google.com/spanner/docs/deadline-exceeded.md",
+          "status": 200,
+          "file": "base__docs__docs.cloud.google.com__spanner__docs__deadline-exceeded.md.txt",
+          "sha256": "fd9bc82f36a7f523e8c07ad92b2f3c26441a65e886950708280add61896db9e2",
+          "bytes": 19024
+        },
+        {
+          "side": "head",
+          "revision": "6d7397601456dc5602c0926d254424f64643a64f",
+          "path": "docs/docs.cloud.google.com/spanner/docs/deadline-exceeded.md",
+          "status": 200,
+          "file": "head__docs__docs.cloud.google.com__spanner__docs__deadline-exceeded.md.txt",
+          "sha256": "616741513667ae7293a2584fed7114957c114e669bfcdad73dd8f8ecb97f86a7",
+          "bytes": 19036
+        }
+      ]
+    },
+    {
+      "path": "docs/docs.cloud.google.com/spanner/docs/dml-best-practices.md",
+      "summary": "Remove insert_or_update as a mutation-only operation example.",
+      "verification_group": "source_only",
+      "limits": "Does not independently introduce a new DML grammar; no new upsert claim inferred.",
+      "commits": [
+        {
+          "sha": "7f3624d746587360e1f784dab55cf4536833f826",
+          "committed_at": "2026-10-24T18:01:51Z",
+          "status": "modified",
+          "previous_filename": null
+        }
+      ],
+      "body_receipts": [
+        {
+          "side": "base",
+          "revision": "3dcf9df46b1a7bdb261991f0b4197e9b4dda6acf",
+          "path": "docs/docs.cloud.google.com/spanner/docs/dml-best-practices.md",
+          "status": 200,
+          "file": "base__docs__docs.cloud.google.com__spanner__docs__dml-best-practices.md.txt",
+          "sha256": "5cc98ff2de71f7852bcfe385520f2d7dce7afe07efc91a08263ccb5b91d878f1",
+          "bytes": 17035
+        },
+        {
+          "side": "head",
+          "revision": "6d7397601456dc5602c0926d254424f64643a64f",
+          "path": "docs/docs.cloud.google.com/spanner/docs/dml-best-practices.md",
+          "status": 200,
+          "file": "head__docs__docs.cloud.google.com__spanner__docs__dml-best-practices.md.txt",
+          "sha256": "f3868962c17ac20366f9e624c8787bd5ece33fd986c119e3c6a1a3864f3a90b1",
+          "bytes": 16758
+        }
+      ]
+    },
+    {
+      "path": "docs/docs.cloud.google.com/spanner/docs/foreign-keys/how-to.md",
+      "summary": "Add ON DELETE SET NULL creation/alteration and restrictions.",
+      "verification_group": "foreign-key",
+      "limits": "Both dialects: DDL, metadata/export, DML/mutation delete, rollback, enforcement, composite and invalid-column controls.",
+      "commits": [
+        {
+          "sha": "bf8fecd08a4332c5c9a2040e2508627b3a058661",
+          "committed_at": "2026-10-27T18:02:01Z",
+          "status": "modified",
+          "previous_filename": null
+        }
+      ],
+      "body_receipts": [
+        {
+          "side": "base",
+          "revision": "3dcf9df46b1a7bdb261991f0b4197e9b4dda6acf",
+          "path": "docs/docs.cloud.google.com/spanner/docs/foreign-keys/how-to.md",
+          "status": 200,
+          "file": "base__docs__docs.cloud.google.com__spanner__docs__foreign-keys__how-to.md.txt",
+          "sha256": "fe0eb76fefab602927f5d7fe6acaaebad60126e9a9b850bdaa1cc603737e4b71",
+          "bytes": 21984
+        },
+        {
+          "side": "head",
+          "revision": "6d7397601456dc5602c0926d254424f64643a64f",
+          "path": "docs/docs.cloud.google.com/spanner/docs/foreign-keys/how-to.md",
+          "status": 200,
+          "file": "head__docs__docs.cloud.google.com__spanner__docs__foreign-keys__how-to.md.txt",
+          "sha256": "01599815a0c9784f60f42ac362a4ab4f8d8e6dadb68fb7ca5fd7575d5e5c0bb8",
+          "bytes": 23538
+        }
+      ]
+    },
+    {
+      "path": "docs/docs.cloud.google.com/spanner/docs/foreign-keys/overview.md",
+      "summary": "Describe SET NULL referential action and limitations.",
+      "verification_group": "foreign-key",
+      "limits": "First tested here; publication time is not feature introduction time.",
+      "commits": [
+        {
+          "sha": "bf8fecd08a4332c5c9a2040e2508627b3a058661",
+          "committed_at": "2026-10-27T18:02:01Z",
+          "status": "modified",
+          "previous_filename": null
+        }
+      ],
+      "body_receipts": [
+        {
+          "side": "base",
+          "revision": "3dcf9df46b1a7bdb261991f0b4197e9b4dda6acf",
+          "path": "docs/docs.cloud.google.com/spanner/docs/foreign-keys/overview.md",
+          "status": 200,
+          "file": "base__docs__docs.cloud.google.com__spanner__docs__foreign-keys__overview.md.txt",
+          "sha256": "d239ddbed2dd3e5229703a525cd65354cf79f8e1f11056823d048b455fd50f89",
+          "bytes": 45654
+        },
+        {
+          "side": "head",
+          "revision": "6d7397601456dc5602c0926d254424f64643a64f",
+          "path": "docs/docs.cloud.google.com/spanner/docs/foreign-keys/overview.md",
+          "status": 200,
+          "file": "head__docs__docs.cloud.google.com__spanner__docs__foreign-keys__overview.md.txt",
+          "sha256": "36af66fa01c048d11aa652c28ddfe46a353feaa84af163aac280416220391e10",
+          "bytes": 48586
+        }
+      ]
+    },
+    {
+      "path": "docs/docs.cloud.google.com/spanner/docs/full-text-search/numeric-indexes.md",
+      "summary": "Recommend prefixtree for range predicates; outline mapping unsupported high-precision types.",
+      "verification_group": "numeric-search",
+      "limits": "Compare six predicates through automatic/prefix/log/base plans; native type controls. No throughput/storage improvement claim.",
+      "commits": [
+        {
+          "sha": "bf8fecd08a4332c5c9a2040e2508627b3a058661",
+          "committed_at": "2026-10-27T18:02:01Z",
+          "status": "modified",
+          "previous_filename": null
+        }
+      ],
+      "body_receipts": [
+        {
+          "side": "base",
+          "revision": "3dcf9df46b1a7bdb261991f0b4197e9b4dda6acf",
+          "path": "docs/docs.cloud.google.com/spanner/docs/full-text-search/numeric-indexes.md",
+          "status": 200,
+          "file": "base__docs__docs.cloud.google.com__spanner__docs__full-text-search__numeric-indexes.md.txt",
+          "sha256": "bc2747e4a3382e9823f43f0e80fb3a97cff809aadd059e9ed3462166bd1d109f",
+          "bytes": 4860
+        },
+        {
+          "side": "head",
+          "revision": "6d7397601456dc5602c0926d254424f64643a64f",
+          "path": "docs/docs.cloud.google.com/spanner/docs/full-text-search/numeric-indexes.md",
+          "status": 200,
+          "file": "head__docs__docs.cloud.google.com__spanner__docs__full-text-search__numeric-indexes.md.txt",
+          "sha256": "9b0e7cb862901d8b69403970b77f03ade30e705f304229be162af2bd2d651a2c",
+          "bytes": 6311
+        }
+      ]
+    },
+    {
+      "path": "docs/docs.cloud.google.com/spanner/docs/full-text-search/search-indexes.md",
+      "summary": "Add optimizer paragraph adjacent to explicit NULL-filter predicate requirement.",
+      "verification_group": "filtered-search",
+      "limits": "Distinguish implied non-NULL predicates from omitted predicates and predicates admitting NULL.",
+      "commits": [
+        {
+          "sha": "bf8fecd08a4332c5c9a2040e2508627b3a058661",
+          "committed_at": "2026-10-27T18:02:01Z",
+          "status": "modified",
+          "previous_filename": null
+        }
+      ],
+      "body_receipts": [
+        {
+          "side": "base",
+          "revision": "3dcf9df46b1a7bdb261991f0b4197e9b4dda6acf",
+          "path": "docs/docs.cloud.google.com/spanner/docs/full-text-search/search-indexes.md",
+          "status": 200,
+          "file": "base__docs__docs.cloud.google.com__spanner__docs__full-text-search__search-indexes.md.txt",
+          "sha256": "e6b6be3eb216203a322dc30ef75d2c5ba913f5f14bb0f7dd4250666e4eb8ce49",
+          "bytes": 22579
+        },
+        {
+          "side": "head",
+          "revision": "6d7397601456dc5602c0926d254424f64643a64f",
+          "path": "docs/docs.cloud.google.com/spanner/docs/full-text-search/search-indexes.md",
+          "status": 200,
+          "file": "head__docs__docs.cloud.google.com__spanner__docs__full-text-search__search-indexes.md.txt",
+          "sha256": "ff51b1f386d0c715c3d5b19a5267a631864c5824078b9749033313dda67e6aa3",
+          "bytes": 22864
+        }
+      ]
+    },
+    {
+      "path": "docs/docs.cloud.google.com/spanner/docs/geo-partitioning.md",
+      "summary": "IAM link title correction.",
+      "verification_group": "source_only",
+      "limits": "No instance partition or IAM mutation.",
+      "commits": [
+        {
+          "sha": "6d7397601456dc5602c0926d254424f64643a64f",
+          "committed_at": "2026-10-28T18:01:51Z",
+          "status": "modified",
+          "previous_filename": null
+        }
+      ],
+      "body_receipts": [
+        {
+          "side": "base",
+          "revision": "3dcf9df46b1a7bdb261991f0b4197e9b4dda6acf",
+          "path": "docs/docs.cloud.google.com/spanner/docs/geo-partitioning.md",
+          "status": 200,
+          "file": "base__docs__docs.cloud.google.com__spanner__docs__geo-partitioning.md.txt",
+          "sha256": "e6adb8d66ec7005f04189b49e824e4617b6e444a7cc0dc817cb0252122a8d5ac",
+          "bytes": 12551
+        },
+        {
+          "side": "head",
+          "revision": "6d7397601456dc5602c0926d254424f64643a64f",
+          "path": "docs/docs.cloud.google.com/spanner/docs/geo-partitioning.md",
+          "status": 200,
+          "file": "head__docs__docs.cloud.google.com__spanner__docs__geo-partitioning.md.txt",
+          "sha256": "b3cf28858ccacd0769e399b3e6900f91221223e31f1846383cbda96d6f125e32",
+          "bytes": 12584
+        }
+      ]
+    },
+    {
+      "path": "docs/docs.cloud.google.com/spanner/docs/graph/graph-with-views-how-to.md",
+      "summary": "Add volatility handling and graph examples.",
+      "verification_group": "volatile-graph",
+      "limits": "Explicit/default allow flags, uniqueness flags, projection/body/join/key volatility and unused volatile projection.",
+      "commits": [
+        {
+          "sha": "6d7397601456dc5602c0926d254424f64643a64f",
+          "committed_at": "2026-10-28T18:01:51Z",
+          "status": "modified",
+          "previous_filename": null
+        }
+      ],
+      "body_receipts": [
+        {
+          "side": "base",
+          "revision": "3dcf9df46b1a7bdb261991f0b4197e9b4dda6acf",
+          "path": "docs/docs.cloud.google.com/spanner/docs/graph/graph-with-views-how-to.md",
+          "status": 200,
+          "file": "base__docs__docs.cloud.google.com__spanner__docs__graph__graph-with-views-how-to.md.txt",
+          "sha256": "1dcff790a57baad1d310aa934cb5fc39bc70f4514e5e16cf6c90520c1de80217",
+          "bytes": 14154
+        },
+        {
+          "side": "head",
+          "revision": "6d7397601456dc5602c0926d254424f64643a64f",
+          "path": "docs/docs.cloud.google.com/spanner/docs/graph/graph-with-views-how-to.md",
+          "status": 200,
+          "file": "head__docs__docs.cloud.google.com__spanner__docs__graph__graph-with-views-how-to.md.txt",
+          "sha256": "8d55f8d75b6ef19b661c76f3aeb38930eea1e8e89b8c9e27baa0af64972d81b1",
+          "bytes": 16218
+        }
+      ]
+    },
+    {
+      "path": "docs/docs.cloud.google.com/spanner/docs/graph/graph-with-views-overview.md",
+      "summary": "Clarify volatile-column effects and support option.",
+      "verification_group": "volatile-graph",
+      "limits": "Built-ins only; no remote service deployed or invoked.",
+      "commits": [
+        {
+          "sha": "6d7397601456dc5602c0926d254424f64643a64f",
+          "committed_at": "2026-10-28T18:01:51Z",
+          "status": "modified",
+          "previous_filename": null
+        }
+      ],
+      "body_receipts": [
+        {
+          "side": "base",
+          "revision": "3dcf9df46b1a7bdb261991f0b4197e9b4dda6acf",
+          "path": "docs/docs.cloud.google.com/spanner/docs/graph/graph-with-views-overview.md",
+          "status": 200,
+          "file": "base__docs__docs.cloud.google.com__spanner__docs__graph__graph-with-views-overview.md.txt",
+          "sha256": "f8d5a6ed1b946824382d1f4780b3a87cc850c6ddcac237bd14a1e2ff77947557",
+          "bytes": 15235
+        },
+        {
+          "side": "head",
+          "revision": "6d7397601456dc5602c0926d254424f64643a64f",
+          "path": "docs/docs.cloud.google.com/spanner/docs/graph/graph-with-views-overview.md",
+          "status": 200,
+          "file": "head__docs__docs.cloud.google.com__spanner__docs__graph__graph-with-views-overview.md.txt",
+          "sha256": "327a42c3119a06d79bb8723976415ab02f4acea84d276f9a7eeed8f185151c0c",
+          "bytes": 16896
+        }
+      ]
+    },
+    {
+      "path": "docs/docs.cloud.google.com/spanner/docs/index-advisor.md",
+      "summary": "Query tuning link replacement.",
+      "verification_group": "source_only",
+      "limits": "No new index advisor execution performed.",
+      "commits": [
+        {
+          "sha": "e626247a85f8472c6b8a150d3f93427d6442aad9",
+          "committed_at": "2026-10-25T18:01:31Z",
+          "status": "modified",
+          "previous_filename": null
+        }
+      ],
+      "body_receipts": [
+        {
+          "side": "base",
+          "revision": "3dcf9df46b1a7bdb261991f0b4197e9b4dda6acf",
+          "path": "docs/docs.cloud.google.com/spanner/docs/index-advisor.md",
+          "status": 200,
+          "file": "base__docs__docs.cloud.google.com__spanner__docs__index-advisor.md.txt",
+          "sha256": "a9908fc7417400b134f5f758295d43686ce1f3f69d2044c13c8b8b035d9d50c2",
+          "bytes": 5685
+        },
+        {
+          "side": "head",
+          "revision": "6d7397601456dc5602c0926d254424f64643a64f",
+          "path": "docs/docs.cloud.google.com/spanner/docs/index-advisor.md",
+          "status": 200,
+          "file": "head__docs__docs.cloud.google.com__spanner__docs__index-advisor.md.txt",
+          "sha256": "cdddd8a7f381d374305c3684ef7e40b3c1bf4c2a320056ed5d06387158a6e122",
+          "bytes": 5697
+        }
+      ]
+    },
+    {
+      "path": "docs/docs.cloud.google.com/spanner/docs/information-schema-pg.md",
+      "summary": "Add SET NULL to DELETE_RULE value documentation.",
+      "verification_group": "foreign-key",
+      "limits": "Catalog row value change, not an added INFORMATION_SCHEMA column.",
+      "commits": [
+        {
+          "sha": "bf8fecd08a4332c5c9a2040e2508627b3a058661",
+          "committed_at": "2026-10-27T18:02:01Z",
+          "status": "modified",
+          "previous_filename": null
+        }
+      ],
+      "body_receipts": [
+        {
+          "side": "base",
+          "revision": "3dcf9df46b1a7bdb261991f0b4197e9b4dda6acf",
+          "path": "docs/docs.cloud.google.com/spanner/docs/information-schema-pg.md",
+          "status": 200,
+          "file": "base__docs__docs.cloud.google.com__spanner__docs__information-schema-pg.md.txt",
+          "sha256": "a434c804ab0cd62da1fea73637fe089e1fbb61bb1352a281e31e121e601417fb",
+          "bytes": 114075
+        },
+        {
+          "side": "head",
+          "revision": "6d7397601456dc5602c0926d254424f64643a64f",
+          "path": "docs/docs.cloud.google.com/spanner/docs/information-schema-pg.md",
+          "status": 200,
+          "file": "head__docs__docs.cloud.google.com__spanner__docs__information-schema-pg.md.txt",
+          "sha256": "94df2745bdf3cfaa939fc6dab5ac68bd27ed664d6a79896a38caf247ad7f7422",
+          "bytes": 114101
+        }
+      ]
+    },
+    {
+      "path": "docs/docs.cloud.google.com/spanner/docs/information-schema.md",
+      "summary": "Add SET NULL to DELETE_RULE value documentation.",
+      "verification_group": "foreign-key",
+      "limits": "Catalog row value change, not an added INFORMATION_SCHEMA column.",
+      "commits": [
+        {
+          "sha": "bf8fecd08a4332c5c9a2040e2508627b3a058661",
+          "committed_at": "2026-10-27T18:02:01Z",
+          "status": "modified",
+          "previous_filename": null
+        }
+      ],
+      "body_receipts": [
+        {
+          "side": "base",
+          "revision": "3dcf9df46b1a7bdb261991f0b4197e9b4dda6acf",
+          "path": "docs/docs.cloud.google.com/spanner/docs/information-schema.md",
+          "status": 200,
+          "file": "base__docs__docs.cloud.google.com__spanner__docs__information-schema.md.txt",
+          "sha256": "488d834ae296fb210bf870e8e7bfd0a97024ad16e42591ff6877d6bbafec20b7",
+          "bytes": 98423
+        },
+        {
+          "side": "head",
+          "revision": "6d7397601456dc5602c0926d254424f64643a64f",
+          "path": "docs/docs.cloud.google.com/spanner/docs/information-schema.md",
+          "status": 200,
+          "file": "head__docs__docs.cloud.google.com__spanner__docs__information-schema.md.txt",
+          "sha256": "c4127e94d08875d3133caab2422334165a5b0e1ee31c62ee2356b8da1ab73256",
+          "bytes": 98449
+        }
+      ]
+    },
+    {
+      "path": "docs/docs.cloud.google.com/spanner/docs/instance-configurations.md",
+      "summary": "Configuration terminology, optional replica and performance guidance wording.",
+      "verification_group": "source_only",
+      "limits": "No topology, region, edition or capacity mutation; no benchmark.",
+      "commits": [
+        {
+          "sha": "6d7397601456dc5602c0926d254424f64643a64f",
+          "committed_at": "2026-10-28T18:01:51Z",
+          "status": "modified",
+          "previous_filename": null
+        }
+      ],
+      "body_receipts": [
+        {
+          "side": "base",
+          "revision": "3dcf9df46b1a7bdb261991f0b4197e9b4dda6acf",
+          "path": "docs/docs.cloud.google.com/spanner/docs/instance-configurations.md",
+          "status": 200,
+          "file": "base__docs__docs.cloud.google.com__spanner__docs__instance-configurations.md.txt",
+          "sha256": "937583cc4e812d8d15ed8e0b5183db427d9e28b269c4af89ea5838da0b4a5be4",
+          "bytes": 117103
+        },
+        {
+          "side": "head",
+          "revision": "6d7397601456dc5602c0926d254424f64643a64f",
+          "path": "docs/docs.cloud.google.com/spanner/docs/instance-configurations.md",
+          "status": 200,
+          "file": "head__docs__docs.cloud.google.com__spanner__docs__instance-configurations.md.txt",
+          "sha256": "f2841d09f41c652cd7739e594870c9fdaa465e1b9f90f8e18841b9b1e92088af",
+          "bytes": 116874
+        }
+      ]
+    },
+    {
+      "path": "docs/docs.cloud.google.com/spanner/docs/introspection/table-sizes-statistics.md",
+      "summary": "Document six columnar storage fields and used-byte summation.",
+      "verification_group": "storage",
+      "limits": "Qualified queryability in both dialects; fields already present in the October 23 598-column capture.",
+      "commits": [
+        {
+          "sha": "6d7397601456dc5602c0926d254424f64643a64f",
+          "committed_at": "2026-10-28T18:01:51Z",
+          "status": "modified",
+          "previous_filename": null
+        }
+      ],
+      "body_receipts": [
+        {
+          "side": "base",
+          "revision": "3dcf9df46b1a7bdb261991f0b4197e9b4dda6acf",
+          "path": "docs/docs.cloud.google.com/spanner/docs/introspection/table-sizes-statistics.md",
+          "status": 200,
+          "file": "base__docs__docs.cloud.google.com__spanner__docs__introspection__table-sizes-statistics.md.txt",
+          "sha256": "48a2504b81eb06a70802902b3cad9b7d1e82184cddba1503216dda440cb5459b",
+          "bytes": 9861
+        },
+        {
+          "side": "head",
+          "revision": "6d7397601456dc5602c0926d254424f64643a64f",
+          "path": "docs/docs.cloud.google.com/spanner/docs/introspection/table-sizes-statistics.md",
+          "status": 200,
+          "file": "head__docs__docs.cloud.google.com__spanner__docs__introspection__table-sizes-statistics.md.txt",
+          "sha256": "fb3306dce14862ad6af1938f145d6643a65dae524c62f778709c66f17d684967",
+          "bytes": 16452
+        }
+      ]
+    },
+    {
+      "path": "docs/docs.cloud.google.com/spanner/docs/metrics.md",
+      "summary": "Add lock wait latency distribution metric and mark four queue metrics GA; generated table timestamp updates.",
+      "verification_group": "source_only",
+      "limits": "Monitoring descriptor text is not runtime metric emission; queue product GA was already announced September 17.",
+      "commits": [
+        {
+          "sha": "7f3624d746587360e1f784dab55cf4536833f826",
+          "committed_at": "2026-10-24T18:01:51Z",
+          "status": "modified",
+          "previous_filename": null
+        }
+      ],
+      "body_receipts": [
+        {
+          "side": "base",
+          "revision": "3dcf9df46b1a7bdb261991f0b4197e9b4dda6acf",
+          "path": "docs/docs.cloud.google.com/spanner/docs/metrics.md",
+          "status": 200,
+          "file": "base__docs__docs.cloud.google.com__spanner__docs__metrics.md.txt",
+          "sha256": "20b602607df95840fd2ea413a8b29b39ec0e03e3232728a3eac3d0bf279e1765",
+          "bytes": 267932
+        },
+        {
+          "side": "head",
+          "revision": "6d7397601456dc5602c0926d254424f64643a64f",
+          "path": "docs/docs.cloud.google.com/spanner/docs/metrics.md",
+          "status": 200,
+          "file": "head__docs__docs.cloud.google.com__spanner__docs__metrics.md.txt",
+          "sha256": "1cd9702424ffd3b6b2ac13ae4c88a69557fb61af40d135537683a4ebeee59a86",
+          "bytes": 270076
+        }
+      ]
+    },
+    {
+      "path": "docs/docs.cloud.google.com/spanner/docs/monitor-columnar-engine.md",
+      "summary": "Link columnar coverage/storage fields in table size statistics.",
+      "verification_group": "storage",
+      "limits": "Metadata/queryability measured; no columnar workload or coverage population promise.",
+      "commits": [
+        {
+          "sha": "6d7397601456dc5602c0926d254424f64643a64f",
+          "committed_at": "2026-10-28T18:01:51Z",
+          "status": "modified",
+          "previous_filename": null
+        }
+      ],
+      "body_receipts": [
+        {
+          "side": "base",
+          "revision": "3dcf9df46b1a7bdb261991f0b4197e9b4dda6acf",
+          "path": "docs/docs.cloud.google.com/spanner/docs/monitor-columnar-engine.md",
+          "status": 200,
+          "file": "base__docs__docs.cloud.google.com__spanner__docs__monitor-columnar-engine.md.txt",
+          "sha256": "646aad27441239b57e3e31fdc9199811f5de65319c5fc0fd3f785a031d3f4b95",
+          "bytes": 3229
+        },
+        {
+          "side": "head",
+          "revision": "6d7397601456dc5602c0926d254424f64643a64f",
+          "path": "docs/docs.cloud.google.com/spanner/docs/monitor-columnar-engine.md",
+          "status": 200,
+          "file": "head__docs__docs.cloud.google.com__spanner__docs__monitor-columnar-engine.md.txt",
+          "sha256": "6dc997074e65ddc823f344aa1c754d30c62b3abfcc8aaa0bab78597145b14097",
+          "bytes": 3764
+        }
+      ]
+    },
+    {
+      "path": "docs/docs.cloud.google.com/spanner/docs/move-instance.md",
+      "summary": "Expand move phases, limitations, backup handling and post-move guidance.",
+      "verification_group": "source_only",
+      "limits": "Trial cannot move without paid conversion; no move/upgrade/backup operation performed.",
+      "commits": [
+        {
+          "sha": "09ce8f56bc5d42e8ef1ac0a4f3e5fff863876cae",
+          "committed_at": "2026-10-23T18:01:59Z",
+          "status": "modified",
+          "previous_filename": null
+        }
+      ],
+      "body_receipts": [
+        {
+          "side": "base",
+          "revision": "3dcf9df46b1a7bdb261991f0b4197e9b4dda6acf",
+          "path": "docs/docs.cloud.google.com/spanner/docs/move-instance.md",
+          "status": 200,
+          "file": "base__docs__docs.cloud.google.com__spanner__docs__move-instance.md.txt",
+          "sha256": "61dc461e70827eafbfa12c58cce9fa456a95bdcb02a1d58562578e6e0427af02",
+          "bytes": 22577
+        },
+        {
+          "side": "head",
+          "revision": "6d7397601456dc5602c0926d254424f64643a64f",
+          "path": "docs/docs.cloud.google.com/spanner/docs/move-instance.md",
+          "status": 200,
+          "file": "head__docs__docs.cloud.google.com__spanner__docs__move-instance.md.txt",
+          "sha256": "2d51e7a0196aa2ccd7031ac4d89a679d1bb211c5a01e5f9c0127c89c51f3e123",
+          "bytes": 30760
+        }
+      ]
+    },
+    {
+      "path": "docs/docs.cloud.google.com/spanner/docs/performance.md",
+      "summary": "Peak throughput explanation and troubleshooting links.",
+      "verification_group": "source_only",
+      "limits": "Published sizing guidance is not measured throughput on this trial.",
+      "commits": [
+        {
+          "sha": "e626247a85f8472c6b8a150d3f93427d6442aad9",
+          "committed_at": "2026-10-25T18:01:31Z",
+          "status": "modified",
+          "previous_filename": null
+        }
+      ],
+      "body_receipts": [
+        {
+          "side": "base",
+          "revision": "3dcf9df46b1a7bdb261991f0b4197e9b4dda6acf",
+          "path": "docs/docs.cloud.google.com/spanner/docs/performance.md",
+          "status": 200,
+          "file": "base__docs__docs.cloud.google.com__spanner__docs__performance.md.txt",
+          "sha256": "906ca43d6038aec18c099b02404726ccbcb9a3b363cc03857c42e0efe4490c92",
+          "bytes": 16849
+        },
+        {
+          "side": "head",
+          "revision": "6d7397601456dc5602c0926d254424f64643a64f",
+          "path": "docs/docs.cloud.google.com/spanner/docs/performance.md",
+          "status": 200,
+          "file": "head__docs__docs.cloud.google.com__spanner__docs__performance.md.txt",
+          "sha256": "9273161e4e37de2d09cb9738581b1f07a5deb46f0fe9b29c12434d15654d5d91",
+          "bytes": 16891
+        }
+      ]
+    },
+    {
+      "path": "docs/docs.cloud.google.com/spanner/docs/query-execution-plans.md",
+      "summary": "Restructure plan guidance and introduce visualizer/tuning links.",
+      "verification_group": "source_only",
+      "limits": "PROFILE plans retained for bounded search cases; no console visualizer UI or performance benchmark.",
+      "commits": [
+        {
+          "sha": "e626247a85f8472c6b8a150d3f93427d6442aad9",
+          "committed_at": "2026-10-25T18:01:31Z",
+          "status": "modified",
+          "previous_filename": null
+        },
+        {
+          "sha": "bf8fecd08a4332c5c9a2040e2508627b3a058661",
+          "committed_at": "2026-10-27T18:02:01Z",
+          "status": "modified",
+          "previous_filename": null
+        }
+      ],
+      "body_receipts": [
+        {
+          "side": "base",
+          "revision": "3dcf9df46b1a7bdb261991f0b4197e9b4dda6acf",
+          "path": "docs/docs.cloud.google.com/spanner/docs/query-execution-plans.md",
+          "status": 200,
+          "file": "base__docs__docs.cloud.google.com__spanner__docs__query-execution-plans.md.txt",
+          "sha256": "4a8021e33c492c2871c37c937f4901cd97530f1c54b524d691d34abcf1a179dc",
+          "bytes": 17466
+        },
+        {
+          "side": "head",
+          "revision": "6d7397601456dc5602c0926d254424f64643a64f",
+          "path": "docs/docs.cloud.google.com/spanner/docs/query-execution-plans.md",
+          "status": 200,
+          "file": "head__docs__docs.cloud.google.com__spanner__docs__query-execution-plans.md.txt",
+          "sha256": "aa3a883655c8aa67effe2d79623640ba885cc627f9857ec6114a7396978db2a4",
+          "bytes": 20476
+        }
+      ]
+    },
+    {
+      "path": "docs/docs.cloud.google.com/spanner/docs/query-plan-visualizer-overview.md",
+      "summary": "New visualizer navigation, summaries, prominent operators and execution timeline guide.",
+      "verification_group": "source_only",
+      "limits": "Console interaction is outside this SDK validation.",
+      "commits": [
+        {
+          "sha": "e626247a85f8472c6b8a150d3f93427d6442aad9",
+          "committed_at": "2026-10-25T18:01:31Z",
+          "status": "added",
+          "previous_filename": null
+        }
+      ],
+      "body_receipts": [
+        {
+          "side": "base",
+          "revision": "3dcf9df46b1a7bdb261991f0b4197e9b4dda6acf",
+          "path": "docs/docs.cloud.google.com/spanner/docs/query-plan-visualizer-overview.md",
+          "status": 404
+        },
+        {
+          "side": "head",
+          "revision": "6d7397601456dc5602c0926d254424f64643a64f",
+          "path": "docs/docs.cloud.google.com/spanner/docs/query-plan-visualizer-overview.md",
+          "status": 200,
+          "file": "head__docs__docs.cloud.google.com__spanner__docs__query-plan-visualizer-overview.md.txt",
+          "sha256": "2bb5f26cee778e1cbc7277186551d63d68041b03593f450b5c6cfebc554526ba",
+          "bytes": 9439
+        }
+      ]
+    },
+    {
+      "path": "docs/docs.cloud.google.com/spanner/docs/query-tuning.md",
+      "summary": "New consolidated tuning guide: indexes, joins, aggregation, limits, scans and batch execution.",
+      "verification_group": "query-tuning",
+      "limits": "Execute ANY_VALUE HAVING MAX/MIN and PostgreSQL generate_series plus additional-parallelism controls; other index/scan hints already appear in inspected base docs. No performance claim.",
+      "commits": [
+        {
+          "sha": "e626247a85f8472c6b8a150d3f93427d6442aad9",
+          "committed_at": "2026-10-25T18:01:31Z",
+          "status": "added",
+          "previous_filename": null
+        }
+      ],
+      "body_receipts": [
+        {
+          "side": "base",
+          "revision": "3dcf9df46b1a7bdb261991f0b4197e9b4dda6acf",
+          "path": "docs/docs.cloud.google.com/spanner/docs/query-tuning.md",
+          "status": 404
+        },
+        {
+          "side": "head",
+          "revision": "6d7397601456dc5602c0926d254424f64643a64f",
+          "path": "docs/docs.cloud.google.com/spanner/docs/query-tuning.md",
+          "status": 200,
+          "file": "head__docs__docs.cloud.google.com__spanner__docs__query-tuning.md.txt",
+          "sha256": "6be5e008dc7b3e40265aaab35557e99de3cd1ac4d0c22bc7aef4534b7269c1d1",
+          "bytes": 36070
+        }
+      ]
+    },
+    {
+      "path": "docs/docs.cloud.google.com/spanner/docs/reference/postgresql/data-definition-language.md",
+      "summary": "Add SET NULL FK action.",
+      "verification_group": "foreign-key",
+      "limits": "Executed via direct SDK DDL; local parser compatibility not inferred.",
+      "commits": [
+        {
+          "sha": "bf8fecd08a4332c5c9a2040e2508627b3a058661",
+          "committed_at": "2026-10-27T18:02:01Z",
+          "status": "modified",
+          "previous_filename": null
+        }
+      ],
+      "body_receipts": [
+        {
+          "side": "base",
+          "revision": "3dcf9df46b1a7bdb261991f0b4197e9b4dda6acf",
+          "path": "docs/docs.cloud.google.com/spanner/docs/reference/postgresql/data-definition-language.md",
+          "status": 200,
+          "file": "base__docs__docs.cloud.google.com__spanner__docs__reference__postgresql__data-definition-language.md.txt",
+          "sha256": "46a0fc8a90cfcec833b91c57f8f65c78132e86108bd620ad6c64e899ee867f66",
+          "bytes": 81548
+        },
+        {
+          "side": "head",
+          "revision": "6d7397601456dc5602c0926d254424f64643a64f",
+          "path": "docs/docs.cloud.google.com/spanner/docs/reference/postgresql/data-definition-language.md",
+          "status": 200,
+          "file": "head__docs__docs.cloud.google.com__spanner__docs__reference__postgresql__data-definition-language.md.txt",
+          "sha256": "d017eadec446d883b15600b61a2450e4d347e66474c1130d1613dfd81facd35f",
+          "bytes": 81584
+        }
+      ]
+    },
+    {
+      "path": "docs/docs.cloud.google.com/spanner/docs/reference/postgresql/operators.md",
+      "summary": "Add JSONB comparison operator rows.",
+      "verification_group": "jsonb",
+      "limits": "Pairwise ordering, edge rules, stored ORDER BY/GROUP BY/join, aggregate limitations and SQL NULL controls.",
+      "commits": [
+        {
+          "sha": "6d7397601456dc5602c0926d254424f64643a64f",
+          "committed_at": "2026-10-28T18:01:51Z",
+          "status": "modified",
+          "previous_filename": null
+        }
+      ],
+      "body_receipts": [
+        {
+          "side": "base",
+          "revision": "3dcf9df46b1a7bdb261991f0b4197e9b4dda6acf",
+          "path": "docs/docs.cloud.google.com/spanner/docs/reference/postgresql/operators.md",
+          "status": 200,
+          "file": "base__docs__docs.cloud.google.com__spanner__docs__reference__postgresql__operators.md.txt",
+          "sha256": "78de1ad3ccd386429f1743c4508581c013a3c6ca799ab1518db8fbefcb046c81",
+          "bytes": 24276
+        },
+        {
+          "side": "head",
+          "revision": "6d7397601456dc5602c0926d254424f64643a64f",
+          "path": "docs/docs.cloud.google.com/spanner/docs/reference/postgresql/operators.md",
+          "status": 200,
+          "file": "head__docs__docs.cloud.google.com__spanner__docs__reference__postgresql__operators.md.txt",
+          "sha256": "f4f22c129955ad2470efb072173d6e546ee1280032ca4b19c87c7741ab2dae35",
+          "bytes": 26130
+        }
+      ]
+    },
+    {
+      "path": "docs/docs.cloud.google.com/spanner/docs/reference/standard-sql/conversion_rules.md",
+      "summary": "Fix duplicate word and table padding.",
+      "verification_group": "source_only",
+      "limits": "No new conversion rule inferred; existing JSON conversion corpus repeated.",
+      "commits": [
+        {
+          "sha": "6d7397601456dc5602c0926d254424f64643a64f",
+          "committed_at": "2026-10-28T18:01:51Z",
+          "status": "modified",
+          "previous_filename": null
+        }
+      ],
+      "body_receipts": [
+        {
+          "side": "base",
+          "revision": "3dcf9df46b1a7bdb261991f0b4197e9b4dda6acf",
+          "path": "docs/docs.cloud.google.com/spanner/docs/reference/standard-sql/conversion_rules.md",
+          "status": 200,
+          "file": "base__docs__docs.cloud.google.com__spanner__docs__reference__standard-sql__conversion_rules.md.txt",
+          "sha256": "0771eec325af70719ee625b47cb42d9cc19349c55edc1d8fc6473a5c677049aa",
+          "bytes": 13430
+        },
+        {
+          "side": "head",
+          "revision": "6d7397601456dc5602c0926d254424f64643a64f",
+          "path": "docs/docs.cloud.google.com/spanner/docs/reference/standard-sql/conversion_rules.md",
+          "status": 200,
+          "file": "head__docs__docs.cloud.google.com__spanner__docs__reference__standard-sql__conversion_rules.md.txt",
+          "sha256": "6168854488c2a045105461f360f30e0ce4dbb2dc46beedbdb95bbea07784a89a",
+          "bytes": 13405
+        }
+      ]
+    },
+    {
+      "path": "docs/docs.cloud.google.com/spanner/docs/reference/standard-sql/data-definition-language.md",
+      "summary": "Add SET NULL FK action.",
+      "verification_group": "foreign-key",
+      "limits": "Executed via direct SDK DDL; local parser compatibility not inferred.",
+      "commits": [
+        {
+          "sha": "bf8fecd08a4332c5c9a2040e2508627b3a058661",
+          "committed_at": "2026-10-27T18:02:01Z",
+          "status": "modified",
+          "previous_filename": null
+        }
+      ],
+      "body_receipts": [
+        {
+          "side": "base",
+          "revision": "3dcf9df46b1a7bdb261991f0b4197e9b4dda6acf",
+          "path": "docs/docs.cloud.google.com/spanner/docs/reference/standard-sql/data-definition-language.md",
+          "status": 200,
+          "file": "base__docs__docs.cloud.google.com__spanner__docs__reference__standard-sql__data-definition-language.md.txt",
+          "sha256": "a4241a447762733a33952b2dec6f63b2bffe7c9c8a3ce403929434912ac93b4b",
+          "bytes": 140383
+        },
+        {
+          "side": "head",
+          "revision": "6d7397601456dc5602c0926d254424f64643a64f",
+          "path": "docs/docs.cloud.google.com/spanner/docs/reference/standard-sql/data-definition-language.md",
+          "status": 200,
+          "file": "head__docs__docs.cloud.google.com__spanner__docs__reference__standard-sql__data-definition-language.md.txt",
+          "sha256": "2e1c820d729fd4267a9279cffa2eba951de81119678c83b33216fc9788597c6e",
+          "bytes": 140668
+        }
+      ]
+    },
+    {
+      "path": "docs/docs.cloud.google.com/spanner/docs/reference/standard-sql/graph-patterns.md",
+      "summary": "Remove unbounded quantifier forms/examples from documentation.",
+      "verification_group": "path-quantifier",
+      "limits": "Bounded/no-lower/no-upper/star/plus controls on a finite cyclic graph, grouped star and invalid bounds.",
+      "commits": [
+        {
+          "sha": "bf8fecd08a4332c5c9a2040e2508627b3a058661",
+          "committed_at": "2026-10-27T18:02:01Z",
+          "status": "modified",
+          "previous_filename": null
+        }
+      ],
+      "body_receipts": [
+        {
+          "side": "base",
+          "revision": "3dcf9df46b1a7bdb261991f0b4197e9b4dda6acf",
+          "path": "docs/docs.cloud.google.com/spanner/docs/reference/standard-sql/graph-patterns.md",
+          "status": 200,
+          "file": "base__docs__docs.cloud.google.com__spanner__docs__reference__standard-sql__graph-patterns.md.txt",
+          "sha256": "8905382078a27b98a8c224edcec5b02a514d67ec93c9591a96c63d66a91554b3",
+          "bytes": 56238
+        },
+        {
+          "side": "head",
+          "revision": "6d7397601456dc5602c0926d254424f64643a64f",
+          "path": "docs/docs.cloud.google.com/spanner/docs/reference/standard-sql/graph-patterns.md",
+          "status": 200,
+          "file": "head__docs__docs.cloud.google.com__spanner__docs__reference__standard-sql__graph-patterns.md.txt",
+          "sha256": "2421f4b9e9119d12b8968adb6dc6843be40a1e340240c5d355918fd86f2965b1",
+          "bytes": 54164
+        }
+      ]
+    },
+    {
+      "path": "docs/docs.cloud.google.com/spanner/docs/reference/standard-sql/graph-schema-statements.md",
+      "summary": "Specify volatile functions/body effects and false-default/true graph option behavior.",
+      "verification_group": "volatile-graph",
+      "limits": "Separate documented contract from observed enforcement; initial harness failure remains NOT_RUN.",
+      "commits": [
+        {
+          "sha": "6d7397601456dc5602c0926d254424f64643a64f",
+          "committed_at": "2026-10-28T18:01:51Z",
+          "status": "modified",
+          "previous_filename": null
+        }
+      ],
+      "body_receipts": [
+        {
+          "side": "base",
+          "revision": "3dcf9df46b1a7bdb261991f0b4197e9b4dda6acf",
+          "path": "docs/docs.cloud.google.com/spanner/docs/reference/standard-sql/graph-schema-statements.md",
+          "status": 200,
+          "file": "base__docs__docs.cloud.google.com__spanner__docs__reference__standard-sql__graph-schema-statements.md.txt",
+          "sha256": "88a75ca18984d57ca5ca7088e6d4f894f2111ba95e9a1df0241492291618c3de",
+          "bytes": 18892
+        },
+        {
+          "side": "head",
+          "revision": "6d7397601456dc5602c0926d254424f64643a64f",
+          "path": "docs/docs.cloud.google.com/spanner/docs/reference/standard-sql/graph-schema-statements.md",
+          "status": 200,
+          "file": "head__docs__docs.cloud.google.com__spanner__docs__reference__standard-sql__graph-schema-statements.md.txt",
+          "sha256": "562422f67c2f60369360e9cbf871593f931ba1f64e9e1ca03c8725fad40acab8",
+          "bytes": 20188
+        }
+      ]
+    },
+    {
+      "path": "docs/docs.cloud.google.com/spanner/docs/reference/standard-sql/json_functions.md",
+      "summary": "Spelling fix: unparsable.",
+      "verification_group": "source_only",
+      "limits": "No semantic change inferred; retained JSON corpus repeated.",
+      "commits": [
+        {
+          "sha": "6d7397601456dc5602c0926d254424f64643a64f",
+          "committed_at": "2026-10-28T18:01:51Z",
+          "status": "modified",
+          "previous_filename": null
+        }
+      ],
+      "body_receipts": [
+        {
+          "side": "base",
+          "revision": "3dcf9df46b1a7bdb261991f0b4197e9b4dda6acf",
+          "path": "docs/docs.cloud.google.com/spanner/docs/reference/standard-sql/json_functions.md",
+          "status": 200,
+          "file": "base__docs__docs.cloud.google.com__spanner__docs__reference__standard-sql__json_functions.md.txt",
+          "sha256": "6db9990930cf6038ef33abb0a912048a89a3535c4b0a60af79144523014bba8e",
+          "bytes": 142024
+        },
+        {
+          "side": "head",
+          "revision": "6d7397601456dc5602c0926d254424f64643a64f",
+          "path": "docs/docs.cloud.google.com/spanner/docs/reference/standard-sql/json_functions.md",
+          "status": 200,
+          "file": "head__docs__docs.cloud.google.com__spanner__docs__reference__standard-sql__json_functions.md.txt",
+          "sha256": "3a906fffeded576b0fb995622211c4df1d7531f9195ce9b91914cc3da70be728",
+          "bytes": 142021
+        }
+      ]
+    },
+    {
+      "path": "docs/docs.cloud.google.com/spanner/docs/reference/standard-sql/query-syntax.md",
+      "summary": "Remove duplicate word in LIMIT guidance.",
+      "verification_group": "source_only",
+      "limits": "No syntax addition inferred.",
+      "commits": [
+        {
+          "sha": "6d7397601456dc5602c0926d254424f64643a64f",
+          "committed_at": "2026-10-28T18:01:51Z",
+          "status": "modified",
+          "previous_filename": null
+        }
+      ],
+      "body_receipts": [
+        {
+          "side": "base",
+          "revision": "3dcf9df46b1a7bdb261991f0b4197e9b4dda6acf",
+          "path": "docs/docs.cloud.google.com/spanner/docs/reference/standard-sql/query-syntax.md",
+          "status": 200,
+          "file": "base__docs__docs.cloud.google.com__spanner__docs__reference__standard-sql__query-syntax.md.txt",
+          "sha256": "b326d8b7fc4ea0775afcab2a8df0c8111fc02bb1c13fdab3f34435362d7c1b0b",
+          "bytes": 142283
+        },
+        {
+          "side": "head",
+          "revision": "6d7397601456dc5602c0926d254424f64643a64f",
+          "path": "docs/docs.cloud.google.com/spanner/docs/reference/standard-sql/query-syntax.md",
+          "status": 200,
+          "file": "head__docs__docs.cloud.google.com__spanner__docs__reference__standard-sql__query-syntax.md.txt",
+          "sha256": "5ef1bffdb6acfcfa54425b0a4fb3494f98ba565a6bd9e89793adbacfdcb327ec",
+          "bytes": 142275
+        }
+      ]
+    },
+    {
+      "path": "docs/docs.cloud.google.com/spanner/docs/reference/standard-sql/search_functions.md",
+      "summary": "Repair comparison/named-argument characters in examples and numeric function text.",
+      "verification_group": "numeric-search",
+      "limits": "Current full body compared with mirror and live HTML code; repaired extraction is not a new backend capability.",
+      "commits": [
+        {
+          "sha": "09ce8f56bc5d42e8ef1ac0a4f3e5fff863876cae",
+          "committed_at": "2026-10-23T18:01:59Z",
+          "status": "modified",
+          "previous_filename": null
+        }
+      ],
+      "body_receipts": [
+        {
+          "side": "base",
+          "revision": "3dcf9df46b1a7bdb261991f0b4197e9b4dda6acf",
+          "path": "docs/docs.cloud.google.com/spanner/docs/reference/standard-sql/search_functions.md",
+          "status": 200,
+          "file": "base__docs__docs.cloud.google.com__spanner__docs__reference__standard-sql__search_functions.md.txt",
+          "sha256": "9036049554fe7d0135549f79434910bf6e270e5d5178e094a36a12b8a2a1b2e4",
+          "bytes": 89174
+        },
+        {
+          "side": "head",
+          "revision": "6d7397601456dc5602c0926d254424f64643a64f",
+          "path": "docs/docs.cloud.google.com/spanner/docs/reference/standard-sql/search_functions.md",
+          "status": 200,
+          "file": "head__docs__docs.cloud.google.com__spanner__docs__reference__standard-sql__search_functions.md.txt",
+          "sha256": "ca633dcb500d0f2672e33197fb18fb70ce263379572a6f547437e1bc4ac65f69",
+          "bytes": 89163
+        }
+      ]
+    },
+    {
+      "path": "docs/docs.cloud.google.com/spanner/docs/saved-queries.md",
+      "summary": "Spanner Studio introduction wording.",
+      "verification_group": "source_only",
+      "limits": "Console UI not exercised.",
+      "commits": [
+        {
+          "sha": "09ce8f56bc5d42e8ef1ac0a4f3e5fff863876cae",
+          "committed_at": "2026-10-23T18:01:59Z",
+          "status": "modified",
+          "previous_filename": null
+        }
+      ],
+      "body_receipts": [
+        {
+          "side": "base",
+          "revision": "3dcf9df46b1a7bdb261991f0b4197e9b4dda6acf",
+          "path": "docs/docs.cloud.google.com/spanner/docs/saved-queries.md",
+          "status": 200,
+          "file": "base__docs__docs.cloud.google.com__spanner__docs__saved-queries.md.txt",
+          "sha256": "ea5d765fb95182088d91d53b276f215850d0ec2e587bbfebb72d44538c615909",
+          "bytes": 3148
+        },
+        {
+          "side": "head",
+          "revision": "6d7397601456dc5602c0926d254424f64643a64f",
+          "path": "docs/docs.cloud.google.com/spanner/docs/saved-queries.md",
+          "status": 200,
+          "file": "head__docs__docs.cloud.google.com__spanner__docs__saved-queries.md.txt",
+          "sha256": "7ddcbb94825b77a068185cb1bfd5fc4bcd368a30f726d985814354340f67e35f",
+          "bytes": 3234
+        }
+      ]
+    },
+    {
+      "path": "docs/docs.cloud.google.com/spanner/docs/secondary-indexes.md",
+      "summary": "Repair escaped brackets in GQL example link.",
+      "verification_group": "source_only",
+      "limits": "Link correction.",
+      "commits": [
+        {
+          "sha": "e626247a85f8472c6b8a150d3f93427d6442aad9",
+          "committed_at": "2026-10-25T18:01:31Z",
+          "status": "modified",
+          "previous_filename": null
+        }
+      ],
+      "body_receipts": [
+        {
+          "side": "base",
+          "revision": "3dcf9df46b1a7bdb261991f0b4197e9b4dda6acf",
+          "path": "docs/docs.cloud.google.com/spanner/docs/secondary-indexes.md",
+          "status": 200,
+          "file": "base__docs__docs.cloud.google.com__spanner__docs__secondary-indexes.md.txt",
+          "sha256": "be4752257ac2feabce1414a6165f59aa7afef2a5badd8f5c233d786019e9aa7d",
+          "bytes": 73907
+        },
+        {
+          "side": "head",
+          "revision": "6d7397601456dc5602c0926d254424f64643a64f",
+          "path": "docs/docs.cloud.google.com/spanner/docs/secondary-indexes.md",
+          "status": 200,
+          "file": "head__docs__docs.cloud.google.com__spanner__docs__secondary-indexes.md.txt",
+          "sha256": "6a5cb007f60c2725da55f28afbff647364da3c67b97a17e4b95a945d50d8ccd9",
+          "bytes": 73851
+        }
+      ]
+    },
+    {
+      "path": "docs/docs.cloud.google.com/spanner/docs/sql-best-practices.md",
+      "summary": "Move detailed batch scan/execution guidance into query tuning and reorganize references.",
+      "verification_group": "source_only",
+      "limits": "Content movement not a new engine release.",
+      "commits": [
+        {
+          "sha": "e626247a85f8472c6b8a150d3f93427d6442aad9",
+          "committed_at": "2026-10-25T18:01:31Z",
+          "status": "modified",
+          "previous_filename": null
+        }
+      ],
+      "body_receipts": [
+        {
+          "side": "base",
+          "revision": "3dcf9df46b1a7bdb261991f0b4197e9b4dda6acf",
+          "path": "docs/docs.cloud.google.com/spanner/docs/sql-best-practices.md",
+          "status": 200,
+          "file": "base__docs__docs.cloud.google.com__spanner__docs__sql-best-practices.md.txt",
+          "sha256": "f27055127893763a98968e273d48b0618907d13c4004d6eee4234625f2a45cb5",
+          "bytes": 35210
+        },
+        {
+          "side": "head",
+          "revision": "6d7397601456dc5602c0926d254424f64643a64f",
+          "path": "docs/docs.cloud.google.com/spanner/docs/sql-best-practices.md",
+          "status": 200,
+          "file": "head__docs__docs.cloud.google.com__spanner__docs__sql-best-practices.md.txt",
+          "sha256": "3fadf16ad49329aef9c8b2e74ae71803bde118e7fc6dbebaa37ec343604167d9",
+          "bytes": 26956
+        }
+      ]
+    },
+    {
+      "path": "docs/docs.cloud.google.com/spanner/docs/troubleshooting-performance-regressions.md",
+      "summary": "Retired path renamed to troubleshooting-query-performance-regressions.",
+      "verification_group": "source_only",
+      "limits": "Preserve base body and rename identity; not a product removal.",
+      "commits": [
+        {
+          "sha": "e626247a85f8472c6b8a150d3f93427d6442aad9",
+          "committed_at": "2026-10-25T18:01:31Z",
+          "status": "renamed",
+          "previous_filename": "docs/docs.cloud.google.com/spanner/docs/troubleshooting-performance-regressions.md"
+        }
+      ],
+      "body_receipts": [
+        {
+          "side": "base",
+          "revision": "3dcf9df46b1a7bdb261991f0b4197e9b4dda6acf",
+          "path": "docs/docs.cloud.google.com/spanner/docs/troubleshooting-performance-regressions.md",
+          "status": 200,
+          "file": "base__docs__docs.cloud.google.com__spanner__docs__troubleshooting-performance-regressions.md.txt",
+          "sha256": "7c358516a4b945c8d06b1a7819456dcab5d07ca84489bd5c00eb51e519bbeb37",
+          "bytes": 13843
+        },
+        {
+          "side": "head",
+          "revision": "6d7397601456dc5602c0926d254424f64643a64f",
+          "path": "docs/docs.cloud.google.com/spanner/docs/troubleshooting-performance-regressions.md",
+          "status": 404
+        }
+      ]
+    },
+    {
+      "path": "docs/docs.cloud.google.com/spanner/docs/troubleshooting-query-performance-regressions.md",
+      "summary": "Rename and expand performance troubleshooting guide; profile REST examples, index/queue/client-wait/data-statistics guidance.",
+      "verification_group": "source_only",
+      "limits": "PROFILE collected through SDK; REST session creation and console timing workflows not separately exercised.",
+      "commits": [
+        {
+          "sha": "e626247a85f8472c6b8a150d3f93427d6442aad9",
+          "committed_at": "2026-10-25T18:01:31Z",
+          "status": "renamed",
+          "previous_filename": "docs/docs.cloud.google.com/spanner/docs/troubleshooting-performance-regressions.md"
+        }
+      ],
+      "body_receipts": [
+        {
+          "side": "base",
+          "revision": "3dcf9df46b1a7bdb261991f0b4197e9b4dda6acf",
+          "path": "docs/docs.cloud.google.com/spanner/docs/troubleshooting-query-performance-regressions.md",
+          "status": 404
+        },
+        {
+          "side": "head",
+          "revision": "6d7397601456dc5602c0926d254424f64643a64f",
+          "path": "docs/docs.cloud.google.com/spanner/docs/troubleshooting-query-performance-regressions.md",
+          "status": 200,
+          "file": "head__docs__docs.cloud.google.com__spanner__docs__troubleshooting-query-performance-regressions.md.txt",
+          "sha256": "601f29fb4e5a0793ed8a455bcfa3b73616b184b3fc6f3561d07d43767d76c6ae",
+          "bytes": 16271
+        }
+      ]
+    },
+    {
+      "path": "docs/docs.cloud.google.com/spanner/docs/use-pitr.md",
+      "summary": "Intermediate commit touch; endpoint bodies equal.",
+      "verification_group": "source_only",
+      "limits": "Per-commit patch retained even though net body comparison is equal.",
+      "commits": [
+        {
+          "sha": "e626247a85f8472c6b8a150d3f93427d6442aad9",
+          "committed_at": "2026-10-25T18:01:31Z",
+          "status": "modified",
+          "previous_filename": null
+        },
+        {
+          "sha": "46f7b510c2e67a15b7d5eb8be7a520dac1fec142",
+          "committed_at": "2026-10-26T18:02:27Z",
+          "status": "modified",
+          "previous_filename": null
+        }
+      ],
+      "body_receipts": [
+        {
+          "side": "base",
+          "revision": "3dcf9df46b1a7bdb261991f0b4197e9b4dda6acf",
+          "path": "docs/docs.cloud.google.com/spanner/docs/use-pitr.md",
+          "status": 200,
+          "file": "base__docs__docs.cloud.google.com__spanner__docs__use-pitr.md.txt",
+          "sha256": "3233765109195292250aceececc0be42fceaaf9d5590fe808836930e9297b45a",
+          "bytes": 64868
+        },
+        {
+          "side": "head",
+          "revision": "6d7397601456dc5602c0926d254424f64643a64f",
+          "path": "docs/docs.cloud.google.com/spanner/docs/use-pitr.md",
+          "status": 200,
+          "file": "head__docs__docs.cloud.google.com__spanner__docs__use-pitr.md.txt",
+          "sha256": "3233765109195292250aceececc0be42fceaaf9d5590fe808836930e9297b45a",
+          "bytes": 64868
+        }
+      ]
+    },
+    {
+      "path": "docs/docs.cloud.google.com/spanner/docs/working-with-jsonb.md",
+      "summary": "New JSONB comparison/sorting rules; remove obsolete unsupported-ordering bullet.",
+      "verification_group": "jsonb",
+      "limits": "Ordering differs from GoogleSQL JSON in specific edge cases; COUNT(jsonb)/MIN(jsonb) tested separately.",
+      "commits": [
+        {
+          "sha": "6d7397601456dc5602c0926d254424f64643a64f",
+          "committed_at": "2026-10-28T18:01:51Z",
+          "status": "modified",
+          "previous_filename": null
+        }
+      ],
+      "body_receipts": [
+        {
+          "side": "base",
+          "revision": "3dcf9df46b1a7bdb261991f0b4197e9b4dda6acf",
+          "path": "docs/docs.cloud.google.com/spanner/docs/working-with-jsonb.md",
+          "status": 200,
+          "file": "base__docs__docs.cloud.google.com__spanner__docs__working-with-jsonb.md.txt",
+          "sha256": "ff2137f8fe202145f1e9f78ebd8b9ba24b613c5de22e6308a544a5bf148a567c",
+          "bytes": 48837
+        },
+        {
+          "side": "head",
+          "revision": "6d7397601456dc5602c0926d254424f64643a64f",
+          "path": "docs/docs.cloud.google.com/spanner/docs/working-with-jsonb.md",
+          "status": 200,
+          "file": "head__docs__docs.cloud.google.com__spanner__docs__working-with-jsonb.md.txt",
+          "sha256": "bdd73ed4c1e21d4391a3ac3d53c551e904143ada69b6d1c56c453c4c065916eb",
+          "bytes": 50442
+        }
+      ]
+    }
+  ],
+  "non_document_net_changes": [
+    {
+      "sha": "8b137891791fe96927ad78e64b0aad7bded08bdc",
+      "filename": "logs/failed.txt",
+      "status": "modified",
+      "additions": 1,
+      "deletions": 1,
+      "changes": 2,
+      "blob_url": "https://github.com/apstndb/spanner-docs-mirror/blob/6d7397601456dc5602c0926d254424f64643a64f/logs%2Ffailed.txt",
+      "raw_url": "https://github.com/apstndb/spanner-docs-mirror/raw/6d7397601456dc5602c0926d254424f64643a64f/logs%2Ffailed.txt",
+      "contents_url": "https://api.github.com/repos/apstndb/spanner-docs-mirror/contents/logs%2Ffailed.txt?ref=6d7397601456dc5602c0926d254424f64643a64f",
+      "patch": "@@ -1 +1 @@\n-200 https://docs.cloud.google.com/spanner-omni/replicate-data\n+"
+    },
+    {
+      "sha": "b38d6fc9278e11abab0b5c46c51ec1872332ca85",
+      "filename": "logs/urls.txt",
+      "status": "modified",
+      "additions": 48,
+      "deletions": 45,
+      "changes": 93,
+      "blob_url": "https://github.com/apstndb/spanner-docs-mirror/blob/6d7397601456dc5602c0926d254424f64643a64f/logs%2Furls.txt",
+      "raw_url": "https://github.com/apstndb/spanner-docs-mirror/raw/6d7397601456dc5602c0926d254424f64643a64f/logs%2Furls.txt",
+      "contents_url": "https://api.github.com/repos/apstndb/spanner-docs-mirror/contents/logs%2Furls.txt?ref=6d7397601456dc5602c0926d254424f64643a64f",
+      "patch": "@@ -87,8 +87,8 @@ https://docs.cloud.google.com/sdk/gcloud/reference/spanner/samples/workload\t2026\n https://docs.cloud.google.com/spanner-omni\t2026-10-15T18:58:44Z\n https://docs.cloud.google.com/spanner-omni/audit-logs\t2026-10-01T16:55:26Z\n https://docs.cloud.google.com/spanner-omni/authentication\t2026-10-01T16:55:26Z\n-https://docs.cloud.google.com/spanner-omni/backups\t2026-10-01T16:55:26Z\n-https://docs.cloud.google.com/spanner-omni/beam\t2026-10-01T16:55:26Z\n+https://docs.cloud.google.com/spanner-omni/backups\t2026-10-22T17:11:49Z\n+https://docs.cloud.google.com/spanner-omni/beam\t2026-10-22T17:11:49Z\n https://docs.cloud.google.com/spanner-omni/cassandra-proxy\t2026-10-01T16:55:26Z\n https://docs.cloud.google.com/spanner-omni/cli-quickstart\t2026-10-01T16:55:26Z\n https://docs.cloud.google.com/spanner-omni/client-library-overview\t2026-10-01T16:55:26Z\n@@ -132,8 +132,9 @@ https://docs.cloud.google.com/spanner-omni/prometheus-alerts\t2026-10-01T16:55:26\n https://docs.cloud.google.com/spanner-omni/python\t2026-10-01T16:55:26Z\n https://docs.cloud.google.com/spanner-omni/quickstart\t2026-10-01T16:55:26Z\n https://docs.cloud.google.com/spanner-omni/release-notes\t2026-10-01T16:55:26Z\n+https://docs.cloud.google.com/spanner-omni/replicate-data\t2026-10-22T17:11:49Z\n https://docs.cloud.google.com/spanner-omni/resources\t2026-10-01T16:55:26Z\n-https://docs.cloud.google.com/spanner-omni/restores\t2026-10-01T16:55:26Z\n+https://docs.cloud.google.com/spanner-omni/restores\t2026-10-22T17:11:49Z\n https://docs.cloud.google.com/spanner-omni/scale-kubernetes-deployment\t2026-10-01T16:55:26Z\n https://docs.cloud.google.com/spanner-omni/scale-vm-deployment\t2026-10-01T16:55:26Z\n https://docs.cloud.google.com/spanner-omni/scaling-benefits\t2026-10-01T16:55:26Z\n@@ -148,15 +149,15 @@ https://docs.cloud.google.com/spanner-omni/true-time-external-consistency\t2026-1\n https://docs.cloud.google.com/spanner-omni/upgrade-deployment\t2026-10-15T18:58:44Z\n https://docs.cloud.google.com/spanner-omni/use-console\t2026-10-01T16:55:26Z\n https://docs.cloud.google.com/spanner-omni/vector-search-overview\t2026-10-01T16:55:26Z\n-https://docs.cloud.google.com/spanner/docs\t2026-10-01T01:25:14Z\n+https://docs.cloud.google.com/spanner/docs\t2026-10-24T22:46:36Z\n https://docs.cloud.google.com/spanner/docs/access-with-fgac\t2026-10-07T09:40:22Z\n https://docs.cloud.google.com/spanner/docs/adding-spring\t2026-10-07T09:40:22Z\n https://docs.cloud.google.com/spanner/docs/api-libraries-overview\t2026-10-07T09:40:22Z\n https://docs.cloud.google.com/spanner/docs/api-parameters\t2026-09-26T09:41:27Z\n https://docs.cloud.google.com/spanner/docs/apis\t2026-10-01T01:24:09Z\n https://docs.cloud.google.com/spanner/docs/application-migration\t2026-10-07T09:40:22Z\n https://docs.cloud.google.com/spanner/docs/assess-migration\t2026-10-07T09:40:22Z\n-https://docs.cloud.google.com/spanner/docs/audit-logging\t2026-10-07T09:40:22Z\n+https://docs.cloud.google.com/spanner/docs/audit-logging\t2026-10-27T13:05:39Z\n https://docs.cloud.google.com/spanner/docs/audit-logging-request-latency-guide\t2026-10-07T09:40:22Z\n https://docs.cloud.google.com/spanner/docs/authentication\t2026-10-09T22:04:15Z\n https://docs.cloud.google.com/spanner/docs/autoscaler-tool-overview\t2026-10-01T01:24:09Z\n@@ -202,11 +203,11 @@ https://docs.cloud.google.com/spanner/docs/connect-gke-cluster\t2026-10-07T09:39:\n https://docs.cloud.google.com/spanner/docs/cpu-utilization\t2026-10-07T09:39:47Z\n https://docs.cloud.google.com/spanner/docs/create-manage-configurations\t2026-10-07T09:39:47Z\n https://docs.cloud.google.com/spanner/docs/create-manage-data-placements\t2026-10-07T09:39:47Z\n-https://docs.cloud.google.com/spanner/docs/create-manage-databases\t2026-10-07T09:39:47Z\n+https://docs.cloud.google.com/spanner/docs/create-manage-databases\t2026-10-26T03:50:29Z\n https://docs.cloud.google.com/spanner/docs/create-manage-instances\t2026-10-07T09:39:47Z\n https://docs.cloud.google.com/spanner/docs/create-manage-locality-groups\t2026-10-07T09:39:47Z\n https://docs.cloud.google.com/spanner/docs/create-manage-partitions\t2026-10-07T09:39:47Z\n-https://docs.cloud.google.com/spanner/docs/create-manage-saved-queries\t2026-10-07T09:39:47Z\n+https://docs.cloud.google.com/spanner/docs/create-manage-saved-queries\t2026-10-23T06:22:23Z\n https://docs.cloud.google.com/spanner/docs/create-manage-split-points\t2026-10-07T09:39:47Z\n https://docs.cloud.google.com/spanner/docs/create-manage-views\t2026-10-07T09:39:47Z\n https://docs.cloud.google.com/spanner/docs/create-query-database-console\t2026-10-07T09:39:47Z\n@@ -219,17 +220,17 @@ https://docs.cloud.google.com/spanner/docs/data-validation\t2026-10-07T09:39:47Z\n https://docs.cloud.google.com/spanner/docs/databases\t2026-10-07T09:39:47Z\n https://docs.cloud.google.com/spanner/docs/databoost/databoost-applications\t2026-10-07T09:41:07Z\n https://docs.cloud.google.com/spanner/docs/databoost/databoost-export\t2026-10-07T09:41:07Z\n-https://docs.cloud.google.com/spanner/docs/databoost/databoost-monitor\t2026-10-21T00:17:12Z\n+https://docs.cloud.google.com/spanner/docs/databoost/databoost-monitor\t2026-10-23T08:15:40Z\n https://docs.cloud.google.com/spanner/docs/databoost/databoost-overview\t2026-10-07T09:41:07Z\n https://docs.cloud.google.com/spanner/docs/databoost/databoost-quotas\t2026-10-07T09:41:07Z\n-https://docs.cloud.google.com/spanner/docs/databoost/databoost-run-queries\t2026-10-07T09:41:07Z\n+https://docs.cloud.google.com/spanner/docs/databoost/databoost-run-queries\t2026-10-25T01:09:04Z\n https://docs.cloud.google.com/spanner/docs/dataflow-connector\t2026-10-07T09:39:47Z\n https://docs.cloud.google.com/spanner/docs/dataflow-templates\t2026-10-07T09:39:47Z\n-https://docs.cloud.google.com/spanner/docs/dc-integration\t2026-10-07T09:39:47Z\n-https://docs.cloud.google.com/spanner/docs/deadline-exceeded\t2026-10-07T09:39:47Z\n+https://docs.cloud.google.com/spanner/docs/dc-integration\t2026-10-26T11:38:57Z\n+https://docs.cloud.google.com/spanner/docs/deadline-exceeded\t2026-10-24T22:46:36Z\n https://docs.cloud.google.com/spanner/docs/directed-reads\t2026-10-07T09:39:47Z\n https://docs.cloud.google.com/spanner/docs/django-orm\t2026-10-07T09:39:47Z\n-https://docs.cloud.google.com/spanner/docs/dml-best-practices\t2026-10-07T09:39:47Z\n+https://docs.cloud.google.com/spanner/docs/dml-best-practices\t2026-10-23T19:40:06Z\n https://docs.cloud.google.com/spanner/docs/dml-partitioned\t2026-10-07T09:39:47Z\n https://docs.cloud.google.com/spanner/docs/dml-tasks\t2026-10-07T09:39:47Z\n https://docs.cloud.google.com/spanner/docs/dml-versus-mutations\t2026-10-07T09:39:47Z\n@@ -250,8 +251,8 @@ https://docs.cloud.google.com/spanner/docs/fgac-system-roles\t2026-10-07T09:39:47\n https://docs.cloud.google.com/spanner/docs/find-approximate-nearest-neighbors\t2026-10-07T09:39:47Z\n https://docs.cloud.google.com/spanner/docs/find-hotspots-in-database\t2026-10-07T09:39:47Z\n https://docs.cloud.google.com/spanner/docs/find-k-nearest-neighbors\t2026-10-07T09:39:47Z\n-https://docs.cloud.google.com/spanner/docs/foreign-keys/how-to\t2026-10-07T09:41:07Z\n-https://docs.cloud.google.com/spanner/docs/foreign-keys/overview\t2026-10-07T09:41:07Z\n+https://docs.cloud.google.com/spanner/docs/foreign-keys/how-to\t2026-10-27T05:00:12Z\n+https://docs.cloud.google.com/spanner/docs/foreign-keys/overview\t2026-10-27T05:00:12Z\n https://docs.cloud.google.com/spanner/docs/free-trial-instance\t2026-10-07T09:39:47Z\n https://docs.cloud.google.com/spanner/docs/free-trial-quickstart\t2026-10-07T09:39:33Z\n https://docs.cloud.google.com/spanner/docs/full-text-search\t2026-10-07T09:40:19Z\n@@ -260,21 +261,21 @@ https://docs.cloud.google.com/spanner/docs/full-text-search/facets\t2026-10-01T01\n https://docs.cloud.google.com/spanner/docs/full-text-search/fuzzy-search\t2026-10-07T09:41:07Z\n https://docs.cloud.google.com/spanner/docs/full-text-search/json-indexes\t2026-10-13T01:17:55Z\n https://docs.cloud.google.com/spanner/docs/full-text-search/mix-full-text-and-non-text-queries\t2026-10-07T09:41:07Z\n-https://docs.cloud.google.com/spanner/docs/full-text-search/numeric-indexes\t2026-10-07T09:41:07Z\n+https://docs.cloud.google.com/spanner/docs/full-text-search/numeric-indexes\t2026-10-26T14:30:56Z\n https://docs.cloud.google.com/spanner/docs/full-text-search/paginate-search-results\t2026-10-07T09:41:07Z\n https://docs.cloud.google.com/spanner/docs/full-text-search/partition-search-index\t2026-10-07T09:41:07Z\n https://docs.cloud.google.com/spanner/docs/full-text-search/pattern-matching-function-acceleration\t2026-10-07T09:41:07Z\n https://docs.cloud.google.com/spanner/docs/full-text-search/query-overview\t2026-10-07T09:41:07Z\n https://docs.cloud.google.com/spanner/docs/full-text-search/ranked-search\t2026-10-07T09:41:07Z\n-https://docs.cloud.google.com/spanner/docs/full-text-search/search-indexes\t2026-10-07T09:41:07Z\n+https://docs.cloud.google.com/spanner/docs/full-text-search/search-indexes\t2026-10-26T14:30:56Z\n https://docs.cloud.google.com/spanner/docs/full-text-search/search-multiple-columns\t2026-10-07T09:41:07Z\n https://docs.cloud.google.com/spanner/docs/full-text-search/search-query-enhancement\t2026-10-07T09:41:07Z\n https://docs.cloud.google.com/spanner/docs/full-text-search/search-vs-secondary-index\t2026-10-07T09:41:07Z\n https://docs.cloud.google.com/spanner/docs/full-text-search/substring-search\t2026-10-07T09:41:07Z\n https://docs.cloud.google.com/spanner/docs/full-text-search/tokenization\t2026-10-13T01:17:55Z\n https://docs.cloud.google.com/spanner/docs/full-text-search/top-k-pattern-matching\t2026-10-07T09:41:07Z\n https://docs.cloud.google.com/spanner/docs/generated-column/how-to\t2026-10-07T09:41:07Z\n-https://docs.cloud.google.com/spanner/docs/geo-partitioning\t2026-10-22T03:58:03Z\n+https://docs.cloud.google.com/spanner/docs/geo-partitioning\t2026-10-27T23:32:52Z\n https://docs.cloud.google.com/spanner/docs/getting-started/ado_net\t2026-10-01T01:25:14Z\n https://docs.cloud.google.com/spanner/docs/getting-started/cpp\t2026-10-01T01:25:14Z\n https://docs.cloud.google.com/spanner/docs/getting-started/csharp\t2026-10-01T01:25:14Z\n@@ -301,8 +302,8 @@ https://docs.cloud.google.com/spanner/docs/graph/create-update-drop-schema\t2026-\n https://docs.cloud.google.com/spanner/docs/graph/create-update-drop-schema-visually\t2026-10-07T09:41:07Z\n https://docs.cloud.google.com/spanner/docs/graph/full-text-search-and-graph\t2026-10-01T01:31:42Z\n https://docs.cloud.google.com/spanner/docs/graph/graph-algorithms-overview\t2026-10-07T09:39:54Z\n-https://docs.cloud.google.com/spanner/docs/graph/graph-with-views-how-to\t2026-10-01T01:24:07Z\n-https://docs.cloud.google.com/spanner/docs/graph/graph-with-views-overview\t2026-10-01T01:24:07Z\n+https://docs.cloud.google.com/spanner/docs/graph/graph-with-views-how-to\t2026-10-27T15:38:01Z\n+https://docs.cloud.google.com/spanner/docs/graph/graph-with-views-overview\t2026-10-27T15:38:01Z\n https://docs.cloud.google.com/spanner/docs/graph/insert-update-delete-data\t2026-10-01T01:24:07Z\n https://docs.cloud.google.com/spanner/docs/graph/iso-standards\t2026-10-01T01:24:07Z\n https://docs.cloud.google.com/spanner/docs/graph/manage-schemaless-data\t2026-10-15T23:20:30Z\n@@ -329,12 +330,12 @@ https://docs.cloud.google.com/spanner/docs/import-database-cloudsql\t2026-10-07T0\n https://docs.cloud.google.com/spanner/docs/import-export-csv\t2026-10-07T09:39:33Z\n https://docs.cloud.google.com/spanner/docs/import-export-overview\t2026-10-07T09:39:33Z\n https://docs.cloud.google.com/spanner/docs/import-non-spanner\t2026-10-07T09:39:33Z\n-https://docs.cloud.google.com/spanner/docs/index-advisor\t2026-10-07T09:39:33Z\n+https://docs.cloud.google.com/spanner/docs/index-advisor\t2026-10-24T22:46:36Z\n https://docs.cloud.google.com/spanner/docs/index-geo-partitioning\t2026-10-07T09:39:33Z\n-https://docs.cloud.google.com/spanner/docs/information-schema\t2026-10-10T21:27:06Z\n-https://docs.cloud.google.com/spanner/docs/information-schema-pg\t2026-10-10T21:27:06Z\n+https://docs.cloud.google.com/spanner/docs/information-schema\t2026-10-27T05:00:12Z\n+https://docs.cloud.google.com/spanner/docs/information-schema-pg\t2026-10-27T05:00:12Z\n https://docs.cloud.google.com/spanner/docs/install-mysql-functions\t2026-10-07T09:39:33Z\n-https://docs.cloud.google.com/spanner/docs/instance-configurations\t2026-10-15T15:51:06Z\n+https://docs.cloud.google.com/spanner/docs/instance-configurations\t2026-10-27T23:31:29Z\n https://docs.cloud.google.com/spanner/docs/instances\t2026-10-07T09:39:33Z\n https://docs.cloud.google.com/spanner/docs/integrate-google-cloud-platform\t2026-10-07T09:39:33Z\n https://docs.cloud.google.com/spanner/docs/introspection\t2026-10-07T09:40:19Z\n@@ -347,7 +348,7 @@ https://docs.cloud.google.com/spanner/docs/introspection/oldest-active-queries\t2\n https://docs.cloud.google.com/spanner/docs/introspection/query-statistics\t2026-10-07T09:39:54Z\n https://docs.cloud.google.com/spanner/docs/introspection/read-statistics\t2026-10-07T09:39:54Z\n https://docs.cloud.google.com/spanner/docs/introspection/table-operations-statistics\t2026-10-07T09:39:54Z\n-https://docs.cloud.google.com/spanner/docs/introspection/table-sizes-statistics\t2026-10-07T09:39:54Z\n+https://docs.cloud.google.com/spanner/docs/introspection/table-sizes-statistics\t2026-10-27T21:34:32Z\n https://docs.cloud.google.com/spanner/docs/introspection/transaction-statistics\t2026-10-21T18:11:27Z\n https://docs.cloud.google.com/spanner/docs/introspection/troubleshooting-with-tags\t2026-10-07T09:39:54Z\n https://docs.cloud.google.com/spanner/docs/introspection/vector-index-statistics\t2026-10-01T01:24:07Z\n@@ -373,7 +374,7 @@ https://docs.cloud.google.com/spanner/docs/manage-data-using-console\t2026-10-07T\n https://docs.cloud.google.com/spanner/docs/managed-autoscaler\t2026-10-07T09:39:33Z\n https://docs.cloud.google.com/spanner/docs/manual-data-compaction\t2026-10-14T19:24:59Z\n https://docs.cloud.google.com/spanner/docs/media\t2026-10-07T09:39:33Z\n-https://docs.cloud.google.com/spanner/docs/metrics\t2026-10-15T13:37:48Z\n+https://docs.cloud.google.com/spanner/docs/metrics\t2026-10-23T13:31:25Z\n https://docs.cloud.google.com/spanner/docs/migrate-mysql-schema\t2026-10-07T09:39:33Z\n https://docs.cloud.google.com/spanner/docs/migrate-spanner-pg-to-pg-database\t2026-10-07T09:39:33Z\n https://docs.cloud.google.com/spanner/docs/migrating-dynamodb-to-cloud-spanner\t2026-10-07T09:39:33Z\n@@ -395,11 +396,11 @@ https://docs.cloud.google.com/spanner/docs/modify-gcloud\t2026-10-07T09:39:39Z\n https://docs.cloud.google.com/spanner/docs/modify-mutation-api\t2026-10-07T09:39:39Z\n https://docs.cloud.google.com/spanner/docs/modifying-leader-region\t2026-10-07T09:39:39Z\n https://docs.cloud.google.com/spanner/docs/monitor-active-queries\t2026-10-07T09:39:39Z\n-https://docs.cloud.google.com/spanner/docs/monitor-columnar-engine\t2026-10-07T09:39:39Z\n+https://docs.cloud.google.com/spanner/docs/monitor-columnar-engine\t2026-10-27T21:34:32Z\n https://docs.cloud.google.com/spanner/docs/monitor-troubleshoot-with-ai\t2026-10-07T09:39:39Z\n https://docs.cloud.google.com/spanner/docs/monitoring-cloud\t2026-10-07T09:39:39Z\n https://docs.cloud.google.com/spanner/docs/monitoring-console\t2026-10-07T09:39:39Z\n-https://docs.cloud.google.com/spanner/docs/move-instance\t2026-10-07T09:39:39Z\n+https://docs.cloud.google.com/spanner/docs/move-instance\t2026-10-23T09:34:41Z\n https://docs.cloud.google.com/spanner/docs/mysql-configure-fallback\t2026-10-12T21:46:24Z\n https://docs.cloud.google.com/spanner/docs/mysql-fallback\t2026-10-12T21:46:24Z\n https://docs.cloud.google.com/spanner/docs/mysql-live-data-migration\t2026-10-12T21:46:24Z\n@@ -413,7 +414,7 @@ https://docs.cloud.google.com/spanner/docs/open-source-jdbc\t2026-10-07T09:39:39Z\n https://docs.cloud.google.com/spanner/docs/optimize-schema-performance\t2026-10-07T09:39:39Z\n https://docs.cloud.google.com/spanner/docs/org-policy-violations\t2026-10-07T09:39:39Z\n https://docs.cloud.google.com/spanner/docs/partners/looker\t2026-10-07T09:39:54Z\n-https://docs.cloud.google.com/spanner/docs/performance\t2026-10-07T09:39:39Z\n+https://docs.cloud.google.com/spanner/docs/performance\t2026-10-24T22:46:36Z\n https://docs.cloud.google.com/spanner/docs/pg-jdbc-connect\t2026-10-07T09:39:39Z\n https://docs.cloud.google.com/spanner/docs/pg-node-postgres-connect\t2026-10-07T09:39:39Z\n https://docs.cloud.google.com/spanner/docs/pg-pgx-connect\t2026-10-07T09:39:39Z\n@@ -436,7 +437,7 @@ https://docs.cloud.google.com/spanner/docs/psql-commands\t2026-10-07T09:39:39Z\n https://docs.cloud.google.com/spanner/docs/psql-connect\t2026-10-07T09:39:39Z\n https://docs.cloud.google.com/spanner/docs/query-columnar-data\t2026-10-07T09:39:39Z\n https://docs.cloud.google.com/spanner/docs/query-execution-operators\t2026-10-07T09:39:39Z\n-https://docs.cloud.google.com/spanner/docs/query-execution-plans\t2026-10-07T09:39:39Z\n+https://docs.cloud.google.com/spanner/docs/query-execution-plans\t2026-10-26T14:30:56Z\n https://docs.cloud.google.com/spanner/docs/query-operators-array-subqueries\t2026-10-07T09:39:39Z\n https://docs.cloud.google.com/spanner/docs/query-operators-binary\t2026-10-07T09:39:39Z\n https://docs.cloud.google.com/spanner/docs/query-operators-distributed\t2026-10-07T09:39:39Z\n@@ -449,6 +450,8 @@ https://docs.cloud.google.com/spanner/docs/query-optimizer/manage-query-optimize\n https://docs.cloud.google.com/spanner/docs/query-optimizer/overview\t2026-10-07T09:39:54Z\n https://docs.cloud.google.com/spanner/docs/query-optimizer/version-statistics\t2026-10-07T09:39:54Z\n https://docs.cloud.google.com/spanner/docs/query-optimizer/versions\t2026-10-07T09:39:54Z\n+https://docs.cloud.google.com/spanner/docs/query-plan-visualizer-overview\t2026-10-24T22:45:44Z\n+https://docs.cloud.google.com/spanner/docs/query-tuning\t2026-10-24T22:45:57Z\n https://docs.cloud.google.com/spanner/docs/querydata\t2026-10-12T21:03:27Z\n https://docs.cloud.google.com/spanner/docs/queues/queues-at-most-once\t2026-10-07T09:39:54Z\n https://docs.cloud.google.com/spanner/docs/queues/queues-examples\t2026-10-07T09:40:30Z\n@@ -500,13 +503,13 @@ https://docs.cloud.google.com/spanner/docs/reference/mysql/timestamp_functions\t2\n https://docs.cloud.google.com/spanner/docs/reference/mysql/user_defined_functions_all\t2026-10-07T09:40:30Z\n https://docs.cloud.google.com/spanner/docs/reference/mysql/utility_functions\t2026-10-07T09:40:30Z\n https://docs.cloud.google.com/spanner/docs/reference/postgresql/arrays\t2026-10-07T09:40:30Z\n-https://docs.cloud.google.com/spanner/docs/reference/postgresql/data-definition-language\t2026-10-07T09:40:30Z\n+https://docs.cloud.google.com/spanner/docs/reference/postgresql/data-definition-language\t2026-10-27T05:00:12Z\n https://docs.cloud.google.com/spanner/docs/reference/postgresql/data-types\t2026-10-07T09:40:30Z\n https://docs.cloud.google.com/spanner/docs/reference/postgresql/dml-syntax\t2026-10-07T09:40:30Z\n https://docs.cloud.google.com/spanner/docs/reference/postgresql/functions\t2026-10-20T16:05:28Z\n https://docs.cloud.google.com/spanner/docs/reference/postgresql/known-issues-postgresql-interface\t2026-10-20T16:05:28Z\n https://docs.cloud.google.com/spanner/docs/reference/postgresql/lexical\t2026-10-07T09:40:30Z\n-https://docs.cloud.google.com/spanner/docs/reference/postgresql/operators\t2026-10-07T09:40:30Z\n+https://docs.cloud.google.com/spanner/docs/reference/postgresql/operators\t2026-10-28T01:23:45Z\n https://docs.cloud.google.com/spanner/docs/reference/postgresql/overview\t2026-10-07T09:40:30Z\n https://docs.cloud.google.com/spanner/docs/reference/postgresql/pg-system-catalog-tables\t2026-10-07T09:40:30Z\n https://docs.cloud.google.com/spanner/docs/reference/postgresql/pg-system-catalog-views\t2026-10-07T09:40:30Z\n@@ -695,8 +698,8 @@ https://docs.cloud.google.com/spanner/docs/reference/standard-sql/collation-conc\n https://docs.cloud.google.com/spanner/docs/reference/standard-sql/compression-functions\t2026-10-01T01:24:09Z\n https://docs.cloud.google.com/spanner/docs/reference/standard-sql/conditional_expressions\t2026-10-08T18:27:29Z\n https://docs.cloud.google.com/spanner/docs/reference/standard-sql/conversion_functions\t2026-10-10T21:29:04Z\n-https://docs.cloud.google.com/spanner/docs/reference/standard-sql/conversion_rules\t2026-10-08T19:54:18Z\n-https://docs.cloud.google.com/spanner/docs/reference/standard-sql/data-definition-language\t2026-10-01T01:23:56Z\n+https://docs.cloud.google.com/spanner/docs/reference/standard-sql/conversion_rules\t2026-10-28T00:26:28Z\n+https://docs.cloud.google.com/spanner/docs/reference/standard-sql/data-definition-language\t2026-10-27T05:00:12Z\n https://docs.cloud.google.com/spanner/docs/reference/standard-sql/data-types\t2026-10-08T19:54:18Z\n https://docs.cloud.google.com/spanner/docs/reference/standard-sql/date_functions\t2026-10-01T01:23:56Z\n https://docs.cloud.google.com/spanner/docs/reference/standard-sql/debugging_functions\t2026-10-01T01:23:56Z\n@@ -709,16 +712,16 @@ https://docs.cloud.google.com/spanner/docs/reference/standard-sql/graph-data-typ\n https://docs.cloud.google.com/spanner/docs/reference/standard-sql/graph-gql-functions\t2026-10-01T01:23:56Z\n https://docs.cloud.google.com/spanner/docs/reference/standard-sql/graph-intro\t2026-10-01T01:23:56Z\n https://docs.cloud.google.com/spanner/docs/reference/standard-sql/graph-operators\t2026-10-01T01:23:56Z\n-https://docs.cloud.google.com/spanner/docs/reference/standard-sql/graph-patterns\t2026-10-01T01:23:56Z\n+https://docs.cloud.google.com/spanner/docs/reference/standard-sql/graph-patterns\t2026-10-26T22:50:59Z\n https://docs.cloud.google.com/spanner/docs/reference/standard-sql/graph-query-statements\t2026-10-19T19:31:07Z\n-https://docs.cloud.google.com/spanner/docs/reference/standard-sql/graph-schema-statements\t2026-10-01T01:23:56Z\n+https://docs.cloud.google.com/spanner/docs/reference/standard-sql/graph-schema-statements\t2026-10-27T15:38:01Z\n https://docs.cloud.google.com/spanner/docs/reference/standard-sql/graph-sql-functions\t2026-10-01T01:23:56Z\n https://docs.cloud.google.com/spanner/docs/reference/standard-sql/graph-sql-queries\t2026-10-01T01:23:56Z\n https://docs.cloud.google.com/spanner/docs/reference/standard-sql/graph-subqueries\t2026-10-01T01:23:56Z\n https://docs.cloud.google.com/spanner/docs/reference/standard-sql/hash_functions\t2026-10-15T14:49:58Z\n https://docs.cloud.google.com/spanner/docs/reference/standard-sql/hll_functions\t2026-10-20T16:01:44Z\n https://docs.cloud.google.com/spanner/docs/reference/standard-sql/interval_functions\t2026-10-01T01:23:56Z\n-https://docs.cloud.google.com/spanner/docs/reference/standard-sql/json_functions\t2026-10-01T01:23:56Z\n+https://docs.cloud.google.com/spanner/docs/reference/standard-sql/json_functions\t2026-10-28T00:26:28Z\n https://docs.cloud.google.com/spanner/docs/reference/standard-sql/lexical\t2026-10-01T01:23:56Z\n https://docs.cloud.google.com/spanner/docs/reference/standard-sql/mathematical_functions\t2026-10-01T01:23:56Z\n https://docs.cloud.google.com/spanner/docs/reference/standard-sql/ml-functions\t2026-10-01T01:23:56Z\n@@ -730,8 +733,8 @@ https://docs.cloud.google.com/spanner/docs/reference/standard-sql/pipe-syntax-gu\n https://docs.cloud.google.com/spanner/docs/reference/standard-sql/procedural-language\t2026-10-01T01:23:56Z\n https://docs.cloud.google.com/spanner/docs/reference/standard-sql/protocol-buffers\t2026-10-01T01:23:56Z\n https://docs.cloud.google.com/spanner/docs/reference/standard-sql/protocol_buffer_functions\t2026-10-01T01:23:56Z\n-https://docs.cloud.google.com/spanner/docs/reference/standard-sql/query-syntax\t2026-10-01T01:23:56Z\n-https://docs.cloud.google.com/spanner/docs/reference/standard-sql/search_functions\t2026-10-21T00:09:18Z\n+https://docs.cloud.google.com/spanner/docs/reference/standard-sql/query-syntax\t2026-10-28T00:26:28Z\n+https://docs.cloud.google.com/spanner/docs/reference/standard-sql/search_functions\t2026-10-23T08:15:44Z\n https://docs.cloud.google.com/spanner/docs/reference/standard-sql/security_functions\t2026-10-06T21:47:46Z\n https://docs.cloud.google.com/spanner/docs/reference/standard-sql/sequence_functions\t2026-10-01T01:23:56Z\n https://docs.cloud.google.com/spanner/docs/reference/standard-sql/sketches\t2026-10-20T16:01:44Z\n@@ -839,14 +842,14 @@ https://docs.cloud.google.com/spanner/docs/samples/spanner-update-data-with-time\n https://docs.cloud.google.com/spanner/docs/samples/spanner-update-graph-data-with-dml\t2026-10-01T01:24:24Z\n https://docs.cloud.google.com/spanner/docs/samples/spanner-update-graph-data-with-graph-query-in-dml\t2026-10-01T01:24:24Z\n https://docs.cloud.google.com/spanner/docs/samples/spanner-write-data-for-struct-queries\t2026-10-01T01:24:24Z\n-https://docs.cloud.google.com/spanner/docs/saved-queries\t2026-10-07T09:40:03Z\n+https://docs.cloud.google.com/spanner/docs/saved-queries\t2026-10-23T06:22:23Z\n https://docs.cloud.google.com/spanner/docs/schema-and-data-model\t2026-10-07T09:40:03Z\n https://docs.cloud.google.com/spanner/docs/schema-design\t2026-10-07T09:40:03Z\n https://docs.cloud.google.com/spanner/docs/schema-drop-protection\t2026-10-01T01:24:59Z\n https://docs.cloud.google.com/spanner/docs/schema-migration\t2026-10-07T09:40:03Z\n https://docs.cloud.google.com/spanner/docs/schema-updates\t2026-10-07T09:40:03Z\n https://docs.cloud.google.com/spanner/docs/schema-updates-best-practices\t2026-10-07T09:40:03Z\n-https://docs.cloud.google.com/spanner/docs/secondary-indexes\t2026-10-07T09:40:03Z\n+https://docs.cloud.google.com/spanner/docs/secondary-indexes\t2026-10-24T22:46:36Z\n https://docs.cloud.google.com/spanner/docs/secure-agent-interactions-mcp\t2026-10-07T09:40:03Z\n https://docs.cloud.google.com/spanner/docs/security-privacy-compliance\t2026-09-19T08:28:30Z\n https://docs.cloud.google.com/spanner/docs/sequence-tasks\t2026-10-07T09:40:03Z\n@@ -862,8 +865,8 @@ https://docs.cloud.google.com/spanner/docs/spanner-ai-overview\t2026-10-07T09:40:\n https://docs.cloud.google.com/spanner/docs/spanner-cli\t2026-10-07T09:40:03Z\n https://docs.cloud.google.com/spanner/docs/spanner-cli-commands\t2026-10-07T09:40:03Z\n https://docs.cloud.google.com/spanner/docs/spanner-custom-constraints\t2026-10-06T17:11:33Z\n-https://docs.cloud.google.com/spanner/docs/sql-best-practices\t2026-10-07T09:40:03Z\n-https://docs.cloud.google.com/spanner/docs/statement-timeout\t2026-10-07T09:40:03Z\n+https://docs.cloud.google.com/spanner/docs/sql-best-practices\t2026-10-24T22:45:57Z\n+https://docs.cloud.google.com/spanner/docs/statement-timeout\t2026-10-23T08:18:29Z\n https://docs.cloud.google.com/spanner/docs/storage-utilization\t2026-10-07T09:40:03Z\n https://docs.cloud.google.com/spanner/docs/storing-numeric-data\t2026-10-07T09:40:03Z\n https://docs.cloud.google.com/spanner/docs/structs\t2026-10-07T09:40:03Z\n@@ -877,7 +880,7 @@ https://docs.cloud.google.com/spanner/docs/tracing-overview\t2026-10-07T09:40:03Z\n https://docs.cloud.google.com/spanner/docs/transaction-timeout\t2026-10-07T09:40:03Z\n https://docs.cloud.google.com/spanner/docs/transactions\t2026-10-07T09:43:42Z\n https://docs.cloud.google.com/spanner/docs/troubleshoot-vector-search\t2026-10-07T09:43:42Z\n-https://docs.cloud.google.com/spanner/docs/troubleshooting-performance-regressions\t2026-10-07T09:43:42Z\n+https://docs.cloud.google.com/spanner/docs/troubleshooting-query-performance-regressions\t2026-10-24T22:46:36Z\n https://docs.cloud.google.com/spanner/docs/true-time-external-consistency\t2026-10-07T09:43:42Z\n https://docs.cloud.google.com/spanner/docs/ttl\t2026-10-07T09:43:42Z\n https://docs.cloud.google.com/spanner/docs/ttl/monitoring-and-metrics\t2026-10-07T09:42:01Z\n@@ -900,7 +903,7 @@ https://docs.cloud.google.com/spanner/docs/use-mybatis-spring-boot-googlesql\t202\n https://docs.cloud.google.com/spanner/docs/use-mybatis-spring-boot-postgresql\t2026-10-07T09:43:42Z\n https://docs.cloud.google.com/spanner/docs/use-oss-jdbc\t2026-10-07T09:43:42Z\n https://docs.cloud.google.com/spanner/docs/use-oss-r2dbc\t2026-10-07T09:43:42Z\n-https://docs.cloud.google.com/spanner/docs/use-pitr\t2026-10-07T09:43:42Z\n+https://docs.cloud.google.com/spanner/docs/use-pitr\t2026-10-26T03:48:33Z\n https://docs.cloud.google.com/spanner/docs/use-repeatable-read-isolation\t2026-10-01T01:32:44Z\n https://docs.cloud.google.com/spanner/docs/use-select-for-update-repeatable-read\t2026-10-01T01:32:44Z\n https://docs.cloud.google.com/spanner/docs/use-select-for-update-serializable\t2026-10-01T01:32:44Z\n@@ -927,7 +930,7 @@ https://docs.cloud.google.com/spanner/docs/whitepapers/life-of-query\t2026-10-07T\n https://docs.cloud.google.com/spanner/docs/whitepapers/life-of-reads-and-writes\t2026-10-07T09:42:01Z\n https://docs.cloud.google.com/spanner/docs/whitepapers/optimizing-schema-design\t2026-10-07T09:42:01Z\n https://docs.cloud.google.com/spanner/docs/working-with-json\t2026-10-13T01:17:55Z\n-https://docs.cloud.google.com/spanner/docs/working-with-jsonb\t2026-10-13T01:17:55Z\n+https://docs.cloud.google.com/spanner/docs/working-with-jsonb\t2026-10-28T01:23:45Z\n https://docs.cloud.google.com/spanner/docs/working-with-numerics\t2026-10-07T09:43:42Z\n https://docs.cloud.google.com/spanner/docs/write-hibernate-app\t2026-10-07T09:41:07Z\n https://docs.cloud.google.com/spanner/docs/write-spring-boot-app\t2026-10-07T09:41:07Z"
+    },
+    {
+      "sha": "da262d535dcd104d586f51916da396ee08568c09",
+      "filename": "metadata.yaml",
+      "status": "modified",
+      "additions": 2,
+      "deletions": 2,
+      "changes": 4,
+      "blob_url": "https://github.com/apstndb/spanner-docs-mirror/blob/6d7397601456dc5602c0926d254424f64643a64f/metadata.yaml",
+      "raw_url": "https://github.com/apstndb/spanner-docs-mirror/raw/6d7397601456dc5602c0926d254424f64643a64f/metadata.yaml",
+      "contents_url": "https://api.github.com/repos/apstndb/spanner-docs-mirror/contents/metadata.yaml?ref=6d7397601456dc5602c0926d254424f64643a64f",
+      "patch": "@@ -1,2 +1,2 @@\n-file_count: 936\n-last_sync: 2026-10-22T18:01:39Z\n+file_count: 939\n+last_sync: 2026-10-28T18:01:49Z"
+    }
+  ],
+  "release_feed": {
+    "updated": "2026-10-20T00:00:00-07:00",
+    "latest_title": "October 20, 2026",
+    "latest_updated": "2026-10-20T00:00:00-07:00",
+    "scope": "Current live HTML, API and Atom feed latest dated entry remains October 20; no release introduction date inferred for later document edits."
+  },
+  "live_code_extraction": [
+    {
+      "source": "search-functions.html",
+      "code_blocks": 58,
+      "extracted_file": "search-functions.html.codes.txt",
+      "extracted_sha256": "eccdd43f0f743ceede523656aff08210220409cdeb6b38e789434ed638f07d91"
+    },
+    {
+      "source": "databoost-monitor.html",
+      "code_blocks": 3,
+      "extracted_file": "databoost-monitor.html.codes.txt",
+      "extracted_sha256": "6906c34f24b075b71bdeee9082b2774311a5f792da510158bdd45be1fa02ab8c"
+    }
+  ],
+  "scope_notes": [
+    "Mirror commit time is a documentation capture time, not managed deployment time.",
+    "BATCH_OPERATIONS and 15 new statistics columns are additional runtime catalog observations, not names introduced in the inspected document diffs.",
+    "Omni and Emulator execution is not included."
+  ]
+}

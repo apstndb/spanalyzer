@@ -1,0 +1,10 @@
+from pathlib import Path
+from concurrent.futures import ThreadPoolExecutor
+import datetime,hashlib,json,subprocess
+s=Path('<LOCAL_CHECKOUT>/.tmp/emulator-open-issues-20261030');out=Path('<LOCAL_TASK_ROOT>/apstndb/spanalyzer/emulator-open-issues-20261030');pages=json.loads((s/'issues-pages.json').read_text());issues=[x for page in pages for x in page if 'pull_request'not in x]
+def comments(issue):
+ if not issue['comments']:return issue['number'],[]
+ cmd=['gh','api','--paginate','--slurp',f"repos/GoogleCloudPlatform/cloud-spanner-emulator/issues/{issue['number']}/comments?per_page=100"]
+ r=subprocess.run(cmd,capture_output=True,text=True);assert r.returncode==0,(issue['number'],r.stderr);cp=json.loads(r.stdout);rows=[x for page in cp for x in page];assert len(rows)==issue['comments'],(issue['number'],len(rows),issue['comments']);return issue['number'],rows
+with ThreadPoolExecutor(max_workers=4)as pool:cs=dict(pool.map(comments,issues))
+q='{ repository(owner:"GoogleCloudPlatform",name:"cloud-spanner-emulator") { issues(states:OPEN) { totalCount } } }';r=subprocess.run(['gh','api','graphql','-f','query='+q],capture_output=True,text=True);assert r.returncode==0,r.stderr;count=json.loads(r.stdout)['data']['repository']['issues']['totalCount'];assert count==len(issues),(count,len(issues));snapshot={'observed_at':datetime.datetime.now(datetime.timezone.utc).isoformat(),'repository':'GoogleCloudPlatform/cloud-spanner-emulator','state':'open','graphql_total_count':count,'rest_pages':len(pages),'comments':sum(len(x)for x in cs.values()),'issues':[{'issue':x,'comments':cs[x['number']]}for x in issues]};out.joinpath('open-issues.json').write_text(json.dumps(snapshot,indent=2)+'\n');out.joinpath('fetch.py.txt').write_bytes(Path(__file__).read_bytes());out.joinpath('issues-pages.json').write_bytes(s.joinpath('issues-pages.json').read_bytes());print(json.dumps({k:v for k,v in snapshot.items()if k!='issues'}))

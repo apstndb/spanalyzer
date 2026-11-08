@@ -1,0 +1,817 @@
+[
+  {
+    "name": "preflight",
+    "started_at": "2026-10-23T14:27:00.724800+00:00",
+    "completed_at": "2026-10-23T14:27:02.149193+00:00",
+    "exit_code": 0,
+    "seconds": 1.424,
+    "argv": [
+      "<LOCAL_HOME>/.agents/skills/apstndb-spanner-syntax-verify/scripts/run-managed-spanner.sh",
+      "--execute",
+      "SELECT 1 AS ready",
+      "--timeout",
+      "30s"
+    ],
+    "cwd": "<LOCAL_CHECKOUT>",
+    "gowork": "off"
+  },
+  {
+    "name": "infoschema",
+    "started_at": "2026-10-23T14:27:02.149512+00:00",
+    "completed_at": "2026-10-23T14:27:09.356745+00:00",
+    "exit_code": 0,
+    "seconds": 7.207,
+    "argv": [
+      "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go",
+      "run",
+      "./cmd/infoschema-capture",
+      "check",
+      "--target",
+      "managed",
+      "--repo-root",
+      "..",
+      "--observations",
+      "3"
+    ],
+    "cwd": "<LOCAL_CHECKOUT>/survey",
+    "gowork": "off"
+  },
+  {
+    "name": "spanner-sys",
+    "started_at": "2026-10-23T14:27:09.357011+00:00",
+    "completed_at": "2026-10-23T14:27:12.522179+00:00",
+    "exit_code": 0,
+    "seconds": 3.165,
+    "argv": [
+      "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go",
+      "run",
+      "./cmd/spanner-sys-capture",
+      "check",
+      "--target",
+      "managed",
+      "--repo-root",
+      ".."
+    ],
+    "cwd": "<LOCAL_CHECKOUT>/survey",
+    "gowork": "off"
+  },
+  {
+    "name": "spanner-sys-2",
+    "started_at": "2026-10-23T14:27:12.522408+00:00",
+    "completed_at": "2026-10-23T14:27:14.174045+00:00",
+    "exit_code": 0,
+    "seconds": 1.652,
+    "argv": [
+      "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go",
+      "run",
+      "./cmd/spanner-sys-capture",
+      "check",
+      "--target",
+      "managed",
+      "--repo-root",
+      ".."
+    ],
+    "cwd": "<LOCAL_CHECKOUT>/survey",
+    "gowork": "off"
+  },
+  {
+    "name": "spanner-sys-3",
+    "started_at": "2026-10-23T14:27:14.174292+00:00",
+    "completed_at": "2026-10-23T14:27:15.501765+00:00",
+    "exit_code": 0,
+    "seconds": 1.327,
+    "argv": [
+      "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go",
+      "run",
+      "./cmd/spanner-sys-capture",
+      "check",
+      "--target",
+      "managed",
+      "--repo-root",
+      ".."
+    ],
+    "cwd": "<LOCAL_CHECKOUT>/survey",
+    "gowork": "off"
+  },
+  {
+    "name": "infoschema-capture",
+    "started_at": "2026-10-23T14:27:15.501990+00:00",
+    "completed_at": "2026-10-23T14:27:17.433408+00:00",
+    "exit_code": 0,
+    "seconds": 1.931,
+    "argv": [
+      "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go",
+      "run",
+      "./cmd/infoschema-capture",
+      "--target",
+      "managed",
+      "--repo-root",
+      "..",
+      "--write"
+    ],
+    "cwd": "<LOCAL_CHECKOUT>/survey",
+    "gowork": "off"
+  },
+  {
+    "name": "spanner-sys-capture",
+    "started_at": "2026-10-23T14:27:17.433705+00:00",
+    "completed_at": "2026-10-23T14:27:18.643091+00:00",
+    "exit_code": 0,
+    "seconds": 1.209,
+    "argv": [
+      "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go",
+      "run",
+      "./cmd/spanner-sys-capture",
+      "--target",
+      "managed",
+      "--repo-root",
+      "..",
+      "--write"
+    ],
+    "cwd": "<LOCAL_CHECKOUT>/survey",
+    "gowork": "off"
+  },
+  {
+    "name": "managed-tests",
+    "started_at": "2026-10-23T14:27:18.643436+00:00",
+    "completed_at": "2026-10-23T14:29:24.403834+00:00",
+    "exit_code": 1,
+    "seconds": 125.76,
+    "argv": [
+      "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go",
+      "test",
+      "-count=1",
+      "-v",
+      "-timeout=15m",
+      "-run",
+      "Test(CanonicalDDL_RealSpanner|Drift_RealTableMetas|ExpressionIndex_RealSpanner|UUID_RealSpanner)$",
+      "./infoschem"
+    ],
+    "cwd": "<LOCAL_CHECKOUT>/survey",
+    "gowork": "off"
+  },
+  {
+    "name": "readonly",
+    "started_at": "2026-10-23T14:29:24.404366+00:00",
+    "completed_at": "2026-10-23T14:29:32.337527+00:00",
+    "exit_code": 0,
+    "seconds": 7.933,
+    "argv": [
+      "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go",
+      "run",
+      "<LOCAL_CHECKOUT>/.tmp/managed-recheck-20261023/readonly.go"
+    ],
+    "cwd": "<LOCAL_CHECKOUT>/survey",
+    "gowork": "off"
+  },
+  {
+    "name": "active-batch",
+    "started_at": "2026-10-23T14:29:32.338030+00:00",
+    "completed_at": "2026-10-23T14:29:35.278526+00:00",
+    "exit_code": 0,
+    "seconds": 2.941,
+    "argv": [
+      "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go",
+      "run",
+      "<LOCAL_CHECKOUT>/.tmp/managed-recheck-20261023/active-batch.go"
+    ],
+    "cwd": "<LOCAL_CHECKOUT>/survey",
+    "gowork": "off"
+  },
+  {
+    "name": "google-features-build",
+    "started_at": "2026-10-23T14:29:35.279011+00:00",
+    "completed_at": "2026-10-23T14:29:36.861480+00:00",
+    "exit_code": 0,
+    "seconds": 1.582,
+    "argv": [
+      "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go",
+      "build",
+      "-o",
+      "<LOCAL_CHECKOUT>/.tmp/managed-recheck-20261023/google-features",
+      "<LOCAL_CHECKOUT>/.tmp/managed-recheck-20261023/google-features.go"
+    ],
+    "cwd": "<LOCAL_CHECKOUT>/tools",
+    "gowork": "<LOCAL_CHECKOUT>/go.work"
+  },
+  {
+    "name": "google-features-buildinfo",
+    "started_at": "2026-10-23T14:29:36.861778+00:00",
+    "completed_at": "2026-10-23T14:29:36.874166+00:00",
+    "exit_code": 0,
+    "seconds": 0.012,
+    "argv": [
+      "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go",
+      "version",
+      "-m",
+      "<LOCAL_CHECKOUT>/.tmp/managed-recheck-20261023/google-features"
+    ],
+    "cwd": "<LOCAL_CHECKOUT>/tools",
+    "gowork": "<LOCAL_CHECKOUT>/go.work"
+  },
+  {
+    "name": "pg-features-build",
+    "started_at": "2026-10-23T14:29:36.874421+00:00",
+    "completed_at": "2026-10-23T14:29:37.670748+00:00",
+    "exit_code": 0,
+    "seconds": 0.796,
+    "argv": [
+      "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go",
+      "build",
+      "-o",
+      "<LOCAL_CHECKOUT>/.tmp/managed-recheck-20261023/pg-features",
+      "<LOCAL_CHECKOUT>/.tmp/managed-recheck-20261023/pg-features.go"
+    ],
+    "cwd": "<LOCAL_CHECKOUT>/tools",
+    "gowork": "<LOCAL_CHECKOUT>/go.work"
+  },
+  {
+    "name": "pg-features-buildinfo",
+    "started_at": "2026-10-23T14:29:37.671063+00:00",
+    "completed_at": "2026-10-23T14:29:37.683935+00:00",
+    "exit_code": 0,
+    "seconds": 0.013,
+    "argv": [
+      "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go",
+      "version",
+      "-m",
+      "<LOCAL_CHECKOUT>/.tmp/managed-recheck-20261023/pg-features"
+    ],
+    "cwd": "<LOCAL_CHECKOUT>/tools",
+    "gowork": "<LOCAL_CHECKOUT>/go.work"
+  },
+  {
+    "name": "queue-build",
+    "started_at": "2026-10-23T14:29:37.684225+00:00",
+    "completed_at": "2026-10-23T14:29:38.501483+00:00",
+    "exit_code": 0,
+    "seconds": 0.817,
+    "argv": [
+      "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go",
+      "build",
+      "-o",
+      "<LOCAL_CHECKOUT>/.tmp/managed-recheck-20261023/queue",
+      "<LOCAL_CHECKOUT>/.tmp/managed-recheck-20261023/queue.go"
+    ],
+    "cwd": "<LOCAL_CHECKOUT>/tools",
+    "gowork": "<LOCAL_CHECKOUT>/go.work"
+  },
+  {
+    "name": "queue-buildinfo",
+    "started_at": "2026-10-23T14:29:38.501792+00:00",
+    "completed_at": "2026-10-23T14:29:38.513904+00:00",
+    "exit_code": 0,
+    "seconds": 0.012,
+    "argv": [
+      "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go",
+      "version",
+      "-m",
+      "<LOCAL_CHECKOUT>/.tmp/managed-recheck-20261023/queue"
+    ],
+    "cwd": "<LOCAL_CHECKOUT>/tools",
+    "gowork": "<LOCAL_CHECKOUT>/go.work"
+  },
+  {
+    "name": "google-features",
+    "started_at": "2026-10-23T14:29:38.514121+00:00",
+    "completed_at": "2026-10-23T14:31:56.515233+00:00",
+    "exit_code": 0,
+    "seconds": 138.001,
+    "argv": [
+      "<LOCAL_CHECKOUT>/.tmp/managed-recheck-20261023/google-features"
+    ],
+    "cwd": "<LOCAL_CHECKOUT>/tools",
+    "gowork": "<LOCAL_CHECKOUT>/go.work"
+  },
+  {
+    "name": "pg-features",
+    "started_at": "2026-10-23T14:31:56.515762+00:00",
+    "completed_at": "2026-10-23T14:33:23.710650+00:00",
+    "exit_code": 0,
+    "seconds": 87.195,
+    "argv": [
+      "<LOCAL_CHECKOUT>/.tmp/managed-recheck-20261023/pg-features"
+    ],
+    "cwd": "<LOCAL_CHECKOUT>/tools",
+    "gowork": "<LOCAL_CHECKOUT>/go.work"
+  },
+  {
+    "name": "json-preflight",
+    "started_at": "2026-10-23T14:32:36.228851+00:00",
+    "completed_at": "2026-10-23T14:32:36.808900+00:00",
+    "exit_code": 0,
+    "seconds": 0.58,
+    "argv": [
+      "<LOCAL_HOME>/.agents/skills/apstndb-spanner-syntax-verify/scripts/run-managed-spanner.sh",
+      "--execute",
+      "SELECT 1 AS ready",
+      "--timeout",
+      "30s"
+    ],
+    "cwd": "<LOCAL_CHECKOUT>",
+    "gowork": "off"
+  },
+  {
+    "name": "query-build",
+    "started_at": "2026-10-23T14:32:36.809249+00:00",
+    "completed_at": "2026-10-23T14:32:39.228691+00:00",
+    "exit_code": 0,
+    "seconds": 2.419,
+    "argv": [
+      "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go",
+      "build",
+      "-o",
+      "<LOCAL_CHECKOUT>/.tmp/managed-recheck-20261023/query",
+      "<LOCAL_CHECKOUT>/.tmp/managed-recheck-20261023/query.go"
+    ],
+    "cwd": "<LOCAL_CHECKOUT>/tools",
+    "gowork": "<LOCAL_CHECKOUT>/go.work"
+  },
+  {
+    "name": "query-buildinfo",
+    "started_at": "2026-10-23T14:32:39.228902+00:00",
+    "completed_at": "2026-10-23T14:32:39.241573+00:00",
+    "exit_code": 0,
+    "seconds": 0.013,
+    "argv": [
+      "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go",
+      "version",
+      "-m",
+      "<LOCAL_CHECKOUT>/.tmp/managed-recheck-20261023/query"
+    ],
+    "cwd": "<LOCAL_CHECKOUT>/tools",
+    "gowork": "<LOCAL_CHECKOUT>/go.work"
+  },
+  {
+    "name": "json-fixtures-build",
+    "started_at": "2026-10-23T14:32:39.241713+00:00",
+    "completed_at": "2026-10-23T14:32:40.242150+00:00",
+    "exit_code": 0,
+    "seconds": 1.0,
+    "argv": [
+      "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go",
+      "build",
+      "-o",
+      "<LOCAL_CHECKOUT>/.tmp/managed-recheck-20261023/json-fixtures",
+      "<LOCAL_CHECKOUT>/.tmp/managed-recheck-20261023/json-fixtures.go"
+    ],
+    "cwd": "<LOCAL_CHECKOUT>/tools",
+    "gowork": "<LOCAL_CHECKOUT>/go.work"
+  },
+  {
+    "name": "json-fixtures-buildinfo",
+    "started_at": "2026-10-23T14:32:40.242335+00:00",
+    "completed_at": "2026-10-23T14:32:40.255133+00:00",
+    "exit_code": 0,
+    "seconds": 0.013,
+    "argv": [
+      "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go",
+      "version",
+      "-m",
+      "<LOCAL_CHECKOUT>/.tmp/managed-recheck-20261023/json-fixtures"
+    ],
+    "cwd": "<LOCAL_CHECKOUT>/tools",
+    "gowork": "<LOCAL_CHECKOUT>/go.work"
+  },
+  {
+    "name": "json-pg-build",
+    "started_at": "2026-10-23T14:32:40.255281+00:00",
+    "completed_at": "2026-10-23T14:32:41.052984+00:00",
+    "exit_code": 0,
+    "seconds": 0.798,
+    "argv": [
+      "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go",
+      "build",
+      "-o",
+      "<LOCAL_CHECKOUT>/.tmp/managed-recheck-20261023/json-pg",
+      "<LOCAL_CHECKOUT>/.tmp/managed-recheck-20261023/json-pg.go"
+    ],
+    "cwd": "<LOCAL_CHECKOUT>/tools",
+    "gowork": "<LOCAL_CHECKOUT>/go.work"
+  },
+  {
+    "name": "json-pg-buildinfo",
+    "started_at": "2026-10-23T14:32:41.053178+00:00",
+    "completed_at": "2026-10-23T14:32:41.065486+00:00",
+    "exit_code": 0,
+    "seconds": 0.012,
+    "argv": [
+      "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go",
+      "version",
+      "-m",
+      "<LOCAL_CHECKOUT>/.tmp/managed-recheck-20261023/json-pg"
+    ],
+    "cwd": "<LOCAL_CHECKOUT>/tools",
+    "gowork": "<LOCAL_CHECKOUT>/go.work"
+  },
+  {
+    "name": "graph-controls-build",
+    "started_at": "2026-10-23T14:32:41.065642+00:00",
+    "completed_at": "2026-10-23T14:32:41.835244+00:00",
+    "exit_code": 0,
+    "seconds": 0.77,
+    "argv": [
+      "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go",
+      "build",
+      "-o",
+      "<LOCAL_CHECKOUT>/.tmp/managed-recheck-20261023/graph-controls",
+      "<LOCAL_CHECKOUT>/.tmp/managed-recheck-20261023/graph-controls.go"
+    ],
+    "cwd": "<LOCAL_CHECKOUT>/tools",
+    "gowork": "<LOCAL_CHECKOUT>/go.work"
+  },
+  {
+    "name": "graph-controls-buildinfo",
+    "started_at": "2026-10-23T14:32:41.835682+00:00",
+    "completed_at": "2026-10-23T14:32:41.849297+00:00",
+    "exit_code": 0,
+    "seconds": 0.014,
+    "argv": [
+      "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go",
+      "version",
+      "-m",
+      "<LOCAL_CHECKOUT>/.tmp/managed-recheck-20261023/graph-controls"
+    ],
+    "cwd": "<LOCAL_CHECKOUT>/tools",
+    "gowork": "<LOCAL_CHECKOUT>/go.work"
+  },
+  {
+    "name": "stream-options-build",
+    "started_at": "2026-10-23T14:32:41.849562+00:00",
+    "completed_at": "2026-10-23T14:32:42.654421+00:00",
+    "exit_code": 0,
+    "seconds": 0.805,
+    "argv": [
+      "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go",
+      "build",
+      "-o",
+      "<LOCAL_CHECKOUT>/.tmp/managed-recheck-20261023/stream-options",
+      "<LOCAL_CHECKOUT>/.tmp/managed-recheck-20261023/stream-options.go"
+    ],
+    "cwd": "<LOCAL_CHECKOUT>/tools",
+    "gowork": "<LOCAL_CHECKOUT>/go.work"
+  },
+  {
+    "name": "stream-options-buildinfo",
+    "started_at": "2026-10-23T14:32:42.654749+00:00",
+    "completed_at": "2026-10-23T14:32:42.667175+00:00",
+    "exit_code": 0,
+    "seconds": 0.012,
+    "argv": [
+      "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go",
+      "version",
+      "-m",
+      "<LOCAL_CHECKOUT>/.tmp/managed-recheck-20261023/stream-options"
+    ],
+    "cwd": "<LOCAL_CHECKOUT>/tools",
+    "gowork": "<LOCAL_CHECKOUT>/go.work"
+  },
+  {
+    "name": "value-capture-build",
+    "started_at": "2026-10-23T14:32:42.667453+00:00",
+    "completed_at": "2026-10-23T14:32:43.451867+00:00",
+    "exit_code": 0,
+    "seconds": 0.784,
+    "argv": [
+      "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go",
+      "build",
+      "-o",
+      "<LOCAL_CHECKOUT>/.tmp/managed-recheck-20261023/value-capture",
+      "<LOCAL_CHECKOUT>/.tmp/managed-recheck-20261023/value-capture.go"
+    ],
+    "cwd": "<LOCAL_CHECKOUT>/tools",
+    "gowork": "<LOCAL_CHECKOUT>/go.work"
+  },
+  {
+    "name": "value-capture-buildinfo",
+    "started_at": "2026-10-23T14:32:43.452168+00:00",
+    "completed_at": "2026-10-23T14:32:43.466030+00:00",
+    "exit_code": 0,
+    "seconds": 0.014,
+    "argv": [
+      "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go",
+      "version",
+      "-m",
+      "<LOCAL_CHECKOUT>/.tmp/managed-recheck-20261023/value-capture"
+    ],
+    "cwd": "<LOCAL_CHECKOUT>/tools",
+    "gowork": "<LOCAL_CHECKOUT>/go.work"
+  },
+  {
+    "name": "queries",
+    "started_at": "2026-10-23T14:32:43.466286+00:00",
+    "completed_at": "2026-10-23T14:32:47.605678+00:00",
+    "exit_code": 0,
+    "seconds": 4.139,
+    "argv": [
+      "<LOCAL_CHECKOUT>/.tmp/managed-recheck-20261023/query",
+      "<LOCAL_CHECKOUT>/.tmp/managed-recheck-20261023/cases.json"
+    ],
+    "cwd": "<LOCAL_CHECKOUT>/tools",
+    "gowork": "<LOCAL_CHECKOUT>/go.work"
+  },
+  {
+    "name": "followup",
+    "started_at": "2026-10-23T14:32:47.606308+00:00",
+    "completed_at": "2026-10-23T14:32:49.106082+00:00",
+    "exit_code": 0,
+    "seconds": 1.5,
+    "argv": [
+      "<LOCAL_CHECKOUT>/.tmp/managed-recheck-20261023/query",
+      "<LOCAL_CHECKOUT>/.tmp/managed-recheck-20261023/followup-cases.json"
+    ],
+    "cwd": "<LOCAL_CHECKOUT>/tools",
+    "gowork": "<LOCAL_CHECKOUT>/go.work"
+  },
+  {
+    "name": "distinctness",
+    "started_at": "2026-10-23T14:32:49.106548+00:00",
+    "completed_at": "2026-10-23T14:32:51.997207+00:00",
+    "exit_code": 0,
+    "seconds": 2.891,
+    "argv": [
+      "<LOCAL_CHECKOUT>/.tmp/managed-recheck-20261023/query",
+      "<LOCAL_CHECKOUT>/.tmp/managed-recheck-20261023/distinctness-cases.json"
+    ],
+    "cwd": "<LOCAL_CHECKOUT>/tools",
+    "gowork": "<LOCAL_CHECKOUT>/go.work"
+  },
+  {
+    "name": "queue",
+    "started_at": "2026-10-23T14:33:23.711227+00:00",
+    "completed_at": "2026-10-23T14:34:01.001775+00:00",
+    "exit_code": 0,
+    "seconds": 37.291,
+    "argv": [
+      "<LOCAL_CHECKOUT>/.tmp/managed-recheck-20261023/queue"
+    ],
+    "cwd": "<LOCAL_CHECKOUT>/tools",
+    "gowork": "<LOCAL_CHECKOUT>/go.work"
+  },
+  {
+    "name": "cleanup",
+    "started_at": "2026-10-23T14:34:01.002598+00:00",
+    "completed_at": "2026-10-23T14:34:05.308958+00:00",
+    "exit_code": 0,
+    "seconds": 4.306,
+    "argv": [
+      "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go",
+      "run",
+      "<LOCAL_CHECKOUT>/.tmp/managed-recheck-20261023/cleanup.go"
+    ],
+    "cwd": "<LOCAL_CHECKOUT>/survey",
+    "gowork": "off"
+  },
+  {
+    "name": "google-json",
+    "started_at": "2026-10-23T14:34:07.109035+00:00",
+    "completed_at": "2026-10-23T14:36:25.461650+00:00",
+    "exit_code": 0,
+    "seconds": 138.353,
+    "argv": [
+      "<LOCAL_CHECKOUT>/.tmp/managed-recheck-20261023/json-fixtures",
+      "google"
+    ],
+    "cwd": "<LOCAL_CHECKOUT>/tools",
+    "gowork": "<LOCAL_CHECKOUT>/go.work"
+  },
+  {
+    "name": "pg-streams",
+    "started_at": "2026-10-23T14:36:25.462945+00:00",
+    "completed_at": "2026-10-23T14:38:38.706355+00:00",
+    "exit_code": 0,
+    "seconds": 133.243,
+    "argv": [
+      "<LOCAL_CHECKOUT>/.tmp/managed-recheck-20261023/json-pg",
+      "pg"
+    ],
+    "cwd": "<LOCAL_CHECKOUT>/tools",
+    "gowork": "<LOCAL_CHECKOUT>/go.work"
+  },
+  {
+    "name": "graph-controls",
+    "started_at": "2026-10-23T14:38:38.706947+00:00",
+    "completed_at": "2026-10-23T14:40:04.333233+00:00",
+    "exit_code": 0,
+    "seconds": 85.626,
+    "argv": [
+      "<LOCAL_CHECKOUT>/.tmp/managed-recheck-20261023/graph-controls",
+      "google"
+    ],
+    "cwd": "<LOCAL_CHECKOUT>/tools",
+    "gowork": "<LOCAL_CHECKOUT>/go.work"
+  },
+  {
+    "name": "google-options",
+    "started_at": "2026-10-23T14:40:04.334057+00:00",
+    "completed_at": "2026-10-23T14:43:06.120743+00:00",
+    "exit_code": 0,
+    "seconds": 181.787,
+    "argv": [
+      "<LOCAL_CHECKOUT>/.tmp/managed-recheck-20261023/stream-options",
+      "google"
+    ],
+    "cwd": "<LOCAL_CHECKOUT>/tools",
+    "gowork": "<LOCAL_CHECKOUT>/go.work"
+  },
+  {
+    "name": "pg-options",
+    "started_at": "2026-10-23T14:43:06.121911+00:00",
+    "completed_at": "2026-10-23T14:45:12.400029+00:00",
+    "exit_code": 0,
+    "seconds": 126.278,
+    "argv": [
+      "<LOCAL_CHECKOUT>/.tmp/managed-recheck-20261023/stream-options",
+      "pg"
+    ],
+    "cwd": "<LOCAL_CHECKOUT>/tools",
+    "gowork": "<LOCAL_CHECKOUT>/go.work"
+  },
+  {
+    "name": "google-capture",
+    "started_at": "2026-10-23T14:45:12.401088+00:00",
+    "completed_at": "2026-10-23T14:47:42.351859+00:00",
+    "exit_code": 0,
+    "seconds": 149.951,
+    "argv": [
+      "<LOCAL_CHECKOUT>/.tmp/managed-recheck-20261023/value-capture",
+      "google"
+    ],
+    "cwd": "<LOCAL_CHECKOUT>/tools",
+    "gowork": "<LOCAL_CHECKOUT>/go.work"
+  },
+  {
+    "name": "pg-capture",
+    "started_at": "2026-10-23T14:47:42.353424+00:00",
+    "completed_at": "2026-10-23T14:49:24.386092+00:00",
+    "exit_code": 0,
+    "seconds": 102.033,
+    "argv": [
+      "<LOCAL_CHECKOUT>/.tmp/managed-recheck-20261023/value-capture",
+      "pg"
+    ],
+    "cwd": "<LOCAL_CHECKOUT>/tools",
+    "gowork": "<LOCAL_CHECKOUT>/go.work"
+  },
+  {
+    "name": "doc-delta-build",
+    "started_at": "2026-10-23T14:49:28.073165+00:00",
+    "completed_at": "2026-10-23T14:49:30.434000+00:00",
+    "exit_code": 0,
+    "seconds": 2.361,
+    "argv": [
+      "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go",
+      "build",
+      "-o",
+      "<LOCAL_CHECKOUT>/.tmp/managed-recheck-20261023/doc-delta",
+      "<LOCAL_CHECKOUT>/.tmp/managed-recheck-20261023/doc-delta.go"
+    ],
+    "cwd": "<LOCAL_CHECKOUT>/tools",
+    "gowork": "<LOCAL_CHECKOUT>/go.work"
+  },
+  {
+    "name": "doc-delta-buildinfo",
+    "started_at": "2026-10-23T14:49:30.434162+00:00",
+    "completed_at": "2026-10-23T14:49:30.446543+00:00",
+    "exit_code": 0,
+    "seconds": 0.012,
+    "argv": [
+      "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go",
+      "version",
+      "-m",
+      "<LOCAL_CHECKOUT>/.tmp/managed-recheck-20261023/doc-delta"
+    ],
+    "cwd": "<LOCAL_CHECKOUT>/tools",
+    "gowork": "<LOCAL_CHECKOUT>/go.work"
+  },
+  {
+    "name": "doc-delta-google",
+    "started_at": "2026-10-23T14:49:30.446970+00:00",
+    "completed_at": "2026-10-23T14:52:16.138109+00:00",
+    "exit_code": 0,
+    "seconds": 165.691,
+    "argv": [
+      "<LOCAL_CHECKOUT>/.tmp/managed-recheck-20261023/doc-delta",
+      "<LOCAL_CHECKOUT>/.tmp/managed-recheck-20261023/doc-delta-probe-plan.json",
+      "google"
+    ],
+    "cwd": "<LOCAL_CHECKOUT>/tools",
+    "gowork": "<LOCAL_CHECKOUT>/go.work"
+  },
+  {
+    "name": "doc-delta-pg",
+    "started_at": "2026-10-23T14:52:16.139555+00:00",
+    "completed_at": "2026-10-23T14:54:50.672618+00:00",
+    "exit_code": 0,
+    "seconds": 154.533,
+    "argv": [
+      "<LOCAL_CHECKOUT>/.tmp/managed-recheck-20261023/doc-delta",
+      "<LOCAL_CHECKOUT>/.tmp/managed-recheck-20261023/doc-delta-probe-plan.json",
+      "pg"
+    ],
+    "cwd": "<LOCAL_CHECKOUT>/tools",
+    "gowork": "<LOCAL_CHECKOUT>/go.work"
+  },
+  {
+    "name": "queue-recreate-build",
+    "started_at": "2026-10-23T14:54:50.706030+00:00",
+    "completed_at": "2026-10-23T14:54:52.945211+00:00",
+    "exit_code": 0,
+    "seconds": 2.239,
+    "argv": [
+      "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go",
+      "build",
+      "-o",
+      "<LOCAL_CHECKOUT>/.tmp/managed-recheck-20261023/queue-recreate",
+      "<LOCAL_CHECKOUT>/.tmp/managed-recheck-20261023/queue-recreate.go"
+    ],
+    "cwd": "<LOCAL_CHECKOUT>/tools",
+    "gowork": "<LOCAL_CHECKOUT>/go.work"
+  },
+  {
+    "name": "queue-recreate-buildinfo",
+    "started_at": "2026-10-23T14:54:52.945401+00:00",
+    "completed_at": "2026-10-23T14:54:52.958211+00:00",
+    "exit_code": 0,
+    "seconds": 0.013,
+    "argv": [
+      "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go",
+      "version",
+      "-m",
+      "<LOCAL_CHECKOUT>/.tmp/managed-recheck-20261023/queue-recreate"
+    ],
+    "cwd": "<LOCAL_CHECKOUT>/tools",
+    "gowork": "<LOCAL_CHECKOUT>/go.work"
+  },
+  {
+    "name": "queue-recreate",
+    "started_at": "2026-10-23T14:54:52.958335+00:00",
+    "completed_at": "2026-10-23T14:55:56.998600+00:00",
+    "exit_code": 0,
+    "seconds": 64.04,
+    "argv": [
+      "<LOCAL_CHECKOUT>/.tmp/managed-recheck-20261023/queue-recreate"
+    ],
+    "cwd": "<LOCAL_CHECKOUT>/tools",
+    "gowork": "<LOCAL_CHECKOUT>/go.work"
+  },
+  {
+    "name": "hll-controls-build",
+    "started_at": "2026-10-23T14:56:01.863995+00:00",
+    "completed_at": "2026-10-23T14:56:04.070178+00:00",
+    "exit_code": 0,
+    "seconds": 2.206,
+    "argv": [
+      "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go",
+      "build",
+      "-o",
+      "<LOCAL_CHECKOUT>/.tmp/managed-recheck-20261023/hll-controls",
+      "<LOCAL_CHECKOUT>/.tmp/managed-recheck-20261023/hll-controls.go"
+    ],
+    "cwd": "<LOCAL_CHECKOUT>/tools",
+    "gowork": "<LOCAL_CHECKOUT>/go.work"
+  },
+  {
+    "name": "hll-controls-buildinfo",
+    "started_at": "2026-10-23T14:56:04.070338+00:00",
+    "completed_at": "2026-10-23T14:56:04.082762+00:00",
+    "exit_code": 0,
+    "seconds": 0.012,
+    "argv": [
+      "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go",
+      "version",
+      "-m",
+      "<LOCAL_CHECKOUT>/.tmp/managed-recheck-20261023/hll-controls"
+    ],
+    "cwd": "<LOCAL_CHECKOUT>/tools",
+    "gowork": "<LOCAL_CHECKOUT>/go.work"
+  },
+  {
+    "name": "hll-controls-google",
+    "started_at": "2026-10-23T14:56:04.082898+00:00",
+    "completed_at": "2026-10-23T14:56:06.376877+00:00",
+    "exit_code": 0,
+    "seconds": 2.294,
+    "argv": [
+      "<LOCAL_CHECKOUT>/.tmp/managed-recheck-20261023/hll-controls",
+      "<LOCAL_CHECKOUT>/.tmp/managed-recheck-20261023/hll-controls-google-cases.json",
+      "google"
+    ],
+    "cwd": "<LOCAL_CHECKOUT>/tools",
+    "gowork": "<LOCAL_CHECKOUT>/go.work"
+  },
+  {
+    "name": "hll-controls-pg",
+    "started_at": "2026-10-23T14:56:06.377599+00:00",
+    "completed_at": "2026-10-23T14:56:29.412970+00:00",
+    "exit_code": 0,
+    "seconds": 23.035,
+    "argv": [
+      "<LOCAL_CHECKOUT>/.tmp/managed-recheck-20261023/hll-controls",
+      "<LOCAL_CHECKOUT>/.tmp/managed-recheck-20261023/hll-controls-pg-cases.json",
+      "pg"
+    ],
+    "cwd": "<LOCAL_CHECKOUT>/tools",
+    "gowork": "<LOCAL_CHECKOUT>/go.work"
+  }
+]

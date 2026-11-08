@@ -1,0 +1,55 @@
+{
+  "observed_date_utc": "2026-09-26",
+  "local_dates_jst": [
+    "2026-09-26",
+    "2026-09-27"
+  ],
+  "source_snapshot": "Same detached dirty snapshot as receipt.json; no dependency or runtime-pin edits for this follow-up",
+  "builds": [
+    {
+      "source": "queue-probe.go.txt",
+      "source_sha256": "ea66750d5a61cefee41b353c69a32b55368e030bbab6689e3dfd1212d74db306",
+      "binary_sha256": "5c10a74a0ea7abfc2e2764191718b6d468fa75e5517022aeb1f0d52d31f9d35a",
+      "buildinfo": "queue-probe-buildinfo.txt"
+    },
+    {
+      "source": "queue-control.go.txt",
+      "source_sha256": "1576f0591bbc0657481a0d69beca5d66609c50386b4374138c86f4816b7eb875",
+      "binary_sha256": "7162e7ca77f6047c7b32229be9c9c041f293f4dc7e15360dae45e4e5d5ed245f",
+      "buildinfo": "queue-control-buildinfo.txt"
+    }
+  ],
+  "commands": [
+    "queue-commands.json",
+    "queue-control-commands.json"
+  ],
+  "runs": [
+    {
+      "file": "queue-r3.jsonl",
+      "records": 32,
+      "sha256": "c5e9547d0f078a1f367b5072aba9e0586693ac32d2f566b91681296ea9666035"
+    },
+    {
+      "file": "queue-r2.jsonl",
+      "records": 32,
+      "sha256": "927ca6adc73eda37049be53b1a2fafcb4a8c7aac0194b2a4446a819b38440c46"
+    },
+    {
+      "file": "queue-control-r3.jsonl",
+      "records": 14,
+      "sha256": "5f59076a3b470e853a4053204e132d21dc9f7585651d5e362e256cfc349b4ecc"
+    },
+    {
+      "file": "queue-control-r2.jsonl",
+      "records": 14,
+      "sha256": "215acffd7f23d085fc025363c7b2e7d08c6c6bebd55497c7616a7c6a4b3a00c9"
+    }
+  ],
+  "retention_transforms": [
+    "Lease token values replaced in producer with SHA-256 hashes; original tokens only in memory",
+    "Request IDs removed from retained error strings"
+  ],
+  "cleanup": "Both fresh databases and runtimes closed successfully for each paired producer; no running Docker containers after completion",
+  "documents": "post-cutoff-coverage.json lists full fetched source hashes; full files retained in durable task directory",
+  "scope": "Bounded GoogleSQL queue lifecycle; prior same-day Graph and automatic-parameterization probes cover all remaining post-September-3 managed announcements"
+}

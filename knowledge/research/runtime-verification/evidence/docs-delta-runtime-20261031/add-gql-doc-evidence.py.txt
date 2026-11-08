@@ -1,0 +1,36 @@
+from pathlib import Path
+import json,hashlib,shutil,datetime
+root=Path('<LOCAL_CHECKOUT>');task=Path('<LOCAL_TASK_ROOT>/apstndb/spanalyzer/docs-delta-runtime-20261031');dest=root/'knowledge/research/runtime-verification/evidence/docs-delta-runtime-20261031';src=task/'sources';scratch=root/'.tmp/docs-delta-runtime-20261031';shutil.copyfile(dest.parent/'artifact-sha256.json',scratch/'gql-doc-addendum-baseline.json');doc=json.loads((src/'gql-column-propagation-docs-refresh.json').read_text());commit=json.loads((src/'gql-documentation-introduction-commit.json').read_text());assert commit['sha']=='9f3859b9ea131f481bca92225c4cd4c020d5885b';f=next(f for f in commit['files']if f['filename'].endswith('/graph-query-statements.md'));patch=f['patch'];assert '+column_propagation_mode:'in patch
+for token in ['FULL [ OUTER ]','| OUTER','LEFT [ OUTER ]','| INNER']:assert token in doc['content']
+assert 'However, you can use a `column_propagation_mode`'in doc['content'];assert '+FULL OUTER UNION ALL'in patch
+for name in ['gql-column-propagation-docs-refresh.json','gql-documentation-history.json','gql-documentation-introduction-commit.json']:shutil.copyfile(src/name,dest/'sources'/name)
+addendum={'recorded_on_jst':'2026-10-31','checked_at_utc':datetime.datetime.now(datetime.timezone.utc).isoformat(),'official_uri':doc['uri']+'#gql_set','official_update_time':doc['updateTime'],'mirror_change_commit':commit['sha'],'mirror_parent':commit['parents'][0]['sha'],'mirror_capture_time_utc':commit['commit']['committer']['date'],'documented_modes':['FULL OUTER','FULL','OUTER','LEFT OUTER','LEFT','INNER'],'documented_semantics':{'FULL OUTER / FULL / OUTER':'Union of column names, missing values padded with NULL; left columns first','LEFT OUTER / LEFT':'Left input column names, missing right values padded with NULL','INNER':'Common column names only','unspecified':'Inputs must have the same set of column names','CORRESPONDING':'Explicitly unsupported as a GQL keyword'},'latest_two_commit_interval':'This October 20 capture predates the October 28 baseline of the latest two-commit audit','parser_assessment':'Officially documented Spanner syntax missing from the tested memefish main; runtime results are complementary evidence','source_sha256':{name:hashlib.sha256((src/name).read_bytes()).hexdigest()for name in ['gql-column-propagation-docs-refresh.json','gql-documentation-history.json','gql-documentation-introduction-commit.json']},'runtime_rerun':False};(dest/'gql-documentation-addendum.json').write_text(json.dumps(addendum,indent=2)+'\n')
+p=root/'knowledge/research/runtime-verification/documentation-runtime-and-memefish-audit-20261031.md';text=p.read_text();anchor='  - id: provenance\n';assert text.count(anchor)==1;text=text.replace(anchor,'  - id: gql-reference\n    resource: https://docs.cloud.google.com/spanner/docs/reference/standard-sql/graph-query-statements#gql_set\n    title: "Officially documented GQL column propagation syntax and semantics"\n  - id: gql-documentation-addendum\n    resource: evidence/docs-delta-runtime-20261031/gql-documentation-addendum.json\n    title: "Current official body and October 20 mirror introduction"\n'+anchor)
+anchor='These parser gaps are distinct from semantic restrictions.';assert text.count(anchor)==1;paragraph='''### Official GQL documentation status
+
+The official [Set operation reference](https://docs.cloud.google.com/spanner/docs/reference/standard-sql/graph-query-statements#gql_set)
+explicitly documents the following grammar:
+
+```text
+column_propagation_mode:
+  { FULL [ OUTER ] | OUTER | LEFT [ OUTER ] | INNER }
+```
+
+FULL OUTER/FULL/OUTER preserves both inputs' column names and fills missing
+values with NULL. LEFT OUTER/LEFT preserves the left input's columns; INNER
+keeps common columns. With no mode, inputs must have matching column-name
+sets. The GQL CORRESPONDING keyword remains unsupported; the reference
+explicitly permits column propagation modes and includes a FULL OUTER UNION
+ALL example.
+
+These additions appear in the [October 20 UTC mirror capture](https://github.com/apstndb/spanner-docs-mirror/commit/9f3859b9ea131f481bca92225c4cd4c020d5885b),
+before the October 28 baseline used for the latest two-commit documentation
+audit. The [addendum receipt](evidence/docs-delta-runtime-20261031/gql-documentation-addendum.json)
+retains the refreshed official body, its update metadata and the actual
+introduction patch. This is an **officially documented Spanner syntax gap in
+the tested memefish main**, supported by the separately retained runtime cases.
+
+''';text=text.replace(anchor,paragraph+anchor);p.write_text(text)
+# Link the previously narrower documentation interval to the earlier introduction.
+p=root/'knowledge/research/runtime-verification/documentation-delta-review-20261031.md';text=p.read_text();addition='\nGQL column propagation was already added in the October 20 UTC mirror capture,\nbefore this interval. The [official documentation status](documentation-runtime-and-memefish-audit-20261031.md#official-gql-documentation-status)\nrecords the complete mode grammar, semantics and official reference.\n';p.write_text(text+addition)
+print('Documented modes',addendum['documented_modes'],'mirror capture',addendum['mirror_capture_time_utc'])

@@ -1,0 +1,28 @@
+[
+  {
+    "name": "post-graph-inventory",
+    "started_at": "2026-10-29T01:17:30.625833+00:00",
+    "completed_at": "2026-10-29T01:17:32.189939+00:00",
+    "exit_code": 0,
+    "seconds": 1.564,
+    "argv": [
+      "<LOCAL_CHECKOUT>/.tmp/managed-recheck-20261029/query",
+      "<LOCAL_CHECKOUT>/.tmp/managed-recheck-20261029/final-inventory-cases.json"
+    ],
+    "cwd": "<LOCAL_CHECKOUT>/tools",
+    "gowork": "<LOCAL_CHECKOUT>/go.work"
+  },
+  {
+    "name": "post-graph-trial-state",
+    "started_at": "2026-10-29T01:17:32.190136+00:00",
+    "completed_at": "2026-10-29T01:17:33.956722+00:00",
+    "exit_code": 0,
+    "seconds": 1.767,
+    "argv": [
+      "<LOCAL_HOME>/.local/share/mise/installs/python/3.13/bin/python3",
+      "<LOCAL_CHECKOUT>/.tmp/managed-recheck-20261029/inspect-cloud-state.py"
+    ],
+    "cwd": "<LOCAL_CHECKOUT>/tools",
+    "gowork": "<LOCAL_CHECKOUT>/go.work"
+  }
+]

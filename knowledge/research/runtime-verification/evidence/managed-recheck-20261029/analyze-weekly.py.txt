@@ -1,0 +1,72 @@
+"""Check bounded semantics, preserving original failures and NOT_RUN dependencies."""
+from pathlib import Path
+from collections import Counter,defaultdict
+import json
+root=Path('<LOCAL_CHECKOUT>');p=root/'.tmp/managed-recheck-20261029';out=Path('<LOCAL_TASK_ROOT>/apstndb/spanalyzer/managed-recheck-20261029/evidence')
+def load(name):return[json.loads(s)for s in(p/(name+'.stdout')).read_text().splitlines()if s]
+def scans(r):return[n['metadata']for n in r.get('plan',{}).get('planNodes',[])if n.get('metadata',{}).get('scan_type')]
+def check(condition,description):
+ if not condition:raise AssertionError(description)
+checks=[]
+def checked(condition,description):check(condition,description);checks.append(description)
+recordsets={name:load(name)for name in ['weekly-google','weekly-pg','repair-google','repair-pg','graph-final']};attempts=[];effective={}
+for name,records in recordsets.items():
+ cases=[r for r in records if r.get('family')];attempts.append({'name':name,'step_records':len(cases),'submitted_steps':sum(r['code']!='NOT_RUN'for r in cases),'codes':dict(Counter(r['code']for r in cases)),'families':{f:dict(Counter(r['code']for r in cases if r['family']==f))for f in sorted({r['family']for r in cases})}})
+ dialect='pg'if name.endswith('-pg')else'google'
+ for r in cases:effective[(dialect,r['label'])]=r
+fk={}
+for dialect in ['google','pg']:
+ r={label:record for(d,label),record in effective.items()if d==dialect};rows=lambda label:r[label]['rows'];indexed=lambda values:{int(v['id']):v for v in values}
+ before=indexed(rows('fk-before'));after=indexed(rows('fk-after-dml'));mutation=indexed(rows('fk-after-mutation'));inside=indexed(r['fk-rollback']['rows_inside_rollback']);rolled=indexed(rows('fk-after-rollback'))
+ checked(len(before)==len(after)==len(mutation)==8,dialect+' SET NULL preserves all child rows')
+ checked(all(after[i]['parent_id']is None and after[i]['payload']==before[i]['payload']for i in [11,21]),dialect+' DML nulls referencing value and preserves payload')
+ checked(all(mutation[i]['parent_id']is None for i in [11,12,21,22]),dialect+' mutation delete performs SET NULL')
+ checked(r['fk-rollback']['rollback_expected']and not r['fk-rollback']['transaction_committed']and all(inside[i]['parent_id']is None and rolled[i]['parent_id']=='5'for i in [15,25]),dialect+' rollback isolates referential action')
+ checked(rows('fk-cascade-control')==[{'n':'0'}],dialect+' CASCADE removes child')
+ checked(r['fk-no-action-reject']['code']=='FailedPrecondition'and rows('fk-no-action-parent-present')==[{'id':'3'}],dialect+' NO ACTION rejects parent removal')
+ checked(r['fk-reference-still-enforced']['code']=='FailedPrecondition',dialect+' referencing insert remains enforced')
+ checked(rows('fk-composite-after')==[{'id':'51','parent_id':None,'parent_k':None},{'id':'52','parent_id':'1','parent_k':None},{'id':'53','parent_id':'2','parent_k':'20'}],dialect+' composite full reference nulls all fields; partial NULL stays unchanged')
+ checked(sum(v['rule']=='SET NULL'for v in rows('fk-metadata'))==2,dialect+' metadata DELETE_RULE records SET NULL')
+ checked(r['fk-reject-not-null']['code']=='InvalidArgument'and r['fk-reject-primary-key']['code']=='Unimplemented'and r['fk-reject-generated']['code']=='InvalidArgument'and 'generated column'in r['fk-reject-generated']['error'],dialect+' NOT NULL/key/generated restrictions have isolated outcomes')
+ export=next(v for v in recordsets['weekly-'+dialect]if v['label']=='final-ddl-export')
+ checked(sum('ON DELETE SET NULL'in sql for sql in export['ddl'])==3,dialect+' exported DDL preserves all three SET NULL constraints')
+ fk[dialect]={'checks':'pass','child_rows':8,'nullified_after_dml':[11,21],'additional_nullified_after_mutation':[12,22],'rollback_preserved':[15,25],'invalid_column_codes':{label:r[label]['code']for label in ['fk-reject-not-null','fk-reject-primary-key','fk-reject-generated']},'metadata':rows('fk-metadata')}
+pg={label:r for(d,label),r in effective.items()if d=='pg'};pgplan=json.loads((p/'weekly-pg-plan.json').read_text());expected=[]
+for case in pgplan['steps']:
+ if 'expected'not in case:continue
+ row=pg[case['label']];matches=row['code']=='OK'and row['rows']==[case['expected']];expected.append({'label':case['label'],'code':row['code'],'expected':case['expected'],'observed':row.get('rows'),'matches':matches})
+ if case['label']!='jsonb-stored-distinct-count':checked(matches,'JSONB declared rows '+case['label'])
+ordercase=next(s for s in pgplan['steps']if s['label']=='jsonb-stored-order');ids=[int(r['id'])for r in pg['jsonb-stored-order']['rows']];checked(ids==ordercase['expected_ids'],'JSONB stored sort order matches all 22 IDs')
+group=pg['jsonb-stored-group']['rows'];checked(len(group)==20 and sum(int(v['n'])for v in group)==22 and[(v['first_id'],v['last_id'],v['n'])for v in group if v['n']=='2']==[('7','8','2'),('19','22','2')],'JSONB grouping merges numeric scale and duplicate-key normalization')
+checked(pg['jsonb-distinct-subquery-count']['rows']==[{'n':'19'}]and pg['jsonb-nonnull-star-count']['rows']==[{'n':'21'}],'JSONB DISTINCT-subquery COUNT(*) works')
+checked(pg['jsonb-stored-distinct-count']['code']==pg['jsonb-count-expression']['code']=='Unimplemented','COUNT(jsonb), including DISTINCT, remains unsupported')
+checked(pg['jsonb-stored-minmax']['code']=='InvalidArgument','MIN/MAX(jsonb) exploratory control rejects')
+g={label:r for(d,label),r in effective.items()if d=='google'};numbers={}
+for predicate in ['eq','le','gt','between','not-eq','in']:
+ variants={access:g['numeric-'+predicate+'-'+access]for access in ['auto','prefix','log','base']};base=variants['base'];equal=all(r['code']=='OK'and r['rows']==base['rows']for r in variants.values());checked(equal,'Numeric '+predicate+' rows agree across four access variants')
+ for access in ['prefix','log']:checked(any(s['scan_type']=='SearchIndexScan'for s in scans(variants[access])),'Numeric '+predicate+' '+access+' uses actual SearchIndexScan')
+ numbers[predicate]={access:{'code':r['code'],'rows':r['rows'],'scans':scans(r)}for access,r in variants.items()}
+filtered={}
+for predicate in ['omitted','explicit','implied-equality','implied-in','admits-null','only-null']:
+ variants={access:g['filtered-'+predicate+'-'+access]for access in ['auto','forced','base-control']};expected_code='OK'if predicate in ['explicit','implied-equality','implied-in']else'InvalidArgument'
+ checked(all(variants[a]['code']==expected_code for a in ['auto','forced']),'Filtered search '+predicate+' accepts only safe predicates')
+ if expected_code=='OK':checked(all(variants[a]['rows']==variants['base-control']['rows']and any(s['scan_type']=='SearchIndexScan'for s in scans(variants[a]))for a in ['auto','forced']),'Filtered search '+predicate+' matches rows and uses index')
+ filtered[predicate]={access:{'code':r['code'],'rows':r['rows'],'error':r['error'],'scans':scans(r)}for access,r in variants.items()}
+floatcontrols={name:{k:g[name].get(k)for k in ['code','error','rows']}for name in ['tokenize-float-prefix-typed','tokenize-float-default','tokenize-float-missing-granularity','tokenize-numeric-typed-options','bignumeric-type-control']}
+checked(all(g[n]['code']=='OK'for n in ['tokenize-float-prefix-typed','tokenize-float-default']),'FLOAT64 tokenization works with correct typed options')
+checked(all(g[n]['code']=='InvalidArgument'for n in ['tokenize-float-missing-granularity','tokenize-numeric-typed-options','bignumeric-type-control']),'Missing granularity/native NUMERIC/BIGNUMERIC controls remain separate rejections')
+graphrows=recordsets['graph-final'];graphcases=[r for r in graphrows if r.get('family')=='volatile-graph'and r.get('kind')=='ddl'];graphplan={s['label']:s for s in json.loads((p/'graph-final-plan.json').read_text())['steps']};matrix=[]
+for r in graphcases:
+ case=graphplan[r['label']];read=g[r['label']+'-read'];matrix.append({k:case.get(k)for k in ['label','view','uniqueness','allow_volatile']}|{'create_code':r['code'],'create_error':r.get('error',''),'read_code':read['code'],'read_rows':read.get('rows')})
+paths=[{k:r.get(k)for k in ['label','code','error','rows']}for r in graphrows if r.get('family')=='path-quantifier'and r.get('kind')=='query']
+checked(all(r['code']!='NOT_RUN'for r in paths)and len(paths)==17,'All finite-graph path cases submitted independently of view support')
+checked(sum(r['create_code']=='OK'for r in matrix)==24 and sum(r['create_code']=='NOT_RUN'for r in matrix)==6,'All 24 available-view graph definitions create; six RAND-view graphs remain dependency-blocked')
+checked(all(r['create_code']=='OK'and r['read_code']=='OK'for r in matrix if r['view']not in ['GBody','GJoin']),'All available-view graph reads succeed, including false/default volatile option')
+checked(all(g['view-'+name]['code']=='InvalidArgument'for name in ['gbody','gjoin'])and g['rand-direct-control']['code']=='Unimplemented','RAND view rejection and direct builtin rejection remain distinct')
+checked(sum(r['code']=='OK'for r in paths)==6 and sum(r['code']=='InvalidArgument'for r in paths)==11,'Six bounded path controls succeed and eleven unbounded/invalid controls reject')
+for r in paths:
+ if r['code']=='OK':checked(len(r['rows'])==(6 if r['label']=='path-acyclic-bounded'else 9),'Finite path endpoint pairs '+r['label'])
+
+storage={d:[{k:r.get(k)for k in ['label','code','rows']}for r in recordsets['weekly-'+d]if r.get('family')=='storage']for d in ['google','pg']};checked(all(r['code']=='OK'for rr in storage.values()for r in rr),'Storage column queries all execute in both dialects')
+summary={'scope':'First coverage of current documentation changes; no inferred engine introduction date or performance claim. Original failed and dependency-blocked attempts remain in attempt ledger.','attempts':attempts,'semantic_assertions':{'status':'pass','count':len(checks),'checks':checks},'foreign_keys':fk,'jsonb':{'declared_expectations':expected,'stored_order_ids':ids,'group_count':len(group),'join':pg['jsonb-stored-join']['rows'],'distinct_subquery_count':pg['jsonb-distinct-subquery-count']['rows'],'count_jsonb':{k:pg[k]['code']for k in ['jsonb-stored-distinct-count','jsonb-count-expression','jsonb-stored-minmax']}},'numeric_search':numbers,'numeric_type_controls':floatcontrols,'null_filtered_search':filtered,'volatile_graph_matrix':matrix,'view_ddl_and_rand':[{k:r.get(k)for k in ['label','code','error']}for r in graphrows if r.get('family')=='view-volatility'],'path_quantifiers':paths,'columnar_storage':storage,'google_json_boundary_controls':[{k:r.get(k)for k in ['label','code','rows']}for r in recordsets['weekly-google']if r.get('family')=='json-dialect-control']}
+(out/'weekly-summary.json').write_text(json.dumps(summary,indent=2)+'\n');print(json.dumps({'checks':len(checks),'attempts':attempts,'graph_create_codes':dict(Counter(r['create_code']for r in matrix)),'path_codes':dict(Counter(r['code']for r in paths))}))

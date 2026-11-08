@@ -1,0 +1,190 @@
+{
+  "schema_version": "v0alpha1",
+  "status": "surface_changed",
+  "material_change": true,
+  "current": {
+    "schema_version": "v0alpha2",
+    "target": {
+      "kind": "managed",
+      "observation_scope": "single_database"
+    },
+    "observed_at": "2026-10-29T00:30:26.259156Z",
+    "surface_sha256": "016061fbe58ebf687727bab9f31154ba29205d8e45e25fd65fc55b9b14cae8f0",
+    "column_count": 624,
+    "producer_source_sha256": "3cf070ae5909bb26babeb3ca5bcfa20a161e2440eac934ca14d42de41a82a12a",
+    "invocation_sha256": "911f8d0021d67bf33420131130a46c1b258f3c30665bf390510113ad931a342c"
+  },
+  "retained": {
+    "path": "survey/spannersys/evidence/managed/20261023T142718Z-9bb70c640b69.json",
+    "schema_version": "v0alpha2",
+    "target": {
+      "kind": "managed",
+      "observation_scope": "single_database"
+    },
+    "observed_at": "2026-10-23T14:27:18.147916Z",
+    "surface_sha256": "9bb70c640b69e4929e4b44ed834d69e1dfcd5fc17cc53e017f541b9f58f9ec8f",
+    "column_count": 598,
+    "producer_source_sha256": "3cf070ae5909bb26babeb3ca5bcfa20a161e2440eac934ca14d42de41a82a12a",
+    "invocation_sha256": "911f8d0021d67bf33420131130a46c1b258f3c30665bf390510113ad931a342c"
+  },
+  "surface_delta": {
+    "added_columns": [
+      {
+        "table_name": "BATCH_OPERATIONS",
+        "column_name": "LAST_UPDATE_TIMESTAMP",
+        "spanner_type": "TIMESTAMP",
+        "ordinal_position": 11
+      },
+      {
+        "table_name": "BATCH_OPERATIONS",
+        "column_name": "NUM_PARTITIONS_COMPLETE",
+        "spanner_type": "INT64",
+        "ordinal_position": 4
+      },
+      {
+        "table_name": "BATCH_OPERATIONS",
+        "column_name": "NUM_PARTITIONS_TOTAL",
+        "spanner_type": "INT64",
+        "ordinal_position": 3
+      },
+      {
+        "table_name": "BATCH_OPERATIONS",
+        "column_name": "NUM_TRIVIAL_PARTITIONS_COMPLETE",
+        "spanner_type": "INT64",
+        "ordinal_position": 5
+      },
+      {
+        "table_name": "BATCH_OPERATIONS",
+        "column_name": "PROGRESS",
+        "spanner_type": "STRING(MAX)",
+        "ordinal_position": 6
+      },
+      {
+        "table_name": "BATCH_OPERATIONS",
+        "column_name": "QUERY_ID",
+        "spanner_type": "STRING(MAX)",
+        "ordinal_position": 2
+      },
+      {
+        "table_name": "BATCH_OPERATIONS",
+        "column_name": "RESULT",
+        "spanner_type": "STRING(MAX)",
+        "ordinal_position": 9
+      },
+      {
+        "table_name": "BATCH_OPERATIONS",
+        "column_name": "ROWS_PROCESSED",
+        "spanner_type": "INT64",
+        "ordinal_position": 7
+      },
+      {
+        "table_name": "BATCH_OPERATIONS",
+        "column_name": "START_TIMESTAMP",
+        "spanner_type": "TIMESTAMP",
+        "ordinal_position": 10
+      },
+      {
+        "table_name": "BATCH_OPERATIONS",
+        "column_name": "STATUS",
+        "spanner_type": "STRING(MAX)",
+        "ordinal_position": 8
+      },
+      {
+        "table_name": "BATCH_OPERATIONS",
+        "column_name": "TEXT",
+        "spanner_type": "STRING(MAX)",
+        "ordinal_position": 1
+      },
+      {
+        "table_name": "LOCK_STATS_TOP_10MINUTE",
+        "column_name": "LOCK_WAIT_DISTRIBUTION",
+        "spanner_type": "ARRAY<STRUCT<COUNT INT64, MEAN FLOAT64, SUM_OF_SQUARED_DEVIATION FLOAT64, NUM_FINITE_BUCKETS INT64, GROWTH_FACTOR FLOAT64, SCALE FLOAT64, BUCKET_COUNTS ARRAY<INT64>>>",
+        "ordinal_position": 6
+      },
+      {
+        "table_name": "LOCK_STATS_TOP_10MINUTE",
+        "column_name": "LOCK_WAIT_DISTRIBUTION_JSON_STRING",
+        "spanner_type": "STRING(MAX)",
+        "ordinal_position": 7
+      },
+      {
+        "table_name": "LOCK_STATS_TOP_HOUR",
+        "column_name": "LOCK_WAIT_DISTRIBUTION",
+        "spanner_type": "ARRAY<STRUCT<COUNT INT64, MEAN FLOAT64, SUM_OF_SQUARED_DEVIATION FLOAT64, NUM_FINITE_BUCKETS INT64, GROWTH_FACTOR FLOAT64, SCALE FLOAT64, BUCKET_COUNTS ARRAY<INT64>>>",
+        "ordinal_position": 6
+      },
+      {
+        "table_name": "LOCK_STATS_TOP_HOUR",
+        "column_name": "LOCK_WAIT_DISTRIBUTION_JSON_STRING",
+        "spanner_type": "STRING(MAX)",
+        "ordinal_position": 7
+      },
+      {
+        "table_name": "LOCK_STATS_TOP_MINUTE",
+        "column_name": "LOCK_WAIT_DISTRIBUTION",
+        "spanner_type": "ARRAY<STRUCT<COUNT INT64, MEAN FLOAT64, SUM_OF_SQUARED_DEVIATION FLOAT64, NUM_FINITE_BUCKETS INT64, GROWTH_FACTOR FLOAT64, SCALE FLOAT64, BUCKET_COUNTS ARRAY<INT64>>>",
+        "ordinal_position": 6
+      },
+      {
+        "table_name": "LOCK_STATS_TOP_MINUTE",
+        "column_name": "LOCK_WAIT_DISTRIBUTION_JSON_STRING",
+        "spanner_type": "STRING(MAX)",
+        "ordinal_position": 7
+      },
+      {
+        "table_name": "LOCK_STATS_TOTAL_10MINUTE",
+        "column_name": "LOCK_WAIT_DISTRIBUTION",
+        "spanner_type": "ARRAY<STRUCT<COUNT INT64, MEAN FLOAT64, SUM_OF_SQUARED_DEVIATION FLOAT64, NUM_FINITE_BUCKETS INT64, GROWTH_FACTOR FLOAT64, SCALE FLOAT64, BUCKET_COUNTS ARRAY<INT64>>>",
+        "ordinal_position": 3
+      },
+      {
+        "table_name": "LOCK_STATS_TOTAL_10MINUTE",
+        "column_name": "LOCK_WAIT_DISTRIBUTION_JSON_STRING",
+        "spanner_type": "STRING(MAX)",
+        "ordinal_position": 4
+      },
+      {
+        "table_name": "LOCK_STATS_TOTAL_HOUR",
+        "column_name": "LOCK_WAIT_DISTRIBUTION",
+        "spanner_type": "ARRAY<STRUCT<COUNT INT64, MEAN FLOAT64, SUM_OF_SQUARED_DEVIATION FLOAT64, NUM_FINITE_BUCKETS INT64, GROWTH_FACTOR FLOAT64, SCALE FLOAT64, BUCKET_COUNTS ARRAY<INT64>>>",
+        "ordinal_position": 3
+      },
+      {
+        "table_name": "LOCK_STATS_TOTAL_HOUR",
+        "column_name": "LOCK_WAIT_DISTRIBUTION_JSON_STRING",
+        "spanner_type": "STRING(MAX)",
+        "ordinal_position": 4
+      },
+      {
+        "table_name": "LOCK_STATS_TOTAL_MINUTE",
+        "column_name": "LOCK_WAIT_DISTRIBUTION",
+        "spanner_type": "ARRAY<STRUCT<COUNT INT64, MEAN FLOAT64, SUM_OF_SQUARED_DEVIATION FLOAT64, NUM_FINITE_BUCKETS INT64, GROWTH_FACTOR FLOAT64, SCALE FLOAT64, BUCKET_COUNTS ARRAY<INT64>>>",
+        "ordinal_position": 3
+      },
+      {
+        "table_name": "LOCK_STATS_TOTAL_MINUTE",
+        "column_name": "LOCK_WAIT_DISTRIBUTION_JSON_STRING",
+        "spanner_type": "STRING(MAX)",
+        "ordinal_position": 4
+      },
+      {
+        "table_name": "SPLIT_STATS_TOP_10MINUTE",
+        "column_name": "LATENCY_IMPACT_CORRELATION_SCORE",
+        "spanner_type": "STRING(MAX)",
+        "ordinal_position": 7
+      },
+      {
+        "table_name": "SPLIT_STATS_TOP_HOUR",
+        "column_name": "LATENCY_IMPACT_CORRELATION_SCORE",
+        "spanner_type": "STRING(MAX)",
+        "ordinal_position": 7
+      },
+      {
+        "table_name": "SPLIT_STATS_TOP_MINUTE",
+        "column_name": "LATENCY_IMPACT_CORRELATION_SCORE",
+        "spanner_type": "STRING(MAX)",
+        "ordinal_position": 7
+      }
+    ]
+  }
+}

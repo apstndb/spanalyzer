@@ -1,0 +1,39 @@
+"""Update only the dedicated user-level verification profile; never print values."""
+from pathlib import Path
+import datetime
+import json
+import os
+import re
+import subprocess
+import sys
+import tomllib
+
+keys = ['SPANNER_PROJECT_ID', 'SPANNER_INSTANCE_ID', 'SPANNER_DATABASE_ID']
+values = dict(zip(keys, sys.argv[1:4], strict=True))
+profile = Path.home() / '.config/mise/environments/spanner-syntax-verify/mise.toml'
+if not profile.is_file():
+    raise SystemExit('Expected existing dedicated profile is absent')
+tomllib.loads(profile.read_text())
+commands = [
+    ['mise', 'set', '--file', str(profile), *[key + '=' + value for key, value in values.items()]],
+    ['mise', 'config', 'set', '--file', str(profile), '--type', 'list', 'redactions', ','.join(keys)],
+    ['mise', 'trust', str(profile)],
+]
+exits = []
+for command in commands:
+    result = subprocess.run(command, capture_output=True, text=True)
+    exits.append(result.returncode)
+    if result.returncode:
+        message = result.stderr
+        for value in values.values():
+            message = message.replace(value, '<redacted>')
+        print(message, file=sys.stderr)
+        raise SystemExit(result.returncode)
+data = tomllib.loads(profile.read_text())
+matches = all(data['env'][key] == value for key, value in values.items())
+if not matches:
+    raise SystemExit('Dedicated profile values do not match the authorized target')
+receipt = {'recorded_at': datetime.datetime.now(datetime.timezone.utc).isoformat(), 'action': 'Update existing dedicated user-level verification profile and retain redaction settings', 'command_exits': exits, 'values_match_authorized_target': matches, 'profile_permissions': oct(profile.stat().st_mode & 0o777), 'destinations_retained_only_in_dedicated_profile': True, 'credentials_modified': False}
+path = Path('<LOCAL_TASK_ROOT>/apstndb/spanalyzer/managed-recheck-20261023/evidence/profile-update.json')
+path.write_text(json.dumps(receipt, indent=2) + '\n')
+print(json.dumps(receipt))

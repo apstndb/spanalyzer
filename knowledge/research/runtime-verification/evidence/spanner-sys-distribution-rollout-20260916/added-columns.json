@@ -1,0 +1,294 @@
+{
+  "added_columns": [
+    {
+      "table_name": "QUERY_STATS_TOP_10MINUTE",
+      "column_name": "CPU_SECONDS_DISTRIBUTION",
+      "spanner_type": "ARRAY<STRUCT<COUNT INT64, MEAN FLOAT64, SUM_OF_SQUARED_DEVIATION FLOAT64, NUM_FINITE_BUCKETS INT64, GROWTH_FACTOR FLOAT64, SCALE FLOAT64, BUCKET_COUNTS ARRAY<INT64>>>",
+      "ordinal_position": 33
+    },
+    {
+      "table_name": "QUERY_STATS_TOP_10MINUTE",
+      "column_name": "CPU_SECONDS_DISTRIBUTION_JSON_STRING",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 34
+    },
+    {
+      "table_name": "QUERY_STATS_TOP_10MINUTE",
+      "column_name": "ROW_SCANNED_DISTRIBUTION",
+      "spanner_type": "ARRAY<STRUCT<COUNT INT64, MEAN FLOAT64, SUM_OF_SQUARED_DEVIATION FLOAT64, NUM_FINITE_BUCKETS INT64, GROWTH_FACTOR FLOAT64, SCALE FLOAT64, BUCKET_COUNTS ARRAY<INT64>>>",
+      "ordinal_position": 35
+    },
+    {
+      "table_name": "QUERY_STATS_TOP_10MINUTE",
+      "column_name": "ROW_SCANNED_DISTRIBUTION_JSON_STRING",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 36
+    },
+    {
+      "table_name": "QUERY_STATS_TOP_HOUR",
+      "column_name": "CPU_SECONDS_DISTRIBUTION",
+      "spanner_type": "ARRAY<STRUCT<COUNT INT64, MEAN FLOAT64, SUM_OF_SQUARED_DEVIATION FLOAT64, NUM_FINITE_BUCKETS INT64, GROWTH_FACTOR FLOAT64, SCALE FLOAT64, BUCKET_COUNTS ARRAY<INT64>>>",
+      "ordinal_position": 33
+    },
+    {
+      "table_name": "QUERY_STATS_TOP_HOUR",
+      "column_name": "CPU_SECONDS_DISTRIBUTION_JSON_STRING",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 34
+    },
+    {
+      "table_name": "QUERY_STATS_TOP_HOUR",
+      "column_name": "ROW_SCANNED_DISTRIBUTION",
+      "spanner_type": "ARRAY<STRUCT<COUNT INT64, MEAN FLOAT64, SUM_OF_SQUARED_DEVIATION FLOAT64, NUM_FINITE_BUCKETS INT64, GROWTH_FACTOR FLOAT64, SCALE FLOAT64, BUCKET_COUNTS ARRAY<INT64>>>",
+      "ordinal_position": 35
+    },
+    {
+      "table_name": "QUERY_STATS_TOP_HOUR",
+      "column_name": "ROW_SCANNED_DISTRIBUTION_JSON_STRING",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 36
+    },
+    {
+      "table_name": "QUERY_STATS_TOP_MINUTE",
+      "column_name": "CPU_SECONDS_DISTRIBUTION",
+      "spanner_type": "ARRAY<STRUCT<COUNT INT64, MEAN FLOAT64, SUM_OF_SQUARED_DEVIATION FLOAT64, NUM_FINITE_BUCKETS INT64, GROWTH_FACTOR FLOAT64, SCALE FLOAT64, BUCKET_COUNTS ARRAY<INT64>>>",
+      "ordinal_position": 33
+    },
+    {
+      "table_name": "QUERY_STATS_TOP_MINUTE",
+      "column_name": "CPU_SECONDS_DISTRIBUTION_JSON_STRING",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 34
+    },
+    {
+      "table_name": "QUERY_STATS_TOP_MINUTE",
+      "column_name": "ROW_SCANNED_DISTRIBUTION",
+      "spanner_type": "ARRAY<STRUCT<COUNT INT64, MEAN FLOAT64, SUM_OF_SQUARED_DEVIATION FLOAT64, NUM_FINITE_BUCKETS INT64, GROWTH_FACTOR FLOAT64, SCALE FLOAT64, BUCKET_COUNTS ARRAY<INT64>>>",
+      "ordinal_position": 35
+    },
+    {
+      "table_name": "QUERY_STATS_TOP_MINUTE",
+      "column_name": "ROW_SCANNED_DISTRIBUTION_JSON_STRING",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 36
+    },
+    {
+      "table_name": "QUERY_STATS_TOTAL_10MINUTE",
+      "column_name": "CPU_SECONDS_DISTRIBUTION",
+      "spanner_type": "ARRAY<STRUCT<COUNT INT64, MEAN FLOAT64, SUM_OF_SQUARED_DEVIATION FLOAT64, NUM_FINITE_BUCKETS INT64, GROWTH_FACTOR FLOAT64, SCALE FLOAT64, BUCKET_COUNTS ARRAY<INT64>>>",
+      "ordinal_position": 25
+    },
+    {
+      "table_name": "QUERY_STATS_TOTAL_10MINUTE",
+      "column_name": "CPU_SECONDS_DISTRIBUTION_JSON_STRING",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 26
+    },
+    {
+      "table_name": "QUERY_STATS_TOTAL_10MINUTE",
+      "column_name": "ROW_SCANNED_DISTRIBUTION",
+      "spanner_type": "ARRAY<STRUCT<COUNT INT64, MEAN FLOAT64, SUM_OF_SQUARED_DEVIATION FLOAT64, NUM_FINITE_BUCKETS INT64, GROWTH_FACTOR FLOAT64, SCALE FLOAT64, BUCKET_COUNTS ARRAY<INT64>>>",
+      "ordinal_position": 27
+    },
+    {
+      "table_name": "QUERY_STATS_TOTAL_10MINUTE",
+      "column_name": "ROW_SCANNED_DISTRIBUTION_JSON_STRING",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 28
+    },
+    {
+      "table_name": "QUERY_STATS_TOTAL_HOUR",
+      "column_name": "CPU_SECONDS_DISTRIBUTION",
+      "spanner_type": "ARRAY<STRUCT<COUNT INT64, MEAN FLOAT64, SUM_OF_SQUARED_DEVIATION FLOAT64, NUM_FINITE_BUCKETS INT64, GROWTH_FACTOR FLOAT64, SCALE FLOAT64, BUCKET_COUNTS ARRAY<INT64>>>",
+      "ordinal_position": 25
+    },
+    {
+      "table_name": "QUERY_STATS_TOTAL_HOUR",
+      "column_name": "CPU_SECONDS_DISTRIBUTION_JSON_STRING",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 26
+    },
+    {
+      "table_name": "QUERY_STATS_TOTAL_HOUR",
+      "column_name": "ROW_SCANNED_DISTRIBUTION",
+      "spanner_type": "ARRAY<STRUCT<COUNT INT64, MEAN FLOAT64, SUM_OF_SQUARED_DEVIATION FLOAT64, NUM_FINITE_BUCKETS INT64, GROWTH_FACTOR FLOAT64, SCALE FLOAT64, BUCKET_COUNTS ARRAY<INT64>>>",
+      "ordinal_position": 27
+    },
+    {
+      "table_name": "QUERY_STATS_TOTAL_HOUR",
+      "column_name": "ROW_SCANNED_DISTRIBUTION_JSON_STRING",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 28
+    },
+    {
+      "table_name": "QUERY_STATS_TOTAL_MINUTE",
+      "column_name": "CPU_SECONDS_DISTRIBUTION",
+      "spanner_type": "ARRAY<STRUCT<COUNT INT64, MEAN FLOAT64, SUM_OF_SQUARED_DEVIATION FLOAT64, NUM_FINITE_BUCKETS INT64, GROWTH_FACTOR FLOAT64, SCALE FLOAT64, BUCKET_COUNTS ARRAY<INT64>>>",
+      "ordinal_position": 25
+    },
+    {
+      "table_name": "QUERY_STATS_TOTAL_MINUTE",
+      "column_name": "CPU_SECONDS_DISTRIBUTION_JSON_STRING",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 26
+    },
+    {
+      "table_name": "QUERY_STATS_TOTAL_MINUTE",
+      "column_name": "ROW_SCANNED_DISTRIBUTION",
+      "spanner_type": "ARRAY<STRUCT<COUNT INT64, MEAN FLOAT64, SUM_OF_SQUARED_DEVIATION FLOAT64, NUM_FINITE_BUCKETS INT64, GROWTH_FACTOR FLOAT64, SCALE FLOAT64, BUCKET_COUNTS ARRAY<INT64>>>",
+      "ordinal_position": 27
+    },
+    {
+      "table_name": "QUERY_STATS_TOTAL_MINUTE",
+      "column_name": "ROW_SCANNED_DISTRIBUTION_JSON_STRING",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 28
+    },
+    {
+      "table_name": "TXN_STATS_TOP_10MINUTE",
+      "column_name": "COMMIT_LATENCY_DISTRIBUTION",
+      "spanner_type": "ARRAY<STRUCT<COUNT INT64, MEAN FLOAT64, SUM_OF_SQUARED_DEVIATION FLOAT64, NUM_FINITE_BUCKETS INT64, GROWTH_FACTOR FLOAT64, SCALE FLOAT64, BUCKET_COUNTS ARRAY<INT64>>>",
+      "ordinal_position": 24
+    },
+    {
+      "table_name": "TXN_STATS_TOP_10MINUTE",
+      "column_name": "COMMIT_LATENCY_DISTRIBUTION_JSON_STRING",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 25
+    },
+    {
+      "table_name": "TXN_STATS_TOP_10MINUTE",
+      "column_name": "PARTICIPANTS_DISTRIBUTION",
+      "spanner_type": "ARRAY<STRUCT<COUNT INT64, MEAN FLOAT64, SUM_OF_SQUARED_DEVIATION FLOAT64, NUM_FINITE_BUCKETS INT64, GROWTH_FACTOR FLOAT64, SCALE FLOAT64, BUCKET_COUNTS ARRAY<INT64>>>",
+      "ordinal_position": 26
+    },
+    {
+      "table_name": "TXN_STATS_TOP_10MINUTE",
+      "column_name": "PARTICIPANTS_DISTRIBUTION_JSON_STRING",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 27
+    },
+    {
+      "table_name": "TXN_STATS_TOP_HOUR",
+      "column_name": "COMMIT_LATENCY_DISTRIBUTION",
+      "spanner_type": "ARRAY<STRUCT<COUNT INT64, MEAN FLOAT64, SUM_OF_SQUARED_DEVIATION FLOAT64, NUM_FINITE_BUCKETS INT64, GROWTH_FACTOR FLOAT64, SCALE FLOAT64, BUCKET_COUNTS ARRAY<INT64>>>",
+      "ordinal_position": 24
+    },
+    {
+      "table_name": "TXN_STATS_TOP_HOUR",
+      "column_name": "COMMIT_LATENCY_DISTRIBUTION_JSON_STRING",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 25
+    },
+    {
+      "table_name": "TXN_STATS_TOP_HOUR",
+      "column_name": "PARTICIPANTS_DISTRIBUTION",
+      "spanner_type": "ARRAY<STRUCT<COUNT INT64, MEAN FLOAT64, SUM_OF_SQUARED_DEVIATION FLOAT64, NUM_FINITE_BUCKETS INT64, GROWTH_FACTOR FLOAT64, SCALE FLOAT64, BUCKET_COUNTS ARRAY<INT64>>>",
+      "ordinal_position": 26
+    },
+    {
+      "table_name": "TXN_STATS_TOP_HOUR",
+      "column_name": "PARTICIPANTS_DISTRIBUTION_JSON_STRING",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 27
+    },
+    {
+      "table_name": "TXN_STATS_TOP_MINUTE",
+      "column_name": "COMMIT_LATENCY_DISTRIBUTION",
+      "spanner_type": "ARRAY<STRUCT<COUNT INT64, MEAN FLOAT64, SUM_OF_SQUARED_DEVIATION FLOAT64, NUM_FINITE_BUCKETS INT64, GROWTH_FACTOR FLOAT64, SCALE FLOAT64, BUCKET_COUNTS ARRAY<INT64>>>",
+      "ordinal_position": 24
+    },
+    {
+      "table_name": "TXN_STATS_TOP_MINUTE",
+      "column_name": "COMMIT_LATENCY_DISTRIBUTION_JSON_STRING",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 25
+    },
+    {
+      "table_name": "TXN_STATS_TOP_MINUTE",
+      "column_name": "PARTICIPANTS_DISTRIBUTION",
+      "spanner_type": "ARRAY<STRUCT<COUNT INT64, MEAN FLOAT64, SUM_OF_SQUARED_DEVIATION FLOAT64, NUM_FINITE_BUCKETS INT64, GROWTH_FACTOR FLOAT64, SCALE FLOAT64, BUCKET_COUNTS ARRAY<INT64>>>",
+      "ordinal_position": 26
+    },
+    {
+      "table_name": "TXN_STATS_TOP_MINUTE",
+      "column_name": "PARTICIPANTS_DISTRIBUTION_JSON_STRING",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 27
+    },
+    {
+      "table_name": "TXN_STATS_TOTAL_10MINUTE",
+      "column_name": "COMMIT_LATENCY_DISTRIBUTION",
+      "spanner_type": "ARRAY<STRUCT<COUNT INT64, MEAN FLOAT64, SUM_OF_SQUARED_DEVIATION FLOAT64, NUM_FINITE_BUCKETS INT64, GROWTH_FACTOR FLOAT64, SCALE FLOAT64, BUCKET_COUNTS ARRAY<INT64>>>",
+      "ordinal_position": 19
+    },
+    {
+      "table_name": "TXN_STATS_TOTAL_10MINUTE",
+      "column_name": "COMMIT_LATENCY_DISTRIBUTION_JSON_STRING",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 20
+    },
+    {
+      "table_name": "TXN_STATS_TOTAL_10MINUTE",
+      "column_name": "PARTICIPANTS_DISTRIBUTION",
+      "spanner_type": "ARRAY<STRUCT<COUNT INT64, MEAN FLOAT64, SUM_OF_SQUARED_DEVIATION FLOAT64, NUM_FINITE_BUCKETS INT64, GROWTH_FACTOR FLOAT64, SCALE FLOAT64, BUCKET_COUNTS ARRAY<INT64>>>",
+      "ordinal_position": 21
+    },
+    {
+      "table_name": "TXN_STATS_TOTAL_10MINUTE",
+      "column_name": "PARTICIPANTS_DISTRIBUTION_JSON_STRING",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 22
+    },
+    {
+      "table_name": "TXN_STATS_TOTAL_HOUR",
+      "column_name": "COMMIT_LATENCY_DISTRIBUTION",
+      "spanner_type": "ARRAY<STRUCT<COUNT INT64, MEAN FLOAT64, SUM_OF_SQUARED_DEVIATION FLOAT64, NUM_FINITE_BUCKETS INT64, GROWTH_FACTOR FLOAT64, SCALE FLOAT64, BUCKET_COUNTS ARRAY<INT64>>>",
+      "ordinal_position": 19
+    },
+    {
+      "table_name": "TXN_STATS_TOTAL_HOUR",
+      "column_name": "COMMIT_LATENCY_DISTRIBUTION_JSON_STRING",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 20
+    },
+    {
+      "table_name": "TXN_STATS_TOTAL_HOUR",
+      "column_name": "PARTICIPANTS_DISTRIBUTION",
+      "spanner_type": "ARRAY<STRUCT<COUNT INT64, MEAN FLOAT64, SUM_OF_SQUARED_DEVIATION FLOAT64, NUM_FINITE_BUCKETS INT64, GROWTH_FACTOR FLOAT64, SCALE FLOAT64, BUCKET_COUNTS ARRAY<INT64>>>",
+      "ordinal_position": 21
+    },
+    {
+      "table_name": "TXN_STATS_TOTAL_HOUR",
+      "column_name": "PARTICIPANTS_DISTRIBUTION_JSON_STRING",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 22
+    },
+    {
+      "table_name": "TXN_STATS_TOTAL_MINUTE",
+      "column_name": "COMMIT_LATENCY_DISTRIBUTION",
+      "spanner_type": "ARRAY<STRUCT<COUNT INT64, MEAN FLOAT64, SUM_OF_SQUARED_DEVIATION FLOAT64, NUM_FINITE_BUCKETS INT64, GROWTH_FACTOR FLOAT64, SCALE FLOAT64, BUCKET_COUNTS ARRAY<INT64>>>",
+      "ordinal_position": 19
+    },
+    {
+      "table_name": "TXN_STATS_TOTAL_MINUTE",
+      "column_name": "COMMIT_LATENCY_DISTRIBUTION_JSON_STRING",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 20
+    },
+    {
+      "table_name": "TXN_STATS_TOTAL_MINUTE",
+      "column_name": "PARTICIPANTS_DISTRIBUTION",
+      "spanner_type": "ARRAY<STRUCT<COUNT INT64, MEAN FLOAT64, SUM_OF_SQUARED_DEVIATION FLOAT64, NUM_FINITE_BUCKETS INT64, GROWTH_FACTOR FLOAT64, SCALE FLOAT64, BUCKET_COUNTS ARRAY<INT64>>>",
+      "ordinal_position": 21
+    },
+    {
+      "table_name": "TXN_STATS_TOTAL_MINUTE",
+      "column_name": "PARTICIPANTS_DISTRIBUTION_JSON_STRING",
+      "spanner_type": "STRING(MAX)",
+      "ordinal_position": 22
+    }
+  ],
+  "observed_surface_column_count": 587,
+  "legacy_baseline_column_count": 539
+}

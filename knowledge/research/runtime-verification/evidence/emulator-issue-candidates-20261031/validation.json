@@ -1,0 +1,66 @@
+{
+  "status": "passed",
+  "commands": [
+    {
+      "name": "tools-tests",
+      "argv": [
+        "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go",
+        "test",
+        "./..."
+      ],
+      "cwd": "<LOCAL_CHECKOUT>/tools",
+      "started_at": "2026-10-30T19:51:36.539666+00:00",
+      "exit_code": 0,
+      "log": "validation-logs/tools-tests.log"
+    },
+    {
+      "name": "okf-all",
+      "argv": [
+        "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go",
+        "run",
+        "./okf-check",
+        "--repo-root",
+        "..",
+        "--gate",
+        "all",
+        "--publication-manifest",
+        "<LOCAL_TASK_ROOT>/apstndb/spanalyzer/emulator-issue-candidates-20261031/publication-manifest.json"
+      ],
+      "cwd": "<LOCAL_CHECKOUT>/tools",
+      "started_at": "2026-10-30T19:51:38.500095+00:00",
+      "exit_code": 0,
+      "log": "validation-logs/okf-all.log"
+    },
+    {
+      "name": "markdown-language",
+      "argv": [
+        "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go",
+        "run",
+        "./markdown-language-check",
+        "--repo-root",
+        ".."
+      ],
+      "cwd": "<LOCAL_CHECKOUT>/tools",
+      "started_at": "2026-10-30T19:51:39.090407+00:00",
+      "exit_code": 0,
+      "log": "validation-logs/markdown-language.log"
+    },
+    {
+      "name": "git-diff-check",
+      "argv": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "cwd": "<LOCAL_CHECKOUT>",
+      "started_at": "2026-10-30T19:51:39.173008+00:00",
+      "exit_code": 0,
+      "log": "validation-logs/git-diff-check.log"
+    }
+  ],
+  "evidence_assertions": {
+    "passed": 31,
+    "failed": 0
+  },
+  "scope": "Source/evidence audit only; no new runtime or managed/Omni call and no implementation change."
+}

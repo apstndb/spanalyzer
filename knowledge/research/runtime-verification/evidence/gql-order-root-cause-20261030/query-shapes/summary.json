@@ -1,0 +1,2192 @@
+{
+  "runtime": "Emulator 1.5.59 linux/arm64 manifest 969af6a9349948fbfb4a826c18e160e258a4005f7c759f8e7f2dcec369cccba8",
+  "queries": 73,
+  "planned_steps": 77,
+  "root_records": 89,
+  "query_errors": 0,
+  "final_unique_key_order": {
+    "correct": 0,
+    "total": 32
+  },
+  "cases": [
+    {
+      "label": "id-ASC",
+      "kind": "ordered-rows",
+      "actual": [
+        {
+          "v": "2"
+        },
+        {
+          "v": "1"
+        },
+        {
+          "v": "3"
+        }
+      ],
+      "expected": [
+        {
+          "v": "1"
+        },
+        {
+          "v": "2"
+        },
+        {
+          "v": "3"
+        }
+      ],
+      "ordered": false
+    },
+    {
+      "label": "sql-id-ASC",
+      "kind": "sql-oracle",
+      "actual": [
+        {
+          "v": "1"
+        },
+        {
+          "v": "2"
+        },
+        {
+          "v": "3"
+        }
+      ]
+    },
+    {
+      "label": "id-DESC",
+      "kind": "ordered-rows",
+      "actual": [
+        {
+          "v": "2"
+        },
+        {
+          "v": "3"
+        },
+        {
+          "v": "1"
+        }
+      ],
+      "expected": [
+        {
+          "v": "3"
+        },
+        {
+          "v": "2"
+        },
+        {
+          "v": "1"
+        }
+      ],
+      "ordered": false
+    },
+    {
+      "label": "sql-id-DESC",
+      "kind": "sql-oracle",
+      "actual": [
+        {
+          "v": "3"
+        },
+        {
+          "v": "2"
+        },
+        {
+          "v": "1"
+        }
+      ]
+    },
+    {
+      "label": "name-ASC",
+      "kind": "ordered-rows",
+      "actual": [
+        {
+          "v": "Dana"
+        },
+        {
+          "v": "Alex"
+        },
+        {
+          "v": "Lee"
+        }
+      ],
+      "expected": [
+        {
+          "v": "Alex"
+        },
+        {
+          "v": "Dana"
+        },
+        {
+          "v": "Lee"
+        }
+      ],
+      "ordered": false
+    },
+    {
+      "label": "sql-name-ASC",
+      "kind": "sql-oracle",
+      "actual": [
+        {
+          "v": "Alex"
+        },
+        {
+          "v": "Dana"
+        },
+        {
+          "v": "Lee"
+        }
+      ]
+    },
+    {
+      "label": "name-DESC",
+      "kind": "ordered-rows",
+      "actual": [
+        {
+          "v": "Dana"
+        },
+        {
+          "v": "Lee"
+        },
+        {
+          "v": "Alex"
+        }
+      ],
+      "expected": [
+        {
+          "v": "Lee"
+        },
+        {
+          "v": "Dana"
+        },
+        {
+          "v": "Alex"
+        }
+      ],
+      "ordered": false
+    },
+    {
+      "label": "sql-name-DESC",
+      "kind": "sql-oracle",
+      "actual": [
+        {
+          "v": "Lee"
+        },
+        {
+          "v": "Dana"
+        },
+        {
+          "v": "Alex"
+        }
+      ]
+    },
+    {
+      "label": "country-ASC",
+      "kind": "ordered-rows",
+      "actual": [
+        {
+          "v": "Czech_Republic"
+        },
+        {
+          "v": "Australia"
+        },
+        {
+          "v": "India"
+        }
+      ],
+      "expected": [
+        {
+          "v": "Australia"
+        },
+        {
+          "v": "Czech_Republic"
+        },
+        {
+          "v": "India"
+        }
+      ],
+      "ordered": false
+    },
+    {
+      "label": "sql-country-ASC",
+      "kind": "sql-oracle",
+      "actual": [
+        {
+          "v": "Australia"
+        },
+        {
+          "v": "Czech_Republic"
+        },
+        {
+          "v": "India"
+        }
+      ]
+    },
+    {
+      "label": "country-DESC",
+      "kind": "ordered-rows",
+      "actual": [
+        {
+          "v": "Czech_Republic"
+        },
+        {
+          "v": "India"
+        },
+        {
+          "v": "Australia"
+        }
+      ],
+      "expected": [
+        {
+          "v": "India"
+        },
+        {
+          "v": "Czech_Republic"
+        },
+        {
+          "v": "Australia"
+        }
+      ],
+      "ordered": false
+    },
+    {
+      "label": "sql-country-DESC",
+      "kind": "sql-oracle",
+      "actual": [
+        {
+          "v": "India"
+        },
+        {
+          "v": "Czech_Republic"
+        },
+        {
+          "v": "Australia"
+        }
+      ]
+    },
+    {
+      "label": "timestamp-ASC",
+      "kind": "ordered-rows",
+      "actual": [
+        {
+          "v": "1986-12-07T08:00:00Z"
+        },
+        {
+          "v": "1980-10-31T08:00:00Z"
+        },
+        {
+          "v": "1991-12-21T08:00:00Z"
+        }
+      ],
+      "expected": [
+        {
+          "v": "1980-10-31T08:00:00Z"
+        },
+        {
+          "v": "1986-12-07T08:00:00Z"
+        },
+        {
+          "v": "1991-12-21T08:00:00Z"
+        }
+      ],
+      "ordered": false
+    },
+    {
+      "label": "sql-timestamp-ASC",
+      "kind": "sql-oracle",
+      "actual": [
+        {
+          "v": "1980-10-31T08:00:00Z"
+        },
+        {
+          "v": "1986-12-07T08:00:00Z"
+        },
+        {
+          "v": "1991-12-21T08:00:00Z"
+        }
+      ]
+    },
+    {
+      "label": "timestamp-DESC",
+      "kind": "ordered-rows",
+      "actual": [
+        {
+          "v": "1986-12-07T08:00:00Z"
+        },
+        {
+          "v": "1991-12-21T08:00:00Z"
+        },
+        {
+          "v": "1980-10-31T08:00:00Z"
+        }
+      ],
+      "expected": [
+        {
+          "v": "1991-12-21T08:00:00Z"
+        },
+        {
+          "v": "1986-12-07T08:00:00Z"
+        },
+        {
+          "v": "1980-10-31T08:00:00Z"
+        }
+      ],
+      "ordered": false
+    },
+    {
+      "label": "sql-timestamp-DESC",
+      "kind": "sql-oracle",
+      "actual": [
+        {
+          "v": "1991-12-21T08:00:00Z"
+        },
+        {
+          "v": "1986-12-07T08:00:00Z"
+        },
+        {
+          "v": "1980-10-31T08:00:00Z"
+        }
+      ]
+    },
+    {
+      "label": "arithmetic-ASC",
+      "kind": "ordered-rows",
+      "actual": [
+        {
+          "v": "12"
+        },
+        {
+          "v": "11"
+        },
+        {
+          "v": "13"
+        }
+      ],
+      "expected": [
+        {
+          "v": "11"
+        },
+        {
+          "v": "12"
+        },
+        {
+          "v": "13"
+        }
+      ],
+      "ordered": false
+    },
+    {
+      "label": "sql-arithmetic-ASC",
+      "kind": "sql-oracle",
+      "actual": [
+        {
+          "v": "11"
+        },
+        {
+          "v": "12"
+        },
+        {
+          "v": "13"
+        }
+      ]
+    },
+    {
+      "label": "arithmetic-DESC",
+      "kind": "ordered-rows",
+      "actual": [
+        {
+          "v": "12"
+        },
+        {
+          "v": "13"
+        },
+        {
+          "v": "11"
+        }
+      ],
+      "expected": [
+        {
+          "v": "13"
+        },
+        {
+          "v": "12"
+        },
+        {
+          "v": "11"
+        }
+      ],
+      "ordered": false
+    },
+    {
+      "label": "sql-arithmetic-DESC",
+      "kind": "sql-oracle",
+      "actual": [
+        {
+          "v": "13"
+        },
+        {
+          "v": "12"
+        },
+        {
+          "v": "11"
+        }
+      ]
+    },
+    {
+      "label": "string-cast-ASC",
+      "kind": "ordered-rows",
+      "actual": [
+        {
+          "v": "2"
+        },
+        {
+          "v": "1"
+        },
+        {
+          "v": "3"
+        }
+      ],
+      "expected": [
+        {
+          "v": "1"
+        },
+        {
+          "v": "2"
+        },
+        {
+          "v": "3"
+        }
+      ],
+      "ordered": false
+    },
+    {
+      "label": "sql-string-cast-ASC",
+      "kind": "sql-oracle",
+      "actual": [
+        {
+          "v": "1"
+        },
+        {
+          "v": "2"
+        },
+        {
+          "v": "3"
+        }
+      ]
+    },
+    {
+      "label": "string-cast-DESC",
+      "kind": "ordered-rows",
+      "actual": [
+        {
+          "v": "2"
+        },
+        {
+          "v": "3"
+        },
+        {
+          "v": "1"
+        }
+      ],
+      "expected": [
+        {
+          "v": "3"
+        },
+        {
+          "v": "2"
+        },
+        {
+          "v": "1"
+        }
+      ],
+      "ordered": false
+    },
+    {
+      "label": "sql-string-cast-DESC",
+      "kind": "sql-oracle",
+      "actual": [
+        {
+          "v": "3"
+        },
+        {
+          "v": "2"
+        },
+        {
+          "v": "1"
+        }
+      ]
+    },
+    {
+      "label": "distinct-ASC",
+      "kind": "ordered-rows",
+      "actual": [
+        {
+          "v": "2"
+        },
+        {
+          "v": "1"
+        },
+        {
+          "v": "3"
+        }
+      ],
+      "expected": [
+        {
+          "v": "1"
+        },
+        {
+          "v": "2"
+        },
+        {
+          "v": "3"
+        }
+      ],
+      "ordered": false
+    },
+    {
+      "label": "aggregate-ASC",
+      "kind": "ordered-rows",
+      "actual": [
+        {
+          "id": "7",
+          "total": 400
+        },
+        {
+          "id": "16",
+          "total": 300
+        },
+        {
+          "id": "20",
+          "total": 700
+        }
+      ],
+      "expected": [
+        {
+          "id": "16",
+          "total": 300
+        },
+        {
+          "id": "7",
+          "total": 400
+        },
+        {
+          "id": "20",
+          "total": 700
+        }
+      ],
+      "ordered": false
+    },
+    {
+      "label": "sql-aggregate-ASC",
+      "kind": "sql-oracle",
+      "actual": [
+        {
+          "id": "16",
+          "total": 300
+        },
+        {
+          "id": "7",
+          "total": 400
+        },
+        {
+          "id": "20",
+          "total": 700
+        }
+      ]
+    },
+    {
+      "label": "next-ASC",
+      "kind": "ordered-rows",
+      "actual": [
+        {
+          "v": "2"
+        },
+        {
+          "v": "1"
+        },
+        {
+          "v": "3"
+        }
+      ],
+      "expected": [
+        {
+          "v": "1"
+        },
+        {
+          "v": "2"
+        },
+        {
+          "v": "3"
+        }
+      ],
+      "ordered": false
+    },
+    {
+      "label": "limit1-ASC",
+      "kind": "selection",
+      "actual": [
+        {
+          "v": "1"
+        }
+      ],
+      "expected": [
+        {
+          "v": "1"
+        }
+      ],
+      "ordered": true
+    },
+    {
+      "label": "limit2-ASC",
+      "kind": "ordered-rows-and-selection",
+      "actual": [
+        {
+          "v": "2"
+        },
+        {
+          "v": "1"
+        }
+      ],
+      "expected": [
+        {
+          "v": "1"
+        },
+        {
+          "v": "2"
+        }
+      ],
+      "ordered": false
+    },
+    {
+      "label": "primitive-limit2-ASC",
+      "kind": "selection-only",
+      "actual": [
+        {
+          "v": "1"
+        },
+        {
+          "v": "2"
+        }
+      ],
+      "expected": [
+        {
+          "v": "1"
+        },
+        {
+          "v": "2"
+        }
+      ],
+      "ordered": true
+    },
+    {
+      "label": "distinct-DESC",
+      "kind": "ordered-rows",
+      "actual": [
+        {
+          "v": "2"
+        },
+        {
+          "v": "3"
+        },
+        {
+          "v": "1"
+        }
+      ],
+      "expected": [
+        {
+          "v": "3"
+        },
+        {
+          "v": "2"
+        },
+        {
+          "v": "1"
+        }
+      ],
+      "ordered": false
+    },
+    {
+      "label": "aggregate-DESC",
+      "kind": "ordered-rows",
+      "actual": [
+        {
+          "id": "7",
+          "total": 400
+        },
+        {
+          "id": "20",
+          "total": 700
+        },
+        {
+          "id": "16",
+          "total": 300
+        }
+      ],
+      "expected": [
+        {
+          "id": "20",
+          "total": 700
+        },
+        {
+          "id": "7",
+          "total": 400
+        },
+        {
+          "id": "16",
+          "total": 300
+        }
+      ],
+      "ordered": false
+    },
+    {
+      "label": "sql-aggregate-DESC",
+      "kind": "sql-oracle",
+      "actual": [
+        {
+          "id": "20",
+          "total": 700
+        },
+        {
+          "id": "7",
+          "total": 400
+        },
+        {
+          "id": "16",
+          "total": 300
+        }
+      ]
+    },
+    {
+      "label": "next-DESC",
+      "kind": "ordered-rows",
+      "actual": [
+        {
+          "v": "2"
+        },
+        {
+          "v": "3"
+        },
+        {
+          "v": "1"
+        }
+      ],
+      "expected": [
+        {
+          "v": "3"
+        },
+        {
+          "v": "2"
+        },
+        {
+          "v": "1"
+        }
+      ],
+      "ordered": false
+    },
+    {
+      "label": "limit1-DESC",
+      "kind": "selection",
+      "actual": [
+        {
+          "v": "3"
+        }
+      ],
+      "expected": [
+        {
+          "v": "3"
+        }
+      ],
+      "ordered": true
+    },
+    {
+      "label": "limit2-DESC",
+      "kind": "ordered-rows-and-selection",
+      "actual": [
+        {
+          "v": "2"
+        },
+        {
+          "v": "3"
+        }
+      ],
+      "expected": [
+        {
+          "v": "3"
+        },
+        {
+          "v": "2"
+        }
+      ],
+      "ordered": false
+    },
+    {
+      "label": "primitive-limit2-DESC",
+      "kind": "selection-only",
+      "actual": [
+        {
+          "v": "3"
+        },
+        {
+          "v": "2"
+        }
+      ],
+      "expected": [
+        {
+          "v": "3"
+        },
+        {
+          "v": "2"
+        }
+      ],
+      "ordered": true
+    },
+    {
+      "label": "primitive-no-page",
+      "kind": "undefined-output-order",
+      "actual": [
+        {
+          "v": "2"
+        },
+        {
+          "v": "3"
+        },
+        {
+          "v": "1"
+        }
+      ]
+    },
+    {
+      "label": "offset-limit",
+      "kind": "ordered-rows-and-selection",
+      "actual": [
+        {
+          "v": "1"
+        },
+        {
+          "v": "2"
+        }
+      ],
+      "expected": [
+        {
+          "v": "2"
+        },
+        {
+          "v": "1"
+        }
+      ],
+      "ordered": false
+    },
+    {
+      "label": "tie-keys",
+      "kind": "tie-keys",
+      "actual": [
+        {
+          "id": "2",
+          "k": false
+        },
+        {
+          "id": "1",
+          "k": false
+        },
+        {
+          "id": "3",
+          "k": true
+        }
+      ],
+      "ordered": true,
+      "contract": "Only k is ordered; swapped equal-key IDs do not violate that clause"
+    },
+    {
+      "label": "tie-keys-with-id",
+      "kind": "ordered-ids",
+      "actual": [
+        {
+          "id": "2",
+          "k": false
+        },
+        {
+          "id": "1",
+          "k": false
+        },
+        {
+          "id": "3",
+          "k": true
+        }
+      ],
+      "ordered": false
+    },
+    {
+      "label": "aggregate-order",
+      "kind": "array-order",
+      "actual": [
+        {
+          "ids": [
+            "1",
+            "2",
+            "3"
+          ]
+        }
+      ],
+      "expected": [
+        {
+          "ids": [
+            "1",
+            "2",
+            "3"
+          ]
+        }
+      ],
+      "ordered": true,
+      "contract": "Explicit aggregate ORDER BY"
+    },
+    {
+      "label": "aggregate-order-desc",
+      "kind": "array-order",
+      "actual": [
+        {
+          "ids": [
+            "3",
+            "2",
+            "1"
+          ]
+        }
+      ],
+      "expected": [
+        {
+          "ids": [
+            "3",
+            "2",
+            "1"
+          ]
+        }
+      ],
+      "ordered": true,
+      "contract": "Explicit aggregate ORDER BY"
+    },
+    {
+      "label": "next-array",
+      "kind": "encounter-order-observation",
+      "actual": [
+        {
+          "ids": [
+            "1",
+            "2",
+            "3"
+          ]
+        }
+      ],
+      "expected": [
+        {
+          "ids": [
+            "1",
+            "2",
+            "3"
+          ]
+        }
+      ],
+      "ordered": true,
+      "contract": "Observed encounter order only; no explicit aggregate ORDER BY"
+    },
+    {
+      "label": "for-values",
+      "kind": "ordered-rows",
+      "actual": [
+        {
+          "v": "2"
+        },
+        {
+          "v": "1"
+        },
+        {
+          "v": "3"
+        }
+      ],
+      "expected": [
+        {
+          "v": "1"
+        },
+        {
+          "v": "2"
+        },
+        {
+          "v": "3"
+        }
+      ],
+      "ordered": false
+    },
+    {
+      "label": "sql-outer-graph",
+      "kind": "sql-outer-control",
+      "actual": [
+        {
+          "v": "1"
+        },
+        {
+          "v": "2"
+        },
+        {
+          "v": "3"
+        }
+      ],
+      "expected": [
+        {
+          "v": "1"
+        },
+        {
+          "v": "2"
+        },
+        {
+          "v": "3"
+        }
+      ],
+      "ordered": true
+    },
+    {
+      "label": "primitive-ASC-2",
+      "kind": "primitive",
+      "actual": [
+        {
+          "amount": 100,
+          "dst": "16",
+          "src": "7"
+        },
+        {
+          "amount": 200,
+          "dst": "16",
+          "src": "20"
+        }
+      ],
+      "expected": [
+        {
+          "amount": 100,
+          "dst": "16",
+          "src": "7"
+        },
+        {
+          "amount": 200,
+          "dst": "16",
+          "src": "20"
+        }
+      ],
+      "ordered": true,
+      "permutations": 2
+    },
+    {
+      "label": "final-ASC-2",
+      "kind": "final",
+      "actual": [
+        {
+          "amount": 200,
+          "dst": "16",
+          "src": "20"
+        },
+        {
+          "amount": 100,
+          "dst": "16",
+          "src": "7"
+        }
+      ],
+      "expected": [
+        {
+          "amount": 100,
+          "dst": "16",
+          "src": "7"
+        },
+        {
+          "amount": 200,
+          "dst": "16",
+          "src": "20"
+        }
+      ],
+      "ordered": false,
+      "permutations": 1
+    },
+    {
+      "label": "sql-ASC-2",
+      "kind": "sql",
+      "actual": [
+        {
+          "amount": 100,
+          "dst": "16",
+          "src": "7"
+        },
+        {
+          "amount": 200,
+          "dst": "16",
+          "src": "20"
+        }
+      ],
+      "expected": [
+        {
+          "amount": 100,
+          "dst": "16",
+          "src": "7"
+        },
+        {
+          "amount": 200,
+          "dst": "16",
+          "src": "20"
+        }
+      ]
+    },
+    {
+      "label": "primitive-ASC-3",
+      "kind": "primitive",
+      "actual": [
+        {
+          "amount": 100,
+          "dst": "16",
+          "src": "7"
+        },
+        {
+          "amount": 200,
+          "dst": "16",
+          "src": "20"
+        },
+        {
+          "amount": 300,
+          "dst": "16",
+          "src": "7"
+        }
+      ],
+      "expected": [
+        {
+          "amount": 100,
+          "dst": "16",
+          "src": "7"
+        },
+        {
+          "amount": 200,
+          "dst": "16",
+          "src": "20"
+        },
+        {
+          "amount": 300,
+          "dst": "16",
+          "src": "7"
+        }
+      ],
+      "ordered": true,
+      "permutations": 2
+    },
+    {
+      "label": "final-ASC-3",
+      "kind": "final",
+      "actual": [
+        {
+          "amount": 200,
+          "dst": "16",
+          "src": "20"
+        },
+        {
+          "amount": 100,
+          "dst": "16",
+          "src": "7"
+        },
+        {
+          "amount": 300,
+          "dst": "16",
+          "src": "7"
+        }
+      ],
+      "expected": [
+        {
+          "amount": 100,
+          "dst": "16",
+          "src": "7"
+        },
+        {
+          "amount": 200,
+          "dst": "16",
+          "src": "20"
+        },
+        {
+          "amount": 300,
+          "dst": "16",
+          "src": "7"
+        }
+      ],
+      "ordered": false,
+      "permutations": 1
+    },
+    {
+      "label": "sql-ASC-3",
+      "kind": "sql",
+      "actual": [
+        {
+          "amount": 100,
+          "dst": "16",
+          "src": "7"
+        },
+        {
+          "amount": 200,
+          "dst": "16",
+          "src": "20"
+        },
+        {
+          "amount": 300,
+          "dst": "16",
+          "src": "7"
+        }
+      ],
+      "expected": [
+        {
+          "amount": 100,
+          "dst": "16",
+          "src": "7"
+        },
+        {
+          "amount": 200,
+          "dst": "16",
+          "src": "20"
+        },
+        {
+          "amount": 300,
+          "dst": "16",
+          "src": "7"
+        }
+      ]
+    },
+    {
+      "label": "primitive-ASC-4",
+      "kind": "primitive",
+      "actual": [
+        {
+          "amount": 300,
+          "dst": "20",
+          "src": "16"
+        },
+        {
+          "amount": 300,
+          "dst": "16",
+          "src": "7"
+        },
+        {
+          "amount": 200,
+          "dst": "16",
+          "src": "20"
+        },
+        {
+          "amount": 100,
+          "dst": "16",
+          "src": "7"
+        }
+      ],
+      "expected": [
+        {
+          "amount": 100,
+          "dst": "16",
+          "src": "7"
+        },
+        {
+          "amount": 200,
+          "dst": "16",
+          "src": "20"
+        },
+        {
+          "amount": 300,
+          "dst": "16",
+          "src": "7"
+        },
+        {
+          "amount": 300,
+          "dst": "20",
+          "src": "16"
+        }
+      ],
+      "ordered": false,
+      "permutations": 2
+    },
+    {
+      "label": "final-ASC-4",
+      "kind": "final",
+      "actual": [
+        {
+          "amount": 200,
+          "dst": "16",
+          "src": "20"
+        },
+        {
+          "amount": 300,
+          "dst": "20",
+          "src": "16"
+        },
+        {
+          "amount": 100,
+          "dst": "16",
+          "src": "7"
+        },
+        {
+          "amount": 300,
+          "dst": "16",
+          "src": "7"
+        }
+      ],
+      "expected": [
+        {
+          "amount": 100,
+          "dst": "16",
+          "src": "7"
+        },
+        {
+          "amount": 200,
+          "dst": "16",
+          "src": "20"
+        },
+        {
+          "amount": 300,
+          "dst": "16",
+          "src": "7"
+        },
+        {
+          "amount": 300,
+          "dst": "20",
+          "src": "16"
+        }
+      ],
+      "ordered": false,
+      "permutations": 1
+    },
+    {
+      "label": "sql-ASC-4",
+      "kind": "sql",
+      "actual": [
+        {
+          "amount": 100,
+          "dst": "16",
+          "src": "7"
+        },
+        {
+          "amount": 200,
+          "dst": "16",
+          "src": "20"
+        },
+        {
+          "amount": 300,
+          "dst": "16",
+          "src": "7"
+        },
+        {
+          "amount": 300,
+          "dst": "20",
+          "src": "16"
+        }
+      ],
+      "expected": [
+        {
+          "amount": 100,
+          "dst": "16",
+          "src": "7"
+        },
+        {
+          "amount": 200,
+          "dst": "16",
+          "src": "20"
+        },
+        {
+          "amount": 300,
+          "dst": "16",
+          "src": "7"
+        },
+        {
+          "amount": 300,
+          "dst": "20",
+          "src": "16"
+        }
+      ]
+    },
+    {
+      "label": "primitive-ASC-5",
+      "kind": "primitive",
+      "actual": [
+        {
+          "amount": 300,
+          "dst": "20",
+          "src": "16"
+        },
+        {
+          "amount": 300,
+          "dst": "16",
+          "src": "7"
+        },
+        {
+          "amount": 200,
+          "dst": "16",
+          "src": "20"
+        },
+        {
+          "amount": 100,
+          "dst": "16",
+          "src": "7"
+        },
+        {
+          "amount": 500,
+          "dst": "7",
+          "src": "20"
+        }
+      ],
+      "expected": [
+        {
+          "amount": 100,
+          "dst": "16",
+          "src": "7"
+        },
+        {
+          "amount": 200,
+          "dst": "16",
+          "src": "20"
+        },
+        {
+          "amount": 300,
+          "dst": "16",
+          "src": "7"
+        },
+        {
+          "amount": 300,
+          "dst": "20",
+          "src": "16"
+        },
+        {
+          "amount": 500,
+          "dst": "7",
+          "src": "20"
+        }
+      ],
+      "ordered": false,
+      "permutations": 2
+    },
+    {
+      "label": "final-ASC-5",
+      "kind": "final",
+      "actual": [
+        {
+          "amount": 200,
+          "dst": "16",
+          "src": "20"
+        },
+        {
+          "amount": 300,
+          "dst": "20",
+          "src": "16"
+        },
+        {
+          "amount": 100,
+          "dst": "16",
+          "src": "7"
+        },
+        {
+          "amount": 300,
+          "dst": "16",
+          "src": "7"
+        },
+        {
+          "amount": 500,
+          "dst": "7",
+          "src": "20"
+        }
+      ],
+      "expected": [
+        {
+          "amount": 100,
+          "dst": "16",
+          "src": "7"
+        },
+        {
+          "amount": 200,
+          "dst": "16",
+          "src": "20"
+        },
+        {
+          "amount": 300,
+          "dst": "16",
+          "src": "7"
+        },
+        {
+          "amount": 300,
+          "dst": "20",
+          "src": "16"
+        },
+        {
+          "amount": 500,
+          "dst": "7",
+          "src": "20"
+        }
+      ],
+      "ordered": false,
+      "permutations": 1
+    },
+    {
+      "label": "sql-ASC-5",
+      "kind": "sql",
+      "actual": [
+        {
+          "amount": 100,
+          "dst": "16",
+          "src": "7"
+        },
+        {
+          "amount": 200,
+          "dst": "16",
+          "src": "20"
+        },
+        {
+          "amount": 300,
+          "dst": "16",
+          "src": "7"
+        },
+        {
+          "amount": 300,
+          "dst": "20",
+          "src": "16"
+        },
+        {
+          "amount": 500,
+          "dst": "7",
+          "src": "20"
+        }
+      ],
+      "expected": [
+        {
+          "amount": 100,
+          "dst": "16",
+          "src": "7"
+        },
+        {
+          "amount": 200,
+          "dst": "16",
+          "src": "20"
+        },
+        {
+          "amount": 300,
+          "dst": "16",
+          "src": "7"
+        },
+        {
+          "amount": 300,
+          "dst": "20",
+          "src": "16"
+        },
+        {
+          "amount": 500,
+          "dst": "7",
+          "src": "20"
+        }
+      ]
+    },
+    {
+      "label": "primitive-DESC-2",
+      "kind": "primitive",
+      "actual": [
+        {
+          "amount": 500,
+          "dst": "7",
+          "src": "20"
+        },
+        {
+          "amount": 300,
+          "dst": "20",
+          "src": "16"
+        }
+      ],
+      "expected": [
+        {
+          "amount": 500,
+          "dst": "7",
+          "src": "20"
+        },
+        {
+          "amount": 300,
+          "dst": "20",
+          "src": "16"
+        }
+      ],
+      "ordered": true,
+      "permutations": 2
+    },
+    {
+      "label": "final-DESC-2",
+      "kind": "final",
+      "actual": [
+        {
+          "amount": 300,
+          "dst": "20",
+          "src": "16"
+        },
+        {
+          "amount": 500,
+          "dst": "7",
+          "src": "20"
+        }
+      ],
+      "expected": [
+        {
+          "amount": 500,
+          "dst": "7",
+          "src": "20"
+        },
+        {
+          "amount": 300,
+          "dst": "20",
+          "src": "16"
+        }
+      ],
+      "ordered": false,
+      "permutations": 1
+    },
+    {
+      "label": "sql-DESC-2",
+      "kind": "sql",
+      "actual": [
+        {
+          "amount": 500,
+          "dst": "7",
+          "src": "20"
+        },
+        {
+          "amount": 300,
+          "dst": "20",
+          "src": "16"
+        }
+      ],
+      "expected": [
+        {
+          "amount": 500,
+          "dst": "7",
+          "src": "20"
+        },
+        {
+          "amount": 300,
+          "dst": "20",
+          "src": "16"
+        }
+      ]
+    },
+    {
+      "label": "primitive-DESC-3",
+      "kind": "primitive",
+      "actual": [
+        {
+          "amount": 500,
+          "dst": "7",
+          "src": "20"
+        },
+        {
+          "amount": 300,
+          "dst": "20",
+          "src": "16"
+        },
+        {
+          "amount": 300,
+          "dst": "16",
+          "src": "7"
+        }
+      ],
+      "expected": [
+        {
+          "amount": 500,
+          "dst": "7",
+          "src": "20"
+        },
+        {
+          "amount": 300,
+          "dst": "20",
+          "src": "16"
+        },
+        {
+          "amount": 300,
+          "dst": "16",
+          "src": "7"
+        }
+      ],
+      "ordered": true,
+      "permutations": 2
+    },
+    {
+      "label": "final-DESC-3",
+      "kind": "final",
+      "actual": [
+        {
+          "amount": 300,
+          "dst": "20",
+          "src": "16"
+        },
+        {
+          "amount": 500,
+          "dst": "7",
+          "src": "20"
+        },
+        {
+          "amount": 300,
+          "dst": "16",
+          "src": "7"
+        }
+      ],
+      "expected": [
+        {
+          "amount": 500,
+          "dst": "7",
+          "src": "20"
+        },
+        {
+          "amount": 300,
+          "dst": "20",
+          "src": "16"
+        },
+        {
+          "amount": 300,
+          "dst": "16",
+          "src": "7"
+        }
+      ],
+      "ordered": false,
+      "permutations": 1
+    },
+    {
+      "label": "sql-DESC-3",
+      "kind": "sql",
+      "actual": [
+        {
+          "amount": 500,
+          "dst": "7",
+          "src": "20"
+        },
+        {
+          "amount": 300,
+          "dst": "20",
+          "src": "16"
+        },
+        {
+          "amount": 300,
+          "dst": "16",
+          "src": "7"
+        }
+      ],
+      "expected": [
+        {
+          "amount": 500,
+          "dst": "7",
+          "src": "20"
+        },
+        {
+          "amount": 300,
+          "dst": "20",
+          "src": "16"
+        },
+        {
+          "amount": 300,
+          "dst": "16",
+          "src": "7"
+        }
+      ]
+    },
+    {
+      "label": "primitive-DESC-4",
+      "kind": "primitive",
+      "actual": [
+        {
+          "amount": 200,
+          "dst": "16",
+          "src": "20"
+        },
+        {
+          "amount": 300,
+          "dst": "16",
+          "src": "7"
+        },
+        {
+          "amount": 300,
+          "dst": "20",
+          "src": "16"
+        },
+        {
+          "amount": 500,
+          "dst": "7",
+          "src": "20"
+        }
+      ],
+      "expected": [
+        {
+          "amount": 500,
+          "dst": "7",
+          "src": "20"
+        },
+        {
+          "amount": 300,
+          "dst": "20",
+          "src": "16"
+        },
+        {
+          "amount": 300,
+          "dst": "16",
+          "src": "7"
+        },
+        {
+          "amount": 200,
+          "dst": "16",
+          "src": "20"
+        }
+      ],
+      "ordered": false,
+      "permutations": 2
+    },
+    {
+      "label": "final-DESC-4",
+      "kind": "final",
+      "actual": [
+        {
+          "amount": 300,
+          "dst": "20",
+          "src": "16"
+        },
+        {
+          "amount": 200,
+          "dst": "16",
+          "src": "20"
+        },
+        {
+          "amount": 500,
+          "dst": "7",
+          "src": "20"
+        },
+        {
+          "amount": 300,
+          "dst": "16",
+          "src": "7"
+        }
+      ],
+      "expected": [
+        {
+          "amount": 500,
+          "dst": "7",
+          "src": "20"
+        },
+        {
+          "amount": 300,
+          "dst": "20",
+          "src": "16"
+        },
+        {
+          "amount": 300,
+          "dst": "16",
+          "src": "7"
+        },
+        {
+          "amount": 200,
+          "dst": "16",
+          "src": "20"
+        }
+      ],
+      "ordered": false,
+      "permutations": 1
+    },
+    {
+      "label": "sql-DESC-4",
+      "kind": "sql",
+      "actual": [
+        {
+          "amount": 500,
+          "dst": "7",
+          "src": "20"
+        },
+        {
+          "amount": 300,
+          "dst": "20",
+          "src": "16"
+        },
+        {
+          "amount": 300,
+          "dst": "16",
+          "src": "7"
+        },
+        {
+          "amount": 200,
+          "dst": "16",
+          "src": "20"
+        }
+      ],
+      "expected": [
+        {
+          "amount": 500,
+          "dst": "7",
+          "src": "20"
+        },
+        {
+          "amount": 300,
+          "dst": "20",
+          "src": "16"
+        },
+        {
+          "amount": 300,
+          "dst": "16",
+          "src": "7"
+        },
+        {
+          "amount": 200,
+          "dst": "16",
+          "src": "20"
+        }
+      ]
+    },
+    {
+      "label": "primitive-DESC-5",
+      "kind": "primitive",
+      "actual": [
+        {
+          "amount": 200,
+          "dst": "16",
+          "src": "20"
+        },
+        {
+          "amount": 300,
+          "dst": "16",
+          "src": "7"
+        },
+        {
+          "amount": 300,
+          "dst": "20",
+          "src": "16"
+        },
+        {
+          "amount": 500,
+          "dst": "7",
+          "src": "20"
+        },
+        {
+          "amount": 100,
+          "dst": "16",
+          "src": "7"
+        }
+      ],
+      "expected": [
+        {
+          "amount": 500,
+          "dst": "7",
+          "src": "20"
+        },
+        {
+          "amount": 300,
+          "dst": "20",
+          "src": "16"
+        },
+        {
+          "amount": 300,
+          "dst": "16",
+          "src": "7"
+        },
+        {
+          "amount": 200,
+          "dst": "16",
+          "src": "20"
+        },
+        {
+          "amount": 100,
+          "dst": "16",
+          "src": "7"
+        }
+      ],
+      "ordered": false,
+      "permutations": 2
+    },
+    {
+      "label": "final-DESC-5",
+      "kind": "final",
+      "actual": [
+        {
+          "amount": 300,
+          "dst": "20",
+          "src": "16"
+        },
+        {
+          "amount": 200,
+          "dst": "16",
+          "src": "20"
+        },
+        {
+          "amount": 500,
+          "dst": "7",
+          "src": "20"
+        },
+        {
+          "amount": 300,
+          "dst": "16",
+          "src": "7"
+        },
+        {
+          "amount": 100,
+          "dst": "16",
+          "src": "7"
+        }
+      ],
+      "expected": [
+        {
+          "amount": 500,
+          "dst": "7",
+          "src": "20"
+        },
+        {
+          "amount": 300,
+          "dst": "20",
+          "src": "16"
+        },
+        {
+          "amount": 300,
+          "dst": "16",
+          "src": "7"
+        },
+        {
+          "amount": 200,
+          "dst": "16",
+          "src": "20"
+        },
+        {
+          "amount": 100,
+          "dst": "16",
+          "src": "7"
+        }
+      ],
+      "ordered": false,
+      "permutations": 1
+    },
+    {
+      "label": "sql-DESC-5",
+      "kind": "sql",
+      "actual": [
+        {
+          "amount": 500,
+          "dst": "7",
+          "src": "20"
+        },
+        {
+          "amount": 300,
+          "dst": "20",
+          "src": "16"
+        },
+        {
+          "amount": 300,
+          "dst": "16",
+          "src": "7"
+        },
+        {
+          "amount": 200,
+          "dst": "16",
+          "src": "20"
+        },
+        {
+          "amount": 100,
+          "dst": "16",
+          "src": "7"
+        }
+      ],
+      "expected": [
+        {
+          "amount": 500,
+          "dst": "7",
+          "src": "20"
+        },
+        {
+          "amount": 300,
+          "dst": "20",
+          "src": "16"
+        },
+        {
+          "amount": 300,
+          "dst": "16",
+          "src": "7"
+        },
+        {
+          "amount": 200,
+          "dst": "16",
+          "src": "20"
+        },
+        {
+          "amount": 100,
+          "dst": "16",
+          "src": "7"
+        }
+      ]
+    },
+    {
+      "label": "for-primitive-five",
+      "kind": "for-five",
+      "actual": [
+        {
+          "v": "4"
+        },
+        {
+          "v": "3"
+        },
+        {
+          "v": "2"
+        },
+        {
+          "v": "1"
+        },
+        {
+          "v": "5"
+        }
+      ],
+      "expected": [
+        {
+          "v": "1"
+        },
+        {
+          "v": "2"
+        },
+        {
+          "v": "3"
+        },
+        {
+          "v": "4"
+        },
+        {
+          "v": "5"
+        }
+      ],
+      "ordered": false,
+      "permutations": 2
+    },
+    {
+      "label": "for-final-five",
+      "kind": "for-five",
+      "actual": [
+        {
+          "v": "2"
+        },
+        {
+          "v": "4"
+        },
+        {
+          "v": "1"
+        },
+        {
+          "v": "3"
+        },
+        {
+          "v": "5"
+        }
+      ],
+      "expected": [
+        {
+          "v": "1"
+        },
+        {
+          "v": "2"
+        },
+        {
+          "v": "3"
+        },
+        {
+          "v": "4"
+        },
+        {
+          "v": "5"
+        }
+      ],
+      "ordered": false,
+      "permutations": 1
+    }
+  ],
+  "cleanup": {
+    "databases_confirmed_not_found": 2,
+    "runtime_containers_confirmed_absent": 2
+  },
+  "local_AST_boundary": "Initial full official schema analysis failed because the local catalog exposed no implicit Person properties. Both exact GQL queries analyzed with an explicit reduced Person(id) graph; these are local frontend dumps, not Emulator AST output. No implementation repair made.",
+  "scope": "Current pinned Emulator sample only; no managed or Omni request; array argument ordering, final row ordering, top-N membership and tied keys have distinct contracts."
+}

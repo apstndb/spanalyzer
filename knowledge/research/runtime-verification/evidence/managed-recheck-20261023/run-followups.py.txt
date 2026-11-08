@@ -1,0 +1,25 @@
+"""Serialize new fixture suites after the retained JSON/stream baseline."""
+from pathlib import Path
+import json
+import subprocess
+import time
+
+task=Path('<LOCAL_CHECKOUT>/.tmp/managed-recheck-20261023')
+ledger=Path('<LOCAL_TASK_ROOT>/apstndb/spanalyzer/managed-recheck-20261023/evidence/json-commands.json')
+started=time.monotonic()
+print('Waiting for pg-capture cleanup before new documentation-delta fixtures',flush=True)
+while True:
+    rows=json.loads(ledger.read_text()) if ledger.exists() else []
+    last=next((row for row in rows if row['name']=='pg-capture'),None)
+    if last:
+        if last['exit_code']!=0:raise SystemExit('Inspect prior fixture process before continuing')
+        observations=[json.loads(line)for line in (task/'pg-capture.stdout').read_text().splitlines()]
+        bylabel={row['label']:row for row in observations}
+        if bylabel.get('database-absent',{}).get('code')!='NotFound':raise SystemExit('Prior owned database cleanup is unconfirmed')
+        break
+    if time.monotonic()-started>1800:raise SystemExit('Prior fixture completion unavailable')
+    time.sleep(5)
+for name in ['run-doc-delta.py','run-queue-recreate.py']:
+    result=subprocess.run(['python3',str(task/name)])
+    if result.returncode:raise SystemExit(result.returncode)
+print('COMPLETE: new documentation and queue lifecycle follow-ups',flush=True)

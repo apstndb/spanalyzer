@@ -1,0 +1,119 @@
+"""Retain completed redacted outputs and derive dated, bounded comparisons."""
+from pathlib import Path
+import collections, datetime, hashlib, json, re, shutil, statistics
+
+root = Path('<LOCAL_CHECKOUT>')
+scratch = root/'.tmp/managed-recheck-20261011'
+task = Path('<LOCAL_TASK_ROOT>/apstndb/spanalyzer/managed-recheck-20261011')
+ev = task/'evidence'
+canonical = root/'knowledge/research/runtime-verification/evidence/managed-recheck-20261011'
+old = root/'knowledge/research/runtime-verification/evidence/managed-recheck-20261009'
+json_old = root/'knowledge/research/runtime-verification/evidence/docs-diff-20261010'
+load = lambda p: [json.loads(x) for x in p.read_text().splitlines()]
+sha = lambda p: hashlib.sha256(p.read_bytes()).hexdigest()
+baseline = json.loads((ev/'commands.json').read_text())
+extra = json.loads((ev/'json-commands.json').read_text())
+assert any(x['name']=='cleanup' and x['exit_code']==0 for x in baseline)
+assert any(x['name']=='pg-capture' and x['exit_code']==0 for x in extra)
+commands = sorted(baseline+extra, key=lambda x:x['started_at'])
+(ev/'all-commands.json').write_text(json.dumps(commands,indent=2)+'\n')
+
+names = ['readonly','google-features','pg-features','queue','cleanup','active-batch','queries','followup','distinctness','google-json','pg-streams','graph-controls','google-options','pg-options','google-capture','pg-capture']
+records = {}
+for name in names:
+    records[name] = load(ev/(name+'.stdout'))
+    (ev/(name+'.jsonl')).write_text('\n'.join(json.dumps(x,ensure_ascii=False) for x in records[name])+'\n')
+(ev/'managed-tests.log').write_text((ev/'managed-tests.stdout').read_text()+(ev/'managed-tests.stderr').read_text())
+
+def normalized(value):
+    text = json.dumps(value,sort_keys=True)
+    text = re.sub(r'202610(?:09|11)r1', '<fixture-date>',text)
+    text = re.sub(r'docdiff-202610(?:10|11)[gp]\d+', '<temporary-database>',text)
+    return text
+
+def paired(before,after,values=False):
+    def key(x): return (x.get('label'),x.get('kind'),normalized(x.get('sql')))
+    left,right=collections.defaultdict(list),collections.defaultdict(list)
+    for x in before:left[key(x)].append(x)
+    for x in after:right[key(x)].append(x)
+    changes=[];rowchanges=[];typechanges=[];n=0
+    for key,rows in left.items():
+        for a,b in zip(rows,right.get(key,[])):
+            n+=1
+            if a.get('code')!=b.get('code'):changes.append({'label':a.get('label'),'sql':b.get('sql'),'before':a.get('code'),'after':b.get('code')})
+            if values and normalized(a.get('rows'))!=normalized(b.get('rows')):rowchanges.append(b.get('label'))
+            if values and a.get('metadata',{}).get('rowType')!=b.get('metadata',{}).get('rowType'):typechanges.append(b.get('label'))
+    return {'baseline_records':len(before),'current_records':len(after),'comparable_records':n,'changed_codes':changes,'changed_values':rowchanges if values else None,'changed_row_types':typechanges if values else None,'value_comparison':'deterministic rows and result row types' if values else 'not compared; workload, heartbeat timestamps, sampled rows and plans can vary'}
+
+features={name:paired(load(old/(name+'.jsonl')),records[name]) for name in ['readonly','google-features','pg-features','queue','active-batch']}
+(ev/'feature-comparison.json').write_text(json.dumps(features,indent=2)+'\n')
+json_pairs={'queries':'queries','followup':'followup','google-json':'google-features','pg-streams':'pg-features','graph-controls':'graph-controls','google-options':'google-options','pg-options':'pg-options'}
+json_comp={name:paired(load(json_old/(prev+'.jsonl')),records[name],name in ['queries','followup','google-options','pg-options']) for name,prev in json_pairs.items()}
+(ev/'json-comparison.json').write_text(json.dumps(json_comp,indent=2)+'\n')
+checks=[]
+for name in ['infoschema','spanner-sys','spanner-sys-2','spanner-sys-3']:
+    check=json.loads((ev/(name+'.stdout')).read_text())
+    (ev/(name+'-check.json')).write_text(json.dumps(check,indent=2)+'\n')
+    checks.append({'name':name,'status':check['status'],'current':check['current'],'retained':check['retained']})
+capture_path=re.search(r'wrote (survey/[^\s]+\.json)',(ev/'spanner-sys-capture.stderr').read_text()).group(1)
+capture=json.loads((root/capture_path).read_text())
+catalog={'baseline':'managed-recheck-20261009','observations':checks,'retained_new_capture':capture_path,'retained_new_capture_sha256':sha(root/capture_path),'table_count':len({x['table_name'] for x in capture['columns']}),'surface_matches_october9':capture['surface_sha256']==json.loads((old/'spanner-sys-check.json').read_text())['current']['surface_sha256']}
+(ev/'catalog-comparison.json').write_text(json.dumps(catalog,indent=2)+'\n')
+
+expected=json.loads((scratch/'distinctness-expected.json').read_text());bylabel={x['label']:x for x in records['distinctness']}
+assert len(bylabel)==64
+for label,want in expected.items():
+    for field,value in want.items(): assert bylabel[label][field]==value,(label,field)
+distinctness={'cases':64,'codes':dict(collections.Counter(x['code'] for x in records['distinctness'])),'explicit_expected_cases':len(expected),'expectations_pass':True,'new_coverage_not_rollout_date':True,'semantic_grouping_rejections':[x['label'] for x in records['distinctness'] if 'Grouping is not defined' in x['error']],'type_signature_rejections':[x['label'] for x in records['distinctness'] if 'No matching signature' in x['error']],'syntax_rejections':[x['label'] for x in records['distinctness'] if 'Syntax error' in x['error']]}
+(ev/'distinctness-summary.json').write_text(json.dumps(distinctness,indent=2)+'\n')
+
+def walk(value):
+    if isinstance(value,dict):
+        yield value
+        for x in value.values():yield from walk(x)
+    elif isinstance(value,list):
+        for x in value:yield from walk(x)
+
+heartbeat={}
+for name in ['google-json','pg-streams']:
+    child=next(x for x in records[name] if x['label']=='heartbeat-child-100')
+    stamps=sorted(x['timestamp'] for row in child['rows'] for x in walk(row['record']) if set(x)=={'timestamp'} and isinstance(x['timestamp'],str))
+    times=[datetime.datetime.fromisoformat(x.replace('Z','+00:00')) for x in stamps]
+    intervals=[(b-a).total_seconds()*1000 for a,b in zip(times,times[1:])]
+    heartbeat[name]={'code':child['code'],'rows':len(child['rows']),'record_timestamps':stamps,'intervals_ms':intervals,'interval_median_ms':statistics.median(intervals) if intervals else None}
+(ev/'heartbeat-summary.json').write_text(json.dumps(heartbeat,indent=2)+'\n')
+
+capture_records={}
+for name in ['google-capture','pg-capture']:
+    data=[]
+    for event in records[name]:
+        if '-child-' not in event['label']:continue
+        for row in event.get('rows',[]):
+            for item in walk(row['record']):
+                if {'mod_type','value_capture_type','mods'}<=item.keys():
+                    simplified={k:item[k] for k in ['mod_type','value_capture_type','mods','column_types']}
+                    for mod in simplified['mods']:
+                        for key in ['keys','new_values','old_values']:
+                            if isinstance(mod.get(key),str):mod[key]=json.loads(mod[key])
+                    data.append(simplified)
+    capture_records[name]=data
+(ev/'value-capture-summary.json').write_text(json.dumps(capture_records,indent=2)+'\n')
+
+for name in ['google-features','pg-features','queue','query','json-fixtures','json-pg','graph-controls','stream-options','value-capture']:
+    shutil.copy2(ev/(name+'-buildinfo.stdout'),ev/(name+'-buildinfo.txt'))
+for p in scratch.glob('*.go'):shutil.copy2(p,ev/(p.name+'.txt'))
+for name in ['cases.json','followup-cases.json','distinctness-cases.json','distinctness-expected.json']:shutil.copy2(scratch/name,ev/name)
+for name in ['run-baseline.py','run-json.py','prepare-followup.py','prepare-capture.py','retain.py']:shutil.copy2(scratch/name,ev/(name+'.txt'))
+shutil.copy2(task/'documents/change-streams-manage.diff',ev/'change-streams-manage.diff')
+docs=json.loads((task/'documents/official-documents.json').read_text())['documents']
+for d in docs:
+    if d['name'].endswith('standard-sql/operators'): (ev/'google-operators.md.txt').write_text(d['content'])
+    if d['name'].endswith('postgresql/operators'): (ev/'pg-operators.md.txt').write_text(d['content'])
+
+receipt={'observed_on':'2026-10-11','timezone':'UTC; client timezone Asia/Tokyo','execution_start':commands[0]['started_at'],'execution_end':commands[-1]['completed_at'],'managed_identity':'Dedicated existing user-level verification profile; connection coordinates redacted and deployment build unavailable','source_head':json.loads((ev/'source-comparison.json').read_text())['head'],'source_state':'Existing dirty checkout preserved; 123 measured implementation/dependency hashes match October 9','dependencies':{'go':'go1.26.8','survey':'GOWORK=off, Spanner v1.88.0','features':'explicit workspace, Spanner v1.91.0'},'direct_api_without_local_sql_parser':True,'records':{name:len(rows) for name,rows in records.items()},'source_hashes':{p.name:sha(p) for p in ev.glob('*.go.txt')},'binary_hashes':{name:sha(scratch/name) for name in ['google-features','pg-features','queue','query','json-fixtures','json-pg','graph-controls','stream-options','value-capture']},'commands':'all-commands.json','baseline_managed_drift_failure':'unknown_tables=[ACTIVE_BATCH_OPERATIONS]','temporary_database_probes':[name for name in names if name in ['google-json','pg-streams','graph-controls','google-options','pg-options','google-capture','pg-capture']],'durable_directory':str(task),'authority':'Managed reads and bounded owned fixtures; local retained research. No implementation/dependency/selector changes, commit, push, PR, merge, release or external synchronization.'}
+(ev/'receipt.json').write_text(json.dumps(receipt,indent=2)+'\n')
+canonical.mkdir(parents=True,exist_ok=True)
+for p in ev.iterdir():
+    if p.suffix in ['.stdout','.stderr']:continue
+    if p.is_file():shutil.copy2(p,canonical/p.name)
+print(json.dumps({'counts':receipt['records'],'feature_code_changes':{k:v['changed_codes'] for k,v in features.items()},'json_changes':json_comp,'distinctness':distinctness,'heartbeat':heartbeat,'value_capture':capture_records},indent=2))

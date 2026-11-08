@@ -1,0 +1,18 @@
+{
+  "name": "target2-final-databases",
+  "started_at": "2026-10-23T14:57:53.362300+00:00",
+  "completed_at": "2026-10-23T14:57:54.981139+00:00",
+  "argv": [
+    "<LOCAL_HOME>/google-cloud-sdk/bin/gcloud",
+    "spanner",
+    "databases",
+    "list",
+    "--instance=<redacted>",
+    "--format=json",
+    "--project=<redacted>",
+    "--quiet"
+  ],
+  "exit_code": 0,
+  "stdout": "[\n  {\n    \"createTime\": \"2026-10-23T14:26:08.523693Z\",\n    \"databaseDialect\": \"GOOGLE_STANDARD_SQL\",\n    \"earliestVersionTime\": \"2026-10-23T14:26:08.523693Z\",\n    \"encryptionInfo\": [\n      {\n        \"encryptionType\": \"GOOGLE_DEFAULT_ENCRYPTION\"\n      }\n    ],\n    \"name\": \"projects/<redacted>/instances/<redacted>/databases/<redacted>\",\n    \"state\": \"READY\",\n    \"versionRetentionPeriod\": \"1h\"\n  }\n]\n",
+  "stderr": ""
+}

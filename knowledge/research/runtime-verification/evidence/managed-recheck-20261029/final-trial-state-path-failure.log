@@ -1,0 +1,21 @@
+Traceback (most recent call last):
+  File "<LOCAL_CHECKOUT>/.tmp/managed-recheck-20261029/inspect-cloud-state.py", line 8, in <module>
+    i=read(['spanner','instances','describe',instance]);d=read(['spanner','databases','list','--instance',instance])
+  File "<LOCAL_CHECKOUT>/.tmp/managed-recheck-20261029/inspect-cloud-state.py", line 5, in read
+    p=subprocess.run(['gcloud','--quiet',*args,'--project',project,'--format=json'],capture_output=True,text=True)
+  File "<LOCAL_HOME>/.local/share/mise/installs/python/3.13.16/lib/python3.13/subprocess.py", line 555, in run
+    with Popen(*popenargs, **kwargs) as process:
+         ~~~~~^^^^^^^^^^^^^^^^^^^^^^
+  File "<LOCAL_HOME>/.local/share/mise/installs/python/3.13.16/lib/python3.13/subprocess.py", line 1040, in __init__
+    self._execute_child(args, executable, preexec_fn, close_fds,
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                        pass_fds, cwd, env,
+                        ^^^^^^^^^^^^^^^^^^^
+    ...<5 lines>...
+                        gid, gids, uid, umask,
+                        ^^^^^^^^^^^^^^^^^^^^^^
+                        start_new_session, process_group)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<LOCAL_HOME>/.local/share/mise/installs/python/3.13.16/lib/python3.13/subprocess.py", line 1992, in _execute_child
+    raise child_exception_type(errno_num, err_msg, err_filename)
+FileNotFoundError: [Errno 2] No such file or directory: 'gcloud'

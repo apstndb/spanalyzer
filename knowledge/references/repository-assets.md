@@ -40,6 +40,8 @@ asset_families:
       - survey/infoschem/evidence/omni/*/*.json
       - survey/infoschem/evidence/emulator/*/*.json
       - survey/spannersys/evidence/*.json
+      - survey/spannersys/evidence/managed/*.json
+      - survey/spannersys/evidence/omni/*/*.json
   - id: executable-plan-evidence
     paths:
       - tools/spanner-query-plan-shape/*_cases.go

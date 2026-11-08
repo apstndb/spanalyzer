@@ -1,0 +1,8 @@
+{
+  "command": "run-managed-spanner.sh -e <sql>",
+  "sql": "CREATE QUEUE QueueProbe20260918A (MessageId STRING(36) NOT NULL, Payload BYTES(MAX) NOT NULL) PRIMARY KEY (MessageId)",
+  "exit_code": 0,
+  "stdout": "",
+  "stderr": "",
+  "corroboration": "managed-initial.jsonl catalog-tables and ddl-export"
+}

@@ -1,0 +1,61 @@
+[
+  {
+    "name": "doc-delta-build",
+    "started_at": "2026-10-23T14:49:28.073165+00:00",
+    "completed_at": "2026-10-23T14:49:30.434000+00:00",
+    "exit_code": 0,
+    "seconds": 2.361,
+    "argv": [
+      "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go",
+      "build",
+      "-o",
+      "<LOCAL_CHECKOUT>/.tmp/managed-recheck-20261023/doc-delta",
+      "<LOCAL_CHECKOUT>/.tmp/managed-recheck-20261023/doc-delta.go"
+    ],
+    "cwd": "<LOCAL_CHECKOUT>/tools",
+    "gowork": "<LOCAL_CHECKOUT>/go.work"
+  },
+  {
+    "name": "doc-delta-buildinfo",
+    "started_at": "2026-10-23T14:49:30.434162+00:00",
+    "completed_at": "2026-10-23T14:49:30.446543+00:00",
+    "exit_code": 0,
+    "seconds": 0.012,
+    "argv": [
+      "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go",
+      "version",
+      "-m",
+      "<LOCAL_CHECKOUT>/.tmp/managed-recheck-20261023/doc-delta"
+    ],
+    "cwd": "<LOCAL_CHECKOUT>/tools",
+    "gowork": "<LOCAL_CHECKOUT>/go.work"
+  },
+  {
+    "name": "doc-delta-google",
+    "started_at": "2026-10-23T14:49:30.446970+00:00",
+    "completed_at": "2026-10-23T14:52:16.138109+00:00",
+    "exit_code": 0,
+    "seconds": 165.691,
+    "argv": [
+      "<LOCAL_CHECKOUT>/.tmp/managed-recheck-20261023/doc-delta",
+      "<LOCAL_CHECKOUT>/.tmp/managed-recheck-20261023/doc-delta-probe-plan.json",
+      "google"
+    ],
+    "cwd": "<LOCAL_CHECKOUT>/tools",
+    "gowork": "<LOCAL_CHECKOUT>/go.work"
+  },
+  {
+    "name": "doc-delta-pg",
+    "started_at": "2026-10-23T14:52:16.139555+00:00",
+    "completed_at": "2026-10-23T14:54:50.672618+00:00",
+    "exit_code": 0,
+    "seconds": 154.533,
+    "argv": [
+      "<LOCAL_CHECKOUT>/.tmp/managed-recheck-20261023/doc-delta",
+      "<LOCAL_CHECKOUT>/.tmp/managed-recheck-20261023/doc-delta-probe-plan.json",
+      "pg"
+    ],
+    "cwd": "<LOCAL_CHECKOUT>/tools",
+    "gowork": "<LOCAL_CHECKOUT>/go.work"
+  }
+]

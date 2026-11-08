@@ -1,0 +1,90 @@
+[
+  {
+    "file": "mirror-head.json",
+    "argv": [
+      "gh",
+      "api",
+      "repos/apstndb/spanner-docs-mirror/commits/main"
+    ],
+    "at": "2026-11-03T01:34:00.960845+00:00",
+    "sha256": "96ff10871bd55f22ebca695c07ffa8f66454959e4cc681f8fe09a947df302fd7"
+  },
+  {
+    "file": "mirror-commits.json",
+    "argv": [
+      "gh",
+      "api",
+      "repos/apstndb/spanner-docs-mirror/commits?per_page=15"
+    ],
+    "at": "2026-11-03T01:34:00.946515+00:00",
+    "sha256": "87db8ceb39e18b307725927e81c910c5da784704fec22be99e9dc294ab56fa82"
+  },
+  {
+    "file": "differences-history.json",
+    "argv": [
+      "gh",
+      "api",
+      "repos/apstndb/spanner-docs-mirror/commits?path=docs/docs.cloud.google.com/spanner-omni/differences.md&per_page=10"
+    ],
+    "at": "2026-11-03T01:34:00.979011+00:00",
+    "sha256": "a604a9402b8971df564f42dd0831f9f2fb603777a6ddc6f3b2539716497eb223"
+  },
+  {
+    "file": "differences.json",
+    "argv": [
+      "dkcli",
+      "get",
+      "-f",
+      "json",
+      "docs.cloud.google.com/spanner-omni/differences"
+    ],
+    "at": "2026-11-03T01:34:01.435066+00:00",
+    "sha256": "2153e3a2de6befe3d549aac434c4ff4653e19fd88aca4776794533d8e00b6306"
+  },
+  {
+    "file": "managed-release.json",
+    "argv": [
+      "dkcli",
+      "get",
+      "-f",
+      "json",
+      "docs.cloud.google.com/spanner/docs/release-notes"
+    ],
+    "at": "2026-11-03T01:34:01.702418+00:00",
+    "sha256": "5edb9dbc0baac945be843e87a1033b14e72c88d0c01b7c31fd6cdc1a38f00806"
+  },
+  {
+    "file": "omni-release.json",
+    "argv": [
+      "dkcli",
+      "get",
+      "-f",
+      "json",
+      "docs.cloud.google.com/spanner-omni/release-notes"
+    ],
+    "at": "2026-11-03T01:34:01.895680+00:00",
+    "sha256": "f1608b2ad47872db5630f747587f23b4d49b8fbf7152de1e6fb688212ece1967"
+  },
+  {
+    "file": "omni-download.json",
+    "argv": [
+      "dkcli",
+      "get",
+      "-f",
+      "json",
+      "docs.cloud.google.com/spanner-omni/download"
+    ],
+    "at": "2026-11-03T01:34:01.511172+00:00",
+    "sha256": "8bbe46310b6c2398f36dc5dda446789f39b7d41b9451a214a8c06c80d3b6d672"
+  },
+  {
+    "file": "mirror-compare.json",
+    "argv": [
+      "gh",
+      "api",
+      "repos/apstndb/spanner-docs-mirror/compare/1e880188144a326e383778ebc165a63197efbf70...ec91ce497a621dd3d318cad40a58944367415165"
+    ],
+    "at": "2026-11-03T01:34:02.495462+00:00",
+    "sha256": "4aa886c69600edc7cd63b1158e445bf23718ac7d8d7ba0a48e6fc1aabc27a486"
+  }
+]

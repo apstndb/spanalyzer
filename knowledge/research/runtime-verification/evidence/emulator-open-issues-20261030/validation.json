@@ -1,0 +1,65 @@
+{
+  "status": "pass",
+  "recorded_at": "2026-10-30T01:52:28.035973+00:00",
+  "scope": "Source completeness and local documentation gates; no new runtime tests, upstream posts or external publication",
+  "assertions": [
+    "70 unique issues; REST/GraphQL agree",
+    "all issue records open and PRs excluded",
+    "112 full comments; no per-issue truncation",
+    "one local inventory row per source issue",
+    "all six local categories cover inventory once",
+    "all full source bodies retained with integrity",
+    "public latest remains v1.5.59",
+    "v1.5.60 comment kept as unverified source",
+    "official v1.5.59 notes list clock fix",
+    "routine absence uses retained runtime tuples",
+    "search metadata columns already present",
+    "SQL ordering not declared GQL duplicate",
+    "proposal flags not promoted to official support",
+    "existing 1331 evidence files unchanged",
+    "all 123 implementation/dependency files unchanged"
+  ],
+  "checks": [
+    {
+      "name": "okf-all",
+      "argv": [
+        "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go",
+        "run",
+        "./okf-check",
+        "--repo-root",
+        "..",
+        "--gate",
+        "all",
+        "--publication-manifest",
+        "<LOCAL_TASK_ROOT>/apstndb/spanalyzer/emulator-open-issues-20261030/publication-manifest.json"
+      ],
+      "cwd": "<LOCAL_CHECKOUT>/tools",
+      "exit_code": 0,
+      "log": "okf-all.log"
+    },
+    {
+      "name": "markdown-language",
+      "argv": [
+        "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go",
+        "run",
+        "./markdown-language-check",
+        "--repo-root",
+        ".."
+      ],
+      "cwd": "<LOCAL_CHECKOUT>/tools",
+      "exit_code": 0,
+      "log": "markdown-language.log"
+    },
+    {
+      "name": "diff-whitespace",
+      "argv": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "cwd": "<LOCAL_CHECKOUT>",
+      "exit_code": 0,
+      "log": "diff-whitespace.log"
+    }
+  ]
+}

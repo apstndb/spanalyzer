@@ -1,0 +1,35 @@
+"""Capture redacted Cloud SDK setup receipts without changing CLI defaults."""
+from pathlib import Path
+import datetime
+import json
+import os
+import re
+import subprocess
+import sys
+
+name, project = sys.argv[1:3]
+args = ['<LOCAL_HOME>/google-cloud-sdk/bin/gcloud', *sys.argv[3:], '--project=' + project, '--quiet']
+sensitive = [project]
+for i, arg in enumerate(args):
+    if arg.startswith(('--instance=', '--database=')):
+        sensitive.append(arg.split('=', 1)[1])
+    if arg in ['describe', 'create'] and i and args[i - 1] in ['instances', 'databases'] and i + 1 < len(args):
+        sensitive.append(args[i + 1])
+env = os.environ.copy()
+env.update(CLOUDSDK_CORE_DISABLE_FILE_LOGGING='true', CLOUDSDK_COMPONENT_MANAGER_DISABLE_UPDATE_CHECK='true')
+started = datetime.datetime.now(datetime.timezone.utc).isoformat()
+result = subprocess.run(args, env=env, capture_output=True, text=True, timeout=600)
+
+def scrub(value):
+    for secret in sensitive:
+        value = value.replace(secret, '<redacted>')
+    value = re.sub(r'projects/[^/\s"\]\']+', 'projects/<redacted>', value)
+    value = re.sub(r'/instances/[^/\s"\]\']+', '/instances/<redacted>', value)
+    value = re.sub(r'/databases/[^/\s"\]\']+', '/databases/<redacted>', value)
+    return re.sub(r'[A-Za-z0-9_.+%-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}', '<account-redacted>', value)
+
+receipt = {'name': name, 'started_at': started, 'completed_at': datetime.datetime.now(datetime.timezone.utc).isoformat(), 'argv': [scrub(arg) for arg in args], 'exit_code': result.returncode, 'stdout': scrub(result.stdout), 'stderr': scrub(result.stderr)}
+path = Path('<LOCAL_TASK_ROOT>/apstndb/spanalyzer/managed-recheck-20261023/evidence') / (name + '.json')
+path.write_text(json.dumps(receipt, indent=2) + '\n')
+print(json.dumps(receipt), flush=True)
+raise SystemExit(result.returncode)

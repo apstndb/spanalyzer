@@ -1,0 +1,103 @@
+{
+  "observed_at": "2026-10-10T02:43:18.183395+00:00",
+  "scope": "Offline syntax/row-type probes; reuses October 10 managed/Omni/Emulator execution evidence. No production changes or publication.",
+  "toolchain": "go1.26.8 darwin/arm64",
+  "spanalyzer_head": "c2d7792dd7f83d5dd086e2d32bc22e5d253cf06c",
+  "spanalyzer_dirty": true,
+  "workspace_modules": [
+    {
+      "path": "github.com/cloudspannerecosystem/memefish",
+      "version": "v0.8.1",
+      "sum": "h1:W8TmFa+Jqh7U1Hg7JBMovzijLCR+tEtpiFPQTM64D78="
+    },
+    {
+      "path": "github.com/goccy/go-googlesql",
+      "version": "v0.3.0",
+      "sum": "h1:S6tOuDeBtyoIeNaGTliYGleZebuVE2/KwXc+zw5mHfQ="
+    },
+    {
+      "path": "github.com/goccy/googlesqlwasm2go",
+      "version": "v0.1.0",
+      "sum": "h1:JQBPU09y9PvwU/GS2gOpP7pjaE9ttwI/9YGtj2ZlPZc="
+    }
+  ],
+  "memefish_main": "b2e4052e331584723633066850ee343fbcc6e095",
+  "memefish_main_remote_verified": true,
+  "memefish_parser_matches_head": true,
+  "latest_binding": {
+    "version": "v0.4.0",
+    "commit": "2b3726f947f7f809afb1daf534ff9ca06fd4da5c",
+    "sum": "h1:kNPiBuBQ5QWhYElLFb+5aohFtSqHOl61eLUDg5mOoiA="
+  },
+  "frontend_documented_revision": "36dd14aa0657ea299725504bc0f938732f58f380",
+  "sources": {
+    "spanalyzer/models.go": "ab465e830433cd733b79deedd07ba88271b22716e74366cfe5a3c4091346d4df",
+    "spanalyzer/spannerpb.go": "607b36789aeaf5ac186192d21b9d36a4133b208066e8216ed46311a7c543e464",
+    "spanalyzer/protobundle.go": "7d1409c5b2900c72e803d52a2eb91763db76e9a1f66fc87e2214ec99da37e0ea",
+    "spanalyzer/options.go": "9d653b8eff4c5d3cf87de898603543ac5e74e1e367c468efb84ad8251e31ca6b",
+    "spanalyzer/spanner_function_named_args.go": "8c3e2944475c53f8ab2226e2c2f10893e45e7569fd5cc777ad18356f94d650ea",
+    "spanalyzer/catalog.go": "3fff3b945c10e94d281c737e28a874903d92817bb900d8029bc94207c7224b99",
+    "spanalyzer/spanner_functions.go": "291999a0df136a0efb28892ad663f01c536273dbe285bb0fc28fe1e781094a3f",
+    "spanalyzer/resultconv.go": "75bcc58db8903b1152a953e601aa45d85b613424836e920999f7b5c9c6a987e8",
+    "spanalyzer/googlesql_proto.go": "9ca074d453c8cc20e8a0ef3d99953055f0ed6f56bb053353bcc40d8c261e48bd",
+    "spanalyzer/spanner_sys.go": "9941ed740e74358aac4c9f6b5e928a5a5e1ced0b7ad9e0b68ab821c42c2b3631",
+    "spanalyzer/typeconv.go": "14870a0f9a6691afbdda9c5d58691cbdd87a61b2febbcf688475059e5ebb58a5",
+    "spanalyzer/querygen_shared.go": "bb968661257da5201a8c357d6abae78522abf46a5ec3225cbb138b01af48725a",
+    "spanalyzer/bigquery.go": "74057f6ce17345af51c0d7a73bfd53a1a2905a0ef520722e32338dcfb163179c",
+    "spanalyzer/analyzer.go": "585d5766ab11dd0d3edc91d3600b7e1a9888693b344ac23c3a57be166861dce1",
+    "spanalyzer/ml_predict.go": "0cf14382dbc98336ca9576a84bfd90adb06e41fb38235a58765350eaa436b8da",
+    "spanalyzer/propertygraph.go": "9ef95baac5f3fe1429d67a91548cd0ad2a13e0827b0a594077da36c21ca45749",
+    "spanalyzer/bigquery_external_query.go": "30f9617d85b76cf3fcb2222795d23f2fa8cbc72d902b0c879dd3fea947a7cba5",
+    "spanalyzer/googlesql_catalog.go": "cf4a8a9259458c18645c8174ab9567d2a6e79df4df5587b658697f65745c6ae6",
+    "spanalyzer/doc.go": "cd6d19362f2bff43e679a6276dd741109bd6471960efbfd4466670ac7972e4bd",
+    "spanalyzer/typespec_parse.go": "899d18eb66671f50ceb35e87996e20d164dc682e2c7a54e98acf504d1595b23c",
+    "spanalyzer/function_catalog.go": "6484fd1ae5956aaa16fbf705dd22db920f017eb6e9493108fb354747ce9636bf",
+    "spanalyzer/googlesql_helper.go": "043623e5f035d17a382c4e8f418cae01ac43aca0534e1e4e6918ada96ebf1af3",
+    "spanalyzer/information_schema.go": "3cc710843ae543b9fc85ffd43edaad913d702bcdf912a2167605a1795c32d38c",
+    "spanalyzer/go.mod": "007463a721dca322ca96e228551303c0b67626f9ec7518e2286b22b078a1c740",
+    "spanalyzer/go.sum": "fb76d980db468d969cb29d3691c3c4743b3c9b1aee04fdda88acef784b514bc3",
+    "spanalyzer/go.work": "b4a708a522cdaa9ca8776a360191c2bc8a355295ee6b48e5b0dc6ecdea0c815a",
+    "spanalyzer/information_schema_manifest.json": "31a6d253f888e764e129b957f71849663bf1a38d1fd2ad658298b30e7f6a5f67",
+    "spanalyzer/spanner_sys_manifest.json": "d48af3290da0181b3260b1ebfedd09818815f3d359197e8e0c051cd6faf81c4d",
+    "memefish-main/parser.go": "3f86e23e503f4773ea0f8b7892362be642a2fe629e8a61c948bcd62bfdfdc531",
+    "memefish-main/parse_helpers.go": "cae90e0ec738e5f8b8ef219b4fc44b881f7a897015ee0923662647d40acea24a",
+    "memefish-main/ast/ast.go": "dfcd379147d8a8eb45dc979dc599bc2bbcc71c9b9b897a9ef46652c926019f66",
+    "memefish-main/ast/sql.go": "a0859f03bd71a8fd11619cbf0c75f4343bca925e463a2bf054b9f66b5c4dab07",
+    "memefish-main/ast/pos.go": "85db120e54668fb0dcdfc52ad95333d7595edf243312bc437a93b8f027460d3f",
+    "memefish-main/go.mod": "1ef84b78cbfa1674802a6a194bfe37a4f0b43575d4bec466e05f98b163ff149c"
+  },
+  "commands": [
+    {
+      "probe": "workspace memefish strict parse/unparse/reparse/range",
+      "exit_code": 1,
+      "expected_findings": [
+        "json-is-distinct",
+        "json-window",
+        "alter-set-for-all",
+        "graph-cast-node",
+        "graph-to-json-node",
+        "graph-cast-path",
+        "graph-to-json-path",
+        "graph-property-cast"
+      ]
+    },
+    {
+      "probe": "main memefish strict parse/unparse/reparse/range",
+      "exit_code": 1,
+      "expected_findings": [
+        "json-is-distinct",
+        "json-window",
+        "alter-set-for-all"
+      ]
+    },
+    {
+      "probe": "workspace spanalyzer row types",
+      "exit_code": 0
+    },
+    {
+      "probe": "latest binding 11 semantic controls",
+      "exit_code": 0
+    }
+  ],
+  "diagnostics": "Initial sandbox Go cache/network access failed; host retries completed. Initial expected-parse harness misclassified CASE as procedural IF; corrected before final parser runs. Initial parser output is retained only in the durable task area."
+}

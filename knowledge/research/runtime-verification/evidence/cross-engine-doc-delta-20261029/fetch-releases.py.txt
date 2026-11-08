@@ -1,0 +1,21 @@
+"""Retain full primary release/docs/registry responses; no generated summaries."""
+from pathlib import Path
+from concurrent.futures import ThreadPoolExecutor
+import datetime,hashlib,json,subprocess,urllib.request,urllib.error
+p=Path('<LOCAL_TASK_ROOT>/apstndb/spanalyzer/cross-engine-doc-delta-20261029/sources');receipt=[]
+def write(name,data,uri,status=200):
+ (p/name).write_bytes(data);return{'file':name,'uri':uri,'status':status,'retrieved_at':datetime.datetime.now(datetime.timezone.utc).isoformat(),'bytes':len(data),'sha256':hashlib.sha256(data).hexdigest()}
+def get(item):
+ name,url=item
+ try:
+  with urllib.request.urlopen(urllib.request.Request(url,headers={'User-Agent':'spanalyzer-runtime-verification'}),timeout=60)as r:data=r.read();status=r.status
+ except urllib.error.HTTPError as e:data=e.read();status=e.code
+ return write(name,data,url,status)
+urls=[('emulator-tags.json','https://gcr.io/v2/cloud-spanner-emulator/emulator/tags/list'),('omni-tags.json','https://us-docker.pkg.dev/v2/spanner-omni/images/spanner-omni/tags/list'),('omni-release-notes.html','https://docs.cloud.google.com/spanner-omni/docs/release-notes'),('omni-release-notes-canonical.html','https://docs.cloud.google.com/spanner-omni/release-notes')]
+with ThreadPoolExecutor(max_workers=4)as pool:receipt.extend(pool.map(get,urls))
+r=subprocess.run(['gh','api','--paginate','--slurp','repos/GoogleCloudPlatform/cloud-spanner-emulator/releases?per_page=100'],capture_output=True,text=True,check=True);receipt.append(write('emulator-github-releases.json',r.stdout.encode(),'https://api.github.com/repos/GoogleCloudPlatform/cloud-spanner-emulator/releases?per_page=100'))
+names=['documents/docs.cloud.google.com/spanner-omni/release-notes','documents/docs.cloud.google.com/spanner/docs/emulator']
+r=subprocess.run(['dkcli','batch-get','-f','json',*names],capture_output=True,text=True)
+if r.returncode==0:receipt.append(write('official-runtime-documents.json',r.stdout.encode(),'Developer Knowledge API batch-get full documents'))
+else:receipt.append(write('official-runtime-documents-error.txt',r.stderr.encode(),'Developer Knowledge API batch-get full documents',r.returncode))
+(p/'release-retrieval.json').write_text(json.dumps(receipt,indent=2)+'\n');print(json.dumps([{k:r[k]for k in ['file','status','bytes']}for r in receipt]))

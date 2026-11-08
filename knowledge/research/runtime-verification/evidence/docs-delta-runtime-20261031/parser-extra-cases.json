@@ -1,0 +1,17 @@
+{
+  "dialect": "google",
+  "steps": [
+    {
+      "label": "fk-set-null",
+      "family": "fk",
+      "kind": "ddl",
+      "sql": "ALTER TABLE Child ADD CONSTRAINT FK_Parent FOREIGN KEY (ParentId) REFERENCES Parent (Id) ON DELETE SET NULL"
+    },
+    {
+      "label": "fk-cascade",
+      "family": "fk",
+      "kind": "ddl",
+      "sql": "ALTER TABLE Child ADD CONSTRAINT FK_Parent FOREIGN KEY (ParentId) REFERENCES Parent (Id) ON DELETE CASCADE"
+    }
+  ]
+}

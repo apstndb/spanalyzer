@@ -1,0 +1,9 @@
+from pathlib import Path
+from concurrent.futures import ThreadPoolExecutor
+import subprocess,json,hashlib
+out=Path('<LOCAL_TASK_ROOT>/apstndb/spanalyzer/docs-delta-runtime-20261031/sources');ref='a09b0bd95dd55dba9478eb8f20a3971bc9e30b70'
+files=['googlesql/parser/googlesql.tm','googlesql/parser/gen_parse_tree.py','googlesql/parser/unparser.cc','googlesql/parser/testdata/pipe_aggregate.test','googlesql/parser/testdata/tvf.test','docs/pipe-syntax.md'];items=[('googlesql-commit.json',['gh','api','repos/google/googlesql/commits/'+ref]),('graph-draft-99.diff',['gh','api','-H','Accept: application/vnd.github.diff','repos/cloudspannerecosystem/memefish/pulls/99'])]+[(path.replace('/','__')+'.txt',['gh','api','-H','Accept: application/vnd.github.raw+json','repos/google/googlesql/contents/'+path+'?ref='+ref])for path in files]
+def get(item):
+ name,args=item;r=subprocess.run(args,capture_output=True);dest=out/name;dest.write_bytes(r.stdout);return{'file':name,'argv':args,'exit_code':r.returncode,'sha256':hashlib.sha256(r.stdout).hexdigest(),'bytes':len(r.stdout)}
+with ThreadPoolExecutor(max_workers=5)as p:rows=list(p.map(get,items))
+(out/'design-retrieval.json').write_text(json.dumps(rows,indent=2)+'\n');print([(r['file'],r['exit_code'],r['bytes'])for r in rows])

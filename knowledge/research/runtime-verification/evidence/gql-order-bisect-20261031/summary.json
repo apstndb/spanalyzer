@@ -1,0 +1,233 @@
+{
+  "observed_date_jst": "2026-10-31",
+  "method": "Release-level endpoint/adaptive search reaches the feature-availability boundary at 1.5.29/1.5.30; representative later tags corroborate continued observed behavior. No valid good-GQL baseline exists, so this is not a source-built git bisect.",
+  "versions": [
+    {
+      "version": "1.5.29",
+      "published_at": "2025-02-21T13:28:51Z",
+      "release_url": "https://github.com/GoogleCloudPlatform/cloud-spanner-emulator/releases/tag/v1.5.29",
+      "image": "gcr.io/cloud-spanner-emulator/emulator:1.5.29@sha256:ef44e4116647d88f4f20e3a326deca3fdfa58c1ed1cdd8218e09e8d352aed70e",
+      "platform": "linux/arm64",
+      "classification": "unsupported-GRAPH-syntax",
+      "primary_code": "InvalidArgument",
+      "primary_rows": [],
+      "gql_order_failures": 0,
+      "expected_graph_order_cases": 7,
+      "outer_SQL_control": "NOT_RUN",
+      "SQL_controls_correct": true,
+      "database_absent": true,
+      "container_absent": true
+    },
+    {
+      "version": "1.5.30",
+      "published_at": "2025-03-12T01:30:33Z",
+      "release_url": "https://github.com/GoogleCloudPlatform/cloud-spanner-emulator/releases/tag/v1.5.30",
+      "image": "gcr.io/cloud-spanner-emulator/emulator:1.5.30@sha256:e2582adc5efc557ddd62597e27c680e7478064a07fbf3fda685c676fcb906e5f",
+      "platform": "linux/arm64",
+      "classification": "reproduced",
+      "primary_code": "OK",
+      "primary_rows": [
+        {
+          "id": "2"
+        },
+        {
+          "id": "1"
+        },
+        {
+          "id": "3"
+        }
+      ],
+      "gql_order_failures": 7,
+      "expected_graph_order_cases": 7,
+      "outer_SQL_control": "InvalidArgument",
+      "SQL_controls_correct": true,
+      "database_absent": true,
+      "container_absent": true
+    },
+    {
+      "version": "1.5.31",
+      "published_at": "2025-04-04T14:15:32Z",
+      "release_url": "https://github.com/GoogleCloudPlatform/cloud-spanner-emulator/releases/tag/v1.5.31",
+      "image": "gcr.io/cloud-spanner-emulator/emulator:1.5.31@sha256:d9650c946a2af4275b1322a790cf054c4cd4f51736ef1babbd8736d3a308d871",
+      "platform": "linux/arm64",
+      "classification": "reproduced",
+      "primary_code": "OK",
+      "primary_rows": [
+        {
+          "id": "2"
+        },
+        {
+          "id": "1"
+        },
+        {
+          "id": "3"
+        }
+      ],
+      "gql_order_failures": 7,
+      "expected_graph_order_cases": 7,
+      "outer_SQL_control": "InvalidArgument",
+      "SQL_controls_correct": true,
+      "database_absent": true,
+      "container_absent": true
+    },
+    {
+      "version": "1.5.37",
+      "published_at": "2025-06-25T13:08:16Z",
+      "release_url": "https://github.com/GoogleCloudPlatform/cloud-spanner-emulator/releases/tag/v1.5.37",
+      "image": "gcr.io/cloud-spanner-emulator/emulator:1.5.37@sha256:6415f1d2d79fdda807e3abe44d421ffd633a4898a72810038628d023d6e6a015",
+      "platform": "linux/arm64",
+      "classification": "reproduced",
+      "primary_code": "OK",
+      "primary_rows": [
+        {
+          "id": "2"
+        },
+        {
+          "id": "1"
+        },
+        {
+          "id": "3"
+        }
+      ],
+      "gql_order_failures": 7,
+      "expected_graph_order_cases": 7,
+      "outer_SQL_control": "OK",
+      "SQL_controls_correct": true,
+      "database_absent": true,
+      "container_absent": true
+    },
+    {
+      "version": "1.5.44",
+      "published_at": "2025-11-19T06:54:41Z",
+      "release_url": "https://github.com/GoogleCloudPlatform/cloud-spanner-emulator/releases/tag/v1.5.44",
+      "image": "gcr.io/cloud-spanner-emulator/emulator:1.5.44@sha256:a63034eba579a6cf9855ac3101d2dc5896707742d01e1fef7f0bad485d188bac",
+      "platform": "linux/arm64",
+      "classification": "reproduced",
+      "primary_code": "OK",
+      "primary_rows": [
+        {
+          "id": "2"
+        },
+        {
+          "id": "1"
+        },
+        {
+          "id": "3"
+        }
+      ],
+      "gql_order_failures": 7,
+      "expected_graph_order_cases": 7,
+      "outer_SQL_control": "OK",
+      "SQL_controls_correct": true,
+      "database_absent": true,
+      "container_absent": true
+    },
+    {
+      "version": "1.5.52",
+      "published_at": "2026-04-09T14:26:05Z",
+      "release_url": "https://github.com/GoogleCloudPlatform/cloud-spanner-emulator/releases/tag/v1.5.52",
+      "image": "gcr.io/cloud-spanner-emulator/emulator:1.5.52@sha256:d33f3aab823d1ec893d116c192292b8e2272565998fbc70b7c85be2fb1c85637",
+      "platform": "linux/arm64",
+      "classification": "reproduced",
+      "primary_code": "OK",
+      "primary_rows": [
+        {
+          "id": "2"
+        },
+        {
+          "id": "1"
+        },
+        {
+          "id": "3"
+        }
+      ],
+      "gql_order_failures": 7,
+      "expected_graph_order_cases": 7,
+      "outer_SQL_control": "OK",
+      "SQL_controls_correct": true,
+      "database_absent": true,
+      "container_absent": true
+    },
+    {
+      "version": "1.5.58",
+      "published_at": "2026-09-15T06:17:12Z",
+      "release_url": "https://github.com/GoogleCloudPlatform/cloud-spanner-emulator/releases/tag/v1.5.58",
+      "image": "gcr.io/cloud-spanner-emulator/emulator:1.5.58@sha256:5f42f55ad4129ea0d86cf60f0d385e8a6be60a7e8e0cc791adcdedc8982bcb55",
+      "platform": "linux/arm64",
+      "classification": "reproduced",
+      "primary_code": "OK",
+      "primary_rows": [
+        {
+          "id": "2"
+        },
+        {
+          "id": "1"
+        },
+        {
+          "id": "3"
+        }
+      ],
+      "gql_order_failures": 7,
+      "expected_graph_order_cases": 7,
+      "outer_SQL_control": "OK",
+      "SQL_controls_correct": true,
+      "database_absent": true,
+      "container_absent": true
+    },
+    {
+      "version": "1.5.59",
+      "published_at": "2026-10-14T04:17:58Z",
+      "release_url": "https://github.com/GoogleCloudPlatform/cloud-spanner-emulator/releases/tag/v1.5.59",
+      "image": "gcr.io/cloud-spanner-emulator/emulator:1.5.59@sha256:969af6a9349948fbfb4a826c18e160e258a4005f7c759f8e7f2dcec369cccba8",
+      "platform": "linux/arm64",
+      "classification": "reproduced",
+      "primary_code": "OK",
+      "primary_rows": [
+        {
+          "id": "2"
+        },
+        {
+          "id": "1"
+        },
+        {
+          "id": "3"
+        }
+      ],
+      "gql_order_failures": 7,
+      "expected_graph_order_cases": 7,
+      "outer_SQL_control": "OK",
+      "SQL_controls_correct": true,
+      "database_absent": true,
+      "container_absent": true
+    }
+  ],
+  "counts": {
+    "root_records": 160,
+    "planned_steps": 112,
+    "planned_queries": 88,
+    "query_OK": 78,
+    "query_InvalidArgument": 3,
+    "query_NOT_RUN": 7,
+    "accepted_gql_order_failures": 49
+  },
+  "oldest_reproduced_release": "1.5.30",
+  "previous_release": "1.5.29",
+  "previous_release_status": "GRAPH rejected at syntax; ordinary SQL controls pass, not a passing GQL baseline",
+  "source_boundary": {
+    "emulator_1.5.29": "16643ae8d6308a54e546fcf7f02ddb3d24959240",
+    "emulator_1.5.30": "0c1d49622079618b6d5f4b02765243fff2fa7b4c",
+    "frontend_1.5.30": "a516c6b26d183efc4f56293256bba92e243b7a61",
+    "scope": "Pinned source trace only. No historical full source rebuild or causal instruction patch is repeated."
+  },
+  "cleanup": {
+    "databases_confirmed_not_found": 8,
+    "containers_confirmed_absent": 8,
+    "preexisting_containers_preserved": true,
+    "official_images": "Unmodified official images retained as local reproducible cache; no image/container prune."
+  },
+  "limits": [
+    "No claim that every untested intervening tag has identical behavior.",
+    "No last-known-good GQL release or finer introducing source commit identified.",
+    "No amd64, managed or Omni execution in this task."
+  ]
+}

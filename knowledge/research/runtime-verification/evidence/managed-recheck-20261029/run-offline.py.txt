@@ -1,0 +1,8 @@
+from pathlib import Path
+import shutil,subprocess,sys
+root=Path('<LOCAL_CHECKOUT>');task=Path('<LOCAL_TASK_ROOT>/apstndb/spanalyzer/managed-recheck-20261029');current=root/'knowledge/research/runtime-verification/evidence/managed-recheck-20261029'
+r=subprocess.run([sys.executable,str(root/'.tmp/managed-recheck-20261029/verify-evidence.py')],capture_output=True,text=True)
+(task/'evidence-check.log').write_text(r.stdout+r.stderr)
+print(r.stdout+r.stderr,end='')
+if r.returncode:sys.exit(r.returncode)
+for name in ['evidence-check.json','evidence-check.log']:shutil.copyfile(task/name,current/name)

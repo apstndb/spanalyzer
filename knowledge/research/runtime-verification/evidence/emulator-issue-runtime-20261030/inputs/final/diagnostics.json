@@ -1,0 +1,29 @@
+{
+  "dialect": "google",
+  "steps": [
+    {
+      "label": "diagnostic-reclaim",
+      "family": "issue-407",
+      "kind": "query",
+      "sql": "SELECT EMULATOR_RECLAIM(['ApiRows'])",
+      "requires": [],
+      "timeout_seconds": 15
+    },
+    {
+      "label": "diagnostic-lock-stats",
+      "family": "issue-407",
+      "kind": "query",
+      "sql": "SELECT EMULATOR_LOCK_STATS()",
+      "requires": [],
+      "timeout_seconds": 15
+    },
+    {
+      "label": "retention-one-second",
+      "family": "issue-403",
+      "kind": "ddl",
+      "sql": "ALTER DATABASE PLACEHOLDER SET OPTIONS(version_retention_period='1s')",
+      "requires": [],
+      "timeout_seconds": 30
+    }
+  ]
+}

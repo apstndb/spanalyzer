@@ -1,0 +1,154 @@
+{
+  "owned_database_fixtures": {
+    "google-json": {
+      "drop": "OK",
+      "get_after_drop": "NotFound"
+    },
+    "pg-streams": {
+      "drop": "OK",
+      "get_after_drop": "NotFound"
+    },
+    "graph-controls": {
+      "drop": "OK",
+      "get_after_drop": "NotFound"
+    },
+    "google-options": {
+      "drop": "OK",
+      "get_after_drop": "NotFound"
+    },
+    "pg-options": {
+      "drop": "OK",
+      "get_after_drop": "NotFound"
+    },
+    "google-capture": {
+      "drop": "OK",
+      "get_after_drop": "NotFound"
+    },
+    "pg-capture": {
+      "drop": "OK",
+      "get_after_drop": "NotFound"
+    },
+    "doc-delta-google": {
+      "drop": "OK",
+      "get_after_drop": "NotFound"
+    },
+    "doc-delta-pg": {
+      "drop": "OK",
+      "get_after_drop": "NotFound"
+    },
+    "hll-controls-pg": {
+      "drop": "OK",
+      "get_after_drop": "NotFound"
+    },
+    "weekly-google": {
+      "drop": "OK",
+      "get_after_drop": "NotFound"
+    },
+    "weekly-pg": {
+      "drop": "OK",
+      "get_after_drop": "NotFound"
+    },
+    "repair-google": {
+      "drop": "OK",
+      "get_after_drop": "NotFound"
+    },
+    "repair-pg": {
+      "drop": "OK",
+      "get_after_drop": "NotFound"
+    },
+    "graph-final": {
+      "drop": "OK",
+      "get_after_drop": "NotFound"
+    },
+    "tuning-pg": {
+      "drop": "OK",
+      "get_after_drop": "NotFound"
+    },
+    "baseline-pg": {
+      "drop": "OK",
+      "get_after_drop": "NotFound"
+    }
+  },
+  "temporary_database_lifecycles": 17,
+  "final_cloud_state": {
+    "observed_at": "2026-10-29T01:29:28.699277+00:00",
+    "instance": {
+      "instanceType": "FREE_INSTANCE",
+      "edition": "ENTERPRISE",
+      "state": "READY",
+      "createTime": "2026-10-23T14:24:35.339918Z",
+      "freeInstanceMetadata": {
+        "expireBehavior": "REMOVE_AFTER_GRACE_PERIOD",
+        "expireTime": "2027-01-21T14:24:35.339918Z"
+      },
+      "resourceLocation": "asia-northeast1",
+      "defaultBackupScheduleType": "NONE"
+    },
+    "databases": {
+      "total": 1,
+      "only_dedicated_database": true,
+      "ready": true,
+      "dialects": [
+        "GOOGLE_STANDARD_SQL"
+      ]
+    },
+    "operations": "Read-only describe/list; no provisioning, upgrade, deletion or profile changes."
+  },
+  "final_user_object_counts": [
+    {
+      "label": "final-tables",
+      "code": "OK",
+      "rows": [
+        {
+          "n": "0"
+        }
+      ]
+    },
+    {
+      "label": "final-views",
+      "code": "OK",
+      "rows": [
+        {
+          "n": "0"
+        }
+      ]
+    },
+    {
+      "label": "final-graphs",
+      "code": "OK",
+      "rows": [
+        {
+          "n": "0"
+        }
+      ]
+    },
+    {
+      "label": "final-streams",
+      "code": "OK",
+      "rows": [
+        {
+          "n": "0"
+        }
+      ]
+    },
+    {
+      "label": "final-routines",
+      "code": "OK",
+      "rows": [
+        {
+          "n": "0"
+        }
+      ]
+    },
+    {
+      "label": "final-models",
+      "code": "OK",
+      "rows": [
+        {
+          "n": "0"
+        }
+      ]
+    }
+  ],
+  "scope": "Only accepted owned temporary resources were removed. Existing trial and dedicated base database remain."
+}

@@ -1,0 +1,2305 @@
+{
+  "scope": "Every October 30 open issue is dispositioned; an attempt is not a successful reproduction or complete resolution.",
+  "counts": {
+    "runtime-attempted": 43,
+    "related-bounded-control": 8,
+    "not-executed-original-scope": 19
+  },
+  "issues": [
+    {
+      "number": 407,
+      "url": "https://github.com/GoogleCloudPlatform/cloud-spanner-emulator/issues/407",
+      "title": "Feature request: opt-in diagnostic SQL statements to purge storage on demand and report lock conflicts",
+      "status": "runtime-attempted",
+      "scope": "Runtime attempts include setup/negative/blocked cases; inspect the report for outcome and fixture corrections.",
+      "attempts": [
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "diagnostics",
+          "label": "diagnostic-reclaim",
+          "code": "InvalidArgument"
+        },
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "diagnostics",
+          "label": "diagnostic-lock-stats",
+          "code": "InvalidArgument"
+        }
+      ]
+    },
+    {
+      "number": 406,
+      "url": "https://github.com/GoogleCloudPlatform/cloud-spanner-emulator/issues/406",
+      "title": "\"aborted due to concurrent schema change\" doesn't say which schema change",
+      "status": "runtime-attempted",
+      "scope": "Runtime attempts include setup/negative/blocked cases; inspect the report for outcome and fixture corrections.",
+      "attempts": [
+        {
+          "file": "emulator-extra.jsonl",
+          "phase": "more-api",
+          "label": "more-api-ddl",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-extra.jsonl",
+          "phase": "more-api",
+          "label": "more-api-seed",
+          "code": "OK"
+        }
+      ]
+    },
+    {
+      "number": 405,
+      "url": "https://github.com/GoogleCloudPlatform/cloud-spanner-emulator/issues/405",
+      "title": "Feature request: narrow the locks SQL reads and DML take to the keys they target (builds on #404)",
+      "status": "related-bounded-control",
+      "scope": "Proposed SQL pushdown flag rejected; no implementation of the proposed fork tested.",
+      "attempts": []
+    },
+    {
+      "number": 404,
+      "url": "https://github.com/GoogleCloudPlatform/cloud-spanner-emulator/issues/404",
+      "title": "Feature request: allow concurrent read-write transactions that touch different keys (opt-in key-range locking)",
+      "status": "related-bounded-control",
+      "scope": "Three disjoint-key raw transaction controls; default database-wide conflicts observed. Proposed CLI flag rejected.",
+      "attempts": []
+    },
+    {
+      "number": 403,
+      "url": "https://github.com/GoogleCloudPlatform/cloud-spanner-emulator/issues/403",
+      "title": "Feature request: release memory from deleted rows, idle sessions, finished operations and old schema versions",
+      "status": "runtime-attempted",
+      "scope": "Runtime attempts include setup/negative/blocked cases; inspect the report for outcome and fixture corrections.",
+      "attempts": [
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "diagnostics",
+          "label": "retention-one-second",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-focused.jsonl",
+          "phase": "memory-focused",
+          "label": "memory-retention",
+          "code": "OK"
+        }
+      ]
+    },
+    {
+      "number": 402,
+      "url": "https://github.com/GoogleCloudPlatform/cloud-spanner-emulator/issues/402",
+      "title": "Conformance test environment never shuts down its gRPC server",
+      "status": "not-executed-original-scope",
+      "scope": "Conformance test executable shutdown requires building that harness; not the distributed server process.",
+      "attempts": []
+    },
+    {
+      "number": 401,
+      "url": "https://github.com/GoogleCloudPlatform/cloud-spanner-emulator/issues/401",
+      "title": "Building from source: CRC32C copts in spanner_pg port, bootstrap_catalog writes into a read-only checkout, Docker build OOM",
+      "status": "not-executed-original-scope",
+      "scope": "Source/Bazel/Docker build environment and resource-limit reports; no source build performed.",
+      "attempts": []
+    },
+    {
+      "number": 400,
+      "url": "https://github.com/GoogleCloudPlatform/cloud-spanner-emulator/issues/400",
+      "title": "DROP INDEX leaves the index's data in memory for the life of the process",
+      "status": "runtime-attempted",
+      "scope": "Runtime attempts include setup/negative/blocked cases; inspect the report for outcome and fixture corrections.",
+      "attempts": [
+        {
+          "file": "emulator-focused.jsonl",
+          "phase": "memory-focused",
+          "label": "memory-table",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-focused.jsonl",
+          "phase": "memory-focused",
+          "label": "memory-lifecycle",
+          "code": "OK"
+        }
+      ]
+    },
+    {
+      "number": 398,
+      "url": "https://github.com/GoogleCloudPlatform/cloud-spanner-emulator/issues/398",
+      "title": "Improve performance: DML is analysed twice in QueryEngine::ExecuteSql",
+      "status": "related-bounded-control",
+      "scope": "Related bounded SQL/DML samples only; no double-analysis profiling.",
+      "attempts": []
+    },
+    {
+      "number": 397,
+      "url": "https://github.com/GoogleCloudPlatform/cloud-spanner-emulator/issues/397",
+      "title": "Improve performance: ExecuteStreamingSql analyses every statement twice, once to check for change streams",
+      "status": "related-bounded-control",
+      "scope": "Related bounded SQL samples only; no streaming-analysis profiling.",
+      "attempts": []
+    },
+    {
+      "number": 396,
+      "url": "https://github.com/GoogleCloudPlatform/cloud-spanner-emulator/issues/396",
+      "title": "Improve performance: ExecuteStreamingSql builds a new FunctionCatalog for every statement",
+      "status": "related-bounded-control",
+      "scope": "Related bounded SQL samples only; no profiling to confirm catalog construction cost.",
+      "attempts": []
+    },
+    {
+      "number": 395,
+      "url": "https://github.com/GoogleCloudPlatform/cloud-spanner-emulator/issues/395",
+      "title": "`Update` mutation re-applies DEFAULT to unspecified non-key columns when a primary-key column has DEFAULT or is generated",
+      "status": "runtime-attempted",
+      "scope": "Runtime attempts include setup/negative/blocked cases; inspect the report for outcome and fixture corrections.",
+      "attempts": [
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "defaults",
+          "label": "KeyDefault-ddl",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "defaults",
+          "label": "KeyDefault-seed",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "defaults",
+          "label": "KeyDefault-mutation",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "defaults",
+          "label": "KeyDefault-after-mutation",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "defaults",
+          "label": "KeyDefault-reset",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "defaults",
+          "label": "KeyDefault-dml",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "defaults",
+          "label": "KeyDefault-after-dml",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "defaults",
+          "label": "PlainKey-ddl",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "defaults",
+          "label": "PlainKey-seed",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "defaults",
+          "label": "PlainKey-mutation",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "defaults",
+          "label": "PlainKey-after-mutation",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "defaults",
+          "label": "PlainKey-reset",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "defaults",
+          "label": "PlainKey-dml",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "defaults",
+          "label": "PlainKey-after-dml",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "defaults",
+          "label": "GeneratedKey-ddl",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "defaults",
+          "label": "GeneratedKey-seed",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "defaults",
+          "label": "GeneratedKey-mutation",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "defaults",
+          "label": "GeneratedKey-after-mutation",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "defaults",
+          "label": "GeneratedKey-reset",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "defaults",
+          "label": "GeneratedKey-dml",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "defaults",
+          "label": "GeneratedKey-after-dml",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "defaults",
+          "label": "CompositeDefault-ddl",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "defaults",
+          "label": "CompositeDefault-seed",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "defaults",
+          "label": "CompositeDefault-mutation",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "defaults",
+          "label": "CompositeDefault-after-mutation",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "defaults",
+          "label": "CompositeDefault-reset",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "defaults",
+          "label": "CompositeDefault-dml",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "defaults",
+          "label": "CompositeDefault-after-dml",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "defaults",
+          "label": "key-nonkey-default-ddl",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "defaults",
+          "label": "key-nonkey-seed",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "defaults",
+          "label": "key-nonkey-mutation",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "defaults",
+          "label": "key-nonkey-after",
+          "code": "OK"
+        }
+      ]
+    },
+    {
+      "number": 389,
+      "url": "https://github.com/GoogleCloudPlatform/cloud-spanner-emulator/issues/389",
+      "title": "Four fixed costs that dominate test suites on the emulator: clock lead on every read, full-table reads for keyed queries, per-statement catalog rebuild, double analysis of every streaming query (patches available)",
+      "status": "runtime-attempted",
+      "scope": "Runtime attempts include setup/negative/blocked cases; inspect the report for outcome and fixture corrections.",
+      "attempts": [
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "performance",
+          "label": "perf-sample",
+          "code": "OK"
+        }
+      ]
+    },
+    {
+      "number": 388,
+      "url": "https://github.com/GoogleCloudPlatform/cloud-spanner-emulator/issues/388",
+      "title": "v1.5.58 applies schema changes about 65% slower than v1.5.57 on linux/amd64",
+      "status": "not-executed-original-scope",
+      "scope": "Original amd64 cross-version DDL workload not run; no regression ratio established.",
+      "attempts": []
+    },
+    {
+      "number": 386,
+      "url": "https://github.com/GoogleCloudPlatform/cloud-spanner-emulator/issues/386",
+      "title": "Missing INFORMATION_SCHEMA.(ROUTINES|ROUTINE_OPTIONS|PARAMETERS)",
+      "status": "runtime-attempted",
+      "scope": "Runtime attempts include setup/negative/blocked cases; inspect the report for outcome and fixture corrections.",
+      "attempts": [
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "catalog-hints",
+          "label": "catalog-ROUTINES",
+          "code": "InvalidArgument"
+        },
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "catalog-hints",
+          "label": "catalog-ROUTINE_OPTIONS",
+          "code": "InvalidArgument"
+        },
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "catalog-hints",
+          "label": "catalog-PARAMETERS",
+          "code": "InvalidArgument"
+        },
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "catalog-hints",
+          "label": "catalog-ROUTINE_PRIVILEGES",
+          "code": "InvalidArgument"
+        },
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "catalog-hints",
+          "label": "catalog-TABLE_OPTIONS",
+          "code": "InvalidArgument"
+        }
+      ]
+    },
+    {
+      "number": 358,
+      "url": "https://github.com/GoogleCloudPlatform/cloud-spanner-emulator/issues/358",
+      "title": "Emulator not supporting INSERT with ON CONFLICT DO NOTHING clause",
+      "status": "runtime-attempted",
+      "scope": "Runtime attempts include setup/negative/blocked cases; inspect the report for outcome and fixture corrections.",
+      "attempts": [
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "gsql-dml",
+          "label": "conflict-table",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "gsql-dml",
+          "label": "conflict-seed",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "gsql-dml",
+          "label": "conflict-nothing-1",
+          "code": "Unimplemented"
+        },
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "gsql-dml",
+          "label": "conflict-nothing-2",
+          "code": "Unimplemented"
+        },
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "gsql-dml",
+          "label": "conflict-after",
+          "code": "OK"
+        }
+      ]
+    },
+    {
+      "number": 356,
+      "url": "https://github.com/GoogleCloudPlatform/cloud-spanner-emulator/issues/356",
+      "title": "Discrepancy in fts `SNIPPET` text normalization",
+      "status": "runtime-attempted",
+      "scope": "Runtime attempts include setup/negative/blocked cases; inspect the report for outcome and fixture corrections.",
+      "attempts": [
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "search",
+          "label": "snippet-0",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "search",
+          "label": "snippet-1",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-focused.jsonl",
+          "phase": "search-focused",
+          "label": "snippet-0",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-focused.jsonl",
+          "phase": "search-focused",
+          "label": "snippet-1",
+          "code": "OK"
+        }
+      ]
+    },
+    {
+      "number": 355,
+      "url": "https://github.com/GoogleCloudPlatform/cloud-spanner-emulator/issues/355",
+      "title": "Discrepancy in json returned by fts `SNIPPET` function",
+      "status": "runtime-attempted",
+      "scope": "Runtime attempts include setup/negative/blocked cases; inspect the report for outcome and fixture corrections.",
+      "attempts": [
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "search",
+          "label": "search-seed",
+          "code": "InvalidArgument"
+        },
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "search",
+          "label": "snippet-indexed",
+          "code": "NOT_RUN"
+        },
+        {
+          "file": "emulator-focused.jsonl",
+          "phase": "search-focused",
+          "label": "search-seed",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-focused.jsonl",
+          "phase": "search-focused",
+          "label": "snippet-indexed",
+          "code": "OK"
+        }
+      ]
+    },
+    {
+      "number": 353,
+      "url": "https://github.com/GoogleCloudPlatform/cloud-spanner-emulator/issues/353",
+      "title": "Incorrect INFORMATION_SCHEMA for Cross-Schema Foreign Keys",
+      "status": "runtime-attempted",
+      "scope": "Runtime attempts include setup/negative/blocked cases; inspect the report for outcome and fixture corrections.",
+      "attempts": [
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "cross-schema",
+          "label": "foreign-schema",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "cross-schema",
+          "label": "foreign-parent",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "cross-schema",
+          "label": "foreign-unique",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "cross-schema",
+          "label": "foreign-child-1",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "cross-schema",
+          "label": "foreign-child-2",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "cross-schema",
+          "label": "foreign-TABLE_CONSTRAINTS",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "cross-schema",
+          "label": "foreign-REFERENTIAL_CONSTRAINTS",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "cross-schema",
+          "label": "foreign-KEY_COLUMN_USAGE",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "cross-schema",
+          "label": "foreign-join",
+          "code": "OK"
+        }
+      ]
+    },
+    {
+      "number": 352,
+      "url": "https://github.com/GoogleCloudPlatform/cloud-spanner-emulator/issues/352",
+      "title": "ALTER CHANGE STREAM ... SET FOR leaves a column-tracked table tracked, blocking DROP TABLE (1.5.54)",
+      "status": "runtime-attempted",
+      "scope": "Runtime attempts include setup/negative/blocked cases; inspect the report for outcome and fixture corrections.",
+      "attempts": [
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "stream-ddl",
+          "label": "table-K",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "stream-ddl",
+          "label": "table-Z",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "stream-ddl",
+          "label": "column-stream",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "stream-ddl",
+          "label": "column-untrack",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "stream-ddl",
+          "label": "drop-untracked",
+          "code": "FailedPrecondition"
+        }
+      ]
+    },
+    {
+      "number": 350,
+      "url": "https://github.com/GoogleCloudPlatform/cloud-spanner-emulator/issues/350",
+      "title": "Roles metadata is missing",
+      "status": "runtime-attempted",
+      "scope": "Runtime attempts include setup/negative/blocked cases; inspect the report for outcome and fixture corrections.",
+      "attempts": [
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "catalog-hints",
+          "label": "catalog-ROLES",
+          "code": "InvalidArgument"
+        },
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "catalog-hints",
+          "label": "create-role",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "catalog-hints",
+          "label": "export-roles",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-focused.jsonl",
+          "phase": "catalog-hints-focused",
+          "label": "create-role",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-focused.jsonl",
+          "phase": "catalog-hints-focused",
+          "label": "export-roles",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-extra.jsonl",
+          "phase": "more-api",
+          "label": "more-role",
+          "code": "OK"
+        }
+      ]
+    },
+    {
+      "number": 349,
+      "url": "https://github.com/GoogleCloudPlatform/cloud-spanner-emulator/issues/349",
+      "title": "Support a flag to disabe hint validations",
+      "status": "runtime-attempted",
+      "scope": "Runtime attempts include setup/negative/blocked cases; inspect the report for outcome and fixture corrections.",
+      "attempts": [
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "catalog-hints",
+          "label": "hint-OPTIMIZER_VERSION-ignore",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "catalog-hints",
+          "label": "hint-OPTIMIZER_STATISTICS_PACKAGE-ignore",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "catalog-hints",
+          "label": "hint-ALLOW_DISTRIBUTED_MERGE-ignore",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "catalog-hints",
+          "label": "hint-EXECUTION_METHOD-ignore",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "catalog-hints",
+          "label": "hint-USE_UNENFORCED_FOREIGN_KEY-ignore",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "catalog-hints",
+          "label": "hint-ALLOW_TIMESTAMP_PREDICATE_PUSHDOWN-ignore",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "catalog-hints",
+          "label": "hint-USE_ADDITIONAL_PARALLELISM-ignore",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "catalog-hints",
+          "label": "hint-SCAN_METHOD-ignore",
+          "code": "InvalidArgument"
+        },
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "catalog-hints",
+          "label": "hint-AUTO_PARAMETER-ignore",
+          "code": "OK"
+        }
+      ]
+    },
+    {
+      "number": 347,
+      "url": "https://github.com/GoogleCloudPlatform/cloud-spanner-emulator/issues/347",
+      "title": "Change-stream mods.keys JSON drops sub-second precision for TIMESTAMP columns",
+      "status": "runtime-attempted",
+      "scope": "Runtime attempts include setup/negative/blocked cases; inspect the report for outcome and fixture corrections.",
+      "attempts": [
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "stream-records",
+          "label": "records-table",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "stream-records",
+          "label": "stream-precision-tag",
+          "code": "OutOfRange"
+        },
+        {
+          "file": "emulator-focused.jsonl",
+          "phase": "stream-records-focused",
+          "label": "records-table",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-focused.jsonl",
+          "phase": "stream-records-focused",
+          "label": "stream-precision-tag",
+          "code": "OK"
+        }
+      ]
+    },
+    {
+      "number": 341,
+      "url": "https://github.com/GoogleCloudPlatform/cloud-spanner-emulator/issues/341",
+      "title": "Missing INFORMATION_SCHEMA.INDEXES.SEARCH_(PARTITION_BY|ORDER_BY)",
+      "status": "runtime-attempted",
+      "scope": "Runtime attempts include setup/negative/blocked cases; inspect the report for outcome and fixture corrections.",
+      "attempts": [
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "search",
+          "label": "search-index-metadata",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-focused.jsonl",
+          "phase": "search-focused",
+          "label": "search-index-metadata",
+          "code": "OK"
+        }
+      ]
+    },
+    {
+      "number": 332,
+      "url": "https://github.com/GoogleCloudPlatform/cloud-spanner-emulator/issues/332",
+      "title": "Unable to create generated timestamp column from protobuf timestamp",
+      "status": "runtime-attempted",
+      "scope": "Runtime attempts include setup/negative/blocked cases; inspect the report for outcome and fixture corrections.",
+      "attempts": [
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "proto-generated",
+          "label": "proto-generated-nanos",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-focused.jsonl",
+          "phase": "proto-generated-focused",
+          "label": "proto-generated-nanos",
+          "code": "OK"
+        }
+      ]
+    },
+    {
+      "number": 324,
+      "url": "https://github.com/GoogleCloudPlatform/cloud-spanner-emulator/issues/324",
+      "title": "Add support for `ALTER SEARCH INDEX`",
+      "status": "runtime-attempted",
+      "scope": "Runtime attempts include setup/negative/blocked cases; inspect the report for outcome and fixture corrections.",
+      "attempts": [
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "search",
+          "label": "search-table",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "search",
+          "label": "search-index",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "search",
+          "label": "alter-search-add",
+          "code": "InvalidArgument"
+        },
+        {
+          "file": "emulator-focused.jsonl",
+          "phase": "search-focused",
+          "label": "search-table",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-focused.jsonl",
+          "phase": "search-focused",
+          "label": "search-index",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-focused.jsonl",
+          "phase": "search-focused",
+          "label": "alter-search-add",
+          "code": "InvalidArgument"
+        }
+      ]
+    },
+    {
+      "number": 316,
+      "url": "https://github.com/GoogleCloudPlatform/cloud-spanner-emulator/issues/316",
+      "title": "DEFAULT (PENDING_COMMIT_TIMESTAMP()) fails with FailedPrecondition when table has a generated stored primary key.",
+      "status": "runtime-attempted",
+      "scope": "Runtime attempts include setup/negative/blocked cases; inspect the report for outcome and fixture corrections.",
+      "attempts": [
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "commit-defaults",
+          "label": "generated-timestamps-ddl",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "commit-defaults",
+          "label": "generated-timestamps-dml",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "commit-defaults",
+          "label": "generated-timestamps-mutation",
+          "code": "FailedPrecondition"
+        },
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "commit-defaults",
+          "label": "generated-timestamps-rows",
+          "code": "OK"
+        }
+      ]
+    },
+    {
+      "number": 315,
+      "url": "https://github.com/GoogleCloudPlatform/cloud-spanner-emulator/issues/315",
+      "title": "Cloud spanner emulator no longer included in gcloud cli",
+      "status": "not-executed-original-scope",
+      "scope": "Runtime attempts include setup/negative/blocked cases; inspect the report for outcome and fixture corrections.",
+      "attempts": []
+    },
+    {
+      "number": 312,
+      "url": "https://github.com/GoogleCloudPlatform/cloud-spanner-emulator/issues/312",
+      "title": "PostgreSQL \"ON CONFLICT\" and table in schema",
+      "status": "runtime-attempted",
+      "scope": "Runtime attempts include setup/negative/blocked cases; inspect the report for outcome and fixture corrections.",
+      "attempts": [
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "pg-conflict",
+          "label": "pg-schema",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "pg-conflict",
+          "label": "pg-table",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "pg-conflict",
+          "label": "pg-conflict-0",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "pg-conflict",
+          "label": "pg-conflict-1",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "pg-conflict",
+          "label": "pg-conflict-2",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "pg-conflict",
+          "label": "pg-conflict-after",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-focused.jsonl",
+          "phase": "pg-conflict-focused",
+          "label": "pg-schema",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-focused.jsonl",
+          "phase": "pg-conflict-focused",
+          "label": "pg-table",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-focused.jsonl",
+          "phase": "pg-conflict-focused",
+          "label": "pg-conflict-0",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-focused.jsonl",
+          "phase": "pg-conflict-focused",
+          "label": "pg-conflict-1",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-focused.jsonl",
+          "phase": "pg-conflict-focused",
+          "label": "pg-conflict-2",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-focused.jsonl",
+          "phase": "pg-conflict-focused",
+          "label": "pg-conflict-after",
+          "code": "OK"
+        }
+      ]
+    },
+    {
+      "number": 310,
+      "url": "https://github.com/GoogleCloudPlatform/cloud-spanner-emulator/issues/310",
+      "title": "Feature Request: Support local embedding services for ML.PREDICT testing",
+      "status": "not-executed-original-scope",
+      "scope": "Runtime attempts include setup/negative/blocked cases; inspect the report for outcome and fixture corrections.",
+      "attempts": []
+    },
+    {
+      "number": 304,
+      "url": "https://github.com/GoogleCloudPlatform/cloud-spanner-emulator/issues/304",
+      "title": "Named argument `dialect` does not exist in signature SEARCH",
+      "status": "runtime-attempted",
+      "scope": "Runtime attempts include setup/negative/blocked cases; inspect the report for outcome and fixture corrections.",
+      "attempts": [
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "search",
+          "label": "search-dialect",
+          "code": "NOT_RUN"
+        },
+        {
+          "file": "emulator-focused.jsonl",
+          "phase": "search-focused",
+          "label": "search-dialect",
+          "code": "OK"
+        }
+      ]
+    },
+    {
+      "number": 300,
+      "url": "https://github.com/GoogleCloudPlatform/cloud-spanner-emulator/issues/300",
+      "title": "Support all documented query hints",
+      "status": "runtime-attempted",
+      "scope": "Runtime attempts include setup/negative/blocked cases; inspect the report for outcome and fixture corrections.",
+      "attempts": [
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "catalog-hints",
+          "label": "hint-OPTIMIZER_VERSION-strict",
+          "code": "InvalidArgument"
+        },
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "catalog-hints",
+          "label": "hint-OPTIMIZER_STATISTICS_PACKAGE-strict",
+          "code": "InvalidArgument"
+        },
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "catalog-hints",
+          "label": "hint-ALLOW_DISTRIBUTED_MERGE-strict",
+          "code": "InvalidArgument"
+        },
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "catalog-hints",
+          "label": "hint-EXECUTION_METHOD-strict",
+          "code": "InvalidArgument"
+        },
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "catalog-hints",
+          "label": "hint-USE_UNENFORCED_FOREIGN_KEY-strict",
+          "code": "InvalidArgument"
+        },
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "catalog-hints",
+          "label": "hint-ALLOW_TIMESTAMP_PREDICATE_PUSHDOWN-strict",
+          "code": "InvalidArgument"
+        },
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "catalog-hints",
+          "label": "hint-USE_ADDITIONAL_PARALLELISM-strict",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "catalog-hints",
+          "label": "hint-SCAN_METHOD-strict",
+          "code": "InvalidArgument"
+        },
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "catalog-hints",
+          "label": "hint-AUTO_PARAMETER-strict",
+          "code": "InvalidArgument"
+        }
+      ]
+    },
+    {
+      "number": 298,
+      "url": "https://github.com/GoogleCloudPlatform/cloud-spanner-emulator/issues/298",
+      "title": "Change stream ALTER operations incorrectly accumulate internal state causing false limit violations",
+      "status": "runtime-attempted",
+      "scope": "Runtime attempts include setup/negative/blocked cases; inspect the report for outcome and fixture corrections.",
+      "attempts": [
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "stream-ddl",
+          "label": "stream-T1",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "stream-ddl",
+          "label": "stream-T2",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "stream-ddl",
+          "label": "stream-T3",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "stream-ddl",
+          "label": "stream-T4",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "stream-ddl",
+          "label": "alter-stream-create",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "stream-ddl",
+          "label": "alter-stream-0",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "stream-ddl",
+          "label": "alter-stream-1",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "stream-ddl",
+          "label": "alter-stream-2",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "stream-ddl",
+          "label": "alter-stream-3",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "stream-ddl",
+          "label": "alter-stream-4",
+          "code": "OK"
+        }
+      ]
+    },
+    {
+      "number": 294,
+      "url": "https://github.com/GoogleCloudPlatform/cloud-spanner-emulator/issues/294",
+      "title": "ON CONFLICT does not match production for PostgresSQL in latest release",
+      "status": "runtime-attempted",
+      "scope": "Runtime attempts include setup/negative/blocked cases; inspect the report for outcome and fixture corrections.",
+      "attempts": [
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "pg-conflict",
+          "label": "pg-parent",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "pg-conflict",
+          "label": "pg-fk",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "pg-conflict",
+          "label": "pg-fk-seed",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "pg-conflict",
+          "label": "pg-fk-conflict-0",
+          "code": "Unimplemented"
+        },
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "pg-conflict",
+          "label": "pg-fk-conflict-1",
+          "code": "Unimplemented"
+        },
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "pg-conflict",
+          "label": "pg-fk-after",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-focused.jsonl",
+          "phase": "pg-conflict-focused",
+          "label": "pg-parent",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-focused.jsonl",
+          "phase": "pg-conflict-focused",
+          "label": "pg-fk",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-focused.jsonl",
+          "phase": "pg-conflict-focused",
+          "label": "pg-fk-seed",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-focused.jsonl",
+          "phase": "pg-conflict-focused",
+          "label": "pg-fk-conflict-0",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-focused.jsonl",
+          "phase": "pg-conflict-focused",
+          "label": "pg-fk-conflict-1",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-focused.jsonl",
+          "phase": "pg-conflict-focused",
+          "label": "pg-fk-after",
+          "code": "OK"
+        }
+      ]
+    },
+    {
+      "number": 292,
+      "url": "https://github.com/GoogleCloudPlatform/cloud-spanner-emulator/issues/292",
+      "title": "Emulator doesn't recreate unsupported query shape that can return a null-valued array of struct",
+      "status": "runtime-attempted",
+      "scope": "Runtime attempts include setup/negative/blocked cases; inspect the report for outcome and fixture corrections.",
+      "attempts": [
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "gsql-dml",
+          "label": "null-array-0",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "gsql-dml",
+          "label": "null-array-1",
+          "code": "OK"
+        }
+      ]
+    },
+    {
+      "number": 291,
+      "url": "https://github.com/GoogleCloudPlatform/cloud-spanner-emulator/issues/291",
+      "title": "Spanner Emulator: UNIQUE constraint violation detection takes ~7 seconds",
+      "status": "runtime-attempted",
+      "scope": "Runtime attempts include setup/negative/blocked cases; inspect the report for outcome and fixture corrections.",
+      "attempts": [
+        {
+          "file": "emulator-extra.jsonl",
+          "phase": "unique-default-latency",
+          "label": "unique-table",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-extra.jsonl",
+          "phase": "unique-default-latency",
+          "label": "unique-index",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-extra.jsonl",
+          "phase": "unique-default-latency",
+          "label": "unique-seed",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-extra.jsonl",
+          "phase": "unique-default-latency",
+          "label": "unique-duplicate",
+          "code": "AlreadyExists"
+        },
+        {
+          "file": "emulator-last.jsonl",
+          "phase": "latency-corrected",
+          "label": "unique-table",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-last.jsonl",
+          "phase": "latency-corrected",
+          "label": "unique-index",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-last.jsonl",
+          "phase": "latency-corrected",
+          "label": "unique-seed",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-last.jsonl",
+          "phase": "latency-corrected",
+          "label": "unique-duplicate",
+          "code": "AlreadyExists"
+        }
+      ]
+    },
+    {
+      "number": 290,
+      "url": "https://github.com/GoogleCloudPlatform/cloud-spanner-emulator/issues/290",
+      "title": "Display table synonym in Emulator's information schema",
+      "status": "runtime-attempted",
+      "scope": "Runtime attempts include setup/negative/blocked cases; inspect the report for outcome and fixture corrections.",
+      "attempts": [
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "rename-synonym",
+          "label": "add-synonym",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "rename-synonym",
+          "label": "synonym-metadata",
+          "code": "InvalidArgument"
+        }
+      ]
+    },
+    {
+      "number": 281,
+      "url": "https://github.com/GoogleCloudPlatform/cloud-spanner-emulator/issues/281",
+      "title": "Request: recovery method when a commit aborts at the RPC level",
+      "status": "not-executed-original-scope",
+      "scope": "Disjoint active transaction conflict observed, but no external gRPC commit interceptor reproduction.",
+      "attempts": []
+    },
+    {
+      "number": 280,
+      "url": "https://github.com/GoogleCloudPlatform/cloud-spanner-emulator/issues/280",
+      "title": "transaction_tag is not passed in change stream data change records",
+      "status": "related-bounded-control",
+      "scope": "Fresh stream transaction_tag is empty despite submitted tag.",
+      "attempts": []
+    },
+    {
+      "number": 277,
+      "url": "https://github.com/GoogleCloudPlatform/cloud-spanner-emulator/issues/277",
+      "title": "Clock/Lock Slowdown",
+      "status": "not-executed-original-scope",
+      "scope": "Runtime attempts include setup/negative/blocked cases; inspect the report for outcome and fixture corrections.",
+      "attempts": []
+    },
+    {
+      "number": 276,
+      "url": "https://github.com/GoogleCloudPlatform/cloud-spanner-emulator/issues/276",
+      "title": "Enable `FEATURE_WITH_ON_SUBQUERY` feature switch in zetasql package",
+      "status": "runtime-attempted",
+      "scope": "Runtime attempts include setup/negative/blocked cases; inspect the report for outcome and fixture corrections.",
+      "attempts": [
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "gsql-dml",
+          "label": "with-in-subquery",
+          "code": "InvalidArgument"
+        }
+      ]
+    },
+    {
+      "number": 273,
+      "url": "https://github.com/GoogleCloudPlatform/cloud-spanner-emulator/issues/273",
+      "title": "Emulator crashes with `Segmentation fault (core dumped)`",
+      "status": "not-executed-original-scope",
+      "scope": "Intermittent historical crash workload not provided as an executable fixture; bounded official image runs do not rule it out.",
+      "attempts": []
+    },
+    {
+      "number": 265,
+      "url": "https://github.com/GoogleCloudPlatform/cloud-spanner-emulator/issues/265",
+      "title": "Spanner Graph -- Emulator does not support node/edge label reuse and 0-length path traversal",
+      "status": "runtime-attempted",
+      "scope": "Runtime attempts include setup/negative/blocked cases; inspect the report for outcome and fixture corrections.",
+      "attempts": [
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "graph",
+          "label": "graph-nodes",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "graph",
+          "label": "graph-edges",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "graph",
+          "label": "graph-seed",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "graph",
+          "label": "graph-ordinary",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "graph",
+          "label": "path-TRAIL-{0}",
+          "code": "InvalidArgument"
+        },
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "graph",
+          "label": "path-TRAIL-{0,1}",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "graph",
+          "label": "path-TRAIL-{0,3}",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "graph",
+          "label": "path-TRAIL-{,3}",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "graph",
+          "label": "path-TRAIL-{1,3}",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "graph",
+          "label": "path-ACYCLIC-{0}",
+          "code": "InvalidArgument"
+        },
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "graph",
+          "label": "path-ACYCLIC-{0,1}",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "graph",
+          "label": "path-ACYCLIC-{0,3}",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "graph",
+          "label": "path-ACYCLIC-{,3}",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "graph",
+          "label": "path-ACYCLIC-{1,3}",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "graph",
+          "label": "path-ANY-SHORTEST-{0}",
+          "code": "InvalidArgument"
+        },
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "graph",
+          "label": "path-ANY-SHORTEST-{0,1}",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "graph",
+          "label": "path-ANY-SHORTEST-{0,3}",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "graph",
+          "label": "path-ANY-SHORTEST-{,3}",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "graph",
+          "label": "path-ANY-SHORTEST-{1,3}",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "graph",
+          "label": "graph-reused-label",
+          "code": "InvalidArgument"
+        },
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "graph",
+          "label": "graph-reused-label-read",
+          "code": "NOT_RUN"
+        },
+        {
+          "file": "emulator-focused.jsonl",
+          "phase": "graph-focused",
+          "label": "graph-nodes",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-focused.jsonl",
+          "phase": "graph-focused",
+          "label": "graph-edges",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-focused.jsonl",
+          "phase": "graph-focused",
+          "label": "graph-seed",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-focused.jsonl",
+          "phase": "graph-focused",
+          "label": "graph-reused-label",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-focused.jsonl",
+          "phase": "graph-focused",
+          "label": "graph-reused-label-read",
+          "code": "OK"
+        }
+      ]
+    },
+    {
+      "number": 261,
+      "url": "https://github.com/GoogleCloudPlatform/cloud-spanner-emulator/issues/261",
+      "title": "Support User-Defined Function",
+      "status": "runtime-attempted",
+      "scope": "Runtime attempts include setup/negative/blocked cases; inspect the report for outcome and fixture corrections.",
+      "attempts": [
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "catalog-hints",
+          "label": "udf",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "catalog-hints",
+          "label": "udf-value",
+          "code": "OK"
+        }
+      ]
+    },
+    {
+      "number": 252,
+      "url": "https://github.com/GoogleCloudPlatform/cloud-spanner-emulator/issues/252",
+      "title": "Linux binary dynamically links too new a version of libstdc++",
+      "status": "not-executed-original-scope",
+      "scope": "Standalone binary compatibility on Ubuntu 22.04/Debian 12 not tested by the container.",
+      "attempts": []
+    },
+    {
+      "number": 251,
+      "url": "https://github.com/GoogleCloudPlatform/cloud-spanner-emulator/issues/251",
+      "title": "Renaming table with foreign keys hangs",
+      "status": "runtime-attempted",
+      "scope": "Runtime attempts include setup/negative/blocked cases; inspect the report for outcome and fixture corrections.",
+      "attempts": [
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "rename-synonym",
+          "label": "rename-parent",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "rename-synonym",
+          "label": "rename-child",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "rename-synonym",
+          "label": "rename-with-fk",
+          "code": "Internal"
+        },
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "rename-synonym",
+          "label": "rename-export",
+          "code": "OK"
+        }
+      ]
+    },
+    {
+      "number": 247,
+      "url": "https://github.com/GoogleCloudPlatform/cloud-spanner-emulator/issues/247",
+      "title": "Many fixes are not documented in the release note of v1.5.35",
+      "status": "not-executed-original-scope",
+      "scope": "Historical v1.5.35 release-note completeness is a source audit, not latest-image runtime behavior.",
+      "attempts": []
+    },
+    {
+      "number": 236,
+      "url": "https://github.com/GoogleCloudPlatform/cloud-spanner-emulator/issues/236",
+      "title": "Executing UPDATE statement with subquery results in UNAVAILABLE error",
+      "status": "runtime-attempted",
+      "scope": "Runtime attempts include setup/negative/blocked cases; inspect the report for outcome and fixture corrections.",
+      "attempts": [
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "gsql-dml",
+          "label": "Requisitions-ddl",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "gsql-dml",
+          "label": "Measurements-ddl",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "gsql-dml",
+          "label": "subquery-seed",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "gsql-dml",
+          "label": "subquery-update-0",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "gsql-dml",
+          "label": "subquery-update-1",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "gsql-dml",
+          "label": "subquery-update-2",
+          "code": "OK"
+        }
+      ]
+    },
+    {
+      "number": 233,
+      "url": "https://github.com/GoogleCloudPlatform/cloud-spanner-emulator/issues/233",
+      "title": "Error parsing Spanner DDL statement: CREATE OR REPLACE VIEW {name} SQL SECURITY DEFINER",
+      "status": "runtime-attempted",
+      "scope": "Runtime attempts include setup/negative/blocked cases; inspect the report for outcome and fixture corrections.",
+      "attempts": [
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "catalog-hints",
+          "label": "view-table",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "catalog-hints",
+          "label": "view-INVOKER",
+          "code": "InvalidArgument"
+        },
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "catalog-hints",
+          "label": "view-DEFINER",
+          "code": "InvalidArgument"
+        },
+        {
+          "file": "emulator-focused.jsonl",
+          "phase": "catalog-hints-focused",
+          "label": "view-table",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-focused.jsonl",
+          "phase": "catalog-hints-focused",
+          "label": "view-INVOKER",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-focused.jsonl",
+          "phase": "catalog-hints-focused",
+          "label": "view-DEFINER",
+          "code": "OK"
+        }
+      ]
+    },
+    {
+      "number": 230,
+      "url": "https://github.com/GoogleCloudPlatform/cloud-spanner-emulator/issues/230",
+      "title": "DFA out of memory",
+      "status": "not-executed-original-scope",
+      "scope": "Historical DFA/regex OOM report lacks a complete bounded input; no OOM stress run.",
+      "attempts": []
+    },
+    {
+      "number": 221,
+      "url": "https://github.com/GoogleCloudPlatform/cloud-spanner-emulator/issues/221",
+      "title": "Query doesn't return result within few seconds",
+      "status": "not-executed-original-scope",
+      "scope": "Attached multi-table performance workload not reproduced; bounded IN/JOIN sample is separate.",
+      "attempts": []
+    },
+    {
+      "number": 214,
+      "url": "https://github.com/GoogleCloudPlatform/cloud-spanner-emulator/issues/214",
+      "title": "FORCE_INDEX=PRIMARY_KEY not supported by emulator",
+      "status": "runtime-attempted",
+      "scope": "Runtime attempts include setup/negative/blocked cases; inspect the report for outcome and fixture corrections.",
+      "attempts": [
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "search",
+          "label": "force-index-_BASE_TABLE",
+          "code": "NOT_RUN"
+        },
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "search",
+          "label": "force-index-PRIMARY_KEY",
+          "code": "NOT_RUN"
+        },
+        {
+          "file": "emulator-focused.jsonl",
+          "phase": "search-focused",
+          "label": "force-index-_BASE_TABLE",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-focused.jsonl",
+          "phase": "search-focused",
+          "label": "force-index-PRIMARY_KEY",
+          "code": "InvalidArgument"
+        }
+      ]
+    },
+    {
+      "number": 210,
+      "url": "https://github.com/GoogleCloudPlatform/cloud-spanner-emulator/issues/210",
+      "title": "Timestamps reported in change records values are incorrect",
+      "status": "runtime-attempted",
+      "scope": "Runtime attempts include setup/negative/blocked cases; inspect the report for outcome and fixture corrections.",
+      "attempts": [
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "stream-records",
+          "label": "records-stream",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-focused.jsonl",
+          "phase": "stream-records-focused",
+          "label": "records-stream",
+          "code": "OK"
+        }
+      ]
+    },
+    {
+      "number": 209,
+      "url": "https://github.com/GoogleCloudPlatform/cloud-spanner-emulator/issues/209",
+      "title": "WHERE IN subqueries appear to cause a CPU spike/are slow",
+      "status": "related-bounded-control",
+      "scope": "Five equal-result IN-subquery and JOIN samples; 2,000-row fixture only.",
+      "attempts": []
+    },
+    {
+      "number": 197,
+      "url": "https://github.com/GoogleCloudPlatform/cloud-spanner-emulator/issues/197",
+      "title": "Interleaved search index incorrectly requires parent key in token_column_list",
+      "status": "runtime-attempted",
+      "scope": "Runtime attempts include setup/negative/blocked cases; inspect the report for outcome and fixture corrections.",
+      "attempts": [
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "search",
+          "label": "parent-search",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "search",
+          "label": "child-search",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "search",
+          "label": "interleaved-search-index",
+          "code": "FailedPrecondition"
+        },
+        {
+          "file": "emulator-focused.jsonl",
+          "phase": "search-focused",
+          "label": "parent-search",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-focused.jsonl",
+          "phase": "search-focused",
+          "label": "child-search",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-focused.jsonl",
+          "phase": "search-focused",
+          "label": "interleaved-search-index",
+          "code": "FailedPrecondition"
+        }
+      ]
+    },
+    {
+      "number": 189,
+      "url": "https://github.com/GoogleCloudPlatform/cloud-spanner-emulator/issues/189",
+      "title": "TimestampBounds using ReadTimestamps do not behave as expected",
+      "status": "runtime-attempted",
+      "scope": "Runtime attempts include setup/negative/blocked cases; inspect the report for outcome and fixture corrections.",
+      "attempts": [
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "api-controls",
+          "label": "api-table",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "api-controls",
+          "label": "api-readtimestamp-stats",
+          "code": "OK"
+        }
+      ]
+    },
+    {
+      "number": 188,
+      "url": "https://github.com/GoogleCloudPlatform/cloud-spanner-emulator/issues/188",
+      "title": "Feature request: add or document macOS build",
+      "status": "not-executed-original-scope",
+      "scope": "Native macOS/Bazel source build not performed; Linux arm64 container is distinct.",
+      "attempts": []
+    },
+    {
+      "number": 187,
+      "url": "https://github.com/GoogleCloudPlatform/cloud-spanner-emulator/issues/187",
+      "title": "INSERTs with default values are too slow",
+      "status": "runtime-attempted",
+      "scope": "Runtime attempts include setup/negative/blocked cases; inspect the report for outcome and fixture corrections.",
+      "attempts": [
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "performance",
+          "label": "perf-table",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-extra.jsonl",
+          "phase": "unique-default-latency",
+          "label": "default-latency-0-False",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-extra.jsonl",
+          "phase": "unique-default-latency",
+          "label": "default-latency-0-True",
+          "code": "AlreadyExists"
+        },
+        {
+          "file": "emulator-extra.jsonl",
+          "phase": "unique-default-latency",
+          "label": "default-latency-1-False",
+          "code": "AlreadyExists"
+        },
+        {
+          "file": "emulator-extra.jsonl",
+          "phase": "unique-default-latency",
+          "label": "default-latency-1-True",
+          "code": "AlreadyExists"
+        },
+        {
+          "file": "emulator-extra.jsonl",
+          "phase": "unique-default-latency",
+          "label": "default-latency-2-False",
+          "code": "AlreadyExists"
+        },
+        {
+          "file": "emulator-extra.jsonl",
+          "phase": "unique-default-latency",
+          "label": "default-latency-2-True",
+          "code": "AlreadyExists"
+        },
+        {
+          "file": "emulator-extra.jsonl",
+          "phase": "unique-default-latency",
+          "label": "default-latency-3-False",
+          "code": "AlreadyExists"
+        },
+        {
+          "file": "emulator-extra.jsonl",
+          "phase": "unique-default-latency",
+          "label": "default-latency-3-True",
+          "code": "AlreadyExists"
+        },
+        {
+          "file": "emulator-extra.jsonl",
+          "phase": "unique-default-latency",
+          "label": "default-latency-4-False",
+          "code": "AlreadyExists"
+        },
+        {
+          "file": "emulator-extra.jsonl",
+          "phase": "unique-default-latency",
+          "label": "default-latency-4-True",
+          "code": "AlreadyExists"
+        },
+        {
+          "file": "emulator-last.jsonl",
+          "phase": "latency-corrected",
+          "label": "drop-unique-before-latency",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-last.jsonl",
+          "phase": "latency-corrected",
+          "label": "default-latency-0-False",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-last.jsonl",
+          "phase": "latency-corrected",
+          "label": "default-latency-0-True",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-last.jsonl",
+          "phase": "latency-corrected",
+          "label": "default-latency-1-False",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-last.jsonl",
+          "phase": "latency-corrected",
+          "label": "default-latency-1-True",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-last.jsonl",
+          "phase": "latency-corrected",
+          "label": "default-latency-2-False",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-last.jsonl",
+          "phase": "latency-corrected",
+          "label": "default-latency-2-True",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-last.jsonl",
+          "phase": "latency-corrected",
+          "label": "default-latency-3-False",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-last.jsonl",
+          "phase": "latency-corrected",
+          "label": "default-latency-3-True",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-last.jsonl",
+          "phase": "latency-corrected",
+          "label": "default-latency-4-False",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-last.jsonl",
+          "phase": "latency-corrected",
+          "label": "default-latency-4-True",
+          "code": "OK"
+        }
+      ]
+    },
+    {
+      "number": 184,
+      "url": "https://github.com/GoogleCloudPlatform/cloud-spanner-emulator/issues/184",
+      "title": "[Feature Request] Support Commit Stats",
+      "status": "related-bounded-control",
+      "scope": "Commit with ReturnCommitStats succeeds but returns nil statistics; nested API control is recorded under the historical-read family.",
+      "attempts": []
+    },
+    {
+      "number": 181,
+      "url": "https://github.com/GoogleCloudPlatform/cloud-spanner-emulator/issues/181",
+      "title": "Using pending_commit_timestamp() in an IF expression yields a weird result",
+      "status": "runtime-attempted",
+      "scope": "Runtime attempts include setup/negative/blocked cases; inspect the report for outcome and fixture corrections.",
+      "attempts": [
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "commit-defaults",
+          "label": "simple-timestamps-ddl",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "commit-defaults",
+          "label": "pending-in-if",
+          "code": "InvalidArgument"
+        },
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "commit-defaults",
+          "label": "pending-in-if-value",
+          "code": "OK"
+        }
+      ]
+    },
+    {
+      "number": 163,
+      "url": "https://github.com/GoogleCloudPlatform/cloud-spanner-emulator/issues/163",
+      "title": "Protocol Buffer namespace warnings",
+      "status": "not-executed-original-scope",
+      "scope": "Historical protobuf namespace startup warnings not assessed across the reported environments.",
+      "attempts": []
+    },
+    {
+      "number": 159,
+      "url": "https://github.com/GoogleCloudPlatform/cloud-spanner-emulator/issues/159",
+      "title": "Performance Degradation in Long-Running Spanner Emulator Sessions",
+      "status": "runtime-attempted",
+      "scope": "Runtime attempts include setup/negative/blocked cases; inspect the report for outcome and fixture corrections.",
+      "attempts": [
+        {
+          "file": "emulator-extra.jsonl",
+          "phase": "more-api",
+          "label": "more-api-controls",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-last.jsonl",
+          "phase": "multiplexed",
+          "label": "multiplexed-lifecycle",
+          "code": "OK"
+        }
+      ]
+    },
+    {
+      "number": 145,
+      "url": "https://github.com/GoogleCloudPlatform/cloud-spanner-emulator/issues/145",
+      "title": "Pre-built docker image v1.5.12 not supporting arm64 ",
+      "status": "not-executed-original-scope",
+      "scope": "Current native arm64 image executed; historical 1.5.12/1.5.57 publication timing is unverified.",
+      "attempts": []
+    },
+    {
+      "number": 143,
+      "url": "https://github.com/GoogleCloudPlatform/cloud-spanner-emulator/issues/143",
+      "title": "Results returned by SELECT statement with ORDER BY clause and LIMIT clause are out of order",
+      "status": "runtime-attempted",
+      "scope": "Runtime attempts include setup/negative/blocked cases; inspect the report for outcome and fixture corrections.",
+      "attempts": [
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "gsql-dml",
+          "label": "order-items",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "gsql-dml",
+          "label": "order-items-seed",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "gsql-dml",
+          "label": "sql-order-ASC-1",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "gsql-dml",
+          "label": "sql-order-ASC-2",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "gsql-dml",
+          "label": "sql-order-ASC-3",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "gsql-dml",
+          "label": "sql-order-DESC-1",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "gsql-dml",
+          "label": "sql-order-DESC-2",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "gsql-dml",
+          "label": "sql-order-DESC-3",
+          "code": "OK"
+        }
+      ]
+    },
+    {
+      "number": 134,
+      "url": "https://github.com/GoogleCloudPlatform/cloud-spanner-emulator/issues/134",
+      "title": "image sha changed for \"emulator/emulator:1.5.10\"",
+      "status": "not-executed-original-scope",
+      "scope": "Historical tag publication/mutable-manifest race not reproduced by current digest-pinned execution.",
+      "attempts": []
+    },
+    {
+      "number": 70,
+      "url": "https://github.com/GoogleCloudPlatform/cloud-spanner-emulator/issues/70",
+      "title": "Add instance and database to Spanner emulator startup",
+      "status": "not-executed-original-scope",
+      "scope": "Automatic CLI/container provisioning request not implemented or established by SDK bootstrap.",
+      "attempts": []
+    },
+    {
+      "number": 40,
+      "url": "https://github.com/GoogleCloudPlatform/cloud-spanner-emulator/issues/40",
+      "title": "Issue with releasing connections on updating interleaved/non-interleaved table with generated column.",
+      "status": "runtime-attempted",
+      "scope": "Runtime attempts include setup/negative/blocked cases; inspect the report for outcome and fixture corrections.",
+      "attempts": [
+        {
+          "file": "emulator-extra.jsonl",
+          "phase": "pdml",
+          "label": "pdml-parent",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-extra.jsonl",
+          "phase": "pdml",
+          "label": "pdml-child",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-extra.jsonl",
+          "phase": "pdml",
+          "label": "pdml-seed",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-extra.jsonl",
+          "phase": "pdml",
+          "label": "pdml-read-0",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-extra.jsonl",
+          "phase": "pdml",
+          "label": "pdml-update-0",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-extra.jsonl",
+          "phase": "pdml",
+          "label": "pdml-read-1",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-extra.jsonl",
+          "phase": "pdml",
+          "label": "pdml-update-1",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-extra.jsonl",
+          "phase": "pdml",
+          "label": "pdml-read-2",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-extra.jsonl",
+          "phase": "pdml",
+          "label": "pdml-update-2",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-extra.jsonl",
+          "phase": "pdml",
+          "label": "pdml-read-3",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-extra.jsonl",
+          "phase": "pdml",
+          "label": "pdml-update-3",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-extra.jsonl",
+          "phase": "pdml",
+          "label": "pdml-read-4",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-extra.jsonl",
+          "phase": "pdml",
+          "label": "pdml-update-4",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-extra.jsonl",
+          "phase": "pdml",
+          "label": "pdml-read-5",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-extra.jsonl",
+          "phase": "pdml",
+          "label": "pdml-update-5",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-extra.jsonl",
+          "phase": "pdml",
+          "label": "pdml-read-6",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-extra.jsonl",
+          "phase": "pdml",
+          "label": "pdml-update-6",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-extra.jsonl",
+          "phase": "pdml",
+          "label": "pdml-read-7",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-extra.jsonl",
+          "phase": "pdml",
+          "label": "pdml-update-7",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-extra.jsonl",
+          "phase": "pdml",
+          "label": "pdml-read-8",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-extra.jsonl",
+          "phase": "pdml",
+          "label": "pdml-update-8",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-extra.jsonl",
+          "phase": "pdml",
+          "label": "pdml-read-9",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-extra.jsonl",
+          "phase": "pdml",
+          "label": "pdml-update-9",
+          "code": "OK"
+        }
+      ]
+    },
+    {
+      "number": 33,
+      "url": "https://github.com/GoogleCloudPlatform/cloud-spanner-emulator/issues/33",
+      "title": "[Feature Request] Emulator persistence",
+      "status": "not-executed-original-scope",
+      "scope": "Disk persistence across process/container restart not tested; no persistent configuration added.",
+      "attempts": []
+    },
+    {
+      "number": 30,
+      "url": "https://github.com/GoogleCloudPlatform/cloud-spanner-emulator/issues/30",
+      "title": "Deleting a session with an active read/write transaction leaves the emulator in an invalid state",
+      "status": "runtime-attempted",
+      "scope": "Runtime attempts include setup/negative/blocked cases; inspect the report for outcome and fixture corrections.",
+      "attempts": [
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "session-abort",
+          "label": "session-table",
+          "code": "OK"
+        },
+        {
+          "file": "emulator-issues.jsonl",
+          "phase": "session-abort",
+          "label": "deleted-active-session",
+          "code": "OK"
+        }
+      ]
+    },
+    {
+      "number": 15,
+      "url": "https://github.com/GoogleCloudPlatform/cloud-spanner-emulator/issues/15",
+      "title": "Creating a spanner instance from a Golang unit test?",
+      "status": "not-executed-original-scope",
+      "scope": "Instance/database API bootstrap is exercised indirectly via spanemuboost; no documentation correction claim.",
+      "attempts": []
+    }
+  ]
+}

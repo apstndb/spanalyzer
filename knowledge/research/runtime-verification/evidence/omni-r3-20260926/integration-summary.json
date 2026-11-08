@@ -1,0 +1,49 @@
+{
+  "top_level": {
+    "fail": 2,
+    "pass": 20
+  },
+  "subtests": {
+    "fail": 18,
+    "pass": 200
+  },
+  "failures": [
+    {
+      "test": "TestIntegrationAggregateFunctionAggTypesVersionMatrixOnOmni",
+      "diagnostics": [
+        "aggregate_function_omni_test.go:101: AnalyzeQuery(aggregate-function/unsupported/approx-count-distinct, v1) error = <nil>, want containing \"Unsupported aggregate function: approx_count_distinct\"",
+        "aggregate_function_omni_test.go:101: AnalyzeQuery(aggregate-function/unsupported/approx-count-distinct, v2) error = <nil>, want containing \"Unsupported aggregate function: approx_count_distinct\"",
+        "aggregate_function_omni_test.go:101: AnalyzeQuery(aggregate-function/unsupported/approx-count-distinct, v3) error = <nil>, want containing \"Unsupported aggregate function: approx_count_distinct\"",
+        "aggregate_function_omni_test.go:101: AnalyzeQuery(aggregate-function/unsupported/approx-count-distinct, v4) error = <nil>, want containing \"Unsupported aggregate function: approx_count_distinct\"",
+        "aggregate_function_omni_test.go:101: AnalyzeQuery(aggregate-function/unsupported/approx-count-distinct, v5) error = <nil>, want containing \"Unsupported aggregate function: approx_count_distinct\"",
+        "aggregate_function_omni_test.go:101: AnalyzeQuery(aggregate-function/unsupported/approx-count-distinct, v6) error = <nil>, want containing \"Unsupported aggregate function: approx_count_distinct\"",
+        "aggregate_function_omni_test.go:101: AnalyzeQuery(aggregate-function/unsupported/approx-count-distinct, v7) error = <nil>, want containing \"Unsupported aggregate function: approx_count_distinct\"",
+        "aggregate_function_omni_test.go:101: AnalyzeQuery(aggregate-function/unsupported/approx-count-distinct, v8) error = <nil>, want containing \"Unsupported aggregate function: approx_count_distinct\"",
+        "aggregate_function_omni_test.go:101: AnalyzeQuery(aggregate-function/unsupported/approx-count-distinct, v9) error = <nil>, want containing \"Unsupported aggregate function: approx_count_distinct\""
+      ]
+    },
+    {
+      "test": "TestIntegrationConditionBoundariesVersionMatrixOnOmni",
+      "diagnostics": [
+        "condition_boundary_omni_test.go:43: Distributed Union Split Range expressions = [\"($SongName = @_auto_p0_string_)\"], want \"($SongName = 'Alpha')\"",
+        "condition_boundary_omni_test.go:44: Scan Seek Condition expressions = [\"IS_NOT_DISTINCT_FROM($SongName, @_auto_p0_string_)\"], want \"IS_NOT_DISTINCT_FROM($SongName, 'Alpha')\"",
+        "condition_boundary_omni_test.go:43: Distributed Union Split Range expressions = [\"($SongName = @_auto_p0_string_)\"], want \"($SongName = 'Alpha')\"",
+        "condition_boundary_omni_test.go:44: Scan Seek Condition expressions = [\"IS_NOT_DISTINCT_FROM($SongName, @_auto_p0_string_)\"], want \"IS_NOT_DISTINCT_FROM($SongName, 'Alpha')\"",
+        "condition_boundary_omni_test.go:43: Distributed Union Split Range expressions = [\"($SongName = @_auto_p0_string_)\"], want \"($SongName = 'Alpha')\"",
+        "condition_boundary_omni_test.go:44: Scan Seek Condition expressions = [\"IS_NOT_DISTINCT_FROM($SongName, @_auto_p0_string_)\"], want \"IS_NOT_DISTINCT_FROM($SongName, 'Alpha')\"",
+        "condition_boundary_omni_test.go:43: Distributed Union Split Range expressions = [\"($SongName = @_auto_p0_string_)\"], want \"($SongName = 'Alpha')\"",
+        "condition_boundary_omni_test.go:44: Scan Seek Condition expressions = [\"IS_NOT_DISTINCT_FROM($SongName, @_auto_p0_string_)\"], want \"IS_NOT_DISTINCT_FROM($SongName, 'Alpha')\"",
+        "condition_boundary_omni_test.go:43: Distributed Union Split Range expressions = [\"($SongName = @_auto_p0_string_)\"], want \"($SongName = 'Alpha')\"",
+        "condition_boundary_omni_test.go:44: Scan Seek Condition expressions = [\"IS_NOT_DISTINCT_FROM($SongName, @_auto_p0_string_)\"], want \"IS_NOT_DISTINCT_FROM($SongName, 'Alpha')\"",
+        "condition_boundary_omni_test.go:43: Distributed Union Split Range expressions = [\"($SongName = @_auto_p0_string_)\"], want \"($SongName = 'Alpha')\"",
+        "condition_boundary_omni_test.go:44: Scan Seek Condition expressions = [\"IS_NOT_DISTINCT_FROM($SongName, @_auto_p0_string_)\"], want \"IS_NOT_DISTINCT_FROM($SongName, 'Alpha')\"",
+        "condition_boundary_omni_test.go:43: Distributed Union Split Range expressions = [\"($SongName = @_auto_p0_string_)\"], want \"($SongName = 'Alpha')\"",
+        "condition_boundary_omni_test.go:44: Scan Seek Condition expressions = [\"IS_NOT_DISTINCT_FROM($SongName, @_auto_p0_string_)\"], want \"IS_NOT_DISTINCT_FROM($SongName, 'Alpha')\"",
+        "condition_boundary_omni_test.go:43: Distributed Union Split Range expressions = [\"($SongName = @_auto_p0_string_)\"], want \"($SongName = 'Alpha')\"",
+        "condition_boundary_omni_test.go:44: Scan Seek Condition expressions = [\"IS_NOT_DISTINCT_FROM($SongName, @_auto_p0_string_)\"], want \"IS_NOT_DISTINCT_FROM($SongName, 'Alpha')\"",
+        "condition_boundary_omni_test.go:43: Distributed Union Split Range expressions = [\"($SongName = @_auto_p0_string_)\"], want \"($SongName = 'Alpha')\"",
+        "condition_boundary_omni_test.go:44: Scan Seek Condition expressions = [\"IS_NOT_DISTINCT_FROM($SongName, @_auto_p0_string_)\"], want \"IS_NOT_DISTINCT_FROM($SongName, 'Alpha')\""
+      ]
+    }
+  ]
+}

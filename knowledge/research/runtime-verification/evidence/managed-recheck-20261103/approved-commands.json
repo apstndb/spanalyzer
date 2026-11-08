@@ -1,0 +1,24 @@
+[
+  {
+    "dialect": "google",
+    "argv": [
+      "<LOCAL_CHECKOUT>/.tmp/managed-recheck-20261103/managed",
+      "<LOCAL_TASK_ROOT>/apstndb/spanalyzer/managed-recheck-20261103/evidence/google-cases.json"
+    ],
+    "started_at": "2026-11-03T01:37:14.869785+00:00",
+    "completed_at": "2026-11-03T01:44:04.388681+00:00",
+    "exit_code": 0,
+    "authorization": "User explicitly approved two newly created disposable DBs, one per dialect, verification and their deletion; earlier retained DB excluded."
+  },
+  {
+    "dialect": "pg",
+    "argv": [
+      "<LOCAL_CHECKOUT>/.tmp/managed-recheck-20261103/managed",
+      "<LOCAL_TASK_ROOT>/apstndb/spanalyzer/managed-recheck-20261103/evidence/pg-cases.json"
+    ],
+    "started_at": "2026-11-03T01:44:04.388887+00:00",
+    "completed_at": "2026-11-03T01:47:19.185246+00:00",
+    "exit_code": 0,
+    "authorization": "User explicitly approved two newly created disposable DBs, one per dialect, verification and their deletion; earlier retained DB excluded."
+  }
+]

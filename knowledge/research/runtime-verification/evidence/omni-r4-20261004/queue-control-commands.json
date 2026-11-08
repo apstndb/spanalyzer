@@ -1,0 +1,30 @@
+[
+  {
+    "name": "queue-control-build",
+    "started_at": "2026-10-04T14:38:22.669147+00:00",
+    "exit_code": 0,
+    "elapsed_seconds": 0.99,
+    "cwd": "<LOCAL_CHECKOUT>/.worktrees/omni-r4-20261004/tools",
+    "args": [
+      "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go",
+      "build",
+      "-o",
+      "<LOCAL_CHECKOUT>/.tmp/omni-r4-20261004/queue-control",
+      "<LOCAL_CHECKOUT>/.tmp/omni-r4-20261004/queue-control.go"
+    ],
+    "env_overrides": {}
+  },
+  {
+    "name": "queue-control-r4",
+    "started_at": "2026-10-04T14:38:23.664086+00:00",
+    "exit_code": 0,
+    "elapsed_seconds": 67.2,
+    "cwd": "<LOCAL_CHECKOUT>/.worktrees/omni-r4-20261004/tools",
+    "args": [
+      "<LOCAL_CHECKOUT>/.tmp/omni-r4-20261004/queue-control"
+    ],
+    "env_overrides": {
+      "OMNI_IMAGE": "us-docker.pkg.dev/spanner-omni/images/spanner-omni:2026.r4-lts@sha256:9f10586c5de366bec5c0ff6cf542a67c21c8363e8a12a3deb9c372a07c9aa8b6"
+    }
+  }
+]

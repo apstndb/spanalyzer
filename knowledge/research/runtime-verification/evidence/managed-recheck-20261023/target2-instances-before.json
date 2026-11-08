@@ -1,0 +1,17 @@
+{
+  "name": "target2-instances-before",
+  "started_at": "2026-10-23T14:23:51.876141+00:00",
+  "completed_at": "2026-10-23T14:23:53.882113+00:00",
+  "argv": [
+    "<LOCAL_HOME>/google-cloud-sdk/bin/gcloud",
+    "spanner",
+    "instances",
+    "list",
+    "--format=value(instanceType,state)",
+    "--project=<redacted>",
+    "--quiet"
+  ],
+  "exit_code": 0,
+  "stdout": "",
+  "stderr": ""
+}

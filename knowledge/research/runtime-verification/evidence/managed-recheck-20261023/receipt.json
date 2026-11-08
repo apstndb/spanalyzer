@@ -1,0 +1,60 @@
+{
+  "observed_on": "2026-10-23",
+  "client_timezone": "Asia/Tokyo",
+  "execution_start": "2026-10-23T14:27:00.724800+00:00",
+  "execution_end": "2026-10-23T14:56:29.412970+00:00",
+  "runtime_identity": "New user-authorized free trial via dedicated user-level profile; deployment build unavailable; previous target unavailable",
+  "trial": {
+    "instanceType": "FREE_INSTANCE",
+    "edition": "ENTERPRISE",
+    "state": "READY",
+    "createTime": "2026-10-23T14:24:35.339918Z",
+    "freeInstanceMetadata": {
+      "expireBehavior": "REMOVE_AFTER_GRACE_PERIOD",
+      "expireTime": "2027-01-21T14:24:35.339918Z"
+    },
+    "resourceLocation": "asia-northeast1",
+    "defaultBackupScheduleType": "NONE"
+  },
+  "initial_target_attempt": "First designated project refused with one-trial-per-project-lifecycle FAILED_PRECONDITION; second designated project succeeded after enabling Spanner API",
+  "source_head": "c2d7792dd7f83d5dd086e2d32bc22e5d253cf06c",
+  "source_state": "Pre-existing dirty/untracked state preserved; 123 implementation/dependency hashes unchanged; twelve existing probes differ only in fixture date",
+  "dependencies": {
+    "go": "go1.26.8",
+    "catalog_and_integration": "GOWORK=off; Spanner v1.88.0",
+    "feature_clients": "Explicit workspace; Spanner v1.91.0"
+  },
+  "flow_status": "completed_with_known_local_drift_failure",
+  "managed_gate": "Three pass; TestDrift_RealTableMetas fails on unregistered ACTIVE_BATCH_OPERATIONS",
+  "records": {
+    "readonly": 86,
+    "google-features": 57,
+    "pg-features": 40,
+    "queue": 32,
+    "cleanup": 4,
+    "active-batch": 19,
+    "queries": 115,
+    "followup": 10,
+    "distinctness": 64,
+    "google-json": 29,
+    "pg-streams": 15,
+    "graph-controls": 12,
+    "google-options": 30,
+    "pg-options": 30,
+    "google-capture": 48,
+    "pg-capture": 48,
+    "doc-delta-google": 100,
+    "doc-delta-pg": 53,
+    "queue-recreate": 12,
+    "hll-controls-google": 11,
+    "hll-controls-pg": 14
+  },
+  "owned_fixture_cleanup": "All created temporary databases and queue/table fixtures confirmed absent; free trial and dedicated base database retained",
+  "new_cases": 136,
+  "additional_hll_controls": 22,
+  "new_queue_case": "Two immediate same-name queue generations",
+  "catalog_selectors_changed": false,
+  "commands": "all-commands.json",
+  "durable_task_directory": "<LOCAL_TASK_ROOT>/apstndb/spanalyzer/managed-recheck-20261023",
+  "authority": "Explicit trial creation and dedicated profile update, bounded managed verification and owned cleanup, local research. No paid conversion, existing-resource deletion, implementation change, commit, push, PR, merge, release or external synchronization"
+}

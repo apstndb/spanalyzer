@@ -1,0 +1,916 @@
+This document describes the transaction statistics Spanner offers as built-in tables. You can retrieve statistics from these `SPANNER_SYS.TXN_STATS*` tables using SQL statements.
+
+## When to use transaction statistics
+
+Transaction statistics are useful when investigating performance issues. For example, you can check whether there are any slow running transactions that might be impacting performance or Queries Per Second (QPS) in your database. Another scenario is when your client applications are experiencing high transaction execution latency. Analyzing transaction statistics may help to discover potential bottlenecks, such as large volumes of updates to a particular column, which might be impacting latency.
+
+## How to access transaction statistics
+
+> **Note:** Spanner Studio (formerly labeled **Query** in the Google Cloud console) supports SQL, DML, and DDL operations in a single editor. For more information, see [Manage your data using the Google Cloud console](https://docs.cloud.google.com/spanner/docs/manage-data-using-console) .
+
+Spanner provides the table transaction statistics in the `SPANNER_SYS` schema. You can use the following ways to access `SPANNER_SYS` data:
+
+- A database's [Spanner Studio page](https://docs.cloud.google.com/spanner/docs/manage-data-using-console) in the Google Cloud console.
+
+- The [`gcloud spanner databases execute-sql`](https://docs.cloud.google.com/sdk/gcloud/reference/spanner/databases/execute-sql) command.
+
+- The [Transaction insights](https://docs.cloud.google.com/spanner/docs/use-lock-and-transaction-insights#txn-insights) dashboard.
+
+- The [`executeSql`](https://docs.cloud.google.com/spanner/docs/reference/rest/v1/projects.instances.databases.sessions/executeSql) or the [`executeStreamingSql`](https://docs.cloud.google.com/spanner/docs/reference/rest/v1/projects.instances.databases.sessions/executeStreamingSql) method.
+
+The following single read methods that Spanner provides don't support `SPANNER_SYS` :
+
+- Performing a strong read from a single row or multiple rows in a table.
+- Performing a stale read from a single row or multiple rows in a table.
+- Reading from a single row or multiple rows in a secondary index.
+
+## Latency statistics grouped by transaction
+
+The following tables track the statistics for `TOP` resource consuming transactions during a specific time period.
+
+- `SPANNER_SYS.TXN_STATS_TOP_MINUTE` : transaction statistics aggregated across 1-minute intervals.
+
+- `SPANNER_SYS.TXN_STATS_TOP_10MINUTE` : transaction statistics aggregated across 10-minute intervals.
+
+- `SPANNER_SYS.TXN_STATS_TOP_HOUR` : transaction statistics aggregated across 1-hour intervals.
+
+These tables have the following properties:
+
+- Each table contains data for non-overlapping time intervals of the duration the table name specifies.
+
+- Intervals are based on clock times
+
+  - 1 minute intervals end on the minute.
+  - 10 minute intervals end every 10 minutes starting on the hour.
+  - 1 hour intervals end on the hour.
+
+  For example, at 11:59:30 AM, the most recent intervals available to SQL queries are:
+
+  - **1 minute** : 11:58:00–11:58:59 AM
+  - **10 minute** : 11:40:00–11:49:59 AM
+  - **1 hour** : 10:00:00–10:59:59 AM
+
+- Spanner groups the statistics by **FPRINT** (Fingerprint) of the transactions. If a transaction tag is present, **FPRINT** is the hash of the tag. Otherwise, it is the hash calculated based on the operations involved in the transaction.
+
+- Since statistics are grouped based on **FPRINT** , if the same transaction is executed multiple times within any time interval, only one entry appears for that transaction in these tables.
+
+- Each row contains statistics for all executions of a particular transaction that Spanner captures statistics for during the specified interval.
+
+- If Spanner is unable to store statistics for all transactions run during the interval in these tables, the system prioritizes transactions with the highest latency, commit attempts, and bytes written during the specified interval.
+
+- All columns in the tables are nullable.
+
+### Table schema
+
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Column name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>INTERVAL_END</code></td>
+<td><code>TIMESTAMP</code></td>
+<td>End of the time interval in which the included transaction executions occurred.</td>
+</tr>
+<tr class="even">
+<td><code>TRANSACTION_TAG</code></td>
+<td><code>STRING</code></td>
+<td>The optional transaction tag for this transaction operation. For more information about using tags, see <a href="https://docs.cloud.google.com/spanner/docs/introspection/troubleshooting-with-tags#transaction_tags">Troubleshooting with transaction tags</a> . Statistics for multiple transactions that have the same tag string are grouped in a single row with the `TRANSACTION_TAG` matching that tag string.</td>
+</tr>
+<tr class="odd">
+<td><code>FPRINT</code></td>
+<td><code>INT64</code></td>
+<td>The hash of the <code>TRANSACTION_TAG</code> if present; Otherwise, the hash is calculated based on the operations involved in the transaction. <code>INTERVAL_END</code> and <code>FPRINT</code> together act as an unique key for these tables.</td>
+</tr>
+<tr class="even">
+<td><code>READ_COLUMNS</code></td>
+<td><code>ARRAY&lt;STRING&gt;</code></td>
+<td>The set of columns that were read by the transaction.</td>
+</tr>
+<tr class="odd">
+<td><code>WRITE_CONSTRUCTIVE_COLUMNS</code></td>
+<td><code>ARRAY&lt;STRING&gt;</code></td>
+<td>The set of columns that were constructively written, that is assigned to new values, by the transaction.<br />
+<br />
+For change streams, if the transaction involved writes to columns and tables watched by a change stream, <code>WRITE_CONSTRUCTIVE_COLUMNS</code> contains two columns - <code>.data</code> and <code>._exists</code> , prefixed with a change stream name. <code>_exists</code> is an field that is used to check whether a certain row exists or not.</td>
+</tr>
+<tr class="even">
+<td><code>WRITE_DELETE_TABLES</code></td>
+<td><code>ARRAY&lt;STRING&gt;</code></td>
+<td>The set of tables that had rows deleted or replaced by the transaction.</td>
+</tr>
+<tr class="odd">
+<td><code>ATTEMPT_COUNT</code></td>
+<td><code>INT64</code></td>
+<td>Total number of transaction attempts, including attempts that abort before calling the <code>commit</code> method. This count represents the total attempts during the specified interval. For more information about intervals, see <a href="https://docs.cloud.google.com/spanner/docs/introspection/transaction-statistics#stats-intervals">Intervals</a> .</td>
+</tr>
+<tr class="even">
+<td><code>COMMIT_ATTEMPT_COUNT</code></td>
+<td><code>INT64</code></td>
+<td>Total number of transaction commit attempts. This must match the number of calls to the transaction's <code>commit</code> method. This count represents the total commit attempts during the specified interval. For more information about intervals, see <a href="https://docs.cloud.google.com/spanner/docs/introspection/transaction-statistics#stats-intervals">Intervals</a> .</td>
+</tr>
+<tr class="odd">
+<td><code>COMMIT_ABORT_COUNT</code></td>
+<td><code>INT64</code></td>
+<td>Total number of transaction attempts that abort, including attempts that abort before calling the transaction's <code>commit</code> method. This count represents the total aborts during the specified interval. For more information about intervals, see <a href="https://docs.cloud.google.com/spanner/docs/introspection/transaction-statistics#stats-intervals">Intervals</a> .</td>
+</tr>
+<tr class="even">
+<td><code>COMMIT_RETRY_COUNT</code></td>
+<td><code>INT64</code></td>
+<td>Total number of attempts that are retries from previously aborted attempts. A Spanner transaction might be tried multiple times before it commits due to lock contentions or transient events. A high number of retries relative to commit attempts indicates that there might be issues worth investigating. For more information, see <a href="https://docs.cloud.google.com/spanner/docs/introspection/transaction-statistics#commit-counts">Understanding transactions and commit counts</a> on this page.</td>
+</tr>
+<tr class="odd">
+<td><code>COMMIT_FAILED_PRECONDITION_COUNT</code></td>
+<td><code>INT64</code></td>
+<td>Total number of transaction commit attempts that returned failed precondition errors, such as <code>UNIQUE</code> index violations, row already exists, or row not found.</td>
+</tr>
+<tr class="even">
+<td><code>SERIALIZABLE_PESSIMISTIC_TXN_COUNT</code></td>
+<td><code>INT64</code></td>
+<td>Total number of transaction attempts initiated with the <a href="https://docs.cloud.google.com/spanner/docs/isolation-levels#serializable"><code>SERIALIZABLE</code> isolation level</a> and <code>PESSIMISTIC</code> locking. It's a subset of <code>ATTEMPT_COUNT</code> .</td>
+</tr>
+<tr class="odd">
+<td><code>SERIALIZABLE_OPTIMISTIC_TXN_COUNT</code></td>
+<td><code>INT64</code></td>
+<td>Total number of transaction attempts initiated with the <a href="https://docs.cloud.google.com/spanner/docs/isolation-levels#serializable"><code>SERIALIZABLE</code> isolation level</a> and <code>OPTIMISTIC</code> locking. It's a subset of <code>ATTEMPT_COUNT</code> .</td>
+</tr>
+<tr class="even">
+<td><code>REPEATABLE_READ_OPTIMISTIC_TXN_COUNT</code></td>
+<td><code>INT64</code></td>
+<td>Total number of transaction attempts initiated with the <a href="https://docs.cloud.google.com/spanner/docs/isolation-levels#repeatable-read"><code>REPEATABLE READ</code> isolation level</a> and <code>OPTIMISTIC</code> locking. It's a subset of <code>ATTEMPT_COUNT</code> .</td>
+</tr>
+<tr class="odd">
+<td><code>AVG_PARTICIPANTS</code></td>
+<td><code>FLOAT64</code></td>
+<td>Average number of participants in each commit attempt. To learn more about participants, see <a href="https://docs.cloud.google.com/spanner/docs/whitepapers/life-of-reads-and-writes">Life of Spanner Reads &amp; Writes</a> .</td>
+</tr>
+<tr class="even">
+<td><code>AVG_TOTAL_LATENCY_SECONDS</code></td>
+<td><code>FLOAT64</code></td>
+<td>Average seconds taken from the first operation of the transaction to commit/abort.</td>
+</tr>
+<tr class="odd">
+<td><code>AVG_COMMIT_LATENCY_SECONDS</code></td>
+<td><code>FLOAT64</code></td>
+<td>Average seconds taken to perform the commit operation.</td>
+</tr>
+<tr class="even">
+<td><code>AVG_BYTES</code></td>
+<td><code>FLOAT64</code></td>
+<td>Average number of bytes written by the transaction.</td>
+</tr>
+<tr class="odd">
+<td><code>TOTAL_LATENCY_DISTRIBUTION</code></td>
+<td><code>ARRAY&lt;STRUCT&gt;</code></td>
+<td><p>A histogram of the total commit latency, which is the time from the first transactional operation start time to the commit or abort time, for all attempts of a transaction.</p>
+<blockquote>
+<strong>PostgreSQL interface note:</strong> PostgreSQL-dialect databases don't support this column. Use the <code>TOTAL_LATENCY_DISTRIBUTION_JSON_STRING</code> column instead for PostgreSQL-dialect databases.
+</blockquote>
+<p>If a transaction aborts multiple times and then successfully commits, latency is measured for each attempt until the final successful commit. The values are measured in seconds.</p>
+<p>The array contains a single element and has the following type:<br />
+<code>ARRAY&lt;STRUCT&lt; COUNT INT64, MEAN FLOAT64, SUM_OF_SQUARED_DEVIATION FLOAT64, NUM_FINITE_BUCKETS INT64, GROWTH_FACTOR FLOAT64, SCALE FLOAT64, BUCKET_COUNTS ARRAY&lt;INT64&gt;&gt;&gt;</code><br />
+For more information about the values, see <a href="https://docs.cloud.google.com/monitoring/api/ref_v3/rest/v3/TypedValue#Distribution">Distribution</a> and <a href="https://docs.cloud.google.com/monitoring/api/ref_v3/rest/v3/TypedValue#exponential">Exponential</a> .</p>
+<p>To calculate the percentile latency from the distribution, use the <code>SPANNER_SYS.DISTRIBUTION_PERCENTILE(distribution, n FLOAT64)</code> function, which returns the estimated <em>n</em> th percentile. For a related example, see <a href="https://docs.cloud.google.com/spanner/docs/introspection/transaction-statistics#example-percentile-latency">Find the 99th percentile latency for transactions</a> .</p>
+<p>For more information, see <a href="https://docs.cloud.google.com/monitoring/api/v3/distribution-metrics">Percentiles and distribution-valued metrics</a> .</p></td>
+</tr>
+<tr class="even">
+<td><code>OPERATIONS_BY_TABLE</code></td>
+<td><code>ARRAY&lt;STRUCT&gt;</code></td>
+<td><p>Impact of <code>INSERT</code> or <code>UPDATE</code> operations by the transaction on a per-table basis. This is indicated by the number of times that rows are affected and the number of bytes that are written.</p>
+<blockquote>
+<strong>PostgreSQL interface note:</strong> PostgreSQL-dialect databases don't support this column. Use the <code>OPERATIONS_BY_TABLE_JSON_STRING</code> column instead for PostgreSQL-dialect databases.
+</blockquote>
+<p>This column helps visualize the load on tables and provides insights into the rate at which a transaction writes to tables.</p>
+<p>Specify the array as follows:<br />
+<code>ARRAY&lt;STRUCT&lt; TABLE STRING(MAX), INSERT_OR_UPDATE_COUNT INT64, INSERT_OR_UPDATE_BYTES INT64&gt;&gt;</code></p></td>
+</tr>
+<tr class="odd">
+<td><code>TOTAL_LATENCY_DISTRIBUTION_JSON_STRING</code></td>
+<td><code>STRING</code></td>
+<td><p>A histogram of the total commit latency, which is the time from the first transactional operation start time to the commit or abort time, for all attempts of a transaction.</p>
+<p>A JSON-compatible string representation of the <a href="https://docs.cloud.google.com/spanner/docs/introspection/transaction-statistics#latency-distribution"><code>TOTAL_LATENCY_DISTRIBUTION</code></a> statistic. The JSON string is a JSON object with the same structure as the STRUCT defined in <code>TOTAL_LATENCY_DISTRIBUTION</code> .</p>
+<p>If a transaction aborts multiple times and then successfully commits, latency is measured for each attempt until the final successful commit. The values are measured in seconds.</p>
+<p>This column is supported in GoogleSQL-dialect and PostgreSQL-dialect databases. This column contains the <a href="https://docs.cloud.google.com/monitoring/api/ref_v3/rest/v3/TypedValue#Distribution">Distribution</a> .</p>
+<p>To calculate the percentile latency from the distribution, use the <code>SPANNER_SYS.DISTRIBUTION_PERCENTILE(distribution_json_string, n FLOAT64)</code> function, which returns the estimated <em>n</em> th percentile. For a related example, see <a href="https://docs.cloud.google.com/spanner/docs/introspection/transaction-statistics#example-percentile-latency">Find the 99th percentile latency for transactions using the <code>TOTAL_LATENCY_DISTRIBUTION_JSON_STRING</code></a> column.</p>
+<p>For more information, see <a href="https://docs.cloud.google.com/monitoring/api/v3/distribution-metrics">Percentiles and distribution-valued metrics</a> .</p></td>
+</tr>
+<tr class="even">
+<td><code>OPERATIONS_BY_TABLE_JSON_STRING</code></td>
+<td><code>STRING</code></td>
+<td><p>Impact of <code>INSERT</code> or <code>UPDATE</code> operations by the transaction on a per-table basis. This is indicated by the number of times that rows are affected and the number of bytes that are written.</p>
+<p>A JSON-compatible string representation of the <code>OPERATIONS_BY_TABLE</code> column. The JSON string is a JSON object with the same structure as the STRUCT defined in the <code>OPERATIONS_BY_TABLE</code> column.</p>
+<p>This column is supported in GoogleSQL-dialect and PostgreSQL-dialect databases.</p>
+<p>This column helps visualize the load on tables and provides insights into the rate at which a transaction writes to tables.</p></td>
+</tr>
+<tr class="odd">
+<td><code>COMMIT_LATENCY_DISTRIBUTION</code></td>
+<td><code>ARRAY&lt;STRUCT&gt;</code></td>
+<td><p>A histogram of the number of seconds taken to perform the commit operation.</p>
+<blockquote>
+<strong>PostgreSQL interface note:</strong> PostgreSQL-dialect databases don't support this column. Use the <code>COMMIT_LATENCY_DISTRIBUTION_JSON_STRING</code> column instead for PostgreSQL-dialect databases.
+</blockquote>
+<p>The array has the following structure:<br />
+<code>ARRAY&lt;STRUCT&lt; COUNT INT64, MEAN FLOAT64, SUM_OF_SQUARED_DEVIATION FLOAT64, NUM_FINITE_BUCKETS INT64, GROWTH_FACTOR FLOAT64, SCALE FLOAT64, BUCKET_COUNTS ARRAY&lt;INT64&gt;&gt;&gt;</code></p>
+<p>For more information about the value types, see <a href="https://docs.cloud.google.com/monitoring/api/ref_v3/rest/v3/TypedValue#Distribution">Distribution</a> and <a href="https://docs.cloud.google.com/monitoring/api/ref_v3/rest/v3/TypedValue#exponential">Exponential</a> .</p>
+<p>To calculate commit latency percentiles from the distribution, use the <code>SPANNER_SYS.DISTRIBUTION_PERCENTILE(distribution, n FLOAT64)</code> function.</p></td>
+</tr>
+<tr class="even">
+<td><code>COMMIT_LATENCY_DISTRIBUTION_JSON_STRING</code></td>
+<td><code>STRING</code></td>
+<td><p>A JSON-compatible string representation of the <a href="https://docs.cloud.google.com/spanner/docs/introspection/transaction-statistics#commit-latency-distribution-1"><code>COMMIT_LATENCY_DISTRIBUTION</code></a> statistic. The JSON string is a JSON object with the same structure as the STRUCT defined in the <a href="https://docs.cloud.google.com/spanner/docs/introspection/transaction-statistics#commit-latency-distribution-1"><code>COMMIT_LATENCY_DISTRIBUTION</code></a> column.</p>
+<p>This column is supported in GoogleSQL-dialect and PostgreSQL-dialect databases.</p>
+<p>To calculate commit latency percentiles from the distribution, use the <code>SPANNER_SYS.DISTRIBUTION_PERCENTILE(distribution_json_string, n FLOAT64)</code> function.</p></td>
+</tr>
+<tr class="odd">
+<td><code>PARTICIPANTS_DISTRIBUTION</code></td>
+<td><code>ARRAY&lt;STRUCT&gt;</code></td>
+<td><p>A histogram of the number of participants in each commit attempt.</p>
+<blockquote>
+<strong>PostgreSQL interface note:</strong> PostgreSQL-dialect databases don't support this column. Use the <code>PARTICIPANTS_DISTRIBUTION_JSON_STRING</code> column instead for PostgreSQL-dialect databases.
+</blockquote>
+<p>The array has the following structure:<br />
+<code>ARRAY&lt;STRUCT&lt; COUNT INT64, MEAN FLOAT64, SUM_OF_SQUARED_DEVIATION FLOAT64, NUM_FINITE_BUCKETS INT64, GROWTH_FACTOR FLOAT64, SCALE FLOAT64, BUCKET_COUNTS ARRAY&lt;INT64&gt;&gt;&gt;</code></p>
+<p>For more information about the value types, see <a href="https://docs.cloud.google.com/monitoring/api/ref_v3/rest/v3/TypedValue#Distribution">Distribution</a> and <a href="https://docs.cloud.google.com/monitoring/api/ref_v3/rest/v3/TypedValue#exponential">Exponential</a> .</p>
+<p>To calculate participant percentiles from the distribution, use the <code>SPANNER_SYS.DISTRIBUTION_PERCENTILE(distribution, n FLOAT64)</code> function.</p></td>
+</tr>
+<tr class="even">
+<td><code>PARTICIPANTS_DISTRIBUTION_JSON_STRING</code></td>
+<td><code>STRING</code></td>
+<td><p>A JSON-compatible string representation of the <a href="https://docs.cloud.google.com/spanner/docs/introspection/transaction-statistics#participants-distribution-1"><code>PARTICIPANTS_DISTRIBUTION</code></a> statistic. The JSON string is a JSON object with the same structure as the STRUCT defined in the <a href="https://docs.cloud.google.com/spanner/docs/introspection/transaction-statistics#participants-distribution-1"><code>PARTICIPANTS_DISTRIBUTION</code></a> column.</p>
+<p>This column is supported in GoogleSQL-dialect and PostgreSQL-dialect databases.</p>
+<p>To calculate participant percentiles from the distribution, use the <code>SPANNER_SYS.DISTRIBUTION_PERCENTILE(distribution_json_string, n FLOAT64)</code> function.</p></td>
+</tr>
+</tbody>
+</table>
+
+### Example queries
+
+This section includes several example SQL statements that retrieve transaction statistics. You can run these SQL statements by using the [client libraries](https://docs.cloud.google.com/spanner/docs/reference/libraries) , the [gcloud spanner](https://docs.cloud.google.com/spanner/docs/gcloud-spanner#execute_sql_statements) , or the [Google Cloud console](https://docs.cloud.google.com/spanner/docs/create-query-database-console#run_a_query) .
+
+#### List the basic statistics for each transaction in a given time period
+
+The following query returns the raw data for the top transactions in the previous minute.
+
+```
+SELECT fprint,
+       read_columns,
+       write_constructive_columns,
+       write_delete_tables,
+       avg_total_latency_seconds,
+       avg_commit_latency_seconds,
+       operations_by_table,
+       avg_bytes
+FROM spanner_sys.txn_stats_top_minute
+WHERE interval_end =
+  (SELECT MAX(interval_end)
+   FROM spanner_sys.txn_stats_top_minute);
+```
+
+##### Query output
+
+| fprint        | read_columns   | write_constructive_columns      | write_delete_tables  | avg_total_latency_seconds | avg_commit_latency_seconds | operations_by_table                          | avg_bytes |
+|---------------|----------------|---------------------------------|----------------------|---------------------------|----------------------------|----------------------------------------------|-----------|
+| `40015598317` | `[]`           | `["Routes.name", "Cars.model"]` | `["Users"]`          | `0.006578737`             | `0.006547737`              | `[["Cars",1107,30996],["Routes",560,26880]]` | `25286`   |
+| `20524969030` | `["id", "no"]` | `[]`                            | `[]`                 | `0.001732442`             | `0.000247442`              | `[]`                                         | `0`       |
+| `77848338483` | `[]`           | `[]`                            | `["Cars", "Routes"]` | `0.033467418`             | `0.000251418`              | `[]`                                         | `0`       |
+
+#### List the transactions with the highest average commit latency
+
+The following query returns the transactions with high average commit latency in the previous hour, ordered from highest to lowest average commit latency.
+
+```
+SELECT fprint,
+       read_columns,
+       write_constructive_columns,
+       write_delete_tables,
+       avg_total_latency_seconds,
+       avg_commit_latency_seconds,
+       avg_bytes
+FROM spanner_sys.txn_stats_top_hour
+WHERE interval_end =
+  (SELECT MAX(interval_end)
+   FROM spanner_sys.txn_stats_top_hour)
+ORDER BY avg_commit_latency_seconds DESC;
+```
+
+##### Query output
+
+| fprint        | read_columns   | write_constructive_columns      | write_delete_tables  | avg_total_latency_seconds | avg_commit_latency_seconds | avg_bytes |
+|---------------|----------------|---------------------------------|----------------------|---------------------------|----------------------------|-----------|
+| `40015598317` | `[]`           | `["Routes.name", "Cars.model"]` | `["Users"]`          | `0.006578737`             | `0.006547737`              | `25286`   |
+| `77848338483` | `[]`           | `[]`                            | `["Cars", "Routes"]` | `0.033467418`             | `0.000251418`              | `0`       |
+| `20524969030` | `["id", "no"]` | `[]`                            | `[]`                 | `0.001732442`             | `0.000247442`              | `0`       |
+
+#### Find the average latency of transactions which read certain columns
+
+The following query returns the average latency information for transactions that read the column **ADDRESS** from 1 hour stats:
+
+```
+SELECT fprint,
+       read_columns,
+       write_constructive_columns,
+       write_delete_tables,
+       avg_total_latency_seconds
+FROM spanner_sys.txn_stats_top_hour
+WHERE 'ADDRESS' IN UNNEST(read_columns)
+ORDER BY avg_total_latency_seconds DESC;
+```
+
+##### Query output
+
+| fprint        | read_columns                | write_constructive_columns | write_delete_tables  | avg_total_latency_seconds |
+|---------------|-----------------------------|----------------------------|----------------------|---------------------------|
+| `77848338483` | `["ID", "ADDRESS"]`         | `[]`                       | `["Cars", "Routes"]` | `0.033467418`             |
+| `40015598317` | `["ID", "NAME", "ADDRESS"]` | `[]`                       | `["Users"]`          | `0.006578737`             |
+
+#### List transactions by the average number of bytes modified
+
+The following query returns the transactions sampled in the last hour, ordered by the average number of bytes modified by the transaction.
+
+```
+SELECT fprint,
+       read_columns,
+       write_constructive_columns,
+       write_delete_tables,
+       avg_bytes
+FROM spanner_sys.txn_stats_top_hour
+ORDER BY avg_bytes DESC;
+```
+
+##### Query output
+
+| fprint        | read_columns        | write_constructive_columns | write_delete_tables  | avg_bytes |
+|---------------|---------------------|----------------------------|----------------------|-----------|
+| `40015598317` | `[]`                | `[]`                       | `["Users"]`          | `25286`   |
+| `77848338483` | `[]`                | `[]`                       | `["Cars", "Routes"]` | `12005`   |
+| `20524969030` | `["ID", "ADDRESS"]` | `[]`                       | `["Users"]`          | `10923`   |
+
+## Aggregate statistics
+
+`SPANNER_SYS` also contains tables to store aggregate data for all the transactions for which Spanner captured statistics in a specific time period:
+
+- `SPANNER_SYS.TXN_STATS_TOTAL_MINUTE` : Aggregate statistics for all transactions during 1 minute intervals
+- `SPANNER_SYS.TXN_STATS_TOTAL_10MINUTE` : Aggregate statistics for all transactions during 10 minute intervals
+- `SPANNER_SYS.TXN_STATS_TOTAL_HOUR` : Aggregate statistics for all transactions during 1 hour intervals
+
+Aggregate statistics tables have the following properties:
+
+- Each table contains data for non-overlapping time intervals of the length the table name specifies.
+
+- Intervals are based on clock times. 1 minute intervals end on the minute, 10 minute intervals end every 10 minutes starting on the hour, and 1 hour intervals end on the hour.
+
+  For example, at 11:59:30 AM, the most recent intervals available to SQL queries on aggregate transaction statistics are:
+
+  - **1 minute** : 11:58:00–11:58:59 AM
+  - **10 minute** : 11:40:00–11:49:59 AM
+  - **1 hour** : 10:00:00–10:59:59 AM
+
+- Each row contains statistics for **all** transactions executed over the database during the specified interval, aggregated together. There is only one row per time interval.
+
+- The statistics captured in the `SPANNER_SYS.TXN_STATS_TOTAL_*` tables might include transactions that Spanner did not capture in the `SPANNER_SYS.TXN_STATS_TOP_*` tables.
+
+- Some columns in these tables are exposed as metrics in Cloud Monitoring. The exposed metrics are:
+
+  - Commit attempts count
+  - Commit retries count
+  - Transaction participants
+  - Transaction latencies
+  - Bytes written
+
+  For more information, see [Spanner metrics](https://docs.cloud.google.com/monitoring/api/metrics_gcp_p_z#gcp-spanner) .
+
+### Table schema
+
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Column name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>INTERVAL_END</code></td>
+<td><code>TIMESTAMP</code></td>
+<td>End of the time interval in which this statistic was captured.</td>
+</tr>
+<tr class="even">
+<td><code>ATTEMPT_COUNT</code></td>
+<td><code>INT64</code></td>
+<td>Total number of transaction attempts, including attempts that abort before calling `commit`. This count represents the total attempts during the specified interval. For more information about intervals, see <a href="https://docs.cloud.google.com/spanner/docs/introspection/transaction-statistics#stats-intervals">Intervals</a> .</td>
+</tr>
+<tr class="odd">
+<td><code>COMMIT_ATTEMPT_COUNT</code></td>
+<td><code>INT64</code></td>
+<td>Total number of transaction commit attempts. This must match the number of calls to the transaction's <code>commit</code> method. This count represents the total commit attempts during the specified interval. For more information about intervals, see <a href="https://docs.cloud.google.com/spanner/docs/introspection/transaction-statistics#stats-intervals">Intervals</a> .</td>
+</tr>
+<tr class="even">
+<td><code>COMMIT_ABORT_COUNT</code></td>
+<td><code>INT64</code></td>
+<td>Total number of transaction attempts that abort, including attempts that abort before calling the transaction's <code>commit</code> method. This count represents the total aborts during the specified interval. For more information about intervals, see <a href="https://docs.cloud.google.com/spanner/docs/introspection/transaction-statistics#stats-intervals">Intervals</a> .</td>
+</tr>
+<tr class="odd">
+<td><code>COMMIT_RETRY_COUNT</code></td>
+<td><code>INT64</code></td>
+<td>Number of commit attempts that are retries from previously aborted attempts. A Spanner transaction may have been tried multiple times before it commits due to lock contentions or transient events. A high number of retries relative to commit attempts indicates that there might be issues worth investigating. For more information, see <a href="https://docs.cloud.google.com/spanner/docs/introspection/transaction-statistics#commit-counts">Understanding transactions and commit counts</a> on this page.</td>
+</tr>
+<tr class="even">
+<td><code>COMMIT_FAILED_PRECONDITION_COUNT</code></td>
+<td><code>INT64</code></td>
+<td>Total number of transaction commit attempts that returned failed precondition errors, such as <code>UNIQUE</code> index violations, row already exists, or row not found.</td>
+</tr>
+<tr class="odd">
+<td><code>SERIALIZABLE_PESSIMISTIC_TXN_COUNT</code></td>
+<td><code>INT64</code></td>
+<td>Total number of transaction attempts initiated with the <a href="https://docs.cloud.google.com/spanner/docs/isolation-levels#serializable"><code>SERIALIZABLE</code> isolation level</a> and <code>PESSIMISTIC</code> locking. It's a subset of <code>ATTEMPT_COUNT</code> .</td>
+</tr>
+<tr class="even">
+<td><code>REPEATABLE_READ_OPTIMISTIC_TXN_COUNT</code></td>
+<td><code>INT64</code></td>
+<td>Total number of transaction attempts initiated with the <a href="https://docs.cloud.google.com/spanner/docs/isolation-levels#repeatable-read"><code>REPEATABLE READ</code> isolation level</a> and <code>OPTIMISTIC</code> locking. It's a subset of <code>ATTEMPT_COUNT</code> .</td>
+</tr>
+<tr class="odd">
+<td><code>AVG_PARTICIPANTS</code></td>
+<td><code>FLOAT64</code></td>
+<td>Average number of participants in each commit attempt. To learn more about participants, see <a href="https://docs.cloud.google.com/spanner/docs/whitepapers/life-of-reads-and-writes">Life of Spanner Reads &amp; Writes</a> .</td>
+</tr>
+<tr class="even">
+<td><code>AVG_TOTAL_LATENCY_SECONDS</code></td>
+<td><code>FLOAT64</code></td>
+<td>Average seconds taken from the first operation of the transaction to commit/abort.</td>
+</tr>
+<tr class="odd">
+<td><code>AVG_COMMIT_LATENCY_SECONDS</code></td>
+<td><code>FLOAT64</code></td>
+<td>Average seconds taken to perform the commit operation.</td>
+</tr>
+<tr class="even">
+<td><code>AVG_BYTES</code></td>
+<td><code>FLOAT64</code></td>
+<td>Average number of bytes written by the transaction.</td>
+</tr>
+<tr class="odd">
+<td><code>TOTAL_LATENCY_DISTRIBUTION</code></td>
+<td><code>ARRAY&lt;STRUCT&gt;</code></td>
+<td><p>A histogram of the total commit latency, which is the time from the first transactional operation start time to the commit or abort time for all transaction attempts.</p>
+<blockquote>
+<strong>PostgreSQL interface note:</strong> PostgreSQL-dialect databases don't support this column. Use the <code>TOTAL_LATENCY_DISTRIBUTION_JSON_STRING</code> column instead for PostgreSQL-dialect databases.
+</blockquote>
+<p>If a transaction aborts multiple times and then successfully commits, latency is measured for each attempt until the final successful commit. The values are measured in seconds.</p>
+<p>The array contains a single element and has the following type:<br />
+<code>ARRAY&lt;STRUCT&lt; COUNT INT64, MEAN FLOAT64, SUM_OF_SQUARED_DEVIATION FLOAT64, NUM_FINITE_BUCKETS INT64, GROWTH_FACTOR FLOAT64, SCALE FLOAT64, BUCKET_COUNTS ARRAY&lt;INT64&gt;&gt;&gt;</code><br />
+For more information about the values, see <a href="https://docs.cloud.google.com/monitoring/api/ref_v3/rest/v3/TypedValue#Distribution">Distribution</a> and <a href="https://docs.cloud.google.com/monitoring/api/ref_v3/rest/v3/TypedValue#exponential">Exponential</a> .</p>
+<p>To calculate the percentile latency from the distribution, use the <code>SPANNER_SYS.DISTRIBUTION_PERCENTILE(distribution, n FLOAT64)</code> function, which returns the estimated <em>n</em> th percentile. For an example, see <a href="https://docs.cloud.google.com/spanner/docs/introspection/transaction-statistics#example-percentile-latency">Find the 99th percentile latency for transactions</a> .</p>
+<p>For more information, see <a href="https://docs.cloud.google.com/monitoring/api/v3/distribution-metrics">Percentiles and distribution-valued metrics</a> .</p></td>
+</tr>
+<tr class="even">
+<td><code>OPERATIONS_BY_TABLE</code></td>
+<td><code>ARRAY&lt;STRUCT&gt;</code></td>
+<td><p>Impact of <code>INSERT</code> or <code>UPDATE</code> operations by all transactions on a per-table basis. This is indicated by the number of times that rows are affected and the number of bytes that are written.</p>
+<blockquote>
+<strong>PostgreSQL interface note:</strong> PostgreSQL-dialect databases don't support this column. Use the <code>OPERATIONS_BY_TABLE_JSON_STRING</code> column instead for PostgreSQL-dialect databases.
+</blockquote>
+<p>This column helps visualize the load on tables and provides insights into the rate at which the transactions write to tables.</p>
+<p>Specify the array as follows:<br />
+<code>ARRAY&lt;STRUCT&lt; TABLE STRING(MAX), INSERT_OR_UPDATE_COUNT INT64, INSERT_OR_UPDATE_BYTES INT64&gt;&gt;</code></p></td>
+</tr>
+<tr class="odd">
+<td><code>TOTAL_LATENCY_DISTRIBUTION_JSON_STRING</code></td>
+<td><code>STRING</code></td>
+<td><p>A histogram of the total commit latency, which is the time from the first transactional operation start time to the commit or abort time, for all attempts of a transaction.</p>
+<p>A JSON-compatible string representation of the <a href="https://docs.cloud.google.com/spanner/docs/introspection/transaction-statistics#latency-distribution"><code>TOTAL_LATENCY_DISTRIBUTION</code></a> statistic. The JSON string is a JSON object with the same structure as the STRUCT defined in <code>TOTAL_LATENCY_DISTRIBUTION</code> .</p>
+<p>If a transaction aborts multiple times and then successfully commits, latency is measured for each attempt until the final successful commit. The values are measured in seconds.</p>
+<p>This column is supported in GoogleSQL-dialect and PostgreSQL-dialect databases. This column contains the <a href="https://docs.cloud.google.com/monitoring/api/ref_v3/rest/v3/TypedValue#Distribution">Distribution</a> .</p>
+<p>To calculate the percentile latency from the distribution, use the <code>SPANNER_SYS.DISTRIBUTION_PERCENTILE(distribution_json_string, n FLOAT64)</code> function, which returns the estimated <em>n</em> th percentile. For a related example, see <a href="https://docs.cloud.google.com/spanner/docs/introspection/transaction-statistics#example-percentile-latency">Find the 99th percentile latency for transactions using the <code>TOTAL_LATENCY_DISTRIBUTION_JSON_STRING</code></a> column.</p>
+<p>For more information, see <a href="https://docs.cloud.google.com/monitoring/api/v3/distribution-metrics">Percentiles and distribution-valued metrics</a> .</p></td>
+</tr>
+<tr class="even">
+<td><code>OPERATIONS_BY_TABLE_JSON_STRING</code></td>
+<td><code>STRING</code></td>
+<td><p>Impact of <code>INSERT</code> or <code>UPDATE</code> operations by the transaction on a per-table basis. This is indicated by the number of times that rows are affected and the number of bytes that are written.</p>
+<p>A JSON-compatible string representation of the <code>OPERATIONS_BY_TABLE</code> column. The JSON string is a JSON object with the same structure as the STRUCT defined in the <code>OPERATIONS_BY_TABLE</code> column.</p>
+<p>This column is supported in GoogleSQL-dialect and PostgreSQL-dialect databases.</p>
+<p>This column helps visualize the load on tables and provides insights into the rate at which a transaction writes to tables.</p></td>
+</tr>
+<tr class="odd">
+<td><code>COMMIT_LATENCY_DISTRIBUTION</code></td>
+<td><code>ARRAY&lt;STRUCT&gt;</code></td>
+<td><p>A histogram of the number of seconds taken to perform the commit operation.</p>
+<blockquote>
+<strong>PostgreSQL interface note:</strong> PostgreSQL-dialect databases don't support this column. Use the <code>COMMIT_LATENCY_DISTRIBUTION_JSON_STRING</code> column instead for PostgreSQL-dialect databases.
+</blockquote>
+<p>The array has the following structure:<br />
+<code>ARRAY&lt;STRUCT&lt; COUNT INT64, MEAN FLOAT64, SUM_OF_SQUARED_DEVIATION FLOAT64, NUM_FINITE_BUCKETS INT64, GROWTH_FACTOR FLOAT64, SCALE FLOAT64, BUCKET_COUNTS ARRAY&lt;INT64&gt;&gt;&gt;</code></p>
+<p>For more information about the value types, see <a href="https://docs.cloud.google.com/monitoring/api/ref_v3/rest/v3/TypedValue#Distribution">Distribution</a> and <a href="https://docs.cloud.google.com/monitoring/api/ref_v3/rest/v3/TypedValue#exponential">Exponential</a> .</p>
+<p>To calculate commit latency percentiles from the distribution, use the <code>SPANNER_SYS.DISTRIBUTION_PERCENTILE(distribution, n FLOAT64)</code> function.</p></td>
+</tr>
+<tr class="even">
+<td><code>COMMIT_LATENCY_DISTRIBUTION_JSON_STRING</code></td>
+<td><code>STRING</code></td>
+<td><p>A JSON-compatible string representation of the <a href="https://docs.cloud.google.com/spanner/docs/introspection/transaction-statistics#commit-latency-distribution-2"><code>COMMIT_LATENCY_DISTRIBUTION</code></a> statistic. The JSON string is a JSON object with the same structure as the STRUCT defined in the <a href="https://docs.cloud.google.com/spanner/docs/introspection/transaction-statistics#commit-latency-distribution-2"><code>COMMIT_LATENCY_DISTRIBUTION</code></a> column.</p>
+<p>This column is supported in GoogleSQL-dialect and PostgreSQL-dialect databases.</p>
+<p>To calculate commit latency percentiles from the distribution, use the <code>SPANNER_SYS.DISTRIBUTION_PERCENTILE(distribution_json_string, n FLOAT64)</code> function.</p></td>
+</tr>
+<tr class="odd">
+<td><code>PARTICIPANTS_DISTRIBUTION</code></td>
+<td><code>ARRAY&lt;STRUCT&gt;</code></td>
+<td><p>A histogram of the number of participants in each commit attempt.</p>
+<blockquote>
+<strong>PostgreSQL interface note:</strong> PostgreSQL-dialect databases don't support this column. Use the <code>PARTICIPANTS_DISTRIBUTION_JSON_STRING</code> column instead for PostgreSQL-dialect databases.
+</blockquote>
+<p>The array has the following structure:<br />
+<code>ARRAY&lt;STRUCT&lt; COUNT INT64, MEAN FLOAT64, SUM_OF_SQUARED_DEVIATION FLOAT64, NUM_FINITE_BUCKETS INT64, GROWTH_FACTOR FLOAT64, SCALE FLOAT64, BUCKET_COUNTS ARRAY&lt;INT64&gt;&gt;&gt;</code></p>
+<p>For more information about the value types, see <a href="https://docs.cloud.google.com/monitoring/api/ref_v3/rest/v3/TypedValue#Distribution">Distribution</a> and <a href="https://docs.cloud.google.com/monitoring/api/ref_v3/rest/v3/TypedValue#exponential">Exponential</a> .</p>
+<p>To calculate participant percentiles from the distribution, use the <code>SPANNER_SYS.DISTRIBUTION_PERCENTILE(distribution, n FLOAT64)</code> function.</p></td>
+</tr>
+<tr class="even">
+<td><code>PARTICIPANTS_DISTRIBUTION_JSON_STRING</code></td>
+<td><code>STRING</code></td>
+<td><p>A JSON-compatible string representation of the <a href="https://docs.cloud.google.com/spanner/docs/introspection/transaction-statistics#participants-distribution-2"><code>PARTICIPANTS_DISTRIBUTION</code></a> statistic. The JSON string is a JSON object with the same structure as the STRUCT defined in the <a href="https://docs.cloud.google.com/spanner/docs/introspection/transaction-statistics#participants-distribution-2"><code>PARTICIPANTS_DISTRIBUTION</code></a> column.</p>
+<p>This column is supported in GoogleSQL-dialect and PostgreSQL-dialect databases.</p>
+<p>To calculate participant percentiles from the distribution, use the <code>SPANNER_SYS.DISTRIBUTION_PERCENTILE(distribution_json_string, n FLOAT64)</code> function.</p></td>
+</tr>
+</tbody>
+</table>
+
+### Example queries
+
+This section includes several example SQL statements that retrieve transaction statistics. You can run these SQL statements by using the [client libraries](https://docs.cloud.google.com/spanner/docs/reference/libraries) , the [gcloud spanner](https://docs.cloud.google.com/spanner/docs/gcloud-spanner#execute_sql_statements) , or the [Google Cloud console](https://docs.cloud.google.com/spanner/docs/create-query-database-console#run_a_query) .
+
+#### Find the total number of commit attempts for all transactions
+
+The following query returns the total number of commit attempts for all transactions in the most recent complete 1-minute interval:
+
+```
+SELECT interval_end,
+       commit_attempt_count
+FROM spanner_sys.txn_stats_total_minute
+WHERE interval_end =
+  (SELECT MAX(interval_end)
+   FROM spanner_sys.txn_stats_total_minute)
+ORDER BY interval_end;
+```
+
+##### Query output
+
+| interval_end                | commit_attempt_count |
+|-----------------------------|----------------------|
+| `2020-01-17 11:46:00-08:00` | `21`                 |
+
+Note that there is only one row in the result because aggregated stats have only one entry per `interval_end` for any time duration.
+
+#### Find the total commit latency across all transactions
+
+The following query returns the total commit latency across all transactions in the previous 10 minutes:
+
+```
+SELECT (avg_commit_latency_seconds * commit_attempt_count / 60 / 60)
+  AS total_commit_latency_hours
+FROM spanner_sys.txn_stats_total_10minute
+WHERE interval_end =
+  (SELECT MAX(interval_end)
+   FROM spanner_sys.txn_stats_total_10minute);
+```
+
+##### Query output
+
+**total_commit_latency_hours**
+
+`0.8967`
+
+Note that there is only one row in the result because aggregated stats have only one entry per `interval_end` for any time duration.
+
+#### Find the 99th percentile latency for transactions
+
+The following queries return the 99th percentile of execution time across queries run in the previous 10 minutes.
+
+For GoogleSQL-dialect databases, you can use the `TOTAL_LATENCY_DISTRIBUTION` column:
+
+```
+SELECT interval_end, avg_total_latency_seconds,
+       SPANNER_SYS.DISTRIBUTION_PERCENTILE(total_latency_distribution[OFFSET(0)], 99.0)
+  AS percentile_latency
+FROM spanner_sys.txn_stats_total_10minute
+WHERE interval_end =
+  (SELECT MAX(interval_end)
+   FROM spanner_sys.txn_stats_total_10minute)
+ORDER BY interval_end;
+```
+
+For PostgreSQL-dialect databases, use the `TOTAL_LATENCY_JSON_DISTRIBUTION_JSON_STRING` column instead:
+
+```
+SELECT interval_end, avg_total_latency_seconds,
+       SPANNER_SYS.DISTRIBUTION_PERCENTILE(total_latency_distribution_json_string, 99.0)
+  AS percentile_latency
+FROM spanner_sys.txn_stats_total_10minute
+WHERE interval_end =
+  (SELECT MAX(interval_end)
+   FROM spanner_sys.txn_stats_total_10minute)
+ORDER BY interval_end;
+```
+
+##### Query output
+
+| interval_end                | avg_total_latency_seconds | percentile_latency    |
+|-----------------------------|---------------------------|-----------------------|
+| `2022-08-17 11:46:00-08:00` | `0.34576998305986395`     | `9.00296190476190476` |
+
+Notice the large difference between the average and the 99th percentile latency. The 99th percentile latency helps identify possible outlier transactions with high latency.
+
+There's only one row in the result because aggregated stats have only one entry per `interval_end` for any time duration.
+
+## Data retention
+
+At a minimum, Spanner keeps data for each table for the following time periods:
+
+- `SPANNER_SYS.TXN_STATS_TOP_MINUTE` and `SPANNER_SYS.TXN_STATS_TOTAL_MINUTE` : Intervals covering the previous 6 hours.
+
+- `SPANNER_SYS.TXN_STATS_TOP_10MINUTE` and `SPANNER_SYS.TXN_STATS_TOTAL_10MINUTE` : Intervals covering the previous 4 days.
+
+- `SPANNER_SYS.TXN_STATS_TOP_HOUR` and `SPANNER_SYS.TXN_STATS_TOTAL_HOUR` : Intervals covering the previous 30 days.
+
+> **Note:** You cannot prevent Spanner from collecting transaction statistics. To delete the data in these tables, you must delete the database associated with the tables or wait until Spanner removes the data automatically. You can't extend the retention period for these tables.
+
+Transaction statistics in Spanner give insight into how an application is using the database, and are useful when investigating performance issues. For example, you can check whether there are any slow running transactions that might be causing contention, or you can identify potential sources of high load, such as large volumes of updates to a particular column.
+
+## Understand transactions and commit counts
+
+A Spanner transaction might have to be tried multiple times before it commits. This most commonly occurs when two transactions attempt to work on the same data at the same time, and one of the transactions needs to be aborted to preserve the [isolation property](https://docs.cloud.google.com/spanner/docs/transactions#isolation) of the transaction. Some other transient events which can also cause a transaction to be aborted include:
+
+- Transient network issues.
+
+- Database schema changes being applied while a transaction is in the process of committing.
+
+- Spanner instance doesn't have the capacity to handle all the requests it is receiving.
+
+In such scenarios, a client should retry the aborted transaction until it commits successfully or times out. For users of the official Spanner [client libraries](https://docs.cloud.google.com/spanner/docs/reference/libraries) , each library has implemented an automatic retry mechanism. If you are using a custom version of the client code, wrap your transaction commits in a retry loop.
+
+A Spanner transaction may also be aborted due to a non-retriable error such as a transaction timeout, permission issues, or an invalid table or column name. There is no need to retry such transactions and the Spanner client library will return the error immediately.
+
+The following table describes some examples of how `COMMIT_ATTEMPT_COUNT` , `COMMIT_ABORT_COUNT` , and `COMMIT_RETRY_COUNT` are logged in different scenarios.
+
+| Scenario                                                                                                                                                                                                                           | COMMIT_ATTEMPT_COUNT | COMMIT_ABORT_COUNT | COMMIT_RETRY_COUNT |
+|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------|--------------------|--------------------|
+| Transaction successfully committed on first attempt.                                                                                                                                                                               | 1                    | 0                  | 0                  |
+| Transaction aborted due to time out error.                                                                                                                                                                                         | 1                    | 1                  | 0                  |
+| Transaction aborted due to transient network issue and successfully committed after one retry.                                                                                                                                     | 2                    | 1                  | 1                  |
+| 5 transactions with the same FPRINT are executed within a 10-minute interval. 3 of the transactions successfully committed on first attempt, while 2 transactions were aborted and then committed successfully on the first retry. | 7                    | 2                  | 2                  |
+
+The data in the transaction-stats tables are aggregated data for a time interval. For a particular interval, it is possible that a transaction abort and retry happens around the boundaries and fall into different buckets. As a result, in a particular time interval aborts and retries may not be equal.
+
+These stats are designed for troubleshooting and introspection and are not guaranteed to be 100% accurate. Statistics are aggregated in memory before being stored in Spanner tables. During an upgrade or other maintenance activities, Spanner servers can restart, affecting the accuracy of the numbers.
+
+## Troubleshoot database contentions using transaction statistics
+
+You can use SQL code or the [Transaction insights](https://docs.cloud.google.com/spanner/docs/use-lock-and-transaction-insights#txn-insights) dashboard to view the transactions in your database that might cause high latencies due to lock contentions.
+
+The following topics show how you can investigate such transactions by using SQL code.
+
+### Select a time period to investigate
+
+This can be found from the application which is using Spanner.
+
+For the purposes of this exercise, assume that the issue started occurring at around 5:20pm on the 17th May, 2020.
+
+You can use Transaction Tags to identify the source of the transaction and correlate between Transaction Statistics Table and Lock Statistics tables for effective lock contention troubleshooting. Read more at [Troubleshooting with transaction tags](https://docs.cloud.google.com/spanner/docs/introspection/troubleshooting-with-tags#transaction_tags) .
+
+### Gather transaction statistics for the selected time period
+
+To start the investigation, query the `TXN_STATS_TOTAL_10MINUTE` table around the start of the issue. The results of this query show how latency and other transaction statistics changed over that period of time.
+
+For example, the following query returns the aggregated transaction statistics from `4:30 pm` to `7:40 pm` (inclusive).
+
+```
+SELECT
+  interval_end,
+  ROUND(avg_total_latency_seconds,4) as avg_total_latency_seconds,
+  commit_attempt_count,
+  commit_abort_count
+FROM SPANNER_SYS.TXN_STATS_TOTAL_10MINUTE
+WHERE
+  interval_end >= "2020-05-17T16:40:00"
+  AND interval_end <= "2020-05-17T19:40:00"
+ORDER BY interval_end;
+```
+
+The following table lists example data returned from the query.
+
+| interval_end                  | avg_total_latency_seconds | commit_attempt_count | commit_abort_count |
+|-------------------------------|---------------------------|----------------------|--------------------|
+| 2020-05-17 16:40:00-07:00     | 0.0284                    | 315691               | 5170               |
+| 2020-05-17 16:50:00-07:00     | 0.0250                    | 302124               | 3828               |
+| 2020-05-17 17:00:00-07:00     | 0.0460                    | 346087               | 11382              |
+| 2020-05-17 17:10:00-07:00     | 0.0864                    | 379964               | 33826              |
+| **2020-05-17 17:20:00-07:00** | **0.1291**                | **390343**           | **52549**          |
+| **2020-05-17 17:30:00-07:00** | **0.1314**                | **456455**           | **76392**          |
+| **2020-05-17 17:40:00-07:00** | **0.1598**                | **507774**           | **121458**         |
+| **2020-05-17 17:50:00-07:00** | **0.1641**                | **516587**           | **115875**         |
+| **2020-05-17 18:00:00-07:00** | **0.1578**                | **552711**           | **122626**         |
+| **2020-05-17 18:10:00-07:00** | **0.1750**                | **569460**           | **154205**         |
+| **2020-05-17 18:20:00-07:00** | **0.1727**                | **613571**           | **160772**         |
+| **2020-05-17 18:30:00-07:00** | **0.1588**                | **601994**           | **143044**         |
+| **2020-05-17 18:40:00-07:00** | **0.2025**                | **604211**           | **170019**         |
+| **2020-05-17 18:50:00-07:00** | **0.1615**                | **601622**           | **135601**         |
+| **2020-05-17 19:00:00-07:00** | **0.1653**                | **596804**           | **129511**         |
+| **2020-05-17 19:10:00-07:00** | **0.1414**                | **560023**           | **112247**         |
+| **2020-05-17 19:20:00-07:00** | **0.1367**                | **570864**           | **100596**         |
+| 2020-05-17 19:30:00-07:00     | 0.0894                    | 539729               | 65316              |
+| 2020-05-17 19:40:00-07:00     | 0.0820                    | 479151               | 40398              |
+
+The aggregated latency and abort count are higher in the **highlighted** periods. Pick any 10 minute interval where aggregated latency and abort count or both are high. The interval ending at `2020-05-17T18:40:00` is used in the next step to identify which transactions are contributing to high latency and abort count.
+
+### Identify transactions that are experiencing high latency
+
+Query the `TXN_STATS_TOP_10MINUTE` table for the interval which was picked in the previous step. Using this data, you can start to identify which transactions are experiencing high latency or high abort count or both.
+
+Execute the following query to get top performance-impacting transactions in descending order of total latency for the example interval ending at `2020-05-17T18:40:00` .
+
+```
+SELECT
+  interval_end,
+  fprint,
+  ROUND(avg_total_latency_seconds,4) as avg_total_latency_seconds,
+  ROUND(avg_commit_latency_seconds,4) as avg_commit_latency_seconds,
+  commit_attempt_count,
+  commit_abort_count,
+  commit_retry_count
+FROM SPANNER_SYS.TXN_STATS_TOP_10MINUTE
+WHERE
+  interval_end = "2020-05-17T18:40:00"
+ORDER BY avg_total_latency_seconds DESC;
+```
+
+| interval_end                  | fprint                   | avg_total_latency_seconds | avg_commit_latency_seconds | commit_attempt_count | commit_abort_count | commit_retry_count |
+|-------------------------------|--------------------------|---------------------------|----------------------------|----------------------|--------------------|--------------------|
+| **2020-05-17 18:40:00-07:00** | **15185072816865185658** | **0.3508**                | **0.0139**                 | **278802**           | **142205**         | **129884**         |
+| 2020-05-17 18:40:00-07:00     | 15435530087434255496     | 0.1633                    | 0.0142                     | 129012               | 27177              | 24559              |
+| 2020-05-17 18:40:00-07:00     | 14175643543447671202     | 0.1423                    | 0.0133                     | 5357                 | 636                | 433                |
+| 2020-05-17 18:40:00-07:00     | 898069986622520747       | 0.0198                    | 0.0158                     | 6                    | 0                  | 0                  |
+| 2020-05-17 18:40:00-07:00     | 10510121182038036893     | 0.0168                    | 0.0125                     | 7                    | 0                  | 0                  |
+| 2020-05-17 18:40:00-07:00     | 9287748709638024175      | 0.0159                    | 0.0118                     | 4269                 | 1                  | 0                  |
+| 2020-05-17 18:40:00-07:00     | 7129109266372596045      | 0.0142                    | 0.0102                     | 182227               | 0                  | 0                  |
+| 2020-05-17 18:40:00-07:00     | 15630228555662391800     | 0.0120                    | 0.0107                     | 58                   | 0                  | 0                  |
+| 2020-05-17 18:40:00-07:00     | 7907238229716746451      | 0.0108                    | 0.0097                     | 65                   | 0                  | 0                  |
+| 2020-05-17 18:40:00-07:00     | 10158167220149989178     | 0.0095                    | 0.0047                     | 3454                 | 0                  | 0                  |
+| 2020-05-17 18:40:00-07:00     | 9353100217060788102      | 0.0093                    | 0.0045                     | 725                  | 0                  | 0                  |
+| 2020-05-17 18:40:00-07:00     | 9521689070912159706      | 0.0093                    | 0.0045                     | 164                  | 0                  | 0                  |
+| 2020-05-17 18:40:00-07:00     | 11079878968512225881     | 0.0064                    | 0.0019                     | 65                   | 0                  | 0                  |
+
+The first row ( **highlighted** ) in the preceding table shows a transaction experiencing high latency because of a high number of commit aborts. There is also a high number of commit retries which indicates the aborted commits were subsequently retried. The next step investigates further to see what is causing this issue.
+
+### Identify the columns involved in a transaction experiencing high latency
+
+In this step, check whether high latency transactions are operating on the same set of columns by fetching `read_columns` , `write_constructive_columns` and `write_delete_tables` data for transactions with high abort count. The `FPRINT` value will also be useful in the next step.
+
+```
+SELECT
+  fprint,
+  read_columns,
+  write_constructive_columns,
+  write_delete_tables
+FROM SPANNER_SYS.TXN_STATS_TOP_10MINUTE
+WHERE
+  interval_end = "2020-05-17T18:40:00"
+ORDER BY avg_total_latency_seconds DESC LIMIT 3;
+```
+
+| fprint               | read_columns                                                                                                   | write_constructive_columns                                                                                  | write_delete_tables |
+|----------------------|----------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------|---------------------|
+| 15185072816865185658 | `[TestHigherLatency._exists,TestHigherLatency.lang_status,TestHigherLatency.score,globalTagAffinity.shares]`   | `[TestHigherLatency._exists,TestHigherLatency.shares,TestHigherLatency_lang_status_score_index.shares]`     | \[\]                |
+| 15435530087434255496 | `[TestHigherLatency._exists,TestHigherLatency.lang_status,TestHigherLatency.likes,globalTagAffinity.score]`    | `[TestHigherLatency._exists,TestHigherLatency.likes,TestHigherLatency_lang_status_score_index.likes]`       | \[\]                |
+| 14175643543447671202 | `[TestHigherLatency._exists,TestHigherLatency.lang_status,TestHigherLatency.score,globalTagAffinity.ugcCount]` | `[TestHigherLatency._exists,TestHigherLatency.ugcCount,TestHigherLatency_lang_status_score_index.ugcCount]` | \[\]                |
+
+As the output shows in the preceding table, the transactions with the highest average total latency are reading the same columns. There is also some write contention since the transactions are writing to the same column, that is, `TestHigherLatency._exists` .
+
+### Determine how the transaction performance has changed over time
+
+You can see how the statistics associated with this transaction shape have changed over a period of time. Use the following query, where \$FPRINT is the fingerprint of the high latency transaction from the previous step.
+
+```
+SELECT
+  interval_end,
+  ROUND(avg_total_latency_seconds, 3) AS latency,
+  ROUND(avg_commit_latency_seconds, 3) AS commit_latency,
+  commit_attempt_count,
+  commit_abort_count,
+  commit_retry_count,
+  commit_failed_precondition_count,
+  avg_bytes
+FROM SPANNER_SYS.TXN_STATS_TOP_10MINUTE
+WHERE
+  interval_end >= "2020-05-17T16:40:00"
+  AND interval_end <= "2020-05-17T19:40:00"
+  AND fprint = $FPRINT
+ORDER BY interval_end;
+```
+
+| interval_end              | latency | commit_latency | commit_attempt_count | commit_abort_count | commit_retry_count | commit_failed_precondition_count | avg_bytes |
+|---------------------------|---------|----------------|----------------------|--------------------|--------------------|----------------------------------|-----------|
+| 2020-05-17 16:40:00-07:00 | 0.095   | 0.010          | 53230                | 4752               | 4330               | 0                                | 91        |
+| 2020-05-17 16:50:00-07:00 | 0.069   | 0.009          | 61264                | 3589               | 3364               | 0                                | 91        |
+| 2020-05-17 17:00:00-07:00 | 0.150   | 0.010          | 75868                | 10557              | 9322               | 0                                | 91        |
+| 2020-05-17 17:10:00-07:00 | 0.248   | 0.013          | 103151               | 30220              | 28483              | 0                                | 91        |
+| 2020-05-17 17:20:00-07:00 | 0.310   | 0.012          | 130078               | 45655              | 41966              | 0                                | 91        |
+| 2020-05-17 17:30:00-07:00 | 0.294   | 0.012          | 160064               | 64930              | 59933              | 0                                | 91        |
+| 2020-05-17 17:40:00-07:00 | 0.315   | 0.013          | 209614               | 104949             | 96770              | 0                                | 91        |
+| 2020-05-17 17:50:00-07:00 | 0.322   | 0.012          | 215682               | 100408             | 95867              | 0                                | 90        |
+| 2020-05-17 18:00:00-07:00 | 0.310   | 0.012          | 230932               | 106728             | 99462              | 0                                | 91        |
+| 2020-05-17 18:10:00-07:00 | 0.309   | 0.012          | 259645               | 131049             | 125889             | 0                                | 91        |
+| 2020-05-17 18:20:00-07:00 | 0.315   | 0.013          | 272171               | 137910             | 129411             | 0                                | 90        |
+| 2020-05-17 18:30:00-07:00 | 0.292   | 0.013          | 258944               | 121475             | 115844             | 0                                | 91        |
+| 2020-05-17 18:40:00-07:00 | 0.350   | 0.013          | 278802               | 142205             | 134229             | 0                                | 91        |
+| 2020-05-17 18:50:00-07:00 | 0.302   | 0.013          | 256259               | 115626             | 109756             | 0                                | 91        |
+| 2020-05-17 19:00:00-07:00 | 0.315   | 0.014          | 250560               | 110662             | 100322             | 0                                | 91        |
+| 2020-05-17 19:10:00-07:00 | 0.271   | 0.014          | 238384               | 99025              | 90187              | 0                                | 91        |
+| 2020-05-17 19:20:00-07:00 | 0.273   | 0.014          | 219687               | 84019              | 79874              | 0                                | 91        |
+| 2020-05-17 19:30:00-07:00 | 0.198   | 0.013          | 195357               | 59370              | 55909              | 0                                | 91        |
+| 2020-05-17 19:40:00-07:00 | 0.181   | 0.013          | 167514               | 35705              | 32885              | 0                                | 91        |
+
+In this output observe that total latency is high for the highlighted period of time. And, wherever total latency is high, `commit_attempt_count` `commit_abort_count` , and `commit_retry_count` are also high even though commit latency ( `commit_latency` ) has not changed very much. Since transaction commits are getting aborted more frequently, commit attempts are also high because of commit retries.
+
+### Conclusion
+
+In this example, the high commit abort count was the cause of high latency. The next step is to look at the commit abort error messages received by the application to know the reason for aborts. By inspecting logs in the application, you can see the application actually changed its workload during this time, that is, some other transaction shape showed up with high `attempts_per_second` , and that different transaction (maybe a nightly cleanup job) was responsible for the additional lock conflicts.
+
+## Identify transactions that were not retried correctly
+
+The following query returns the transactions sampled in the last ten minutes that have a high commit abort count, but no retries.
+
+```
+SELECT
+  *
+FROM (
+  SELECT
+    fprint,
+    SUM(commit_attempt_count) AS total_commit_attempt_count,
+    SUM(commit_abort_count) AS total_commit_abort_count,
+    SUM(commit_retry_count) AS total_commit_retry_count
+  FROM
+    SPANNER_SYS.TXN_STATS_TOP_10MINUTE
+  GROUP BY
+    fprint )
+WHERE
+  total_commit_retry_count = 0
+  AND total_commit_abort_count > 0
+ORDER BY
+  total_commit_abort_count DESC;
+```
+
+| fprint              | total_commit_attempt_count | total_commit_abort_count | total_commit_retry_count |
+|---------------------|----------------------------|--------------------------|--------------------------|
+| 1557557373282541312 | 3367894                    | 44232                    | 0                        |
+| 5776062322886969344 | 13566                      | 14                       | 0                        |
+
+The transaction with fprint **1557557373282541312** was aborted 44232 times, but it was never retried. This looks suspicious because the abort count is high and it is unlikely that every abort was caused by a non-retriable error. On the other hand, for the transaction with fprint **5776062322886969344** , it is less suspicious because the total abort count is not that high.
+
+The following query returns more details about the transaction with fprint **1557557373282541312** including the `read_columns` , `write_constructive_columns` , and `write_delete_tables` . This information helps to identify the transaction in client code, where the retry logic can be reviewed for this scenario.
+
+```
+SELECT
+  interval_end,
+  fprint,
+  read_columns,
+  write_constructive_columns,
+  write_delete_tables,
+  commit_attempt_count,
+  commit_abort_count,
+  commit_retry_count
+FROM
+  SPANNER_SYS.TXN_STATS_TOP_10MINUTE
+WHERE
+  fprint = 1557557373282541312
+ORDER BY
+  interval_end DESC;
+```
+
+| interval_end         | fprint              | read_columns           | write_constructive_columns                                      | write_delete_tables | commit_attempt_count | commit_abort_count | commit_retry_count |
+|----------------------|---------------------|------------------------|-----------------------------------------------------------------|---------------------|----------------------|--------------------|--------------------|
+| 2021-01-27T18:30:00Z | 1557557373282541312 | \['Singers.\_exists'\] | \['Singers.FirstName', 'Singers.LastName', 'Singers.\_exists'\] | \[\]                | 805228               | 1839               | 0                  |
+| 2021-01-27T18:20:00Z | 1557557373282541312 | \['Singers.\_exists'\] | \['Singers.FirstName', 'Singers.LastName', 'Singers.\_exists'\] | \[\]                | 1034429              | 38779              | 0                  |
+| 2021-01-27T18:10:00Z | 1557557373282541312 | \['Singers.\_exists'\] | \['Singers.FirstName', 'Singers.LastName', 'Singers.\_exists'\] | \[\]                | 833677               | 2266               | 0                  |
+| 2021-01-27T18:00:00Z | 1557557373282541312 | \['Singers.\_exists'\] | \['Singers.FirstName', 'Singers.LastName', 'Singers.\_exists'\] | \[\]                | 694560               | 1348               | 0                  |
+
+The transaction involves a read to the `Singers._exists` hidden column to check the existence of a row. The transaction also writes to the `Singers.FirstName` and `Singer.LastName` columns. This information can help determine whether the transaction retry mechanism implemented in your custom client library is working as expected.
+
+## What's next
+
+- Learn about other [Introspection tools](https://docs.cloud.google.com/spanner/docs/introspection) .
+- Learn about other information Spanner stores for each database in the database [information schema](https://docs.cloud.google.com/spanner/docs/information-schema) tables.
+- Learn more about [SQL best practices](https://docs.cloud.google.com/spanner/docs/sql-best-practices) for Spanner.
+- Learn more about [Investigating high CPU utilization](https://docs.cloud.google.com/spanner/docs/introspection/investigate-cpu-utilization) .

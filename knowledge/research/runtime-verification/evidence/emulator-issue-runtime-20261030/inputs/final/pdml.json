@@ -1,0 +1,232 @@
+{
+  "dialect": "google",
+  "steps": [
+    {
+      "label": "pdml-parent",
+      "family": "issue-40",
+      "kind": "ddl",
+      "sql": "CREATE TABLE PDMLParent(id INT64 NOT NULL) PRIMARY KEY(id)"
+    },
+    {
+      "label": "pdml-child",
+      "family": "issue-40",
+      "kind": "ddl",
+      "sql": "CREATE TABLE PDMLChild(id INT64 NOT NULL,child INT64 NOT NULL,val INT64,generated INT64 AS(val+1) STORED) PRIMARY KEY(id,child), INTERLEAVE IN PARENT PDMLParent",
+      "requires": [
+        "pdml-parent"
+      ]
+    },
+    {
+      "label": "pdml-seed",
+      "family": "issue-40",
+      "kind": "dml",
+      "statements": [
+        "INSERT INTO PDMLParent(id) VALUES(1)",
+        "INSERT INTO PDMLChild(id,child,val) VALUES(1,1,10),(1,2,20)"
+      ],
+      "requires": [
+        "pdml-child"
+      ]
+    },
+    {
+      "label": "pdml-read-0",
+      "family": "issue-40",
+      "kind": "query",
+      "sql": "SELECT * FROM PDMLChild ORDER BY child",
+      "requires": [
+        "pdml-seed"
+      ],
+      "timeout_seconds": 8
+    },
+    {
+      "label": "pdml-update-0",
+      "family": "issue-40",
+      "kind": "pdml",
+      "sql": "UPDATE PDMLChild SET val=100 WHERE TRUE",
+      "requires": [
+        "pdml-seed"
+      ],
+      "timeout_seconds": 8
+    },
+    {
+      "label": "pdml-read-1",
+      "family": "issue-40",
+      "kind": "query",
+      "sql": "SELECT * FROM PDMLChild ORDER BY child",
+      "requires": [
+        "pdml-seed"
+      ],
+      "timeout_seconds": 8
+    },
+    {
+      "label": "pdml-update-1",
+      "family": "issue-40",
+      "kind": "pdml",
+      "sql": "UPDATE PDMLChild SET val=100 WHERE TRUE",
+      "requires": [
+        "pdml-seed"
+      ],
+      "timeout_seconds": 8
+    },
+    {
+      "label": "pdml-read-2",
+      "family": "issue-40",
+      "kind": "query",
+      "sql": "SELECT * FROM PDMLChild ORDER BY child",
+      "requires": [
+        "pdml-seed"
+      ],
+      "timeout_seconds": 8
+    },
+    {
+      "label": "pdml-update-2",
+      "family": "issue-40",
+      "kind": "pdml",
+      "sql": "UPDATE PDMLChild SET val=100 WHERE TRUE",
+      "requires": [
+        "pdml-seed"
+      ],
+      "timeout_seconds": 8
+    },
+    {
+      "label": "pdml-read-3",
+      "family": "issue-40",
+      "kind": "query",
+      "sql": "SELECT * FROM PDMLChild ORDER BY child",
+      "requires": [
+        "pdml-seed"
+      ],
+      "timeout_seconds": 8
+    },
+    {
+      "label": "pdml-update-3",
+      "family": "issue-40",
+      "kind": "pdml",
+      "sql": "UPDATE PDMLChild SET val=100 WHERE TRUE",
+      "requires": [
+        "pdml-seed"
+      ],
+      "timeout_seconds": 8
+    },
+    {
+      "label": "pdml-read-4",
+      "family": "issue-40",
+      "kind": "query",
+      "sql": "SELECT * FROM PDMLChild ORDER BY child",
+      "requires": [
+        "pdml-seed"
+      ],
+      "timeout_seconds": 8
+    },
+    {
+      "label": "pdml-update-4",
+      "family": "issue-40",
+      "kind": "pdml",
+      "sql": "UPDATE PDMLChild SET val=100 WHERE TRUE",
+      "requires": [
+        "pdml-seed"
+      ],
+      "timeout_seconds": 8
+    },
+    {
+      "label": "pdml-read-5",
+      "family": "issue-40",
+      "kind": "query",
+      "sql": "SELECT * FROM PDMLChild ORDER BY child",
+      "requires": [
+        "pdml-seed"
+      ],
+      "timeout_seconds": 8
+    },
+    {
+      "label": "pdml-update-5",
+      "family": "issue-40",
+      "kind": "pdml",
+      "sql": "UPDATE PDMLChild SET val=100 WHERE TRUE",
+      "requires": [
+        "pdml-seed"
+      ],
+      "timeout_seconds": 8
+    },
+    {
+      "label": "pdml-read-6",
+      "family": "issue-40",
+      "kind": "query",
+      "sql": "SELECT * FROM PDMLChild ORDER BY child",
+      "requires": [
+        "pdml-seed"
+      ],
+      "timeout_seconds": 8
+    },
+    {
+      "label": "pdml-update-6",
+      "family": "issue-40",
+      "kind": "pdml",
+      "sql": "UPDATE PDMLChild SET val=100 WHERE TRUE",
+      "requires": [
+        "pdml-seed"
+      ],
+      "timeout_seconds": 8
+    },
+    {
+      "label": "pdml-read-7",
+      "family": "issue-40",
+      "kind": "query",
+      "sql": "SELECT * FROM PDMLChild ORDER BY child",
+      "requires": [
+        "pdml-seed"
+      ],
+      "timeout_seconds": 8
+    },
+    {
+      "label": "pdml-update-7",
+      "family": "issue-40",
+      "kind": "pdml",
+      "sql": "UPDATE PDMLChild SET val=100 WHERE TRUE",
+      "requires": [
+        "pdml-seed"
+      ],
+      "timeout_seconds": 8
+    },
+    {
+      "label": "pdml-read-8",
+      "family": "issue-40",
+      "kind": "query",
+      "sql": "SELECT * FROM PDMLChild ORDER BY child",
+      "requires": [
+        "pdml-seed"
+      ],
+      "timeout_seconds": 8
+    },
+    {
+      "label": "pdml-update-8",
+      "family": "issue-40",
+      "kind": "pdml",
+      "sql": "UPDATE PDMLChild SET val=100 WHERE TRUE",
+      "requires": [
+        "pdml-seed"
+      ],
+      "timeout_seconds": 8
+    },
+    {
+      "label": "pdml-read-9",
+      "family": "issue-40",
+      "kind": "query",
+      "sql": "SELECT * FROM PDMLChild ORDER BY child",
+      "requires": [
+        "pdml-seed"
+      ],
+      "timeout_seconds": 8
+    },
+    {
+      "label": "pdml-update-9",
+      "family": "issue-40",
+      "kind": "pdml",
+      "sql": "UPDATE PDMLChild SET val=100 WHERE TRUE",
+      "requires": [
+        "pdml-seed"
+      ],
+      "timeout_seconds": 8
+    }
+  ]
+}

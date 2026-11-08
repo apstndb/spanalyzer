@@ -1,0 +1,34 @@
+{
+  "scope": "Codes, values and row types only; metadata transaction timestamps are intentionally excluded",
+  "corpora": {
+    "queries": {
+      "before_cases": 115,
+      "current_cases": 115,
+      "differences": [],
+      "outcomes": {
+        "OK": 92,
+        "InvalidArgument": 9,
+        "OutOfRange": 13,
+        "Unimplemented": 1
+      }
+    },
+    "followup": {
+      "before_cases": 10,
+      "current_cases": 10,
+      "differences": [],
+      "outcomes": {
+        "InvalidArgument": 3,
+        "OK": 7
+      }
+    },
+    "distinctness": {
+      "before_cases": 64,
+      "current_cases": 64,
+      "differences": [],
+      "outcomes": {
+        "OK": 49,
+        "InvalidArgument": 15
+      }
+    }
+  }
+}

@@ -1,0 +1,227 @@
+package main
+
+import (
+	"cloud.google.com/go/spanner"
+	database "cloud.google.com/go/spanner/admin/database/apiv1"
+	dbpb "cloud.google.com/go/spanner/admin/database/apiv1/databasepb"
+	sppb "cloud.google.com/go/spanner/apiv1/spannerpb"
+	"context"
+	"crypto/sha256"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"github.com/apstndb/spanemuboost"
+	"google.golang.org/api/iterator"
+	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/encoding/protojson"
+	"os"
+	"strings"
+	"time"
+)
+
+var ctx = context.Background()
+var c *spanner.Client
+var a *database.DatabaseAdminClient
+var db string
+var dialect string
+var q = "OmniQueueControl20260926"
+
+func emit(v map[string]any) {
+	v["at"] = time.Now().UTC().Format(time.RFC3339Nano)
+	v["dialect"] = dialect
+	json.NewEncoder(os.Stdout).Encode(v)
+}
+func clean(e error) string {
+	if e == nil {
+		return ""
+	}
+	s := e.Error()
+	s = strings.ReplaceAll(s, db, "<database>")
+	for _, k := range []string{"SPANNER_PROJECT_ID", "SPANNER_INSTANCE_ID", "SPANNER_DATABASE_ID"} {
+		if v := os.Getenv(k); v != "" {
+			s = strings.ReplaceAll(s, v, "<redacted>")
+		}
+	}
+	return s
+}
+func query(label, sql string, params map[string]any, stale bool, first bool) []map[string]any {
+	start := time.Now()
+	cx, cancel := context.WithTimeout(ctx, 35*time.Second)
+	defer cancel()
+	tx := c.Single()
+	defer tx.Close()
+	if stale {
+		tx = tx.WithTimestampBound(spanner.ExactStaleness(time.Millisecond))
+	}
+	it := tx.Query(cx, spanner.Statement{SQL: sql, Params: params})
+	defer it.Stop()
+	rows := []map[string]any{}
+	retained := []map[string]any{}
+	types := map[string]string{}
+	var err error
+	for {
+		var r *spanner.Row
+		r, err = it.Next()
+		if err != nil {
+			break
+		}
+		row := map[string]any{}
+		rr := map[string]any{}
+		for i, n := range r.ColumnNames() {
+			var g spanner.GenericColumnValue
+			if err = r.Column(i, &g); err != nil {
+				break
+			}
+			types[n] = g.Type.Code.String()
+			v := g.Value.AsInterface()
+			row[n] = v
+			rr[n] = v
+			if strings.Contains(n, "Token") && v != nil {
+				rr[n] = fmt.Sprintf("sha256:%x", sha256.Sum256([]byte(fmt.Sprint(v))))
+			}
+		}
+		if err != nil {
+			break
+		}
+		rows = append(rows, row)
+		retained = append(retained, rr)
+		if first {
+			if label == "control-receive" {
+				if token, ok := row["SpannerLeaseToken"].(string); ok {
+					leaseControls(token)
+				}
+			}
+			break
+		}
+	}
+	if err == iterator.Done {
+		err = nil
+	}
+	emit(map[string]any{"kind": "query", "label": label, "sql": sql, "stale": stale, "stop_after_first": first, "rows": retained, "column_types": types, "error": clean(err), "code": status.Code(err).String(), "elapsed_ms": time.Since(start).Milliseconds()})
+	return rows
+}
+func tx(label string, sqls []string, rollback bool) {
+	var counts []int64
+	cx, cancel := context.WithTimeout(ctx, 35*time.Second)
+	defer cancel()
+	_, err := c.ReadWriteTransaction(cx, func(cx context.Context, t *spanner.ReadWriteTransaction) error {
+		counts = nil
+		for _, sql := range sqls {
+			n, e := t.Update(cx, spanner.Statement{SQL: sql})
+			counts = append(counts, n)
+			if e != nil {
+				return e
+			}
+		}
+		if rollback {
+			return errors.New("intentional probe rollback")
+		}
+		return nil
+	})
+	emit(map[string]any{"kind": "transaction", "label": label, "sql": sqls, "rows_modified": counts, "intentional_rollback": rollback, "error": clean(err), "code": status.Code(err).String()})
+}
+func ddl(label, sql string) bool {
+	cx, cancel := context.WithTimeout(ctx, 4*time.Minute)
+	defer cancel()
+	op, e := a.UpdateDatabaseDdl(cx, &dbpb.UpdateDatabaseDdlRequest{Database: db, Statements: []string{sql}})
+	if e == nil {
+		e = op.Wait(cx)
+	}
+	emit(map[string]any{"kind": "ddl", "label": label, "sql": sql, "error": clean(e), "code": status.Code(e).String()})
+	return e == nil
+}
+
+func observe(label, sql string, params map[string]any, mode sppb.ExecuteSqlRequest_QueryMode) {
+	cx, cancel := context.WithTimeout(ctx, 25*time.Second)
+	defer cancel()
+	ro := c.Single()
+	defer ro.Close()
+	it := ro.QueryWithOptions(cx, spanner.Statement{SQL: sql, Params: params}, spanner.QueryOptions{Mode: &mode})
+	defer it.Stop()
+	count := 0
+	var e error
+	start := time.Now()
+	for {
+		_, e = it.Next()
+		if e != nil {
+			break
+		}
+		count++
+	}
+	if e == iterator.Done {
+		e = nil
+	}
+	v := map[string]any{"kind": "plan-probe", "label": label, "sql": sql, "params": params, "mode": mode.String(), "error": clean(e), "code": status.Code(e).String(), "rows": count, "elapsed_ms": time.Since(start).Milliseconds(), "stats": it.QueryStats}
+	if it.QueryPlan != nil {
+		b, _ := protojson.Marshal(it.QueryPlan)
+		v["plan"] = json.RawMessage(b)
+	}
+	if it.Metadata != nil {
+		b, _ := protojson.Marshal(it.Metadata)
+		v["metadata"] = json.RawMessage(b)
+	}
+	emit(v)
+}
+
+func setup(rt spanemuboost.Runtime, d dbpb.DatabaseDialect) *spanemuboost.Clients {
+	dialect = d.String()
+	clients, e := spanemuboost.OpenClients(ctx, rt, spanemuboost.EnableDatabaseAutoConfigOnly(), spanemuboost.WithRandomDatabaseID(), spanemuboost.ForceSchemaTeardown(), spanemuboost.WithDatabaseDialect(d))
+	if e != nil {
+		panic(e)
+	}
+	c = clients.Client
+	a = clients.DatabaseClient
+	db = clients.DatabasePath()
+	return clients
+}
+func finish(clients *spanemuboost.Clients) {
+	e := clients.Close()
+	emit(map[string]any{"label": "database-cleanup", "code": status.Code(e).String(), "error": clean(e)})
+}
+func main() {
+	image := os.Getenv("PROBE_IMAGE")
+	if image == "" {
+		panic("PROBE_IMAGE required")
+	}
+	backend := spanemuboost.BackendOmni
+	if os.Getenv("PROBE_BACKEND") == "emulator" {
+		backend = spanemuboost.BackendEmulator
+	}
+	rt, e := spanemuboost.Run(ctx, backend, spanemuboost.WithContainerImage(image), spanemuboost.DisableAutoConfig())
+	if e != nil {
+		panic(e)
+	}
+	defer func() {
+		e := rt.Close()
+		emit(map[string]any{"label": "runtime-cleanup", "error": clean(e), "code": status.Code(e).String()})
+	}()
+	emit(map[string]any{"label": "identity", "image": image, "runtime": string(backend)})
+	runQueue(rt)
+}
+
+func leaseControls(token string) {
+	query("control-scalar-default", "SELECT * FROM RENEWLEASE_"+q+"(lease_tokens=>[@token])", map[string]any{"token": token}, false, false)
+	query("control-scalar-off", "@{AUTO_PARAMETER='OFF'} SELECT * FROM RENEWLEASE_"+q+"(lease_tokens=>[@token])", map[string]any{"token": token}, false, false)
+	rows := query("control-array-default", "SELECT * FROM RENEWLEASE_"+q+"(lease_tokens=>@tokens)", map[string]any{"tokens": []string{token}}, false, false)
+	if len(rows) > 0 {
+		if next, ok := rows[0]["SpannerNewLeaseToken"].(string); ok {
+			token = next
+		}
+	}
+	query("control-array-off", "@{AUTO_PARAMETER='OFF'} SELECT * FROM RENEWLEASE_"+q+"(lease_tokens=>@tokens)", map[string]any{"tokens": []string{token}}, false, false)
+}
+func runQueue(rt spanemuboost.Runtime) {
+	clients := setup(rt, dbpb.DatabaseDialect_GOOGLE_STANDARD_SQL)
+	defer finish(clients)
+	if !ddl("create", "CREATE QUEUE "+q+" (MessageId STRING(36) NOT NULL, Payload BYTES(MAX) NOT NULL) PRIMARY KEY(MessageId)") {
+		return
+	}
+	defer func() {
+		ddl("cleanup", "DROP QUEUE "+q)
+		query("cleanup-confirmation", "SELECT COUNT(*) AS remaining FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME='"+q+"'", nil, false, false)
+	}()
+	tx("control-send", []string{"INSERT INTO " + q + "(MessageId,Payload) VALUES('lease-control',b'control')"}, false)
+	query("control-stale-ordinary", "SELECT MessageId FROM "+q, nil, true, false)
+	query("control-stale-receive", "SELECT * FROM RECEIVE_"+q+"(max_duration=>'3s',max_batch_size=>1)", nil, true, true)
+	query("control-receive", "SELECT * FROM RECEIVE_"+q+"(max_duration=>'20m',max_batch_size=>1)", nil, false, true)
+}

@@ -1,0 +1,23 @@
+{
+  "observed_on": "2026-10-29",
+  "client_timezone": "Asia/Tokyo",
+  "execution_start": "2026-10-29T00:30:18.035465+00:00",
+  "execution_end": "2026-10-29T01:29:28.702525+00:00",
+  "runtime_identity": "Existing October 23 dedicated regional free trial; no new instance or paid conversion. Managed build identifier unavailable.",
+  "source_head": "c2d7792dd7f83d5dd086e2d32bc22e5d253cf06c",
+  "source_state": "Pre-existing dirty/untracked work preserved; all 123 measured implementation/dependency hashes unchanged.",
+  "dependencies": {
+    "go": "go1.26.8",
+    "catalog_and_integration": "GOWORK=off; Spanner v1.88.0",
+    "feature_clients": "Explicit workspace; Spanner v1.91.0"
+  },
+  "flow_status": "completed_with_observed_catalog_variation_and_local_drift_failure",
+  "managed_gate": "Canonical DDL, expression index and UUID pass; drift fails on unregistered ACTIVE_BATCH_OPERATIONS and BATCH_OPERATIONS. Diagnostic catalog checks retain nonzero exits.",
+  "harness_attempts": "Original unqualified views, duplicate generated-column constraint name and FLOAT64 option mismatch remain explicit; focused corrected attempts retained. Rejected RAND views isolated. Initial final-state CLI lookup failed before RPC; absolute SDK path succeeds in final state.",
+  "owned_fixture_cleanup": "All seventeen temporary database lifecycles and owned base fixtures confirmed absent; dedicated base and trial retained.",
+  "catalog_selectors_changed": false,
+  "new_instance_created": false,
+  "commands": "all-commands.json",
+  "durable_task_directory": "<LOCAL_TASK_ROOT>/apstndb/spanalyzer/managed-recheck-20261029",
+  "authority": "Bounded current managed verification, owned temporary fixtures/cleanup, source research and local documentation. No implementation change, commit, push, PR, merge, release, paid conversion, instance move or external synchronization."
+}

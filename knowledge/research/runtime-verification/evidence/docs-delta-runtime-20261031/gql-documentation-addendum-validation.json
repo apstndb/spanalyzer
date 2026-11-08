@@ -1,0 +1,49 @@
+{
+  "status": "passed",
+  "commands": [
+    {
+      "name": "okf-all",
+      "argv": [
+        "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go",
+        "run",
+        "./okf-check",
+        "--repo-root",
+        "..",
+        "--gate",
+        "all",
+        "--publication-manifest",
+        "<LOCAL_TASK_ROOT>/apstndb/spanalyzer/docs-delta-runtime-20261031/gql-documentation-publication-manifest.json"
+      ],
+      "cwd": "<LOCAL_CHECKOUT>/tools",
+      "at": "2026-10-31T04:53:30.138070+00:00",
+      "exit_code": 0,
+      "log": "gql-documentation-okf-all.log"
+    },
+    {
+      "name": "markdown-language",
+      "argv": [
+        "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go",
+        "run",
+        "./markdown-language-check",
+        "--repo-root",
+        ".."
+      ],
+      "cwd": "<LOCAL_CHECKOUT>/tools",
+      "at": "2026-10-31T04:53:31.221927+00:00",
+      "exit_code": 0,
+      "log": "gql-documentation-markdown-language.log"
+    },
+    {
+      "name": "diff-check",
+      "argv": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "cwd": "<LOCAL_CHECKOUT>",
+      "at": "2026-10-31T04:53:31.299993+00:00",
+      "exit_code": 0,
+      "log": "gql-documentation-diff-check.log"
+    }
+  ]
+}

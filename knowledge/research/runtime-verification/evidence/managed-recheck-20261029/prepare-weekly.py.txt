@@ -1,0 +1,145 @@
+"""Prepare source-scoped cases; inputs do not attest execution."""
+from pathlib import Path
+import json
+
+out=Path('<LOCAL_CHECKOUT>/.tmp/managed-recheck-20261029')
+sources={
+ 'foreign-key':'https://docs.cloud.google.com/spanner/docs/foreign-keys/how-to',
+ 'jsonb':'https://docs.cloud.google.com/spanner/docs/working-with-jsonb',
+ 'volatile':'https://docs.cloud.google.com/spanner/docs/reference/standard-sql/graph-schema-statements',
+ 'paths':'https://docs.cloud.google.com/spanner/docs/reference/standard-sql/graph-patterns',
+ 'numeric':'https://docs.cloud.google.com/spanner/docs/full-text-search/numeric-indexes',
+ 'storage':'https://docs.cloud.google.com/spanner/docs/introspection/table-sizes-statistics',
+ 'filtered-search':'https://docs.cloud.google.com/spanner/docs/full-text-search/search-indexes'}
+for dialect in ['google','pg']:
+    steps=[]
+    def add(label,family,kind,sql='',statements=None,requires=None,**other):
+        row={'label':label,'family':family,'kind':kind,'sql':sql,'requires':requires or []}
+        if statements is not None:row['statements']=statements
+        row.update(other);steps.append(row);return label
+    integer='INT64'if dialect=='google'else'bigint'
+    text='STRING(MAX)'if dialect=='google'else'text'
+    def table(name,columns,constraints=(),keys='Id'):
+        clauses=[*columns,*constraints]
+        if dialect=='pg':clauses.append('PRIMARY KEY ('+keys+')')
+        return 'CREATE TABLE '+name+' ('+', '.join(clauses)+')'+(' PRIMARY KEY ('+keys+')'if dialect=='google'else'')
+    fkbase=add('fk-base','foreign-key','ddl',statements=[
+        table('FkParent',[f'Id {integer} NOT NULL']),
+        table('FkAlterChild',[f'Id {integer} NOT NULL',f'ParentId {integer}',f'Payload {text}']),
+        table('FkCascadeChild',[f'Id {integer} NOT NULL',f'ParentId {integer}'],['CONSTRAINT FkCascade FOREIGN KEY (ParentId) REFERENCES FkParent(Id) ON DELETE CASCADE']),
+        table('FkNoActionChild',[f'Id {integer} NOT NULL',f'ParentId {integer}'],['CONSTRAINT FkNoAction FOREIGN KEY (ParentId) REFERENCES FkParent(Id) ON DELETE NO ACTION'])])
+    inline=add('fk-inline-set-null','foreign-key','ddl',table('FkInlineChild',[f'Id {integer} NOT NULL',f'ParentId {integer}',f'Payload {text}'],['CONSTRAINT FkInline FOREIGN KEY (ParentId) REFERENCES FkParent(Id) ON DELETE SET NULL']),requires=[fkbase])
+    alter=add('fk-alter-set-null','foreign-key','ddl','ALTER TABLE FkAlterChild ADD CONSTRAINT FkAlter FOREIGN KEY (ParentId) REFERENCES FkParent(Id) ON DELETE SET NULL',requires=[fkbase])
+    for label,column,keys in [('not-null',f'ParentId {integer} NOT NULL','Id'),('primary-key',f'ParentId {integer}','Id,ParentId')]:
+        add('fk-reject-'+label,'foreign-key','ddl',table('FkBad'+label.replace('-',''),[f'Id {integer} NOT NULL',column],['CONSTRAINT FkBad FOREIGN KEY (ParentId) REFERENCES FkParent(Id) ON DELETE SET NULL'],keys),requires=[fkbase],control='documented_invalid_referencing_column')
+    generated=f'ParentId {integer} AS (SourceId) STORED'if dialect=='google'else f'ParentId {integer} GENERATED ALWAYS AS (SourceId) STORED'
+    gen=add('fk-generated-control','foreign-key','ddl',table('FkGenerated',[f'Id {integer} NOT NULL',f'SourceId {integer}',generated]),requires=[fkbase])
+    add('fk-reject-generated','foreign-key','ddl','ALTER TABLE FkGenerated ADD CONSTRAINT FkGenerated FOREIGN KEY (ParentId) REFERENCES FkParent(Id) ON DELETE SET NULL',requires=[gen],control='documented_invalid_referencing_column')
+    if dialect=='google':add('fk-reject-not-enforced','foreign-key','ddl',table('FkBadNotEnforced',[f'Id {integer} NOT NULL',f'ParentId {integer}'],['CONSTRAINT FkBadNotEnforced FOREIGN KEY(ParentId) REFERENCES FkParent(Id) ON DELETE SET NULL NOT ENFORCED']),requires=[fkbase],control='delete_action_requires_enforcement')
+    seeded=add('fk-seed','foreign-key','dml',statements=[
+        'INSERT INTO FkParent(Id) VALUES (1),(2),(3),(4),(5)',
+        "INSERT INTO FkInlineChild(Id,ParentId,Payload) VALUES (11,1,'keep'),(12,2,'mutation'),(15,5,'rollback'),(16,NULL,'already-null')",
+        "INSERT INTO FkAlterChild(Id,ParentId,Payload) VALUES (21,1,'keep'),(22,2,'mutation'),(25,5,'rollback'),(26,NULL,'already-null')",
+        'INSERT INTO FkCascadeChild(Id,ParentId) VALUES (31,1)',
+        'INSERT INTO FkNoActionChild(Id,ParentId) VALUES (41,3)'],requires=[inline,alter])
+    snapshot="SELECT 'inline' AS source,Id AS id,ParentId AS parent_id,Payload AS payload FROM FkInlineChild UNION ALL SELECT 'alter',Id,ParentId,Payload FROM FkAlterChild ORDER BY source,id"
+    add('fk-metadata','foreign-key','query',"SELECT CONSTRAINT_NAME AS name,DELETE_RULE AS rule FROM INFORMATION_SCHEMA.REFERENTIAL_CONSTRAINTS WHERE LOWER(CONSTRAINT_NAME) LIKE 'fk%' ORDER BY name",requires=[inline,alter])
+    add('fk-before','foreign-key','query',snapshot,requires=[seeded])
+    deleted=add('fk-delete-dml','foreign-key','dml',statements=['DELETE FROM FkParent WHERE Id=1'],requires=[seeded])
+    add('fk-after-dml','foreign-key','query',snapshot,requires=[deleted])
+    add('fk-cascade-control','foreign-key','query','SELECT COUNT(*) AS n FROM FkCascadeChild',requires=[deleted])
+    mutation=add('fk-delete-mutation','foreign-key','mutation-delete',requires=[seeded],table='FkParent'if dialect=='google'else'fkparent',key=[2])
+    add('fk-after-mutation','foreign-key','query',snapshot,requires=[mutation])
+    rollback=add('fk-rollback','foreign-key','rollback','DELETE FROM FkParent WHERE Id=5',requires=[seeded],after=snapshot)
+    add('fk-after-rollback','foreign-key','query',snapshot,requires=[rollback])
+    add('fk-no-action-reject','foreign-key','dml',statements=['DELETE FROM FkParent WHERE Id=3'],requires=[seeded],control='NO ACTION preserves parent')
+    add('fk-no-action-parent-present','foreign-key','query','SELECT Id AS id FROM FkParent WHERE Id=3',requires=[seeded])
+    add('fk-reference-still-enforced','foreign-key','dml',statements=["INSERT INTO FkInlineChild(Id,ParentId,Payload) VALUES (99,999,'invalid')"],requires=[seeded],control='enforcement after SET NULL creation')
+    composite=add('fk-composite-base','foreign-key','ddl',statements=[
+        table('FkCompositeParent',[f'Id {integer} NOT NULL',f'K {integer} NOT NULL'],keys='Id,K'),
+        table('FkCompositeChild',[f'Id {integer} NOT NULL',f'ParentId {integer}',f'ParentK {integer}'],['CONSTRAINT FkComposite FOREIGN KEY (ParentId,ParentK) REFERENCES FkCompositeParent(Id,K) ON DELETE SET NULL'])])
+    compseed=add('fk-composite-seed','foreign-key','dml',statements=['INSERT INTO FkCompositeParent(Id,K) VALUES (1,10),(2,20)','INSERT INTO FkCompositeChild(Id,ParentId,ParentK) VALUES (51,1,10),(52,1,NULL),(53,2,20)'],requires=[composite])
+    compdelete=add('fk-composite-delete','foreign-key','dml',statements=['DELETE FROM FkCompositeParent WHERE Id=1 AND K=10'],requires=[compseed])
+    add('fk-composite-after','foreign-key','query','SELECT Id AS id,ParentId AS parent_id,ParentK AS parent_k FROM FkCompositeChild ORDER BY Id',requires=[compdelete])
+
+    storage=['COLUMNAR_USED_BYTES','COLUMNAR_USED_SSD_BYTES','COLUMNAR_USED_HDD_BYTES','COLUMNAR_COVERAGE_RATIO','COLUMNAR_SSD_COVERAGE_RATIO','COLUMNAR_HDD_COVERAGE_RATIO']
+    add('storage-catalog','storage','query',"SELECT COLUMN_NAME AS name,SPANNER_TYPE AS type,ORDINAL_POSITION AS ordinal FROM INFORMATION_SCHEMA.COLUMNS WHERE LOWER(TABLE_SCHEMA)='spanner_sys' AND LOWER(TABLE_NAME)='table_sizes_stats_1hour' ORDER BY ORDINAL_POSITION")
+    for column in storage:add('storage-'+column.lower(),'storage','query','SELECT s.'+column+' AS value FROM SPANNER_SYS.TABLE_SIZES_STATS_1HOUR AS s LIMIT 3')
+    add('storage-combined','storage','query','SELECT table_name AS name,used_bytes+columnar_used_bytes AS total_used_bytes,columnar_coverage_ratio AS coverage FROM SPANNER_SYS.TABLE_SIZES_STATS_1HOUR LIMIT 3')
+    add('storage-limit-zero','storage','query','SELECT '+','.join(column+' AS '+column.lower()for column in storage)+' FROM SPANNER_SYS.TABLE_SIZES_STATS_1HOUR LIMIT 0')
+
+    if dialect=='google':
+        graphbase=add('graph-base','volatile-graph','ddl',statements=[
+            table('GNodes',['Id INT64 NOT NULL']),table('GEdges',['Src INT64 NOT NULL','Dst INT64 NOT NULL'],keys='Src,Dst'),
+            'CREATE VIEW GStable SQL SECURITY INVOKER AS SELECT Id FROM GNodes',
+            'CREATE VIEW GProjection SQL SECURITY INVOKER AS SELECT Id,GENERATE_UUID() AS V FROM GNodes',
+            'CREATE VIEW GBody SQL SECURITY INVOKER AS SELECT Id FROM GNodes WHERE RAND()<0.5',
+            'CREATE VIEW GJoin SQL SECURITY INVOKER AS SELECT a.Id FROM GNodes a JOIN GNodes b ON a.Id=b.Id AND RAND()<0.5',
+            'CREATE VIEW GKey SQL SECURITY INVOKER AS SELECT GENERATE_UUID() AS Id FROM GNodes'])
+        graphseed=add('graph-seed','volatile-graph','dml',statements=['INSERT INTO GNodes(Id) VALUES (1),(2),(3)','INSERT INTO GEdges(Src,Dst) VALUES (1,2),(2,3),(3,1)'],requires=[graphbase])
+        counter=0
+        for view in ['GStable','GProjection','GBody','GJoin','GKey','GProjectionUnused']:
+            uniqueness=['omit','false','true']if view=='GProjection'else['false']
+            for unique in uniqueness:
+                for allow in ['omit','false','true']:
+                    counter+=1;name='VG'+str(counter);actual='GProjection'if view=='GProjectionUnused'else view
+                    options=[]
+                    if unique!='omit':options.append('validate_element_key_uniqueness='+unique)
+                    if allow!='omit':options.append('allow_view_with_volatile_column='+allow)
+                    properties=' PROPERTIES(Id)'if view=='GProjectionUnused'else''
+                    sql='CREATE PROPERTY GRAPH '+name+' NODE TABLES('+actual+' KEY(Id)'+properties+')'+(' OPTIONS('+','.join(options)+')'if options else'')
+                    label='volatile-'+view.lower()+'-key-'+unique+'-allow-'+allow
+                    created=add(label,'volatile-graph','ddl',sql,requires=[graphseed],view=view,uniqueness=unique,allow_volatile=allow)
+                    add(label+'-read','volatile-graph','query','GRAPH '+name+' MATCH(n) RETURN COUNT(*) AS n',requires=[created],nondeterministic_row_count=view in ['GBody','GJoin'])
+        finite=add('finite-graph','path-quantifier','ddl','CREATE PROPERTY GRAPH FiniteGraph NODE TABLES(GNodes KEY(Id) LABEL Node PROPERTIES(Id)) EDGE TABLES(GEdges KEY(Src,Dst) SOURCE KEY(Src) REFERENCES GNodes(Id) DESTINATION KEY(Dst) REFERENCES GNodes(Id) LABEL Edge PROPERTIES(Src,Dst))',requires=[graphseed])
+        for prefix in ['TRAIL','ACYCLIC','ANY SHORTEST']:
+            for quantifier in ['{1,3}','{,3}','{1,}','*','+']:
+                label='path-'+prefix.lower().replace(' ','-')+'-'+{'{1,3}':'bounded','{,3}':'no-lower','{1,}':'no-upper','*':'star','+':'plus'}[quantifier]
+                add(label,'path-quantifier','query','GRAPH FiniteGraph MATCH '+prefix+' (a)-[e]->'+quantifier+'(b) RETURN DISTINCT a.Id AS src,b.Id AS dst ORDER BY src,dst',requires=[finite],timeout_seconds=8)
+        add('path-invalid-bounds','path-quantifier','query','GRAPH FiniteGraph MATCH TRAIL (a)-[e]->{3,1}(b) RETURN a.Id AS src,b.Id AS dst',requires=[finite],timeout_seconds=8)
+        add('path-group-star','path-quantifier','query','GRAPH FiniteGraph MATCH ANY SHORTEST (a)(-[e]->)*(b) RETURN DISTINCT a.Id AS src,b.Id AS dst ORDER BY src,dst',requires=[finite],timeout_seconds=8)
+        numberbase=add('numeric-index-base','numeric-search','ddl',statements=[
+            table('NumDocs',['Id INT64 NOT NULL','N INT64',"PreTokens TOKENLIST AS (TOKENIZE_NUMBER(N,comparison_type=>'all',algorithm=>'prefixtree',min=>-16,max=>16)) HIDDEN", "LogTokens TOKENLIST AS (TOKENIZE_NUMBER(N,comparison_type=>'all',algorithm=>'logtree',min=>-16,max=>16)) HIDDEN"]),
+            'CREATE SEARCH INDEX NumPre ON NumDocs(PreTokens)','CREATE SEARCH INDEX NumLog ON NumDocs(LogTokens)'])
+        numberseed=add('numeric-index-seed','numeric-search','dml',statements=['INSERT INTO NumDocs(Id,N) VALUES '+','.join('('+str(i)+','+str(n)+')'for i,n in enumerate([-8,-2,-1,0,1,2,3,5,8],1))],requires=[numberbase])
+        for name,predicate in [('eq','N=1'),('le','N<=2'),('gt','N>0'),('between','N BETWEEN -1 AND 5'),('not-eq','N<>2'),('in','N IN (1,3,8)')]:
+            for access,index in [('auto',None),('prefix','NumPre'),('log','NumLog'),('base','_BASE_TABLE')]:
+                hint='@{FORCE_INDEX='+index+'}'if index else''
+                add('numeric-'+name+'-'+access,'numeric-search','query','SELECT Id AS id FROM NumDocs'+hint+' WHERE '+predicate+' ORDER BY Id',requires=[numberseed],profile=True,predicate=name,access=access)
+        for label,expr in [('numeric-type',"NUMERIC '1.25'"),('float-prefix','CAST(1.25 AS FLOAT64)'),('int-prefix','1')]:
+            add('tokenize-'+label,'numeric-search','query',"SELECT DEBUG_TOKENLIST(TOKENIZE_NUMBER("+expr+",comparison_type=>'all',algorithm=>'prefixtree',min=>-16,max=>16)) AS tokens")
+        add('bignumeric-type-control','numeric-search','query',"SELECT CAST('1.25' AS BIGNUMERIC) AS value",control='guide mentions a type not established for Spanner')
+        for label,left,right in [('array-length','[9]','[0,0]'),('object-count','{"z":0}','{"a":0,"b":0}'),('empty-v-null','[]','null')]:
+            add('google-json-control-'+label,'json-dialect-control','query',"SELECT JSON '"+left+"' < JSON '"+right+"' AS result")
+        filtered=add('filtered-index-base','filtered-search','ddl',statements=[
+            table('FilteredDocs',['Id INT64 NOT NULL','Genre STRING(MAX)','Body STRING(MAX)','Tokens TOKENLIST AS (TOKENIZE_FULLTEXT(Body)) HIDDEN']),
+            'CREATE SEARCH INDEX FilteredSearch ON FilteredDocs(Tokens) STORING(Genre) WHERE Genre IS NOT NULL'])
+        filterseed=add('filtered-index-seed','filtered-search','dml',statements=["INSERT INTO FilteredDocs(Id,Genre,Body) VALUES (1,'rock','rock'),(2,NULL,'rock'),(3,'jazz','jazz')"],requires=[filtered])
+        for label,predicate in [('omitted','TRUE'),('explicit','Genre IS NOT NULL'),('implied-equality',"Genre='rock'"),('implied-in',"Genre IN ('rock','jazz')"),('admits-null',"Genre='rock' OR Genre IS NULL"),('only-null','Genre IS NULL')]:
+            for access,hint in [('auto',''),('forced','@{FORCE_INDEX=FilteredSearch}')]:
+                add('filtered-'+label+'-'+access,'filtered-search','query',"SELECT Id AS id FROM FilteredDocs"+hint+" WHERE SEARCH(Tokens,'rock') AND ("+predicate+') ORDER BY Id',requires=[filterseed],profile=True,predicate=label,access=access)
+            add('filtered-'+label+'-base-control','filtered-search','query',"SELECT Id AS id FROM FilteredDocs@{FORCE_INDEX=_BASE_TABLE} WHERE Body='rock' AND ("+predicate+') ORDER BY Id',requires=[filterseed],predicate=label,access='base-control')
+    else:
+        exemplars=[('null','null'),('string','"x"'),('number','1'),('boolean','false'),('array','[1]'),('object','{}')]
+        for i,(left_name,left)in enumerate(exemplars):
+            for j,(right_name,right)in enumerate(exemplars):
+                a="'"+left+"'::jsonb";b="'"+right+"'::jsonb"
+                add('jsonb-type-'+left_name+'-'+right_name,'jsonb-order','query','SELECT '+a+'<'+b+' AS lt,'+a+'='+b+' AS eq,'+a+'>'+b+' AS gt',expected={'lt':i<j,'eq':i==j,'gt':i>j})
+        comparisons=[('empty-before-null','[]','null'),('null-before-nested-empty','null','[[]]'),('nested-null-before-empty','[null]','[[]]'),('array-length','[9]','[0,0]'),('object-count','{"z":0}','{"a":0,"b":0}'),('object-key-length','{"b":0,"aa":0}','{"aa":0,"b":0}')]
+        for label,left,right in comparisons:
+            operator='='if label=='object-key-length'else'<'
+            add('jsonb-'+label,'jsonb-order','query',"SELECT '"+left+"'::jsonb "+operator+" '"+right+"'::jsonb AS result",expected={'result':True})
+        jbbase=add('jsonb-base','jsonb-stored','ddl',table('JbValues',[f'Id {integer} NOT NULL','V jsonb']))
+        values=['null','""','"a"','"aa"','-1','0','1','1.0','false','true','[]','[0]','[1]','[0,0]','[null]','[[]]','{}','{"b":0}','{"a":1}','{"a":1,"b":0}']
+        tuples=['('+str(i)+",'"+value+"'::jsonb)"for i,value in enumerate(values,1)]+['(21,NULL)',"(22,'{\"a\":0,\"a\":1}'::jsonb)"]
+        jbseed=add('jsonb-seed','jsonb-stored','dml',statements=['INSERT INTO JbValues(Id,V) VALUES '+','.join(tuples)],requires=[jbbase])
+        add('jsonb-stored-order','jsonb-stored','query','SELECT Id AS id,V AS v FROM JbValues ORDER BY V NULLS FIRST,Id',requires=[jbseed],expected_ids=[21,11,1,2,3,4,5,6,7,8,9,10,15,12,13,16,14,17,19,22,18,20])
+        add('jsonb-stored-group','jsonb-stored','query','SELECT MIN(Id) AS first_id,MAX(Id) AS last_id,COUNT(*) AS n FROM JbValues GROUP BY V ORDER BY first_id',requires=[jbseed])
+        add('jsonb-stored-distinct-count','jsonb-stored','query','SELECT COUNT(DISTINCT V) AS n FROM JbValues',requires=[jbseed],expected={'n':'19'})
+        add('jsonb-stored-join','jsonb-stored','query','SELECT COUNT(*) AS n FROM JbValues a JOIN JbValues b ON a.V=b.V',requires=[jbseed],expected={'n':'25'})
+        add('jsonb-stored-minmax','jsonb-exploratory','query','SELECT MIN(V) AS minimum,MAX(V) AS maximum FROM JbValues',requires=[jbseed],control='MIN/MAX not explicitly promised by comparison/sorting section')
+        add('jsonb-sql-null-control','jsonb-order','query',"SELECT NULL::jsonb IS NULL AS sql_null,'null'::jsonb IS NULL AS json_null",expected={'sql_null':True,'json_null':False})
+    add('final-ddl-export','metadata','ddl-export')
+    plan={'dialect':dialect,'status':'prepared_execution_input','sources':sources,'scope':'Owned fresh database; direct API. No performance, fleet, external remote-function, Data Boost or provisioning claim','steps':steps}
+    (out/('weekly-'+dialect+'-plan.json')).write_text(json.dumps(plan,indent=2)+'\n')
+    print(dialect,len(steps),'steps',sum(step['kind']=='ddl'for step in steps),'DDL cases')

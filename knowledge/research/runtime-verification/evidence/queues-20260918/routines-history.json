@@ -1,0 +1,108 @@
+{
+  "retrieved_on": "2026-09-18",
+  "archive_url": "https://web.archive.org/web/20240526142656/https://cloud.google.com/spanner/docs/information-schema",
+  "archive_page_last_updated": "2024-05-23",
+  "archive_full_html_sha256": "3dfb7293b6dca8192c98446d055e8f420ba23a033406b9b9a36f098d8e08dec6",
+  "emulator_commit": "cc0e5b3b2a9fc57aadd5ec394a9ad6b17fbbb379",
+  "emulator_commit_date": "2023-07-31",
+  "emulator_path": "backend/query/info_schema_columns_metadata.csv",
+  "emulator_rows": [
+    {
+      "line": 140,
+      "text": "PARAMETERS,SPECIFIC_CATALOG,NO,STRING(MAX)"
+    },
+    {
+      "line": 141,
+      "text": "PARAMETERS,SPECIFIC_SCHEMA,NO,STRING(MAX)"
+    },
+    {
+      "line": 142,
+      "text": "PARAMETERS,SPECIFIC_NAME,NO,STRING(MAX)"
+    },
+    {
+      "line": 143,
+      "text": "PARAMETERS,ORDINAL_POSITION,NO,INT64"
+    },
+    {
+      "line": 144,
+      "text": "PARAMETERS,PARAMETER_NAME,NO,STRING(MAX)"
+    },
+    {
+      "line": 145,
+      "text": "PARAMETERS,DATA_TYPE,NO,STRING(MAX)"
+    },
+    {
+      "line": 181,
+      "text": "ROUTINES,SPECIFIC_CATALOG,NO,STRING(MAX)"
+    },
+    {
+      "line": 182,
+      "text": "ROUTINES,SPECIFIC_SCHEMA,NO,STRING(MAX)"
+    },
+    {
+      "line": 183,
+      "text": "ROUTINES,SPECIFIC_NAME,NO,STRING(MAX)"
+    },
+    {
+      "line": 184,
+      "text": "ROUTINES,ROUTINE_CATALOG,NO,STRING(MAX)"
+    },
+    {
+      "line": 185,
+      "text": "ROUTINES,ROUTINE_SCHEMA,NO,STRING(MAX)"
+    },
+    {
+      "line": 186,
+      "text": "ROUTINES,ROUTINE_NAME,NO,STRING(MAX)"
+    },
+    {
+      "line": 187,
+      "text": "ROUTINES,ROUTINE_TYPE,NO,STRING(MAX)"
+    },
+    {
+      "line": 188,
+      "text": "ROUTINES,DATA_TYPE,NO,STRING(MAX)"
+    },
+    {
+      "line": 189,
+      "text": "ROUTINES,ROUTINE_BODY,NO,STRING(MAX)"
+    },
+    {
+      "line": 190,
+      "text": "ROUTINES,ROUTINE_DEFINITION,NO,STRING(MAX)"
+    },
+    {
+      "line": 191,
+      "text": "ROUTINES,SECURITY_TYPE,NO,STRING(MAX)"
+    },
+    {
+      "line": 192,
+      "text": "ROUTINE_OPTIONS,SPECIFIC_CATALOG,NO,STRING(MAX)"
+    },
+    {
+      "line": 193,
+      "text": "ROUTINE_OPTIONS,SPECIFIC_SCHEMA,NO,STRING(MAX)"
+    },
+    {
+      "line": 194,
+      "text": "ROUTINE_OPTIONS,SPECIFIC_NAME,NO,STRING(MAX)"
+    },
+    {
+      "line": 195,
+      "text": "ROUTINE_OPTIONS,OPTION_NAME,NO,STRING(MAX)"
+    },
+    {
+      "line": 196,
+      "text": "ROUTINE_OPTIONS,OPTION_TYPE,NO,STRING(MAX)"
+    },
+    {
+      "line": 197,
+      "text": "ROUTINE_OPTIONS,OPTION_VALUE,NO,STRING(MAX)"
+    }
+  ],
+  "limits": [
+    "Emulator metadata definitions do not establish managed rollout date or row population.",
+    "Earlier translated snapshots lack ROUTINES documentation; absence in documentation does not establish absence in service.",
+    "Exact initial UDF release date was not established by the retrieved release notes."
+  ]
+}

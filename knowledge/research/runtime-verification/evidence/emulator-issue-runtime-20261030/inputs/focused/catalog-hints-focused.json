@@ -1,0 +1,49 @@
+{
+  "dialect": "google",
+  "steps": [
+    {
+      "label": "view-table",
+      "family": "issue-233",
+      "kind": "ddl",
+      "sql": "CREATE TABLE ViewBase(id INT64 NOT NULL) PRIMARY KEY(id)",
+      "requires": [],
+      "timeout_seconds": 30
+    },
+    {
+      "label": "view-INVOKER",
+      "family": "issue-233",
+      "kind": "ddl",
+      "sql": "CREATE OR REPLACE VIEW VINVOKER SQL SECURITY INVOKER AS SELECT b.id FROM ViewBase AS b",
+      "requires": [
+        "view-table"
+      ],
+      "timeout_seconds": 30
+    },
+    {
+      "label": "view-DEFINER",
+      "family": "issue-233",
+      "kind": "ddl",
+      "sql": "CREATE OR REPLACE VIEW VDEFINER SQL SECURITY DEFINER AS SELECT b.id FROM ViewBase AS b",
+      "requires": [
+        "view-table"
+      ],
+      "timeout_seconds": 30
+    },
+    {
+      "label": "create-role",
+      "family": "issue-350",
+      "kind": "ddl",
+      "sql": "CREATE ROLE ProbeRole",
+      "requires": [],
+      "timeout_seconds": 30
+    },
+    {
+      "label": "export-roles",
+      "family": "issue-350",
+      "kind": "ddl-export",
+      "sql": "",
+      "requires": [],
+      "timeout_seconds": 15
+    }
+  ]
+}

@@ -1,0 +1,3174 @@
+{
+  "executed_cases": 136,
+  "family_codes": {
+    "hll": {
+      "OK": 23,
+      "OutOfRange": 4,
+      "InvalidArgument": 5
+    },
+    "gql_column_propagation": {
+      "OK": 36,
+      "InvalidArgument": 4
+    },
+    "json_search_equality": {
+      "OK": 57
+    },
+    "dynamic_json_properties": {
+      "OK": 5,
+      "InvalidArgument": 1
+    },
+    "hash_documentation": {
+      "OK": 1
+    }
+  },
+  "hll": [
+    {
+      "label": "google-approx-distinct",
+      "code": "OK",
+      "error": "",
+      "rows": [
+        {
+          "estimate": "2"
+        }
+      ]
+    },
+    {
+      "label": "google-hll-precision-9",
+      "code": "OutOfRange",
+      "error": "spanner: code = \"OutOfRange\", desc = \"HLL_COUNT.INIT precision must be between 10 and 24, but is 9.\", requestID = \"<redacted>\"",
+      "rows": []
+    },
+    {
+      "label": "google-hll-precision-10",
+      "code": "OK",
+      "error": "",
+      "rows": [
+        {
+          "estimate": "2"
+        }
+      ]
+    },
+    {
+      "label": "google-hll-precision-15",
+      "code": "OK",
+      "error": "",
+      "rows": [
+        {
+          "estimate": "2"
+        }
+      ]
+    },
+    {
+      "label": "google-hll-precision-24",
+      "code": "OK",
+      "error": "",
+      "rows": [
+        {
+          "estimate": "2"
+        }
+      ]
+    },
+    {
+      "label": "google-hll-precision-25",
+      "code": "OutOfRange",
+      "error": "spanner: code = \"OutOfRange\", desc = \"HLL_COUNT.INIT precision must be between 10 and 24, but is 25.\", requestID = \"<redacted>\"",
+      "rows": []
+    },
+    {
+      "label": "google-hll-input-int",
+      "code": "OK",
+      "error": "",
+      "rows": [
+        {
+          "estimate": "1"
+        }
+      ]
+    },
+    {
+      "label": "google-hll-input-string",
+      "code": "OK",
+      "error": "",
+      "rows": [
+        {
+          "estimate": "1"
+        }
+      ]
+    },
+    {
+      "label": "google-hll-input-bytes",
+      "code": "OK",
+      "error": "",
+      "rows": [
+        {
+          "estimate": "1"
+        }
+      ]
+    },
+    {
+      "label": "google-hll-input-numeric",
+      "code": "OK",
+      "error": "",
+      "rows": [
+        {
+          "estimate": "1"
+        }
+      ]
+    },
+    {
+      "label": "google-hll-input-bool",
+      "code": "InvalidArgument",
+      "error": "spanner: code = \"InvalidArgument\", desc = \"No matching signature for aggregate function HLL_COUNT.INIT\\\\n  Argument types: BOOL\\\\n  Signature: HLL_COUNT.INIT(INT64, [INT64])\\\\n    Argument 1: Unable to coerce type BOOL to expected type INT64\\\\n  Signature: HLL_COUNT.INIT(STRING, [INT64])\\\\n    Argument 1: Unable to coerce type BOOL to expected type STRING\\\\n  Signature: HLL_COUNT.INIT(BYTES, [INT64])\\\\n    Argument 1: Unable to coerce type BOOL to expected type BYTES\\\\n  Signature: HLL_COUNT.INIT(NUMERIC, [INT64])\\\\n    Argument 1: Unable to coerce type BOOL to expected type NUMERIC [at 1:26]\\\\nSELECT HLL_COUNT.EXTRACT(HLL_COUNT.INIT(v)) AS estimate FROM (SELECT TRUE AS v)\\\\n                         ^\", requestID = \"<redacted>\"",
+      "rows": []
+    },
+    {
+      "label": "google-hll-input-interval",
+      "code": "InvalidArgument",
+      "error": "spanner: code = \"InvalidArgument\", desc = \"No matching signature for aggregate function HLL_COUNT.INIT\\\\n  Argument types: INTERVAL\\\\n  Signature: HLL_COUNT.INIT(INT64, [INT64])\\\\n    Argument 1: Unable to coerce type INTERVAL to expected type INT64\\\\n  Signature: HLL_COUNT.INIT(STRING, [INT64])\\\\n    Argument 1: Unable to coerce type INTERVAL to expected type STRING\\\\n  Signature: HLL_COUNT.INIT(BYTES, [INT64])\\\\n    Argument 1: Unable to coerce type INTERVAL to expected type BYTES\\\\n  Signature: HLL_COUNT.INIT(NUMERIC, [INT64])\\\\n    Argument 1: Unable to coerce type INTERVAL to expected type NUMERIC [at 1:26]\\\\nSELECT HLL_COUNT.EXTRACT(HLL_COUNT.INIT(v)) AS estimate FROM (SELECT INTERVAL...\\\\n                         ^\", requestID = \"<redacted>\"",
+      "rows": []
+    },
+    {
+      "label": "google-hll-extract-null",
+      "code": "OK",
+      "error": "",
+      "rows": [
+        {
+          "estimate": "0"
+        }
+      ]
+    },
+    {
+      "label": "google-hll-init-null",
+      "code": "InvalidArgument",
+      "error": "spanner: code = \"InvalidArgument\", desc = \"Aggregate function HLL_COUNT.INIT not allowed in SELECT without FROM clause [at 1:8]\\\\nSELECT HLL_COUNT.INIT(CAST(NULL AS INT64)) AS sketch\\\\n       ^\", requestID = \"<redacted>\"",
+      "rows": []
+    },
+    {
+      "label": "google-hll-merge",
+      "code": "OK",
+      "error": "",
+      "rows": [
+        {
+          "estimate": "2"
+        }
+      ]
+    },
+    {
+      "label": "google-hll-merge-partial",
+      "code": "OK",
+      "error": "",
+      "rows": [
+        {
+          "estimate": "2"
+        }
+      ]
+    },
+    {
+      "label": "pg-approx-distinct",
+      "code": "OK",
+      "error": "",
+      "rows": [
+        {
+          "estimate": "2"
+        }
+      ]
+    },
+    {
+      "label": "pg-hll-precision-9",
+      "code": "OutOfRange",
+      "error": "spanner: code = \"OutOfRange\", desc = \"HLL_COUNT.INIT precision must be between 10 and 24, but is 9.\", requestID = \"<redacted>\"",
+      "rows": []
+    },
+    {
+      "label": "pg-hll-precision-10",
+      "code": "OK",
+      "error": "",
+      "rows": [
+        {
+          "estimate": "2"
+        }
+      ]
+    },
+    {
+      "label": "pg-hll-precision-15",
+      "code": "OK",
+      "error": "",
+      "rows": [
+        {
+          "estimate": "2"
+        }
+      ]
+    },
+    {
+      "label": "pg-hll-precision-24",
+      "code": "OK",
+      "error": "",
+      "rows": [
+        {
+          "estimate": "2"
+        }
+      ]
+    },
+    {
+      "label": "pg-hll-precision-25",
+      "code": "OutOfRange",
+      "error": "spanner: code = \"OutOfRange\", desc = \"HLL_COUNT.INIT precision must be between 10 and 24, but is 25.\", requestID = \"<redacted>\"",
+      "rows": []
+    },
+    {
+      "label": "pg-hll-input-int",
+      "code": "OK",
+      "error": "",
+      "rows": [
+        {
+          "estimate": "1"
+        }
+      ]
+    },
+    {
+      "label": "pg-hll-input-string",
+      "code": "OK",
+      "error": "",
+      "rows": [
+        {
+          "estimate": "1"
+        }
+      ]
+    },
+    {
+      "label": "pg-hll-input-bytes",
+      "code": "OK",
+      "error": "",
+      "rows": [
+        {
+          "estimate": "1"
+        }
+      ]
+    },
+    {
+      "label": "pg-hll-input-numeric",
+      "code": "OK",
+      "error": "",
+      "rows": [
+        {
+          "estimate": "1"
+        }
+      ]
+    },
+    {
+      "label": "pg-hll-input-bool",
+      "code": "InvalidArgument",
+      "error": "spanner: code = \"InvalidArgument\", desc = \"[ERROR] function hll_count.init(boolean) does not exist\\\\nHint: No function matches the given name and argument types. You might need to add explicit type casts.\", requestID = \"<redacted>\"",
+      "rows": []
+    },
+    {
+      "label": "pg-hll-input-interval",
+      "code": "InvalidArgument",
+      "error": "spanner: code = \"InvalidArgument\", desc = \"[ERROR] function hll_count.init(interval) does not exist\\\\nHint: No function matches the given name and argument types. You might need to add explicit type casts.\", requestID = \"<redacted>\"",
+      "rows": []
+    },
+    {
+      "label": "pg-hll-extract-null",
+      "code": "OK",
+      "error": "",
+      "rows": [
+        {
+          "estimate": "0"
+        }
+      ]
+    },
+    {
+      "label": "pg-hll-init-null",
+      "code": "OK",
+      "error": "",
+      "rows": [
+        {
+          "sketch": null
+        }
+      ]
+    },
+    {
+      "label": "pg-hll-merge",
+      "code": "OK",
+      "error": "",
+      "rows": [
+        {
+          "estimate": "2"
+        }
+      ]
+    },
+    {
+      "label": "pg-hll-merge-partial",
+      "code": "OK",
+      "error": "",
+      "rows": [
+        {
+          "estimate": "2"
+        }
+      ]
+    }
+  ],
+  "gql": [
+    {
+      "label": "gql-full-outer-union-all",
+      "code": "OK",
+      "error": "",
+      "rows": [
+        {
+          "common": "10",
+          "left_only": "1",
+          "right_only": null
+        },
+        {
+          "common": "10",
+          "left_only": null,
+          "right_only": "2"
+        }
+      ],
+      "columns": [
+        "left_only",
+        "common",
+        "right_only"
+      ],
+      "expected_rows": [
+        {
+          "left_only": "1",
+          "common": "10",
+          "right_only": null
+        },
+        {
+          "left_only": null,
+          "common": "10",
+          "right_only": "2"
+        }
+      ],
+      "expected_columns": [
+        "left_only",
+        "common",
+        "right_only"
+      ],
+      "matches_expected": true
+    },
+    {
+      "label": "gql-full-outer-union-distinct",
+      "code": "OK",
+      "error": "",
+      "rows": [
+        {
+          "common": "10",
+          "left_only": null,
+          "right_only": "2"
+        },
+        {
+          "common": "10",
+          "left_only": "1",
+          "right_only": null
+        }
+      ],
+      "columns": [
+        "left_only",
+        "common",
+        "right_only"
+      ],
+      "expected_rows": [
+        {
+          "left_only": "1",
+          "common": "10",
+          "right_only": null
+        },
+        {
+          "left_only": null,
+          "common": "10",
+          "right_only": "2"
+        }
+      ],
+      "expected_columns": [
+        "left_only",
+        "common",
+        "right_only"
+      ],
+      "matches_expected": true
+    },
+    {
+      "label": "gql-full-outer-intersect-all",
+      "code": "OK",
+      "error": "",
+      "rows": [],
+      "columns": [
+        "left_only",
+        "common",
+        "right_only"
+      ],
+      "expected_rows": [],
+      "expected_columns": [
+        "left_only",
+        "common",
+        "right_only"
+      ],
+      "matches_expected": true
+    },
+    {
+      "label": "gql-full-outer-intersect-distinct",
+      "code": "OK",
+      "error": "",
+      "rows": [],
+      "columns": [
+        "left_only",
+        "common",
+        "right_only"
+      ],
+      "expected_rows": [],
+      "expected_columns": [
+        "left_only",
+        "common",
+        "right_only"
+      ],
+      "matches_expected": true
+    },
+    {
+      "label": "gql-full-outer-except-all",
+      "code": "OK",
+      "error": "",
+      "rows": [
+        {
+          "common": "10",
+          "left_only": "1",
+          "right_only": null
+        }
+      ],
+      "columns": [
+        "left_only",
+        "common",
+        "right_only"
+      ],
+      "expected_rows": [
+        {
+          "left_only": "1",
+          "common": "10",
+          "right_only": null
+        }
+      ],
+      "expected_columns": [
+        "left_only",
+        "common",
+        "right_only"
+      ],
+      "matches_expected": true
+    },
+    {
+      "label": "gql-full-outer-except-distinct",
+      "code": "OK",
+      "error": "",
+      "rows": [
+        {
+          "common": "10",
+          "left_only": "1",
+          "right_only": null
+        }
+      ],
+      "columns": [
+        "left_only",
+        "common",
+        "right_only"
+      ],
+      "expected_rows": [
+        {
+          "left_only": "1",
+          "common": "10",
+          "right_only": null
+        }
+      ],
+      "expected_columns": [
+        "left_only",
+        "common",
+        "right_only"
+      ],
+      "matches_expected": true
+    },
+    {
+      "label": "gql-full-union-all",
+      "code": "OK",
+      "error": "",
+      "rows": [
+        {
+          "common": "10",
+          "left_only": "1",
+          "right_only": null
+        },
+        {
+          "common": "10",
+          "left_only": null,
+          "right_only": "2"
+        }
+      ],
+      "columns": [
+        "left_only",
+        "common",
+        "right_only"
+      ],
+      "expected_rows": [
+        {
+          "left_only": "1",
+          "common": "10",
+          "right_only": null
+        },
+        {
+          "left_only": null,
+          "common": "10",
+          "right_only": "2"
+        }
+      ],
+      "expected_columns": [
+        "left_only",
+        "common",
+        "right_only"
+      ],
+      "matches_expected": true
+    },
+    {
+      "label": "gql-full-union-distinct",
+      "code": "OK",
+      "error": "",
+      "rows": [
+        {
+          "common": "10",
+          "left_only": null,
+          "right_only": "2"
+        },
+        {
+          "common": "10",
+          "left_only": "1",
+          "right_only": null
+        }
+      ],
+      "columns": [
+        "left_only",
+        "common",
+        "right_only"
+      ],
+      "expected_rows": [
+        {
+          "left_only": "1",
+          "common": "10",
+          "right_only": null
+        },
+        {
+          "left_only": null,
+          "common": "10",
+          "right_only": "2"
+        }
+      ],
+      "expected_columns": [
+        "left_only",
+        "common",
+        "right_only"
+      ],
+      "matches_expected": true
+    },
+    {
+      "label": "gql-full-intersect-all",
+      "code": "OK",
+      "error": "",
+      "rows": [],
+      "columns": [
+        "left_only",
+        "common",
+        "right_only"
+      ],
+      "expected_rows": [],
+      "expected_columns": [
+        "left_only",
+        "common",
+        "right_only"
+      ],
+      "matches_expected": true
+    },
+    {
+      "label": "gql-full-intersect-distinct",
+      "code": "OK",
+      "error": "",
+      "rows": [],
+      "columns": [
+        "left_only",
+        "common",
+        "right_only"
+      ],
+      "expected_rows": [],
+      "expected_columns": [
+        "left_only",
+        "common",
+        "right_only"
+      ],
+      "matches_expected": true
+    },
+    {
+      "label": "gql-full-except-all",
+      "code": "OK",
+      "error": "",
+      "rows": [
+        {
+          "common": "10",
+          "left_only": "1",
+          "right_only": null
+        }
+      ],
+      "columns": [
+        "left_only",
+        "common",
+        "right_only"
+      ],
+      "expected_rows": [
+        {
+          "left_only": "1",
+          "common": "10",
+          "right_only": null
+        }
+      ],
+      "expected_columns": [
+        "left_only",
+        "common",
+        "right_only"
+      ],
+      "matches_expected": true
+    },
+    {
+      "label": "gql-full-except-distinct",
+      "code": "OK",
+      "error": "",
+      "rows": [
+        {
+          "common": "10",
+          "left_only": "1",
+          "right_only": null
+        }
+      ],
+      "columns": [
+        "left_only",
+        "common",
+        "right_only"
+      ],
+      "expected_rows": [
+        {
+          "left_only": "1",
+          "common": "10",
+          "right_only": null
+        }
+      ],
+      "expected_columns": [
+        "left_only",
+        "common",
+        "right_only"
+      ],
+      "matches_expected": true
+    },
+    {
+      "label": "gql-outer-union-all",
+      "code": "OK",
+      "error": "",
+      "rows": [
+        {
+          "common": "10",
+          "left_only": "1",
+          "right_only": null
+        },
+        {
+          "common": "10",
+          "left_only": null,
+          "right_only": "2"
+        }
+      ],
+      "columns": [
+        "left_only",
+        "common",
+        "right_only"
+      ],
+      "expected_rows": [
+        {
+          "left_only": "1",
+          "common": "10",
+          "right_only": null
+        },
+        {
+          "left_only": null,
+          "common": "10",
+          "right_only": "2"
+        }
+      ],
+      "expected_columns": [
+        "left_only",
+        "common",
+        "right_only"
+      ],
+      "matches_expected": true
+    },
+    {
+      "label": "gql-outer-union-distinct",
+      "code": "OK",
+      "error": "",
+      "rows": [
+        {
+          "common": "10",
+          "left_only": null,
+          "right_only": "2"
+        },
+        {
+          "common": "10",
+          "left_only": "1",
+          "right_only": null
+        }
+      ],
+      "columns": [
+        "left_only",
+        "common",
+        "right_only"
+      ],
+      "expected_rows": [
+        {
+          "left_only": "1",
+          "common": "10",
+          "right_only": null
+        },
+        {
+          "left_only": null,
+          "common": "10",
+          "right_only": "2"
+        }
+      ],
+      "expected_columns": [
+        "left_only",
+        "common",
+        "right_only"
+      ],
+      "matches_expected": true
+    },
+    {
+      "label": "gql-outer-intersect-all",
+      "code": "OK",
+      "error": "",
+      "rows": [],
+      "columns": [
+        "left_only",
+        "common",
+        "right_only"
+      ],
+      "expected_rows": [],
+      "expected_columns": [
+        "left_only",
+        "common",
+        "right_only"
+      ],
+      "matches_expected": true
+    },
+    {
+      "label": "gql-outer-intersect-distinct",
+      "code": "OK",
+      "error": "",
+      "rows": [],
+      "columns": [
+        "left_only",
+        "common",
+        "right_only"
+      ],
+      "expected_rows": [],
+      "expected_columns": [
+        "left_only",
+        "common",
+        "right_only"
+      ],
+      "matches_expected": true
+    },
+    {
+      "label": "gql-outer-except-all",
+      "code": "OK",
+      "error": "",
+      "rows": [
+        {
+          "common": "10",
+          "left_only": "1",
+          "right_only": null
+        }
+      ],
+      "columns": [
+        "left_only",
+        "common",
+        "right_only"
+      ],
+      "expected_rows": [
+        {
+          "left_only": "1",
+          "common": "10",
+          "right_only": null
+        }
+      ],
+      "expected_columns": [
+        "left_only",
+        "common",
+        "right_only"
+      ],
+      "matches_expected": true
+    },
+    {
+      "label": "gql-outer-except-distinct",
+      "code": "OK",
+      "error": "",
+      "rows": [
+        {
+          "common": "10",
+          "left_only": "1",
+          "right_only": null
+        }
+      ],
+      "columns": [
+        "left_only",
+        "common",
+        "right_only"
+      ],
+      "expected_rows": [
+        {
+          "left_only": "1",
+          "common": "10",
+          "right_only": null
+        }
+      ],
+      "expected_columns": [
+        "left_only",
+        "common",
+        "right_only"
+      ],
+      "matches_expected": true
+    },
+    {
+      "label": "gql-left-outer-union-all",
+      "code": "OK",
+      "error": "",
+      "rows": [
+        {
+          "common": "10",
+          "left_only": "1"
+        },
+        {
+          "common": "10",
+          "left_only": null
+        }
+      ],
+      "columns": [
+        "left_only",
+        "common"
+      ],
+      "expected_rows": [
+        {
+          "left_only": "1",
+          "common": "10"
+        },
+        {
+          "left_only": null,
+          "common": "10"
+        }
+      ],
+      "expected_columns": [
+        "left_only",
+        "common"
+      ],
+      "matches_expected": true
+    },
+    {
+      "label": "gql-left-outer-union-distinct",
+      "code": "OK",
+      "error": "",
+      "rows": [
+        {
+          "common": "10",
+          "left_only": "1"
+        },
+        {
+          "common": "10",
+          "left_only": null
+        }
+      ],
+      "columns": [
+        "left_only",
+        "common"
+      ],
+      "expected_rows": [
+        {
+          "left_only": "1",
+          "common": "10"
+        },
+        {
+          "left_only": null,
+          "common": "10"
+        }
+      ],
+      "expected_columns": [
+        "left_only",
+        "common"
+      ],
+      "matches_expected": true
+    },
+    {
+      "label": "gql-left-outer-intersect-all",
+      "code": "OK",
+      "error": "",
+      "rows": [],
+      "columns": [
+        "left_only",
+        "common"
+      ],
+      "expected_rows": [],
+      "expected_columns": [
+        "left_only",
+        "common"
+      ],
+      "matches_expected": true
+    },
+    {
+      "label": "gql-left-outer-intersect-distinct",
+      "code": "OK",
+      "error": "",
+      "rows": [],
+      "columns": [
+        "left_only",
+        "common"
+      ],
+      "expected_rows": [],
+      "expected_columns": [
+        "left_only",
+        "common"
+      ],
+      "matches_expected": true
+    },
+    {
+      "label": "gql-left-outer-except-all",
+      "code": "OK",
+      "error": "",
+      "rows": [
+        {
+          "common": "10",
+          "left_only": "1"
+        }
+      ],
+      "columns": [
+        "left_only",
+        "common"
+      ],
+      "expected_rows": [
+        {
+          "left_only": "1",
+          "common": "10"
+        }
+      ],
+      "expected_columns": [
+        "left_only",
+        "common"
+      ],
+      "matches_expected": true
+    },
+    {
+      "label": "gql-left-outer-except-distinct",
+      "code": "OK",
+      "error": "",
+      "rows": [
+        {
+          "common": "10",
+          "left_only": "1"
+        }
+      ],
+      "columns": [
+        "left_only",
+        "common"
+      ],
+      "expected_rows": [
+        {
+          "left_only": "1",
+          "common": "10"
+        }
+      ],
+      "expected_columns": [
+        "left_only",
+        "common"
+      ],
+      "matches_expected": true
+    },
+    {
+      "label": "gql-left-union-all",
+      "code": "OK",
+      "error": "",
+      "rows": [
+        {
+          "common": "10",
+          "left_only": "1"
+        },
+        {
+          "common": "10",
+          "left_only": null
+        }
+      ],
+      "columns": [
+        "left_only",
+        "common"
+      ],
+      "expected_rows": [
+        {
+          "left_only": "1",
+          "common": "10"
+        },
+        {
+          "left_only": null,
+          "common": "10"
+        }
+      ],
+      "expected_columns": [
+        "left_only",
+        "common"
+      ],
+      "matches_expected": true
+    },
+    {
+      "label": "gql-left-union-distinct",
+      "code": "OK",
+      "error": "",
+      "rows": [
+        {
+          "common": "10",
+          "left_only": "1"
+        },
+        {
+          "common": "10",
+          "left_only": null
+        }
+      ],
+      "columns": [
+        "left_only",
+        "common"
+      ],
+      "expected_rows": [
+        {
+          "left_only": "1",
+          "common": "10"
+        },
+        {
+          "left_only": null,
+          "common": "10"
+        }
+      ],
+      "expected_columns": [
+        "left_only",
+        "common"
+      ],
+      "matches_expected": true
+    },
+    {
+      "label": "gql-left-intersect-all",
+      "code": "OK",
+      "error": "",
+      "rows": [],
+      "columns": [
+        "left_only",
+        "common"
+      ],
+      "expected_rows": [],
+      "expected_columns": [
+        "left_only",
+        "common"
+      ],
+      "matches_expected": true
+    },
+    {
+      "label": "gql-left-intersect-distinct",
+      "code": "OK",
+      "error": "",
+      "rows": [],
+      "columns": [
+        "left_only",
+        "common"
+      ],
+      "expected_rows": [],
+      "expected_columns": [
+        "left_only",
+        "common"
+      ],
+      "matches_expected": true
+    },
+    {
+      "label": "gql-left-except-all",
+      "code": "OK",
+      "error": "",
+      "rows": [
+        {
+          "common": "10",
+          "left_only": "1"
+        }
+      ],
+      "columns": [
+        "left_only",
+        "common"
+      ],
+      "expected_rows": [
+        {
+          "left_only": "1",
+          "common": "10"
+        }
+      ],
+      "expected_columns": [
+        "left_only",
+        "common"
+      ],
+      "matches_expected": true
+    },
+    {
+      "label": "gql-left-except-distinct",
+      "code": "OK",
+      "error": "",
+      "rows": [
+        {
+          "common": "10",
+          "left_only": "1"
+        }
+      ],
+      "columns": [
+        "left_only",
+        "common"
+      ],
+      "expected_rows": [
+        {
+          "left_only": "1",
+          "common": "10"
+        }
+      ],
+      "expected_columns": [
+        "left_only",
+        "common"
+      ],
+      "matches_expected": true
+    },
+    {
+      "label": "gql-inner-union-all",
+      "code": "OK",
+      "error": "",
+      "rows": [
+        {
+          "common": "10"
+        },
+        {
+          "common": "10"
+        }
+      ],
+      "columns": [
+        "common"
+      ],
+      "expected_rows": [
+        {
+          "common": "10"
+        },
+        {
+          "common": "10"
+        }
+      ],
+      "expected_columns": [
+        "common"
+      ],
+      "matches_expected": true
+    },
+    {
+      "label": "gql-inner-union-distinct",
+      "code": "OK",
+      "error": "",
+      "rows": [
+        {
+          "common": "10"
+        }
+      ],
+      "columns": [
+        "common"
+      ],
+      "expected_rows": [
+        {
+          "common": "10"
+        }
+      ],
+      "expected_columns": [
+        "common"
+      ],
+      "matches_expected": true
+    },
+    {
+      "label": "gql-inner-intersect-all",
+      "code": "OK",
+      "error": "",
+      "rows": [
+        {
+          "common": "10"
+        }
+      ],
+      "columns": [
+        "common"
+      ],
+      "expected_rows": [
+        {
+          "common": "10"
+        }
+      ],
+      "expected_columns": [
+        "common"
+      ],
+      "matches_expected": true
+    },
+    {
+      "label": "gql-inner-intersect-distinct",
+      "code": "OK",
+      "error": "",
+      "rows": [
+        {
+          "common": "10"
+        }
+      ],
+      "columns": [
+        "common"
+      ],
+      "expected_rows": [
+        {
+          "common": "10"
+        }
+      ],
+      "expected_columns": [
+        "common"
+      ],
+      "matches_expected": true
+    },
+    {
+      "label": "gql-inner-except-all",
+      "code": "OK",
+      "error": "",
+      "rows": [],
+      "columns": [
+        "common"
+      ],
+      "expected_rows": [],
+      "expected_columns": [
+        "common"
+      ],
+      "matches_expected": true
+    },
+    {
+      "label": "gql-inner-except-distinct",
+      "code": "OK",
+      "error": "",
+      "rows": [],
+      "columns": [
+        "common"
+      ],
+      "expected_rows": [],
+      "expected_columns": [
+        "common"
+      ],
+      "matches_expected": true
+    },
+    {
+      "label": "gql-default-name-mismatch",
+      "code": "InvalidArgument",
+      "error": "spanner: code = \"InvalidArgument\", desc = \"GQL set operation requires all input queries to have identical column names when column propagation mode is default (STRICT), but the first query has [left_only] and query 2 has [right_only] [at 1:43]\\\\nGRAPH DocDeltaGraph RETURN 1 AS left_only UNION ALL RETURN 2 AS right_only\\\\n                                          ^\", requestID = \"<redacted>\"",
+      "rows": [],
+      "columns": []
+    },
+    {
+      "label": "gql-inner-no-common",
+      "code": "InvalidArgument",
+      "error": "spanner: code = \"InvalidArgument\", desc = \"GQL set operation using INNER requires that the intersection of columns from input queries is non-empty [at 1:43]\\\\nGRAPH DocDeltaGraph RETURN 1 AS left_only INNER UNION ALL RETURN 2 AS right_only\\\\n                                          ^\", requestID = \"<redacted>\"",
+      "rows": [],
+      "columns": []
+    },
+    {
+      "label": "gql-malformed-rhs",
+      "code": "InvalidArgument",
+      "error": "spanner: code = \"InvalidArgument\", desc = \"Syntax error: Unexpected end of statement [at 1:55]\\\\nGRAPH DocDeltaGraph RETURN 1 AS x FULL OUTER UNION ALL\\\\n                                                      ^\", requestID = \"<redacted>\"",
+      "rows": [],
+      "columns": []
+    },
+    {
+      "label": "gql-malformed-alias",
+      "code": "InvalidArgument",
+      "error": "spanner: code = \"InvalidArgument\", desc = \"Syntax error: Unexpected end of statement [at 1:67]\\\\nGRAPH DocDeltaGraph RETURN 1 AS x FULL OUTER UNION ALL RETURN 2 AS\\\\n                                                                  ^\", requestID = \"<redacted>\"",
+      "rows": [],
+      "columns": []
+    }
+  ],
+  "search": [
+    {
+      "label": "google-json-document-equal",
+      "variants": {
+        "automatic": {
+          "code": "OK",
+          "error": "",
+          "rows": [
+            {
+              "Id": "1"
+            }
+          ],
+          "operators": [
+            "Distributed Union",
+            "Serialize Result",
+            "Sort",
+            "Distributed Union",
+            "Scan"
+          ],
+          "scan_metadata": [
+            {
+              "execution_method": "Row",
+              "scan_method": "Row",
+              "scan_target": "DocDeltaSearch",
+              "scan_type": "SearchIndexScan"
+            }
+          ],
+          "uses_search_index_scan": true,
+          "full_search_scan": false
+        },
+        "forced-search": {
+          "code": "OK",
+          "error": "",
+          "rows": [
+            {
+              "Id": "1"
+            }
+          ],
+          "operators": [
+            "Distributed Union",
+            "Serialize Result",
+            "Sort",
+            "Distributed Union",
+            "Scan"
+          ],
+          "scan_metadata": [
+            {
+              "execution_method": "Row",
+              "scan_method": "Row",
+              "scan_target": "DocDeltaSearch",
+              "scan_type": "SearchIndexScan"
+            }
+          ],
+          "uses_search_index_scan": true,
+          "full_search_scan": false
+        },
+        "forced-base": {
+          "code": "OK",
+          "error": "",
+          "rows": [
+            {
+              "Id": "1"
+            }
+          ],
+          "operators": [
+            "Distributed Union",
+            "Distributed Union",
+            "Serialize Result",
+            "Filter Scan",
+            "Scan"
+          ],
+          "scan_metadata": [
+            {
+              "Full scan": "true",
+              "execution_method": "Row",
+              "scan_method": "Automatic",
+              "scan_target": "DocDeltaDocs",
+              "scan_type": "TableScan"
+            }
+          ],
+          "uses_search_index_scan": false,
+          "full_search_scan": false
+        }
+      },
+      "automatic_equals_base": true,
+      "forced_search_equals_base": true
+    },
+    {
+      "label": "google-json-path-equal",
+      "variants": {
+        "automatic": {
+          "code": "OK",
+          "error": "",
+          "rows": [
+            {
+              "Id": "1"
+            }
+          ],
+          "operators": [
+            "Distributed Union",
+            "Serialize Result",
+            "Sort",
+            "Distributed Union",
+            "Scan"
+          ],
+          "scan_metadata": [
+            {
+              "execution_method": "Row",
+              "scan_method": "Row",
+              "scan_target": "DocDeltaSearch",
+              "scan_type": "SearchIndexScan"
+            }
+          ],
+          "uses_search_index_scan": true,
+          "full_search_scan": false
+        },
+        "forced-search": {
+          "code": "OK",
+          "error": "",
+          "rows": [
+            {
+              "Id": "1"
+            }
+          ],
+          "operators": [
+            "Distributed Union",
+            "Serialize Result",
+            "Sort",
+            "Distributed Union",
+            "Scan"
+          ],
+          "scan_metadata": [
+            {
+              "execution_method": "Row",
+              "scan_method": "Row",
+              "scan_target": "DocDeltaSearch",
+              "scan_type": "SearchIndexScan"
+            }
+          ],
+          "uses_search_index_scan": true,
+          "full_search_scan": false
+        },
+        "forced-base": {
+          "code": "OK",
+          "error": "",
+          "rows": [
+            {
+              "Id": "1"
+            }
+          ],
+          "operators": [
+            "Distributed Union",
+            "Distributed Union",
+            "Serialize Result",
+            "Filter Scan",
+            "Scan"
+          ],
+          "scan_metadata": [
+            {
+              "Full scan": "true",
+              "execution_method": "Row",
+              "scan_method": "Automatic",
+              "scan_target": "DocDeltaDocs",
+              "scan_type": "TableScan"
+            }
+          ],
+          "uses_search_index_scan": false,
+          "full_search_scan": false
+        }
+      },
+      "automatic_equals_base": true,
+      "forced_search_equals_base": true
+    },
+    {
+      "label": "google-json-number-equal",
+      "variants": {
+        "automatic": {
+          "code": "OK",
+          "error": "",
+          "rows": [
+            {
+              "Id": "1"
+            }
+          ],
+          "operators": [
+            "Distributed Union",
+            "Serialize Result",
+            "Sort",
+            "Distributed Union",
+            "Scan"
+          ],
+          "scan_metadata": [
+            {
+              "execution_method": "Row",
+              "scan_method": "Row",
+              "scan_target": "DocDeltaSearch",
+              "scan_type": "SearchIndexScan"
+            }
+          ],
+          "uses_search_index_scan": true,
+          "full_search_scan": false
+        },
+        "forced-search": {
+          "code": "OK",
+          "error": "",
+          "rows": [
+            {
+              "Id": "1"
+            }
+          ],
+          "operators": [
+            "Distributed Union",
+            "Serialize Result",
+            "Sort",
+            "Distributed Union",
+            "Scan"
+          ],
+          "scan_metadata": [
+            {
+              "execution_method": "Row",
+              "scan_method": "Row",
+              "scan_target": "DocDeltaSearch",
+              "scan_type": "SearchIndexScan"
+            }
+          ],
+          "uses_search_index_scan": true,
+          "full_search_scan": false
+        },
+        "forced-base": {
+          "code": "OK",
+          "error": "",
+          "rows": [
+            {
+              "Id": "1"
+            }
+          ],
+          "operators": [
+            "Distributed Union",
+            "Distributed Union",
+            "Serialize Result",
+            "Filter Scan",
+            "Scan"
+          ],
+          "scan_metadata": [
+            {
+              "Full scan": "true",
+              "execution_method": "Row",
+              "scan_method": "Automatic",
+              "scan_target": "DocDeltaDocs",
+              "scan_type": "TableScan"
+            }
+          ],
+          "uses_search_index_scan": false,
+          "full_search_scan": false
+        }
+      },
+      "automatic_equals_base": true,
+      "forced_search_equals_base": true
+    },
+    {
+      "label": "google-json-not-equal",
+      "variants": {
+        "automatic": {
+          "code": "OK",
+          "error": "",
+          "rows": [
+            {
+              "Id": "2"
+            },
+            {
+              "Id": "3"
+            }
+          ],
+          "operators": [
+            "Distributed Union",
+            "Distributed Union",
+            "Serialize Result",
+            "Filter Scan",
+            "Scan"
+          ],
+          "scan_metadata": [
+            {
+              "Full scan": "true",
+              "execution_method": "Row",
+              "scan_method": "Automatic",
+              "scan_target": "DocDeltaDocs",
+              "scan_type": "TableScan"
+            }
+          ],
+          "uses_search_index_scan": false,
+          "full_search_scan": false
+        },
+        "forced-search": {
+          "code": "OK",
+          "error": "",
+          "rows": [
+            {
+              "Id": "2"
+            },
+            {
+              "Id": "3"
+            }
+          ],
+          "operators": [
+            "Distributed Union",
+            "Serialize Result",
+            "Sort",
+            "Distributed Union",
+            "Scan"
+          ],
+          "scan_metadata": [
+            {
+              "execution_method": "Row",
+              "scan_method": "Row",
+              "scan_target": "DocDeltaSearch",
+              "scan_type": "SearchIndexScan"
+            }
+          ],
+          "uses_search_index_scan": true,
+          "full_search_scan": false
+        },
+        "forced-base": {
+          "code": "OK",
+          "error": "",
+          "rows": [
+            {
+              "Id": "2"
+            },
+            {
+              "Id": "3"
+            }
+          ],
+          "operators": [
+            "Distributed Union",
+            "Distributed Union",
+            "Serialize Result",
+            "Filter Scan",
+            "Scan"
+          ],
+          "scan_metadata": [
+            {
+              "Full scan": "true",
+              "execution_method": "Row",
+              "scan_method": "Automatic",
+              "scan_target": "DocDeltaDocs",
+              "scan_type": "TableScan"
+            }
+          ],
+          "uses_search_index_scan": false,
+          "full_search_scan": false
+        }
+      },
+      "automatic_equals_base": true,
+      "forced_search_equals_base": true
+    },
+    {
+      "label": "google-json-not-equal-alias",
+      "variants": {
+        "automatic": {
+          "code": "OK",
+          "error": "",
+          "rows": [
+            {
+              "Id": "2"
+            },
+            {
+              "Id": "3"
+            }
+          ],
+          "operators": [
+            "Distributed Union",
+            "Distributed Union",
+            "Serialize Result",
+            "Filter Scan",
+            "Scan"
+          ],
+          "scan_metadata": [
+            {
+              "Full scan": "true",
+              "execution_method": "Row",
+              "scan_method": "Automatic",
+              "scan_target": "DocDeltaDocs",
+              "scan_type": "TableScan"
+            }
+          ],
+          "uses_search_index_scan": false,
+          "full_search_scan": false
+        },
+        "forced-search": {
+          "code": "OK",
+          "error": "",
+          "rows": [
+            {
+              "Id": "2"
+            },
+            {
+              "Id": "3"
+            }
+          ],
+          "operators": [
+            "Distributed Union",
+            "Serialize Result",
+            "Sort",
+            "Distributed Union",
+            "Scan"
+          ],
+          "scan_metadata": [
+            {
+              "execution_method": "Row",
+              "scan_method": "Row",
+              "scan_target": "DocDeltaSearch",
+              "scan_type": "SearchIndexScan"
+            }
+          ],
+          "uses_search_index_scan": true,
+          "full_search_scan": false
+        },
+        "forced-base": {
+          "code": "OK",
+          "error": "",
+          "rows": [
+            {
+              "Id": "2"
+            },
+            {
+              "Id": "3"
+            }
+          ],
+          "operators": [
+            "Distributed Union",
+            "Distributed Union",
+            "Serialize Result",
+            "Filter Scan",
+            "Scan"
+          ],
+          "scan_metadata": [
+            {
+              "Full scan": "true",
+              "execution_method": "Row",
+              "scan_method": "Automatic",
+              "scan_target": "DocDeltaDocs",
+              "scan_type": "TableScan"
+            }
+          ],
+          "uses_search_index_scan": false,
+          "full_search_scan": false
+        }
+      },
+      "automatic_equals_base": true,
+      "forced_search_equals_base": true
+    },
+    {
+      "label": "google-json-in",
+      "variants": {
+        "automatic": {
+          "code": "OK",
+          "error": "",
+          "rows": [
+            {
+              "Id": "1"
+            },
+            {
+              "Id": "2"
+            }
+          ],
+          "operators": [
+            "Distributed Union",
+            "Serialize Result",
+            "Sort",
+            "Distributed Union",
+            "Scan"
+          ],
+          "scan_metadata": [
+            {
+              "execution_method": "Row",
+              "scan_method": "Row",
+              "scan_target": "DocDeltaSearch",
+              "scan_type": "SearchIndexScan"
+            }
+          ],
+          "uses_search_index_scan": true,
+          "full_search_scan": false
+        },
+        "forced-search": {
+          "code": "OK",
+          "error": "",
+          "rows": [
+            {
+              "Id": "1"
+            },
+            {
+              "Id": "2"
+            }
+          ],
+          "operators": [
+            "Distributed Union",
+            "Serialize Result",
+            "Sort",
+            "Distributed Union",
+            "Scan"
+          ],
+          "scan_metadata": [
+            {
+              "execution_method": "Row",
+              "scan_method": "Row",
+              "scan_target": "DocDeltaSearch",
+              "scan_type": "SearchIndexScan"
+            }
+          ],
+          "uses_search_index_scan": true,
+          "full_search_scan": false
+        },
+        "forced-base": {
+          "code": "OK",
+          "error": "",
+          "rows": [
+            {
+              "Id": "1"
+            },
+            {
+              "Id": "2"
+            }
+          ],
+          "operators": [
+            "Distributed Union",
+            "Distributed Union",
+            "Serialize Result",
+            "Filter Scan",
+            "Scan"
+          ],
+          "scan_metadata": [
+            {
+              "Full scan": "true",
+              "execution_method": "Row",
+              "scan_method": "Automatic",
+              "scan_target": "DocDeltaDocs",
+              "scan_type": "TableScan"
+            }
+          ],
+          "uses_search_index_scan": false,
+          "full_search_scan": false
+        }
+      },
+      "automatic_equals_base": true,
+      "forced_search_equals_base": true
+    },
+    {
+      "label": "google-json-not-in",
+      "variants": {
+        "automatic": {
+          "code": "OK",
+          "error": "",
+          "rows": [
+            {
+              "Id": "3"
+            }
+          ],
+          "operators": [
+            "Distributed Union",
+            "Distributed Union",
+            "Serialize Result",
+            "Filter Scan",
+            "Scan"
+          ],
+          "scan_metadata": [
+            {
+              "Full scan": "true",
+              "execution_method": "Row",
+              "scan_method": "Automatic",
+              "scan_target": "DocDeltaDocs",
+              "scan_type": "TableScan"
+            }
+          ],
+          "uses_search_index_scan": false,
+          "full_search_scan": false
+        },
+        "forced-search": {
+          "code": "OK",
+          "error": "",
+          "rows": [
+            {
+              "Id": "3"
+            }
+          ],
+          "operators": [
+            "Distributed Union",
+            "Serialize Result",
+            "Sort",
+            "Distributed Union",
+            "Scan"
+          ],
+          "scan_metadata": [
+            {
+              "execution_method": "Row",
+              "scan_method": "Row",
+              "scan_target": "DocDeltaSearch",
+              "scan_type": "SearchIndexScan"
+            }
+          ],
+          "uses_search_index_scan": true,
+          "full_search_scan": false
+        },
+        "forced-base": {
+          "code": "OK",
+          "error": "",
+          "rows": [
+            {
+              "Id": "3"
+            }
+          ],
+          "operators": [
+            "Distributed Union",
+            "Distributed Union",
+            "Serialize Result",
+            "Filter Scan",
+            "Scan"
+          ],
+          "scan_metadata": [
+            {
+              "Full scan": "true",
+              "execution_method": "Row",
+              "scan_method": "Automatic",
+              "scan_target": "DocDeltaDocs",
+              "scan_type": "TableScan"
+            }
+          ],
+          "uses_search_index_scan": false,
+          "full_search_scan": false
+        }
+      },
+      "automatic_equals_base": true,
+      "forced_search_equals_base": true
+    },
+    {
+      "label": "google-json-exists",
+      "variants": {
+        "automatic": {
+          "code": "OK",
+          "error": "",
+          "rows": [
+            {
+              "Id": "1"
+            },
+            {
+              "Id": "2"
+            },
+            {
+              "Id": "3"
+            }
+          ],
+          "operators": [
+            "Distributed Union",
+            "Serialize Result",
+            "Sort",
+            "Distributed Union",
+            "Scan"
+          ],
+          "scan_metadata": [
+            {
+              "execution_method": "Row",
+              "scan_method": "Row",
+              "scan_target": "DocDeltaSearch",
+              "scan_type": "SearchIndexScan"
+            }
+          ],
+          "uses_search_index_scan": true,
+          "full_search_scan": false
+        },
+        "forced-search": {
+          "code": "OK",
+          "error": "",
+          "rows": [
+            {
+              "Id": "1"
+            },
+            {
+              "Id": "2"
+            },
+            {
+              "Id": "3"
+            }
+          ],
+          "operators": [
+            "Distributed Union",
+            "Serialize Result",
+            "Sort",
+            "Distributed Union",
+            "Scan"
+          ],
+          "scan_metadata": [
+            {
+              "execution_method": "Row",
+              "scan_method": "Row",
+              "scan_target": "DocDeltaSearch",
+              "scan_type": "SearchIndexScan"
+            }
+          ],
+          "uses_search_index_scan": true,
+          "full_search_scan": false
+        },
+        "forced-base": {
+          "code": "OK",
+          "error": "",
+          "rows": [
+            {
+              "Id": "1"
+            },
+            {
+              "Id": "2"
+            },
+            {
+              "Id": "3"
+            }
+          ],
+          "operators": [
+            "Distributed Union",
+            "Distributed Union",
+            "Serialize Result",
+            "Filter Scan",
+            "Scan"
+          ],
+          "scan_metadata": [
+            {
+              "Full scan": "true",
+              "execution_method": "Row",
+              "scan_method": "Automatic",
+              "scan_target": "DocDeltaDocs",
+              "scan_type": "TableScan"
+            }
+          ],
+          "uses_search_index_scan": false,
+          "full_search_scan": false
+        }
+      },
+      "automatic_equals_base": true,
+      "forced_search_equals_base": true
+    },
+    {
+      "label": "google-json-range",
+      "variants": {
+        "automatic": {
+          "code": "OK",
+          "error": "",
+          "rows": [
+            {
+              "Id": "2"
+            },
+            {
+              "Id": "3"
+            }
+          ],
+          "operators": [
+            "Distributed Union",
+            "Distributed Union",
+            "Serialize Result",
+            "Filter Scan",
+            "Scan"
+          ],
+          "scan_metadata": [
+            {
+              "Full scan": "true",
+              "execution_method": "Row",
+              "scan_method": "Automatic",
+              "scan_target": "DocDeltaDocs",
+              "scan_type": "TableScan"
+            }
+          ],
+          "uses_search_index_scan": false,
+          "full_search_scan": false
+        },
+        "forced-search": {
+          "code": "OK",
+          "error": "",
+          "rows": [
+            {
+              "Id": "2"
+            },
+            {
+              "Id": "3"
+            }
+          ],
+          "operators": [
+            "Distributed Union",
+            "Serialize Result",
+            "Sort",
+            "Distributed Cross Apply",
+            "Create Batch",
+            "RowToDataBlock",
+            "Distributed Union",
+            "Scan",
+            "Cross Apply",
+            "KeyRangeAccumulator",
+            "DataBlockToRow",
+            "Scan",
+            "Distributed Union",
+            "Filter Scan",
+            "Scan"
+          ],
+          "scan_metadata": [
+            {
+              "Full scan": "true",
+              "execution_method": "Row",
+              "scan_method": "Automatic",
+              "scan_target": "DocDeltaSearch",
+              "scan_type": "SearchIndexScan"
+            },
+            {
+              "execution_method": "Batch",
+              "scan_method": "Batch",
+              "scan_target": "$v2",
+              "scan_type": "BatchScan"
+            },
+            {
+              "execution_method": "Row",
+              "scan_method": "Row",
+              "scan_target": "DocDeltaDocs",
+              "scan_type": "TableScan"
+            }
+          ],
+          "uses_search_index_scan": true,
+          "full_search_scan": true
+        },
+        "forced-base": {
+          "code": "OK",
+          "error": "",
+          "rows": [
+            {
+              "Id": "2"
+            },
+            {
+              "Id": "3"
+            }
+          ],
+          "operators": [
+            "Distributed Union",
+            "Distributed Union",
+            "Serialize Result",
+            "Filter Scan",
+            "Scan"
+          ],
+          "scan_metadata": [
+            {
+              "Full scan": "true",
+              "execution_method": "Row",
+              "scan_method": "Automatic",
+              "scan_target": "DocDeltaDocs",
+              "scan_type": "TableScan"
+            }
+          ],
+          "uses_search_index_scan": false,
+          "full_search_scan": false
+        }
+      },
+      "automatic_equals_base": true,
+      "forced_search_equals_base": true
+    },
+    {
+      "label": "pg-json-document-equal",
+      "variants": {
+        "automatic": {
+          "code": "OK",
+          "error": "",
+          "rows": [
+            {
+              "id": "1"
+            }
+          ],
+          "operators": [
+            "Distributed Union",
+            "Serialize Result",
+            "Sort",
+            "Distributed Union",
+            "Scan"
+          ],
+          "scan_metadata": [
+            {
+              "execution_method": "Row",
+              "scan_method": "Row",
+              "scan_target": "docdeltasearch",
+              "scan_type": "SearchIndexScan"
+            }
+          ],
+          "uses_search_index_scan": true,
+          "full_search_scan": false
+        },
+        "forced-search": {
+          "code": "OK",
+          "error": "",
+          "rows": [
+            {
+              "id": "1"
+            }
+          ],
+          "operators": [
+            "Distributed Union",
+            "Serialize Result",
+            "Sort",
+            "Distributed Union",
+            "Scan"
+          ],
+          "scan_metadata": [
+            {
+              "execution_method": "Row",
+              "scan_method": "Row",
+              "scan_target": "docdeltasearch",
+              "scan_type": "SearchIndexScan"
+            }
+          ],
+          "uses_search_index_scan": true,
+          "full_search_scan": false
+        },
+        "forced-base": {
+          "code": "OK",
+          "error": "",
+          "rows": [
+            {
+              "id": "1"
+            }
+          ],
+          "operators": [
+            "Distributed Union",
+            "Distributed Union",
+            "Serialize Result",
+            "Filter Scan",
+            "Scan"
+          ],
+          "scan_metadata": [
+            {
+              "Full scan": "true",
+              "execution_method": "Row",
+              "scan_method": "Automatic",
+              "scan_target": "docdeltadocs",
+              "scan_type": "TableScan"
+            }
+          ],
+          "uses_search_index_scan": false,
+          "full_search_scan": false
+        }
+      },
+      "automatic_equals_base": true,
+      "forced_search_equals_base": true
+    },
+    {
+      "label": "pg-json-path-equal",
+      "variants": {
+        "automatic": {
+          "code": "OK",
+          "error": "",
+          "rows": [
+            {
+              "id": "1"
+            }
+          ],
+          "operators": [
+            "Distributed Union",
+            "Serialize Result",
+            "Sort",
+            "Distributed Union",
+            "Scan"
+          ],
+          "scan_metadata": [
+            {
+              "execution_method": "Row",
+              "scan_method": "Row",
+              "scan_target": "docdeltasearch",
+              "scan_type": "SearchIndexScan"
+            }
+          ],
+          "uses_search_index_scan": true,
+          "full_search_scan": false
+        },
+        "forced-search": {
+          "code": "OK",
+          "error": "",
+          "rows": [
+            {
+              "id": "1"
+            }
+          ],
+          "operators": [
+            "Distributed Union",
+            "Serialize Result",
+            "Sort",
+            "Distributed Union",
+            "Scan"
+          ],
+          "scan_metadata": [
+            {
+              "execution_method": "Row",
+              "scan_method": "Row",
+              "scan_target": "docdeltasearch",
+              "scan_type": "SearchIndexScan"
+            }
+          ],
+          "uses_search_index_scan": true,
+          "full_search_scan": false
+        },
+        "forced-base": {
+          "code": "OK",
+          "error": "",
+          "rows": [
+            {
+              "id": "1"
+            }
+          ],
+          "operators": [
+            "Distributed Union",
+            "Distributed Union",
+            "Serialize Result",
+            "Filter Scan",
+            "Scan"
+          ],
+          "scan_metadata": [
+            {
+              "Full scan": "true",
+              "execution_method": "Row",
+              "scan_method": "Automatic",
+              "scan_target": "docdeltadocs",
+              "scan_type": "TableScan"
+            }
+          ],
+          "uses_search_index_scan": false,
+          "full_search_scan": false
+        }
+      },
+      "automatic_equals_base": true,
+      "forced_search_equals_base": true
+    },
+    {
+      "label": "pg-json-number-equal",
+      "variants": {
+        "automatic": {
+          "code": "OK",
+          "error": "",
+          "rows": [
+            {
+              "id": "1"
+            }
+          ],
+          "operators": [
+            "Distributed Union",
+            "Serialize Result",
+            "Sort",
+            "Distributed Union",
+            "Scan"
+          ],
+          "scan_metadata": [
+            {
+              "execution_method": "Row",
+              "scan_method": "Row",
+              "scan_target": "docdeltasearch",
+              "scan_type": "SearchIndexScan"
+            }
+          ],
+          "uses_search_index_scan": true,
+          "full_search_scan": false
+        },
+        "forced-search": {
+          "code": "OK",
+          "error": "",
+          "rows": [
+            {
+              "id": "1"
+            }
+          ],
+          "operators": [
+            "Distributed Union",
+            "Serialize Result",
+            "Sort",
+            "Distributed Union",
+            "Scan"
+          ],
+          "scan_metadata": [
+            {
+              "execution_method": "Row",
+              "scan_method": "Row",
+              "scan_target": "docdeltasearch",
+              "scan_type": "SearchIndexScan"
+            }
+          ],
+          "uses_search_index_scan": true,
+          "full_search_scan": false
+        },
+        "forced-base": {
+          "code": "OK",
+          "error": "",
+          "rows": [
+            {
+              "id": "1"
+            }
+          ],
+          "operators": [
+            "Distributed Union",
+            "Distributed Union",
+            "Serialize Result",
+            "Filter Scan",
+            "Scan"
+          ],
+          "scan_metadata": [
+            {
+              "Full scan": "true",
+              "execution_method": "Row",
+              "scan_method": "Automatic",
+              "scan_target": "docdeltadocs",
+              "scan_type": "TableScan"
+            }
+          ],
+          "uses_search_index_scan": false,
+          "full_search_scan": false
+        }
+      },
+      "automatic_equals_base": true,
+      "forced_search_equals_base": true
+    },
+    {
+      "label": "pg-json-not-equal",
+      "variants": {
+        "automatic": {
+          "code": "OK",
+          "error": "",
+          "rows": [
+            {
+              "id": "2"
+            },
+            {
+              "id": "3"
+            }
+          ],
+          "operators": [
+            "Distributed Union",
+            "Distributed Union",
+            "Serialize Result",
+            "Filter Scan",
+            "Scan"
+          ],
+          "scan_metadata": [
+            {
+              "Full scan": "true",
+              "execution_method": "Row",
+              "scan_method": "Automatic",
+              "scan_target": "docdeltadocs",
+              "scan_type": "TableScan"
+            }
+          ],
+          "uses_search_index_scan": false,
+          "full_search_scan": false
+        },
+        "forced-search": {
+          "code": "OK",
+          "error": "",
+          "rows": [
+            {
+              "id": "2"
+            },
+            {
+              "id": "3"
+            }
+          ],
+          "operators": [
+            "Distributed Union",
+            "Serialize Result",
+            "Sort",
+            "Distributed Union",
+            "Scan"
+          ],
+          "scan_metadata": [
+            {
+              "execution_method": "Row",
+              "scan_method": "Row",
+              "scan_target": "docdeltasearch",
+              "scan_type": "SearchIndexScan"
+            }
+          ],
+          "uses_search_index_scan": true,
+          "full_search_scan": false
+        },
+        "forced-base": {
+          "code": "OK",
+          "error": "",
+          "rows": [
+            {
+              "id": "2"
+            },
+            {
+              "id": "3"
+            }
+          ],
+          "operators": [
+            "Distributed Union",
+            "Distributed Union",
+            "Serialize Result",
+            "Filter Scan",
+            "Scan"
+          ],
+          "scan_metadata": [
+            {
+              "Full scan": "true",
+              "execution_method": "Row",
+              "scan_method": "Automatic",
+              "scan_target": "docdeltadocs",
+              "scan_type": "TableScan"
+            }
+          ],
+          "uses_search_index_scan": false,
+          "full_search_scan": false
+        }
+      },
+      "automatic_equals_base": true,
+      "forced_search_equals_base": true
+    },
+    {
+      "label": "pg-json-not-equal-alias",
+      "variants": {
+        "automatic": {
+          "code": "OK",
+          "error": "",
+          "rows": [
+            {
+              "id": "2"
+            },
+            {
+              "id": "3"
+            }
+          ],
+          "operators": [
+            "Distributed Union",
+            "Distributed Union",
+            "Serialize Result",
+            "Filter Scan",
+            "Scan"
+          ],
+          "scan_metadata": [
+            {
+              "Full scan": "true",
+              "execution_method": "Row",
+              "scan_method": "Automatic",
+              "scan_target": "docdeltadocs",
+              "scan_type": "TableScan"
+            }
+          ],
+          "uses_search_index_scan": false,
+          "full_search_scan": false
+        },
+        "forced-search": {
+          "code": "OK",
+          "error": "",
+          "rows": [
+            {
+              "id": "2"
+            },
+            {
+              "id": "3"
+            }
+          ],
+          "operators": [
+            "Distributed Union",
+            "Serialize Result",
+            "Sort",
+            "Distributed Union",
+            "Scan"
+          ],
+          "scan_metadata": [
+            {
+              "execution_method": "Row",
+              "scan_method": "Row",
+              "scan_target": "docdeltasearch",
+              "scan_type": "SearchIndexScan"
+            }
+          ],
+          "uses_search_index_scan": true,
+          "full_search_scan": false
+        },
+        "forced-base": {
+          "code": "OK",
+          "error": "",
+          "rows": [
+            {
+              "id": "2"
+            },
+            {
+              "id": "3"
+            }
+          ],
+          "operators": [
+            "Distributed Union",
+            "Distributed Union",
+            "Serialize Result",
+            "Filter Scan",
+            "Scan"
+          ],
+          "scan_metadata": [
+            {
+              "Full scan": "true",
+              "execution_method": "Row",
+              "scan_method": "Automatic",
+              "scan_target": "docdeltadocs",
+              "scan_type": "TableScan"
+            }
+          ],
+          "uses_search_index_scan": false,
+          "full_search_scan": false
+        }
+      },
+      "automatic_equals_base": true,
+      "forced_search_equals_base": true
+    },
+    {
+      "label": "pg-json-in",
+      "variants": {
+        "automatic": {
+          "code": "OK",
+          "error": "",
+          "rows": [
+            {
+              "id": "1"
+            },
+            {
+              "id": "2"
+            }
+          ],
+          "operators": [
+            "Distributed Union",
+            "Serialize Result",
+            "Sort",
+            "Distributed Union",
+            "Scan"
+          ],
+          "scan_metadata": [
+            {
+              "execution_method": "Row",
+              "scan_method": "Row",
+              "scan_target": "docdeltasearch",
+              "scan_type": "SearchIndexScan"
+            }
+          ],
+          "uses_search_index_scan": true,
+          "full_search_scan": false
+        },
+        "forced-search": {
+          "code": "OK",
+          "error": "",
+          "rows": [
+            {
+              "id": "1"
+            },
+            {
+              "id": "2"
+            }
+          ],
+          "operators": [
+            "Distributed Union",
+            "Serialize Result",
+            "Sort",
+            "Distributed Union",
+            "Scan"
+          ],
+          "scan_metadata": [
+            {
+              "execution_method": "Row",
+              "scan_method": "Row",
+              "scan_target": "docdeltasearch",
+              "scan_type": "SearchIndexScan"
+            }
+          ],
+          "uses_search_index_scan": true,
+          "full_search_scan": false
+        },
+        "forced-base": {
+          "code": "OK",
+          "error": "",
+          "rows": [
+            {
+              "id": "1"
+            },
+            {
+              "id": "2"
+            }
+          ],
+          "operators": [
+            "Distributed Union",
+            "Distributed Union",
+            "Serialize Result",
+            "Filter Scan",
+            "Scan"
+          ],
+          "scan_metadata": [
+            {
+              "Full scan": "true",
+              "execution_method": "Row",
+              "scan_method": "Automatic",
+              "scan_target": "docdeltadocs",
+              "scan_type": "TableScan"
+            }
+          ],
+          "uses_search_index_scan": false,
+          "full_search_scan": false
+        }
+      },
+      "automatic_equals_base": true,
+      "forced_search_equals_base": true
+    },
+    {
+      "label": "pg-json-not-in",
+      "variants": {
+        "automatic": {
+          "code": "OK",
+          "error": "",
+          "rows": [
+            {
+              "id": "3"
+            }
+          ],
+          "operators": [
+            "Distributed Union",
+            "Distributed Union",
+            "Serialize Result",
+            "Filter Scan",
+            "Scan"
+          ],
+          "scan_metadata": [
+            {
+              "Full scan": "true",
+              "execution_method": "Row",
+              "scan_method": "Automatic",
+              "scan_target": "docdeltadocs",
+              "scan_type": "TableScan"
+            }
+          ],
+          "uses_search_index_scan": false,
+          "full_search_scan": false
+        },
+        "forced-search": {
+          "code": "OK",
+          "error": "",
+          "rows": [
+            {
+              "id": "3"
+            }
+          ],
+          "operators": [
+            "Distributed Union",
+            "Serialize Result",
+            "Sort",
+            "Distributed Union",
+            "Scan"
+          ],
+          "scan_metadata": [
+            {
+              "execution_method": "Row",
+              "scan_method": "Row",
+              "scan_target": "docdeltasearch",
+              "scan_type": "SearchIndexScan"
+            }
+          ],
+          "uses_search_index_scan": true,
+          "full_search_scan": false
+        },
+        "forced-base": {
+          "code": "OK",
+          "error": "",
+          "rows": [
+            {
+              "id": "3"
+            }
+          ],
+          "operators": [
+            "Distributed Union",
+            "Distributed Union",
+            "Serialize Result",
+            "Filter Scan",
+            "Scan"
+          ],
+          "scan_metadata": [
+            {
+              "Full scan": "true",
+              "execution_method": "Row",
+              "scan_method": "Automatic",
+              "scan_target": "docdeltadocs",
+              "scan_type": "TableScan"
+            }
+          ],
+          "uses_search_index_scan": false,
+          "full_search_scan": false
+        }
+      },
+      "automatic_equals_base": true,
+      "forced_search_equals_base": true
+    },
+    {
+      "label": "pg-json-exists",
+      "variants": {
+        "automatic": {
+          "code": "OK",
+          "error": "",
+          "rows": [
+            {
+              "id": "1"
+            },
+            {
+              "id": "2"
+            },
+            {
+              "id": "3"
+            }
+          ],
+          "operators": [
+            "Distributed Union",
+            "Serialize Result",
+            "Sort",
+            "Distributed Union",
+            "Scan"
+          ],
+          "scan_metadata": [
+            {
+              "execution_method": "Row",
+              "scan_method": "Row",
+              "scan_target": "docdeltasearch",
+              "scan_type": "SearchIndexScan"
+            }
+          ],
+          "uses_search_index_scan": true,
+          "full_search_scan": false
+        },
+        "forced-search": {
+          "code": "OK",
+          "error": "",
+          "rows": [
+            {
+              "id": "1"
+            },
+            {
+              "id": "2"
+            },
+            {
+              "id": "3"
+            }
+          ],
+          "operators": [
+            "Distributed Union",
+            "Serialize Result",
+            "Sort",
+            "Distributed Union",
+            "Scan"
+          ],
+          "scan_metadata": [
+            {
+              "execution_method": "Row",
+              "scan_method": "Row",
+              "scan_target": "docdeltasearch",
+              "scan_type": "SearchIndexScan"
+            }
+          ],
+          "uses_search_index_scan": true,
+          "full_search_scan": false
+        },
+        "forced-base": {
+          "code": "OK",
+          "error": "",
+          "rows": [
+            {
+              "id": "1"
+            },
+            {
+              "id": "2"
+            },
+            {
+              "id": "3"
+            }
+          ],
+          "operators": [
+            "Distributed Union",
+            "Distributed Union",
+            "Serialize Result",
+            "Filter Scan",
+            "Scan"
+          ],
+          "scan_metadata": [
+            {
+              "Full scan": "true",
+              "execution_method": "Row",
+              "scan_method": "Automatic",
+              "scan_target": "docdeltadocs",
+              "scan_type": "TableScan"
+            }
+          ],
+          "uses_search_index_scan": false,
+          "full_search_scan": false
+        }
+      },
+      "automatic_equals_base": true,
+      "forced_search_equals_base": true
+    },
+    {
+      "label": "pg-json-range",
+      "variants": {
+        "automatic": {
+          "code": "OK",
+          "error": "",
+          "rows": [
+            {
+              "id": "2"
+            },
+            {
+              "id": "3"
+            }
+          ],
+          "operators": [
+            "Distributed Union",
+            "Distributed Union",
+            "Serialize Result",
+            "Filter Scan",
+            "Scan"
+          ],
+          "scan_metadata": [
+            {
+              "Full scan": "true",
+              "execution_method": "Row",
+              "scan_method": "Automatic",
+              "scan_target": "docdeltadocs",
+              "scan_type": "TableScan"
+            }
+          ],
+          "uses_search_index_scan": false,
+          "full_search_scan": false
+        },
+        "forced-search": {
+          "code": "OK",
+          "error": "",
+          "rows": [
+            {
+              "id": "2"
+            },
+            {
+              "id": "3"
+            }
+          ],
+          "operators": [
+            "Distributed Union",
+            "Serialize Result",
+            "Sort",
+            "Distributed Cross Apply",
+            "Create Batch",
+            "RowToDataBlock",
+            "Distributed Union",
+            "Scan",
+            "Cross Apply",
+            "KeyRangeAccumulator",
+            "DataBlockToRow",
+            "Scan",
+            "Distributed Union",
+            "Filter Scan",
+            "Scan"
+          ],
+          "scan_metadata": [
+            {
+              "Full scan": "true",
+              "execution_method": "Row",
+              "scan_method": "Automatic",
+              "scan_target": "docdeltasearch",
+              "scan_type": "SearchIndexScan"
+            },
+            {
+              "execution_method": "Batch",
+              "scan_method": "Batch",
+              "scan_target": "$v2",
+              "scan_type": "BatchScan"
+            },
+            {
+              "execution_method": "Row",
+              "scan_method": "Row",
+              "scan_target": "docdeltadocs",
+              "scan_type": "TableScan"
+            }
+          ],
+          "uses_search_index_scan": true,
+          "full_search_scan": true
+        },
+        "forced-base": {
+          "code": "OK",
+          "error": "",
+          "rows": [
+            {
+              "id": "2"
+            },
+            {
+              "id": "3"
+            }
+          ],
+          "operators": [
+            "Distributed Union",
+            "Distributed Union",
+            "Serialize Result",
+            "Filter Scan",
+            "Scan"
+          ],
+          "scan_metadata": [
+            {
+              "Full scan": "true",
+              "execution_method": "Row",
+              "scan_method": "Automatic",
+              "scan_target": "docdeltadocs",
+              "scan_type": "TableScan"
+            }
+          ],
+          "uses_search_index_scan": false,
+          "full_search_scan": false
+        }
+      },
+      "automatic_equals_base": true,
+      "forced_search_equals_base": true
+    },
+    {
+      "label": "pg-json-text-extraction",
+      "variants": {
+        "automatic": {
+          "code": "OK",
+          "error": "",
+          "rows": [
+            {
+              "id": "1"
+            }
+          ],
+          "operators": [
+            "Distributed Union",
+            "Distributed Union",
+            "Serialize Result",
+            "Filter Scan",
+            "Scan"
+          ],
+          "scan_metadata": [
+            {
+              "Full scan": "true",
+              "execution_method": "Row",
+              "scan_method": "Automatic",
+              "scan_target": "docdeltadocs",
+              "scan_type": "TableScan"
+            }
+          ],
+          "uses_search_index_scan": false,
+          "full_search_scan": false
+        },
+        "forced-search": {
+          "code": "OK",
+          "error": "",
+          "rows": [
+            {
+              "id": "1"
+            }
+          ],
+          "operators": [
+            "Distributed Union",
+            "Serialize Result",
+            "Sort",
+            "Distributed Cross Apply",
+            "Create Batch",
+            "RowToDataBlock",
+            "Distributed Union",
+            "Scan",
+            "Cross Apply",
+            "KeyRangeAccumulator",
+            "DataBlockToRow",
+            "Scan",
+            "Distributed Union",
+            "Filter Scan",
+            "Scan"
+          ],
+          "scan_metadata": [
+            {
+              "Full scan": "true",
+              "execution_method": "Row",
+              "scan_method": "Automatic",
+              "scan_target": "docdeltasearch",
+              "scan_type": "SearchIndexScan"
+            },
+            {
+              "execution_method": "Batch",
+              "scan_method": "Batch",
+              "scan_target": "$v2",
+              "scan_type": "BatchScan"
+            },
+            {
+              "execution_method": "Row",
+              "scan_method": "Row",
+              "scan_target": "docdeltadocs",
+              "scan_type": "TableScan"
+            }
+          ],
+          "uses_search_index_scan": true,
+          "full_search_scan": true
+        },
+        "forced-base": {
+          "code": "OK",
+          "error": "",
+          "rows": [
+            {
+              "id": "1"
+            }
+          ],
+          "operators": [
+            "Distributed Union",
+            "Distributed Union",
+            "Serialize Result",
+            "Filter Scan",
+            "Scan"
+          ],
+          "scan_metadata": [
+            {
+              "Full scan": "true",
+              "execution_method": "Row",
+              "scan_method": "Automatic",
+              "scan_target": "docdeltadocs",
+              "scan_type": "TableScan"
+            }
+          ],
+          "uses_search_index_scan": false,
+          "full_search_scan": false
+        }
+      },
+      "automatic_equals_base": true,
+      "forced_search_equals_base": true
+    }
+  ],
+  "dynamic": [
+    {
+      "label": "dynamic-filter",
+      "code": "OK",
+      "error": "",
+      "rows": [
+        {
+          "id": "1"
+        }
+      ]
+    },
+    {
+      "label": "dynamic-group",
+      "code": "OK",
+      "error": "",
+      "rows": [
+        {
+          "count": "2",
+          "kind": "\"a\""
+        }
+      ]
+    },
+    {
+      "label": "dynamic-order",
+      "code": "OK",
+      "error": "",
+      "rows": [
+        {
+          "value": "1"
+        },
+        {
+          "value": "2"
+        }
+      ]
+    },
+    {
+      "label": "dynamic-distinct",
+      "code": "OK",
+      "error": "",
+      "rows": [
+        {
+          "kind": "\"a\""
+        }
+      ]
+    },
+    {
+      "label": "dynamic-bare-bool",
+      "code": "InvalidArgument",
+      "error": "spanner: code = \"InvalidArgument\", desc = \"WHERE clause should return type BOOL, but returns JSON [at 1:39]\\\\nGRAPH DocDeltaDynamic MATCH (n) WHERE n.flag RETURN n.Id AS id\\\\n                                      ^\", requestID = \"<redacted>\"",
+      "rows": []
+    },
+    {
+      "label": "dynamic-string-number-mismatch",
+      "code": "OK",
+      "error": "",
+      "rows": []
+    }
+  ]
+}

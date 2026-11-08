@@ -1,0 +1,40 @@
+{
+  "observed_date_utc": "2026-10-04",
+  "source_head": "c2d7792dd7f83d5dd086e2d32bc22e5d253cf06c",
+  "source_snapshot": "Existing dirty working tree plus 172 untracked files copied before isolation",
+  "dirty_patch_sha256": "299afcab60fe8610dbaf83821b4584b1ad400dc2503ad7f47542b3671f78ef77",
+  "worktree": "<LOCAL_CHECKOUT>/.worktrees/omni-r4-20261004",
+  "durable_task_area": "<LOCAL_TASK_ROOT>/apstndb/spanalyzer/omni-r4-20261004",
+  "scratch": "<LOCAL_CHECKOUT>/.tmp/omni-r4-20261004",
+  "go_version": "go1.26.8",
+  "host_platform": "darwin/arm64",
+  "container_platform": "linux/arm64",
+  "image": "us-docker.pkg.dev/spanner-omni/images/spanner-omni:2026.r4-lts@sha256:9f10586c5de366bec5c0ff6cf542a67c21c8363e8a12a3deb9c372a07c9aa8b6",
+  "baseline_spanemuboost": "v0.4.7",
+  "harness_override": "Worktree-only local spanemuboost copy adds --listen-addresses=0.0.0.0; see harness.patch. go.work and survey/go.mod replace the module with that local copy. Integration runner adds -json. Only worktree runtime_targets.json selects r4.",
+  "security_probe_sdk": "cloud.google.com/go/spanner v1.94.0 in standalone module",
+  "documents": {
+    "release-notes.md": "2988f2abeb3698453e66ef35fbfdb6bff79efbb8723a7a0665456aa3f15cb839",
+    "release-notes.html": "5af20b90ba8f3f6361e591eefd8c6be9759e6bc3924221fac99b59580b5faf1a",
+    "download.md": "ff31f791cddf28724582127a6df84c61cbfea9601d40f72aeedf57783da22321",
+    "download.html": "f71fc118fb4fa4697828d022af5d382f7caf2cd6b6cdba31108c4c08482eee75",
+    "upgrade-deployment.md": "dcd3c176ec512c3388f9629917bc7efd12a384f39e225fa326df6596a15c7467",
+    "deploy-encryption-vms.md": "aa552b088bef7bb9be12c1b2236ffa896372971d326bde3912f3499adc1ed8aa",
+    "go.md": "a3a7d7986e877c4c8d50bf4cb7da579d5cf847369bc355ff903a32f9db3405a0"
+  },
+  "binaries": {
+    "feature-probe": "ebc1aeddf3adeafcf2aa21e2bf1b233d31a0ea41ffb3eb8b22b48bee1ec16ee0",
+    "queue-probe": "35cd90f2c938f19d47e198b77d0c712c2b127100e224eddf090402d129e60634",
+    "queue-control": "33e7a590d8381ddf3c5e52cd763f038f8d90d852d49ac6b3bb2b931cf6194b27",
+    "volatile-probe": "4c0a40e9fb7f58bb163938fa6dd76cf7af97a1454b27bdf3a1c3bc73444d2762"
+  },
+  "authority": "Isolated runtime verification and local research only; no main runtime migration, existing deployment upgrade, commit, push, PR, or publication.",
+  "source_files_manifest_sha256": "df1c3423bf3303bf63fc3ef31fed8180b075ec4cb6e5600f2e588f531d24ff20",
+  "source_files_manifest": "<LOCAL_TASK_ROOT>/apstndb/spanalyzer/omni-r4-20261004/source-files.json",
+  "security_probe_binary_sha256": "2afa0f7539d5890eca6cf02df4d071529d2bc16aa309ce821c87eb7d3c0acfde",
+  "cleanup": {
+    "task_containers_after": "empty for exact r4 ancestor and task label; unrelated stopped containers were preserved",
+    "temporary_security_credentials_removed": true,
+    "evidence": "cleanup-checks.json and per-probe cleanup records"
+  }
+}

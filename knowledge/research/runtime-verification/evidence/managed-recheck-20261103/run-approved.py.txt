@@ -1,0 +1,33 @@
+from pathlib import Path
+import os,subprocess,json,datetime,re
+root=Path('<LOCAL_CHECKOUT>');s=root/'.tmp/managed-recheck-20261103';out=Path('<LOCAL_TASK_ROOT>/apstndb/spanalyzer/managed-recheck-20261103/evidence')
+assert not os.getenv('SPANNER_EMULATOR_HOST')
+keys=['SPANNER_PROJECT_ID','SPANNER_INSTANCE_ID','SPANNER_DATABASE_ID'];assert all(os.getenv(k)for k in keys)
+secrets=[os.environ[k]for k in keys]
+def clean(v):
+    if isinstance(v,dict):return {k:clean(x)for k,x in v.items()}
+    if isinstance(v,list):return [clean(x)for x in v]
+    if not isinstance(v,str):return v
+    for key in sorted(secrets,key=len,reverse=True):v=v.replace(key,'<redacted>')
+    v=re.sub(r'projects/[^/\s"\']+/instances/[^/\s"\']+/databases/[^/\s"\']+','<database>',v)
+    v=re.sub(r'recheck1103[gp]-[a-f0-9]+','<owned-database>',v)
+    return re.sub(r'requestID = "[^"]*"','requestID = "<redacted>"',v)
+receipts=[]
+for dialect in ['google','pg']:
+    args=[str(s/'managed'),str(out/(dialect+'-cases.json'))];at=datetime.datetime.now(datetime.timezone.utc).isoformat()
+    assert not (out/(dialect+'.jsonl')).exists(),'Do not repeat an approved database lifecycle accidentally'
+    print('START',dialect,flush=True)
+    rows=[]
+    with (out/(dialect+'.jsonl')).open('w')as log, (s/(dialect+'-raw.stderr')).open('w+')as err:
+        p=subprocess.Popen(args,stdout=subprocess.PIPE,stderr=err,text=True)
+        for line in p.stdout:
+            row=clean(json.loads(line));rows.append(row);log.write(json.dumps(row)+'\n');log.flush()
+            print(dialect,row['label'],row['code'],flush=True)
+        code=p.wait();err.seek(0);(out/(dialect+'.stderr')).write_text(clean(err.read()))
+    (s/(dialect+'-raw.stderr')).unlink()
+    receipt={'dialect':dialect,'argv':args,'started_at':at,'completed_at':datetime.datetime.now(datetime.timezone.utc).isoformat(),'exit_code':code,'authorization':'User explicitly approved two newly created disposable DBs, one per dialect, verification and their deletion; earlier retained DB excluded.'}
+    receipts.append(receipt);(out/'approved-commands.json').write_text(json.dumps(receipts,indent=2)+'\n')
+    codes={r['label']:r['code']for r in rows}
+    assert code==0 and codes.get('create-database')=='OK' and codes.get('drop-database')=='OK' and codes.get('database-absent')=='NotFound', 'Inspect fixture lifecycle before another creation'
+    assert not any(r['code']in ['DeadlineExceeded','Unavailable']for r in rows),'Transport failure remains inconclusive'
+print('COMPLETE: exactly two owned DB lifecycles, both absent',flush=True)

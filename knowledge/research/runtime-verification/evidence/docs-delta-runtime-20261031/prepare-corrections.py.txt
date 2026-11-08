@@ -1,0 +1,35 @@
+from pathlib import Path
+import json
+root=Path('<LOCAL_CHECKOUT>');s=root/'.tmp/docs-delta-runtime-20261031';out=Path('<LOCAL_TASK_ROOT>/apstndb/spanalyzer/docs-delta-runtime-20261031/evidence')
+def step(label,kind,sql='',**kw):return dict(label=label,family=kw.pop('family',label.split('-')[0]),kind=kind,sql=sql,**kw)
+for dialect in ['google','pg']:
+ pg=dialect=='pg';g=[]
+ ddl="CREATE TABLE ScoreDocs (id bigint NOT NULL PRIMARY KEY, body text, bodytokens spanner.tokenlist GENERATED ALWAYS AS (spanner.tokenize_fulltext(body)) VIRTUAL HIDDEN)"if pg else"CREATE TABLE ScoreDocs (Id INT64 NOT NULL, Body STRING(MAX), BodyTokens TOKENLIST AS (TOKENIZE_FULLTEXT(Body)) HIDDEN) PRIMARY KEY(Id)"
+ g +=[step('score-fixture','ddl',ddl),step('score-search-index','ddl','CREATE SEARCH INDEX ScoreIndex ON ScoreDocs(BodyTokens)',requires=['score-fixture']),step('score-insert','dml',statements=["INSERT INTO ScoreDocs(Id,Body) VALUES (1,'cat cat dog'),(2,'cat dog'),(3,'dog')"],requires=['score-fixture'])]
+ fn='spanner.score'if pg else'SCORE'
+ def score(version=None):return fn+"(BodyTokens,'cat'"+(''if version is None else(", options => '{\"version\": "+str(version)+"}'::jsonb"if pg else", options => JSON '{\"version\": "+str(version)+"}'"))+')'
+ sql='SELECT Id, '+score()+' AS default_score, '+score(1)+' AS version1_score, '+score(2)+' AS version2_score FROM ScoreDocs ORDER BY Id'
+ g.append(step('score-unpinned','query',sql,requires=['score-insert','score-search-index']))
+ for version in [1,2]:
+  ddl='ALTER DATABASE {{DATABASE}} SET "spanner.score_version" = '+str(version)if pg else'ALTER DATABASE {{DATABASE}} SET OPTIONS (score_version = '+str(version)+')'
+  g.append(step('score-set-db-'+str(version),'ddl',ddl));g.append(step('score-pinned-db-'+str(version),'query',sql,requires=['score-insert','score-search-index','score-set-db-'+str(version)]))
+ # Evaluate explicit versions independently of unsupported database defaults.
+ g.append(step('score-explicit-independent','query','SELECT Id, '+score(1)+' AS version1_score, '+score(2)+' AS version2_score FROM ScoreDocs ORDER BY Id',requires=['score-insert','score-search-index']))
+ if not pg:
+  g.append(step('bucket-fixture','ddl',"CREATE TABLE BucketFixed (Id INT64 NOT NULL, Body STRING(MAX), UpdatedAt TIMESTAMP NOT NULL, UpdatedSeconds INT64 NOT NULL AS (UNIX_SECONDS(UpdatedAt)) STORED, HourBucket INT64 NOT NULL AS (UNIX_SECONDS(TIMESTAMP_TRUNC(UpdatedAt,HOUR))) STORED, BodyTokens TOKENLIST AS (TOKENIZE_FULLTEXT(Body)) HIDDEN) PRIMARY KEY(Id)"))
+  for name,col in [('seconds','UpdatedSeconds'),('hour','HourBucket'),('none','')]:g.append(step('bucket-index-'+name,'ddl','CREATE SEARCH INDEX FixedIndex'+name+' ON BucketFixed(BodyTokens)'+(' ORDER BY '+col+' DESC'if col else''),requires=['bucket-fixture']))
+  g.append(step('bucket-insert','dml',statements=["INSERT INTO BucketFixed(Id,Body,UpdatedAt) VALUES (1,'cat cat dog',TIMESTAMP '2026-10-31 00:01:00Z')"],requires=['bucket-fixture']))
+  g.append(step('bucket-values-start','query','SELECT Id,UpdatedSeconds,HourBucket FROM BucketFixed',requires=['bucket-insert']))
+  for key,stamp in [('same-hour','2026-10-31 00:59:00Z'),('next-hour','2026-10-31 01:00:00Z')]:
+   g.append(step('bucket-update-'+key,'dml',statements=["UPDATE BucketFixed SET UpdatedAt=TIMESTAMP '"+stamp+"' WHERE Id=1"],requires=['bucket-insert']));g.append(step('bucket-values-'+key,'query','SELECT Id,UpdatedSeconds,HourBucket FROM BucketFixed',requires=['bucket-update-'+key]))
+  g.append(step('queue-fixture','ddl','CREATE QUEUE AliasQueue (Id STRING(36) NOT NULL, Payload BYTES(MAX) NOT NULL) PRIMARY KEY(Id)'))
+  for key,tail in [('plain',''),('as',' AS r'),('bare',' r')]:g.append(step('tvf-star-'+key,'query','SELECT * FROM RENEWLEASE_AliasQueue(lease_tokens=>ARRAY<STRING>[])'+tail,requires=['queue-fixture']))
+  g.append(step('graph-node-table','ddl','CREATE TABLE PropNodes (Id INT64 NOT NULL) PRIMARY KEY(Id)'));g.append(step('graph-create','ddl','CREATE PROPERTY GRAPH ProbeGraph NODE TABLES (PropNodes)',requires=['graph-node-table']));g.append(step('gql-left-common','query','GRAPH ProbeGraph RETURN 1 AS a, 9 AS left_only LEFT OUTER UNION ALL RETURN 2 AS a, 8 AS right_only',requires=['graph-create']))
+  g.append(step('schema-readback','ddl-export'))
+ else:
+  # A query-level control also probes fractional/pre-epoch input behavior without assuming cross-dialect bucket equality.
+  g.append(step('bucket-pg-query','query',"SELECT EXTRACT(EPOCH FROM '2026-10-31 00:59:59.9Z'::timestamptz - '1970-01-01Z'::timestamptz)::bigint / 3600 AS near_hour, EXTRACT(EPOCH FROM '2026-10-31 01:00:00Z'::timestamptz - '1970-01-01Z'::timestamptz)::bigint / 3600 AS on_hour"))
+ p=out/(dialect+'-corrected-cases.json');p.write_text(json.dumps({'dialect':dialect,'steps':g},indent=2)+'\n');print(dialect,'corrected cases',len(g))
+p=s/'run-managed.py';text=p.read_text().replace("name='managed-'+dialect","name='managed-corrected-'+dialect").replace("dialect+'-cases.json'","dialect+'-corrected-cases.json'").replace("managed-commands.json","managed-corrected-commands.json");(s/'run-managed-corrected.py').write_text(text)
+p=s/'run-local.py';text=p.read_text().replace("for name,entry in images.items():","for backend,entry in images.items():\n name=backend+'-corrected'").replace("str(scratch/'local'),name,entry['image']","str(scratch/'local'),backend,entry['image']").replace("'google-cases.json'","'google-corrected-cases.json'").replace("'pg-cases.json'","'pg-corrected-cases.json'").replace("'local-commands.json'","'local-corrected-commands.json'");text=text.replace("def ids():", "wait_started=time.monotonic()\nwhile True:\n ledger=out/'local-commands.json'\n prior=json.loads(ledger.read_text())if ledger.exists()else[]\n if len(prior)==3 and all(r['exit_code']==0 for r in prior):break\n if time.monotonic()-wait_started>1800:raise SystemExit('Original local cohort did not complete')\n time.sleep(5)\ndef ids():")
+(s/'run-local-corrected.py').write_text(text)

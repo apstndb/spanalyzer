@@ -1,0 +1,40 @@
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 209B done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for gcr.io/cloud-spanner-emulator/emulator:1.5.59@sha256:969af6a9349948fbfb4a826c18e160e258a4005f7c759f8e7f2dcec369cccba8
+#2 DONE 0.0s
+
+#3 [internal] load .dockerignore
+#3 transferring context: 2B done
+#3 DONE 0.0s
+
+#4 [1/2] FROM gcr.io/cloud-spanner-emulator/emulator:1.5.59@sha256:969af6a9349948fbfb4a826c18e160e258a4005f7c759f8e7f2dcec369cccba8
+#4 resolve gcr.io/cloud-spanner-emulator/emulator:1.5.59@sha256:969af6a9349948fbfb4a826c18e160e258a4005f7c759f8e7f2dcec369cccba8 done
+#4 DONE 0.0s
+
+#5 [internal] load build context
+#5 transferring context: 119.98MB 0.6s done
+#5 DONE 0.6s
+
+#4 [1/2] FROM gcr.io/cloud-spanner-emulator/emulator:1.5.59@sha256:969af6a9349948fbfb4a826c18e160e258a4005f7c759f8e7f2dcec369cccba8
+#4 CACHED
+
+#6 [2/2] COPY --chmod=0755 emulator_main /emulator_main
+#6 DONE 0.2s
+
+#7 exporting to image
+#7 exporting layers
+#7 exporting layers 1.9s done
+#7 exporting manifest sha256:f8f90cb9f8cd18ba3f50babb6cb5bc56df1207aaef6a601daed10eca67f08d67 done
+#7 exporting config sha256:b218e8bef698e78f4af132d4f8809f885a87236e6035b3034615d1e47481ae91 done
+#7 exporting attestation manifest sha256:75871d65fc0ee5075dc68a77cea0a15c85a7fb04a5d1044f40b779227734b19a done
+#7 exporting manifest list sha256:83619e5830c5a5c11066f7f41a8ebf029802909ecd45806e73843d37cda085cc done
+#7 naming to docker.io/library/spanalyzer-gql-order-diagnostic:no-scramble-7a306d65 done
+#7 unpacking to docker.io/library/spanalyzer-gql-order-diagnostic:no-scramble-7a306d65
+#7 unpacking to docker.io/library/spanalyzer-gql-order-diagnostic:no-scramble-7a306d65 0.4s done
+#7 DONE 2.3s
+
+View build details: docker-desktop://dashboard/build/default/default/m4dv33koy0bjeiceq8xfpi5kj

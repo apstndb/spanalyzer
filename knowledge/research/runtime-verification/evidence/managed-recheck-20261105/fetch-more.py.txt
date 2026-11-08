@@ -1,0 +1,13 @@
+from pathlib import Path
+from concurrent.futures import ThreadPoolExecutor
+import subprocess,json,hashlib,datetime
+p=Path('<LOCAL_TASK_ROOT>/apstndb/spanalyzer/managed-recheck-20261105/sources');comp=json.loads((p/'mirror-compare.json').read_text());base=comp['base_commit']['sha'];head=json.loads((p/'mirror-head.json').read_text())['sha'];items=[]
+for row in comp['files']:
+ path=row['filename']
+ if not path.startswith('docs/'):continue
+ for phase,ref in [('baseline',base),('target',head)]:items.append((phase+'__'+path.replace('/','__')+'.txt',['curl','--fail','--silent','--show-error','https://raw.githubusercontent.com/apstndb/spanner-docs-mirror/'+ref+'/'+path]))
+ doc=path.removeprefix('docs/').removesuffix('.md');items.append((doc.replace('/','__')+'.json',['dkcli','get','-f','json',doc]))
+def run(item):
+ name,args=item;r=subprocess.run(args,capture_output=True,timeout=120);assert r.returncode==0,(name,r.stderr.decode()[-400:]);(p/name).write_bytes(r.stdout);return {'file':name,'argv':args,'at':datetime.datetime.now(datetime.timezone.utc).isoformat(),'sha256':hashlib.sha256(r.stdout).hexdigest()}
+with ThreadPoolExecutor(max_workers=4)as pool:rows=list(pool.map(run,items))
+(p/'supplemental-retrieval.json').write_text(json.dumps(rows,indent=2)+'\n');print('Retained',len(rows),'full document bodies')

@@ -1,0 +1,269 @@
+{
+  "dialect": "google",
+  "steps": [
+    {
+      "label": "score-fixture",
+      "family": "score",
+      "kind": "ddl",
+      "sql": "CREATE TABLE ScoreDocs (Id INT64 NOT NULL, Body STRING(MAX), BodyTokens TOKENLIST AS (TOKENIZE_FULLTEXT(Body)) HIDDEN) PRIMARY KEY(Id)"
+    },
+    {
+      "label": "score-search-index",
+      "family": "score",
+      "kind": "ddl",
+      "sql": "CREATE SEARCH INDEX ScoreIndex ON ScoreDocs(BodyTokens)",
+      "requires": [
+        "score-fixture"
+      ]
+    },
+    {
+      "label": "score-insert",
+      "family": "score",
+      "kind": "dml",
+      "sql": "",
+      "statements": [
+        "INSERT INTO ScoreDocs(Id,Body) VALUES (1,'cat cat dog'),(2,'cat dog'),(3,'dog')"
+      ],
+      "requires": [
+        "score-fixture"
+      ]
+    },
+    {
+      "label": "score-unpinned",
+      "family": "score",
+      "kind": "query",
+      "sql": "SELECT Id, SCORE(BodyTokens,'cat') AS default_score, SCORE(BodyTokens,'cat', options => JSON '{\"version\": 1}') AS version1_score, SCORE(BodyTokens,'cat', options => JSON '{\"version\": 2}') AS version2_score FROM ScoreDocs WHERE SEARCH(BodyTokens,'cat') ORDER BY Id",
+      "requires": [
+        "score-insert",
+        "score-search-index"
+      ]
+    },
+    {
+      "label": "score-set-db-1",
+      "family": "score",
+      "kind": "ddl",
+      "sql": "ALTER DATABASE {{DATABASE}} SET OPTIONS (score_version = 1)"
+    },
+    {
+      "label": "score-pinned-db-1",
+      "family": "score",
+      "kind": "query",
+      "sql": "SELECT Id, SCORE(BodyTokens,'cat') AS default_score, SCORE(BodyTokens,'cat', options => JSON '{\"version\": 1}') AS version1_score, SCORE(BodyTokens,'cat', options => JSON '{\"version\": 2}') AS version2_score FROM ScoreDocs WHERE SEARCH(BodyTokens,'cat') ORDER BY Id",
+      "requires": [
+        "score-insert",
+        "score-search-index",
+        "score-set-db-1"
+      ]
+    },
+    {
+      "label": "score-set-db-2",
+      "family": "score",
+      "kind": "ddl",
+      "sql": "ALTER DATABASE {{DATABASE}} SET OPTIONS (score_version = 2)"
+    },
+    {
+      "label": "score-pinned-db-2",
+      "family": "score",
+      "kind": "query",
+      "sql": "SELECT Id, SCORE(BodyTokens,'cat') AS default_score, SCORE(BodyTokens,'cat', options => JSON '{\"version\": 1}') AS version1_score, SCORE(BodyTokens,'cat', options => JSON '{\"version\": 2}') AS version2_score FROM ScoreDocs WHERE SEARCH(BodyTokens,'cat') ORDER BY Id",
+      "requires": [
+        "score-insert",
+        "score-search-index",
+        "score-set-db-2"
+      ]
+    },
+    {
+      "label": "score-explicit-independent",
+      "family": "score",
+      "kind": "query",
+      "sql": "SELECT Id, SCORE(BodyTokens,'cat', options => JSON '{\"version\": 1}') AS version1_score, SCORE(BodyTokens,'cat', options => JSON '{\"version\": 2}') AS version2_score FROM ScoreDocs WHERE SEARCH(BodyTokens,'cat') ORDER BY Id",
+      "requires": [
+        "score-insert",
+        "score-search-index"
+      ]
+    },
+    {
+      "label": "bucket-fixture",
+      "family": "bucket",
+      "kind": "ddl",
+      "sql": "CREATE TABLE BucketFixed (Id INT64 NOT NULL, Body STRING(MAX), UpdatedAt TIMESTAMP NOT NULL, UpdatedSeconds INT64 NOT NULL AS (UNIX_SECONDS(UpdatedAt)) STORED, HourBucket INT64 NOT NULL AS (UNIX_SECONDS(TIMESTAMP_TRUNC(UpdatedAt,HOUR))) STORED, BodyTokens TOKENLIST AS (TOKENIZE_FULLTEXT(Body)) HIDDEN) PRIMARY KEY(Id)"
+    },
+    {
+      "label": "bucket-index-seconds",
+      "family": "bucket",
+      "kind": "ddl",
+      "sql": "CREATE SEARCH INDEX FixedIndexseconds ON BucketFixed(BodyTokens) ORDER BY UpdatedSeconds DESC",
+      "requires": [
+        "bucket-fixture"
+      ]
+    },
+    {
+      "label": "bucket-index-hour",
+      "family": "bucket",
+      "kind": "ddl",
+      "sql": "CREATE SEARCH INDEX FixedIndexhour ON BucketFixed(BodyTokens) ORDER BY HourBucket DESC",
+      "requires": [
+        "bucket-fixture"
+      ]
+    },
+    {
+      "label": "bucket-index-none",
+      "family": "bucket",
+      "kind": "ddl",
+      "sql": "CREATE SEARCH INDEX FixedIndexnone ON BucketFixed(BodyTokens)",
+      "requires": [
+        "bucket-fixture"
+      ]
+    },
+    {
+      "label": "bucket-insert",
+      "family": "bucket",
+      "kind": "dml",
+      "sql": "",
+      "statements": [
+        "INSERT INTO BucketFixed(Id,Body,UpdatedAt) VALUES (1,'cat cat dog',TIMESTAMP '2026-10-31 00:01:00Z')"
+      ],
+      "requires": [
+        "bucket-fixture"
+      ]
+    },
+    {
+      "label": "bucket-values-start",
+      "family": "bucket",
+      "kind": "query",
+      "sql": "SELECT Id,UpdatedSeconds,HourBucket FROM BucketFixed",
+      "requires": [
+        "bucket-insert"
+      ]
+    },
+    {
+      "label": "bucket-update-same-hour",
+      "family": "bucket",
+      "kind": "dml",
+      "sql": "",
+      "statements": [
+        "UPDATE BucketFixed SET UpdatedAt=TIMESTAMP '2026-10-31 00:59:00Z' WHERE Id=1"
+      ],
+      "requires": [
+        "bucket-insert"
+      ]
+    },
+    {
+      "label": "bucket-values-same-hour",
+      "family": "bucket",
+      "kind": "query",
+      "sql": "SELECT Id,UpdatedSeconds,HourBucket FROM BucketFixed",
+      "requires": [
+        "bucket-update-same-hour"
+      ]
+    },
+    {
+      "label": "bucket-update-next-hour",
+      "family": "bucket",
+      "kind": "dml",
+      "sql": "",
+      "statements": [
+        "UPDATE BucketFixed SET UpdatedAt=TIMESTAMP '2026-10-31 01:00:00Z' WHERE Id=1"
+      ],
+      "requires": [
+        "bucket-insert"
+      ]
+    },
+    {
+      "label": "bucket-values-next-hour",
+      "family": "bucket",
+      "kind": "query",
+      "sql": "SELECT Id,UpdatedSeconds,HourBucket FROM BucketFixed",
+      "requires": [
+        "bucket-update-next-hour"
+      ]
+    },
+    {
+      "label": "queue-fixture",
+      "family": "queue",
+      "kind": "ddl",
+      "sql": "CREATE QUEUE AliasQueue (Id STRING(36) NOT NULL, Payload BYTES(MAX) NOT NULL) PRIMARY KEY(Id)"
+    },
+    {
+      "label": "tvf-star-plain",
+      "family": "tvf",
+      "kind": "query",
+      "sql": "SELECT * FROM RENEWLEASE_AliasQueue(lease_tokens=>ARRAY<STRING>[])",
+      "requires": [
+        "queue-fixture"
+      ]
+    },
+    {
+      "label": "tvf-star-as",
+      "family": "tvf",
+      "kind": "query",
+      "sql": "SELECT * FROM RENEWLEASE_AliasQueue(lease_tokens=>ARRAY<STRING>[]) AS r",
+      "requires": [
+        "queue-fixture"
+      ]
+    },
+    {
+      "label": "tvf-star-bare",
+      "family": "tvf",
+      "kind": "query",
+      "sql": "SELECT * FROM RENEWLEASE_AliasQueue(lease_tokens=>ARRAY<STRING>[]) r",
+      "requires": [
+        "queue-fixture"
+      ]
+    },
+    {
+      "label": "graph-node-table",
+      "family": "graph",
+      "kind": "ddl",
+      "sql": "CREATE TABLE PropNodes (Id INT64 NOT NULL) PRIMARY KEY(Id)"
+    },
+    {
+      "label": "graph-create",
+      "family": "graph",
+      "kind": "ddl",
+      "sql": "CREATE PROPERTY GRAPH ProbeGraph NODE TABLES (PropNodes)",
+      "requires": [
+        "graph-node-table"
+      ]
+    },
+    {
+      "label": "gql-left-common",
+      "family": "gql",
+      "kind": "query",
+      "sql": "GRAPH ProbeGraph RETURN 1 AS a, 9 AS left_only LEFT OUTER UNION ALL RETURN 2 AS a, 8 AS right_only",
+      "requires": [
+        "graph-create"
+      ]
+    },
+    {
+      "label": "schema-readback",
+      "family": "schema",
+      "kind": "ddl-export",
+      "sql": ""
+    },
+    {
+      "label": "select-led-select",
+      "family": "pipe-isolation",
+      "kind": "query",
+      "sql": "SELECT 1 AS x |> SELECT x"
+    },
+    {
+      "label": "select-led-where",
+      "family": "pipe-isolation",
+      "kind": "query",
+      "sql": "SELECT 1 AS x |> WHERE x=1"
+    },
+    {
+      "label": "select-led-aggregate",
+      "family": "pipe-isolation",
+      "kind": "query",
+      "sql": "SELECT 1 AS x |> AGGREGATE SUM(x) AS n"
+    },
+    {
+      "label": "from-only",
+      "family": "pipe-isolation",
+      "kind": "query",
+      "sql": "FROM (SELECT 1 AS x)"
+    }
+  ]
+}

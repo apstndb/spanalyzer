@@ -1,0 +1,33 @@
+[
+  {
+    "name": "last-build",
+    "argv": [
+      "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go",
+      "build",
+      "-o",
+      "<LOCAL_CHECKOUT>/.tmp/emulator-issue-runtime-20261030/probe-last",
+      "./probe.go",
+      "./custom.go"
+    ],
+    "cwd": "<LOCAL_CHECKOUT>/.tmp/emulator-issue-runtime-20261030/module",
+    "started_at": "2026-10-30T08:11:41.347354+00:00",
+    "completed_at": "2026-10-30T08:11:43.846807+00:00",
+    "seconds": 2.499,
+    "exit_code": 0
+  },
+  {
+    "name": "emulator-last",
+    "argv": [
+      "<LOCAL_CHECKOUT>/.tmp/emulator-issue-runtime-20261030/probe-last",
+      "emulator",
+      "gcr.io/cloud-spanner-emulator/emulator:1.5.59@sha256:969af6a9349948fbfb4a826c18e160e258a4005f7c759f8e7f2dcec369cccba8",
+      "<LOCAL_CHECKOUT>/.tmp/emulator-issue-runtime-20261030/module/latency-corrected.json",
+      "<LOCAL_CHECKOUT>/.tmp/emulator-issue-runtime-20261030/module/multiplexed.json"
+    ],
+    "cwd": "<LOCAL_CHECKOUT>/.tmp/emulator-issue-runtime-20261030/module",
+    "started_at": "2026-10-30T08:11:44.138795+00:00",
+    "completed_at": "2026-10-30T08:11:47.039889+00:00",
+    "seconds": 2.901,
+    "exit_code": 0
+  }
+]

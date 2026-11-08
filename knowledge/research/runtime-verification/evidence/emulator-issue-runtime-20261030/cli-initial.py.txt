@@ -1,0 +1,10 @@
+from pathlib import Path
+import datetime,json,subprocess,uuid
+p=Path('<LOCAL_TASK_ROOT>/apstndb/spanalyzer/emulator-issue-runtime-20261030');image=json.loads((p/'sources/selected-image.json').read_text())['image'];records=[]
+for flag in ['--help','--enable_key_range_locking','--enable_sql_read_pushdown','--schema_version_retention=0s','--enable_emulator_diagnostic_statements','--ignore_unknown_hints']:
+ name='spanalyzer-issue-cli-'+uuid.uuid4().hex[:10];create=subprocess.run(['docker','create','--name',name,image,flag],capture_output=True,text=True);assert create.returncode==0,create.stderr;cid=create.stdout.strip();entry={'flag':flag,'owned_id':cid,'name':name,'image':image,'at':datetime.datetime.now(datetime.timezone.utc).isoformat()}
+ try:
+  inspected=json.loads(subprocess.check_output(['docker','inspect',cid],text=True))[0];entry['actual_image_id']=inspected['Image'];entry['path']=inspected['Path'];entry['args']=inspected['Args'];r=subprocess.run(['docker','start','-a',cid],capture_output=True,text=True,timeout=15);entry.update(exit_code=r.returncode,stdout=r.stdout,stderr=r.stderr)
+ finally:
+  cleanup=subprocess.run(['docker','rm','-f',cid],capture_output=True,text=True);absent=subprocess.run(['docker','inspect',cid],capture_output=True,text=True);entry.update(remove_exit_code=cleanup.returncode,absent=absent.returncode!=0)
+ records.append(entry);(p/'evidence/cli-checks.json').write_text(json.dumps(records,indent=2)+'\n');print(flag,entry.get('exit_code'),entry['absent'],flush=True)

@@ -1,0 +1,80 @@
+{
+  "infoschema": {
+    "current": {
+      "target": {
+        "kind": "managed",
+        "observation_scope": "single_database"
+      },
+      "observed_at": "2026-10-04T15:35:07.572573Z",
+      "surface_sha256": "89b4ab9e231d7d61bf417669b6f5d29d1715c3999058b905f60698bc1047c6b0",
+      "column_count": 310,
+      "rolling_queryability": [
+        {
+          "table_name": "INDEXES",
+          "column_name": "SEARCH_UNNEST",
+          "status": "queryable"
+        },
+        {
+          "table_name": "INDEX_COLUMNS",
+          "column_name": "EXPRESSION",
+          "status": "queryable"
+        }
+      ],
+      "producer_source_sha256": "6dc7ba9212558654df6624bea8ff6a7b92da9dce17308d57562b30c393457a94",
+      "invocation_sha256": "394c27273867ee16446472b5131b47283bcdb06d902be6a30c98982a205aa676"
+    },
+    "previous": {
+      "target": {
+        "kind": "managed",
+        "observation_scope": "single_database"
+      },
+      "observed_at": "2026-09-29T03:18:39.609834Z",
+      "surface_sha256": "89b4ab9e231d7d61bf417669b6f5d29d1715c3999058b905f60698bc1047c6b0",
+      "column_count": 310,
+      "rolling_queryability": [
+        {
+          "table_name": "INDEXES",
+          "column_name": "SEARCH_UNNEST",
+          "status": "queryable"
+        },
+        {
+          "table_name": "INDEX_COLUMNS",
+          "column_name": "EXPRESSION",
+          "status": "queryable"
+        }
+      ],
+      "producer_source_sha256": "6dc7ba9212558654df6624bea8ff6a7b92da9dce17308d57562b30c393457a94",
+      "invocation_sha256": "394c27273867ee16446472b5131b47283bcdb06d902be6a30c98982a205aa676"
+    },
+    "same_surface": true,
+    "same_producer": true
+  },
+  "spanner-sys": {
+    "current": {
+      "schema_version": "v0alpha2",
+      "target": {
+        "kind": "managed",
+        "observation_scope": "single_database"
+      },
+      "observed_at": "2026-10-04T15:35:15.336591Z",
+      "surface_sha256": "58205fd318c3b38615f801290c44b78a3dddcbdd2e8916298c6c7a8ff4a2d727",
+      "column_count": 587,
+      "producer_source_sha256": "3cf070ae5909bb26babeb3ca5bcfa20a161e2440eac934ca14d42de41a82a12a",
+      "invocation_sha256": "911f8d0021d67bf33420131130a46c1b258f3c30665bf390510113ad931a342c"
+    },
+    "previous": {
+      "schema_version": "v0alpha2",
+      "target": {
+        "kind": "managed",
+        "observation_scope": "single_database"
+      },
+      "observed_at": "2026-09-29T03:18:47.092432Z",
+      "surface_sha256": "58205fd318c3b38615f801290c44b78a3dddcbdd2e8916298c6c7a8ff4a2d727",
+      "column_count": 587,
+      "producer_source_sha256": "3cf070ae5909bb26babeb3ca5bcfa20a161e2440eac934ca14d42de41a82a12a",
+      "invocation_sha256": "911f8d0021d67bf33420131130a46c1b258f3c30665bf390510113ad931a342c"
+    },
+    "same_surface": true,
+    "same_producer": true
+  }
+}

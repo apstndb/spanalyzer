@@ -116,3 +116,13 @@ This is a reproducibility criterion, not authorization to delete the checkout.
 [^survey-import-provenance]: [`survey/import-provenance.json`](../../survey/import-provenance.json)
     is strict machine-readable provenance. It validates the initial imported
     subtree rather than pretending later retained development has the same tree.
+
+## Historical navigation
+
+The [runtime index](../research/runtime-verification/index.md) links current
+selected investigations and retained historical notes. Separate
+[managed](../research/runtime-verification/managed/index.md),
+[Omni](../research/runtime-verification/omni/index.md) and
+[Emulator](../research/runtime-verification/emulator/index.md) timelines retain
+observation and correction dates. Appending history does not change the
+selected captures or analyzer projection policy described here.

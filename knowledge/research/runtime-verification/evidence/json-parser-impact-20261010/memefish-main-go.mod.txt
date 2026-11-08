@@ -1,0 +1,7 @@
+module local/json-parser-impact
+
+go 1.26.2
+
+require github.com/cloudspannerecosystem/memefish v0.8.1
+
+replace github.com/cloudspannerecosystem/memefish => <LOCAL_HOME>/work/cloudspannerecosystem/memefish

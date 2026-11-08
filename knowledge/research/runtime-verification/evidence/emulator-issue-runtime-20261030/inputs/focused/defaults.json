@@ -1,0 +1,397 @@
+{
+  "dialect": "google",
+  "steps": [
+    {
+      "label": "KeyDefault-ddl",
+      "family": "issue-395",
+      "kind": "ddl",
+      "sql": "CREATE TABLE KeyDefault (id STRING(36) NOT NULL DEFAULT (GENERATE_UUID()), status STRING(16) DEFAULT ('draft'), n INT64 DEFAULT (0), total NUMERIC) PRIMARY KEY (id)",
+      "requires": [],
+      "timeout_seconds": 30
+    },
+    {
+      "label": "KeyDefault-seed",
+      "family": "issue-395",
+      "kind": "dml",
+      "sql": "",
+      "requires": [
+        "KeyDefault-ddl"
+      ],
+      "timeout_seconds": 15,
+      "statements": [
+        "INSERT INTO KeyDefault (id,status,n,total) VALUES ('A','sent',5,10)"
+      ]
+    },
+    {
+      "label": "KeyDefault-mutation",
+      "family": "issue-395",
+      "kind": "mutation",
+      "sql": "",
+      "requires": [
+        "KeyDefault-seed"
+      ],
+      "timeout_seconds": 15,
+      "table": "KeyDefault",
+      "operation": "update",
+      "values": {
+        "id": "A",
+        "total": {
+          "type": "numeric",
+          "value": "11"
+        }
+      }
+    },
+    {
+      "label": "KeyDefault-after-mutation",
+      "family": "issue-395",
+      "kind": "query",
+      "sql": "SELECT id,status,n,total FROM KeyDefault",
+      "requires": [
+        "KeyDefault-seed"
+      ],
+      "timeout_seconds": 15
+    },
+    {
+      "label": "KeyDefault-reset",
+      "family": "issue-395",
+      "kind": "dml",
+      "sql": "",
+      "requires": [
+        "KeyDefault-seed"
+      ],
+      "timeout_seconds": 15,
+      "statements": [
+        "UPDATE KeyDefault SET status='sent', n=5 WHERE id='A'"
+      ]
+    },
+    {
+      "label": "KeyDefault-dml",
+      "family": "issue-395",
+      "kind": "dml",
+      "sql": "",
+      "requires": [
+        "KeyDefault-seed"
+      ],
+      "timeout_seconds": 15,
+      "statements": [
+        "UPDATE KeyDefault SET total=12 WHERE id='A'"
+      ]
+    },
+    {
+      "label": "KeyDefault-after-dml",
+      "family": "issue-395",
+      "kind": "query",
+      "sql": "SELECT id,status,n,total FROM KeyDefault",
+      "requires": [
+        "KeyDefault-seed"
+      ],
+      "timeout_seconds": 15
+    },
+    {
+      "label": "PlainKey-ddl",
+      "family": "issue-395",
+      "kind": "ddl",
+      "sql": "CREATE TABLE PlainKey (id STRING(36) NOT NULL, status STRING(16) DEFAULT ('draft'), n INT64 DEFAULT (0), total NUMERIC) PRIMARY KEY (id)",
+      "requires": [],
+      "timeout_seconds": 30
+    },
+    {
+      "label": "PlainKey-seed",
+      "family": "issue-395",
+      "kind": "dml",
+      "sql": "",
+      "requires": [
+        "PlainKey-ddl"
+      ],
+      "timeout_seconds": 15,
+      "statements": [
+        "INSERT INTO PlainKey (id,status,n,total) VALUES ('A','sent',5,10)"
+      ]
+    },
+    {
+      "label": "PlainKey-mutation",
+      "family": "issue-395",
+      "kind": "mutation",
+      "sql": "",
+      "requires": [
+        "PlainKey-seed"
+      ],
+      "timeout_seconds": 15,
+      "table": "PlainKey",
+      "operation": "update",
+      "values": {
+        "id": "A",
+        "total": {
+          "type": "numeric",
+          "value": "11"
+        }
+      }
+    },
+    {
+      "label": "PlainKey-after-mutation",
+      "family": "issue-395",
+      "kind": "query",
+      "sql": "SELECT id,status,n,total FROM PlainKey",
+      "requires": [
+        "PlainKey-seed"
+      ],
+      "timeout_seconds": 15
+    },
+    {
+      "label": "PlainKey-reset",
+      "family": "issue-395",
+      "kind": "dml",
+      "sql": "",
+      "requires": [
+        "PlainKey-seed"
+      ],
+      "timeout_seconds": 15,
+      "statements": [
+        "UPDATE PlainKey SET status='sent', n=5 WHERE id='A'"
+      ]
+    },
+    {
+      "label": "PlainKey-dml",
+      "family": "issue-395",
+      "kind": "dml",
+      "sql": "",
+      "requires": [
+        "PlainKey-seed"
+      ],
+      "timeout_seconds": 15,
+      "statements": [
+        "UPDATE PlainKey SET total=12 WHERE id='A'"
+      ]
+    },
+    {
+      "label": "PlainKey-after-dml",
+      "family": "issue-395",
+      "kind": "query",
+      "sql": "SELECT id,status,n,total FROM PlainKey",
+      "requires": [
+        "PlainKey-seed"
+      ],
+      "timeout_seconds": 15
+    },
+    {
+      "label": "GeneratedKey-ddl",
+      "family": "issue-395",
+      "kind": "ddl",
+      "sql": "CREATE TABLE GeneratedKey (id STRING(36) NOT NULL, status STRING(16) DEFAULT ('draft'), n INT64 DEFAULT (0), total NUMERIC, k INT64 AS (LENGTH(id)) STORED) PRIMARY KEY (k)",
+      "requires": [],
+      "timeout_seconds": 30
+    },
+    {
+      "label": "GeneratedKey-seed",
+      "family": "issue-395",
+      "kind": "dml",
+      "sql": "",
+      "requires": [
+        "GeneratedKey-ddl"
+      ],
+      "timeout_seconds": 15,
+      "statements": [
+        "INSERT INTO GeneratedKey (id,status,n,total) VALUES ('A','sent',5,10)"
+      ]
+    },
+    {
+      "label": "GeneratedKey-mutation",
+      "family": "issue-395",
+      "kind": "mutation",
+      "sql": "",
+      "requires": [
+        "GeneratedKey-seed"
+      ],
+      "timeout_seconds": 15,
+      "table": "GeneratedKey",
+      "operation": "update",
+      "values": {
+        "k": 1,
+        "total": {
+          "type": "numeric",
+          "value": "11"
+        }
+      }
+    },
+    {
+      "label": "GeneratedKey-after-mutation",
+      "family": "issue-395",
+      "kind": "query",
+      "sql": "SELECT id,status,n,total FROM GeneratedKey",
+      "requires": [
+        "GeneratedKey-seed"
+      ],
+      "timeout_seconds": 15
+    },
+    {
+      "label": "GeneratedKey-reset",
+      "family": "issue-395",
+      "kind": "dml",
+      "sql": "",
+      "requires": [
+        "GeneratedKey-seed"
+      ],
+      "timeout_seconds": 15,
+      "statements": [
+        "UPDATE GeneratedKey SET status='sent', n=5 WHERE id='A'"
+      ]
+    },
+    {
+      "label": "GeneratedKey-dml",
+      "family": "issue-395",
+      "kind": "dml",
+      "sql": "",
+      "requires": [
+        "GeneratedKey-seed"
+      ],
+      "timeout_seconds": 15,
+      "statements": [
+        "UPDATE GeneratedKey SET total=12 WHERE id='A'"
+      ]
+    },
+    {
+      "label": "GeneratedKey-after-dml",
+      "family": "issue-395",
+      "kind": "query",
+      "sql": "SELECT id,status,n,total FROM GeneratedKey",
+      "requires": [
+        "GeneratedKey-seed"
+      ],
+      "timeout_seconds": 15
+    },
+    {
+      "label": "CompositeDefault-ddl",
+      "family": "issue-395",
+      "kind": "ddl",
+      "sql": "CREATE TABLE CompositeDefault (id STRING(36) NOT NULL DEFAULT ('k'), status STRING(16) DEFAULT ('draft'), n INT64 DEFAULT (0), total NUMERIC, sub INT64 NOT NULL) PRIMARY KEY (id,sub)",
+      "requires": [],
+      "timeout_seconds": 30
+    },
+    {
+      "label": "CompositeDefault-seed",
+      "family": "issue-395",
+      "kind": "dml",
+      "sql": "",
+      "requires": [
+        "CompositeDefault-ddl"
+      ],
+      "timeout_seconds": 15,
+      "statements": [
+        "INSERT INTO CompositeDefault (id,status,n,total,sub) VALUES ('A','sent',5,10,1)"
+      ]
+    },
+    {
+      "label": "CompositeDefault-mutation",
+      "family": "issue-395",
+      "kind": "mutation",
+      "sql": "",
+      "requires": [
+        "CompositeDefault-seed"
+      ],
+      "timeout_seconds": 15,
+      "table": "CompositeDefault",
+      "operation": "update",
+      "values": {
+        "id": "A",
+        "total": {
+          "type": "numeric",
+          "value": "11"
+        },
+        "sub": 1
+      }
+    },
+    {
+      "label": "CompositeDefault-after-mutation",
+      "family": "issue-395",
+      "kind": "query",
+      "sql": "SELECT id,status,n,total FROM CompositeDefault",
+      "requires": [
+        "CompositeDefault-seed"
+      ],
+      "timeout_seconds": 15
+    },
+    {
+      "label": "CompositeDefault-reset",
+      "family": "issue-395",
+      "kind": "dml",
+      "sql": "",
+      "requires": [
+        "CompositeDefault-seed"
+      ],
+      "timeout_seconds": 15,
+      "statements": [
+        "UPDATE CompositeDefault SET status='sent', n=5 WHERE id='A'"
+      ]
+    },
+    {
+      "label": "CompositeDefault-dml",
+      "family": "issue-395",
+      "kind": "dml",
+      "sql": "",
+      "requires": [
+        "CompositeDefault-seed"
+      ],
+      "timeout_seconds": 15,
+      "statements": [
+        "UPDATE CompositeDefault SET total=12 WHERE id='A'"
+      ]
+    },
+    {
+      "label": "CompositeDefault-after-dml",
+      "family": "issue-395",
+      "kind": "query",
+      "sql": "SELECT id,status,n,total FROM CompositeDefault",
+      "requires": [
+        "CompositeDefault-seed"
+      ],
+      "timeout_seconds": 15
+    },
+    {
+      "label": "key-nonkey-default-ddl",
+      "family": "issue-395",
+      "kind": "ddl",
+      "sql": "CREATE TABLE NonkeyDefault (id STRING(36) NOT NULL, generated STRING(36) DEFAULT (GENERATE_UUID()), status STRING(16) DEFAULT ('draft'), n INT64 DEFAULT (0)) PRIMARY KEY(id)",
+      "requires": [],
+      "timeout_seconds": 30
+    },
+    {
+      "label": "key-nonkey-seed",
+      "family": "issue-395",
+      "kind": "dml",
+      "sql": "",
+      "requires": [
+        "key-nonkey-default-ddl"
+      ],
+      "timeout_seconds": 15,
+      "statements": [
+        "INSERT INTO NonkeyDefault(id,status,n) VALUES('A','sent',5)"
+      ]
+    },
+    {
+      "label": "key-nonkey-mutation",
+      "family": "issue-395",
+      "kind": "mutation",
+      "sql": "",
+      "requires": [
+        "key-nonkey-seed"
+      ],
+      "timeout_seconds": 15,
+      "table": "NonkeyDefault",
+      "operation": "update",
+      "values": {
+        "id": "A",
+        "generated": "fixed"
+      }
+    },
+    {
+      "label": "key-nonkey-after",
+      "family": "issue-395",
+      "kind": "query",
+      "sql": "SELECT id,status,n FROM NonkeyDefault",
+      "requires": [
+        "key-nonkey-seed"
+      ],
+      "timeout_seconds": 15
+    }
+  ]
+}

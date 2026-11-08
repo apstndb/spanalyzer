@@ -1,0 +1,58 @@
+{
+  "observed_on_utc": "2026-10-29",
+  "client_dates_jst": [
+    "2026-10-29",
+    "2026-10-30"
+  ],
+  "source_head": "c2d7792dd7f83d5dd086e2d32bc22e5d253cf06c",
+  "execution_start": "2026-10-29T14:53:13.907391+00:00",
+  "execution_end": "2026-10-29T15:40:32.093141+00:00",
+  "managed_reference": "managed-recheck-20261029",
+  "managed_reference_window": "2026-10-29 00:30:18-01:29:28 UTC; no managed request in this task",
+  "images": {
+    "omni-r5": {
+      "tagged_image": "us-docker.pkg.dev/spanner-omni/images/spanner-omni:2026.r5",
+      "platform": "linux/arm64",
+      "digest": "sha256:e506672206e0291cac28cbe19ad4cd470cec112c24601637bc896c65f7362396",
+      "image": "us-docker.pkg.dev/spanner-omni/images/spanner-omni:2026.r5@sha256:e506672206e0291cac28cbe19ad4cd470cec112c24601637bc896c65f7362396",
+      "retrieved_at": "2026-10-29T14:44:10.570288+00:00",
+      "manifest_sha256": "c9e0053579c761d070fa86f0a59484e0e3a4a51097339fe2dc3aeca5fabfddac"
+    },
+    "omni-lts": {
+      "tagged_image": "us-docker.pkg.dev/spanner-omni/images/spanner-omni:2026.r4-lts.1",
+      "platform": "linux/arm64",
+      "digest": "sha256:5e3cf199f5abf3a09cd2348ab36c129b3268966eb4eb72fca278fe58252fcbdb",
+      "image": "us-docker.pkg.dev/spanner-omni/images/spanner-omni:2026.r4-lts.1@sha256:5e3cf199f5abf3a09cd2348ab36c129b3268966eb4eb72fca278fe58252fcbdb",
+      "retrieved_at": "2026-10-29T14:44:14.984116+00:00",
+      "manifest_sha256": "6384c4c65fe05720bb7a01e78ba603038e80310f7987513ac5537338df5e6c2e"
+    },
+    "emulator": {
+      "tagged_image": "gcr.io/cloud-spanner-emulator/emulator:1.5.59",
+      "platform": "linux/arm64",
+      "digest": "sha256:969af6a9349948fbfb4a826c18e160e258a4005f7c759f8e7f2dcec369cccba8",
+      "image": "gcr.io/cloud-spanner-emulator/emulator:1.5.59@sha256:969af6a9349948fbfb4a826c18e160e258a4005f7c759f8e7f2dcec369cccba8",
+      "retrieved_at": "2026-10-29T14:44:18.101064+00:00",
+      "manifest_sha256": "5b836e50638b856d4a4263fcff0eda403059bb9e971505bce9d9582b0d05ebc3"
+    }
+  },
+  "dependencies": {
+    "go": "go1.26.8",
+    "spanner": "v1.91.0",
+    "spanemuboost": "v0.4.10-alpha.1",
+    "workspace": "GOWORK=off scratch-only reproducer module"
+  },
+  "core_planned_steps_per_runtime": 700,
+  "owned_temporary_databases": 37,
+  "owned_runtime_containers": 15,
+  "cleanup_status": "All 37 owned temporary databases have close/drop OK plus GetDatabase NotFound; all 15 task runtime containers are absent. Fast-container identities use bounded daemon events where the active snapshot raced completion.",
+  "comparison_status": "Completed with product divergences, preserved dependency skips and two Emulator long-duration receive deadlines. No timeout is treated as SQL grammar rejection.",
+  "harness_attempts": [
+    "One core adapter omitted choose=true; byte-identical retained JSON input and original parameter-aware producer correct that case without hiding the first attempt.",
+    "Emulator graph limit 16 caused nine initial DDL capacity failures; only blocked cases rerun in a fresh database with fewer graphs.",
+    "Separate fresh ordering matrix and queue receive/lease contexts distinguish code acceptance from value correctness and streaming uncertainty."
+  ],
+  "sources": "sources/source-integrity.json",
+  "commands": "all-commands.json",
+  "durable_task_directory": "<LOCAL_TASK_ROOT>/apstndb/spanalyzer/cross-engine-doc-delta-20261029",
+  "authority": "Public release/registry/document reads; owned local runtimes/databases and cleanup; local evidence and documentation. No managed cloud writes, selector/implementation/dependency changes, commit, push, PR, merge, release or external synchronization."
+}

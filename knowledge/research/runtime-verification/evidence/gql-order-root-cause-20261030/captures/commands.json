@@ -1,0 +1,101 @@
+[
+  {
+    "name": "probe-build",
+    "argv": [
+      "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go",
+      "build",
+      "-o",
+      "<LOCAL_CHECKOUT>/.tmp/gql-order-root-cause-20261030/probe",
+      "./probe.go"
+    ],
+    "cwd": "<LOCAL_CHECKOUT>/.tmp/gql-order-root-cause-20261030/module",
+    "started_at": "2026-10-30T09:37:51.076794+00:00",
+    "completed_at": "2026-10-30T09:37:53.646869+00:00",
+    "seconds": 2.57,
+    "exit_code": 0
+  },
+  {
+    "name": "probe-buildinfo",
+    "argv": [
+      "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go",
+      "version",
+      "-m",
+      "<LOCAL_CHECKOUT>/.tmp/gql-order-root-cause-20261030/probe"
+    ],
+    "cwd": "<LOCAL_CHECKOUT>/.tmp/gql-order-root-cause-20261030/module",
+    "started_at": "2026-10-30T09:37:53.647272+00:00",
+    "completed_at": "2026-10-30T09:37:53.667557+00:00",
+    "seconds": 0.02,
+    "exit_code": 0
+  },
+  {
+    "name": "official-before",
+    "argv": [
+      "<LOCAL_CHECKOUT>/.tmp/gql-order-root-cause-20261030/probe",
+      "emulator",
+      "gcr.io/cloud-spanner-emulator/emulator:1.5.59@sha256:969af6a9349948fbfb4a826c18e160e258a4005f7c759f8e7f2dcec369cccba8",
+      "<LOCAL_CHECKOUT>/.tmp/gql-order-root-cause-20261030/module/matrix.json"
+    ],
+    "cwd": "<LOCAL_CHECKOUT>/.tmp/gql-order-root-cause-20261030/module",
+    "started_at": "2026-10-30T09:37:53.980279+00:00",
+    "completed_at": "2026-10-30T09:37:58.677444+00:00",
+    "seconds": 4.697,
+    "exit_code": 0
+  },
+  {
+    "name": "original-copy",
+    "argv": [
+      "<LOCAL_CHECKOUT>/.tmp/gql-order-root-cause-20261030/probe",
+      "emulator",
+      "sha256:100965267ce51cddc7b8b9bec85b8cadc8d711d215b30e7ca6841aee35f88e18",
+      "<LOCAL_CHECKOUT>/.tmp/gql-order-root-cause-20261030/module/matrix.json"
+    ],
+    "cwd": "<LOCAL_CHECKOUT>/.tmp/gql-order-root-cause-20261030/module",
+    "started_at": "2026-10-30T09:37:58.941495+00:00",
+    "completed_at": "2026-10-30T09:38:02.718373+00:00",
+    "seconds": 3.777,
+    "exit_code": 0
+  },
+  {
+    "name": "no-scramble",
+    "argv": [
+      "<LOCAL_CHECKOUT>/.tmp/gql-order-root-cause-20261030/probe",
+      "emulator",
+      "sha256:83619e5830c5a5c11066f7f41a8ebf029802909ecd45806e73843d37cda085cc",
+      "<LOCAL_CHECKOUT>/.tmp/gql-order-root-cause-20261030/module/matrix.json"
+    ],
+    "cwd": "<LOCAL_CHECKOUT>/.tmp/gql-order-root-cause-20261030/module",
+    "started_at": "2026-10-30T09:38:02.979618+00:00",
+    "completed_at": "2026-10-30T09:38:06.739228+00:00",
+    "seconds": 3.76,
+    "exit_code": 0
+  },
+  {
+    "name": "graph-ordered",
+    "argv": [
+      "<LOCAL_CHECKOUT>/.tmp/gql-order-root-cause-20261030/probe",
+      "emulator",
+      "sha256:9f07e6b01884e5e668b1bcdbe6009e68753d001177e51d45993a4d648b573c96",
+      "<LOCAL_CHECKOUT>/.tmp/gql-order-root-cause-20261030/module/matrix.json"
+    ],
+    "cwd": "<LOCAL_CHECKOUT>/.tmp/gql-order-root-cause-20261030/module",
+    "started_at": "2026-10-30T09:38:07.024839+00:00",
+    "completed_at": "2026-10-30T09:38:10.816452+00:00",
+    "seconds": 3.792,
+    "exit_code": 0
+  },
+  {
+    "name": "official-after",
+    "argv": [
+      "<LOCAL_CHECKOUT>/.tmp/gql-order-root-cause-20261030/probe",
+      "emulator",
+      "gcr.io/cloud-spanner-emulator/emulator:1.5.59@sha256:969af6a9349948fbfb4a826c18e160e258a4005f7c759f8e7f2dcec369cccba8",
+      "<LOCAL_CHECKOUT>/.tmp/gql-order-root-cause-20261030/module/matrix.json"
+    ],
+    "cwd": "<LOCAL_CHECKOUT>/.tmp/gql-order-root-cause-20261030/module",
+    "started_at": "2026-10-30T09:38:11.133252+00:00",
+    "completed_at": "2026-10-30T09:38:14.918293+00:00",
+    "seconds": 3.785,
+    "exit_code": 0
+  }
+]

@@ -1,0 +1,15 @@
+from pathlib import Path
+from concurrent.futures import ThreadPoolExecutor
+import subprocess,json,datetime,hashlib
+out=Path('<LOCAL_TASK_ROOT>/apstndb/spanalyzer/managed-recheck-20261103/sources')
+docs=['spanner-omni/overview','spanner-omni/vector-search-overview','spanner-omni/editions-overview','spanner-omni/authentication','spanner/docs/timestamp-bounds','spanner/docs/reference/standard-sql/search_functions','spanner/docs/full-text-search','spanner/docs/full-text-search/search-indexes','spanner/docs/graph/graph-algorithms-overview']
+def run(path):
+    args=['dkcli','get','-f','json','docs.cloud.google.com/'+path]
+    r=subprocess.run(args,capture_output=True,timeout=120)
+    assert r.returncode==0,(path,r.stderr.decode()[-500:])
+    name=path.replace('/','__')+'.json';(out/name).write_bytes(r.stdout)
+    d=json.loads(r.stdout);(out/name.replace('.json','.md')).write_text(d['content'])
+    return {'file':name,'argv':args,'at':datetime.datetime.now(datetime.timezone.utc).isoformat(),'updateTime':d.get('updateTime'),'sha256':hashlib.sha256(r.stdout).hexdigest()}
+with ThreadPoolExecutor(max_workers=4)as pool:rows=list(pool.map(run,docs))
+(out/'related-retrieval.json').write_text(json.dumps(rows,indent=2)+'\n')
+print('Fetched',len(rows),'full official documents')

@@ -1,0 +1,52 @@
+"""Derive per-feature and ordered-result evidence; no runtime or cloud requests."""
+from pathlib import Path
+from collections import Counter,defaultdict
+import datetime,hashlib,json,statistics
+root=Path('<LOCAL_CHECKOUT>');task=Path('<LOCAL_TASK_ROOT>/apstndb/spanalyzer/cross-engine-doc-delta-20261029');ev=task/'evidence';managed=root/'knowledge/research/runtime-verification/evidence/managed-recheck-20261029';old=root/'knowledge/research/runtime-verification/evidence/json-cross-engine-20261010'
+def load(p):return[json.loads(s)for s in p.read_text().splitlines()if s]
+def walk(x):
+ if isinstance(x,dict):
+  yield x
+  for v in x.values():yield from walk(v)
+ elif isinstance(x,list):
+  for v in x:yield from walk(v)
+comparisons=json.loads((ev/'comparison.json').read_text());out={};before={r['label']:r for name in ['queries','followup']for r in load(managed/(name+'.jsonl'))}
+for backend in ['omni-r5','omni-lts','emulator']:
+ main=load(ev/(backend+'.stdout'));legacy=load(ev/(backend+'-legacy.stdout'));queues=load(ev/(backend+'-queues.stdout'));order=load(ev/(backend+'-order.stdout'));constants=[r for r in legacy if r['phase']=='google-constants'and r['label']in before];heartbeats={}
+ for phase in ['google-fixtures','pg-fixtures']:
+  r=next(r for r in legacy if r['phase']==phase and r['label']=='heartbeat-child-100');ts=sorted(x['timestamp']for row in r.get('rows',[])for x in walk(row['record'])if set(x)=={'timestamp'}and isinstance(x['timestamp'],str));times=[datetime.datetime.fromisoformat(t.replace('Z','+00:00'))for t in ts];intervals=[(b-a).total_seconds()*1000 for a,b in zip(times,times[1:])];heartbeats[phase]={'code':r['code'],'rows':len(r.get('rows',[])),'timestamps':ts,'median_record_gap_ms':statistics.median(intervals)if intervals else None}
+ ordered=[{k:r.get(k)for k in ['label','code','rows','sql']}for r in order if r.get('family')=='dynamic-order-reproduction']
+ desired={};desired['foreign_keys']=[{k:r.get(k)for k in ['phase','label','code','error','rows','rollback_expected','transaction_committed']}for r in main if r['label']in ['fk-inline-set-null','fk-alter-set-null','fk-after-dml','fk-after-mutation','fk-rollback','fk-composite-after']]
+ desired['jsonb']=[{k:r.get(k)for k in ['label','code','error','rows']}for r in main if r['phase']=='pg-new'and r['label'].startswith('jsonb-')]
+ desired['filtered_search']=[{k:r.get(k)for k in ['label','code','error','rows']}for r in main if r.get('family')=='filtered-search'and r['kind']=='query']
+ desired['numeric_search']=[{k:r.get(k)for k in ['label','code','error','rows']}for r in main if r.get('family')=='numeric-search'and r['label'].startswith('numeric-')and r.get('kind')=='query']
+ desired['tuning']=[{k:r.get(k)for k in ['label','code','error','rows']}for r in main if r['label'].startswith('tuning-')]
+ desired['graph_json_conversions']=[{k:r.get(k)for k in ['phase','label','code','error','rows']}for r in legacy if ('graph-'in r['label']or r['label'].startswith(('cast-','enum-')))]
+ gen=[{k:r.get(k)for k in ['phase','label','matches','expected_message_id','row_count']}for r in queues if r.get('label','').endswith('-expected-generation')];unusual=[{k:r.get(k)for k in ['phase','label','code','error']}for r in queues if r.get('code')in ['DeadlineExceeded','Unavailable','Internal','Unknown']and r.get('error')!='intentional probe rollback']
+ queue_codes=[{k:r.get(k)for k in ['phase','label','code','error','rows','rollback','committed']}for r in queues if r.get('kind')in ['query','transaction']or r.get('label')in ['create','cycle-1-create','cycle-2-create','cleanup','cleanup-confirmation']]
+ historical=None
+ if backend=='emulator':
+  prior=[r for r in load(old/'emulator.jsonl')if r.get('phase')=='google-constants'and r['label']in before];bylabel={r['label']:r for r in constants};historical={'source':'json-cross-engine-20261010/emulator.jsonl','before_cases':len(prior),'after_cases':len(constants),'before_codes':dict(Counter(r['code']for r in prior)),'after_codes':dict(Counter(r['code']for r in constants)),'changed_codes':[{'label':r['label'],'before':r['code'],'after':bylabel[r['label']]['code']}for r in prior if r['code']!=bylabel[r['label']]['code']],'new_successes':sum(r['code']!='OK'and bylabel[r['label']]['code']=='OK'for r in prior)}
+ out[backend]={'constant_corpus':{'cases':len(constants),'codes':dict(Counter(r['code']for r in constants)),'codes_matching_managed':sum(r['code']==before[r['label']]['code']for r in constants),'correctly_bound_conditional':next({k:r.get(k)for k in ['label','params','code','rows']}for r in constants if r['label']=='if-subquery-unused')},'heartbeats':heartbeats,'queue_generation_checks':gen,'queue_observations':queue_codes,'queue_inconclusive':unusual,'order_matrix':ordered,'features':desired,'historical_emulator':historical}
+out['emulator']['queue_followups']={name:[{k:r.get(k)for k in ['phase','label','kind','code','error','rows','elapsed_ms']}for r in load(ev/(name+'.stdout'))]for name in ['emulator-queue-focus','emulator-queue-single']}
+cleanup=[];containers=[]
+for path in sorted(ev.glob('*.stdout')):
+ if path.name.endswith('buildinfo.stdout')or path.name.endswith('build.stdout'):continue
+ try:rr=load(path)
+ except (ValueError,KeyError):continue
+ byphase=defaultdict(list)
+ for r in rr:
+  if r.get('phase'):
+   phase='google-fixtures'if path.name.endswith('-legacy.stdout')and r['phase']=='google-constants'else r['phase'];byphase[phase].append(r)
+ for phase,rows in byphase.items():
+  labels={r.get('label'):r for r in rows};created=labels.get('create-database',labels.get('database-setup'))
+  if created and created.get('code')=='OK':
+   drop=labels.get('drop-database',labels.get('database-cleanup'));absent=labels.get('database-absent');cleanup.append({'file':path.name,'phase':phase,'drop_code':drop.get('code')if drop else None,'get_after_drop_code':absent.get('code')if absent else None})
+for path in sorted(ev.glob('*-container-cleanup.json')):
+ a=json.loads(path.read_text());active=json.loads((ev/path.name.replace('-container-cleanup','-active-containers')).read_text());entry={'file':path.name,'active_count':len(active),**a}
+ if not active:
+  recovered=path.name.replace('-container-cleanup.json','-event-identity.json');r=json.loads((ev/recovered).read_text());entry['identity_recovery']=recovered;entry['owned']=[{'id':r['container_id'],'inspect_exit_code':r['inspect_after_completion_exit_code'],'absent':r['absent_from_reachable_daemon']}]
+ containers.append(entry)
+assert len(cleanup)==37,len(cleanup);assert all(r['drop_code']=='OK'and r['get_after_drop_code']=='NotFound'for r in cleanup);assert len(containers)==15 and all((r['active_count']==1 or r.get('identity_recovery'))and len(r['owned'])==1 and all(x['absent']for x in r['owned'])for r in containers)
+(ev/'feature-summary.json').write_text(json.dumps(out,indent=2)+'\n');(ev/'cleanup-summary.json').write_text(json.dumps({'database_lifecycles':cleanup,'owned_temporary_databases':len(cleanup),'containers':containers,'owned_runtime_containers':len(containers)},indent=2)+'\n')
+print(json.dumps({k:{'constants':v['constant_corpus'],'heartbeats':{p:{key:r[key]for key in ['code','rows','median_record_gap_ms']}for p,r in v['heartbeats'].items()},'queue_generations':v['queue_generation_checks'],'queue_inconclusive':v['queue_inconclusive'],'new_emulator_successes':v['historical_emulator']['new_successes']if v['historical_emulator']else None}for k,v in out.items()}));print('cleanup',len(cleanup),len(containers))

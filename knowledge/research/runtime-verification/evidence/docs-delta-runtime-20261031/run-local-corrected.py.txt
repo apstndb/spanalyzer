@@ -1,0 +1,33 @@
+from pathlib import Path
+import os,json,subprocess,threading,datetime,time,hashlib
+root=Path('<LOCAL_CHECKOUT>');scratch=root/'.tmp/docs-delta-runtime-20261031';task=Path('<LOCAL_TASK_ROOT>/apstndb/spanalyzer/docs-delta-runtime-20261031');out=task/'evidence';env=os.environ.copy()
+for k in list(env):
+ if k.startswith(('SPANEMUBOOST_','SPANNER_','TEST_REAL_SPANNER_','REQUIRE_REAL_SPANNER_','GOOGLE_APPLICATION_CREDENTIALS')):env.pop(k,None)
+env['TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE']='/var/run/docker.sock';env['DOCKER_HOST']=subprocess.check_output(['docker','context','inspect','--format','{{.Endpoints.docker.Host}}'],text=True).strip();images=json.loads((Path('<LOCAL_TASK_ROOT>/apstndb/spanalyzer/cross-engine-doc-delta-20261029/sources/selected-images.json')).read_text());(task/'sources/selected-images.json').write_text(json.dumps(images,indent=2)+'\n');receipts=[]
+wait_started=time.monotonic()
+while True:
+ ledger=out/'local-commands.json'
+ prior=json.loads(ledger.read_text())if ledger.exists()else[]
+ if len(prior)==3 and all(r['exit_code']==0 for r in prior):break
+ if time.monotonic()-wait_started>1800:raise SystemExit('Original local cohort did not complete')
+ time.sleep(5)
+def ids():return set(subprocess.check_output(['docker','ps','-aq','--no-trunc'],text=True).split())
+for backend,entry in images.items():
+ name=backend+'-corrected'
+ before=ids();owned=[];print('START',name,flush=True);args=[str(scratch/'local'),backend,entry['image'],str(out/'google-corrected-cases.json'),str(out/'pg-corrected-cases.json')];started=datetime.datetime.now(datetime.timezone.utc).isoformat();at=time.monotonic()
+ with (out/(name+'.jsonl')).open('w')as stdout,(out/(name+'.stderr')).open('w')as stderr:
+  p=subprocess.Popen(args,cwd=scratch/'module',env=env,stdout=subprocess.PIPE,stderr=stderr,text=True)
+  def consume():
+   for line in p.stdout:
+    stdout.write(line);stdout.flush()
+    try:row=json.loads(line)
+    except ValueError:continue
+    if row.get('label')=='runtime-start'and row.get('code')=='OK':
+     for cid in ids()-before:
+      r=subprocess.run(['docker','inspect',cid],capture_output=True,text=True)
+      if r.returncode:continue
+      data=json.loads(r.stdout)[0]
+      if data['Config']['Image']==entry['image']:owned.append({'container_id':cid,'configured_image':data['Config']['Image'],'image_id':data['Image'],'path':data['Path'],'args':data['Args'],'state':data['State']['Status']})
+  reader=threading.Thread(target=consume,daemon=True);reader.start();code=p.wait(timeout=1800);reader.join(timeout=30)
+ after=ids();receipt={'name':name,'argv':args,'started_at':started,'completed_at':datetime.datetime.now(datetime.timezone.utc).isoformat(),'seconds':round(time.monotonic()-at,3),'exit_code':code,'owned_containers':owned,'owned_containers_absent':all(x['container_id']not in after for x in owned),'preexisting_container_count':len(before),'preexisting_containers_preserved':before.issubset(after),'preexisting_id_set_sha256':hashlib.sha256('\n'.join(sorted(before)).encode()).hexdigest()};receipts.append(receipt);(out/'local-corrected-commands.json').write_text(json.dumps(receipts,indent=2)+'\n');print(name,'exit',code,'seconds',receipt['seconds'],'cleanup',receipt['owned_containers_absent'],'existing',receipt['preexisting_containers_preserved'],flush=True)
+ if code:raise SystemExit('Local runtime process failed; inspect retained output')

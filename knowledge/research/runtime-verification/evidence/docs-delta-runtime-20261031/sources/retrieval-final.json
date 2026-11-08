@@ -1,0 +1,58 @@
+[
+  {
+    "file": "memefish-main-final.json",
+    "argv": [
+      "gh",
+      "api",
+      "repos/cloudspannerecosystem/memefish/commits/main"
+    ],
+    "retrieved_at": "2026-10-30T23:38:17.191029+00:00",
+    "sha256": "a28b06db8ca5d0663aa12d47e9fd39417ba884b66892add71eb047581dde29db"
+  },
+  {
+    "file": "memefish-open-prs-final.json",
+    "argv": [
+      "gh",
+      "api",
+      "--paginate",
+      "--slurp",
+      "repos/cloudspannerecosystem/memefish/pulls?state=open&per_page=100"
+    ],
+    "retrieved_at": "2026-10-30T23:38:17.287539+00:00",
+    "sha256": "d2f8bdf867e48dadb0b668ff6dc98fea36bc3065c3124412d2e396735b5d41a7"
+  },
+  {
+    "file": "memefish-all-prs-final.json",
+    "argv": [
+      "gh",
+      "api",
+      "--paginate",
+      "--slurp",
+      "repos/cloudspannerecosystem/memefish/pulls?state=all&per_page=100"
+    ],
+    "retrieved_at": "2026-10-30T23:38:20.656038+00:00",
+    "sha256": "9807d737bd2596238c0fccbda1ff70a5d29a8c7c854031ce7b9c026716c38029"
+  },
+  {
+    "file": "memefish-open-issues-final.json",
+    "argv": [
+      "gh",
+      "api",
+      "--paginate",
+      "--slurp",
+      "repos/cloudspannerecosystem/memefish/issues?state=open&per_page=100"
+    ],
+    "retrieved_at": "2026-10-30T23:38:17.466229+00:00",
+    "sha256": "8ef1127c5f3b16535d0f1db61c1654ad3126707819dfa302c5c8d682e0ec1cd3"
+  },
+  {
+    "file": "emulator-latest-final.json",
+    "argv": [
+      "gh",
+      "api",
+      "repos/GoogleCloudPlatform/cloud-spanner-emulator/releases/latest"
+    ],
+    "retrieved_at": "2026-10-30T23:38:17.452104+00:00",
+    "sha256": "2b83c85a310dbfcbc7ba5c55f7147362765e51dbf5c580f2d0d60e12d3942d96"
+  }
+]

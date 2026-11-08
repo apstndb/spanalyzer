@@ -1,0 +1,53 @@
+GoogleSQL for Spanner supports approximate aggregate functions. To learn about the syntax for aggregate function calls, see [Aggregate function calls](https://docs.cloud.google.com/spanner/docs/reference/standard-sql/aggregate-function-calls) .
+
+Approximate aggregate functions are scalable in terms of time and resource usage, but produce approximate results instead of exact results. These functions typically use fewer resources than [exact aggregation functions](https://docs.cloud.google.com/spanner/docs/reference/standard-sql/aggregate_functions) like `COUNT(DISTINCT ...)` , but also introduce statistical uncertainty. This makes approximate aggregation appropriate for large data streams for which linear memory usage is impractical, as well as for data that's already approximate.
+
+The approximate aggregate functions in this section compute an estimate directly from the input data. These functions don't return a [*sketch*](https://docs.cloud.google.com/spanner/docs/reference/standard-sql/sketches) , which is a compact summary of the data that you can store and merge later, and they don't let you specify the precision of the estimate.
+
+To specify precision with sketches, use [HyperLogLog++ functions](https://docs.cloud.google.com/spanner/docs/reference/standard-sql/hll_functions) to estimate cardinality.
+
+## Function list
+
+| Name                                                                                                                                               | Summary                                                        |
+|----------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------|
+| [`APPROX_COUNT_DISTINCT`](https://docs.cloud.google.com/spanner/docs/reference/standard-sql/approximate_aggregate_functions#approx_count_distinct) | Gets the approximate result for `COUNT(DISTINCT expression)` . |
+
+## `APPROX_COUNT_DISTINCT`
+
+```
+APPROX_COUNT_DISTINCT(
+  expression
+)
+```
+
+**Description**
+
+Returns the approximate result for `COUNT(DISTINCT expression)` . The value returned is a statistical estimate, not necessarily the actual value.
+
+This function is less accurate than `COUNT(DISTINCT expression)` , but performs better on very large input.
+
+**Supported Argument Types**
+
+Any data type **except** :
+
+- `ARRAY`
+- `STRUCT`
+- `PROTO`
+- `INTERVAL`
+
+**Returned Data Types**
+
+`INT64`
+
+**Examples**
+
+```
+SELECT APPROX_COUNT_DISTINCT(x) as approx_distinct
+FROM UNNEST([0, 1, 1, 2, 3, 5]) as x;
+
+/*-----------------+
+ | approx_distinct |
+ +-----------------+
+ | 5               |
+ +-----------------*/
+```

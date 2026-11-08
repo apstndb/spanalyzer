@@ -1,0 +1,104 @@
+[
+  {
+    "name": "google-features-build",
+    "started_at": "2026-10-05T00:20:05.157210+00:00",
+    "exit_code": 0,
+    "elapsed_seconds": 2.44,
+    "command": [
+      "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go",
+      "build",
+      "-o",
+      "<LOCAL_CHECKOUT>/.tmp/cross-engine-20261005/managed/google-features",
+      "<LOCAL_CHECKOUT>/.tmp/cross-engine-20261005/managed/google-features.go"
+    ]
+  },
+  {
+    "name": "google-features-buildinfo",
+    "started_at": "2026-10-05T00:20:07.594702+00:00",
+    "exit_code": 0,
+    "elapsed_seconds": 0.02,
+    "command": [
+      "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go",
+      "version",
+      "-m",
+      "<LOCAL_CHECKOUT>/.tmp/cross-engine-20261005/managed/google-features"
+    ]
+  },
+  {
+    "name": "pg-features-build",
+    "started_at": "2026-10-05T00:20:07.612100+00:00",
+    "exit_code": 0,
+    "elapsed_seconds": 1.03,
+    "command": [
+      "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go",
+      "build",
+      "-o",
+      "<LOCAL_CHECKOUT>/.tmp/cross-engine-20261005/managed/pg-features",
+      "<LOCAL_CHECKOUT>/.tmp/cross-engine-20261005/managed/pg-features.go"
+    ]
+  },
+  {
+    "name": "pg-features-buildinfo",
+    "started_at": "2026-10-05T00:20:08.645142+00:00",
+    "exit_code": 0,
+    "elapsed_seconds": 0.02,
+    "command": [
+      "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go",
+      "version",
+      "-m",
+      "<LOCAL_CHECKOUT>/.tmp/cross-engine-20261005/managed/pg-features"
+    ]
+  },
+  {
+    "name": "queue-build",
+    "started_at": "2026-10-05T00:20:08.661683+00:00",
+    "exit_code": 0,
+    "elapsed_seconds": 1.04,
+    "command": [
+      "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go",
+      "build",
+      "-o",
+      "<LOCAL_CHECKOUT>/.tmp/cross-engine-20261005/managed/queue",
+      "<LOCAL_CHECKOUT>/.tmp/cross-engine-20261005/managed/queue.go"
+    ]
+  },
+  {
+    "name": "queue-buildinfo",
+    "started_at": "2026-10-05T00:20:09.700557+00:00",
+    "exit_code": 0,
+    "elapsed_seconds": 0.02,
+    "command": [
+      "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go",
+      "version",
+      "-m",
+      "<LOCAL_CHECKOUT>/.tmp/cross-engine-20261005/managed/queue"
+    ]
+  },
+  {
+    "name": "google-features",
+    "started_at": "2026-10-05T00:20:09.716694+00:00",
+    "exit_code": 0,
+    "elapsed_seconds": 249.6,
+    "command": [
+      "<LOCAL_CHECKOUT>/.tmp/cross-engine-20261005/managed/google-features"
+    ]
+  },
+  {
+    "name": "pg-features",
+    "started_at": "2026-10-05T00:24:19.318002+00:00",
+    "exit_code": 0,
+    "elapsed_seconds": 54.65,
+    "command": [
+      "<LOCAL_CHECKOUT>/.tmp/cross-engine-20261005/managed/pg-features"
+    ]
+  },
+  {
+    "name": "queue",
+    "started_at": "2026-10-05T00:25:13.970685+00:00",
+    "exit_code": 0,
+    "elapsed_seconds": 128.76,
+    "command": [
+      "<LOCAL_CHECKOUT>/.tmp/cross-engine-20261005/managed/queue"
+    ]
+  }
+]

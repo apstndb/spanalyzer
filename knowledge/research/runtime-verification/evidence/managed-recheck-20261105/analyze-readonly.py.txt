@@ -1,0 +1,38 @@
+from pathlib import Path
+import json,math
+r=Path('<LOCAL_CHECKOUT>');p=Path('<LOCAL_TASK_ROOT>/apstndb/spanalyzer/managed-recheck-20261105/evidence');old=r/'knowledge/research/runtime-verification/evidence/managed-recheck-20261103'
+checks=[]
+def check(name,ok,detail=None):checks.append({'name':name,'pass':bool(ok),'detail':detail})
+read=lambda path:[json.loads(x)for x in path.read_text().splitlines()]
+phases=['readonly','supplemental','statistics','statistics-controls','histogram-controls','observed-histogram'];allrows=[]
+for phase in phases:
+ rows=read(p/(phase+'.jsonl'));plan=json.loads((p/(phase+'-cases.json')).read_text());allrows+=rows;check(phase+'-complete',[x['label']for x in rows]==[x['label']for x in plan]);check(phase+'-process',json.loads((p/(phase+'-command.json')).read_text())['exit_code']==0);check(phase+'-no-transport-failure',all(x['code']not in ['DeadlineExceeded','Unavailable','Unauthenticated','Unknown']for x in rows))
+rows=read(p/'readonly.jsonl');by={x['label']:x for x in rows};prior={x['label']:x for x in read(old/'readonly.jsonl')};changes=[]
+for label,now in by.items():
+ before=prior[label];same_code=now['code']==before['code'];check(label+'-same-code',same_code)
+ if label.startswith(('sys-columns','infoschema-columns')):
+  check(label+'-same-catalog-tuples',now['rows']==before['rows']);continue
+ if label.startswith('sys-query')or label=='pipe-limit':continue
+ unordered=lambda rr:sorted(json.dumps(v,sort_keys=True)for v in rr)
+ check(label+'-same-values',unordered(now['rows'])==unordered(before['rows']))
+check('ordered-pipe-sequence',[v['b']for v in by['pipe-order-by']['rows']]==['30','20','10'])
+current=by['sys-columns-0']['rows'];names=['AVG_COLUMNAR_READ_SHARE','CPU_SECONDS_DISTRIBUTION','CPU_SECONDS_DISTRIBUTION_JSON_STRING','ROW_SCANNED_DISTRIBUTION','ROW_SCANNED_DISTRIBUTION_JSON_STRING'];covered=[x for x in current if x['COLUMN_NAME']in names];check('documented-30-columns',len(covered)==30)
+stats=read(p/'statistics.jsonl');counts={'populated_scalar_rows':0,'json_percentile_success':0,'array_signature_rejections':0}
+for x in stats[1:]:
+ if x['label'].endswith('-scalar'):
+  check(x['label']+'-executes',x['code']=='OK');counts['populated_scalar_rows']+=len(x['rows'])
+  for row in x['rows']:
+   check(x['label']+'-columnar-bound',row['AVG_COLUMNAR_READ_SHARE']is None or 0<=row['AVG_COLUMNAR_READ_SHARE']<=1)
+   for col in ['CPU_SECONDS_DISTRIBUTION','ROW_SCANNED_DISTRIBUTION']:
+    text=row[col+'_JSON_STRING'];check(x['label']+col+'-json',text is None or isinstance(json.loads(text),dict))
+ elif x['label'].endswith('-struct'):
+  ok=x['code']=='InvalidArgument'and 'No matching signature'in x['error'];check(x['label']+'-array-negative-control',ok);counts['array_signature_rejections']+=int(ok)
+ else:check(x['label']+'-json-executes',x['code']=='OK');counts['json_percentile_success']+=int(x['code']=='OK')
+pairs=read(p/'statistics-controls.jsonl')[1:]
+for x in pairs:
+ check(x['label']+'-executes',x['code']=='OK')
+ for row in x['rows']:check(x['label']+'-paired-value',row['p99_struct']==row['p99_json'])
+encoded=read(p/'observed-histogram.jsonl');check('observed-encoded-json-valid',encoded[1]['code']=='OK');check('expanded-histogram-negative-control',encoded[2]['code']=='InvalidArgument');synthetic=read(p/'histogram-controls.jsonl');check('synthetic-json-inconclusive',synthetic[1]['code']=='InvalidArgument')
+drift=json.loads((p/'drift-command.json').read_text());check('local-drift-failure-retained',drift['exit_code']==1 and 'unknown_tables=[ACTIVE_BATCH_OPERATIONS BATCH_OPERATIONS]'in(p/'drift.log').read_text())
+summary={'status':'pass'if all(x['pass']for x in checks)else 'fail','checks':len(checks),'failures':[x for x in checks if not x['pass']],'assertions':checks,'executed_readonly_steps':len(allrows),'statistics_scope':counts,'paired_percentile_controls':len(pairs),'pending_fixture_steps':{'google':77,'pg':50},'boundary':'No fixture was executed by this producer. Negative controls and local drift failure remain explicit; this is not a fully green integration gate.'}
+(p/'readonly-assertions.json').write_text(json.dumps(summary,indent=2)+'\n');print(summary['status'],'checks',len(checks),'read-only steps',len(allrows));print('failures',summary['failures']);assert summary['status']=='pass'

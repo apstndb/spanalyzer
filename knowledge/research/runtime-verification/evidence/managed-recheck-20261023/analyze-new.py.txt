@@ -1,0 +1,54 @@
+"""Derive bounded new-case results without promoting source claims to execution."""
+from collections import Counter, defaultdict
+from pathlib import Path
+import json
+
+scratch=Path('<LOCAL_CHECKOUT>/.tmp/managed-recheck-20261023')
+out=Path('<LOCAL_TASK_ROOT>/apstndb/spanalyzer/managed-recheck-20261023/evidence')
+plan=json.loads((scratch/'doc-delta-probe-plan.json').read_text())
+cases={row['label']:row for row in plan['cases']}
+results={row['label']:row for name in ['doc-delta-google','doc-delta-pg']for row in [json.loads(line)for line in (scratch/(name+'.stdout')).read_text().splitlines()]if row.get('family')}
+assert results.keys()==cases.keys(),(len(results),len(cases))
+families=defaultdict(list)
+for label,row in results.items():families[row['family']].append(row)
+summary={'executed_cases':len(results),'family_codes':{name:dict(Counter(row['code']for row in rows))for name,rows in families.items()},'hll':[],'gql':[],'search':[],'dynamic':[]}
+for row in families['hll']:
+    summary['hll'].append({key:row.get(key)for key in ['label','code','error','rows']})
+for row in families['gql_column_propagation']:
+    label=row['label'];entry={key:row.get(key)for key in ['label','code','error','rows']}
+    entry['columns']=[field['name']for field in row.get('metadata',{}).get('rowType',{}).get('fields',[])]
+    for mode in ['full-outer','left-outer','full','outer','left','inner']:
+        prefix='gql-'+mode+'-'
+        if not label.startswith(prefix):continue
+        operation=label.removeprefix(prefix)
+        if operation not in ['union-all','union-distinct','intersect-all','intersect-distinct','except-all','except-distinct']:
+            break
+        left={'left_only':'1','common':'10'};right={'left_only':None,'common':'10'}
+        columns=['left_only','common']
+        if mode in ['full-outer','full','outer']:
+            left['right_only']=None;right['right_only']='2';columns.append('right_only')
+        elif mode=='inner':left=right={'common':'10'};columns=['common']
+        if operation=='union-all':expected=[left,right]
+        elif operation=='union-distinct':expected=[left]if left==right else[left,right]
+        elif operation.startswith('intersect'):expected=[left]if left==right else[]
+        elif operation.startswith('except'):expected=[]if left==right else[left]
+        else:raise AssertionError(operation)
+        norm=lambda rows:sorted(json.dumps(value,sort_keys=True)for value in rows)
+        entry['expected_rows']=expected;entry['expected_columns']=columns
+        entry['matches_expected']=row['code']=='OK'and norm(row['rows'])==norm(expected)and entry['columns']==columns
+        break
+    summary['gql'].append(entry)
+search=defaultdict(dict)
+for row in families['json_search_equality']:
+    case=cases[row['label']];access=case['access'];key=row['label'].removesuffix('-'+access)
+    nodes=row.get('plan',{}).get('planNodes',[])
+    scans=[node['metadata']for node in nodes if node.get('metadata',{}).get('scan_type')]
+    search[key][access]={'code':row['code'],'error':row['error'],'rows':row['rows'],'operators':[node.get('displayName')for node in nodes if node.get('kind')=='RELATIONAL'],'scan_metadata':scans,'uses_search_index_scan':any(scan.get('scan_type')=='SearchIndexScan'for scan in scans),'full_search_scan':any(scan.get('scan_type')=='SearchIndexScan'and scan.get('Full scan')=='true'for scan in scans)}
+for label,variants in search.items():
+    base=variants['forced-base'];entry={'label':label,'variants':variants}
+    entry['automatic_equals_base']=base['code']==variants['automatic']['code']=='OK'and base['rows']==variants['automatic']['rows']
+    forced=variants['forced-search'];entry['forced_search_equals_base']=base['code']==forced['code']=='OK'and base['rows']==forced['rows']
+    summary['search'].append(entry)
+summary['dynamic']=[{key:row.get(key)for key in ['label','code','error','rows']}for row in families['dynamic_json_properties']]
+(out/'doc-delta-summary.json').write_text(json.dumps(summary,indent=2)+'\n')
+print(json.dumps({'cases':len(results),'family_codes':summary['family_codes'],'gql_expected_matches':sum(row.get('matches_expected',False)for row in summary['gql']),'gql_mode_cases':sum('matches_expected'in row for row in summary['gql']),'search_automatic_base_matches':sum(row['automatic_equals_base']for row in summary['search']),'search_groups':len(summary['search'])}))

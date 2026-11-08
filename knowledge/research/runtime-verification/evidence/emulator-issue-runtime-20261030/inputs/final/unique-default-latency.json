@@ -1,0 +1,152 @@
+{
+  "dialect": "google",
+  "steps": [
+    {
+      "label": "unique-table",
+      "family": "issue-291",
+      "kind": "ddl",
+      "sql": "CREATE TABLE UniqueRows(id INT64 NOT NULL,email STRING(MAX),val STRING(MAX) DEFAULT('draft')) PRIMARY KEY(id)"
+    },
+    {
+      "label": "unique-index",
+      "family": "issue-291",
+      "kind": "ddl",
+      "sql": "CREATE UNIQUE INDEX UniqueEmail ON UniqueRows(email)",
+      "requires": [
+        "unique-table"
+      ]
+    },
+    {
+      "label": "unique-seed",
+      "family": "issue-291",
+      "kind": "dml",
+      "statements": [
+        "INSERT INTO UniqueRows(id,email) VALUES(1,'same')"
+      ],
+      "requires": [
+        "unique-index"
+      ]
+    },
+    {
+      "label": "unique-duplicate",
+      "family": "issue-291",
+      "kind": "dml",
+      "statements": [
+        "INSERT INTO UniqueRows(id,email) VALUES(2,'same')"
+      ],
+      "requires": [
+        "unique-seed"
+      ]
+    },
+    {
+      "label": "default-latency-0-False",
+      "family": "issue-187",
+      "kind": "dml",
+      "statements": [
+        "INSERT INTO UniqueRows(id) VALUES(10)"
+      ],
+      "requires": [
+        "unique-table"
+      ]
+    },
+    {
+      "label": "default-latency-0-True",
+      "family": "issue-187",
+      "kind": "dml",
+      "statements": [
+        "INSERT INTO UniqueRows(id,val) VALUES(11,'draft')"
+      ],
+      "requires": [
+        "unique-table"
+      ]
+    },
+    {
+      "label": "default-latency-1-False",
+      "family": "issue-187",
+      "kind": "dml",
+      "statements": [
+        "INSERT INTO UniqueRows(id) VALUES(12)"
+      ],
+      "requires": [
+        "unique-table"
+      ]
+    },
+    {
+      "label": "default-latency-1-True",
+      "family": "issue-187",
+      "kind": "dml",
+      "statements": [
+        "INSERT INTO UniqueRows(id,val) VALUES(13,'draft')"
+      ],
+      "requires": [
+        "unique-table"
+      ]
+    },
+    {
+      "label": "default-latency-2-False",
+      "family": "issue-187",
+      "kind": "dml",
+      "statements": [
+        "INSERT INTO UniqueRows(id) VALUES(14)"
+      ],
+      "requires": [
+        "unique-table"
+      ]
+    },
+    {
+      "label": "default-latency-2-True",
+      "family": "issue-187",
+      "kind": "dml",
+      "statements": [
+        "INSERT INTO UniqueRows(id,val) VALUES(15,'draft')"
+      ],
+      "requires": [
+        "unique-table"
+      ]
+    },
+    {
+      "label": "default-latency-3-False",
+      "family": "issue-187",
+      "kind": "dml",
+      "statements": [
+        "INSERT INTO UniqueRows(id) VALUES(16)"
+      ],
+      "requires": [
+        "unique-table"
+      ]
+    },
+    {
+      "label": "default-latency-3-True",
+      "family": "issue-187",
+      "kind": "dml",
+      "statements": [
+        "INSERT INTO UniqueRows(id,val) VALUES(17,'draft')"
+      ],
+      "requires": [
+        "unique-table"
+      ]
+    },
+    {
+      "label": "default-latency-4-False",
+      "family": "issue-187",
+      "kind": "dml",
+      "statements": [
+        "INSERT INTO UniqueRows(id) VALUES(18)"
+      ],
+      "requires": [
+        "unique-table"
+      ]
+    },
+    {
+      "label": "default-latency-4-True",
+      "family": "issue-187",
+      "kind": "dml",
+      "statements": [
+        "INSERT INTO UniqueRows(id,val) VALUES(19,'draft')"
+      ],
+      "requires": [
+        "unique-table"
+      ]
+    }
+  ]
+}

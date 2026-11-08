@@ -1,0 +1,66 @@
+{
+  "status": "pass",
+  "recorded_at": "2026-10-23T15:11:33.314672+00:00",
+  "scope": "Local research gates; managed suite retains its separate known drift failure",
+  "checks": [
+    {
+      "name": "okf-all",
+      "argv": [
+        "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go",
+        "run",
+        "./okf-check",
+        "--repo-root",
+        "..",
+        "--gate",
+        "all",
+        "--publication-manifest",
+        "<LOCAL_TASK_ROOT>/apstndb/spanalyzer/managed-recheck-20261023/publication-manifest.json"
+      ],
+      "cwd": "<LOCAL_CHECKOUT>/tools",
+      "started_at": "2026-10-23T15:11:33.314861+00:00",
+      "completed_at": "2026-10-23T15:11:33.611692+00:00",
+      "exit_code": 0,
+      "log": "okf-check.log"
+    },
+    {
+      "name": "markdown-language",
+      "argv": [
+        "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go",
+        "run",
+        "./markdown-language-check",
+        "--repo-root",
+        ".."
+      ],
+      "cwd": "<LOCAL_CHECKOUT>/tools",
+      "started_at": "2026-10-23T15:11:33.611973+00:00",
+      "completed_at": "2026-10-23T15:11:33.685935+00:00",
+      "exit_code": 0,
+      "log": "language-check.log"
+    },
+    {
+      "name": "diff-whitespace",
+      "argv": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "cwd": "<LOCAL_CHECKOUT>",
+      "started_at": "2026-10-23T15:11:33.686160+00:00",
+      "completed_at": "2026-10-23T15:11:33.703233+00:00",
+      "exit_code": 0,
+      "log": "diff-check.log"
+    }
+  ],
+  "offline_evidence_check": {
+    "exit_code": 0,
+    "assertions": 109,
+    "receipt": "evidence-check.json"
+  },
+  "environment": {
+    "GOROOT": "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8",
+    "GOTOOLCHAIN": "local",
+    "GOWORK": "<LOCAL_CHECKOUT>/go.work",
+    "GOCACHE": "<LOCAL_CHECKOUT>/.tmp/managed-recheck-20260925/go-cache",
+    "GOFLAGS": "-mod=readonly"
+  }
+}

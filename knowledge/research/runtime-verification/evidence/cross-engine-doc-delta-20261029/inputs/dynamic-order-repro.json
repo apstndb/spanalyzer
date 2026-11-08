@@ -1,0 +1,131 @@
+{
+  "dialect": "google",
+  "steps": [
+    {
+      "label": "doc-fixture-0",
+      "family": "doc-fixture",
+      "kind": "ddl",
+      "sql": "CREATE TABLE DocDeltaNodes (Id INT64 NOT NULL, Label STRING(MAX) NOT NULL, Properties JSON) PRIMARY KEY(Id)",
+      "requires": []
+    },
+    {
+      "label": "doc-fixture-1",
+      "family": "doc-fixture",
+      "kind": "ddl",
+      "sql": "CREATE PROPERTY GRAPH DocDeltaGraph NODE TABLES (DocDeltaNodes LABEL Node PROPERTIES(Id))",
+      "requires": [
+        "doc-fixture-0"
+      ]
+    },
+    {
+      "label": "doc-fixture-2",
+      "family": "doc-fixture",
+      "kind": "ddl",
+      "sql": "CREATE PROPERTY GRAPH DocDeltaDynamic NODE TABLES (DocDeltaNodes DYNAMIC LABEL(Label) DYNAMIC PROPERTIES(Properties))",
+      "requires": [
+        "doc-fixture-0"
+      ]
+    },
+    {
+      "label": "doc-dynamic-seed",
+      "family": "doc-fixture",
+      "kind": "dml",
+      "statements": [
+        "INSERT INTO DocDeltaNodes(Id,Label,Properties) VALUES (1,'Node',JSON '{\"flag\":true,\"kind\":\"a\",\"value\":2,\"num_string\":\"1\"}'),(2,'Node',JSON '{\"flag\":false,\"kind\":\"a\",\"value\":1,\"num_string\":\"2\"}')"
+      ],
+      "requires": [
+        "doc-fixture-0"
+      ]
+    },
+    {
+      "label": "dynamic-order-repeat-1",
+      "family": "dynamic-order-reproduction",
+      "kind": "query",
+      "sql": "GRAPH DocDeltaDynamic MATCH (n) WHERE TRUE RETURN n.value AS value ORDER BY value",
+      "requires": [
+        "doc-fixture-2",
+        "doc-dynamic-seed"
+      ]
+    },
+    {
+      "label": "dynamic-order-repeat-2",
+      "family": "dynamic-order-reproduction",
+      "kind": "query",
+      "sql": "GRAPH DocDeltaDynamic MATCH (n) WHERE TRUE RETURN n.value AS value ORDER BY value",
+      "requires": [
+        "doc-fixture-2",
+        "doc-dynamic-seed"
+      ]
+    },
+    {
+      "label": "dynamic-order-repeat-3",
+      "family": "dynamic-order-reproduction",
+      "kind": "query",
+      "sql": "GRAPH DocDeltaDynamic MATCH (n) WHERE TRUE RETURN n.value AS value ORDER BY value",
+      "requires": [
+        "doc-fixture-2",
+        "doc-dynamic-seed"
+      ]
+    },
+    {
+      "label": "dynamic-order-no-filter",
+      "family": "dynamic-order-reproduction",
+      "kind": "query",
+      "sql": "GRAPH DocDeltaDynamic MATCH (n) RETURN n.value AS value ORDER BY value",
+      "requires": [
+        "doc-fixture-2",
+        "doc-dynamic-seed"
+      ]
+    },
+    {
+      "label": "dynamic-order-renamed",
+      "family": "dynamic-order-reproduction",
+      "kind": "query",
+      "sql": "GRAPH DocDeltaDynamic MATCH (n) WHERE TRUE RETURN n.value AS v ORDER BY v",
+      "requires": [
+        "doc-fixture-2",
+        "doc-dynamic-seed"
+      ]
+    },
+    {
+      "label": "dynamic-order-desc",
+      "family": "dynamic-order-reproduction",
+      "kind": "query",
+      "sql": "GRAPH DocDeltaDynamic MATCH (n) WHERE TRUE RETURN n.value AS value ORDER BY value DESC",
+      "requires": [
+        "doc-fixture-2",
+        "doc-dynamic-seed"
+      ]
+    },
+    {
+      "label": "dynamic-order-int64",
+      "family": "dynamic-order-reproduction",
+      "kind": "query",
+      "sql": "GRAPH DocDeltaDynamic MATCH (n) WHERE TRUE RETURN INT64(n.value) AS value ORDER BY value",
+      "requires": [
+        "doc-fixture-2",
+        "doc-dynamic-seed"
+      ]
+    },
+    {
+      "label": "dynamic-sql-json-control",
+      "family": "dynamic-order-reproduction",
+      "kind": "query",
+      "sql": "SELECT JSON_QUERY(t.Properties,'$.value') AS value FROM DocDeltaNodes t ORDER BY value",
+      "requires": [
+        "doc-fixture-2",
+        "doc-dynamic-seed"
+      ]
+    },
+    {
+      "label": "dynamic-static-id-desc",
+      "family": "dynamic-order-reproduction",
+      "kind": "query",
+      "sql": "GRAPH DocDeltaGraph MATCH (n) RETURN n.Id AS id ORDER BY id DESC",
+      "requires": [
+        "doc-fixture-1",
+        "doc-dynamic-seed"
+      ]
+    }
+  ]
+}

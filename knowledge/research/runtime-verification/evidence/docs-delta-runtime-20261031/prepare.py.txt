@@ -1,0 +1,53 @@
+from pathlib import Path
+import json,shutil
+root=Path('<LOCAL_CHECKOUT>');scratch=root/'.tmp/docs-delta-runtime-20261031';task=Path('<LOCAL_TASK_ROOT>/apstndb/spanalyzer/docs-delta-runtime-20261031');evidence=task/'evidence';module=scratch/'module';module.mkdir(exist_ok=True)
+for f in ['go.mod','go.sum']:shutil.copyfile(root/'.tmp/cross-engine-doc-delta-20261029/module'/f,module/f)
+local=(root/'.tmp/cross-engine-doc-delta-20261029/module/probe.go').read_text();managed=(root/'.tmp/managed-recheck-20261029/tuning-delta.go').read_text()
+# Both producers send RPCs directly, without local SQL parser classification.
+for kind,text in [('local',local),('managed',managed)]:
+ if kind=='managed':
+  text=text.replace('name := "tuning-delta-20261029g1"','name := fmt.Sprintf("ddrt1031g-%x", time.Now().UnixNano())').replace('name = "tuning-delta-20261029p1"','name = fmt.Sprintf("ddrt1031p-%x", time.Now().UnixNano())');text=text.replace('"os"','"os"\n "strings"')
+  declaration='quotedDB := "`" + name + "`"\n if plan.Dialect == "pg" { quotedDB = "\\\"" + name + "\\\"" }\n'
+  text=text.replace('\tcodes := map[string]string{}',declaration+'\tcodes := map[string]string{}')
+ else:
+  declaration='dbLeaf := db[strings.LastIndex(db, "/")+1:]\n quotedDB := "`" + dbLeaf + "`"\n if plan.Dialect == "pg" { quotedDB = "\\\"" + dbLeaf + "\\\"" }\n'
+  text=text.replace('\tcodes := map[string]string{}',declaration+'\tcodes := map[string]string{}')
+ needle='\t\t\top, err := admin.UpdateDatabaseDdl(cx, &dbpb.UpdateDatabaseDdlRequest{Database: db, Statements: statements})'
+ replacement='\t\t\tstatements = append([]string(nil), statements...)\n for i := range statements { statements[i] = strings.ReplaceAll(statements[i], "{{DATABASE}}", quotedDB) }\n'+needle
+ assert needle in text,kind;text=text.replace(needle,replacement);(module/(kind+'.go')).write_text(text)
+
+def step(label,kind,sql='',**extra):return dict(label=label,family=extra.pop('family',label.split('-')[0]),kind=kind,sql=sql,**extra)
+g=[];base='FROM (SELECT 1 AS a, 10 AS b UNION ALL SELECT 1, 20 UNION ALL SELECT 2, 30)'
+queries={'select':base+' |> SELECT a, b','extend':base+' |> EXTEND a+b AS total','set':base+' |> SET b=b+1','drop':base+' |> DROP b','rename':base+' |> RENAME b AS c','as':base+' |> AS t |> SELECT t.a, t.b','where':base+' |> WHERE a=1','aggregate':base+' |> AGGREGATE SUM(b) AS total GROUP BY a','join':base+" |> JOIN (SELECT 1 AS a, 'match' AS tag) AS r USING (a)",'order-by':base+' |> ORDER BY b DESC','limit':base+' |> LIMIT 2','union':base+' |> UNION ALL (SELECT 3 AS a, 40 AS b)','intersect':base+' |> INTERSECT DISTINCT (SELECT 1 AS a, 10 AS b)','except':base+' |> EXCEPT DISTINCT (SELECT 1 AS a, 10 AS b)','tablesample':base+' |> TABLESAMPLE BERNOULLI (100 PERCENT)'}
+for label,sql in queries.items():g.append(step('pipe-'+label,'query',sql,family='pipe-operator'))
+controls={'standard-ordinal':'SELECT a AS k, SUM(b) AS total FROM (SELECT 1 AS a, 10 AS b UNION ALL SELECT 1,20 UNION ALL SELECT 2,30) GROUP BY 1','group-alias':base+' |> AGGREGATE SUM(b) AS total GROUP BY a AS k','group-bare-alias':base+' |> AGGREGATE SUM(b) AS total GROUP BY a k','group-two-aliases':base+' |> AGGREGATE COUNT(*) AS n GROUP BY a AS k, b AS v','group-ordinal':base+' |> AGGREGATE SUM(b) AS total GROUP BY 1','group-output-alias':base+' |> AGGREGATE SUM(b) AS total GROUP BY total','group-input-alias':base+' |> EXTEND a+1 AS k |> AGGREGATE SUM(b) AS total GROUP BY k','group-and-order':base+' |> AGGREGATE SUM(b) AS total GROUP AND ORDER BY a DESC'}
+for label,sql in controls.items():g.append(step('pipe-'+label,'query',sql,family='pipe-grouping'))
+for suffix,col in [('title','Payload'),('lower','payload'),('upper','PAYLOAD'),('mixed','PaYlOaD')]:g.append(step('queue-create-'+suffix,'ddl','CREATE QUEUE QueueCase'+suffix+' (MessageId STRING(36) NOT NULL, '+col+' BYTES(MAX) NOT NULL) PRIMARY KEY(MessageId)',family='queue-case'))
+g.append(step('queue-schema','ddl-export',family='queue-case'))
+for label,tail in [('plain',''),('as',' AS r'),('bare',' r')]:g.append(step('tvf-alias-'+label,'query',"SELECT COUNT(*) AS n FROM RENEWLEASE_QueueCasetitle(lease_tokens => ARRAY<STRING>[])"+tail,family='tvf-alias',requires=['queue-create-title']))
+for label,tail in [('plain',''),('as',' AS p'),('bare',' p')]:g.append(step('model-tvf-alias-'+label,'query','SELECT * FROM ML.PREDICT(MODEL MissingModel, (SELECT 1 AS x))'+tail,family='tvf-alias-resolution'))
+# Known syntax-only candidates get strict parser controls without changing runtime setup.
+parser_extra=[step('fk-set-null','ddl','ALTER TABLE Child ADD CONSTRAINT FK_Parent FOREIGN KEY (ParentId) REFERENCES Parent (Id) ON DELETE SET NULL'),step('fk-cascade','ddl','ALTER TABLE Child ADD CONSTRAINT FK_Parent FOREIGN KEY (ParentId) REFERENCES Parent (Id) ON DELETE CASCADE')]
+# Pair the already documented GQL propagation cases with their previously tested graph setup.
+old=json.loads((root/'.tmp/cross-engine-doc-delta-20261029/module/google-new.json').read_text())if(root/'.tmp/cross-engine-doc-delta-20261029/module/google-new.json').exists()else json.loads((root/'knowledge/research/runtime-verification/evidence/cross-engine-doc-delta-20261029/inputs/google-new.json').read_text())
+for s in old['steps']:
+ if any(x in s.get('sql','').upper()for x in ['FULL OUTER UNION','LEFT OUTER UNION','INNER UNION']):parser_extra.append(s)
+
+def score_steps(pg=False):
+ default="spanner.score(spanner.tokenize_fulltext('cat cat dog'), 'cat')"if pg else"SCORE(TOKENIZE_FULLTEXT('cat cat dog'), 'cat')"
+ def explicit(n):return default[:-1]+(", options => '{\"version\": "+str(n)+"}'::jsonb)"if pg else", options => JSON '{\"version\": "+str(n)+"}')")
+ steps=[]
+ for n in [1,2]:
+  ddl=('ALTER DATABASE {{DATABASE}} SET "spanner.score_version" = '+str(n))if pg else('ALTER DATABASE {{DATABASE}} SET OPTIONS (score_version = '+str(n)+')')
+  steps.append(step('score-set-db-'+str(n),'ddl',ddl,family='scorer'))
+  steps.append(step('score-values-db-'+str(n),'query','SELECT '+default+' AS default_score, '+explicit(1)+' AS version1_score, '+explicit(2)+' AS version2_score',family='scorer',requires=['score-set-db-'+str(n)]))
+ return steps
+for s in score_steps():g.append(s)
+# Test the new generated-bucket example and sort-key updates functionally; no timing claim.
+g+= [step('bucket-create','ddl',"CREATE TABLE BucketDocs (Id INT64 NOT NULL, Body STRING(MAX), UpdatedAt TIMESTAMP NOT NULL, HourBucket INT64 AS (UNIX_SECONDS(TIMESTAMP_TRUNC(UpdatedAt,HOUR))) STORED, BodyTokens TOKENLIST AS (TOKENIZE_FULLTEXT(Body)) HIDDEN) PRIMARY KEY(Id)",family='bucket')]
+for key,col in [('timestamp','UpdatedAt'),('hour','HourBucket'),('none','')]:g.append(step('bucket-index-'+key,'ddl','CREATE SEARCH INDEX BucketIndex'+key+' ON BucketDocs(BodyTokens)'+(' ORDER BY '+col+' DESC'if col else''),family='bucket',requires=['bucket-create']))
+g+= [step('bucket-insert','dml',statements=["INSERT INTO BucketDocs(Id,Body,UpdatedAt) VALUES (1,'cat cat dog',TIMESTAMP '2026-10-31 00:01:00+00')"],family='bucket',requires=['bucket-create']),step('bucket-before','query','SELECT Id, UpdatedAt, HourBucket FROM BucketDocs',family='bucket',requires=['bucket-insert']),step('bucket-update-same-hour','dml',statements=["UPDATE BucketDocs SET UpdatedAt=TIMESTAMP '2026-10-31 00:59:00+00' WHERE Id=1"],family='bucket',requires=['bucket-insert']),step('bucket-same-hour','query','SELECT Id, UpdatedAt, HourBucket FROM BucketDocs',family='bucket',requires=['bucket-update-same-hour']),step('bucket-update-next-hour','dml',statements=["UPDATE BucketDocs SET UpdatedAt=TIMESTAMP '2026-10-31 01:00:00+00' WHERE Id=1"],family='bucket',requires=['bucket-insert']),step('bucket-next-hour','query','SELECT Id, UpdatedAt, HourBucket FROM BucketDocs',family='bucket',requires=['bucket-update-next-hour'])]
+p=score_steps(True);p +=[step('bucket-pg-create','ddl',"CREATE TABLE bucketdocs (id bigint NOT NULL PRIMARY KEY, updatedat timestamptz NOT NULL, hourbucket bigint GENERATED ALWAYS AS (EXTRACT(EPOCH FROM updatedat - '1970-01-01Z'::timestamptz)::bigint / 3600) STORED)",family='bucket-pg'),step('bucket-pg-insert','dml',statements=["INSERT INTO bucketdocs(id,updatedat) VALUES (1,'2026-10-31 00:01:00Z'),(2,'2026-10-31 00:59:00Z'),(3,'2026-10-31 01:00:00Z')"],family='bucket-pg',requires=['bucket-pg-create']),step('bucket-pg-values','query','SELECT id, updatedat, hourbucket FROM bucketdocs ORDER BY id',family='bucket-pg',requires=['bucket-pg-insert'])]
+for name,data in [('google',{'dialect':'google','steps':g}),('pg',{'dialect':'pg','steps':p}),('parser-extra',{'dialect':'google','steps':parser_extra})]:
+ dest=evidence/(name+'-cases.json');dest.write_text(json.dumps(data,indent=2)+'\n')
+print('Google steps',len(g),'PG steps',len(p),'additional parser cases',len(parser_extra))

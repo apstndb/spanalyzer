@@ -1,0 +1,45 @@
+{
+  "owned_database_fixtures": {
+    "google-json": {
+      "drop": "OK",
+      "get_after_drop": "NotFound"
+    },
+    "pg-streams": {
+      "drop": "OK",
+      "get_after_drop": "NotFound"
+    },
+    "graph-controls": {
+      "drop": "OK",
+      "get_after_drop": "NotFound"
+    },
+    "google-options": {
+      "drop": "OK",
+      "get_after_drop": "NotFound"
+    },
+    "pg-options": {
+      "drop": "OK",
+      "get_after_drop": "NotFound"
+    },
+    "google-capture": {
+      "drop": "OK",
+      "get_after_drop": "NotFound"
+    },
+    "pg-capture": {
+      "drop": "OK",
+      "get_after_drop": "NotFound"
+    },
+    "doc-delta-google": {
+      "drop": "OK",
+      "get_after_drop": "NotFound"
+    },
+    "doc-delta-pg": {
+      "drop": "OK",
+      "get_after_drop": "NotFound"
+    },
+    "hll-controls-pg": {
+      "drop": "OK",
+      "get_after_drop": "NotFound"
+    }
+  },
+  "scope": "Ten serial fixtures here plus the separately retained baseline PostgreSQL database; final admin list must contain only the dedicated base database, and the free trial remains for follow-up"
+}

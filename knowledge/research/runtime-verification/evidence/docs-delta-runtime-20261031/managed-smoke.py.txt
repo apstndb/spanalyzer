@@ -1,0 +1,8 @@
+from pathlib import Path
+import subprocess,json,os,re,datetime
+out=Path('<LOCAL_TASK_ROOT>/apstndb/spanalyzer/docs-delta-runtime-20261031/evidence');args=['<LOCAL_HOME>/.agents/skills/apstndb-spanner-syntax-verify/scripts/run-managed-spanner.sh','--execute','SELECT 1 AS connectivity'];p=subprocess.run(args,capture_output=True,text=True,timeout=70)
+def clean(s):
+ for k in ['SPANNER_PROJECT_ID','SPANNER_INSTANCE_ID','SPANNER_DATABASE_ID']:
+  if os.getenv(k):s=s.replace(os.environ[k],'<redacted>')
+ return re.sub(r'requestID = "[^"]+"','requestID = "<redacted>"',s)
+(out/'managed-connectivity.stdout').write_text(clean(p.stdout));(out/'managed-connectivity.stderr').write_text(clean(p.stderr));(out/'managed-connectivity.json').write_text(json.dumps({'argv':['run-managed-spanner.sh','--execute','SELECT 1 AS connectivity'],'exit_code':p.returncode,'at':datetime.datetime.now(datetime.timezone.utc).isoformat()},indent=2)+'\n');print('Managed connectivity exit',p.returncode);print(clean(p.stdout)[-1200:]);print(clean(p.stderr)[-500:]);raise SystemExit(p.returncode)

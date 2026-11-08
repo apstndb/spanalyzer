@@ -1,0 +1,351 @@
+{
+  "int-equal": {
+    "code": "OK",
+    "rows": [
+      {
+        "d": false,
+        "nd": true
+      }
+    ]
+  },
+  "int-different": {
+    "code": "OK",
+    "rows": [
+      {
+        "d": true,
+        "nd": false
+      }
+    ]
+  },
+  "null-null": {
+    "code": "OK",
+    "rows": [
+      {
+        "d": false,
+        "nd": true
+      }
+    ]
+  },
+  "null-int": {
+    "code": "OK",
+    "rows": [
+      {
+        "d": true,
+        "nd": false
+      }
+    ]
+  },
+  "int-null": {
+    "code": "OK",
+    "rows": [
+      {
+        "d": true,
+        "nd": false
+      }
+    ]
+  },
+  "string-equal": {
+    "code": "OK",
+    "rows": [
+      {
+        "d": false,
+        "nd": true
+      }
+    ]
+  },
+  "string-different": {
+    "code": "OK",
+    "rows": [
+      {
+        "d": true,
+        "nd": false
+      }
+    ]
+  },
+  "bool-different": {
+    "code": "OK",
+    "rows": [
+      {
+        "d": true,
+        "nd": false
+      }
+    ]
+  },
+  "bytes-equal": {
+    "code": "OK",
+    "rows": [
+      {
+        "d": false,
+        "nd": true
+      }
+    ]
+  },
+  "bytes-different": {
+    "code": "OK",
+    "rows": [
+      {
+        "d": true,
+        "nd": false
+      }
+    ]
+  },
+  "date-equal": {
+    "code": "OK",
+    "rows": [
+      {
+        "d": false,
+        "nd": true
+      }
+    ]
+  },
+  "timestamp-equal": {
+    "code": "OK",
+    "rows": [
+      {
+        "d": false,
+        "nd": true
+      }
+    ]
+  },
+  "numeric-equal": {
+    "code": "OK",
+    "rows": [
+      {
+        "d": false,
+        "nd": true
+      }
+    ]
+  },
+  "float-equal": {
+    "code": "OK",
+    "rows": [
+      {
+        "d": false,
+        "nd": true
+      }
+    ]
+  },
+  "float-signed-zero": {
+    "code": "OK",
+    "rows": [
+      {
+        "d": false,
+        "nd": true
+      }
+    ]
+  },
+  "nan-nan": {
+    "code": "OK",
+    "rows": [
+      {
+        "d": false,
+        "nd": true
+      }
+    ]
+  },
+  "nan-finite": {
+    "code": "OK",
+    "rows": [
+      {
+        "d": true,
+        "nd": false
+      }
+    ]
+  },
+  "finite-nan": {
+    "code": "OK",
+    "rows": [
+      {
+        "d": true,
+        "nd": false
+      }
+    ]
+  },
+  "nan-null": {
+    "code": "OK",
+    "rows": [
+      {
+        "d": true,
+        "nd": false
+      }
+    ]
+  },
+  "infinity-equal": {
+    "code": "OK",
+    "rows": [
+      {
+        "d": false,
+        "nd": true
+      }
+    ]
+  },
+  "infinity-sign": {
+    "code": "OK",
+    "rows": [
+      {
+        "d": true,
+        "nd": false
+      }
+    ]
+  },
+  "json-number-equal": {
+    "code": "OK",
+    "rows": [
+      {
+        "d": false,
+        "nd": true
+      }
+    ]
+  },
+  "json-number-different": {
+    "code": "OK",
+    "rows": [
+      {
+        "d": true,
+        "nd": false
+      }
+    ]
+  },
+  "json-null-equal": {
+    "code": "OK",
+    "rows": [
+      {
+        "d": false,
+        "nd": true
+      }
+    ]
+  },
+  "sql-null-json-null": {
+    "code": "OK",
+    "rows": [
+      {
+        "d": true,
+        "nd": false
+      }
+    ]
+  },
+  "json-null-sql-null": {
+    "code": "OK",
+    "rows": [
+      {
+        "d": true,
+        "nd": false
+      }
+    ]
+  },
+  "json-typed-null-pair": {
+    "code": "OK",
+    "rows": [
+      {
+        "d": false,
+        "nd": true
+      }
+    ]
+  },
+  "json-object-order": {
+    "code": "OK",
+    "rows": [
+      {
+        "d": false,
+        "nd": true
+      }
+    ]
+  },
+  "json-object-value": {
+    "code": "OK",
+    "rows": [
+      {
+        "d": true,
+        "nd": false
+      }
+    ]
+  },
+  "json-array-equal": {
+    "code": "OK",
+    "rows": [
+      {
+        "d": false,
+        "nd": true
+      }
+    ]
+  },
+  "json-array-length": {
+    "code": "OK",
+    "rows": [
+      {
+        "d": true,
+        "nd": false
+      }
+    ]
+  },
+  "json-type-difference": {
+    "code": "OK",
+    "rows": [
+      {
+        "d": true,
+        "nd": false
+      }
+    ]
+  },
+  "equality-nan-control": {
+    "code": "OK",
+    "rows": [
+      {
+        "eq": false
+      }
+    ]
+  },
+  "equality-null-control": {
+    "code": "OK",
+    "rows": [
+      {
+        "eq": null
+      }
+    ]
+  },
+  "missing-from-control": {
+    "code": "InvalidArgument"
+  },
+  "missing-rhs-control": {
+    "code": "InvalidArgument"
+  },
+  "missing-distinct-control": {
+    "code": "InvalidArgument"
+  },
+  "int-equal-profile": {
+    "code": "OK",
+    "rows": [
+      {
+        "d": false,
+        "nd": true
+      }
+    ]
+  },
+  "nan-nan-profile": {
+    "code": "OK",
+    "rows": [
+      {
+        "d": false,
+        "nd": true
+      }
+    ]
+  },
+  "sql-null-json-null-profile": {
+    "code": "OK",
+    "rows": [
+      {
+        "d": true,
+        "nd": false
+      }
+    ]
+  },
+  "json-object-order-profile": {
+    "code": "OK",
+    "rows": [
+      {
+        "d": false,
+        "nd": true
+      }
+    ]
+  }
+}

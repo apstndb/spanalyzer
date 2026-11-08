@@ -1,0 +1,233 @@
+{
+  "dialect": "pg",
+  "steps": [
+    {
+      "label": "fixture-connectivity",
+      "kind": "query",
+      "sql": "SELECT 1 AS connectivity",
+      "family": "extension"
+    },
+    {
+      "label": "score-fixture",
+      "family": "score",
+      "kind": "ddl",
+      "sql": "CREATE TABLE ScoreDocs (id bigint NOT NULL PRIMARY KEY, body text, bodytokens spanner.tokenlist GENERATED ALWAYS AS (spanner.tokenize_fulltext(body)) VIRTUAL HIDDEN)"
+    },
+    {
+      "label": "score-search-index",
+      "family": "score",
+      "kind": "ddl",
+      "sql": "CREATE SEARCH INDEX ScoreIndex ON ScoreDocs(BodyTokens)",
+      "requires": [
+        "score-fixture"
+      ]
+    },
+    {
+      "label": "score-insert",
+      "family": "score",
+      "kind": "dml",
+      "sql": "",
+      "statements": [
+        "INSERT INTO ScoreDocs(Id,Body) VALUES (1,'cat cat dog'),(2,'cat dog'),(3,'dog')"
+      ],
+      "requires": [
+        "score-fixture"
+      ]
+    },
+    {
+      "label": "score-unpinned",
+      "family": "score",
+      "kind": "query",
+      "sql": "SELECT Id, spanner.score(BodyTokens,'cat') AS default_score, spanner.score(BodyTokens,'cat', options => '{\"version\": 1}'::jsonb) AS version1_score, spanner.score(BodyTokens,'cat', options => '{\"version\": 2}'::jsonb) AS version2_score FROM ScoreDocs WHERE spanner.search(BodyTokens,'cat') ORDER BY Id",
+      "requires": [
+        "score-insert",
+        "score-search-index"
+      ]
+    },
+    {
+      "label": "score-set-db-1",
+      "family": "score",
+      "kind": "ddl",
+      "sql": "ALTER DATABASE {{DATABASE}} SET \"spanner.score_version\" = 1"
+    },
+    {
+      "label": "score-pinned-db-1",
+      "family": "score",
+      "kind": "query",
+      "sql": "SELECT Id, spanner.score(BodyTokens,'cat') AS default_score, spanner.score(BodyTokens,'cat', options => '{\"version\": 1}'::jsonb) AS version1_score, spanner.score(BodyTokens,'cat', options => '{\"version\": 2}'::jsonb) AS version2_score FROM ScoreDocs WHERE spanner.search(BodyTokens,'cat') ORDER BY Id",
+      "requires": [
+        "score-insert",
+        "score-search-index",
+        "score-set-db-1"
+      ]
+    },
+    {
+      "label": "score-set-db-2",
+      "family": "score",
+      "kind": "ddl",
+      "sql": "ALTER DATABASE {{DATABASE}} SET \"spanner.score_version\" = 2"
+    },
+    {
+      "label": "score-pinned-db-2",
+      "family": "score",
+      "kind": "query",
+      "sql": "SELECT Id, spanner.score(BodyTokens,'cat') AS default_score, spanner.score(BodyTokens,'cat', options => '{\"version\": 1}'::jsonb) AS version1_score, spanner.score(BodyTokens,'cat', options => '{\"version\": 2}'::jsonb) AS version2_score FROM ScoreDocs WHERE spanner.search(BodyTokens,'cat') ORDER BY Id",
+      "requires": [
+        "score-insert",
+        "score-search-index",
+        "score-set-db-2"
+      ]
+    },
+    {
+      "label": "score-explicit-independent",
+      "family": "score",
+      "kind": "query",
+      "sql": "SELECT Id, spanner.score(BodyTokens,'cat', options => '{\"version\": 1}'::jsonb) AS version1_score, spanner.score(BodyTokens,'cat', options => '{\"version\": 2}'::jsonb) AS version2_score FROM ScoreDocs WHERE spanner.search(BodyTokens,'cat') ORDER BY Id",
+      "requires": [
+        "score-insert",
+        "score-search-index"
+      ]
+    },
+    {
+      "label": "bucket-pg-query",
+      "family": "bucket",
+      "kind": "query",
+      "sql": "SELECT EXTRACT(EPOCH FROM '2026-10-31 00:59:59.9Z'::timestamptz - '1970-01-01Z'::timestamptz)::bigint / 3600 AS near_hour, EXTRACT(EPOCH FROM '2026-10-31 01:00:00Z'::timestamptz - '1970-01-01Z'::timestamptz)::bigint / 3600 AS on_hour"
+    },
+    {
+      "label": "bucket-pg-boundaries",
+      "family": "bucket-boundary",
+      "kind": "query",
+      "sql": "SELECT t, EXTRACT(EPOCH FROM t - '1970-01-01Z'::timestamptz)::bigint / 3600 AS documented_hour, FLOOR(EXTRACT(EPOCH FROM t - '1970-01-01Z'::timestamptz) / 3600)::bigint AS floored_hour FROM (SELECT '1969-12-31 23:59:59Z'::timestamptz AS t UNION ALL SELECT '2026-10-31 00:00:00Z'::timestamptz UNION ALL SELECT '2026-10-31 00:59:59.4Z'::timestamptz UNION ALL SELECT '2026-10-31 00:59:59.9Z'::timestamptz UNION ALL SELECT '2026-10-31 01:00:00Z'::timestamptz) q ORDER BY t"
+    },
+    {
+      "label": "pg-jsonb-sort",
+      "kind": "query",
+      "sql": "SELECT x FROM (SELECT '2'::jsonb x UNION ALL SELECT '1'::jsonb UNION ALL SELECT 'null'::jsonb) q ORDER BY x",
+      "family": "json"
+    },
+    {
+      "label": "pg-jsonb-count",
+      "kind": "query",
+      "sql": "SELECT COUNT(x) AS n FROM (SELECT '1'::jsonb x) q",
+      "family": "json"
+    },
+    {
+      "label": "json-table",
+      "kind": "ddl",
+      "sql": "CREATE TABLE JsonDocs (Id bigint PRIMARY KEY, Doc jsonb, Tokens spanner.tokenlist GENERATED ALWAYS AS (spanner.tokenize_jsonb(Doc)) VIRTUAL HIDDEN)",
+      "family": "json-search"
+    },
+    {
+      "label": "json-index",
+      "kind": "ddl",
+      "sql": "CREATE SEARCH INDEX JsonSearch ON JsonDocs(Tokens)",
+      "family": "json-search",
+      "requires": [
+        "json-table"
+      ]
+    },
+    {
+      "label": "json-insert",
+      "kind": "dml",
+      "sql": "",
+      "family": "json-search",
+      "statements": [
+        "INSERT INTO JsonDocs(Id,Doc) VALUES (1,'{\"kind\":\"active\",\"n\":1}'::jsonb),(2,'{\"kind\":\"pending\",\"n\":2}'::jsonb),(3,'{\"kind\":\"active\",\"n\":3}'::jsonb)"
+      ],
+      "requires": [
+        "json-index"
+      ]
+    },
+    {
+      "label": "json-search-equal-auto",
+      "kind": "query",
+      "sql": "SELECT Id FROM JsonDocs WHERE Doc->'kind'='\"active\"'::jsonb ORDER BY Id",
+      "family": "json-search",
+      "profile": true,
+      "requires": [
+        "json-insert"
+      ]
+    },
+    {
+      "label": "json-search-equal-search",
+      "kind": "query",
+      "sql": "SELECT Id FROM JsonDocs/*@ FORCE_INDEX=JsonSearch */ WHERE Doc->'kind'='\"active\"'::jsonb ORDER BY Id",
+      "family": "json-search",
+      "profile": true,
+      "requires": [
+        "json-insert"
+      ]
+    },
+    {
+      "label": "json-search-equal-base",
+      "kind": "query",
+      "sql": "SELECT Id FROM JsonDocs/*@ FORCE_INDEX=_BASE_TABLE */ WHERE Doc->'kind'='\"active\"'::jsonb ORDER BY Id",
+      "family": "json-search",
+      "profile": true,
+      "requires": [
+        "json-insert"
+      ]
+    },
+    {
+      "label": "json-search-in-auto",
+      "kind": "query",
+      "sql": "SELECT Id FROM JsonDocs WHERE Doc->'kind' IN ('\"active\"'::jsonb,'\"pending\"'::jsonb) ORDER BY Id",
+      "family": "json-search",
+      "profile": true,
+      "requires": [
+        "json-insert"
+      ]
+    },
+    {
+      "label": "json-search-in-search",
+      "kind": "query",
+      "sql": "SELECT Id FROM JsonDocs/*@ FORCE_INDEX=JsonSearch */ WHERE Doc->'kind' IN ('\"active\"'::jsonb,'\"pending\"'::jsonb) ORDER BY Id",
+      "family": "json-search",
+      "profile": true,
+      "requires": [
+        "json-insert"
+      ]
+    },
+    {
+      "label": "json-search-in-base",
+      "kind": "query",
+      "sql": "SELECT Id FROM JsonDocs/*@ FORCE_INDEX=_BASE_TABLE */ WHERE Doc->'kind' IN ('\"active\"'::jsonb,'\"pending\"'::jsonb) ORDER BY Id",
+      "family": "json-search",
+      "profile": true,
+      "requires": [
+        "json-insert"
+      ]
+    },
+    {
+      "label": "json-search-whole-auto",
+      "kind": "query",
+      "sql": "SELECT Id FROM JsonDocs WHERE Doc='{\"n\":1,\"kind\":\"active\"}'::jsonb ORDER BY Id",
+      "family": "json-search",
+      "profile": true,
+      "requires": [
+        "json-insert"
+      ]
+    },
+    {
+      "label": "json-search-whole-search",
+      "kind": "query",
+      "sql": "SELECT Id FROM JsonDocs/*@ FORCE_INDEX=JsonSearch */ WHERE Doc='{\"n\":1,\"kind\":\"active\"}'::jsonb ORDER BY Id",
+      "family": "json-search",
+      "profile": true,
+      "requires": [
+        "json-insert"
+      ]
+    },
+    {
+      "label": "json-search-whole-base",
+      "kind": "query",
+      "sql": "SELECT Id FROM JsonDocs/*@ FORCE_INDEX=_BASE_TABLE */ WHERE Doc='{\"n\":1,\"kind\":\"active\"}'::jsonb ORDER BY Id",
+      "family": "json-search",
+      "profile": true,
+      "requires": [
+        "json-insert"
+      ]
+    }
+  ]
+}

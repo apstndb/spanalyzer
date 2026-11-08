@@ -1,0 +1,30 @@
+import os,pathlib,subprocess,tomllib,json,time,datetime,hashlib
+root=pathlib.Path('<LOCAL_CHECKOUT>');out=root/'.tmp/managed-recheck-20260929'
+env=os.environ.copy();profile=tomllib.loads((pathlib.Path.home()/'.config/mise/environments/spanner-syntax-verify/mise.toml').read_text())['env'];env.update(profile)
+env['TEST_REAL_SPANNER_DATABASE']='projects/{SPANNER_PROJECT_ID}/instances/{SPANNER_INSTANCE_ID}/databases/{SPANNER_DATABASE_ID}'.format(**env)
+assert not env.get('SPANNER_EMULATOR_HOST')
+go='<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go';env.update(GOTOOLCHAIN='local',GOROOT=str(pathlib.Path(go).parent.parent),GOFLAGS='-mod=readonly',GOCACHE=str(root/'.tmp/managed-recheck-20260925/go-cache'));env.pop('GOWORK',None)
+receipts=[]
+def run(name,args):
+ print('Starting '+name,flush=True);start=time.time();at=datetime.datetime.now(datetime.timezone.utc).isoformat()
+ p=subprocess.run(args,cwd=root/'tools',env=env,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+ for stream,data in [('stdout',p.stdout),('stderr',p.stderr)]:
+  txt=data.decode(errors='replace')
+  for value in [env['TEST_REAL_SPANNER_DATABASE'],*profile.values()]:txt=txt.replace(value,'<redacted>')
+  (out/(name+'.'+stream)).write_text(txt)
+ receipt={'name':name,'started_at':at,'exit_code':p.returncode,'elapsed_seconds':round(time.time()-start,2),'command':args};receipts.append(receipt);(out/'feature-commands.json').write_text(json.dumps(receipts,indent=2)+'\n');print(json.dumps(receipt),flush=True)
+ return p.returncode
+for name in ['google-features','pg-features','queue']:
+ if run(name+'-build',[go,'build','-o',str(out/name),str(out/(name+'.go'))]):raise SystemExit(1)
+ run(name+'-buildinfo',[go,'version','-m',str(out/name)])
+print('Waiting for the existing managed suite to finish before feature DDL.',flush=True)
+end=time.time()+900
+while time.time()<end:
+ commands=json.loads((out/'commands.json').read_text())
+ if any(x['name']=='managed-tests' for x in commands):
+  assert all(x['exit_code']==0 for x in commands), 'Inspect the failed baseline before feature DDL.'
+  break
+ time.sleep(2)
+else:raise SystemExit('Baseline did not finish within 15 minutes; feature DDL not started.')
+for name in ['google-features','pg-features','queue']:
+ if run(name,[str(out/name)]):raise SystemExit(1)

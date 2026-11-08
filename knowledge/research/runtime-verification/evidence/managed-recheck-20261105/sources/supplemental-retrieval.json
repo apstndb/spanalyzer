@@ -1,0 +1,74 @@
+[
+  {
+    "file": "baseline__docs__docs.cloud.google.com__spanner__docs__introspection__query-statistics.md.txt",
+    "argv": [
+      "curl",
+      "--fail",
+      "--silent",
+      "--show-error",
+      "https://raw.githubusercontent.com/apstndb/spanner-docs-mirror/ec91ce497a621dd3d318cad40a58944367415165/docs/docs.cloud.google.com/spanner/docs/introspection/query-statistics.md"
+    ],
+    "at": "2026-11-05T02:16:04.583800+00:00",
+    "sha256": "0e52d03c32bd4bcc6b4de179a4a3e3390067e007126402cc26376e8a1b79486f"
+  },
+  {
+    "file": "target__docs__docs.cloud.google.com__spanner__docs__introspection__query-statistics.md.txt",
+    "argv": [
+      "curl",
+      "--fail",
+      "--silent",
+      "--show-error",
+      "https://raw.githubusercontent.com/apstndb/spanner-docs-mirror/293fe78b6da4b70bfe8f693161c5fc784f0364a8/docs/docs.cloud.google.com/spanner/docs/introspection/query-statistics.md"
+    ],
+    "at": "2026-11-05T02:16:04.602978+00:00",
+    "sha256": "7cb6a78a84967fcdaaba3bcc0d2e114141a0b0cff8d6c4cbcff4b86c07c8d3c7"
+  },
+  {
+    "file": "docs.cloud.google.com__spanner__docs__introspection__query-statistics.json",
+    "argv": [
+      "dkcli",
+      "get",
+      "-f",
+      "json",
+      "docs.cloud.google.com/spanner/docs/introspection/query-statistics"
+    ],
+    "at": "2026-11-05T02:16:05.249573+00:00",
+    "sha256": "5d77aeb21a59f38ac56a4093906606c510f37e361cd7347a8a6812cebd2c025a"
+  },
+  {
+    "file": "baseline__docs__docs.cloud.google.com__spanner__docs__leader-aware-routing.md.txt",
+    "argv": [
+      "curl",
+      "--fail",
+      "--silent",
+      "--show-error",
+      "https://raw.githubusercontent.com/apstndb/spanner-docs-mirror/ec91ce497a621dd3d318cad40a58944367415165/docs/docs.cloud.google.com/spanner/docs/leader-aware-routing.md"
+    ],
+    "at": "2026-11-05T02:16:04.580616+00:00",
+    "sha256": "60348156fe1d6b811b69170e223e8c67880e964c23f329f31966bf5c3e35c41f"
+  },
+  {
+    "file": "target__docs__docs.cloud.google.com__spanner__docs__leader-aware-routing.md.txt",
+    "argv": [
+      "curl",
+      "--fail",
+      "--silent",
+      "--show-error",
+      "https://raw.githubusercontent.com/apstndb/spanner-docs-mirror/293fe78b6da4b70bfe8f693161c5fc784f0364a8/docs/docs.cloud.google.com/spanner/docs/leader-aware-routing.md"
+    ],
+    "at": "2026-11-05T02:16:04.825293+00:00",
+    "sha256": "a36419631c7cd7e802ab1b04ec9d4d7a5a54b5afce8d225816fcc4928c0f7400"
+  },
+  {
+    "file": "docs.cloud.google.com__spanner__docs__leader-aware-routing.json",
+    "argv": [
+      "dkcli",
+      "get",
+      "-f",
+      "json",
+      "docs.cloud.google.com/spanner/docs/leader-aware-routing"
+    ],
+    "at": "2026-11-05T02:16:05.067586+00:00",
+    "sha256": "e629dd52478aded29c8f06189939e58f7ad89264215c0832d846b7a8ecf3053f"
+  }
+]

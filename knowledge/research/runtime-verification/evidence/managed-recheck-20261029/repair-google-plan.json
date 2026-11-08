@@ -1,0 +1,817 @@
+{
+  "dialect": "google",
+  "scope": "Focused harness repairs and COUNT(jsonb) isolation; initial results remain immutable.",
+  "original_plan": "weekly-google-plan.json",
+  "repair_reasons": [
+    {
+      "attempt": "weekly-google",
+      "label": "graph-base",
+      "cause": "Unqualified Id in three view definitions violates strict name resolution; dependent graph/path cases were NOT_RUN."
+    },
+    {
+      "attempt": "weekly-google and weekly-pg",
+      "label": "fk-reject-generated",
+      "cause": "The constraint and table shared a name, so duplicate-name rejection did not test generated-column restrictions."
+    },
+    {
+      "attempt": "weekly-google",
+      "label": "tokenize-float-prefix",
+      "cause": "INT64 min/max arguments did not match the FLOAT64 overload; supply typed FLOAT64 bounds and granularity."
+    }
+  ],
+  "steps": [
+    {
+      "label": "fk-base",
+      "family": "foreign-key",
+      "kind": "ddl",
+      "sql": "",
+      "requires": [],
+      "statements": [
+        "CREATE TABLE FkParent (Id INT64 NOT NULL) PRIMARY KEY (Id)"
+      ]
+    },
+    {
+      "label": "fk-generated-control",
+      "family": "foreign-key",
+      "kind": "ddl",
+      "sql": "CREATE TABLE FkGenerated (Id INT64 NOT NULL, SourceId INT64, ParentId INT64 AS (SourceId) STORED) PRIMARY KEY (Id)",
+      "requires": [
+        "fk-base"
+      ]
+    },
+    {
+      "label": "fk-reject-generated",
+      "family": "foreign-key",
+      "kind": "ddl",
+      "sql": "ALTER TABLE FkGenerated ADD CONSTRAINT FkGeneratedReference FOREIGN KEY (ParentId) REFERENCES FkParent(Id) ON DELETE SET NULL",
+      "requires": [
+        "fk-generated-control"
+      ],
+      "control": "documented_invalid_referencing_column"
+    },
+    {
+      "label": "graph-base",
+      "family": "volatile-graph",
+      "kind": "ddl",
+      "sql": "",
+      "requires": [],
+      "statements": [
+        "CREATE TABLE GNodes (Id INT64 NOT NULL) PRIMARY KEY (Id)",
+        "CREATE TABLE GEdges (Src INT64 NOT NULL, Dst INT64 NOT NULL) PRIMARY KEY (Src,Dst)",
+        "CREATE VIEW GStable SQL SECURITY INVOKER AS SELECT n.Id FROM GNodes n",
+        "CREATE VIEW GProjection SQL SECURITY INVOKER AS SELECT n.Id,GENERATE_UUID() AS V FROM GNodes n",
+        "CREATE VIEW GBody SQL SECURITY INVOKER AS SELECT n.Id FROM GNodes n WHERE RAND()<0.5",
+        "CREATE VIEW GJoin SQL SECURITY INVOKER AS SELECT a.Id FROM GNodes a JOIN GNodes b ON a.Id=b.Id AND RAND()<0.5",
+        "CREATE VIEW GKey SQL SECURITY INVOKER AS SELECT GENERATE_UUID() AS Id FROM GNodes"
+      ]
+    },
+    {
+      "label": "graph-seed",
+      "family": "volatile-graph",
+      "kind": "dml",
+      "sql": "",
+      "requires": [
+        "graph-base"
+      ],
+      "statements": [
+        "INSERT INTO GNodes(Id) VALUES (1),(2),(3)",
+        "INSERT INTO GEdges(Src,Dst) VALUES (1,2),(2,3),(3,1)"
+      ]
+    },
+    {
+      "label": "volatile-gstable-key-false-allow-omit",
+      "family": "volatile-graph",
+      "kind": "ddl",
+      "sql": "CREATE PROPERTY GRAPH VG1 NODE TABLES(GStable KEY(Id)) OPTIONS(validate_element_key_uniqueness=false)",
+      "requires": [
+        "graph-seed"
+      ],
+      "view": "GStable",
+      "uniqueness": "false",
+      "allow_volatile": "omit"
+    },
+    {
+      "label": "volatile-gstable-key-false-allow-omit-read",
+      "family": "volatile-graph",
+      "kind": "query",
+      "sql": "GRAPH VG1 MATCH(n) RETURN COUNT(*) AS n",
+      "requires": [
+        "volatile-gstable-key-false-allow-omit"
+      ],
+      "nondeterministic_row_count": false
+    },
+    {
+      "label": "volatile-gstable-key-false-allow-false",
+      "family": "volatile-graph",
+      "kind": "ddl",
+      "sql": "CREATE PROPERTY GRAPH VG2 NODE TABLES(GStable KEY(Id)) OPTIONS(validate_element_key_uniqueness=false,allow_view_with_volatile_column=false)",
+      "requires": [
+        "graph-seed"
+      ],
+      "view": "GStable",
+      "uniqueness": "false",
+      "allow_volatile": "false"
+    },
+    {
+      "label": "volatile-gstable-key-false-allow-false-read",
+      "family": "volatile-graph",
+      "kind": "query",
+      "sql": "GRAPH VG2 MATCH(n) RETURN COUNT(*) AS n",
+      "requires": [
+        "volatile-gstable-key-false-allow-false"
+      ],
+      "nondeterministic_row_count": false
+    },
+    {
+      "label": "volatile-gstable-key-false-allow-true",
+      "family": "volatile-graph",
+      "kind": "ddl",
+      "sql": "CREATE PROPERTY GRAPH VG3 NODE TABLES(GStable KEY(Id)) OPTIONS(validate_element_key_uniqueness=false,allow_view_with_volatile_column=true)",
+      "requires": [
+        "graph-seed"
+      ],
+      "view": "GStable",
+      "uniqueness": "false",
+      "allow_volatile": "true"
+    },
+    {
+      "label": "volatile-gstable-key-false-allow-true-read",
+      "family": "volatile-graph",
+      "kind": "query",
+      "sql": "GRAPH VG3 MATCH(n) RETURN COUNT(*) AS n",
+      "requires": [
+        "volatile-gstable-key-false-allow-true"
+      ],
+      "nondeterministic_row_count": false
+    },
+    {
+      "label": "volatile-gprojection-key-omit-allow-omit",
+      "family": "volatile-graph",
+      "kind": "ddl",
+      "sql": "CREATE PROPERTY GRAPH VG4 NODE TABLES(GProjection KEY(Id))",
+      "requires": [
+        "graph-seed"
+      ],
+      "view": "GProjection",
+      "uniqueness": "omit",
+      "allow_volatile": "omit"
+    },
+    {
+      "label": "volatile-gprojection-key-omit-allow-omit-read",
+      "family": "volatile-graph",
+      "kind": "query",
+      "sql": "GRAPH VG4 MATCH(n) RETURN COUNT(*) AS n",
+      "requires": [
+        "volatile-gprojection-key-omit-allow-omit"
+      ],
+      "nondeterministic_row_count": false
+    },
+    {
+      "label": "volatile-gprojection-key-omit-allow-false",
+      "family": "volatile-graph",
+      "kind": "ddl",
+      "sql": "CREATE PROPERTY GRAPH VG5 NODE TABLES(GProjection KEY(Id)) OPTIONS(allow_view_with_volatile_column=false)",
+      "requires": [
+        "graph-seed"
+      ],
+      "view": "GProjection",
+      "uniqueness": "omit",
+      "allow_volatile": "false"
+    },
+    {
+      "label": "volatile-gprojection-key-omit-allow-false-read",
+      "family": "volatile-graph",
+      "kind": "query",
+      "sql": "GRAPH VG5 MATCH(n) RETURN COUNT(*) AS n",
+      "requires": [
+        "volatile-gprojection-key-omit-allow-false"
+      ],
+      "nondeterministic_row_count": false
+    },
+    {
+      "label": "volatile-gprojection-key-omit-allow-true",
+      "family": "volatile-graph",
+      "kind": "ddl",
+      "sql": "CREATE PROPERTY GRAPH VG6 NODE TABLES(GProjection KEY(Id)) OPTIONS(allow_view_with_volatile_column=true)",
+      "requires": [
+        "graph-seed"
+      ],
+      "view": "GProjection",
+      "uniqueness": "omit",
+      "allow_volatile": "true"
+    },
+    {
+      "label": "volatile-gprojection-key-omit-allow-true-read",
+      "family": "volatile-graph",
+      "kind": "query",
+      "sql": "GRAPH VG6 MATCH(n) RETURN COUNT(*) AS n",
+      "requires": [
+        "volatile-gprojection-key-omit-allow-true"
+      ],
+      "nondeterministic_row_count": false
+    },
+    {
+      "label": "volatile-gprojection-key-false-allow-omit",
+      "family": "volatile-graph",
+      "kind": "ddl",
+      "sql": "CREATE PROPERTY GRAPH VG7 NODE TABLES(GProjection KEY(Id)) OPTIONS(validate_element_key_uniqueness=false)",
+      "requires": [
+        "graph-seed"
+      ],
+      "view": "GProjection",
+      "uniqueness": "false",
+      "allow_volatile": "omit"
+    },
+    {
+      "label": "volatile-gprojection-key-false-allow-omit-read",
+      "family": "volatile-graph",
+      "kind": "query",
+      "sql": "GRAPH VG7 MATCH(n) RETURN COUNT(*) AS n",
+      "requires": [
+        "volatile-gprojection-key-false-allow-omit"
+      ],
+      "nondeterministic_row_count": false
+    },
+    {
+      "label": "volatile-gprojection-key-false-allow-false",
+      "family": "volatile-graph",
+      "kind": "ddl",
+      "sql": "CREATE PROPERTY GRAPH VG8 NODE TABLES(GProjection KEY(Id)) OPTIONS(validate_element_key_uniqueness=false,allow_view_with_volatile_column=false)",
+      "requires": [
+        "graph-seed"
+      ],
+      "view": "GProjection",
+      "uniqueness": "false",
+      "allow_volatile": "false"
+    },
+    {
+      "label": "volatile-gprojection-key-false-allow-false-read",
+      "family": "volatile-graph",
+      "kind": "query",
+      "sql": "GRAPH VG8 MATCH(n) RETURN COUNT(*) AS n",
+      "requires": [
+        "volatile-gprojection-key-false-allow-false"
+      ],
+      "nondeterministic_row_count": false
+    },
+    {
+      "label": "volatile-gprojection-key-false-allow-true",
+      "family": "volatile-graph",
+      "kind": "ddl",
+      "sql": "CREATE PROPERTY GRAPH VG9 NODE TABLES(GProjection KEY(Id)) OPTIONS(validate_element_key_uniqueness=false,allow_view_with_volatile_column=true)",
+      "requires": [
+        "graph-seed"
+      ],
+      "view": "GProjection",
+      "uniqueness": "false",
+      "allow_volatile": "true"
+    },
+    {
+      "label": "volatile-gprojection-key-false-allow-true-read",
+      "family": "volatile-graph",
+      "kind": "query",
+      "sql": "GRAPH VG9 MATCH(n) RETURN COUNT(*) AS n",
+      "requires": [
+        "volatile-gprojection-key-false-allow-true"
+      ],
+      "nondeterministic_row_count": false
+    },
+    {
+      "label": "volatile-gprojection-key-true-allow-omit",
+      "family": "volatile-graph",
+      "kind": "ddl",
+      "sql": "CREATE PROPERTY GRAPH VG10 NODE TABLES(GProjection KEY(Id)) OPTIONS(validate_element_key_uniqueness=true)",
+      "requires": [
+        "graph-seed"
+      ],
+      "view": "GProjection",
+      "uniqueness": "true",
+      "allow_volatile": "omit"
+    },
+    {
+      "label": "volatile-gprojection-key-true-allow-omit-read",
+      "family": "volatile-graph",
+      "kind": "query",
+      "sql": "GRAPH VG10 MATCH(n) RETURN COUNT(*) AS n",
+      "requires": [
+        "volatile-gprojection-key-true-allow-omit"
+      ],
+      "nondeterministic_row_count": false
+    },
+    {
+      "label": "volatile-gprojection-key-true-allow-false",
+      "family": "volatile-graph",
+      "kind": "ddl",
+      "sql": "CREATE PROPERTY GRAPH VG11 NODE TABLES(GProjection KEY(Id)) OPTIONS(validate_element_key_uniqueness=true,allow_view_with_volatile_column=false)",
+      "requires": [
+        "graph-seed"
+      ],
+      "view": "GProjection",
+      "uniqueness": "true",
+      "allow_volatile": "false"
+    },
+    {
+      "label": "volatile-gprojection-key-true-allow-false-read",
+      "family": "volatile-graph",
+      "kind": "query",
+      "sql": "GRAPH VG11 MATCH(n) RETURN COUNT(*) AS n",
+      "requires": [
+        "volatile-gprojection-key-true-allow-false"
+      ],
+      "nondeterministic_row_count": false
+    },
+    {
+      "label": "volatile-gprojection-key-true-allow-true",
+      "family": "volatile-graph",
+      "kind": "ddl",
+      "sql": "CREATE PROPERTY GRAPH VG12 NODE TABLES(GProjection KEY(Id)) OPTIONS(validate_element_key_uniqueness=true,allow_view_with_volatile_column=true)",
+      "requires": [
+        "graph-seed"
+      ],
+      "view": "GProjection",
+      "uniqueness": "true",
+      "allow_volatile": "true"
+    },
+    {
+      "label": "volatile-gprojection-key-true-allow-true-read",
+      "family": "volatile-graph",
+      "kind": "query",
+      "sql": "GRAPH VG12 MATCH(n) RETURN COUNT(*) AS n",
+      "requires": [
+        "volatile-gprojection-key-true-allow-true"
+      ],
+      "nondeterministic_row_count": false
+    },
+    {
+      "label": "volatile-gbody-key-false-allow-omit",
+      "family": "volatile-graph",
+      "kind": "ddl",
+      "sql": "CREATE PROPERTY GRAPH VG13 NODE TABLES(GBody KEY(Id)) OPTIONS(validate_element_key_uniqueness=false)",
+      "requires": [
+        "graph-seed"
+      ],
+      "view": "GBody",
+      "uniqueness": "false",
+      "allow_volatile": "omit"
+    },
+    {
+      "label": "volatile-gbody-key-false-allow-omit-read",
+      "family": "volatile-graph",
+      "kind": "query",
+      "sql": "GRAPH VG13 MATCH(n) RETURN COUNT(*) AS n",
+      "requires": [
+        "volatile-gbody-key-false-allow-omit"
+      ],
+      "nondeterministic_row_count": true
+    },
+    {
+      "label": "volatile-gbody-key-false-allow-false",
+      "family": "volatile-graph",
+      "kind": "ddl",
+      "sql": "CREATE PROPERTY GRAPH VG14 NODE TABLES(GBody KEY(Id)) OPTIONS(validate_element_key_uniqueness=false,allow_view_with_volatile_column=false)",
+      "requires": [
+        "graph-seed"
+      ],
+      "view": "GBody",
+      "uniqueness": "false",
+      "allow_volatile": "false"
+    },
+    {
+      "label": "volatile-gbody-key-false-allow-false-read",
+      "family": "volatile-graph",
+      "kind": "query",
+      "sql": "GRAPH VG14 MATCH(n) RETURN COUNT(*) AS n",
+      "requires": [
+        "volatile-gbody-key-false-allow-false"
+      ],
+      "nondeterministic_row_count": true
+    },
+    {
+      "label": "volatile-gbody-key-false-allow-true",
+      "family": "volatile-graph",
+      "kind": "ddl",
+      "sql": "CREATE PROPERTY GRAPH VG15 NODE TABLES(GBody KEY(Id)) OPTIONS(validate_element_key_uniqueness=false,allow_view_with_volatile_column=true)",
+      "requires": [
+        "graph-seed"
+      ],
+      "view": "GBody",
+      "uniqueness": "false",
+      "allow_volatile": "true"
+    },
+    {
+      "label": "volatile-gbody-key-false-allow-true-read",
+      "family": "volatile-graph",
+      "kind": "query",
+      "sql": "GRAPH VG15 MATCH(n) RETURN COUNT(*) AS n",
+      "requires": [
+        "volatile-gbody-key-false-allow-true"
+      ],
+      "nondeterministic_row_count": true
+    },
+    {
+      "label": "volatile-gjoin-key-false-allow-omit",
+      "family": "volatile-graph",
+      "kind": "ddl",
+      "sql": "CREATE PROPERTY GRAPH VG16 NODE TABLES(GJoin KEY(Id)) OPTIONS(validate_element_key_uniqueness=false)",
+      "requires": [
+        "graph-seed"
+      ],
+      "view": "GJoin",
+      "uniqueness": "false",
+      "allow_volatile": "omit"
+    },
+    {
+      "label": "volatile-gjoin-key-false-allow-omit-read",
+      "family": "volatile-graph",
+      "kind": "query",
+      "sql": "GRAPH VG16 MATCH(n) RETURN COUNT(*) AS n",
+      "requires": [
+        "volatile-gjoin-key-false-allow-omit"
+      ],
+      "nondeterministic_row_count": true
+    },
+    {
+      "label": "volatile-gjoin-key-false-allow-false",
+      "family": "volatile-graph",
+      "kind": "ddl",
+      "sql": "CREATE PROPERTY GRAPH VG17 NODE TABLES(GJoin KEY(Id)) OPTIONS(validate_element_key_uniqueness=false,allow_view_with_volatile_column=false)",
+      "requires": [
+        "graph-seed"
+      ],
+      "view": "GJoin",
+      "uniqueness": "false",
+      "allow_volatile": "false"
+    },
+    {
+      "label": "volatile-gjoin-key-false-allow-false-read",
+      "family": "volatile-graph",
+      "kind": "query",
+      "sql": "GRAPH VG17 MATCH(n) RETURN COUNT(*) AS n",
+      "requires": [
+        "volatile-gjoin-key-false-allow-false"
+      ],
+      "nondeterministic_row_count": true
+    },
+    {
+      "label": "volatile-gjoin-key-false-allow-true",
+      "family": "volatile-graph",
+      "kind": "ddl",
+      "sql": "CREATE PROPERTY GRAPH VG18 NODE TABLES(GJoin KEY(Id)) OPTIONS(validate_element_key_uniqueness=false,allow_view_with_volatile_column=true)",
+      "requires": [
+        "graph-seed"
+      ],
+      "view": "GJoin",
+      "uniqueness": "false",
+      "allow_volatile": "true"
+    },
+    {
+      "label": "volatile-gjoin-key-false-allow-true-read",
+      "family": "volatile-graph",
+      "kind": "query",
+      "sql": "GRAPH VG18 MATCH(n) RETURN COUNT(*) AS n",
+      "requires": [
+        "volatile-gjoin-key-false-allow-true"
+      ],
+      "nondeterministic_row_count": true
+    },
+    {
+      "label": "volatile-gkey-key-false-allow-omit",
+      "family": "volatile-graph",
+      "kind": "ddl",
+      "sql": "CREATE PROPERTY GRAPH VG19 NODE TABLES(GKey KEY(Id)) OPTIONS(validate_element_key_uniqueness=false)",
+      "requires": [
+        "graph-seed"
+      ],
+      "view": "GKey",
+      "uniqueness": "false",
+      "allow_volatile": "omit"
+    },
+    {
+      "label": "volatile-gkey-key-false-allow-omit-read",
+      "family": "volatile-graph",
+      "kind": "query",
+      "sql": "GRAPH VG19 MATCH(n) RETURN COUNT(*) AS n",
+      "requires": [
+        "volatile-gkey-key-false-allow-omit"
+      ],
+      "nondeterministic_row_count": false
+    },
+    {
+      "label": "volatile-gkey-key-false-allow-false",
+      "family": "volatile-graph",
+      "kind": "ddl",
+      "sql": "CREATE PROPERTY GRAPH VG20 NODE TABLES(GKey KEY(Id)) OPTIONS(validate_element_key_uniqueness=false,allow_view_with_volatile_column=false)",
+      "requires": [
+        "graph-seed"
+      ],
+      "view": "GKey",
+      "uniqueness": "false",
+      "allow_volatile": "false"
+    },
+    {
+      "label": "volatile-gkey-key-false-allow-false-read",
+      "family": "volatile-graph",
+      "kind": "query",
+      "sql": "GRAPH VG20 MATCH(n) RETURN COUNT(*) AS n",
+      "requires": [
+        "volatile-gkey-key-false-allow-false"
+      ],
+      "nondeterministic_row_count": false
+    },
+    {
+      "label": "volatile-gkey-key-false-allow-true",
+      "family": "volatile-graph",
+      "kind": "ddl",
+      "sql": "CREATE PROPERTY GRAPH VG21 NODE TABLES(GKey KEY(Id)) OPTIONS(validate_element_key_uniqueness=false,allow_view_with_volatile_column=true)",
+      "requires": [
+        "graph-seed"
+      ],
+      "view": "GKey",
+      "uniqueness": "false",
+      "allow_volatile": "true"
+    },
+    {
+      "label": "volatile-gkey-key-false-allow-true-read",
+      "family": "volatile-graph",
+      "kind": "query",
+      "sql": "GRAPH VG21 MATCH(n) RETURN COUNT(*) AS n",
+      "requires": [
+        "volatile-gkey-key-false-allow-true"
+      ],
+      "nondeterministic_row_count": false
+    },
+    {
+      "label": "volatile-gprojectionunused-key-false-allow-omit",
+      "family": "volatile-graph",
+      "kind": "ddl",
+      "sql": "CREATE PROPERTY GRAPH VG22 NODE TABLES(GProjection KEY(Id) PROPERTIES(Id)) OPTIONS(validate_element_key_uniqueness=false)",
+      "requires": [
+        "graph-seed"
+      ],
+      "view": "GProjectionUnused",
+      "uniqueness": "false",
+      "allow_volatile": "omit"
+    },
+    {
+      "label": "volatile-gprojectionunused-key-false-allow-omit-read",
+      "family": "volatile-graph",
+      "kind": "query",
+      "sql": "GRAPH VG22 MATCH(n) RETURN COUNT(*) AS n",
+      "requires": [
+        "volatile-gprojectionunused-key-false-allow-omit"
+      ],
+      "nondeterministic_row_count": false
+    },
+    {
+      "label": "volatile-gprojectionunused-key-false-allow-false",
+      "family": "volatile-graph",
+      "kind": "ddl",
+      "sql": "CREATE PROPERTY GRAPH VG23 NODE TABLES(GProjection KEY(Id) PROPERTIES(Id)) OPTIONS(validate_element_key_uniqueness=false,allow_view_with_volatile_column=false)",
+      "requires": [
+        "graph-seed"
+      ],
+      "view": "GProjectionUnused",
+      "uniqueness": "false",
+      "allow_volatile": "false"
+    },
+    {
+      "label": "volatile-gprojectionunused-key-false-allow-false-read",
+      "family": "volatile-graph",
+      "kind": "query",
+      "sql": "GRAPH VG23 MATCH(n) RETURN COUNT(*) AS n",
+      "requires": [
+        "volatile-gprojectionunused-key-false-allow-false"
+      ],
+      "nondeterministic_row_count": false
+    },
+    {
+      "label": "volatile-gprojectionunused-key-false-allow-true",
+      "family": "volatile-graph",
+      "kind": "ddl",
+      "sql": "CREATE PROPERTY GRAPH VG24 NODE TABLES(GProjection KEY(Id) PROPERTIES(Id)) OPTIONS(validate_element_key_uniqueness=false,allow_view_with_volatile_column=true)",
+      "requires": [
+        "graph-seed"
+      ],
+      "view": "GProjectionUnused",
+      "uniqueness": "false",
+      "allow_volatile": "true"
+    },
+    {
+      "label": "volatile-gprojectionunused-key-false-allow-true-read",
+      "family": "volatile-graph",
+      "kind": "query",
+      "sql": "GRAPH VG24 MATCH(n) RETURN COUNT(*) AS n",
+      "requires": [
+        "volatile-gprojectionunused-key-false-allow-true"
+      ],
+      "nondeterministic_row_count": false
+    },
+    {
+      "label": "finite-graph",
+      "family": "path-quantifier",
+      "kind": "ddl",
+      "sql": "CREATE PROPERTY GRAPH FiniteGraph NODE TABLES(GNodes KEY(Id) LABEL Node PROPERTIES(Id)) EDGE TABLES(GEdges KEY(Src,Dst) SOURCE KEY(Src) REFERENCES GNodes(Id) DESTINATION KEY(Dst) REFERENCES GNodes(Id) LABEL Edge PROPERTIES(Src,Dst))",
+      "requires": [
+        "graph-seed"
+      ]
+    },
+    {
+      "label": "path-trail-bounded",
+      "family": "path-quantifier",
+      "kind": "query",
+      "sql": "GRAPH FiniteGraph MATCH TRAIL (a)-[e]->{1,3}(b) RETURN DISTINCT a.Id AS src,b.Id AS dst ORDER BY src,dst",
+      "requires": [
+        "finite-graph"
+      ],
+      "timeout_seconds": 8
+    },
+    {
+      "label": "path-trail-no-lower",
+      "family": "path-quantifier",
+      "kind": "query",
+      "sql": "GRAPH FiniteGraph MATCH TRAIL (a)-[e]->{,3}(b) RETURN DISTINCT a.Id AS src,b.Id AS dst ORDER BY src,dst",
+      "requires": [
+        "finite-graph"
+      ],
+      "timeout_seconds": 8
+    },
+    {
+      "label": "path-trail-no-upper",
+      "family": "path-quantifier",
+      "kind": "query",
+      "sql": "GRAPH FiniteGraph MATCH TRAIL (a)-[e]->{1,}(b) RETURN DISTINCT a.Id AS src,b.Id AS dst ORDER BY src,dst",
+      "requires": [
+        "finite-graph"
+      ],
+      "timeout_seconds": 8
+    },
+    {
+      "label": "path-trail-star",
+      "family": "path-quantifier",
+      "kind": "query",
+      "sql": "GRAPH FiniteGraph MATCH TRAIL (a)-[e]->*(b) RETURN DISTINCT a.Id AS src,b.Id AS dst ORDER BY src,dst",
+      "requires": [
+        "finite-graph"
+      ],
+      "timeout_seconds": 8
+    },
+    {
+      "label": "path-trail-plus",
+      "family": "path-quantifier",
+      "kind": "query",
+      "sql": "GRAPH FiniteGraph MATCH TRAIL (a)-[e]->+(b) RETURN DISTINCT a.Id AS src,b.Id AS dst ORDER BY src,dst",
+      "requires": [
+        "finite-graph"
+      ],
+      "timeout_seconds": 8
+    },
+    {
+      "label": "path-acyclic-bounded",
+      "family": "path-quantifier",
+      "kind": "query",
+      "sql": "GRAPH FiniteGraph MATCH ACYCLIC (a)-[e]->{1,3}(b) RETURN DISTINCT a.Id AS src,b.Id AS dst ORDER BY src,dst",
+      "requires": [
+        "finite-graph"
+      ],
+      "timeout_seconds": 8
+    },
+    {
+      "label": "path-acyclic-no-lower",
+      "family": "path-quantifier",
+      "kind": "query",
+      "sql": "GRAPH FiniteGraph MATCH ACYCLIC (a)-[e]->{,3}(b) RETURN DISTINCT a.Id AS src,b.Id AS dst ORDER BY src,dst",
+      "requires": [
+        "finite-graph"
+      ],
+      "timeout_seconds": 8
+    },
+    {
+      "label": "path-acyclic-no-upper",
+      "family": "path-quantifier",
+      "kind": "query",
+      "sql": "GRAPH FiniteGraph MATCH ACYCLIC (a)-[e]->{1,}(b) RETURN DISTINCT a.Id AS src,b.Id AS dst ORDER BY src,dst",
+      "requires": [
+        "finite-graph"
+      ],
+      "timeout_seconds": 8
+    },
+    {
+      "label": "path-acyclic-star",
+      "family": "path-quantifier",
+      "kind": "query",
+      "sql": "GRAPH FiniteGraph MATCH ACYCLIC (a)-[e]->*(b) RETURN DISTINCT a.Id AS src,b.Id AS dst ORDER BY src,dst",
+      "requires": [
+        "finite-graph"
+      ],
+      "timeout_seconds": 8
+    },
+    {
+      "label": "path-acyclic-plus",
+      "family": "path-quantifier",
+      "kind": "query",
+      "sql": "GRAPH FiniteGraph MATCH ACYCLIC (a)-[e]->+(b) RETURN DISTINCT a.Id AS src,b.Id AS dst ORDER BY src,dst",
+      "requires": [
+        "finite-graph"
+      ],
+      "timeout_seconds": 8
+    },
+    {
+      "label": "path-any-shortest-bounded",
+      "family": "path-quantifier",
+      "kind": "query",
+      "sql": "GRAPH FiniteGraph MATCH ANY SHORTEST (a)-[e]->{1,3}(b) RETURN DISTINCT a.Id AS src,b.Id AS dst ORDER BY src,dst",
+      "requires": [
+        "finite-graph"
+      ],
+      "timeout_seconds": 8
+    },
+    {
+      "label": "path-any-shortest-no-lower",
+      "family": "path-quantifier",
+      "kind": "query",
+      "sql": "GRAPH FiniteGraph MATCH ANY SHORTEST (a)-[e]->{,3}(b) RETURN DISTINCT a.Id AS src,b.Id AS dst ORDER BY src,dst",
+      "requires": [
+        "finite-graph"
+      ],
+      "timeout_seconds": 8
+    },
+    {
+      "label": "path-any-shortest-no-upper",
+      "family": "path-quantifier",
+      "kind": "query",
+      "sql": "GRAPH FiniteGraph MATCH ANY SHORTEST (a)-[e]->{1,}(b) RETURN DISTINCT a.Id AS src,b.Id AS dst ORDER BY src,dst",
+      "requires": [
+        "finite-graph"
+      ],
+      "timeout_seconds": 8
+    },
+    {
+      "label": "path-any-shortest-star",
+      "family": "path-quantifier",
+      "kind": "query",
+      "sql": "GRAPH FiniteGraph MATCH ANY SHORTEST (a)-[e]->*(b) RETURN DISTINCT a.Id AS src,b.Id AS dst ORDER BY src,dst",
+      "requires": [
+        "finite-graph"
+      ],
+      "timeout_seconds": 8
+    },
+    {
+      "label": "path-any-shortest-plus",
+      "family": "path-quantifier",
+      "kind": "query",
+      "sql": "GRAPH FiniteGraph MATCH ANY SHORTEST (a)-[e]->+(b) RETURN DISTINCT a.Id AS src,b.Id AS dst ORDER BY src,dst",
+      "requires": [
+        "finite-graph"
+      ],
+      "timeout_seconds": 8
+    },
+    {
+      "label": "path-invalid-bounds",
+      "family": "path-quantifier",
+      "kind": "query",
+      "sql": "GRAPH FiniteGraph MATCH TRAIL (a)-[e]->{3,1}(b) RETURN a.Id AS src,b.Id AS dst",
+      "requires": [
+        "finite-graph"
+      ],
+      "timeout_seconds": 8
+    },
+    {
+      "label": "path-group-star",
+      "family": "path-quantifier",
+      "kind": "query",
+      "sql": "GRAPH FiniteGraph MATCH ANY SHORTEST (a)(-[e]->)*(b) RETURN DISTINCT a.Id AS src,b.Id AS dst ORDER BY src,dst",
+      "requires": [
+        "finite-graph"
+      ],
+      "timeout_seconds": 8
+    },
+    {
+      "label": "tokenize-float-prefix-typed",
+      "family": "numeric-type-controls",
+      "kind": "query",
+      "sql": "SELECT DEBUG_TOKENLIST(TOKENIZE_NUMBER(CAST(1.25 AS FLOAT64),comparison_type=>'all',algorithm=>'prefixtree',min=>CAST(-16 AS FLOAT64),max=>CAST(16 AS FLOAT64),granularity=>CAST(0.25 AS FLOAT64))) AS tokens",
+      "requires": []
+    },
+    {
+      "label": "tokenize-float-default",
+      "family": "numeric-type-controls",
+      "kind": "query",
+      "sql": "SELECT DEBUG_TOKENLIST(TOKENIZE_NUMBER(CAST(1.25 AS FLOAT64))) AS tokens",
+      "requires": []
+    },
+    {
+      "label": "tokenize-float-missing-granularity",
+      "family": "numeric-type-controls",
+      "kind": "query",
+      "sql": "SELECT DEBUG_TOKENLIST(TOKENIZE_NUMBER(CAST(1.25 AS FLOAT64),comparison_type=>'all',algorithm=>'prefixtree',min=>CAST(-16 AS FLOAT64),max=>CAST(16 AS FLOAT64))) AS tokens",
+      "requires": []
+    },
+    {
+      "label": "tokenize-numeric-typed-options",
+      "family": "numeric-type-controls",
+      "kind": "query",
+      "sql": "SELECT DEBUG_TOKENLIST(TOKENIZE_NUMBER(NUMERIC '1.25',comparison_type=>'all',algorithm=>'prefixtree',min=>NUMERIC '-16',max=>NUMERIC '16',granularity=>NUMERIC '0.25')) AS tokens",
+      "requires": []
+    }
+  ]
+}

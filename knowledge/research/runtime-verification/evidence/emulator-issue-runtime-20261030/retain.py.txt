@@ -1,0 +1,49 @@
+"""Retain runtime attempts, corrections, scope and owned-resource cleanup."""
+from pathlib import Path
+from collections import Counter
+import datetime,hashlib,json,re,shutil,statistics
+root=Path('<LOCAL_CHECKOUT>');s=root/'.tmp/emulator-issue-runtime-20261030';task=Path('<LOCAL_TASK_ROOT>/apstndb/spanalyzer/emulator-issue-runtime-20261030');raw=task/'evidence';out=root/'knowledge/research/runtime-verification/evidence/emulator-issue-runtime-20261030';out.mkdir(exist_ok=True)
+def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
+def read(p):return json.loads(p.read_text())
+def lines(p):return[json.loads(t)for t in p.read_text().splitlines()if t]
+def clean(v):
+ if isinstance(v,str):
+  v=re.sub(r'(?i)(transaction )(\d+)',lambda m:m[1]+('0'if m[2]=='0'else'sha256:'+hashlib.sha256(m[2].encode()).hexdigest()),v)
+  return re.sub(r'/sessions/[A-Za-z0-9_-]+','/sessions/<redacted>',v)
+ if isinstance(v,list):return[clean(x)for x in v]
+ if isinstance(v,dict):return{k:clean(x)for k,x in v.items()}
+ return v
+transforms=[]
+for f in raw.iterdir():
+ if not f.is_file():continue
+ name=f.stem+'.jsonl'if f.suffix=='.stdout'and f.name.startswith('emulator-')else f.name
+ dest=out/name
+ if f.suffix=='.stdout'and f.name.startswith('emulator-'):dest.write_text(''.join(json.dumps(clean(x),separators=(',',':'))+'\n'for x in lines(f)))
+ elif f.suffix in ['.json','.jsonl']:
+  if f.suffix=='.json':dest.write_text(json.dumps(clean(read(f)),indent=2)+'\n')
+  else:dest.write_text(''.join(json.dumps(clean(x),separators=(',',':'))+'\n'for x in lines(f)))
+ else:shutil.copyfile(f,dest)
+ transforms.append({'file':name,'raw_sha256':sha(f),'retained_sha256':sha(dest),'transform':'Operational transaction IDs hashed; session suffixes redacted. Runtime data, SQL, statuses and sample values preserved.'if f.suffix in ['.stdout','.json','.jsonl']else'byte copy'})
+(out/'sources').mkdir(exist_ok=True)
+for f in(task/'sources').iterdir():shutil.copyfile(f,out/'sources'/f.name)
+for directory,target in [(s/'initial-producer','initial'),(s/'focused-producer','focused'),(s/'extra-producer','extra'),(s/'module','final')]:
+ d=out/'inputs'/target;d.mkdir(parents=True,exist_ok=True)
+ for f in directory.iterdir():
+  if f.is_file()and(f.suffix in ['.json','.go']or f.name in ['go.mod','go.sum']):shutil.copyfile(f,d/(f.name+'.txt'if f.suffix=='.go'or f.name in ['go.mod','go.sum']else f.name))
+for f in s.glob('*.py'):shutil.copyfile(f,out/(f.name+'.txt'))
+(out/'retention-transformations.json').write_text(json.dumps(transforms,indent=2)+'\n')
+files=['emulator-issues','emulator-focused','emulator-extra','emulator-last'];records={n:lines(out/(n+'.jsonl'))for n in files};allrows=[x for a in records.values()for x in a];index={(x['phase'],x['label']):x for x in allrows}
+def case(phase,label):return index[(phase,label)]
+def ms(x):return(datetime.datetime.fromisoformat(x['completed_at'])-datetime.datetime.fromisoformat(x['started_at'])).total_seconds()*1000
+issues=read(root/'knowledge/research/runtime-verification/evidence/emulator-open-issues-20261030/audit.json')['issues'];executed=sorted({int(x['family'][6:])for x in allrows if x.get('family','').startswith('issue-')});special={184:'Commit with ReturnCommitStats succeeds but returns nil statistics; nested API control is recorded under the historical-read family.',280:'Fresh stream transaction_tag is empty despite submitted tag.',209:'Five equal-result IN-subquery and JOIN samples; 2,000-row fixture only.',404:'Three disjoint-key raw transaction controls; default database-wide conflicts observed. Proposed CLI flag rejected.',405:'Proposed SQL pushdown flag rejected; no implementation of the proposed fork tested.',396:'Related bounded SQL samples only; no profiling to confirm catalog construction cost.',397:'Related bounded SQL samples only; no streaming-analysis profiling.',398:'Related bounded SQL/DML samples only; no double-analysis profiling.'};unverified={401:'Source/Bazel/Docker build environment and resource-limit reports; no source build performed.',402:'Conformance test executable shutdown requires building that harness; not the distributed server process.',388:'Original amd64 cross-version DDL workload not run; no regression ratio established.',221:'Attached multi-table performance workload not reproduced; bounded IN/JOIN sample is separate.',273:'Intermittent historical crash workload not provided as an executable fixture; bounded official image runs do not rule it out.',230:'Historical DFA/regex OOM report lacks a complete bounded input; no OOM stress run.',252:'Standalone binary compatibility on Ubuntu 22.04/Debian 12 not tested by the container.',247:'Historical v1.5.35 release-note completeness is a source audit, not latest-image runtime behavior.',188:'Native macOS/Bazel source build not performed; Linux arm64 container is distinct.',163:'Historical protobuf namespace startup warnings not assessed across the reported environments.',134:'Historical tag publication/mutable-manifest race not reproduced by current digest-pinned execution.',70:'Automatic CLI/container provisioning request not implemented or established by SDK bootstrap.',33:'Disk persistence across process/container restart not tested; no persistent configuration added.',15:'Instance/database API bootstrap is exercised indirectly via spanemuboost; no documentation correction claim.',145:'Current native arm64 image executed; historical 1.5.12/1.5.57 publication timing is unverified.',281:'Disjoint active transaction conflict observed, but no external gRPC commit interceptor reproduction.'}
+coverage=[]
+for item in issues:
+ n=item['number'];matches=[{'file':fn+'.jsonl','phase':x['phase'],'label':x['label'],'code':x['code']}for fn,rs in records.items()for x in rs if x.get('family')==f'issue-{n}'];status='runtime-attempted'if matches else'related-bounded-control'if n in special else'not-executed-original-scope';note=special.get(n,unverified.get(n,'Runtime attempts include setup/negative/blocked cases; inspect the report for outcome and fixture corrections.'))
+ coverage.append({'number':n,'url':item['url'],'title':item['title'],'status':status,'scope':note,'attempts':matches})
+(out/'issue-coverage.json').write_text(json.dumps({'scope':'Every October 30 open issue is dispositioned; an attempt is not a successful reproduction or complete resolution.','counts':dict(Counter(x['status']for x in coverage)),'issues':coverage},indent=2)+'\n')
+cleanup=[]
+for name,rs in records.items():
+ for phase in sorted({x['phase']for x in rs if x['label']=='create-database'}):
+  by={x['label']:x for x in rs if x['phase']==phase};cleanup.append({'file':name+'.jsonl','phase':phase,'create_code':by['create-database']['code'],'drop_code':by['drop-database']['code'],'get_after_drop_code':by['database-absent']['code']})
+containers=[dict(file=n+'-container-cleanup.json',**read(out/(n+'-container-cleanup.json')))for n in files];cli=read(out/'cli-checks.json');initialcli=read(out/'cli-initial-command-errors.json');result={'owned_database_lifecycles':len(cleanup),'database_lifecycles':cleanup,'owned_runtime_containers':len(containers),'runtime_containers':containers,'owned_cli_containers':len(cli)+len(initialcli),'cli_absent':all(x['absent']and x['remove_exit_code']==0 for x in cli+initialcli),'managed_or_omni_requests':False};(out/'cleanup-summary.json').write_text(json.dumps(result,indent=2)+'\n')
+summary={'observed_from':min(x['at']for x in allrows),'observed_until':max(x['at']for x in allrows),'selected_image':read(out/'sources/selected-image.json'),'dependency_versions':{'go':'go1.26.8','spanner':'v1.91.0','spanemuboost':'v0.4.10-alpha.1','gowork':'off'},'producer_runs':{n:{'records':len(rs),'planned_steps_recorded':sum(bool(x.get('family'))for x in rs),'root_codes':dict(Counter(x['code']for x in rs if x.get('family')))}for n,rs in records.items()},'planned_steps_recorded':sum(bool(x.get('family'))for x in allrows),'direct_issue_families':executed,'timings_ms':{'in_subquery':[x['elapsed_ms']for x in allrows if x['phase']=='performance'and re.fullmatch(r'perf-in-\d',x['label'])],'join':[x['elapsed_ms']for x in allrows if x['phase']=='performance'and re.fullmatch(r'perf-join-\d',x['label'])],'unique_violation':ms(case('latency-corrected','unique-duplicate')),'omitted_default':[ms(x)for x in allrows if x['phase']=='latency-corrected'and re.fullmatch(r'default-latency-\d-False',x['label'])],'explicit_default':[ms(x)for x in allrows if x['phase']=='latency-corrected'and re.fullmatch(r'default-latency-\d-True',x['label'])]},'memory_samples':lines(out/'memory-samples.jsonl'),'scope_limits':['No fresh managed or Omni execution.','No before/after version introduction claim.','ListSessions returned zero even for an explicit live multiplexed session; counts do not prove absence.','Two RPC engine-error controls (Internal foreign-key rename; Unknown proto nanos) retain successful later health queries.','CLI initial commands replaced image CMD and never reached gateway_main; corrected explicit gateway invocations are separate.','Initial strict view names, mismatched graph properties, SQL newline, bytea decode, too-early stream start and latency UNIQUE(NULL) failures are producer/fixture limits, not feature conclusions.','Ten thousand 2-KiB payload rows, two index cycles and short retention-window working-set samples do not establish internal object reclamation or long-run memory behavior.']};(out/'summary.json').write_text(json.dumps(summary,indent=2)+'\n');(task/'summary.json').write_text(json.dumps(summary,indent=2)+'\n');print(json.dumps({'steps':summary['planned_steps_recorded'],'direct_families':len(executed),'coverage_counts':dict(Counter(x['status']for x in coverage)),'databases':len(cleanup),'runtime_containers':len(containers),'cli_containers':len(cli)+len(initialcli),'sample_medians_ms':{k:statistics.median(v)if isinstance(v,list)else v for k,v in summary['timings_ms'].items()}}))

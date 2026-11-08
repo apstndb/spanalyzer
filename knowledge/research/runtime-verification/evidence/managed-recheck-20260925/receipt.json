@@ -1,0 +1,21 @@
+{
+  "observed_on_utc": "2026-09-24",
+  "local_date": "2026-09-25 Asia/Tokyo",
+  "runtime": "Managed Cloud Spanner GoogleSQL; single database; optimizer 9; server build unavailable",
+  "source_revision": "c2d7792dd7f83d5dd086e2d32bc22e5d253cf06c",
+  "working_tree": "pre-existing uncommitted changes; snapshot hashes retained",
+  "go_version": "go1.26.8 darwin/arm64",
+  "dependency_scope": "survey module, GOWORK=off GOFLAGS=-mod=readonly; Spanner client v1.88.0; memefish v0.8.1",
+  "target": "Existing user-level managed verification profile; coordinates omitted",
+  "documentation_directory": "<LOCAL_TASK_ROOT>/apstndb/spanalyzer/managed-recheck-20260925",
+  "documentation_hashes": {
+    "release-notes.md": "8c4950b13a3c7489b967cec442ec1dda140d6b187f0a270da4403a0cbb2faef9",
+    "release-notes.html": "15b84d383c8336f3b63feae53991143a2ce0b2d9251d28366fc657cff1dc8a39",
+    "docs/docs.cloud.google.com/spanner/docs/introspection/transaction-statistics.md": "40af3d86bcbfcc60858bd7ce2294a52e19db1990e8a6bce8127fb83bbbb955de",
+    "docs/docs.cloud.google.com/spanner/docs/introspection/query-statistics.md": "e549994f63dae17e5723decb43b285193cef220049fef89452534d0c39f26afd"
+  },
+  "retention_transform": "Connection coordinates replaced with <redacted> in command outputs; retained producer sources unchanged. Unused inherited DDL/transaction helpers in probe sources are never called.",
+  "managed_test_exit_code": 0,
+  "managed_test_count": 4,
+  "managed_test_skips": 0
+}

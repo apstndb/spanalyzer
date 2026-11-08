@@ -1,0 +1,845 @@
+{
+  "before": "51280d38ddf737240e6ee86b0da9138f6f790c1b",
+  "after": "1e880188144a326e383778ebc165a63197efbf70",
+  "rows": 69,
+  "regional": 43,
+  "dual_region": 5,
+  "multi_region": 21,
+  "added": [],
+  "removed": [],
+  "changed_after_normalization": [],
+  "normalization": [
+    "Trim table-cell padding and collapse whitespace",
+    "Strip Markdown link destinations while retaining displayed footnote labels",
+    "Ignore parentheses around displayed replica labels",
+    "Normalize the documented Zurich spelling change"
+  ],
+  "raw_rows_before": {
+    "regional-northamerica-northeast1": [
+      "`regional-northamerica-northeast1`",
+      "Montréal ![leaf icon](https://cloud.google.com/sustainability/region-carbon/gleaf.svg) [Low CO <sub>2</sub>](https://cloud.google.com/sustainability/region-carbon#region-picker)",
+      ""
+    ],
+    "regional-northamerica-northeast2": [
+      "`regional-northamerica-northeast2`",
+      "Toronto ![leaf icon](https://cloud.google.com/sustainability/region-carbon/gleaf.svg) [Low CO <sub>2</sub>](https://cloud.google.com/sustainability/region-carbon#region-picker)",
+      ""
+    ],
+    "regional-northamerica-south1": [
+      "`regional-northamerica-south1`",
+      "Querétaro",
+      ""
+    ],
+    "regional-southamerica-east1": [
+      "`regional-southamerica-east1`",
+      "São Paulo ![leaf icon](https://cloud.google.com/sustainability/region-carbon/gleaf.svg) [Low CO <sub>2</sub>](https://cloud.google.com/sustainability/region-carbon#region-picker)",
+      ""
+    ],
+    "regional-southamerica-west1": [
+      "`regional-southamerica-west1`",
+      "Santiago ![leaf icon](https://cloud.google.com/sustainability/region-carbon/gleaf.svg) [Low CO <sub>2</sub>](https://cloud.google.com/sustainability/region-carbon#region-picker)",
+      ""
+    ],
+    "regional-us-central1": [
+      "`regional-us-central1`",
+      "Iowa ![leaf icon](https://cloud.google.com/sustainability/region-carbon/gleaf.svg) [Low CO <sub>2</sub>](https://cloud.google.com/sustainability/region-carbon#region-picker)",
+      "Read-only: `asia-northeast1` [*1-OR*](https://docs.cloud.google.com/spanner/docs/instance-configurations#1-OR) `asia-south1` [*1-OR*](https://docs.cloud.google.com/spanner/docs/instance-configurations#1-OR) `europe-west1` [*2-OR*](https://docs.cloud.google.com/spanner/docs/instance-configurations#2-OR) `europe-west2` [*1-OR*](https://docs.cloud.google.com/spanner/docs/instance-configurations#1-OR) `europe-west9` [*1-OR*](https://docs.cloud.google.com/spanner/docs/instance-configurations#1-OR) `us-west3` [*1-OR*](https://docs.cloud.google.com/spanner/docs/instance-configurations#1-OR)"
+    ],
+    "regional-us-east1": [
+      "`regional-us-east1`",
+      "South Carolina",
+      "Read-only: `us-central1` [*1-OR*](https://docs.cloud.google.com/spanner/docs/instance-configurations#1-OR) `us-west1` [*1-OR*](https://docs.cloud.google.com/spanner/docs/instance-configurations#1-OR) `europe-west1` [*1-OR*](https://docs.cloud.google.com/spanner/docs/instance-configurations#1-OR) `europe-west3` [*1-OR*](https://docs.cloud.google.com/spanner/docs/instance-configurations#1-OR)"
+    ],
+    "regional-us-east4": [
+      "`regional-us-east4`",
+      "Northern Virginia",
+      ""
+    ],
+    "regional-us-east5": [
+      "`regional-us-east5`",
+      "Columbus",
+      "Read-only: `us-central1` [*1-OR*](https://docs.cloud.google.com/spanner/docs/instance-configurations#1-OR)"
+    ],
+    "regional-us-south1": [
+      "`regional-us-south1`",
+      "Dallas ![leaf icon](https://cloud.google.com/sustainability/region-carbon/gleaf.svg) [Low CO <sub>2</sub>](https://cloud.google.com/sustainability/region-carbon#region-picker)",
+      ""
+    ],
+    "regional-us-west1": [
+      "`regional-us-west1`",
+      "Oregon ![leaf icon](https://cloud.google.com/sustainability/region-carbon/gleaf.svg) [Low CO <sub>2</sub>](https://cloud.google.com/sustainability/region-carbon#region-picker)",
+      ""
+    ],
+    "regional-us-west2": [
+      "`regional-us-west2`",
+      "Los Angeles",
+      ""
+    ],
+    "regional-us-west3": [
+      "`regional-us-west3`",
+      "Salt Lake City",
+      ""
+    ],
+    "regional-us-west4": [
+      "`regional-us-west4`",
+      "Las Vegas",
+      ""
+    ],
+    "regional-europe-central2": [
+      "`regional-europe-central2`",
+      "Warsaw ![leaf icon](https://cloud.google.com/sustainability/region-carbon/gleaf.svg) [Low CO <sub>2</sub>](https://cloud.google.com/sustainability/region-carbon#region-picker)",
+      ""
+    ],
+    "regional-europe-north1": [
+      "`regional-europe-north1`",
+      "Finland ![leaf icon](https://cloud.google.com/sustainability/region-carbon/gleaf.svg) [Low CO <sub>2</sub>](https://cloud.google.com/sustainability/region-carbon#region-picker)",
+      ""
+    ],
+    "regional-europe-north2": [
+      "`regional-europe-north2`",
+      "Stockholm ![leaf icon](https://cloud.google.com/sustainability/region-carbon/gleaf.svg) [Low CO <sub>2</sub>](https://cloud.google.com/sustainability/region-carbon#region-picker)",
+      ""
+    ],
+    "regional-europe-southwest1": [
+      "`regional-europe-southwest1`",
+      "Madrid ![leaf icon](https://cloud.google.com/sustainability/region-carbon/gleaf.svg) [Low CO <sub>2</sub>](https://cloud.google.com/sustainability/region-carbon#region-picker)",
+      ""
+    ],
+    "regional-europe-west1": [
+      "`regional-europe-west1`",
+      "Belgium ![leaf icon](https://cloud.google.com/sustainability/region-carbon/gleaf.svg) [Low CO <sub>2</sub>](https://cloud.google.com/sustainability/region-carbon#region-picker)",
+      "Read-only: `us-central1` [*1-OR*](https://docs.cloud.google.com/spanner/docs/instance-configurations#1-OR) `us-west1` [*1-OR*](https://docs.cloud.google.com/spanner/docs/instance-configurations#1-OR)"
+    ],
+    "regional-europe-west2": [
+      "`regional-europe-west2`",
+      "London ![leaf icon](https://cloud.google.com/sustainability/region-carbon/gleaf.svg) [Low CO <sub>2</sub>](https://cloud.google.com/sustainability/region-carbon#region-picker)",
+      ""
+    ],
+    "regional-europe-west3": [
+      "`regional-europe-west3`",
+      "Frankfurt",
+      ""
+    ],
+    "regional-europe-west4": [
+      "`regional-europe-west4`",
+      "Netherlands ![leaf icon](https://cloud.google.com/sustainability/region-carbon/gleaf.svg) [Low CO <sub>2</sub>](https://cloud.google.com/sustainability/region-carbon#region-picker)",
+      ""
+    ],
+    "regional-europe-west6": [
+      "`regional-europe-west6`",
+      "Zürich ![leaf icon](https://cloud.google.com/sustainability/region-carbon/gleaf.svg) [Low CO <sub>2</sub>](https://cloud.google.com/sustainability/region-carbon#region-picker)",
+      ""
+    ],
+    "regional-europe-west8": [
+      "`regional-europe-west8`",
+      "Milan ![leaf icon](https://cloud.google.com/sustainability/region-carbon/gleaf.svg) [Low CO <sub>2</sub>](https://cloud.google.com/sustainability/region-carbon#region-picker)",
+      ""
+    ],
+    "regional-europe-west9": [
+      "`regional-europe-west9`",
+      "Paris ![leaf icon](https://cloud.google.com/sustainability/region-carbon/gleaf.svg) [Low CO <sub>2</sub>](https://cloud.google.com/sustainability/region-carbon#region-picker)",
+      ""
+    ],
+    "regional-europe-west10": [
+      "`regional-europe-west10`",
+      "Berlin",
+      ""
+    ],
+    "regional-europe-west12": [
+      "`regional-europe-west12`",
+      "Turin ![leaf icon](https://cloud.google.com/sustainability/region-carbon/gleaf.svg) [Low CO <sub>2</sub>](https://cloud.google.com/sustainability/region-carbon#region-picker)",
+      ""
+    ],
+    "regional-asia-east1": [
+      "`regional-asia-east1`",
+      "Taiwan",
+      ""
+    ],
+    "regional-asia-east2": [
+      "`regional-asia-east2`",
+      "Hong Kong",
+      ""
+    ],
+    "regional-asia-northeast1": [
+      "`regional-asia-northeast1`",
+      "Tokyo",
+      ""
+    ],
+    "regional-asia-northeast2": [
+      "`regional-asia-northeast2`",
+      "Osaka",
+      ""
+    ],
+    "regional-asia-northeast3": [
+      "`regional-asia-northeast3`",
+      "Seoul",
+      ""
+    ],
+    "regional-asia-south1": [
+      "`regional-asia-south1`",
+      "Mumbai",
+      ""
+    ],
+    "regional-asia-south2": [
+      "`regional-asia-south2`",
+      "Delhi",
+      ""
+    ],
+    "regional-asia-southeast1": [
+      "`regional-asia-southeast1`",
+      "Singapore",
+      ""
+    ],
+    "regional-asia-southeast2": [
+      "`regional-asia-southeast2`",
+      "Jakarta",
+      ""
+    ],
+    "regional-asia-southeast3": [
+      "`regional-asia-southeast3`",
+      "Bangkok",
+      ""
+    ],
+    "regional-australia-southeast1": [
+      "`regional-australia-southeast1`",
+      "Sydney",
+      ""
+    ],
+    "regional-australia-southeast2": [
+      "`regional-australia-southeast2`",
+      "Melbourne",
+      ""
+    ],
+    "regional-me-central1": [
+      "`regional-me-central1`",
+      "Doha",
+      ""
+    ],
+    "regional-me-central2": [
+      "`regional-me-central2`",
+      "Dammam",
+      ""
+    ],
+    "regional-me-west1": [
+      "`regional-me-west1`",
+      "Tel Aviv",
+      ""
+    ],
+    "regional-africa-south1": [
+      "`regional-africa-south1`",
+      "Johannesburg",
+      ""
+    ],
+    "dual-region-australia1": [
+      "`dual-region-australia1`",
+      "au (Australia)",
+      "Sydney: `australia-southeast1` [*L*](https://docs.cloud.google.com/spanner/docs/instance-configurations#L) , [*2RW+1W*](https://docs.cloud.google.com/spanner/docs/instance-configurations#2RW) Melbourne: `australia-southeast2` [*2RW+1W*](https://docs.cloud.google.com/spanner/docs/instance-configurations#2RW)"
+    ],
+    "dual-region-canada1": [
+      "`dual-region-canada1`",
+      "ca (Canada)",
+      "Toronto: `northamerica-northeast2` [*L*](https://docs.cloud.google.com/spanner/docs/instance-configurations#L) , [*2RW+1W*](https://docs.cloud.google.com/spanner/docs/instance-configurations#2RW) Montréal: `northamerica-northeast1` [*2RW+1W*](https://docs.cloud.google.com/spanner/docs/instance-configurations#2RW)"
+    ],
+    "dual-region-germany1": [
+      "`dual-region-germany1`",
+      "de (Germany)",
+      "Berlin: `europe-west10` [*L*](https://docs.cloud.google.com/spanner/docs/instance-configurations#L) , [*2RW+1W*](https://docs.cloud.google.com/spanner/docs/instance-configurations#2RW) Frankfurt: `europe-west3` [*2RW+1W*](https://docs.cloud.google.com/spanner/docs/instance-configurations#2RW)"
+    ],
+    "dual-region-india1": [
+      "`dual-region-india1`",
+      "in (India)",
+      "Mumbai: `asia-south1` [*L*](https://docs.cloud.google.com/spanner/docs/instance-configurations#L) , [*2RW+1W*](https://docs.cloud.google.com/spanner/docs/instance-configurations#2RW) Delhi: `asia-south2` [*2RW+1W*](https://docs.cloud.google.com/spanner/docs/instance-configurations#2RW)"
+    ],
+    "dual-region-japan1": [
+      "`dual-region-japan1`",
+      "jp (Japan)",
+      "Tokyo: `asia-northeast1` [*L*](https://docs.cloud.google.com/spanner/docs/instance-configurations#L) , [*2RW+1W*](https://docs.cloud.google.com/spanner/docs/instance-configurations#2RW) Osaka: `asia-northeast2` [*2RW+1W*](https://docs.cloud.google.com/spanner/docs/instance-configurations#2RW)"
+    ],
+    "asia1": [
+      "`asia1`",
+      "global",
+      "Tokyo: `asia-northeast1` [*L*](https://docs.cloud.google.com/spanner/docs/instance-configurations#L) , [*2R*](https://docs.cloud.google.com/spanner/docs/instance-configurations#2R) Osaka: `asia-northeast2` [*2R*](https://docs.cloud.google.com/spanner/docs/instance-configurations#2R)",
+      "None",
+      "Seoul: `asia-northeast3`",
+      "Read-only: `us-west1` [*1-OR*](https://docs.cloud.google.com/spanner/docs/instance-configurations#1-OR) `us-east5` [*1-OR*](https://docs.cloud.google.com/spanner/docs/instance-configurations#1-OR)"
+    ],
+    "eur3": [
+      "`eur3`",
+      "eu (European Union)",
+      "Belgium: `europe-west1` [*L*](https://docs.cloud.google.com/spanner/docs/instance-configurations#L) , [*2R*](https://docs.cloud.google.com/spanner/docs/instance-configurations#2R) Netherlands: `europe-west4` [*2R*](https://docs.cloud.google.com/spanner/docs/instance-configurations#2R)",
+      "None",
+      "Finland: `europe-north1`",
+      "Read-only: `us-central1` [*1-OR*](https://docs.cloud.google.com/spanner/docs/instance-configurations#1-OR) `us-east4` [*1-OR*](https://docs.cloud.google.com/spanner/docs/instance-configurations#1-OR)"
+    ],
+    "eur5": [
+      "`eur5`",
+      "global",
+      "London: `europe-west2` [*L*](https://docs.cloud.google.com/spanner/docs/instance-configurations#L) , [*2R*](https://docs.cloud.google.com/spanner/docs/instance-configurations#2R) Belgium: `europe-west1` [*2R*](https://docs.cloud.google.com/spanner/docs/instance-configurations#2R)",
+      "None",
+      "Netherlands: `europe-west4`",
+      "Read-only: `us-central1` [*1-OR*](https://docs.cloud.google.com/spanner/docs/instance-configurations#1-OR) `us-east1` [*1-OR*](https://docs.cloud.google.com/spanner/docs/instance-configurations#1-OR)"
+    ],
+    "eur6": [
+      "`eur6`",
+      "global",
+      "Netherlands: `europe-west4` [*L*](https://docs.cloud.google.com/spanner/docs/instance-configurations#L) , [*2R*](https://docs.cloud.google.com/spanner/docs/instance-configurations#2R) Frankfurt: `europe-west3` [*2R*](https://docs.cloud.google.com/spanner/docs/instance-configurations#2R)",
+      "None",
+      "Zurich: `europe-west6`",
+      "Read-only: `us-east1` [*2-OR*](https://docs.cloud.google.com/spanner/docs/instance-configurations#2-OR)"
+    ],
+    "eur7": [
+      "`eur7`",
+      "eu (European Union)",
+      "Milan: `europe-west8` [*L*](https://docs.cloud.google.com/spanner/docs/instance-configurations#L) , [*2R*](https://docs.cloud.google.com/spanner/docs/instance-configurations#2R) Frankfurt: `europe-west3` [*2R*](https://docs.cloud.google.com/spanner/docs/instance-configurations#2R)",
+      "None",
+      "Turin: `europe-west12`",
+      ""
+    ],
+    "nam3": [
+      "`nam3`",
+      "us (United States)",
+      "Northern Virginia: `us-east4` [*L*](https://docs.cloud.google.com/spanner/docs/instance-configurations#L) , [*2R*](https://docs.cloud.google.com/spanner/docs/instance-configurations#2R) South Carolina: `us-east1` [*2R*](https://docs.cloud.google.com/spanner/docs/instance-configurations#2R)",
+      "None",
+      "Iowa: `us-central1`",
+      "Read-only: `asia-south1` [*1-OR*](https://docs.cloud.google.com/spanner/docs/instance-configurations#1-OR) `asia-southeast1` [*1-OR*](https://docs.cloud.google.com/spanner/docs/instance-configurations#1-OR) `asia-southeast2` [*1-OR*](https://docs.cloud.google.com/spanner/docs/instance-configurations#1-OR) `europe-west1` [*1-OR*](https://docs.cloud.google.com/spanner/docs/instance-configurations#1-OR) `europe-west2` [*1-OR*](https://docs.cloud.google.com/spanner/docs/instance-configurations#1-OR) `europe-west4` [*1-OR*](https://docs.cloud.google.com/spanner/docs/instance-configurations#1-OR) `europe-west9` [*1-OR*](https://docs.cloud.google.com/spanner/docs/instance-configurations#1-OR) `us-east5` [*1-OR*](https://docs.cloud.google.com/spanner/docs/instance-configurations#1-OR) `us-west1` [*1-OR*](https://docs.cloud.google.com/spanner/docs/instance-configurations#1-OR) `us-west2` [*1-OR*](https://docs.cloud.google.com/spanner/docs/instance-configurations#1-OR) `us-west4` [*1-OR*](https://docs.cloud.google.com/spanner/docs/instance-configurations#1-OR) `us-west8` [*1-OR*](https://docs.cloud.google.com/spanner/docs/instance-configurations#1-OR)"
+    ],
+    "nam6": [
+      "`nam6`",
+      "us (United States)",
+      "Iowa: `us-central1` [*L*](https://docs.cloud.google.com/spanner/docs/instance-configurations#L) , [*2R*](https://docs.cloud.google.com/spanner/docs/instance-configurations#2R) South Carolina: `us-east1` [*2R*](https://docs.cloud.google.com/spanner/docs/instance-configurations#2R)",
+      "Oregon: `us-west1` [*1R*](https://docs.cloud.google.com/spanner/docs/instance-configurations#1R) Los Angeles: `us-west2` [*1R*](https://docs.cloud.google.com/spanner/docs/instance-configurations#1R)",
+      "Oklahoma: `us-central2`",
+      ""
+    ],
+    "nam7": [
+      "`nam7`",
+      "us (United States)",
+      "Iowa: `us-central1` [*L*](https://docs.cloud.google.com/spanner/docs/instance-configurations#L) , [*2R*](https://docs.cloud.google.com/spanner/docs/instance-configurations#2R) Northern Virginia: `us-east4` [*2R*](https://docs.cloud.google.com/spanner/docs/instance-configurations#2R)",
+      "None",
+      "Oklahoma: `us-central2`",
+      "Read-only: `us-east1` [*2-OR*](https://docs.cloud.google.com/spanner/docs/instance-configurations#2-OR) `us-south1` [*1-OR*](https://docs.cloud.google.com/spanner/docs/instance-configurations#1-OR) `us-west1` [*1-OR*](https://docs.cloud.google.com/spanner/docs/instance-configurations#1-OR) `europe-west1` [*2-OR*](https://docs.cloud.google.com/spanner/docs/instance-configurations#2-OR)"
+    ],
+    "nam8": [
+      "`nam8`",
+      "us (United States)",
+      "Los Angeles: `us-west2` [*L*](https://docs.cloud.google.com/spanner/docs/instance-configurations#L) , [*2R*](https://docs.cloud.google.com/spanner/docs/instance-configurations#2R) Oregon: `us-west1` [*2R*](https://docs.cloud.google.com/spanner/docs/instance-configurations#2R)",
+      "None",
+      "Salt Lake City: `us-west3`",
+      "Read-only: `asia-northeast1` [*2-OR*](https://docs.cloud.google.com/spanner/docs/instance-configurations#2-OR) `asia-southeast1` [*2-OR*](https://docs.cloud.google.com/spanner/docs/instance-configurations#2-OR) `europe-west2` [*2-OR*](https://docs.cloud.google.com/spanner/docs/instance-configurations#2-OR) `europe-west3` [*2-OR*](https://docs.cloud.google.com/spanner/docs/instance-configurations#2-OR) `us-east5` [*1-OR*](https://docs.cloud.google.com/spanner/docs/instance-configurations#1-OR)"
+    ],
+    "nam9": [
+      "`nam9`",
+      "us (United States)",
+      "Northern Virginia: `us-east4` [*L*](https://docs.cloud.google.com/spanner/docs/instance-configurations#L) , [*2R*](https://docs.cloud.google.com/spanner/docs/instance-configurations#2R) Iowa: `us-central1` [*2R*](https://docs.cloud.google.com/spanner/docs/instance-configurations#2R)",
+      "Oregon: `us-west1` [*2R*](https://docs.cloud.google.com/spanner/docs/instance-configurations#2R)",
+      "South Carolina: `us-east1`",
+      ""
+    ],
+    "nam10": [
+      "`nam10`",
+      "us (United States)",
+      "Iowa: `us-central1` [*L*](https://docs.cloud.google.com/spanner/docs/instance-configurations#L) , [*2R*](https://docs.cloud.google.com/spanner/docs/instance-configurations#2R) Salt Lake City: `us-west3` [*2R*](https://docs.cloud.google.com/spanner/docs/instance-configurations#2R)",
+      "None",
+      "Oklahoma: `us-central2`",
+      "Read-only: `us-east4` [*1-OR*](https://docs.cloud.google.com/spanner/docs/instance-configurations#1-OR)"
+    ],
+    "nam11": [
+      "`nam11`",
+      "us (United States)",
+      "Iowa: `us-central1` [*L*](https://docs.cloud.google.com/spanner/docs/instance-configurations#L) , [*2R*](https://docs.cloud.google.com/spanner/docs/instance-configurations#2R) South Carolina: `us-east1` [*2R*](https://docs.cloud.google.com/spanner/docs/instance-configurations#2R)",
+      "None",
+      "Oklahoma: `us-central2`",
+      "Read-only: `us-west1` [*1-OR*](https://docs.cloud.google.com/spanner/docs/instance-configurations#1-OR)"
+    ],
+    "nam12": [
+      "`nam12`",
+      "us (United States)",
+      "Iowa: `us-central1` [*L*](https://docs.cloud.google.com/spanner/docs/instance-configurations#L) , [*2R*](https://docs.cloud.google.com/spanner/docs/instance-configurations#2R) Northern Virginia: `us-east4` [*2R*](https://docs.cloud.google.com/spanner/docs/instance-configurations#2R)",
+      "Oregon: `us-west1` [*2R*](https://docs.cloud.google.com/spanner/docs/instance-configurations#2R)",
+      "Oklahoma: `us-central2`",
+      ""
+    ],
+    "nam13": [
+      "`nam13`",
+      "us (United States)",
+      "Oklahoma: `us-central2` [*L*](https://docs.cloud.google.com/spanner/docs/instance-configurations#L) , [*2R*](https://docs.cloud.google.com/spanner/docs/instance-configurations#2R) Iowa: `us-central1` [*2R*](https://docs.cloud.google.com/spanner/docs/instance-configurations#2R)",
+      "None",
+      "Salt Lake City: `us-west3`",
+      ""
+    ],
+    "nam14": [
+      "`nam14`",
+      "global",
+      "Northern Virginia: `us-east4` [*L*](https://docs.cloud.google.com/spanner/docs/instance-configurations#L) , [*2R*](https://docs.cloud.google.com/spanner/docs/instance-configurations#2R) Montréal: `northamerica-northeast1` [*2R*](https://docs.cloud.google.com/spanner/docs/instance-configurations#2R)",
+      "None",
+      "South Carolina: `us-east1`",
+      ""
+    ],
+    "nam15": [
+      "`nam15`",
+      "us (United States)",
+      "Dallas: `us-south1` [*L*](https://docs.cloud.google.com/spanner/docs/instance-configurations#L) , [*2R*](https://docs.cloud.google.com/spanner/docs/instance-configurations#2R) Northern Virginia: `us-east4` [*2R*](https://docs.cloud.google.com/spanner/docs/instance-configurations#2R)",
+      "None",
+      "Iowa: `us-central1`",
+      "Read-only: `us-central2` [*1-OR*](https://docs.cloud.google.com/spanner/docs/instance-configurations#1-OR) `us-east1` [*1-OR*](https://docs.cloud.google.com/spanner/docs/instance-configurations#1-OR) `us-west3` [*1-OR*](https://docs.cloud.google.com/spanner/docs/instance-configurations#1-OR)"
+    ],
+    "nam16": [
+      "`nam16`",
+      "us (United States)",
+      "Iowa: `us-central1` [*L*](https://docs.cloud.google.com/spanner/docs/instance-configurations#L) , [*2R*](https://docs.cloud.google.com/spanner/docs/instance-configurations#2R) Northern Virginia: `us-east4` [*2R*](https://docs.cloud.google.com/spanner/docs/instance-configurations#2R)",
+      "None",
+      "Columbus: `us-east5`",
+      "Read-only: `us-west2` [*2-OR*](https://docs.cloud.google.com/spanner/docs/instance-configurations#2-OR)"
+    ],
+    "nam22": [
+      "`nam22`",
+      "us (United States)",
+      "Columbus: `us-east5` ( [*L*](https://docs.cloud.google.com/spanner/docs/instance-configurations#L) , [*2R*](https://docs.cloud.google.com/spanner/docs/instance-configurations#2R) ) South Carolina: `us-east1` ( [*2R*](https://docs.cloud.google.com/spanner/docs/instance-configurations#2R) )",
+      "None",
+      "Northern Virginia: `us-east4`",
+      "Read-only: `us-west1` [*1-OR*](https://docs.cloud.google.com/spanner/docs/instance-configurations#1-OR)"
+    ],
+    "nam23": [
+      "`nam23`",
+      "us (United States)",
+      "Iowa: `us-central1` [*L*](https://docs.cloud.google.com/spanner/docs/instance-configurations#L) , [*2R*](https://docs.cloud.google.com/spanner/docs/instance-configurations#2R) Las Vegas: `us-west4` [*2R*](https://docs.cloud.google.com/spanner/docs/instance-configurations#2R)",
+      "None",
+      "Dallas: `us-south1`",
+      "Read-only: `asia-northeast1` [*1-OR*](https://docs.cloud.google.com/spanner/docs/instance-configurations#1-OR) `australia-southeast2` [*1-OR*](https://docs.cloud.google.com/spanner/docs/instance-configurations#1-OR) `europe-west1` [*1-OR*](https://docs.cloud.google.com/spanner/docs/instance-configurations#1-OR) `europe-west3` [*1-OR*](https://docs.cloud.google.com/spanner/docs/instance-configurations#1-OR)"
+    ],
+    "nam-eur-asia1": [
+      "`nam-eur-asia1`",
+      "global",
+      "Iowa: `us-central1` [*L*](https://docs.cloud.google.com/spanner/docs/instance-configurations#L) , [*2R*](https://docs.cloud.google.com/spanner/docs/instance-configurations#2R) Oklahoma: `us-central2` [*2R*](https://docs.cloud.google.com/spanner/docs/instance-configurations#2R)",
+      "Belgium: `europe-west1` [*2R*](https://docs.cloud.google.com/spanner/docs/instance-configurations#2R) Taiwan: `asia-east1` [*2R*](https://docs.cloud.google.com/spanner/docs/instance-configurations#2R)",
+      "South Carolina: `us-east1`",
+      "Read-only: `us-west2` [*1-OR*](https://docs.cloud.google.com/spanner/docs/instance-configurations#1-OR)"
+    ],
+    "nam-eur-asia3": [
+      "`nam-eur-asia3`",
+      "global",
+      "Iowa: `us-central1` [*L*](https://docs.cloud.google.com/spanner/docs/instance-configurations#L) , [*2R*](https://docs.cloud.google.com/spanner/docs/instance-configurations#2R) South Carolina: `us-east1` [*2R*](https://docs.cloud.google.com/spanner/docs/instance-configurations#2R)",
+      "Belgium: `europe-west1` [*1R*](https://docs.cloud.google.com/spanner/docs/instance-configurations#1R) Netherlands: `europe-west4` [*1R*](https://docs.cloud.google.com/spanner/docs/instance-configurations#1R) Taiwan: `asia-east1` [*2R*](https://docs.cloud.google.com/spanner/docs/instance-configurations#2R)",
+      "Oklahoma: `us-central2`",
+      ""
+    ]
+  },
+  "raw_rows_after": {
+    "regional-northamerica-northeast1": [
+      "`regional-northamerica-northeast1`",
+      "Montréal ![leaf icon](https://cloud.google.com/sustainability/region-carbon/gleaf.svg) [Low CO <sub>2</sub>](https://cloud.google.com/sustainability/region-carbon#region-picker)",
+      ""
+    ],
+    "regional-northamerica-northeast2": [
+      "`regional-northamerica-northeast2`",
+      "Toronto ![leaf icon](https://cloud.google.com/sustainability/region-carbon/gleaf.svg) [Low CO <sub>2</sub>](https://cloud.google.com/sustainability/region-carbon#region-picker)",
+      ""
+    ],
+    "regional-northamerica-south1": [
+      "`regional-northamerica-south1`",
+      "Querétaro",
+      ""
+    ],
+    "regional-southamerica-east1": [
+      "`regional-southamerica-east1`",
+      "São Paulo ![leaf icon](https://cloud.google.com/sustainability/region-carbon/gleaf.svg) [Low CO <sub>2</sub>](https://cloud.google.com/sustainability/region-carbon#region-picker)",
+      ""
+    ],
+    "regional-southamerica-west1": [
+      "`regional-southamerica-west1`",
+      "Santiago ![leaf icon](https://cloud.google.com/sustainability/region-carbon/gleaf.svg) [Low CO <sub>2</sub>](https://cloud.google.com/sustainability/region-carbon#region-picker)",
+      ""
+    ],
+    "regional-us-central1": [
+      "`regional-us-central1`",
+      "Iowa ![leaf icon](https://cloud.google.com/sustainability/region-carbon/gleaf.svg) [Low CO <sub>2</sub>](https://cloud.google.com/sustainability/region-carbon#region-picker)",
+      "Read-only: `asia-northeast1` [*1-OR*](https://docs.cloud.google.com/spanner/docs/instance-configurations#regional-1-OR) `asia-south1` [*1-OR*](https://docs.cloud.google.com/spanner/docs/instance-configurations#regional-1-OR) `europe-west1` [*2-OR*](https://docs.cloud.google.com/spanner/docs/instance-configurations#regional-2-OR) `europe-west2` [*1-OR*](https://docs.cloud.google.com/spanner/docs/instance-configurations#regional-1-OR) `europe-west9` [*1-OR*](https://docs.cloud.google.com/spanner/docs/instance-configurations#regional-1-OR) `us-west3` [*1-OR*](https://docs.cloud.google.com/spanner/docs/instance-configurations#regional-1-OR)"
+    ],
+    "regional-us-east1": [
+      "`regional-us-east1`",
+      "South Carolina",
+      "Read-only: `us-central1` [*1-OR*](https://docs.cloud.google.com/spanner/docs/instance-configurations#regional-1-OR) `us-west1` [*1-OR*](https://docs.cloud.google.com/spanner/docs/instance-configurations#regional-1-OR) `europe-west1` [*1-OR*](https://docs.cloud.google.com/spanner/docs/instance-configurations#regional-1-OR) `europe-west3` [*1-OR*](https://docs.cloud.google.com/spanner/docs/instance-configurations#regional-1-OR)"
+    ],
+    "regional-us-east4": [
+      "`regional-us-east4`",
+      "Northern Virginia",
+      ""
+    ],
+    "regional-us-east5": [
+      "`regional-us-east5`",
+      "Columbus",
+      "Read-only: `us-central1` [*1-OR*](https://docs.cloud.google.com/spanner/docs/instance-configurations#regional-1-OR)"
+    ],
+    "regional-us-south1": [
+      "`regional-us-south1`",
+      "Dallas ![leaf icon](https://cloud.google.com/sustainability/region-carbon/gleaf.svg) [Low CO <sub>2</sub>](https://cloud.google.com/sustainability/region-carbon#region-picker)",
+      ""
+    ],
+    "regional-us-west1": [
+      "`regional-us-west1`",
+      "Oregon ![leaf icon](https://cloud.google.com/sustainability/region-carbon/gleaf.svg) [Low CO <sub>2</sub>](https://cloud.google.com/sustainability/region-carbon#region-picker)",
+      ""
+    ],
+    "regional-us-west2": [
+      "`regional-us-west2`",
+      "Los Angeles",
+      ""
+    ],
+    "regional-us-west3": [
+      "`regional-us-west3`",
+      "Salt Lake City",
+      ""
+    ],
+    "regional-us-west4": [
+      "`regional-us-west4`",
+      "Las Vegas",
+      ""
+    ],
+    "regional-europe-central2": [
+      "`regional-europe-central2`",
+      "Warsaw ![leaf icon](https://cloud.google.com/sustainability/region-carbon/gleaf.svg) [Low CO <sub>2</sub>](https://cloud.google.com/sustainability/region-carbon#region-picker)",
+      ""
+    ],
+    "regional-europe-north1": [
+      "`regional-europe-north1`",
+      "Finland ![leaf icon](https://cloud.google.com/sustainability/region-carbon/gleaf.svg) [Low CO <sub>2</sub>](https://cloud.google.com/sustainability/region-carbon#region-picker)",
+      ""
+    ],
+    "regional-europe-north2": [
+      "`regional-europe-north2`",
+      "Stockholm ![leaf icon](https://cloud.google.com/sustainability/region-carbon/gleaf.svg) [Low CO <sub>2</sub>](https://cloud.google.com/sustainability/region-carbon#region-picker)",
+      ""
+    ],
+    "regional-europe-southwest1": [
+      "`regional-europe-southwest1`",
+      "Madrid ![leaf icon](https://cloud.google.com/sustainability/region-carbon/gleaf.svg) [Low CO <sub>2</sub>](https://cloud.google.com/sustainability/region-carbon#region-picker)",
+      ""
+    ],
+    "regional-europe-west1": [
+      "`regional-europe-west1`",
+      "Belgium ![leaf icon](https://cloud.google.com/sustainability/region-carbon/gleaf.svg) [Low CO <sub>2</sub>](https://cloud.google.com/sustainability/region-carbon#region-picker)",
+      "Read-only: `us-central1` [*1-OR*](https://docs.cloud.google.com/spanner/docs/instance-configurations#regional-1-OR) `us-west1` [*1-OR*](https://docs.cloud.google.com/spanner/docs/instance-configurations#regional-1-OR)"
+    ],
+    "regional-europe-west2": [
+      "`regional-europe-west2`",
+      "London ![leaf icon](https://cloud.google.com/sustainability/region-carbon/gleaf.svg) [Low CO <sub>2</sub>](https://cloud.google.com/sustainability/region-carbon#region-picker)",
+      ""
+    ],
+    "regional-europe-west3": [
+      "`regional-europe-west3`",
+      "Frankfurt",
+      ""
+    ],
+    "regional-europe-west4": [
+      "`regional-europe-west4`",
+      "Netherlands ![leaf icon](https://cloud.google.com/sustainability/region-carbon/gleaf.svg) [Low CO <sub>2</sub>](https://cloud.google.com/sustainability/region-carbon#region-picker)",
+      ""
+    ],
+    "regional-europe-west6": [
+      "`regional-europe-west6`",
+      "Zurich ![leaf icon](https://cloud.google.com/sustainability/region-carbon/gleaf.svg) [Low CO <sub>2</sub>](https://cloud.google.com/sustainability/region-carbon#region-picker)",
+      ""
+    ],
+    "regional-europe-west8": [
+      "`regional-europe-west8`",
+      "Milan ![leaf icon](https://cloud.google.com/sustainability/region-carbon/gleaf.svg) [Low CO <sub>2</sub>](https://cloud.google.com/sustainability/region-carbon#region-picker)",
+      ""
+    ],
+    "regional-europe-west9": [
+      "`regional-europe-west9`",
+      "Paris ![leaf icon](https://cloud.google.com/sustainability/region-carbon/gleaf.svg) [Low CO <sub>2</sub>](https://cloud.google.com/sustainability/region-carbon#region-picker)",
+      ""
+    ],
+    "regional-europe-west10": [
+      "`regional-europe-west10`",
+      "Berlin",
+      ""
+    ],
+    "regional-europe-west12": [
+      "`regional-europe-west12`",
+      "Turin ![leaf icon](https://cloud.google.com/sustainability/region-carbon/gleaf.svg) [Low CO <sub>2</sub>](https://cloud.google.com/sustainability/region-carbon#region-picker)",
+      ""
+    ],
+    "regional-asia-east1": [
+      "`regional-asia-east1`",
+      "Taiwan",
+      ""
+    ],
+    "regional-asia-east2": [
+      "`regional-asia-east2`",
+      "Hong Kong",
+      ""
+    ],
+    "regional-asia-northeast1": [
+      "`regional-asia-northeast1`",
+      "Tokyo",
+      ""
+    ],
+    "regional-asia-northeast2": [
+      "`regional-asia-northeast2`",
+      "Osaka",
+      ""
+    ],
+    "regional-asia-northeast3": [
+      "`regional-asia-northeast3`",
+      "Seoul",
+      ""
+    ],
+    "regional-asia-south1": [
+      "`regional-asia-south1`",
+      "Mumbai",
+      ""
+    ],
+    "regional-asia-south2": [
+      "`regional-asia-south2`",
+      "Delhi",
+      ""
+    ],
+    "regional-asia-southeast1": [
+      "`regional-asia-southeast1`",
+      "Singapore",
+      ""
+    ],
+    "regional-asia-southeast2": [
+      "`regional-asia-southeast2`",
+      "Jakarta",
+      ""
+    ],
+    "regional-asia-southeast3": [
+      "`regional-asia-southeast3`",
+      "Bangkok",
+      ""
+    ],
+    "regional-australia-southeast1": [
+      "`regional-australia-southeast1`",
+      "Sydney",
+      ""
+    ],
+    "regional-australia-southeast2": [
+      "`regional-australia-southeast2`",
+      "Melbourne",
+      ""
+    ],
+    "regional-me-central1": [
+      "`regional-me-central1`",
+      "Doha",
+      ""
+    ],
+    "regional-me-central2": [
+      "`regional-me-central2`",
+      "Dammam",
+      ""
+    ],
+    "regional-me-west1": [
+      "`regional-me-west1`",
+      "Tel Aviv",
+      ""
+    ],
+    "regional-africa-south1": [
+      "`regional-africa-south1`",
+      "Johannesburg",
+      ""
+    ],
+    "dual-region-australia1": [
+      "`dual-region-australia1`",
+      "au (Australia)",
+      "Sydney: `australia-southeast1` [*L*](https://docs.cloud.google.com/spanner/docs/instance-configurations#dual-L) , [*2RW+1W*](https://docs.cloud.google.com/spanner/docs/instance-configurations#dual-2RW) Melbourne: `australia-southeast2` [*2RW+1W*](https://docs.cloud.google.com/spanner/docs/instance-configurations#dual-2RW)"
+    ],
+    "dual-region-canada1": [
+      "`dual-region-canada1`",
+      "ca (Canada)",
+      "Toronto: `northamerica-northeast2` [*L*](https://docs.cloud.google.com/spanner/docs/instance-configurations#dual-L) , [*2RW+1W*](https://docs.cloud.google.com/spanner/docs/instance-configurations#dual-2RW) Montréal: `northamerica-northeast1` [*2RW+1W*](https://docs.cloud.google.com/spanner/docs/instance-configurations#dual-2RW)"
+    ],
+    "dual-region-germany1": [
+      "`dual-region-germany1`",
+      "de (Germany)",
+      "Berlin: `europe-west10` [*L*](https://docs.cloud.google.com/spanner/docs/instance-configurations#dual-L) , [*2RW+1W*](https://docs.cloud.google.com/spanner/docs/instance-configurations#dual-2RW) Frankfurt: `europe-west3` [*2RW+1W*](https://docs.cloud.google.com/spanner/docs/instance-configurations#dual-2RW)"
+    ],
+    "dual-region-india1": [
+      "`dual-region-india1`",
+      "in (India)",
+      "Mumbai: `asia-south1` [*L*](https://docs.cloud.google.com/spanner/docs/instance-configurations#dual-L) , [*2RW+1W*](https://docs.cloud.google.com/spanner/docs/instance-configurations#dual-2RW) Delhi: `asia-south2` [*2RW+1W*](https://docs.cloud.google.com/spanner/docs/instance-configurations#dual-2RW)"
+    ],
+    "dual-region-japan1": [
+      "`dual-region-japan1`",
+      "jp (Japan)",
+      "Tokyo: `asia-northeast1` [*L*](https://docs.cloud.google.com/spanner/docs/instance-configurations#dual-L) , [*2RW+1W*](https://docs.cloud.google.com/spanner/docs/instance-configurations#dual-2RW) Osaka: `asia-northeast2` [*2RW+1W*](https://docs.cloud.google.com/spanner/docs/instance-configurations#dual-2RW)"
+    ],
+    "asia1": [
+      "`asia1`",
+      "global",
+      "Tokyo: `asia-northeast1` [*L*](https://docs.cloud.google.com/spanner/docs/instance-configurations#L) , [*2R*](https://docs.cloud.google.com/spanner/docs/instance-configurations#2R) Osaka: `asia-northeast2` [*2R*](https://docs.cloud.google.com/spanner/docs/instance-configurations#2R)",
+      "None",
+      "Seoul: `asia-northeast3`",
+      "Read-only: `us-west1` [*1-OR*](https://docs.cloud.google.com/spanner/docs/instance-configurations#1-OR) `us-east5` [*1-OR*](https://docs.cloud.google.com/spanner/docs/instance-configurations#1-OR)"
+    ],
+    "eur3": [
+      "`eur3`",
+      "eu (European Union)",
+      "Belgium: `europe-west1` [*L*](https://docs.cloud.google.com/spanner/docs/instance-configurations#L) , [*2R*](https://docs.cloud.google.com/spanner/docs/instance-configurations#2R) Netherlands: `europe-west4` [*2R*](https://docs.cloud.google.com/spanner/docs/instance-configurations#2R)",
+      "None",
+      "Finland: `europe-north1`",
+      "Read-only: `us-central1` [*1-OR*](https://docs.cloud.google.com/spanner/docs/instance-configurations#1-OR) `us-east4` [*1-OR*](https://docs.cloud.google.com/spanner/docs/instance-configurations#1-OR)"
+    ],
+    "eur5": [
+      "`eur5`",
+      "global",
+      "London: `europe-west2` [*L*](https://docs.cloud.google.com/spanner/docs/instance-configurations#L) , [*2R*](https://docs.cloud.google.com/spanner/docs/instance-configurations#2R) Belgium: `europe-west1` [*2R*](https://docs.cloud.google.com/spanner/docs/instance-configurations#2R)",
+      "None",
+      "Netherlands: `europe-west4`",
+      "Read-only: `us-central1` [*1-OR*](https://docs.cloud.google.com/spanner/docs/instance-configurations#1-OR) `us-east1` [*1-OR*](https://docs.cloud.google.com/spanner/docs/instance-configurations#1-OR)"
+    ],
+    "eur6": [
+      "`eur6`",
+      "global",
+      "Netherlands: `europe-west4` [*L*](https://docs.cloud.google.com/spanner/docs/instance-configurations#L) , [*2R*](https://docs.cloud.google.com/spanner/docs/instance-configurations#2R) Frankfurt: `europe-west3` [*2R*](https://docs.cloud.google.com/spanner/docs/instance-configurations#2R)",
+      "None",
+      "Zurich: `europe-west6`",
+      "Read-only: `us-east1` [*2-OR*](https://docs.cloud.google.com/spanner/docs/instance-configurations#2-OR)"
+    ],
+    "eur7": [
+      "`eur7`",
+      "eu (European Union)",
+      "Milan: `europe-west8` [*L*](https://docs.cloud.google.com/spanner/docs/instance-configurations#L) , [*2R*](https://docs.cloud.google.com/spanner/docs/instance-configurations#2R) Frankfurt: `europe-west3` [*2R*](https://docs.cloud.google.com/spanner/docs/instance-configurations#2R)",
+      "None",
+      "Turin: `europe-west12`",
+      ""
+    ],
+    "nam3": [
+      "`nam3`",
+      "us (United States)",
+      "Northern Virginia: `us-east4` [*L*](https://docs.cloud.google.com/spanner/docs/instance-configurations#L) , [*2R*](https://docs.cloud.google.com/spanner/docs/instance-configurations#2R) South Carolina: `us-east1` [*2R*](https://docs.cloud.google.com/spanner/docs/instance-configurations#2R)",
+      "None",
+      "Iowa: `us-central1`",
+      "Read-only: `asia-south1` [*1-OR*](https://docs.cloud.google.com/spanner/docs/instance-configurations#1-OR) `asia-southeast1` [*1-OR*](https://docs.cloud.google.com/spanner/docs/instance-configurations#1-OR) `asia-southeast2` [*1-OR*](https://docs.cloud.google.com/spanner/docs/instance-configurations#1-OR) `europe-west1` [*1-OR*](https://docs.cloud.google.com/spanner/docs/instance-configurations#1-OR) `europe-west2` [*1-OR*](https://docs.cloud.google.com/spanner/docs/instance-configurations#1-OR) `europe-west4` [*1-OR*](https://docs.cloud.google.com/spanner/docs/instance-configurations#1-OR) `europe-west9` [*1-OR*](https://docs.cloud.google.com/spanner/docs/instance-configurations#1-OR) `us-east5` [*1-OR*](https://docs.cloud.google.com/spanner/docs/instance-configurations#1-OR) `us-west1` [*1-OR*](https://docs.cloud.google.com/spanner/docs/instance-configurations#1-OR) `us-west2` [*1-OR*](https://docs.cloud.google.com/spanner/docs/instance-configurations#1-OR) `us-west4` [*1-OR*](https://docs.cloud.google.com/spanner/docs/instance-configurations#1-OR) `us-west8` [*1-OR*](https://docs.cloud.google.com/spanner/docs/instance-configurations#1-OR)"
+    ],
+    "nam6": [
+      "`nam6`",
+      "us (United States)",
+      "Iowa: `us-central1` [*L*](https://docs.cloud.google.com/spanner/docs/instance-configurations#L) , [*2R*](https://docs.cloud.google.com/spanner/docs/instance-configurations#2R) South Carolina: `us-east1` [*2R*](https://docs.cloud.google.com/spanner/docs/instance-configurations#2R)",
+      "Oregon: `us-west1` [*1R*](https://docs.cloud.google.com/spanner/docs/instance-configurations#1R) Los Angeles: `us-west2` [*1R*](https://docs.cloud.google.com/spanner/docs/instance-configurations#1R)",
+      "Oklahoma: `us-central2`",
+      ""
+    ],
+    "nam7": [
+      "`nam7`",
+      "us (United States)",
+      "Iowa: `us-central1` [*L*](https://docs.cloud.google.com/spanner/docs/instance-configurations#L) , [*2R*](https://docs.cloud.google.com/spanner/docs/instance-configurations#2R) Northern Virginia: `us-east4` [*2R*](https://docs.cloud.google.com/spanner/docs/instance-configurations#2R)",
+      "None",
+      "Oklahoma: `us-central2`",
+      "Read-only: `us-east1` [*2-OR*](https://docs.cloud.google.com/spanner/docs/instance-configurations#2-OR) `us-south1` [*1-OR*](https://docs.cloud.google.com/spanner/docs/instance-configurations#1-OR) `us-west1` [*1-OR*](https://docs.cloud.google.com/spanner/docs/instance-configurations#1-OR) `europe-west1` [*2-OR*](https://docs.cloud.google.com/spanner/docs/instance-configurations#2-OR)"
+    ],
+    "nam8": [
+      "`nam8`",
+      "us (United States)",
+      "Los Angeles: `us-west2` [*L*](https://docs.cloud.google.com/spanner/docs/instance-configurations#L) , [*2R*](https://docs.cloud.google.com/spanner/docs/instance-configurations#2R) Oregon: `us-west1` [*2R*](https://docs.cloud.google.com/spanner/docs/instance-configurations#2R)",
+      "None",
+      "Salt Lake City: `us-west3`",
+      "Read-only: `asia-northeast1` [*2-OR*](https://docs.cloud.google.com/spanner/docs/instance-configurations#2-OR) `asia-southeast1` [*2-OR*](https://docs.cloud.google.com/spanner/docs/instance-configurations#2-OR) `europe-west2` [*2-OR*](https://docs.cloud.google.com/spanner/docs/instance-configurations#2-OR) `europe-west3` [*2-OR*](https://docs.cloud.google.com/spanner/docs/instance-configurations#2-OR) `us-east5` [*1-OR*](https://docs.cloud.google.com/spanner/docs/instance-configurations#1-OR)"
+    ],
+    "nam9": [
+      "`nam9`",
+      "us (United States)",
+      "Northern Virginia: `us-east4` [*L*](https://docs.cloud.google.com/spanner/docs/instance-configurations#L) , [*2R*](https://docs.cloud.google.com/spanner/docs/instance-configurations#2R) Iowa: `us-central1` [*2R*](https://docs.cloud.google.com/spanner/docs/instance-configurations#2R)",
+      "Oregon: `us-west1` [*2R*](https://docs.cloud.google.com/spanner/docs/instance-configurations#2R)",
+      "South Carolina: `us-east1`",
+      ""
+    ],
+    "nam10": [
+      "`nam10`",
+      "us (United States)",
+      "Iowa: `us-central1` [*L*](https://docs.cloud.google.com/spanner/docs/instance-configurations#L) , [*2R*](https://docs.cloud.google.com/spanner/docs/instance-configurations#2R) Salt Lake City: `us-west3` [*2R*](https://docs.cloud.google.com/spanner/docs/instance-configurations#2R)",
+      "None",
+      "Oklahoma: `us-central2`",
+      "Read-only: `us-east4` [*1-OR*](https://docs.cloud.google.com/spanner/docs/instance-configurations#1-OR)"
+    ],
+    "nam11": [
+      "`nam11`",
+      "us (United States)",
+      "Iowa: `us-central1` [*L*](https://docs.cloud.google.com/spanner/docs/instance-configurations#L) , [*2R*](https://docs.cloud.google.com/spanner/docs/instance-configurations#2R) South Carolina: `us-east1` [*2R*](https://docs.cloud.google.com/spanner/docs/instance-configurations#2R)",
+      "None",
+      "Oklahoma: `us-central2`",
+      "Read-only: `us-west1` [*1-OR*](https://docs.cloud.google.com/spanner/docs/instance-configurations#1-OR)"
+    ],
+    "nam12": [
+      "`nam12`",
+      "us (United States)",
+      "Iowa: `us-central1` [*L*](https://docs.cloud.google.com/spanner/docs/instance-configurations#L) , [*2R*](https://docs.cloud.google.com/spanner/docs/instance-configurations#2R) Northern Virginia: `us-east4` [*2R*](https://docs.cloud.google.com/spanner/docs/instance-configurations#2R)",
+      "Oregon: `us-west1` [*2R*](https://docs.cloud.google.com/spanner/docs/instance-configurations#2R)",
+      "Oklahoma: `us-central2`",
+      ""
+    ],
+    "nam13": [
+      "`nam13`",
+      "us (United States)",
+      "Oklahoma: `us-central2` [*L*](https://docs.cloud.google.com/spanner/docs/instance-configurations#L) , [*2R*](https://docs.cloud.google.com/spanner/docs/instance-configurations#2R) Iowa: `us-central1` [*2R*](https://docs.cloud.google.com/spanner/docs/instance-configurations#2R)",
+      "None",
+      "Salt Lake City: `us-west3`",
+      ""
+    ],
+    "nam14": [
+      "`nam14`",
+      "global",
+      "Northern Virginia: `us-east4` [*L*](https://docs.cloud.google.com/spanner/docs/instance-configurations#L) , [*2R*](https://docs.cloud.google.com/spanner/docs/instance-configurations#2R) Montréal: `northamerica-northeast1` [*2R*](https://docs.cloud.google.com/spanner/docs/instance-configurations#2R)",
+      "None",
+      "South Carolina: `us-east1`",
+      ""
+    ],
+    "nam15": [
+      "`nam15`",
+      "us (United States)",
+      "Dallas: `us-south1` [*L*](https://docs.cloud.google.com/spanner/docs/instance-configurations#L) , [*2R*](https://docs.cloud.google.com/spanner/docs/instance-configurations#2R) Northern Virginia: `us-east4` [*2R*](https://docs.cloud.google.com/spanner/docs/instance-configurations#2R)",
+      "None",
+      "Iowa: `us-central1`",
+      "Read-only: `us-central2` [*1-OR*](https://docs.cloud.google.com/spanner/docs/instance-configurations#1-OR) `us-east1` [*1-OR*](https://docs.cloud.google.com/spanner/docs/instance-configurations#1-OR) `us-west3` [*1-OR*](https://docs.cloud.google.com/spanner/docs/instance-configurations#1-OR)"
+    ],
+    "nam16": [
+      "`nam16`",
+      "us (United States)",
+      "Iowa: `us-central1` [*L*](https://docs.cloud.google.com/spanner/docs/instance-configurations#L) , [*2R*](https://docs.cloud.google.com/spanner/docs/instance-configurations#2R) Northern Virginia: `us-east4` [*2R*](https://docs.cloud.google.com/spanner/docs/instance-configurations#2R)",
+      "None",
+      "Columbus: `us-east5`",
+      "Read-only: `us-west2` [*2-OR*](https://docs.cloud.google.com/spanner/docs/instance-configurations#2-OR)"
+    ],
+    "nam22": [
+      "`nam22`",
+      "us (United States)",
+      "Columbus: `us-east5` [*L*](https://docs.cloud.google.com/spanner/docs/instance-configurations#L) , [*2R*](https://docs.cloud.google.com/spanner/docs/instance-configurations#2R) South Carolina: `us-east1` [*2R*](https://docs.cloud.google.com/spanner/docs/instance-configurations#2R)",
+      "None",
+      "Northern Virginia: `us-east4`",
+      "Read-only: `us-west1` [*1-OR*](https://docs.cloud.google.com/spanner/docs/instance-configurations#1-OR)"
+    ],
+    "nam23": [
+      "`nam23`",
+      "us (United States)",
+      "Iowa: `us-central1` [*L*](https://docs.cloud.google.com/spanner/docs/instance-configurations#L) , [*2R*](https://docs.cloud.google.com/spanner/docs/instance-configurations#2R) Las Vegas: `us-west4` [*2R*](https://docs.cloud.google.com/spanner/docs/instance-configurations#2R)",
+      "None",
+      "Dallas: `us-south1`",
+      "Read-only: `asia-northeast1` [*1-OR*](https://docs.cloud.google.com/spanner/docs/instance-configurations#1-OR) `australia-southeast2` [*1-OR*](https://docs.cloud.google.com/spanner/docs/instance-configurations#1-OR) `europe-west1` [*1-OR*](https://docs.cloud.google.com/spanner/docs/instance-configurations#1-OR) `europe-west3` [*1-OR*](https://docs.cloud.google.com/spanner/docs/instance-configurations#1-OR)"
+    ],
+    "nam-eur-asia1": [
+      "`nam-eur-asia1`",
+      "global",
+      "Iowa: `us-central1` [*L*](https://docs.cloud.google.com/spanner/docs/instance-configurations#L) , [*2R*](https://docs.cloud.google.com/spanner/docs/instance-configurations#2R) Oklahoma: `us-central2` [*2R*](https://docs.cloud.google.com/spanner/docs/instance-configurations#2R)",
+      "Belgium: `europe-west1` [*2R*](https://docs.cloud.google.com/spanner/docs/instance-configurations#2R) Taiwan: `asia-east1` [*2R*](https://docs.cloud.google.com/spanner/docs/instance-configurations#2R)",
+      "South Carolina: `us-east1`",
+      "Read-only: `us-west2` [*1-OR*](https://docs.cloud.google.com/spanner/docs/instance-configurations#1-OR)"
+    ],
+    "nam-eur-asia3": [
+      "`nam-eur-asia3`",
+      "global",
+      "Iowa: `us-central1` [*L*](https://docs.cloud.google.com/spanner/docs/instance-configurations#L) , [*2R*](https://docs.cloud.google.com/spanner/docs/instance-configurations#2R) South Carolina: `us-east1` [*2R*](https://docs.cloud.google.com/spanner/docs/instance-configurations#2R)",
+      "Belgium: `europe-west1` [*1R*](https://docs.cloud.google.com/spanner/docs/instance-configurations#1R) Netherlands: `europe-west4` [*1R*](https://docs.cloud.google.com/spanner/docs/instance-configurations#1R) Taiwan: `asia-east1` [*2R*](https://docs.cloud.google.com/spanner/docs/instance-configurations#2R)",
+      "Oklahoma: `us-central2`",
+      ""
+    ]
+  },
+  "additional_non_table_changes": [
+    "Define regional 1-OR/2-OR and dual-region L/2RW+1W labels with matching anchors",
+    "Describe default-leader-region changes as metadata operations using a long-running operation, replacing schema-change wording",
+    "Add table introductions and standardize headings",
+    "Earlier interval commit adds Canada to prose already listing its configuration in the unchanged table",
+    "Describe asia2 as three read-write regions with five read-write replicas and no witness, consistent with its unchanged table row",
+    "Clarify multi-region automatic leader failover, dual-region compute placement, instance moves including dual-region, and eligible default-leader read-write regions"
+  ]
+}

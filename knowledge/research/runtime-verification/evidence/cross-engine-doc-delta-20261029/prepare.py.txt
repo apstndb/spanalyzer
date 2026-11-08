@@ -1,0 +1,66 @@
+"""Reuse managed inputs and corrected cases; record every equivalence boundary."""
+from pathlib import Path
+import copy,json
+root=Path('<LOCAL_CHECKOUT>');old=root/'knowledge/research/runtime-verification/evidence/managed-recheck-20261029';out=root/'.tmp/cross-engine-doc-delta-20261029/module';mapping=[]
+def read(name):return json.loads((old/name).read_text())
+def write(name,dialect,steps):
+ for s in steps:s.setdefault('requires',[])
+ (out/(name+'.json')).write_text(json.dumps({'dialect':dialect,'steps':steps},indent=2)+'\n')
+def query(row,family=None,requires=()):
+ s={k:row[k]for k in ['label','sql']};s.update(kind='query',family=family or row.get('family','control'),requires=list(requires));
+ if row.get('profile')or row.get('mode')=='PROFILE':s['profile']=True
+ return s
+# Full constant corpus, distinctness and catalog discovery are independent of fixtures.
+steps=[]
+for name in ['cases','followup-cases','distinctness-cases']:
+ for r in read(name+'.json'):steps.append(query(r,'constant-'+name))
+for r in [
+ {'label':'information-schema-columns','sql':"SELECT TABLE_NAME AS table_name,COLUMN_NAME AS column_name,SPANNER_TYPE AS spanner_type,ORDINAL_POSITION AS ordinal_position FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA='INFORMATION_SCHEMA' ORDER BY TABLE_NAME,ORDINAL_POSITION"},
+ {'label':'spanner-sys-columns','sql':"SELECT TABLE_NAME AS table_name,COLUMN_NAME AS column_name,SPANNER_TYPE AS spanner_type,ORDINAL_POSITION AS ordinal_position FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA='SPANNER_SYS' ORDER BY TABLE_NAME,ORDINAL_POSITION"}]:steps.append(query(r,'catalog'))
+for name in ['active-batch','batch-operations']:
+ for line in (old/(name+'.jsonl')).read_text().splitlines():
+  r=json.loads(line)
+  if r.get('sql')and r.get('label')not in ['active-pdml-control']:steps.append(query(r,'catalog-'+name))
+for r in read('new-sys-column-cases.json'):steps.append(query(r,'new-sys-column'))
+write('constants-catalog','google',steps)
+# Keep valid managed fixture SQL; corrected generated-column constraint has a separate name.
+a=read('weekly-google-plan.json');steps=[copy.deepcopy(s)for s in a['steps']if s['family']not in ['volatile-graph','path-quantifier']]
+for s in steps:
+ if s['label']=='fk-reject-generated':s['sql']=s['sql'].replace('ADD CONSTRAINT FkGenerated FOREIGN KEY','ADD CONSTRAINT FkGeneratedReference FOREIGN KEY')
+steps.extend(copy.deepcopy(s)for s in read('repair-google-plan.json')['steps']if s['family']=='numeric-type-controls');steps.extend(query(r,'query-tuning')for r in read('tuning-google-cases.json'))
+write('google-new','google',steps);write('graphs','google',read('graph-final-plan.json')['steps'])
+a=read('weekly-pg-plan.json');steps=copy.deepcopy(a['steps'])
+for s in steps:
+ if s['label']=='fk-reject-generated':s['sql']=s['sql'].replace('ADD CONSTRAINT FkGenerated FOREIGN KEY','ADD CONSTRAINT FkGeneratedReference FOREIGN KEY')
+steps.extend(copy.deepcopy(s)for s in read('repair-pg-plan.json')['steps']if s['family']=='jsonb-count-controls');steps.extend(read('tuning-pg-plan.json')['steps']);write('pg-new','pg',steps)
+# Split independent source DDL so a missing dynamic graph/index does not block HLL or base scans.
+a=read('doc-delta-probe-plan.json');f=a['fixtures']
+def literal(value):return json.dumps(value,separators=(',',':')).replace("'","''")
+for dialect in ['google','pg']:
+ steps=[];ddls=f[dialect+'_ddl'];labels=[]
+ for i,sql in enumerate(ddls):
+  label='doc-fixture-'+str(i);requires=[]
+  if dialect=='google'and i in [1,2]:requires=['doc-fixture-0']
+  if dialect=='google'and i==4:requires=['doc-fixture-3']
+  if dialect=='pg'and i==1:requires=['doc-fixture-0']
+  steps.append({'label':label,'family':'doc-fixture','kind':'ddl','sql':sql,'requires':requires});labels.append(label)
+ table='DocDeltaDocs'if dialect=='google'else'docdeltadocs';typed=lambda value:("JSON '"+literal(value)+"'")if dialect=='google'else("'"+literal(value)+"'::jsonb")
+ # API mutation NULL maps to SQL NULL, while explicit JSON objects keep their type.
+ values=["("+str(r['Id'])+","+('NULL'if r['Doc']is None else typed(r['Doc']))+")"for r in f['documents']]
+ steps.append({'label':'doc-documents-seed','family':'doc-fixture','kind':'dml','statements':['INSERT INTO '+table+'(Id,Doc) VALUES '+','.join(values)],'requires':['doc-fixture-3'if dialect=='google'else'doc-fixture-0']})
+ if dialect=='google':
+  values=["("+str(r['Id'])+",'"+r['Label']+"',"+typed(r['Properties'])+")"for r in f['dynamic_properties']];steps.append({'label':'doc-dynamic-seed','family':'doc-fixture','kind':'dml','statements':['INSERT INTO DocDeltaNodes(Id,Label,Properties) VALUES '+','.join(values)],'requires':['doc-fixture-0']})
+ for r in a['cases']:
+  if r['dialect']!=dialect:continue
+  requires=[]
+  if r['family']=='gql_column_propagation':requires=['doc-fixture-1']
+  if r['family']=='dynamic_json_properties':requires=['doc-fixture-2','doc-dynamic-seed']
+  if r['family']=='json_search_equality':
+   requires=['doc-documents-seed']
+   if r.get('access')=='forced-search':requires+=['doc-fixture-4'if dialect=='google'else'doc-fixture-1']
+  steps.append(query(r,requires=requires))
+ for r in read('hll-controls-'+dialect+'-cases.json'):steps.append(query(r,'hll-extra'))
+ write('doc-delta-'+dialect,dialect,steps)
+# Retain source inputs byte-for-byte beside prepared plans for provenance.
+for name in ['cases.json','followup-cases.json','distinctness-cases.json','doc-delta-probe-plan.json']:(out/('managed-'+name)).write_bytes((old/name).read_bytes())
+print(json.dumps({p.stem:len(json.loads(p.read_text())['steps'])for p in out.glob('*.json')if not p.name.startswith('managed-')}))

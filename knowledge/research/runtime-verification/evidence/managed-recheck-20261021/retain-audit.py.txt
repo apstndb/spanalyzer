@@ -1,0 +1,67 @@
+"""Retain source-history findings and failed connectivity without runtime claims."""
+from pathlib import Path
+import collections, datetime, hashlib, json, re, shutil
+
+repo=Path('<LOCAL_CHECKOUT>')
+task=Path('<LOCAL_TASK_ROOT>/apstndb/spanalyzer/managed-recheck-20261021')
+scratch=repo/'.tmp/managed-recheck-20261021'
+out=repo/'knowledge/research/runtime-verification/evidence/managed-recheck-20261021'
+out.mkdir(parents=True,exist_ok=True)
+sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+history=json.loads((task/'history/receipt.json').read_text())
+commits=json.loads((task/'history/commit-details.json').read_text())
+classification=json.loads((task/'history/body-classification.json').read_text())
+comparisons=json.loads((task/'documents/mirror-vs-current.json').read_text())
+expanded=json.loads((task/'documents/official-expanded-documents.json').read_text())['documents']
+hll=json.loads((task/'documents/approx-hll-documents.json').read_text())['documents']
+source=json.loads((task/'evidence/source-comparison.json').read_text())
+direct=[json.loads(x) for x in (scratch/'direct-connectivity.stdout').read_text().splitlines()]
+assert len(direct)==1 and direct[0]['code']=='NotFound'
+assert 'Instance not found' in direct[0]['error']
+assert json.loads((task/'evidence/commands.json').read_text())[0]['exit_code']==1
+assert not any(x['name']=='managed-tests' for x in json.loads((task/'evidence/commands.json').read_text()))
+
+def group(path):
+    p=path.removeprefix('docs/docs.cloud.google.com/')
+    if p.startswith('spanner-omni'):return 'omni_documentation_context_only'
+    if '/samples/' in p:return 'sample_code_repairs'
+    if 'full-text-search/' in p or p.endswith(('search_functions.md','working-with-json.md','working-with-jsonb.md')):return 'json_search_equality'
+    if p.endswith('graph-query-statements.md'):return 'gql_column_propagation'
+    if p.endswith('manage-schemaless-data.md'):return 'dynamic_json_properties'
+    if '/graph/' in p:return 'graph_analytics_documentation'
+    if p.endswith(('hash_functions.md','functions-all.md')):return 'function_documentation'
+    if any(x in p for x in ['mysql','migration','cutover','fallback']):return 'migration_cutover_fallback_documentation'
+    if p.endswith(('instance-configurations.md','region-types.md','replication.md','geo-partitioning.md')):return 'replication_geo_documentation'
+    if p.endswith('iam.md'):return 'iam_documentation'
+    return 'catalog_format_or_editorial'
+
+for row in classification:
+    row['review_group']=group(row['path'])
+    row['runtime_status']='not_run_missing_managed_target'
+dates=[]
+for c in sorted(commits,key=lambda x:x['committed_at']):
+    docs=[f for f in c['files'] if f['filename'].startswith('docs/')]
+    dates.append({'sha':c['sha'],'committed_at':c['committed_at'],'commit_url':'https://github.com/apstndb/spanner-docs-mirror/commit/'+c['sha'],'changed_files':len(c['files']),'changed_document_files':len(docs),'document_paths':[f['filename'] for f in docs]})
+audit={'base':history['base'],'head':history['head'],'reviewed_commits':dates,'net_changed_files':history['net_changed_files'],'union_document_paths':history['union_document_paths'],'retained_base_head_full_bodies':len(history['bodies']),'body_classification_counts':dict(collections.Counter(x['classification'] for x in classification)),'per_document_disposition':classification,'mirror_current_comparison':comparisons,'mirror_current_equal_count':sum(x['equal_body'] for x in comparisons),'current_primary_source_gaps':['release-notes: live HTML/feed latest October 20; mirror and Developer Knowledge body latest September 18','PostgreSQL functions: approximate aggregates/HLL++ missing from mirror','functions-all: five approximate/HLL names missing from mirror','geo-partitioning: additional-partition configuration movement restriction missing from mirror'],'mirror_failed_pages_recovered':[x['uri'] for x in hll],'intermediate_only_change':'ml-tutorial removed October 15 and restored October 16; base/head bytes identical','raw_history_directory':str(task/'history')}
+(out/'history-audit.json').write_text(json.dumps(audit,indent=2)+'\n')
+shutil.copy2(task/'history/receipt.json',out/'history-retrieval.json')
+shutil.copy2(task/'history/compare-oct11-oct21.json',out/'mirror-compare.json')
+shutil.copy2(task/'history/commit-details.json',out/'commit-details.json')
+
+docs={'focused_retrieval':json.loads((task/'documents/retrieval.json').read_text()),'expanded_retrieval':json.loads((task/'documents/expanded-retrieval.json').read_text()),'focused_and_expanded_distinct_documents':len({x['name'] for x in expanded}),'recovered_hll_documents':[{k:v for k,v in x.items() if k!='content'}|{'body_sha256':hashlib.sha256(x['content'].encode()).hexdigest()} for x in hll],'live_sources':json.loads((task/'documents/live-retrieval.json').read_text()),'live_inspection':json.loads((task/'documents/live-inspection.json').read_text()),'raw_directory':str(task/'documents'),'mirror_release_body_sha256':sha(task/'history/head-release-notes.md.txt')}
+(out/'documentation.json').write_text(json.dumps(docs,indent=2)+'\n')
+for name in ['release-entries-since-baseline.json','mirror-vs-current.json','functions-mirror-vs-official.diff','geo-partitioning-mirror-vs-official.diff','reference__standard-sql__functions-all-mirror-vs-official.diff']:
+    shutil.copy2(task/'documents'/name,out/name)
+for d in hll:(out/(d['name'].split('/')[-1]+'.md.txt')).write_text(d['content'])
+for suffix,dest in [('reference/postgresql/functions','postgresql-functions-current.md.txt'),('reference/standard-sql/graph-query-statements','graph-query-statements-current.md.txt'),('full-text-search/json-indexes','json-indexes-current.md.txt')]:
+    (out/dest).write_text(next(x['content'] for x in expanded if x['name'].endswith('/'+suffix)))
+for name in ['commands.json','connectivity-commands.json','source-hashes.json','source-comparison.json']:shutil.copy2(task/'evidence'/name,out/name)
+(out/'preflight.log').write_text((scratch/'preflight.stdout').read_text()+(scratch/'preflight.stderr').read_text())
+shutil.copy2(scratch/'direct-connectivity.stdout',out/'direct-connectivity.jsonl')
+shutil.copy2(scratch/'direct-query-buildinfo.stdout',out/'query-buildinfo.txt')
+shutil.copy2(scratch/'query.go',out/'query.go.txt')
+for name in ['doc-delta-probe-plan.json','prepare-doc-cases.py','retain-audit.py','fetch-history.py','fetch-official.py','fetch-official-expanded.py','fetch-live.py','run-connectivity.py']:
+    shutil.copy2(scratch/name,out/(name if name.endswith('.json') else name+'.txt'))
+receipt={'observed_on':'2026-10-21','client_timezone':'Asia/Tokyo','recorded_at':datetime.datetime.now(datetime.timezone.utc).isoformat(),'source_revision':json.loads((task/'initial-source-state.json').read_text())['head'],'source_state':'Pre-existing dirty checkout preserved; 123 measured implementation/dependency hashes match October 11','runtime_scope':'configured dedicated user-level managed verification profile; coordinates omitted','flow_status':'stopped_at_connectivity_preflight','preflight_cli_exit':1,'direct_query_process_exit':0,'direct_query_rpc_code':'NotFound','classification':'inconclusive_environment_or_resource_not_available; no SQL syntax/semantic conclusion','catalog_checks':'not_run','managed_integration_tests':'not_run','feature_probes':'not_run','owned_fixture_ddl_or_database_creation_started':False,'cleanup_status':'not_applicable_no_fixtures_created','new_probe_cases_prepared':len(json.loads((out/'doc-delta-probe-plan.json').read_text())['cases']),'managed_last_successful_baseline':'managed-recheck-20261011; historical, not revalidated today','awaiting':'User update of existing dedicated profile to an available managed target','documentation_scope':'10 commits, 50 unique document paths, 95 full mirror bodies, 61 expanded current official pages, 3 additional recovered pages, live release/operator/PG HTML and feed','durable_task_directory':str(task),'authority':'Read-only source audit, bounded connectivity attempt and local research; no commit/push/PR/merge/release or external synchronization'}
+(out/'receipt.json').write_text(json.dumps(receipt,indent=2)+'\n')
+print(json.dumps({'canonical_files':len(list(out.iterdir())),'history_commits':len(dates),'document_dispositions':len(classification),'runtime':receipt['flow_status'],'prepared_cases':receipt['new_probe_cases_prepared']}))

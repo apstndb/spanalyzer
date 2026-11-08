@@ -1,0 +1,1823 @@
+{
+  "dialect": "google",
+  "steps": [
+    {
+      "label": "json-equality",
+      "sql": "SELECT JSON '1' = JSON '1.0' AS result",
+      "kind": "query",
+      "family": "constant-cases",
+      "requires": []
+    },
+    {
+      "label": "json-number-order",
+      "sql": "SELECT JSON '10' > JSON '2' AS result",
+      "kind": "query",
+      "family": "constant-cases",
+      "requires": []
+    },
+    {
+      "label": "json-type-order",
+      "sql": "SELECT JSON 'null' < JSON '\"a\"' AND JSON '\"z\"' < JSON '-1' AND JSON '999' < JSON 'false' AND JSON 'true' < JSON '[]' AND JSON '[999]' < JSON '{}'  AS result",
+      "kind": "query",
+      "family": "constant-cases",
+      "requires": []
+    },
+    {
+      "label": "bool-order",
+      "sql": "SELECT JSON 'false' < JSON 'true' AS result",
+      "kind": "query",
+      "family": "constant-cases",
+      "requires": []
+    },
+    {
+      "label": "string-order",
+      "sql": "SELECT JSON '\"a\"' < JSON '\"b\"' AS result",
+      "kind": "query",
+      "family": "constant-cases",
+      "requires": []
+    },
+    {
+      "label": "object-key-order",
+      "sql": "SELECT JSON '{\"b\":2,\"a\":1}' = JSON '{\"a\":1,\"b\":2}' AS result",
+      "kind": "query",
+      "family": "constant-cases",
+      "requires": []
+    },
+    {
+      "label": "object-keys-before-values",
+      "sql": "SELECT JSON '{\"a\":999}' < JSON '{\"b\":0}' AS result",
+      "kind": "query",
+      "family": "constant-cases",
+      "requires": []
+    },
+    {
+      "label": "object-value-order",
+      "sql": "SELECT JSON '{\"a\":2}' < JSON '{\"a\":10}' AS result",
+      "kind": "query",
+      "family": "constant-cases",
+      "requires": []
+    },
+    {
+      "label": "object-prefix",
+      "sql": "SELECT JSON '{\"a\":1}' < JSON '{\"a\":1,\"b\":0}' AS result",
+      "kind": "query",
+      "family": "constant-cases",
+      "requires": []
+    },
+    {
+      "label": "array-prefix",
+      "sql": "SELECT JSON '[1,2]' < JSON '[1,2,0]' AS result",
+      "kind": "query",
+      "family": "constant-cases",
+      "requires": []
+    },
+    {
+      "label": "array-numeric",
+      "sql": "SELECT JSON '[2]' < JSON '[10]' AS result",
+      "kind": "query",
+      "family": "constant-cases",
+      "requires": []
+    },
+    {
+      "label": "json-null-equal",
+      "sql": "SELECT JSON 'null' = JSON 'null' AS result",
+      "kind": "query",
+      "family": "constant-cases",
+      "requires": []
+    },
+    {
+      "label": "sql-null-equal",
+      "sql": "SELECT JSON 'null' = CAST(NULL AS JSON) AS result",
+      "kind": "query",
+      "family": "constant-cases",
+      "requires": []
+    },
+    {
+      "label": "json-null-is-sql-null",
+      "sql": "SELECT JSON 'null' IS NULL AS result",
+      "kind": "query",
+      "family": "constant-cases",
+      "requires": []
+    },
+    {
+      "label": "cast-null-is-sql-null",
+      "sql": "SELECT CAST(NULL AS JSON) IS NULL AS result",
+      "kind": "query",
+      "family": "constant-cases",
+      "requires": []
+    },
+    {
+      "label": "json-string-vs-object-text",
+      "sql": "SELECT JSON '{\"a\":1}' = '{\"a\":1}' AS result",
+      "kind": "query",
+      "family": "constant-cases",
+      "requires": []
+    },
+    {
+      "label": "in-json-first",
+      "sql": "SELECT JSON '2' IN (1, 2, 3) AS result",
+      "kind": "query",
+      "family": "constant-cases",
+      "requires": []
+    },
+    {
+      "label": "in-nonjson-first",
+      "sql": "SELECT 2 IN (JSON '1', JSON '2') AS result",
+      "kind": "query",
+      "family": "constant-cases",
+      "requires": []
+    },
+    {
+      "label": "in-json-unnest-json",
+      "sql": "SELECT JSON '2' IN UNNEST([JSON '1', JSON '2']) AS result",
+      "kind": "query",
+      "family": "constant-cases",
+      "requires": []
+    },
+    {
+      "label": "in-json-unnest-int",
+      "sql": "SELECT JSON '2' IN UNNEST([1,2]) AS result",
+      "kind": "query",
+      "family": "constant-cases",
+      "requires": []
+    },
+    {
+      "label": "in-json-subquery-int",
+      "sql": "SELECT JSON '2' IN (SELECT 2) AS result",
+      "kind": "query",
+      "family": "constant-cases",
+      "requires": []
+    },
+    {
+      "label": "in-json-subquery-json",
+      "sql": "SELECT JSON '2' IN (SELECT JSON '2') AS result",
+      "kind": "query",
+      "family": "constant-cases",
+      "requires": []
+    },
+    {
+      "label": "between-json-first",
+      "sql": "SELECT JSON '2' BETWEEN 1 AND 3 AS result",
+      "kind": "query",
+      "family": "constant-cases",
+      "requires": []
+    },
+    {
+      "label": "between-nonjson-first",
+      "sql": "SELECT 2 BETWEEN JSON '1' AND JSON '3' AS result",
+      "kind": "query",
+      "family": "constant-cases",
+      "requires": []
+    },
+    {
+      "label": "bytes-order-reject",
+      "sql": "SELECT JSON '\"YQ==\"' < b'b' AS result",
+      "kind": "query",
+      "family": "constant-cases",
+      "requires": []
+    },
+    {
+      "label": "struct-equality-reject",
+      "sql": "SELECT JSON '{\"a\":1}' = STRUCT(1 AS a) AS result",
+      "kind": "query",
+      "family": "constant-cases",
+      "requires": []
+    },
+    {
+      "label": "interval-equality-reject",
+      "sql": "SELECT JSON '\"0-0 1 0:0:0\"' = INTERVAL 1 DAY AS result",
+      "kind": "query",
+      "family": "constant-cases",
+      "requires": []
+    },
+    {
+      "label": "array-order-coerce",
+      "sql": "SELECT JSON '[1,2]' < [1,3] AS result",
+      "kind": "query",
+      "family": "constant-cases",
+      "requires": []
+    },
+    {
+      "label": "array-bytes-order-reject",
+      "sql": "SELECT JSON '[\"YQ==\"]' < [b'b'] AS result",
+      "kind": "query",
+      "family": "constant-cases",
+      "requires": []
+    },
+    {
+      "label": "json-case",
+      "sql": "SELECT CASE JSON '1' WHEN JSON '1.0' THEN 'yes' ELSE 'no' END AS result",
+      "kind": "query",
+      "family": "constant-cases",
+      "requires": []
+    },
+    {
+      "label": "json-is-distinct",
+      "sql": "SELECT JSON '1' IS DISTINCT FROM JSON '1.0' AS result",
+      "kind": "query",
+      "family": "constant-cases",
+      "requires": []
+    },
+    {
+      "label": "json-null-in",
+      "sql": "SELECT JSON 'null' IN (NULL, JSON 'null') AS result",
+      "kind": "query",
+      "family": "constant-cases",
+      "requires": []
+    },
+    {
+      "label": "cast-int",
+      "sql": "SELECT CAST(1 AS JSON) AS result",
+      "kind": "query",
+      "family": "constant-cases",
+      "requires": []
+    },
+    {
+      "label": "cast-float32",
+      "sql": "SELECT CAST(CAST(1.25 AS FLOAT32) AS JSON) AS result",
+      "kind": "query",
+      "family": "constant-cases",
+      "requires": []
+    },
+    {
+      "label": "cast-float64",
+      "sql": "SELECT CAST(1.25 AS JSON) AS result",
+      "kind": "query",
+      "family": "constant-cases",
+      "requires": []
+    },
+    {
+      "label": "cast-numeric",
+      "sql": "SELECT CAST(NUMERIC '1.25' AS JSON) AS result",
+      "kind": "query",
+      "family": "constant-cases",
+      "requires": []
+    },
+    {
+      "label": "cast-bool",
+      "sql": "SELECT CAST(TRUE AS JSON) AS result",
+      "kind": "query",
+      "family": "constant-cases",
+      "requires": []
+    },
+    {
+      "label": "cast-string",
+      "sql": "SELECT CAST('foo' AS JSON) AS result",
+      "kind": "query",
+      "family": "constant-cases",
+      "requires": []
+    },
+    {
+      "label": "cast-string-json-looking",
+      "sql": "SELECT CAST('{\"a\":1}' AS JSON) AS result",
+      "kind": "query",
+      "family": "constant-cases",
+      "requires": []
+    },
+    {
+      "label": "cast-bytes",
+      "sql": "SELECT CAST(b'a' AS JSON) AS result",
+      "kind": "query",
+      "family": "constant-cases",
+      "requires": []
+    },
+    {
+      "label": "cast-date",
+      "sql": "SELECT CAST(DATE '2026-10-10' AS JSON) AS result",
+      "kind": "query",
+      "family": "constant-cases",
+      "requires": []
+    },
+    {
+      "label": "cast-timestamp",
+      "sql": "SELECT CAST(TIMESTAMP '2026-10-10 00:00:00+00' AS JSON) AS result",
+      "kind": "query",
+      "family": "constant-cases",
+      "requires": []
+    },
+    {
+      "label": "cast-uuid",
+      "sql": "SELECT CAST(CAST('00000000-0000-0000-0000-000000000001' AS UUID) AS JSON) AS result",
+      "kind": "query",
+      "family": "constant-cases",
+      "requires": []
+    },
+    {
+      "label": "cast-interval",
+      "sql": "SELECT CAST(INTERVAL 1 DAY AS JSON) AS result",
+      "kind": "query",
+      "family": "constant-cases",
+      "requires": []
+    },
+    {
+      "label": "cast-array",
+      "sql": "SELECT CAST([1, NULL, 3] AS JSON) AS result",
+      "kind": "query",
+      "family": "constant-cases",
+      "requires": []
+    },
+    {
+      "label": "cast-struct",
+      "sql": "SELECT CAST(STRUCT(1 AS a, NULL AS b) AS JSON) AS result",
+      "kind": "query",
+      "family": "constant-cases",
+      "requires": []
+    },
+    {
+      "label": "cast-json",
+      "sql": "SELECT CAST(JSON '{\"a\":1}' AS JSON) AS result",
+      "kind": "query",
+      "family": "constant-cases",
+      "requires": []
+    },
+    {
+      "label": "cast-sql-null",
+      "sql": "SELECT CAST(NULL AS JSON) AS result",
+      "kind": "query",
+      "family": "constant-cases",
+      "requires": []
+    },
+    {
+      "label": "cast-wide-int",
+      "sql": "SELECT CAST(9223372036854775807 AS JSON) AS result",
+      "kind": "query",
+      "family": "constant-cases",
+      "requires": []
+    },
+    {
+      "label": "cast-wide-numeric",
+      "sql": "SELECT CAST(NUMERIC '99999999999999999999999999999.123456789' AS JSON) AS result",
+      "kind": "query",
+      "family": "constant-cases",
+      "requires": []
+    },
+    {
+      "label": "cast-positive-infinity",
+      "sql": "SELECT CAST(CAST('inf' AS FLOAT64) AS JSON) AS result",
+      "kind": "query",
+      "family": "constant-cases",
+      "requires": []
+    },
+    {
+      "label": "cast-negative-infinity",
+      "sql": "SELECT CAST(CAST('-inf' AS FLOAT64) AS JSON) AS result",
+      "kind": "query",
+      "family": "constant-cases",
+      "requires": []
+    },
+    {
+      "label": "cast-nan",
+      "sql": "SELECT CAST(CAST('NaN' AS FLOAT64) AS JSON) AS result",
+      "kind": "query",
+      "family": "constant-cases",
+      "requires": []
+    },
+    {
+      "label": "cast-nested-infinity",
+      "sql": "SELECT CAST([CAST('inf' AS FLOAT64)] AS JSON) AS result",
+      "kind": "query",
+      "family": "constant-cases",
+      "requires": []
+    },
+    {
+      "label": "to-json-control-sql-null",
+      "sql": "SELECT TO_JSON(NULL) AS result",
+      "kind": "query",
+      "family": "constant-cases",
+      "requires": []
+    },
+    {
+      "label": "safe-cast-sql-null",
+      "sql": "SELECT SAFE_CAST(NULL AS JSON) AS result",
+      "kind": "query",
+      "family": "constant-cases",
+      "requires": []
+    },
+    {
+      "label": "to-json-control-positive-infinity",
+      "sql": "SELECT TO_JSON(CAST('inf' AS FLOAT64)) AS result",
+      "kind": "query",
+      "family": "constant-cases",
+      "requires": []
+    },
+    {
+      "label": "safe-cast-positive-infinity",
+      "sql": "SELECT SAFE_CAST(CAST('inf' AS FLOAT64) AS JSON) AS result",
+      "kind": "query",
+      "family": "constant-cases",
+      "requires": []
+    },
+    {
+      "label": "to-json-control-wide-int",
+      "sql": "SELECT TO_JSON(9223372036854775807) AS result",
+      "kind": "query",
+      "family": "constant-cases",
+      "requires": []
+    },
+    {
+      "label": "safe-cast-wide-int",
+      "sql": "SELECT SAFE_CAST(9223372036854775807 AS JSON) AS result",
+      "kind": "query",
+      "family": "constant-cases",
+      "requires": []
+    },
+    {
+      "label": "to-json-control-wide-numeric",
+      "sql": "SELECT TO_JSON(NUMERIC '99999999999999999999999999999.123456789') AS result",
+      "kind": "query",
+      "family": "constant-cases",
+      "requires": []
+    },
+    {
+      "label": "safe-cast-wide-numeric",
+      "sql": "SELECT SAFE_CAST(NUMERIC '99999999999999999999999999999.123456789' AS JSON) AS result",
+      "kind": "query",
+      "family": "constant-cases",
+      "requires": []
+    },
+    {
+      "label": "coerce-equal-int",
+      "sql": "SELECT JSON '1' = 1 AS result",
+      "kind": "query",
+      "family": "constant-cases",
+      "requires": []
+    },
+    {
+      "label": "coerce-reverse-equal-int",
+      "sql": "SELECT 1 = JSON '1' AS result",
+      "kind": "query",
+      "family": "constant-cases",
+      "requires": []
+    },
+    {
+      "label": "coerce-order-int",
+      "sql": "SELECT JSON '1' <= 1 AS result",
+      "kind": "query",
+      "family": "constant-cases",
+      "requires": []
+    },
+    {
+      "label": "coerce-equal-float32",
+      "sql": "SELECT JSON '1.25' = CAST(1.25 AS FLOAT32) AS result",
+      "kind": "query",
+      "family": "constant-cases",
+      "requires": []
+    },
+    {
+      "label": "coerce-reverse-equal-float32",
+      "sql": "SELECT CAST(1.25 AS FLOAT32) = JSON '1.25' AS result",
+      "kind": "query",
+      "family": "constant-cases",
+      "requires": []
+    },
+    {
+      "label": "coerce-order-float32",
+      "sql": "SELECT JSON '1.25' <= CAST(1.25 AS FLOAT32) AS result",
+      "kind": "query",
+      "family": "constant-cases",
+      "requires": []
+    },
+    {
+      "label": "coerce-equal-float64",
+      "sql": "SELECT JSON '1.25' = 1.25 AS result",
+      "kind": "query",
+      "family": "constant-cases",
+      "requires": []
+    },
+    {
+      "label": "coerce-reverse-equal-float64",
+      "sql": "SELECT 1.25 = JSON '1.25' AS result",
+      "kind": "query",
+      "family": "constant-cases",
+      "requires": []
+    },
+    {
+      "label": "coerce-order-float64",
+      "sql": "SELECT JSON '1.25' <= 1.25 AS result",
+      "kind": "query",
+      "family": "constant-cases",
+      "requires": []
+    },
+    {
+      "label": "coerce-equal-numeric",
+      "sql": "SELECT JSON '1.25' = NUMERIC '1.25' AS result",
+      "kind": "query",
+      "family": "constant-cases",
+      "requires": []
+    },
+    {
+      "label": "coerce-reverse-equal-numeric",
+      "sql": "SELECT NUMERIC '1.25' = JSON '1.25' AS result",
+      "kind": "query",
+      "family": "constant-cases",
+      "requires": []
+    },
+    {
+      "label": "coerce-order-numeric",
+      "sql": "SELECT JSON '1.25' <= NUMERIC '1.25' AS result",
+      "kind": "query",
+      "family": "constant-cases",
+      "requires": []
+    },
+    {
+      "label": "coerce-equal-bool",
+      "sql": "SELECT JSON 'true' = TRUE AS result",
+      "kind": "query",
+      "family": "constant-cases",
+      "requires": []
+    },
+    {
+      "label": "coerce-reverse-equal-bool",
+      "sql": "SELECT TRUE = JSON 'true' AS result",
+      "kind": "query",
+      "family": "constant-cases",
+      "requires": []
+    },
+    {
+      "label": "coerce-order-bool",
+      "sql": "SELECT JSON 'true' <= TRUE AS result",
+      "kind": "query",
+      "family": "constant-cases",
+      "requires": []
+    },
+    {
+      "label": "coerce-equal-string",
+      "sql": "SELECT JSON '\"foo\"' = 'foo' AS result",
+      "kind": "query",
+      "family": "constant-cases",
+      "requires": []
+    },
+    {
+      "label": "coerce-reverse-equal-string",
+      "sql": "SELECT 'foo' = JSON '\"foo\"' AS result",
+      "kind": "query",
+      "family": "constant-cases",
+      "requires": []
+    },
+    {
+      "label": "coerce-order-string",
+      "sql": "SELECT JSON '\"foo\"' <= 'foo' AS result",
+      "kind": "query",
+      "family": "constant-cases",
+      "requires": []
+    },
+    {
+      "label": "coerce-equal-bytes",
+      "sql": "SELECT JSON '\"YQ==\"' = b'a' AS result",
+      "kind": "query",
+      "family": "constant-cases",
+      "requires": []
+    },
+    {
+      "label": "coerce-reverse-equal-bytes",
+      "sql": "SELECT b'a' = JSON '\"YQ==\"' AS result",
+      "kind": "query",
+      "family": "constant-cases",
+      "requires": []
+    },
+    {
+      "label": "coerce-equal-date",
+      "sql": "SELECT JSON '\"2026-10-10\"' = DATE '2026-10-10' AS result",
+      "kind": "query",
+      "family": "constant-cases",
+      "requires": []
+    },
+    {
+      "label": "coerce-reverse-equal-date",
+      "sql": "SELECT DATE '2026-10-10' = JSON '\"2026-10-10\"' AS result",
+      "kind": "query",
+      "family": "constant-cases",
+      "requires": []
+    },
+    {
+      "label": "coerce-order-date",
+      "sql": "SELECT JSON '\"2026-10-10\"' <= DATE '2026-10-10' AS result",
+      "kind": "query",
+      "family": "constant-cases",
+      "requires": []
+    },
+    {
+      "label": "coerce-equal-timestamp",
+      "sql": "SELECT JSON '\"2026-10-10T00:00:00Z\"' = TIMESTAMP '2026-10-10 00:00:00+00' AS result",
+      "kind": "query",
+      "family": "constant-cases",
+      "requires": []
+    },
+    {
+      "label": "coerce-reverse-equal-timestamp",
+      "sql": "SELECT TIMESTAMP '2026-10-10 00:00:00+00' = JSON '\"2026-10-10T00:00:00Z\"' AS result",
+      "kind": "query",
+      "family": "constant-cases",
+      "requires": []
+    },
+    {
+      "label": "coerce-order-timestamp",
+      "sql": "SELECT JSON '\"2026-10-10T00:00:00Z\"' <= TIMESTAMP '2026-10-10 00:00:00+00' AS result",
+      "kind": "query",
+      "family": "constant-cases",
+      "requires": []
+    },
+    {
+      "label": "coerce-equal-uuid",
+      "sql": "SELECT JSON '\"00000000-0000-0000-0000-000000000001\"' = CAST('00000000-0000-0000-0000-000000000001' AS UUID) AS result",
+      "kind": "query",
+      "family": "constant-cases",
+      "requires": []
+    },
+    {
+      "label": "coerce-reverse-equal-uuid",
+      "sql": "SELECT CAST('00000000-0000-0000-0000-000000000001' AS UUID) = JSON '\"00000000-0000-0000-0000-000000000001\"' AS result",
+      "kind": "query",
+      "family": "constant-cases",
+      "requires": []
+    },
+    {
+      "label": "coerce-order-uuid",
+      "sql": "SELECT JSON '\"00000000-0000-0000-0000-000000000001\"' <= CAST('00000000-0000-0000-0000-000000000001' AS UUID) AS result",
+      "kind": "query",
+      "family": "constant-cases",
+      "requires": []
+    },
+    {
+      "label": "coerce-equal-array",
+      "sql": "SELECT JSON '[1,null,3]' = [1, NULL, 3] AS result",
+      "kind": "query",
+      "family": "constant-cases",
+      "requires": []
+    },
+    {
+      "label": "coerce-reverse-equal-array",
+      "sql": "SELECT [1, NULL, 3] = JSON '[1,null,3]' AS result",
+      "kind": "query",
+      "family": "constant-cases",
+      "requires": []
+    },
+    {
+      "label": "coerce-order-array",
+      "sql": "SELECT JSON '[1,null,3]' <= [1, NULL, 3] AS result",
+      "kind": "query",
+      "family": "constant-cases",
+      "requires": []
+    },
+    {
+      "label": "json-sort",
+      "sql": "SELECT j, JSON_TYPE(j) AS type FROM UNNEST([JSON '{}', JSON '[]', JSON 'true', JSON 'false', JSON '10', JSON '2', JSON '\"b\"', JSON '\"a\"', JSON 'null', CAST(NULL AS JSON)]) j ORDER BY j",
+      "kind": "query",
+      "family": "constant-cases",
+      "requires": []
+    },
+    {
+      "label": "json-group",
+      "sql": "SELECT j, COUNT(*) AS n FROM UNNEST([JSON '{\"b\":2,\"a\":1}',JSON '{\"a\":1,\"b\":2}',JSON '1',JSON '1.0',JSON 'null',JSON 'null',CAST(NULL AS JSON)]) j GROUP BY j ORDER BY j",
+      "kind": "query",
+      "family": "constant-cases",
+      "requires": []
+    },
+    {
+      "label": "json-distinct",
+      "sql": "SELECT DISTINCT j FROM UNNEST([JSON '1',JSON '1.0',JSON '2']) j ORDER BY j",
+      "kind": "query",
+      "family": "constant-cases",
+      "requires": []
+    },
+    {
+      "label": "json-minmax",
+      "sql": "SELECT MIN(j) AS lo, MAX(j) AS hi FROM UNNEST([JSON '1',JSON '2']) j",
+      "kind": "query",
+      "family": "constant-cases",
+      "requires": []
+    },
+    {
+      "label": "json-join",
+      "sql": "SELECT COUNT(*) AS n FROM UNNEST([JSON '1',JSON '2']) a JOIN UNNEST([JSON '1.0',JSON '3']) b ON a=b",
+      "kind": "query",
+      "family": "constant-cases",
+      "requires": []
+    },
+    {
+      "label": "json-window",
+      "sql": "SELECT j, ROW_NUMBER() OVER(ORDER BY j) AS n FROM UNNEST([JSON '2',JSON '1']) j",
+      "kind": "query",
+      "family": "constant-cases",
+      "requires": []
+    },
+    {
+      "label": "coalesce-unused",
+      "sql": "SELECT COALESCE(10, 1 / 0) AS result",
+      "kind": "query",
+      "family": "constant-cases",
+      "requires": []
+    },
+    {
+      "label": "coalesce-selected",
+      "sql": "SELECT COALESCE(CAST(NULL AS FLOAT64), 1 / 0) AS result",
+      "kind": "query",
+      "family": "constant-cases",
+      "requires": []
+    },
+    {
+      "label": "ifnull-unused",
+      "sql": "SELECT IFNULL(10, 1 / 0) AS result",
+      "kind": "query",
+      "family": "constant-cases",
+      "requires": []
+    },
+    {
+      "label": "ifnull-selected",
+      "sql": "SELECT IFNULL(CAST(NULL AS FLOAT64), 1 / 0) AS result",
+      "kind": "query",
+      "family": "constant-cases",
+      "requires": []
+    },
+    {
+      "label": "if-unused",
+      "sql": "SELECT IF(TRUE, 10, 1 / 0) AS result",
+      "kind": "query",
+      "family": "constant-cases",
+      "requires": []
+    },
+    {
+      "label": "if-selected",
+      "sql": "SELECT IF(FALSE, 10, 1 / 0) AS result",
+      "kind": "query",
+      "family": "constant-cases",
+      "requires": []
+    },
+    {
+      "label": "case-simple-unused",
+      "sql": "SELECT CASE 1 WHEN 1 THEN 10 WHEN CAST(1/0 AS INT64) THEN 20 ELSE 1/0 END AS result",
+      "kind": "query",
+      "family": "constant-cases",
+      "requires": []
+    },
+    {
+      "label": "case-simple-selected",
+      "sql": "SELECT CASE 2 WHEN 1 THEN 10 ELSE 1/0 END AS result",
+      "kind": "query",
+      "family": "constant-cases",
+      "requires": []
+    },
+    {
+      "label": "case-searched-unused",
+      "sql": "SELECT CASE WHEN TRUE THEN 10 WHEN 1/0=1 THEN 20 ELSE 1/0 END AS result",
+      "kind": "query",
+      "family": "constant-cases",
+      "requires": []
+    },
+    {
+      "label": "case-searched-selected",
+      "sql": "SELECT CASE WHEN FALSE THEN 10 ELSE 1/0 END AS result",
+      "kind": "query",
+      "family": "constant-cases",
+      "requires": []
+    },
+    {
+      "label": "coalesce-subquery-unused",
+      "sql": "SELECT COALESCE((SELECT 10), (SELECT 1/0)) AS result",
+      "kind": "query",
+      "family": "constant-cases",
+      "requires": []
+    },
+    {
+      "label": "coalesce-subquery-selected",
+      "sql": "SELECT COALESCE((SELECT CAST(NULL AS FLOAT64)), (SELECT 1/0)) AS result",
+      "kind": "query",
+      "family": "constant-cases",
+      "requires": []
+    },
+    {
+      "label": "if-subquery-unused",
+      "sql": "SELECT IF(@choose, (SELECT 10), (SELECT 1/0)) AS result",
+      "kind": "query",
+      "family": "constant-cases",
+      "requires": []
+    },
+    {
+      "label": "coalesce-name-resolution",
+      "sql": "SELECT COALESCE(10, missing_probe_identifier) AS result",
+      "kind": "query",
+      "family": "constant-cases",
+      "requires": []
+    },
+    {
+      "label": "regular-function-eager",
+      "sql": "SELECT GREATEST(10,1/0) AS result",
+      "kind": "query",
+      "family": "constant-cases",
+      "requires": []
+    },
+    {
+      "label": "procedural-if-suggestion",
+      "sql": "IF TRUE THEN SELECT 1; END IF",
+      "kind": "query",
+      "family": "constant-followup-cases",
+      "requires": []
+    },
+    {
+      "label": "not-equal-coercion",
+      "sql": "SELECT JSON '1' != 2 AS result",
+      "kind": "query",
+      "family": "constant-followup-cases",
+      "requires": []
+    },
+    {
+      "label": "in-mixed-list",
+      "sql": "SELECT JSON 'true' IN (1,TRUE,'true',JSON '[]') AS result",
+      "kind": "query",
+      "family": "constant-followup-cases",
+      "requires": []
+    },
+    {
+      "label": "explicit-bytes-cast-order",
+      "sql": "SELECT JSON '\"YQ==\"' < CAST(b'b' AS JSON) AS result",
+      "kind": "query",
+      "family": "constant-followup-cases",
+      "requires": []
+    },
+    {
+      "label": "cast-all-nested-null",
+      "sql": "SELECT CAST(ARRAY<INT64>[NULL] AS JSON) AS a, CAST(STRUCT(CAST(NULL AS INT64) AS n) AS JSON) AS s",
+      "kind": "query",
+      "family": "constant-followup-cases",
+      "requires": []
+    },
+    {
+      "label": "in-null-no-match",
+      "sql": "SELECT JSON '5' IN (1,NULL) AS result",
+      "kind": "query",
+      "family": "constant-followup-cases",
+      "requires": []
+    },
+    {
+      "label": "generic-json-supertype-reject",
+      "sql": "SELECT COALESCE(JSON '1',1) AS result",
+      "kind": "query",
+      "family": "constant-followup-cases",
+      "requires": []
+    },
+    {
+      "label": "json-array-struct-cast",
+      "sql": "SELECT CAST([STRUCT(1 AS a),STRUCT(2 AS a)] AS JSON) AS result",
+      "kind": "query",
+      "family": "constant-followup-cases",
+      "requires": []
+    },
+    {
+      "label": "json-array-struct-equality-reject",
+      "sql": "SELECT JSON '[{\"a\":1}]' = [STRUCT(1 AS a)] AS result",
+      "kind": "query",
+      "family": "constant-followup-cases",
+      "requires": []
+    },
+    {
+      "label": "safe-cast-nested-infinity",
+      "sql": "SELECT SAFE_CAST([CAST('inf' AS FLOAT64)] AS JSON) AS result",
+      "kind": "query",
+      "family": "constant-followup-cases",
+      "requires": []
+    },
+    {
+      "label": "int-equal",
+      "sql": "SELECT (1) IS DISTINCT FROM (1) AS d, (1) IS NOT DISTINCT FROM (1) AS nd",
+      "kind": "query",
+      "family": "constant-distinctness-cases",
+      "requires": []
+    },
+    {
+      "label": "int-different",
+      "sql": "SELECT (1) IS DISTINCT FROM (2) AS d, (1) IS NOT DISTINCT FROM (2) AS nd",
+      "kind": "query",
+      "family": "constant-distinctness-cases",
+      "requires": []
+    },
+    {
+      "label": "null-null",
+      "sql": "SELECT (NULL) IS DISTINCT FROM (NULL) AS d, (NULL) IS NOT DISTINCT FROM (NULL) AS nd",
+      "kind": "query",
+      "family": "constant-distinctness-cases",
+      "requires": []
+    },
+    {
+      "label": "null-int",
+      "sql": "SELECT (CAST(NULL AS INT64)) IS DISTINCT FROM (1) AS d, (CAST(NULL AS INT64)) IS NOT DISTINCT FROM (1) AS nd",
+      "kind": "query",
+      "family": "constant-distinctness-cases",
+      "requires": []
+    },
+    {
+      "label": "int-null",
+      "sql": "SELECT (1) IS DISTINCT FROM (CAST(NULL AS INT64)) AS d, (1) IS NOT DISTINCT FROM (CAST(NULL AS INT64)) AS nd",
+      "kind": "query",
+      "family": "constant-distinctness-cases",
+      "requires": []
+    },
+    {
+      "label": "string-equal",
+      "sql": "SELECT ('x') IS DISTINCT FROM ('x') AS d, ('x') IS NOT DISTINCT FROM ('x') AS nd",
+      "kind": "query",
+      "family": "constant-distinctness-cases",
+      "requires": []
+    },
+    {
+      "label": "string-different",
+      "sql": "SELECT ('x') IS DISTINCT FROM ('y') AS d, ('x') IS NOT DISTINCT FROM ('y') AS nd",
+      "kind": "query",
+      "family": "constant-distinctness-cases",
+      "requires": []
+    },
+    {
+      "label": "bool-different",
+      "sql": "SELECT (TRUE) IS DISTINCT FROM (FALSE) AS d, (TRUE) IS NOT DISTINCT FROM (FALSE) AS nd",
+      "kind": "query",
+      "family": "constant-distinctness-cases",
+      "requires": []
+    },
+    {
+      "label": "bytes-equal",
+      "sql": "SELECT (b'x') IS DISTINCT FROM (b'x') AS d, (b'x') IS NOT DISTINCT FROM (b'x') AS nd",
+      "kind": "query",
+      "family": "constant-distinctness-cases",
+      "requires": []
+    },
+    {
+      "label": "bytes-different",
+      "sql": "SELECT (b'x') IS DISTINCT FROM (b'y') AS d, (b'x') IS NOT DISTINCT FROM (b'y') AS nd",
+      "kind": "query",
+      "family": "constant-distinctness-cases",
+      "requires": []
+    },
+    {
+      "label": "date-equal",
+      "sql": "SELECT (DATE '2026-10-11') IS DISTINCT FROM (DATE '2026-10-11') AS d, (DATE '2026-10-11') IS NOT DISTINCT FROM (DATE '2026-10-11') AS nd",
+      "kind": "query",
+      "family": "constant-distinctness-cases",
+      "requires": []
+    },
+    {
+      "label": "timestamp-equal",
+      "sql": "SELECT (TIMESTAMP '2026-10-11 00:00:00+00') IS DISTINCT FROM (TIMESTAMP '2026-10-11 00:00:00+00') AS d, (TIMESTAMP '2026-10-11 00:00:00+00') IS NOT DISTINCT FROM (TIMESTAMP '2026-10-11 00:00:00+00') AS nd",
+      "kind": "query",
+      "family": "constant-distinctness-cases",
+      "requires": []
+    },
+    {
+      "label": "numeric-equal",
+      "sql": "SELECT (NUMERIC '1') IS DISTINCT FROM (NUMERIC '1.0') AS d, (NUMERIC '1') IS NOT DISTINCT FROM (NUMERIC '1.0') AS nd",
+      "kind": "query",
+      "family": "constant-distinctness-cases",
+      "requires": []
+    },
+    {
+      "label": "float-equal",
+      "sql": "SELECT (1.0) IS DISTINCT FROM (1.0) AS d, (1.0) IS NOT DISTINCT FROM (1.0) AS nd",
+      "kind": "query",
+      "family": "constant-distinctness-cases",
+      "requires": []
+    },
+    {
+      "label": "float-signed-zero",
+      "sql": "SELECT (0.0) IS DISTINCT FROM (-0.0) AS d, (0.0) IS NOT DISTINCT FROM (-0.0) AS nd",
+      "kind": "query",
+      "family": "constant-distinctness-cases",
+      "requires": []
+    },
+    {
+      "label": "nan-nan",
+      "sql": "SELECT (CAST('NaN' AS FLOAT64)) IS DISTINCT FROM (CAST('NaN' AS FLOAT64)) AS d, (CAST('NaN' AS FLOAT64)) IS NOT DISTINCT FROM (CAST('NaN' AS FLOAT64)) AS nd",
+      "kind": "query",
+      "family": "constant-distinctness-cases",
+      "requires": []
+    },
+    {
+      "label": "nan-finite",
+      "sql": "SELECT (CAST('NaN' AS FLOAT64)) IS DISTINCT FROM (1.0) AS d, (CAST('NaN' AS FLOAT64)) IS NOT DISTINCT FROM (1.0) AS nd",
+      "kind": "query",
+      "family": "constant-distinctness-cases",
+      "requires": []
+    },
+    {
+      "label": "finite-nan",
+      "sql": "SELECT (1.0) IS DISTINCT FROM (CAST('NaN' AS FLOAT64)) AS d, (1.0) IS NOT DISTINCT FROM (CAST('NaN' AS FLOAT64)) AS nd",
+      "kind": "query",
+      "family": "constant-distinctness-cases",
+      "requires": []
+    },
+    {
+      "label": "nan-null",
+      "sql": "SELECT (CAST('NaN' AS FLOAT64)) IS DISTINCT FROM (CAST(NULL AS FLOAT64)) AS d, (CAST('NaN' AS FLOAT64)) IS NOT DISTINCT FROM (CAST(NULL AS FLOAT64)) AS nd",
+      "kind": "query",
+      "family": "constant-distinctness-cases",
+      "requires": []
+    },
+    {
+      "label": "infinity-equal",
+      "sql": "SELECT (CAST('inf' AS FLOAT64)) IS DISTINCT FROM (CAST('inf' AS FLOAT64)) AS d, (CAST('inf' AS FLOAT64)) IS NOT DISTINCT FROM (CAST('inf' AS FLOAT64)) AS nd",
+      "kind": "query",
+      "family": "constant-distinctness-cases",
+      "requires": []
+    },
+    {
+      "label": "infinity-sign",
+      "sql": "SELECT (CAST('inf' AS FLOAT64)) IS DISTINCT FROM (CAST('-inf' AS FLOAT64)) AS d, (CAST('inf' AS FLOAT64)) IS NOT DISTINCT FROM (CAST('-inf' AS FLOAT64)) AS nd",
+      "kind": "query",
+      "family": "constant-distinctness-cases",
+      "requires": []
+    },
+    {
+      "label": "json-number-equal",
+      "sql": "SELECT (JSON '1') IS DISTINCT FROM (JSON '1.0') AS d, (JSON '1') IS NOT DISTINCT FROM (JSON '1.0') AS nd",
+      "kind": "query",
+      "family": "constant-distinctness-cases",
+      "requires": []
+    },
+    {
+      "label": "json-number-different",
+      "sql": "SELECT (JSON '1') IS DISTINCT FROM (JSON '2') AS d, (JSON '1') IS NOT DISTINCT FROM (JSON '2') AS nd",
+      "kind": "query",
+      "family": "constant-distinctness-cases",
+      "requires": []
+    },
+    {
+      "label": "json-null-equal",
+      "sql": "SELECT (JSON 'null') IS DISTINCT FROM (JSON 'null') AS d, (JSON 'null') IS NOT DISTINCT FROM (JSON 'null') AS nd",
+      "kind": "query",
+      "family": "constant-distinctness-cases",
+      "requires": []
+    },
+    {
+      "label": "sql-null-json-null",
+      "sql": "SELECT (CAST(NULL AS JSON)) IS DISTINCT FROM (JSON 'null') AS d, (CAST(NULL AS JSON)) IS NOT DISTINCT FROM (JSON 'null') AS nd",
+      "kind": "query",
+      "family": "constant-distinctness-cases",
+      "requires": []
+    },
+    {
+      "label": "json-null-sql-null",
+      "sql": "SELECT (JSON 'null') IS DISTINCT FROM (CAST(NULL AS JSON)) AS d, (JSON 'null') IS NOT DISTINCT FROM (CAST(NULL AS JSON)) AS nd",
+      "kind": "query",
+      "family": "constant-distinctness-cases",
+      "requires": []
+    },
+    {
+      "label": "json-typed-null-pair",
+      "sql": "SELECT (CAST(NULL AS JSON)) IS DISTINCT FROM (CAST(NULL AS JSON)) AS d, (CAST(NULL AS JSON)) IS NOT DISTINCT FROM (CAST(NULL AS JSON)) AS nd",
+      "kind": "query",
+      "family": "constant-distinctness-cases",
+      "requires": []
+    },
+    {
+      "label": "json-object-order",
+      "sql": "SELECT (JSON '{\"a\":1,\"b\":2}') IS DISTINCT FROM (JSON '{\"b\":2,\"a\":1}') AS d, (JSON '{\"a\":1,\"b\":2}') IS NOT DISTINCT FROM (JSON '{\"b\":2,\"a\":1}') AS nd",
+      "kind": "query",
+      "family": "constant-distinctness-cases",
+      "requires": []
+    },
+    {
+      "label": "json-object-value",
+      "sql": "SELECT (JSON '{\"a\":1}') IS DISTINCT FROM (JSON '{\"a\":2}') AS d, (JSON '{\"a\":1}') IS NOT DISTINCT FROM (JSON '{\"a\":2}') AS nd",
+      "kind": "query",
+      "family": "constant-distinctness-cases",
+      "requires": []
+    },
+    {
+      "label": "json-array-equal",
+      "sql": "SELECT (JSON '[1,null]') IS DISTINCT FROM (JSON '[1.0,null]') AS d, (JSON '[1,null]') IS NOT DISTINCT FROM (JSON '[1.0,null]') AS nd",
+      "kind": "query",
+      "family": "constant-distinctness-cases",
+      "requires": []
+    },
+    {
+      "label": "json-array-length",
+      "sql": "SELECT (JSON '[1]') IS DISTINCT FROM (JSON '[1,2]') AS d, (JSON '[1]') IS NOT DISTINCT FROM (JSON '[1,2]') AS nd",
+      "kind": "query",
+      "family": "constant-distinctness-cases",
+      "requires": []
+    },
+    {
+      "label": "json-type-difference",
+      "sql": "SELECT (JSON '1') IS DISTINCT FROM (JSON '\"1\"') AS d, (JSON '1') IS NOT DISTINCT FROM (JSON '\"1\"') AS nd",
+      "kind": "query",
+      "family": "constant-distinctness-cases",
+      "requires": []
+    },
+    {
+      "label": "json-int",
+      "sql": "SELECT (JSON '1') IS DISTINCT FROM (1) AS d, (JSON '1') IS NOT DISTINCT FROM (1) AS nd",
+      "kind": "query",
+      "family": "constant-distinctness-cases",
+      "requires": []
+    },
+    {
+      "label": "int-json",
+      "sql": "SELECT (1) IS DISTINCT FROM (JSON '1') AS d, (1) IS NOT DISTINCT FROM (JSON '1') AS nd",
+      "kind": "query",
+      "family": "constant-distinctness-cases",
+      "requires": []
+    },
+    {
+      "label": "json-string",
+      "sql": "SELECT (JSON '\"x\"') IS DISTINCT FROM ('x') AS d, (JSON '\"x\"') IS NOT DISTINCT FROM ('x') AS nd",
+      "kind": "query",
+      "family": "constant-distinctness-cases",
+      "requires": []
+    },
+    {
+      "label": "string-json",
+      "sql": "SELECT ('x') IS DISTINCT FROM (JSON '\"x\"') AS d, ('x') IS NOT DISTINCT FROM (JSON '\"x\"') AS nd",
+      "kind": "query",
+      "family": "constant-distinctness-cases",
+      "requires": []
+    },
+    {
+      "label": "json-bool",
+      "sql": "SELECT (JSON 'true') IS DISTINCT FROM (TRUE) AS d, (JSON 'true') IS NOT DISTINCT FROM (TRUE) AS nd",
+      "kind": "query",
+      "family": "constant-distinctness-cases",
+      "requires": []
+    },
+    {
+      "label": "bool-json",
+      "sql": "SELECT (TRUE) IS DISTINCT FROM (JSON 'true') AS d, (TRUE) IS NOT DISTINCT FROM (JSON 'true') AS nd",
+      "kind": "query",
+      "family": "constant-distinctness-cases",
+      "requires": []
+    },
+    {
+      "label": "json-bytes",
+      "sql": "SELECT (JSON '\"eA==\"') IS DISTINCT FROM (b'x') AS d, (JSON '\"eA==\"') IS NOT DISTINCT FROM (b'x') AS nd",
+      "kind": "query",
+      "family": "constant-distinctness-cases",
+      "requires": []
+    },
+    {
+      "label": "bytes-json",
+      "sql": "SELECT (b'x') IS DISTINCT FROM (JSON '\"eA==\"') AS d, (b'x') IS NOT DISTINCT FROM (JSON '\"eA==\"') AS nd",
+      "kind": "query",
+      "family": "constant-distinctness-cases",
+      "requires": []
+    },
+    {
+      "label": "json-array",
+      "sql": "SELECT (JSON '[1,null]') IS DISTINCT FROM ([1,NULL]) AS d, (JSON '[1,null]') IS NOT DISTINCT FROM ([1,NULL]) AS nd",
+      "kind": "query",
+      "family": "constant-distinctness-cases",
+      "requires": []
+    },
+    {
+      "label": "array-json",
+      "sql": "SELECT ([1,NULL]) IS DISTINCT FROM (JSON '[1,null]') AS d, ([1,NULL]) IS NOT DISTINCT FROM (JSON '[1,null]') AS nd",
+      "kind": "query",
+      "family": "constant-distinctness-cases",
+      "requires": []
+    },
+    {
+      "label": "array-equal",
+      "sql": "SELECT ([1,2]) IS DISTINCT FROM ([1,2]) AS d, ([1,2]) IS NOT DISTINCT FROM ([1,2]) AS nd",
+      "kind": "query",
+      "family": "constant-distinctness-cases",
+      "requires": []
+    },
+    {
+      "label": "array-different",
+      "sql": "SELECT ([1,2]) IS DISTINCT FROM ([1,3]) AS d, ([1,2]) IS NOT DISTINCT FROM ([1,3]) AS nd",
+      "kind": "query",
+      "family": "constant-distinctness-cases",
+      "requires": []
+    },
+    {
+      "label": "array-null-elements",
+      "sql": "SELECT ([1,NULL]) IS DISTINCT FROM ([1,NULL]) AS d, ([1,NULL]) IS NOT DISTINCT FROM ([1,NULL]) AS nd",
+      "kind": "query",
+      "family": "constant-distinctness-cases",
+      "requires": []
+    },
+    {
+      "label": "array-null-versus-value",
+      "sql": "SELECT ([1,NULL]) IS DISTINCT FROM ([1,2]) AS d, ([1,NULL]) IS NOT DISTINCT FROM ([1,2]) AS nd",
+      "kind": "query",
+      "family": "constant-distinctness-cases",
+      "requires": []
+    },
+    {
+      "label": "array-empty",
+      "sql": "SELECT (ARRAY<INT64>[]) IS DISTINCT FROM (ARRAY<INT64>[]) AS d, (ARRAY<INT64>[]) IS NOT DISTINCT FROM (ARRAY<INT64>[]) AS nd",
+      "kind": "query",
+      "family": "constant-distinctness-cases",
+      "requires": []
+    },
+    {
+      "label": "array-sql-null",
+      "sql": "SELECT (CAST(NULL AS ARRAY<INT64>)) IS DISTINCT FROM (ARRAY<INT64>[]) AS d, (CAST(NULL AS ARRAY<INT64>)) IS NOT DISTINCT FROM (ARRAY<INT64>[]) AS nd",
+      "kind": "query",
+      "family": "constant-distinctness-cases",
+      "requires": []
+    },
+    {
+      "label": "struct-equal",
+      "sql": "SELECT (STRUCT(1 AS x)) IS DISTINCT FROM (STRUCT(1 AS x)) AS d, (STRUCT(1 AS x)) IS NOT DISTINCT FROM (STRUCT(1 AS x)) AS nd",
+      "kind": "query",
+      "family": "constant-distinctness-cases",
+      "requires": []
+    },
+    {
+      "label": "struct-different",
+      "sql": "SELECT (STRUCT(1 AS x)) IS DISTINCT FROM (STRUCT(2 AS x)) AS d, (STRUCT(1 AS x)) IS NOT DISTINCT FROM (STRUCT(2 AS x)) AS nd",
+      "kind": "query",
+      "family": "constant-distinctness-cases",
+      "requires": []
+    },
+    {
+      "label": "struct-null-elements",
+      "sql": "SELECT (STRUCT(CAST(NULL AS INT64) AS x)) IS DISTINCT FROM (STRUCT(CAST(NULL AS INT64) AS x)) AS d, (STRUCT(CAST(NULL AS INT64) AS x)) IS NOT DISTINCT FROM (STRUCT(CAST(NULL AS INT64) AS x)) AS nd",
+      "kind": "query",
+      "family": "constant-distinctness-cases",
+      "requires": []
+    },
+    {
+      "label": "interval-equal",
+      "sql": "SELECT (INTERVAL 1 DAY) IS DISTINCT FROM (INTERVAL 1 DAY) AS d, (INTERVAL 1 DAY) IS NOT DISTINCT FROM (INTERVAL 1 DAY) AS nd",
+      "kind": "query",
+      "family": "constant-distinctness-cases",
+      "requires": []
+    },
+    {
+      "label": "incompatible-string-int",
+      "sql": "SELECT ('x') IS DISTINCT FROM (1) AS d, ('x') IS NOT DISTINCT FROM (1) AS nd",
+      "kind": "query",
+      "family": "constant-distinctness-cases",
+      "requires": []
+    },
+    {
+      "label": "incompatible-struct-int",
+      "sql": "SELECT (STRUCT(1 AS x)) IS DISTINCT FROM (1) AS d, (STRUCT(1 AS x)) IS NOT DISTINCT FROM (1) AS nd",
+      "kind": "query",
+      "family": "constant-distinctness-cases",
+      "requires": []
+    },
+    {
+      "label": "equality-nan-control",
+      "sql": "SELECT CAST('NaN' AS FLOAT64) = CAST('NaN' AS FLOAT64) AS eq",
+      "kind": "query",
+      "family": "constant-distinctness-cases",
+      "requires": []
+    },
+    {
+      "label": "equality-null-control",
+      "sql": "SELECT CAST(NULL AS INT64) = CAST(NULL AS INT64) AS eq",
+      "kind": "query",
+      "family": "constant-distinctness-cases",
+      "requires": []
+    },
+    {
+      "label": "missing-from-control",
+      "sql": "SELECT 1 IS DISTINCT 2 AS result",
+      "kind": "query",
+      "family": "constant-distinctness-cases",
+      "requires": []
+    },
+    {
+      "label": "missing-rhs-control",
+      "sql": "SELECT 1 IS NOT DISTINCT FROM",
+      "kind": "query",
+      "family": "constant-distinctness-cases",
+      "requires": []
+    },
+    {
+      "label": "missing-distinct-control",
+      "sql": "SELECT 1 IS NOT FROM 1 AS result",
+      "kind": "query",
+      "family": "constant-distinctness-cases",
+      "requires": []
+    },
+    {
+      "label": "int-equal-profile",
+      "sql": "SELECT (1) IS DISTINCT FROM (1) AS d, (1) IS NOT DISTINCT FROM (1) AS nd",
+      "kind": "query",
+      "family": "constant-distinctness-cases",
+      "requires": [],
+      "profile": true
+    },
+    {
+      "label": "nan-nan-profile",
+      "sql": "SELECT (CAST('NaN' AS FLOAT64)) IS DISTINCT FROM (CAST('NaN' AS FLOAT64)) AS d, (CAST('NaN' AS FLOAT64)) IS NOT DISTINCT FROM (CAST('NaN' AS FLOAT64)) AS nd",
+      "kind": "query",
+      "family": "constant-distinctness-cases",
+      "requires": [],
+      "profile": true
+    },
+    {
+      "label": "sql-null-json-null-profile",
+      "sql": "SELECT (CAST(NULL AS JSON)) IS DISTINCT FROM (JSON 'null') AS d, (CAST(NULL AS JSON)) IS NOT DISTINCT FROM (JSON 'null') AS nd",
+      "kind": "query",
+      "family": "constant-distinctness-cases",
+      "requires": [],
+      "profile": true
+    },
+    {
+      "label": "json-object-order-profile",
+      "sql": "SELECT (JSON '{\"a\":1,\"b\":2}') IS DISTINCT FROM (JSON '{\"b\":2,\"a\":1}') AS d, (JSON '{\"a\":1,\"b\":2}') IS NOT DISTINCT FROM (JSON '{\"b\":2,\"a\":1}') AS nd",
+      "kind": "query",
+      "family": "constant-distinctness-cases",
+      "requires": [],
+      "profile": true
+    },
+    {
+      "label": "array-null-elements-profile",
+      "sql": "SELECT ([1,NULL]) IS DISTINCT FROM ([1,NULL]) AS d, ([1,NULL]) IS NOT DISTINCT FROM ([1,NULL]) AS nd",
+      "kind": "query",
+      "family": "constant-distinctness-cases",
+      "requires": [],
+      "profile": true
+    },
+    {
+      "label": "information-schema-columns",
+      "sql": "SELECT TABLE_NAME AS table_name,COLUMN_NAME AS column_name,SPANNER_TYPE AS spanner_type,ORDINAL_POSITION AS ordinal_position FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA='INFORMATION_SCHEMA' ORDER BY TABLE_NAME,ORDINAL_POSITION",
+      "kind": "query",
+      "family": "catalog",
+      "requires": []
+    },
+    {
+      "label": "spanner-sys-columns",
+      "sql": "SELECT TABLE_NAME AS table_name,COLUMN_NAME AS column_name,SPANNER_TYPE AS spanner_type,ORDINAL_POSITION AS ordinal_position FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA='SPANNER_SYS' ORDER BY TABLE_NAME,ORDINAL_POSITION",
+      "kind": "query",
+      "family": "catalog",
+      "requires": []
+    },
+    {
+      "label": "preflight",
+      "sql": "SELECT 1 AS ready",
+      "kind": "query",
+      "family": "catalog-active-batch",
+      "requires": []
+    },
+    {
+      "label": "active-star-1",
+      "sql": "SELECT * FROM SPANNER_SYS.ACTIVE_BATCH_OPERATIONS LIMIT 1",
+      "kind": "query",
+      "family": "catalog-active-batch",
+      "requires": []
+    },
+    {
+      "label": "active-star-2",
+      "sql": "SELECT * FROM SPANNER_SYS.ACTIVE_BATCH_OPERATIONS LIMIT 1",
+      "kind": "query",
+      "family": "catalog-active-batch",
+      "requires": []
+    },
+    {
+      "label": "active-star-3",
+      "sql": "SELECT * FROM SPANNER_SYS.ACTIVE_BATCH_OPERATIONS LIMIT 1",
+      "kind": "query",
+      "family": "catalog-active-batch",
+      "requires": []
+    },
+    {
+      "label": "active-limit-zero",
+      "sql": "SELECT * FROM SPANNER_SYS.ACTIVE_BATCH_OPERATIONS LIMIT 0",
+      "kind": "query",
+      "family": "catalog-active-batch",
+      "requires": []
+    },
+    {
+      "label": "active-count",
+      "sql": "SELECT COUNT(*) AS n FROM SPANNER_SYS.ACTIVE_BATCH_OPERATIONS",
+      "kind": "query",
+      "family": "catalog-active-batch",
+      "requires": []
+    },
+    {
+      "label": "active-column-TEXT",
+      "sql": "SELECT t.`TEXT` FROM SPANNER_SYS.ACTIVE_BATCH_OPERATIONS AS t LIMIT 1",
+      "kind": "query",
+      "family": "catalog-active-batch",
+      "requires": []
+    },
+    {
+      "label": "active-column-QUERY_ID",
+      "sql": "SELECT t.`QUERY_ID` FROM SPANNER_SYS.ACTIVE_BATCH_OPERATIONS AS t LIMIT 1",
+      "kind": "query",
+      "family": "catalog-active-batch",
+      "requires": []
+    },
+    {
+      "label": "active-column-NUM_PARTITIONS_TOTAL",
+      "sql": "SELECT t.`NUM_PARTITIONS_TOTAL` FROM SPANNER_SYS.ACTIVE_BATCH_OPERATIONS AS t LIMIT 1",
+      "kind": "query",
+      "family": "catalog-active-batch",
+      "requires": []
+    },
+    {
+      "label": "active-column-NUM_PARTITIONS_COMPLETE",
+      "sql": "SELECT t.`NUM_PARTITIONS_COMPLETE` FROM SPANNER_SYS.ACTIVE_BATCH_OPERATIONS AS t LIMIT 1",
+      "kind": "query",
+      "family": "catalog-active-batch",
+      "requires": []
+    },
+    {
+      "label": "active-column-NUM_TRIVIAL_PARTITIONS_COMPLETE",
+      "sql": "SELECT t.`NUM_TRIVIAL_PARTITIONS_COMPLETE` FROM SPANNER_SYS.ACTIVE_BATCH_OPERATIONS AS t LIMIT 1",
+      "kind": "query",
+      "family": "catalog-active-batch",
+      "requires": []
+    },
+    {
+      "label": "active-column-PROGRESS",
+      "sql": "SELECT t.`PROGRESS` FROM SPANNER_SYS.ACTIVE_BATCH_OPERATIONS AS t LIMIT 1",
+      "kind": "query",
+      "family": "catalog-active-batch",
+      "requires": []
+    },
+    {
+      "label": "active-column-ROWS_PROCESSED",
+      "sql": "SELECT t.`ROWS_PROCESSED` FROM SPANNER_SYS.ACTIVE_BATCH_OPERATIONS AS t LIMIT 1",
+      "kind": "query",
+      "family": "catalog-active-batch",
+      "requires": []
+    },
+    {
+      "label": "active-column-STATUS",
+      "sql": "SELECT t.`STATUS` FROM SPANNER_SYS.ACTIVE_BATCH_OPERATIONS AS t LIMIT 1",
+      "kind": "query",
+      "family": "catalog-active-batch",
+      "requires": []
+    },
+    {
+      "label": "active-column-RESULT",
+      "sql": "SELECT t.`RESULT` FROM SPANNER_SYS.ACTIVE_BATCH_OPERATIONS AS t LIMIT 1",
+      "kind": "query",
+      "family": "catalog-active-batch",
+      "requires": []
+    },
+    {
+      "label": "active-column-START_TIMESTAMP",
+      "sql": "SELECT t.`START_TIMESTAMP` FROM SPANNER_SYS.ACTIVE_BATCH_OPERATIONS AS t LIMIT 1",
+      "kind": "query",
+      "family": "catalog-active-batch",
+      "requires": []
+    },
+    {
+      "label": "active-column-LAST_UPDATE_TIMESTAMP",
+      "sql": "SELECT t.`LAST_UPDATE_TIMESTAMP` FROM SPANNER_SYS.ACTIVE_BATCH_OPERATIONS AS t LIMIT 1",
+      "kind": "query",
+      "family": "catalog-active-batch",
+      "requires": []
+    },
+    {
+      "label": "existing-active-pdml-control",
+      "sql": "SELECT * FROM SPANNER_SYS.ACTIVE_PARTITIONED_DMLS LIMIT 1",
+      "kind": "query",
+      "family": "catalog-active-batch",
+      "requires": []
+    },
+    {
+      "label": "unknown-column-control",
+      "sql": "SELECT DeliberatelyMissingColumn FROM SPANNER_SYS.ACTIVE_BATCH_OPERATIONS LIMIT 0",
+      "kind": "query",
+      "family": "catalog-active-batch",
+      "requires": []
+    },
+    {
+      "label": "preflight",
+      "sql": "SELECT 1 AS ready",
+      "kind": "query",
+      "family": "catalog-batch-operations",
+      "requires": []
+    },
+    {
+      "label": "batch-star-1",
+      "sql": "SELECT * FROM SPANNER_SYS.BATCH_OPERATIONS LIMIT 1",
+      "kind": "query",
+      "family": "catalog-batch-operations",
+      "requires": []
+    },
+    {
+      "label": "batch-star-2",
+      "sql": "SELECT * FROM SPANNER_SYS.BATCH_OPERATIONS LIMIT 1",
+      "kind": "query",
+      "family": "catalog-batch-operations",
+      "requires": []
+    },
+    {
+      "label": "batch-star-3",
+      "sql": "SELECT * FROM SPANNER_SYS.BATCH_OPERATIONS LIMIT 1",
+      "kind": "query",
+      "family": "catalog-batch-operations",
+      "requires": []
+    },
+    {
+      "label": "batch-limit-zero",
+      "sql": "SELECT * FROM SPANNER_SYS.BATCH_OPERATIONS LIMIT 0",
+      "kind": "query",
+      "family": "catalog-batch-operations",
+      "requires": []
+    },
+    {
+      "label": "batch-count",
+      "sql": "SELECT COUNT(*) AS n FROM SPANNER_SYS.BATCH_OPERATIONS",
+      "kind": "query",
+      "family": "catalog-batch-operations",
+      "requires": []
+    },
+    {
+      "label": "batch-column-TEXT",
+      "sql": "SELECT t.`TEXT` FROM SPANNER_SYS.BATCH_OPERATIONS AS t LIMIT 1",
+      "kind": "query",
+      "family": "catalog-batch-operations",
+      "requires": []
+    },
+    {
+      "label": "batch-column-QUERY_ID",
+      "sql": "SELECT t.`QUERY_ID` FROM SPANNER_SYS.BATCH_OPERATIONS AS t LIMIT 1",
+      "kind": "query",
+      "family": "catalog-batch-operations",
+      "requires": []
+    },
+    {
+      "label": "batch-column-NUM_PARTITIONS_TOTAL",
+      "sql": "SELECT t.`NUM_PARTITIONS_TOTAL` FROM SPANNER_SYS.BATCH_OPERATIONS AS t LIMIT 1",
+      "kind": "query",
+      "family": "catalog-batch-operations",
+      "requires": []
+    },
+    {
+      "label": "batch-column-NUM_PARTITIONS_COMPLETE",
+      "sql": "SELECT t.`NUM_PARTITIONS_COMPLETE` FROM SPANNER_SYS.BATCH_OPERATIONS AS t LIMIT 1",
+      "kind": "query",
+      "family": "catalog-batch-operations",
+      "requires": []
+    },
+    {
+      "label": "batch-column-NUM_TRIVIAL_PARTITIONS_COMPLETE",
+      "sql": "SELECT t.`NUM_TRIVIAL_PARTITIONS_COMPLETE` FROM SPANNER_SYS.BATCH_OPERATIONS AS t LIMIT 1",
+      "kind": "query",
+      "family": "catalog-batch-operations",
+      "requires": []
+    },
+    {
+      "label": "batch-column-PROGRESS",
+      "sql": "SELECT t.`PROGRESS` FROM SPANNER_SYS.BATCH_OPERATIONS AS t LIMIT 1",
+      "kind": "query",
+      "family": "catalog-batch-operations",
+      "requires": []
+    },
+    {
+      "label": "batch-column-ROWS_PROCESSED",
+      "sql": "SELECT t.`ROWS_PROCESSED` FROM SPANNER_SYS.BATCH_OPERATIONS AS t LIMIT 1",
+      "kind": "query",
+      "family": "catalog-batch-operations",
+      "requires": []
+    },
+    {
+      "label": "batch-column-STATUS",
+      "sql": "SELECT t.`STATUS` FROM SPANNER_SYS.BATCH_OPERATIONS AS t LIMIT 1",
+      "kind": "query",
+      "family": "catalog-batch-operations",
+      "requires": []
+    },
+    {
+      "label": "batch-column-RESULT",
+      "sql": "SELECT t.`RESULT` FROM SPANNER_SYS.BATCH_OPERATIONS AS t LIMIT 1",
+      "kind": "query",
+      "family": "catalog-batch-operations",
+      "requires": []
+    },
+    {
+      "label": "batch-column-START_TIMESTAMP",
+      "sql": "SELECT t.`START_TIMESTAMP` FROM SPANNER_SYS.BATCH_OPERATIONS AS t LIMIT 1",
+      "kind": "query",
+      "family": "catalog-batch-operations",
+      "requires": []
+    },
+    {
+      "label": "batch-column-LAST_UPDATE_TIMESTAMP",
+      "sql": "SELECT t.`LAST_UPDATE_TIMESTAMP` FROM SPANNER_SYS.BATCH_OPERATIONS AS t LIMIT 1",
+      "kind": "query",
+      "family": "catalog-batch-operations",
+      "requires": []
+    },
+    {
+      "label": "existing-active-pdml-control",
+      "sql": "SELECT * FROM SPANNER_SYS.ACTIVE_PARTITIONED_DMLS LIMIT 1",
+      "kind": "query",
+      "family": "catalog-batch-operations",
+      "requires": []
+    },
+    {
+      "label": "unknown-column-control",
+      "sql": "SELECT DeliberatelyMissingColumn FROM SPANNER_SYS.BATCH_OPERATIONS LIMIT 0",
+      "kind": "query",
+      "family": "catalog-batch-operations",
+      "requires": []
+    },
+    {
+      "label": "1-LOCK_STATS_TOP_10MINUTE-LOCK_WAIT_DISTRIBUTION",
+      "sql": "SELECT t.`LOCK_WAIT_DISTRIBUTION` AS value FROM SPANNER_SYS.LOCK_STATS_TOP_10MINUTE AS t LIMIT 3",
+      "kind": "query",
+      "family": "new-sys-column",
+      "requires": []
+    },
+    {
+      "label": "1-LOCK_STATS_TOP_10MINUTE-LOCK_WAIT_DISTRIBUTION_JSON_STRING",
+      "sql": "SELECT t.`LOCK_WAIT_DISTRIBUTION_JSON_STRING` AS value FROM SPANNER_SYS.LOCK_STATS_TOP_10MINUTE AS t LIMIT 3",
+      "kind": "query",
+      "family": "new-sys-column",
+      "requires": []
+    },
+    {
+      "label": "1-LOCK_STATS_TOP_HOUR-LOCK_WAIT_DISTRIBUTION",
+      "sql": "SELECT t.`LOCK_WAIT_DISTRIBUTION` AS value FROM SPANNER_SYS.LOCK_STATS_TOP_HOUR AS t LIMIT 3",
+      "kind": "query",
+      "family": "new-sys-column",
+      "requires": []
+    },
+    {
+      "label": "1-LOCK_STATS_TOP_HOUR-LOCK_WAIT_DISTRIBUTION_JSON_STRING",
+      "sql": "SELECT t.`LOCK_WAIT_DISTRIBUTION_JSON_STRING` AS value FROM SPANNER_SYS.LOCK_STATS_TOP_HOUR AS t LIMIT 3",
+      "kind": "query",
+      "family": "new-sys-column",
+      "requires": []
+    },
+    {
+      "label": "1-LOCK_STATS_TOP_MINUTE-LOCK_WAIT_DISTRIBUTION",
+      "sql": "SELECT t.`LOCK_WAIT_DISTRIBUTION` AS value FROM SPANNER_SYS.LOCK_STATS_TOP_MINUTE AS t LIMIT 3",
+      "kind": "query",
+      "family": "new-sys-column",
+      "requires": []
+    },
+    {
+      "label": "1-LOCK_STATS_TOP_MINUTE-LOCK_WAIT_DISTRIBUTION_JSON_STRING",
+      "sql": "SELECT t.`LOCK_WAIT_DISTRIBUTION_JSON_STRING` AS value FROM SPANNER_SYS.LOCK_STATS_TOP_MINUTE AS t LIMIT 3",
+      "kind": "query",
+      "family": "new-sys-column",
+      "requires": []
+    },
+    {
+      "label": "1-LOCK_STATS_TOTAL_10MINUTE-LOCK_WAIT_DISTRIBUTION",
+      "sql": "SELECT t.`LOCK_WAIT_DISTRIBUTION` AS value FROM SPANNER_SYS.LOCK_STATS_TOTAL_10MINUTE AS t LIMIT 3",
+      "kind": "query",
+      "family": "new-sys-column",
+      "requires": []
+    },
+    {
+      "label": "1-LOCK_STATS_TOTAL_10MINUTE-LOCK_WAIT_DISTRIBUTION_JSON_STRING",
+      "sql": "SELECT t.`LOCK_WAIT_DISTRIBUTION_JSON_STRING` AS value FROM SPANNER_SYS.LOCK_STATS_TOTAL_10MINUTE AS t LIMIT 3",
+      "kind": "query",
+      "family": "new-sys-column",
+      "requires": []
+    },
+    {
+      "label": "1-LOCK_STATS_TOTAL_HOUR-LOCK_WAIT_DISTRIBUTION",
+      "sql": "SELECT t.`LOCK_WAIT_DISTRIBUTION` AS value FROM SPANNER_SYS.LOCK_STATS_TOTAL_HOUR AS t LIMIT 3",
+      "kind": "query",
+      "family": "new-sys-column",
+      "requires": []
+    },
+    {
+      "label": "1-LOCK_STATS_TOTAL_HOUR-LOCK_WAIT_DISTRIBUTION_JSON_STRING",
+      "sql": "SELECT t.`LOCK_WAIT_DISTRIBUTION_JSON_STRING` AS value FROM SPANNER_SYS.LOCK_STATS_TOTAL_HOUR AS t LIMIT 3",
+      "kind": "query",
+      "family": "new-sys-column",
+      "requires": []
+    },
+    {
+      "label": "1-LOCK_STATS_TOTAL_MINUTE-LOCK_WAIT_DISTRIBUTION",
+      "sql": "SELECT t.`LOCK_WAIT_DISTRIBUTION` AS value FROM SPANNER_SYS.LOCK_STATS_TOTAL_MINUTE AS t LIMIT 3",
+      "kind": "query",
+      "family": "new-sys-column",
+      "requires": []
+    },
+    {
+      "label": "1-LOCK_STATS_TOTAL_MINUTE-LOCK_WAIT_DISTRIBUTION_JSON_STRING",
+      "sql": "SELECT t.`LOCK_WAIT_DISTRIBUTION_JSON_STRING` AS value FROM SPANNER_SYS.LOCK_STATS_TOTAL_MINUTE AS t LIMIT 3",
+      "kind": "query",
+      "family": "new-sys-column",
+      "requires": []
+    },
+    {
+      "label": "1-SPLIT_STATS_TOP_10MINUTE-LATENCY_IMPACT_CORRELATION_SCORE",
+      "sql": "SELECT t.`LATENCY_IMPACT_CORRELATION_SCORE` AS value FROM SPANNER_SYS.SPLIT_STATS_TOP_10MINUTE AS t LIMIT 3",
+      "kind": "query",
+      "family": "new-sys-column",
+      "requires": []
+    },
+    {
+      "label": "1-SPLIT_STATS_TOP_HOUR-LATENCY_IMPACT_CORRELATION_SCORE",
+      "sql": "SELECT t.`LATENCY_IMPACT_CORRELATION_SCORE` AS value FROM SPANNER_SYS.SPLIT_STATS_TOP_HOUR AS t LIMIT 3",
+      "kind": "query",
+      "family": "new-sys-column",
+      "requires": []
+    },
+    {
+      "label": "1-SPLIT_STATS_TOP_MINUTE-LATENCY_IMPACT_CORRELATION_SCORE",
+      "sql": "SELECT t.`LATENCY_IMPACT_CORRELATION_SCORE` AS value FROM SPANNER_SYS.SPLIT_STATS_TOP_MINUTE AS t LIMIT 3",
+      "kind": "query",
+      "family": "new-sys-column",
+      "requires": []
+    },
+    {
+      "label": "2-LOCK_STATS_TOP_10MINUTE-LOCK_WAIT_DISTRIBUTION",
+      "sql": "SELECT t.`LOCK_WAIT_DISTRIBUTION` AS value FROM SPANNER_SYS.LOCK_STATS_TOP_10MINUTE AS t LIMIT 3",
+      "kind": "query",
+      "family": "new-sys-column",
+      "requires": []
+    },
+    {
+      "label": "2-LOCK_STATS_TOP_10MINUTE-LOCK_WAIT_DISTRIBUTION_JSON_STRING",
+      "sql": "SELECT t.`LOCK_WAIT_DISTRIBUTION_JSON_STRING` AS value FROM SPANNER_SYS.LOCK_STATS_TOP_10MINUTE AS t LIMIT 3",
+      "kind": "query",
+      "family": "new-sys-column",
+      "requires": []
+    },
+    {
+      "label": "2-LOCK_STATS_TOP_HOUR-LOCK_WAIT_DISTRIBUTION",
+      "sql": "SELECT t.`LOCK_WAIT_DISTRIBUTION` AS value FROM SPANNER_SYS.LOCK_STATS_TOP_HOUR AS t LIMIT 3",
+      "kind": "query",
+      "family": "new-sys-column",
+      "requires": []
+    },
+    {
+      "label": "2-LOCK_STATS_TOP_HOUR-LOCK_WAIT_DISTRIBUTION_JSON_STRING",
+      "sql": "SELECT t.`LOCK_WAIT_DISTRIBUTION_JSON_STRING` AS value FROM SPANNER_SYS.LOCK_STATS_TOP_HOUR AS t LIMIT 3",
+      "kind": "query",
+      "family": "new-sys-column",
+      "requires": []
+    },
+    {
+      "label": "2-LOCK_STATS_TOP_MINUTE-LOCK_WAIT_DISTRIBUTION",
+      "sql": "SELECT t.`LOCK_WAIT_DISTRIBUTION` AS value FROM SPANNER_SYS.LOCK_STATS_TOP_MINUTE AS t LIMIT 3",
+      "kind": "query",
+      "family": "new-sys-column",
+      "requires": []
+    },
+    {
+      "label": "2-LOCK_STATS_TOP_MINUTE-LOCK_WAIT_DISTRIBUTION_JSON_STRING",
+      "sql": "SELECT t.`LOCK_WAIT_DISTRIBUTION_JSON_STRING` AS value FROM SPANNER_SYS.LOCK_STATS_TOP_MINUTE AS t LIMIT 3",
+      "kind": "query",
+      "family": "new-sys-column",
+      "requires": []
+    },
+    {
+      "label": "2-LOCK_STATS_TOTAL_10MINUTE-LOCK_WAIT_DISTRIBUTION",
+      "sql": "SELECT t.`LOCK_WAIT_DISTRIBUTION` AS value FROM SPANNER_SYS.LOCK_STATS_TOTAL_10MINUTE AS t LIMIT 3",
+      "kind": "query",
+      "family": "new-sys-column",
+      "requires": []
+    },
+    {
+      "label": "2-LOCK_STATS_TOTAL_10MINUTE-LOCK_WAIT_DISTRIBUTION_JSON_STRING",
+      "sql": "SELECT t.`LOCK_WAIT_DISTRIBUTION_JSON_STRING` AS value FROM SPANNER_SYS.LOCK_STATS_TOTAL_10MINUTE AS t LIMIT 3",
+      "kind": "query",
+      "family": "new-sys-column",
+      "requires": []
+    },
+    {
+      "label": "2-LOCK_STATS_TOTAL_HOUR-LOCK_WAIT_DISTRIBUTION",
+      "sql": "SELECT t.`LOCK_WAIT_DISTRIBUTION` AS value FROM SPANNER_SYS.LOCK_STATS_TOTAL_HOUR AS t LIMIT 3",
+      "kind": "query",
+      "family": "new-sys-column",
+      "requires": []
+    },
+    {
+      "label": "2-LOCK_STATS_TOTAL_HOUR-LOCK_WAIT_DISTRIBUTION_JSON_STRING",
+      "sql": "SELECT t.`LOCK_WAIT_DISTRIBUTION_JSON_STRING` AS value FROM SPANNER_SYS.LOCK_STATS_TOTAL_HOUR AS t LIMIT 3",
+      "kind": "query",
+      "family": "new-sys-column",
+      "requires": []
+    },
+    {
+      "label": "2-LOCK_STATS_TOTAL_MINUTE-LOCK_WAIT_DISTRIBUTION",
+      "sql": "SELECT t.`LOCK_WAIT_DISTRIBUTION` AS value FROM SPANNER_SYS.LOCK_STATS_TOTAL_MINUTE AS t LIMIT 3",
+      "kind": "query",
+      "family": "new-sys-column",
+      "requires": []
+    },
+    {
+      "label": "2-LOCK_STATS_TOTAL_MINUTE-LOCK_WAIT_DISTRIBUTION_JSON_STRING",
+      "sql": "SELECT t.`LOCK_WAIT_DISTRIBUTION_JSON_STRING` AS value FROM SPANNER_SYS.LOCK_STATS_TOTAL_MINUTE AS t LIMIT 3",
+      "kind": "query",
+      "family": "new-sys-column",
+      "requires": []
+    },
+    {
+      "label": "2-SPLIT_STATS_TOP_10MINUTE-LATENCY_IMPACT_CORRELATION_SCORE",
+      "sql": "SELECT t.`LATENCY_IMPACT_CORRELATION_SCORE` AS value FROM SPANNER_SYS.SPLIT_STATS_TOP_10MINUTE AS t LIMIT 3",
+      "kind": "query",
+      "family": "new-sys-column",
+      "requires": []
+    },
+    {
+      "label": "2-SPLIT_STATS_TOP_HOUR-LATENCY_IMPACT_CORRELATION_SCORE",
+      "sql": "SELECT t.`LATENCY_IMPACT_CORRELATION_SCORE` AS value FROM SPANNER_SYS.SPLIT_STATS_TOP_HOUR AS t LIMIT 3",
+      "kind": "query",
+      "family": "new-sys-column",
+      "requires": []
+    },
+    {
+      "label": "2-SPLIT_STATS_TOP_MINUTE-LATENCY_IMPACT_CORRELATION_SCORE",
+      "sql": "SELECT t.`LATENCY_IMPACT_CORRELATION_SCORE` AS value FROM SPANNER_SYS.SPLIT_STATS_TOP_MINUTE AS t LIMIT 3",
+      "kind": "query",
+      "family": "new-sys-column",
+      "requires": []
+    }
+  ]
+}

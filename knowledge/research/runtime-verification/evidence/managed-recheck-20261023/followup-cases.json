@@ -1,0 +1,42 @@
+[
+  {
+    "label": "procedural-if-suggestion",
+    "sql": "IF TRUE THEN SELECT 1; END IF"
+  },
+  {
+    "label": "not-equal-coercion",
+    "sql": "SELECT JSON '1' != 2 AS result"
+  },
+  {
+    "label": "in-mixed-list",
+    "sql": "SELECT JSON 'true' IN (1,TRUE,'true',JSON '[]') AS result"
+  },
+  {
+    "label": "explicit-bytes-cast-order",
+    "sql": "SELECT JSON '\"YQ==\"' < CAST(b'b' AS JSON) AS result"
+  },
+  {
+    "label": "cast-all-nested-null",
+    "sql": "SELECT CAST(ARRAY<INT64>[NULL] AS JSON) AS a, CAST(STRUCT(CAST(NULL AS INT64) AS n) AS JSON) AS s"
+  },
+  {
+    "label": "in-null-no-match",
+    "sql": "SELECT JSON '5' IN (1,NULL) AS result"
+  },
+  {
+    "label": "generic-json-supertype-reject",
+    "sql": "SELECT COALESCE(JSON '1',1) AS result"
+  },
+  {
+    "label": "json-array-struct-cast",
+    "sql": "SELECT CAST([STRUCT(1 AS a),STRUCT(2 AS a)] AS JSON) AS result"
+  },
+  {
+    "label": "json-array-struct-equality-reject",
+    "sql": "SELECT JSON '[{\"a\":1}]' = [STRUCT(1 AS a)] AS result"
+  },
+  {
+    "label": "safe-cast-nested-infinity",
+    "sql": "SELECT SAFE_CAST([CAST('inf' AS FLOAT64)] AS JSON) AS result"
+  }
+]

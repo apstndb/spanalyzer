@@ -1,0 +1,113 @@
+"""Retain completed redacted execution and bounded research comparisons."""
+from collections import Counter, defaultdict
+from pathlib import Path
+import datetime
+import hashlib
+import json
+import re
+import shutil
+import statistics
+import subprocess
+
+root=Path('<LOCAL_CHECKOUT>')
+scratch=root/'.tmp/managed-recheck-20261023'
+task=Path('<LOCAL_TASK_ROOT>/apstndb/spanalyzer/managed-recheck-20261023')
+ev=task/'evidence'
+old=root/'knowledge/research/runtime-verification/evidence/managed-recheck-20261011'
+canonical=root/'knowledge/research/runtime-verification/evidence/managed-recheck-20261023'
+def load(path):return [json.loads(line)for line in path.read_text().splitlines()if line.strip()]
+def sha(path):return hashlib.sha256(path.read_bytes()).hexdigest()
+commands=[]
+for name in ['commands.json','json-commands.json','doc-delta-commands.json','queue-recreate-commands.json','hll-controls-commands.json']:
+    commands.extend(json.loads((ev/name).read_text()))
+commands.sort(key=lambda row:row['started_at'])
+for name in ['cleanup','pg-capture','doc-delta-google','doc-delta-pg','queue-recreate','hll-controls-pg']:
+    assert any(row['name']==name and row['exit_code']==0 for row in commands),name
+(ev/'all-commands.json').write_text(json.dumps(commands,indent=2)+'\n')
+names=['readonly','google-features','pg-features','queue','cleanup','active-batch','queries','followup','distinctness','google-json','pg-streams','graph-controls','google-options','pg-options','google-capture','pg-capture','doc-delta-google','doc-delta-pg','queue-recreate','hll-controls-google','hll-controls-pg']
+records={name:load(ev/(name+'.stdout'))for name in names}
+for name,rows in records.items():(ev/(name+'.jsonl')).write_text('\n'.join(json.dumps(row,ensure_ascii=False)for row in rows)+'\n')
+(ev/'managed-tests.log').write_text((ev/'managed-tests.stdout').read_text()+(ev/'managed-tests.stderr').read_text())
+subprocess.run(['python3',str(scratch/'analyze-baseline.py')],check=True)
+
+def normalized(value):
+    return re.sub(r'202610(?:11|23)','<DATE>',json.dumps(value,sort_keys=True))
+def paired(before,after):
+    left,right=defaultdict(list),defaultdict(list)
+    for row in before:left[(row.get('label'),row.get('kind'),normalized(row.get('sql')))].append(row)
+    for row in after:right[(row.get('label'),row.get('kind'),normalized(row.get('sql')))].append(row)
+    changes=[];count=0
+    for key,rows in left.items():
+        for a,b in zip(rows,right.get(key,[])):
+            count+=1
+            if a.get('code')!=b.get('code'):changes.append({'label':b.get('label'),'before':a.get('code'),'after':b.get('code'),'sql':b.get('sql')})
+    return {'baseline_records':len(before),'current_records':len(after),'comparable_records':count,'changed_codes':changes,'value_scope':'Not compared: workload, tokens, timestamps, sampled rows and plan costs can vary'}
+(ev/'fixture-comparison.json').write_text(json.dumps({name:paired(load(old/(name+'.jsonl')),records[name])for name in ['readonly','active-batch','google-json','pg-streams','graph-controls','google-options','pg-options']},indent=2)+'\n')
+checks=[]
+for name in ['infoschema','spanner-sys','spanner-sys-2','spanner-sys-3']:
+    check=json.loads((ev/(name+'.stdout')).read_text());(ev/(name+'-check.json')).write_text(json.dumps(check,indent=2)+'\n');checks.append({'name':name,'status':check['status'],'current':check['current'],'retained':check['retained']})
+captures=[]
+for name in ['infoschema-capture','spanner-sys-capture']:
+    match=re.search(r'wrote (survey/[^\s]+\.json)',(ev/(name+'.stderr')).read_text());assert match,name
+    path=match.group(1);capture=json.loads((root/path).read_text());captures.append({'path':path,'sha256':sha(root/path),'surface_sha256':capture['surface_sha256'],'column_count':len(capture['columns']),'table_count':len({row['table_name']for row in capture['columns']})})
+(ev/'catalog-comparison.json').write_text(json.dumps({'scope':'Newly created trial; target coordinates intentionally absent from capture contract; comparison does not identify fleet rollout','observations':checks,'captures':captures},indent=2)+'\n')
+expected=json.loads((scratch/'distinctness-expected.json').read_text());distinct={row['label']:row for row in records['distinctness']}
+for label,want in expected.items():
+    for field,value in want.items():assert distinct[label][field]==value,(label,field)
+(ev/'distinctness-summary.json').write_text(json.dumps({'cases':len(distinct),'codes':dict(Counter(row['code']for row in distinct.values())),'explicit_expected_cases':len(expected),'expectations_pass':True},indent=2)+'\n')
+
+def walk(value):
+    if isinstance(value,dict):
+        yield value
+        for item in value.values():yield from walk(item)
+    elif isinstance(value,list):
+        for item in value:yield from walk(item)
+heartbeats={}
+for name in ['google-json','pg-streams']:
+    child=next(row for row in records[name]if row['label']=='heartbeat-child-100')
+    stamps=sorted(item['timestamp']for row in child['rows']for item in walk(row['record'])if set(item)=={'timestamp'}and isinstance(item['timestamp'],str))
+    times=[datetime.datetime.fromisoformat(stamp.replace('Z','+00:00'))for stamp in stamps]
+    intervals=[(b-a).total_seconds()*1000 for a,b in zip(times,times[1:])]
+    heartbeats[name]={'code':child['code'],'rows':len(child['rows']),'record_timestamps':stamps,'intervals_ms':intervals,'median_ms':statistics.median(intervals)if intervals else None}
+(ev/'heartbeat-summary.json').write_text(json.dumps(heartbeats,indent=2)+'\n')
+capture_records={}
+for name in ['google-capture','pg-capture']:
+    data=[]
+    for event in records[name]:
+        if '-child-'not in event['label']:continue
+        for row in event.get('rows',[]):
+            for item in walk(row['record']):
+                if {'mod_type','value_capture_type','mods'}<=item.keys():
+                    simplified={key:item[key]for key in ['mod_type','value_capture_type','mods','column_types']}
+                    for mod in simplified['mods']:
+                        for key in ['keys','new_values','old_values']:
+                            if isinstance(mod.get(key),str):mod[key]=json.loads(mod[key])
+                    data.append(simplified)
+    capture_records[name]=data
+(ev/'value-capture-summary.json').write_text(json.dumps(capture_records,indent=2)+'\n')
+cleanup={}
+for name in ['google-json','pg-streams','graph-controls','google-options','pg-options','google-capture','pg-capture','doc-delta-google','doc-delta-pg']:
+    labels={row['label']:row for row in records[name]}
+    for label,code in [('create-database','OK'),('setup','OK'),('drop-database','OK'),('database-absent','NotFound')]:assert labels.get(label,{}).get('code')==code,(name,label)
+    cleanup[name]={'drop':'OK','get_after_drop':'NotFound'}
+labels={row['label']:row for row in records['hll-controls-pg']}
+assert labels['drop-database']['code']=='OK' and labels['database-absent']['code']=='NotFound'
+cleanup['hll-controls-pg']={'drop':'OK','get_after_drop':'NotFound'}
+(ev/'cleanup-summary.json').write_text(json.dumps({'owned_database_fixtures':cleanup,'scope':'Ten serial fixtures here plus the separately retained baseline PostgreSQL database; final admin list must contain only the dedicated base database, and the free trial remains for follow-up'},indent=2)+'\n')
+for path in scratch.glob('hll-controls-*-cases.json'):shutil.copyfile(path,ev/path.name)
+for path in scratch.glob('*.go'):shutil.copyfile(path,ev/(path.name+'.txt'))
+for path in scratch.glob('*.py'):shutil.copyfile(path,ev/(path.name+'.txt'))
+for name in ['cases.json','followup-cases.json','distinctness-cases.json','distinctness-expected.json','doc-delta-probe-plan.json']:shutil.copyfile(scratch/name,ev/name)
+for path in ev.glob('*-buildinfo.stdout'):shutil.copyfile(path,path.with_suffix('.txt'))
+docs=task/'documents'
+for name in ['retrieval.json','commit-details.json','mirror-compare.json','mirror-vs-current.json','live-retrieval.json','live-inspection.json','history-audit.json']:shutil.copyfile(docs/name,ev/('documentation-'+name))
+for filename in ['search-functions.html.codes.txt','databoost-monitor.html.codes.txt']:shutil.copyfile(docs/filename,ev/filename)
+for doc in json.loads((docs/'official-documents.json').read_text())['documents']:
+    name=doc['name'].removeprefix('documents/').replace('/','__')+'.md.txt';(ev/name).write_text(doc['content'])
+trial=json.loads(json.loads((ev/'target2-trial-description.json').read_text())['stdout'])
+receipt={'observed_on':'2026-10-23','client_timezone':'Asia/Tokyo','execution_start':commands[0]['started_at'],'execution_end':commands[-1]['completed_at'],'runtime_identity':'New user-authorized free trial via dedicated user-level profile; deployment build unavailable; previous target unavailable','trial':{key:trial[key]for key in ['instanceType','edition','state','createTime','freeInstanceMetadata','resourceLocation','defaultBackupScheduleType']},'initial_target_attempt':'First designated project refused with one-trial-per-project-lifecycle FAILED_PRECONDITION; second designated project succeeded after enabling Spanner API','source_head':json.loads((task/'initial-source-state.json').read_text())['head'],'source_state':'Pre-existing dirty/untracked state preserved; 123 implementation/dependency hashes unchanged; twelve existing probes differ only in fixture date','dependencies':{'go':'go1.26.8','catalog_and_integration':'GOWORK=off; Spanner v1.88.0','feature_clients':'Explicit workspace; Spanner v1.91.0'},'flow_status':'completed_with_known_local_drift_failure','managed_gate':'Three pass; TestDrift_RealTableMetas fails on unregistered ACTIVE_BATCH_OPERATIONS','records':{name:len(rows)for name,rows in records.items()},'owned_fixture_cleanup':'All created temporary databases and queue/table fixtures confirmed absent; free trial and dedicated base database retained','new_cases':136,'additional_hll_controls':22,'new_queue_case':'Two immediate same-name queue generations','catalog_selectors_changed':False,'commands':'all-commands.json','durable_task_directory':str(task),'authority':'Explicit trial creation and dedicated profile update, bounded managed verification and owned cleanup, local research. No paid conversion, existing-resource deletion, implementation change, commit, push, PR, merge, release or external synchronization'}
+(ev/'receipt.json').write_text(json.dumps(receipt,indent=2)+'\n')
+canonical.mkdir(parents=True,exist_ok=True)
+for path in ev.iterdir():
+    if path.is_file()and path.suffix not in ['.stdout','.stderr']:shutil.copyfile(path,canonical/path.name)
+print(json.dumps({'records':receipt['records'],'heartbeat':heartbeats,'capture_record_counts':{name:len(rows)for name,rows in capture_records.items()},'canonical_files':len(list(canonical.iterdir()))}))

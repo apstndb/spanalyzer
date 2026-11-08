@@ -1,0 +1,17 @@
+{
+  "scope": "Additional privacy redaction only; runtime result codes and queried values unchanged",
+  "transformations": [
+    {
+      "file": "provision.py.txt",
+      "original_sha256": "662f3ecdf1ba709b462a3368a1de3816cb3e2d6db71816200b0be826fffe2b03",
+      "retained_sha256": "2aee3b7b21b61dc6dbae15ee73f9fca45ddddbb02118a6d1131432937256889a",
+      "reason": "Non-destination purpose label coincided with a destination value; redact this incidental occurrence as well as actual coordinates"
+    },
+    {
+      "file": "target2-trial-description.json",
+      "original_sha256": "4ef9c345bac71e8590e21630f3a23c2e6a079252e561b40051d7363f54eca154",
+      "retained_sha256": "3cc746d77b31a623c62242ba35d0fcd304576a0def0b83410f6138d6e82255a3",
+      "reason": "Non-destination purpose label coincided with a destination value; redact this incidental occurrence as well as actual coordinates"
+    }
+  ]
+}

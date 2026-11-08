@@ -1,0 +1,40 @@
+"""Compare only bounded outcomes, excluding timestamps and timing/plan costs."""
+from collections import Counter, defaultdict
+from pathlib import Path
+import json
+import re
+
+root=Path('<LOCAL_CHECKOUT>')
+old=root/'knowledge/research/runtime-verification/evidence/managed-recheck-20261011'
+new=root/'.tmp/managed-recheck-20261023'
+out=Path('<LOCAL_TASK_ROOT>/apstndb/spanalyzer/managed-recheck-20261023/evidence')
+def rows(path):return [json.loads(line)for line in path.read_text().splitlines()if line.strip()]
+def keyed(observations):
+    counts=defaultdict(int)
+    result={}
+    for row in observations:
+        if 'label' not in row:continue
+        raw_sql=row.get('sql','')
+        sql=re.sub(r'202610(?:11|23)','<DATE>',raw_sql if isinstance(raw_sql,str) else json.dumps(raw_sql,sort_keys=True))
+        base=(row['label'],sql,str(row.get('version','')),str(row.get('requested_version','')))
+        counts[base]+=1
+        result[base+(counts[base],)]=row
+    return result
+features={}
+for name in ['google-features','pg-features','queue']:
+    before=keyed(rows(old/(name+'.jsonl')));after=keyed(rows(new/(name+'.stdout')));common=before.keys()&after.keys()
+    changes=[{'key':key,'before':before[key].get('code'),'after':after[key].get('code'),'current_error':after[key].get('error')}for key in sorted(common)if before[key].get('code')!=after[key].get('code')]
+    features[name]={'before_records':len(rows(old/(name+'.jsonl'))),'current_records':len(rows(new/(name+'.stdout'))),'common_labeled_events':len(common),'code_changes':changes,'missing':sorted(before.keys()-after.keys()),'added':sorted(after.keys()-before.keys())}
+(out/'feature-comparison.json').write_text(json.dumps(features,indent=2)+'\n')
+constants={}
+for name in ['queries','followup','distinctness']:
+    before={row['label']:row for row in rows(old/(name+'.jsonl'))};after={row['label']:row for row in rows(new/(name+'.stdout'))};differences=[]
+    for key in sorted(before.keys()|after.keys()):
+        a,b=before.get(key,{}),after.get(key,{})
+        for field in ['code','rows','row_type']:
+            av=a.get('metadata',{}).get('rowType') if field=='row_type' else a.get(field)
+            bv=b.get('metadata',{}).get('rowType') if field=='row_type' else b.get(field)
+            if av!=bv:differences.append({'label':key,'field':field,'before':av,'after':bv})
+    constants[name]={'before_cases':len(before),'current_cases':len(after),'differences':differences,'outcomes':dict(Counter(row['code']for row in after.values()))}
+(out/'json-comparison.json').write_text(json.dumps({'scope':'Codes, values and row types only; metadata transaction timestamps are intentionally excluded','corpora':constants},indent=2)+'\n')
+print(json.dumps({'feature_code_changes':{name:len(value['code_changes'])for name,value in features.items()},'constant_semantic_differences':{name:len(value['differences'])for name,value in constants.items()}}))

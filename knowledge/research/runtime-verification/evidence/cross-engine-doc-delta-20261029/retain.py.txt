@@ -1,0 +1,49 @@
+"""Retain exact image/source identities, redacted records and derived comparisons."""
+from pathlib import Path
+import datetime,hashlib,json,re,shutil
+root=Path('<LOCAL_CHECKOUT>');scratch=root/'.tmp/cross-engine-doc-delta-20261029';module=scratch/'module';task=Path('<LOCAL_TASK_ROOT>/apstndb/spanalyzer/cross-engine-doc-delta-20261029');ev=task/'evidence';dest=root/'knowledge/research/runtime-verification/evidence/cross-engine-doc-delta-20261029';dest.mkdir(parents=True,exist_ok=True)
+def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
+private={'server_transaction_id','servertransactionid','transaction_id','transactionid','lease_id','leaseid','partition_token','partitiontoken','resume_token','resumetoken'}
+def scrub(v,parent=''):
+ if isinstance(v,dict):
+  out={}
+  for k,x in v.items():
+   if (k.lower()in private or(parent.lower()=='transaction'and k=='id'))and isinstance(x,str)and x and not x.startswith(('sha256:','<redacted>')):out[k]='sha256:'+hashlib.sha256(x.encode()).hexdigest()
+   else:out[k]=scrub(x,k)
+  return out
+ if isinstance(v,list):return[scrub(x,parent)for x in v]
+ if isinstance(v,str):
+  v=re.sub(r'projects/[^/\s"\x27]+/instances/[^/\s"\x27]+/databases/[^/\s"\x27]+','<database>',v);v=re.sub(r'projects/[^/\s"\x27]+/instances/[^/\s"\x27]+','<instance>',v);return re.sub(r'requestID = "[^"]*"','requestID = "<redacted>"',v)
+ return v
+commands=[]
+for name in ['commands.json','extra-commands.json','repair-commands.json','order-commands.json','queue-focus-commands.json','queue-single-commands.json']:commands+=json.loads((ev/name).read_text())
+commands.sort(key=lambda r:r['started_at']);assert all(r['exit_code']==0 for r in commands);(ev/'all-commands.json').write_text(json.dumps(commands,indent=2)+'\n')
+transformations=[]
+for p in ev.iterdir():
+ if not p.is_file():continue
+ if p.suffix=='.stdout':
+  if p.name.endswith('-buildinfo.stdout'):
+   shutil.copyfile(p,dest/(p.stem+'.txt'));continue
+  if p.name.endswith('-build.stdout'):continue
+  rows=[json.loads(s)for s in p.read_text().splitlines()if s];data='\n'.join(json.dumps(scrub(row),ensure_ascii=False)for row in rows)+'\n';target=dest/(p.stem+'.jsonl');target.write_text(data)
+  if hashlib.sha256(data.encode()).hexdigest()!=sha(p):transformations.append({'file':target.name,'original_sha256':sha(p),'retained_sha256':sha(target),'reason':'Structured whitespace normalization, destination/request redaction and opaque operational identifier hashing.'})
+ elif p.suffix=='.stderr':
+  if p.stat().st_size:(dest/(p.stem+'.stderr.log')).write_text(str(scrub(p.read_text())))
+ elif p.suffix in ['.json','.log']:shutil.copyfile(p,dest/p.name)
+for p in scratch.glob('*.py'):shutil.copyfile(p,dest/(p.name+'.txt'))
+inputs=dest/'inputs';inputs.mkdir(exist_ok=True)
+for p in module.iterdir():
+ if not p.is_file():continue
+ if p.suffix=='.go':shutil.copyfile(p,inputs/(p.name+'.txt'))
+ elif p.name in ['go.mod','go.sum']:shutil.copyfile(p,inputs/(p.name+'.txt'))
+ elif p.suffix=='.json':shutil.copyfile(p,inputs/p.name)
+sources=dest/'sources';sources.mkdir(exist_ok=True);index=[]
+for p in sorted((task/'sources').iterdir()):
+ if not p.is_file():continue
+ index.append({'file':p.name,'bytes':p.stat().st_size,'sha256':sha(p),'retained_in_repository':p.suffix!='.html'})
+ if p.suffix!='.html':shutil.copyfile(p,sources/p.name)
+(sources/'source-integrity.json').write_text(json.dumps({'scope':'Full primary source bytes; live HTML originals remain in the retained durable task directory. Mirror/source publication and runtime dates are separate.','files':index},indent=2)+'\n')
+old=root/'knowledge/research/runtime-verification/evidence/managed-recheck-20261029';hashes=json.loads((old/'source-hashes.json').read_text());changed=[p for p,v in hashes.items()if sha(root/p)!=v];assert not changed
+(dest/'source-comparison.json').write_text(json.dumps({'source_head':json.loads((task/'initial-source-state.json').read_text())['head'],'measured_files':len(hashes),'reference':'managed-recheck-20261029/source-hashes.json','changed_files':changed,'runtime_targets_sha256':sha(root/'runtime_targets.json'),'authority':'Local image overrides only; repository runtime targets, selectors, implementation and dependencies unchanged.'},indent=2)+'\n')
+cleanup=json.loads((dest/'cleanup-summary.json').read_text());images=json.loads((sources/'selected-images.json').read_text());receipt={'observed_on_utc':'2026-10-29','client_dates_jst':['2026-10-29','2026-10-30'],'source_head':json.loads((task/'initial-source-state.json').read_text())['head'],'execution_start':next(r['started_at']for r in commands if r['name']=='omni-r5'),'execution_end':commands[-1]['completed_at'],'managed_reference':'managed-recheck-20261029','managed_reference_window':'2026-10-29 00:30:18-01:29:28 UTC; no managed request in this task','images':images,'dependencies':{'go':'go1.26.8','spanner':'v1.91.0','spanemuboost':'v0.4.10-alpha.1','workspace':'GOWORK=off scratch-only reproducer module'},'core_planned_steps_per_runtime':700,'owned_temporary_databases':cleanup['owned_temporary_databases'],'owned_runtime_containers':cleanup['owned_runtime_containers'],'cleanup_status':'All 37 owned temporary databases have close/drop OK plus GetDatabase NotFound; all 15 task runtime containers are absent. Fast-container identities use bounded daemon events where the active snapshot raced completion.','comparison_status':'Completed with product divergences, preserved dependency skips and two Emulator long-duration receive deadlines. No timeout is treated as SQL grammar rejection.','harness_attempts':['One core adapter omitted choose=true; byte-identical retained JSON input and original parameter-aware producer correct that case without hiding the first attempt.','Emulator graph limit 16 caused nine initial DDL capacity failures; only blocked cases rerun in a fresh database with fewer graphs.','Separate fresh ordering matrix and queue receive/lease contexts distinguish code acceptance from value correctness and streaming uncertainty.'],'sources':'sources/source-integrity.json','commands':'all-commands.json','durable_task_directory':str(task),'authority':'Public release/registry/document reads; owned local runtimes/databases and cleanup; local evidence and documentation. No managed cloud writes, selector/implementation/dependency changes, commit, push, PR, merge, release or external synchronization.'}
+(dest/'receipt.json').write_text(json.dumps(receipt,indent=2)+'\n');(dest/'retention-transformations.json').write_text(json.dumps({'scope':'Redaction and JSONL formatting only; response codes and logical fixture data preserved.','files':transformations},indent=2)+'\n');print(json.dumps({'files':sum(p.is_file()for p in dest.rglob('*')),'databases':receipt['owned_temporary_databases'],'containers':receipt['owned_runtime_containers']}))

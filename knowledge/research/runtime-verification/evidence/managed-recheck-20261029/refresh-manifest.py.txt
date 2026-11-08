@@ -1,0 +1,9 @@
+from pathlib import Path
+import hashlib,json
+root=Path('<LOCAL_CHECKOUT>');evidence=root/'knowledge/research/runtime-verification/evidence';current=evidence/'managed-recheck-20261029';p=evidence/'artifact-sha256.json';a=json.loads(p.read_text());initial=json.loads((root/'.tmp/managed-recheck-20261029/initial-artifact-manifest.json').read_text())['files']
+assert len(initial)==855 and all(a['files'].get(k)==v and hashlib.sha256((evidence/k).read_bytes()).hexdigest()==v for k,v in initial.items())
+a['recorded_on']='2026-10-29'
+for f in current.rglob('*'):
+ if f.is_file():a['files'][str(f.relative_to(evidence))]=hashlib.sha256(f.read_bytes()).hexdigest()
+a['files']=dict(sorted(a['files'].items()));p.write_text(json.dumps(a,indent=2)+'\n')
+print(json.dumps({'old_entries_preserved':len(initial),'total_entries':len(a['files'])}))

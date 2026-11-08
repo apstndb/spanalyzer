@@ -1,0 +1,34 @@
+"""Check issue snapshot completeness and documentation; no runtime/network work."""
+from pathlib import Path
+import datetime,hashlib,json,os,shutil,subprocess,sys
+root=Path('<LOCAL_CHECKOUT>');scratch=root/'.tmp/emulator-open-issues-20261030';task=Path('<LOCAL_TASK_ROOT>/apstndb/spanalyzer/emulator-open-issues-20261030');base=root/'knowledge/research/runtime-verification/evidence';out=base/'emulator-open-issues-20261030';a=json.loads((out/'audit.json').read_text());s=json.loads((out/'open-issues.json').read_text());issues={x['issue']['number']:x for x in s['issues']};initial=json.loads((scratch/'initial-artifact-manifest.json').read_text());checks=[]
+def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
+def check(name,value):
+ assert value,name
+ checks.append(name)
+check('70 unique issues; REST/GraphQL agree',len(issues)==s['graphql_total_count']==a['open_issues']==70)
+check('all issue records open and PRs excluded',all(x['issue']['state']=='open'and'pull_request'not in x['issue']for x in issues.values()))
+check('112 full comments; no per-issue truncation',sum(len(x['comments'])for x in issues.values())==112 and all(len(x['comments'])==x['issue']['comments']for x in issues.values()))
+check('one local inventory row per source issue',{x['number']for x in a['issues']}==set(issues)and len(a['issues'])==70)
+check('all six local categories cover inventory once',sum(a['categories'].values())==70)
+check('all full source bodies retained with integrity',all(sha(out/x['file'])==x['sha256']for x in a['sources']))
+check('public latest remains v1.5.59',a['latest_release']['tag']=='v1.5.59'and a['latest_release']['registry_has_1_5_59']and not a['latest_release']['registry_has_1_5_60'])
+c=next(c for c in issues[403]['comments']if c['id']==6510580613);check('v1.5.60 comment kept as unverified source',c['author_association']=='NONE'and'v1.5.60'in c['body']and a['latest_release']['comment_claim_is_release_proof']is False)
+check('official v1.5.59 notes list clock fix', 'fix clock drift reported in #389'in json.loads((out/'latest-release.json').read_text())['body'])
+cat=json.loads((base/'cross-engine-doc-delta-20261029/comparison.json').read_text())['emulator']['catalog']['information-schema-columns']['columns'];tables={x['table_name']for x in cat};indexcols={x['column_name']for x in cat if x['table_name']=='INDEXES'}
+check('routine absence uses retained runtime tuples',not({'ROUTINES','ROUTINE_OPTIONS','PARAMETERS'}&tables))
+check('search metadata columns already present',{'SEARCH_PARTITION_BY','SEARCH_ORDER_BY'}<=indexcols)
+rel={x['number']:x['relationship_status']for x in a['issues']};check('SQL ordering not declared GQL duplicate',rel[143]=='similar-symptom-unverified-identity')
+check('proposal flags not promoted to official support',all(rel[n]=='proposal-only'for n in [404,405,407]))
+check('existing 1331 evidence files unchanged',len(initial['files'])==1331 and all(sha(base/n)==v for n,v in initial['files'].items()))
+check('all 123 implementation/dependency files unchanged',all(sha(root/n)==v for n,v in json.loads((base/'managed-recheck-20261029/source-hashes.json').read_text()).items()))
+shutil.copyfile(__file__,out/'validate.py.txt');receipt={'status':'running','recorded_at':datetime.datetime.now(datetime.timezone.utc).isoformat(),'scope':'Source completeness and local documentation gates; no new runtime tests, upstream posts or external publication','assertions':checks,'checks':[]};(out/'validation.json').write_text(json.dumps(receipt,indent=2)+'\n')
+goroot='<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8';env=os.environ.copy();env.update(GOROOT=goroot,GOTOOLCHAIN='local',GOWORK=str(root/'go.work'),GOCACHE=str(root/'.tmp/managed-recheck-20260925/go-cache'),GOFLAGS='-mod=readonly')
+for name,args,cwd in [('okf-all',[goroot+'/bin/go','run','./okf-check','--repo-root','..','--gate','all','--publication-manifest',str(task/'publication-manifest.json')],root/'tools'),('markdown-language',[goroot+'/bin/go','run','./markdown-language-check','--repo-root','..'],root/'tools'),('diff-whitespace',['git','diff','--check'],root)]:
+ with(task/(name+'.log')).open('w')as log:r=subprocess.run(args,cwd=cwd,env=env,stdout=log,stderr=subprocess.STDOUT)
+ shutil.copyfile(task/(name+'.log'),out/(name+'.log'));receipt['checks'].append({'name':name,'argv':args,'cwd':str(cwd),'exit_code':r.returncode,'log':name+'.log'});print(name,r.returncode,flush=True)
+ if r.returncode:receipt['status']='failed';(out/'validation.json').write_text(json.dumps(receipt,indent=2)+'\n');sys.exit(r.returncode)
+receipt['status']='pass';(out/'validation.json').write_text(json.dumps(receipt,indent=2)+'\n');shutil.copyfile(out/'validation.json',task/'validation.json');manifest=json.loads((base/'artifact-sha256.json').read_text())
+for f in out.rglob('*'):
+ if f.is_file():manifest['files'][str(f.relative_to(base))]=sha(f)
+manifest['files']=dict(sorted(manifest['files'].items()));(base/'artifact-sha256.json').write_text(json.dumps(manifest,indent=2)+'\n');assert all(sha(base/n)==v for n,v in manifest['files'].items());assert all(manifest['files'][n]==v for n,v in initial['files'].items());print(json.dumps({'source_assertions':len(checks),'all_evidence_hashes_verified':len(manifest['files']),'status':'pass'}))

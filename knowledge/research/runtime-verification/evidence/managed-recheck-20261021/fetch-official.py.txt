@@ -1,0 +1,13 @@
+from pathlib import Path
+import datetime,hashlib,json,subprocess
+root=Path('<LOCAL_CHECKOUT>/.tmp/managed-recheck-20261021')
+dest=Path('<LOCAL_TASK_ROOT>/apstndb/spanalyzer/managed-recheck-20261021/documents')
+names=json.loads((root/'document-names.json').read_text())
+at=datetime.datetime.now(datetime.timezone.utc).isoformat()
+p=subprocess.run(['mise','x','--no-deps','--','dkcli','batch-get','-f','json',*names],capture_output=True)
+if p.returncode:raise SystemExit('Official batch-get failed; exit '+str(p.returncode))
+(dest/'official-documents.json').write_bytes(p.stdout)
+d=json.loads(p.stdout)
+for doc in d['documents']:(dest/(doc['name'].replace('/','__')+'.md.txt')).write_text(doc['content'])
+receipt={'started_at':at,'completed_at':datetime.datetime.now(datetime.timezone.utc).isoformat(),'method':'dkcli batch-get full raw content','exit_code':p.returncode,'documents':[{k:v for k,v in x.items() if k!='content'}|{'body_sha256':hashlib.sha256(x['content'].encode()).hexdigest()} for x in d['documents']]}
+(dest/'retrieval.json').write_text(json.dumps(receipt,indent=2)+'\n');print('Full primary documents retrieved: '+str(len(d['documents'])))

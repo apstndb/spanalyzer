@@ -1,0 +1,28 @@
+[
+  {
+    "args": [
+      "docker",
+      "ps",
+      "-a",
+      "--filter",
+      "ancestor=us-docker.pkg.dev/spanner-omni/images/spanner-omni:2026.r4-lts@sha256:9f10586c5de366bec5c0ff6cf542a67c21c8363e8a12a3deb9c372a07c9aa8b6",
+      "--format",
+      "{{.ID}} {{.Image}} {{.Names}}"
+    ],
+    "exit_code": 0,
+    "stdout": ""
+  },
+  {
+    "args": [
+      "docker",
+      "ps",
+      "-a",
+      "--filter",
+      "label=spanalyzer.task=omni-r4-20261004",
+      "--format",
+      "{{.ID}} {{.Image}} {{.Names}}"
+    ],
+    "exit_code": 0,
+    "stdout": ""
+  }
+]

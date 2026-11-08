@@ -1,0 +1,490 @@
+{
+  "status": "passed",
+  "checks": [
+    {
+      "check": "managed all 15 pipe operators execute",
+      "passed": true
+    },
+    {
+      "check": "managed exact payload declarations enforced",
+      "passed": true
+    },
+    {
+      "check": "managed pipe-group-alias grouping members and aliases",
+      "passed": true
+    },
+    {
+      "check": "managed pipe-group-alias output column order",
+      "passed": true
+    },
+    {
+      "check": "managed pipe-group-bare-alias grouping members and aliases",
+      "passed": true
+    },
+    {
+      "check": "managed pipe-group-bare-alias output column order",
+      "passed": true
+    },
+    {
+      "check": "managed SQL pipe ORDER BY sequence",
+      "passed": true
+    },
+    {
+      "check": "managed unordered pipe LIMIT count only",
+      "passed": true
+    },
+    {
+      "check": "omni-r5 all 15 pipe operators execute",
+      "passed": true
+    },
+    {
+      "check": "omni-r5 exact payload declarations enforced",
+      "passed": true
+    },
+    {
+      "check": "omni-r5 pipe-group-alias grouping members and aliases",
+      "passed": true
+    },
+    {
+      "check": "omni-r5 pipe-group-alias output column order",
+      "passed": true
+    },
+    {
+      "check": "omni-r5 pipe-group-bare-alias grouping members and aliases",
+      "passed": true
+    },
+    {
+      "check": "omni-r5 pipe-group-bare-alias output column order",
+      "passed": true
+    },
+    {
+      "check": "omni-r5 SQL pipe ORDER BY sequence",
+      "passed": true
+    },
+    {
+      "check": "omni-r5 unordered pipe LIMIT count only",
+      "passed": true
+    },
+    {
+      "check": "omni-r5 final runtime cleanup succeeds",
+      "passed": true
+    },
+    {
+      "check": "omni-r5 PostgreSQL explicit scorer versions execute",
+      "passed": true
+    },
+    {
+      "check": "omni-r5 score-unpinned executes",
+      "passed": true
+    },
+    {
+      "check": "omni-r5 score-pinned-db-1 executes",
+      "passed": true
+    },
+    {
+      "check": "omni-r5 score-pinned-db-2 executes",
+      "passed": true
+    },
+    {
+      "check": "omni-r5 score-explicit-independent executes",
+      "passed": true
+    },
+    {
+      "check": "omni-r5 scorer default matches explicit version 1",
+      "passed": true
+    },
+    {
+      "check": "omni-r5 scorer default matches explicit version 2",
+      "passed": true
+    },
+    {
+      "check": "omni-r5 explicit scorer values remain stable across database defaults",
+      "passed": true
+    },
+    {
+      "check": "omni-r5 generated hour bucket stable within hour",
+      "passed": true
+    },
+    {
+      "check": "omni-r5 generated hour bucket advances by 3600",
+      "passed": true
+    },
+    {
+      "check": "omni-r5 tvf-star-plain executes",
+      "passed": true
+    },
+    {
+      "check": "omni-r5 tvf-star-as executes",
+      "passed": true
+    },
+    {
+      "check": "omni-r5 tvf-star-bare executes",
+      "passed": true
+    },
+    {
+      "check": "omni-r5 bucket-index-seconds executes",
+      "passed": true
+    },
+    {
+      "check": "omni-r5 bucket-index-hour executes",
+      "passed": true
+    },
+    {
+      "check": "omni-r5 bucket-index-none executes",
+      "passed": true
+    },
+    {
+      "check": "omni-r5 PG boundary query executes",
+      "passed": true
+    },
+    {
+      "check": "omni-r5 PG bucket exposes fractional and negative boundary errors",
+      "passed": true
+    },
+    {
+      "check": "omni-lts all 15 pipe operators execute",
+      "passed": true
+    },
+    {
+      "check": "omni-lts exact payload declarations enforced",
+      "passed": true
+    },
+    {
+      "check": "omni-lts pipe-group-alias grouping members and aliases",
+      "passed": true
+    },
+    {
+      "check": "omni-lts pipe-group-alias output column order",
+      "passed": true
+    },
+    {
+      "check": "omni-lts pipe-group-bare-alias grouping members and aliases",
+      "passed": true
+    },
+    {
+      "check": "omni-lts pipe-group-bare-alias output column order",
+      "passed": true
+    },
+    {
+      "check": "omni-lts SQL pipe ORDER BY sequence",
+      "passed": true
+    },
+    {
+      "check": "omni-lts unordered pipe LIMIT count only",
+      "passed": true
+    },
+    {
+      "check": "omni-lts final runtime cleanup succeeds",
+      "passed": true
+    },
+    {
+      "check": "omni-lts PostgreSQL explicit scorer versions execute",
+      "passed": true
+    },
+    {
+      "check": "omni-lts score-unpinned executes",
+      "passed": true
+    },
+    {
+      "check": "omni-lts score-pinned-db-1 executes",
+      "passed": true
+    },
+    {
+      "check": "omni-lts score-pinned-db-2 executes",
+      "passed": true
+    },
+    {
+      "check": "omni-lts score-explicit-independent executes",
+      "passed": true
+    },
+    {
+      "check": "omni-lts scorer default matches explicit version 1",
+      "passed": true
+    },
+    {
+      "check": "omni-lts scorer default matches explicit version 2",
+      "passed": true
+    },
+    {
+      "check": "omni-lts explicit scorer values remain stable across database defaults",
+      "passed": true
+    },
+    {
+      "check": "omni-lts generated hour bucket stable within hour",
+      "passed": true
+    },
+    {
+      "check": "omni-lts generated hour bucket advances by 3600",
+      "passed": true
+    },
+    {
+      "check": "omni-lts tvf-star-plain executes",
+      "passed": true
+    },
+    {
+      "check": "omni-lts tvf-star-as executes",
+      "passed": true
+    },
+    {
+      "check": "omni-lts tvf-star-bare executes",
+      "passed": true
+    },
+    {
+      "check": "omni-lts bucket-index-seconds executes",
+      "passed": true
+    },
+    {
+      "check": "omni-lts bucket-index-hour executes",
+      "passed": true
+    },
+    {
+      "check": "omni-lts bucket-index-none executes",
+      "passed": true
+    },
+    {
+      "check": "omni-lts PG boundary query executes",
+      "passed": true
+    },
+    {
+      "check": "omni-lts PG bucket exposes fractional and negative boundary errors",
+      "passed": true
+    },
+    {
+      "check": "Emulator accepts all four queue declaration spellings",
+      "passed": true
+    },
+    {
+      "check": "emulator final runtime cleanup succeeds",
+      "passed": true
+    },
+    {
+      "check": "emulator PostgreSQL explicit scorer versions execute",
+      "passed": true
+    },
+    {
+      "check": "emulator score-unpinned executes",
+      "passed": true
+    },
+    {
+      "check": "emulator score-pinned-db-1 executes",
+      "passed": true
+    },
+    {
+      "check": "emulator score-pinned-db-2 executes",
+      "passed": true
+    },
+    {
+      "check": "emulator score-explicit-independent executes",
+      "passed": true
+    },
+    {
+      "check": "emulator scorer default matches explicit version 1",
+      "passed": true
+    },
+    {
+      "check": "emulator scorer default matches explicit version 2",
+      "passed": true
+    },
+    {
+      "check": "emulator explicit scorer values remain stable across database defaults",
+      "passed": true
+    },
+    {
+      "check": "emulator generated hour bucket stable within hour",
+      "passed": true
+    },
+    {
+      "check": "emulator generated hour bucket advances by 3600",
+      "passed": true
+    },
+    {
+      "check": "emulator tvf-star-plain executes",
+      "passed": true
+    },
+    {
+      "check": "emulator tvf-star-as executes",
+      "passed": true
+    },
+    {
+      "check": "emulator tvf-star-bare executes",
+      "passed": true
+    },
+    {
+      "check": "emulator bucket-index-seconds executes",
+      "passed": true
+    },
+    {
+      "check": "emulator bucket-index-hour executes",
+      "passed": true
+    },
+    {
+      "check": "emulator bucket-index-none executes",
+      "passed": true
+    },
+    {
+      "check": "emulator PG boundary query executes",
+      "passed": true
+    },
+    {
+      "check": "emulator PG bucket exposes fractional and negative boundary errors",
+      "passed": true
+    },
+    {
+      "check": "local-commands.json has three completed runtimes",
+      "passed": true
+    },
+    {
+      "check": "local-commands.json omni-r5 exactly one owned runtime inspected",
+      "passed": true
+    },
+    {
+      "check": "local-commands.json omni-r5 owned container absent",
+      "passed": true
+    },
+    {
+      "check": "local-commands.json omni-r5 preexisting containers preserved",
+      "passed": true
+    },
+    {
+      "check": "local-commands.json omni-r5 both owned databases removed",
+      "passed": true
+    },
+    {
+      "check": "local-commands.json omni-lts exactly one owned runtime inspected",
+      "passed": true
+    },
+    {
+      "check": "local-commands.json omni-lts owned container absent",
+      "passed": true
+    },
+    {
+      "check": "local-commands.json omni-lts preexisting containers preserved",
+      "passed": true
+    },
+    {
+      "check": "local-commands.json omni-lts both owned databases removed",
+      "passed": true
+    },
+    {
+      "check": "local-commands.json emulator exactly one owned runtime inspected",
+      "passed": true
+    },
+    {
+      "check": "local-commands.json emulator owned container absent",
+      "passed": true
+    },
+    {
+      "check": "local-commands.json emulator preexisting containers preserved",
+      "passed": true
+    },
+    {
+      "check": "local-commands.json emulator both owned databases removed",
+      "passed": true
+    },
+    {
+      "check": "local-corrected-commands.json has three completed runtimes",
+      "passed": true
+    },
+    {
+      "check": "local-corrected-commands.json omni-r5-corrected exactly one owned runtime inspected",
+      "passed": true
+    },
+    {
+      "check": "local-corrected-commands.json omni-r5-corrected owned container absent",
+      "passed": true
+    },
+    {
+      "check": "local-corrected-commands.json omni-r5-corrected preexisting containers preserved",
+      "passed": true
+    },
+    {
+      "check": "local-corrected-commands.json omni-r5-corrected both owned databases removed",
+      "passed": true
+    },
+    {
+      "check": "local-corrected-commands.json omni-lts-corrected exactly one owned runtime inspected",
+      "passed": true
+    },
+    {
+      "check": "local-corrected-commands.json omni-lts-corrected owned container absent",
+      "passed": true
+    },
+    {
+      "check": "local-corrected-commands.json omni-lts-corrected preexisting containers preserved",
+      "passed": true
+    },
+    {
+      "check": "local-corrected-commands.json omni-lts-corrected both owned databases removed",
+      "passed": true
+    },
+    {
+      "check": "local-corrected-commands.json emulator-corrected exactly one owned runtime inspected",
+      "passed": true
+    },
+    {
+      "check": "local-corrected-commands.json emulator-corrected owned container absent",
+      "passed": true
+    },
+    {
+      "check": "local-corrected-commands.json emulator-corrected preexisting containers preserved",
+      "passed": true
+    },
+    {
+      "check": "local-corrected-commands.json emulator-corrected both owned databases removed",
+      "passed": true
+    },
+    {
+      "check": "local-final-commands.json has three completed runtimes",
+      "passed": true
+    },
+    {
+      "check": "local-final-commands.json omni-r5-final exactly one owned runtime inspected",
+      "passed": true
+    },
+    {
+      "check": "local-final-commands.json omni-r5-final owned container absent",
+      "passed": true
+    },
+    {
+      "check": "local-final-commands.json omni-r5-final preexisting containers preserved",
+      "passed": true
+    },
+    {
+      "check": "local-final-commands.json omni-r5-final both owned databases removed",
+      "passed": true
+    },
+    {
+      "check": "local-final-commands.json omni-lts-final exactly one owned runtime inspected",
+      "passed": true
+    },
+    {
+      "check": "local-final-commands.json omni-lts-final owned container absent",
+      "passed": true
+    },
+    {
+      "check": "local-final-commands.json omni-lts-final preexisting containers preserved",
+      "passed": true
+    },
+    {
+      "check": "local-final-commands.json omni-lts-final both owned databases removed",
+      "passed": true
+    },
+    {
+      "check": "local-final-commands.json emulator-final exactly one owned runtime inspected",
+      "passed": true
+    },
+    {
+      "check": "local-final-commands.json emulator-final owned container absent",
+      "passed": true
+    },
+    {
+      "check": "local-final-commands.json emulator-final preexisting containers preserved",
+      "passed": true
+    },
+    {
+      "check": "local-final-commands.json emulator-final both owned databases removed",
+      "passed": true
+    }
+  ],
+  "scope": "Dated completed samples; pending managed final controls are not counted as passed"
+}

@@ -1,0 +1,13 @@
+from pathlib import Path
+import os,subprocess,json,re,datetime,hashlib
+root=Path('<LOCAL_CHECKOUT>');out=Path('<LOCAL_TASK_ROOT>/apstndb/spanalyzer/managed-recheck-20261105/evidence')
+env=os.environ.copy();keys=['SPANNER_PROJECT_ID','SPANNER_INSTANCE_ID','SPANNER_DATABASE_ID'];assert all(env.get(k)for k in keys);assert not env.get('SPANNER_EMULATOR_HOST')
+env['TEST_REAL_SPANNER_DATABASE']='projects/{SPANNER_PROJECT_ID}/instances/{SPANNER_INSTANCE_ID}/databases/{SPANNER_DATABASE_ID}'.format(**env)
+env['REQUIRE_REAL_SPANNER_DRIFT']='1';go='<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go';env.update(GOWORK='off',GOTOOLCHAIN='local',GOROOT=str(Path(go).parent.parent),GOFLAGS='-mod=readonly',GOCACHE=str(root/'.tmp/managed-recheck-20260925/go-cache'))
+args=[go,'test','-count=1','-run','^TestDrift_RealTableMetas$','-v','./infoschem'];at=datetime.datetime.now(datetime.timezone.utc).isoformat();r=subprocess.run(args,cwd=root/'survey',env=env,capture_output=True,text=True,timeout=240)
+def clean(s):
+    for value in [env['TEST_REAL_SPANNER_DATABASE']]+sorted([env[k]for k in keys],key=len,reverse=True):s=s.replace(value,'<redacted>')
+    return re.sub(r'requestID = "[^"]*"','requestID = "<redacted>"',s)
+(out/'drift.log').write_text(clean(r.stdout+r.stderr))
+(out/'drift-command.json').write_text(json.dumps({'argv':args,'started_at':at,'completed_at':datetime.datetime.now(datetime.timezone.utc).isoformat(),'exit_code':r.returncode,'scope':'Existing read-only drift test against base database; no fixture operations','source_sha256':hashlib.sha256((root/'survey/infoschem/drift_test.go').read_bytes()).hexdigest()},indent=2)+'\n')
+print('Drift exit',r.returncode);print(clean(r.stdout+r.stderr)[-5000:])

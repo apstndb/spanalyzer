@@ -1,0 +1,45 @@
+[
+  {
+    "name": "batch-scope-build",
+    "started_at": "2026-10-29T00:45:40.723328+00:00",
+    "completed_at": "2026-10-29T00:45:42.796831+00:00",
+    "exit_code": 0,
+    "seconds": 2.073,
+    "argv": [
+      "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go",
+      "build",
+      "-o",
+      "<LOCAL_CHECKOUT>/.tmp/managed-recheck-20261029/batch-scope",
+      "<LOCAL_CHECKOUT>/.tmp/managed-recheck-20261029/batch-scope.go"
+    ],
+    "cwd": "<LOCAL_CHECKOUT>/tools",
+    "gowork": "<LOCAL_CHECKOUT>/go.work"
+  },
+  {
+    "name": "batch-scope-buildinfo",
+    "started_at": "2026-10-29T00:45:42.797027+00:00",
+    "completed_at": "2026-10-29T00:45:42.809767+00:00",
+    "exit_code": 0,
+    "seconds": 0.013,
+    "argv": [
+      "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go",
+      "version",
+      "-m",
+      "<LOCAL_CHECKOUT>/.tmp/managed-recheck-20261029/batch-scope"
+    ],
+    "cwd": "<LOCAL_CHECKOUT>/tools",
+    "gowork": "<LOCAL_CHECKOUT>/go.work"
+  },
+  {
+    "name": "batch-scope",
+    "started_at": "2026-10-29T00:45:42.809897+00:00",
+    "completed_at": "2026-10-29T00:45:46.445587+00:00",
+    "exit_code": 0,
+    "seconds": 3.636,
+    "argv": [
+      "<LOCAL_CHECKOUT>/.tmp/managed-recheck-20261029/batch-scope"
+    ],
+    "cwd": "<LOCAL_CHECKOUT>/tools",
+    "gowork": "<LOCAL_CHECKOUT>/go.work"
+  }
+]

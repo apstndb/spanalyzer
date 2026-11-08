@@ -1,0 +1,54 @@
+"""Owned, digest-pinned local runtime probes; managed environment is excluded."""
+from pathlib import Path
+import datetime,json,os,subprocess,threading,time
+root=Path('<LOCAL_CHECKOUT>');scratch=root/'.tmp/cross-engine-doc-delta-20261029';module=scratch/'module';task=Path('<LOCAL_TASK_ROOT>/apstndb/spanalyzer/cross-engine-doc-delta-20261029');out=task/'evidence';go='<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go';env=os.environ.copy()
+for k in list(env):
+ if k.startswith(('SPANEMUBOOST_','SPANNER_','TEST_REAL_SPANNER_','REQUIRE_REAL_SPANNER_','GOOGLE_APPLICATION_CREDENTIALS')):env.pop(k,None)
+env.update(GOWORK='off',GOTOOLCHAIN='local',GOROOT=str(Path(go).parent.parent),GOCACHE=str(root/'.tmp/managed-recheck-20260925/go-cache'),GOFLAGS='-mod=readonly',TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE='/var/run/docker.sock');env['PATH']=str(Path(go).parent)+':'+env['PATH'];env['DOCKER_HOST']=subprocess.check_output(['docker','context','inspect','--format','{{.Endpoints.docker.Host}}'],text=True).strip()
+images=json.loads((task/'sources/selected-images.json').read_text());ledger=out/'commands.json';receipts=json.loads(ledger.read_text())if ledger.exists()else[]
+def container_ids():return subprocess.check_output(['docker','ps','-aq','--no-trunc'],text=True).split()
+def inspect_owned(name,image,before):
+ found=[]
+ for cid in set(container_ids())-set(before):
+  r=subprocess.run(['docker','inspect',cid],capture_output=True,text=True)
+  if r.returncode:continue
+  a=json.loads(r.stdout)[0]
+  if a['Config']['Image']!=image:continue
+  found.append({'id':cid,'image_id':a['Image'],'configured_image':a['Config']['Image'],'path':a['Path'],'args':a['Args'],'state':a['State']['Status'],'platform':a.get('Platform'),'labels':a['Config'].get('Labels')})
+ (out/(name+'-active-containers.json')).write_text(json.dumps(found,indent=2)+'\n');return found
+
+def run(name,args,timeout=2400,image=None):
+ if any(r['name']==name and r['exit_code']==0 for r in receipts):print('RETAINED '+name,flush=True);return 0
+ before=container_ids()if image else[];started=datetime.datetime.now(datetime.timezone.utc).isoformat();print('START '+name,flush=True);at=time.time();owned=[]
+ with(out/(name+'.stderr')).open('w')as err,(out/(name+'.stdout')).open('w')as output:
+  p=subprocess.Popen(args,cwd=module,env=env,stdout=subprocess.PIPE,stderr=err,text=True)
+  def consume():
+   nonlocal owned
+   for line in p.stdout:
+    output.write(line);output.flush()
+    try:r=json.loads(line)
+    except ValueError:continue
+    if image and r.get('label')=='runtime-start'and r.get('code')=='OK':owned=inspect_owned(name,image,before)
+  reader=threading.Thread(target=consume,daemon=True);reader.start()
+  try:code=p.wait(timeout=timeout)
+  except subprocess.TimeoutExpired:p.kill();code=p.wait();print('TIMEOUT '+name,flush=True)
+  reader.join(timeout=30)
+ if image:
+  states=[]
+  for row in owned:
+   r=subprocess.run(['docker','inspect',row['id']],capture_output=True,text=True);states.append({'id':row['id'],'inspect_exit_code':r.returncode,'absent':r.returncode!=0})
+  (out/(name+'-container-cleanup.json')).write_text(json.dumps({'owned':states,'preexisting_containers_preserved':set(before).issubset(set(container_ids()))},indent=2)+'\n')
+ entry={'name':name,'argv':args,'cwd':str(module),'started_at':started,'completed_at':datetime.datetime.now(datetime.timezone.utc).isoformat(),'seconds':round(time.time()-at,3),'exit_code':code};receipts.append(entry);ledger.write_text(json.dumps(receipts,indent=2)+'\n');print(json.dumps(entry),flush=True);return code
+if run('probe-build',[go,'build','-o',str(scratch/'probe'),'./probe.go']):raise SystemExit('Build failed')
+run('probe-buildinfo',[go,'version','-m',str(scratch/'probe')])
+phases=['constants-catalog','google-new','graphs','pg-new','doc-delta-google','doc-delta-pg']
+for name,entry in images.items():
+ if run(name,[str(scratch/'probe'),name,entry['image'],*[str(module/(phase+'.json'))for phase in phases]],image=entry['image']):raise SystemExit('Inspect runtime process failure: '+name)
+ records=[json.loads(s)for s in(out/(name+'.stdout')).read_text().splitlines()]
+ for phase in phases:
+  current=[r for r in records if r['phase']==phase];labels={r['label']:r for r in current}
+  if labels.get('create-database',{}).get('code')!='OK':raise SystemExit('Runtime database bootstrap failed: '+name+' '+phase)
+  if labels.get('drop-database',{}).get('code')!='OK'or labels.get('database-absent',{}).get('code')!='NotFound':raise SystemExit('Runtime database cleanup unavailable: '+name+' '+phase)
+  expected={s['label']for s in json.loads((module/(phase+'.json')).read_text())['steps']}
+  if not expected.issubset(labels):raise SystemExit('Missing step records: '+name+' '+phase)
+print('COMPLETE: all three pinned runtimes recorded; inspect values, plans, skips and product errors',flush=True)

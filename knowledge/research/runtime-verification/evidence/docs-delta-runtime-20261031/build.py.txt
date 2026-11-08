@@ -1,0 +1,8 @@
+from pathlib import Path
+import subprocess,os,json,datetime
+r=Path('<LOCAL_CHECKOUT>');s=r/'.tmp/docs-delta-runtime-20261031';out=Path('<LOCAL_TASK_ROOT>/apstndb/spanalyzer/docs-delta-runtime-20261031/evidence');go='<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go';env=os.environ.copy();env.update(GOWORK='off',GOTOOLCHAIN='local',GOROOT=str(Path(go).parent.parent),GOCACHE=str(r/'.tmp/managed-recheck-20260925/go-cache'),GOFLAGS='-mod=readonly');rows=[]
+for name in ['managed','local']:
+ args=[go,'build','-o',str(s/name),'./'+name+'.go'];p=subprocess.run(args,cwd=s/'module',env=env,capture_output=True,text=True);(out/(name+'-build.log')).write_text(p.stdout+p.stderr);rows.append({'name':name,'argv':args,'exit_code':p.returncode,'at':datetime.datetime.now(datetime.timezone.utc).isoformat()});print(name,'build',p.returncode,flush=True)
+ if p.returncode:print(p.stderr);raise SystemExit(p.returncode)
+ (out/(name+'-buildinfo.txt')).write_text(subprocess.check_output([go,'version','-m',str(s/name)],env=env,text=True))
+(out/'build-commands.json').write_text(json.dumps(rows,indent=2)+'\n')

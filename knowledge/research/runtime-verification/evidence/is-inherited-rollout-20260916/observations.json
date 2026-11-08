@@ -1,0 +1,70 @@
+{
+  "recorded_on": "2026-09-16",
+  "scope": "Redacted managed Cloud Spanner INFORMATION_SCHEMA observations from managed-cycle-20260917; counts only, no database identifiers.",
+  "runtime": {
+    "kind": "managed",
+    "observation_scope": "single_database",
+    "producer": "survey/cmd/infoschema-capture check --target managed and direct INFORMATION_SCHEMA queries through spanner-mycli"
+  },
+  "retained_baseline": {
+    "path": "survey/infoschem/evidence/managed/20260825T120538Z-f8b0ea3092e7.json",
+    "observed_at": "2026-08-25T12:05:38.437354Z",
+    "column_count": 308,
+    "surface_sha256": "f8b0ea3092e7601f260d6d9cb59002dcd0cf4fba6283df8a7c04c004e6a664ee"
+  },
+  "new_observation": {
+    "path": "survey/infoschem/evidence/managed/20260916T171439Z-89b4ab9e231d.json",
+    "file_sha256": "e4ee194e6cf4f10a3c2e9139e6708d4e046b145a6bde9e59086edd674830613c",
+    "observed_at": "2026-09-16T17:14:39.178882Z",
+    "column_count": 310,
+    "surface_sha256": "89b4ab9e231d7d61bf417669b6f5d29d1715c3999058b905f60698bc1047c6b0",
+    "added_columns": [
+      {"table_name": "COLUMN_OPTIONS", "column_name": "IS_INHERITED", "spanner_type": "BOOL", "ordinal_position": 8},
+      {"table_name": "LOCALITY_GROUP_OPTIONS", "column_name": "IS_INHERITED", "spanner_type": "BOOL", "ordinal_position": 4}
+    ],
+    "removed_columns": [],
+    "changed_columns": []
+  },
+  "check_runs": [
+    {"observed_at": "2026-09-16T16:56:07.707925Z", "status": "surface_changed", "column_count": 310, "surface_sha256_prefix": "89b4ab9e231d"},
+    {"observed_at": "2026-09-16T17:06:52.155787Z", "status": "surface_changed", "column_count": 310, "surface_sha256_prefix": "89b4ab9e231d"},
+    {"observed_at": "2026-09-16T17:06:55.873321Z", "status": "producer_changed_only", "column_count": 308, "surface_sha256_prefix": "f8b0ea3092e7"},
+    {"observed_at": "2026-09-16T17:06:59.465014Z", "status": "surface_changed", "column_count": 310, "surface_sha256_prefix": "89b4ab9e231d"}
+  ],
+  "direct_column_count_samples": {
+    "query": "SELECT TABLE_NAME, COLUMN_NAME, SPANNER_TYPE, ORDINAL_POSITION FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = 'INFORMATION_SCHEMA' ORDER BY TABLE_NAME, ORDINAL_POSITION",
+    "row_counts_in_order": [310, 308, 310, 310, 310, 310, 310, 310],
+    "distinct_310_surfaces": 1
+  },
+  "combined_count_samples": {
+    "columns": ["information_schema_column_count", "column_options_locality_group_rows", "column_options_all_rows", "locality_group_options_rows"],
+    "rows_in_order": [
+      [310, 0, 28, 4],
+      [310, 1651, 1679, 4],
+      [310, 1651, 1679, 4],
+      [310, 1651, 1679, 4],
+      [310, 0, 28, 4],
+      [308, 1651, 1679, 4],
+      [310, 1651, 1679, 4],
+      [310, 0, 28, 4]
+    ],
+    "note": "Each row is one single-use read-only query with four scalar subqueries. Column advertisement and inherited-row emission vary independently."
+  },
+  "is_inherited_distribution": {
+    "samples": 3,
+    "identical_across_samples": true,
+    "rows": [
+      {"table_name": "COLUMN_OPTIONS", "option_name": "allow_commit_timestamp", "is_inherited": null, "count": 11},
+      {"table_name": "COLUMN_OPTIONS", "option_name": "cassandra_type", "is_inherited": null, "count": 17},
+      {"table_name": "COLUMN_OPTIONS", "option_name": "locality_group", "is_inherited": true, "count": 1651},
+      {"table_name": "LOCALITY_GROUP_OPTIONS", "option_name": "ssd_to_hdd_spill_timespan", "is_inherited": null, "count": 2},
+      {"table_name": "LOCALITY_GROUP_OPTIONS", "option_name": "storage", "is_inherited": false, "count": 1},
+      {"table_name": "LOCALITY_GROUP_OPTIONS", "option_name": "storage", "is_inherited": true, "count": 1}
+    ],
+    "inherited_locality_group_rows": {"option_type": "STRING", "option_value": "default", "count": 1651, "distinct_tables": 206}
+  },
+  "container_targets_at_pinned_versions": {
+    "emulator": {"image": "gcr.io/cloud-spanner-emulator/emulator:1.5.56", "information_schema_column_count": 198, "advertises_is_inherited": false},
+    "omni": {"image": "us-docker.pkg.dev/spanner-omni/images/spanner-omni:2026.r2.1-beta", "information_schema_column_count": 308, "advertises_is_inherited": false}
+  }
+}

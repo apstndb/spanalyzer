@@ -1,0 +1,62 @@
+[
+  {
+    "name": "okf",
+    "argv": [
+      "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go",
+      "run",
+      "./okf-check",
+      "--repo-root",
+      "..",
+      "--gate",
+      "all",
+      "--publication-manifest",
+      "<LOCAL_CHECKOUT>/.tmp/docs-diff-20261010/publication-manifest.json"
+    ],
+    "exit_code": 1,
+    "completed_at": "2026-10-10T01:43:24.908770+00:00"
+  },
+  {
+    "name": "okf-corrected-manifest-path",
+    "argv": [
+      "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go",
+      "run",
+      "./okf-check",
+      "--repo-root",
+      "..",
+      "--gate",
+      "all",
+      "--publication-manifest",
+      "<LOCAL_TASK_ROOT>/apstndb/spanalyzer/docs-diff-20261010/publication-manifest.json"
+    ],
+    "exit_code": 0,
+    "completed_at": "2026-10-10T01:43:53.148972+00:00"
+  },
+  {
+    "name": "language",
+    "argv": [
+      "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go",
+      "run",
+      "./markdown-language-check",
+      "--repo-root",
+      ".."
+    ],
+    "exit_code": 0,
+    "completed_at": "2026-10-10T01:43:53.433077+00:00"
+  },
+  {
+    "name": "git-diff-check",
+    "exit_code": 0,
+    "completed_at": "2026-10-10T01:44:40.119976+00:00"
+  },
+  {
+    "name": "offline-evidence-check",
+    "exit_code": 0,
+    "result": {
+      "status": "pass",
+      "readonly_cases": 125,
+      "created_temporary_databases_deleted_and_not_found": 9,
+      "matching_official_document_bodies": 11,
+      "scope": "Offline integrity and bounded result assertions; not a runtime attestation."
+    }
+  }
+]

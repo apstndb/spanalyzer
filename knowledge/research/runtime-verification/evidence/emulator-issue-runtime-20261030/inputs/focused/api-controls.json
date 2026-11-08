@@ -1,0 +1,23 @@
+{
+  "dialect": "google",
+  "steps": [
+    {
+      "label": "api-table",
+      "family": "issue-189",
+      "kind": "ddl",
+      "sql": "CREATE TABLE ApiRows(id INT64 NOT NULL,val INT64,ts TIMESTAMP OPTIONS(allow_commit_timestamp=true)) PRIMARY KEY(id)",
+      "requires": [],
+      "timeout_seconds": 30
+    },
+    {
+      "label": "api-readtimestamp-stats",
+      "family": "issue-189",
+      "kind": "api-controls",
+      "sql": "",
+      "requires": [
+        "api-table"
+      ],
+      "timeout_seconds": 30
+    }
+  ]
+}

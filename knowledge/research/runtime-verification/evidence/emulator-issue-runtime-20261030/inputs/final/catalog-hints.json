@@ -1,0 +1,259 @@
+{
+  "dialect": "google",
+  "steps": [
+    {
+      "label": "catalog-ROUTINES",
+      "family": "issue-386",
+      "kind": "query",
+      "sql": "SELECT * FROM INFORMATION_SCHEMA.ROUTINES LIMIT 3",
+      "requires": [],
+      "timeout_seconds": 15
+    },
+    {
+      "label": "catalog-ROUTINE_OPTIONS",
+      "family": "issue-386",
+      "kind": "query",
+      "sql": "SELECT * FROM INFORMATION_SCHEMA.ROUTINE_OPTIONS LIMIT 3",
+      "requires": [],
+      "timeout_seconds": 15
+    },
+    {
+      "label": "catalog-PARAMETERS",
+      "family": "issue-386",
+      "kind": "query",
+      "sql": "SELECT * FROM INFORMATION_SCHEMA.PARAMETERS LIMIT 3",
+      "requires": [],
+      "timeout_seconds": 15
+    },
+    {
+      "label": "catalog-ROUTINE_PRIVILEGES",
+      "family": "issue-386",
+      "kind": "query",
+      "sql": "SELECT * FROM INFORMATION_SCHEMA.ROUTINE_PRIVILEGES LIMIT 3",
+      "requires": [],
+      "timeout_seconds": 15
+    },
+    {
+      "label": "catalog-TABLE_OPTIONS",
+      "family": "issue-386",
+      "kind": "query",
+      "sql": "SELECT * FROM INFORMATION_SCHEMA.TABLE_OPTIONS LIMIT 3",
+      "requires": [],
+      "timeout_seconds": 15
+    },
+    {
+      "label": "catalog-ROLES",
+      "family": "issue-350",
+      "kind": "query",
+      "sql": "SELECT * FROM INFORMATION_SCHEMA.ROLES LIMIT 3",
+      "requires": [],
+      "timeout_seconds": 15
+    },
+    {
+      "label": "hint-OPTIMIZER_VERSION-strict",
+      "family": "issue-300",
+      "kind": "query",
+      "sql": "@{OPTIMIZER_VERSION=latest} SELECT 1 AS value",
+      "requires": [],
+      "timeout_seconds": 15
+    },
+    {
+      "label": "hint-OPTIMIZER_VERSION-ignore",
+      "family": "issue-349",
+      "kind": "query",
+      "sql": "@{spanner_emulator.ignore_unknown_hints=TRUE,OPTIMIZER_VERSION=latest} SELECT 1 AS value",
+      "requires": [],
+      "timeout_seconds": 15
+    },
+    {
+      "label": "hint-OPTIMIZER_STATISTICS_PACKAGE-strict",
+      "family": "issue-300",
+      "kind": "query",
+      "sql": "@{OPTIMIZER_STATISTICS_PACKAGE=latest} SELECT 1 AS value",
+      "requires": [],
+      "timeout_seconds": 15
+    },
+    {
+      "label": "hint-OPTIMIZER_STATISTICS_PACKAGE-ignore",
+      "family": "issue-349",
+      "kind": "query",
+      "sql": "@{spanner_emulator.ignore_unknown_hints=TRUE,OPTIMIZER_STATISTICS_PACKAGE=latest} SELECT 1 AS value",
+      "requires": [],
+      "timeout_seconds": 15
+    },
+    {
+      "label": "hint-ALLOW_DISTRIBUTED_MERGE-strict",
+      "family": "issue-300",
+      "kind": "query",
+      "sql": "@{ALLOW_DISTRIBUTED_MERGE=TRUE} SELECT 1 AS value",
+      "requires": [],
+      "timeout_seconds": 15
+    },
+    {
+      "label": "hint-ALLOW_DISTRIBUTED_MERGE-ignore",
+      "family": "issue-349",
+      "kind": "query",
+      "sql": "@{spanner_emulator.ignore_unknown_hints=TRUE,ALLOW_DISTRIBUTED_MERGE=TRUE} SELECT 1 AS value",
+      "requires": [],
+      "timeout_seconds": 15
+    },
+    {
+      "label": "hint-EXECUTION_METHOD-strict",
+      "family": "issue-300",
+      "kind": "query",
+      "sql": "@{EXECUTION_METHOD=BATCH} SELECT 1 AS value",
+      "requires": [],
+      "timeout_seconds": 15
+    },
+    {
+      "label": "hint-EXECUTION_METHOD-ignore",
+      "family": "issue-349",
+      "kind": "query",
+      "sql": "@{spanner_emulator.ignore_unknown_hints=TRUE,EXECUTION_METHOD=BATCH} SELECT 1 AS value",
+      "requires": [],
+      "timeout_seconds": 15
+    },
+    {
+      "label": "hint-USE_UNENFORCED_FOREIGN_KEY-strict",
+      "family": "issue-300",
+      "kind": "query",
+      "sql": "@{USE_UNENFORCED_FOREIGN_KEY=TRUE} SELECT 1 AS value",
+      "requires": [],
+      "timeout_seconds": 15
+    },
+    {
+      "label": "hint-USE_UNENFORCED_FOREIGN_KEY-ignore",
+      "family": "issue-349",
+      "kind": "query",
+      "sql": "@{spanner_emulator.ignore_unknown_hints=TRUE,USE_UNENFORCED_FOREIGN_KEY=TRUE} SELECT 1 AS value",
+      "requires": [],
+      "timeout_seconds": 15
+    },
+    {
+      "label": "hint-ALLOW_TIMESTAMP_PREDICATE_PUSHDOWN-strict",
+      "family": "issue-300",
+      "kind": "query",
+      "sql": "@{ALLOW_TIMESTAMP_PREDICATE_PUSHDOWN=TRUE} SELECT 1 AS value",
+      "requires": [],
+      "timeout_seconds": 15
+    },
+    {
+      "label": "hint-ALLOW_TIMESTAMP_PREDICATE_PUSHDOWN-ignore",
+      "family": "issue-349",
+      "kind": "query",
+      "sql": "@{spanner_emulator.ignore_unknown_hints=TRUE,ALLOW_TIMESTAMP_PREDICATE_PUSHDOWN=TRUE} SELECT 1 AS value",
+      "requires": [],
+      "timeout_seconds": 15
+    },
+    {
+      "label": "hint-USE_ADDITIONAL_PARALLELISM-strict",
+      "family": "issue-300",
+      "kind": "query",
+      "sql": "@{USE_ADDITIONAL_PARALLELISM=TRUE} SELECT 1 AS value",
+      "requires": [],
+      "timeout_seconds": 15
+    },
+    {
+      "label": "hint-USE_ADDITIONAL_PARALLELISM-ignore",
+      "family": "issue-349",
+      "kind": "query",
+      "sql": "@{spanner_emulator.ignore_unknown_hints=TRUE,USE_ADDITIONAL_PARALLELISM=TRUE} SELECT 1 AS value",
+      "requires": [],
+      "timeout_seconds": 15
+    },
+    {
+      "label": "hint-SCAN_METHOD-strict",
+      "family": "issue-300",
+      "kind": "query",
+      "sql": "@{SCAN_METHOD=COLUMNAR} SELECT 1 AS value",
+      "requires": [],
+      "timeout_seconds": 15
+    },
+    {
+      "label": "hint-SCAN_METHOD-ignore",
+      "family": "issue-349",
+      "kind": "query",
+      "sql": "@{spanner_emulator.ignore_unknown_hints=TRUE,SCAN_METHOD=COLUMNAR} SELECT 1 AS value",
+      "requires": [],
+      "timeout_seconds": 15
+    },
+    {
+      "label": "hint-AUTO_PARAMETER-strict",
+      "family": "issue-300",
+      "kind": "query",
+      "sql": "@{AUTO_PARAMETER=OFF} SELECT 1 AS value",
+      "requires": [],
+      "timeout_seconds": 15
+    },
+    {
+      "label": "hint-AUTO_PARAMETER-ignore",
+      "family": "issue-349",
+      "kind": "query",
+      "sql": "@{spanner_emulator.ignore_unknown_hints=TRUE,AUTO_PARAMETER=OFF} SELECT 1 AS value",
+      "requires": [],
+      "timeout_seconds": 15
+    },
+    {
+      "label": "view-table",
+      "family": "issue-233",
+      "kind": "ddl",
+      "sql": "CREATE TABLE ViewBase(id INT64 NOT NULL) PRIMARY KEY(id)",
+      "requires": [],
+      "timeout_seconds": 30
+    },
+    {
+      "label": "view-INVOKER",
+      "family": "issue-233",
+      "kind": "ddl",
+      "sql": "CREATE OR REPLACE VIEW VINVOKER SQL SECURITY INVOKER AS SELECT id FROM ViewBase",
+      "requires": [
+        "view-table"
+      ],
+      "timeout_seconds": 30
+    },
+    {
+      "label": "view-DEFINER",
+      "family": "issue-233",
+      "kind": "ddl",
+      "sql": "CREATE OR REPLACE VIEW VDEFINER SQL SECURITY DEFINER AS SELECT id FROM ViewBase",
+      "requires": [
+        "view-table"
+      ],
+      "timeout_seconds": 30
+    },
+    {
+      "label": "create-role",
+      "family": "issue-350",
+      "kind": "ddl",
+      "sql": "CREATE ROLE ProbeRole",
+      "requires": [],
+      "timeout_seconds": 30
+    },
+    {
+      "label": "export-roles",
+      "family": "issue-350",
+      "kind": "ddl-export",
+      "sql": "",
+      "requires": [],
+      "timeout_seconds": 15
+    },
+    {
+      "label": "udf",
+      "family": "issue-261",
+      "kind": "ddl",
+      "sql": "CREATE FUNCTION PlusOne(x INT64) RETURNS INT64 SQL SECURITY INVOKER AS (x+1)",
+      "requires": [],
+      "timeout_seconds": 30
+    },
+    {
+      "label": "udf-value",
+      "family": "issue-261",
+      "kind": "query",
+      "sql": "SELECT PlusOne(4) AS value",
+      "requires": [
+        "udf"
+      ],
+      "timeout_seconds": 15
+    }
+  ]
+}

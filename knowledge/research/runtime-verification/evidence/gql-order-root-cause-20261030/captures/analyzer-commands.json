@@ -1,0 +1,50 @@
+[
+  {
+    "name": "gql",
+    "argv": [
+      "<LOCAL_CHECKOUT>/.tmp/gql-order-root-cause-20261030/analyzer",
+      "--ddl",
+      "<LOCAL_CHECKOUT>/.tmp/gql-order-root-cause-20261030/schema.sql",
+      "--mode=resolved_ast",
+      "--sql",
+      "GRAPH OrderGraph MATCH(n) RETURN n.val AS value ORDER BY value"
+    ],
+    "exit_code": 0
+  },
+  {
+    "name": "gql-limit",
+    "argv": [
+      "<LOCAL_CHECKOUT>/.tmp/gql-order-root-cause-20261030/analyzer",
+      "--ddl",
+      "<LOCAL_CHECKOUT>/.tmp/gql-order-root-cause-20261030/schema.sql",
+      "--mode=resolved_ast",
+      "--sql",
+      "GRAPH OrderGraph MATCH(n) RETURN n.val AS value ORDER BY value LIMIT 3"
+    ],
+    "exit_code": 0
+  },
+  {
+    "name": "sql",
+    "argv": [
+      "<LOCAL_CHECKOUT>/.tmp/gql-order-root-cause-20261030/analyzer",
+      "--ddl",
+      "<LOCAL_CHECKOUT>/.tmp/gql-order-root-cause-20261030/schema.sql",
+      "--mode=resolved_ast",
+      "--sql",
+      "SELECT val AS value FROM OrderNodes ORDER BY value"
+    ],
+    "exit_code": 0
+  },
+  {
+    "name": "gql-outer-sql",
+    "argv": [
+      "<LOCAL_CHECKOUT>/.tmp/gql-order-root-cause-20261030/analyzer",
+      "--ddl",
+      "<LOCAL_CHECKOUT>/.tmp/gql-order-root-cause-20261030/schema.sql",
+      "--mode=resolved_ast",
+      "--sql",
+      "SELECT value FROM GRAPH_TABLE(OrderGraph MATCH(n) RETURN n.val AS value ORDER BY value) ORDER BY value"
+    ],
+    "exit_code": 0
+  }
+]

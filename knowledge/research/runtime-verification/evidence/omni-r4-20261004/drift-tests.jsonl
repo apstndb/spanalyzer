@@ -1,0 +1,12 @@
+{"Time":"2026-10-04T23:29:08.897389+09:00","Action":"start","Package":"github.com/apstndb/spanalyzer/survey/infoschem"}
+{"Time":"2026-10-04T23:29:09.466925+09:00","Action":"run","Package":"github.com/apstndb/spanalyzer/survey/infoschem","Test":"TestDrift_OmniTableMetas"}
+{"Time":"2026-10-04T23:29:09.467023+09:00","Action":"output","Package":"github.com/apstndb/spanalyzer/survey/infoschem","Test":"TestDrift_OmniTableMetas","Output":"=== RUN   TestDrift_OmniTableMetas\n"}
+{"Time":"2026-10-04T23:29:17.953301+09:00","Action":"output","Package":"github.com/apstndb/spanalyzer/survey/infoschem","Test":"TestDrift_OmniTableMetas","Output":"    drift_test.go:77: SPANNER_SYS surface (omni): got 51 tables / 598 columns / 8 known absent, accepted [{50 539 56}]\n"}
+{"Time":"2026-10-04T23:29:17.953494+09:00","Action":"output","Package":"github.com/apstndb/spanalyzer/survey/infoschem","Test":"TestDrift_OmniTableMetas","Output":"    drift_test.go:77: SPANNER_SYS contract_metrics target=omni registered_tables=51 advertised_tables=51 advertised_columns=598 known_absent_columns=8 has_drift=true\n"}
+{"Time":"2026-10-04T23:29:17.953529+09:00","Action":"output","Package":"github.com/apstndb/spanalyzer/survey/infoschem","Test":"TestDrift_OmniTableMetas","Output":"    drift_test.go:77: SPANNER_SYS diagnostic_metrics target=omni checked_tables=50 decoded_rows=3 advertised_not_queryable=0\n"}
+{"Time":"2026-10-04T23:29:17.953553+09:00","Action":"output","Package":"github.com/apstndb/spanalyzer/survey/infoschem","Test":"TestDrift_OmniTableMetas","Output":"    drift_test.go:77: SPANNER_SYS drift (omni): unknown_tables=[ACTIVE_BATCH_OPERATIONS] unknown_columns=map[] ordinal_mismatches=[] type_mismatches=[]\n"}
+{"Time":"2026-10-04T23:30:49.730096+09:00","Action":"output","Package":"github.com/apstndb/spanalyzer/survey/infoschem","Test":"TestDrift_OmniTableMetas","Output":"--- FAIL: TestDrift_OmniTableMetas (100.26s)\n"}
+{"Time":"2026-10-04T23:30:49.730268+09:00","Action":"fail","Package":"github.com/apstndb/spanalyzer/survey/infoschem","Test":"TestDrift_OmniTableMetas","Elapsed":100.26}
+{"Time":"2026-10-04T23:30:49.730315+09:00","Action":"output","Package":"github.com/apstndb/spanalyzer/survey/infoschem","Output":"FAIL\n"}
+{"Time":"2026-10-04T23:30:49.733972+09:00","Action":"output","Package":"github.com/apstndb/spanalyzer/survey/infoschem","Output":"FAIL\tgithub.com/apstndb/spanalyzer/survey/infoschem\t100.836s\n"}
+{"Time":"2026-10-04T23:30:49.734038+09:00","Action":"fail","Package":"github.com/apstndb/spanalyzer/survey/infoschem","Elapsed":100.836}

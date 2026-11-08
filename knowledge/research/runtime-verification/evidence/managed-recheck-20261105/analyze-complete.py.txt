@@ -1,0 +1,25 @@
+from pathlib import Path
+import json,uuid
+p=Path('<LOCAL_TASK_ROOT>/apstndb/spanalyzer/managed-recheck-20261105/evidence');read=lambda f:[json.loads(l)for l in(p/f).read_text().splitlines()];checks=[]
+def check(name,ok):checks.append({'name':name,'pass':bool(ok)})
+g={r['label']:r for r in read('google.jsonl')};pg={r['label']:r for r in read('pg.jsonl')};repair=read('volatile-repair.jsonl');rb={r['label']:r for r in repair};plan=json.loads((p/'volatile-repair-cases.json').read_text())
+check('repair-complete',[r['label']for r in repair if r['label']not in ['create-database','drop-database','database-absent']]==[r['label']for r in plan['steps']]);check('repair-owned-lifecycle',rb['create-database']['code']=='OK'and rb['drop-database']['code']=='OK'and rb['database-absent']['code']=='NotFound')
+for row in repair:check('repair-code-'+row['label'],row['code']==('NotFound'if row['label']=='database-absent'else'OK'))
+for mode in ['default','false','true']:
+ first=rb['repair-read-'+mode+'-1']['rows'];second=rb['repair-read-'+mode+'-2']['rows'];check('volatile-'+mode+'-ids',[r['id']for r in first]==['1','2','3']and [r['id']for r in second]==['1','2','3']);check('volatile-'+mode+'-changes',all(a['v']!=b['v']for a,b in zip(first,second)))
+ for row in first+second:
+  try:valid=uuid.UUID(row['v']).version==4
+  except(ValueError,KeyError):valid=False
+  check('volatile-'+mode+'-uuid',valid)
+check('initial-volatile-setup-error-retained',g['volatile-view']['code']=='InvalidArgument'and 'without a qualifier'in g['volatile-view']['error']);check('initial-volatile-dependent-cases-blocked',all(r['code']=='NOT_RUN'for label,r in g.items()if label.startswith(('volatile-graph-','volatile-read-'))))
+for dialect,by in [('google',g),('pg',pg)]:
+ r=by['set-null-result'];row=r['rows'][0];check('set-null-'+dialect,r['code']=='OK'and len(r['rows'])==1 and row.get('Id',row.get('id'))=='1'and row.get('ParentId',row.get('parentid'))is None)
+for label in ['gql-standalone-corrected','gql-next-corrected']:
+ r=g[label];check(label+'-executes',r['code']=='OK');check(label+'-membership',sorted(x['id']for x in r['rows'])==['1','2'])
+for label,r in pg.items():
+ if label.startswith('pg-stats-')and label!='pg-stats-struct-negative':check(label+'-executes',r['code']=='OK')
+meta=pg['pg-stats-metadata']['rows'];check('pg-statistics-18-columns',len(meta)==18 and len({r['table_name']for r in meta})==6);check('pg-struct-absent',pg['pg-stats-struct-negative']['code']=='InvalidArgument')
+allchecks=[]
+for f,key in [('readonly-assertions.json','pass'),('fixture-base-assertions.json','pass_')]:
+ d=json.loads((p/f).read_text());check(f+'-passed',d['status']=='pass');allchecks += [{'name':f+':'+x['name'],'pass':x[key]}for x in d['assertions']]
+allchecks+=checks;failures=[x for x in allchecks if not x['pass']];summary={'status':'pass'if not failures else'fail','checks':len(allchecks),'failures':failures,'assertions':allchecks,'steps':{'read_only':131,'initial_fixtures':127,'corrected_volatile_fixture':12,'total':270},'additional_lifecycle_records':9,'new_databases_created_and_deleted':3,'cleanup':'All three current owned databases have DropDatabase OK and GetDatabase NotFound. The additional repair lifecycle has separate explicit authorization.','initial_volatile_fixture':'Invalid qualified-name setup retained; nine dependent steps NOT_RUN. Corrected twelve-step fixture completes independently.','runtime_findings':['Scorer and JSON search agree with November 3','PG score_version database option remains unsupported','PG JSON bucket boundary discrepancy remains','All three volatile-view modes execute; generated UUID properties change between reads','All six PG statistics JSON/scalar projections execute; struct columns absent','SET NULL child key becomes SQL NULL in both dialects'],'local_drift':'Initial read-only gate failed before the separately authorized catalog update; preserve that dated result.'};(p/'assertions.json').write_text(json.dumps(summary,indent=2)+'\n');print('Complete assertions',summary['status'],len(allchecks),'steps',270);print(failures);assert not failures

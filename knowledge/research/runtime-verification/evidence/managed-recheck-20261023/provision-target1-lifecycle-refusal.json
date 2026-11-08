@@ -1,0 +1,13 @@
+{
+  "started_at": "2026-10-23T14:18:37.663354+00:00",
+  "completed_at": "2026-10-23T14:18:42.771664+00:00",
+  "action": "create explicitly user-authorized free trial instance",
+  "configuration": "regional-asia-northeast1",
+  "requested_instance_type": "FREE_INSTANCE",
+  "requested_expire_behavior": "REMOVE_AFTER_GRACE_PERIOD",
+  "automatic_paid_conversion": false,
+  "default_backup_schedule_type": "NONE",
+  "exit_code": 1,
+  "stderr": "ERROR: (gcloud.spanner.instances.create) FAILED_PRECONDITION: Free instances are limited to 1 per project lifecycle.\n",
+  "stdout": ""
+}

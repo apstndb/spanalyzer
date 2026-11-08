@@ -1,0 +1,44 @@
+{
+  "parser-v0.8.1.jsonl": {
+    "records": 141,
+    "successful_parses": 129,
+    "known_assertion_failures": [
+      "alter-set-for-all",
+      "graph-cast-node",
+      "graph-cast-path",
+      "graph-property-cast",
+      "graph-to-json-node",
+      "graph-to-json-path",
+      "json-is-distinct",
+      "json-window"
+    ],
+    "all_successful_parses_reparse_idempotently": true
+  },
+  "parser-main.jsonl": {
+    "records": 141,
+    "successful_parses": 134,
+    "known_assertion_failures": [
+      "alter-set-for-all",
+      "json-is-distinct",
+      "json-window"
+    ],
+    "all_successful_parses_reparse_idempotently": true
+  },
+  "analyzer": {
+    "queries": 136,
+    "accepted": 52,
+    "rejected": 84
+  },
+  "matched_managed": {
+    "managed_successful": 99,
+    "local_rejected": 61,
+    "matching_row_types": 38
+  },
+  "latest_binding": {
+    "version": "v0.4.0",
+    "controls": 11,
+    "accepted": 3,
+    "rejected": 8,
+    "json_comparison_feature_enabled": true
+  }
+}

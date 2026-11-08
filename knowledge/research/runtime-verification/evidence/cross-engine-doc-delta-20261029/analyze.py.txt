@@ -1,0 +1,96 @@
+"""Compare runtime outcomes without equating errors, opaque encodings or sampled rows."""
+from pathlib import Path
+from collections import Counter,defaultdict
+from decimal import Decimal
+import hashlib,json,re
+root=Path('<LOCAL_CHECKOUT>');task=Path('<LOCAL_TASK_ROOT>/apstndb/spanalyzer/cross-engine-doc-delta-20261029');ev=task/'evidence';managed=root/'knowledge/research/runtime-verification/evidence/managed-recheck-20261029';module=root/'.tmp/cross-engine-doc-delta-20261029/module'
+def load(p):return[json.loads(s)for s in p.read_text().splitlines()if s]
+def source(name):return load(managed/(name+'.jsonl'))
+cache={name:source(name)for name in ['queries','followup','distinctness','active-batch','batch-operations','new-sys-columns','weekly-google','repair-google','tuning-google','graph-final','weekly-pg','repair-pg','tuning-pg','doc-delta-google','doc-delta-pg','hll-controls-google','hll-controls-pg']}
+def reference(r):
+ phase,family,label=r['phase'],r.get('family',''),r['label']
+ if phase=='constants-catalog':
+  file={'constant-cases':'queries','constant-followup-cases':'followup','constant-distinctness-cases':'distinctness','catalog-active-batch':'active-batch','catalog-batch-operations':'batch-operations','new-sys-column':'new-sys-columns'}.get(family)
+ elif phase=='google-new':file='repair-google'if family=='numeric-type-controls'or label=='fk-reject-generated'else'tuning-google'if family=='query-tuning'else'weekly-google'
+ elif phase=='graphs':file='graph-final'
+ elif phase=='pg-new':file='repair-pg'if family=='jsonb-count-controls'or label=='fk-reject-generated'else'tuning-pg'if family=='query-tuning'else'weekly-pg'
+ elif phase in ['doc-delta-google','doc-delta-pg']:file='hll-controls-'+phase.removeprefix('doc-delta-')if family=='hll-extra'else phase
+ else:file=None
+ if file is None:return None,None
+ hits=[x for x in cache[file]if x.get('label')==label]
+ if not hits:return None,None
+ return file,hits[-1]
+def json_value(value):
+ if value is None:return ('null',)
+ if isinstance(value,bool):return ('bool',value)
+ if isinstance(value,Decimal):return ('number',str(value.normalize())if value else '0')
+ if isinstance(value,str):return ('string',value)
+ if isinstance(value,list):return ('array',tuple(json_value(v)for v in value))
+ if isinstance(value,dict):return ('object',tuple((k,json_value(v))for k,v in sorted(value.items())))
+ return ('other',value)
+def norm(value,t):
+ if value is None:return None
+ code=t.get('code')
+ if code=='JSON'and isinstance(value,str):
+  try:return ('JSON',json_value(json.loads(value,parse_float=Decimal,parse_int=Decimal)))
+  except ValueError:return value
+ if code=='ARRAY'and isinstance(value,list):return[norm(v,t.get('arrayElementType',{}))for v in value]
+ if code=='STRUCT'and isinstance(value,list):return{f['name']:norm(v,f['type'])for f,v in zip(t.get('structType',{}).get('fields',[]),value)}
+ return value
+def normalized_rows(r):
+ types={f['name']:f['type']for f in r.get('metadata',{}).get('rowType',{}).get('fields',[])}
+ return[{k:norm(v,types.get(k,{}))for k,v in row.items()}for row in r.get('rows',[])]
+def is_opaque(r):return any(any('sketch'in k.lower()and v is not None for k,v in row.items())for row in r.get('rows',[]))
+def classification(r):
+ code=r.get('code')
+ if code=='NOT_RUN':return'dependency_blocked'
+ if code=='OK':return'executed'
+ if code in ['DeadlineExceeded','Unavailable','Internal','Unknown','ResourceExhausted','Unauthenticated','PermissionDenied']:return'inconclusive_transport_or_environment'
+ if re.search(r'syntax error',r.get('error',''),re.I):return'syntax_rejected'
+ if re.search(r'not supported|unimplemented',r.get('error',''),re.I):return'explicitly_unsupported_after_submission'
+ return'later_error_after_submission'
+def scans(r):return[n['metadata']for n in r.get('plan',{}).get('planNodes',[])if n.get('metadata',{}).get('scan_type')]
+def hashcols(rows):
+ cols=[{k:(int(row[k])if k=='ordinal_position'else row[k])for k in ['table_name','column_name','spanner_type','ordinal_position']}for row in rows]
+ data=json.dumps(cols,ensure_ascii=False,separators=(',',':')).replace('<','\\u003c').replace('>','\\u003e').replace('&','\\u0026').encode();return hashlib.sha256(data).hexdigest(),cols
+reports={}
+for backend in ['omni-r5','omni-lts','emulator']:
+ path=ev/(backend+'.stdout')
+ if not path.exists():continue
+ original_records=load(path);records=original_records[:]
+ repair_path=ev/'emulator-repair.stdout'
+ if backend=='emulator'and repair_path.exists():
+  repaired=[dict(r,phase='graphs',producer_phase='graphs-repair',producer_file='emulator-repair.stdout')for r in load(repair_path)if r.get('phase')=='graphs-repair'and r.get('family')]
+  replacements={r['label']:r for r in repaired}
+  records=[replacements.get(r['label'],r)if r.get('phase')=='graphs'and r.get('family')else r for r in records]
+ legacy_path=ev/(backend+'-legacy.stdout');legacy=load(legacy_path)if legacy_path.exists()else[]
+ corrected=next((r for r in legacy if r.get('phase')=='google-constants'and r['label']=='if-subquery-unused'),None)
+ if corrected is not None:
+  records=[dict(corrected,phase=r['phase'],family=r['family'],kind='query',producer_file=backend+'-legacy.stdout',producer_phase='google-constants',original_core_code=r['code'],harness_correction='Original adapter omitted choose=true; unchanged retained producer binds the input parameter.')if r.get('phase')=='constants-catalog'and r['label']=='if-subquery-unused'else r for r in records]
+ if not any(r['label']=='runtime-cleanup'for r in records):continue
+ pairs=[]
+ for r in records:
+  if not r.get('family'):continue
+  file,before=reference(r)
+  if before is None:continue
+  row={'phase':r['phase'],'label':r['label'],'family':r['family'],'kind':r.get('kind'),'reference':file+'.jsonl','managed_code':before.get('code'),'code':r['code'],'code_equal':r['code']==before.get('code'),'classification':classification(r),'error':r.get('error','')}
+  excluded=r['family'].startswith(('catalog','new-sys-column'))or r['family']in ['storage','metadata','numeric-type-controls']or r['label'].startswith('tokenize-')or is_opaque(r)or is_opaque(before)
+  if r.get('kind')=='query'and r['code']==before.get('code')=='OK'and not excluded:
+   row['rows_equal']=normalized_rows(r)==normalized_rows(before);row['row_types_equal']=r.get('metadata',{}).get('rowType')==before.get('metadata',{}).get('rowType')
+  pairs.append(row)
+ catalog={}
+ for label in ['information-schema-columns','spanner-sys-columns']:
+  row=next(r for r in records if r['label']==label);digest,cols=hashcols(row['rows']);catalog[label]={'code':row['code'],'column_count':len(cols),'table_count':len({r['table_name']for r in cols}),'tuple_array_sha256':digest,'columns':cols}
+ groups={}
+ for phase in ['constants-catalog','google-new','graphs','pg-new','doc-delta-google','doc-delta-pg']:
+  rr=[r for r in records if r['phase']==phase and r.get('family')];pp=[r for r in pairs if r['phase']==phase];groups[phase]={'steps':len(rr),'codes':dict(Counter(r['code']for r in rr)),'mapped_cases':len(pp),'equal_codes':sum(r['code_equal']for r in pp),'comparable_successful_rows':sum('rows_equal'in r for r in pp),'equal_successful_rows':sum(r.get('rows_equal',False)for r in pp)}
+ keys=lambda phase:{r['label']:r for r in records if r['phase']==phase}
+ constants={}
+ for family in ['constant-cases','constant-followup-cases','constant-distinctness-cases']:
+  rr=[r for r in records if r.get('family')==family];pp=[p for p in pairs if p['family']==family];constants[family]={'cases':len(rr),'codes':dict(Counter(r['code']for r in rr)),'code_matches_managed':sum(r['code_equal']for r in pp),'successful_row_pairs':sum('rows_equal'in r for r in pp),'matching_successful_rows':sum(r.get('rows_equal',False)for r in pp)}
+ plans=[]
+ for r in records:
+  if r.get('profile')or r.get('plan')or(r['phase']=='google-new'and r.get('family')in ['numeric-search','filtered-search'])or r.get('family')=='json_search_equality':
+   if r.get('kind')=='query':plans.append({'phase':r['phase'],'label':r['label'],'code':r['code'],'rows':r.get('rows'),'scan_metadata':scans(r),'plan_node_count':len(r.get('plan',{}).get('planNodes',[]))})
+ reports[backend]={'scope':'Same managed case labels and logical fixtures; API mutations and SQL seed equivalents distinguished in producer. No opaque sketch, sampled SYS/storage or token encoding equality claim.','groups':groups,'constants':constants,'catalog':catalog,'pairs':pairs,'plan_observations':plans,'initial_capacity_failures':[{k:r.get(k)for k in ['phase','label','code','error']}for r in original_records if 'limit 16'in r.get('error','')],'harness_binding_correction':corrected is not None,'inconclusive':[{k:r.get(k)for k in ['phase','label','code','error']}for r in records if classification(r)=='inconclusive_transport_or_environment'],'code_differences':[r for r in pairs if not r['code_equal']],'value_differences':[r for r in pairs if r.get('rows_equal')is False]}
+(ev/'comparison.json').write_text(json.dumps(reports,indent=2)+'\n');print(json.dumps({k:{'groups':v['groups'],'constant_cases':v['constants'],'code_differences':len(v['code_differences']),'value_differences':len(v['value_differences']),'inconclusive':len(v['inconclusive']),'catalogs':{n:{k:r[k]for k in ['table_count','column_count','tuple_array_sha256']}for n,r in v['catalog'].items()}}for k,v in reports.items()}))

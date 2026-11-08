@@ -1,0 +1,112 @@
+{
+  "dialect": "google",
+  "steps": [
+    {
+      "label": "repair-node-table",
+      "family": "volatile-repair",
+      "kind": "ddl",
+      "sql": "CREATE TABLE PropNodes(Id INT64 NOT NULL) PRIMARY KEY(Id)"
+    },
+    {
+      "label": "repair-node-insert",
+      "family": "volatile-repair",
+      "kind": "dml",
+      "statements": [
+        "INSERT INTO PropNodes(Id) VALUES(3),(1),(2)"
+      ],
+      "requires": [
+        "repair-node-table"
+      ]
+    },
+    {
+      "label": "repair-view",
+      "family": "volatile-repair",
+      "kind": "ddl",
+      "sql": "CREATE VIEW VolatileView SQL SECURITY INVOKER AS SELECT n.Id, GENERATE_UUID() AS V FROM PropNodes AS n",
+      "requires": [
+        "repair-node-insert"
+      ]
+    },
+    {
+      "label": "repair-graph-default",
+      "family": "volatile-repair",
+      "kind": "ddl",
+      "sql": "CREATE PROPERTY GRAPH Volatiledefault NODE TABLES(VolatileView KEY(Id))",
+      "requires": [
+        "repair-view"
+      ]
+    },
+    {
+      "label": "repair-read-default-1",
+      "family": "volatile-repair",
+      "kind": "query",
+      "sql": "GRAPH Volatiledefault MATCH(n) RETURN n.Id AS id,n.V AS v ORDER BY id",
+      "requires": [
+        "repair-graph-default"
+      ]
+    },
+    {
+      "label": "repair-read-default-2",
+      "family": "volatile-repair",
+      "kind": "query",
+      "sql": "GRAPH Volatiledefault MATCH(n) RETURN n.Id AS id,n.V AS v ORDER BY id",
+      "requires": [
+        "repair-graph-default"
+      ]
+    },
+    {
+      "label": "repair-graph-false",
+      "family": "volatile-repair",
+      "kind": "ddl",
+      "sql": "CREATE PROPERTY GRAPH Volatilefalse NODE TABLES(VolatileView KEY(Id)) OPTIONS(allow_view_with_volatile_column=false)",
+      "requires": [
+        "repair-view"
+      ]
+    },
+    {
+      "label": "repair-read-false-1",
+      "family": "volatile-repair",
+      "kind": "query",
+      "sql": "GRAPH Volatilefalse MATCH(n) RETURN n.Id AS id,n.V AS v ORDER BY id",
+      "requires": [
+        "repair-graph-false"
+      ]
+    },
+    {
+      "label": "repair-read-false-2",
+      "family": "volatile-repair",
+      "kind": "query",
+      "sql": "GRAPH Volatilefalse MATCH(n) RETURN n.Id AS id,n.V AS v ORDER BY id",
+      "requires": [
+        "repair-graph-false"
+      ]
+    },
+    {
+      "label": "repair-graph-true",
+      "family": "volatile-repair",
+      "kind": "ddl",
+      "sql": "CREATE PROPERTY GRAPH Volatiletrue NODE TABLES(VolatileView KEY(Id)) OPTIONS(allow_view_with_volatile_column=true)",
+      "requires": [
+        "repair-view"
+      ]
+    },
+    {
+      "label": "repair-read-true-1",
+      "family": "volatile-repair",
+      "kind": "query",
+      "sql": "GRAPH Volatiletrue MATCH(n) RETURN n.Id AS id,n.V AS v ORDER BY id",
+      "requires": [
+        "repair-graph-true"
+      ]
+    },
+    {
+      "label": "repair-read-true-2",
+      "family": "volatile-repair",
+      "kind": "query",
+      "sql": "GRAPH Volatiletrue MATCH(n) RETURN n.Id AS id,n.V AS v ORDER BY id",
+      "requires": [
+        "repair-graph-true"
+      ]
+    }
+  ]
+}

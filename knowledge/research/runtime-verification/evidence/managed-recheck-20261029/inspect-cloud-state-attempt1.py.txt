@@ -1,0 +1,12 @@
+"""Read target state privately; emit counts and lifecycle fields, never coordinates."""
+import datetime,json,os,subprocess,sys
+project=os.environ['SPANNER_PROJECT_ID'];instance=os.environ['SPANNER_INSTANCE_ID'];base=os.environ['SPANNER_DATABASE_ID']
+def read(args):
+ p=subprocess.run(['gcloud','--quiet',*args,'--project',project,'--format=json'],capture_output=True,text=True)
+ if p.returncode:raise RuntimeError('Read-only gcloud state request failed; raw output withheld')
+ return json.loads(p.stdout)
+i=read(['spanner','instances','describe',instance]);d=read(['spanner','databases','list','--instance',instance])
+only_base=len(d)==1 and d[0]['name'].rsplit('/',1)[-1]==base
+result={'observed_at':datetime.datetime.now(datetime.timezone.utc).isoformat(),'instance':{k:i[k]for k in ['instanceType','edition','state','createTime','freeInstanceMetadata','resourceLocation','defaultBackupScheduleType']if k in i},'databases':{'total':len(d),'only_dedicated_database':only_base,'ready':all(x.get('state')=='READY'for x in d),'dialects':[x.get('databaseDialect')for x in d]},'operations':'Read-only describe/list; no provisioning, upgrade, deletion or profile changes.'}
+print(json.dumps(result))
+if not only_base or i.get('instanceType')!='FREE_INSTANCE' or i.get('state')!='READY':sys.exit(1)

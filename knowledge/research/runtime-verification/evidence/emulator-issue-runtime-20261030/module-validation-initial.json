@@ -1,0 +1,35 @@
+{
+  "status": "failed",
+  "scope": "Offline module tests; survey short mode skips container integration; no managed/Omni requirement flags. No container integration or real target requirement flags.",
+  "checks": [
+    {
+      "name": "survey-short",
+      "argv": [
+        "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go",
+        "test",
+        "-short",
+        "./..."
+      ],
+      "cwd": "<LOCAL_CHECKOUT>/survey",
+      "gowork": "off",
+      "started_at": "2026-10-30T08:26:27.335472+00:00",
+      "completed_at": "2026-10-30T08:26:27.942985+00:00",
+      "exit_code": 0,
+      "log": "survey-short.log"
+    },
+    {
+      "name": "tools-unit",
+      "argv": [
+        "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go",
+        "test",
+        "./..."
+      ],
+      "cwd": "<LOCAL_CHECKOUT>/tools",
+      "gowork": "<LOCAL_CHECKOUT>/go.work",
+      "started_at": "2026-10-30T08:26:27.335859+00:00",
+      "completed_at": "2026-10-30T08:26:29.098098+00:00",
+      "exit_code": 1,
+      "log": "tools-unit.log"
+    }
+  ]
+}

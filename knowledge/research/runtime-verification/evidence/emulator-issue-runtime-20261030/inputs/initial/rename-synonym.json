@@ -1,0 +1,61 @@
+{
+  "dialect": "google",
+  "steps": [
+    {
+      "label": "rename-parent",
+      "family": "issue-251",
+      "kind": "ddl",
+      "sql": "CREATE TABLE RenameParent(id INT64 NOT NULL) PRIMARY KEY(id)",
+      "requires": [],
+      "timeout_seconds": 30
+    },
+    {
+      "label": "rename-child",
+      "family": "issue-251",
+      "kind": "ddl",
+      "sql": "CREATE TABLE RenameChild(id INT64 NOT NULL,parent INT64,CONSTRAINT FK FOREIGN KEY(parent) REFERENCES RenameParent(id)) PRIMARY KEY(id)",
+      "requires": [
+        "rename-parent"
+      ],
+      "timeout_seconds": 30
+    },
+    {
+      "label": "rename-with-fk",
+      "family": "issue-251",
+      "kind": "ddl",
+      "sql": "RENAME TABLE RenameChild TO RenamedChild",
+      "requires": [
+        "rename-child"
+      ],
+      "timeout_seconds": 12
+    },
+    {
+      "label": "add-synonym",
+      "family": "issue-290",
+      "kind": "ddl",
+      "sql": "ALTER TABLE RenameParent ADD SYNONYM ParentAlias",
+      "requires": [
+        "rename-parent"
+      ],
+      "timeout_seconds": 30
+    },
+    {
+      "label": "synonym-metadata",
+      "family": "issue-290",
+      "kind": "query",
+      "sql": "SELECT TABLE_NAME,SYNONYM FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME='RenameParent'",
+      "requires": [
+        "rename-parent"
+      ],
+      "timeout_seconds": 15
+    },
+    {
+      "label": "rename-export",
+      "family": "issue-251",
+      "kind": "ddl-export",
+      "sql": "",
+      "requires": [],
+      "timeout_seconds": 15
+    }
+  ]
+}

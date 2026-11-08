@@ -1,0 +1,8 @@
+from pathlib import Path
+from concurrent.futures import ThreadPoolExecutor
+import subprocess,json,hashlib,datetime
+p=Path('<LOCAL_TASK_ROOT>/apstndb/spanalyzer/docs-delta-20261031/sources');target='1e880188144a326e383778ebc165a63197efbf70';base='6d7397601456dc5602c0926d254424f64643a64f';items=[('target-commit.json',f'repos/apstndb/spanner-docs-mirror/commits/{target}',None),('target.diff',f'repos/apstndb/spanner-docs-mirror/commits/{target}','application/vnd.github.diff'),('since-baseline.json',f'repos/apstndb/spanner-docs-mirror/compare/{base}...{target}',None),('current-head.json','repos/apstndb/spanner-docs-mirror/commits/main',None)]
+def get(item):
+ name,url,accept=item;args=['gh','api']+(['-H','Accept: '+accept]if accept else[])+[url];r=subprocess.run(args,capture_output=True);assert r.returncode==0,r.stderr;(p/name).write_bytes(r.stdout);return{'file':name,'api':url,'accept':accept,'retrieved_at':datetime.datetime.now(datetime.timezone.utc).isoformat(),'sha256':hashlib.sha256(r.stdout).hexdigest()}
+with ThreadPoolExecutor(max_workers=4)as pool:rows=list(pool.map(get,items))
+(p/'retrieval.json').write_text(json.dumps(rows,indent=2)+'\n');c=json.loads((p/'target-commit.json').read_text());print('target',c['sha'],c['commit']['message'],'parents',[x['sha']for x in c['parents']]);print('target files',[(x['filename'],x['status'],x['additions'],x['deletions'])for x in c['files']]);c=json.loads((p/'since-baseline.json').read_text());print('interval',c['status'],c['total_commits'],[(x['sha'],x['commit']['message'])for x in c['commits']]);print('interval files',[x['filename']for x in c['files']]);print('current head',json.loads((p/'current-head.json').read_text())['sha'])

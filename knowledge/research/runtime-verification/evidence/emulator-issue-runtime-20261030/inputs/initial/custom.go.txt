@@ -1,0 +1,395 @@
+package main
+
+import (
+	"cloud.google.com/go/spanner"
+	database "cloud.google.com/go/spanner/admin/database/apiv1"
+	dbpb "cloud.google.com/go/spanner/admin/database/apiv1/databasepb"
+	api "cloud.google.com/go/spanner/apiv1"
+	sppb "cloud.google.com/go/spanner/apiv1/spannerpb"
+	"context"
+	"crypto/sha256"
+	"encoding/json"
+	"fmt"
+	"github.com/apstndb/spanemuboost"
+	"google.golang.org/api/iterator"
+	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/reflect/protodesc"
+	"google.golang.org/protobuf/types/descriptorpb"
+	"google.golang.org/protobuf/types/known/timestamppb"
+	"math/big"
+	"sort"
+	"strings"
+	"time"
+)
+
+func typed(v any) any {
+	if f, ok := v.(float64); ok {
+		return int64(f)
+	}
+	if m, ok := v.(map[string]any); ok {
+		switch m["type"] {
+		case "json":
+			return spanner.NullJSON{Value: m["value"], Valid: true}
+		case "numeric":
+			r, _ := new(big.Rat).SetString(m["value"].(string))
+			return r
+		case "commit":
+			return spanner.CommitTimestamp
+		}
+	}
+	return v
+}
+func qrows(cx context.Context, c *spanner.Client, sql string) ([]map[string]any, error) {
+	ro := c.Single()
+	defer ro.Close()
+	it := ro.Query(cx, spanner.Statement{SQL: sql})
+	defer it.Stop()
+	return scan(it)
+}
+func sub(label string, e error, fields map[string]any) {
+	if fields == nil {
+		fields = map[string]any{}
+	}
+	fields["label"] = label
+	fields["kind"] = "sub-control"
+	fields["code"] = status.Code(e).String()
+	fields["error"] = ""
+	if e != nil {
+		fields["error"] = e.Error()
+	}
+	emit(fields)
+}
+func custom(cx context.Context, c *spanner.Client, a *database.DatabaseAdminClient, rt spanemuboost.Runtime, s step, out map[string]any) error {
+	switch s.Kind {
+	case "mutation":
+		vals := map[string]any{}
+		for k, v := range s.Values {
+			vals[k] = typed(v)
+		}
+		var m *spanner.Mutation
+		switch s.Operation {
+		case "insert":
+			m = spanner.InsertMap(s.Table, vals)
+		case "update":
+			m = spanner.UpdateMap(s.Table, vals)
+		default:
+			return fmt.Errorf("unknown mutation operation")
+		}
+		ts, e := c.Apply(cx, []*spanner.Mutation{m})
+		out["commit_timestamp"] = ts
+		out["submitted_columns"] = s.Values
+		return e
+	case "dml-returning":
+		var rows []map[string]any
+		_, e := c.ReadWriteTransaction(cx, func(cx context.Context, tx *spanner.ReadWriteTransaction) error {
+			it := tx.Query(cx, spanner.Statement{SQL: s.SQL})
+			defer it.Stop()
+			var err error
+			rows, err = scan(it)
+			return err
+		})
+		out["rows"] = rows
+		return e
+	case "api-controls":
+		return apiControls(cx, c, out)
+	case "session-abort":
+		return sessionControls(cx, c, rt, out)
+	case "stream-records":
+		return streamRecords(cx, c, out)
+	case "performance":
+		return performance(cx, c, a, out)
+	case "proto-generated":
+		return protoGenerated(cx, c, a, out)
+	default:
+		return fmt.Errorf("unknown step kind %q", s.Kind)
+	}
+}
+func apiControls(cx context.Context, c *spanner.Client, out map[string]any) error {
+	resp, e := c.ReadWriteTransactionWithOptions(cx, func(cx context.Context, tx *spanner.ReadWriteTransaction) error {
+		return tx.BufferWrite([]*spanner.Mutation{spanner.InsertMap("ApiRows", map[string]any{"id": int64(1), "val": int64(10), "ts": spanner.CommitTimestamp})})
+	}, spanner.TransactionOptions{CommitOptions: spanner.CommitOptions{ReturnCommitStats: true}})
+	sub("commit-stats", e, map[string]any{"commit_timestamp": resp.CommitTs, "commit_stats": resp.CommitStats})
+	if e != nil {
+		return e
+	}
+	for _, delay := range []time.Duration{time.Second, 3 * time.Second} {
+		select {
+		case <-time.After(delay):
+		case <-cx.Done():
+			return cx.Err()
+		}
+		readts := time.Now().Add(-500 * time.Millisecond)
+		ro := c.Single().WithTimestampBound(spanner.ReadTimestamp(readts))
+		it := ro.Read(cx, "ApiRows", spanner.AllKeys(), []string{"id", "val", "ts"})
+		rows, err := scan(it)
+		it.Stop()
+		ro.Close()
+		sub(fmt.Sprintf("read-after-%dms", delay.Milliseconds()), err, map[string]any{"read_timestamp": readts, "commit_timestamp": resp.CommitTs, "rows": rows, "read_after_commit": readts.After(resp.CommitTs)})
+	}
+	return nil
+}
+func rw() *sppb.TransactionOptions {
+	return &sppb.TransactionOptions{Mode: &sppb.TransactionOptions_ReadWrite_{ReadWrite: &sppb.TransactionOptions_ReadWrite{}}}
+}
+func sessionControls(cx context.Context, c *spanner.Client, rt spanemuboost.Runtime, out map[string]any) error {
+	_, e := c.Apply(cx, []*spanner.Mutation{spanner.InsertMap("ApiRows", map[string]any{"id": int64(1), "val": int64(1)}), spanner.InsertMap("ApiRows", map[string]any{"id": int64(2), "val": int64(2)})})
+	if e != nil {
+		return e
+	}
+	raw, e := api.NewClient(cx, rt.ClientOptions()...)
+	if e != nil {
+		return e
+	}
+	defer raw.Close()
+	sa, e := raw.CreateSession(cx, &sppb.CreateSessionRequest{Database: db})
+	if e != nil {
+		return e
+	}
+	sb, e := raw.CreateSession(cx, &sppb.CreateSessionRequest{Database: db})
+	if e != nil {
+		return e
+	}
+	defer func() {
+		clean, cancel := context.WithTimeout(context.Background(), 4*time.Second)
+		defer cancel()
+		raw.DeleteSession(clean, &sppb.DeleteSessionRequest{Name: sa.Name})
+		raw.DeleteSession(clean, &sppb.DeleteSessionRequest{Name: sb.Name})
+	}()
+	for n := 0; n < 3; n++ {
+		ta, err := raw.BeginTransaction(cx, &sppb.BeginTransactionRequest{Session: sa.Name, Options: rw()})
+		if err != nil {
+			sub(fmt.Sprintf("concurrency-%d-begin-a", n), err, nil)
+			continue
+		}
+		_, err = raw.ExecuteSql(cx, &sppb.ExecuteSqlRequest{Session: sa.Name, Transaction: &sppb.TransactionSelector{Selector: &sppb.TransactionSelector_Id{Id: ta.Id}}, Sql: "SELECT val FROM ApiRows WHERE id=1"})
+		sub(fmt.Sprintf("concurrency-%d-read-a", n), err, nil)
+		tb, err := raw.BeginTransaction(cx, &sppb.BeginTransactionRequest{Session: sb.Name, Options: rw()})
+		sub(fmt.Sprintf("concurrency-%d-begin-b", n), err, nil)
+		if err == nil {
+			_, err = raw.ExecuteSql(cx, &sppb.ExecuteSqlRequest{Session: sb.Name, Transaction: &sppb.TransactionSelector{Selector: &sppb.TransactionSelector_Id{Id: tb.Id}}, Sql: "SELECT val FROM ApiRows WHERE id=2"})
+			sub(fmt.Sprintf("concurrency-%d-read-b-disjoint", n), err, nil)
+			raw.Rollback(cx, &sppb.RollbackRequest{Session: sb.Name, TransactionId: tb.Id})
+		}
+		raw.Rollback(cx, &sppb.RollbackRequest{Session: sa.Name, TransactionId: ta.Id})
+	}
+	ta, e := raw.BeginTransaction(cx, &sppb.BeginTransactionRequest{Session: sa.Name, Options: rw()})
+	if e != nil {
+		return e
+	}
+	_, e = raw.ExecuteSql(cx, &sppb.ExecuteSqlRequest{Session: sa.Name, Transaction: &sppb.TransactionSelector{Selector: &sppb.TransactionSelector_Id{Id: ta.Id}}, Sql: "SELECT val FROM ApiRows WHERE id=1"})
+	sub("session-delete-initial-read", e, nil)
+	if e != nil {
+		return e
+	}
+	e = raw.DeleteSession(cx, &sppb.DeleteSessionRequest{Name: sa.Name})
+	sub("session-delete-active", e, nil)
+	_, err := raw.Commit(cx, &sppb.CommitRequest{Session: sa.Name, Transaction: &sppb.CommitRequest_TransactionId{TransactionId: ta.Id}})
+	sub("deleted-session-commit", err, nil)
+	tb, e := raw.BeginTransaction(cx, &sppb.BeginTransactionRequest{Session: sb.Name, Options: rw()})
+	sub("after-delete-begin", e, nil)
+	if e == nil {
+		_, e = raw.ExecuteSql(cx, &sppb.ExecuteSqlRequest{Session: sb.Name, Transaction: &sppb.TransactionSelector{Selector: &sppb.TransactionSelector_Id{Id: tb.Id}}, Sql: "SELECT val FROM ApiRows WHERE id=2"})
+		sub("after-delete-read", e, nil)
+		raw.Rollback(cx, &sppb.RollbackRequest{Session: sb.Name, TransactionId: tb.Id})
+	}
+	return nil
+}
+func decode(t *sppb.Type, v any) any {
+	if v == nil {
+		return nil
+	}
+	if t.Code == sppb.TypeCode_ARRAY {
+		a := v.([]any)
+		o := make([]any, len(a))
+		for i, x := range a {
+			o[i] = decode(t.ArrayElementType, x)
+		}
+		return o
+	}
+	if t.Code == sppb.TypeCode_STRUCT {
+		a := v.([]any)
+		o := map[string]any{}
+		for i, f := range t.StructType.Fields {
+			o[f.Name] = decode(f.Type, a[i])
+		}
+		return o
+	}
+	return v
+}
+func token(v any) string {
+	switch x := v.(type) {
+	case map[string]any:
+		if s, ok := x["token"].(string); ok {
+			return s
+		}
+		for _, v := range x {
+			if s := token(v); s != "" {
+				return s
+			}
+		}
+	case []any:
+		for _, v := range x {
+			if s := token(v); s != "" {
+				return s
+			}
+		}
+	}
+	return ""
+}
+func private(v any) any {
+	switch x := v.(type) {
+	case map[string]any:
+		o := map[string]any{}
+		for k, v := range x {
+			if strings.Contains(strings.ToLower(k), "token") || k == "server_transaction_id" {
+				o[k] = fmt.Sprintf("sha256:%x", sha256.Sum256([]byte(fmt.Sprint(v))))
+			} else {
+				o[k] = private(v)
+			}
+		}
+		return o
+	case []any:
+		o := make([]any, len(x))
+		for i, v := range x {
+			o[i] = private(v)
+		}
+		return o
+	}
+	return v
+}
+func streamRead(cx context.Context, c *spanner.Client, start, end time.Time, part string) ([]map[string]any, string, error) {
+	ro := c.Single()
+	defer ro.Close()
+	var p any = spanner.NullString{}
+	if part != "" {
+		p = part
+	}
+	it := ro.Query(cx, spanner.Statement{SQL: "SELECT ChangeRecord FROM READ_Changes(@start,@end,@part,100)", Params: map[string]any{"start": start, "end": end, "part": p}})
+	defer it.Stop()
+	rows := []map[string]any{}
+	found := ""
+	for {
+		r, e := it.Next()
+		if e == iterator.Done {
+			return rows, found, nil
+		}
+		if e != nil {
+			return rows, found, e
+		}
+		v := spanner.GenericColumnValue{}
+		if e = r.Column(0, &v); e != nil {
+			return rows, found, e
+		}
+		record := decode(v.Type, v.Value.AsInterface())
+		if found == "" {
+			found = token(record)
+		}
+		rows = append(rows, map[string]any{"record": private(record)})
+	}
+}
+func streamRecords(cx context.Context, c *spanner.Client, out map[string]any) error {
+	start := time.Now().UTC()
+	key := time.Date(1970, 1, 21, 14, 9, 51, 234567890, time.UTC)
+	previous := time.Date(2025, 2, 19, 13, 55, 36, 429694000, time.UTC)
+	resp, e := c.ReadWriteTransactionWithOptions(cx, func(cx context.Context, tx *spanner.ReadWriteTransaction) error {
+		return tx.BufferWrite([]*spanner.Mutation{spanner.InsertMap("Records", map[string]any{"key_ts": key, "id": int64(1), "value": "seed", "resource_version": spanner.CommitTimestamp, "previous_resource_version": previous})})
+	}, spanner.TransactionOptions{TransactionTag: "issue-runtime-tag"})
+	if e != nil {
+		return e
+	}
+	sub("stream-written", nil, map[string]any{"commit_timestamp": resp.CommitTs, "key_ts": key, "previous_ts": previous, "expected_tag": "issue-runtime-tag"})
+	rows, e := qrows(cx, c, "SELECT * FROM Records")
+	sub("stream-base-values", e, map[string]any{"rows": rows})
+	end := time.Now().Add(300 * time.Millisecond)
+	select {
+	case <-time.After(time.Until(end) + 100*time.Millisecond):
+	case <-cx.Done():
+		return cx.Err()
+	}
+	rows, t, e := streamRead(cx, c, start, end, "")
+	sub("stream-root", e, map[string]any{"rows": rows, "child_found": t != ""})
+	if e != nil {
+		return e
+	}
+	if t == "" {
+		return fmt.Errorf("root returned no child partition")
+	}
+	rows, _, e = streamRead(cx, c, start, end, t)
+	sub("stream-child-records", e, map[string]any{"rows": rows})
+	out["child_rows"] = len(rows)
+	return e
+}
+func performance(cx context.Context, c *spanner.Client, a *database.DatabaseAdminClient, out map[string]any) error {
+	mutations := []*spanner.Mutation{}
+	for i := 0; i < 2000; i++ {
+		mutations = append(mutations, spanner.InsertMap("Perf", map[string]any{"id": int64(i), "val": strings.Repeat("x", 1024), "grp": int64(i % 10)}))
+	}
+	at := time.Now()
+	_, e := c.Apply(cx, mutations)
+	sub("perf-seed", e, map[string]any{"rows": 2000, "elapsed_ms": time.Since(at).Milliseconds()})
+	if e != nil {
+		return e
+	}
+	samples := map[string][]float64{}
+	for i := 0; i < 5; i++ {
+		for label, sql := range map[string]string{"constant": "SELECT 1 AS value", "key": "SELECT id FROM Perf WHERE id=1999", "in": "SELECT COUNT(*) AS count FROM Perf WHERE id IN (SELECT id FROM Perf WHERE grp=1)", "join": "SELECT COUNT(*) AS count FROM Perf a JOIN Perf b ON a.id=b.id WHERE b.grp=1"} {
+			at := time.Now()
+			rows, err := qrows(cx, c, sql)
+			ms := float64(time.Since(at).Microseconds()) / 1000
+			samples[label] = append(samples[label], ms)
+			sub(fmt.Sprintf("perf-%s-%d", label, i), err, map[string]any{"rows": rows, "elapsed_ms": ms})
+		}
+	}
+	for k, v := range samples {
+		sort.Float64s(v)
+		sub("perf-median-"+k, nil, map[string]any{"samples": len(v), "median_ms": v[len(v)/2]})
+	}
+	for i := 0; i < 3; i++ {
+		name := fmt.Sprintf("PerfIndex%d", i)
+		for _, sql := range []string{"CREATE INDEX " + name + " ON Perf(val)", "DROP INDEX " + name} {
+			at := time.Now()
+			op, err := a.UpdateDatabaseDdl(cx, &dbpb.UpdateDatabaseDdlRequest{Database: db, Statements: []string{sql}})
+			if err == nil {
+				err = op.Wait(cx)
+			}
+			sub(fmt.Sprintf("perf-index-%d-%t", i, strings.HasPrefix(sql, "CREATE")), err, map[string]any{"sql": sql, "elapsed_ms": time.Since(at).Milliseconds()})
+		}
+	}
+	out["scope"] = "Bounded sample only: not a sustained-memory, asymptotic, production or before/after performance claim"
+	return nil
+}
+func protoGenerated(cx context.Context, c *spanner.Client, a *database.DatabaseAdminClient, out map[string]any) error {
+	ts := protodesc.ToFileDescriptorProto((&timestamppb.Timestamp{}).ProtoReflect().Descriptor().ParentFile())
+	f := &descriptorpb.FileDescriptorProto{Name: proto.String("issue332.proto"), Package: proto.String("project.service"), Syntax: proto.String("proto3"), Dependency: []string{"google/protobuf/timestamp.proto"}, MessageType: []*descriptorpb.DescriptorProto{{Name: proto.String("Parent"), Field: []*descriptorpb.FieldDescriptorProto{{Name: proto.String("child"), Number: proto.Int32(1), Type: descriptorpb.FieldDescriptorProto_TYPE_MESSAGE.Enum(), TypeName: proto.String(".project.service.Child")}}}, {Name: proto.String("Child"), Field: []*descriptorpb.FieldDescriptorProto{{Name: proto.String("created_at"), Number: proto.Int32(1), Type: descriptorpb.FieldDescriptorProto_TYPE_MESSAGE.Enum(), TypeName: proto.String(".google.protobuf.Timestamp")}}}}}
+	desc, e := proto.Marshal(&descriptorpb.FileDescriptorSet{File: []*descriptorpb.FileDescriptorProto{ts, f}})
+	if e != nil {
+		return e
+	}
+	statements := []string{"CREATE PROTO BUNDLE(project.service.Parent,project.service.Child,google.protobuf.Timestamp)", "CREATE TABLE ProtoNanos(parent project.service.Parent NOT NULL,id STRING(MAX) NOT NULL,created_at TIMESTAMP NOT NULL AS(TIMESTAMP_ADD(TIMESTAMP_SECONDS(parent.child.created_at.seconds),INTERVAL parent.child.created_at.nanos NANOSECOND)) STORED) PRIMARY KEY(id)", "CREATE TABLE ProtoSeconds(parent project.service.Parent NOT NULL,id STRING(MAX) NOT NULL,created_at TIMESTAMP NOT NULL AS(TIMESTAMP_SECONDS(parent.child.created_at.seconds)) STORED) PRIMARY KEY(id)"}
+	op, e := a.UpdateDatabaseDdl(cx, &dbpb.UpdateDatabaseDdlRequest{Database: db, Statements: statements, ProtoDescriptors: desc})
+	if e == nil {
+		e = op.Wait(cx)
+	}
+	sub("proto-generated-ddl", e, map[string]any{"sql": statements})
+	if e != nil {
+		return e
+	}
+	for _, name := range []string{"ProtoNanos", "ProtoSeconds"} {
+		_, err := c.ReadWriteTransaction(cx, func(cx context.Context, tx *spanner.ReadWriteTransaction) error {
+			_, err := tx.Update(cx, spanner.Statement{SQL: "INSERT INTO " + name + "(id,parent) VALUES('A',NEW project.service.Parent(NEW project.service.Child(TIMESTAMP '2025-01-01T00:00:00.123456Z' AS created_at) AS child))"})
+			return err
+		})
+		sub(name+"-insert-literal", err, nil)
+		_, err = c.ReadWriteTransaction(cx, func(cx context.Context, tx *spanner.ReadWriteTransaction) error {
+			_, err := tx.Update(cx, spanner.Statement{SQL: "INSERT INTO " + name + "(id,parent) VALUES('B',CAST('child { created_at { seconds: 1735689600 nanos: 123456000 } }' AS project.service.Parent))"})
+			return err
+		})
+		sub(name+"-insert-textproto", err, nil)
+		rows, err := qrows(cx, c, "SELECT id,created_at FROM "+name)
+		sub(name+"-read", err, map[string]any{"rows": rows})
+	}
+	return nil
+}
+
+var _ = json.Valid

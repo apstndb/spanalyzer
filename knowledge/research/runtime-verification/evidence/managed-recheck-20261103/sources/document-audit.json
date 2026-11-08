@@ -1,0 +1,126 @@
+{
+  "status": "pass",
+  "base": "1e880188144a326e383778ebc165a63197efbf70",
+  "head": "ec91ce497a621dd3d318cad40a58944367415165",
+  "commit_count": 3,
+  "changed_documents": [
+    {
+      "path": "docs/docs.cloud.google.com/spanner-omni/create-helm-configuration.md",
+      "status": "reviewed",
+      "disposition": "Helm examples advance from 1.0.0 to 1.1.0; no Kubernetes deployment performed."
+    },
+    {
+      "path": "docs/docs.cloud.google.com/spanner-omni/deploy-multi-cluster-on-kubernetes.md",
+      "status": "reviewed",
+      "disposition": "Helm chart version examples advance to 1.1.0; source-only."
+    },
+    {
+      "path": "docs/docs.cloud.google.com/spanner-omni/deploy-on-kubernetes.md",
+      "status": "reviewed",
+      "disposition": "Helm chart version examples advance to 1.1.0; source-only."
+    },
+    {
+      "path": "docs/docs.cloud.google.com/spanner-omni/download.md",
+      "status": "reviewed",
+      "disposition": "Container/server/CLI examples advance from r4-lts.1 to r5, chart to 1.1.0, release date October 29; not proof that older images disappeared."
+    },
+    {
+      "path": "docs/docs.cloud.google.com/spanner-omni/quickstart.md",
+      "status": "reviewed",
+      "disposition": "Image example advances to r5; previous exact-image runtime observations remain dated."
+    },
+    {
+      "path": "docs/docs.cloud.google.com/spanner-omni/release-notes.md",
+      "status": "reviewed",
+      "disposition": "Adds October 28 r4-lts.1 patch notice and October 29 r5 notice, with managed incorporation cutoff October 27. Publication capture differs from release label date."
+    },
+    {
+      "path": "docs/docs.cloud.google.com/spanner-omni/scale-kubernetes-deployment.md",
+      "status": "reviewed",
+      "disposition": "Helm chart examples advance to 1.1.0; source-only."
+    },
+    {
+      "path": "docs/docs.cloud.google.com/spanner-omni/setup.md",
+      "status": "reviewed",
+      "disposition": "Image example advances to r5; no installer execution."
+    },
+    {
+      "path": "docs/docs.cloud.google.com/spanner-omni/upgrade-deployment.md",
+      "status": "reviewed",
+      "disposition": "Version examples advance to r5; no upgrade/rollback execution."
+    },
+    {
+      "path": "docs/docs.cloud.google.com/spanner-omni/use-console.md",
+      "status": "reviewed",
+      "disposition": "Image example advances to r5; no console execution."
+    },
+    {
+      "path": "docs/docs.cloud.google.com/spanner/docs/create-manage-instances.md",
+      "status": "reviewed",
+      "disposition": "Asymmetric autoscaling Java sample explicitly sets Enterprise Plus. No instance/edition change performed."
+    },
+    {
+      "path": "docs/docs.cloud.google.com/spanner/docs/getting-started/java.md",
+      "status": "reviewed",
+      "disposition": "Adds dependency installation instructions, BOM 26.90.0 and Spanner 6.125.0; no Java dependency upgrade performed."
+    },
+    {
+      "path": "docs/docs.cloud.google.com/spanner/docs/metrics.md",
+      "status": "reviewed",
+      "disposition": "Adds BETA api/tvf_request_count and api/tvf_request_latencies; retains labels and 60s sampling/180s visibility guidance. No Monitoring emission/time-series assertion."
+    },
+    {
+      "path": "docs/docs.cloud.google.com/spanner/docs/reference/libraries.md",
+      "status": "reviewed",
+      "disposition": "Java BOM 26.78.0 to 26.90.0, Spanner 6.113.0 to 6.125.0, closes XML dependencies; source-only."
+    },
+    {
+      "path": "docs/docs.cloud.google.com/spanner/docs/reference/standard-sql/search_functions.md",
+      "status": "reviewed",
+      "disposition": "Documents raw-score/ranking and in-flight pagination discontinuity when default scorer changes; version pinning mitigation. Current-version controls tested; future switch not simulated."
+    },
+    {
+      "path": "docs/docs.cloud.google.com/spanner/docs/release-notes.md",
+      "status": "reviewed",
+      "disposition": "October 30 JSON/JSONB equality/order/group/casts/coercion/search announcement; runtime functionality had prior coverage and is rechecked."
+    },
+    {
+      "path": "docs/docs.cloud.google.com/spanner/docs/use-cmek.md",
+      "status": "reviewed",
+      "disposition": "Java backup sample wait changes 1200 to 3600 seconds in two snippets; no backup operation performed."
+    }
+  ],
+  "bookkeeping_paths": [
+    "logs/urls.txt",
+    "metadata.yaml"
+  ],
+  "official_body_comparisons": [
+    {
+      "document": "spanner-omni/differences",
+      "official_updateTime": "2026-10-01T16:55:26Z",
+      "matches_mirror_target_body": true
+    },
+    {
+      "document": "spanner/docs/release-notes",
+      "official_updateTime": "2026-10-30T17:55:15Z",
+      "matches_mirror_target_body": true
+    },
+    {
+      "document": "spanner-omni/release-notes",
+      "official_updateTime": "2026-10-31T21:40:02Z",
+      "matches_mirror_target_body": true
+    },
+    {
+      "document": "spanner-omni/download",
+      "official_updateTime": "2026-10-30T23:31:37Z",
+      "matches_mirror_target_body": true
+    },
+    {
+      "document": "spanner/docs/reference/standard-sql/search_functions",
+      "official_updateTime": "2026-10-29T22:25:55Z",
+      "matches_mirror_target_body": true
+    }
+  ],
+  "differences_body_unchanged_in_interval": true,
+  "interpretation_boundary": "Document updateTime, mirror commit time, release label date and runtime observation time are distinct."
+}

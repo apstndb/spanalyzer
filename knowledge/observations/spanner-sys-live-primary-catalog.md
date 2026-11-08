@@ -155,3 +155,13 @@ This catalog is suitable for type-checking queries against the pinned common
 surface. It is not a substitute for checking `INFORMATION_SCHEMA.COLUMNS` on a
 specific deployment when rollout timing matters, and it does not guarantee
 that a future managed or Omni release preserves the same surface.
+
+## Historical navigation
+
+The [runtime index](../research/runtime-verification/index.md) links current
+selected investigations and retained historical notes. Separate
+[managed](../research/runtime-verification/managed/index.md),
+[Omni](../research/runtime-verification/omni/index.md) and
+[Emulator](../research/runtime-verification/emulator/index.md) timelines retain
+observation and correction dates. Appending history does not change the
+selected captures or analyzer projection policy described here.

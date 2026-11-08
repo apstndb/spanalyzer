@@ -1,0 +1,106 @@
+{
+  "observed_on": "2026-10-05 UTC and Asia/Tokyo",
+  "source_revision": "c2d7792dd7f83d5dd086e2d32bc22e5d253cf06c",
+  "source_state": "Pre-existing dirty working snapshot; current task changes documentation/evidence only",
+  "initial_working_diff_sha256": "21c1108530e9fce9ff67297e1c1186bdb01787b01607c272ec875a77678f2ef3",
+  "initial_working_diff_local_file": "<LOCAL_TASK_ROOT>/apstndb/spanalyzer/cross-engine-20261005/source.patch",
+  "go": "go1.26.8 darwin/arm64",
+  "dependency_scope": {
+    "feature": "Spanner v1.91.0; spanemuboost v0.4.7 with isolated Omni listen-address fix",
+    "managed_readonly_catalog_cleanup": "survey, GOWORK=off; Spanner v1.88.0 and memefish v0.8.1"
+  },
+  "startup_producer_sha256": "82b1a896271f666ec2398d5b76add04d1907fee2d434bf86179e2d5569861587",
+  "producers": {
+    "emulator-feature-probe": {
+      "source_sha256": "16c7d711f7f327636b990e09a9cbbf3fa52a878502aa16a6574834a8bd9a13cd",
+      "binary_sha256": "4bb1b949e26ec6d6bef4e8199d516e5eedf9327a3a6da6aa978ba5d9448ca9b4"
+    },
+    "emulator-option-control": {
+      "source_sha256": "0a795479082071238f34656e4244e9f6baddcf5688891905c5d947e6a56f70b8",
+      "binary_sha256": "72bfd72b502b44960aba0590558bff968f73fd1c8f30f40106f06b6d5d1b5724"
+    },
+    "emulator-queue-control": {
+      "source_sha256": "45477340509693ab3f8b33ad18dcb64e63ea3d694858d3e73cc1899bc00c6393",
+      "binary_sha256": "9486537882f3f71ef857a561e44813db09a7962d8d3bc85ae271a5b66e28ca4b"
+    },
+    "emulator-queue-probe": {
+      "source_sha256": "79f8002c31f393d92b847929729a2d9a82dd04d3706feb6c5753f1f25a0fed7a",
+      "binary_sha256": "ca97129a79943a002bccce52364be1765b98034405c4629b49c0b90c4b9c410f"
+    },
+    "emulator-volatile-probe": {
+      "source_sha256": "dd58bc106eab6969c8105d949109d94642a41616def0cd11a77605be3d4fb29a",
+      "binary_sha256": "fd8617fd0fb95073808be2724f670e6ac0c648067ada7d8885bce715a5c1e21a"
+    },
+    "feature-probe": {
+      "source_sha256": "0d6b7fdf0811b415e705b2c832935f7d9b9cd3412e6f301b3cb830fe7abc28d5",
+      "binary_sha256": "c171fc8014247398443d8b87e846f64ff34af6ad0cb36a2ea1694522c48878d0"
+    },
+    "queue-control": {
+      "source_sha256": "32af6a40c5962ac433c090e355c230558b86d09ec0573dc8476adaa69d784329",
+      "binary_sha256": "3fc640c503f4ff392ede97305a25d040241278718c67f5b12503c2ac62cad255"
+    },
+    "queue-probe": {
+      "source_sha256": "84517ce9688dea8f5beabb25c2f1d55de309bfb5ce94e3409d0c19ad2027bbb9",
+      "binary_sha256": "4caf955722d9df6766d4dc9c608d98c01231fc239a5bd32f26bde27b89426ad9"
+    },
+    "volatile-probe": {
+      "source_sha256": "3e7089028f01d335209f83b5172465291fbd96b41fcdfea9bd6a4bfd792e0bad",
+      "binary_sha256": "ca1f5da8438e1f01d17d9a7d1420a8fe5e5afc9130bc1d43aa60dfc7a97fce35"
+    },
+    "managed-catalog": {
+      "source_sha256": "fe8fce2594523c8ae4ac936d6a2ba20109da35e98d30726765f48e6daf50f99b"
+    },
+    "managed-cleanup": {
+      "source_sha256": "47804db84d17fcff93b22d91757628495caa38f0c0be81857930d69d516956b9"
+    },
+    "managed-google-features": {
+      "source_sha256": "092428773352fb27d4fe360cf02ee74163f792aeb7fae1c3432d1bd1cd3ba9de",
+      "binary_sha256": "93053cd2635c7ab68a9697bd6155a7369dfc9b4c8c464fba2401d80c78c38b0e"
+    },
+    "managed-pg-features": {
+      "source_sha256": "78f3855eb27f22ae37266c767c348e9b20e0f4358156bb91f2728672499f41d3",
+      "binary_sha256": "02be4839cec1603955d28d98f0f01a1dde7e2bca8a150a68fcbf4358117c7db0"
+    },
+    "managed-queue": {
+      "source_sha256": "84d0dde287bdfbffc39ed74cb8ed3615d5eb646681e696aa931824b33b765a63",
+      "binary_sha256": "7b77c104ca36b760c25dfe189fbfaa74d50657d909afe7660798195984abc46e"
+    },
+    "managed-readonly": {
+      "source_sha256": "41b711a3492c6393e8ae868b284c0222c5ac9ef793893125504cb6fe5613cfaf"
+    }
+  },
+  "records": {
+    "omni-feature-probe.jsonl": 95,
+    "omni-queue-probe.jsonl": 32,
+    "omni-queue-control.jsonl": 14,
+    "omni-volatile-probe.jsonl": 13,
+    "emulator-feature-probe.jsonl": 98,
+    "emulator-queue-probe.jsonl": 5,
+    "emulator-volatile-probe.jsonl": 17,
+    "emulator-option-control.jsonl": 18,
+    "managed-catalog.jsonl": 2,
+    "managed-cleanup.jsonl": 4,
+    "managed-google-features.jsonl": 53,
+    "managed-pg-features.jsonl": 40,
+    "managed-queue.jsonl": 32,
+    "managed-readonly.jsonl": 80
+  },
+  "runtime_identity": "Platform-specific image manifests in raw identity records and images.json; managed service build unavailable; target coordinates omitted",
+  "retention_transforms": [
+    "Managed connection coordinates redacted before capture",
+    "Request IDs removed from retained errors",
+    "Lease tokens hashed by producers; original values remain in memory only"
+  ],
+  "authority": "Owned temporary fixtures and research documentation; no commit, push, publication, dependency/pin/projection migration",
+  "durable_local_directory": "<LOCAL_TASK_ROOT>/apstndb/spanalyzer/cross-engine-20261005",
+  "initial_emulator_bootstrap": "Initial attempt exit 2 before SQL: instance absent. Emulator copies changed only EnableDatabaseAutoConfigOnly to EnableAutoConfig and then completed.",
+  "validation": {
+    "derived_record_assertions": "summary-check.log; exit 0",
+    "documentation": "documentation-checks.json"
+  },
+  "cleanup": {
+    "omni": "Database and runtime cleanup records OK; no container remains for tested image",
+    "emulator": "Database and runtime cleanup records OK; no container remains for tested image",
+    "managed": "Owned GoogleSQL fixture scans empty; temporary PostgreSQL database NotFound"
+  }
+}

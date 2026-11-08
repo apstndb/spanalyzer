@@ -1,0 +1,79 @@
+package main
+
+import (
+	"context"
+	"encoding/json"
+	"os"
+	"time"
+
+	"cloud.google.com/go/spanner"
+	"google.golang.org/api/iterator"
+	"google.golang.org/grpc/status"
+)
+
+func main() {
+	if os.Getenv("SPANNER_EMULATOR_HOST") != "" {
+		panic("emulator override")
+	}
+	ctx := context.Background()
+	client, err := spanner.NewClient(ctx, os.Getenv("TEST_REAL_SPANNER_DATABASE"))
+	if err != nil {
+		panic(err)
+	}
+	defer client.Close()
+	queries := []struct{ label, sql string }{
+		{"sys-column-count", "SELECT COUNT(*) AS n FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA='SPANNER_SYS'"},
+		{"batch-advertisement", "SELECT COLUMN_NAME AS name,SPANNER_TYPE AS type,ORDINAL_POSITION AS ordinal FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA='SPANNER_SYS' AND TABLE_NAME='BATCH_OPERATIONS' ORDER BY ORDINAL_POSITION"},
+		{"batch-limit-zero", "SELECT * FROM SPANNER_SYS.BATCH_OPERATIONS LIMIT 0"},
+		{"batch-count", "SELECT COUNT(*) AS n FROM SPANNER_SYS.BATCH_OPERATIONS"},
+		{"batch-star", "SELECT * FROM SPANNER_SYS.BATCH_OPERATIONS LIMIT 1"},
+		{"active-control", "SELECT COUNT(*) AS n FROM SPANNER_SYS.ACTIVE_BATCH_OPERATIONS"},
+	}
+	for sample := 1; sample <= 10; sample++ {
+		tx := client.ReadOnlyTransaction()
+		for _, q := range queries {
+			started := time.Now().UTC()
+			cx, cancel := context.WithTimeout(ctx, 15*time.Second)
+			it := tx.Query(cx, spanner.Statement{SQL: q.sql})
+			rows := []map[string]any{}
+			var e error
+			for {
+				var row *spanner.Row
+				row, e = it.Next()
+				if e != nil {
+					break
+				}
+				values := map[string]any{}
+				for i, name := range row.ColumnNames() {
+					var value spanner.GenericColumnValue
+					if e = row.Column(i, &value); e != nil {
+						break
+					}
+					values[name] = value.Value.AsInterface()
+				}
+				if e != nil {
+					break
+				}
+				rows = append(rows, values)
+			}
+			if e == iterator.Done {
+				e = nil
+			}
+			it.Stop()
+			cancel()
+			timestamp, timestampError := tx.Timestamp()
+			message := ""
+			if e != nil {
+				message = e.Error()
+			}
+			result := map[string]any{"sample": sample, "label": q.label, "sql": q.sql, "started_at": started.Format(time.RFC3339Nano), "completed_at": time.Now().UTC().Format(time.RFC3339Nano), "code": status.Code(e).String(), "error": message, "rows": rows, "scope": "same read-only transaction within sample; transaction identifiers omitted"}
+			if timestampError == nil {
+				result["read_timestamp"] = timestamp.UTC().Format(time.RFC3339Nano)
+			}
+			if err := json.NewEncoder(os.Stdout).Encode(result); err != nil {
+				panic(err)
+			}
+		}
+		tx.Close()
+	}
+}

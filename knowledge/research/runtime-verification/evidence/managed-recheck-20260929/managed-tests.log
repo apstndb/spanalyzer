@@ -1,0 +1,29 @@
+=== RUN   TestCanonicalDDL_RealSpanner
+    canonical_integration_test.go:106: canonical DDL diagnostic_metrics canonical_total=330 canonical_parse_errors=0 canonical_allowlisted=1 generated_total=330
+    canonical_integration_test.go:129: canonical DDL diagnostic_family family=AlterDatabase canonical=1 generated=1 delta=+0
+    canonical_integration_test.go:129: canonical DDL diagnostic_family family=AlterStatistics canonical=0 generated=1 delta=+1
+    canonical_integration_test.go:129: canonical DDL diagnostic_family family=AlterTable canonical=1 generated=0 delta=-1 expected=true
+    canonical_integration_test.go:129: canonical DDL diagnostic_family family=CreateChangeStream canonical=1 generated=1 delta=+0
+    canonical_integration_test.go:129: canonical DDL diagnostic_family family=CreateFunction canonical=4 generated=4 delta=+0
+    canonical_integration_test.go:129: canonical DDL diagnostic_family family=CreateIndex canonical=46 generated=46 delta=+0
+    canonical_integration_test.go:129: canonical DDL diagnostic_family family=CreateLocalityGroup canonical=1 generated=1 delta=+0
+    canonical_integration_test.go:129: canonical DDL diagnostic_family family=CreatePropertyGraph canonical=13 generated=13 delta=+0
+    canonical_integration_test.go:129: canonical DDL diagnostic_family family=CreateProtoBundle canonical=1 generated=1 delta=+0
+    canonical_integration_test.go:129: canonical DDL diagnostic_family family=CreateRole canonical=2 generated=2 delta=+0
+    canonical_integration_test.go:129: canonical DDL diagnostic_family family=CreateSchema canonical=18 generated=18 delta=+0
+    canonical_integration_test.go:129: canonical DDL diagnostic_family family=CreateSearchIndex canonical=6 generated=6 delta=+0
+    canonical_integration_test.go:129: canonical DDL diagnostic_family family=CreateSequence canonical=3 generated=3 delta=+0
+    canonical_integration_test.go:129: canonical DDL diagnostic_family family=CreateTable canonical=223 generated=223 delta=+0 canonical_allowlisted=1
+    canonical_integration_test.go:129: canonical DDL diagnostic_family family=CreateView canonical=9 generated=9 delta=+0
+    canonical_integration_test.go:129: canonical DDL diagnostic_family family=Grant canonical=1 generated=1 delta=+0
+--- PASS: TestCanonicalDDL_RealSpanner (12.45s)
+=== RUN   TestDrift_RealTableMetas
+    drift_test.go:118: SPANNER_SYS contract_metrics target=real_spanner registered_tables=51 advertised_tables=50 advertised_columns=587 known_absent_columns=8 has_drift=false
+    drift_test.go:118: SPANNER_SYS diagnostic_metrics target=real_spanner checked_tables=50 decoded_rows=23 advertised_not_queryable=0
+--- PASS: TestDrift_RealTableMetas (53.94s)
+=== RUN   TestExpressionIndex_RealSpanner
+--- PASS: TestExpressionIndex_RealSpanner (225.37s)
+=== RUN   TestUUID_RealSpanner
+--- PASS: TestUUID_RealSpanner (33.74s)
+PASS
+ok  	github.com/apstndb/spanalyzer/survey/infoschem	326.065s

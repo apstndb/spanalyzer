@@ -1,0 +1,68 @@
+{
+  "observed_on": "2026-09-22",
+  "runtime": "Managed Spanner, GoogleSQL and PostgreSQL; optimizer version 9; server build unavailable",
+  "target": "Existing managed verification profile; coordinates omitted; isolated temporary PostgreSQL database dropped",
+  "source_revision": "c2d7792dd7f83d5dd086e2d32bc22e5d253cf06c",
+  "working_tree": "dirty; probe compiled against current workspace dependencies",
+  "producer": {
+    "probe": {
+      "source_sha256": "928399c53133fa05f07c6f8d1ce96b2b205ff09bd0c93620496084a5dd374946",
+      "binary_sha256": "c4301e2aca49e58fa38290397abf0be4cc0d233c0c9062d949c9dced4fee7ab6",
+      "build_exit_code": 0,
+      "run_exit_code": 0
+    },
+    "pg-probe": {
+      "source_sha256": "5bd80f502d48e37f980ff2d5c8258111e4122c8486d6db8516c2732683d61ace",
+      "binary_sha256": "79666909ceb409823aed525ee296c228fcdbd30fb3d10d4ffa5ffbfb6d9ca32c",
+      "build_exit_code": 0,
+      "run_exit_code": 0
+    },
+    "pg-followup": {
+      "source_sha256": "49af45894584fc498ca06705c0740986cfdd9fe03042e643fbde699036751616",
+      "binary_sha256": "dc7e3b1b5f6b5b5e3c87d4445d33f5ac28609bb9e9c7e1074e8392c544e684fc",
+      "build_exit_code": 0,
+      "run_exit_code": 0
+    }
+  },
+  "retention_transform": "Retained producer source substitutes temporary PostgreSQL database name with release-probe-YYYYMMDD; JSONL unchanged from producers, which redact target coordinates. Source/binary hashes identify originals. Unused inherited queue helper functions were not invoked.",
+  "documentation": [
+    {
+      "file": "release-notes.html",
+      "url": "https://docs.cloud.google.com/spanner/docs/release-notes?hl=en",
+      "sha256": "a42a4bcb541f9b0e640dcf573fc97bc71aedc30bef41e86e99978f0869610309",
+      "method": "curl full HTML"
+    },
+    {
+      "file": "doc0.html",
+      "url": "https://docs.cloud.google.com/spanner/docs/sql-best-practices?hl=en",
+      "sha256": "ab7fdd3807fb237270bc0f79dc10e203842f4ce2d8a9a0539a40b3f6d74ccb27",
+      "method": "curl full HTML"
+    },
+    {
+      "file": "doc1.html",
+      "url": "https://docs.cloud.google.com/spanner/docs/reference/standard-sql/query-syntax?hl=en",
+      "sha256": "410cd4f3909569d35e9060a98a12d134c8f6733e39ebb68c8df5cdb8a4d52fce",
+      "method": "curl full HTML"
+    },
+    {
+      "file": "doc2.html",
+      "url": "https://docs.cloud.google.com/spanner/docs/reference/postgresql/query-syntax?hl=en",
+      "sha256": "982a43f7b4755102b9bdf2f68ffaace0204bb7ecc31593786532aa1480b67935",
+      "method": "curl full HTML"
+    },
+    {
+      "file": "functions.html",
+      "url": "https://docs.cloud.google.com/spanner/docs/reference/postgresql/functions?hl=en",
+      "sha256": "6805e4c405a69fd50457baa109f998faa6d34789e9cfec181008d76ea1295aa4",
+      "method": "curl full HTML"
+    },
+    {
+      "file": "dkcli-release-notes.md",
+      "url": "https://docs.cloud.google.com/spanner/docs/release-notes",
+      "sha256": "31db8bc1230a4065b356842a5601df149b8341a3187edc6411ca478aa1ed8e4e",
+      "method": "dkcli get"
+    }
+  ],
+  "documentation_difference": "Direct release page starts September 18; dkcli starts September 17.",
+  "durable_local_directory": "<LOCAL_TASK_ROOT>/apstndb/spanalyzer/release-notes-20260922"
+}

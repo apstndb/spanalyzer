@@ -1,0 +1,94 @@
+{
+  "status": "passed",
+  "commands": [
+    {
+      "name": "survey-short",
+      "argv": [
+        "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go",
+        "test",
+        "-short",
+        "./..."
+      ],
+      "cwd": "<LOCAL_CHECKOUT>/survey",
+      "GOWORK": "off",
+      "started_at": "2026-10-30T09:51:18.383354+00:00",
+      "completed_at": "2026-10-30T09:51:18.984317+00:00",
+      "exit_code": 0,
+      "log": "<LOCAL_TASK_ROOT>/apstndb/spanalyzer/gql-order-root-cause-20261030/validation/survey-short.log",
+      "retained_log": "validation-logs/survey-short.log"
+    },
+    {
+      "name": "tools-tests",
+      "argv": [
+        "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go",
+        "test",
+        "./..."
+      ],
+      "cwd": "<LOCAL_CHECKOUT>/tools",
+      "GOWORK": "<LOCAL_CHECKOUT>/go.work",
+      "started_at": "2026-10-30T09:51:18.383484+00:00",
+      "completed_at": "2026-10-30T09:51:20.394626+00:00",
+      "exit_code": 0,
+      "log": "<LOCAL_TASK_ROOT>/apstndb/spanalyzer/gql-order-root-cause-20261030/validation/tools-tests.log",
+      "retained_log": "validation-logs/tools-tests.log"
+    },
+    {
+      "name": "okf-all",
+      "argv": [
+        "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go",
+        "run",
+        "./okf-check",
+        "--repo-root",
+        "..",
+        "--gate",
+        "all",
+        "--publication-manifest",
+        "<LOCAL_TASK_ROOT>/apstndb/spanalyzer/gql-order-root-cause-20261030/publication-manifest.json"
+      ],
+      "cwd": "<LOCAL_CHECKOUT>/tools",
+      "GOWORK": "<LOCAL_CHECKOUT>/go.work",
+      "started_at": "2026-10-30T09:51:20.394871+00:00",
+      "completed_at": "2026-10-30T09:51:20.977237+00:00",
+      "exit_code": 0,
+      "log": "<LOCAL_TASK_ROOT>/apstndb/spanalyzer/gql-order-root-cause-20261030/validation/okf-all.log",
+      "retained_log": "validation-logs/okf-all.log"
+    },
+    {
+      "name": "markdown-language",
+      "argv": [
+        "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go",
+        "run",
+        "./markdown-language-check",
+        "--repo-root",
+        ".."
+      ],
+      "cwd": "<LOCAL_CHECKOUT>/tools",
+      "GOWORK": "<LOCAL_CHECKOUT>/go.work",
+      "started_at": "2026-10-30T09:51:20.977645+00:00",
+      "completed_at": "2026-10-30T09:51:21.056808+00:00",
+      "exit_code": 0,
+      "log": "<LOCAL_TASK_ROOT>/apstndb/spanalyzer/gql-order-root-cause-20261030/validation/markdown-language.log",
+      "retained_log": "validation-logs/markdown-language.log"
+    },
+    {
+      "name": "git-diff-check",
+      "argv": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "cwd": "<LOCAL_CHECKOUT>",
+      "GOWORK": "<LOCAL_CHECKOUT>/go.work",
+      "started_at": "2026-10-30T09:51:21.056919+00:00",
+      "completed_at": "2026-10-30T09:51:21.074799+00:00",
+      "exit_code": 0,
+      "log": "<LOCAL_TASK_ROOT>/apstndb/spanalyzer/gql-order-root-cause-20261030/validation/git-diff-check.log",
+      "retained_log": "validation-logs/git-diff-check.log"
+    }
+  ],
+  "evidence_assertions": {
+    "passed": 319,
+    "failed": 0
+  },
+  "boundary": "No new managed/Omni request and no full source-build or broad source-fix test. Existing implementation and dependencies unchanged."
+}

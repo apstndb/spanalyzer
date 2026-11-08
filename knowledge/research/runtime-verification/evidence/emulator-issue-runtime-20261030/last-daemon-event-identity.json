@@ -1,0 +1,176 @@
+{
+  "scope": "Runtime completed before active inspection; exact-image bounded create/start/destroy events recover identity. No active command/Env inspection fabricated.",
+  "argv": [
+    "docker",
+    "events",
+    "--since",
+    "2026-10-30T08:11:43.138795+00:00",
+    "--until",
+    "2026-10-30T08:11:48.039889+00:00",
+    "--filter",
+    "type=container",
+    "--format",
+    "{{json .}}"
+  ],
+  "events": [
+    {
+      "Type": "container",
+      "Action": "create",
+      "Actor": {
+        "ID": "507bf36d72958e4087ba1a13b2845f52b05e2da385d41ddb66d2fd2ae1fa0d06",
+        "Attributes": {
+          "image": "gcr.io/cloud-spanner-emulator/emulator:1.5.59@sha256:969af6a9349948fbfb4a826c18e160e258a4005f7c759f8e7f2dcec369cccba8",
+          "name": "affectionate_golick",
+          "org.testcontainers": "true",
+          "org.testcontainers.lang": "go",
+          "org.testcontainers.reap": "true",
+          "org.testcontainers.sessionId": "ca0339343d1f8e65b131c871a842d6d00a80d88ad5d2c701f77b7dae26f69896",
+          "org.testcontainers.version": "0.42.0"
+        }
+      },
+      "scope": "local",
+      "time": 1793347904,
+      "timeNano": 1793347904899855879
+    },
+    {
+      "Type": "container",
+      "Action": "start",
+      "Actor": {
+        "ID": "507bf36d72958e4087ba1a13b2845f52b05e2da385d41ddb66d2fd2ae1fa0d06",
+        "Attributes": {
+          "image": "gcr.io/cloud-spanner-emulator/emulator:1.5.59@sha256:969af6a9349948fbfb4a826c18e160e258a4005f7c759f8e7f2dcec369cccba8",
+          "name": "affectionate_golick",
+          "org.testcontainers": "true",
+          "org.testcontainers.lang": "go",
+          "org.testcontainers.reap": "true",
+          "org.testcontainers.sessionId": "ca0339343d1f8e65b131c871a842d6d00a80d88ad5d2c701f77b7dae26f69896",
+          "org.testcontainers.version": "0.42.0"
+        }
+      },
+      "scope": "local",
+      "time": 1793347905,
+      "timeNano": 1793347905315101020
+    },
+    {
+      "Type": "container",
+      "Action": "exec_create: /bin/sh -c true && (\n\t\t\t\t\tcat /proc/net/tcp* | awk '{print $2}' | grep -i :2332 ||\n\t\t\t\t\tnc -vz -w 1 localhost 9010 ||\n\t\t\t\t\t/bin/sh -c '</dev/tcp/localhost/9010'\n\t\t\t\t)\n\t\t\t\t",
+      "Actor": {
+        "ID": "507bf36d72958e4087ba1a13b2845f52b05e2da385d41ddb66d2fd2ae1fa0d06",
+        "Attributes": {
+          "execID": "7301d9e3e837fd59e4679230d6dd0e81630e86b2d5407c7c74bf7039bcd4e9df",
+          "image": "gcr.io/cloud-spanner-emulator/emulator:1.5.59@sha256:969af6a9349948fbfb4a826c18e160e258a4005f7c759f8e7f2dcec369cccba8",
+          "name": "affectionate_golick",
+          "org.testcontainers": "true",
+          "org.testcontainers.lang": "go",
+          "org.testcontainers.reap": "true",
+          "org.testcontainers.sessionId": "ca0339343d1f8e65b131c871a842d6d00a80d88ad5d2c701f77b7dae26f69896",
+          "org.testcontainers.version": "0.42.0"
+        }
+      },
+      "scope": "local",
+      "time": 1793347905,
+      "timeNano": 1793347905318728240
+    },
+    {
+      "Type": "container",
+      "Action": "exec_start: /bin/sh -c true && (\n\t\t\t\t\tcat /proc/net/tcp* | awk '{print $2}' | grep -i :2332 ||\n\t\t\t\t\tnc -vz -w 1 localhost 9010 ||\n\t\t\t\t\t/bin/sh -c '</dev/tcp/localhost/9010'\n\t\t\t\t)\n\t\t\t\t",
+      "Actor": {
+        "ID": "507bf36d72958e4087ba1a13b2845f52b05e2da385d41ddb66d2fd2ae1fa0d06",
+        "Attributes": {
+          "execID": "7301d9e3e837fd59e4679230d6dd0e81630e86b2d5407c7c74bf7039bcd4e9df",
+          "image": "gcr.io/cloud-spanner-emulator/emulator:1.5.59@sha256:969af6a9349948fbfb4a826c18e160e258a4005f7c759f8e7f2dcec369cccba8",
+          "name": "affectionate_golick",
+          "org.testcontainers": "true",
+          "org.testcontainers.lang": "go",
+          "org.testcontainers.reap": "true",
+          "org.testcontainers.sessionId": "ca0339343d1f8e65b131c871a842d6d00a80d88ad5d2c701f77b7dae26f69896",
+          "org.testcontainers.version": "0.42.0"
+        }
+      },
+      "scope": "local",
+      "time": 1793347905,
+      "timeNano": 1793347905319232242
+    },
+    {
+      "Type": "container",
+      "Action": "kill",
+      "Actor": {
+        "ID": "507bf36d72958e4087ba1a13b2845f52b05e2da385d41ddb66d2fd2ae1fa0d06",
+        "Attributes": {
+          "image": "gcr.io/cloud-spanner-emulator/emulator:1.5.59@sha256:969af6a9349948fbfb4a826c18e160e258a4005f7c759f8e7f2dcec369cccba8",
+          "name": "affectionate_golick",
+          "org.testcontainers": "true",
+          "org.testcontainers.lang": "go",
+          "org.testcontainers.reap": "true",
+          "org.testcontainers.sessionId": "ca0339343d1f8e65b131c871a842d6d00a80d88ad5d2c701f77b7dae26f69896",
+          "org.testcontainers.version": "0.42.0",
+          "signal": "15"
+        }
+      },
+      "scope": "local",
+      "time": 1793347906,
+      "timeNano": 1793347906485486929
+    },
+    {
+      "Type": "container",
+      "Action": "stop",
+      "Actor": {
+        "ID": "507bf36d72958e4087ba1a13b2845f52b05e2da385d41ddb66d2fd2ae1fa0d06",
+        "Attributes": {
+          "image": "gcr.io/cloud-spanner-emulator/emulator:1.5.59@sha256:969af6a9349948fbfb4a826c18e160e258a4005f7c759f8e7f2dcec369cccba8",
+          "name": "affectionate_golick",
+          "org.testcontainers": "true",
+          "org.testcontainers.lang": "go",
+          "org.testcontainers.reap": "true",
+          "org.testcontainers.sessionId": "ca0339343d1f8e65b131c871a842d6d00a80d88ad5d2c701f77b7dae26f69896",
+          "org.testcontainers.version": "0.42.0"
+        }
+      },
+      "scope": "local",
+      "time": 1793347906,
+      "timeNano": 1793347906562663862
+    },
+    {
+      "Type": "container",
+      "Action": "die",
+      "Actor": {
+        "ID": "507bf36d72958e4087ba1a13b2845f52b05e2da385d41ddb66d2fd2ae1fa0d06",
+        "Attributes": {
+          "execDuration": "1",
+          "exitCode": "2",
+          "image": "gcr.io/cloud-spanner-emulator/emulator:1.5.59@sha256:969af6a9349948fbfb4a826c18e160e258a4005f7c759f8e7f2dcec369cccba8",
+          "name": "affectionate_golick",
+          "org.testcontainers": "true",
+          "org.testcontainers.lang": "go",
+          "org.testcontainers.reap": "true",
+          "org.testcontainers.sessionId": "ca0339343d1f8e65b131c871a842d6d00a80d88ad5d2c701f77b7dae26f69896",
+          "org.testcontainers.version": "0.42.0"
+        }
+      },
+      "scope": "local",
+      "time": 1793347906,
+      "timeNano": 1793347906565078287
+    },
+    {
+      "Type": "container",
+      "Action": "destroy",
+      "Actor": {
+        "ID": "507bf36d72958e4087ba1a13b2845f52b05e2da385d41ddb66d2fd2ae1fa0d06",
+        "Attributes": {
+          "image": "gcr.io/cloud-spanner-emulator/emulator:1.5.59@sha256:969af6a9349948fbfb4a826c18e160e258a4005f7c759f8e7f2dcec369cccba8",
+          "name": "affectionate_golick",
+          "org.testcontainers": "true",
+          "org.testcontainers.lang": "go",
+          "org.testcontainers.reap": "true",
+          "org.testcontainers.sessionId": "ca0339343d1f8e65b131c871a842d6d00a80d88ad5d2c701f77b7dae26f69896",
+          "org.testcontainers.version": "0.42.0"
+        }
+      },
+      "scope": "local",
+      "time": 1793347906,
+      "timeNano": 1793347906582806098
+    }
+  ],
+  "id": "507bf36d72958e4087ba1a13b2845f52b05e2da385d41ddb66d2fd2ae1fa0d06",
+  "absent": true
+}

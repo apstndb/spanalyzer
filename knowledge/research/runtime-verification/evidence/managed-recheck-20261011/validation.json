@@ -1,0 +1,55 @@
+{
+  "verified_at": "2026-10-11T03:38:40.009462+00:00",
+  "go": "go1.26.8",
+  "workspace": "<LOCAL_CHECKOUT>/go.work",
+  "commands": [
+    {
+      "name": "okf",
+      "argv": [
+        "go",
+        "run",
+        "./okf-check",
+        "--repo-root",
+        "..",
+        "--gate",
+        "all",
+        "--publication-manifest",
+        "<LOCAL_TASK_ROOT>/apstndb/spanalyzer/managed-recheck-20261011/publication-manifest.json"
+      ],
+      "cwd": "<LOCAL_CHECKOUT>/tools",
+      "exit_code": 0
+    },
+    {
+      "name": "language",
+      "argv": [
+        "go",
+        "run",
+        "./markdown-language-check",
+        "--repo-root",
+        ".."
+      ],
+      "cwd": "<LOCAL_CHECKOUT>/tools",
+      "exit_code": 0
+    },
+    {
+      "name": "diff-check",
+      "argv": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "cwd": "<LOCAL_CHECKOUT>",
+      "exit_code": 0
+    },
+    {
+      "name": "offline-evidence",
+      "argv": [
+        "python3",
+        "<LOCAL_CHECKOUT>/knowledge/research/runtime-verification/evidence/managed-recheck-20261011/verify.py"
+      ],
+      "cwd": "<LOCAL_CHECKOUT>",
+      "exit_code": 0
+    }
+  ],
+  "managed_runtime_exception": "TestDrift_RealTableMetas fails on unregistered ACTIVE_BATCH_OPERATIONS; separate from these passing documentation/evidence gates."
+}

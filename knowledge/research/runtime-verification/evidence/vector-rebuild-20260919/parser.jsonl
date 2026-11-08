@@ -1,0 +1,3 @@
+{"error":"syntax error: :1:22: expected token: SET, pseudo keyword: ADD, DROP, but: REBUILD","sql":"ALTER VECTOR INDEX V REBUILD"}
+{"error":"","sql":"ALTER VECTOR INDEX V SET OPTIONS(disable_search=true)"}
+{"error":"syntax error: :1:22: expected token: SET, pseudo keyword: ADD, DROP, but: REBUILD","sql":"ALTER VECTOR INDEX V REBUILD OPTIONS(num_leaves=3)"}

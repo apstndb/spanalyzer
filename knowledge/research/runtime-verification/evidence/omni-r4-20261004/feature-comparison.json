@@ -1,0 +1,94 @@
+[
+  {
+    "label": "graph-metadata",
+    "kind": "query",
+    "dialect": "GOOGLE_STANDARD_SQL",
+    "rows": {
+      "r3": [
+        {
+          "PROPERTY_GRAPH_CATALOG": "",
+          "PROPERTY_GRAPH_METADATA_JSON": "{\"catalog\":\"\",\"labels\":[{\"name\":\"ReleaseProbe20260922View\",\"propertyDeclarationNames\":[\"Id\",\"Name\"]}],\"name\":\"ReleaseProbe20260922G2\",\"nodeTables\":[{\"baseCatalogName\":\"\",\"baseSchemaName\":\"\",\"baseTableName\":\"ReleaseProbe20260922View\",\"keyColumns\":[\"Id\"],\"kind\":\"NODE\",\"labelNames\":[\"ReleaseProbe20260922View\"],\"name\":\"ReleaseProbe20260922View\",\"propertyDefinitions\":[{\"propertyDeclarationName\":\"Id\",\"valueExpressionSql\":\"Id\"},{\"propertyDeclarationName\":\"Name\",\"valueExpressionSql\":\"Name\"}]}],\"options\":[{\"name\":\"validate_element_key_uniqueness\",\"type\":\"BOOL\",\"value\":\"FALSE\"}],\"propertyDeclarations\":[{\"name\":\"Id\",\"type\":\"INT64\"},{\"name\":\"Name\",\"type\":\"STRING\"}],\"schema\":\"\"}",
+          "PROPERTY_GRAPH_NAME": "ReleaseProbe20260922G2",
+          "PROPERTY_GRAPH_SCHEMA": ""
+        }
+      ],
+      "r4": [
+        {
+          "PROPERTY_GRAPH_CATALOG": "",
+          "PROPERTY_GRAPH_METADATA_JSON": "{\"catalog\":\"\",\"labels\":[{\"name\":\"ReleaseProbe20260922View\",\"propertyDeclarationNames\":[\"Id\",\"Name\"]}],\"name\":\"ReleaseProbe20260922G2\",\"nodeTables\":[{\"baseCatalogName\":\"\",\"baseSchemaName\":\"\",\"baseTableName\":\"ReleaseProbe20260922View\",\"keyColumns\":[\"Id\"],\"kind\":\"NODE\",\"labelNames\":[\"ReleaseProbe20260922View\"],\"name\":\"ReleaseProbe20260922View\",\"propertyDefinitions\":[{\"propertyDeclarationName\":\"Id\",\"valueExpressionSql\":\"Id\"},{\"propertyDeclarationName\":\"Name\",\"valueExpressionSql\":\"Name\"}]}],\"options\":[{\"name\":\"validate_element_key_uniqueness\",\"type\":\"BOOL\",\"value\":\"FALSE\"},{\"name\":\"allow_view_with_volatile_column\",\"type\":\"BOOL\",\"value\":\"FALSE\"}],\"propertyDeclarations\":[{\"name\":\"Id\",\"type\":\"INT64\"},{\"name\":\"Name\",\"type\":\"STRING\"}],\"schema\":\"\"}",
+          "PROPERTY_GRAPH_NAME": "ReleaseProbe20260922G2",
+          "PROPERTY_GRAPH_SCHEMA": ""
+        }
+      ]
+    }
+  },
+  {
+    "label": "semantic-metadata",
+    "kind": "query",
+    "dialect": "GOOGLE_STANDARD_SQL",
+    "rows": {
+      "r3": [
+        {
+          "PROPERTY_GRAPH_CATALOG": "",
+          "PROPERTY_GRAPH_METADATA_JSON": "{\"catalog\":\"\",\"labels\":[{\"name\":\"ReleaseProbe20260922\",\"options\":[{\"name\":\"description\",\"type\":\"STRING\",\"value\":\"'People'\"},{\"name\":\"synonyms\",\"type\":\"ARRAY<STRING>\",\"value\":\"['person']\"}],\"propertyDeclarationNames\":[\"Id\",\"Name\"]}],\"name\":\"ReleaseProbe20260922Semantic\",\"nodeTables\":[{\"baseCatalogName\":\"\",\"baseSchemaName\":\"\",\"baseTableName\":\"ReleaseProbe20260922\",\"keyColumns\":[\"Id\"],\"kind\":\"NODE\",\"labelNames\":[\"ReleaseProbe20260922\"],\"name\":\"ReleaseProbe20260922\",\"propertyDefinitions\":[{\"propertyDeclarationName\":\"Id\",\"valueExpressionSql\":\"Id\"},{\"options\":[{\"name\":\"description\",\"type\":\"STRING\",\"value\":\"'Person name'\"},{\"name\":\"synonyms\",\"type\":\"ARRAY<STRING>\",\"value\":\"['full name']\"}],\"propertyDeclarationName\":\"Name\",\"valueExpressionSql\":\"Name\"}]}],\"options\":[{\"name\":\"validate_element_key_uniqueness\",\"type\":\"BOOL\",\"value\":\"TRUE\"}],\"propertyDeclarations\":[{\"name\":\"Id\",\"type\":\"INT64\"},{\"name\":\"Name\",\"type\":\"STRING\"}],\"schema\":\"\"}",
+          "PROPERTY_GRAPH_NAME": "ReleaseProbe20260922Semantic",
+          "PROPERTY_GRAPH_SCHEMA": ""
+        }
+      ],
+      "r4": [
+        {
+          "PROPERTY_GRAPH_CATALOG": "",
+          "PROPERTY_GRAPH_METADATA_JSON": "{\"catalog\":\"\",\"labels\":[{\"name\":\"ReleaseProbe20260922\",\"options\":[{\"name\":\"description\",\"type\":\"STRING\",\"value\":\"'People'\"},{\"name\":\"synonyms\",\"type\":\"ARRAY<STRING>\",\"value\":\"['person']\"}],\"propertyDeclarationNames\":[\"Id\",\"Name\"]}],\"name\":\"ReleaseProbe20260922Semantic\",\"nodeTables\":[{\"baseCatalogName\":\"\",\"baseSchemaName\":\"\",\"baseTableName\":\"ReleaseProbe20260922\",\"keyColumns\":[\"Id\"],\"kind\":\"NODE\",\"labelNames\":[\"ReleaseProbe20260922\"],\"name\":\"ReleaseProbe20260922\",\"propertyDefinitions\":[{\"propertyDeclarationName\":\"Id\",\"valueExpressionSql\":\"Id\"},{\"options\":[{\"name\":\"description\",\"type\":\"STRING\",\"value\":\"'Person name'\"},{\"name\":\"synonyms\",\"type\":\"ARRAY<STRING>\",\"value\":\"['full name']\"}],\"propertyDeclarationName\":\"Name\",\"valueExpressionSql\":\"Name\"}]}],\"options\":[{\"name\":\"validate_element_key_uniqueness\",\"type\":\"BOOL\",\"value\":\"TRUE\"},{\"name\":\"allow_view_with_volatile_column\",\"type\":\"BOOL\",\"value\":\"FALSE\"}],\"propertyDeclarations\":[{\"name\":\"Id\",\"type\":\"INT64\"},{\"name\":\"Name\",\"type\":\"STRING\"}],\"schema\":\"\"}",
+          "PROPERTY_GRAPH_NAME": "ReleaseProbe20260922Semantic",
+          "PROPERTY_GRAPH_SCHEMA": ""
+        }
+      ]
+    }
+  },
+  {
+    "label": "reservoir",
+    "kind": "query",
+    "dialect": "POSTGRESQL",
+    "rows": {
+      "r3": [
+        {
+          "id": "2",
+          "name": "Bob"
+        }
+      ],
+      "r4": [
+        {
+          "id": "1",
+          "name": "Alice"
+        }
+      ]
+    }
+  },
+  {
+    "label": "reservoir",
+    "kind": "query",
+    "dialect": "POSTGRESQL",
+    "rows": {
+      "r3": [
+        {
+          "id": "2",
+          "name": "Bob"
+        },
+        {
+          "id": "1",
+          "name": "Alice"
+        }
+      ],
+      "r4": [
+        {
+          "id": "1",
+          "name": "Alice"
+        },
+        {
+          "id": "2",
+          "name": "Bob"
+        }
+      ]
+    }
+  }
+]

@@ -1,0 +1,16 @@
+from pathlib import Path
+import json,hashlib,shutil,datetime,subprocess
+root=Path('<LOCAL_CHECKOUT>');s=root/'.tmp/managed-recheck-20261103';task=Path('<LOCAL_TASK_ROOT>/apstndb/spanalyzer/managed-recheck-20261103');out=root/'knowledge/research/runtime-verification/evidence/managed-recheck-20261103';out.mkdir(exist_ok=True)
+old=json.loads((s/'evidence-baseline.json').read_text());base=out.parent;sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();assert all(sha(base/p)==h for p,h in old['files'].items())
+assert json.loads((task/'sources/final-head-refresh.json').read_text())['sha']==json.loads((task/'sources/mirror-head.json').read_text())['sha']
+assert json.loads((task/'evidence/assertions.json').read_text())['status']=='pass'
+for source in (task/'sources').rglob('*'):
+    if not source.is_file()or source.suffix=='.md':continue
+    p=out/'sources'/source.relative_to(task/'sources');p.parent.mkdir(parents=True,exist_ok=True);shutil.copyfile(source,p)
+for source in (task/'evidence').iterdir():
+    if source.is_file():shutil.copyfile(source,out/source.name)
+for source in s.glob('*.py'):shutil.copyfile(source,out/(source.name+'.txt'))
+shutil.copyfile(root/'survey/infoschem/drift_test.go',out/'drift_test.go.txt')
+commands=json.loads((out/'approved-commands.json').read_text());receipt={'status':'completed_with_classified_service_rejections_and_local_drift_failure','observed_on':'2026-11-03','source_checkout_head':subprocess.check_output(['git','rev-parse','HEAD'],cwd=root,text=True).strip(),'source_checkout_dirty':True,'managed_target':'existing dedicated user-level mise profile; destinations excluded','backend_build':'unavailable','runtime_scope':'managed only; previous Omni and Emulator samples remain dated','steps':{'read_only':86,'google_fixture':61,'postgresql_fixture':26,'total':173},'additional_lifecycle_records':6,'bounded_assertions':157,'disposable_database_lifecycles':2,'cleanup':'Both newly created disposable databases dropped; GetDatabase NotFound recorded for each','earlier_retained_database':'Excluded from all lifecycle operations; no deletion approval inferred','authorization':'User explicitly approved two disposable DB creations, verification and deletion, one per dialect. No commit, push or public posting.','owned_fixture_commands':commands,'prior_artifact_count':len(old['files']),'prior_artifacts_unchanged':True,'retained_at':datetime.datetime.now(datetime.timezone.utc).isoformat()}
+(out/'receipt.json').write_text(json.dumps(receipt,indent=2)+'\n');(task/'evidence/receipt.json').write_text(json.dumps(receipt,indent=2)+'\n')
+print('Retained source/runtime artifacts',sum(p.is_file()for p in out.rglob('*')),'previous hashes preserved',len(old['files']))
