@@ -36,7 +36,10 @@ func (c *GoogleSQLCatalog) newGoogleSQLModel(model *Model) (*googlesql.SimpleMod
 	if err != nil {
 		return nil, err
 	}
-	gsModel, err := googlesql.NewSimpleModel(model.Name, inputs, outputs, true, -1)
+	// The wrapper keeps the Go column handles alive through the registered
+	// model. Let those handles own columns; native ownership would give both
+	// the model and the Go handles responsibility for deleting them.
+	gsModel, err := googlesql.NewSimpleModel(model.Name, inputs, outputs, false, -1)
 	if err != nil {
 		return nil, fmt.Errorf("model %s: %w", model.Name, err)
 	}
