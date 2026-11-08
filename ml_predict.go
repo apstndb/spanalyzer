@@ -16,6 +16,10 @@ func (c *GoogleSQLCatalog) addMLPredict() error {
 	if err != nil {
 		return err
 	}
+	// The signature result schema is only a placeholder from the first
+	// registered model. Resolve replaces it with the named model's schema.
+	// extraRelationInputColumnsAllowed is true, so a differently shaped
+	// named model still matches the signature.
 	resultSchema, err := c.mlPredictResultSchema(fallback.model, nil)
 	if err != nil {
 		return err
@@ -169,6 +173,8 @@ func (f *mlPredictTVF) Resolve(
 		return nil, err
 	} else if actualModel != nil {
 		model = actualModel
+	} else if len(f.catalog.models) > 1 {
+		return nil, f.catalog.ambiguousMLPredictModelError()
 	}
 	resultSchema, err := f.catalog.mlPredictResultSchema(model.model, relation)
 	if err != nil {
@@ -195,9 +201,9 @@ func (f *mlPredictTVF) modelArgument(args []*googlesql.TVFInputArgumentType) (*r
 	}
 	modelNode, err := modelArg.Model()
 	if err != nil {
-		// go-googlesql can currently surface Go callback models as ModelTrampoline,
-		// which cannot be decoded back to a ModelNode. The catalog fallback still
-		// preserves Spanner's schema-only ML.PREDICT behavior for registered models.
+		// Go callback models still surface as ModelTrampoline, which
+		// cannot be decoded back to a ModelNode. Catalog models are
+		// registered as SimpleModel so Name() works here.
 		return nil, nil
 	}
 	name, err := modelNode.Name()
@@ -291,4 +297,15 @@ func mlPredictOptionsInput(typeFactory *googlesql.TypeFactory) (*googlesql.TVFIn
 		return nil, err
 	}
 	return googlesql.NewTVFInputArgumentType6(optionsArg)
+}
+
+func (c *GoogleSQLCatalog) ambiguousMLPredictModelError() error {
+	names := make([]string, 0, len(c.models))
+	for _, model := range c.models {
+		if model != nil && model.model != nil && model.model.Name != "" {
+			names = append(names, model.model.Name)
+		}
+	}
+	sort.Strings(names)
+	return fmt.Errorf("ML.PREDICT model argument could not be resolved; %d models are registered (%s); analysis is ambiguous", len(c.models), strings.Join(names, ", "))
 }
