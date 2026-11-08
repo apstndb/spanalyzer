@@ -68,23 +68,19 @@ func verifyExpressionIndexAccepted(
 	cityIndex := tableName + "ByCity"
 	mixedIndex := tableName + "ByNameState"
 	noWrapIndex := tableName + "ByCityNoWrap"
-	createdIndexes := make([]string, 0, 3)
 	tableCreated := false
 	cleanup := func(cleanupCtx context.Context) error {
-		for len(createdIndexes) > 0 {
-			last := len(createdIndexes) - 1
-			indexName := createdIndexes[last]
-			if err := updateExpressionIndexDDL(cleanupCtx, admin, databaseName, "DROP INDEX "+indexName); err != nil {
-				return fmt.Errorf("drop index %s: %w", indexName, err)
-			}
-			createdIndexes = createdIndexes[:last]
+		if !tableCreated {
+			return nil
 		}
-		if tableCreated {
-			if err := updateExpressionIndexDDL(cleanupCtx, admin, databaseName, "DROP TABLE "+tableName); err != nil {
-				return fmt.Errorf("drop table %s: %w", tableName, err)
-			}
-			tableCreated = false
+		indexNames, err := listExpressionIndexFixtureIndexes(cleanupCtx, client, tableName)
+		if err != nil {
+			return fmt.Errorf("list indexes for %s: %w", tableName, err)
 		}
+		if err := updateExpressionIndexDDLBatch(cleanupCtx, admin, databaseName, expressionIndexCleanupStatements(indexNames, tableName)); err != nil {
+			return fmt.Errorf("drop expression-index fixture %s: %w", tableName, err)
+		}
+		tableCreated = false
 		return nil
 	}
 	defer func() {
@@ -100,40 +96,25 @@ func verifyExpressionIndexAccepted(
 	}
 	tableCreated = true
 
-	acceptedDDLs := []struct {
-		name string
-		sql  string
-	}{
-		{
-			name: cityIndex,
-			sql: fmt.Sprintf(
-				"CREATE INDEX %s ON %s((JSON_VALUE(VenueData.address.city)))",
-				cityIndex,
-				tableName,
-			),
-		},
-		{
-			name: mixedIndex,
-			sql: fmt.Sprintf(
-				"CREATE INDEX %s ON %s(VenueName, (JSON_VALUE(VenueData.address.state)))",
-				mixedIndex,
-				tableName,
-			),
-		},
-		{
-			name: noWrapIndex,
-			sql: fmt.Sprintf(
-				"CREATE INDEX %s ON %s(JSON_VALUE(VenueData.address.city))",
-				noWrapIndex,
-				tableName,
-			),
-		},
+	acceptedDDLs := []string{
+		fmt.Sprintf(
+			"CREATE INDEX %s ON %s((JSON_VALUE(VenueData.address.city)))",
+			cityIndex,
+			tableName,
+		),
+		fmt.Sprintf(
+			"CREATE INDEX %s ON %s(VenueName, (JSON_VALUE(VenueData.address.state)))",
+			mixedIndex,
+			tableName,
+		),
+		fmt.Sprintf(
+			"CREATE INDEX %s ON %s(JSON_VALUE(VenueData.address.city))",
+			noWrapIndex,
+			tableName,
+		),
 	}
-	for _, ddl := range acceptedDDLs {
-		if err := updateExpressionIndexDDL(ctx, admin, databaseName, ddl.sql); err != nil {
-			t.Fatalf("create expression-index fixture %s: %v", ddl.name, err)
-		}
-		createdIndexes = append(createdIndexes, ddl.name)
+	if err := updateExpressionIndexDDLBatch(ctx, admin, databaseName, acceptedDDLs); err != nil {
+		t.Fatalf("create expression-index fixtures on %s: %v", tableName, err)
 	}
 
 	descendingName := tableName + "ByCityDesc"
@@ -143,7 +124,6 @@ func verifyExpressionIndexAccepted(
 		tableName,
 	))
 	if descendingErr == nil {
-		createdIndexes = append(createdIndexes, descendingName)
 		t.Fatal("descending GoogleSQL expression-index key succeeded, want current syntax boundary")
 	}
 	if status.Code(descendingErr) != codes.InvalidArgument || !strings.Contains(strings.ToLower(descendingErr.Error()), "syntax error") {
@@ -157,7 +137,6 @@ func verifyExpressionIndexAccepted(
 		tableName,
 	))
 	if volatileErr == nil {
-		createdIndexes = append(createdIndexes, volatileName)
 		t.Fatal("non-deterministic expression index succeeded, want semantic rejection")
 	}
 	if (status.Code(volatileErr) != codes.InvalidArgument && status.Code(volatileErr) != codes.FailedPrecondition) || !strings.Contains(strings.ToLower(volatileErr.Error()), "non-deterministic") {
@@ -208,6 +187,54 @@ func updateExpressionIndexDDL(
 		return err
 	}
 	return op.Wait(ctx)
+}
+
+func updateExpressionIndexDDLBatch(
+	ctx context.Context,
+	admin *database.DatabaseAdminClient,
+	databaseName string,
+	statements []string,
+) error {
+	op, err := admin.UpdateDatabaseDdl(ctx, &databasepb.UpdateDatabaseDdlRequest{
+		Database:   databaseName,
+		Statements: statements,
+	})
+	if err != nil {
+		return fmt.Errorf("batch of %d statements: %w", len(statements), err)
+	}
+	if err := op.Wait(ctx); err != nil {
+		if meta, metaErr := op.Metadata(); metaErr == nil && meta != nil {
+			return fmt.Errorf("batch of %d statements (applied %d): %w", len(statements), len(meta.GetCommitTimestamps()), err)
+		}
+		return fmt.Errorf("batch of %d statements: %w", len(statements), err)
+	}
+	return nil
+}
+
+// listExpressionIndexFixtureIndexes returns non-PRIMARY_KEY indexes on the
+// default-schema fixture table so cleanup can drop a partially applied batch
+// or an unexpectedly accepted rejection probe.
+func listExpressionIndexFixtureIndexes(ctx context.Context, client *spanner.Client, tableName string) ([]string, error) {
+	iter := client.Single().Query(ctx, spanner.Statement{
+		SQL: `SELECT INDEX_NAME
+                FROM INFORMATION_SCHEMA.INDEXES
+               WHERE TABLE_SCHEMA = '' AND TABLE_NAME = @table_name
+                 AND INDEX_NAME != 'PRIMARY_KEY'
+               ORDER BY INDEX_NAME`,
+		Params: map[string]any{"table_name": tableName},
+	})
+	defer iter.Stop()
+	var rows []struct {
+		IndexName string `spanner:"INDEX_NAME"`
+	}
+	if err := spanner.SelectAll(iter, &rows); err != nil {
+		return nil, err
+	}
+	indexNames := make([]string, 0, len(rows))
+	for _, row := range rows {
+		indexNames = append(indexNames, row.IndexName)
+	}
+	return indexNames, nil
 }
 
 func loadExpressionIndexColumns(

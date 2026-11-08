@@ -1,5 +1,13 @@
 # TODO
 
+## Catalog observation resilience (2026-11-08)
+
+- [x] Bound loader fallback to observed optional compatibility flags and keep
+  failed row decodes out of the final schema.
+- [x] Add column-level comparison deltas and check-only repeated observations.
+- [x] Batch expression-index fixtures and discover partial-batch cleanup state.
+- [x] Preserve current registry, runtime pins and manifest expectations.
+
 ## Pending local fixes (2026-11-08)
 
 - [x] Reject user queues explicitly during DDL reconstruction while keeping

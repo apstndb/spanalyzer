@@ -74,6 +74,11 @@ accepted.
 
 Prefix either capture command with `check` and omit `--write` to compare the
 live target with retained evidence and emit only a compact read-only report.
+INFORMATION_SCHEMA check accepts `--observations=1..10` for sequential
+read-only observations in one runtime; it reports inconsistent surfaces and
+column-level/queryability deltas. SPANNER_SYS check reports column-level deltas.
+Both comparison reports identify this preview format as `schema_version: v0alpha2`;
+stored capture revisions and original observations retain their own versions.
 The SPANNER_SYS command writes the provenance-complete `v0alpha2` capture
 format. Its legacy `v0alpha1` sidecars remain immutable inputs to the existing
 manifest and serve as comparison baselines until an equivalent v0alpha2
@@ -101,13 +106,16 @@ observation is deliberately retained.
   return defensive copies; callers must not assume they can mutate the registry.
   `LoadSchemaFromDiscovered` always performs discovery again inside its own
   read-only transaction so a caller-supplied map cannot describe a stale
-  snapshot. `PlacementKeyColumn`, `SequenceGrant`, `SchemaGrant`, and
+  snapshot. Loader retries are limited to rejected `IS_INHERITED` flags in
+  `COLUMN_OPTIONS` and `LOCALITY_GROUP_OPTIONS`; errors for identity or other
+  semantic columns remain fatal. Failed reads are buffered so retries cannot
+  append duplicate partial rows. `PlacementKeyColumn`, `SequenceGrant`, `SchemaGrant`, and
   `AllSchemaGrant` preserve AST-only state that current INFORMATION_SCHEMA
   surfaces cannot recover.
 
-- `spannersys/` — Go structs for 51 known `SPANNER_SYS` tables. The tested managed and
-  Omni targets currently advertise 50; the superset also includes the documented,
-  Enterprise-only `VECTOR_INDEX_STATS`. Tables that exist per interval
+- `spannersys/` — Go structs for 53 known `SPANNER_SYS` tables. Target-specific
+  advertisements remain dated observations in the retained captures; the
+  superset also includes the documented Enterprise-only `VECTOR_INDEX_STATS`. Tables that exist per interval
   (e.g. `QUERY_STATS_TOP_MINUTE` / `_10MINUTE` / `_HOUR`) share a single struct; pick the
   table via `Interval` constants and `*Query(interval)` helpers in `query.go`; these
   helpers reject any interval outside the documented `MINUTE`, `10MINUTE`, and `HOUR`
