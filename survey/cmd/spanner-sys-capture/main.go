@@ -177,6 +177,40 @@ type comparisonReport struct {
 	MaterialChange bool                  `json:"material_change"`
 	Current        comparisonObservation `json:"current"`
 	Retained       comparisonObservation `json:"retained"`
+	SurfaceDelta   *surfaceDelta         `json:"surface_delta,omitempty"`
+}
+
+// surfaceDelta lists column-level differences for a surface_changed report.
+// SPANNER_SYS captures have no rolling-queryability probes, so unlike the
+// INFORMATION_SCHEMA report there is no rolling_queryability_changes field.
+type surfaceDelta struct {
+	AddedColumns   []surfaceColumnRef    `json:"added_columns,omitempty"`
+	RemovedColumns []surfaceColumnRef    `json:"removed_columns,omitempty"`
+	ChangedColumns []surfaceColumnChange `json:"changed_columns,omitempty"`
+}
+
+type surfaceColumnRef struct {
+	TableName       string `json:"table_name"`
+	ColumnName      string `json:"column_name"`
+	SpannerType     string `json:"spanner_type"`
+	OrdinalPosition int    `json:"ordinal_position"`
+}
+
+type surfaceColumnChange struct {
+	TableName  string              `json:"table_name"`
+	ColumnName string              `json:"column_name"`
+	Retained   surfaceColumnFields `json:"retained"`
+	Current    surfaceColumnFields `json:"current"`
+}
+
+type surfaceColumnFields struct {
+	SpannerType     string `json:"spanner_type"`
+	OrdinalPosition int    `json:"ordinal_position"`
+}
+
+type columnIdentity struct {
+	table  string
+	column string
 }
 
 type comparisonObservation struct {
@@ -232,7 +266,7 @@ func compareRetainedCapture(repoRoot string, current *spannersys.SurfaceCapture)
 		targetChanged = *current.Target.Image != pinnedImage
 		baselineTarget.Image = &pinnedImage
 	}
-	report := &comparisonReport{SchemaVersion: "v0alpha1", Current: comparisonObservation{
+	report := &comparisonReport{SchemaVersion: "v0alpha2", Current: comparisonObservation{
 		SchemaVersion: current.SchemaVersion, Target: comparisonTargetFromCapture(current.Target), ObservedAt: current.ObservedAt,
 		SurfaceSHA256: current.SurfaceSHA256, ColumnCount: len(current.Columns),
 		ProducerSourceSHA256: current.ProducerSourceSHA256, InvocationSHA256: current.InvocationSHA256,
@@ -245,16 +279,7 @@ func compareRetainedCapture(repoRoot string, current *spannersys.SurfaceCapture)
 			ColumnCount: len(retained.Columns), ProducerSourceSHA256: retained.ProducerSourceSHA256,
 			InvocationSHA256: retained.InvocationSHA256,
 		}
-		switch {
-		case targetChanged:
-			report.Status, report.MaterialChange = "target_identity_changed", true
-		case retained.SurfaceSHA256 != current.SurfaceSHA256:
-			report.Status, report.MaterialChange = "surface_changed", true
-		case retained.ProducerSourceSHA256 != current.ProducerSourceSHA256 || retained.InvocationSHA256 != current.InvocationSHA256:
-			report.Status = "producer_changed_only"
-		default:
-			report.Status = "unchanged"
-		}
+		classifyV0Alpha2Comparison(report, current, retained, targetChanged)
 		return report, nil
 	}
 	if !errors.Is(err, fs.ErrNotExist) {
@@ -279,6 +304,89 @@ func compareRetainedCapture(repoRoot string, current *spannersys.SurfaceCapture)
 		report.Status = "unchanged_legacy_baseline"
 	}
 	return report, nil
+}
+
+func classifyV0Alpha2Comparison(report *comparisonReport, current, retained *spannersys.SurfaceCapture, targetChanged bool) {
+	switch {
+	case targetChanged:
+		report.Status, report.MaterialChange = "target_identity_changed", true
+	case retained.SurfaceSHA256 != current.SurfaceSHA256:
+		report.Status, report.MaterialChange = "surface_changed", true
+		report.SurfaceDelta = computeSurfaceDelta(retained.Columns, current.Columns)
+	case retained.ProducerSourceSHA256 != current.ProducerSourceSHA256 || retained.InvocationSHA256 != current.InvocationSHA256:
+		report.Status = "producer_changed_only"
+	default:
+		report.Status = "unchanged"
+	}
+}
+
+func computeSurfaceDelta(retained, current []spannersys.SurfaceCaptureColumn) *surfaceDelta {
+	delta := &surfaceDelta{}
+	retainedColumns := indexSurfaceColumns(retained)
+	currentColumns := indexSurfaceColumns(current)
+	for _, key := range sortedColumnIdentities(retainedColumns, currentColumns) {
+		retainedColumn, retainedOK := retainedColumns[key]
+		currentColumn, currentOK := currentColumns[key]
+		switch {
+		case !retainedOK:
+			delta.AddedColumns = append(delta.AddedColumns, surfaceColumnRefFrom(currentColumn))
+		case !currentOK:
+			delta.RemovedColumns = append(delta.RemovedColumns, surfaceColumnRefFrom(retainedColumn))
+		case retainedColumn.SpannerType != currentColumn.SpannerType || retainedColumn.OrdinalPosition != currentColumn.OrdinalPosition:
+			delta.ChangedColumns = append(delta.ChangedColumns, surfaceColumnChange{
+				TableName:  key.table,
+				ColumnName: key.column,
+				Retained: surfaceColumnFields{
+					SpannerType:     retainedColumn.SpannerType,
+					OrdinalPosition: retainedColumn.OrdinalPosition,
+				},
+				Current: surfaceColumnFields{
+					SpannerType:     currentColumn.SpannerType,
+					OrdinalPosition: currentColumn.OrdinalPosition,
+				},
+			})
+		}
+	}
+	return delta
+}
+
+func surfaceColumnRefFrom(column spannersys.SurfaceCaptureColumn) surfaceColumnRef {
+	return surfaceColumnRef{
+		TableName:       column.TableName,
+		ColumnName:      column.ColumnName,
+		SpannerType:     column.SpannerType,
+		OrdinalPosition: column.OrdinalPosition,
+	}
+}
+
+func indexSurfaceColumns(columns []spannersys.SurfaceCaptureColumn) map[columnIdentity]spannersys.SurfaceCaptureColumn {
+	index := make(map[columnIdentity]spannersys.SurfaceCaptureColumn, len(columns))
+	for _, column := range columns {
+		index[columnIdentity{table: column.TableName, column: column.ColumnName}] = column
+	}
+	return index
+}
+
+func sortedColumnIdentities[T any](left, right map[columnIdentity]T) []columnIdentity {
+	seen := make(map[columnIdentity]bool, len(left)+len(right))
+	keys := make([]columnIdentity, 0, len(left)+len(right))
+	for key := range left {
+		seen[key] = true
+		keys = append(keys, key)
+	}
+	for key := range right {
+		if seen[key] {
+			continue
+		}
+		keys = append(keys, key)
+	}
+	sort.Slice(keys, func(i, j int) bool {
+		if keys[i].table != keys[j].table {
+			return keys[i].table < keys[j].table
+		}
+		return keys[i].column < keys[j].column
+	})
+	return keys
 }
 
 func legacyPathSuffix(baseline spannersys.LegacySurfaceBaseline) string {

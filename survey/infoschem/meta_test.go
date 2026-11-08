@@ -47,6 +47,8 @@ func TestTableMetaByName(t *testing.T) {
 		{"TABLES", true, 9},
 		{"INDEXES", true, 14},
 		{"VIEWS", true, 5},
+		{"COLUMN_OPTIONS", true, 8},
+		{"LOCALITY_GROUP_OPTIONS", true, 4},
 		{"NONEXISTENT", false, 0},
 	}
 
@@ -188,5 +190,42 @@ func TestTableMeta_Query_MissingTable(t *testing.T) {
 
 	if _, err := meta.Query(discovered); err == nil {
 		t.Error("Query should fail if table is not discovered")
+	}
+}
+
+func TestIsInheritedRegistryColumnsAreStable(t *testing.T) {
+	cases := []struct {
+		table   string
+		ordinal int
+	}{
+		{table: "COLUMN_OPTIONS", ordinal: 8},
+		{table: "LOCALITY_GROUP_OPTIONS", ordinal: 4},
+	}
+	for _, tt := range cases {
+		t.Run(tt.table, func(t *testing.T) {
+			meta, ok := TableMetaByName(tt.table)
+			if !ok {
+				t.Fatalf("TableMetaByName(%q) missing", tt.table)
+			}
+			var found *ColumnMeta
+			for i := range meta.Columns {
+				if meta.Columns[i].Name == "IS_INHERITED" {
+					found = &meta.Columns[i]
+					break
+				}
+			}
+			if found == nil {
+				t.Fatalf("%s.IS_INHERITED is not registered", tt.table)
+			}
+			if found.SpannerType != "BOOL" {
+				t.Errorf("SpannerType = %q, want BOOL", found.SpannerType)
+			}
+			if found.OrdinalPosition != tt.ordinal {
+				t.Errorf("OrdinalPosition = %d, want %d", found.OrdinalPosition, tt.ordinal)
+			}
+			if found.Rolling {
+				t.Errorf("%s.IS_INHERITED is marked Rolling; it is a stable advertised column", tt.table)
+			}
+		})
 	}
 }
