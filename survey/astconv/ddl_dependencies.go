@@ -186,6 +186,38 @@ func (v ddlDependencyVisitor) Visit(node ast.Node) ast.Visitor {
 			ast.Walk(&body, v)
 			return nil
 		}
+	case *ast.SubQueryTableExpr:
+		// The alias is introduced after its source has been visited. It must
+		// not mask a dependency inside the source query itself.
+		ast.Walk(n.Query, v)
+		if n.Sample != nil {
+			ast.Walk(n.Sample, v)
+		}
+		if n.As != nil {
+			v.aliases[strings.ToLower(n.As.Alias.Name)] = true
+		}
+		return nil
+	case *ast.Unnest:
+		ast.Walk(n.Expr, v)
+		if n.Hint != nil {
+			ast.Walk(n.Hint, v)
+		}
+		if n.As != nil {
+			v.aliases[strings.ToLower(n.As.Alias.Name)] = true
+		}
+		if n.WithOffset != nil {
+			ast.Walk(n.WithOffset, v)
+		}
+		if n.Sample != nil {
+			ast.Walk(n.Sample, v)
+		}
+		return nil
+	case *ast.WithOffset:
+		alias := "offset"
+		if n.As != nil {
+			alias = n.As.Alias.Name
+		}
+		v.aliases[strings.ToLower(alias)] = true
 	case *ast.TableName:
 		if !v.ctes[strings.ToLower(n.Table.Name)] {
 			v.add(ddlKey("relation", n.Table.Name))

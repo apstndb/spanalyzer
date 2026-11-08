@@ -32,8 +32,10 @@ func assertDDLDependencyReapplication(t *testing.T, runtime spanemuboost.Runtime
 		`CREATE SCHEMA app`,
 		`CREATE VIEW ZBase SQL SECURITY INVOKER AS SELECT 1 AS Id`,
 		`CREATE VIEW ALeaf SQL SECURITY INVOKER AS SELECT z.Id FROM ZBase z`,
+		`CREATE VIEW app.Items SQL SECURITY INVOKER AS SELECT item AS Id FROM (SELECT [1] AS Items) AS app, app.Items AS item`,
+		`CREATE VIEW app.More SQL SECURITY INVOKER AS SELECT item AS Id FROM UNNEST([STRUCT([1] AS More)]) AS app, app.More AS item`,
 	}
-	views := map[string]int64{"ALeaf": 1}
+	views := map[string]int64{"ALeaf": 1, "app.Items": 1, "app.More": 1}
 	if includeFunctions {
 		original = append(original, `CREATE FUNCTION app.F(x INT64) RETURNS INT64 SQL SECURITY INVOKER AS (x + 1)`, `CREATE VIEW V SQL SECURITY INVOKER AS SELECT app.F(1) AS Id`)
 		views["V"] = 2

@@ -23,6 +23,9 @@ sources:
   - id: evaluator-schema
     resource: evidence/repo-hardening-20261108/v2-schema-validation.json
     title: Positive and negative schema checks using local evaluator v2 output
+  - id: alias-followup
+    resource: evidence/repo-hardening-20261108/alias-scope-followup.json
+    title: Derived-table and UNNEST alias follow-up on both pinned runtimes
   - id: emulator-gap
     resource: evidence/repo-hardening-20261108/emulator-routines-gap.json
     title: UDF execution versus missing live routine metadata in Emulator
@@ -60,6 +63,14 @@ the owned runtime closed successfully. The source was a dirty implementation
 tree on the library commit, as recorded by the runner. Post-run hashes identify
 the remaining implementation files; this receipt does not claim execution of
 a clean final merge commit or independent server-version discovery.
+
+Final review identified an additional alias-scope false cycle: a derived-table
+or explicit UNNEST alias matching a named schema made a following implicit
+UNNEST path look like a relation reference. Both alias forms are now bound
+after visiting their sources. The expanded DDL fixture passed source acceptance,
+AST/live reapplication and SELECT checks on both pinned runtimes. Its separate
+follow-up receipt records the dirty source boundary and the three updated source
+hashes; the earlier runner and source record remain historical evidence.
 
 Emulator `1.5.59` used the configured arm64 pin
 `sha256:969af6a9349948fbfb4a826c18e160e258a4005f7c759f8e7f2dcec369cccba8`.

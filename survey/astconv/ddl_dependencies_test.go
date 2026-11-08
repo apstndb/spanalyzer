@@ -66,6 +66,23 @@ func TestDDLDependencies(t *testing.T) {
 			want: []string{"schema:app", "relation:t", "relation:app\x00items"},
 		},
 		{
+			name: "derived table alias shadows a schema relation",
+			ddls: []string{
+				`CREATE SCHEMA app`,
+				`CREATE TABLE T (Id INT64 NOT NULL, Items ARRAY<INT64>) PRIMARY KEY (Id)`,
+				`CREATE VIEW app.Items SQL SECURITY INVOKER AS SELECT item AS Id FROM (SELECT t.Items FROM T t) AS app, app.Items AS item`,
+			},
+			want: []string{"schema:app", "relation:t", "relation:app\x00items"},
+		},
+		{
+			name: "UNNEST alias shadows a schema relation",
+			ddls: []string{
+				`CREATE SCHEMA app`,
+				`CREATE VIEW app.Items SQL SECURITY INVOKER AS SELECT item AS Id FROM UNNEST([STRUCT([1] AS Items)]) AS app, app.Items AS item`,
+			},
+			want: []string{"schema:app", "relation:app\x00items"},
+		},
+		{
 			name: "partial export allows external references",
 			ddls: []string{`CREATE VIEW V SQL SECURITY INVOKER AS SELECT t.Id FROM ExternalTable t`},
 			want: []string{"relation:v"},

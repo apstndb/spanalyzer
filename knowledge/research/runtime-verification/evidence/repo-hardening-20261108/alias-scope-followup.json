@@ -1,0 +1,40 @@
+{
+  "status": "pass",
+  "scope": "Follow-up alias-scope fix, source DDL acceptance, AST/live export reapplication and SELECT checks on fresh local databases. Owned runtimes closed successfully.",
+  "source_head": "a8c2bafdeb9b290b41a20c7a2a35603627377ebc",
+  "source_dirty": true,
+  "configured_images": {
+    "emulator": "gcr.io/cloud-spanner-emulator/emulator:1.5.59@sha256:969af6a9349948fbfb4a826c18e160e258a4005f7c759f8e7f2dcec369cccba8",
+    "omni": "us-docker.pkg.dev/spanner-omni/images/spanner-omni:2026.r4-lts.2@sha256:b607b10bee3c1903f0a7f88f99bece67cb0dd9d9a028aee64226fc311bd78dae"
+  },
+  "validation": {
+    "emulator": {
+      "exit_code": 0,
+      "original_log_sha256": "d5f709d1922ecf4850c50a977826421f17edf3c9812507808150f9f429b11fad",
+      "passed_tests": [
+        "--- PASS: TestDDLDependencyReapplicationOnEmulator (1.88s)",
+        "--- PASS: TestDDLDependencyReapplicationOnEmulator/from_ast (0.03s)",
+        "--- PASS: TestDDLDependencyReapplicationOnEmulator/from_live (0.24s)"
+      ]
+    },
+    "omni": {
+      "exit_code": 0,
+      "original_log_sha256": "cf14f0a3a856b5c128adb3848c4fe45f89c0b7aa5dfbdc6b40619fd25c55c926",
+      "passed_tests": [
+        "--- PASS: TestIntegrationDDLDependenciesOnOmni (129.92s)",
+        "--- PASS: TestIntegrationDDLDependenciesOnOmni/from_ast (63.26s)",
+        "--- PASS: TestIntegrationDDLDependenciesOnOmni/from_live (48.06s)"
+      ]
+    }
+  },
+  "changed_source_sha256": {
+    "survey/astconv/ddl_dependencies.go": "1fed6326ccc216b5fa878d562a4bec38c5ed28758a695d2c697da894b1ddc036",
+    "survey/astconv/ddl_dependencies_test.go": "19458e28e8c2fbeda2670fc9badbcd347fca265118ff811ed4cf45ac136f04ab",
+    "survey/astconv/ddl_dependencies_runtime_test.go": "90b01b03407e68eb23c97253028344916a5ae4f4e7c63b5f4b2e671551a26be5"
+  },
+  "commands": {
+    "emulator": "GOWORK=off go test -count=1 -v -timeout=8m ./astconv -run '^TestDDLDependencyReapplicationOnEmulator$'",
+    "omni": "GOWORK=off SPANEMUBOOST_ENABLE_OMNI_TESTS=1 go test -count=1 -v -timeout=8m -tags=integration,omni ./astconv -run '^TestIntegrationDDLDependenciesOnOmni$'"
+  },
+  "source_boundary": "These three source hashes supersede the corresponding post-run hashes in source-boundary.json for the follow-up. Other implementation files are unchanged. Images are configured pins, not independent server-version observations."
+}
