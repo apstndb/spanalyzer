@@ -1023,6 +1023,116 @@ FROM ML.PREDICT(
 	}
 }
 
+func TestAnalyzerRowTypeForMLPredictNamedModel(t *testing.T) {
+	const ddl = `
+CREATE MODEL AlphaModel INPUT (prompt STRING(MAX)) OUTPUT (alpha_out INT64)
+REMOTE OPTIONS (endpoint = '//aiplatform.googleapis.com/projects/p/locations/us-central1/endpoints/a');
+CREATE MODEL BetaModel INPUT (prompt STRING(MAX)) OUTPUT (beta_out STRING(MAX))
+REMOTE OPTIONS (endpoint = '//aiplatform.googleapis.com/projects/p/locations/us-central1/endpoints/b');
+`
+	tests := []struct {
+		name       string
+		sql        string
+		wantFields []struct {
+			name string
+			code spannerpb.TypeCode
+		}
+	}{
+		{
+			name: "select star uses named BetaModel",
+			sql:  `SELECT * FROM ML.PREDICT(MODEL BetaModel, (SELECT "x" AS prompt))`,
+			wantFields: []struct {
+				name string
+				code spannerpb.TypeCode
+			}{
+				{name: "beta_out", code: spannerpb.TypeCode_STRING},
+				{name: "prompt", code: spannerpb.TypeCode_STRING},
+			},
+		},
+		{
+			name: "select star uses named AlphaModel",
+			sql:  `SELECT * FROM ML.PREDICT(MODEL AlphaModel, (SELECT "x" AS prompt))`,
+			wantFields: []struct {
+				name string
+				code spannerpb.TypeCode
+			}{
+				{name: "alpha_out", code: spannerpb.TypeCode_INT64},
+				{name: "prompt", code: spannerpb.TypeCode_STRING},
+			},
+		},
+		{
+			name: "select beta_out from named BetaModel",
+			sql:  `SELECT beta_out FROM ML.PREDICT(MODEL BetaModel, (SELECT "x" AS prompt))`,
+			wantFields: []struct {
+				name string
+				code spannerpb.TypeCode
+			}{
+				{name: "beta_out", code: spannerpb.TypeCode_STRING},
+			},
+		},
+		{
+			name: "safe namespace uses named BetaModel",
+			sql:  `SELECT * FROM SAFE.ML.PREDICT(MODEL BetaModel, (SELECT "x" AS prompt))`,
+			wantFields: []struct {
+				name string
+				code spannerpb.TypeCode
+			}{
+				{name: "beta_out", code: spannerpb.TypeCode_STRING},
+				{name: "prompt", code: spannerpb.TypeCode_STRING},
+			},
+		},
+		{
+			name: "three-argument form uses named BetaModel",
+			sql: `
+SELECT *
+FROM ML.PREDICT(
+  MODEL BetaModel,
+  (SELECT "x" AS prompt),
+  STRUCT(256 AS maxOutputTokens)
+)
+`,
+			wantFields: []struct {
+				name string
+				code spannerpb.TypeCode
+			}{
+				{name: "beta_out", code: spannerpb.TypeCode_STRING},
+				{name: "prompt", code: spannerpb.TypeCode_STRING},
+			},
+		},
+	}
+
+	analyzer, err := NewAnalyzerFromDDL("schema.sql", ddl)
+	if err != nil {
+		t.Fatalf("NewAnalyzerFromDDL() error = %v", err)
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			rowType, err := analyzer.RowTypeForStatement(tt.sql)
+			if err != nil {
+				t.Fatalf("RowTypeForStatement() error = %v", err)
+			}
+			if got, want := len(rowType.Fields), len(tt.wantFields); got != want {
+				t.Fatalf("len(rowType.Fields) = %d, want %d", got, want)
+			}
+			for i, want := range tt.wantFields {
+				assertField(t, rowType.Fields[i], want.name, want.code)
+			}
+		})
+	}
+}
+
+func TestAnalyzerRejectsDuplicateModelColumns(t *testing.T) {
+	for _, columns := range []string{
+		`INPUT (prompt STRING(MAX), Prompt STRING(MAX)) OUTPUT (answer INT64)`,
+		`INPUT (prompt STRING(MAX)) OUTPUT (answer INT64, Answer STRING(MAX))`,
+	} {
+		ddl := "CREATE MODEL M " + columns + " REMOTE OPTIONS (endpoint = '//aiplatform.googleapis.com/projects/p/locations/us-central1/endpoints/m')"
+		if _, err := NewAnalyzerFromDDL("schema.sql", ddl); err == nil || !strings.Contains(err.Error(), "duplicate column") {
+			t.Fatalf("NewAnalyzerFromDDL(%q) error = %v, want duplicate-column diagnostic", columns, err)
+		}
+	}
+}
+
 func TestAnalyzerRowTypeForPropertyGraph(t *testing.T) {
 	const ddl = `
 CREATE TABLE Person (

@@ -9,13 +9,12 @@ import (
 
 func (c *GoogleSQLCatalog) addModels() error {
 	for _, model := range c.SpannerCatalog.Models {
-		impl, err := c.newGoogleSQLModel(model)
+		// Register as SimpleModel so ML.PREDICT can decode the named
+		// argument back to a ModelNode. Go callback models surface as
+		// ModelTrampoline and cannot be identified in Resolve.
+		gsModel, err := c.newGoogleSQLModel(model)
 		if err != nil {
 			return err
-		}
-		gsModel, err := googlesql.NewModelFromImpl(impl)
-		if err != nil {
-			return fmt.Errorf("model %s: %w", model.Name, err)
 		}
 		if err := c.SimpleCatalog.AddOwnedModel(gsModel); err != nil {
 			return fmt.Errorf("model %s: %w", model.Name, err)
@@ -28,7 +27,7 @@ func (c *GoogleSQLCatalog) addModels() error {
 	return nil
 }
 
-func (c *GoogleSQLCatalog) newGoogleSQLModel(model *Model) (*googleSQLModel, error) {
+func (c *GoogleSQLCatalog) newGoogleSQLModel(model *Model) (*googlesql.SimpleModel, error) {
 	inputs, err := c.modelColumns(model.Name, model.Inputs)
 	if err != nil {
 		return nil, err
@@ -37,10 +36,27 @@ func (c *GoogleSQLCatalog) newGoogleSQLModel(model *Model) (*googleSQLModel, err
 	if err != nil {
 		return nil, err
 	}
-	return &googleSQLModel{name: model.Name, inputs: inputs, outputs: outputs}, nil
+	gsModel, err := googlesql.NewSimpleModel(model.Name, inputs, outputs, true, -1)
+	if err != nil {
+		return nil, fmt.Errorf("model %s: %w", model.Name, err)
+	}
+	return gsModel, nil
 }
 
 func (c *GoogleSQLCatalog) modelColumns(modelName string, columns []*ModelColumn) ([]googlesql.Googlesql_ColumnNode, error) {
+	// SimpleModel rejects duplicate column names in native code. Validate first
+	// so malformed DDL or a caller-built Catalog returns a Go error instead.
+	seen := make(map[string]bool, len(columns))
+	for _, column := range columns {
+		if column == nil || strings.TrimSpace(column.Name) == "" {
+			return nil, fmt.Errorf("model %s has an empty column name", modelName)
+		}
+		key := strings.ToLower(column.Name)
+		if seen[key] {
+			return nil, fmt.Errorf("model %s has duplicate column %s", modelName, column.Name)
+		}
+		seen[key] = true
+	}
 	out := make([]googlesql.Googlesql_ColumnNode, 0, len(columns))
 	for _, column := range columns {
 		typ, err := c.TypeSpecToGoogleSQLType(column.Type)
@@ -56,67 +72,7 @@ func (c *GoogleSQLCatalog) modelColumns(modelName string, columns []*ModelColumn
 	return out, nil
 }
 
-type googleSQLModel struct {
-	googlesql.ModelCallbackDefaults
-
-	name    string
-	inputs  []googlesql.Googlesql_ColumnNode
-	outputs []googlesql.Googlesql_ColumnNode
-}
-
 type registeredGoogleSQLModel struct {
 	model *Model
 	node  googlesql.ModelNode
-}
-
-func (m *googleSQLModel) Name() (string, error) {
-	return m.name, nil
-}
-
-func (m *googleSQLModel) FullName() (string, error) {
-	return m.name, nil
-}
-
-func (m *googleSQLModel) NumInputs() (uint64, error) {
-	return uint64(len(m.inputs)), nil
-}
-
-func (m *googleSQLModel) NumOutputs() (uint64, error) {
-	return uint64(len(m.outputs)), nil
-}
-
-func (m *googleSQLModel) GetInput(i int32) (googlesql.Googlesql_ColumnNode, error) {
-	return modelColumnAt(m.inputs, i)
-}
-
-func (m *googleSQLModel) GetOutput(i int32) (googlesql.Googlesql_ColumnNode, error) {
-	return modelColumnAt(m.outputs, i)
-}
-
-func (m *googleSQLModel) FindInputByName(name string) (googlesql.Googlesql_ColumnNode, error) {
-	return findModelColumn(m.inputs, name)
-}
-
-func (m *googleSQLModel) FindOutputByName(name string) (googlesql.Googlesql_ColumnNode, error) {
-	return findModelColumn(m.outputs, name)
-}
-
-func modelColumnAt(columns []googlesql.Googlesql_ColumnNode, i int32) (googlesql.Googlesql_ColumnNode, error) {
-	if i < 0 || int(i) >= len(columns) {
-		return nil, nil
-	}
-	return columns[i], nil
-}
-
-func findModelColumn(columns []googlesql.Googlesql_ColumnNode, name string) (googlesql.Googlesql_ColumnNode, error) {
-	for _, column := range columns {
-		columnName, err := column.Name()
-		if err != nil {
-			return nil, err
-		}
-		if strings.EqualFold(columnName, name) {
-			return column, nil
-		}
-	}
-	return nil, nil
 }
