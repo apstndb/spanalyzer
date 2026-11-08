@@ -52,7 +52,7 @@ func analyzeCodegenQuerySpannerVariants(ddlPath, ddl string, schema QueryCodegen
 			return nil, nil, fmt.Errorf("variant %s: build analyzer: %w", v.Key(), err)
 		}
 		for _, p := range query.Params {
-			if optParamMode(p) == optparam.ModeOrderByChoice {
+			if mode := optParamMode(p); mode == optparam.ModeOrderByChoice || mode == optparam.ModeSQLChoice {
 				continue
 			}
 			if err := addSpannerQueryParameter(analyzer, query.Name, p); err != nil {
@@ -98,14 +98,7 @@ func emitQueryGoBuilder(query QueryCodegenQuery, builderFunc, paramsType string)
 	if err != nil {
 		return "", nil, err
 	}
-	imports := []string{"sort", "strings"}
-	for _, p := range opParams {
-		if p.Mode == optparam.ModeNullIsNull {
-			imports = append(imports, "cloud.google.com/go/spanner")
-			break
-		}
-	}
-	return code, imports, nil
+	return code, optparam.GoBuilderImports(opParams), nil
 }
 
 func toOptParamParams(params []QueryCodegenParam) ([]optparam.Param, error) {
@@ -136,6 +129,8 @@ func optParamMode(p QueryCodegenParam) optparam.Mode {
 		return optparam.ModeOmitWhenEmpty
 	case "orderby_choice":
 		return optparam.ModeOrderByChoice
+	case "sql_choice":
+		return optparam.ModeSQLChoice
 	default:
 		return optparam.ModeRequired
 	}

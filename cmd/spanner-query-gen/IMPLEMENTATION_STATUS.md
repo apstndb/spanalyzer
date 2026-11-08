@@ -21,6 +21,11 @@ deliberate deferrals.
   cardinalities (`one`, `maybe_one`, `many`) plus row-set DML
   `THEN RETURN`. Optional Spanner queries emit typed params structs and
   `Build<Name>SQL` helpers instead of a single SQL constant.
+- Closed `sql_choice` fragments for same-row-type Spanner SQL variants,
+  including mutually exclusive predicates and column choices, with selected
+  bind filtering. Required TIMESTAMP builder values use `time.Time`. Open
+  runtime SQL holes, row-shape-changing choices, BigQuery optional variants
+  and row-count DML variants remain outside this preview.
 - Spanner `table` and `index` shorthand query generation with deterministic
   `order_by: key` by default and opt-out `order_by: none`.
 - Spanner write helper generation for mutation and DML surfaces, including
