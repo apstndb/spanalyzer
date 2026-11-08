@@ -11,6 +11,10 @@ deliberate deferrals.
 - `generate`, `check`, `explain-plan`, `vet`, `plan-report`,
   `config-schema`, `plan-report-schema`, and `plan-contract-schema`
   subcommands.
+- Continued `explain-plan` / `vet` inspection after target planning failures,
+  with partial status, scoped unsuppressible errors and preserved later result
+  fields/warnings. Shared generation conflicts remain errors; `generate` and
+  `check` stay strict.
 - Query result DTO and SQL constant generation for Spanner, BigQuery, and
   reviewable `external_query` declarations.
 - Basic runtime query free functions for Spanner and BigQuery query

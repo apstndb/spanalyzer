@@ -1,5 +1,14 @@
 # TODO
 
+## Inspection feedback (2026-11-08)
+
+- [x] Reproduce the ADD ROW DELETION POLICY input gap against current main and
+  compare folding supported ALTERs with skipping unsupported statements.
+- [x] Fold ADD policy into the existing table metadata, preserving named-schema
+  identity and rejecting missing targets or duplicate policies.
+- [x] Verify inline/ALTER equivalence and fresh-runtime reapplication, and update
+  the supported DDL boundary.
+
 ## Repository hardening (2026-11-08)
 
 - [x] Order reconstructed DDL by known object dependencies, including sequence

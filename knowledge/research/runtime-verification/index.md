@@ -7,6 +7,7 @@ source evidence, results and unverified boundaries travel with each note.
 
 | Runtime and observation scope | Research Note |
 | --- | --- |
+| Local frontend and Emulator 1.5.59, 2026-11-08 | [Inspection continuation and row deletion policy folding](inspection-feedback-20261108.md): current-baseline reproduction, partial CLI artifacts and AST/live TTL reapplication |
 | Emulator 1.5.59 and Omni r4 LTS.2, 2026-11-08 | [Repository hardening verification](repository-hardening-20261108.md): seven review fixes, dependency-safe DDL, explicit DB retention, standalone builds and isolated CEL errors |
 | Omni r4 LTS.2, 2026-11-08 | [Compact PLAN summaries](plan-summary-omni-lts-20261108.md): full/summary parity, separate pinning warnings, output size and actual JSON/YAML schema checks |
 | Managed Spanner, 2026-11-08 | [Managed revalidation and documentation audit](managed-revalidation-20261108.md): all three new mirror commits, search pagination, queue batch defaults and unchanged catalog surfaces |

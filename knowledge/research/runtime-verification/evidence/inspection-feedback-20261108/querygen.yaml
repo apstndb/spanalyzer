@@ -1,0 +1,15 @@
+version: v1alpha
+go: {package: db}
+catalogs:
+- {name: app, kind: spanner, ddl: schema.sql}
+queries:
+- name: Bad
+  catalog: app
+  kind: sql
+  sql: SELECT * FROM UNNEST(1)
+  result: {struct: BadRow}
+- name: Good
+  catalog: app
+  kind: sql
+  sql: SELECT Id FROM T
+  result: {struct: GoodRow}

@@ -1392,8 +1392,9 @@ belongs to the future rule policy layer.
 
 Current `vet` is plan validation, not a full policy engine. It should:
 
-- build the same resolved plan as code generation,
-- fail on planning errors,
+- use the same strict planner as code generation for valid inputs,
+- continue after target planning errors and fail after writing all available
+  diagnostics,
 - print implemented unsuppressed warning summaries and suppression summaries to
   stderr for the default text output while keeping stdout empty,
 - expose implemented diagnostics, unsuppressed warnings, and suppressions in
@@ -1406,6 +1407,30 @@ Current `vet` is plan validation, not a full policy engine. It should:
 Diagnostic records include `stage`, `suppressible`, and `suppressed`.
 Warning diagnostics are suppressible. Planning and config-parse errors are not
 suppressible.
+
+### Inspection after planning failures
+
+`explain-plan` and `vet` continue by default because their purpose is inspecting
+a collection. An opt-in continuation flag was considered but would leave
+existing inspection calls hiding later results. Generation and `check` remain
+strict, and config parse failures cannot be isolated into target results.
+
+The CLI first attempts the strict planner, preserving complete metadata and
+the existing fast path for valid configurations. On failure it reuses the
+existing report planner for target isolation and rebuilds the successful subset
+through the strict planner to retain bindings, warnings, suppressions, structs
+and writes. This error path can analyze successful targets again. A new public
+planner contract or a second generation resolver was rejected: command
+orchestration can use the already-published APIs, keeping standalone module
+behavior consistent without an unrelated dependency publication.
+
+Target errors are not suppressible. Cross-target namespace/DTO conflicts and
+unavailable catalog metadata remain plan-wide errors; per-target success never
+implies that the full generation package is valid. If complete metadata cannot
+be rebuilt, only available target data is emitted with the plan error.
+`explain-plan` records `status: partial`, `planning_errors`, and per-query
+status/error fields. Both commands serialize the artifact before a nonzero
+exit, and output failures take precedence over planning failures.
 
 Future `vet` work can add per-rule severity configuration, `--strict`,
 warnings-as-errors, source spans, expired suppression behavior, and custom
