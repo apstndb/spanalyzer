@@ -8,6 +8,11 @@
 - [ ] Batch expression-index fixtures and discover partial-batch cleanup state.
 - [ ] Preserve current registry, runtime pins and manifest expectations.
 
+## Pending local fixes (2026-11-08)
+
+- [x] Reject user queues explicitly during DDL reconstruction while keeping
+  system-schema objects excluded.
+
 ## Inspection feedback (2026-11-08)
 
 - [x] Reproduce the ADD ROW DELETION POLICY input gap against current main and

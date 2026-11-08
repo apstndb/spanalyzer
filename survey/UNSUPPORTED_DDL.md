@@ -16,6 +16,18 @@ These features either lack a corresponding memefish AST node or cannot be
 recovered from the available live metadata. Each subsection states the exact
 boundary.
 
+### Spanner queues
+
+`TABLES.TABLE_TYPE = 'QUEUE'` describes a user schema object. The current
+memefish AST and converter have no `CREATE QUEUE` path. `ToDDLStatements`
+therefore returns an explicit unsupported-queue error instead of silently
+omitting the queue and its generated table-valued functions. System-schema
+objects remain excluded from user DDL reconstruction.
+
+Full queue round-trip support requires a corresponding parser AST and
+conversion implementation; a `CREATE TABLE` substitute would lose queue
+semantics.
+
 ### `GRANT USAGE ON SCHEMA` — AST-only live recovery
 
 `GRANT USAGE ON SCHEMA [DEFAULT|<schema_name>[, ...]] TO ROLE <role>` now
