@@ -208,3 +208,83 @@ func main() {
 		}
 	}
 }
+
+func TestSQLChoiceBuilderUsesCompleteSQLCommentContext(t *testing.T) {
+	// A fragment-local lexer sees @value and @guard in later segments, but
+	// the complete statement comments them out in the comment branch. The
+	// repeated choice marker is one axis, including in the emitted label.
+	sql := `SELECT 1 /*?choice:tail*/ /*?end*/ + @value /*?optional:guard*/ + @guard /*?end*/ /*?choice:tail*/ /*?end*/`
+	params := []Param{
+		{Name: "tail", Mode: ModeSQLChoice, Default: "comment", Choices: map[string]string{"comment": " -- comment", "value": " + 0"}},
+		{Name: "value", Type: "INT64"},
+		{Name: "guard", Type: "INT64", Mode: ModeOmitWhenNull},
+	}
+	verified, err := VerifyVariants("schema.sql", "", sql, params)
+	if err != nil {
+		t.Fatal(err)
+	}
+	segments, err := SegmentTemplate(sql, params)
+	if err != nil {
+		t.Fatal(err)
+	}
+	src, err := EmitGoBuilder(segments, params, BuilderOptions{Package: "main", FuncName: "Build"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	dir := t.TempDir()
+	for name, content := range map[string]string{
+		"go.mod":     "module comments\n\ngo 1.26\n",
+		"builder.go": src,
+		"main.go": `package main
+import ("encoding/json"; "os"; "sort")
+func main() {
+  n := int64(3)
+  for _, p := range []BuildParams{{Value: 2}, {Value: 2, Guard: &n}, {Tail: "value", Value: 2}, {Tail: "value", Value: 2, Guard: &n}} {
+    sql, args, label := Build(p)
+    names := make([]string,0,len(args)); for name := range args { names=append(names,name) }; sort.Strings(names)
+    json.NewEncoder(os.Stdout).Encode(struct {SQL, Label string; Names []string}{sql,label,names})
+  }
+}
+`,
+	} {
+		if err := os.WriteFile(filepath.Join(dir, name), []byte(content), 0o644); err != nil {
+			t.Fatal(err)
+		}
+	}
+	cmd := exec.Command("go", "run", ".")
+	cmd.Dir = dir
+	out, err := cmd.CombinedOutput()
+	if err != nil {
+		t.Fatalf("compiled comment-boundary builder: %v\n%s\n%s", err, src, out)
+	}
+	want := map[string]Variant{}
+	for _, v := range verified.Variants {
+		want[v.Key()] = v
+	}
+	lines := strings.Split(strings.TrimSpace(string(out)), "\n")
+	if len(lines) != len(want) {
+		t.Fatalf("outputs = %q", out)
+	}
+	for _, line := range lines {
+		var got struct {
+			SQL, Label string
+			Names      []string
+		}
+		if err := json.Unmarshal([]byte(line), &got); err != nil {
+			t.Fatal(err)
+		}
+		v, ok := want[got.Label]
+		if !ok || v.SQL != got.SQL {
+			t.Fatalf("label/SQL differs from verification: %+v", got)
+		}
+		var names []string
+		for _, name := range []string{"guard", "value"} {
+			if !slices.Contains(v.AbsentParams, name) {
+				names = append(names, name)
+			}
+		}
+		if !slices.Equal(names, got.Names) {
+			t.Fatalf("%s bindings = %v, want verified %v", got.Label, got.Names, names)
+		}
+	}
+}

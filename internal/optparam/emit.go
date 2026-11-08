@@ -124,47 +124,36 @@ func EmitGoBuilder(segments []Segment, params []Param, opts BuilderOptions) (str
 	b.WriteString("\tvar b strings.Builder\n")
 	b.WriteString("\targs = map[string]interface{}{}\n")
 	b.WriteString("\tvar parts []string\n\n")
-	if trackBindings {
-		b.WriteString("\tused := map[string]bool{}\n")
-	}
+	labelSeen := map[string]bool{}
 	for _, seg := range segments {
+		// A repeated marker is still one selector/presence axis. SQL-choice
+		// pruning below uses the same canonical label as the verified variant.
+		addLabel := !trackBindings || !labelSeen[seg.Param]
 		switch seg.Kind {
 		case SegFixed:
 			fmt.Fprintf(&b, "\tb.WriteString(%s)\n", strconv.Quote(seg.Text))
-			if trackBindings {
-				if err := emitUsedBindings(&b, seg.Text, params, "\t"); err != nil {
-					return "", err
-				}
-			}
 		case SegOmitWhenNull:
 			field := exportIdent(seg.Param)
 			fmt.Fprintf(&b, "\tif p.%s != nil {\n", field)
 			fmt.Fprintf(&b, "\t\tb.WriteString(%s)\n", strconv.Quote(seg.Text))
-			if trackBindings {
-				if err := emitUsedBindings(&b, seg.Text, params, "\t\t"); err != nil {
-					return "", err
-				}
-			}
 			fmt.Fprintf(&b, "\t\targs[%s] = *p.%s\n", strconv.Quote(seg.Param), field)
-			fmt.Fprintf(&b, "\t\tparts = append(parts, %s)\n", strconv.Quote(seg.Param))
+			if addLabel {
+				fmt.Fprintf(&b, "\t\tparts = append(parts, %s)\n", strconv.Quote(seg.Param))
+			}
 			b.WriteString("\t}\n")
 		case SegOmitWhenEmpty:
 			field := exportIdent(seg.Param)
 			fmt.Fprintf(&b, "\tif len(p.%s) > 0 {\n", field)
 			fmt.Fprintf(&b, "\t\tb.WriteString(%s)\n", strconv.Quote(seg.Text))
-			if trackBindings {
-				if err := emitUsedBindings(&b, seg.Text, params, "\t\t"); err != nil {
-					return "", err
-				}
-			}
 			fmt.Fprintf(&b, "\t\targs[%s] = p.%s\n", strconv.Quote(seg.Param), field)
-			fmt.Fprintf(&b, "\t\tparts = append(parts, %s)\n", strconv.Quote(seg.Param))
+			if addLabel {
+				fmt.Fprintf(&b, "\t\tparts = append(parts, %s)\n", strconv.Quote(seg.Param))
+			}
 			b.WriteString("\t}\n")
 		case SegOrderByChoice, SegSQLChoice:
-			if err := emitChoice(&b, seg, params, trackBindings); err != nil {
-				return "", err
-			}
+			emitChoice(&b, seg, addLabel)
 		}
+		labelSeen[seg.Param] = true
 	}
 	required := requiredParams(params, nil)
 	sort.Strings(required)
@@ -177,17 +166,17 @@ func EmitGoBuilder(segments []Segment, params []Param, opts BuilderOptions) (str
 		field := exportIdent(name)
 		fmt.Fprintf(&b, "\targs[%s] = p.%s\n", strconv.Quote(name), field)
 	}
-	if trackBindings {
-		// Only declared, generation-time lexed references are recorded. The
-		// runtime builder needs neither a parser nor a database dependency.
-		b.WriteString("\tfor name := range args {\n\t\tif !used[name] {\n\t\t\tdelete(args, name)\n\t\t}\n\t}\n")
-	}
 	b.WriteString("\n")
 	b.WriteString("\tsort.Strings(parts)\n")
 	b.WriteString("\tlabel := \"(none)\"\n")
 	b.WriteString("\tif len(parts) > 0 {\n")
 	b.WriteString("\t\tlabel = strings.Join(parts, \"+\")\n")
 	b.WriteString("\t}\n")
+	if trackBindings {
+		if err := emitVariantBindingPruning(&b, segments, params); err != nil {
+			return "", err
+		}
+	}
 	b.WriteString("\treturn b.String(), args, label\n")
 	b.WriteString("}\n")
 
@@ -221,7 +210,7 @@ func ValidateGoFields(params []Param) error {
 	return nil
 }
 
-func emitChoice(b *strings.Builder, seg Segment, params []Param, trackBindings bool) error {
+func emitChoice(b *strings.Builder, seg Segment, addLabel bool) {
 	field := exportIdent(seg.Param)
 	fmt.Fprintf(b, "\t{\n")
 	fmt.Fprintf(b, "\t\tchoice := p.%s\n", field)
@@ -232,11 +221,6 @@ func emitChoice(b *strings.Builder, seg Segment, params []Param, trackBindings b
 	for _, k := range sortedChoiceKeys(seg.Choices) {
 		fmt.Fprintf(b, "\t\tcase %s:\n", strconv.Quote(k))
 		fmt.Fprintf(b, "\t\t\tb.WriteString(%s)\n", strconv.Quote(seg.Choices[k]))
-		if trackBindings {
-			if err := emitUsedBindings(b, seg.Choices[k], params, "\t\t\t"); err != nil {
-				return err
-			}
-		}
 	}
 	fmt.Fprintf(b, "\t\tdefault:\n")
 	kind := "orderby"
@@ -245,19 +229,50 @@ func emitChoice(b *strings.Builder, seg Segment, params []Param, trackBindings b
 	}
 	fmt.Fprintf(b, "\t\t\tpanic(%q + choice)\n", kind+" "+seg.Param+": unknown choice ")
 	fmt.Fprintf(b, "\t\t}\n")
-	fmt.Fprintf(b, "\t\tparts = append(parts, %s+\"=\"+choice)\n", strconv.Quote(seg.Param))
+	if addLabel {
+		fmt.Fprintf(b, "\t\tparts = append(parts, %s+\"=\"+choice)\n", strconv.Quote(seg.Param))
+	}
 	fmt.Fprintf(b, "\t}\n")
-	return nil
 }
 
-func emitUsedBindings(b *strings.Builder, sql string, params []Param, indent string) error {
-	names, err := bindingNames(sql, params)
+func emitVariantBindingPruning(b *strings.Builder, segments []Segment, params []Param) error {
+	// SQL token context can cross segment boundaries: a trailing -- comment
+	// may hide a fixed segment's @bind. Derive pruning from the complete SQL,
+	// exactly like verification, rather than unioning fragment-local tokens.
+	// Group equal masks to keep the bounded dispatch compact; no lexer runs
+	// in the generated builder.
+	variants, err := enumerateSegmentVariants(segments, params)
 	if err != nil {
 		return err
 	}
-	for _, name := range names {
-		fmt.Fprintf(b, "%sused[%q] = true\n", indent, name)
+	groups := map[string][]string{}
+	for _, v := range variants {
+		if len(v.AbsentParams) > 0 {
+			key := strings.Join(v.AbsentParams, "\x00")
+			groups[key] = append(groups[key], v.Key())
+		}
 	}
+	if len(groups) == 0 {
+		return nil
+	}
+	b.WriteString("\tswitch label {\n")
+	keys := make([]string, 0, len(groups))
+	for key := range groups {
+		keys = append(keys, key)
+	}
+	sort.Strings(keys)
+	for _, key := range keys {
+		labels := groups[key]
+		quoted := make([]string, len(labels))
+		for i, label := range labels {
+			quoted[i] = strconv.Quote(label)
+		}
+		fmt.Fprintf(b, "\tcase %s:\n", strings.Join(quoted, ", "))
+		for _, name := range strings.Split(key, "\x00") {
+			fmt.Fprintf(b, "\t\tdelete(args, %q)\n", name)
+		}
+	}
+	b.WriteString("\t}\n")
 	return nil
 }
 

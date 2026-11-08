@@ -90,7 +90,7 @@ func TestSQLChoicePlanGenerationAndReportBindings(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	for _, want := range []string{`"time"`, "Start", "time.Time", "Bounds", "func BuildFindEventsSQL(", `used["start"] = true`, "delete(args, name)"} {
+	for _, want := range []string{`"time"`, "Start", "time.Time", "Bounds", "func BuildFindEventsSQL(", `delete(args, "start")`, `delete(args, "end")`} {
 		if !strings.Contains(code, want) {
 			t.Fatalf("generated code missing %q", want)
 		}

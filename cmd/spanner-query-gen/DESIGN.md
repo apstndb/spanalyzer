@@ -413,10 +413,14 @@ axes; a closed column predicate can be another independent selector. Defaults
 select declared candidates only. Every concrete statement must analyze to the
 same row type, and the existing 4,096-variant limit applies.
 
-Bind references are lexed at generation time, excluding quoted text and
-comments. Choice selectors are never bindings. Required value params may be
+Bind references are lexed from each complete candidate statement at generation
+time, excluding quoted text and comments. Choice selectors are never bindings. Required value params may be
 used by only some candidates; generated builders and per-variant PLAN inputs
-omit unused values. This does not require a runtime parser. Nullable omission
+omit unused values. Generated pruning dispatches by the verified variant label
+and groups identical omitted-binding sets. Fragment-local used-bind maps were
+rejected because a line comment can cross a fragment boundary and hide a later
+binding. Repeated markers still contribute one selector or presence axis to
+the label. This does not require a runtime parser. Nullable omission
 gates remain independent blocks; choice fragments require ordinary required
 bindings so two mechanisms do not compete to decide a value's presence.
 

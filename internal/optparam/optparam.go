@@ -401,6 +401,10 @@ func EnumerateVariants(sql string, params []Param) ([]Variant, error) {
 	if err != nil {
 		return nil, err
 	}
+	return enumerateSegmentVariants(segments, params)
+}
+
+func enumerateSegmentVariants(segments []Segment, params []Param) ([]Variant, error) {
 	gateable, choiceable := segmentAxes(segments)
 
 	// Two-dimensional Cartesian product: 2^k presence combinations ×
