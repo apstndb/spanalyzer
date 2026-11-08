@@ -1,0 +1,3 @@
+package main
+import("encoding/json";"os";"github.com/cloudspannerecosystem/memefish")
+func main(){for _,s:=range []string{"ALTER VECTOR INDEX V REBUILD","ALTER VECTOR INDEX V SET OPTIONS(disable_search=true)","ALTER VECTOR INDEX V REBUILD OPTIONS(num_leaves=3)"}{_,e:=memefish.ParseDDL("",s);msg:="";if e!=nil{msg=e.Error()};json.NewEncoder(os.Stdout).Encode(map[string]any{"sql":s,"error":msg})}}

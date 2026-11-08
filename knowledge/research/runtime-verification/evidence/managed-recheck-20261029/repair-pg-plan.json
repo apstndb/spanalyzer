@@ -1,0 +1,105 @@
+{
+  "dialect": "pg",
+  "scope": "Focused harness repairs and COUNT(jsonb) isolation; initial results remain immutable.",
+  "original_plan": "weekly-pg-plan.json",
+  "repair_reasons": [
+    {
+      "attempt": "weekly-google",
+      "label": "graph-base",
+      "cause": "Unqualified Id in three view definitions violates strict name resolution; dependent graph/path cases were NOT_RUN."
+    },
+    {
+      "attempt": "weekly-google and weekly-pg",
+      "label": "fk-reject-generated",
+      "cause": "The constraint and table shared a name, so duplicate-name rejection did not test generated-column restrictions."
+    },
+    {
+      "attempt": "weekly-google",
+      "label": "tokenize-float-prefix",
+      "cause": "INT64 min/max arguments did not match the FLOAT64 overload; supply typed FLOAT64 bounds and granularity."
+    }
+  ],
+  "steps": [
+    {
+      "label": "fk-base",
+      "family": "foreign-key",
+      "kind": "ddl",
+      "sql": "",
+      "requires": [],
+      "statements": [
+        "CREATE TABLE FkParent (Id bigint NOT NULL, PRIMARY KEY (Id))"
+      ]
+    },
+    {
+      "label": "fk-generated-control",
+      "family": "foreign-key",
+      "kind": "ddl",
+      "sql": "CREATE TABLE FkGenerated (Id bigint NOT NULL, SourceId bigint, ParentId bigint GENERATED ALWAYS AS (SourceId) STORED, PRIMARY KEY (Id))",
+      "requires": [
+        "fk-base"
+      ]
+    },
+    {
+      "label": "fk-reject-generated",
+      "family": "foreign-key",
+      "kind": "ddl",
+      "sql": "ALTER TABLE FkGenerated ADD CONSTRAINT FkGeneratedReference FOREIGN KEY (ParentId) REFERENCES FkParent(Id) ON DELETE SET NULL",
+      "requires": [
+        "fk-generated-control"
+      ],
+      "control": "documented_invalid_referencing_column"
+    },
+    {
+      "label": "jsonb-base",
+      "family": "jsonb-stored",
+      "kind": "ddl",
+      "sql": "CREATE TABLE JbValues (Id bigint NOT NULL, V jsonb, PRIMARY KEY (Id))",
+      "requires": []
+    },
+    {
+      "label": "jsonb-seed",
+      "family": "jsonb-stored",
+      "kind": "dml",
+      "sql": "",
+      "requires": [
+        "jsonb-base"
+      ],
+      "statements": [
+        "INSERT INTO JbValues(Id,V) VALUES (1,'null'::jsonb),(2,'\"\"'::jsonb),(3,'\"a\"'::jsonb),(4,'\"aa\"'::jsonb),(5,'-1'::jsonb),(6,'0'::jsonb),(7,'1'::jsonb),(8,'1.0'::jsonb),(9,'false'::jsonb),(10,'true'::jsonb),(11,'[]'::jsonb),(12,'[0]'::jsonb),(13,'[1]'::jsonb),(14,'[0,0]'::jsonb),(15,'[null]'::jsonb),(16,'[[]]'::jsonb),(17,'{}'::jsonb),(18,'{\"b\":0}'::jsonb),(19,'{\"a\":1}'::jsonb),(20,'{\"a\":1,\"b\":0}'::jsonb),(21,NULL),(22,'{\"a\":0,\"a\":1}'::jsonb)"
+      ]
+    },
+    {
+      "label": "jsonb-distinct-subquery-count",
+      "family": "jsonb-count-controls",
+      "kind": "query",
+      "sql": "SELECT COUNT(*) AS n FROM (SELECT DISTINCT V FROM JbValues WHERE V IS NOT NULL) AS d",
+      "requires": [
+        "jsonb-seed"
+      ],
+      "expected": {
+        "n": "19"
+      }
+    },
+    {
+      "label": "jsonb-nonnull-star-count",
+      "family": "jsonb-count-controls",
+      "kind": "query",
+      "sql": "SELECT COUNT(*) AS n FROM JbValues WHERE V IS NOT NULL",
+      "requires": [
+        "jsonb-seed"
+      ],
+      "expected": {
+        "n": "21"
+      }
+    },
+    {
+      "label": "jsonb-count-expression",
+      "family": "jsonb-count-controls",
+      "kind": "query",
+      "sql": "SELECT COUNT(V) AS n FROM JbValues",
+      "requires": [
+        "jsonb-seed"
+      ]
+    }
+  ]
+}

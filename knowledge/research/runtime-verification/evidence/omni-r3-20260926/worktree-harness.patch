@@ -1,0 +1,42 @@
+diff --git a/runtime_targets.json b/runtime_targets.json
+index 0e572ea..78793fa 100644
+--- a/runtime_targets.json
++++ b/runtime_targets.json
+@@ -20,15 +20,15 @@
+     {
+       "kind": "omni",
+       "image_family": "us-docker.pkg.dev/spanner-omni/images/spanner-omni",
+-      "tag": "2026.r2.1-beta",
++      "tag": "2026.r3-beta",
+       "platforms": [
+         {
+           "platform": "linux/amd64",
+-          "digest": "sha256:48631bc2f3999358368a81042c7974abb131e05c04d246206fb7b82eae41789f"
++          "digest": "sha256:0452b944e1ecd111d1e7c1d70dbd2371b302c6383b5c610222a382e8c894c5b3"
+         },
+         {
+           "platform": "linux/arm64",
+-          "digest": "sha256:ed31d9ee72eeee69cac78566eb3a6e72ee389b26234735f0ef449774cc006741"
++          "digest": "sha256:8243ce3c748b10371a16f05bc7553465fe978d7349127ad331d02c1d3a9fcc99"
+         }
+       ]
+     }
+diff --git a/tools/omni-integration-runner/main.go b/tools/omni-integration-runner/main.go
+index bd2b1c6..a8e789c 100644
+--- a/tools/omni-integration-runner/main.go
++++ b/tools/omni-integration-runner/main.go
+@@ -158,12 +158,12 @@ func integrationSteps(repoRoot string) []step {
+ 		{
+ 			name:    "plan-shape",
+ 			workdir: filepath.Join(repoRoot, "tools"),
+-			args:    []string{"test", "-count=1", "-timeout=30m", "-tags=integration,omni", "-run", "^TestIntegration.*OnOmni$", "./spanner-query-plan-shape"},
++			args:    []string{"test", "-json", "-count=1", "-timeout=30m", "-tags=integration,omni", "-run", "^TestIntegration.*OnOmni$", "./spanner-query-plan-shape"},
+ 		},
+ 		{
+ 			name:    "query-generator",
+ 			workdir: filepath.Join(repoRoot, "cmd", "spanner-query-gen"),
+-			args:    []string{"test", "-count=1", "-timeout=30m", "-tags=integration,omni", "-run", "^TestIntegration.*OnOmni$", "./..."},
++			args:    []string{"test", "-json", "-count=1", "-timeout=30m", "-tags=integration,omni", "-run", "^TestIntegration.*OnOmni$", "./..."},
+ 		},
+ 	}
+ }

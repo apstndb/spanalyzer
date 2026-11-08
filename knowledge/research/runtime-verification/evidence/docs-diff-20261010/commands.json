@@ -1,0 +1,445 @@
+[
+  {
+    "name": "preflight",
+    "started_at": "2026-10-10T01:24:13.081403+00:00",
+    "completed_at": "2026-10-10T01:24:14.853893+00:00",
+    "exit_code": 0,
+    "seconds": 1.772,
+    "argv": [
+      "<LOCAL_HOME>/.agents/skills/apstndb-spanner-syntax-verify/scripts/run-managed-spanner.sh",
+      "--execute",
+      "SELECT 1 AS ready",
+      "--timeout",
+      "30s"
+    ],
+    "cwd": "<LOCAL_CHECKOUT>",
+    "gowork": "off"
+  },
+  {
+    "name": "query-build",
+    "started_at": "2026-10-10T01:24:14.854547+00:00",
+    "completed_at": "2026-10-10T01:24:17.316473+00:00",
+    "exit_code": 0,
+    "seconds": 2.462,
+    "argv": [
+      "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go",
+      "build",
+      "-o",
+      "<LOCAL_CHECKOUT>/.tmp/docs-diff-20261010/query",
+      "<LOCAL_CHECKOUT>/.tmp/docs-diff-20261010/query.go"
+    ],
+    "cwd": "<LOCAL_CHECKOUT>/tools",
+    "gowork": "<LOCAL_CHECKOUT>/go.work"
+  },
+  {
+    "name": "query-buildinfo",
+    "started_at": "2026-10-10T01:24:17.316691+00:00",
+    "completed_at": "2026-10-10T01:24:17.332097+00:00",
+    "exit_code": 0,
+    "seconds": 0.015,
+    "argv": [
+      "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go",
+      "version",
+      "-m",
+      "<LOCAL_CHECKOUT>/.tmp/docs-diff-20261010/query"
+    ],
+    "cwd": "<LOCAL_CHECKOUT>/tools",
+    "gowork": "<LOCAL_CHECKOUT>/go.work"
+  },
+  {
+    "name": "queries",
+    "started_at": "2026-10-10T01:24:17.332264+00:00",
+    "completed_at": "2026-10-10T01:24:40.505038+00:00",
+    "exit_code": 0,
+    "seconds": 23.173,
+    "argv": [
+      "<LOCAL_CHECKOUT>/.tmp/docs-diff-20261010/query",
+      "<LOCAL_CHECKOUT>/.tmp/docs-diff-20261010/cases.json"
+    ],
+    "cwd": "<LOCAL_CHECKOUT>/tools",
+    "gowork": "<LOCAL_CHECKOUT>/go.work"
+  },
+  {
+    "name": "fixtures-build",
+    "started_at": "2026-10-10T01:26:56.477975+00:00",
+    "completed_at": "2026-10-10T01:26:58.811214+00:00",
+    "exit_code": 0,
+    "seconds": 2.333,
+    "argv": [
+      "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go",
+      "build",
+      "-o",
+      "<LOCAL_CHECKOUT>/.tmp/docs-diff-20261010/fixtures",
+      "<LOCAL_CHECKOUT>/.tmp/docs-diff-20261010/fixtures.go"
+    ],
+    "cwd": "<LOCAL_CHECKOUT>/tools",
+    "gowork": "<LOCAL_CHECKOUT>/go.work"
+  },
+  {
+    "name": "fixtures-buildinfo",
+    "started_at": "2026-10-10T01:26:58.811651+00:00",
+    "completed_at": "2026-10-10T01:26:58.827832+00:00",
+    "exit_code": 0,
+    "seconds": 0.016,
+    "argv": [
+      "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go",
+      "version",
+      "-m",
+      "<LOCAL_CHECKOUT>/.tmp/docs-diff-20261010/fixtures"
+    ],
+    "cwd": "<LOCAL_CHECKOUT>/tools",
+    "gowork": "<LOCAL_CHECKOUT>/go.work"
+  },
+  {
+    "name": "fixtures-v2-build",
+    "started_at": "2026-10-10T01:27:51.129448+00:00",
+    "completed_at": "2026-10-10T01:27:52.161340+00:00",
+    "exit_code": 0,
+    "seconds": 1.032,
+    "argv": [
+      "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go",
+      "build",
+      "-o",
+      "<LOCAL_CHECKOUT>/.tmp/docs-diff-20261010/fixtures-v2",
+      "<LOCAL_CHECKOUT>/.tmp/docs-diff-20261010/fixtures-v2.go"
+    ],
+    "cwd": "<LOCAL_CHECKOUT>/tools",
+    "gowork": "<LOCAL_CHECKOUT>/go.work"
+  },
+  {
+    "name": "fixtures-v2-buildinfo",
+    "started_at": "2026-10-10T01:27:52.161632+00:00",
+    "completed_at": "2026-10-10T01:27:52.176360+00:00",
+    "exit_code": 0,
+    "seconds": 0.015,
+    "argv": [
+      "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go",
+      "version",
+      "-m",
+      "<LOCAL_CHECKOUT>/.tmp/docs-diff-20261010/fixtures-v2"
+    ],
+    "cwd": "<LOCAL_CHECKOUT>/tools",
+    "gowork": "<LOCAL_CHECKOUT>/go.work"
+  },
+  {
+    "name": "fixtures-pg-corrected",
+    "started_at": "2026-10-10T01:27:52.176547+00:00",
+    "completed_at": "2026-10-10T01:29:46.479610+00:00",
+    "exit_code": 0,
+    "seconds": 114.303,
+    "argv": [
+      "<LOCAL_CHECKOUT>/.tmp/docs-diff-20261010/fixtures-v2",
+      "pg"
+    ],
+    "cwd": "<LOCAL_CHECKOUT>/tools",
+    "gowork": "<LOCAL_CHECKOUT>/go.work"
+  },
+  {
+    "name": "followup",
+    "started_at": "2026-10-10T01:28:56.791263+00:00",
+    "completed_at": "2026-10-10T01:29:02.263299+00:00",
+    "exit_code": 0,
+    "seconds": 5.472,
+    "argv": [
+      "<LOCAL_CHECKOUT>/.tmp/docs-diff-20261010/query",
+      "<LOCAL_CHECKOUT>/.tmp/docs-diff-20261010/followup-cases.json"
+    ],
+    "cwd": "<LOCAL_CHECKOUT>/tools",
+    "gowork": "<LOCAL_CHECKOUT>/go.work"
+  },
+  {
+    "name": "preflight",
+    "started_at": "2026-10-10T01:30:10.294459+00:00",
+    "completed_at": "2026-10-10T01:30:11.819585+00:00",
+    "exit_code": 0,
+    "seconds": 1.525,
+    "argv": [
+      "<LOCAL_HOME>/.agents/skills/apstndb-spanner-syntax-verify/scripts/run-managed-spanner.sh",
+      "--execute",
+      "SELECT 1 AS ready",
+      "--timeout",
+      "30s"
+    ],
+    "cwd": "<LOCAL_CHECKOUT>",
+    "gowork": "off"
+  },
+  {
+    "name": "fixtures-v3-build",
+    "started_at": "2026-10-10T01:30:11.819778+00:00",
+    "completed_at": "2026-10-10T01:30:13.606867+00:00",
+    "exit_code": 0,
+    "seconds": 1.787,
+    "argv": [
+      "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go",
+      "build",
+      "-o",
+      "<LOCAL_CHECKOUT>/.tmp/docs-diff-20261010/fixtures-v3",
+      "<LOCAL_CHECKOUT>/.tmp/docs-diff-20261010/fixtures-v3.go"
+    ],
+    "cwd": "<LOCAL_CHECKOUT>/tools",
+    "gowork": "<LOCAL_CHECKOUT>/go.work"
+  },
+  {
+    "name": "fixtures-v3-buildinfo",
+    "started_at": "2026-10-10T01:30:13.607097+00:00",
+    "completed_at": "2026-10-10T01:30:13.621479+00:00",
+    "exit_code": 0,
+    "seconds": 0.014,
+    "argv": [
+      "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go",
+      "version",
+      "-m",
+      "<LOCAL_CHECKOUT>/.tmp/docs-diff-20261010/fixtures-v3"
+    ],
+    "cwd": "<LOCAL_CHECKOUT>/tools",
+    "gowork": "<LOCAL_CHECKOUT>/go.work"
+  },
+  {
+    "name": "fixtures-v3-google",
+    "started_at": "2026-10-10T01:30:13.621634+00:00",
+    "completed_at": "2026-10-10T01:32:16.270555+00:00",
+    "exit_code": 0,
+    "seconds": 122.649,
+    "argv": [
+      "<LOCAL_CHECKOUT>/.tmp/docs-diff-20261010/fixtures-v3",
+      "google"
+    ],
+    "cwd": "<LOCAL_CHECKOUT>/tools",
+    "gowork": "<LOCAL_CHECKOUT>/go.work"
+  },
+  {
+    "name": "fixtures-v3-pg",
+    "started_at": "2026-10-10T01:32:16.270740+00:00",
+    "completed_at": "2026-10-10T01:34:01.484357+00:00",
+    "exit_code": 0,
+    "seconds": 105.214,
+    "argv": [
+      "<LOCAL_CHECKOUT>/.tmp/docs-diff-20261010/fixtures-v3",
+      "pg"
+    ],
+    "cwd": "<LOCAL_CHECKOUT>/tools",
+    "gowork": "<LOCAL_CHECKOUT>/go.work"
+  },
+  {
+    "name": "preflight",
+    "started_at": "2026-10-10T01:33:49.327357+00:00",
+    "completed_at": "2026-10-10T01:33:50.874708+00:00",
+    "exit_code": 0,
+    "seconds": 1.547,
+    "argv": [
+      "<LOCAL_HOME>/.agents/skills/apstndb-spanner-syntax-verify/scripts/run-managed-spanner.sh",
+      "--execute",
+      "SELECT 1 AS ready",
+      "--timeout",
+      "30s"
+    ],
+    "cwd": "<LOCAL_CHECKOUT>",
+    "gowork": "off"
+  },
+  {
+    "name": "fixtures-v4-build",
+    "started_at": "2026-10-10T01:33:50.874930+00:00",
+    "completed_at": "2026-10-10T01:33:53.258758+00:00",
+    "exit_code": 0,
+    "seconds": 2.384,
+    "argv": [
+      "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go",
+      "build",
+      "-o",
+      "<LOCAL_CHECKOUT>/.tmp/docs-diff-20261010/fixtures-v4",
+      "<LOCAL_CHECKOUT>/.tmp/docs-diff-20261010/fixtures-v4.go"
+    ],
+    "cwd": "<LOCAL_CHECKOUT>/tools",
+    "gowork": "<LOCAL_CHECKOUT>/go.work"
+  },
+  {
+    "name": "fixtures-v4-buildinfo",
+    "started_at": "2026-10-10T01:33:53.258988+00:00",
+    "completed_at": "2026-10-10T01:33:53.273774+00:00",
+    "exit_code": 0,
+    "seconds": 0.015,
+    "argv": [
+      "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go",
+      "version",
+      "-m",
+      "<LOCAL_CHECKOUT>/.tmp/docs-diff-20261010/fixtures-v4"
+    ],
+    "cwd": "<LOCAL_CHECKOUT>/tools",
+    "gowork": "<LOCAL_CHECKOUT>/go.work"
+  },
+  {
+    "name": "fixtures-v4-google",
+    "started_at": "2026-10-10T01:33:53.275865+00:00",
+    "completed_at": "2026-10-10T01:36:30.238530+00:00",
+    "exit_code": 0,
+    "seconds": 156.963,
+    "argv": [
+      "<LOCAL_CHECKOUT>/.tmp/docs-diff-20261010/fixtures-v4",
+      "google"
+    ],
+    "cwd": "<LOCAL_CHECKOUT>/tools",
+    "gowork": "<LOCAL_CHECKOUT>/go.work"
+  },
+  {
+    "name": "fixtures-v4-pg",
+    "started_at": "2026-10-10T01:33:53.277332+00:00",
+    "completed_at": "2026-10-10T01:33:56.052128+00:00",
+    "exit_code": 0,
+    "seconds": 2.775,
+    "argv": [
+      "<LOCAL_CHECKOUT>/.tmp/docs-diff-20261010/fixtures-v4",
+      "pg"
+    ],
+    "cwd": "<LOCAL_CHECKOUT>/tools",
+    "gowork": "<LOCAL_CHECKOUT>/go.work"
+  },
+  {
+    "name": "preflight",
+    "started_at": "2026-10-10T01:36:49.548566+00:00",
+    "completed_at": "2026-10-10T01:36:51.199917+00:00",
+    "exit_code": 0,
+    "seconds": 1.651,
+    "argv": [
+      "<LOCAL_HOME>/.agents/skills/apstndb-spanner-syntax-verify/scripts/run-managed-spanner.sh",
+      "--execute",
+      "SELECT 1 AS ready",
+      "--timeout",
+      "30s"
+    ],
+    "cwd": "<LOCAL_CHECKOUT>",
+    "gowork": "off"
+  },
+  {
+    "name": "fixtures-v4-pg-retry",
+    "started_at": "2026-10-10T01:36:51.200088+00:00",
+    "completed_at": "2026-10-10T01:37:52.112628+00:00",
+    "exit_code": 0,
+    "seconds": 60.913,
+    "argv": [
+      "<LOCAL_CHECKOUT>/.tmp/docs-diff-20261010/fixtures-v4",
+      "pg"
+    ],
+    "cwd": "<LOCAL_CHECKOUT>/tools",
+    "gowork": "<LOCAL_CHECKOUT>/go.work"
+  },
+  {
+    "name": "preflight",
+    "started_at": "2026-10-10T01:38:03.537366+00:00",
+    "completed_at": "2026-10-10T01:38:05.139237+00:00",
+    "exit_code": 0,
+    "seconds": 1.602,
+    "argv": [
+      "<LOCAL_HOME>/.agents/skills/apstndb-spanner-syntax-verify/scripts/run-managed-spanner.sh",
+      "--execute",
+      "SELECT 1 AS ready",
+      "--timeout",
+      "30s"
+    ],
+    "cwd": "<LOCAL_CHECKOUT>",
+    "gowork": "off"
+  },
+  {
+    "name": "graph-controls-build",
+    "started_at": "2026-10-10T01:38:05.139432+00:00",
+    "completed_at": "2026-10-10T01:38:07.441914+00:00",
+    "exit_code": 0,
+    "seconds": 2.302,
+    "argv": [
+      "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go",
+      "build",
+      "-o",
+      "<LOCAL_CHECKOUT>/.tmp/docs-diff-20261010/graph-controls",
+      "<LOCAL_CHECKOUT>/.tmp/docs-diff-20261010/graph-controls.go"
+    ],
+    "cwd": "<LOCAL_CHECKOUT>/tools",
+    "gowork": "<LOCAL_CHECKOUT>/go.work"
+  },
+  {
+    "name": "graph-controls-buildinfo",
+    "started_at": "2026-10-10T01:38:07.442132+00:00",
+    "completed_at": "2026-10-10T01:38:07.456617+00:00",
+    "exit_code": 0,
+    "seconds": 0.014,
+    "argv": [
+      "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go",
+      "version",
+      "-m",
+      "<LOCAL_CHECKOUT>/.tmp/docs-diff-20261010/graph-controls"
+    ],
+    "cwd": "<LOCAL_CHECKOUT>/tools",
+    "gowork": "<LOCAL_CHECKOUT>/go.work"
+  },
+  {
+    "name": "graph-controls",
+    "started_at": "2026-10-10T01:38:07.456789+00:00",
+    "completed_at": "2026-10-10T01:39:51.519216+00:00",
+    "exit_code": 0,
+    "seconds": 104.062,
+    "argv": [
+      "<LOCAL_CHECKOUT>/.tmp/docs-diff-20261010/graph-controls",
+      "google"
+    ],
+    "cwd": "<LOCAL_CHECKOUT>/tools",
+    "gowork": "<LOCAL_CHECKOUT>/go.work"
+  },
+  {
+    "name": "preflight",
+    "started_at": "2026-10-10T01:38:47.269796+00:00",
+    "completed_at": "2026-10-10T01:38:48.725019+00:00",
+    "exit_code": 0,
+    "seconds": 1.455,
+    "argv": [
+      "<LOCAL_HOME>/.agents/skills/apstndb-spanner-syntax-verify/scripts/run-managed-spanner.sh",
+      "--execute",
+      "SELECT 1 AS ready",
+      "--timeout",
+      "30s"
+    ],
+    "cwd": "<LOCAL_CHECKOUT>",
+    "gowork": "off"
+  },
+  {
+    "name": "fixtures-pg-v5-build",
+    "started_at": "2026-10-10T01:38:48.725337+00:00",
+    "completed_at": "2026-10-10T01:38:50.016652+00:00",
+    "exit_code": 0,
+    "seconds": 1.291,
+    "argv": [
+      "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go",
+      "build",
+      "-o",
+      "<LOCAL_CHECKOUT>/.tmp/docs-diff-20261010/fixtures-pg-v5",
+      "<LOCAL_CHECKOUT>/.tmp/docs-diff-20261010/fixtures-pg-v5.go"
+    ],
+    "cwd": "<LOCAL_CHECKOUT>/tools",
+    "gowork": "<LOCAL_CHECKOUT>/go.work"
+  },
+  {
+    "name": "fixtures-pg-v5-buildinfo",
+    "started_at": "2026-10-10T01:38:50.016898+00:00",
+    "completed_at": "2026-10-10T01:38:50.031555+00:00",
+    "exit_code": 0,
+    "seconds": 0.015,
+    "argv": [
+      "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go",
+      "version",
+      "-m",
+      "<LOCAL_CHECKOUT>/.tmp/docs-diff-20261010/fixtures-pg-v5"
+    ],
+    "cwd": "<LOCAL_CHECKOUT>/tools",
+    "gowork": "<LOCAL_CHECKOUT>/go.work"
+  },
+  {
+    "name": "fixtures-pg-v5",
+    "started_at": "2026-10-10T01:38:50.031722+00:00",
+    "completed_at": "2026-10-10T01:39:41.828923+00:00",
+    "exit_code": 0,
+    "seconds": 51.797,
+    "argv": [
+      "<LOCAL_CHECKOUT>/.tmp/docs-diff-20261010/fixtures-pg-v5",
+      "pg"
+    ],
+    "cwd": "<LOCAL_CHECKOUT>/tools",
+    "gowork": "<LOCAL_CHECKOUT>/go.work"
+  }
+]

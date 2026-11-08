@@ -1,0 +1,296 @@
+{
+  "url": "https://api.github.com/repos/goccy/go-googlesql/compare/eb229fca73e7dca3fc9e8e8be733d14a565f912c...2b3726f947f7f809afb1daf534ff9ca06fd4da5c",
+  "html_url": "https://github.com/goccy/go-googlesql/compare/eb229fca73e7dca3fc9e8e8be733d14a565f912c...2b3726f947f7f809afb1daf534ff9ca06fd4da5c",
+  "permalink_url": "https://github.com/goccy/go-googlesql/compare/goccy:eb229fc...goccy:2b3726f",
+  "diff_url": "https://github.com/goccy/go-googlesql/compare/eb229fca73e7dca3fc9e8e8be733d14a565f912c...2b3726f947f7f809afb1daf534ff9ca06fd4da5c.diff",
+  "patch_url": "https://github.com/goccy/go-googlesql/compare/eb229fca73e7dca3fc9e8e8be733d14a565f912c...2b3726f947f7f809afb1daf534ff9ca06fd4da5c.patch",
+  "base_commit": {
+    "sha": "eb229fca73e7dca3fc9e8e8be733d14a565f912c",
+    "node_id": "C_kwDOSGg8ftoAKGViMjI5ZmNhNzNlN2RjYTNmYzllOGU4YmU3MzNkMTRhNTY1ZjkxMmM",
+    "commit": {
+      "author": {
+        "name": "Masaaki Goshima",
+        "email": "goccy54@gmail.com",
+        "date": "2026-06-10T15:11:39Z"
+      },
+      "committer": {
+        "name": "GitHub",
+        "email": "noreply@github.com",
+        "date": "2026-06-10T15:11:39Z"
+      },
+      "message": "switch runtime from wazero to wasm2go via the googlesqlwasm2go module (#7)\n\nThe wasm-side execution path moves off the wazero interpreter and\nonto a wasm2go-transpiled native-Go implementation. The transpiled\nbundle is consumed as a regular Go dependency\n(github.com/goccy/googlesqlwasm2go v0.1.0), and the bridge file is\npinned to an upstream artifact-attested release.\n\nBridge\n- googlesql.go is the upstream wasm2go-runtime bridge, downloaded\n  from goccy/googlesql-wasm v0.3.1 as `googlesql_wasm2go.go`. The\n  download step renames it to googlesql.go in place; `gh\n  attestation verify` matches by content digest so the rename does\n  not invalidate the signature.\n\nDependency\n- go.mod requires `github.com/goccy/googlesqlwasm2go v0.1.0` (the\n  separately-released wasm2go bundle module). The wazero dependency\n  is dropped because the wasm body now runs as ordinary Go code.\n- The vendored `internal/wasm2go/` tree (~120 chunked .go / .s /\n  data files, ~30 MB) is deleted. The same content lives upstream\n  in the googlesqlwasm2go module, fetched and integrity-checked by\n  the Go module proxy + go.sum.\n\nBuild / verify\n- The Makefile pulls the wasm2go-runtime bridge from the upstream\n  release and verifies its GitHub artifact attestation against the\n  signing workflow (goccy/googlesql-wasm/.github/workflows/build.yml).\n  The attestation bundle is fetched anonymously from the public\n  attestation API and verified offline via\n  `gh attestation verify --bundle`; no GH access token is required.\n- The previous wasm2go bundle sha256 manifest is gone: bundle\n  integrity now flows through go.sum on the googlesqlwasm2go\n  dependency, so the only file this repo verifies directly is\n  googlesql.go.\n- The CI workflow runs `make verify` (job 1) followed by\n  `go test ./...` (job 2, gated on verify) on every push / PR.\n- TestMain's comment describes the new dual-arch module shape\n  (per-chunk amd64.s / arm64.s + pure-Go fallback selected by\n  build constraint) instead of the old \"pure Go via\n  internal/wasm2go\" wording.\n\nCo-authored-by: Claude Opus 4.7 (1M context) <noreply@anthropic.com>",
+      "tree": {
+        "sha": "ec3e234a2ad9a349df5db5deb97f921d22d69292",
+        "url": "https://api.github.com/repos/goccy/go-googlesql/git/trees/ec3e234a2ad9a349df5db5deb97f921d22d69292"
+      },
+      "url": "https://api.github.com/repos/goccy/go-googlesql/git/commits/eb229fca73e7dca3fc9e8e8be733d14a565f912c",
+      "comment_count": 0,
+      "verification": {
+        "verified": true,
+        "reason": "valid",
+        "signature": "-----BEGIN PGP SIGNATURE-----\n\nwsFcBAABCAAQBQJqKX6rCRC1aQ7uu5UhlAAAHqAQAHUkOStHNUXSs/iLTvPH02My\nihcqh6DVb6GTTTUMAwi6Zfd8xxsgOwNIk/c6eC4zYXbuIGFr3xKGyUhRLvN73OiA\nk/T4+YeLAYEaFbk1n+1BiKOuw0cAU3cd8hqwPBk6GwmR+yvJb56YPZt+dgFtzxqO\ndyWb9/LpMToXaBtQEIQl71dpWpayBdh1ZHoRaK/CjJwFLgBMqSbBy13u4gdYJ6Xr\naV5GYbdTrFBaVZLk7RwN+dgVgXlzx2kwH2r4C5ga4x2ZLl2l5hGdYpALozpjRSbO\nsQ6N0ukT4E+t2wswMnUhfN7cfXd5EsRU+0NZqrlDs+bkir+RSrIBKhouxvRyzJiu\nKYSfKaUSDRk+tKIbvJ7umjFrrA3dNDuL0OQpYCFuyTAjqBFSOD7ifQVfdA2V6K+v\nlBS+DN2/5JFF20jsvM9U2p1WBxdiAbb9btH4acCRaOX/H3yIJNVKAYhKn9eeG7tm\n98I472Im9xSqN6aPbck60QMZ5so+ltvJoZc7XE2A56GcBHPovSNpJEB1cXjQSAoe\nxAuowWUMqx+Vf0BKNM4cNOuQ2YD1L1UW2DHpWNfSriqKRB+BddskusiESjdYC8QP\nN+Qxcv45aDbQNCrBtBSjeY1+V7mavXFEu1G5c/PM5/FtoMfoD8Sykf83Y4oRZeSs\nQRLjEpA+oXngcvsv6/BF\n=aupc\n-----END PGP SIGNATURE-----\n",
+        "payload": "tree ec3e234a2ad9a349df5db5deb97f921d22d69292\nparent 82ed58db089db65274b7e26c9c4db1ef101dd913\nauthor Masaaki Goshima <goccy54@gmail.com> 1781104299 +0900\ncommitter GitHub <noreply@github.com> 1781104299 +0900\n\nswitch runtime from wazero to wasm2go via the googlesqlwasm2go module (#7)\n\nThe wasm-side execution path moves off the wazero interpreter and\nonto a wasm2go-transpiled native-Go implementation. The transpiled\nbundle is consumed as a regular Go dependency\n(github.com/goccy/googlesqlwasm2go v0.1.0), and the bridge file is\npinned to an upstream artifact-attested release.\n\nBridge\n- googlesql.go is the upstream wasm2go-runtime bridge, downloaded\n  from goccy/googlesql-wasm v0.3.1 as `googlesql_wasm2go.go`. The\n  download step renames it to googlesql.go in place; `gh\n  attestation verify` matches by content digest so the rename does\n  not invalidate the signature.\n\nDependency\n- go.mod requires `github.com/goccy/googlesqlwasm2go v0.1.0` (the\n  separately-released wasm2go bundle module). The wazero dependency\n  is dropped because the wasm body now runs as ordinary Go code.\n- The vendored `internal/wasm2go/` tree (~120 chunked .go / .s /\n  data files, ~30 MB) is deleted. The same content lives upstream\n  in the googlesqlwasm2go module, fetched and integrity-checked by\n  the Go module proxy + go.sum.\n\nBuild / verify\n- The Makefile pulls the wasm2go-runtime bridge from the upstream\n  release and verifies its GitHub artifact attestation against the\n  signing workflow (goccy/googlesql-wasm/.github/workflows/build.yml).\n  The attestation bundle is fetched anonymously from the public\n  attestation API and verified offline via\n  `gh attestation verify --bundle`; no GH access token is required.\n- The previous wasm2go bundle sha256 manifest is gone: bundle\n  integrity now flows through go.sum on the googlesqlwasm2go\n  dependency, so the only file this repo verifies directly is\n  googlesql.go.\n- The CI workflow runs `make verify` (job 1) followed by\n  `go test ./...` (job 2, gated on verify) on every push / PR.\n- TestMain's comment describes the new dual-arch module shape\n  (per-chunk amd64.s / arm64.s + pure-Go fallback selected by\n  build constraint) instead of the old \"pure Go via\n  internal/wasm2go\" wording.\n\nCo-authored-by: Claude Opus 4.7 (1M context) <noreply@anthropic.com>",
+        "verified_at": "2026-06-10T15:11:42Z"
+      }
+    },
+    "url": "https://api.github.com/repos/goccy/go-googlesql/commits/eb229fca73e7dca3fc9e8e8be733d14a565f912c",
+    "html_url": "https://github.com/goccy/go-googlesql/commit/eb229fca73e7dca3fc9e8e8be733d14a565f912c",
+    "comments_url": "https://api.github.com/repos/goccy/go-googlesql/commits/eb229fca73e7dca3fc9e8e8be733d14a565f912c/comments",
+    "author": {
+      "login": "goccy",
+      "id": 209884,
+      "node_id": "MDQ6VXNlcjIwOTg4NA==",
+      "avatar_url": "https://avatars.githubusercontent.com/u/209884?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/goccy",
+      "html_url": "https://github.com/goccy",
+      "followers_url": "https://api.github.com/users/goccy/followers",
+      "following_url": "https://api.github.com/users/goccy/following{/other_user}",
+      "gists_url": "https://api.github.com/users/goccy/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/goccy/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/goccy/subscriptions",
+      "organizations_url": "https://api.github.com/users/goccy/orgs",
+      "repos_url": "https://api.github.com/users/goccy/repos",
+      "events_url": "https://api.github.com/users/goccy/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/goccy/received_events",
+      "type": "User",
+      "user_view_type": "public",
+      "site_admin": false
+    },
+    "committer": {
+      "login": "web-flow",
+      "id": 19864447,
+      "node_id": "MDQ6VXNlcjE5ODY0NDQ3",
+      "avatar_url": "https://avatars.githubusercontent.com/u/19864447?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/web-flow",
+      "html_url": "https://github.com/web-flow",
+      "followers_url": "https://api.github.com/users/web-flow/followers",
+      "following_url": "https://api.github.com/users/web-flow/following{/other_user}",
+      "gists_url": "https://api.github.com/users/web-flow/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/web-flow/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/web-flow/subscriptions",
+      "organizations_url": "https://api.github.com/users/web-flow/orgs",
+      "repos_url": "https://api.github.com/users/web-flow/repos",
+      "events_url": "https://api.github.com/users/web-flow/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/web-flow/received_events",
+      "type": "User",
+      "user_view_type": "public",
+      "site_admin": false
+    },
+    "parents": [
+      {
+        "sha": "82ed58db089db65274b7e26c9c4db1ef101dd913",
+        "url": "https://api.github.com/repos/goccy/go-googlesql/commits/82ed58db089db65274b7e26c9c4db1ef101dd913",
+        "html_url": "https://github.com/goccy/go-googlesql/commit/82ed58db089db65274b7e26c9c4db1ef101dd913"
+      }
+    ]
+  },
+  "merge_base_commit": {
+    "sha": "eb229fca73e7dca3fc9e8e8be733d14a565f912c",
+    "node_id": "C_kwDOSGg8ftoAKGViMjI5ZmNhNzNlN2RjYTNmYzllOGU4YmU3MzNkMTRhNTY1ZjkxMmM",
+    "commit": {
+      "author": {
+        "name": "Masaaki Goshima",
+        "email": "goccy54@gmail.com",
+        "date": "2026-06-10T15:11:39Z"
+      },
+      "committer": {
+        "name": "GitHub",
+        "email": "noreply@github.com",
+        "date": "2026-06-10T15:11:39Z"
+      },
+      "message": "switch runtime from wazero to wasm2go via the googlesqlwasm2go module (#7)\n\nThe wasm-side execution path moves off the wazero interpreter and\nonto a wasm2go-transpiled native-Go implementation. The transpiled\nbundle is consumed as a regular Go dependency\n(github.com/goccy/googlesqlwasm2go v0.1.0), and the bridge file is\npinned to an upstream artifact-attested release.\n\nBridge\n- googlesql.go is the upstream wasm2go-runtime bridge, downloaded\n  from goccy/googlesql-wasm v0.3.1 as `googlesql_wasm2go.go`. The\n  download step renames it to googlesql.go in place; `gh\n  attestation verify` matches by content digest so the rename does\n  not invalidate the signature.\n\nDependency\n- go.mod requires `github.com/goccy/googlesqlwasm2go v0.1.0` (the\n  separately-released wasm2go bundle module). The wazero dependency\n  is dropped because the wasm body now runs as ordinary Go code.\n- The vendored `internal/wasm2go/` tree (~120 chunked .go / .s /\n  data files, ~30 MB) is deleted. The same content lives upstream\n  in the googlesqlwasm2go module, fetched and integrity-checked by\n  the Go module proxy + go.sum.\n\nBuild / verify\n- The Makefile pulls the wasm2go-runtime bridge from the upstream\n  release and verifies its GitHub artifact attestation against the\n  signing workflow (goccy/googlesql-wasm/.github/workflows/build.yml).\n  The attestation bundle is fetched anonymously from the public\n  attestation API and verified offline via\n  `gh attestation verify --bundle`; no GH access token is required.\n- The previous wasm2go bundle sha256 manifest is gone: bundle\n  integrity now flows through go.sum on the googlesqlwasm2go\n  dependency, so the only file this repo verifies directly is\n  googlesql.go.\n- The CI workflow runs `make verify` (job 1) followed by\n  `go test ./...` (job 2, gated on verify) on every push / PR.\n- TestMain's comment describes the new dual-arch module shape\n  (per-chunk amd64.s / arm64.s + pure-Go fallback selected by\n  build constraint) instead of the old \"pure Go via\n  internal/wasm2go\" wording.\n\nCo-authored-by: Claude Opus 4.7 (1M context) <noreply@anthropic.com>",
+      "tree": {
+        "sha": "ec3e234a2ad9a349df5db5deb97f921d22d69292",
+        "url": "https://api.github.com/repos/goccy/go-googlesql/git/trees/ec3e234a2ad9a349df5db5deb97f921d22d69292"
+      },
+      "url": "https://api.github.com/repos/goccy/go-googlesql/git/commits/eb229fca73e7dca3fc9e8e8be733d14a565f912c",
+      "comment_count": 0,
+      "verification": {
+        "verified": true,
+        "reason": "valid",
+        "signature": "-----BEGIN PGP SIGNATURE-----\n\nwsFcBAABCAAQBQJqKX6rCRC1aQ7uu5UhlAAAHqAQAHUkOStHNUXSs/iLTvPH02My\nihcqh6DVb6GTTTUMAwi6Zfd8xxsgOwNIk/c6eC4zYXbuIGFr3xKGyUhRLvN73OiA\nk/T4+YeLAYEaFbk1n+1BiKOuw0cAU3cd8hqwPBk6GwmR+yvJb56YPZt+dgFtzxqO\ndyWb9/LpMToXaBtQEIQl71dpWpayBdh1ZHoRaK/CjJwFLgBMqSbBy13u4gdYJ6Xr\naV5GYbdTrFBaVZLk7RwN+dgVgXlzx2kwH2r4C5ga4x2ZLl2l5hGdYpALozpjRSbO\nsQ6N0ukT4E+t2wswMnUhfN7cfXd5EsRU+0NZqrlDs+bkir+RSrIBKhouxvRyzJiu\nKYSfKaUSDRk+tKIbvJ7umjFrrA3dNDuL0OQpYCFuyTAjqBFSOD7ifQVfdA2V6K+v\nlBS+DN2/5JFF20jsvM9U2p1WBxdiAbb9btH4acCRaOX/H3yIJNVKAYhKn9eeG7tm\n98I472Im9xSqN6aPbck60QMZ5so+ltvJoZc7XE2A56GcBHPovSNpJEB1cXjQSAoe\nxAuowWUMqx+Vf0BKNM4cNOuQ2YD1L1UW2DHpWNfSriqKRB+BddskusiESjdYC8QP\nN+Qxcv45aDbQNCrBtBSjeY1+V7mavXFEu1G5c/PM5/FtoMfoD8Sykf83Y4oRZeSs\nQRLjEpA+oXngcvsv6/BF\n=aupc\n-----END PGP SIGNATURE-----\n",
+        "payload": "tree ec3e234a2ad9a349df5db5deb97f921d22d69292\nparent 82ed58db089db65274b7e26c9c4db1ef101dd913\nauthor Masaaki Goshima <goccy54@gmail.com> 1781104299 +0900\ncommitter GitHub <noreply@github.com> 1781104299 +0900\n\nswitch runtime from wazero to wasm2go via the googlesqlwasm2go module (#7)\n\nThe wasm-side execution path moves off the wazero interpreter and\nonto a wasm2go-transpiled native-Go implementation. The transpiled\nbundle is consumed as a regular Go dependency\n(github.com/goccy/googlesqlwasm2go v0.1.0), and the bridge file is\npinned to an upstream artifact-attested release.\n\nBridge\n- googlesql.go is the upstream wasm2go-runtime bridge, downloaded\n  from goccy/googlesql-wasm v0.3.1 as `googlesql_wasm2go.go`. The\n  download step renames it to googlesql.go in place; `gh\n  attestation verify` matches by content digest so the rename does\n  not invalidate the signature.\n\nDependency\n- go.mod requires `github.com/goccy/googlesqlwasm2go v0.1.0` (the\n  separately-released wasm2go bundle module). The wazero dependency\n  is dropped because the wasm body now runs as ordinary Go code.\n- The vendored `internal/wasm2go/` tree (~120 chunked .go / .s /\n  data files, ~30 MB) is deleted. The same content lives upstream\n  in the googlesqlwasm2go module, fetched and integrity-checked by\n  the Go module proxy + go.sum.\n\nBuild / verify\n- The Makefile pulls the wasm2go-runtime bridge from the upstream\n  release and verifies its GitHub artifact attestation against the\n  signing workflow (goccy/googlesql-wasm/.github/workflows/build.yml).\n  The attestation bundle is fetched anonymously from the public\n  attestation API and verified offline via\n  `gh attestation verify --bundle`; no GH access token is required.\n- The previous wasm2go bundle sha256 manifest is gone: bundle\n  integrity now flows through go.sum on the googlesqlwasm2go\n  dependency, so the only file this repo verifies directly is\n  googlesql.go.\n- The CI workflow runs `make verify` (job 1) followed by\n  `go test ./...` (job 2, gated on verify) on every push / PR.\n- TestMain's comment describes the new dual-arch module shape\n  (per-chunk amd64.s / arm64.s + pure-Go fallback selected by\n  build constraint) instead of the old \"pure Go via\n  internal/wasm2go\" wording.\n\nCo-authored-by: Claude Opus 4.7 (1M context) <noreply@anthropic.com>",
+        "verified_at": "2026-06-10T15:11:42Z"
+      }
+    },
+    "url": "https://api.github.com/repos/goccy/go-googlesql/commits/eb229fca73e7dca3fc9e8e8be733d14a565f912c",
+    "html_url": "https://github.com/goccy/go-googlesql/commit/eb229fca73e7dca3fc9e8e8be733d14a565f912c",
+    "comments_url": "https://api.github.com/repos/goccy/go-googlesql/commits/eb229fca73e7dca3fc9e8e8be733d14a565f912c/comments",
+    "author": {
+      "login": "goccy",
+      "id": 209884,
+      "node_id": "MDQ6VXNlcjIwOTg4NA==",
+      "avatar_url": "https://avatars.githubusercontent.com/u/209884?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/goccy",
+      "html_url": "https://github.com/goccy",
+      "followers_url": "https://api.github.com/users/goccy/followers",
+      "following_url": "https://api.github.com/users/goccy/following{/other_user}",
+      "gists_url": "https://api.github.com/users/goccy/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/goccy/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/goccy/subscriptions",
+      "organizations_url": "https://api.github.com/users/goccy/orgs",
+      "repos_url": "https://api.github.com/users/goccy/repos",
+      "events_url": "https://api.github.com/users/goccy/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/goccy/received_events",
+      "type": "User",
+      "user_view_type": "public",
+      "site_admin": false
+    },
+    "committer": {
+      "login": "web-flow",
+      "id": 19864447,
+      "node_id": "MDQ6VXNlcjE5ODY0NDQ3",
+      "avatar_url": "https://avatars.githubusercontent.com/u/19864447?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/web-flow",
+      "html_url": "https://github.com/web-flow",
+      "followers_url": "https://api.github.com/users/web-flow/followers",
+      "following_url": "https://api.github.com/users/web-flow/following{/other_user}",
+      "gists_url": "https://api.github.com/users/web-flow/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/web-flow/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/web-flow/subscriptions",
+      "organizations_url": "https://api.github.com/users/web-flow/orgs",
+      "repos_url": "https://api.github.com/users/web-flow/repos",
+      "events_url": "https://api.github.com/users/web-flow/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/web-flow/received_events",
+      "type": "User",
+      "user_view_type": "public",
+      "site_admin": false
+    },
+    "parents": [
+      {
+        "sha": "82ed58db089db65274b7e26c9c4db1ef101dd913",
+        "url": "https://api.github.com/repos/goccy/go-googlesql/commits/82ed58db089db65274b7e26c9c4db1ef101dd913",
+        "html_url": "https://github.com/goccy/go-googlesql/commit/82ed58db089db65274b7e26c9c4db1ef101dd913"
+      }
+    ]
+  },
+  "status": "ahead",
+  "ahead_by": 1,
+  "behind_by": 0,
+  "total_commits": 1,
+  "commits": [
+    {
+      "sha": "2b3726f947f7f809afb1daf534ff9ca06fd4da5c",
+      "node_id": "C_kwDOSGg8ftoAKDJiMzcyNmY5NDdmN2Y4MDlhZmIxZGFmNTM0ZmY5Y2EwNmZkNGRhNWM",
+      "commit": {
+        "author": {
+          "name": "Masaaki Goshima",
+          "email": "goccy54@gmail.com",
+          "date": "2026-07-11T04:31:17Z"
+        },
+        "committer": {
+          "name": "GitHub",
+          "email": "noreply@github.com",
+          "date": "2026-07-11T04:31:17Z"
+        },
+        "message": "deps: bump googlesqlwasm2go to v0.2.0 and regenerate the bridge (#8)\n\ngooglesqlwasm2go v0.2.0 vendors googlesql-wasm v0.3.4 (wasmify v0.4.8 /\nwasm2go v0.4.4), moving the bundle to the gcasm bare-name layout. Pin it\nin go.mod and regenerate googlesql.go from v0.3.4's googlesql_wasm2go.go\nso the bridge matches the bundle it drives (env-import set 26 -> 25,\nplus the generated marshalling updates). Generated file — DO NOT EDIT.\n\ngo build ./... — exit 0\ngo test ./...  — exit 0\n\nCo-authored-by: Claude Opus 4.8 (1M context) <noreply@anthropic.com>",
+        "tree": {
+          "sha": "76c1b8184b5977196298ac3eff305c167dfcba72",
+          "url": "https://api.github.com/repos/goccy/go-googlesql/git/trees/76c1b8184b5977196298ac3eff305c167dfcba72"
+        },
+        "url": "https://api.github.com/repos/goccy/go-googlesql/git/commits/2b3726f947f7f809afb1daf534ff9ca06fd4da5c",
+        "comment_count": 0,
+        "verification": {
+          "verified": true,
+          "reason": "valid",
+          "signature": "-----BEGIN PGP SIGNATURE-----\n\nwsFcBAABCAAQBQJqUccVCRC1aQ7uu5UhlAAAQ20QACfAS7ZGK/wtNIxbA0g0TIrl\neOGNn+TDhaRaQeBinlH7YJS4RritUdH5dEZlRKlGDW4cmJNNIzFYo/lnErwAcf1Z\nKdHNaBHaEZ2MPGE+zVPHT2vsf2b28Fk+yXjwU0DJrL1EI/A0hbeBw8nuyDGlvMR4\nYRM5v8vv3lcRsOVEO+Prr9kjHjAPgJVawCWz1nB7h74gAHnnevf/F9dDn1cdDg+8\nGZDbz4bTTTuDnvMBaSp+Nz7+cgL3g8JKhCJ/G7WdrPhCecSTIPVvGRNKS6JMueSb\n2f0BQmg2Q1vTNbc/6QjsH1Re9MjtHQU9lje8YwZnWCc3r4zoAyZFGVfqhbXde9RD\n8WT8cbkk6hJa9C7yk79ne2ur9j0MrGTeA+tbNxDIiGwEm0o/10o6XYgyrsDFosrw\nK++ToIN8ixz+Rk8O/CoIMOfaqpdSfeGHPnajFdVWCMvPHLiilGo8+iDEd8zrSnGR\nlWHDRQBwk36EsAgo5yag06toOUzg+wttpL6xcv0L1dGTM8lYhJv+XoDfR3lLpWVh\ndCmgAGQIBh85E0Id3Fm1ucEvKB2mKuxNDNCRyxvre5wJP2zN2mTbHBSmSU+XF5x1\nyONXSc4sqPnaGtiwobDakz8CR1KN/C48NqOC1h7tQ6j4gy1JchwHB4CQeFbgEkW/\npMxXc8y5XM9hmM6dQbfN\n=dOM1\n-----END PGP SIGNATURE-----\n",
+          "payload": "tree 76c1b8184b5977196298ac3eff305c167dfcba72\nparent eb229fca73e7dca3fc9e8e8be733d14a565f912c\nauthor Masaaki Goshima <goccy54@gmail.com> 1783744277 +0900\ncommitter GitHub <noreply@github.com> 1783744277 +0900\n\ndeps: bump googlesqlwasm2go to v0.2.0 and regenerate the bridge (#8)\n\ngooglesqlwasm2go v0.2.0 vendors googlesql-wasm v0.3.4 (wasmify v0.4.8 /\nwasm2go v0.4.4), moving the bundle to the gcasm bare-name layout. Pin it\nin go.mod and regenerate googlesql.go from v0.3.4's googlesql_wasm2go.go\nso the bridge matches the bundle it drives (env-import set 26 -> 25,\nplus the generated marshalling updates). Generated file — DO NOT EDIT.\n\ngo build ./... — exit 0\ngo test ./...  — exit 0\n\nCo-authored-by: Claude Opus 4.8 (1M context) <noreply@anthropic.com>",
+          "verified_at": "2026-07-11T04:31:18Z"
+        }
+      },
+      "url": "https://api.github.com/repos/goccy/go-googlesql/commits/2b3726f947f7f809afb1daf534ff9ca06fd4da5c",
+      "html_url": "https://github.com/goccy/go-googlesql/commit/2b3726f947f7f809afb1daf534ff9ca06fd4da5c",
+      "comments_url": "https://api.github.com/repos/goccy/go-googlesql/commits/2b3726f947f7f809afb1daf534ff9ca06fd4da5c/comments",
+      "author": {
+        "login": "goccy",
+        "id": 209884,
+        "node_id": "MDQ6VXNlcjIwOTg4NA==",
+        "avatar_url": "https://avatars.githubusercontent.com/u/209884?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/goccy",
+        "html_url": "https://github.com/goccy",
+        "followers_url": "https://api.github.com/users/goccy/followers",
+        "following_url": "https://api.github.com/users/goccy/following{/other_user}",
+        "gists_url": "https://api.github.com/users/goccy/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/goccy/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/goccy/subscriptions",
+        "organizations_url": "https://api.github.com/users/goccy/orgs",
+        "repos_url": "https://api.github.com/users/goccy/repos",
+        "events_url": "https://api.github.com/users/goccy/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/goccy/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "committer": {
+        "login": "web-flow",
+        "id": 19864447,
+        "node_id": "MDQ6VXNlcjE5ODY0NDQ3",
+        "avatar_url": "https://avatars.githubusercontent.com/u/19864447?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/web-flow",
+        "html_url": "https://github.com/web-flow",
+        "followers_url": "https://api.github.com/users/web-flow/followers",
+        "following_url": "https://api.github.com/users/web-flow/following{/other_user}",
+        "gists_url": "https://api.github.com/users/web-flow/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/web-flow/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/web-flow/subscriptions",
+        "organizations_url": "https://api.github.com/users/web-flow/orgs",
+        "repos_url": "https://api.github.com/users/web-flow/repos",
+        "events_url": "https://api.github.com/users/web-flow/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/web-flow/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "parents": [
+        {
+          "sha": "eb229fca73e7dca3fc9e8e8be733d14a565f912c",
+          "url": "https://api.github.com/repos/goccy/go-googlesql/commits/eb229fca73e7dca3fc9e8e8be733d14a565f912c",
+          "html_url": "https://github.com/goccy/go-googlesql/commit/eb229fca73e7dca3fc9e8e8be733d14a565f912c"
+        }
+      ]
+    }
+  ],
+  "files": [
+    {
+      "sha": "ba6fe426a0f691b952ce93439150bcea2af7a162",
+      "filename": "go.mod",
+      "status": "modified",
+      "additions": 1,
+      "deletions": 1,
+      "changes": 2,
+      "blob_url": "https://github.com/goccy/go-googlesql/blob/2b3726f947f7f809afb1daf534ff9ca06fd4da5c/go.mod",
+      "raw_url": "https://github.com/goccy/go-googlesql/raw/2b3726f947f7f809afb1daf534ff9ca06fd4da5c/go.mod",
+      "contents_url": "https://api.github.com/repos/goccy/go-googlesql/contents/go.mod?ref=2b3726f947f7f809afb1daf534ff9ca06fd4da5c",
+      "patch": "@@ -2,4 +2,4 @@ module github.com/goccy/go-googlesql\n \n go 1.25.0\n \n-require github.com/goccy/googlesqlwasm2go v0.1.0\n+require github.com/goccy/googlesqlwasm2go v0.2.0"
+    },
+    {
+      "sha": "6030386a9f2685b5c14988da6987931735c029d9",
+      "filename": "go.sum",
+      "status": "modified",
+      "additions": 2,
+      "deletions": 2,
+      "changes": 4,
+      "blob_url": "https://github.com/goccy/go-googlesql/blob/2b3726f947f7f809afb1daf534ff9ca06fd4da5c/go.sum",
+      "raw_url": "https://github.com/goccy/go-googlesql/raw/2b3726f947f7f809afb1daf534ff9ca06fd4da5c/go.sum",
+      "contents_url": "https://api.github.com/repos/goccy/go-googlesql/contents/go.sum?ref=2b3726f947f7f809afb1daf534ff9ca06fd4da5c",
+      "patch": "@@ -1,2 +1,2 @@\n-github.com/goccy/googlesqlwasm2go v0.1.0 h1:JQBPU09y9PvwU/GS2gOpP7pjaE9ttwI/9YGtj2ZlPZc=\n-github.com/goccy/googlesqlwasm2go v0.1.0/go.mod h1:tseRDWO0lzEmGYZG9lGqymtexVhg6QNrZLJih4fOQs8=\n+github.com/goccy/googlesqlwasm2go v0.2.0 h1:M+CIX22sDsCI7US0Lk2SVuJBDemlPnb+35b7v6y8YtA=\n+github.com/goccy/googlesqlwasm2go v0.2.0/go.mod h1:tseRDWO0lzEmGYZG9lGqymtexVhg6QNrZLJih4fOQs8="
+    },
+    {
+      "sha": "1371c0d17927339e48d7e404babc4d75e6831cec",
+      "filename": "googlesql.go",
+      "status": "modified",
+      "additions": 26439,
+      "deletions": 26407,
+      "changes": 52846,
+      "blob_url": "https://github.com/goccy/go-googlesql/blob/2b3726f947f7f809afb1daf534ff9ca06fd4da5c/googlesql.go",
+      "raw_url": "https://github.com/goccy/go-googlesql/raw/2b3726f947f7f809afb1daf534ff9ca06fd4da5c/googlesql.go",
+      "contents_url": "https://api.github.com/repos/goccy/go-googlesql/contents/googlesql.go?ref=2b3726f947f7f809afb1daf534ff9ca06fd4da5c"
+    }
+  ]
+}

@@ -1,0 +1,26 @@
+[
+  {
+    "name": "primitive",
+    "argv": [
+      "<LOCAL_CHECKOUT>/.tmp/gql-order-root-cause-20261030/analyzer",
+      "--ddl",
+      "<LOCAL_CHECKOUT>/.tmp/gql-order-patterns-20261030/explicit-analysis-schema.sql",
+      "--mode=resolved_ast",
+      "--sql",
+      "GRAPH FinGraph MATCH (p:Person) ORDER BY p.id LIMIT 2 RETURN p.id AS v"
+    ],
+    "exit_code": 0
+  },
+  {
+    "name": "final",
+    "argv": [
+      "<LOCAL_CHECKOUT>/.tmp/gql-order-root-cause-20261030/analyzer",
+      "--ddl",
+      "<LOCAL_CHECKOUT>/.tmp/gql-order-patterns-20261030/explicit-analysis-schema.sql",
+      "--mode=resolved_ast",
+      "--sql",
+      "GRAPH FinGraph MATCH (p:Person) RETURN p.id AS v ORDER BY v LIMIT 2"
+    ],
+    "exit_code": 0
+  }
+]

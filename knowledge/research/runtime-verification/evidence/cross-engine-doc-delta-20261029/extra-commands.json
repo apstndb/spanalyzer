@@ -1,0 +1,138 @@
+[
+  {
+    "name": "legacy-build",
+    "argv": [
+      "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go",
+      "build",
+      "-o",
+      "<LOCAL_CHECKOUT>/.tmp/cross-engine-doc-delta-20261029/legacy",
+      "./legacy.go"
+    ],
+    "cwd": "<LOCAL_CHECKOUT>/.tmp/cross-engine-doc-delta-20261029/module",
+    "started_at": "2026-10-29T15:08:56.671250+00:00",
+    "completed_at": "2026-10-29T15:08:59.075407+00:00",
+    "seconds": 2.403,
+    "exit_code": 0
+  },
+  {
+    "name": "legacy-buildinfo",
+    "argv": [
+      "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go",
+      "version",
+      "-m",
+      "<LOCAL_CHECKOUT>/.tmp/cross-engine-doc-delta-20261029/legacy"
+    ],
+    "cwd": "<LOCAL_CHECKOUT>/.tmp/cross-engine-doc-delta-20261029/module",
+    "started_at": "2026-10-29T15:08:59.075805+00:00",
+    "completed_at": "2026-10-29T15:08:59.100125+00:00",
+    "seconds": 0.024,
+    "exit_code": 0
+  },
+  {
+    "name": "omni-r5-legacy",
+    "argv": [
+      "<LOCAL_CHECKOUT>/.tmp/cross-engine-doc-delta-20261029/legacy",
+      "omni-r5",
+      "us-docker.pkg.dev/spanner-omni/images/spanner-omni:2026.r5@sha256:e506672206e0291cac28cbe19ad4cd470cec112c24601637bc896c65f7362396"
+    ],
+    "cwd": "<LOCAL_CHECKOUT>/.tmp/cross-engine-doc-delta-20261029/module",
+    "started_at": "2026-10-29T15:08:59.418583+00:00",
+    "completed_at": "2026-10-29T15:11:33.702972+00:00",
+    "seconds": 154.284,
+    "exit_code": 0
+  },
+  {
+    "name": "omni-lts-legacy",
+    "argv": [
+      "<LOCAL_CHECKOUT>/.tmp/cross-engine-doc-delta-20261029/legacy",
+      "omni-lts",
+      "us-docker.pkg.dev/spanner-omni/images/spanner-omni:2026.r4-lts.1@sha256:5e3cf199f5abf3a09cd2348ab36c129b3268966eb4eb72fca278fe58252fcbdb"
+    ],
+    "cwd": "<LOCAL_CHECKOUT>/.tmp/cross-engine-doc-delta-20261029/module",
+    "started_at": "2026-10-29T15:11:33.967760+00:00",
+    "completed_at": "2026-10-29T15:14:34.767469+00:00",
+    "seconds": 180.8,
+    "exit_code": 0
+  },
+  {
+    "name": "emulator-legacy",
+    "argv": [
+      "<LOCAL_CHECKOUT>/.tmp/cross-engine-doc-delta-20261029/legacy",
+      "emulator",
+      "gcr.io/cloud-spanner-emulator/emulator:1.5.59@sha256:969af6a9349948fbfb4a826c18e160e258a4005f7c759f8e7f2dcec369cccba8"
+    ],
+    "cwd": "<LOCAL_CHECKOUT>/.tmp/cross-engine-doc-delta-20261029/module",
+    "started_at": "2026-10-29T15:14:35.017557+00:00",
+    "completed_at": "2026-10-29T15:14:41.639066+00:00",
+    "seconds": 6.621,
+    "exit_code": 0
+  },
+  {
+    "name": "queues-build",
+    "argv": [
+      "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go",
+      "build",
+      "-o",
+      "<LOCAL_CHECKOUT>/.tmp/cross-engine-doc-delta-20261029/queues",
+      "./queues.go"
+    ],
+    "cwd": "<LOCAL_CHECKOUT>/.tmp/cross-engine-doc-delta-20261029/module",
+    "started_at": "2026-10-29T15:14:41.639264+00:00",
+    "completed_at": "2026-10-29T15:14:44.077151+00:00",
+    "seconds": 2.438,
+    "exit_code": 0
+  },
+  {
+    "name": "queues-buildinfo",
+    "argv": [
+      "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go",
+      "version",
+      "-m",
+      "<LOCAL_CHECKOUT>/.tmp/cross-engine-doc-delta-20261029/queues"
+    ],
+    "cwd": "<LOCAL_CHECKOUT>/.tmp/cross-engine-doc-delta-20261029/module",
+    "started_at": "2026-10-29T15:14:44.077564+00:00",
+    "completed_at": "2026-10-29T15:14:44.099566+00:00",
+    "seconds": 0.022,
+    "exit_code": 0
+  },
+  {
+    "name": "omni-r5-queues",
+    "argv": [
+      "<LOCAL_CHECKOUT>/.tmp/cross-engine-doc-delta-20261029/queues",
+      "omni-r5",
+      "us-docker.pkg.dev/spanner-omni/images/spanner-omni:2026.r5@sha256:e506672206e0291cac28cbe19ad4cd470cec112c24601637bc896c65f7362396"
+    ],
+    "cwd": "<LOCAL_CHECKOUT>/.tmp/cross-engine-doc-delta-20261029/module",
+    "started_at": "2026-10-29T15:14:44.388115+00:00",
+    "completed_at": "2026-10-29T15:17:41.160152+00:00",
+    "seconds": 176.772,
+    "exit_code": 0
+  },
+  {
+    "name": "omni-lts-queues",
+    "argv": [
+      "<LOCAL_CHECKOUT>/.tmp/cross-engine-doc-delta-20261029/queues",
+      "omni-lts",
+      "us-docker.pkg.dev/spanner-omni/images/spanner-omni:2026.r4-lts.1@sha256:5e3cf199f5abf3a09cd2348ab36c129b3268966eb4eb72fca278fe58252fcbdb"
+    ],
+    "cwd": "<LOCAL_CHECKOUT>/.tmp/cross-engine-doc-delta-20261029/module",
+    "started_at": "2026-10-29T15:17:41.416303+00:00",
+    "completed_at": "2026-10-29T15:21:03.577477+00:00",
+    "seconds": 202.161,
+    "exit_code": 0
+  },
+  {
+    "name": "emulator-queues",
+    "argv": [
+      "<LOCAL_CHECKOUT>/.tmp/cross-engine-doc-delta-20261029/queues",
+      "emulator",
+      "gcr.io/cloud-spanner-emulator/emulator:1.5.59@sha256:969af6a9349948fbfb4a826c18e160e258a4005f7c759f8e7f2dcec369cccba8"
+    ],
+    "cwd": "<LOCAL_CHECKOUT>/.tmp/cross-engine-doc-delta-20261029/module",
+    "started_at": "2026-10-29T15:21:03.824204+00:00",
+    "completed_at": "2026-10-29T15:21:52.376685+00:00",
+    "seconds": 48.552,
+    "exit_code": 0
+  }
+]

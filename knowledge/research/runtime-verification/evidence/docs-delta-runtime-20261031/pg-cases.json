@@ -1,0 +1,62 @@
+{
+  "dialect": "pg",
+  "steps": [
+    {
+      "label": "score-set-db-1",
+      "family": "scorer",
+      "kind": "ddl",
+      "sql": "ALTER DATABASE {{DATABASE}} SET \"spanner.score_version\" = 1"
+    },
+    {
+      "label": "score-values-db-1",
+      "family": "scorer",
+      "kind": "query",
+      "sql": "SELECT spanner.score(spanner.tokenize_fulltext('cat cat dog'), 'cat') AS default_score, spanner.score(spanner.tokenize_fulltext('cat cat dog'), 'cat', options => '{\"version\": 1}'::jsonb) AS version1_score, spanner.score(spanner.tokenize_fulltext('cat cat dog'), 'cat', options => '{\"version\": 2}'::jsonb) AS version2_score",
+      "requires": [
+        "score-set-db-1"
+      ]
+    },
+    {
+      "label": "score-set-db-2",
+      "family": "scorer",
+      "kind": "ddl",
+      "sql": "ALTER DATABASE {{DATABASE}} SET \"spanner.score_version\" = 2"
+    },
+    {
+      "label": "score-values-db-2",
+      "family": "scorer",
+      "kind": "query",
+      "sql": "SELECT spanner.score(spanner.tokenize_fulltext('cat cat dog'), 'cat') AS default_score, spanner.score(spanner.tokenize_fulltext('cat cat dog'), 'cat', options => '{\"version\": 1}'::jsonb) AS version1_score, spanner.score(spanner.tokenize_fulltext('cat cat dog'), 'cat', options => '{\"version\": 2}'::jsonb) AS version2_score",
+      "requires": [
+        "score-set-db-2"
+      ]
+    },
+    {
+      "label": "bucket-pg-create",
+      "family": "bucket-pg",
+      "kind": "ddl",
+      "sql": "CREATE TABLE bucketdocs (id bigint NOT NULL PRIMARY KEY, updatedat timestamptz NOT NULL, hourbucket bigint GENERATED ALWAYS AS (EXTRACT(EPOCH FROM updatedat - '1970-01-01Z'::timestamptz)::bigint / 3600) STORED)"
+    },
+    {
+      "label": "bucket-pg-insert",
+      "family": "bucket-pg",
+      "kind": "dml",
+      "sql": "",
+      "statements": [
+        "INSERT INTO bucketdocs(id,updatedat) VALUES (1,'2026-10-31 00:01:00Z'),(2,'2026-10-31 00:59:00Z'),(3,'2026-10-31 01:00:00Z')"
+      ],
+      "requires": [
+        "bucket-pg-create"
+      ]
+    },
+    {
+      "label": "bucket-pg-values",
+      "family": "bucket-pg",
+      "kind": "query",
+      "sql": "SELECT id, updatedat, hourbucket FROM bucketdocs ORDER BY id",
+      "requires": [
+        "bucket-pg-insert"
+      ]
+    }
+  ]
+}

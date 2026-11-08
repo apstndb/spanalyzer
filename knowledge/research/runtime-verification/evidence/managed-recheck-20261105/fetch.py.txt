@@ -1,0 +1,16 @@
+from pathlib import Path
+from concurrent.futures import ThreadPoolExecutor
+import subprocess,json,hashlib,datetime
+p=Path('<LOCAL_TASK_ROOT>/apstndb/spanalyzer/managed-recheck-20261105/sources');base='ec91ce497a621dd3d318cad40a58944367415165'
+items=[('mirror-head.json',['gh','api','repos/apstndb/spanner-docs-mirror/commits/main']),('release-feed.xml',['curl','--fail','--silent','--show-error','https://docs.cloud.google.com/feeds/spanner-release-notes.xml']),('release-live.html',['curl','--fail','--silent','--show-error','https://docs.cloud.google.com/spanner/docs/release-notes'])]
+for name,path in [('managed-release','spanner/docs/release-notes'),('graph-schema','spanner/docs/reference/standard-sql/graph-schema-statements'),('ranked-search','spanner/docs/full-text-search/ranked-search'),('search-indexes','spanner/docs/full-text-search/search-indexes')]:items.append((name+'.json',['dkcli','get','-f','json','docs.cloud.google.com/'+path]))
+def get(item):
+ name,args=item;r=subprocess.run(args,capture_output=True,timeout=120);assert r.returncode==0,(name,r.stderr.decode()[-500:]);(p/name).write_bytes(r.stdout);return {'file':name,'argv':args,'at':datetime.datetime.now(datetime.timezone.utc).isoformat(),'sha256':hashlib.sha256(r.stdout).hexdigest()}
+with ThreadPoolExecutor(max_workers=5)as pool:rows=list(pool.map(get,items))
+head=json.loads((p/'mirror-head.json').read_text())['sha'];rows.append(get(('mirror-compare.json',['gh','api',f'repos/apstndb/spanner-docs-mirror/compare/{base}...{head}'])))
+comp=json.loads((p/'mirror-compare.json').read_text());more=[('commit-'+c['sha']+'.json',['gh','api','repos/apstndb/spanner-docs-mirror/commits/'+c['sha']])for c in comp['commits']]
+with ThreadPoolExecutor(max_workers=4)as pool:rows+=list(pool.map(get,more))
+(p/'retrieval.json').write_text(json.dumps(rows,indent=2)+'\n')
+for name in ['managed-release','graph-schema','ranked-search','search-indexes']:
+ d=json.loads((p/(name+'.json')).read_text());(p/(name+'.md.txt')).write_text(d['content']);print(name,d.get('updateTime'),len(d['content']))
+print('Head',head,'commits',comp['total_commits'],'files',len(comp['files']));print('commits',[(c['sha'],c['commit']['message'])for c in comp['commits']]);print('files',[f['filename']for f in comp['files']])

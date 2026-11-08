@@ -1,0 +1,104 @@
+[
+  {
+    "flag": "--help",
+    "owned_id": "ff0a4e0afcd4446c51721480e411d93903eee52b45ce9c18c66e3fa3d762b9f9",
+    "name": "spanalyzer-issue-cli-42545604a8",
+    "image": "gcr.io/cloud-spanner-emulator/emulator:1.5.59@sha256:969af6a9349948fbfb4a826c18e160e258a4005f7c759f8e7f2dcec369cccba8",
+    "at": "2026-10-30T08:11:40.035897+00:00",
+    "actual_image_id": "sha256:969af6a9349948fbfb4a826c18e160e258a4005f7c759f8e7f2dcec369cccba8",
+    "path": "./gateway_main",
+    "args": [
+      "--help"
+    ],
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": "Usage of ./gateway_main:\n  -copy_emulator_stderr\n    \tIf true, the gateway will copy the emulator's stderr to its stderr. (default true)\n  -copy_emulator_stdout\n    \tIf true, the gateway will copy the emulator's stdout to its stdout.\n  -disable_query_null_filtered_index_check\n    \tIf true, then queries that use NULL_FILTERED indexes will be answered.\n  -enable_fault_injection\n    \tIf true, the emulator will inject faults at runtime (e.g. randomly abort commit requests to allow testing application abort-retry behavior).\n  -grpc_binary string\n    \tLocation of the grpc binary. (default \"emulator_main\")\n  -grpc_port int\n    \tPort on which to run the emulator grpc server. (default 9010)\n  -hostname string\n    \tHostname for the emulator servers. (default \"localhost\")\n  -http_port int\n    \tPort on which to run the emulator http server. (default 9020)\n  -log_requests\n    \tIf true, gRPC requests and responses will be logged to stdout.\n  -notices\n    \tIf true, the emulator will print all third-party notices to stdout.\n  -override_change_stream_partition_token_alive_seconds int\n    \tIf set to X seconds, and X is greater than 0, then override the default partition token alivetime from 20-40 seconds(default for Emulator only, not for production Spanner) to X-2X seconds. (default -1)\n  -override_max_databases_per_instance int\n    \tIf set at a value greater than the default limit of Spanner, overrides the allowed maximum number of databases per instance. If the MAX_DATABASES_PER_INSTANCE environment variable is set, it overrides the value set in this flag but it is only respected if it's greater than the default limit of Spanner. (default 100)\n  -remote_functions_host_port string\n    \tThe host:port to use for remote functions.\n",
+    "remove_exit_code": 0,
+    "absent": true
+  },
+  {
+    "flag": "--enable_key_range_locking",
+    "owned_id": "b261f4ed6b06ae5b8085a54298cdacbe4f7062beb33cdc0604014c19dc52d52b",
+    "name": "spanalyzer-issue-cli-1de5040adb",
+    "image": "gcr.io/cloud-spanner-emulator/emulator:1.5.59@sha256:969af6a9349948fbfb4a826c18e160e258a4005f7c759f8e7f2dcec369cccba8",
+    "at": "2026-10-30T08:11:40.282428+00:00",
+    "actual_image_id": "sha256:969af6a9349948fbfb4a826c18e160e258a4005f7c759f8e7f2dcec369cccba8",
+    "path": "./gateway_main",
+    "args": [
+      "--enable_key_range_locking"
+    ],
+    "exit_code": 2,
+    "stdout": "",
+    "stderr": "flag provided but not defined: -enable_key_range_locking\nUsage of ./gateway_main:\n  -copy_emulator_stderr\n    \tIf true, the gateway will copy the emulator's stderr to its stderr. (default true)\n  -copy_emulator_stdout\n    \tIf true, the gateway will copy the emulator's stdout to its stdout.\n  -disable_query_null_filtered_index_check\n    \tIf true, then queries that use NULL_FILTERED indexes will be answered.\n  -enable_fault_injection\n    \tIf true, the emulator will inject faults at runtime (e.g. randomly abort commit requests to allow testing application abort-retry behavior).\n  -grpc_binary string\n    \tLocation of the grpc binary. (default \"emulator_main\")\n  -grpc_port int\n    \tPort on which to run the emulator grpc server. (default 9010)\n  -hostname string\n    \tHostname for the emulator servers. (default \"localhost\")\n  -http_port int\n    \tPort on which to run the emulator http server. (default 9020)\n  -log_requests\n    \tIf true, gRPC requests and responses will be logged to stdout.\n  -notices\n    \tIf true, the emulator will print all third-party notices to stdout.\n  -override_change_stream_partition_token_alive_seconds int\n    \tIf set to X seconds, and X is greater than 0, then override the default partition token alivetime from 20-40 seconds(default for Emulator only, not for production Spanner) to X-2X seconds. (default -1)\n  -override_max_databases_per_instance int\n    \tIf set at a value greater than the default limit of Spanner, overrides the allowed maximum number of databases per instance. If the MAX_DATABASES_PER_INSTANCE environment variable is set, it overrides the value set in this flag but it is only respected if it's greater than the default limit of Spanner. (default 100)\n  -remote_functions_host_port string\n    \tThe host:port to use for remote functions.\n",
+    "remove_exit_code": 0,
+    "absent": true
+  },
+  {
+    "flag": "--enable_sql_read_pushdown",
+    "owned_id": "06a0d6a6b40ef6a868ee81dce5279877e44121d41d7a1d15c6e4f4bf4ea415f0",
+    "name": "spanalyzer-issue-cli-1b7e8ac3b6",
+    "image": "gcr.io/cloud-spanner-emulator/emulator:1.5.59@sha256:969af6a9349948fbfb4a826c18e160e258a4005f7c759f8e7f2dcec369cccba8",
+    "at": "2026-10-30T08:11:40.493373+00:00",
+    "actual_image_id": "sha256:969af6a9349948fbfb4a826c18e160e258a4005f7c759f8e7f2dcec369cccba8",
+    "path": "./gateway_main",
+    "args": [
+      "--enable_sql_read_pushdown"
+    ],
+    "exit_code": 2,
+    "stdout": "",
+    "stderr": "flag provided but not defined: -enable_sql_read_pushdown\nUsage of ./gateway_main:\n  -copy_emulator_stderr\n    \tIf true, the gateway will copy the emulator's stderr to its stderr. (default true)\n  -copy_emulator_stdout\n    \tIf true, the gateway will copy the emulator's stdout to its stdout.\n  -disable_query_null_filtered_index_check\n    \tIf true, then queries that use NULL_FILTERED indexes will be answered.\n  -enable_fault_injection\n    \tIf true, the emulator will inject faults at runtime (e.g. randomly abort commit requests to allow testing application abort-retry behavior).\n  -grpc_binary string\n    \tLocation of the grpc binary. (default \"emulator_main\")\n  -grpc_port int\n    \tPort on which to run the emulator grpc server. (default 9010)\n  -hostname string\n    \tHostname for the emulator servers. (default \"localhost\")\n  -http_port int\n    \tPort on which to run the emulator http server. (default 9020)\n  -log_requests\n    \tIf true, gRPC requests and responses will be logged to stdout.\n  -notices\n    \tIf true, the emulator will print all third-party notices to stdout.\n  -override_change_stream_partition_token_alive_seconds int\n    \tIf set to X seconds, and X is greater than 0, then override the default partition token alivetime from 20-40 seconds(default for Emulator only, not for production Spanner) to X-2X seconds. (default -1)\n  -override_max_databases_per_instance int\n    \tIf set at a value greater than the default limit of Spanner, overrides the allowed maximum number of databases per instance. If the MAX_DATABASES_PER_INSTANCE environment variable is set, it overrides the value set in this flag but it is only respected if it's greater than the default limit of Spanner. (default 100)\n  -remote_functions_host_port string\n    \tThe host:port to use for remote functions.\n",
+    "remove_exit_code": 0,
+    "absent": true
+  },
+  {
+    "flag": "--schema_version_retention=0s",
+    "owned_id": "b084121b28516f0410854588c8847d401a849c09f3b49cb0716e3da82d86cc2f",
+    "name": "spanalyzer-issue-cli-f024d1c503",
+    "image": "gcr.io/cloud-spanner-emulator/emulator:1.5.59@sha256:969af6a9349948fbfb4a826c18e160e258a4005f7c759f8e7f2dcec369cccba8",
+    "at": "2026-10-30T08:11:40.706476+00:00",
+    "actual_image_id": "sha256:969af6a9349948fbfb4a826c18e160e258a4005f7c759f8e7f2dcec369cccba8",
+    "path": "./gateway_main",
+    "args": [
+      "--schema_version_retention=0s"
+    ],
+    "exit_code": 2,
+    "stdout": "",
+    "stderr": "flag provided but not defined: -schema_version_retention\nUsage of ./gateway_main:\n  -copy_emulator_stderr\n    \tIf true, the gateway will copy the emulator's stderr to its stderr. (default true)\n  -copy_emulator_stdout\n    \tIf true, the gateway will copy the emulator's stdout to its stdout.\n  -disable_query_null_filtered_index_check\n    \tIf true, then queries that use NULL_FILTERED indexes will be answered.\n  -enable_fault_injection\n    \tIf true, the emulator will inject faults at runtime (e.g. randomly abort commit requests to allow testing application abort-retry behavior).\n  -grpc_binary string\n    \tLocation of the grpc binary. (default \"emulator_main\")\n  -grpc_port int\n    \tPort on which to run the emulator grpc server. (default 9010)\n  -hostname string\n    \tHostname for the emulator servers. (default \"localhost\")\n  -http_port int\n    \tPort on which to run the emulator http server. (default 9020)\n  -log_requests\n    \tIf true, gRPC requests and responses will be logged to stdout.\n  -notices\n    \tIf true, the emulator will print all third-party notices to stdout.\n  -override_change_stream_partition_token_alive_seconds int\n    \tIf set to X seconds, and X is greater than 0, then override the default partition token alivetime from 20-40 seconds(default for Emulator only, not for production Spanner) to X-2X seconds. (default -1)\n  -override_max_databases_per_instance int\n    \tIf set at a value greater than the default limit of Spanner, overrides the allowed maximum number of databases per instance. If the MAX_DATABASES_PER_INSTANCE environment variable is set, it overrides the value set in this flag but it is only respected if it's greater than the default limit of Spanner. (default 100)\n  -remote_functions_host_port string\n    \tThe host:port to use for remote functions.\n",
+    "remove_exit_code": 0,
+    "absent": true
+  },
+  {
+    "flag": "--enable_emulator_diagnostic_statements",
+    "owned_id": "bd243407ad7b25155bd74003b155b22fc2e46a2605c88b9e433564f9e8d4fba4",
+    "name": "spanalyzer-issue-cli-4c0730b9a1",
+    "image": "gcr.io/cloud-spanner-emulator/emulator:1.5.59@sha256:969af6a9349948fbfb4a826c18e160e258a4005f7c759f8e7f2dcec369cccba8",
+    "at": "2026-10-30T08:11:40.913709+00:00",
+    "actual_image_id": "sha256:969af6a9349948fbfb4a826c18e160e258a4005f7c759f8e7f2dcec369cccba8",
+    "path": "./gateway_main",
+    "args": [
+      "--enable_emulator_diagnostic_statements"
+    ],
+    "exit_code": 2,
+    "stdout": "",
+    "stderr": "flag provided but not defined: -enable_emulator_diagnostic_statements\nUsage of ./gateway_main:\n  -copy_emulator_stderr\n    \tIf true, the gateway will copy the emulator's stderr to its stderr. (default true)\n  -copy_emulator_stdout\n    \tIf true, the gateway will copy the emulator's stdout to its stdout.\n  -disable_query_null_filtered_index_check\n    \tIf true, then queries that use NULL_FILTERED indexes will be answered.\n  -enable_fault_injection\n    \tIf true, the emulator will inject faults at runtime (e.g. randomly abort commit requests to allow testing application abort-retry behavior).\n  -grpc_binary string\n    \tLocation of the grpc binary. (default \"emulator_main\")\n  -grpc_port int\n    \tPort on which to run the emulator grpc server. (default 9010)\n  -hostname string\n    \tHostname for the emulator servers. (default \"localhost\")\n  -http_port int\n    \tPort on which to run the emulator http server. (default 9020)\n  -log_requests\n    \tIf true, gRPC requests and responses will be logged to stdout.\n  -notices\n    \tIf true, the emulator will print all third-party notices to stdout.\n  -override_change_stream_partition_token_alive_seconds int\n    \tIf set to X seconds, and X is greater than 0, then override the default partition token alivetime from 20-40 seconds(default for Emulator only, not for production Spanner) to X-2X seconds. (default -1)\n  -override_max_databases_per_instance int\n    \tIf set at a value greater than the default limit of Spanner, overrides the allowed maximum number of databases per instance. If the MAX_DATABASES_PER_INSTANCE environment variable is set, it overrides the value set in this flag but it is only respected if it's greater than the default limit of Spanner. (default 100)\n  -remote_functions_host_port string\n    \tThe host:port to use for remote functions.\n",
+    "remove_exit_code": 0,
+    "absent": true
+  },
+  {
+    "flag": "--ignore_unknown_hints",
+    "owned_id": "c5e767c4cfabc6bb734187bb64833a9f5ee15a0f5eeee221b2009640a4732701",
+    "name": "spanalyzer-issue-cli-767599d741",
+    "image": "gcr.io/cloud-spanner-emulator/emulator:1.5.59@sha256:969af6a9349948fbfb4a826c18e160e258a4005f7c759f8e7f2dcec369cccba8",
+    "at": "2026-10-30T08:11:41.105865+00:00",
+    "actual_image_id": "sha256:969af6a9349948fbfb4a826c18e160e258a4005f7c759f8e7f2dcec369cccba8",
+    "path": "./gateway_main",
+    "args": [
+      "--ignore_unknown_hints"
+    ],
+    "exit_code": 2,
+    "stdout": "",
+    "stderr": "flag provided but not defined: -ignore_unknown_hints\nUsage of ./gateway_main:\n  -copy_emulator_stderr\n    \tIf true, the gateway will copy the emulator's stderr to its stderr. (default true)\n  -copy_emulator_stdout\n    \tIf true, the gateway will copy the emulator's stdout to its stdout.\n  -disable_query_null_filtered_index_check\n    \tIf true, then queries that use NULL_FILTERED indexes will be answered.\n  -enable_fault_injection\n    \tIf true, the emulator will inject faults at runtime (e.g. randomly abort commit requests to allow testing application abort-retry behavior).\n  -grpc_binary string\n    \tLocation of the grpc binary. (default \"emulator_main\")\n  -grpc_port int\n    \tPort on which to run the emulator grpc server. (default 9010)\n  -hostname string\n    \tHostname for the emulator servers. (default \"localhost\")\n  -http_port int\n    \tPort on which to run the emulator http server. (default 9020)\n  -log_requests\n    \tIf true, gRPC requests and responses will be logged to stdout.\n  -notices\n    \tIf true, the emulator will print all third-party notices to stdout.\n  -override_change_stream_partition_token_alive_seconds int\n    \tIf set to X seconds, and X is greater than 0, then override the default partition token alivetime from 20-40 seconds(default for Emulator only, not for production Spanner) to X-2X seconds. (default -1)\n  -override_max_databases_per_instance int\n    \tIf set at a value greater than the default limit of Spanner, overrides the allowed maximum number of databases per instance. If the MAX_DATABASES_PER_INSTANCE environment variable is set, it overrides the value set in this flag but it is only respected if it's greater than the default limit of Spanner. (default 100)\n  -remote_functions_host_port string\n    \tThe host:port to use for remote functions.\n",
+    "remove_exit_code": 0,
+    "absent": true
+  }
+]

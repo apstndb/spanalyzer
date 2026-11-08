@@ -1,0 +1,147 @@
+{
+  "baseline": "managed-recheck-20261009",
+  "observations": [
+    {
+      "name": "infoschema",
+      "status": "producer_changed_only",
+      "current": {
+        "target": {
+          "kind": "managed",
+          "observation_scope": "single_database"
+        },
+        "observed_at": "2026-10-11T03:04:41.215927Z",
+        "surface_sha256": "89b4ab9e231d7d61bf417669b6f5d29d1715c3999058b905f60698bc1047c6b0",
+        "column_count": 310,
+        "rolling_queryability": [
+          {
+            "table_name": "INDEXES",
+            "column_name": "SEARCH_UNNEST",
+            "status": "queryable"
+          },
+          {
+            "table_name": "INDEX_COLUMNS",
+            "column_name": "EXPRESSION",
+            "status": "queryable"
+          }
+        ],
+        "producer_source_sha256": "6dc7ba9212558654df6624bea8ff6a7b92da9dce17308d57562b30c393457a94",
+        "invocation_sha256": "394c27273867ee16446472b5131b47283bcdb06d902be6a30c98982a205aa676"
+      },
+      "retained": {
+        "path": "survey/infoschem/evidence/managed/20260916T171439Z-89b4ab9e231d.json",
+        "target": {
+          "kind": "managed",
+          "observation_scope": "single_database"
+        },
+        "observed_at": "2026-09-16T17:14:39.178882Z",
+        "surface_sha256": "89b4ab9e231d7d61bf417669b6f5d29d1715c3999058b905f60698bc1047c6b0",
+        "column_count": 310,
+        "rolling_queryability": [
+          {
+            "table_name": "INDEXES",
+            "column_name": "SEARCH_UNNEST",
+            "status": "queryable"
+          },
+          {
+            "table_name": "INDEX_COLUMNS",
+            "column_name": "EXPRESSION",
+            "status": "queryable"
+          }
+        ],
+        "producer_source_sha256": "da0fa2e56edd38957dc24275c9fedac3b595b176d7b598f180b9c9f5878407ac",
+        "invocation_sha256": "394c27273867ee16446472b5131b47283bcdb06d902be6a30c98982a205aa676"
+      }
+    },
+    {
+      "name": "spanner-sys",
+      "status": "unchanged",
+      "current": {
+        "schema_version": "v0alpha2",
+        "target": {
+          "kind": "managed",
+          "observation_scope": "single_database"
+        },
+        "observed_at": "2026-10-11T03:04:48.067092Z",
+        "surface_sha256": "9bb70c640b69e4929e4b44ed834d69e1dfcd5fc17cc53e017f541b9f58f9ec8f",
+        "column_count": 598,
+        "producer_source_sha256": "3cf070ae5909bb26babeb3ca5bcfa20a161e2440eac934ca14d42de41a82a12a",
+        "invocation_sha256": "911f8d0021d67bf33420131130a46c1b258f3c30665bf390510113ad931a342c"
+      },
+      "retained": {
+        "path": "survey/spannersys/evidence/managed/20261009T025812Z-9bb70c640b69.json",
+        "schema_version": "v0alpha2",
+        "target": {
+          "kind": "managed",
+          "observation_scope": "single_database"
+        },
+        "observed_at": "2026-10-09T02:58:12.482974Z",
+        "surface_sha256": "9bb70c640b69e4929e4b44ed834d69e1dfcd5fc17cc53e017f541b9f58f9ec8f",
+        "column_count": 598,
+        "producer_source_sha256": "3cf070ae5909bb26babeb3ca5bcfa20a161e2440eac934ca14d42de41a82a12a",
+        "invocation_sha256": "911f8d0021d67bf33420131130a46c1b258f3c30665bf390510113ad931a342c"
+      }
+    },
+    {
+      "name": "spanner-sys-2",
+      "status": "unchanged",
+      "current": {
+        "schema_version": "v0alpha2",
+        "target": {
+          "kind": "managed",
+          "observation_scope": "single_database"
+        },
+        "observed_at": "2026-10-11T03:04:51.01003Z",
+        "surface_sha256": "9bb70c640b69e4929e4b44ed834d69e1dfcd5fc17cc53e017f541b9f58f9ec8f",
+        "column_count": 598,
+        "producer_source_sha256": "3cf070ae5909bb26babeb3ca5bcfa20a161e2440eac934ca14d42de41a82a12a",
+        "invocation_sha256": "911f8d0021d67bf33420131130a46c1b258f3c30665bf390510113ad931a342c"
+      },
+      "retained": {
+        "path": "survey/spannersys/evidence/managed/20261009T025812Z-9bb70c640b69.json",
+        "schema_version": "v0alpha2",
+        "target": {
+          "kind": "managed",
+          "observation_scope": "single_database"
+        },
+        "observed_at": "2026-10-09T02:58:12.482974Z",
+        "surface_sha256": "9bb70c640b69e4929e4b44ed834d69e1dfcd5fc17cc53e017f541b9f58f9ec8f",
+        "column_count": 598,
+        "producer_source_sha256": "3cf070ae5909bb26babeb3ca5bcfa20a161e2440eac934ca14d42de41a82a12a",
+        "invocation_sha256": "911f8d0021d67bf33420131130a46c1b258f3c30665bf390510113ad931a342c"
+      }
+    },
+    {
+      "name": "spanner-sys-3",
+      "status": "unchanged",
+      "current": {
+        "schema_version": "v0alpha2",
+        "target": {
+          "kind": "managed",
+          "observation_scope": "single_database"
+        },
+        "observed_at": "2026-10-11T03:04:53.94756Z",
+        "surface_sha256": "9bb70c640b69e4929e4b44ed834d69e1dfcd5fc17cc53e017f541b9f58f9ec8f",
+        "column_count": 598,
+        "producer_source_sha256": "3cf070ae5909bb26babeb3ca5bcfa20a161e2440eac934ca14d42de41a82a12a",
+        "invocation_sha256": "911f8d0021d67bf33420131130a46c1b258f3c30665bf390510113ad931a342c"
+      },
+      "retained": {
+        "path": "survey/spannersys/evidence/managed/20261009T025812Z-9bb70c640b69.json",
+        "schema_version": "v0alpha2",
+        "target": {
+          "kind": "managed",
+          "observation_scope": "single_database"
+        },
+        "observed_at": "2026-10-09T02:58:12.482974Z",
+        "surface_sha256": "9bb70c640b69e4929e4b44ed834d69e1dfcd5fc17cc53e017f541b9f58f9ec8f",
+        "column_count": 598,
+        "producer_source_sha256": "3cf070ae5909bb26babeb3ca5bcfa20a161e2440eac934ca14d42de41a82a12a",
+        "invocation_sha256": "911f8d0021d67bf33420131130a46c1b258f3c30665bf390510113ad931a342c"
+      }
+    }
+  ],
+  "retained_new_capture": "survey/spannersys/evidence/managed/20261011T030456Z-9bb70c640b69.json",
+  "retained_new_capture_sha256": "7778f6f7188ebd6521e65aadf389320036573968243c8af2fcd8c9321a913270",
+  "table_count": 51,
+  "surface_matches_october9": true
+}

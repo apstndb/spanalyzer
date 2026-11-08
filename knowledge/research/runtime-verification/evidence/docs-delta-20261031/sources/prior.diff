@@ -1,0 +1,1193 @@
+diff --git a/docs/docs.cloud.google.com/spanner-omni/download.md b/docs/docs.cloud.google.com/spanner-omni/download.md
+index 0c5b0a9..9027dd9 100644
+--- a/docs/docs.cloud.google.com/spanner-omni/download.md
++++ b/docs/docs.cloud.google.com/spanner-omni/download.md
+@@ -28,14 +28,14 @@ Specify the exact version tag when pulling a container image.
+ 
+ The following table lists the available container image versions.
+ 
+-| Version tag   | Release date       |
+-|---------------|--------------------|
+-| `2026.r4-lts` | September 30, 2026 |
++| Version tag     | Release date     |
++|-----------------|------------------|
++| `2026.r4-lts.1` | October 28, 2026 |
+ 
+-For example, to download the `spanner-omni` image for the 2026.r4-lts release, run the following command:
++For example, to download the `spanner-omni` image for the 2026.r4-lts.1 release, run the following command:
+ 
+ ```
+-docker pull us-docker.pkg.dev/spanner-omni/images/spanner-omni:2026.r4-lts
++docker pull us-docker.pkg.dev/spanner-omni/images/spanner-omni:2026.r4-lts.1
+ ```
+ 
+ ## Helm charts
+@@ -74,26 +74,26 @@ Each release is in a folder named after the version tag.
+ 
+ The following table lists the available Spanner Omni server and component packages.
+ 
+-| Filename                                              | Description                                                                     |
+-|-------------------------------------------------------|---------------------------------------------------------------------------------|
+-| `spanner-omni-2026.r4-lts-linux-x86_64.tar.gz`        | Spanner Omni server, Spanner Omni CLI, and Spanner Omni console for Linux (x86) |
+-| `spanner-omni-server-2026.r4-lts-linux-x86_64.tar.gz` | Spanner Omni server and Spanner Omni CLI for Linux (x86)                        |
+-| `spanner-omni-ui-2026.r4-lts-linux-x86_64.tar.gz`     | Spanner Omni console for Linux (x86)                                            |
++| Filename                                                | Description                                                                     |
++|---------------------------------------------------------|---------------------------------------------------------------------------------|
++| `spanner-omni-2026.r4-lts.1-linux-x86_64.tar.gz`        | Spanner Omni server, Spanner Omni CLI, and Spanner Omni console for Linux (x86) |
++| `spanner-omni-server-2026.r4-lts.1-linux-x86_64.tar.gz` | Spanner Omni server and Spanner Omni CLI for Linux (x86)                        |
++| `spanner-omni-ui-2026.r4-lts.1-linux-x86_64.tar.gz`     | Spanner Omni console for Linux (x86)                                            |
+ 
+ ### Spanner Omni CLI binaries
+ 
+ The following table lists the available Spanner Omni CLI binaries.
+ 
+-| Filename                                            | Description                           |
+-|-----------------------------------------------------|---------------------------------------|
+-| `spanner-omni-cli-2026.r4-lts-darwin-arm.tar.gz`    | Spanner Omni CLI, Mac (M1, M2 and M3) |
+-| `spanner-omni-cli-2026.r4-lts-darwin-x86_64.tar.gz` | Spanner Omni CLI for Mac (x86)        |
+-| `spanner-omni-cli-2026.r4-lts-linux-arm.tar.gz`     | Spanner Omni CLI for Linux (ARM)      |
+-| `spanner-omni-cli-2026.r4-lts-linux-x86_64.tar.gz`  | Spanner Omni CLI for Linux (x86)      |
++| Filename                                              | Description                           |
++|-------------------------------------------------------|---------------------------------------|
++| `spanner-omni-cli-2026.r4-lts.1-darwin-arm.tar.gz`    | Spanner Omni CLI, Mac (M1, M2 and M3) |
++| `spanner-omni-cli-2026.r4-lts.1-darwin-x86_64.tar.gz` | Spanner Omni CLI for Mac (x86)        |
++| `spanner-omni-cli-2026.r4-lts.1-linux-arm.tar.gz`     | Spanner Omni CLI for Linux (ARM)      |
++| `spanner-omni-cli-2026.r4-lts.1-linux-x86_64.tar.gz`  | Spanner Omni CLI for Linux (x86)      |
+ 
+ For example, to download the current version of the Spanner Omni CLI for Linux (x86), run the following command:
+ 
+ ```
+ # Download CLI for Linux (x86)
+-curl -O https://storage.googleapis.com/spanner-omni/2026.r4-lts/spanner-omni-cli-2026.r4-lts-linux-x86_64.tar.gz
++curl -O https://storage.googleapis.com/spanner-omni/2026.r4-lts.1/spanner-omni-cli-2026.r4-lts.1-linux-x86_64.tar.gz
+ ```
+diff --git a/docs/docs.cloud.google.com/spanner-omni/quickstart.md b/docs/docs.cloud.google.com/spanner-omni/quickstart.md
+index 568a9ba..6d2de08 100644
+--- a/docs/docs.cloud.google.com/spanner-omni/quickstart.md
++++ b/docs/docs.cloud.google.com/spanner-omni/quickstart.md
+@@ -23,7 +23,7 @@ To set up and run a Spanner Omni container, follow these steps:
+ 2.  Start the Spanner Omni server:
+ 
+     ```
+-    docker run -d --network host --name spanneromni -v "spanner:/spanner" us-docker.pkg.dev/spanner-omni/images/spanner-omni:2026.r4-lts start-single-server
++    docker run -d --network host --name spanneromni -v "spanner:/spanner" us-docker.pkg.dev/spanner-omni/images/spanner-omni:2026.r4-lts.1 start-single-server
+     ```
+ 
+     The `--network host` flag opens the ports for Spanner Omni on the host machine. The following table describes the ports used by Spanner Omni:
+diff --git a/docs/docs.cloud.google.com/spanner-omni/setup.md b/docs/docs.cloud.google.com/spanner-omni/setup.md
+index 04a80b6..8f45962 100644
+--- a/docs/docs.cloud.google.com/spanner-omni/setup.md
++++ b/docs/docs.cloud.google.com/spanner-omni/setup.md
+@@ -30,7 +30,7 @@ We recommend storing Spanner data in a [Docker volume](https://docs.docker.com/s
+     docker volume create spanner
+     ```
+ 
+-2.  Start the Spanner Omni server container. Replace ` VERSION_TAG ` with the Spanner Omni version you want to use. The current version is `2026.r4-lts` .
++2.  Start the Spanner Omni server container. Replace ` VERSION_TAG ` with the Spanner Omni version you want to use. The current version is `2026.r4-lts.1` .
+ 
+     ```
+     docker run -d --network host \
+diff --git a/docs/docs.cloud.google.com/spanner-omni/upgrade-deployment.md b/docs/docs.cloud.google.com/spanner-omni/upgrade-deployment.md
+index e2033cb..e56b8fe 100644
+--- a/docs/docs.cloud.google.com/spanner-omni/upgrade-deployment.md
++++ b/docs/docs.cloud.google.com/spanner-omni/upgrade-deployment.md
+@@ -66,7 +66,7 @@ In VM deployments, download and extract the target release package, and then use
+ 
+     Replace the following:
+ 
+-    - `TARGET_VERSION` : The target version to upgrade to, for example, `2026.r4-lts` .
++    - `TARGET_VERSION` : The target version to upgrade to, for example, `2026.r4-lts.1` .
+     - `EXTRACT_DIR` : The directory where you extract the release package, for example, `/tmp/target_spanner/` .
+ 
+ 3.  Initiate rollout preparation by running the `rollouts prepare` command from the extracted CLI:
+@@ -104,7 +104,7 @@ In Helm deployments, schema preparation depends on whether you run a multi-serve
+ 
+   - `POD_NAME` : The name of the server pod, for example, `spanner-a-0` .
+   - `NAMESPACE` : The Kubernetes namespace of the deployment, for example, `spanner-ns` .
+-  - `TARGET_VERSION` : The target version to upgrade to, for example, `2026.r4-lts` .
++  - `TARGET_VERSION` : The target version to upgrade to, for example, `2026.r4-lts.1` .
+ 
+ ### Standalone Kubernetes
+ 
+@@ -152,7 +152,7 @@ If you deploy Spanner Omni on Kubernetes without Helm, run a standalone Kubernet
+     Replace the following:
+ 
+     - `NAMESPACE` : The Kubernetes namespace of the deployment, for example, `spanner-ns` .
+-    - `TARGET_VERSION` : The target version to upgrade to, for example, `2026.r4-lts` .
++    - `TARGET_VERSION` : The target version to upgrade to, for example, `2026.r4-lts.1` .
+     - `ROOT_SERVER_ENDPOINT` : The endpoint of an active root server pod, for example, `spanner-a-0.pod.spanner-ns` .
+ 
+ 2.  Apply the manifest to run the preparation job:
+@@ -271,7 +271,7 @@ Replace the following:
+ 
+ - `CHART_VERSION` : The target Helm chart version, for example, `1.0.0` .
+ - `NAMESPACE` : The Kubernetes namespace of the deployment, for example, `spanner-ns` .
+-- `TARGET_VERSION` : The target container image tag, for example, `2026.r4-lts` .
++- `TARGET_VERSION` : The target container image tag, for example, `2026.r4-lts.1` .
+ 
+ ### Standalone Kubernetes
+ 
+diff --git a/docs/docs.cloud.google.com/spanner-omni/use-console.md b/docs/docs.cloud.google.com/spanner-omni/use-console.md
+index 86900be..e7908b9 100644
+--- a/docs/docs.cloud.google.com/spanner-omni/use-console.md
++++ b/docs/docs.cloud.google.com/spanner-omni/use-console.md
+@@ -76,7 +76,7 @@ This section lists details for your deployment:
+ 
+ - **Deployment ID** : A unique identifier for your current Spanner Omni deployment. You specify this ID when you create the deployment.
+ 
+-- **Database version** : The specific version of the Spanner Omni software that you are running (for example, `2026.r4-lts` ).
++- **Database version** : The specific version of the Spanner Omni software that you are running (for example, `2026.r4-lts.1` ).
+ 
+ - **Edition** : The edition of Spanner Omni license installed on the deployment.
+ 
+diff --git a/docs/docs.cloud.google.com/spanner/docs/create-manage-databases.md b/docs/docs.cloud.google.com/spanner/docs/create-manage-databases.md
+index 136687f..0151a72 100644
+--- a/docs/docs.cloud.google.com/spanner/docs/create-manage-databases.md
++++ b/docs/docs.cloud.google.com/spanner/docs/create-manage-databases.md
+@@ -2,7 +2,7 @@
+ name: documents/docs.cloud.google.com/spanner/docs/create-manage-databases
+ uri: https://docs.cloud.google.com/spanner/docs/create-manage-databases
+ title: Create and manage databases
+-description: Manage Spanner databases using the {{dynamic_data.site_values.cloud_name_short}} console, Google Cloud CLI, client libraries, or REST APIs.
++description: Manage Spanner databases using the {{dynamic_data.site_values.cloud_name_short}} console, gcloud CLI, client libraries, or REST APIs.
+ data_source: docs.cloud.google.com
+ ---
+ 
+diff --git a/docs/docs.cloud.google.com/spanner/docs/create-manage-instances.md b/docs/docs.cloud.google.com/spanner/docs/create-manage-instances.md
+index 5458036..bcd1d34 100644
+--- a/docs/docs.cloud.google.com/spanner/docs/create-manage-instances.md
++++ b/docs/docs.cloud.google.com/spanner/docs/create-manage-instances.md
+@@ -40,7 +40,7 @@ You can create an instance with the Google Cloud console, the [Google Cloud CLI]
+ 
+ 9.  Select a configuration location from the drop-down.
+ 
+-10. Optional: To add a read-only replica to a Spanner base configuration, first [create a custom instance configuration using the Google Cloud CLI](https://docs.cloud.google.com/spanner/docs/create-manage-configurations#gcloud_2) . Adding optional read-only replicas to a base configuration is available in the [Enterprise edition and Enterprise Plus edition](https://docs.cloud.google.com/spanner/docs/editions-overview#features) .
++10. Optional: To add a read-only replica to a Spanner base configuration, first [create a custom instance configuration using the gcloud CLI](https://docs.cloud.google.com/spanner/docs/create-manage-configurations#gcloud_2) . Adding optional read-only replicas to a base configuration is available in the [Enterprise edition and Enterprise Plus edition](https://docs.cloud.google.com/spanner/docs/editions-overview#features) .
+ 
+ 11. Click **Continue** .
+ 
+@@ -2241,7 +2241,7 @@ For instructions on how to move your instance from any instance configuration to
+ 
+ > **Warning:** Deleting an instance permanently removes the instance and all its databases. You can't undo this later. Also, you can't create another free trial instance once you've deleted your first free trial instance. You can create one free trial instance per project lifecycle.
+ 
+-You can delete an instance with the Google Cloud console or the [Google Cloud CLI](https://docs.cloud.google.com/spanner/docs/gcloud-spanner) .
++You can delete an instance with the Google Cloud console or the [gcloud CLI](https://docs.cloud.google.com/spanner/docs/gcloud-spanner) .
+ 
+ If you want to delete an instance that has one or more databases with deletion protection enabled, you must first [disable the deletion protection](https://docs.cloud.google.com/spanner/docs/prevent-database-deletion#disable) on all databases in that instance before you can delete the instance.
+ 
+@@ -2272,5 +2272,5 @@ Spanner is a fully managed database service which oversees its own underlying ta
+ ## What's next
+ 
+ - Learn how to insert, update, and delete data with [Data Manipulation Language (DML)](https://docs.cloud.google.com/spanner/docs/dml-tasks) or the [gcloud CLI](https://docs.cloud.google.com/spanner/docs/modify-gcloud) .
+-- Grant [Identity and Access Management roles](https://docs.cloud.google.com/spanner/docs/grant-permissions) for the instance and its databases.
++- Grant [Identity and Access Management (IAM) roles](https://docs.cloud.google.com/spanner/docs/grant-permissions) for the instance and its databases.
+ - Understand how to [design a Spanner schema](https://docs.cloud.google.com/spanner/docs/schema-design) .
+diff --git a/docs/docs.cloud.google.com/spanner/docs/create-manage-locality-groups.md b/docs/docs.cloud.google.com/spanner/docs/create-manage-locality-groups.md
+index 937abea..43ce682 100644
+--- a/docs/docs.cloud.google.com/spanner/docs/create-manage-locality-groups.md
++++ b/docs/docs.cloud.google.com/spanner/docs/create-manage-locality-groups.md
+@@ -76,7 +76,7 @@ If you create a locality group without a tiered storage policy, the locality gro
+ 
+ ### gcloud
+ 
+-To create a locality group with the gcloud CLI command, use [`gcloud spanner databases ddl update`](https://docs.cloud.google.com/sdk/gcloud/reference/spanner/databases/ddl/update) .
++To create a locality group with the Google Cloud CLI command, use [`gcloud spanner databases ddl update`](https://docs.cloud.google.com/sdk/gcloud/reference/spanner/databases/ddl/update) .
+ 
+ For example, you can run the following to create a locality group, `separate_storage` , that stores columns in a separate file than the data for the rest of the columns:
+ 
+diff --git a/docs/docs.cloud.google.com/spanner/docs/create-manage-partitions.md b/docs/docs.cloud.google.com/spanner/docs/create-manage-partitions.md
+index f67f80e..fc75ec2 100644
+--- a/docs/docs.cloud.google.com/spanner/docs/create-manage-partitions.md
++++ b/docs/docs.cloud.google.com/spanner/docs/create-manage-partitions.md
+@@ -499,7 +499,7 @@ To list your instance partitions, use [`gcloud spanner instance-partitions list`
+ gcloud spanner instance-partitions list --instance=INSTANCE_ID
+ ```
+ 
+-The gcloud CLI prints a list of your Spanner instance partitions, along with each instance partition's ID, display name, configuration, and compute capacity.
++The Google Cloud CLI prints a list of your Spanner instance partitions, along with each instance partition's ID, display name, configuration, and compute capacity.
+ 
+ ## Edit an instance partition
+ 
+diff --git a/docs/docs.cloud.google.com/spanner/docs/create-manage-split-points.md b/docs/docs.cloud.google.com/spanner/docs/create-manage-split-points.md
+index d1d564b..19c42a3 100644
+--- a/docs/docs.cloud.google.com/spanner/docs/create-manage-split-points.md
++++ b/docs/docs.cloud.google.com/spanner/docs/create-manage-split-points.md
+@@ -16,7 +16,7 @@ This page describes how you can create and manage split points in your database.
+ 
+   You might also be able to get this permission with [custom roles](https://docs.cloud.google.com/iam/docs/creating-custom-roles) or other [predefined roles](https://docs.cloud.google.com/iam/docs/roles-overview#predefined) .
+ 
+-- The gcloud CLI examples on this page make the following assumptions:
++- The Google Cloud CLI examples on this page make the following assumptions:
+ 
+   - You've set up [gcloud CLI](https://docs.cloud.google.com/sdk/docs) for use with Spanner. If you're new to using gcloud CLI with Spanner, see [Create and query a database using the gcloud CLI](https://docs.cloud.google.com/spanner/docs/getting-started/gcloud) .
+ 
+@@ -30,11 +30,11 @@ This page describes how you can create and manage split points in your database.
+ 
+ ## Create split points
+ 
+-You can create split points using the Google Cloud CLI or the REST APIs.
++You can create split points using the gcloud CLI or the REST APIs.
+ 
+ ### gcloud
+ 
+-If you want to create split points using the Google Cloud CLI, you need to create a file that contains all the splits and supply the path in the gcloud CLI command. The file must not exceed the API limit of 100 points per API request. For more information, see [Quotas and limits](https://docs.cloud.google.com/spanner/docs/pre-splitting-overview#quotas-limits) .
++If you want to create split points using the gcloud CLI, you need to create a file that contains all the splits and supply the path in the gcloud CLI command. The file must not exceed the API limit of 100 points per API request. For more information, see [Quotas and limits](https://docs.cloud.google.com/spanner/docs/pre-splitting-overview#quotas-limits) .
+ 
+ The file must use the following format to specify the split points:
+ 
+@@ -710,11 +710,11 @@ A response similar to the following appears:
+ 
+ ## How to expire a split point
+ 
+-You can set an expiration time for each split point you create. For more information, see [Split point expiration](https://docs.cloud.google.com/spanner/docs/pre-splitting-overview#expire) . You can expire split points using the Google Cloud CLI or the REST APIs.
++You can set an expiration time for each split point you create. For more information, see [Split point expiration](https://docs.cloud.google.com/spanner/docs/pre-splitting-overview#expire) . You can expire split points using the gcloud CLI or the REST APIs.
+ 
+ ### gcloud
+ 
+-If you want to expire split points the Google Cloud CLI, you need to create a file that contains all the splits you want to expire and supply its path using the `splits-file` parameter in the gcloud CLI command. The file must not exceed the API limit of 100 points per API request. For more information, see [Quotas and limits](https://docs.cloud.google.com/spanner/quotas#split-point-limits) .
++If you want to expire split points the gcloud CLI, you need to create a file that contains all the splits you want to expire and supply its path using the `splits-file` parameter in the gcloud CLI command. The file must not exceed the API limit of 100 points per API request. For more information, see [Quotas and limits](https://docs.cloud.google.com/spanner/quotas#split-point-limits) .
+ 
+ The file must use the following format to specify the split points:
+ 
+diff --git a/docs/docs.cloud.google.com/spanner/docs/cuds.md b/docs/docs.cloud.google.com/spanner/docs/cuds.md
+index a2d9833..95624eb 100644
+--- a/docs/docs.cloud.google.com/spanner/docs/cuds.md
++++ b/docs/docs.cloud.google.com/spanner/docs/cuds.md
+@@ -33,7 +33,7 @@ If the on-demand rates change after you purchase a commitment, your commitment f
+ 
+ Spanner CUDs automatically apply to your spending on Spanner compute capacity (as measured in nodes or processing units) across projects. This flexibility helps you achieve a high utilization rate of your commitment across regions and projects without manual intervention, saving you time and money.
+ 
+-Spanner CUDs don't apply to your spending on Spanner storage, backup, Data Boost, or outbound data transfer.
++Spanner CUDs don't apply to your spending on Spanner storage, backup, Data Boost for Spanner, or outbound data transfer.
+ 
+ For a list of applicable SKUs, see [Spanner CUD Eligible SKUs](https://cloud.google.com/skus/sku-groups/cloud-spanner-cud-eligible-skus) .
+ 
+@@ -69,7 +69,7 @@ Use the [Spanner pricing page](https://cloud.google.com/spanner/pricing) to get
+ 
+ Based on the results, you can make a commitment amount of `$24.48` per hour to achieve the 20% discount and see the total savings over 1 year:
+ 
+-- Total 1-year committment savings: On-demand cost per month \$22,338 - 1-year commitment cost per month \$17,870.40 = \$4467.60 \* 12 months = **\$53,611.20** .
++- Total 1-year commitment savings: On-demand cost per month \$22,338 - 1-year commitment cost per month \$17,870.40 = \$4467.60 \* 12 months = **\$53,611.20** .
+ 
+ ### Calculate the 3-year commitment cost and discount
+ 
+@@ -82,7 +82,7 @@ Use the [Spanner pricing page](https://cloud.google.com/spanner/pricing) to get
+ 
+ Based on the results, you can make a commitment amount of `$18.36` per hour to achieve the 40% discount and see the total savings over 3 years:
+ 
+-- Total 3-year committment savings: On-demand cost per month \$22,338 - 3-year commitment cost per month \$13,402.80 = \$8935.20 \* 36 months = **\$321,667.20** .
++- Total 3-year commitment savings: On-demand cost per month \$22,338 - 3-year commitment cost per month \$13,402.80 = \$8935.20 \* 36 months = **\$321,667.20** .
+ 
+ ## Recommendations for choosing a commitment
+ 
+diff --git a/docs/docs.cloud.google.com/spanner/docs/data-residency.md b/docs/docs.cloud.google.com/spanner/docs/data-residency.md
+index 493834d..7d264f9 100644
+--- a/docs/docs.cloud.google.com/spanner/docs/data-residency.md
++++ b/docs/docs.cloud.google.com/spanner/docs/data-residency.md
+@@ -43,4 +43,4 @@ The following are by design:
+ 
+ By default, Spanner [encrypts customer data at rest](https://docs.cloud.google.com/docs/security/encryption/default-encryption) . Spanner handles encryption for you without any additional actions on your part. This option is called *Google default encryption* . By default, Google uses encryption keys from the same location as where your data resides.
+ 
+-If you want to control your encryption keys, then you can use *customer-managed encryption keys (CMEKs)* in [Cloud KMS](https://docs.cloud.google.com/kms/docs) with CMEK-integrated services including Spanner. When using CMEK, you must select keys in the same location as where your data resides. For more information, see [Customer-managed encryption keys (CMEK) overview](https://docs.cloud.google.com/spanner/docs/cmek) .
++If you want to control your encryption keys, then you can use *customer-managed encryption keys (CMEKs)* in [Cloud Key Management Service](https://docs.cloud.google.com/kms/docs) with CMEK-integrated services including Spanner. When using CMEK, you must select keys in the same location as where your data resides. For more information, see [Customer-managed encryption keys (CMEK) overview](https://docs.cloud.google.com/spanner/docs/cmek) .
+diff --git a/docs/docs.cloud.google.com/spanner/docs/databases.md b/docs/docs.cloud.google.com/spanner/docs/databases.md
+index 9840f3e..f6285e6 100644
+--- a/docs/docs.cloud.google.com/spanner/docs/databases.md
++++ b/docs/docs.cloud.google.com/spanner/docs/databases.md
+@@ -19,7 +19,7 @@ A database inherits properties from its parent instance, such as its configurati
+ Properties that are set on the database are:
+ 
+ - The [dialect](https://docs.cloud.google.com/spanner/docs/postgresql-interface#choosing_between_and) . Spanner supports GoogleSQL and PostgreSQL. All of the tables in a database must use the same dialect.
+-- An [IAM policy](https://docs.cloud.google.com/spanner/docs/grant-permissions#database-level_permissions) . The access rules defined by this policy are applied to the tables and data inside the database.
++- An [Identity and Access Management (IAM) policy](https://docs.cloud.google.com/spanner/docs/grant-permissions#database-level_permissions) . The access rules defined by this policy are applied to the tables and data inside the database.
+ - The type of encryption key to use. The default is a Google-owned and Google-managed encryption key; a [customer-managed encryption key](https://docs.cloud.google.com/spanner/docs/cmek) is also supported.
+ - [Database deletion protection](https://docs.cloud.google.com/spanner/docs/prevent-database-deletion) to prevent accidental deletion of databases.
+ - Database policies such as the default leader region, query optimizer version, query optimizer statistics package version, and version retention period, can be set or modified with DDL statements. See the DDL reference for [GoogleSQL](https://docs.cloud.google.com/spanner/docs/reference/standard-sql/data-definition-language#alter-database) or [PostgreSQL](https://docs.cloud.google.com/spanner/docs/reference/postgresql/data-definition-language#alter-database) .
+diff --git a/docs/docs.cloud.google.com/spanner/docs/databoost/databoost-applications.md b/docs/docs.cloud.google.com/spanner/docs/databoost/databoost-applications.md
+index ce1769a..bfde302 100644
+--- a/docs/docs.cloud.google.com/spanner/docs/databoost/databoost-applications.md
++++ b/docs/docs.cloud.google.com/spanner/docs/databoost/databoost-applications.md
+@@ -2,7 +2,7 @@
+ name: documents/docs.cloud.google.com/spanner/docs/databoost/databoost-applications
+ uri: https://docs.cloud.google.com/spanner/docs/databoost/databoost-applications
+ title: Use Data Boost in your applications
+-description: Explore various application use cases for Spanner Spanner Data Boost, such as data export, ETL, and federated queries.
++description: Explore various application use cases for Spanner Data Boost, such as data export, ETL, and federated queries.
+ data_source: docs.cloud.google.com
+ ---
+ 
+diff --git a/docs/docs.cloud.google.com/spanner/docs/databoost/databoost-export.md b/docs/docs.cloud.google.com/spanner/docs/databoost/databoost-export.md
+index f78a376..4c62303 100644
+--- a/docs/docs.cloud.google.com/spanner/docs/databoost/databoost-export.md
++++ b/docs/docs.cloud.google.com/spanner/docs/databoost/databoost-export.md
+@@ -2,7 +2,7 @@
+ name: documents/docs.cloud.google.com/spanner/docs/databoost/databoost-export
+ uri: https://docs.cloud.google.com/spanner/docs/databoost/databoost-export
+ title: Export data with Data Boost
+-description: Export data from Spanner using Spanner Data Boost with Dataflow for high-performance, serverless offline access.
++description: Export data from Spanner using Data Boost with Dataflow for high-performance, serverless offline access.
+ data_source: docs.cloud.google.com
+ ---
+ 
+diff --git a/docs/docs.cloud.google.com/spanner/docs/databoost/databoost-monitor.md b/docs/docs.cloud.google.com/spanner/docs/databoost/databoost-monitor.md
+index 8600f40..d88d5e8 100644
+--- a/docs/docs.cloud.google.com/spanner/docs/databoost/databoost-monitor.md
++++ b/docs/docs.cloud.google.com/spanner/docs/databoost/databoost-monitor.md
+@@ -2,15 +2,15 @@
+ name: documents/docs.cloud.google.com/spanner/docs/databoost/databoost-monitor
+ uri: https://docs.cloud.google.com/spanner/docs/databoost/databoost-monitor
+ title: Monitor Data Boost usage
+-description: Monitor Spanner Spanner Data Boost performance and usage using metrics and logs in Cloud Monitoring.
++description: Monitor Spanner Data Boost performance and usage using metrics and logs in Monitoring.
+ data_source: docs.cloud.google.com
+ ---
+ 
+ This page describes how to use Cloud Monitoring and Spanner audit logs to monitor and analyze Spanner Data Boost usage.
+ 
+-Cloud Monitoring provides the ability to track total usage over time and to break down that usage by user. Spanner audit logs allow more flexible usage analysis, including providing metrics by user or by BigQuery job ID.
++Monitoring provides the ability to track total usage over time and to break down that usage by user. Spanner audit logs allow more flexible usage analysis, including providing metrics by user or by BigQuery job ID.
+ 
+-## Use Cloud Monitoring to track Data Boost usage
++## Use Monitoring to track Data Boost usage
+ 
+ Follow these steps to track overall Data Boost usage:
+ 
+@@ -40,9 +40,9 @@ Follow these steps to track overall Data Boost usage:
+ 
+ ## Use audit logs to analyze Data Boost usage
+ 
+-Spanner audit logs allow more flexible analysis of Data Boost usage. In addition to the ability to break down usage over time by instance or principal as with Cloud Monitoring, Spanner audit logs, if enabled and available, allow breaking down usage over time by database or BigQuery job ID.
++Spanner audit logs allow more flexible analysis of Data Boost usage. In addition to the ability to break down usage over time by instance or principal as with Monitoring, Spanner audit logs, if enabled and available, allow breaking down usage over time by database or BigQuery job ID.
+ 
+-Enabling audit logs can incur extra charges. For information about Logging pricing, see [Google Cloud Observability pricing: Cloud Logging](https://cloud.google.com/stackdriver/pricing#logging-costs) .
++Enabling audit logs can incur extra charges. For information about Cloud Logging pricing, see [Google Cloud Observability pricing: Logging](https://cloud.google.com/stackdriver/pricing#logging-costs) .
+ 
+ ### Enable Data Boost usage audit logs
+ 
+diff --git a/docs/docs.cloud.google.com/spanner/docs/databoost/databoost-overview.md b/docs/docs.cloud.google.com/spanner/docs/databoost/databoost-overview.md
+index 3b0cba1..435bad6 100644
+--- a/docs/docs.cloud.google.com/spanner/docs/databoost/databoost-overview.md
++++ b/docs/docs.cloud.google.com/spanner/docs/databoost/databoost-overview.md
+@@ -2,7 +2,7 @@
+ name: documents/docs.cloud.google.com/spanner/docs/databoost/databoost-overview
+ uri: https://docs.cloud.google.com/spanner/docs/databoost/databoost-overview
+ title: Data Boost overview
+-description: Get an overview of Spanner Spanner Data Boost, enabling fast, serverless offline access to your Spanner data.
++description: Get an overview of Spanner Data Boost, enabling fast, serverless offline access to your Spanner data.
+ data_source: docs.cloud.google.com
+ ---
+ 
+diff --git a/docs/docs.cloud.google.com/spanner/docs/databoost/databoost-quotas.md b/docs/docs.cloud.google.com/spanner/docs/databoost/databoost-quotas.md
+index 4b64cbb..f1fff19 100644
+--- a/docs/docs.cloud.google.com/spanner/docs/databoost/databoost-quotas.md
++++ b/docs/docs.cloud.google.com/spanner/docs/databoost/databoost-quotas.md
+@@ -2,7 +2,7 @@
+ name: documents/docs.cloud.google.com/spanner/docs/databoost/databoost-quotas
+ uri: https://docs.cloud.google.com/spanner/docs/databoost/databoost-quotas
+ title: Monitor and manage Data Boost quota usage
+-description: Understand the quotas and limits associated with using Spanner Spanner Data Boost for your data processing workloads.
++description: Understand the quotas and limits associated with using Spanner Data Boost for your data processing workloads.
+ data_source: docs.cloud.google.com
+ ---
+ 
+@@ -104,7 +104,7 @@ If one principal is consistently exceeding the amount of Data Boost resources th
+ 
+ - [Create a notification channel](https://cloud.google.com/monitoring/support/notification-options#creating_channels)
+ 
+-- [Cloud Functions](https://cloud.google.com/functions)
++- [Cloud Run functions](https://cloud.google.com/functions)
+ 
+ - [Remove database-level permissions](https://cloud.google.com/spanner/docs/grant-permissions#remove-iam-db-role)
+ 
+diff --git a/docs/docs.cloud.google.com/spanner/docs/databoost/databoost-run-queries.md b/docs/docs.cloud.google.com/spanner/docs/databoost/databoost-run-queries.md
+index a187b4e..aada2bf 100644
+--- a/docs/docs.cloud.google.com/spanner/docs/databoost/databoost-run-queries.md
++++ b/docs/docs.cloud.google.com/spanner/docs/databoost/databoost-run-queries.md
+@@ -2,7 +2,7 @@
+ name: documents/docs.cloud.google.com/spanner/docs/databoost/databoost-run-queries
+ uri: https://docs.cloud.google.com/spanner/docs/databoost/databoost-run-queries
+ title: Run federated queries with Data Boost
+-description: Run high-performance, serverless queries on Spanner using Spanner Data Boost from BigQuery or Dataflow.
++description: Run high-performance, serverless queries on Spanner using Data Boost from BigQuery or Dataflow.
+ data_source: docs.cloud.google.com
+ ---
+ 
+@@ -23,7 +23,7 @@ Before you can run federated queries with Data Boost, you need to complete the f
+ 
+ - [Enable the BigQuery connection API](https://docs.cloud.google.com/spanner/docs/databoost/databoost-run-queries#enable-bqconnect-API) .
+ 
+-- [Grant the required IAM permissions](https://docs.cloud.google.com/spanner/docs/databoost/databoost-run-queries#grant-databoost-perms) .
++- [Grant the required Identity and Access Management (IAM) permissions](https://docs.cloud.google.com/spanner/docs/databoost/databoost-run-queries#grant-databoost-perms) .
+ 
+ ### Create a Spanner instance and database
+ 
+@@ -46,9 +46,9 @@ For more information, see [BigQuery connection API](https://docs.cloud.google.co
+ A principal must be granted the following permissions to run federated queries with Data Boost:
+ 
+ - `spanner.instances.get` - lets you get the configuration of an instance.
+-- `spanner.databases.useDataBoost` - lets you use the [Spanner Data Boost](https://docs.cloud.google.com/spanner/docs/databoost/databoost-overview) compute resources to process [partitioned queries](https://docs.cloud.google.com/spanner/docs/reads#read_data_in_parallel) .
++- `spanner.databases.useDataBoost` - lets you use the [Data Boost](https://docs.cloud.google.com/spanner/docs/databoost/databoost-overview) compute resources to process [partitioned queries](https://docs.cloud.google.com/spanner/docs/reads#read_data_in_parallel) .
+ 
+-For more information about Spanner permissions, see [Identity and Access Management (IAM) permissions](https://docs.cloud.google.com/spanner/docs/iam#permissions) .
++For more information about Spanner permissions, see [IAM permissions](https://docs.cloud.google.com/spanner/docs/iam#permissions) .
+ 
+ To grant these required permissions, we recommend that you use the `Cloud Spanner Database Reader With DataBoost` ( `roles/spanner.databaseReaderWithDataBoost` ) IAM role. You can add that role to any principal that needs to run federated queries with Data Boost. To learn more about predefined roles in Spanner, see [Predefined roles](https://docs.cloud.google.com/spanner/docs/iam#roles) . To learn how to create a custom IAM role, see [Create a custom role](https://docs.cloud.google.com/iam/docs/creating-custom-roles#creating) .
+ 
+diff --git a/docs/docs.cloud.google.com/spanner/docs/dc-integration.md b/docs/docs.cloud.google.com/spanner/docs/dc-integration.md
+index eb2edb9..36bcb92 100644
+--- a/docs/docs.cloud.google.com/spanner/docs/dc-integration.md
++++ b/docs/docs.cloud.google.com/spanner/docs/dc-integration.md
+@@ -52,7 +52,7 @@ To get the permissions that you need to manage Spanner assets in Knowledge Catal
+   - [Dataplex Catalog Admin](https://docs.cloud.google.com/iam/docs/roles-permissions/dataplex#dataplex.catalogAdmin) ( `roles/dataplex.catalogAdmin` )
+ - Attach or modify aspects:
+   - [Dataplex Catalog Editor](https://docs.cloud.google.com/iam/docs/roles-permissions/dataplex#dataplex.catalogEditor) ( `roles/dataplex.catalogEditor` )
+-  - [Dataplex Entry and EntryLink Owner](https://docs.cloud.google.com/iam/docs/roles-permissions/dataplex#dataplex.entryOwner) ( `roles/dataplex.entryOwner` )
++  - [Knowledge Catalog Entry and EntryLink Owner](https://docs.cloud.google.com/iam/docs/roles-permissions/dataplex#dataplex.entryOwner) ( `roles/dataplex.entryOwner` )
+   - [Dataplex Aspect Type User](https://docs.cloud.google.com/iam/docs/roles-permissions/dataplex#dataplex.aspectTypeUser) ( `roles/dataplex.aspectTypeUser` )
+ 
+ For more information about granting roles, see [Manage access to projects, folders, and organizations](https://docs.cloud.google.com/iam/docs/granting-changing-revoking-access) .
+@@ -320,5 +320,5 @@ To import aspects for multiple entries in batch from Cloud Storage, run a [metad
+ - Learn more about [metadata management in Knowledge Catalog](https://docs.cloud.google.com/knowledge-catalog/docs/metadata-overview) .
+ - Learn how to [search for data assets in Knowledge Catalog](https://docs.cloud.google.com/knowledge-catalog/docs/search-assets) .
+ - Learn how to [manage aspects and enrich metadata](https://docs.cloud.google.com/knowledge-catalog/docs/enrich-entries-metadata) .
+-- Learn more about [Knowledge Catalog IAM roles](https://docs.cloud.google.com/knowledge-catalog/docs/iam-roles) and [permissions](https://docs.cloud.google.com/knowledge-catalog/docs/iam-permissions) .
++- Learn more about [Knowledge Catalog Identity and Access Management (IAM) roles](https://docs.cloud.google.com/knowledge-catalog/docs/iam-roles) and [permissions](https://docs.cloud.google.com/knowledge-catalog/docs/iam-permissions) .
+ - Explore [Fine-grained access control in Spanner](https://docs.cloud.google.com/spanner/docs/fgac-about) .
+diff --git a/docs/docs.cloud.google.com/spanner/docs/dml-tasks.md b/docs/docs.cloud.google.com/spanner/docs/dml-tasks.md
+index 517b8ed..0e183bc 100644
+--- a/docs/docs.cloud.google.com/spanner/docs/dml-tasks.md
++++ b/docs/docs.cloud.google.com/spanner/docs/dml-tasks.md
+@@ -2,11 +2,11 @@
+ name: documents/docs.cloud.google.com/spanner/docs/dml-tasks
+ uri: https://docs.cloud.google.com/spanner/docs/dml-tasks
+ title: Insert, update, and delete data using data manipulation language (DML)
+-description: Manage data in Spanner using DML statements with client libraries, the {{dynamic_data.site_values.cloud_name_short}} console, and Google Cloud CLI.
++description: Manage data in Spanner using DML statements with client libraries, the {{dynamic_data.site_values.cloud_name_short}} console, and gcloud CLI.
+ data_source: docs.cloud.google.com
+ ---
+ 
+-This page describes how to insert, update, and delete Spanner data using Data Manipulation Language (DML) statements. You can run DML statements using the [client libraries](https://docs.cloud.google.com/spanner/docs/dml-tasks#client-library-dml) , the [Google Cloud console](https://docs.cloud.google.com/spanner/docs/modify-data) , and the [`gcloud`](https://docs.cloud.google.com/spanner/docs/modify-gcloud) command-line tool. You can run [Partitioned DML](https://docs.cloud.google.com/spanner/docs/dml-partitioned) statements using the client libraries and the [`gcloud`](https://docs.cloud.google.com/spanner/docs/modify-gcloud) command-line tool.
++This page describes how to insert, update, and delete Spanner data using Data Manipulation Language (DML) statements. You can run DML statements using the [client libraries](https://docs.cloud.google.com/spanner/docs/dml-tasks#client-library-dml) , the [Google Cloud console](https://docs.cloud.google.com/spanner/docs/modify-data) , and the [Google Cloud CLI](https://docs.cloud.google.com/spanner/docs/modify-gcloud) . You can run [Partitioned DML](https://docs.cloud.google.com/spanner/docs/dml-partitioned) statements using the client libraries and the [gcloud CLI](https://docs.cloud.google.com/spanner/docs/modify-gcloud) .
+ 
+ For the complete DML syntax reference, see [Data Manipulation Language syntax](https://docs.cloud.google.com/spanner/docs/reference/standard-sql/dml-syntax) for GoogleSQL-dialect databases or [PostgreSQL data manipulation language](https://docs.cloud.google.com/spanner/docs/reference/postgresql/dml-syntax) for PostgreSQL-dialect databases
+ 
+@@ -14,7 +14,7 @@ For the complete DML syntax reference, see [Data Manipulation Language syntax](h
+ 
+ ## Use DML
+ 
+-DML supports `INSERT` , `UPDATE` , and `DELETE` statements in the Google Cloud console, Google Cloud CLI, and client libraries.
++DML supports `INSERT` , `UPDATE` , and `DELETE` statements in the Google Cloud console, gcloud CLI, and client libraries.
+ 
+ ### Locking
+ 
+@@ -101,7 +101,7 @@ Use the following steps to execute a DML statement in the Google Cloud console.
+ 
+ > **Note:** When you click **Run query** , the transaction commits automatically.
+ 
+-### Execute statements with the Google Cloud CLI
++### Execute statements with the gcloud CLI
+ 
+ To execute DML statements, use the `gcloud spanner databases execute-sql` command. The following example adds a new row to the `Singers` table.
+ 
+@@ -3520,13 +3520,13 @@ end
+ 
+ ### Get the query plan
+ 
+-You can [retrieve a query plan](https://docs.cloud.google.com/spanner/docs/sql-best-practices#how-execute-queries) using the Google Cloud console, the client libraries, and the `gcloud` command-line tool.
++You can [retrieve a query plan](https://docs.cloud.google.com/spanner/docs/sql-best-practices#how-execute-queries) using the Google Cloud console, the client libraries, and the gcloud CLI.
+ 
+ ## Use Partitioned DML
+ 
+ [Partitioned DML](https://docs.cloud.google.com/spanner/docs/dml-partitioned) is designed for bulk updates and deletes, particularly periodic cleanup and backfilling.
+ 
+-### Execute statements with the Google Cloud CLI
++### Execute statements with the gcloud CLI
+ 
+ To execute a Partitioned DML statement, use the `gcloud spanner databases execute-sql` command with the `--enable-partitioned-dml` option. The following example updates rows in the `Albums` table.
+ 
+diff --git a/docs/docs.cloud.google.com/spanner/docs/drivers-overview.md b/docs/docs.cloud.google.com/spanner/docs/drivers-overview.md
+index 745f749..4d64051 100644
+--- a/docs/docs.cloud.google.com/spanner/docs/drivers-overview.md
++++ b/docs/docs.cloud.google.com/spanner/docs/drivers-overview.md
+@@ -30,7 +30,7 @@ You can also use the Spanner client libraries to access the Spanner API. For mor
+ | [Request priority](https://docs.cloud.google.com/spanner/docs/reference/rest/v1/RequestOptions#Priority)           |                                                                                    |                                                                                     |                                                                         |                                                                                                                       |                                                                         |                                                                      |                                                                   |                                                                                     |                                                                               |                                                                                                                          |                                                                                                                                  |
+ | [JSON type](https://docs.cloud.google.com/spanner/docs/working-with-json)                                          |                                                                                    |                                                                                     |                                                                         |                                                                                                                       |                                                                         |                                                                      |                                                                   |                                                                                     |                                                                               |                                                                                                                          |                                                                                                                                  |
+ | [Request tagging](https://docs.cloud.google.com/spanner/docs/introspection/troubleshooting-with-tags)              |                                                                                    |                                                                                     |                                                                         |                                                                                                                       |                                                                         |                                                                      |                                                                   |                                                                                     |                                                                               |                                                                                                                          |                                                                                                                                  |
+-| [Google SQL dialect](https://docs.cloud.google.com/spanner/docs/reference/standard-sql/overview)                   |                                                                                    |                                                                                     |                                                                         |                                                                                                                       |                                                                         |                                                                      |                                                                   |                                                                                     |                                                                               |                                                                                                                          |                                                                                                                                  |
++| [GoogleSQL dialect](https://docs.cloud.google.com/spanner/docs/reference/standard-sql/overview)                    |                                                                                    |                                                                                     |                                                                         |                                                                                                                       |                                                                         |                                                                      |                                                                   |                                                                                     |                                                                               |                                                                                                                          |                                                                                                                                  |
+ | [PostgreSQL dialect](https://docs.cloud.google.com/spanner/docs/postgresql/overview)                               |                                                                                    |                                                                                     |                                                                         |                                                                                                                       |                                                                         |                                                                      |                                                                   |                                                                                     |                                                                               |                                                                                                                          |                                                                                                                                  |
+ | Limitations                                                                                                        | N/A                                                                                | [View](https://github.com/googleapis/go-gorm-spanner/blob/main/docs/limitations.md) | N/A                                                                     | [View](https://github.com/GoogleCloudPlatform/google-cloud-spanner-hibernate#cloud-spanner-hibernate-orm-limitations) | N/A                                                                     | N/A                                                                  | N/A                                                               | [View](https://github.com/googleapis/dotnet-spanner-entity-framework#limitations)   | [View](https://github.com/googleapis/ruby-spanner-activerecord#limitations)   | [View](https://github.com/googleapis/google-cloud-python/tree/main/packages/sqlalchemy-spanner#features-and-limitations) | [View](https://github.com/googleapis/google-cloud-python/blob/main/packages/django-google-spanner/docs/limitations.rst)          |
+ 
+diff --git a/docs/docs.cloud.google.com/spanner/docs/editions-overview.md b/docs/docs.cloud.google.com/spanner/docs/editions-overview.md
+index eb47cb3..443547a 100644
+--- a/docs/docs.cloud.google.com/spanner/docs/editions-overview.md
++++ b/docs/docs.cloud.google.com/spanner/docs/editions-overview.md
+@@ -27,7 +27,7 @@ The following table lists the features available for each edition.
+ | Multi-model capabilities                                                             | Relational ( [GoogleSQL](https://docs.cloud.google.com/spanner/docs/reference/standard-sql/overview) , [PostgreSQL](https://docs.cloud.google.com/spanner/docs/reference/postgresql/overview) ) [Key-value](https://docs.cloud.google.com/spanner/docs/non-relational/overview)               | Relational ( [GoogleSQL](https://docs.cloud.google.com/spanner/docs/reference/standard-sql/overview) , [PostgreSQL](https://docs.cloud.google.com/spanner/docs/reference/postgresql/overview) ) [Key-value](https://docs.cloud.google.com/spanner/docs/non-relational/overview) [Spanner Graph](https://docs.cloud.google.com/spanner/docs/graph/overview)                                                                                                                                   | Relational ( [GoogleSQL](https://docs.cloud.google.com/spanner/docs/reference/standard-sql/overview) , [PostgreSQL](https://docs.cloud.google.com/spanner/docs/reference/postgresql/overview) ) [Key-value](https://docs.cloud.google.com/spanner/docs/non-relational/overview) [Spanner Graph](https://docs.cloud.google.com/spanner/docs/graph/overview)                                                                                                                                                                                                                   |
+ | Search capabilities                                                                  | —                                                                                                                                                                                                                                                                                             | [Full-text search](https://docs.cloud.google.com/spanner/docs/full-text-search) Vector search ( [KNN](https://docs.cloud.google.com/spanner/docs/find-k-nearest-neighbors) , [ANN](https://docs.cloud.google.com/spanner/docs/find-approximate-nearest-neighbors) )                                                                                                                                                                                                                          | [Full-text search](https://docs.cloud.google.com/spanner/docs/full-text-search) Vector search ( [KNN](https://docs.cloud.google.com/spanner/docs/find-k-nearest-neighbors) , [ANN](https://docs.cloud.google.com/spanner/docs/find-approximate-nearest-neighbors) )                                                                                                                                                                                                                                                                                                          |
+ | Resource management                                                                  | [Open source Autoscaler](https://docs.cloud.google.com/spanner/docs/autoscaler-tool-overview)                                                                                                                                                                                                 | [Open source Autoscaler](https://docs.cloud.google.com/spanner/docs/autoscaler-tool-overview) [Managed autoscaler](https://docs.cloud.google.com/spanner/docs/managed-autoscaler) [Asymmetric read-only autoscaling](https://docs.cloud.google.com/spanner/docs/managed-autoscaler#asymmetric-read-only-autoscaling) [Locality groups](https://docs.cloud.google.com/spanner/docs/create-manage-locality-groups) [Tiered storage](https://docs.cloud.google.com/spanner/docs/tiered-storage) | [Open source Autoscaler](https://docs.cloud.google.com/spanner/docs/autoscaler-tool-overview) [Managed autoscaler](https://docs.cloud.google.com/spanner/docs/managed-autoscaler) [Asymmetric read-only autoscaling](https://docs.cloud.google.com/spanner/docs/managed-autoscaler#asymmetric-read-only-autoscaling) [Locality groups](https://docs.cloud.google.com/spanner/docs/create-manage-locality-groups) [Tiered storage](https://docs.cloud.google.com/spanner/docs/tiered-storage) [Geo-partitioning](https://docs.cloud.google.com/spanner/docs/geo-partitioning) |
+-| Analytics                                                                            | [BigQuery federation](https://docs.cloud.google.com/bigquery/docs/spanner-federated-queries) [Spanner Data Boost](https://docs.cloud.google.com/spanner/docs/databoost/databoost-overview) [Reverse ETL (BigQuery to Spanner)](https://docs.cloud.google.com/bigquery/docs/export-to-spanner) | [Columnar engine](https://docs.cloud.google.com/spanner/docs/columnar-engine) [BigQuery federation](https://docs.cloud.google.com/bigquery/docs/spanner-federated-queries) [Spanner Data Boost](https://docs.cloud.google.com/spanner/docs/databoost/databoost-overview) [Reverse ETL (BigQuery to Spanner)](https://docs.cloud.google.com/bigquery/docs/export-to-spanner)                                                                                                                  | [Columnar engine](https://docs.cloud.google.com/spanner/docs/columnar-engine) [BigQuery federation](https://docs.cloud.google.com/bigquery/docs/spanner-federated-queries) [Spanner Data Boost](https://docs.cloud.google.com/spanner/docs/databoost/databoost-overview) [Reverse ETL (BigQuery to Spanner)](https://docs.cloud.google.com/bigquery/docs/export-to-spanner)                                                                                                                                                                                                  |
++| Analytics                                                                            | [BigQuery federation](https://docs.cloud.google.com/bigquery/docs/spanner-federated-queries) [Spanner Data Boost](https://docs.cloud.google.com/spanner/docs/databoost/databoost-overview) [Reverse ETL (BigQuery to Spanner)](https://docs.cloud.google.com/bigquery/docs/export-to-spanner) | [Columnar engine](https://docs.cloud.google.com/spanner/docs/columnar-engine) [BigQuery federation](https://docs.cloud.google.com/bigquery/docs/spanner-federated-queries) [Data Boost](https://docs.cloud.google.com/spanner/docs/databoost/databoost-overview) [Reverse ETL (BigQuery to Spanner)](https://docs.cloud.google.com/bigquery/docs/export-to-spanner)                                                                                                                          | [Columnar engine](https://docs.cloud.google.com/spanner/docs/columnar-engine) [BigQuery federation](https://docs.cloud.google.com/bigquery/docs/spanner-federated-queries) [Data Boost](https://docs.cloud.google.com/spanner/docs/databoost/databoost-overview) [Reverse ETL (BigQuery to Spanner)](https://docs.cloud.google.com/bigquery/docs/export-to-spanner)                                                                                                                                                                                                          |
+ | Data protection                                                                      | [Standard backups](https://docs.cloud.google.com/spanner/docs/backup) [7-day PITR](https://docs.cloud.google.com/spanner/docs/pitr) [Scheduled backups](https://docs.cloud.google.com/spanner/docs/backup#backup-schedules)                                                                   | [Standard backups](https://docs.cloud.google.com/spanner/docs/backup) [7-day PITR](https://docs.cloud.google.com/spanner/docs/pitr) [Scheduled backups](https://docs.cloud.google.com/spanner/docs/backup#backup-schedules) [Incremental backups](https://docs.cloud.google.com/spanner/docs/backup#incremental-backups)                                                                                                                                                                     | [Standard backups](https://docs.cloud.google.com/spanner/docs/backup) [7-day PITR](https://docs.cloud.google.com/spanner/docs/pitr) [Scheduled backups](https://docs.cloud.google.com/spanner/docs/backup#backup-schedules) [Incremental backups](https://docs.cloud.google.com/spanner/docs/backup#incremental-backups)                                                                                                                                                                                                                                                     |
+ | [CUDs](https://docs.cloud.google.com/spanner/docs/cuds)                              | 20% for 1 year 40% for 3 years                                                                                                                                                                                                                                                                | 20% for 1 year 40% for 3 years                                                                                                                                                                                                                                                                                                                                                                                                                                                               | 20% for 1 year 40% for 3 years                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+ 
+diff --git a/docs/docs.cloud.google.com/spanner/docs/emulator.md b/docs/docs.cloud.google.com/spanner/docs/emulator.md
+index f382c12..55420d1 100644
+--- a/docs/docs.cloud.google.com/spanner/docs/emulator.md
++++ b/docs/docs.cloud.google.com/spanner/docs/emulator.md
+@@ -2,13 +2,13 @@
+ name: documents/docs.cloud.google.com/spanner/docs/emulator
+ uri: https://docs.cloud.google.com/spanner/docs/emulator
+ title: Emulate Spanner locally
+-description: Develop and test applications locally using the Spanner emulator. Run it via the Google Cloud CLI or Docker.
++description: Develop and test applications locally using the Spanner emulator. Run it via the gcloud CLI or Docker.
+ data_source: docs.cloud.google.com
+ ---
+ 
+-The [gcloud CLI](https://docs.cloud.google.com/sdk) provides a local, in-memory emulator to develop and test your applications. Because the emulator stores data only in memory, it loses all state, including data, schema, and configs, on restart. The emulator offers the same APIs as the Spanner production service and serves local development and testing, not production deployments.
++The [Google Cloud CLI](https://docs.cloud.google.com/sdk) provides a local, in-memory emulator to develop and test your applications. Because the emulator stores data only in memory, it loses all state, including data, schema, and configs, on restart. The emulator offers the same APIs as the Spanner production service and serves local development and testing, not production deployments.
+ 
+-The emulator supports both the GoogleSQL and PostgreSQL dialects. It supports all languages of the [client libraries](https://docs.cloud.google.com/spanner/docs/emulator#client-libraries) . You can also use the emulator with the [Google Cloud CLI](https://docs.cloud.google.com/sdk/gcloud) and [REST APIs](https://docs.cloud.google.com/spanner/docs/reference/rest) .
++The emulator supports both the GoogleSQL and PostgreSQL dialects. It supports all languages of the [client libraries](https://docs.cloud.google.com/spanner/docs/emulator#client-libraries) . You can also use the emulator with the [gcloud CLI](https://docs.cloud.google.com/sdk/gcloud) and [REST APIs](https://docs.cloud.google.com/spanner/docs/reference/rest) .
+ 
+ The emulator is also available as an open source project in [GitHub](https://github.com/GoogleCloudPlatform/cloud-spanner-emulator) .
+ 
+@@ -46,7 +46,7 @@ Choose the way that is appropriate for your application development and test wor
+ 
+ ### Run the emulator using gcloud CLI
+ 
+-To run the emulator using the Google Cloud CLI:
++To run the emulator using the gcloud CLI:
+ 
+ 1.  Install the `cloud-spanner-emulator` component:
+ 
+diff --git a/docs/docs.cloud.google.com/spanner/docs/encryption-in-transit.md b/docs/docs.cloud.google.com/spanner/docs/encryption-in-transit.md
+index 91a0248..13858bc 100644
+--- a/docs/docs.cloud.google.com/spanner/docs/encryption-in-transit.md
++++ b/docs/docs.cloud.google.com/spanner/docs/encryption-in-transit.md
+@@ -16,6 +16,6 @@ Spanner APIs are hosted on Google Front Ends (GFEs) and [encrypt data in transit
+ 
+ ## What's next
+ 
+-- Learn more about [Access control with IAM](https://docs.cloud.google.com/spanner/docs/iam) .
++- Learn more about [Access control with Identity and Access Management (IAM)](https://docs.cloud.google.com/spanner/docs/iam) .
+ - Learn more about [Fine-grained access control](https://docs.cloud.google.com/spanner/docs/fgac-about) .
+ - Learn more about [Customer-managed encryption keys (CMEK)](https://docs.cloud.google.com/spanner/docs/cmek) .
+diff --git a/docs/docs.cloud.google.com/spanner/docs/export.md b/docs/docs.cloud.google.com/spanner/docs/export.md
+index ddc49ef..9d8962d 100644
+--- a/docs/docs.cloud.google.com/spanner/docs/export.md
++++ b/docs/docs.cloud.google.com/spanner/docs/export.md
+@@ -50,7 +50,7 @@ To get the permissions that you need to export a database, ask your administrato
+ 
+ > **Note:** The Spanner Database Admin role is only required for import jobs.
+ 
+-To use the independent compute resources of Spanner Data Boost during an export, you also need the `spanner.databases.useDataBoost` IAM permission. For more information, see [Data Boost overview](https://docs.cloud.google.com/spanner/docs/databoost/databoost-overview) .
++To use the independent compute resources of Spanner Data Boost during an export, you also need the `spanner.databases.useDataBoost` Identity and Access Management (IAM) permission. For more information, see [Data Boost overview](https://docs.cloud.google.com/spanner/docs/databoost/databoost-overview) .
+ 
+ ## Export a database
+ 
+@@ -95,7 +95,7 @@ To export your Spanner database to a Cloud Storage bucket, follow these steps:
+ 
+     This option does not affect the destination Cloud Storage bucket-level encryption. To enable CMEK for your Cloud Storage bucket, refer to [Use CMEK with Cloud Storage](https://docs.cloud.google.com/storage/docs/encryption/using-customer-managed-keys) .
+ 
+-11. Optional: To export using Spanner Data Boost, select the **Use Spanner Data Boost** checkbox. For more information, see [Data Boost overview](https://docs.cloud.google.com/spanner/docs/databoost/databoost-overview) .
++11. Optional: To export using Data Boost, select the **Use Spanner Data Boost** checkbox. For more information, see [Data Boost overview](https://docs.cloud.google.com/spanner/docs/databoost/databoost-overview) .
+ 
+ 12. Select the checkbox under **Confirm charges** to acknowledge that there are charges in addition to those incurred by your existing Spanner instance.
+ 
+diff --git a/docs/docs.cloud.google.com/spanner/docs/fgac-about.md b/docs/docs.cloud.google.com/spanner/docs/fgac-about.md
+index c0c0b59..082a18b 100644
+--- a/docs/docs.cloud.google.com/spanner/docs/fgac-about.md
++++ b/docs/docs.cloud.google.com/spanner/docs/fgac-about.md
+@@ -2,11 +2,11 @@
+ name: documents/docs.cloud.google.com/spanner/docs/fgac-about
+ uri: https://docs.cloud.google.com/spanner/docs/fgac-about
+ title: Fine-grained access control overview
+-description: Use FGAC in Spanner to define table and column-level permissions using roles.
++description: Use fine-grained access control in Spanner to define table and column-level permissions using roles.
+ data_source: docs.cloud.google.com
+ ---
+ 
+-Spanner fine-grained access control combines the benefits of [Identity and Access Management](https://docs.cloud.google.com/iam/docs) (IAM) with SQL role-based access control. With fine-grained access control, you define database roles, grant privileges to the roles, and create IAM policies to grant permissions on database roles to IAM principals. This page describes how to use fine-grained access control with Spanner for GoogleSQL-dialect databases and PostgreSQL-dialect databases.
++Spanner fine-grained access control combines the benefits of [Identity and Access Management (IAM)](https://docs.cloud.google.com/iam/docs) with SQL role-based access control. With fine-grained access control, you define database roles, grant privileges to the roles, and create IAM policies to grant permissions on database roles to IAM principals. This page describes how to use fine-grained access control with Spanner for GoogleSQL-dialect databases and PostgreSQL-dialect databases.
+ 
+ As an administrator, you must enable fine-grained access control for individual IAM principals. Principals for whom fine-grained access control is enabled ("fine-grained access control users") must assume a database role to access Spanner resources.
+ 
+diff --git a/docs/docs.cloud.google.com/spanner/docs/fgac-change-streams.md b/docs/docs.cloud.google.com/spanner/docs/fgac-change-streams.md
+index 8aba90f..dad5e92 100644
+--- a/docs/docs.cloud.google.com/spanner/docs/fgac-change-streams.md
++++ b/docs/docs.cloud.google.com/spanner/docs/fgac-change-streams.md
+@@ -2,7 +2,7 @@
+ name: documents/docs.cloud.google.com/spanner/docs/fgac-change-streams
+ uri: https://docs.cloud.google.com/spanner/docs/fgac-change-streams
+ title: Fine-grained access control for change streams
+-description: Control access to Spanner change streams using FGAC and grant EXECUTE privilege on table-valued functions.
++description: Control access to Spanner change streams using fine-grained access control and grant EXECUTE privilege on table-valued functions.
+ data_source: docs.cloud.google.com
+ ---
+ 
+@@ -90,7 +90,7 @@ Row filtering also applies to the following metadata views for change stream rea
+ 
+ ## Caveats
+ 
+-- Change streams use a metadata database to maintain internal state. The metadata database can be the same as or different from the application database. We recommend that you use a different database. However, for fine-grained access control users, the metadata database can't be the same as the application database. This is because the IAM principal that runs the Dataflow job needs read or write access at the database level for the metadata database. This would override the fine-grained access control privileges that were configured for the application database.
++- Change streams use a metadata database to maintain internal state. The metadata database can be the same as or different from the application database. We recommend that you use a different database. However, for fine-grained access control users, the metadata database can't be the same as the application database. This is because the Identity and Access Management (IAM) principal that runs the Dataflow job needs read or write access at the database level for the metadata database. This would override the fine-grained access control privileges that were configured for the application database.
+ 
+   For more information, see [Consider a separate metadata database](https://docs.cloud.google.com/spanner/docs/change-streams/manage#why-metadata) .
+ 
+diff --git a/docs/docs.cloud.google.com/spanner/docs/fgac-models.md b/docs/docs.cloud.google.com/spanner/docs/fgac-models.md
+index 7af4fa3..020650c 100644
+--- a/docs/docs.cloud.google.com/spanner/docs/fgac-models.md
++++ b/docs/docs.cloud.google.com/spanner/docs/fgac-models.md
+@@ -2,7 +2,7 @@
+ name: documents/docs.cloud.google.com/spanner/docs/fgac-models
+ uri: https://docs.cloud.google.com/spanner/docs/fgac-models
+ title: Fine-grained access control for models
+-description: Control access to Spanner models using FGAC and the EXECUTE privilege for machine learning functions.
++description: Control access to Spanner models using fine-grained access control and the EXECUTE privilege for machine learning functions.
+ data_source: docs.cloud.google.com
+ ---
+ 
+diff --git a/docs/docs.cloud.google.com/spanner/docs/fgac-privileges.md b/docs/docs.cloud.google.com/spanner/docs/fgac-privileges.md
+index 8400cb6..35348a3 100644
+--- a/docs/docs.cloud.google.com/spanner/docs/fgac-privileges.md
++++ b/docs/docs.cloud.google.com/spanner/docs/fgac-privileges.md
+@@ -2,7 +2,7 @@
+ name: documents/docs.cloud.google.com/spanner/docs/fgac-privileges
+ uri: https://docs.cloud.google.com/spanner/docs/fgac-privileges
+ title: Fine-grained access control privileges
+-description: Understand the privileges used in Spanner FGAC, such as SELECT, INSERT, UPDATE, DELETE, and EXECUTE.
++description: Understand the privileges used in Spanner fine-grained access control, such as SELECT, INSERT, UPDATE, DELETE, and EXECUTE.
+ data_source: docs.cloud.google.com
+ ---
+ 
+@@ -51,7 +51,7 @@ Allows the role to read or query from a table, view, change stream, sequence, or
+ 
+   Suppose that the database role `Analyst` performs the query `SELECT * FROM AlbumsBudget` . The role only needs `SELECT` privilege on the view. It doesn't need the `SELECT` privilege on the three referenced columns or on the `Albums` table.
+ 
+-- After granting `SELECT` on a subset of columns for a table, the FGAC user can no longer use `SELECT *` on that table. Queries on that table must name all columns to be included.
++- After granting `SELECT` on a subset of columns for a table, the fine-grained access control user can no longer use `SELECT *` on that table. Queries on that table must name all columns to be included.
+ 
+ - `SELECT` granted on a generated column doesn't grant `SELECT` on the underlying base columns.
+ 
+diff --git a/docs/docs.cloud.google.com/spanner/docs/fgac-sequences.md b/docs/docs.cloud.google.com/spanner/docs/fgac-sequences.md
+index 00fe114..13bbfad 100644
+--- a/docs/docs.cloud.google.com/spanner/docs/fgac-sequences.md
++++ b/docs/docs.cloud.google.com/spanner/docs/fgac-sequences.md
+@@ -2,7 +2,7 @@
+ name: documents/docs.cloud.google.com/spanner/docs/fgac-sequences
+ uri: https://docs.cloud.google.com/spanner/docs/fgac-sequences
+ title: Fine-grained access control for sequences
+-description: Control access to sequences in Spanner using FGAC, granting USAGE privilege to database roles.
++description: Control access to sequences in Spanner using fine-grained access control, granting USAGE privilege to database roles.
+ data_source: docs.cloud.google.com
+ ---
+ 
+diff --git a/docs/docs.cloud.google.com/spanner/docs/fgac-system-roles.md b/docs/docs.cloud.google.com/spanner/docs/fgac-system-roles.md
+index e723803..dda7fea 100644
+--- a/docs/docs.cloud.google.com/spanner/docs/fgac-system-roles.md
++++ b/docs/docs.cloud.google.com/spanner/docs/fgac-system-roles.md
+@@ -10,7 +10,7 @@ This page defines the characteristics, constraints, and intended use of the thre
+ 
+ ### `public` system role
+ 
+-- All fine-grained access control users have IAM membership in `public` by default.
++- All fine-grained access control users have Identity and Access Management (IAM) membership in `public` by default.
+ 
+ - All database roles inherit privileges from this role.
+ 
+diff --git a/docs/docs.cloud.google.com/spanner/docs/find-hotspots-in-database.md b/docs/docs.cloud.google.com/spanner/docs/find-hotspots-in-database.md
+index 7418fef..83983fc 100644
+--- a/docs/docs.cloud.google.com/spanner/docs/find-hotspots-in-database.md
++++ b/docs/docs.cloud.google.com/spanner/docs/find-hotspots-in-database.md
+@@ -28,9 +28,9 @@ Data retention policies for the Hotspot insights charts and the TopN splits tabl
+ 
+ ## Required roles
+ 
+-You might need different IAM roles and permissions, depending on whether you are an IAM user or a fine-grained access control user.
++You might need different Identity and Access Management (IAM) roles and permissions, depending on whether you are an IAM user or a fine-grained access control user.
+ 
+-### Identity and Access Management (IAM) user
++### IAM user
+ 
+ To get the permissions that you need to view the **Hotspot insights** page, ask your administrator to grant you the following IAM roles on the instance:
+ 
+@@ -77,7 +77,7 @@ The dashboard includes the following elements:
+ - **Time range filter** : filters the peak splits CPU usage by 1-minute increments up to a total of 6 hours.
+ - **TopN splits table** : displays the list of top splits sorted by split CPU usage scores.
+ 
+-![The Hotspot Insights dashboard in Spanner, showing a graph of peak split CPU usage, a database selector, a time range filter, and a table of the top N hot splits.](https://docs.cloud.google.com/static/spanner/docs/images/hotspot-insights.png)
++![The Hotspot insights dashboard in Spanner, showing a graph of peak split CPU usage, a database selector, a time range filter, and a table of the top N hot splits.](https://docs.cloud.google.com/static/spanner/docs/images/hotspot-insights.png)
+ 
+ **Understanding data in the TopN Splits Table:** The **TopN splits** table populates data from the underlying `SPANNER_SYS.SPLIT_STATS_TOP_*` tables based on the time range you select. For more information, see [Hot split statistics data retention](https://docs.cloud.google.com/spanner/docs/introspection/hot-split-statistics#data-retention) .
+ 
+diff --git a/docs/docs.cloud.google.com/spanner/docs/free-trial-instance.md b/docs/docs.cloud.google.com/spanner/docs/free-trial-instance.md
+index fa7a00c..650fb37 100644
+--- a/docs/docs.cloud.google.com/spanner/docs/free-trial-instance.md
++++ b/docs/docs.cloud.google.com/spanner/docs/free-trial-instance.md
+@@ -90,7 +90,7 @@ The free trial instance is subject to the following limitations:
+ - Free trial instances don't support [backup and restore](https://docs.cloud.google.com/spanner/docs/backup) .
+ - Free trial instances don't support [customer-managed encryption keys (CMEK)](https://docs.cloud.google.com/spanner/docs/cmek) .
+ - Spanner free trial instances are available in all [regional configurations](https://docs.cloud.google.com/spanner/docs/instance-configurations#available-configurations-regional) . They aren't available in [dual-region](https://docs.cloud.google.com/spanner/docs/instance-configurations#dual-region-configurations) or [multi-region configurations](https://docs.cloud.google.com/spanner/docs/instance-configurations#multi-region-configurations) .
+-- [Data Boost](https://docs.cloud.google.com/spanner/docs/databoost/databoost-overview) , and graph algorithms that rely on it, are not available.
++- [Spanner Data Boost](https://docs.cloud.google.com/spanner/docs/databoost/databoost-overview) , and graph algorithms that rely on it, are not available.
+ 
+ The free trial instance is meant for evaluation purposes. It is not meant for the following use cases:
+ 
+@@ -112,7 +112,7 @@ A Spanner free trial instance can provide around 500 queries per second (QPS) of
+ You can monitor and optimize the performance of your free trial instance with the help of:
+ 
+ - [Monitoring charts and metrics](https://docs.cloud.google.com/spanner/docs/monitoring-console#charts-metrics)
+-- [Query Insights](https://docs.cloud.google.com/spanner/docs/using-query-insights)
++- [Query insights](https://docs.cloud.google.com/spanner/docs/using-query-insights)
+ - [Query plan visualizer](https://docs.cloud.google.com/spanner/docs/tune-query-with-visualizer)
+ - [Introspection tools](https://docs.cloud.google.com/spanner/docs/introspection)
+ - [Spanner Key Visualizer](https://docs.cloud.google.com/spanner/docs/key-visualizer)
+diff --git a/docs/docs.cloud.google.com/spanner/docs/free-trial-quickstart.md b/docs/docs.cloud.google.com/spanner/docs/free-trial-quickstart.md
+index adb9ea6..1394130 100644
+--- a/docs/docs.cloud.google.com/spanner/docs/free-trial-quickstart.md
++++ b/docs/docs.cloud.google.com/spanner/docs/free-trial-quickstart.md
+@@ -66,7 +66,7 @@ On the **Create your free trial instance** page, do the following:
+ 
+ 4.  Click **Create free instance** .
+ 
+-    After you create your free trial instance, Spanner creates a sample database for you to explore and familiarize yourself with Spanner features. For more information, see [Free trial instances overview](https://docs.cloud.google.com/spanner/docs/free-trial-instance) .
++    After you create your free trial instance, Spanner creates a sample database for you to explore and familiarize yourself with Spanner features. For more information, see [Spanner free trial instances overview](https://docs.cloud.google.com/spanner/docs/free-trial-instance) .
+ 
+ ### gcloud
+ 
+@@ -117,7 +117,7 @@ You can view the tables and data in the sample database. You can also access and
+ 
+ Spanner also offers an open source [sample application](https://github.com/GoogleCloudPlatform/cloud-spanner-samples) to help you get started with the Spanner free trial instance. The sample application consists of a backend gRPC service backed by a Spanner database and a workload generator that drives traffic to the service.
+ 
+-You can access the sample application by using the Google Cloud CLI.
++You can access the sample application by using the gcloud CLI.
+ 
+ ### gcloud
+ 
+diff --git a/docs/docs.cloud.google.com/spanner/docs/getting-started/gcloud.md b/docs/docs.cloud.google.com/spanner/docs/getting-started/gcloud.md
+index caca721..0143ada 100644
+--- a/docs/docs.cloud.google.com/spanner/docs/getting-started/gcloud.md
++++ b/docs/docs.cloud.google.com/spanner/docs/getting-started/gcloud.md
+@@ -73,7 +73,7 @@ gcloud spanner instances create test-instance --config=regional-us-central1 \
+     --description="My Instance" --nodes=1
+ ```
+ 
+-In the command above, the instance name is set to `test-instance` and `--description` sets the display name of the instance. Both of these values must be unique within a Google Cloud Platform project.
++In the command above, the instance name is set to `test-instance` and `--description` sets the display name of the instance. Both of these values must be unique within a Google Cloud project.
+ 
+ > **Note:** Use the instance ID, not the display name, when referring to an instance in `gcloud` commands.
+ 
+diff --git a/docs/docs.cloud.google.com/spanner/docs/instance-configurations.md b/docs/docs.cloud.google.com/spanner/docs/instance-configurations.md
+index 405e832..5c02299 100644
+--- a/docs/docs.cloud.google.com/spanner/docs/instance-configurations.md
++++ b/docs/docs.cloud.google.com/spanner/docs/instance-configurations.md
+@@ -6,14 +6,14 @@ description: Choose the appropriate Spanner instance configuration (regional, mu
+ data_source: docs.cloud.google.com
+ ---
+ 
+-This page describes the different types of instance configurations available in Spanner, and the differences and trade-offs between them.
++This document describes regional, dual-region, and multi-region instance configurations in Spanner, and compares the [trade-offs](https://docs.cloud.google.com/spanner/docs/instance-configurations#tradeoffs) , replication topologies, and available locations for each configuration type. An *instance configuration* defines the geographic placement and replication topology of the databases in your instance. Choosing the right configuration lets you balance availability, read and write latency, cost, and data residency requirements for your workload.
+ 
+ ## Instance configurations
+ 
+-A Spanner instance configuration defines the geographic placement and replication of the databases in that instance. When you create an instance, you must configure it as either *regional* , *dual-region* , or *multi-region* . You make this choice by selecting an instance configuration, which determines where your data is stored for that instance:
++When you create a Spanner instance, you must configure it as *regional* , *dual-region* , or *multi-region* . You make this choice by selecting an instance configuration, which determines where your data is stored for that instance:
+ 
+-- [Regional configurations](https://docs.cloud.google.com/spanner/docs/instance-configurations#regional-configurations) : all resources reside within a single Google Cloud region.
+-- [Dual-region configurations](https://docs.cloud.google.com/spanner/docs/instance-configurations#dual-region-configurations) : all resources span two regions and reside within a single country (available in the [Spanner Enterprise Plus edition](https://docs.cloud.google.com/spanner/docs/editions-overview) ).
++- [Regional configurations](https://docs.cloud.google.com/spanner/docs/instance-configurations#regional-configurations) : all the resources reside within a single Google Cloud region
++- [Dual-region configurations](https://docs.cloud.google.com/spanner/docs/instance-configurations#dual-region-configurations) : all resources span two regions and reside within a single country (available in the [Spanner Enterprise Plus edition](https://docs.cloud.google.com/spanner/docs/editions-overview) )
+ - [Multi-region configurations](https://docs.cloud.google.com/spanner/docs/instance-configurations#multi-region-configurations) : all resources span more than two regions (available in the [Enterprise Plus edition](https://docs.cloud.google.com/spanner/docs/editions-overview) ).
+ 
+ For more information about region-specific considerations, see [Geography and regions](https://docs.cloud.google.com/docs/geography-and-regions#regions_and_zones) .
+@@ -24,9 +24,9 @@ You can [move your instance](https://docs.cloud.google.com/spanner/docs/instance
+ 
+ ## Regional configurations
+ 
+-Google Cloud services are available in [locations](https://docs.cloud.google.com/about/locations) across North America, South America, Europe, Asia, and Australia. If your users and services are located within a single region, choose a regional instance configuration for the lowest-latency reads and writes.
++Google Cloud services are available in [locations](https://docs.cloud.google.com/about/locations) across North America, South America, Europe, Asia, Australia, the Middle East, and Africa. If your users and services are located within a single region, choose a regional instance configuration for the lowest-latency reads and writes.
+ 
+-For any base regional configuration, Spanner maintains three [read-write replicas](https://docs.cloud.google.com/spanner/docs/replication#read-write) , each within a different Google Cloud [zone](https://docs.cloud.google.com/docs/geography-and-regions) in that region. Each read-write replica contains a full copy of your operational database that can serve read-write and read-only requests. Spanner uses replicas in different zones so that if a single-zone failure occurs, your database remains available.
++For any base regional configuration, Spanner maintains three [read-write replicas](https://docs.cloud.google.com/spanner/docs/replication#read-write) , each within a different Google Cloud [zone](https://docs.cloud.google.com/docs/geography-and-regions) in that region. Each read-write replica contains a full copy of your operational database that is able to serve read-write and read-only requests. Spanner uses replicas in different zones so that if a single-zone failure occurs, your database remains available.
+ 
+ ### Available configurations
+ 
+@@ -96,11 +96,11 @@ For optimal performance, follow these best practices:
+ - [Design a schema](https://docs.cloud.google.com/spanner/docs/schema-design) that prevents hotspots and other performance issues.
+ - Place critical compute resources within the same region as your Spanner instance.
+ - Provision enough [compute capacity](https://docs.cloud.google.com/spanner/docs/compute-capacity) to keep high-priority total CPU utilization under 65%.
+-- For information about the amount of throughput per Spanner node, see [Performance for regional configurations](https://docs.cloud.google.com/spanner/docs/performance) .
++- For information about the amount of throughput per Spanner node, see [Performance for regional configurations](https://docs.cloud.google.com/spanner/docs/performance#regional-performance) .
+ 
+ ## Dual-region configurations
+ 
+-> **Note:** Dual-region configurations are available with the Spanner Enterprise Plus edition. For more information, see the [Spanner editions overview](https://docs.cloud.google.com/spanner/docs/editions-overview) .
++> **Note:** This feature is available with the Spanner Enterprise Plus edition. For more information, see the [Spanner editions overview](https://docs.cloud.google.com/spanner/docs/editions-overview) .
+ 
+ Dual-region configurations let you replicate the database's data in multiple zones across two regions in a single country, as defined by the instance configuration.
+ 
+@@ -110,7 +110,7 @@ Dual-region configurations do the following:
+ - Meet data residency requirements.
+ - Provide higher availability and SLAs than regional configurations.
+ 
+-Spanner offers dual-region configurations in Australia, Germany, India, and Japan.
++Spanner offers dual-region configurations in Australia, Canada, Germany, India, and Japan.
+ 
+ For information about the amount of throughput per Spanner node, see [Performance for dual-region configurations](https://docs.cloud.google.com/spanner/docs/performance#dual-region-performance) .
+ 
+@@ -178,22 +178,30 @@ Failover and failback best practices include:
+ 
+ You can't create a custom dual-region instance configuration, and you can't add read-only replicas to a dual-region instance configuration.
+ 
++### Performance best practices for dual-region configurations
++
++For optimal performance, follow these best practices:
++
++- [Design a schema](https://docs.cloud.google.com/spanner/docs/schema-design) that prevents hotspots and other performance issues.
++- For optimal write latency, place compute resources for write-heavy workloads within or close to the default leader region.
++- To avoid single-region dependency for your workloads, place critical compute resources in both regions of your dual-region configuration.
++- For information about the amount of throughput per Spanner node, see [Performance for dual-region configurations](https://docs.cloud.google.com/spanner/docs/performance#dual-region-performance) .
++
+ ## Multi-region configurations
+ 
+-> **Note:** Multi-region configurations are available with the Spanner Enterprise Plus edition. For more information, see the [Spanner editions overview](https://docs.cloud.google.com/spanner/docs/editions-overview) .
++> **Note:** This feature is available with the Spanner Enterprise Plus edition. For more information, see the [Spanner editions overview](https://docs.cloud.google.com/spanner/docs/editions-overview) .
+ 
+-Spanner regional configurations replicate data between multiple zones within a single region. However, a regional configuration might not be optimal if:
++Spanner base regional configurations replicate data between multiple zones within a single region. However, a base regional configuration might not be optimal if:
+ 
+ - Your application often needs to read data from multiple geographic locations (for example, to serve data to users in both North America and Asia).
+ - Your writes originate from a different location than your reads (for example, if you have large write workloads in North America and large read workloads in Europe).
+ 
+-Multi-region configurations can:
++While you can add optional read-only replicas in other regions to a [custom regional configuration](https://docs.cloud.google.com/spanner/docs/instance-configurations#regional-replication) to serve low-latency stale reads in these scenarios, multi-region configurations can also:
+ 
+-- Serve writes from multiple regions.
+-- Maintain availability in the case of regional failures.
++- Maintain write availability across read-write regions with automatic leader failover during regional disruptions.
+ - Provide higher availability and SLAs than regional configurations.
+ 
+-Multi-region configurations let you replicate your databases in multiple zones across multiple regions, as defined by the instance configuration. Each multi-region configuration contains two read-write regions. A read-write region contains two read-write replicas located in separate zones. These replicas let you read data with lower latency from multiple locations close to or within the regions in the configuration.
++Multi-region configurations let you replicate your databases in multiple zones across multiple regions, as defined by the instance configuration. Most base multi-region configurations contain two read-write regions, each with two read-write replicas in separate zones, and one witness region. The exception is the `asia2` configuration, which has no witness region and instead contains three read-write regions: two regions with two read-write replicas each, and a third region with one read-write replica. These read-write replicas let you read data with lower latency from multiple locations close to or within the regions in the configuration.
+ 
+ There are trade-offs though, because in a multi-region configuration, the quorum (read-write) replicas are spread across more than one region. You might notice additional network latency when these replicas communicate with each other to form a write quorum. Reads don't require a quorum. The result is that your application achieves faster reads in more places at the cost of a small increase in write latency. For more information, see [The role of replicas in writes and reads](https://docs.cloud.google.com/spanner/docs/replication#role-of-replicas) .
+ 
+@@ -242,11 +250,11 @@ Spanner offers the following base multi-region instance configurations. To reque
+ 
+ - *2RW+1W* : two read-write replicas and one witness replica in the region.
+ 
+-- *1-OR* : one optional replica. You can create a custom instance configuration and add one optional read-only replica. For more information, see [Create a custom instance configuration](https://docs.cloud.google.com/spanner/docs/create-manage-configurations#create-configuration) .
++- *1-OR* : one optional replica. You can create a custom regional or multi-region instance configuration and add one optional read-only replica. For more information, see [Create a custom instance configuration](https://docs.cloud.google.com/spanner/docs/create-manage-configurations#create-configuration) .
+ 
+-- *2-OR* : up to two optional replicas. You can create a custom instance configuration and add one or two optional read-only replicas. Where possible, consider adding two optional replicas to help maintain low read latency. For more information, see [Create a custom instance configuration](https://docs.cloud.google.com/spanner/docs/create-manage-configurations#create-configuration) .
++- *2-OR* : up to two optional replicas. You can create a custom regional or multi-region instance configuration and add one or two optional read-only replicas. Where possible, consider adding two optional replicas to help maintain low read latency. For more information, see [Create a custom instance configuration](https://docs.cloud.google.com/spanner/docs/create-manage-configurations#create-configuration) .
+ 
+-- *A* : This instance configuration is restricted with an allow-list. To get access, reach out to your Technical Account Manager.
++- *A* : This instance configuration is restricted with an allowlist. To get access, contact your Technical Account Manager.
+ 
+ The resource location of a multi-region configuration defines its disaster recovery zone guarantee. While this location sets the overall boundary for all data throughout its lifecycle, the data itself is only stored at rest within your selected replica locations.
+ 
+@@ -258,11 +266,11 @@ Multi-region instances offer these primary benefits:
+ 
+ - **Data distribution** : Spanner automatically replicates your data between regions with strong consistency. This lets you store your data where it's used, which can reduce latency and improve the user experience.
+ 
+-- **External consistency** : Even though Spanner replicates across geographically distant locations, you can still use Spanner as if it were a database running on a single machine. Transactions are serializable, and the order of transactions within the database is the same as the order in which clients observe the transactions to have been committed. External consistency is a stronger property than "strong consistency", which is offered by some other products. For more information, see [TrueTime and external consistency](https://docs.cloud.google.com/spanner/docs/true-time-external-consistency) .
++- **External consistency** : Even though Spanner replicates across geographically distant locations, you can still use Spanner as if it were a database running on a single machine. Transactions are serializable, and the order of transactions within the database is the same as the order in which clients observe the transactions to have been committed. External consistency is a stronger property than "strong consistency," which is offered by some other products. Read more about this property in [TrueTime and external consistency](https://docs.cloud.google.com/spanner/docs/true-time-external-consistency) .
+ 
+ ### Replication
+ 
+-Each base multi-region configuration contains two regions that are designated as **read-write regions** , each of which contains two read-write replicas. One of these read-write regions is designated as the *default leader region* , which means that it contains your database's leader replicas. Spanner also places a witness replica in a third region called a **witness region** .
++Most base multi-region configurations contain two regions that are designated as **read-write regions** , each of which contains two read-write replicas. One of these read-write regions is designated as the *default leader region* , which means that it contains your database's leader replicas. Spanner also places a witness replica in a third region called a **witness region** . The exception is the `asia2` configuration, which places a fifth read-write replica in a third read-write region instead of using a witness region.
+ 
+ Each time a client issues a mutation to your database, a write quorum forms, consisting of one of the replicas from the default leader region and any two of the additional four voting replicas. (The quorum could be formed by replicas from two or three of the regions that make up your configuration, depending on which other replicas participate in the vote.) In addition to these five voting replicas, some base multi-region configurations contain read-only replicas for serving low-latency reads. The regions that contain read-only replicas are called **read-only regions** .
+ 
+@@ -270,7 +278,7 @@ In general, the voting regions in a multi-region configuration are placed geogra
+ 
+ You can [create a custom multi-region instance configuration](https://docs.cloud.google.com/spanner/docs/create-manage-configurations#create-configuration) with optional read-only replicas. Any custom read-only replicas you create can't be included in write quorums and don't function as a standalone disaster recovery (DR) solution. Instance availability is determined by the quorum of voting replicas. If the Spanner instance goes offline, the read-only replicas also go offline shortly afterward and can't serve reads, including stale reads. You can add locations listed under the Optional Region column as optional read-only replicas. If your preferred read-only replica location isn't listed, you can [request a new optional read-only replica region](https://docs.google.com/forms/d/e/1FAIpQLSfw9Rj4p4KA8oLu7MhIpSyPRd-4qxqazwsFZIY-_tkNrpWFcw/viewform) . For more information, see [Read-only replicas](https://docs.cloud.google.com/spanner/docs/replication#read-only) .
+ 
+-> **Note:** For more information about how Spanner replicates data and the roles of different replica types in reads and writes, see [Replication](https://docs.cloud.google.com/spanner/docs/replication) .
++> **Note:** if you are interested in more detailed information about how data is replicated in Spanner, and about the different types of replicas and their roles in reads and writes, see [Replication](https://docs.cloud.google.com/spanner/docs/replication) .
+ 
+ ### Performance best practices for multi-region configurations
+ 
+@@ -285,19 +293,21 @@ For optimal performance, follow these best practices:
+ 
+ ## Move an instance
+ 
+-You can move your Spanner instance from any instance configuration to any other instance configuration, including between regional and multi-region configurations. Moving your instance doesn't cause downtime, and Spanner continues to provide the usual [transaction guarantees](https://docs.cloud.google.com/spanner/docs/transactions#rw_transaction_properties) , including strong consistency, during the move.
++You can move your Spanner instance from any instance configuration to any other instance configuration, including between regional, dual-region, and multi-region configurations. Moving your instance doesn't cause downtime, and Spanner continues to provide the usual [transaction guarantees](https://docs.cloud.google.com/spanner/docs/transactions#rw_transaction_properties) , including strong consistency, during the move.
+ 
+ For more information about moving a Spanner instance, see [Move an instance](https://docs.cloud.google.com/spanner/docs/move-instance) .
+ 
+ ## Configure the default leader region
+ 
+-You can change the default leader region for any Spanner database in a dual-region or multi-region instance to place the leader closer to connecting clients and reduce application latency. The leader region handles all database writes, so if most of your write traffic comes from one geographic region, you can move the leader region there. Updating the default leader region is cheap, doesn't involve any data moves, and takes a few minutes to take effect.
++To change the location of your database's default leader region to be closer to connecting clients to reduce application latency, you can change the leader region for any Spanner instance that uses a dual-region or multi-region configuration. For instructions on changing the location of the leader region, see [Change the leader region of a database](https://docs.cloud.google.com/spanner/docs/modifying-leader-region#changing_the_leader_region_of_a_db) . The only regions eligible to become the default leader region for your database are the read-write regions in your [dual-region](https://docs.cloud.google.com/spanner/docs/instance-configurations#available-configurations-dual) or [multi-region](https://docs.cloud.google.com/spanner/docs/instance-configurations#available-configurations-multi-region) configuration.
++
++The leader region is responsible for handling all database writes, therefore if most of your traffic comes from one geographic region, you can move it to that region to reduce latency. Updating the default leader region is a metadata operation that doesn't move data between regions. The new value takes a few minutes to take effect.
+ 
+ The only regions eligible to become the default leader region for your database are the read-write regions in your [dual-region](https://docs.cloud.google.com/spanner/docs/instance-configurations#available-configurations-dual) or [multi-region](https://docs.cloud.google.com/spanner/docs/instance-configurations#available-configurations-multi-region) configuration. For instructions, see [Change the leader region of a database](https://docs.cloud.google.com/spanner/docs/modifying-leader-region#changing_the_leader_region_of_a_db) .
+ 
+ > **Note:** In the event that the default leader region fails or isn't available, Spanner automatically places your database's leader replicas in the second read-write region of your instance configuration, ensuring high availability and no impact to your application.
+ 
+-Changing the default leader region is a [schema change](https://docs.cloud.google.com/spanner/docs/schema-updates) , which uses a long-running operation. If needed, you can [Get the status of the long-running operation](https://docs.cloud.google.com/spanner/docs/manage-long-running-operations#get_the_status_of_a_long-running_database_operation) .
++Changing the default leader region is a [schema change](https://docs.cloud.google.com/spanner/docs/schema-updates) , which uses a long-running operation. If needed, you can [check the progress of the long-running operation](https://docs.cloud.google.com/spanner/docs/manage-and-observe-long-running-operations#check_the_progress_of_a_long-running_schema_update_operation) .
+ 
+ ## Trade-offs: regional versus dual-region versus multi-region configurations
+ 
+diff --git a/docs/docs.cloud.google.com/spanner/docs/reference/standard-sql/data-definition-language.md b/docs/docs.cloud.google.com/spanner/docs/reference/standard-sql/data-definition-language.md
+index 7a6034d..87bcde2 100644
+--- a/docs/docs.cloud.google.com/spanner/docs/reference/standard-sql/data-definition-language.md
++++ b/docs/docs.cloud.google.com/spanner/docs/reference/standard-sql/data-definition-language.md
+@@ -1745,7 +1745,7 @@ and queue_option is:
+ 
+ `Payload`
+ 
+-- The required payload column containing the message content. The column must be named `Payload` (case-insensitive) and defined as `NOT NULL` . The `Payload` column cannot be part of the primary key.
++- The required payload column containing the message content. The column must be named `Payload` or `payload` and defined as `NOT NULL` . The `Payload` column cannot be part of the primary key.
+ 
+ ***`payload_type`***
+ 
+diff --git a/docs/docs.cloud.google.com/spanner/docs/reference/standard-sql/pipe-syntax.md b/docs/docs.cloud.google.com/spanner/docs/reference/standard-sql/pipe-syntax.md
+index c8071eb..f54f28c 100644
+--- a/docs/docs.cloud.google.com/spanner/docs/reference/standard-sql/pipe-syntax.md
++++ b/docs/docs.cloud.google.com/spanner/docs/reference/standard-sql/pipe-syntax.md
+@@ -420,7 +420,7 @@ In pipe syntax, the `WHERE` operator also replaces the [`HAVING` clause](https:/
+ ```
+ -- Aggregation with grouping
+ |> AGGREGATE [aggregate_expression [[AS] alias] [, ...]]
+-   GROUP BY groupable_items [[AS] alias] [, ...]
++   GROUP BY groupable_item [[AS] alias] [, ...]
+ ```
+ 
+ ```
+@@ -441,9 +441,14 @@ With the `GROUP BY` clause, the `AGGREGATE` operator performs aggregation with g
+ 
+ The `AGGREGATE` expression list corresponds to the aggregated expressions in a `SELECT` list in standard syntax. Each expression in the `AGGREGATE` list must include an aggregate function. Aggregate expressions can also include scalar expressions (for example, `sqrt(SUM(x*x))` ). Column aliases can be assigned using the [`AS` operator](https://docs.cloud.google.com/spanner/docs/reference/standard-sql/pipe-syntax#as_pipe_operator) .
+ 
+-The `GROUP BY` clause in the `AGGREGATE` operator corresponds to the `GROUP BY` clause in standard syntax. Unlike in standard syntax, aliases can be assigned to `GROUP BY` items.
++**Grouping**
+ 
+-The output columns from the `AGGREGATE` operator include all grouping columns first, followed by all aggregate columns, using their assigned aliases as the column names.
++The `GROUP BY` clause in the `AGGREGATE` operator corresponds to the [`GROUP BY` clause](https://docs.cloud.google.com/spanner/docs/reference/standard-sql/query-syntax#group_by_clause) in standard syntax, with the following differences:
++
++- Unlike in standard syntax, you can't use a column ordinal (such as `GROUP BY 1, 2` ) or an alias from the `AGGREGATE` expression list. Each `groupable_item` must be a [groupable](https://docs.cloud.google.com/spanner/docs/reference/standard-sql/data-types#data_type_properties) expression evaluated on the input table.
++- Unlike in standard syntax, you can assign a column alias ( `[AS] alias` ) to a standalone `groupable_item` in the `GROUP BY` clause.
++
++The output columns from the `AGGREGATE` operator include all grouping columns first, followed by all aggregate columns, using their assigned or implicit aliases as the column names.
+ 
+ Unlike in standard syntax, grouping expressions aren't repeated across `SELECT` and `GROUP BY` clauses. In pipe syntax, the grouping expressions are listed once, in the `GROUP BY` clause, and are automatically included as output columns for the `AGGREGATE` operator.
+ 
+@@ -519,7 +524,7 @@ The `AGGREGATE` operator supports a shorthand ordering syntax, which is equivale
+ order_suffix: {ASC | DESC}
+ ```
+ 
+-The `GROUP AND ORDER BY` clause is equivalent to an `ORDER BY` clause on all `groupable_items` . By default, each `groupable_item` is sorted in ascending order with `NULL` values first. Other ordering suffixes like `DESC` can be used for other orders.
++The `GROUP AND ORDER BY` clause is equivalent to an `ORDER BY` clause on all `groupable_item` s. By default, each `groupable_item` is sorted in ascending order with `NULL` values first. Other ordering suffixes like `DESC` can be used for other orders.
+ 
+ Without the `GROUP AND ORDER BY` clause, the `ASC` or `DESC` suffixes can be added on individual columns in the `GROUP BY` list or `AGGREGATE` list or both.
+ 
+diff --git a/docs/docs.cloud.google.com/spanner/docs/release-notes.md b/docs/docs.cloud.google.com/spanner/docs/release-notes.md
+index 89e8557..b662e4f 100644
+--- a/docs/docs.cloud.google.com/spanner/docs/release-notes.md
++++ b/docs/docs.cloud.google.com/spanner/docs/release-notes.md
+@@ -12,6 +12,14 @@ You can see the latest product updates for all of Google Cloud on the [Google Cl
+ 
+ To get the latest product updates delivered to you, add the URL of this page to your [feed reader](https://wikipedia.org/wiki/Comparison_of_feed_aggregators) , or add the [feed URL](https://docs.cloud.google.com/feeds/spanner-release-notes.xml) directly.
+ 
++## October 27, 2026
++
++Feature
++
++Spanner supports the `ON DELETE SET NULL` foreign key action for GoogleSQL and PostgreSQL dialects. Use `ON DELETE SET NULL` when you delete a referenced row to set the referencing columns to `NULL` .
++
++For more information, see [Foreign key actions](https://docs.cloud.google.com/spanner/docs/foreign-keys/overview#how-to-define-foreign-key-action) and [Create and manage foreign key relationships](https://docs.cloud.google.com/spanner/docs/foreign-keys/how-to) .
++
+ ## October 20, 2026
+ 
+ Feature
+diff --git a/logs/urls.txt b/logs/urls.txt
+index b38d6fc..6e0fef1 100644
+--- a/logs/urls.txt
++++ b/logs/urls.txt
+@@ -103,7 +103,7 @@ https://docs.cloud.google.com/spanner-omni/deploy-on-vms	2026-10-01T16:55:26Z
+ https://docs.cloud.google.com/spanner-omni/deployment-configuration	2026-10-01T16:55:26Z
+ https://docs.cloud.google.com/spanner-omni/develop	2026-10-01T16:55:26Z
+ https://docs.cloud.google.com/spanner-omni/differences	2026-10-01T16:55:26Z
+-https://docs.cloud.google.com/spanner-omni/download	2026-10-01T16:55:26Z
++https://docs.cloud.google.com/spanner-omni/download	2026-10-29T05:00:30Z
+ https://docs.cloud.google.com/spanner-omni/editions-overview	2026-10-01T16:55:26Z
+ https://docs.cloud.google.com/spanner-omni/execution-plans	2026-10-01T16:55:26Z
+ https://docs.cloud.google.com/spanner-omni/faq	2026-09-30T22:02:19Z
+@@ -130,7 +130,7 @@ https://docs.cloud.google.com/spanner-omni/overview	2026-10-01T16:55:26Z
+ https://docs.cloud.google.com/spanner-omni/pgadapter	2026-10-01T16:55:26Z
+ https://docs.cloud.google.com/spanner-omni/prometheus-alerts	2026-10-01T16:55:26Z
+ https://docs.cloud.google.com/spanner-omni/python	2026-10-01T16:55:26Z
+-https://docs.cloud.google.com/spanner-omni/quickstart	2026-10-01T16:55:26Z
++https://docs.cloud.google.com/spanner-omni/quickstart	2026-10-29T05:00:30Z
+ https://docs.cloud.google.com/spanner-omni/release-notes	2026-10-01T16:55:26Z
+ https://docs.cloud.google.com/spanner-omni/replicate-data	2026-10-22T17:11:49Z
+ https://docs.cloud.google.com/spanner-omni/resources	2026-10-01T16:55:26Z
+@@ -138,7 +138,7 @@ https://docs.cloud.google.com/spanner-omni/restores	2026-10-22T17:11:49Z
+ https://docs.cloud.google.com/spanner-omni/scale-kubernetes-deployment	2026-10-01T16:55:26Z
+ https://docs.cloud.google.com/spanner-omni/scale-vm-deployment	2026-10-01T16:55:26Z
+ https://docs.cloud.google.com/spanner-omni/scaling-benefits	2026-10-01T16:55:26Z
+-https://docs.cloud.google.com/spanner-omni/setup	2026-10-01T16:55:26Z
++https://docs.cloud.google.com/spanner-omni/setup	2026-10-29T05:00:30Z
+ https://docs.cloud.google.com/spanner-omni/spanner-graph-overview	2026-10-01T16:55:26Z
+ https://docs.cloud.google.com/spanner-omni/sql-shell-commands	2026-10-01T16:55:26Z
+ https://docs.cloud.google.com/spanner-omni/storage-utilization	2026-10-01T16:55:26Z
+@@ -146,8 +146,8 @@ https://docs.cloud.google.com/spanner-omni/support	2026-10-15T18:58:44Z
+ https://docs.cloud.google.com/spanner-omni/system-requirements	2026-10-01T16:55:26Z
+ https://docs.cloud.google.com/spanner-omni/transaction-latency	2026-10-01T16:55:26Z
+ https://docs.cloud.google.com/spanner-omni/true-time-external-consistency	2026-10-01T16:55:26Z
+-https://docs.cloud.google.com/spanner-omni/upgrade-deployment	2026-10-15T18:58:44Z
+-https://docs.cloud.google.com/spanner-omni/use-console	2026-10-01T16:55:26Z
++https://docs.cloud.google.com/spanner-omni/upgrade-deployment	2026-10-29T05:00:30Z
++https://docs.cloud.google.com/spanner-omni/use-console	2026-10-29T05:00:30Z
+ https://docs.cloud.google.com/spanner-omni/vector-search-overview	2026-10-01T16:55:26Z
+ https://docs.cloud.google.com/spanner/docs	2026-10-24T22:46:36Z
+ https://docs.cloud.google.com/spanner/docs/access-with-fgac	2026-10-07T09:40:22Z
+@@ -203,58 +203,58 @@ https://docs.cloud.google.com/spanner/docs/connect-gke-cluster	2026-10-07T09:39:
+ https://docs.cloud.google.com/spanner/docs/cpu-utilization	2026-10-07T09:39:47Z
+ https://docs.cloud.google.com/spanner/docs/create-manage-configurations	2026-10-07T09:39:47Z
+ https://docs.cloud.google.com/spanner/docs/create-manage-data-placements	2026-10-07T09:39:47Z
+-https://docs.cloud.google.com/spanner/docs/create-manage-databases	2026-10-26T03:50:29Z
+-https://docs.cloud.google.com/spanner/docs/create-manage-instances	2026-10-07T09:39:47Z
+-https://docs.cloud.google.com/spanner/docs/create-manage-locality-groups	2026-10-07T09:39:47Z
+-https://docs.cloud.google.com/spanner/docs/create-manage-partitions	2026-10-07T09:39:47Z
++https://docs.cloud.google.com/spanner/docs/create-manage-databases	2026-10-29T00:26:59Z
++https://docs.cloud.google.com/spanner/docs/create-manage-instances	2026-10-29T00:26:59Z
++https://docs.cloud.google.com/spanner/docs/create-manage-locality-groups	2026-10-29T00:26:59Z
++https://docs.cloud.google.com/spanner/docs/create-manage-partitions	2026-10-29T00:26:59Z
+ https://docs.cloud.google.com/spanner/docs/create-manage-saved-queries	2026-10-23T06:22:23Z
+-https://docs.cloud.google.com/spanner/docs/create-manage-split-points	2026-10-07T09:39:47Z
++https://docs.cloud.google.com/spanner/docs/create-manage-split-points	2026-10-29T00:26:59Z
+ https://docs.cloud.google.com/spanner/docs/create-manage-views	2026-10-07T09:39:47Z
+ https://docs.cloud.google.com/spanner/docs/create-query-database-console	2026-10-07T09:39:47Z
+-https://docs.cloud.google.com/spanner/docs/cuds	2026-10-07T09:39:47Z
++https://docs.cloud.google.com/spanner/docs/cuds	2026-10-29T00:26:59Z
+ https://docs.cloud.google.com/spanner/docs/custom-timeout-and-retry	2026-10-07T09:39:47Z
+ https://docs.cloud.google.com/spanner/docs/cutover-fallback	2026-10-12T21:46:24Z
+ https://docs.cloud.google.com/spanner/docs/data-migration	2026-10-12T21:46:24Z
+-https://docs.cloud.google.com/spanner/docs/data-residency	2026-10-07T09:39:47Z
++https://docs.cloud.google.com/spanner/docs/data-residency	2026-10-29T00:26:59Z
+ https://docs.cloud.google.com/spanner/docs/data-validation	2026-10-07T09:39:47Z
+-https://docs.cloud.google.com/spanner/docs/databases	2026-10-07T09:39:47Z
+-https://docs.cloud.google.com/spanner/docs/databoost/databoost-applications	2026-10-07T09:41:07Z
+-https://docs.cloud.google.com/spanner/docs/databoost/databoost-export	2026-10-07T09:41:07Z
+-https://docs.cloud.google.com/spanner/docs/databoost/databoost-monitor	2026-10-23T08:15:40Z
+-https://docs.cloud.google.com/spanner/docs/databoost/databoost-overview	2026-10-07T09:41:07Z
+-https://docs.cloud.google.com/spanner/docs/databoost/databoost-quotas	2026-10-07T09:41:07Z
+-https://docs.cloud.google.com/spanner/docs/databoost/databoost-run-queries	2026-10-25T01:09:04Z
++https://docs.cloud.google.com/spanner/docs/databases	2026-10-29T00:26:59Z
++https://docs.cloud.google.com/spanner/docs/databoost/databoost-applications	2026-10-29T00:26:59Z
++https://docs.cloud.google.com/spanner/docs/databoost/databoost-export	2026-10-29T00:26:59Z
++https://docs.cloud.google.com/spanner/docs/databoost/databoost-monitor	2026-10-29T00:26:59Z
++https://docs.cloud.google.com/spanner/docs/databoost/databoost-overview	2026-10-29T00:26:59Z
++https://docs.cloud.google.com/spanner/docs/databoost/databoost-quotas	2026-10-29T00:26:59Z
++https://docs.cloud.google.com/spanner/docs/databoost/databoost-run-queries	2026-10-29T00:26:59Z
+ https://docs.cloud.google.com/spanner/docs/dataflow-connector	2026-10-07T09:39:47Z
+ https://docs.cloud.google.com/spanner/docs/dataflow-templates	2026-10-07T09:39:47Z
+-https://docs.cloud.google.com/spanner/docs/dc-integration	2026-10-26T11:38:57Z
++https://docs.cloud.google.com/spanner/docs/dc-integration	2026-10-29T00:26:59Z
+ https://docs.cloud.google.com/spanner/docs/deadline-exceeded	2026-10-24T22:46:36Z
+ https://docs.cloud.google.com/spanner/docs/directed-reads	2026-10-07T09:39:47Z
+ https://docs.cloud.google.com/spanner/docs/django-orm	2026-10-07T09:39:47Z
+ https://docs.cloud.google.com/spanner/docs/dml-best-practices	2026-10-23T19:40:06Z
+ https://docs.cloud.google.com/spanner/docs/dml-partitioned	2026-10-07T09:39:47Z
+-https://docs.cloud.google.com/spanner/docs/dml-tasks	2026-10-07T09:39:47Z
++https://docs.cloud.google.com/spanner/docs/dml-tasks	2026-10-28T23:59:56Z
+ https://docs.cloud.google.com/spanner/docs/dml-versus-mutations	2026-10-07T09:39:47Z
+-https://docs.cloud.google.com/spanner/docs/drivers-overview	2026-10-07T09:39:47Z
+-https://docs.cloud.google.com/spanner/docs/editions-overview	2026-10-07T09:39:47Z
+-https://docs.cloud.google.com/spanner/docs/emulator	2026-10-07T09:39:47Z
+-https://docs.cloud.google.com/spanner/docs/encryption-in-transit	2026-10-07T09:39:47Z
++https://docs.cloud.google.com/spanner/docs/drivers-overview	2026-10-28T23:59:56Z
++https://docs.cloud.google.com/spanner/docs/editions-overview	2026-10-28T23:59:56Z
++https://docs.cloud.google.com/spanner/docs/emulator	2026-10-28T23:59:56Z
++https://docs.cloud.google.com/spanner/docs/encryption-in-transit	2026-10-28T23:59:56Z
+ https://docs.cloud.google.com/spanner/docs/endpoints	2026-10-07T09:39:47Z
+ https://docs.cloud.google.com/spanner/docs/error-codes	2026-10-07T09:39:47Z
+-https://docs.cloud.google.com/spanner/docs/export	2026-10-07T09:39:47Z
+-https://docs.cloud.google.com/spanner/docs/fgac-about	2026-10-07T09:39:47Z
+-https://docs.cloud.google.com/spanner/docs/fgac-change-streams	2026-10-07T09:39:47Z
+-https://docs.cloud.google.com/spanner/docs/fgac-models	2026-10-07T09:39:47Z
+-https://docs.cloud.google.com/spanner/docs/fgac-privileges	2026-10-07T09:39:47Z
++https://docs.cloud.google.com/spanner/docs/export	2026-10-28T23:59:56Z
++https://docs.cloud.google.com/spanner/docs/fgac-about	2026-10-28T23:59:56Z
++https://docs.cloud.google.com/spanner/docs/fgac-change-streams	2026-10-28T23:59:56Z
++https://docs.cloud.google.com/spanner/docs/fgac-models	2026-10-28T23:59:56Z
++https://docs.cloud.google.com/spanner/docs/fgac-privileges	2026-10-28T23:59:56Z
+ https://docs.cloud.google.com/spanner/docs/fgac-queues	2026-10-07T09:39:47Z
+-https://docs.cloud.google.com/spanner/docs/fgac-sequences	2026-10-07T09:39:47Z
+-https://docs.cloud.google.com/spanner/docs/fgac-system-roles	2026-10-07T09:39:47Z
++https://docs.cloud.google.com/spanner/docs/fgac-sequences	2026-10-28T23:59:56Z
++https://docs.cloud.google.com/spanner/docs/fgac-system-roles	2026-10-28T23:59:56Z
+ https://docs.cloud.google.com/spanner/docs/find-approximate-nearest-neighbors	2026-10-07T09:39:47Z
+-https://docs.cloud.google.com/spanner/docs/find-hotspots-in-database	2026-10-07T09:39:47Z
++https://docs.cloud.google.com/spanner/docs/find-hotspots-in-database	2026-10-28T23:59:56Z
+ https://docs.cloud.google.com/spanner/docs/find-k-nearest-neighbors	2026-10-07T09:39:47Z
+ https://docs.cloud.google.com/spanner/docs/foreign-keys/how-to	2026-10-27T05:00:12Z
+ https://docs.cloud.google.com/spanner/docs/foreign-keys/overview	2026-10-27T05:00:12Z
+-https://docs.cloud.google.com/spanner/docs/free-trial-instance	2026-10-07T09:39:47Z
+-https://docs.cloud.google.com/spanner/docs/free-trial-quickstart	2026-10-07T09:39:33Z
++https://docs.cloud.google.com/spanner/docs/free-trial-instance	2026-10-28T23:59:56Z
++https://docs.cloud.google.com/spanner/docs/free-trial-quickstart	2026-10-28T23:59:56Z
+ https://docs.cloud.google.com/spanner/docs/full-text-search	2026-10-07T09:40:19Z
+ https://docs.cloud.google.com/spanner/docs/full-text-search/combine-tokenlists	2026-10-07T09:41:07Z
+ https://docs.cloud.google.com/spanner/docs/full-text-search/facets	2026-10-01T01:31:42Z
+@@ -280,7 +280,7 @@ https://docs.cloud.google.com/spanner/docs/getting-started/ado_net	2026-10-01T01
+ https://docs.cloud.google.com/spanner/docs/getting-started/cpp	2026-10-01T01:25:14Z
+ https://docs.cloud.google.com/spanner/docs/getting-started/csharp	2026-10-01T01:25:14Z
+ https://docs.cloud.google.com/spanner/docs/getting-started/database_sql	2026-10-01T01:25:14Z
+-https://docs.cloud.google.com/spanner/docs/getting-started/gcloud	2026-10-07T09:40:19Z
++https://docs.cloud.google.com/spanner/docs/getting-started/gcloud	2026-10-28T23:23:13Z
+ https://docs.cloud.google.com/spanner/docs/getting-started/go	2026-10-01T01:25:14Z
+ https://docs.cloud.google.com/spanner/docs/getting-started/java	2026-09-19T08:28:27Z
+ https://docs.cloud.google.com/spanner/docs/getting-started/jdbc	2026-10-01T01:25:14Z
+@@ -335,7 +335,7 @@ https://docs.cloud.google.com/spanner/docs/index-geo-partitioning	2026-10-07T09:
+ https://docs.cloud.google.com/spanner/docs/information-schema	2026-10-27T05:00:12Z
+ https://docs.cloud.google.com/spanner/docs/information-schema-pg	2026-10-27T05:00:12Z
+ https://docs.cloud.google.com/spanner/docs/install-mysql-functions	2026-10-07T09:39:33Z
+-https://docs.cloud.google.com/spanner/docs/instance-configurations	2026-10-27T23:31:29Z
++https://docs.cloud.google.com/spanner/docs/instance-configurations	2026-10-29T00:31:35Z
+ https://docs.cloud.google.com/spanner/docs/instances	2026-10-07T09:39:33Z
+ https://docs.cloud.google.com/spanner/docs/integrate-google-cloud-platform	2026-10-07T09:39:33Z
+ https://docs.cloud.google.com/spanner/docs/introspection	2026-10-07T09:40:19Z
+@@ -699,7 +699,7 @@ https://docs.cloud.google.com/spanner/docs/reference/standard-sql/compression-fu
+ https://docs.cloud.google.com/spanner/docs/reference/standard-sql/conditional_expressions	2026-10-08T18:27:29Z
+ https://docs.cloud.google.com/spanner/docs/reference/standard-sql/conversion_functions	2026-10-10T21:29:04Z
+ https://docs.cloud.google.com/spanner/docs/reference/standard-sql/conversion_rules	2026-10-28T00:26:28Z
+-https://docs.cloud.google.com/spanner/docs/reference/standard-sql/data-definition-language	2026-10-27T05:00:12Z
++https://docs.cloud.google.com/spanner/docs/reference/standard-sql/data-definition-language	2026-10-28T17:49:56Z
+ https://docs.cloud.google.com/spanner/docs/reference/standard-sql/data-types	2026-10-08T19:54:18Z
+ https://docs.cloud.google.com/spanner/docs/reference/standard-sql/date_functions	2026-10-01T01:23:56Z
+ https://docs.cloud.google.com/spanner/docs/reference/standard-sql/debugging_functions	2026-10-01T01:23:56Z
+@@ -728,7 +728,7 @@ https://docs.cloud.google.com/spanner/docs/reference/standard-sql/ml-functions	2
+ https://docs.cloud.google.com/spanner/docs/reference/standard-sql/net_functions	2026-10-01T01:23:56Z
+ https://docs.cloud.google.com/spanner/docs/reference/standard-sql/operators	2026-10-08T19:54:18Z
+ https://docs.cloud.google.com/spanner/docs/reference/standard-sql/overview	2026-10-01T01:23:56Z
+-https://docs.cloud.google.com/spanner/docs/reference/standard-sql/pipe-syntax	2026-10-01T01:23:56Z
++https://docs.cloud.google.com/spanner/docs/reference/standard-sql/pipe-syntax	2026-10-28T21:22:34Z
+ https://docs.cloud.google.com/spanner/docs/reference/standard-sql/pipe-syntax-guide	2026-10-01T01:23:56Z
+ https://docs.cloud.google.com/spanner/docs/reference/standard-sql/procedural-language	2026-10-01T01:23:56Z
+ https://docs.cloud.google.com/spanner/docs/reference/standard-sql/protocol-buffers	2026-10-01T01:23:56Z
+@@ -745,7 +745,7 @@ https://docs.cloud.google.com/spanner/docs/reference/standard-sql/subqueries	202
+ https://docs.cloud.google.com/spanner/docs/reference/standard-sql/timestamp_functions	2026-10-01T01:23:56Z
+ https://docs.cloud.google.com/spanner/docs/reference/standard-sql/utility-functions	2026-10-01T01:23:56Z
+ https://docs.cloud.google.com/spanner/docs/region-types	2026-10-10T21:27:56Z
+-https://docs.cloud.google.com/spanner/docs/release-notes	2026-10-20T23:24:45Z
++https://docs.cloud.google.com/spanner/docs/release-notes	2026-10-29T01:23:28Z
+ https://docs.cloud.google.com/spanner/docs/replication	2026-10-10T21:27:56Z
+ https://docs.cloud.google.com/spanner/docs/resources	2026-10-01T01:24:59Z
+ https://docs.cloud.google.com/spanner/docs/rest-endpoints	2026-10-07T09:40:03Z
+diff --git a/metadata.yaml b/metadata.yaml
+index da262d5..2346d72 100644
+--- a/metadata.yaml
++++ b/metadata.yaml
+@@ -1,2 +1,2 @@
+ file_count: 939
+-last_sync: 2026-10-28T18:01:49Z
++last_sync: 2026-10-29T18:01:43Z

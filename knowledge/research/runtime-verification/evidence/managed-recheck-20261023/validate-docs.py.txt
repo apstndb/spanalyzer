@@ -1,0 +1,39 @@
+"""Record exact documentation gates; never contacts managed Spanner."""
+from pathlib import Path
+import datetime
+import hashlib
+import json
+import os
+import shutil
+import subprocess
+
+root=Path('<LOCAL_CHECKOUT>')
+task=Path('<LOCAL_TASK_ROOT>/apstndb/spanalyzer/managed-recheck-20261023')
+current=root/'knowledge/research/runtime-verification/evidence/managed-recheck-20261023'
+goroot='<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8'
+env=os.environ.copy()
+env.update(GOROOT=goroot,GOTOOLCHAIN='local',GOWORK=str(root/'go.work'),GOCACHE=str(root/'.tmp/managed-recheck-20260925/go-cache'),GOFLAGS='-mod=readonly')
+receipt={'status':'running','recorded_at':datetime.datetime.now(datetime.timezone.utc).isoformat(),'scope':'Local research gates; managed suite retains its separate known drift failure','checks':[],'offline_evidence_check':{'exit_code':0,'assertions':109,'receipt':'evidence-check.json'}}
+(current/'validation.json').write_text(json.dumps(receipt,indent=2)+'\n')
+for name,args,cwd,log in [
+ ('okf-all',[goroot+'/bin/go','run','./okf-check','--repo-root','..','--gate','all','--publication-manifest',str(task/'publication-manifest.json')],root/'tools','okf-check.log'),
+ ('markdown-language',[goroot+'/bin/go','run','./markdown-language-check','--repo-root','..'],root/'tools','language-check.log'),
+ ('diff-whitespace',['git','diff','--check'],root,'diff-check.log')]:
+ started=datetime.datetime.now(datetime.timezone.utc).isoformat()
+ with (task/log).open('w')as stream:result=subprocess.run(args,cwd=cwd,env=env,stdout=stream,stderr=subprocess.STDOUT)
+ receipt['checks'].append({'name':name,'argv':args,'cwd':str(cwd),'started_at':started,'completed_at':datetime.datetime.now(datetime.timezone.utc).isoformat(),'exit_code':result.returncode,'log':log})
+ shutil.copyfile(task/log,current/log)
+ print(name,result.returncode,flush=True)
+ if result.returncode:
+  receipt['status']='failed';(current/'validation.json').write_text(json.dumps(receipt,indent=2)+'\n');raise SystemExit(result.returncode)
+receipt['status']='pass';receipt['environment']={key:env[key]for key in ['GOROOT','GOTOOLCHAIN','GOWORK','GOCACHE','GOFLAGS']}
+(current/'validation.json').write_text(json.dumps(receipt,indent=2)+'\n')
+shutil.copyfile(task/'evidence-check.json',current/'evidence-check.json')
+shutil.copyfile(task/'evidence-check.log',current/'evidence-check.log')
+shutil.copyfile(__file__,current/'validate-docs.py.txt')
+p=current.parent/'artifact-sha256.json';manifest=json.loads(p.read_text())
+for path in current.iterdir():
+ if path.is_file():manifest['files'][str(path.relative_to(current.parent))]=hashlib.sha256(path.read_bytes()).hexdigest()
+manifest['files']=dict(sorted(manifest['files'].items()));p.write_text(json.dumps(manifest,indent=2)+'\n')
+shutil.copyfile(current/'validation.json',task/'validation.json')
+shutil.copyfile(root/'knowledge/research/runtime-verification/managed-trial-revalidation-20261023.md',task/'report.md')

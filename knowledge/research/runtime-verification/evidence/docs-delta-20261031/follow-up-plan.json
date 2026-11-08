@@ -1,0 +1,94 @@
+{
+  "status": "planned-not-executed",
+  "runtime_cases_executed": 0,
+  "items": [
+    {
+      "id": "queue-payload-name-case",
+      "priority": 1,
+      "targets": [
+        "managed",
+        "omni-r5",
+        "omni-r4-lts.1",
+        "emulator"
+      ],
+      "dialect": "GoogleSQL",
+      "status": "NOT_RUN",
+      "cases": [
+        "Declare payload column Payload",
+        "Declare payload column payload",
+        "Declare payload column PAYLOAD",
+        "Declare payload column PaYlOaD"
+      ],
+      "source_contract": "The declaration must be named Payload or payload; do not infer declaration acceptance from case-insensitive column references",
+      "prior_coverage": "Retained queue producers use Payload only; no four-way declaration control established",
+      "assertions": [
+        "Record DDL operation completion and exact code, not merely parser/name-resolution acceptance",
+        "Read back actual schema for successful cases; drop only owned fixtures"
+      ]
+    },
+    {
+      "id": "pipe-aggregate-grouping",
+      "priority": 1,
+      "targets": [
+        "managed",
+        "omni-r5",
+        "omni-r4-lts.1",
+        "emulator"
+      ],
+      "dialect": "GoogleSQL",
+      "status": "NOT_RUN",
+      "cases": [
+        "Standard SELECT GROUP BY ordinal as control",
+        "Pipe AGGREGATE GROUP BY ordinal",
+        "Pipe GROUP BY references an AGGREGATE-list output alias absent from the input",
+        "Pipe GROUP BY an input expression AS a new grouping alias",
+        "Include both a non-grouped aggregate and a grouping key; compare output-column order"
+      ],
+      "source_contract": "Ordinals and output-list aliases disallowed; standalone input expressions may receive aliases",
+      "assertions": [
+        "Separate grammar acceptance from semantic rejection",
+        "Include input-alias shadowing controls before interpreting name resolution"
+      ]
+    },
+    {
+      "id": "explicit-scorer-version",
+      "priority": 2,
+      "targets": [
+        "managed",
+        "omni-r5",
+        "omni-r4-lts.1",
+        "emulator"
+      ],
+      "dialects": [
+        "GoogleSQL",
+        "PostgreSQL"
+      ],
+      "status": "NOT_RUN",
+      "cases": [
+        "Database score_version 1 and 2",
+        "SCORE options version 1 and 2 overriding database default",
+        "Unpinned control recorded with observation date"
+      ],
+      "assertions": [
+        "Do not treat unpinned score changes across observations as a regression by themselves",
+        "A single execution cannot demonstrate automatic advance on a future scorer release"
+      ]
+    },
+    {
+      "id": "mutable-search-sort-key",
+      "priority": 3,
+      "targets": [
+        "managed"
+      ],
+      "status": "NOT_RUN",
+      "cases": [
+        "Mutable search ORDER BY timestamp versus hourly generated bucket versus omitted sort key"
+      ],
+      "assertions": [
+        "Separate write-cost measurements from correct query results",
+        "No benchmark is implied by the documentation statement or a successful DDL submission",
+        "Keep this search-index DDL ORDER BY scope separate from GQL issue 408"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,146 @@
+[
+  {
+    "args": [
+      "docker",
+      "create",
+      "--name",
+      "spanalyzer-r4-security-20261004",
+      "--label",
+      "spanalyzer.task=omni-r4-20261004",
+      "-p",
+      "127.0.0.1::15000",
+      "--entrypoint",
+      "/bin/sh",
+      "us-docker.pkg.dev/spanner-omni/images/spanner-omni:2026.r4-lts@sha256:9f10586c5de366bec5c0ff6cf542a67c21c8363e8a12a3deb9c372a07c9aa8b6",
+      "/probe-start.sh"
+    ],
+    "exit_code": 0
+  },
+  {
+    "args": [
+      "docker",
+      "cp",
+      "<LOCAL_CHECKOUT>/.tmp/omni-r4-20261004/tls-probe/start.sh",
+      "spanalyzer-r4-security-20261004:/probe-start.sh"
+    ],
+    "exit_code": 0
+  },
+  {
+    "args": [
+      "docker",
+      "cp",
+      "<LOCAL_CHECKOUT>/.tmp/omni-r4-20261004/tls-probe/password",
+      "spanalyzer-r4-security-20261004:/password-input"
+    ],
+    "exit_code": 0
+  },
+  {
+    "args": [
+      "docker",
+      "cp",
+      "<LOCAL_CHECKOUT>/.tmp/omni-r4-20261004/tls-probe/container-start.sh",
+      "spanalyzer-r4-security-20261004:/probe-start.sh"
+    ],
+    "exit_code": 0
+  },
+  {
+    "args": [
+      "docker",
+      "start",
+      "spanalyzer-r4-security-20261004"
+    ],
+    "exit_code": 0
+  },
+  {
+    "args": [
+      "docker",
+      "logs",
+      "spanalyzer-r4-security-20261004"
+    ],
+    "exit_code": 0
+  },
+  {
+    "args": [
+      "docker",
+      "logs",
+      "spanalyzer-r4-security-20261004"
+    ],
+    "exit_code": 0
+  },
+  {
+    "args": [
+      "docker",
+      "logs",
+      "spanalyzer-r4-security-20261004"
+    ],
+    "exit_code": 0
+  },
+  {
+    "args": [
+      "docker",
+      "logs",
+      "spanalyzer-r4-security-20261004"
+    ],
+    "exit_code": 0
+  },
+  {
+    "args": [
+      "docker",
+      "logs",
+      "spanalyzer-r4-security-20261004"
+    ],
+    "exit_code": 0
+  },
+  {
+    "args": [
+      "docker",
+      "cp",
+      "spanalyzer-r4-security-20261004:/probe/certs/ca-api.crt",
+      "<LOCAL_CHECKOUT>/.tmp/omni-r4-20261004/tls-probe/ca-api.crt"
+    ],
+    "exit_code": 0
+  },
+  {
+    "args": [
+      "docker",
+      "cp",
+      "spanalyzer-r4-security-20261004:/probe/clientcerts/client.crt",
+      "<LOCAL_CHECKOUT>/.tmp/omni-r4-20261004/tls-probe/client.crt"
+    ],
+    "exit_code": 0
+  },
+  {
+    "args": [
+      "docker",
+      "cp",
+      "spanalyzer-r4-security-20261004:/probe/clientcerts/client.key",
+      "<LOCAL_CHECKOUT>/.tmp/omni-r4-20261004/tls-probe/client.key"
+    ],
+    "exit_code": 0
+  },
+  {
+    "args": [
+      "docker",
+      "port",
+      "spanalyzer-r4-security-20261004",
+      "15000/tcp"
+    ],
+    "exit_code": 0
+  },
+  {
+    "args": [
+      "security-probe"
+    ],
+    "exit_code": 0
+  },
+  {
+    "args": [
+      "docker",
+      "rm",
+      "-f",
+      "-v",
+      "spanalyzer-r4-security-20261004"
+    ],
+    "exit_code": 0
+  }
+]

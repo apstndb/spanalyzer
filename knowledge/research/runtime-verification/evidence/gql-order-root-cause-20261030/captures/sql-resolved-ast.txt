@@ -1,0 +1,13 @@
+QueryStmt
++-output_column_list=
+| +-OrderNodes.val#2 AS value [INT64]
++-query=
+  +-OrderByScan
+    +-column_list=[OrderNodes.val#2]
+    +-is_ordered=TRUE
+    +-input_scan=
+    | +-TableScan(column_list=[OrderNodes.val#2], table=OrderNodes, column_index_list=[1])
+    +-order_by_item_list=
+      +-OrderByItem
+        +-column_ref=
+          +-ColumnRef(type=INT64, column=OrderNodes.val#2)

@@ -1,0 +1,13 @@
+{
+  "classification": "Inspected schema drift; retained original failing aggregate gate, no repeated integration suite",
+  "failed_test": "TestDrift_RealTableMetas",
+  "current_unknown_tables": [
+    "ACTIVE_BATCH_OPERATIONS",
+    "BATCH_OPERATIONS"
+  ],
+  "unknown_columns": [],
+  "ordinal_mismatches": [],
+  "type_mismatches": [],
+  "other_integration_tests": "CanonicalDDL, ExpressionIndex and UUID pass",
+  "next_action": "Continue independent fixture probes and inspect new table queryability; implementation and selectors unchanged"
+}

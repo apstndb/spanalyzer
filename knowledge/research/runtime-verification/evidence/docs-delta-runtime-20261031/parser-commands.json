@@ -1,0 +1,42 @@
+[
+  {
+    "name": "parser-tidy",
+    "argv": [
+      "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go",
+      "mod",
+      "tidy"
+    ],
+    "exit_code": 0
+  },
+  {
+    "name": "parser-build",
+    "argv": [
+      "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go",
+      "build",
+      "-mod=readonly",
+      "-o",
+      "<LOCAL_CHECKOUT>/.tmp/docs-delta-runtime-20261031/parser-probe",
+      "."
+    ],
+    "exit_code": 0
+  },
+  {
+    "name": "parser-buildinfo",
+    "argv": [
+      "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go",
+      "version",
+      "-m",
+      "<LOCAL_CHECKOUT>/.tmp/docs-delta-runtime-20261031/parser-probe"
+    ],
+    "exit_code": 0
+  },
+  {
+    "name": "parser-results",
+    "argv": [
+      "<LOCAL_CHECKOUT>/.tmp/docs-delta-runtime-20261031/parser-probe",
+      "<LOCAL_TASK_ROOT>/apstndb/spanalyzer/docs-delta-runtime-20261031/evidence/google-cases.json",
+      "<LOCAL_TASK_ROOT>/apstndb/spanalyzer/docs-delta-runtime-20261031/evidence/parser-extra-cases.json"
+    ],
+    "exit_code": 0
+  }
+]

@@ -1,0 +1,83 @@
+{
+  "observed_at": "2026-10-30T09:37:53Z/2026-10-30T09:38:15Z",
+  "runtime": "Emulator 1.5.59 linux/arm64",
+  "emulator_source": "d357ec1d2b08ae92ce1da4c5078de82fda0c07ab",
+  "googlesql_tag": "2026.7.2",
+  "googlesql_source": "0e7d7073ed0360be587a5efa0fa78abeee00f17b",
+  "current_googlesql_source_spot_check": "a09b0bd95dd55dba9478eb8f20a3971bc9e30b70",
+  "conditions": [
+    {
+      "variant": "official-before",
+      "planned_steps": 30,
+      "queries": 27,
+      "explicit_order_correct": 4,
+      "explicit_order_total": 22,
+      "gql_order_correct": 0,
+      "gql_order_total": 18,
+      "non_OK_steps": []
+    },
+    {
+      "variant": "original-copy",
+      "planned_steps": 30,
+      "queries": 27,
+      "explicit_order_correct": 4,
+      "explicit_order_total": 22,
+      "gql_order_correct": 0,
+      "gql_order_total": 18,
+      "non_OK_steps": []
+    },
+    {
+      "variant": "no-scramble",
+      "planned_steps": 30,
+      "queries": 27,
+      "explicit_order_correct": 22,
+      "explicit_order_total": 22,
+      "gql_order_correct": 18,
+      "gql_order_total": 18,
+      "non_OK_steps": []
+    },
+    {
+      "variant": "graph-ordered",
+      "planned_steps": 30,
+      "queries": 27,
+      "explicit_order_correct": 22,
+      "explicit_order_total": 22,
+      "gql_order_correct": 18,
+      "gql_order_total": 18,
+      "non_OK_steps": [
+        {
+          "label": "gql-unspecified",
+          "code": "Internal"
+        }
+      ]
+    },
+    {
+      "variant": "official-after",
+      "planned_steps": 30,
+      "queries": 27,
+      "explicit_order_correct": 4,
+      "explicit_order_total": 22,
+      "gql_order_correct": 0,
+      "gql_order_total": 18,
+      "non_OK_steps": []
+    }
+  ],
+  "total_planned_steps": 150,
+  "total_queries": 135,
+  "total_root_records": 180,
+  "cleanup": {
+    "databases": 5,
+    "runtime_containers": 5,
+    "extraction_containers": 1,
+    "diagnostic_image_tags": 3,
+    "verified_absent": true
+  },
+  "source_binary_boundary": "Official image and source tag are independently pinned; matching disassembly and causal interventions are retained. No source-to-image reproducible-build attestation or full source-rebuilt fix is claimed.",
+  "unverified": [
+    "first affected version",
+    "amd64 runtime",
+    "general source fix",
+    "managed or Omni internals",
+    "current GoogleSQL HEAD runtime"
+  ]
+}

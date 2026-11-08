@@ -1,0 +1,31 @@
+{
+  "cases": 64,
+  "codes": {
+    "OK": 49,
+    "InvalidArgument": 15
+  },
+  "explicit_expected_cases": 41,
+  "expectations_pass": true,
+  "new_coverage_not_rollout_date": true,
+  "semantic_grouping_rejections": [
+    "array-equal",
+    "array-different",
+    "array-null-elements",
+    "array-null-versus-value",
+    "array-empty",
+    "array-sql-null",
+    "struct-equal",
+    "struct-different",
+    "struct-null-elements",
+    "array-null-elements-profile"
+  ],
+  "type_signature_rejections": [
+    "incompatible-string-int",
+    "incompatible-struct-int"
+  ],
+  "syntax_rejections": [
+    "missing-from-control",
+    "missing-rhs-control",
+    "missing-distinct-control"
+  ]
+}

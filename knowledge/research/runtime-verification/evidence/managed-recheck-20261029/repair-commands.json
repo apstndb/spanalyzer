@@ -1,0 +1,59 @@
+[
+  {
+    "name": "repair-build",
+    "started_at": "2026-10-29T01:05:38.098097+00:00",
+    "completed_at": "2026-10-29T01:05:39.025783+00:00",
+    "exit_code": 0,
+    "seconds": 0.927,
+    "argv": [
+      "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go",
+      "build",
+      "-o",
+      "<LOCAL_CHECKOUT>/.tmp/managed-recheck-20261029/weekly-repair",
+      "<LOCAL_CHECKOUT>/.tmp/managed-recheck-20261029/weekly-repair.go"
+    ],
+    "cwd": "<LOCAL_CHECKOUT>/tools",
+    "gowork": "<LOCAL_CHECKOUT>/go.work"
+  },
+  {
+    "name": "repair-buildinfo",
+    "started_at": "2026-10-29T01:05:39.025978+00:00",
+    "completed_at": "2026-10-29T01:05:39.040400+00:00",
+    "exit_code": 0,
+    "seconds": 0.014,
+    "argv": [
+      "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go",
+      "version",
+      "-m",
+      "<LOCAL_CHECKOUT>/.tmp/managed-recheck-20261029/weekly-repair"
+    ],
+    "cwd": "<LOCAL_CHECKOUT>/tools",
+    "gowork": "<LOCAL_CHECKOUT>/go.work"
+  },
+  {
+    "name": "repair-google",
+    "started_at": "2026-10-29T01:05:39.040578+00:00",
+    "completed_at": "2026-10-29T01:08:00.575136+00:00",
+    "exit_code": 0,
+    "seconds": 141.535,
+    "argv": [
+      "<LOCAL_CHECKOUT>/.tmp/managed-recheck-20261029/weekly-repair",
+      "<LOCAL_CHECKOUT>/.tmp/managed-recheck-20261029/repair-google-plan.json"
+    ],
+    "cwd": "<LOCAL_CHECKOUT>/tools",
+    "gowork": "<LOCAL_CHECKOUT>/go.work"
+  },
+  {
+    "name": "repair-pg",
+    "started_at": "2026-10-29T01:08:00.577377+00:00",
+    "completed_at": "2026-10-29T01:10:29.649803+00:00",
+    "exit_code": 0,
+    "seconds": 149.072,
+    "argv": [
+      "<LOCAL_CHECKOUT>/.tmp/managed-recheck-20261029/weekly-repair",
+      "<LOCAL_CHECKOUT>/.tmp/managed-recheck-20261029/repair-pg-plan.json"
+    ],
+    "cwd": "<LOCAL_CHECKOUT>/tools",
+    "gowork": "<LOCAL_CHECKOUT>/go.work"
+  }
+]

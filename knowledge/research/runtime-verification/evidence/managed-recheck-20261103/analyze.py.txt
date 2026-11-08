@@ -1,0 +1,61 @@
+from pathlib import Path
+from collections import Counter
+import json,hashlib
+root=Path('<LOCAL_CHECKOUT>');out=Path('<LOCAL_TASK_ROOT>/apstndb/spanalyzer/managed-recheck-20261103/evidence')
+read=lambda name:[json.loads(l)for l in (out/name).read_text().splitlines()]
+checks=[]
+def check(name,ok,detail=None):checks.append(dict(name=name,pass_=bool(ok),detail=detail))
+bag=lambda rows:sorted(json.dumps(x,sort_keys=True)for x in rows)
+ro=read('readonly.jsonl');rb={r['label']:r for r in ro};g=read('google.jsonl');pg=read('pg.jsonl');gb={r['label']:r for r in g};pb={r['label']:r for r in pg}
+for phase,rows in [('readonly',ro),('supplemental',read('supplemental.jsonl')),('scalar-correction',read('scalar-correction.jsonl'))]:
+    plan=json.loads((out/(phase+'-cases.json')).read_text());check(phase+'-complete',[r['label']for r in rows]==[r['label']for r in plan]);check(phase+'-no-transport-failure',all(r['code']not in ['DeadlineExceeded','Unavailable','Unknown','Unauthenticated']for r in rows))
+for dialect,rows,by in [('google',g,gb),('pg',pg,pb)]:
+    plan=json.loads((out/(dialect+'-cases.json')).read_text());check(dialect+'-all-steps',[r['label']for r in rows if r['label']not in ['create-database','drop-database','database-absent']]==[r['label']for r in plan['steps']]);check(dialect+'-owned-lifecycle',by['create-database']['code']=='OK'and by['drop-database']['code']=='OK'and by['database-absent']['code']=='NotFound');check(dialect+'-no-transport-failure',all(r['code']not in ['DeadlineExceeded','Unavailable','Unknown','Unauthenticated']for r in rows))
+    for label,ids in [('equal',['1','3']),('in',['1','2','3']),('whole',['1'])]:
+        for mode in ['auto','search','base']:
+            r=by['json-search-'+label+'-'+mode];check(dialect+'-json-'+label+'-'+mode,r['code']=='OK'and [row.get('Id',row.get('id'))for row in r['rows']]==ids)
+    scores=by['score-unpinned']['rows'];check(dialect+'-scorer-different',len(scores)==2 and all(r['version1_score']!=r['version2_score']for r in scores));check(dialect+'-scorer-default-2',all(r['default_score']==r['version2_score']for r in scores))
+    explicit=by['score-explicit-independent']['rows'];check(dialect+'-explicit-stable',all(a['version1_score']==b['version1_score']and a['version2_score']==b['version2_score']for a,b in zip(scores,explicit))and len(explicit)==2)
+    for v in [1,2]:
+        if dialect=='google':check('google-default-'+str(v),by['score-set-db-'+str(v)]['code']=='OK'and all(r['default_score']==r['version'+str(v)+'_score']for r in by['score-pinned-db-'+str(v)]['rows']))
+        else:check('pg-option-rejected-'+str(v),by['score-set-db-'+str(v)]['code']=='InvalidArgument'and by['score-pinned-db-'+str(v)]['code']=='NOT_RUN')
+for name in ['infoschema-columns','sys-columns-0','sys-columns-1','sys-columns-2']:
+    rows=rb[name]['rows'];catalog='INFORMATION_SCHEMA'if name=='infoschema-columns'else 'SPANNER_SYS';path='survey/infoschem/evidence/managed/20261029T003028Z-89b4ab9e231d.json'if catalog=='INFORMATION_SCHEMA'else 'survey/spannersys/evidence/managed/20261029T003029Z-016061fbe58e.json';old=json.loads((root/path).read_text())['columns'];tuples=lambda rr:{(r['TABLE_NAME'],r['COLUMN_NAME'],r['SPANNER_TYPE'],int(r['ORDINAL_POSITION']))for r in rr};prior={(r['table_name'],r['column_name'],r['spanner_type'],r['ordinal_position'])for r in old};check(name+'-same-prior-surface',tuples(rows)==prior);check(name+'-size',len(rows)==(310 if catalog=='INFORMATION_SCHEMA'else 624));check(name+'-tables',len({r['TABLE_NAME']for r in rows})==(48 if catalog=='INFORMATION_SCHEMA'else 52))
+old=[json.loads(l)for l in (root/'knowledge/research/runtime-verification/evidence/docs-delta-runtime-20261031/managed-google.jsonl').read_text().splitlines()];ob={r['label']:r for r in old}
+for name,r in rb.items():
+    if not name.startswith('pipe-'):continue
+    prior=ob[name];check(name+'-same-code',r['code']==prior['code'])
+    if r['code']=='OK':check(name+'-same-values',len(r['rows'])==2 if name=='pipe-limit'else bag(r['rows'])==bag(prior['rows']))
+check('pipe-order-sequence',[r['b']for r in rb['pipe-order-by']['rows']]==['30','20','10'])
+check('json-expressions',rb['json-equality']['rows']==[{'same':True,'ordered':True,'coerced':True,'converted':'{"a":1}'}]);check('json-group',rb['json-group']['rows']==[{'j':'{"a":1}','n':'2'},{'j':'{"a":2}','n':'1'}]);check('distinctness',rb['distinctness']['rows']==[{'same_null':False,'distinct_null':True,'json_coerce':True}]);check('hll',rb['hll-count']['rows']==[{'estimate':'3'}]);check('approx',rb['approx-count']['rows']==[{'estimate':'3'}]);check('rand-unsupported',rb['rand']['code']=='Unimplemented')
+for mode in ['full','full-outer','outer','left','left-outer','inner']:
+    r=gb['gql-mode-'+mode];cols=['a']if mode=='inner'else (['a','left_only']if mode.startswith('left')else ['a','left_only','right_only']);expected=[{'a':'1'},{'a':'2'}]
+    if len(cols)>1:expected[0]['left_only']='9';expected[1]['left_only']=None
+    if len(cols)>2:expected[0]['right_only']=None;expected[1]['right_only']='8'
+    check('gql-'+mode+'-columns',[v['name']for v in r['metadata']['rowType']['fields']]==cols);check('gql-'+mode+'-values',r['code']=='OK'and bag(r['rows'])==bag(expected))
+check('gql-order',gb['gql-return-order']['rows']==[{'id':'1'},{'id':'2'},{'id':'3'}]);check('gql-top2',gb['gql-return-order-limit']['rows']==[{'id':'1'},{'id':'2'}])
+for name in ['gql-standalone-order-limit','gql-cross-next-order-limit']:check(name+'-malformed-control',gb[name]['code']=='InvalidArgument'and 'Unexpected end of statement'in gb[name]['error'])
+for name,code in [('Payload','OK'),('payload','OK'),('PAYLOAD','InvalidArgument'),('PaYlOaD','InvalidArgument')]:check('queue-'+name,gb['queue-case-'+name]['code']==code)
+for name in ['tvf-star-plain','tvf-star-as','tvf-star-bare']:check(name,gb[name]['code']=='OK'and gb[name]['rows']==[])
+for name in ['search-enhanced','search-enhanced-required']:check(name,gb[name]['code']=='OK'and gb[name]['rows']==[{'Id':'1'},{'Id':'2'}])
+for name in ['bucket-index-seconds','bucket-index-hour','bucket-index-none']:check(name,gb[name]['code']=='OK')
+b=[gb['bucket-values-'+x]['rows'][0]for x in ['start','same-hour','next-hour']];check('hour-bucket-values',b[0]['HourBucket']==b[1]['HourBucket']and int(b[2]['HourBucket'])-int(b[1]['HourBucket'])==3600)
+bound=pb['bucket-pg-boundaries']['rows'];check('pg-boundary-values',[r['documented_hour']for r in bound]==['0','498168','498168','498169','498169']and [r['floored_hour']for r in bound]==['-1','498168','498168','498168','498169']);check('pg-count-jsonb-unsupported',pb['pg-jsonb-count']['code']=='Unimplemented')
+drift=json.loads((out/'drift-command.json').read_text());check('drift-retained-failure',drift['exit_code']==1 and 'unknown_tables=[ACTIVE_BATCH_OPERATIONS BATCH_OPERATIONS]'in(out/'drift.log').read_text())
+plans=[]
+for dialect,by in [('google',gb),('pg',pb)]:
+    for label in ['equal','in','whole']:
+        for mode in ['auto','search','base']:
+            r=by['json-search-'+label+'-'+mode];nodes=r.get('plan',{}).get('planNodes',[]);plans.append({'dialect':dialect,'predicate':label,'mode':mode,'scan_nodes':[{'name':n.get('displayName'),'metadata':n.get('metadata')}for n in nodes if 'scan'in n.get('displayName','').lower()]})
+(out/'json-search-plans.json').write_text(json.dumps(plans,indent=2)+'\n')
+for p in plans:
+    types=[n['metadata'].get('scan_type')for n in p['scan_nodes']if n['metadata']]
+    check('plan-'+p['dialect']+'-'+p['predicate']+'-'+p['mode'],('TableScan'in types and 'SearchIndexScan'not in types)if p['mode']=='base'else 'SearchIndexScan'in types)
+for image in ['omni-r5','omni-lts']:
+    prior=[json.loads(l)for l in (root/('knowledge/research/runtime-verification/evidence/docs-delta-runtime-20261031/'+image+'-final.jsonl')).read_text().splitlines()]
+    for dialect,by in [('google',gb),('pg',pb)]:
+        matched=next(r for r in prior if r.get('label')=='score-unpinned'and r.get('phase')==dialect+'-final-cases')
+        check(image+'-'+dialect+'-dated-scorer-comparison',matched['rows']==by['score-unpinned']['rows'])
+fail=[c for c in checks if not c['pass_']];summary={'status':'pass'if not fail else 'fail','checks':len(checks),'failed':fail,'assertions':checks,'case_counts':{'readonly':len(ro)+26+4,'google_steps':len(g)-3,'postgresql_steps':len(pg)-3},'code_counts':{'google':dict(Counter(r['code']for r in g)),'pg':dict(Counter(r['code']for r in pg))},'boundary':'Assertions test bounded observed values. Known service rejections and local drift failure remain classified failures, not a passing integration gate.'}
+(out/'assertions.json').write_text(json.dumps(summary,indent=2)+'\n');print('Assertions',summary['status'],len(checks));print('Failures',fail)
+assert not fail

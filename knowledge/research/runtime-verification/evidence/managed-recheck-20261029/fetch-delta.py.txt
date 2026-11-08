@@ -1,0 +1,62 @@
+"""Read pinned mirror source and current full official documents."""
+from pathlib import Path
+from concurrent.futures import ThreadPoolExecutor
+import datetime
+import hashlib
+import json
+import subprocess
+import urllib.error
+import urllib.request
+
+task = Path('<LOCAL_TASK_ROOT>/apstndb/spanalyzer/managed-recheck-20261029')
+out = task / 'documents'
+compare = json.loads((out / 'mirror-compare.json').read_text())
+base = compare['base_commit']['sha']
+head = compare['commits'][-1]['sha']
+paths = set()
+details = []
+for commit in compare['commits']:
+    command = ['gh', 'api', '--paginate', '--slurp', 'repos/apstndb/spanner-docs-mirror/commits/' + commit['sha'] + '?per_page=100']
+    result = subprocess.run(command, capture_output=True, text=True, check=True)
+    pages = json.loads(result.stdout)
+    files = [f for page in pages for f in page.get('files', [])]
+    details.append({'sha': commit['sha'], 'committed_at': commit['commit']['committer']['date'], 'files': files, 'parents': [parent['sha'] for parent in pages[0].get('parents', [])]})
+    paths.update(path for f in files for path in [f['filename'], f.get('previous_filename','')] if path.startswith('docs/') and path.endswith('.md'))
+(out / 'commit-details.json').write_text(json.dumps(details, indent=2) + '\n')
+
+def fetch(item):
+    side, revision, path = item
+    url = 'https://raw.githubusercontent.com/apstndb/spanner-docs-mirror/' + revision + '/' + path
+    try:
+        with urllib.request.urlopen(url, timeout=45) as response:
+            content = response.read()
+    except urllib.error.HTTPError as error:
+        if error.code == 404:
+            return {'side': side, 'revision': revision, 'path': path, 'status': 404}
+        raise
+    filename = side + '__' + path.replace('/', '__') + '.txt'
+    (out / filename).write_bytes(content)
+    return {'side': side, 'revision': revision, 'path': path, 'status': 200, 'file': filename, 'sha256': hashlib.sha256(content).hexdigest(), 'bytes': len(content)}
+
+with ThreadPoolExecutor(max_workers=5) as pool:
+    bodies = list(pool.map(fetch, [(side, revision, path) for side, revision in [('base', base), ('head', head)] for path in sorted(paths)]))
+names = ['documents/' + path.removeprefix('docs/').removesuffix('.md') for path in sorted(paths) if any(row['path'] == path and row['side'] == 'head' and row['status'] == 200 for row in bodies)]
+docs=[]
+failed=[]
+for offset in range(0,len(names),20):
+    chunk=names[offset:offset+20]
+    result=subprocess.run(['dkcli','batch-get','-f','json',*chunk],capture_output=True,text=True)
+    if result.returncode==0:
+        docs.extend(json.loads(result.stdout)['documents'])
+    else:
+        for name in chunk:
+            item=subprocess.run(['dkcli','get','-f','json',name],capture_output=True,text=True)
+            if item.returncode:failed.append({'name':name,'exit_code':item.returncode,'error':item.stderr})
+            else:docs.append(json.loads(item.stdout))
+(out/'official-documents.json').write_text(json.dumps({'documents':docs},indent=2)+'\n')
+(out/'official-failures.json').write_text(json.dumps(failed,indent=2)+'\n')
+for doc in docs:
+    (out / ('official__' + doc['name'].replace('/', '__') + '.md.txt')).write_text(doc['content'])
+receipt = {'retrieved_at': datetime.datetime.now(datetime.timezone.utc).isoformat(), 'base': base, 'head': head, 'commits': [{'sha': row['sha'], 'committed_at': row['committed_at'], 'file_count': len(row['files'])} for row in details], 'net_changed_files': len(compare['files']), 'union_document_paths': len(paths), 'bodies': bodies, 'official': [{key: value for key, value in doc.items() if key != 'content'} | {'body_sha256': hashlib.sha256(doc['content'].encode()).hexdigest()} for doc in docs], 'official_failures':failed, 'source_scope': 'Document publication and mirror capture only; not managed runtime execution'}
+(out / 'retrieval.json').write_text(json.dumps(receipt, indent=2) + '\n')
+print(json.dumps({'commits': len(details), 'paths': len(paths), 'retained_bodies': sum(row['status'] == 200 for row in bodies), 'official_documents': len(docs), 'head': head}))

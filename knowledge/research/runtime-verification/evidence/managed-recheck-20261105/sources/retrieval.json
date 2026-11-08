@@ -1,0 +1,114 @@
+[
+  {
+    "file": "mirror-head.json",
+    "argv": [
+      "gh",
+      "api",
+      "repos/apstndb/spanner-docs-mirror/commits/main"
+    ],
+    "at": "2026-11-05T02:13:58.810546+00:00",
+    "sha256": "8cbc12fd341df210d470987ac177f64aef7149cba6e50636d8423b026a0898a7"
+  },
+  {
+    "file": "release-feed.xml",
+    "argv": [
+      "curl",
+      "--fail",
+      "--silent",
+      "--show-error",
+      "https://docs.cloud.google.com/feeds/spanner-release-notes.xml"
+    ],
+    "at": "2026-11-05T02:13:58.665585+00:00",
+    "sha256": "855ef65628099da1e180f23462132f62cb8561cd86f5bb0489342b32586fcd1b"
+  },
+  {
+    "file": "release-live.html",
+    "argv": [
+      "curl",
+      "--fail",
+      "--silent",
+      "--show-error",
+      "https://docs.cloud.google.com/spanner/docs/release-notes"
+    ],
+    "at": "2026-11-05T02:14:00.787587+00:00",
+    "sha256": "4bbf76d42a5e32a29a442757fcec96ca0afad7f007886bce62e441954c7b9ee3"
+  },
+  {
+    "file": "managed-release.json",
+    "argv": [
+      "dkcli",
+      "get",
+      "-f",
+      "json",
+      "docs.cloud.google.com/spanner/docs/release-notes"
+    ],
+    "at": "2026-11-05T02:14:00.229483+00:00",
+    "sha256": "5edb9dbc0baac945be843e87a1033b14e72c88d0c01b7c31fd6cdc1a38f00806"
+  },
+  {
+    "file": "graph-schema.json",
+    "argv": [
+      "dkcli",
+      "get",
+      "-f",
+      "json",
+      "docs.cloud.google.com/spanner/docs/reference/standard-sql/graph-schema-statements"
+    ],
+    "at": "2026-11-05T02:13:59.855653+00:00",
+    "sha256": "6031bbaeac8316419a775cfbbc2c32b39b51535dfd22a3d07b208128ea59e81d"
+  },
+  {
+    "file": "ranked-search.json",
+    "argv": [
+      "dkcli",
+      "get",
+      "-f",
+      "json",
+      "docs.cloud.google.com/spanner/docs/full-text-search/ranked-search"
+    ],
+    "at": "2026-11-05T02:13:59.837983+00:00",
+    "sha256": "1043a83591db5251e4127ff9932fdc4889c30be065a8b843bc27afad3e396dcb"
+  },
+  {
+    "file": "search-indexes.json",
+    "argv": [
+      "dkcli",
+      "get",
+      "-f",
+      "json",
+      "docs.cloud.google.com/spanner/docs/full-text-search/search-indexes"
+    ],
+    "at": "2026-11-05T02:14:00.810401+00:00",
+    "sha256": "74fa66ce8d96c8041e807a2f87028d037bfe23c1f0b166e15d0a9cf1158d29d8"
+  },
+  {
+    "file": "mirror-compare.json",
+    "argv": [
+      "gh",
+      "api",
+      "repos/apstndb/spanner-docs-mirror/compare/ec91ce497a621dd3d318cad40a58944367415165...293fe78b6da4b70bfe8f693161c5fc784f0364a8"
+    ],
+    "at": "2026-11-05T02:14:01.414681+00:00",
+    "sha256": "a00e302b1fa0c5568d1644f1f815fa218ee67fa67f9c32f6d493eaf2b50dcb01"
+  },
+  {
+    "file": "commit-28532761a37ec33c986bc1c75a10f25fb22a0e9a.json",
+    "argv": [
+      "gh",
+      "api",
+      "repos/apstndb/spanner-docs-mirror/commits/28532761a37ec33c986bc1c75a10f25fb22a0e9a"
+    ],
+    "at": "2026-11-05T02:14:01.905404+00:00",
+    "sha256": "f43e9cd15dda065569ef2a17f49fd0b312b161b346a479eb62827332c38adae2"
+  },
+  {
+    "file": "commit-293fe78b6da4b70bfe8f693161c5fc784f0364a8.json",
+    "argv": [
+      "gh",
+      "api",
+      "repos/apstndb/spanner-docs-mirror/commits/293fe78b6da4b70bfe8f693161c5fc784f0364a8"
+    ],
+    "at": "2026-11-05T02:14:01.859567+00:00",
+    "sha256": "8cbc12fd341df210d470987ac177f64aef7149cba6e50636d8423b026a0898a7"
+  }
+]

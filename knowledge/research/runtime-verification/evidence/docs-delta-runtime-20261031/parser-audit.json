@@ -1,0 +1,86 @@
+{
+  "current_main": "da2ddfdd6277527f9dc2a54b87221579a9b18abe",
+  "module_version": "v0.9.0",
+  "pr_inventory": {
+    "all": 303,
+    "open": 6,
+    "open_numbers": [
+      481,
+      479,
+      478,
+      475,
+      474,
+      99
+    ]
+  },
+  "strict_cases": 84,
+  "all_accepted_cases_reparse": true,
+  "uncovered_candidates": [
+    {
+      "id": "pipe-operators",
+      "operators": [
+        "extend",
+        "drop",
+        "rename",
+        "aggregate",
+        "join",
+        "order-by",
+        "union",
+        "intersect",
+        "except",
+        "tablesample"
+      ],
+      "matching_open_prs": [],
+      "existing_issue": "https://github.com/cloudspannerecosystem/memefish/issues/408",
+      "source": "parser.go:408, the operator switch supports only SELECT/WHERE/AS/SET/LIMIT",
+      "runtime_scope": "All fifteen operator fixtures execute on this managed sample and both pinned Omni images; Emulator isolation is recorded separately"
+    },
+    {
+      "id": "gql-column-propagation",
+      "forms": [
+        "FULL OUTER",
+        "LEFT OUTER",
+        "INNER"
+      ],
+      "matching_open_prs": [],
+      "candidate_branch": {
+        "ref": "refs/heads/feat/gql-set-operation-propagation-mode",
+        "sha": "60defb4942d0dde0431214591bb17cae0c311def"
+      },
+      "broad_graph_draft_99": "Inspected exact head b36d20c8bf85e8374a10cb436f45a851ca333591; retained patch has no column-propagation implementation or corresponding grammar forms"
+    }
+  ],
+  "covered_pending": [
+    {
+      "id": "tvf-alias",
+      "main_accepts": false,
+      "pr": 481,
+      "url": "https://github.com/cloudspannerecosystem/memefish/pull/481"
+    },
+    {
+      "id": "fk-set-null",
+      "main_accepts": false,
+      "pr": 479,
+      "url": "https://github.com/cloudspannerecosystem/memefish/pull/479"
+    }
+  ],
+  "existing_local_candidates": [
+    {
+      "ref": "refs/heads/feat/gql-set-operation-propagation-mode",
+      "sha": "60defb4942d0dde0431214591bb17cae0c311def"
+    },
+    {
+      "ref": "refs/heads/feat/tvf-alias",
+      "sha": "0b594ad115f2b89bd28feb84993b9cac5dbbd9e8"
+    }
+  ],
+  "design_revision": "a09b0bd95dd55dba9478eb8f20a3971bc9e30b70",
+  "design_locations": {
+    "pipe_aggregate_grammar": "googlesql/parser/googlesql.tm:5406",
+    "tvf_alias_grammar": "googlesql/parser/googlesql.tm:7012",
+    "tvf_alias_unparser": "googlesql/parser/unparser.cc:407",
+    "grouping_item_ast": "googlesql/parser/gen_parse_tree.py:2384",
+    "column_propagation_ast": "googlesql/parser/gen_parse_tree.py:4176"
+  },
+  "scope_limit": "No private trackers, discussions, unpublished branches or every possible Spanner grammar form are covered; this is a focused documentation-driven audit."
+}

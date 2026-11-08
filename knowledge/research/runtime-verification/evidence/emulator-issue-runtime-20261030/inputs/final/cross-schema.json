@@ -1,0 +1,96 @@
+{
+  "dialect": "google",
+  "steps": [
+    {
+      "label": "foreign-schema",
+      "family": "issue-353",
+      "kind": "ddl",
+      "sql": "CREATE SCHEMA other_schema",
+      "requires": [],
+      "timeout_seconds": 30
+    },
+    {
+      "label": "foreign-parent",
+      "family": "issue-353",
+      "kind": "ddl",
+      "sql": "CREATE TABLE other_schema.referenced_table(id INT64 NOT NULL,unique_val INT64 NOT NULL) PRIMARY KEY(id)",
+      "requires": [
+        "foreign-schema"
+      ],
+      "timeout_seconds": 30
+    },
+    {
+      "label": "foreign-unique",
+      "family": "issue-353",
+      "kind": "ddl",
+      "sql": "CREATE UNIQUE INDEX other_schema.referenced_unique ON other_schema.referenced_table(unique_val)",
+      "requires": [
+        "foreign-parent"
+      ],
+      "timeout_seconds": 30
+    },
+    {
+      "label": "foreign-child-1",
+      "family": "issue-353",
+      "kind": "ddl",
+      "sql": "CREATE TABLE referring_table_1(id INT64 NOT NULL,ref_val INT64 NOT NULL,CONSTRAINT fk_ref_1 FOREIGN KEY(ref_val) REFERENCES other_schema.referenced_table(unique_val) NOT ENFORCED) PRIMARY KEY(id)",
+      "requires": [
+        "foreign-unique"
+      ],
+      "timeout_seconds": 30
+    },
+    {
+      "label": "foreign-child-2",
+      "family": "issue-353",
+      "kind": "ddl",
+      "sql": "CREATE TABLE referring_table_2(id INT64 NOT NULL,ref_val INT64 NOT NULL,CONSTRAINT fk_ref_2 FOREIGN KEY(ref_val) REFERENCES other_schema.referenced_table(unique_val) NOT ENFORCED) PRIMARY KEY(id)",
+      "requires": [
+        "foreign-unique"
+      ],
+      "timeout_seconds": 30
+    },
+    {
+      "label": "foreign-TABLE_CONSTRAINTS",
+      "family": "issue-353",
+      "kind": "query",
+      "sql": "SELECT * FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS WHERE TABLE_NAME='referenced_table'",
+      "requires": [
+        "foreign-child-1",
+        "foreign-child-2"
+      ],
+      "timeout_seconds": 15
+    },
+    {
+      "label": "foreign-REFERENTIAL_CONSTRAINTS",
+      "family": "issue-353",
+      "kind": "query",
+      "sql": "SELECT * FROM INFORMATION_SCHEMA.REFERENTIAL_CONSTRAINTS",
+      "requires": [
+        "foreign-child-1",
+        "foreign-child-2"
+      ],
+      "timeout_seconds": 15
+    },
+    {
+      "label": "foreign-KEY_COLUMN_USAGE",
+      "family": "issue-353",
+      "kind": "query",
+      "sql": "SELECT * FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE WHERE TABLE_NAME='referenced_table'",
+      "requires": [
+        "foreign-child-1",
+        "foreign-child-2"
+      ],
+      "timeout_seconds": 15
+    },
+    {
+      "label": "foreign-join",
+      "family": "issue-353",
+      "kind": "query",
+      "sql": "SELECT rc.constraint_name,tc.table_name FROM INFORMATION_SCHEMA.REFERENTIAL_CONSTRAINTS rc JOIN INFORMATION_SCHEMA.TABLE_CONSTRAINTS tc ON tc.constraint_catalog=rc.unique_constraint_catalog AND tc.constraint_schema=rc.unique_constraint_schema AND tc.constraint_name=rc.unique_constraint_name WHERE rc.constraint_name='fk_ref_1'",
+      "requires": [
+        "foreign-child-1"
+      ],
+      "timeout_seconds": 15
+    }
+  ]
+}

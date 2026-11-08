@@ -1,0 +1,926 @@
+{
+  "passed": 230,
+  "failed": 0,
+  "checks": [
+    {
+      "name": "query-shapes unique complete planned records",
+      "pass": true
+    },
+    {
+      "name": "query-shapes code schema",
+      "pass": true
+    },
+    {
+      "name": "query-shapes code seed",
+      "pass": true
+    },
+    {
+      "name": "query-shapes code id-ASC",
+      "pass": true
+    },
+    {
+      "name": "query-shapes code sql-id-ASC",
+      "pass": true
+    },
+    {
+      "name": "query-shapes code id-DESC",
+      "pass": true
+    },
+    {
+      "name": "query-shapes code sql-id-DESC",
+      "pass": true
+    },
+    {
+      "name": "query-shapes code name-ASC",
+      "pass": true
+    },
+    {
+      "name": "query-shapes code sql-name-ASC",
+      "pass": true
+    },
+    {
+      "name": "query-shapes code name-DESC",
+      "pass": true
+    },
+    {
+      "name": "query-shapes code sql-name-DESC",
+      "pass": true
+    },
+    {
+      "name": "query-shapes code country-ASC",
+      "pass": true
+    },
+    {
+      "name": "query-shapes code sql-country-ASC",
+      "pass": true
+    },
+    {
+      "name": "query-shapes code country-DESC",
+      "pass": true
+    },
+    {
+      "name": "query-shapes code sql-country-DESC",
+      "pass": true
+    },
+    {
+      "name": "query-shapes code timestamp-ASC",
+      "pass": true
+    },
+    {
+      "name": "query-shapes code sql-timestamp-ASC",
+      "pass": true
+    },
+    {
+      "name": "query-shapes code timestamp-DESC",
+      "pass": true
+    },
+    {
+      "name": "query-shapes code sql-timestamp-DESC",
+      "pass": true
+    },
+    {
+      "name": "query-shapes code arithmetic-ASC",
+      "pass": true
+    },
+    {
+      "name": "query-shapes code sql-arithmetic-ASC",
+      "pass": true
+    },
+    {
+      "name": "query-shapes code arithmetic-DESC",
+      "pass": true
+    },
+    {
+      "name": "query-shapes code sql-arithmetic-DESC",
+      "pass": true
+    },
+    {
+      "name": "query-shapes code string-cast-ASC",
+      "pass": true
+    },
+    {
+      "name": "query-shapes code sql-string-cast-ASC",
+      "pass": true
+    },
+    {
+      "name": "query-shapes code string-cast-DESC",
+      "pass": true
+    },
+    {
+      "name": "query-shapes code sql-string-cast-DESC",
+      "pass": true
+    },
+    {
+      "name": "query-shapes code distinct-ASC",
+      "pass": true
+    },
+    {
+      "name": "query-shapes code aggregate-ASC",
+      "pass": true
+    },
+    {
+      "name": "query-shapes code sql-aggregate-ASC",
+      "pass": true
+    },
+    {
+      "name": "query-shapes code next-ASC",
+      "pass": true
+    },
+    {
+      "name": "query-shapes code limit1-ASC",
+      "pass": true
+    },
+    {
+      "name": "query-shapes code limit2-ASC",
+      "pass": true
+    },
+    {
+      "name": "query-shapes code primitive-limit2-ASC",
+      "pass": true
+    },
+    {
+      "name": "query-shapes code distinct-DESC",
+      "pass": true
+    },
+    {
+      "name": "query-shapes code aggregate-DESC",
+      "pass": true
+    },
+    {
+      "name": "query-shapes code sql-aggregate-DESC",
+      "pass": true
+    },
+    {
+      "name": "query-shapes code next-DESC",
+      "pass": true
+    },
+    {
+      "name": "query-shapes code limit1-DESC",
+      "pass": true
+    },
+    {
+      "name": "query-shapes code limit2-DESC",
+      "pass": true
+    },
+    {
+      "name": "query-shapes code primitive-limit2-DESC",
+      "pass": true
+    },
+    {
+      "name": "query-shapes code primitive-no-page",
+      "pass": true
+    },
+    {
+      "name": "query-shapes code offset-limit",
+      "pass": true
+    },
+    {
+      "name": "query-shapes code tie-keys",
+      "pass": true
+    },
+    {
+      "name": "query-shapes code tie-keys-with-id",
+      "pass": true
+    },
+    {
+      "name": "query-shapes code aggregate-order",
+      "pass": true
+    },
+    {
+      "name": "query-shapes code aggregate-order-desc",
+      "pass": true
+    },
+    {
+      "name": "query-shapes code next-array",
+      "pass": true
+    },
+    {
+      "name": "query-shapes code for-values",
+      "pass": true
+    },
+    {
+      "name": "query-shapes code sql-outer-graph",
+      "pass": true
+    },
+    {
+      "name": "query-shapes lifecycle create-database",
+      "pass": true
+    },
+    {
+      "name": "query-shapes lifecycle drop-database",
+      "pass": true
+    },
+    {
+      "name": "query-shapes lifecycle database-absent",
+      "pass": true
+    },
+    {
+      "name": "query-shapes lifecycle runtime-cleanup",
+      "pass": true
+    },
+    {
+      "name": "query-shapes container absent",
+      "pass": true
+    },
+    {
+      "name": "cardinality unique complete planned records",
+      "pass": true
+    },
+    {
+      "name": "cardinality code schema",
+      "pass": true
+    },
+    {
+      "name": "cardinality code seed",
+      "pass": true
+    },
+    {
+      "name": "cardinality code primitive-ASC-2",
+      "pass": true
+    },
+    {
+      "name": "cardinality code final-ASC-2",
+      "pass": true
+    },
+    {
+      "name": "cardinality code sql-ASC-2",
+      "pass": true
+    },
+    {
+      "name": "cardinality code primitive-ASC-3",
+      "pass": true
+    },
+    {
+      "name": "cardinality code final-ASC-3",
+      "pass": true
+    },
+    {
+      "name": "cardinality code sql-ASC-3",
+      "pass": true
+    },
+    {
+      "name": "cardinality code primitive-ASC-4",
+      "pass": true
+    },
+    {
+      "name": "cardinality code final-ASC-4",
+      "pass": true
+    },
+    {
+      "name": "cardinality code sql-ASC-4",
+      "pass": true
+    },
+    {
+      "name": "cardinality code primitive-ASC-5",
+      "pass": true
+    },
+    {
+      "name": "cardinality code final-ASC-5",
+      "pass": true
+    },
+    {
+      "name": "cardinality code sql-ASC-5",
+      "pass": true
+    },
+    {
+      "name": "cardinality code primitive-DESC-2",
+      "pass": true
+    },
+    {
+      "name": "cardinality code final-DESC-2",
+      "pass": true
+    },
+    {
+      "name": "cardinality code sql-DESC-2",
+      "pass": true
+    },
+    {
+      "name": "cardinality code primitive-DESC-3",
+      "pass": true
+    },
+    {
+      "name": "cardinality code final-DESC-3",
+      "pass": true
+    },
+    {
+      "name": "cardinality code sql-DESC-3",
+      "pass": true
+    },
+    {
+      "name": "cardinality code primitive-DESC-4",
+      "pass": true
+    },
+    {
+      "name": "cardinality code final-DESC-4",
+      "pass": true
+    },
+    {
+      "name": "cardinality code sql-DESC-4",
+      "pass": true
+    },
+    {
+      "name": "cardinality code primitive-DESC-5",
+      "pass": true
+    },
+    {
+      "name": "cardinality code final-DESC-5",
+      "pass": true
+    },
+    {
+      "name": "cardinality code sql-DESC-5",
+      "pass": true
+    },
+    {
+      "name": "cardinality code for-primitive-five",
+      "pass": true
+    },
+    {
+      "name": "cardinality code for-final-five",
+      "pass": true
+    },
+    {
+      "name": "cardinality lifecycle create-database",
+      "pass": true
+    },
+    {
+      "name": "cardinality lifecycle drop-database",
+      "pass": true
+    },
+    {
+      "name": "cardinality lifecycle database-absent",
+      "pass": true
+    },
+    {
+      "name": "cardinality lifecycle runtime-cleanup",
+      "pass": true
+    },
+    {
+      "name": "cardinality container absent",
+      "pass": true
+    },
+    {
+      "name": "sql-id-ASC SQL order",
+      "pass": true
+    },
+    {
+      "name": "sql-name-ASC SQL order",
+      "pass": true
+    },
+    {
+      "name": "sql-country-ASC SQL order",
+      "pass": true
+    },
+    {
+      "name": "sql-timestamp-ASC SQL order",
+      "pass": true
+    },
+    {
+      "name": "sql-arithmetic-ASC SQL order",
+      "pass": true
+    },
+    {
+      "name": "sql-string-cast-ASC SQL order",
+      "pass": true
+    },
+    {
+      "name": "sql-aggregate-ASC SQL order",
+      "pass": true
+    },
+    {
+      "name": "sql-id-DESC SQL order",
+      "pass": true
+    },
+    {
+      "name": "sql-name-DESC SQL order",
+      "pass": true
+    },
+    {
+      "name": "sql-country-DESC SQL order",
+      "pass": true
+    },
+    {
+      "name": "sql-timestamp-DESC SQL order",
+      "pass": true
+    },
+    {
+      "name": "sql-arithmetic-DESC SQL order",
+      "pass": true
+    },
+    {
+      "name": "sql-string-cast-DESC SQL order",
+      "pass": true
+    },
+    {
+      "name": "sql-aggregate-DESC SQL order",
+      "pass": true
+    },
+    {
+      "name": "SQL outer graph order",
+      "pass": true
+    },
+    {
+      "name": "sql-ASC-2 independent fixture expectation",
+      "pass": true
+    },
+    {
+      "name": "sql-ASC-3 independent fixture expectation",
+      "pass": true
+    },
+    {
+      "name": "sql-ASC-4 independent fixture expectation",
+      "pass": true
+    },
+    {
+      "name": "sql-ASC-5 independent fixture expectation",
+      "pass": true
+    },
+    {
+      "name": "sql-DESC-2 independent fixture expectation",
+      "pass": true
+    },
+    {
+      "name": "sql-DESC-3 independent fixture expectation",
+      "pass": true
+    },
+    {
+      "name": "sql-DESC-4 independent fixture expectation",
+      "pass": true
+    },
+    {
+      "name": "sql-DESC-5 independent fixture expectation",
+      "pass": true
+    },
+    {
+      "name": "all 1594 preexisting artifact hashes preserved",
+      "pass": true
+    },
+    {
+      "name": "all 123 measured implementation files unchanged",
+      "pass": true
+    },
+    {
+      "name": "id-ASC predicted final permutation",
+      "pass": true
+    },
+    {
+      "name": "id-ASC incorrect unique-key order",
+      "pass": true
+    },
+    {
+      "name": "id-ASC membership",
+      "pass": true
+    },
+    {
+      "name": "id-DESC predicted final permutation",
+      "pass": true
+    },
+    {
+      "name": "id-DESC incorrect unique-key order",
+      "pass": true
+    },
+    {
+      "name": "id-DESC membership",
+      "pass": true
+    },
+    {
+      "name": "name-ASC predicted final permutation",
+      "pass": true
+    },
+    {
+      "name": "name-ASC incorrect unique-key order",
+      "pass": true
+    },
+    {
+      "name": "name-ASC membership",
+      "pass": true
+    },
+    {
+      "name": "name-DESC predicted final permutation",
+      "pass": true
+    },
+    {
+      "name": "name-DESC incorrect unique-key order",
+      "pass": true
+    },
+    {
+      "name": "name-DESC membership",
+      "pass": true
+    },
+    {
+      "name": "country-ASC predicted final permutation",
+      "pass": true
+    },
+    {
+      "name": "country-ASC incorrect unique-key order",
+      "pass": true
+    },
+    {
+      "name": "country-ASC membership",
+      "pass": true
+    },
+    {
+      "name": "country-DESC predicted final permutation",
+      "pass": true
+    },
+    {
+      "name": "country-DESC incorrect unique-key order",
+      "pass": true
+    },
+    {
+      "name": "country-DESC membership",
+      "pass": true
+    },
+    {
+      "name": "timestamp-ASC predicted final permutation",
+      "pass": true
+    },
+    {
+      "name": "timestamp-ASC incorrect unique-key order",
+      "pass": true
+    },
+    {
+      "name": "timestamp-ASC membership",
+      "pass": true
+    },
+    {
+      "name": "timestamp-DESC predicted final permutation",
+      "pass": true
+    },
+    {
+      "name": "timestamp-DESC incorrect unique-key order",
+      "pass": true
+    },
+    {
+      "name": "timestamp-DESC membership",
+      "pass": true
+    },
+    {
+      "name": "arithmetic-ASC predicted final permutation",
+      "pass": true
+    },
+    {
+      "name": "arithmetic-ASC incorrect unique-key order",
+      "pass": true
+    },
+    {
+      "name": "arithmetic-ASC membership",
+      "pass": true
+    },
+    {
+      "name": "arithmetic-DESC predicted final permutation",
+      "pass": true
+    },
+    {
+      "name": "arithmetic-DESC incorrect unique-key order",
+      "pass": true
+    },
+    {
+      "name": "arithmetic-DESC membership",
+      "pass": true
+    },
+    {
+      "name": "string-cast-ASC predicted final permutation",
+      "pass": true
+    },
+    {
+      "name": "string-cast-ASC incorrect unique-key order",
+      "pass": true
+    },
+    {
+      "name": "string-cast-ASC membership",
+      "pass": true
+    },
+    {
+      "name": "string-cast-DESC predicted final permutation",
+      "pass": true
+    },
+    {
+      "name": "string-cast-DESC incorrect unique-key order",
+      "pass": true
+    },
+    {
+      "name": "string-cast-DESC membership",
+      "pass": true
+    },
+    {
+      "name": "distinct-ASC predicted final permutation",
+      "pass": true
+    },
+    {
+      "name": "distinct-ASC incorrect unique-key order",
+      "pass": true
+    },
+    {
+      "name": "distinct-ASC membership",
+      "pass": true
+    },
+    {
+      "name": "aggregate-ASC predicted final permutation",
+      "pass": true
+    },
+    {
+      "name": "aggregate-ASC incorrect unique-key order",
+      "pass": true
+    },
+    {
+      "name": "aggregate-ASC membership",
+      "pass": true
+    },
+    {
+      "name": "next-ASC predicted final permutation",
+      "pass": true
+    },
+    {
+      "name": "next-ASC incorrect unique-key order",
+      "pass": true
+    },
+    {
+      "name": "next-ASC membership",
+      "pass": true
+    },
+    {
+      "name": "limit1-ASC selection",
+      "pass": true
+    },
+    {
+      "name": "limit2-ASC predicted final permutation",
+      "pass": true
+    },
+    {
+      "name": "limit2-ASC incorrect unique-key order",
+      "pass": true
+    },
+    {
+      "name": "limit2-ASC membership",
+      "pass": true
+    },
+    {
+      "name": "primitive-limit2-ASC selection",
+      "pass": true
+    },
+    {
+      "name": "distinct-DESC predicted final permutation",
+      "pass": true
+    },
+    {
+      "name": "distinct-DESC incorrect unique-key order",
+      "pass": true
+    },
+    {
+      "name": "distinct-DESC membership",
+      "pass": true
+    },
+    {
+      "name": "aggregate-DESC predicted final permutation",
+      "pass": true
+    },
+    {
+      "name": "aggregate-DESC incorrect unique-key order",
+      "pass": true
+    },
+    {
+      "name": "aggregate-DESC membership",
+      "pass": true
+    },
+    {
+      "name": "next-DESC predicted final permutation",
+      "pass": true
+    },
+    {
+      "name": "next-DESC incorrect unique-key order",
+      "pass": true
+    },
+    {
+      "name": "next-DESC membership",
+      "pass": true
+    },
+    {
+      "name": "limit1-DESC selection",
+      "pass": true
+    },
+    {
+      "name": "limit2-DESC predicted final permutation",
+      "pass": true
+    },
+    {
+      "name": "limit2-DESC incorrect unique-key order",
+      "pass": true
+    },
+    {
+      "name": "limit2-DESC membership",
+      "pass": true
+    },
+    {
+      "name": "primitive-limit2-DESC selection",
+      "pass": true
+    },
+    {
+      "name": "offset-limit predicted final permutation",
+      "pass": true
+    },
+    {
+      "name": "offset-limit incorrect unique-key order",
+      "pass": true
+    },
+    {
+      "name": "offset-limit membership",
+      "pass": true
+    },
+    {
+      "name": "tie-keys tied keys valid despite swapped IDs",
+      "pass": true
+    },
+    {
+      "name": "tie-keys-with-id predicted total-key permutation",
+      "pass": true
+    },
+    {
+      "name": "tie-keys-with-id total-key order wrong",
+      "pass": true
+    },
+    {
+      "name": "aggregate-order array elements",
+      "pass": true
+    },
+    {
+      "name": "aggregate-order-desc array elements",
+      "pass": true
+    },
+    {
+      "name": "next-array array elements",
+      "pass": true
+    },
+    {
+      "name": "for-values predicted final permutation",
+      "pass": true
+    },
+    {
+      "name": "for-values incorrect unique-key order",
+      "pass": true
+    },
+    {
+      "name": "for-values membership",
+      "pass": true
+    },
+    {
+      "name": "sql-outer-graph selection",
+      "pass": true
+    },
+    {
+      "name": "primitive-ASC-2 predicted single/double permutation",
+      "pass": true
+    },
+    {
+      "name": "primitive-ASC-2 selected membership",
+      "pass": true
+    },
+    {
+      "name": "final-ASC-2 predicted single/double permutation",
+      "pass": true
+    },
+    {
+      "name": "final-ASC-2 selected membership",
+      "pass": true
+    },
+    {
+      "name": "primitive-ASC-3 predicted single/double permutation",
+      "pass": true
+    },
+    {
+      "name": "primitive-ASC-3 selected membership",
+      "pass": true
+    },
+    {
+      "name": "final-ASC-3 predicted single/double permutation",
+      "pass": true
+    },
+    {
+      "name": "final-ASC-3 selected membership",
+      "pass": true
+    },
+    {
+      "name": "primitive-ASC-4 predicted single/double permutation",
+      "pass": true
+    },
+    {
+      "name": "primitive-ASC-4 selected membership",
+      "pass": true
+    },
+    {
+      "name": "final-ASC-4 predicted single/double permutation",
+      "pass": true
+    },
+    {
+      "name": "final-ASC-4 selected membership",
+      "pass": true
+    },
+    {
+      "name": "primitive-ASC-5 predicted single/double permutation",
+      "pass": true
+    },
+    {
+      "name": "primitive-ASC-5 selected membership",
+      "pass": true
+    },
+    {
+      "name": "final-ASC-5 predicted single/double permutation",
+      "pass": true
+    },
+    {
+      "name": "final-ASC-5 selected membership",
+      "pass": true
+    },
+    {
+      "name": "primitive-DESC-2 predicted single/double permutation",
+      "pass": true
+    },
+    {
+      "name": "primitive-DESC-2 selected membership",
+      "pass": true
+    },
+    {
+      "name": "final-DESC-2 predicted single/double permutation",
+      "pass": true
+    },
+    {
+      "name": "final-DESC-2 selected membership",
+      "pass": true
+    },
+    {
+      "name": "primitive-DESC-3 predicted single/double permutation",
+      "pass": true
+    },
+    {
+      "name": "primitive-DESC-3 selected membership",
+      "pass": true
+    },
+    {
+      "name": "final-DESC-3 predicted single/double permutation",
+      "pass": true
+    },
+    {
+      "name": "final-DESC-3 selected membership",
+      "pass": true
+    },
+    {
+      "name": "primitive-DESC-4 predicted single/double permutation",
+      "pass": true
+    },
+    {
+      "name": "primitive-DESC-4 selected membership",
+      "pass": true
+    },
+    {
+      "name": "final-DESC-4 predicted single/double permutation",
+      "pass": true
+    },
+    {
+      "name": "final-DESC-4 selected membership",
+      "pass": true
+    },
+    {
+      "name": "primitive-DESC-5 predicted single/double permutation",
+      "pass": true
+    },
+    {
+      "name": "primitive-DESC-5 selected membership",
+      "pass": true
+    },
+    {
+      "name": "final-DESC-5 predicted single/double permutation",
+      "pass": true
+    },
+    {
+      "name": "final-DESC-5 selected membership",
+      "pass": true
+    },
+    {
+      "name": "for-primitive-five predicted single/double permutation",
+      "pass": true
+    },
+    {
+      "name": "for-primitive-five selected membership",
+      "pass": true
+    },
+    {
+      "name": "for-final-five predicted single/double permutation",
+      "pass": true
+    },
+    {
+      "name": "for-final-five selected membership",
+      "pass": true
+    },
+    {
+      "name": "32 final total-key cases all fail ordering",
+      "pass": true
+    },
+    {
+      "name": "73 query attempts in two runtime matrices",
+      "pass": true
+    },
+    {
+      "name": "89 root step records retained",
+      "pass": true
+    }
+  ]
+}

@@ -1,0 +1,46 @@
+{
+  "readonly": {
+    "baseline_records": 80,
+    "current_records": 86,
+    "comparable_records": 80,
+    "changed_codes": [
+      {
+        "label": "active-batch-operations",
+        "sql": "SELECT * FROM SPANNER_SYS.ACTIVE_BATCH_OPERATIONS LIMIT 1",
+        "before": "InvalidArgument",
+        "after": "Internal"
+      }
+    ]
+  },
+  "google-features": {
+    "baseline_records": 53,
+    "current_records": 53,
+    "comparable_records": 53,
+    "changed_codes": [
+      {
+        "label": "volatile-graph-1",
+        "sql": "CREATE PROPERTY GRAPH ReleaseProbe20261007r1VolatileGraph1 NODE TABLES(ReleaseProbe20261007r1VolatileView KEY(Id)) OPTIONS(validate_element_key_uniqueness=false, allow_view_with_volatile_column=false)",
+        "before": "InvalidArgument",
+        "after": "Unimplemented"
+      },
+      {
+        "label": "volatile-graph-2",
+        "sql": "CREATE PROPERTY GRAPH ReleaseProbe20261007r1VolatileGraph2 NODE TABLES(ReleaseProbe20261007r1VolatileView KEY(Id)) OPTIONS(validate_element_key_uniqueness=false, allow_view_with_volatile_column=true)",
+        "before": "InvalidArgument",
+        "after": "Unimplemented"
+      }
+    ]
+  },
+  "pg-features": {
+    "baseline_records": 40,
+    "current_records": 40,
+    "comparable_records": 40,
+    "changed_codes": []
+  },
+  "queue": {
+    "baseline_records": 32,
+    "current_records": 32,
+    "comparable_records": 32,
+    "changed_codes": []
+  }
+}

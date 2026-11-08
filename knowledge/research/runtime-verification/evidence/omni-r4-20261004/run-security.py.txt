@@ -1,0 +1,46 @@
+import pathlib, subprocess, secrets, time, json, os
+out=pathlib.Path(__file__).resolve().parent
+p=out/'tls-probe'
+image='us-docker.pkg.dev/spanner-omni/images/spanner-omni:2026.r4-lts@sha256:9f10586c5de366bec5c0ff6cf542a67c21c8363e8a12a3deb9c372a07c9aa8b6'
+name='spanalyzer-r4-security-20261004'
+receipts=[]
+def run(args, **kw):
+ r=subprocess.run(args, capture_output=True, text=True, **kw)
+ receipts.append({'args':args,'exit_code':r.returncode})
+ if r.returncode: raise RuntimeError(r.stderr)
+ return r.stdout.strip()
+(p/'password').write_text('R4!'+secrets.token_hex(10)+'aZ')
+(p/'password').chmod(0o600)
+cid=None
+try:
+ cid=run(['docker','create','--name',name,'--label','spanalyzer.task=omni-r4-20261004','-p','127.0.0.1::15000','--entrypoint','/bin/sh',image,'/probe-start.sh'])
+ run(['docker','cp',str(p/'start.sh'),name+':/probe-start.sh'])
+ run(['docker','cp',str(p/'password'),name+':/password-input'])
+ # Move the temporary password into the container-private probe directory.
+ start=(p/'start.sh').read_text().replace('cd /probe','mv /password-input /probe/password\ncd /probe')
+ (p/'container-start.sh').write_text(start)
+ run(['docker','cp',str(p/'container-start.sh'),name+':/probe-start.sh'])
+ run(['docker','start',name])
+ deadline=time.time()+120
+ while time.time()<deadline:
+  logs=run(['docker','logs',name])
+  if 'Spanner is ready' in logs: break
+  time.sleep(2)
+ else: raise RuntimeError('TLS server startup timeout: '+logs[-2000:])
+ (out/'security-startup.log').write_text(logs+'\n')
+ for src,dst in [('certs/ca-api.crt','ca-api.crt'),('clientcerts/client.crt','client.crt'),('clientcerts/client.key','client.key')]:
+  run(['docker','cp',name+':/probe/'+src,str(p/dst)])
+  (p/dst).chmod(0o600)
+ endpoint=run(['docker','port',name,'15000/tcp'])
+ env=os.environ.copy();env['OMNI_ENDPOINT']=endpoint
+ for k in ['SPANNER_EMULATOR_HOST','SPANEMUBOOST_ENDPOINT_FILE']:env.pop(k,None)
+ r=subprocess.run([str(p/'probe')],cwd=p,env=env,capture_output=True,text=True,timeout=120)
+ (out/'security.jsonl').write_text(r.stdout);(out/'security.stderr').write_text(r.stderr)
+ receipts.append({'args':['security-probe'],'exit_code':r.returncode})
+ print(r.stdout,flush=True)
+finally:
+ if cid:
+  r=subprocess.run(['docker','rm','-f','-v',name],capture_output=True,text=True)
+  receipts.append({'args':['docker','rm','-f','-v',name],'exit_code':r.returncode})
+ for n in ['password','client.key','client.crt','ca-api.crt']:(p/n).unlink(missing_ok=True)
+ (out/'security-commands.json').write_text(json.dumps(receipts,indent=2)+'\n')

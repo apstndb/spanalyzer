@@ -1,0 +1,83 @@
+"""Offline evidence/provenance assertions; expected divergences remain explicit."""
+from pathlib import Path
+from collections import Counter
+import hashlib,json,re
+root=Path('<LOCAL_CHECKOUT>');scratch=root/'.tmp/cross-engine-doc-delta-20261029';task=Path('<LOCAL_TASK_ROOT>/apstndb/spanalyzer/cross-engine-doc-delta-20261029');base=root/'knowledge/research/runtime-verification/evidence';p=base/'cross-engine-doc-delta-20261029';checks=[]
+def read(path):return json.loads(path.read_text())
+def lines(path):return[json.loads(s)for s in path.read_text().splitlines()if s]
+def sha(path):return hashlib.sha256(path.read_bytes()).hexdigest()
+def check(label,condition):
+ if not condition:raise AssertionError(label)
+ checks.append(label)
+r=read(p/'receipt.json');images=r['images'];check('all three exact platform identities recorded',set(images)=={'omni-r5','omni-lts','emulator'}and all(x['platform']=='linux/arm64'and'@sha256:'in x['image']for x in images.values()))
+check('same isolated SDK and experimental runtime adapter',r['dependencies']=={'go':'go1.26.8','spanner':'v1.91.0','spanemuboost':'v0.4.10-alpha.1','workspace':'GOWORK=off scratch-only reproducer module'})
+commands=read(p/'all-commands.json');check('all producer commands exit zero',all(c['exit_code']==0 for c in commands))
+core={b:lines(p/(b+'.jsonl'))for b in images};summary=read(p/'comparison.json');features=read(p/'feature-summary.json')
+for b,rows in core.items():
+ check(b+' all 700 planned core steps recorded',sum(bool(x.get('family'))for x in rows)==700)
+ check(b+' actual platform matches selected manifest',next(x for x in rows if x['label']=='identity')['platform']=='linux/arm64')
+ check(b+' JSON 125 and distinctness 64 preserve managed success values',features[b]['constant_corpus']['cases']==125 and features[b]['constant_corpus']['codes']['OK']==99 and summary[b]['constants']['constant-distinctness-cases']['cases']==64 and summary[b]['constants']['constant-distinctness-cases']['codes']=={'OK':49,'InvalidArgument':15})
+ check(b+' parameter omission corrected through original producer',features[b]['constant_corpus']['correctly_bound_conditional']['params']=={'choose':True}and features[b]['constant_corpus']['correctly_bound_conditional']['rows']==[{'result':10}])
+ check(b+' two same-name queue generations match exact IDs',len(features[b]['queue_generation_checks'])==2 and all(x['matches']for x in features[b]['queue_generation_checks']))
+ check(b+' actual child heartbeat records in both dialects',all(x['code']=='OK'and x['rows']>0 and 90<x['median_record_gap_ms']<120 for x in features[b]['heartbeats'].values()))
+ check(b+' all 24 numeric search rows execute',sum(x['code']=='OK'for x in features[b]['features']['numeric_search'])==24)
+ order=features[b]['order_matrix'];check(b+' twelve ordering controls captured',len(order)==12 and all(x['code']=='OK'for x in order))
+ for x in order:
+  values=[next(iter(row.values()))for row in x['rows']];descending=x['label']in ['dynamic-order-desc','dynamic-static-id-desc','dynamic-sql-id-desc-control','dynamic-order-int64-desc'];expected=['2','1']if descending else['1','2']
+  if b=='emulator'and not x['label'].startswith('dynamic-sql-'):expected=list(reversed(expected))
+  check(b+' observed direction '+x['label'],values==expected)
+ expected=(48,310,51,598)if b!='emulator'else(30,204,0,0);cat=summary[b]['catalog'];check(b+' scoped catalog dimensions',(cat['information-schema-columns']['table_count'],cat['information-schema-columns']['column_count'],cat['spanner-sys-columns']['table_count'],cat['spanner-sys-columns']['column_count'])==expected)
+ check(b+' no core transport failures',not summary[b]['inconclusive'])
+for b in images:
+ pairs=summary[b]['pairs'];hll=[x for x in pairs if x['family']in ['hll','hll-extra']];prop=[x for x in pairs if x['family']=='gql_column_propagation'and x['managed_code']=='OK']
+ check(b+' full HLL and propagation coverage',len(hll)==54 and len(prop)==36)
+ if b=='emulator':
+  check('Emulator HLL rejection codes retained',Counter(x['code']for x in hll)=={'InvalidArgument':51,'Unimplemented':3})
+  check('Emulator all positive propagation controls rejected',all(x['code']=='InvalidArgument'for x in prop))
+  entries={(x['phase'],x['label']):x for x in core[b]};check('Emulator both SET NULL rejections retained',entries[('google-new','fk-inline-set-null')]['code']=='InvalidArgument'and entries[('pg-new','fk-inline-set-null')]['code']=='FailedPrecondition')
+ else:check(b+' bounded HLL outcomes match reference counts',Counter(x['code']for x in hll)=={'OK':41,'OutOfRange':8,'InvalidArgument':5})
+# Image-specific positive and negative feature expectations.
+for b in ['omni-r5','omni-lts']:
+ check(b+' all JSON outcome codes match managed',features[b]['constant_corpus']['codes_matching_managed']==125)
+ check(b+' HLL and GQL propagation match mapped managed codes',all(x['code_equal']for x in summary[b]['pairs']if x['family']in ['hll','hll-extra','gql_column_propagation']))
+ check(b+' compared deterministic results match',not summary[b]['value_differences'])
+ rows={(x['phase'],x['label']):x for x in core[b]}
+ for d in ['google-new','pg-new']:
+  check(b+' SET NULL outcome '+d,rows[(d,'fk-inline-set-null')]['code']==('OK'if b=='omni-r5'else'InvalidArgument'if d=='google-new'else'Unimplemented'))
+ check(b+' actual forced numeric plans present',all(any(s['scan_type']=='SearchIndexScan'for s in x['scan_metadata'])for x in summary[b]['plan_observations']if re.fullmatch(r'numeric-.+-(prefix|log)',x['label'])))
+check('Emulator 84 new JSON successes against identical 1.5.58 corpus',features['emulator']['historical_emulator']['new_successes']==84 and features['emulator']['constant_corpus']['codes_matching_managed']==124)
+check('historical JSON inputs byte-identical',all((p/'inputs'/name).read_bytes()==(base/'json-cross-engine-20261010'/name).read_bytes()for name in ['cases.json','followup-cases.json']))
+for b in images:
+ check(b+' all common constant rows and types match',all(x.get('rows_equal')is not False and x.get('row_types_equal')is not False for x in summary[b]['pairs']if x['family'].startswith('constant-')))
+managed_graph={x['label']:x for x in lines(base/'managed-recheck-20261029/graph-final.jsonl')};repaired={x['label']:x for x in lines(p/'emulator-repair.jsonl')};finite=[x for x in summary['emulator']['pairs']if x['phase']=='graphs'and x.get('rows_equal')is False]
+check('all six finite path endpoint multisets agree',len(finite)==6 and all(Counter(json.dumps(row,sort_keys=True)for row in repaired[x['label']]['rows'])==Counter(json.dumps(row,sort_keys=True)for row in managed_graph[x['label']]['rows'])for x in finite))
+check('Emulator all profile observations lack physical plan nodes',all(x['plan_node_count']==0 for x in summary['emulator']['plan_observations']))
+check('Emulator accepts unsafe NULL-filtered search forms',all(x['code']=='OK'for x in features['emulator']['features']['filtered_search']))
+check('Emulator quota failures preserved and isolated',len(summary['emulator']['initial_capacity_failures'])==9 and len([x for x in lines(p/'emulator-repair.jsonl')if x.get('family')=='path-quantifier'and x.get('kind')=='query'])==17)
+check('Emulator effective graph codes match but six ordered path rows differ',all(x['code_equal']for x in summary['emulator']['pairs']if x['phase']=='graphs')and sum(x.get('rows_equal')is False for x in summary['emulator']['pairs']if x['phase']=='graphs')==6)
+legacy={x['label']:x for x in lines(p/'emulator-legacy.jsonl')if x.get('phase')=='google-fixtures'};path=legacy['graph-path-cast-normal'];check('Emulator GRAPH_PATH cast executes with JSON array result',path['code']=='OK'and path['metadata']['rowType']['fields'][0]['type']['code']=='JSON'and len(json.loads(next(iter(path['rows'][0].values()))))==3)
+check('Emulator PROTO cast remains Unimplemented',legacy['cast-proto']['code']=='Unimplemented')
+focus={x.get('label'):x for x in lines(p/'emulator-queue-single.jsonl')};check('fresh Emulator receive and remaining lease forms execute',focus['receive-immediate']['code']=='OK'and len(focus['receive-immediate']['rows'])==1 and all(focus[x]['code']=='OK'for x in ['control-scalar-default','control-array-default','renew-lease']))
+check('Emulator AUTO_PARAMETER-off rejection scoped to unsupported hint',all(focus[x]['code']=='InvalidArgument'and'Unsupported hint'in focus[x]['error']for x in ['control-scalar-off','control-array-off']))
+longreads=[]
+for name in ['emulator-queues','emulator-queue-focus']:
+ rows=lines(p/(name+'.jsonl'));target=next(x for x in rows if x.get('label')=='receive-immediate');longreads.append(target);check(name+' long receive deadline retained',target['code']=='DeadlineExceeded')
+check('only two unintentional inconclusive records retained',sum(x.get('code')in ['DeadlineExceeded','Unavailable','Internal','Unknown']and x.get('error')!='intentional probe rollback'for path in p.glob('*.jsonl')for x in lines(path))==2)
+cleanup=read(p/'cleanup-summary.json');check('all 37 owned database lifecycles absent',cleanup['owned_temporary_databases']==37 and all(x['drop_code']=='OK'and x['get_after_drop_code']=='NotFound'for x in cleanup['database_lifecycles']))
+check('all 15 owned runtime containers absent with identity evidence',cleanup['owned_runtime_containers']==15 and all(len(c['owned'])==1 and c['owned'][0]['absent']and(c['active_count']==1 or c.get('identity_recovery'))for c in cleanup['containers']))
+# Public source provenance and final release refresh.
+source_index=read(p/'sources/source-integrity.json');check('all portable full primary source hashes verified',all(sha(p/'sources'/x['file'])==x['sha256']for x in source_index['files']if x['retained_in_repository']))
+refresh=read(p/'sources/release-refresh.json');check('latest public versions unchanged at refresh',refresh[0]['version_tags'][0]=='2026.r5'and refresh[1]['version_tags'][0]=='1.5.59'and refresh[2]['tag']=='v1.5.59')
+check('Omni LTS patch selected and supported-label uncertainty explicit',images['omni-lts']['tagged_image'].endswith(':2026.r4-lts.1'))
+check('all 123 measured implementation/dependency files unchanged',not read(p/'source-comparison.json')['changed_files']and all(sha(root/name)==value for name,value in read(base/'managed-recheck-20261029/source-hashes.json').items()))
+initial=read(scratch/'initial-artifact-manifest.json')['files'];manifest=read(base/'artifact-sha256.json')['files'];check('all 1193 earlier evidence hashes unchanged',len(initial)==1193 and all(manifest.get(k)==v and sha(base/k)==v for k,v in initial.items()))
+check('all current evidence files hashed',all(manifest.get(str(path.relative_to(base)))==sha(path)for path in p.rglob('*')if path.is_file()))
+# Every runtime destination is local; full resource paths and opaque protocol IDs are removed.
+check('no complete connection destination retained in runtime JSONL',all(not re.search(r'projects/[A-Za-z0-9][^/\s"\x27]*/instances/',path.read_text())for path in p.glob('*.jsonl')))
+keys={'server_transaction_id','servertransactionid','transaction_id','transactionid','lease_id','leaseid','partition_token','partitiontoken','resume_token','resumetoken'}
+def safe(v,parent=''):
+ if isinstance(v,list):return all(safe(x,parent)for x in v)
+ if isinstance(v,dict):return all((not(parent!='column_types'and(k.lower()in keys or k.lower().endswith('leasetoken')or(parent.lower()=='transaction'and k=='id')))or not isinstance(x,str)or not x or x.startswith(('sha256:','<redacted>')))and safe(x,k)for k,x in v.items())
+ return True
+check('opaque operational IDs hashed',all(safe(x)for path in p.glob('*.jsonl')for x in lines(path)))
+result={'status':'pass','checks':len(checks),'scope':'Offline result/source/cleanup/privacy verification. Recorded unsupported cases, wrong ordered results and two receive deadlines remain engine observations.','details':checks};(task/'evidence-check.json').write_text(json.dumps(result,indent=2)+'\n');print(json.dumps({'status':'pass','checks':len(checks)}))

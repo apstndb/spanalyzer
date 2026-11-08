@@ -1,0 +1,30 @@
+[
+  {
+    "name": "volatile-build",
+    "started_at": "2026-10-04T14:40:49.767848+00:00",
+    "exit_code": 0,
+    "elapsed_seconds": 2.48,
+    "cwd": "<LOCAL_CHECKOUT>/.worktrees/omni-r4-20261004/tools",
+    "args": [
+      "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go",
+      "build",
+      "-o",
+      "<LOCAL_CHECKOUT>/.tmp/omni-r4-20261004/volatile-probe",
+      "<LOCAL_CHECKOUT>/.tmp/omni-r4-20261004/volatile-probe.go"
+    ],
+    "env_overrides": {}
+  },
+  {
+    "name": "volatile-r4",
+    "started_at": "2026-10-04T14:40:52.251770+00:00",
+    "exit_code": 0,
+    "elapsed_seconds": 78.28,
+    "cwd": "<LOCAL_CHECKOUT>/.worktrees/omni-r4-20261004/tools",
+    "args": [
+      "<LOCAL_CHECKOUT>/.tmp/omni-r4-20261004/volatile-probe"
+    ],
+    "env_overrides": {
+      "OMNI_IMAGE": "us-docker.pkg.dev/spanner-omni/images/spanner-omni:2026.r4-lts@sha256:9f10586c5de366bec5c0ff6cf542a67c21c8363e8a12a3deb9c372a07c9aa8b6"
+    }
+  }
+]

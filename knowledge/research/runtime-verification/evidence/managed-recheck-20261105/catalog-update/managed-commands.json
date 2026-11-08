@@ -1,0 +1,64 @@
+[
+  {
+    "name": "capture-infoschema",
+    "argv": [
+      "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.10/bin/go",
+      "run",
+      "./cmd/infoschema-capture",
+      "--target",
+      "managed",
+      "--write",
+      "--repo-root",
+      "<LOCAL_CHECKOUT>/.worktrees/cross-engine-audit-20261005"
+    ],
+    "started_at": "2026-11-05T03:05:41.795775+00:00",
+    "completed_at": "2026-11-05T03:05:45.111770+00:00",
+    "exit_code": 0
+  },
+  {
+    "name": "capture-spannersys",
+    "argv": [
+      "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.10/bin/go",
+      "run",
+      "./cmd/spanner-sys-capture",
+      "--target",
+      "managed",
+      "--write",
+      "--repo-root",
+      "<LOCAL_CHECKOUT>/.worktrees/cross-engine-audit-20261005"
+    ],
+    "started_at": "2026-11-05T03:05:45.111896+00:00",
+    "completed_at": "2026-11-05T03:05:47.394485+00:00",
+    "exit_code": 0
+  },
+  {
+    "name": "managed-drift",
+    "argv": [
+      "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.10/bin/go",
+      "test",
+      "-count=1",
+      "-v",
+      "-run",
+      "^TestDrift_RealTableMetas$",
+      "./infoschem"
+    ],
+    "started_at": "2026-11-05T03:05:47.394771+00:00",
+    "completed_at": "2026-11-05T03:05:54.996885+00:00",
+    "exit_code": 0
+  },
+  {
+    "name": "managed-canonical",
+    "argv": [
+      "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.10/bin/go",
+      "test",
+      "-count=1",
+      "-v",
+      "-run",
+      "^TestCanonicalDDL_RealSpanner$",
+      "./infoschem"
+    ],
+    "started_at": "2026-11-05T03:05:54.997021+00:00",
+    "completed_at": "2026-11-05T03:05:58.509284+00:00",
+    "exit_code": 0
+  }
+]

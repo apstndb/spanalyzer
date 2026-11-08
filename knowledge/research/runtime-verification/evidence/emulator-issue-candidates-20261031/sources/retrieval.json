@@ -1,0 +1,38 @@
+[
+  {
+    "file": "issues-all.json",
+    "api_args": [
+      "--paginate",
+      "--slurp",
+      "repos/GoogleCloudPlatform/cloud-spanner-emulator/issues?state=all&per_page=100"
+    ],
+    "retrieved_at": "2026-10-30T19:31:47.124876+00:00",
+    "sha256": "8e903495d9b461712a1c2adec3bb187673c9426fa33159f3103778c79ba34e5d"
+  },
+  {
+    "file": "issue-408.json",
+    "api_args": [
+      "repos/GoogleCloudPlatform/cloud-spanner-emulator/issues/408"
+    ],
+    "retrieved_at": "2026-10-30T19:31:42.467928+00:00",
+    "sha256": "ced0f9a2af54ce611afc8b09aebc6645c8a22cf0d33a1cc5d794f28a598fc84c"
+  },
+  {
+    "file": "issue-408-comments.json",
+    "api_args": [
+      "--paginate",
+      "--slurp",
+      "repos/GoogleCloudPlatform/cloud-spanner-emulator/issues/408/comments?per_page=100"
+    ],
+    "retrieved_at": "2026-10-30T19:31:42.398746+00:00",
+    "sha256": "cf1cbb66a638b4860a516671fb74850e6ccf787fe6c4c8d29e9c04efe880bd05"
+  },
+  {
+    "file": "latest-release.json",
+    "api_args": [
+      "repos/GoogleCloudPlatform/cloud-spanner-emulator/releases/latest"
+    ],
+    "retrieved_at": "2026-10-30T19:31:42.440554+00:00",
+    "sha256": "2b83c85a310dbfcbc7ba5c55f7147362765e51dbf5c580f2d0d60e12d3942d96"
+  }
+]

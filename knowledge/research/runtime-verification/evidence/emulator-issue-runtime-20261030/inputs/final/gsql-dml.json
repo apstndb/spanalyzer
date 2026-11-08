@@ -1,0 +1,237 @@
+{
+  "dialect": "google",
+  "steps": [
+    {
+      "label": "conflict-table",
+      "family": "issue-358",
+      "kind": "ddl",
+      "sql": "CREATE TABLE ConflictTable(id INT64 NOT NULL,created_on TIMESTAMP NOT NULL DEFAULT(CURRENT_TIMESTAMP())) PRIMARY KEY(id)",
+      "requires": [],
+      "timeout_seconds": 30
+    },
+    {
+      "label": "conflict-seed",
+      "family": "issue-358",
+      "kind": "dml",
+      "sql": "",
+      "requires": [
+        "conflict-table"
+      ],
+      "timeout_seconds": 15,
+      "statements": [
+        "INSERT INTO ConflictTable(id) VALUES(1)"
+      ]
+    },
+    {
+      "label": "conflict-nothing-1",
+      "family": "issue-358",
+      "kind": "dml",
+      "sql": "",
+      "requires": [
+        "conflict-seed"
+      ],
+      "timeout_seconds": 15,
+      "statements": [
+        "INSERT INTO ConflictTable(id) VALUES(1) ON CONFLICT DO NOTHING"
+      ]
+    },
+    {
+      "label": "conflict-nothing-2",
+      "family": "issue-358",
+      "kind": "dml",
+      "sql": "",
+      "requires": [
+        "conflict-seed"
+      ],
+      "timeout_seconds": 15,
+      "statements": [
+        "INSERT INTO ConflictTable(id) VALUES(2) ON CONFLICT DO NOTHING"
+      ]
+    },
+    {
+      "label": "conflict-after",
+      "family": "issue-358",
+      "kind": "query",
+      "sql": "SELECT id FROM ConflictTable ORDER BY id",
+      "requires": [
+        "conflict-seed"
+      ],
+      "timeout_seconds": 15
+    },
+    {
+      "label": "null-array-0",
+      "family": "issue-292",
+      "kind": "query",
+      "sql": "with\n  grps as (select * from unnest([10, 20, 30]) as group_id),\n  nums as (select * from\n    unnest(array<struct<id int64, group_id int64, name string>>[\n      (1, 10, 'foo'), (2, 20, 'bar'), (11, 10, 'baz')\n    ])\n  ) \n\nselect group_id, (select array_agg(struct(id, name)) from nums where nums.group_id=grps.group_id) from grps;\n",
+      "requires": [],
+      "timeout_seconds": 15
+    },
+    {
+      "label": "null-array-1",
+      "family": "issue-292",
+      "kind": "query",
+      "sql": "with\n  grps as (select * from unnest([10, 20, 30]) as group_id),\n  nums as (select * from\n    unnest(array<struct<id int64, group_id int64, name string>>[\n      (1, 10, 'foo'), (2, 20, 'bar'), (11, 10, 'baz')\n    ])\n  ) \n\nselect group_id, (select coalesce(array_agg(struct(id, name)), []) from nums where nums.group_id=grps.group_id) from grps;\n",
+      "requires": [],
+      "timeout_seconds": 15
+    },
+    {
+      "label": "with-in-subquery",
+      "family": "issue-276",
+      "kind": "query",
+      "sql": "SELECT * FROM (WITH c AS (SELECT 1 AS n) SELECT * FROM c)",
+      "requires": [],
+      "timeout_seconds": 15
+    },
+    {
+      "label": "Requisitions-ddl",
+      "family": "issue-236",
+      "kind": "ddl",
+      "sql": "CREATE TABLE Requisitions(id INT64 NOT NULL,State INT64) PRIMARY KEY(id)",
+      "requires": [],
+      "timeout_seconds": 30
+    },
+    {
+      "label": "Measurements-ddl",
+      "family": "issue-236",
+      "kind": "ddl",
+      "sql": "CREATE TABLE Measurements(MeasurementId INT64 NOT NULL) PRIMARY KEY(MeasurementId)",
+      "requires": [],
+      "timeout_seconds": 30
+    },
+    {
+      "label": "subquery-seed",
+      "family": "issue-236",
+      "kind": "dml",
+      "sql": "",
+      "requires": [
+        "Requisitions-ddl",
+        "Measurements-ddl"
+      ],
+      "timeout_seconds": 15,
+      "statements": [
+        "INSERT INTO Requisitions(id,State) VALUES(1,1),(2,2)",
+        "INSERT INTO Measurements(MeasurementId) VALUES(1)"
+      ]
+    },
+    {
+      "label": "subquery-update-0",
+      "family": "issue-236",
+      "kind": "dml",
+      "sql": "",
+      "requires": [
+        "subquery-seed"
+      ],
+      "timeout_seconds": 8,
+      "statements": [
+        "UPDATE Requisitions\nSET State = 5\nWHERE\n  State IN (1,2)\n  AND EXISTS (\n    SELECT\n      MeasurementId\n    FROM\n      Measurements\n    LIMIT 1\n  );\n"
+      ]
+    },
+    {
+      "label": "subquery-update-1",
+      "family": "issue-236",
+      "kind": "dml",
+      "sql": "",
+      "requires": [
+        "subquery-seed"
+      ],
+      "timeout_seconds": 8,
+      "statements": [
+        "UPDATE Requisitions\nSET State = 5\nWHERE\n  State IN (1,2)\n  AND EXISTS ( SELECT TRUE );\n"
+      ]
+    },
+    {
+      "label": "subquery-update-2",
+      "family": "issue-236",
+      "kind": "dml",
+      "sql": "",
+      "requires": [
+        "subquery-seed"
+      ],
+      "timeout_seconds": 8,
+      "statements": [
+        "UPDATE Requisitions\nSET State = 5\nWHERE\n  State IN (1,2)\n  AND EXISTS ( SELECT FALSE );\n"
+      ]
+    },
+    {
+      "label": "order-items",
+      "family": "issue-143",
+      "kind": "ddl",
+      "sql": "CREATE TABLE Items(itemId STRING(MAX),itemVersionId STRING(MAX)) PRIMARY KEY(itemId,itemVersionId)",
+      "requires": [],
+      "timeout_seconds": 30
+    },
+    {
+      "label": "order-items-seed",
+      "family": "issue-143",
+      "kind": "dml",
+      "sql": "",
+      "requires": [
+        "order-items"
+      ],
+      "timeout_seconds": 15,
+      "statements": [
+        "INSERT INTO Items(itemId,itemVersionId) VALUES('A','2'),('A','3'),('A','1')"
+      ]
+    },
+    {
+      "label": "sql-order-ASC-1",
+      "family": "issue-143",
+      "kind": "query",
+      "sql": "SELECT * FROM Items WHERE itemId='A' ORDER BY itemVersionId ASC LIMIT 1",
+      "requires": [
+        "order-items-seed"
+      ],
+      "timeout_seconds": 15
+    },
+    {
+      "label": "sql-order-ASC-2",
+      "family": "issue-143",
+      "kind": "query",
+      "sql": "SELECT * FROM Items WHERE itemId='A' ORDER BY itemVersionId ASC LIMIT 2",
+      "requires": [
+        "order-items-seed"
+      ],
+      "timeout_seconds": 15
+    },
+    {
+      "label": "sql-order-ASC-3",
+      "family": "issue-143",
+      "kind": "query",
+      "sql": "SELECT * FROM Items WHERE itemId='A' ORDER BY itemVersionId ASC LIMIT 3",
+      "requires": [
+        "order-items-seed"
+      ],
+      "timeout_seconds": 15
+    },
+    {
+      "label": "sql-order-DESC-1",
+      "family": "issue-143",
+      "kind": "query",
+      "sql": "SELECT * FROM Items WHERE itemId='A' ORDER BY itemVersionId DESC LIMIT 1",
+      "requires": [
+        "order-items-seed"
+      ],
+      "timeout_seconds": 15
+    },
+    {
+      "label": "sql-order-DESC-2",
+      "family": "issue-143",
+      "kind": "query",
+      "sql": "SELECT * FROM Items WHERE itemId='A' ORDER BY itemVersionId DESC LIMIT 2",
+      "requires": [
+        "order-items-seed"
+      ],
+      "timeout_seconds": 15
+    },
+    {
+      "label": "sql-order-DESC-3",
+      "family": "issue-143",
+      "kind": "query",
+      "sql": "SELECT * FROM Items WHERE itemId='A' ORDER BY itemVersionId DESC LIMIT 3",
+      "requires": [
+        "order-items-seed"
+      ],
+      "timeout_seconds": 15
+    }
+  ]
+}

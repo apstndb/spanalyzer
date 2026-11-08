@@ -1,0 +1,9 @@
+=== RUN   TestDrift_RealTableMetas
+    drift_test.go:118: SPANNER_SYS surface (real_spanner): got 52 tables / 624 columns / 8 known absent, accepted [{50 587 8} {50 539 56}]
+    drift_test.go:118: SPANNER_SYS contract_metrics target=real_spanner registered_tables=51 advertised_tables=52 advertised_columns=624 known_absent_columns=8 has_drift=true
+    drift_test.go:118: SPANNER_SYS diagnostic_metrics target=real_spanner checked_tables=50 decoded_rows=18 advertised_not_queryable=0
+    drift_test.go:118: SPANNER_SYS drift (real_spanner): unknown_tables=[ACTIVE_BATCH_OPERATIONS BATCH_OPERATIONS] unknown_columns=map[LOCK_STATS_TOP_10MINUTE:[LOCK_WAIT_DISTRIBUTION LOCK_WAIT_DISTRIBUTION_JSON_STRING] LOCK_STATS_TOP_HOUR:[LOCK_WAIT_DISTRIBUTION LOCK_WAIT_DISTRIBUTION_JSON_STRING] LOCK_STATS_TOP_MINUTE:[LOCK_WAIT_DISTRIBUTION LOCK_WAIT_DISTRIBUTION_JSON_STRING] LOCK_STATS_TOTAL_10MINUTE:[LOCK_WAIT_DISTRIBUTION LOCK_WAIT_DISTRIBUTION_JSON_STRING] LOCK_STATS_TOTAL_HOUR:[LOCK_WAIT_DISTRIBUTION LOCK_WAIT_DISTRIBUTION_JSON_STRING] LOCK_STATS_TOTAL_MINUTE:[LOCK_WAIT_DISTRIBUTION LOCK_WAIT_DISTRIBUTION_JSON_STRING] SPLIT_STATS_TOP_10MINUTE:[LATENCY_IMPACT_CORRELATION_SCORE] SPLIT_STATS_TOP_HOUR:[LATENCY_IMPACT_CORRELATION_SCORE] SPLIT_STATS_TOP_MINUTE:[LATENCY_IMPACT_CORRELATION_SCORE]] ordinal_mismatches=[] type_mismatches=[]
+--- FAIL: TestDrift_RealTableMetas (9.67s)
+FAIL
+FAIL	github.com/apstndb/spanalyzer/survey/infoschem	10.263s
+FAIL

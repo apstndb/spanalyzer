@@ -1,0 +1,12 @@
+{
+  "authorized_at_recording": "2026-11-05T02:25:28.585006+00:00",
+  "authority": "User explicitly approved the current two disposable database creations, verification and deletion.",
+  "objects": "Two fresh task-owned databases, GoogleSQL and PostgreSQL, in the existing verification instance.",
+  "allowed_actions": [
+    "create",
+    "execute prepared verification",
+    "delete current successfully created databases",
+    "verify GetDatabase NotFound"
+  ],
+  "excluded": "Earlier retained database and every pre-existing database; no instance creation, paid conversion, commit, push or public posting."
+}

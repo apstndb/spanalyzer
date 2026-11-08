@@ -1,0 +1,11 @@
+--- spanemuboost-v0.4.7/omni.go
++++ local-r4-harness/omni.go
+@@ -286,7 +286,7 @@
+ 		ContainerRequest: testcontainers.ContainerRequest{
+ 			Image:        opts.emulatorImage,
+ 			ExposedPorts: []string{string(omniGRPCPort)},
+-			Cmd:          []string{"start-single-server"},
++			Cmd:          []string{"start-single-server", "--listen-addresses=0.0.0.0"},
+ 			WaitingFor: wait.ForAll(
+ 				wait.ForLog("Spanner is ready").WithStartupTimeout(omniStartupTimeout),
+ 				wait.ForExposedPort().SkipInternalCheck().WithStartupTimeout(omniStartupTimeout),

@@ -1,0 +1,101 @@
+from pathlib import Path
+import datetime
+import hashlib
+import json
+import os
+import shutil
+import subprocess
+
+r = Path('<LOCAL_CHECKOUT>')
+s = r / '.tmp/managed-recheck-20261105'
+t = Path('<LOCAL_TASK_ROOT>/apstndb/spanalyzer/managed-recheck-20261105')
+c = Path('<LOCAL_TASK_ROOT>/apstndb/spanalyzer/managed-catalog-20261105')
+base = r / 'knowledge/research/runtime-verification/evidence'
+out = base / 'managed-recheck-20261105'
+sha = lambda p: hashlib.sha256(p.read_bytes()).hexdigest()
+old = json.loads((s / 'fixture-evidence-baseline.json').read_text())['files']
+assert len(old) == 2234
+assert all(sha(base / p) == v for p, v in old.items())
+a = json.loads((t / 'evidence/assertions.json').read_text())
+assert a['status'] == 'pass' and a['checks'] == 422
+push = json.loads((c / 'push-receipt.json').read_text())
+assert push['status'] == 'pushed' and push['local_head'] == push['remote_head']
+
+def retain(src, dst):
+    dst.parent.mkdir(parents=True, exist_ok=True)
+    if dst.exists():
+        assert sha(src) == sha(dst), f'Refuse to replace retained observation: {dst}'
+    else:
+        shutil.copyfile(src, dst)
+
+for src in (t / 'evidence').iterdir():
+    if src.is_file():
+        retain(src, out / src.name)
+for src in s.glob('*.py'):
+    retain(src, out / (src.name + '.txt'))
+retain(c / 'push-receipt.json', out / 'catalog-update/push-receipt.json')
+retain(c / 'validation-receipt.json', out / 'catalog-update/validation-receipt.json')
+for name in ['managed-commands.json', 'managed-drift.log', 'managed-canonical.log',
+             'capture-infoschema.log', 'capture-spannersys.log',
+             'pre-push-final.json', 'pre-push-final.log']:
+    retain(c / 'evidence' / name, out / 'catalog-update' / name)
+
+repair = {'authority': 'User explicitly approved one additional disposable GoogleSQL database for the corrected volatile-view controls and its deletion.',
+          'scope': 'Only the current successfully created repair database; earlier retained databases excluded.',
+          'observed_cleanup': 'DropDatabase OK followed by GetDatabase NotFound',
+          'command_receipt': 'volatile-repair-commands.json'}
+(out / 'volatile-repair-authorization.json').write_text(json.dumps(repair, indent=2) + '\n')
+receipt = {
+    'status': 'complete', 'observed_on': '2026-11-05',
+    'target': 'Existing dedicated user-level mise profile; destinations excluded',
+    'backend_build': 'unavailable',
+    'source_checkout_head': subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=r, text=True).strip(),
+    'source_checkout_dirty': True,
+    'recorded_steps': a['steps'], 'bounded_assertions': a['checks'],
+    'additional_lifecycle_records': 9,
+    'initial_not_run': {'volatile_view_dependents': 9, 'unsupported_pg_score_database_option_dependents': 2},
+    'initial_view_setup_error': 'Strict name resolution rejects unqualified Id; initial failure retained, then corrected twelve-step separately authorized fixture succeeds.',
+    'new_databases_created': 3, 'new_databases_deleted': 3,
+    'cleanup': a['cleanup'],
+    'authorization': 'User explicitly approved two disposable databases, then one corrected volatile-view database. Separate catalog update and push request covers its isolated branch. No earlier database deletion, PR, merge, release or public issue.',
+    'local_catalog_before': 'Initial drift test fails; dated log retained',
+    'local_catalog_after': 'Isolated branch passes managed drift and canonical DDL; 53 registered / 632 known, managed 52 / 624 with eight known absent',
+    'catalog_push': push,
+    'analyzer_projections': {'information_schema_columns': 310, 'spanner_sys_tables': 50, 'spanner_sys_columns': 539, 'sys_policy': 'Historical matching managed/Omni common projection preserved'},
+    'not_rerun': ['Omni', 'Emulator', 'local parser compatibility', 'authenticated Omni clients', 'cross-region routing'],
+    'earlier_artifacts_preserved': len(old),
+    'at': datetime.datetime.now(datetime.timezone.utc).isoformat(),
+}
+(out / 'complete-receipt.json').write_text(json.dumps(receipt, indent=2) + '\n')
+validation = out / 'complete-validation.json'
+validation.write_text(json.dumps({'status': 'pending', 'commands': []}, indent=2) + '\n')
+go = '<LOCAL_HOME>/.local/share/mise/installs/go/1.26.10/bin/go'
+env = os.environ.copy()
+env.update(GOROOT=str(Path(go).parent.parent), GOTOOLCHAIN='local', GOFLAGS='-mod=readonly',
+           GOCACHE=str(r / '.tmp/managed-recheck-20260925/go-cache'), GOWORK=str(r / 'go.work'))
+rows = []
+for name, args, cwd in [
+    ('okf-all', [go, 'run', './okf-check', '--repo-root', '..', '--gate', 'all', '--publication-manifest', str(t / 'complete-publication-manifest.json')], r / 'tools'),
+    ('markdown-language', [go, 'run', './markdown-language-check', '--repo-root', '..'], r / 'tools'),
+    ('diff-check', ['git', 'diff', '--check'], r),
+]:
+    log = out / ('complete-' + name + '.log')
+    with log.open('wb') as f:
+        result = subprocess.run(args, cwd=cwd, env=env, stdout=f, stderr=subprocess.STDOUT)
+    rows.append({'name': name, 'argv': args, 'cwd': str(cwd), 'exit_code': result.returncode, 'log': log.name})
+    print(name, result.returncode, flush=True)
+    if result.returncode:
+        print(log.read_text()[-3000:])
+        raise SystemExit(result.returncode)
+validation.write_text(json.dumps({'status': 'pass', 'commands': rows}, indent=2) + '\n')
+assert all(sha(base / p) == v for p, v in old.items())
+manifest = base / 'artifact-sha256.json'
+d = json.loads(manifest.read_text())
+d['files'] = {str(p.relative_to(base)): sha(p) for p in sorted(base.rglob('*')) if p.is_file() and p != manifest}
+manifest.write_text(json.dumps(d, indent=2) + '\n')
+assert all(sha(base / p) == v for p, v in d['files'].items())
+for name in ['complete-receipt.json', 'complete-validation.json']:
+    shutil.copyfile(out / name, t / 'evidence' / name)
+shutil.copyfile(r / 'knowledge/research/runtime-verification/managed-revalidation-20261105.md', t / 'complete-report-snapshot.md.txt')
+(t / 'complete-checkpoint.json').write_text(json.dumps({'status': 'complete', 'recorded_steps': 270, 'bounded_assertions': 422, 'owned_databases_removed_and_absent': 3, 'earlier_artifacts_preserved': len(old), 'artifacts_verified': len(d['files']), 'catalog_branch': push['branch'], 'catalog_head': push['local_head']}, indent=2) + '\n')
+print('Preserved prior artifacts', len(old), 'verified total', len(d['files']))

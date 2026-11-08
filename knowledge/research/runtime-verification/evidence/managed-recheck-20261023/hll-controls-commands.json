@@ -1,0 +1,61 @@
+[
+  {
+    "name": "hll-controls-build",
+    "started_at": "2026-10-23T14:56:01.863995+00:00",
+    "completed_at": "2026-10-23T14:56:04.070178+00:00",
+    "exit_code": 0,
+    "seconds": 2.206,
+    "argv": [
+      "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go",
+      "build",
+      "-o",
+      "<LOCAL_CHECKOUT>/.tmp/managed-recheck-20261023/hll-controls",
+      "<LOCAL_CHECKOUT>/.tmp/managed-recheck-20261023/hll-controls.go"
+    ],
+    "cwd": "<LOCAL_CHECKOUT>/tools",
+    "gowork": "<LOCAL_CHECKOUT>/go.work"
+  },
+  {
+    "name": "hll-controls-buildinfo",
+    "started_at": "2026-10-23T14:56:04.070338+00:00",
+    "completed_at": "2026-10-23T14:56:04.082762+00:00",
+    "exit_code": 0,
+    "seconds": 0.012,
+    "argv": [
+      "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go",
+      "version",
+      "-m",
+      "<LOCAL_CHECKOUT>/.tmp/managed-recheck-20261023/hll-controls"
+    ],
+    "cwd": "<LOCAL_CHECKOUT>/tools",
+    "gowork": "<LOCAL_CHECKOUT>/go.work"
+  },
+  {
+    "name": "hll-controls-google",
+    "started_at": "2026-10-23T14:56:04.082898+00:00",
+    "completed_at": "2026-10-23T14:56:06.376877+00:00",
+    "exit_code": 0,
+    "seconds": 2.294,
+    "argv": [
+      "<LOCAL_CHECKOUT>/.tmp/managed-recheck-20261023/hll-controls",
+      "<LOCAL_CHECKOUT>/.tmp/managed-recheck-20261023/hll-controls-google-cases.json",
+      "google"
+    ],
+    "cwd": "<LOCAL_CHECKOUT>/tools",
+    "gowork": "<LOCAL_CHECKOUT>/go.work"
+  },
+  {
+    "name": "hll-controls-pg",
+    "started_at": "2026-10-23T14:56:06.377599+00:00",
+    "completed_at": "2026-10-23T14:56:29.412970+00:00",
+    "exit_code": 0,
+    "seconds": 23.035,
+    "argv": [
+      "<LOCAL_CHECKOUT>/.tmp/managed-recheck-20261023/hll-controls",
+      "<LOCAL_CHECKOUT>/.tmp/managed-recheck-20261023/hll-controls-pg-cases.json",
+      "pg"
+    ],
+    "cwd": "<LOCAL_CHECKOUT>/tools",
+    "gowork": "<LOCAL_CHECKOUT>/go.work"
+  }
+]

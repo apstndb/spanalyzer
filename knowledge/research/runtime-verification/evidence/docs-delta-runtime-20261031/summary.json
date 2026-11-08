@@ -1,0 +1,2040 @@
+{
+  "observed_at_utc": "2026-10-30T23:41:29.388134+00:00",
+  "targets": {
+    "managed": {
+      "core_records": 66,
+      "corrected_records": 29,
+      "final_records": 0,
+      "pipe_operator_codes": {
+        "pipe-select": "OK",
+        "pipe-extend": "OK",
+        "pipe-set": "OK",
+        "pipe-drop": "OK",
+        "pipe-rename": "OK",
+        "pipe-as": "OK",
+        "pipe-where": "OK",
+        "pipe-aggregate": "OK",
+        "pipe-join": "OK",
+        "pipe-order-by": "OK",
+        "pipe-limit": "OK",
+        "pipe-union": "OK",
+        "pipe-intersect": "OK",
+        "pipe-except": "OK",
+        "pipe-tablesample": "OK"
+      },
+      "queue_case_codes": {
+        "title": "OK",
+        "lower": "OK",
+        "upper": "InvalidArgument",
+        "mixed": "InvalidArgument"
+      }
+    },
+    "omni-r5": {
+      "core_records": 69,
+      "corrected_records": 46,
+      "final_records": 51,
+      "pipe_operator_codes": {
+        "pipe-select": "OK",
+        "pipe-extend": "OK",
+        "pipe-set": "OK",
+        "pipe-drop": "OK",
+        "pipe-rename": "OK",
+        "pipe-as": "OK",
+        "pipe-where": "OK",
+        "pipe-aggregate": "OK",
+        "pipe-join": "OK",
+        "pipe-order-by": "OK",
+        "pipe-limit": "OK",
+        "pipe-union": "OK",
+        "pipe-intersect": "OK",
+        "pipe-except": "OK",
+        "pipe-tablesample": "OK"
+      },
+      "queue_case_codes": {
+        "title": "OK",
+        "lower": "OK",
+        "upper": "InvalidArgument",
+        "mixed": "InvalidArgument"
+      },
+      "pipe_isolation": {
+        "select-led-select": {
+          "at": "2026-10-30T23:27:41.939414Z",
+          "backend": "omni-r5",
+          "code": "OK",
+          "completed_at": "2026-10-30T23:27:41.939413Z",
+          "error": "",
+          "family": "pipe-isolation",
+          "kind": "query",
+          "label": "select-led-select",
+          "metadata": {
+            "rowType": {
+              "fields": [
+                {
+                  "name": "x",
+                  "type": {
+                    "code": "INT64"
+                  }
+                }
+              ]
+            },
+            "transaction": {
+              "readTimestamp": "2026-10-30T23:27:41.919495Z"
+            },
+            "undeclaredParameters": {}
+          },
+          "phase": "google-final-cases",
+          "rows": [
+            {
+              "x": "1"
+            }
+          ],
+          "sql": "SELECT 1 AS x |> SELECT x",
+          "started_at": "2026-10-30T23:27:41.936019Z",
+          "statements": null
+        },
+        "select-led-where": {
+          "at": "2026-10-30T23:27:41.943153Z",
+          "backend": "omni-r5",
+          "code": "OK",
+          "completed_at": "2026-10-30T23:27:41.943152Z",
+          "error": "",
+          "family": "pipe-isolation",
+          "kind": "query",
+          "label": "select-led-where",
+          "metadata": {
+            "rowType": {
+              "fields": [
+                {
+                  "name": "x",
+                  "type": {
+                    "code": "INT64"
+                  }
+                }
+              ]
+            },
+            "transaction": {
+              "readTimestamp": "2026-10-30T23:27:41.923060Z"
+            },
+            "undeclaredParameters": {}
+          },
+          "phase": "google-final-cases",
+          "rows": [
+            {
+              "x": "1"
+            }
+          ],
+          "sql": "SELECT 1 AS x |> WHERE x=1",
+          "started_at": "2026-10-30T23:27:41.939602Z",
+          "statements": null
+        },
+        "select-led-aggregate": {
+          "at": "2026-10-30T23:27:41.946293Z",
+          "backend": "omni-r5",
+          "code": "OK",
+          "completed_at": "2026-10-30T23:27:41.946292Z",
+          "error": "",
+          "family": "pipe-isolation",
+          "kind": "query",
+          "label": "select-led-aggregate",
+          "metadata": {
+            "rowType": {
+              "fields": [
+                {
+                  "name": "n",
+                  "type": {
+                    "code": "INT64"
+                  }
+                }
+              ]
+            },
+            "transaction": {
+              "readTimestamp": "2026-10-30T23:27:41.926437Z"
+            },
+            "undeclaredParameters": {}
+          },
+          "phase": "google-final-cases",
+          "rows": [
+            {
+              "n": "1"
+            }
+          ],
+          "sql": "SELECT 1 AS x |> AGGREGATE SUM(x) AS n",
+          "started_at": "2026-10-30T23:27:41.943484Z",
+          "statements": null
+        },
+        "from-only": {
+          "at": "2026-10-30T23:27:41.949316Z",
+          "backend": "omni-r5",
+          "code": "OK",
+          "completed_at": "2026-10-30T23:27:41.949314Z",
+          "error": "",
+          "family": "pipe-isolation",
+          "kind": "query",
+          "label": "from-only",
+          "metadata": {
+            "rowType": {
+              "fields": [
+                {
+                  "name": "x",
+                  "type": {
+                    "code": "INT64"
+                  }
+                }
+              ]
+            },
+            "transaction": {
+              "readTimestamp": "2026-10-30T23:27:41.929410Z"
+            },
+            "undeclaredParameters": {}
+          },
+          "phase": "google-final-cases",
+          "rows": [
+            {
+              "x": "1"
+            }
+          ],
+          "sql": "FROM (SELECT 1 AS x)",
+          "started_at": "2026-10-30T23:27:41.946536Z",
+          "statements": null
+        }
+      },
+      "scorer_google": {
+        "score-unpinned": {
+          "at": "2026-10-30T23:26:07.123896Z",
+          "backend": "omni-r5",
+          "code": "OK",
+          "completed_at": "2026-10-30T23:26:07.123895Z",
+          "error": "",
+          "family": "score",
+          "kind": "query",
+          "label": "score-unpinned",
+          "metadata": {
+            "rowType": {
+              "fields": [
+                {
+                  "name": "Id",
+                  "type": {
+                    "code": "INT64"
+                  }
+                },
+                {
+                  "name": "default_score",
+                  "type": {
+                    "code": "FLOAT64"
+                  }
+                },
+                {
+                  "name": "version1_score",
+                  "type": {
+                    "code": "FLOAT64"
+                  }
+                },
+                {
+                  "name": "version2_score",
+                  "type": {
+                    "code": "FLOAT64"
+                  }
+                }
+              ]
+            },
+            "transaction": {
+              "readTimestamp": "2026-10-30T23:26:07.077488Z"
+            },
+            "undeclaredParameters": {}
+          },
+          "phase": "google-final-cases",
+          "rows": [
+            {
+              "Id": "1",
+              "default_score": 1.6450823545455933,
+              "version1_score": 0.41013103723526,
+              "version2_score": 1.6450823545455933
+            },
+            {
+              "Id": "2",
+              "default_score": 1.2588917016983032,
+              "version1_score": 0.28206658363342285,
+              "version2_score": 1.2588917016983032
+            }
+          ],
+          "sql": "SELECT Id, SCORE(BodyTokens,'cat') AS default_score, SCORE(BodyTokens,'cat', options => JSON '{\"version\": 1}') AS version1_score, SCORE(BodyTokens,'cat', options => JSON '{\"version\": 2}') AS version2_score FROM ScoreDocs WHERE SEARCH(BodyTokens,'cat') ORDER BY Id",
+          "started_at": "2026-10-30T23:26:07.095944Z",
+          "statements": null
+        },
+        "score-set-db-1": {
+          "at": "2026-10-30T23:26:10.834609Z",
+          "backend": "omni-r5",
+          "code": "OK",
+          "completed_at": "2026-10-30T23:26:10.834602Z",
+          "error": "",
+          "family": "score",
+          "kind": "ddl",
+          "label": "score-set-db-1",
+          "phase": "google-final-cases",
+          "sql": "ALTER DATABASE {{DATABASE}} SET OPTIONS (score_version = 1)",
+          "started_at": "2026-10-30T23:26:07.124231Z",
+          "statements": null
+        },
+        "score-pinned-db-1": {
+          "at": "2026-10-30T23:26:10.864269Z",
+          "backend": "omni-r5",
+          "code": "OK",
+          "completed_at": "2026-10-30T23:26:10.864267Z",
+          "error": "",
+          "family": "score",
+          "kind": "query",
+          "label": "score-pinned-db-1",
+          "metadata": {
+            "rowType": {
+              "fields": [
+                {
+                  "name": "Id",
+                  "type": {
+                    "code": "INT64"
+                  }
+                },
+                {
+                  "name": "default_score",
+                  "type": {
+                    "code": "FLOAT64"
+                  }
+                },
+                {
+                  "name": "version1_score",
+                  "type": {
+                    "code": "FLOAT64"
+                  }
+                },
+                {
+                  "name": "version2_score",
+                  "type": {
+                    "code": "FLOAT64"
+                  }
+                }
+              ]
+            },
+            "transaction": {
+              "readTimestamp": "2026-10-30T23:26:09.148904Z"
+            },
+            "undeclaredParameters": {}
+          },
+          "phase": "google-final-cases",
+          "rows": [
+            {
+              "Id": "1",
+              "default_score": 0.41013103723526,
+              "version1_score": 0.41013103723526,
+              "version2_score": 1.6450823545455933
+            },
+            {
+              "Id": "2",
+              "default_score": 0.28206658363342285,
+              "version1_score": 0.28206658363342285,
+              "version2_score": 1.2588917016983032
+            }
+          ],
+          "sql": "SELECT Id, SCORE(BodyTokens,'cat') AS default_score, SCORE(BodyTokens,'cat', options => JSON '{\"version\": 1}') AS version1_score, SCORE(BodyTokens,'cat', options => JSON '{\"version\": 2}') AS version2_score FROM ScoreDocs WHERE SEARCH(BodyTokens,'cat') ORDER BY Id",
+          "started_at": "2026-10-30T23:26:10.834908Z",
+          "statements": null
+        },
+        "score-set-db-2": {
+          "at": "2026-10-30T23:26:16.892809Z",
+          "backend": "omni-r5",
+          "code": "OK",
+          "completed_at": "2026-10-30T23:26:16.892804Z",
+          "error": "",
+          "family": "score",
+          "kind": "ddl",
+          "label": "score-set-db-2",
+          "phase": "google-final-cases",
+          "sql": "ALTER DATABASE {{DATABASE}} SET OPTIONS (score_version = 2)",
+          "started_at": "2026-10-30T23:26:10.864668Z",
+          "statements": null
+        },
+        "score-pinned-db-2": {
+          "at": "2026-10-30T23:26:16.903924Z",
+          "backend": "omni-r5",
+          "code": "OK",
+          "completed_at": "2026-10-30T23:26:16.903922Z",
+          "error": "",
+          "family": "score",
+          "kind": "query",
+          "label": "score-pinned-db-2",
+          "metadata": {
+            "rowType": {
+              "fields": [
+                {
+                  "name": "Id",
+                  "type": {
+                    "code": "INT64"
+                  }
+                },
+                {
+                  "name": "default_score",
+                  "type": {
+                    "code": "FLOAT64"
+                  }
+                },
+                {
+                  "name": "version1_score",
+                  "type": {
+                    "code": "FLOAT64"
+                  }
+                },
+                {
+                  "name": "version2_score",
+                  "type": {
+                    "code": "FLOAT64"
+                  }
+                }
+              ]
+            },
+            "transaction": {
+              "readTimestamp": "2026-10-30T23:26:12.914035Z"
+            },
+            "undeclaredParameters": {}
+          },
+          "phase": "google-final-cases",
+          "rows": [
+            {
+              "Id": "1",
+              "default_score": 1.6450823545455933,
+              "version1_score": 0.41013103723526,
+              "version2_score": 1.6450823545455933
+            },
+            {
+              "Id": "2",
+              "default_score": 1.2588917016983032,
+              "version1_score": 0.28206658363342285,
+              "version2_score": 1.2588917016983032
+            }
+          ],
+          "sql": "SELECT Id, SCORE(BodyTokens,'cat') AS default_score, SCORE(BodyTokens,'cat', options => JSON '{\"version\": 1}') AS version1_score, SCORE(BodyTokens,'cat', options => JSON '{\"version\": 2}') AS version2_score FROM ScoreDocs WHERE SEARCH(BodyTokens,'cat') ORDER BY Id",
+          "started_at": "2026-10-30T23:26:16.893127Z",
+          "statements": null
+        },
+        "score-explicit-independent": {
+          "at": "2026-10-30T23:26:16.910294Z",
+          "backend": "omni-r5",
+          "code": "OK",
+          "completed_at": "2026-10-30T23:26:16.910293Z",
+          "error": "",
+          "family": "score",
+          "kind": "query",
+          "label": "score-explicit-independent",
+          "metadata": {
+            "rowType": {
+              "fields": [
+                {
+                  "name": "Id",
+                  "type": {
+                    "code": "INT64"
+                  }
+                },
+                {
+                  "name": "version1_score",
+                  "type": {
+                    "code": "FLOAT64"
+                  }
+                },
+                {
+                  "name": "version2_score",
+                  "type": {
+                    "code": "FLOAT64"
+                  }
+                }
+              ]
+            },
+            "transaction": {
+              "readTimestamp": "2026-10-30T23:26:12.914035Z"
+            },
+            "undeclaredParameters": {}
+          },
+          "phase": "google-final-cases",
+          "rows": [
+            {
+              "Id": "1",
+              "version1_score": 0.41013103723526,
+              "version2_score": 1.6450823545455933
+            },
+            {
+              "Id": "2",
+              "version1_score": 0.28206658363342285,
+              "version2_score": 1.2588917016983032
+            }
+          ],
+          "sql": "SELECT Id, SCORE(BodyTokens,'cat', options => JSON '{\"version\": 1}') AS version1_score, SCORE(BodyTokens,'cat', options => JSON '{\"version\": 2}') AS version2_score FROM ScoreDocs WHERE SEARCH(BodyTokens,'cat') ORDER BY Id",
+          "started_at": "2026-10-30T23:26:16.904384Z",
+          "statements": null
+        }
+      },
+      "scorer_pg": {
+        "score-unpinned": {
+          "at": "2026-10-30T23:28:49.106735Z",
+          "backend": "omni-r5",
+          "code": "OK",
+          "completed_at": "2026-10-30T23:28:49.106734Z",
+          "error": "",
+          "family": "score",
+          "kind": "query",
+          "label": "score-unpinned",
+          "metadata": {
+            "rowType": {
+              "fields": [
+                {
+                  "name": "id",
+                  "type": {
+                    "code": "INT64"
+                  }
+                },
+                {
+                  "name": "default_score",
+                  "type": {
+                    "code": "FLOAT64"
+                  }
+                },
+                {
+                  "name": "version1_score",
+                  "type": {
+                    "code": "FLOAT64"
+                  }
+                },
+                {
+                  "name": "version2_score",
+                  "type": {
+                    "code": "FLOAT64"
+                  }
+                }
+              ]
+            },
+            "transaction": {
+              "readTimestamp": "2026-10-30T23:28:49.063365Z"
+            },
+            "undeclaredParameters": {}
+          },
+          "phase": "pg-final-cases",
+          "rows": [
+            {
+              "default_score": 1.6450823545455933,
+              "id": "1",
+              "version1_score": 0.41013103723526,
+              "version2_score": 1.6450823545455933
+            },
+            {
+              "default_score": 1.2588917016983032,
+              "id": "2",
+              "version1_score": 0.28206658363342285,
+              "version2_score": 1.2588917016983032
+            }
+          ],
+          "sql": "SELECT Id, spanner.score(BodyTokens,'cat') AS default_score, spanner.score(BodyTokens,'cat', options => '{\"version\": 1}'::jsonb) AS version1_score, spanner.score(BodyTokens,'cat', options => '{\"version\": 2}'::jsonb) AS version2_score FROM ScoreDocs WHERE spanner.search(BodyTokens,'cat') ORDER BY Id",
+          "started_at": "2026-10-30T23:28:49.087406Z",
+          "statements": null
+        },
+        "score-set-db-1": {
+          "at": "2026-10-30T23:28:49.116395Z",
+          "backend": "omni-r5",
+          "code": "InvalidArgument",
+          "completed_at": "2026-10-30T23:28:49.116392Z",
+          "error": "rpc error: code = InvalidArgument desc = Database option <spanner.score_version> is not supported.",
+          "family": "score",
+          "kind": "ddl",
+          "label": "score-set-db-1",
+          "phase": "pg-final-cases",
+          "sql": "ALTER DATABASE {{DATABASE}} SET \"spanner.score_version\" = 1",
+          "started_at": "2026-10-30T23:28:49.10689Z",
+          "statements": null
+        },
+        "score-pinned-db-1": {
+          "at": "2026-10-30T23:28:49.116649Z",
+          "backend": "omni-r5",
+          "code": "NOT_RUN",
+          "execution_status": "blocked_by_fixture_dependency",
+          "family": "score",
+          "kind": "query",
+          "label": "score-pinned-db-1",
+          "phase": "pg-final-cases",
+          "requires": [
+            "score-set-db-1"
+          ]
+        },
+        "score-set-db-2": {
+          "at": "2026-10-30T23:28:49.125053Z",
+          "backend": "omni-r5",
+          "code": "InvalidArgument",
+          "completed_at": "2026-10-30T23:28:49.12505Z",
+          "error": "rpc error: code = InvalidArgument desc = Database option <spanner.score_version> is not supported.",
+          "family": "score",
+          "kind": "ddl",
+          "label": "score-set-db-2",
+          "phase": "pg-final-cases",
+          "sql": "ALTER DATABASE {{DATABASE}} SET \"spanner.score_version\" = 2",
+          "started_at": "2026-10-30T23:28:49.116797Z",
+          "statements": null
+        },
+        "score-pinned-db-2": {
+          "at": "2026-10-30T23:28:49.125314Z",
+          "backend": "omni-r5",
+          "code": "NOT_RUN",
+          "execution_status": "blocked_by_fixture_dependency",
+          "family": "score",
+          "kind": "query",
+          "label": "score-pinned-db-2",
+          "phase": "pg-final-cases",
+          "requires": [
+            "score-set-db-2"
+          ]
+        },
+        "score-explicit-independent": {
+          "at": "2026-10-30T23:28:49.131841Z",
+          "backend": "omni-r5",
+          "code": "OK",
+          "completed_at": "2026-10-30T23:28:49.13184Z",
+          "error": "",
+          "family": "score",
+          "kind": "query",
+          "label": "score-explicit-independent",
+          "metadata": {
+            "rowType": {
+              "fields": [
+                {
+                  "name": "id",
+                  "type": {
+                    "code": "INT64"
+                  }
+                },
+                {
+                  "name": "version1_score",
+                  "type": {
+                    "code": "FLOAT64"
+                  }
+                },
+                {
+                  "name": "version2_score",
+                  "type": {
+                    "code": "FLOAT64"
+                  }
+                }
+              ]
+            },
+            "transaction": {
+              "readTimestamp": "2026-10-30T23:28:49.063365Z"
+            },
+            "undeclaredParameters": {}
+          },
+          "phase": "pg-final-cases",
+          "rows": [
+            {
+              "id": "1",
+              "version1_score": 0.41013103723526,
+              "version2_score": 1.6450823545455933
+            },
+            {
+              "id": "2",
+              "version1_score": 0.28206658363342285,
+              "version2_score": 1.2588917016983032
+            }
+          ],
+          "sql": "SELECT Id, spanner.score(BodyTokens,'cat', options => '{\"version\": 1}'::jsonb) AS version1_score, spanner.score(BodyTokens,'cat', options => '{\"version\": 2}'::jsonb) AS version2_score FROM ScoreDocs WHERE spanner.search(BodyTokens,'cat') ORDER BY Id",
+          "started_at": "2026-10-30T23:28:49.125482Z",
+          "statements": null
+        }
+      },
+      "pg_bucket_boundary": {
+        "at": "2026-10-30T23:28:49.141836Z",
+        "backend": "omni-r5",
+        "code": "OK",
+        "completed_at": "2026-10-30T23:28:49.141834Z",
+        "error": "",
+        "family": "bucket-boundary",
+        "kind": "query",
+        "label": "bucket-pg-boundaries",
+        "metadata": {
+          "rowType": {
+            "fields": [
+              {
+                "name": "t",
+                "type": {
+                  "code": "TIMESTAMP"
+                }
+              },
+              {
+                "name": "documented_hour",
+                "type": {
+                  "code": "INT64"
+                }
+              },
+              {
+                "name": "floored_hour",
+                "type": {
+                  "code": "INT64"
+                }
+              }
+            ]
+          },
+          "transaction": {
+            "readTimestamp": "2026-10-30T23:28:49.117188Z"
+          },
+          "undeclaredParameters": {}
+        },
+        "phase": "pg-final-cases",
+        "rows": [
+          {
+            "documented_hour": "0",
+            "floored_hour": "-1",
+            "t": "1969-12-31T23:59:59Z"
+          },
+          {
+            "documented_hour": "498168",
+            "floored_hour": "498168",
+            "t": "2026-10-31T00:00:00Z"
+          },
+          {
+            "documented_hour": "498168",
+            "floored_hour": "498168",
+            "t": "2026-10-31T00:59:59.4Z"
+          },
+          {
+            "documented_hour": "498169",
+            "floored_hour": "498168",
+            "t": "2026-10-31T00:59:59.9Z"
+          },
+          {
+            "documented_hour": "498169",
+            "floored_hour": "498169",
+            "t": "2026-10-31T01:00:00Z"
+          }
+        ],
+        "sql": "SELECT t, EXTRACT(EPOCH FROM t - '1970-01-01Z'::timestamptz)::bigint / 3600 AS documented_hour, FLOOR(EXTRACT(EPOCH FROM t - '1970-01-01Z'::timestamptz) / 3600)::bigint AS floored_hour FROM (SELECT '1969-12-31 23:59:59Z'::timestamptz AS t UNION ALL SELECT '2026-10-31 00:00:00Z'::timestamptz UNION ALL SELECT '2026-10-31 00:59:59.4Z'::timestamptz UNION ALL SELECT '2026-10-31 00:59:59.9Z'::timestamptz UNION ALL SELECT '2026-10-31 01:00:00Z'::timestamptz) q ORDER BY t",
+        "started_at": "2026-10-30T23:28:49.136778Z",
+        "statements": null
+      },
+      "scorer_versions_distinguished_by_values": true,
+      "pg_documented_bucket_mismatches": [
+        {
+          "documented_hour": "0",
+          "floored_hour": "-1",
+          "t": "1969-12-31T23:59:59Z"
+        },
+        {
+          "documented_hour": "498169",
+          "floored_hour": "498168",
+          "t": "2026-10-31T00:59:59.9Z"
+        }
+      ]
+    },
+    "omni-lts": {
+      "core_records": 69,
+      "corrected_records": 46,
+      "final_records": 51,
+      "pipe_operator_codes": {
+        "pipe-select": "OK",
+        "pipe-extend": "OK",
+        "pipe-set": "OK",
+        "pipe-drop": "OK",
+        "pipe-rename": "OK",
+        "pipe-as": "OK",
+        "pipe-where": "OK",
+        "pipe-aggregate": "OK",
+        "pipe-join": "OK",
+        "pipe-order-by": "OK",
+        "pipe-limit": "OK",
+        "pipe-union": "OK",
+        "pipe-intersect": "OK",
+        "pipe-except": "OK",
+        "pipe-tablesample": "OK"
+      },
+      "queue_case_codes": {
+        "title": "OK",
+        "lower": "OK",
+        "upper": "InvalidArgument",
+        "mixed": "InvalidArgument"
+      },
+      "pipe_isolation": {
+        "select-led-select": {
+          "at": "2026-10-30T23:32:04.484135Z",
+          "backend": "omni-lts",
+          "code": "OK",
+          "completed_at": "2026-10-30T23:32:04.484133Z",
+          "error": "",
+          "family": "pipe-isolation",
+          "kind": "query",
+          "label": "select-led-select",
+          "metadata": {
+            "rowType": {
+              "fields": [
+                {
+                  "name": "x",
+                  "type": {
+                    "code": "INT64"
+                  }
+                }
+              ]
+            },
+            "transaction": {
+              "readTimestamp": "2026-10-30T23:32:04.488066Z"
+            },
+            "undeclaredParameters": {}
+          },
+          "phase": "google-final-cases",
+          "rows": [
+            {
+              "x": "1"
+            }
+          ],
+          "sql": "SELECT 1 AS x |> SELECT x",
+          "started_at": "2026-10-30T23:32:04.478394Z",
+          "statements": null
+        },
+        "select-led-where": {
+          "at": "2026-10-30T23:32:04.489824Z",
+          "backend": "omni-lts",
+          "code": "OK",
+          "completed_at": "2026-10-30T23:32:04.489822Z",
+          "error": "",
+          "family": "pipe-isolation",
+          "kind": "query",
+          "label": "select-led-where",
+          "metadata": {
+            "rowType": {
+              "fields": [
+                {
+                  "name": "x",
+                  "type": {
+                    "code": "INT64"
+                  }
+                }
+              ]
+            },
+            "transaction": {
+              "readTimestamp": "2026-10-30T23:32:04.493980Z"
+            },
+            "undeclaredParameters": {}
+          },
+          "phase": "google-final-cases",
+          "rows": [
+            {
+              "x": "1"
+            }
+          ],
+          "sql": "SELECT 1 AS x |> WHERE x=1",
+          "started_at": "2026-10-30T23:32:04.484548Z",
+          "statements": null
+        },
+        "select-led-aggregate": {
+          "at": "2026-10-30T23:32:04.494702Z",
+          "backend": "omni-lts",
+          "code": "OK",
+          "completed_at": "2026-10-30T23:32:04.494701Z",
+          "error": "",
+          "family": "pipe-isolation",
+          "kind": "query",
+          "label": "select-led-aggregate",
+          "metadata": {
+            "rowType": {
+              "fields": [
+                {
+                  "name": "n",
+                  "type": {
+                    "code": "INT64"
+                  }
+                }
+              ]
+            },
+            "transaction": {
+              "readTimestamp": "2026-10-30T23:32:04.499048Z"
+            },
+            "undeclaredParameters": {}
+          },
+          "phase": "google-final-cases",
+          "rows": [
+            {
+              "n": "1"
+            }
+          ],
+          "sql": "SELECT 1 AS x |> AGGREGATE SUM(x) AS n",
+          "started_at": "2026-10-30T23:32:04.490129Z",
+          "statements": null
+        },
+        "from-only": {
+          "at": "2026-10-30T23:32:04.498837Z",
+          "backend": "omni-lts",
+          "code": "OK",
+          "completed_at": "2026-10-30T23:32:04.498836Z",
+          "error": "",
+          "family": "pipe-isolation",
+          "kind": "query",
+          "label": "from-only",
+          "metadata": {
+            "rowType": {
+              "fields": [
+                {
+                  "name": "x",
+                  "type": {
+                    "code": "INT64"
+                  }
+                }
+              ]
+            },
+            "transaction": {
+              "readTimestamp": "2026-10-30T23:32:04.502294Z"
+            },
+            "undeclaredParameters": {}
+          },
+          "phase": "google-final-cases",
+          "rows": [
+            {
+              "x": "1"
+            }
+          ],
+          "sql": "FROM (SELECT 1 AS x)",
+          "started_at": "2026-10-30T23:32:04.494997Z",
+          "statements": null
+        }
+      },
+      "scorer_google": {
+        "score-unpinned": {
+          "at": "2026-10-30T23:30:29.503395Z",
+          "backend": "omni-lts",
+          "code": "OK",
+          "completed_at": "2026-10-30T23:30:29.503393Z",
+          "error": "",
+          "family": "score",
+          "kind": "query",
+          "label": "score-unpinned",
+          "metadata": {
+            "rowType": {
+              "fields": [
+                {
+                  "name": "Id",
+                  "type": {
+                    "code": "INT64"
+                  }
+                },
+                {
+                  "name": "default_score",
+                  "type": {
+                    "code": "FLOAT64"
+                  }
+                },
+                {
+                  "name": "version1_score",
+                  "type": {
+                    "code": "FLOAT64"
+                  }
+                },
+                {
+                  "name": "version2_score",
+                  "type": {
+                    "code": "FLOAT64"
+                  }
+                }
+              ]
+            },
+            "transaction": {
+              "readTimestamp": "2026-10-30T23:30:29.455051Z"
+            },
+            "undeclaredParameters": {}
+          },
+          "phase": "google-final-cases",
+          "rows": [
+            {
+              "Id": "1",
+              "default_score": 1.6450823545455933,
+              "version1_score": 0.41013103723526,
+              "version2_score": 1.6450823545455933
+            },
+            {
+              "Id": "2",
+              "default_score": 1.2588917016983032,
+              "version1_score": 0.28206658363342285,
+              "version2_score": 1.2588917016983032
+            }
+          ],
+          "sql": "SELECT Id, SCORE(BodyTokens,'cat') AS default_score, SCORE(BodyTokens,'cat', options => JSON '{\"version\": 1}') AS version1_score, SCORE(BodyTokens,'cat', options => JSON '{\"version\": 2}') AS version2_score FROM ScoreDocs WHERE SEARCH(BodyTokens,'cat') ORDER BY Id",
+          "started_at": "2026-10-30T23:30:29.483168Z",
+          "statements": null
+        },
+        "score-set-db-1": {
+          "at": "2026-10-30T23:30:31.837465Z",
+          "backend": "omni-lts",
+          "code": "OK",
+          "completed_at": "2026-10-30T23:30:31.837459Z",
+          "error": "",
+          "family": "score",
+          "kind": "ddl",
+          "label": "score-set-db-1",
+          "phase": "google-final-cases",
+          "sql": "ALTER DATABASE {{DATABASE}} SET OPTIONS (score_version = 1)",
+          "started_at": "2026-10-30T23:30:29.503822Z",
+          "statements": null
+        },
+        "score-pinned-db-1": {
+          "at": "2026-10-30T23:30:31.865213Z",
+          "backend": "omni-lts",
+          "code": "OK",
+          "completed_at": "2026-10-30T23:30:31.865211Z",
+          "error": "",
+          "family": "score",
+          "kind": "query",
+          "label": "score-pinned-db-1",
+          "metadata": {
+            "rowType": {
+              "fields": [
+                {
+                  "name": "Id",
+                  "type": {
+                    "code": "INT64"
+                  }
+                },
+                {
+                  "name": "default_score",
+                  "type": {
+                    "code": "FLOAT64"
+                  }
+                },
+                {
+                  "name": "version1_score",
+                  "type": {
+                    "code": "FLOAT64"
+                  }
+                },
+                {
+                  "name": "version2_score",
+                  "type": {
+                    "code": "FLOAT64"
+                  }
+                }
+              ]
+            },
+            "transaction": {
+              "readTimestamp": "2026-10-30T23:30:31.528484Z"
+            },
+            "undeclaredParameters": {}
+          },
+          "phase": "google-final-cases",
+          "rows": [
+            {
+              "Id": "1",
+              "default_score": 0.41013103723526,
+              "version1_score": 0.41013103723526,
+              "version2_score": 1.6450823545455933
+            },
+            {
+              "Id": "2",
+              "default_score": 0.28206658363342285,
+              "version1_score": 0.28206658363342285,
+              "version2_score": 1.2588917016983032
+            }
+          ],
+          "sql": "SELECT Id, SCORE(BodyTokens,'cat') AS default_score, SCORE(BodyTokens,'cat', options => JSON '{\"version\": 1}') AS version1_score, SCORE(BodyTokens,'cat', options => JSON '{\"version\": 2}') AS version2_score FROM ScoreDocs WHERE SEARCH(BodyTokens,'cat') ORDER BY Id",
+          "started_at": "2026-10-30T23:30:31.837768Z",
+          "statements": null
+        },
+        "score-set-db-2": {
+          "at": "2026-10-30T23:30:35.874594Z",
+          "backend": "omni-lts",
+          "code": "OK",
+          "completed_at": "2026-10-30T23:30:35.874592Z",
+          "error": "",
+          "family": "score",
+          "kind": "ddl",
+          "label": "score-set-db-2",
+          "phase": "google-final-cases",
+          "sql": "ALTER DATABASE {{DATABASE}} SET OPTIONS (score_version = 2)",
+          "started_at": "2026-10-30T23:30:31.865528Z",
+          "statements": null
+        },
+        "score-pinned-db-2": {
+          "at": "2026-10-30T23:30:35.8868Z",
+          "backend": "omni-lts",
+          "code": "OK",
+          "completed_at": "2026-10-30T23:30:35.886799Z",
+          "error": "",
+          "family": "score",
+          "kind": "query",
+          "label": "score-pinned-db-2",
+          "metadata": {
+            "rowType": {
+              "fields": [
+                {
+                  "name": "Id",
+                  "type": {
+                    "code": "INT64"
+                  }
+                },
+                {
+                  "name": "default_score",
+                  "type": {
+                    "code": "FLOAT64"
+                  }
+                },
+                {
+                  "name": "version1_score",
+                  "type": {
+                    "code": "FLOAT64"
+                  }
+                },
+                {
+                  "name": "version2_score",
+                  "type": {
+                    "code": "FLOAT64"
+                  }
+                }
+              ]
+            },
+            "transaction": {
+              "readTimestamp": "2026-10-30T23:30:33.885754Z"
+            },
+            "undeclaredParameters": {}
+          },
+          "phase": "google-final-cases",
+          "rows": [
+            {
+              "Id": "1",
+              "default_score": 1.6450823545455933,
+              "version1_score": 0.41013103723526,
+              "version2_score": 1.6450823545455933
+            },
+            {
+              "Id": "2",
+              "default_score": 1.2588917016983032,
+              "version1_score": 0.28206658363342285,
+              "version2_score": 1.2588917016983032
+            }
+          ],
+          "sql": "SELECT Id, SCORE(BodyTokens,'cat') AS default_score, SCORE(BodyTokens,'cat', options => JSON '{\"version\": 1}') AS version1_score, SCORE(BodyTokens,'cat', options => JSON '{\"version\": 2}') AS version2_score FROM ScoreDocs WHERE SEARCH(BodyTokens,'cat') ORDER BY Id",
+          "started_at": "2026-10-30T23:30:35.874678Z",
+          "statements": null
+        },
+        "score-explicit-independent": {
+          "at": "2026-10-30T23:30:35.893962Z",
+          "backend": "omni-lts",
+          "code": "OK",
+          "completed_at": "2026-10-30T23:30:35.893962Z",
+          "error": "",
+          "family": "score",
+          "kind": "query",
+          "label": "score-explicit-independent",
+          "metadata": {
+            "rowType": {
+              "fields": [
+                {
+                  "name": "Id",
+                  "type": {
+                    "code": "INT64"
+                  }
+                },
+                {
+                  "name": "version1_score",
+                  "type": {
+                    "code": "FLOAT64"
+                  }
+                },
+                {
+                  "name": "version2_score",
+                  "type": {
+                    "code": "FLOAT64"
+                  }
+                }
+              ]
+            },
+            "transaction": {
+              "readTimestamp": "2026-10-30T23:30:33.885754Z"
+            },
+            "undeclaredParameters": {}
+          },
+          "phase": "google-final-cases",
+          "rows": [
+            {
+              "Id": "1",
+              "version1_score": 0.41013103723526,
+              "version2_score": 1.6450823545455933
+            },
+            {
+              "Id": "2",
+              "version1_score": 0.28206658363342285,
+              "version2_score": 1.2588917016983032
+            }
+          ],
+          "sql": "SELECT Id, SCORE(BodyTokens,'cat', options => JSON '{\"version\": 1}') AS version1_score, SCORE(BodyTokens,'cat', options => JSON '{\"version\": 2}') AS version2_score FROM ScoreDocs WHERE SEARCH(BodyTokens,'cat') ORDER BY Id",
+          "started_at": "2026-10-30T23:30:35.88704Z",
+          "statements": null
+        }
+      },
+      "scorer_pg": {
+        "score-unpinned": {
+          "at": "2026-10-30T23:33:47.066576Z",
+          "backend": "omni-lts",
+          "code": "OK",
+          "completed_at": "2026-10-30T23:33:47.066575Z",
+          "error": "",
+          "family": "score",
+          "kind": "query",
+          "label": "score-unpinned",
+          "metadata": {
+            "rowType": {
+              "fields": [
+                {
+                  "name": "id",
+                  "type": {
+                    "code": "INT64"
+                  }
+                },
+                {
+                  "name": "default_score",
+                  "type": {
+                    "code": "FLOAT64"
+                  }
+                },
+                {
+                  "name": "version1_score",
+                  "type": {
+                    "code": "FLOAT64"
+                  }
+                },
+                {
+                  "name": "version2_score",
+                  "type": {
+                    "code": "FLOAT64"
+                  }
+                }
+              ]
+            },
+            "transaction": {
+              "readTimestamp": "2026-10-30T23:33:47.052720Z"
+            },
+            "undeclaredParameters": {}
+          },
+          "phase": "pg-final-cases",
+          "rows": [
+            {
+              "default_score": 1.6450823545455933,
+              "id": "1",
+              "version1_score": 0.41013103723526,
+              "version2_score": 1.6450823545455933
+            },
+            {
+              "default_score": 1.2588917016983032,
+              "id": "2",
+              "version1_score": 0.28206658363342285,
+              "version2_score": 1.2588917016983032
+            }
+          ],
+          "sql": "SELECT Id, spanner.score(BodyTokens,'cat') AS default_score, spanner.score(BodyTokens,'cat', options => '{\"version\": 1}'::jsonb) AS version1_score, spanner.score(BodyTokens,'cat', options => '{\"version\": 2}'::jsonb) AS version2_score FROM ScoreDocs WHERE spanner.search(BodyTokens,'cat') ORDER BY Id",
+          "started_at": "2026-10-30T23:33:47.050633Z",
+          "statements": null
+        },
+        "score-set-db-1": {
+          "at": "2026-10-30T23:33:47.075827Z",
+          "backend": "omni-lts",
+          "code": "InvalidArgument",
+          "completed_at": "2026-10-30T23:33:47.075825Z",
+          "error": "rpc error: code = InvalidArgument desc = Database option <spanner.score_version> is not supported.",
+          "family": "score",
+          "kind": "ddl",
+          "label": "score-set-db-1",
+          "phase": "pg-final-cases",
+          "sql": "ALTER DATABASE {{DATABASE}} SET \"spanner.score_version\" = 1",
+          "started_at": "2026-10-30T23:33:47.06677Z",
+          "statements": null
+        },
+        "score-pinned-db-1": {
+          "at": "2026-10-30T23:33:47.076005Z",
+          "backend": "omni-lts",
+          "code": "NOT_RUN",
+          "execution_status": "blocked_by_fixture_dependency",
+          "family": "score",
+          "kind": "query",
+          "label": "score-pinned-db-1",
+          "phase": "pg-final-cases",
+          "requires": [
+            "score-set-db-1"
+          ]
+        },
+        "score-set-db-2": {
+          "at": "2026-10-30T23:33:47.08469Z",
+          "backend": "omni-lts",
+          "code": "InvalidArgument",
+          "completed_at": "2026-10-30T23:33:47.084688Z",
+          "error": "rpc error: code = InvalidArgument desc = Database option <spanner.score_version> is not supported.",
+          "family": "score",
+          "kind": "ddl",
+          "label": "score-set-db-2",
+          "phase": "pg-final-cases",
+          "sql": "ALTER DATABASE {{DATABASE}} SET \"spanner.score_version\" = 2",
+          "started_at": "2026-10-30T23:33:47.076113Z",
+          "statements": null
+        },
+        "score-pinned-db-2": {
+          "at": "2026-10-30T23:33:47.084907Z",
+          "backend": "omni-lts",
+          "code": "NOT_RUN",
+          "execution_status": "blocked_by_fixture_dependency",
+          "family": "score",
+          "kind": "query",
+          "label": "score-pinned-db-2",
+          "phase": "pg-final-cases",
+          "requires": [
+            "score-set-db-2"
+          ]
+        },
+        "score-explicit-independent": {
+          "at": "2026-10-30T23:33:47.09164Z",
+          "backend": "omni-lts",
+          "code": "OK",
+          "completed_at": "2026-10-30T23:33:47.091639Z",
+          "error": "",
+          "family": "score",
+          "kind": "query",
+          "label": "score-explicit-independent",
+          "metadata": {
+            "rowType": {
+              "fields": [
+                {
+                  "name": "id",
+                  "type": {
+                    "code": "INT64"
+                  }
+                },
+                {
+                  "name": "version1_score",
+                  "type": {
+                    "code": "FLOAT64"
+                  }
+                },
+                {
+                  "name": "version2_score",
+                  "type": {
+                    "code": "FLOAT64"
+                  }
+                }
+              ]
+            },
+            "transaction": {
+              "readTimestamp": "2026-10-30T23:33:47.052720Z"
+            },
+            "undeclaredParameters": {}
+          },
+          "phase": "pg-final-cases",
+          "rows": [
+            {
+              "id": "1",
+              "version1_score": 0.41013103723526,
+              "version2_score": 1.6450823545455933
+            },
+            {
+              "id": "2",
+              "version1_score": 0.28206658363342285,
+              "version2_score": 1.2588917016983032
+            }
+          ],
+          "sql": "SELECT Id, spanner.score(BodyTokens,'cat', options => '{\"version\": 1}'::jsonb) AS version1_score, spanner.score(BodyTokens,'cat', options => '{\"version\": 2}'::jsonb) AS version2_score FROM ScoreDocs WHERE spanner.search(BodyTokens,'cat') ORDER BY Id",
+          "started_at": "2026-10-30T23:33:47.085092Z",
+          "statements": null
+        }
+      },
+      "pg_bucket_boundary": {
+        "at": "2026-10-30T23:33:47.103449Z",
+        "backend": "omni-lts",
+        "code": "OK",
+        "completed_at": "2026-10-30T23:33:47.103448Z",
+        "error": "",
+        "family": "bucket-boundary",
+        "kind": "query",
+        "label": "bucket-pg-boundaries",
+        "metadata": {
+          "rowType": {
+            "fields": [
+              {
+                "name": "t",
+                "type": {
+                  "code": "TIMESTAMP"
+                }
+              },
+              {
+                "name": "documented_hour",
+                "type": {
+                  "code": "INT64"
+                }
+              },
+              {
+                "name": "floored_hour",
+                "type": {
+                  "code": "INT64"
+                }
+              }
+            ]
+          },
+          "transaction": {
+            "readTimestamp": "2026-10-30T23:33:47.106627Z"
+          },
+          "undeclaredParameters": {}
+        },
+        "phase": "pg-final-cases",
+        "rows": [
+          {
+            "documented_hour": "0",
+            "floored_hour": "-1",
+            "t": "1969-12-31T23:59:59Z"
+          },
+          {
+            "documented_hour": "498168",
+            "floored_hour": "498168",
+            "t": "2026-10-31T00:00:00Z"
+          },
+          {
+            "documented_hour": "498168",
+            "floored_hour": "498168",
+            "t": "2026-10-31T00:59:59.4Z"
+          },
+          {
+            "documented_hour": "498169",
+            "floored_hour": "498168",
+            "t": "2026-10-31T00:59:59.9Z"
+          },
+          {
+            "documented_hour": "498169",
+            "floored_hour": "498169",
+            "t": "2026-10-31T01:00:00Z"
+          }
+        ],
+        "sql": "SELECT t, EXTRACT(EPOCH FROM t - '1970-01-01Z'::timestamptz)::bigint / 3600 AS documented_hour, FLOOR(EXTRACT(EPOCH FROM t - '1970-01-01Z'::timestamptz) / 3600)::bigint AS floored_hour FROM (SELECT '1969-12-31 23:59:59Z'::timestamptz AS t UNION ALL SELECT '2026-10-31 00:00:00Z'::timestamptz UNION ALL SELECT '2026-10-31 00:59:59.4Z'::timestamptz UNION ALL SELECT '2026-10-31 00:59:59.9Z'::timestamptz UNION ALL SELECT '2026-10-31 01:00:00Z'::timestamptz) q ORDER BY t",
+        "started_at": "2026-10-30T23:33:47.097694Z",
+        "statements": null
+      },
+      "scorer_versions_distinguished_by_values": true,
+      "pg_documented_bucket_mismatches": [
+        {
+          "documented_hour": "0",
+          "floored_hour": "-1",
+          "t": "1969-12-31T23:59:59Z"
+        },
+        {
+          "documented_hour": "498169",
+          "floored_hour": "498168",
+          "t": "2026-10-31T00:59:59.9Z"
+        }
+      ]
+    },
+    "emulator": {
+      "core_records": 69,
+      "corrected_records": 46,
+      "final_records": 51,
+      "pipe_operator_codes": {
+        "pipe-select": "InvalidArgument",
+        "pipe-extend": "InvalidArgument",
+        "pipe-set": "InvalidArgument",
+        "pipe-drop": "InvalidArgument",
+        "pipe-rename": "InvalidArgument",
+        "pipe-as": "InvalidArgument",
+        "pipe-where": "InvalidArgument",
+        "pipe-aggregate": "InvalidArgument",
+        "pipe-join": "InvalidArgument",
+        "pipe-order-by": "InvalidArgument",
+        "pipe-limit": "InvalidArgument",
+        "pipe-union": "InvalidArgument",
+        "pipe-intersect": "InvalidArgument",
+        "pipe-except": "InvalidArgument",
+        "pipe-tablesample": "InvalidArgument"
+      },
+      "queue_case_codes": {
+        "title": "OK",
+        "lower": "OK",
+        "upper": "OK",
+        "mixed": "OK"
+      },
+      "pipe_isolation": {
+        "select-led-select": {
+          "at": "2026-10-30T23:34:00.423061Z",
+          "backend": "emulator",
+          "code": "InvalidArgument",
+          "completed_at": "2026-10-30T23:34:00.42306Z",
+          "error": "spanner: code = \"InvalidArgument\", desc = \"Pipe query syntax not supported [at 1:15]\\nSELECT 1 AS x |> SELECT x\\n              ^\", requestID = \"<redacted>\"",
+          "family": "pipe-isolation",
+          "kind": "query",
+          "label": "select-led-select",
+          "phase": "google-final-cases",
+          "rows": [],
+          "sql": "SELECT 1 AS x |> SELECT x",
+          "started_at": "2026-10-30T23:34:00.421447Z",
+          "statements": null
+        },
+        "select-led-where": {
+          "at": "2026-10-30T23:34:00.424797Z",
+          "backend": "emulator",
+          "code": "InvalidArgument",
+          "completed_at": "2026-10-30T23:34:00.424797Z",
+          "error": "spanner: code = \"InvalidArgument\", desc = \"Pipe query syntax not supported [at 1:15]\\nSELECT 1 AS x |> WHERE x=1\\n              ^\", requestID = \"<redacted>\"",
+          "family": "pipe-isolation",
+          "kind": "query",
+          "label": "select-led-where",
+          "phase": "google-final-cases",
+          "rows": [],
+          "sql": "SELECT 1 AS x |> WHERE x=1",
+          "started_at": "2026-10-30T23:34:00.423212Z",
+          "statements": null
+        },
+        "select-led-aggregate": {
+          "at": "2026-10-30T23:34:00.426557Z",
+          "backend": "emulator",
+          "code": "InvalidArgument",
+          "completed_at": "2026-10-30T23:34:00.426556Z",
+          "error": "spanner: code = \"InvalidArgument\", desc = \"Pipe query syntax not supported [at 1:15]\\nSELECT 1 AS x |> AGGREGATE SUM(x) AS n\\n              ^\", requestID = \"<redacted>\"",
+          "family": "pipe-isolation",
+          "kind": "query",
+          "label": "select-led-aggregate",
+          "phase": "google-final-cases",
+          "rows": [],
+          "sql": "SELECT 1 AS x |> AGGREGATE SUM(x) AS n",
+          "started_at": "2026-10-30T23:34:00.42492Z",
+          "statements": null
+        },
+        "from-only": {
+          "at": "2026-10-30T23:34:00.428609Z",
+          "backend": "emulator",
+          "code": "InvalidArgument",
+          "completed_at": "2026-10-30T23:34:00.428608Z",
+          "error": "spanner: code = \"InvalidArgument\", desc = \"Syntax error: Unexpected FROM [at 1:1]\\nFROM (SELECT 1 AS x)\\n^\", requestID = \"<redacted>\"",
+          "family": "pipe-isolation",
+          "kind": "query",
+          "label": "from-only",
+          "phase": "google-final-cases",
+          "rows": [],
+          "sql": "FROM (SELECT 1 AS x)",
+          "started_at": "2026-10-30T23:34:00.426716Z",
+          "statements": null
+        }
+      },
+      "scorer_google": {
+        "score-unpinned": {
+          "at": "2026-10-30T23:34:00.376949Z",
+          "backend": "emulator",
+          "code": "OK",
+          "completed_at": "2026-10-30T23:34:00.376948Z",
+          "error": "",
+          "family": "score",
+          "kind": "query",
+          "label": "score-unpinned",
+          "metadata": {
+            "rowType": {
+              "fields": [
+                {
+                  "name": "Id",
+                  "type": {
+                    "code": "INT64"
+                  }
+                },
+                {
+                  "name": "default_score",
+                  "type": {
+                    "code": "FLOAT64"
+                  }
+                },
+                {
+                  "name": "version1_score",
+                  "type": {
+                    "code": "FLOAT64"
+                  }
+                },
+                {
+                  "name": "version2_score",
+                  "type": {
+                    "code": "FLOAT64"
+                  }
+                }
+              ]
+            },
+            "transaction": {
+              "readTimestamp": "2026-10-30T23:34:00.377493Z"
+            }
+          },
+          "phase": "google-final-cases",
+          "rows": [
+            {
+              "Id": "1",
+              "default_score": 2,
+              "version1_score": 2,
+              "version2_score": 2
+            },
+            {
+              "Id": "2",
+              "default_score": 1,
+              "version1_score": 1,
+              "version2_score": 1
+            }
+          ],
+          "sql": "SELECT Id, SCORE(BodyTokens,'cat') AS default_score, SCORE(BodyTokens,'cat', options => JSON '{\"version\": 1}') AS version1_score, SCORE(BodyTokens,'cat', options => JSON '{\"version\": 2}') AS version2_score FROM ScoreDocs WHERE SEARCH(BodyTokens,'cat') ORDER BY Id",
+          "started_at": "2026-10-30T23:34:00.372263Z",
+          "statements": null
+        },
+        "score-set-db-1": {
+          "at": "2026-10-30T23:34:00.377782Z",
+          "backend": "emulator",
+          "code": "OK",
+          "completed_at": "2026-10-30T23:34:00.377781Z",
+          "error": "",
+          "family": "score",
+          "kind": "ddl",
+          "label": "score-set-db-1",
+          "phase": "google-final-cases",
+          "sql": "ALTER DATABASE {{DATABASE}} SET OPTIONS (score_version = 1)",
+          "started_at": "2026-10-30T23:34:00.377054Z",
+          "statements": null
+        },
+        "score-pinned-db-1": {
+          "at": "2026-10-30T23:34:00.37992Z",
+          "backend": "emulator",
+          "code": "OK",
+          "completed_at": "2026-10-30T23:34:00.37992Z",
+          "error": "",
+          "family": "score",
+          "kind": "query",
+          "label": "score-pinned-db-1",
+          "metadata": {
+            "rowType": {
+              "fields": [
+                {
+                  "name": "Id",
+                  "type": {
+                    "code": "INT64"
+                  }
+                },
+                {
+                  "name": "default_score",
+                  "type": {
+                    "code": "FLOAT64"
+                  }
+                },
+                {
+                  "name": "version1_score",
+                  "type": {
+                    "code": "FLOAT64"
+                  }
+                },
+                {
+                  "name": "version2_score",
+                  "type": {
+                    "code": "FLOAT64"
+                  }
+                }
+              ]
+            },
+            "transaction": {
+              "readTimestamp": "2026-10-30T23:34:00.382710Z"
+            }
+          },
+          "phase": "google-final-cases",
+          "rows": [
+            {
+              "Id": "1",
+              "default_score": 2,
+              "version1_score": 2,
+              "version2_score": 2
+            },
+            {
+              "Id": "2",
+              "default_score": 1,
+              "version1_score": 1,
+              "version2_score": 1
+            }
+          ],
+          "sql": "SELECT Id, SCORE(BodyTokens,'cat') AS default_score, SCORE(BodyTokens,'cat', options => JSON '{\"version\": 1}') AS version1_score, SCORE(BodyTokens,'cat', options => JSON '{\"version\": 2}') AS version2_score FROM ScoreDocs WHERE SEARCH(BodyTokens,'cat') ORDER BY Id",
+          "started_at": "2026-10-30T23:34:00.377856Z",
+          "statements": null
+        },
+        "score-set-db-2": {
+          "at": "2026-10-30T23:34:00.380574Z",
+          "backend": "emulator",
+          "code": "OK",
+          "completed_at": "2026-10-30T23:34:00.380572Z",
+          "error": "",
+          "family": "score",
+          "kind": "ddl",
+          "label": "score-set-db-2",
+          "phase": "google-final-cases",
+          "sql": "ALTER DATABASE {{DATABASE}} SET OPTIONS (score_version = 2)",
+          "started_at": "2026-10-30T23:34:00.380005Z",
+          "statements": null
+        },
+        "score-pinned-db-2": {
+          "at": "2026-10-30T23:34:00.382617Z",
+          "backend": "emulator",
+          "code": "OK",
+          "completed_at": "2026-10-30T23:34:00.382617Z",
+          "error": "",
+          "family": "score",
+          "kind": "query",
+          "label": "score-pinned-db-2",
+          "metadata": {
+            "rowType": {
+              "fields": [
+                {
+                  "name": "Id",
+                  "type": {
+                    "code": "INT64"
+                  }
+                },
+                {
+                  "name": "default_score",
+                  "type": {
+                    "code": "FLOAT64"
+                  }
+                },
+                {
+                  "name": "version1_score",
+                  "type": {
+                    "code": "FLOAT64"
+                  }
+                },
+                {
+                  "name": "version2_score",
+                  "type": {
+                    "code": "FLOAT64"
+                  }
+                }
+              ]
+            },
+            "transaction": {
+              "readTimestamp": "2026-10-30T23:34:00.385436Z"
+            }
+          },
+          "phase": "google-final-cases",
+          "rows": [
+            {
+              "Id": "1",
+              "default_score": 2,
+              "version1_score": 2,
+              "version2_score": 2
+            },
+            {
+              "Id": "2",
+              "default_score": 1,
+              "version1_score": 1,
+              "version2_score": 1
+            }
+          ],
+          "sql": "SELECT Id, SCORE(BodyTokens,'cat') AS default_score, SCORE(BodyTokens,'cat', options => JSON '{\"version\": 1}') AS version1_score, SCORE(BodyTokens,'cat', options => JSON '{\"version\": 2}') AS version2_score FROM ScoreDocs WHERE SEARCH(BodyTokens,'cat') ORDER BY Id",
+          "started_at": "2026-10-30T23:34:00.380651Z",
+          "statements": null
+        },
+        "score-explicit-independent": {
+          "at": "2026-10-30T23:34:00.384727Z",
+          "backend": "emulator",
+          "code": "OK",
+          "completed_at": "2026-10-30T23:34:00.384726Z",
+          "error": "",
+          "family": "score",
+          "kind": "query",
+          "label": "score-explicit-independent",
+          "metadata": {
+            "rowType": {
+              "fields": [
+                {
+                  "name": "Id",
+                  "type": {
+                    "code": "INT64"
+                  }
+                },
+                {
+                  "name": "version1_score",
+                  "type": {
+                    "code": "FLOAT64"
+                  }
+                },
+                {
+                  "name": "version2_score",
+                  "type": {
+                    "code": "FLOAT64"
+                  }
+                }
+              ]
+            },
+            "transaction": {
+              "readTimestamp": "2026-10-30T23:34:00.387503Z"
+            }
+          },
+          "phase": "google-final-cases",
+          "rows": [
+            {
+              "Id": "1",
+              "version1_score": 2,
+              "version2_score": 2
+            },
+            {
+              "Id": "2",
+              "version1_score": 1,
+              "version2_score": 1
+            }
+          ],
+          "sql": "SELECT Id, SCORE(BodyTokens,'cat', options => JSON '{\"version\": 1}') AS version1_score, SCORE(BodyTokens,'cat', options => JSON '{\"version\": 2}') AS version2_score FROM ScoreDocs WHERE SEARCH(BodyTokens,'cat') ORDER BY Id",
+          "started_at": "2026-10-30T23:34:00.382716Z",
+          "statements": null
+        }
+      },
+      "scorer_pg": {
+        "score-unpinned": {
+          "at": "2026-10-30T23:34:00.66889Z",
+          "backend": "emulator",
+          "code": "OK",
+          "completed_at": "2026-10-30T23:34:00.668889Z",
+          "error": "",
+          "family": "score",
+          "kind": "query",
+          "label": "score-unpinned",
+          "metadata": {
+            "rowType": {
+              "fields": [
+                {
+                  "name": "id",
+                  "type": {
+                    "code": "INT64"
+                  }
+                },
+                {
+                  "name": "default_score",
+                  "type": {
+                    "code": "FLOAT64"
+                  }
+                },
+                {
+                  "name": "version1_score",
+                  "type": {
+                    "code": "FLOAT64"
+                  }
+                },
+                {
+                  "name": "version2_score",
+                  "type": {
+                    "code": "FLOAT64"
+                  }
+                }
+              ]
+            },
+            "transaction": {
+              "readTimestamp": "2026-10-30T23:34:00.669428Z"
+            }
+          },
+          "phase": "pg-final-cases",
+          "rows": [
+            {
+              "default_score": 2,
+              "id": "1",
+              "version1_score": 2,
+              "version2_score": 2
+            },
+            {
+              "default_score": 1,
+              "id": "2",
+              "version1_score": 1,
+              "version2_score": 1
+            }
+          ],
+          "sql": "SELECT Id, spanner.score(BodyTokens,'cat') AS default_score, spanner.score(BodyTokens,'cat', options => '{\"version\": 1}'::jsonb) AS version1_score, spanner.score(BodyTokens,'cat', options => '{\"version\": 2}'::jsonb) AS version2_score FROM ScoreDocs WHERE spanner.search(BodyTokens,'cat') ORDER BY Id",
+          "started_at": "2026-10-30T23:34:00.664658Z",
+          "statements": null
+        },
+        "score-set-db-1": {
+          "at": "2026-10-30T23:34:00.669461Z",
+          "backend": "emulator",
+          "code": "FailedPrecondition",
+          "completed_at": "2026-10-30T23:34:00.66946Z",
+          "error": "rpc error: code = FailedPrecondition desc = Database option <spanner.score_version> is not supported.",
+          "family": "score",
+          "kind": "ddl",
+          "label": "score-set-db-1",
+          "phase": "pg-final-cases",
+          "sql": "ALTER DATABASE {{DATABASE}} SET \"spanner.score_version\" = 1",
+          "started_at": "2026-10-30T23:34:00.668987Z",
+          "statements": null
+        },
+        "score-pinned-db-1": {
+          "at": "2026-10-30T23:34:00.669534Z",
+          "backend": "emulator",
+          "code": "NOT_RUN",
+          "execution_status": "blocked_by_fixture_dependency",
+          "family": "score",
+          "kind": "query",
+          "label": "score-pinned-db-1",
+          "phase": "pg-final-cases",
+          "requires": [
+            "score-set-db-1"
+          ]
+        },
+        "score-set-db-2": {
+          "at": "2026-10-30T23:34:00.669972Z",
+          "backend": "emulator",
+          "code": "FailedPrecondition",
+          "completed_at": "2026-10-30T23:34:00.669972Z",
+          "error": "rpc error: code = FailedPrecondition desc = Database option <spanner.score_version> is not supported.",
+          "family": "score",
+          "kind": "ddl",
+          "label": "score-set-db-2",
+          "phase": "pg-final-cases",
+          "sql": "ALTER DATABASE {{DATABASE}} SET \"spanner.score_version\" = 2",
+          "started_at": "2026-10-30T23:34:00.669574Z",
+          "statements": null
+        },
+        "score-pinned-db-2": {
+          "at": "2026-10-30T23:34:00.670028Z",
+          "backend": "emulator",
+          "code": "NOT_RUN",
+          "execution_status": "blocked_by_fixture_dependency",
+          "family": "score",
+          "kind": "query",
+          "label": "score-pinned-db-2",
+          "phase": "pg-final-cases",
+          "requires": [
+            "score-set-db-2"
+          ]
+        },
+        "score-explicit-independent": {
+          "at": "2026-10-30T23:34:00.67317Z",
+          "backend": "emulator",
+          "code": "OK",
+          "completed_at": "2026-10-30T23:34:00.67317Z",
+          "error": "",
+          "family": "score",
+          "kind": "query",
+          "label": "score-explicit-independent",
+          "metadata": {
+            "rowType": {
+              "fields": [
+                {
+                  "name": "id",
+                  "type": {
+                    "code": "INT64"
+                  }
+                },
+                {
+                  "name": "version1_score",
+                  "type": {
+                    "code": "FLOAT64"
+                  }
+                },
+                {
+                  "name": "version2_score",
+                  "type": {
+                    "code": "FLOAT64"
+                  }
+                }
+              ]
+            },
+            "transaction": {
+              "readTimestamp": "2026-10-30T23:34:00.674846Z"
+            }
+          },
+          "phase": "pg-final-cases",
+          "rows": [
+            {
+              "id": "1",
+              "version1_score": 2,
+              "version2_score": 2
+            },
+            {
+              "id": "2",
+              "version1_score": 1,
+              "version2_score": 1
+            }
+          ],
+          "sql": "SELECT Id, spanner.score(BodyTokens,'cat', options => '{\"version\": 1}'::jsonb) AS version1_score, spanner.score(BodyTokens,'cat', options => '{\"version\": 2}'::jsonb) AS version2_score FROM ScoreDocs WHERE spanner.search(BodyTokens,'cat') ORDER BY Id",
+          "started_at": "2026-10-30T23:34:00.670064Z",
+          "statements": null
+        }
+      },
+      "pg_bucket_boundary": {
+        "at": "2026-10-30T23:34:00.68516Z",
+        "backend": "emulator",
+        "code": "OK",
+        "completed_at": "2026-10-30T23:34:00.685159Z",
+        "error": "",
+        "family": "bucket-boundary",
+        "kind": "query",
+        "label": "bucket-pg-boundaries",
+        "metadata": {
+          "rowType": {
+            "fields": [
+              {
+                "name": "t",
+                "type": {
+                  "code": "TIMESTAMP"
+                }
+              },
+              {
+                "name": "documented_hour",
+                "type": {
+                  "code": "INT64"
+                }
+              },
+              {
+                "name": "floored_hour",
+                "type": {
+                  "code": "INT64"
+                }
+              }
+            ]
+          },
+          "transaction": {
+            "readTimestamp": "2026-10-30T23:34:00.683597Z"
+          }
+        },
+        "phase": "pg-final-cases",
+        "rows": [
+          {
+            "documented_hour": "0",
+            "floored_hour": "-1",
+            "t": "1969-12-31T23:59:59Z"
+          },
+          {
+            "documented_hour": "498168",
+            "floored_hour": "498168",
+            "t": "2026-10-31T00:00:00Z"
+          },
+          {
+            "documented_hour": "498168",
+            "floored_hour": "498168",
+            "t": "2026-10-31T00:59:59.4Z"
+          },
+          {
+            "documented_hour": "498169",
+            "floored_hour": "498168",
+            "t": "2026-10-31T00:59:59.9Z"
+          },
+          {
+            "documented_hour": "498169",
+            "floored_hour": "498169",
+            "t": "2026-10-31T01:00:00Z"
+          }
+        ],
+        "sql": "SELECT t, EXTRACT(EPOCH FROM t - '1970-01-01Z'::timestamptz)::bigint / 3600 AS documented_hour, FLOOR(EXTRACT(EPOCH FROM t - '1970-01-01Z'::timestamptz) / 3600)::bigint AS floored_hour FROM (SELECT '1969-12-31 23:59:59Z'::timestamptz AS t UNION ALL SELECT '2026-10-31 00:00:00Z'::timestamptz UNION ALL SELECT '2026-10-31 00:59:59.4Z'::timestamptz UNION ALL SELECT '2026-10-31 00:59:59.9Z'::timestamptz UNION ALL SELECT '2026-10-31 01:00:00Z'::timestamptz) q ORDER BY t",
+        "started_at": "2026-10-30T23:34:00.678845Z",
+        "statements": null
+      },
+      "scorer_versions_distinguished_by_values": false,
+      "pg_documented_bucket_mismatches": [
+        {
+          "documented_hour": "0",
+          "floored_hour": "-1",
+          "t": "1969-12-31T23:59:59Z"
+        },
+        {
+          "documented_hour": "498169",
+          "floored_hour": "498168",
+          "t": "2026-10-31T00:59:59.9Z"
+        }
+      ]
+    }
+  },
+  "boundaries": {
+    "managed_final_requires_user_approval": true,
+    "interrupted_managed_database": "Retained pending explicit deletion approval; see interrupted-managed-inspection.json",
+    "performance_measurement": false,
+    "automatic_future_scorer_advance_exercised": false
+  },
+  "fixture_corrections": [
+    "SCORE requires a generated TOKENLIST column and compatible SEARCH predicate",
+    "Search-index order columns require INT64 and NOT NULL; use generated epoch seconds, not a TIMESTAMP",
+    "Queue TVF control uses SELECT * rather than COUNT(*)",
+    "LEFT propagation needs a shared column; retain the disjoint-column negative control"
+  ]
+}

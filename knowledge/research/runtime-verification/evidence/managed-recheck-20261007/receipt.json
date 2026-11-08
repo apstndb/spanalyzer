@@ -1,0 +1,46 @@
+{
+  "local_date": "2026-10-07 Asia/Tokyo",
+  "target": "Configured user-level verification profile; actual connection coordinates omitted",
+  "server_build": "unavailable",
+  "source_revision": "c2d7792dd7f83d5dd086e2d32bc22e5d253cf06c",
+  "source_state": "Existing dirty working snapshot; measured producer/dependency file hashes match October 5",
+  "sources": "source-hashes.json",
+  "dependency_scope": {
+    "survey": "Go1.26.8; Spanner v1.88.0; GOWORK=off",
+    "features": "Go1.26.8; workspace Spanner v1.91.0"
+  },
+  "fixture_change": "Date-scoped owned names changed from 20261005 to 20261007r1; readonly adds six scoped NULL probes; separate ACTIVE_BATCH_OPERATIONS controls added",
+  "records": {
+    "readonly": 86,
+    "google-features": 53,
+    "pg-features": 40,
+    "queue": 32,
+    "cleanup": 4,
+    "active-batch": 19
+  },
+  "main_commands": "commands.json",
+  "active_batch_commands": "active-batch-commands.json",
+  "documentation": "documentation.json",
+  "producer_changes": "producer-source-comparison.json",
+  "producer_hashes": {
+    "readonly": "ef67ce16aceb3cf75f30d47b95f81531ee0894cbff844959d83b26d69b2e9539",
+    "google-features": "415906c260d3dc42349e2552d8fc3eeac4001138af2c84dd19803538ebc1d4c5",
+    "pg-features": "5bc9b8a290e345768215fa79b1b41d2d466de35773bdfb27633fc1997bbea5bb",
+    "queue": "2c3e3695b6b8ae112bf5e7629fab4bc77f1328eafe6b35f729f3ecbd31806f80",
+    "cleanup": "e114c623334794bba83aa909e58b2252f232b11bdc34e86c64fecf6242cb0f3c",
+    "active-batch": "f136b06f6f0c0d2cbd499ba123c962a35e8038cbfad110705e7867bfeaa117a5"
+  },
+  "binary_hashes": {
+    "google-features": "43bb9e232cd514a08a8b89b812a15ebfd6e700983f9c874413c231cc1e185cf3",
+    "pg-features": "986d533980bb171260773c2ada6ed8503b40701b51e44d197bd8784eaf838ed0",
+    "queue": "eb840113a1c766e702afbf2deb588a19d04b686be4e31c08e11ac4c09777526f"
+  },
+  "retention_transforms": [
+    "profile coordinates redacted before persistence",
+    "request IDs replaced by redaction markers during retention",
+    "lease tokens replaced with SHA-256 hashes in producer memory"
+  ],
+  "durable_local_directory": "<LOCAL_TASK_ROOT>/apstndb/spanalyzer/managed-recheck-20261007",
+  "authority": "Read managed target, owned temporary fixtures and PostgreSQL database, retained research; no implementation, dependency, selector, commit, push or publication changes",
+  "execution_end": "2026-10-07T14:44:39.809789Z"
+}

@@ -1,0 +1,56 @@
+{
+  "dialect": "google",
+  "steps": [
+    {
+      "label": "graph-nodes",
+      "family": "issue-265",
+      "kind": "ddl",
+      "sql": "CREATE TABLE Nodes(id INT64 NOT NULL) PRIMARY KEY(id)",
+      "requires": [],
+      "timeout_seconds": 30
+    },
+    {
+      "label": "graph-edges",
+      "family": "issue-265",
+      "kind": "ddl",
+      "sql": "CREATE TABLE Edges(src INT64 NOT NULL,dst INT64 NOT NULL) PRIMARY KEY(src,dst)",
+      "requires": [],
+      "timeout_seconds": 30
+    },
+    {
+      "label": "graph-seed",
+      "family": "issue-265",
+      "kind": "dml",
+      "sql": "",
+      "requires": [
+        "graph-nodes",
+        "graph-edges"
+      ],
+      "timeout_seconds": 15,
+      "statements": [
+        "INSERT INTO Nodes(id) VALUES(1),(2),(3)",
+        "INSERT INTO Edges(src,dst) VALUES(1,2),(2,3)"
+      ]
+    },
+    {
+      "label": "graph-reused-label",
+      "family": "issue-265",
+      "kind": "ddl",
+      "sql": "CREATE PROPERTY GRAPH SameLabel NODE TABLES(Nodes LABEL Shared PROPERTIES(id AS common_key)) EDGE TABLES(Edges SOURCE KEY(src) REFERENCES Nodes(id) DESTINATION KEY(dst) REFERENCES Nodes(id) LABEL Shared PROPERTIES(src AS common_key))",
+      "requires": [
+        "graph-seed"
+      ],
+      "timeout_seconds": 30
+    },
+    {
+      "label": "graph-reused-label-read",
+      "family": "issue-265",
+      "kind": "query",
+      "sql": "GRAPH SameLabel MATCH (a:Shared)-[e:Shared]->(b:Shared) RETURN a.common_key AS src,b.common_key AS dst ORDER BY src,dst",
+      "requires": [
+        "graph-reused-label"
+      ],
+      "timeout_seconds": 15
+    }
+  ]
+}

@@ -1,0 +1,40 @@
+"""Read-only pinned GitHub history and full Markdown source snapshots."""
+from pathlib import Path
+import concurrent.futures,datetime,hashlib,json,subprocess
+root=Path('<LOCAL_TASK_ROOT>/apstndb/spanalyzer/managed-recheck-20261021/history')
+commits=sum(json.loads((root/'commits-pages.json').read_text()),[])
+base='27afee67642907f3b4537fa9a22d7a5726dc504e'
+head=commits[0]['sha']
+selected=[]
+for c in commits:
+    if c['sha']==base:break
+    selected.append(c)
+def fetch_commit(c):
+    path=root/(c['sha']+'.json')
+    data=subprocess.check_output(['gh','api','--paginate','--slurp','repos/apstndb/spanner-docs-mirror/commits/'+c['sha']+'?per_page=100'])
+    path.write_bytes(data)
+    pages=json.loads(data)
+    return {'sha':c['sha'],'committed_at':c['commit']['committer']['date'],'subject':c['commit']['message'].splitlines()[0],'files':[f for page in pages for f in page['files']]}
+with concurrent.futures.ThreadPoolExecutor(max_workers=3) as ex:details=list(ex.map(fetch_commit,selected))
+(root/'commit-details.json').write_text(json.dumps(details,indent=2)+'\n')
+paths=sorted({f['filename'] for c in details for f in c['files'] if f['filename'].startswith('docs/')})
+compare=json.loads((root/'compare-oct11-oct21.json').read_text())
+status={f['filename']:f['status'] for f in compare['files']}
+requests=[]
+for path in paths:
+    for label,sha in [('base',base),('head',head)]:
+        if label=='base' and status.get(path)=='added':continue
+        if label=='head' and status.get(path)=='removed':continue
+        requests.append((label,sha,path))
+def fetch_body(task):
+    label,sha,path=task
+    dest=root/(label+'__'+path.replace('/','__')+'.txt')
+    result=subprocess.run(['gh','api','-H','Accept: application/vnd.github.raw+json','repos/apstndb/spanner-docs-mirror/contents/'+path+'?ref='+sha],capture_output=True)
+    if result.returncode:
+        return {'revision':sha,'side':label,'path':path,'exit_code':result.returncode,'error':result.stderr.decode()}
+    dest.write_bytes(result.stdout)
+    return {'revision':sha,'side':label,'path':path,'file':dest.name,'bytes':len(result.stdout),'sha256':hashlib.sha256(result.stdout).hexdigest(),'exit_code':0}
+with concurrent.futures.ThreadPoolExecutor(max_workers=4) as ex:bodies=list(ex.map(fetch_body,requests))
+receipt={'retrieved_at':datetime.datetime.now(datetime.timezone.utc).isoformat(),'base':base,'head':head,'commits':len(details),'union_document_paths':len(paths),'net_changed_files':len(compare['files']),'bodies':bodies,'scope':'Pinned daily snapshot history; commit dates are not engine availability dates'}
+(root/'receipt.json').write_text(json.dumps(receipt,indent=2)+'\n')
+print(json.dumps({'commits':len(details),'union_paths':len(paths),'body_requests':len(bodies),'body_failures':[x for x in bodies if x['exit_code']]}))

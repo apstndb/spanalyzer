@@ -1,0 +1,88 @@
+[
+  {
+    "name": "probe-build",
+    "argv": [
+      "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go",
+      "build",
+      "-o",
+      "<LOCAL_CHECKOUT>/.tmp/cross-engine-doc-delta-20261029/probe",
+      "./probe.go"
+    ],
+    "cwd": "<LOCAL_CHECKOUT>/.tmp/cross-engine-doc-delta-20261029/module",
+    "started_at": "2026-10-29T14:53:10.012035+00:00",
+    "completed_at": "2026-10-29T14:53:13.568577+00:00",
+    "seconds": 3.556,
+    "exit_code": 0
+  },
+  {
+    "name": "probe-buildinfo",
+    "argv": [
+      "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go",
+      "version",
+      "-m",
+      "<LOCAL_CHECKOUT>/.tmp/cross-engine-doc-delta-20261029/probe"
+    ],
+    "cwd": "<LOCAL_CHECKOUT>/.tmp/cross-engine-doc-delta-20261029/module",
+    "started_at": "2026-10-29T14:53:13.569223+00:00",
+    "completed_at": "2026-10-29T14:53:13.593604+00:00",
+    "seconds": 0.024,
+    "exit_code": 0
+  },
+  {
+    "name": "omni-r5",
+    "argv": [
+      "<LOCAL_CHECKOUT>/.tmp/cross-engine-doc-delta-20261029/probe",
+      "omni-r5",
+      "us-docker.pkg.dev/spanner-omni/images/spanner-omni:2026.r5@sha256:e506672206e0291cac28cbe19ad4cd470cec112c24601637bc896c65f7362396",
+      "<LOCAL_CHECKOUT>/.tmp/cross-engine-doc-delta-20261029/module/constants-catalog.json",
+      "<LOCAL_CHECKOUT>/.tmp/cross-engine-doc-delta-20261029/module/google-new.json",
+      "<LOCAL_CHECKOUT>/.tmp/cross-engine-doc-delta-20261029/module/graphs.json",
+      "<LOCAL_CHECKOUT>/.tmp/cross-engine-doc-delta-20261029/module/pg-new.json",
+      "<LOCAL_CHECKOUT>/.tmp/cross-engine-doc-delta-20261029/module/doc-delta-google.json",
+      "<LOCAL_CHECKOUT>/.tmp/cross-engine-doc-delta-20261029/module/doc-delta-pg.json"
+    ],
+    "cwd": "<LOCAL_CHECKOUT>/.tmp/cross-engine-doc-delta-20261029/module",
+    "started_at": "2026-10-29T14:53:13.907391+00:00",
+    "completed_at": "2026-10-29T15:01:18.323615+00:00",
+    "seconds": 484.416,
+    "exit_code": 0
+  },
+  {
+    "name": "omni-lts",
+    "argv": [
+      "<LOCAL_CHECKOUT>/.tmp/cross-engine-doc-delta-20261029/probe",
+      "omni-lts",
+      "us-docker.pkg.dev/spanner-omni/images/spanner-omni:2026.r4-lts.1@sha256:5e3cf199f5abf3a09cd2348ab36c129b3268966eb4eb72fca278fe58252fcbdb",
+      "<LOCAL_CHECKOUT>/.tmp/cross-engine-doc-delta-20261029/module/constants-catalog.json",
+      "<LOCAL_CHECKOUT>/.tmp/cross-engine-doc-delta-20261029/module/google-new.json",
+      "<LOCAL_CHECKOUT>/.tmp/cross-engine-doc-delta-20261029/module/graphs.json",
+      "<LOCAL_CHECKOUT>/.tmp/cross-engine-doc-delta-20261029/module/pg-new.json",
+      "<LOCAL_CHECKOUT>/.tmp/cross-engine-doc-delta-20261029/module/doc-delta-google.json",
+      "<LOCAL_CHECKOUT>/.tmp/cross-engine-doc-delta-20261029/module/doc-delta-pg.json"
+    ],
+    "cwd": "<LOCAL_CHECKOUT>/.tmp/cross-engine-doc-delta-20261029/module",
+    "started_at": "2026-10-29T15:01:18.592951+00:00",
+    "completed_at": "2026-10-29T15:08:50.554791+00:00",
+    "seconds": 451.962,
+    "exit_code": 0
+  },
+  {
+    "name": "emulator",
+    "argv": [
+      "<LOCAL_CHECKOUT>/.tmp/cross-engine-doc-delta-20261029/probe",
+      "emulator",
+      "gcr.io/cloud-spanner-emulator/emulator:1.5.59@sha256:969af6a9349948fbfb4a826c18e160e258a4005f7c759f8e7f2dcec369cccba8",
+      "<LOCAL_CHECKOUT>/.tmp/cross-engine-doc-delta-20261029/module/constants-catalog.json",
+      "<LOCAL_CHECKOUT>/.tmp/cross-engine-doc-delta-20261029/module/google-new.json",
+      "<LOCAL_CHECKOUT>/.tmp/cross-engine-doc-delta-20261029/module/graphs.json",
+      "<LOCAL_CHECKOUT>/.tmp/cross-engine-doc-delta-20261029/module/pg-new.json",
+      "<LOCAL_CHECKOUT>/.tmp/cross-engine-doc-delta-20261029/module/doc-delta-google.json",
+      "<LOCAL_CHECKOUT>/.tmp/cross-engine-doc-delta-20261029/module/doc-delta-pg.json"
+    ],
+    "cwd": "<LOCAL_CHECKOUT>/.tmp/cross-engine-doc-delta-20261029/module",
+    "started_at": "2026-10-29T15:08:50.849322+00:00",
+    "completed_at": "2026-10-29T15:08:54.106482+00:00",
+    "seconds": 3.257,
+    "exit_code": 0
+  }
+]

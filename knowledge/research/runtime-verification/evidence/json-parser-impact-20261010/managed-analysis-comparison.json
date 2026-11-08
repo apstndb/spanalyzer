@@ -1,0 +1,312 @@
+{
+  "managed_successful": 99,
+  "analyzer_rejected_managed_successful": [
+    {
+      "label": "json-string-vs-object-text",
+      "sql": "SELECT JSON '{\"a\":1}' = '{\"a\":1}' AS result",
+      "analysis_error": "No matching signature for operator = for argument types: JSON, STRING\n  Signature: T1 = T1\n    Unable to find common supertype for templated argument <T1>\n      Input types for <T1>: {STRING, JSON} [at 1:8]"
+    },
+    {
+      "label": "in-json-first",
+      "sql": "SELECT JSON '2' IN (1, 2, 3) AS result",
+      "analysis_error": "No matching signature for operator IN for argument types JSON and {INT64} [at 1:17]"
+    },
+    {
+      "label": "between-json-first",
+      "sql": "SELECT JSON '2' BETWEEN 1 AND 3 AS result",
+      "analysis_error": "No matching signature for operator BETWEEN\n  Argument types: JSON, INT64, INT64\n  Signature: (T1) BETWEEN (T1) AND (T1)\n    Unable to find common supertype for templated argument <T1>\n      Input types for <T1>: {INT64, JSON} [at 1:17]"
+    },
+    {
+      "label": "array-order-coerce",
+      "sql": "SELECT JSON '[1,2]' < [1,3] AS result",
+      "analysis_error": "No matching signature for operator < for argument types: JSON, ARRAY<INT64>\n  Signature: T1 < T1\n    Unable to find common supertype for templated argument <T1>\n      Input types for <T1>: {ARRAY<INT64>, JSON} [at 1:8]"
+    },
+    {
+      "label": "cast-int",
+      "sql": "SELECT CAST(1 AS JSON) AS result",
+      "analysis_error": "Invalid cast from INT64 to JSON [at 1:13]"
+    },
+    {
+      "label": "cast-float32",
+      "sql": "SELECT CAST(CAST(1.25 AS FLOAT32) AS JSON) AS result",
+      "analysis_error": "Invalid cast from FLOAT32 to JSON [at 1:13]"
+    },
+    {
+      "label": "cast-float64",
+      "sql": "SELECT CAST(1.25 AS JSON) AS result",
+      "analysis_error": "Invalid cast from FLOAT64 to JSON [at 1:13]"
+    },
+    {
+      "label": "cast-numeric",
+      "sql": "SELECT CAST(NUMERIC '1.25' AS JSON) AS result",
+      "analysis_error": "Invalid cast from NUMERIC to JSON [at 1:13]"
+    },
+    {
+      "label": "cast-bool",
+      "sql": "SELECT CAST(TRUE AS JSON) AS result",
+      "analysis_error": "Invalid cast from BOOL to JSON [at 1:13]"
+    },
+    {
+      "label": "cast-string",
+      "sql": "SELECT CAST('foo' AS JSON) AS result",
+      "analysis_error": "Invalid cast from STRING to JSON [at 1:13]"
+    },
+    {
+      "label": "cast-string-json-looking",
+      "sql": "SELECT CAST('{\"a\":1}' AS JSON) AS result",
+      "analysis_error": "Invalid cast from STRING to JSON [at 1:13]"
+    },
+    {
+      "label": "cast-bytes",
+      "sql": "SELECT CAST(b'a' AS JSON) AS result",
+      "analysis_error": "Invalid cast from BYTES to JSON [at 1:13]"
+    },
+    {
+      "label": "cast-date",
+      "sql": "SELECT CAST(DATE '2026-10-10' AS JSON) AS result",
+      "analysis_error": "Invalid cast from DATE to JSON [at 1:13]"
+    },
+    {
+      "label": "cast-timestamp",
+      "sql": "SELECT CAST(TIMESTAMP '2026-10-10 00:00:00+00' AS JSON) AS result",
+      "analysis_error": "Invalid cast from TIMESTAMP to JSON [at 1:13]"
+    },
+    {
+      "label": "cast-uuid",
+      "sql": "SELECT CAST(CAST('00000000-0000-0000-0000-000000000001' AS UUID) AS JSON) AS result",
+      "analysis_error": "Invalid cast from UUID to JSON [at 1:13]"
+    },
+    {
+      "label": "cast-interval",
+      "sql": "SELECT CAST(INTERVAL 1 DAY AS JSON) AS result",
+      "analysis_error": "Invalid cast from INTERVAL to JSON [at 1:13]"
+    },
+    {
+      "label": "cast-array",
+      "sql": "SELECT CAST([1, NULL, 3] AS JSON) AS result",
+      "analysis_error": "Invalid cast from ARRAY<INT64> to JSON [at 1:13]"
+    },
+    {
+      "label": "cast-struct",
+      "sql": "SELECT CAST(STRUCT(1 AS a, NULL AS b) AS JSON) AS result",
+      "analysis_error": "Invalid cast from STRUCT<a INT64, b INT64> to JSON [at 1:13]"
+    },
+    {
+      "label": "cast-wide-int",
+      "sql": "SELECT CAST(9223372036854775807 AS JSON) AS result",
+      "analysis_error": "Invalid cast from INT64 to JSON [at 1:13]"
+    },
+    {
+      "label": "safe-cast-positive-infinity",
+      "sql": "SELECT SAFE_CAST(CAST('inf' AS FLOAT64) AS JSON) AS result",
+      "analysis_error": "Invalid cast from FLOAT64 to JSON [at 1:18]"
+    },
+    {
+      "label": "safe-cast-wide-int",
+      "sql": "SELECT SAFE_CAST(9223372036854775807 AS JSON) AS result",
+      "analysis_error": "Invalid cast from INT64 to JSON [at 1:18]"
+    },
+    {
+      "label": "safe-cast-wide-numeric",
+      "sql": "SELECT SAFE_CAST(NUMERIC '99999999999999999999999999999.123456789' AS JSON) AS result",
+      "analysis_error": "Invalid cast from NUMERIC to JSON [at 1:18]"
+    },
+    {
+      "label": "coerce-equal-int",
+      "sql": "SELECT JSON '1' = 1 AS result",
+      "analysis_error": "No matching signature for operator = for argument types: JSON, INT64\n  Signature: T1 = T1\n    Unable to find common supertype for templated argument <T1>\n      Input types for <T1>: {INT64, JSON} [at 1:8]"
+    },
+    {
+      "label": "coerce-reverse-equal-int",
+      "sql": "SELECT 1 = JSON '1' AS result",
+      "analysis_error": "No matching signature for operator = for argument types: INT64, JSON\n  Signature: T1 = T1\n    Unable to find common supertype for templated argument <T1>\n      Input types for <T1>: {INT64, JSON} [at 1:8]"
+    },
+    {
+      "label": "coerce-order-int",
+      "sql": "SELECT JSON '1' <= 1 AS result",
+      "analysis_error": "No matching signature for operator <= for argument types: JSON, INT64\n  Signature: T1 <= T1\n    Unable to find common supertype for templated argument <T1>\n      Input types for <T1>: {INT64, JSON} [at 1:8]"
+    },
+    {
+      "label": "coerce-equal-float32",
+      "sql": "SELECT JSON '1.25' = CAST(1.25 AS FLOAT32) AS result",
+      "analysis_error": "No matching signature for operator = for argument types: JSON, FLOAT32\n  Signature: T1 = T1\n    Unable to find common supertype for templated argument <T1>\n      Input types for <T1>: {FLOAT, JSON} [at 1:8]"
+    },
+    {
+      "label": "coerce-reverse-equal-float32",
+      "sql": "SELECT CAST(1.25 AS FLOAT32) = JSON '1.25' AS result",
+      "analysis_error": "No matching signature for operator = for argument types: FLOAT32, JSON\n  Signature: T1 = T1\n    Unable to find common supertype for templated argument <T1>\n      Input types for <T1>: {FLOAT, JSON} [at 1:8]"
+    },
+    {
+      "label": "coerce-order-float32",
+      "sql": "SELECT JSON '1.25' <= CAST(1.25 AS FLOAT32) AS result",
+      "analysis_error": "No matching signature for operator <= for argument types: JSON, FLOAT32\n  Signature: T1 <= T1\n    Unable to find common supertype for templated argument <T1>\n      Input types for <T1>: {FLOAT, JSON} [at 1:8]"
+    },
+    {
+      "label": "coerce-equal-float64",
+      "sql": "SELECT JSON '1.25' = 1.25 AS result",
+      "analysis_error": "No matching signature for operator = for argument types: JSON, FLOAT64\n  Signature: T1 = T1\n    Unable to find common supertype for templated argument <T1>\n      Input types for <T1>: {DOUBLE, JSON} [at 1:8]"
+    },
+    {
+      "label": "coerce-reverse-equal-float64",
+      "sql": "SELECT 1.25 = JSON '1.25' AS result",
+      "analysis_error": "No matching signature for operator = for argument types: FLOAT64, JSON\n  Signature: T1 = T1\n    Unable to find common supertype for templated argument <T1>\n      Input types for <T1>: {DOUBLE, JSON} [at 1:8]"
+    },
+    {
+      "label": "coerce-order-float64",
+      "sql": "SELECT JSON '1.25' <= 1.25 AS result",
+      "analysis_error": "No matching signature for operator <= for argument types: JSON, FLOAT64\n  Signature: T1 <= T1\n    Unable to find common supertype for templated argument <T1>\n      Input types for <T1>: {DOUBLE, JSON} [at 1:8]"
+    },
+    {
+      "label": "coerce-equal-numeric",
+      "sql": "SELECT JSON '1.25' = NUMERIC '1.25' AS result",
+      "analysis_error": "No matching signature for operator = for argument types: JSON, NUMERIC\n  Signature: T1 = T1\n    Unable to find common supertype for templated argument <T1>\n      Input types for <T1>: {NUMERIC, JSON} [at 1:8]"
+    },
+    {
+      "label": "coerce-reverse-equal-numeric",
+      "sql": "SELECT NUMERIC '1.25' = JSON '1.25' AS result",
+      "analysis_error": "No matching signature for operator = for argument types: NUMERIC, JSON\n  Signature: T1 = T1\n    Unable to find common supertype for templated argument <T1>\n      Input types for <T1>: {NUMERIC, JSON} [at 1:8]"
+    },
+    {
+      "label": "coerce-order-numeric",
+      "sql": "SELECT JSON '1.25' <= NUMERIC '1.25' AS result",
+      "analysis_error": "No matching signature for operator <= for argument types: JSON, NUMERIC\n  Signature: T1 <= T1\n    Unable to find common supertype for templated argument <T1>\n      Input types for <T1>: {NUMERIC, JSON} [at 1:8]"
+    },
+    {
+      "label": "coerce-equal-bool",
+      "sql": "SELECT JSON 'true' = TRUE AS result",
+      "analysis_error": "No matching signature for operator = for argument types: JSON, BOOL\n  Signature: T1 = T1\n    Unable to find common supertype for templated argument <T1>\n      Input types for <T1>: {BOOL, JSON} [at 1:8]"
+    },
+    {
+      "label": "coerce-reverse-equal-bool",
+      "sql": "SELECT TRUE = JSON 'true' AS result",
+      "analysis_error": "No matching signature for operator = for argument types: BOOL, JSON\n  Signature: T1 = T1\n    Unable to find common supertype for templated argument <T1>\n      Input types for <T1>: {BOOL, JSON} [at 1:8]"
+    },
+    {
+      "label": "coerce-order-bool",
+      "sql": "SELECT JSON 'true' <= TRUE AS result",
+      "analysis_error": "No matching signature for operator <= for argument types: JSON, BOOL\n  Signature: T1 <= T1\n    Unable to find common supertype for templated argument <T1>\n      Input types for <T1>: {BOOL, JSON} [at 1:8]"
+    },
+    {
+      "label": "coerce-equal-string",
+      "sql": "SELECT JSON '\"foo\"' = 'foo' AS result",
+      "analysis_error": "No matching signature for operator = for argument types: JSON, STRING\n  Signature: T1 = T1\n    Unable to find common supertype for templated argument <T1>\n      Input types for <T1>: {STRING, JSON} [at 1:8]"
+    },
+    {
+      "label": "coerce-reverse-equal-string",
+      "sql": "SELECT 'foo' = JSON '\"foo\"' AS result",
+      "analysis_error": "No matching signature for operator = for argument types: STRING, JSON\n  Signature: T1 = T1\n    Unable to find common supertype for templated argument <T1>\n      Input types for <T1>: {STRING, JSON} [at 1:8]"
+    },
+    {
+      "label": "coerce-order-string",
+      "sql": "SELECT JSON '\"foo\"' <= 'foo' AS result",
+      "analysis_error": "No matching signature for operator <= for argument types: JSON, STRING\n  Signature: T1 <= T1\n    Unable to find common supertype for templated argument <T1>\n      Input types for <T1>: {STRING, JSON} [at 1:8]"
+    },
+    {
+      "label": "coerce-equal-bytes",
+      "sql": "SELECT JSON '\"YQ==\"' = b'a' AS result",
+      "analysis_error": "No matching signature for operator = for argument types: JSON, BYTES\n  Signature: T1 = T1\n    Unable to find common supertype for templated argument <T1>\n      Input types for <T1>: {BYTES, JSON} [at 1:8]"
+    },
+    {
+      "label": "coerce-reverse-equal-bytes",
+      "sql": "SELECT b'a' = JSON '\"YQ==\"' AS result",
+      "analysis_error": "No matching signature for operator = for argument types: BYTES, JSON\n  Signature: T1 = T1\n    Unable to find common supertype for templated argument <T1>\n      Input types for <T1>: {BYTES, JSON} [at 1:8]"
+    },
+    {
+      "label": "coerce-equal-date",
+      "sql": "SELECT JSON '\"2026-10-10\"' = DATE '2026-10-10' AS result",
+      "analysis_error": "No matching signature for operator = for argument types: JSON, DATE\n  Signature: T1 = T1\n    Unable to find common supertype for templated argument <T1>\n      Input types for <T1>: {DATE, JSON} [at 1:8]"
+    },
+    {
+      "label": "coerce-reverse-equal-date",
+      "sql": "SELECT DATE '2026-10-10' = JSON '\"2026-10-10\"' AS result",
+      "analysis_error": "No matching signature for operator = for argument types: DATE, JSON\n  Signature: T1 = T1\n    Unable to find common supertype for templated argument <T1>\n      Input types for <T1>: {DATE, JSON} [at 1:8]"
+    },
+    {
+      "label": "coerce-order-date",
+      "sql": "SELECT JSON '\"2026-10-10\"' <= DATE '2026-10-10' AS result",
+      "analysis_error": "No matching signature for operator <= for argument types: JSON, DATE\n  Signature: T1 <= T1\n    Unable to find common supertype for templated argument <T1>\n      Input types for <T1>: {DATE, JSON} [at 1:8]"
+    },
+    {
+      "label": "coerce-equal-timestamp",
+      "sql": "SELECT JSON '\"2026-10-10T00:00:00Z\"' = TIMESTAMP '2026-10-10 00:00:00+00' AS result",
+      "analysis_error": "No matching signature for operator = for argument types: JSON, TIMESTAMP\n  Signature: T1 = T1\n    Unable to find common supertype for templated argument <T1>\n      Input types for <T1>: {TIMESTAMP, JSON} [at 1:8]"
+    },
+    {
+      "label": "coerce-reverse-equal-timestamp",
+      "sql": "SELECT TIMESTAMP '2026-10-10 00:00:00+00' = JSON '\"2026-10-10T00:00:00Z\"' AS result",
+      "analysis_error": "No matching signature for operator = for argument types: TIMESTAMP, JSON\n  Signature: T1 = T1\n    Unable to find common supertype for templated argument <T1>\n      Input types for <T1>: {TIMESTAMP, JSON} [at 1:8]"
+    },
+    {
+      "label": "coerce-order-timestamp",
+      "sql": "SELECT JSON '\"2026-10-10T00:00:00Z\"' <= TIMESTAMP '2026-10-10 00:00:00+00' AS result",
+      "analysis_error": "No matching signature for operator <= for argument types: JSON, TIMESTAMP\n  Signature: T1 <= T1\n    Unable to find common supertype for templated argument <T1>\n      Input types for <T1>: {TIMESTAMP, JSON} [at 1:8]"
+    },
+    {
+      "label": "coerce-equal-uuid",
+      "sql": "SELECT JSON '\"00000000-0000-0000-0000-000000000001\"' = CAST('00000000-0000-0000-0000-000000000001' AS UUID) AS result",
+      "analysis_error": "No matching signature for operator = for argument types: JSON, UUID\n  Signature: T1 = T1\n    Unable to find common supertype for templated argument <T1>\n      Input types for <T1>: {JSON, UUID} [at 1:8]"
+    },
+    {
+      "label": "coerce-reverse-equal-uuid",
+      "sql": "SELECT CAST('00000000-0000-0000-0000-000000000001' AS UUID) = JSON '\"00000000-0000-0000-0000-000000000001\"' AS result",
+      "analysis_error": "No matching signature for operator = for argument types: UUID, JSON\n  Signature: T1 = T1\n    Unable to find common supertype for templated argument <T1>\n      Input types for <T1>: {JSON, UUID} [at 1:8]"
+    },
+    {
+      "label": "coerce-order-uuid",
+      "sql": "SELECT JSON '\"00000000-0000-0000-0000-000000000001\"' <= CAST('00000000-0000-0000-0000-000000000001' AS UUID) AS result",
+      "analysis_error": "No matching signature for operator <= for argument types: JSON, UUID\n  Signature: T1 <= T1\n    Unable to find common supertype for templated argument <T1>\n      Input types for <T1>: {JSON, UUID} [at 1:8]"
+    },
+    {
+      "label": "coerce-equal-array",
+      "sql": "SELECT JSON '[1,null,3]' = [1, NULL, 3] AS result",
+      "analysis_error": "No matching signature for operator = for argument types: JSON, ARRAY<INT64>\n  Signature: T1 = T1\n    Unable to find common supertype for templated argument <T1>\n      Input types for <T1>: {ARRAY<INT64>, JSON} [at 1:8]"
+    },
+    {
+      "label": "coerce-reverse-equal-array",
+      "sql": "SELECT [1, NULL, 3] = JSON '[1,null,3]' AS result",
+      "analysis_error": "No matching signature for operator = for argument types: ARRAY<INT64>, JSON\n  Signature: T1 = T1\n    Unable to find common supertype for templated argument <T1>\n      Input types for <T1>: {ARRAY<INT64>, JSON} [at 1:8]"
+    },
+    {
+      "label": "coerce-order-array",
+      "sql": "SELECT JSON '[1,null,3]' <= [1, NULL, 3] AS result",
+      "analysis_error": "No matching signature for operator <= for argument types: JSON, ARRAY<INT64>\n  Signature: T1 <= T1\n    Unable to find common supertype for templated argument <T1>\n      Input types for <T1>: {ARRAY<INT64>, JSON} [at 1:8]"
+    },
+    {
+      "label": "not-equal-coercion",
+      "sql": "SELECT JSON '1' != 2 AS result",
+      "analysis_error": "No matching signature for operator != for argument types: JSON, INT64\n  Signature: T1 != T1\n    Unable to find common supertype for templated argument <T1>\n      Input types for <T1>: {INT64, JSON} [at 1:8]"
+    },
+    {
+      "label": "in-mixed-list",
+      "sql": "SELECT JSON 'true' IN (1,TRUE,'true',JSON '[]') AS result",
+      "analysis_error": "No matching signature for operator IN for argument types JSON and {INT64, BOOL, STRING, JSON} [at 1:20]"
+    },
+    {
+      "label": "explicit-bytes-cast-order",
+      "sql": "SELECT JSON '\"YQ==\"' < CAST(b'b' AS JSON) AS result",
+      "analysis_error": "Invalid cast from BYTES to JSON [at 1:29]"
+    },
+    {
+      "label": "cast-all-nested-null",
+      "sql": "SELECT CAST(ARRAY<INT64>[NULL] AS JSON) AS a, CAST(STRUCT(CAST(NULL AS INT64) AS n) AS JSON) AS s",
+      "analysis_error": "Invalid cast from ARRAY<INT64> to JSON [at 1:13]"
+    },
+    {
+      "label": "in-null-no-match",
+      "sql": "SELECT JSON '5' IN (1,NULL) AS result",
+      "analysis_error": "No matching signature for operator IN for argument types JSON and {INT64, NULL} [at 1:17]"
+    },
+    {
+      "label": "json-array-struct-cast",
+      "sql": "SELECT CAST([STRUCT(1 AS a),STRUCT(2 AS a)] AS JSON) AS result",
+      "analysis_error": "Invalid cast from ARRAY<STRUCT<a INT64>> to JSON [at 1:13]"
+    },
+    {
+      "label": "safe-cast-nested-infinity",
+      "sql": "SELECT SAFE_CAST([CAST('inf' AS FLOAT64)] AS JSON) AS result",
+      "analysis_error": "Invalid cast from ARRAY<FLOAT64> to JSON [at 1:18]"
+    }
+  ],
+  "mutually_successful_analysis_and_execution": 38,
+  "row_types_match": true
+}

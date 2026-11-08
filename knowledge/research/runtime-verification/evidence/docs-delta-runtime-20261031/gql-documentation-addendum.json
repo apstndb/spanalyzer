@@ -1,0 +1,32 @@
+{
+  "recorded_on_jst": "2026-10-31",
+  "checked_at_utc": "2026-10-31T04:52:51.951176+00:00",
+  "official_uri": "https://docs.cloud.google.com/spanner/docs/reference/standard-sql/graph-query-statements#gql_set",
+  "official_update_time": "2026-10-19T19:31:07Z",
+  "mirror_change_commit": "9f3859b9ea131f481bca92225c4cd4c020d5885b",
+  "mirror_parent": "a1c98d849cc91584220e71d4431fefcec1bbd624",
+  "mirror_capture_time_utc": "2026-10-20T18:02:13Z",
+  "documented_modes": [
+    "FULL OUTER",
+    "FULL",
+    "OUTER",
+    "LEFT OUTER",
+    "LEFT",
+    "INNER"
+  ],
+  "documented_semantics": {
+    "FULL OUTER / FULL / OUTER": "Union of column names, missing values padded with NULL; left columns first",
+    "LEFT OUTER / LEFT": "Left input column names, missing right values padded with NULL",
+    "INNER": "Common column names only",
+    "unspecified": "Inputs must have the same set of column names",
+    "CORRESPONDING": "Explicitly unsupported as a GQL keyword"
+  },
+  "latest_two_commit_interval": "This October 20 capture predates the October 28 baseline of the latest two-commit audit",
+  "parser_assessment": "Officially documented Spanner syntax missing from the tested memefish main; runtime results are complementary evidence",
+  "source_sha256": {
+    "gql-column-propagation-docs-refresh.json": "362370fb9014cc81fc72b88d771bb5d2ceb795469a58ecff1e3620a2bb3e06d5",
+    "gql-documentation-history.json": "b90fb5de617503c8accea479360f635b622823af26f3835127ace4a26ec5c328",
+    "gql-documentation-introduction-commit.json": "9caf80ca17f2d03c2236b2a75992cc22ff5590c88444b0489d69f78fb1534e08"
+  },
+  "runtime_rerun": false
+}

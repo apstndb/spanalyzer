@@ -1,0 +1,78 @@
+"""Offline assertions of observations; divergence is not a conformance pass."""
+from pathlib import Path
+from collections import Counter
+import hashlib,json,re
+root=Path('<LOCAL_CHECKOUT>');s=root/'.tmp/emulator-issue-runtime-20261030';base=root/'knowledge/research/runtime-verification/evidence';p=base/'emulator-issue-runtime-20261030';task=Path('<LOCAL_TASK_ROOT>/apstndb/spanalyzer/emulator-issue-runtime-20261030');checks=[]
+def read(f):return json.loads(f.read_text())
+def rows(f):return[json.loads(x)for x in f.read_text().splitlines()if x]
+def sha(f):return hashlib.sha256(f.read_bytes()).hexdigest()
+def check(label,ok):
+ assert ok,label
+ checks.append(label)
+a={name:rows(p/(name+'.jsonl'))for name in ['emulator-issues','emulator-focused','emulator-extra','emulator-last']};allrows=[x for a in a.values()for x in a];idx={(x['phase'],x['label']):x for x in allrows}
+def r(phase,label):return idx[(phase,label)]
+summary=read(p/'summary.json');check('282 planned root records retained',summary['planned_steps_recorded']==282 and sum(bool(x.get('family'))for x in allrows)==282)
+check('selected native image fixed',summary['selected_image']['platform']=='linux/arm64'and summary['selected_image']['platform_manifest_digest']=='sha256:969af6a9349948fbfb4a826c18e160e258a4005f7c759f8e7f2dcec369cccba8')
+check('four producer identity records agree',all(next(x for x in a if x['label']=='identity')['platform']=='linux/arm64'for a in a.values()))
+for table in ['KeyDefault','GeneratedKey','CompositeDefault']:
+ check(table+' mutation resets omitted defaults',r('defaults',table+'-after-mutation')['rows']==[{'id':'A','n':'0','status':'draft','total':'11'}])
+ check(table+' DML retains omitted values',r('defaults',table+'-after-dml')['rows']==[{'id':'A','n':'5','status':'sent','total':'12'}])
+check('plain-key mutation control retains values',r('defaults','PlainKey-after-mutation')['rows'][0]['status']=='sent'and r('defaults','PlainKey-after-mutation')['rows'][0]['n']=='5')
+check('nonkey-default control retains values',r('defaults','key-nonkey-after')['rows']==[{'id':'A','n':'5','status':'sent'}])
+check('generated timestamp DML works but mutation fails',r('commit-defaults','generated-timestamps-dml')['code']=='OK'and r('commit-defaults','generated-timestamps-mutation')['code']=='FailedPrecondition')
+check('generated timestamp successful row is resolved',all(not v.startswith('9999')for k,v in r('commit-defaults','generated-timestamps-rows')['rows'][0].items()if k.endswith('_at')))
+for mode in ['TRAIL','ACYCLIC','ANY-SHORTEST']:
+ check(mode+' zero-only upper bound rejects separately',r('graph','path-'+mode+'-{0}')['code']=='InvalidArgument')
+ for bound in ['{0,1}','{0,3}','{,3}','{1,3}']:
+  got=r('graph','path-'+mode+'-'+bound);expected={('1','2'),('2','3')};
+  if bound!='{0,1}':expected.add(('1','3'))
+  if bound!='{1,3}':expected|={('1','1'),('2','2'),('3','3')}
+  check(mode+bound+' endpoint set matches',got['code']=='OK'and{(x['src'],x['dst'])for x in got['rows']}==expected)
+check('shared label with matching properties executes',r('graph-focused','graph-reused-label')['code']=='OK'and{(x['src'],x['dst'])for x in r('graph-focused','graph-reused-label-read')['rows']}=={('1','2'),('2','3')})
+check('initial incompatible label preserved',r('graph','graph-reused-label')['code']=='InvalidArgument'and'different properties'in r('graph','graph-reused-label')['error'])
+for direction in ['ASC','DESC']:
+ for limit in [1,2,3]:check('SQL ordered limit '+direction+str(limit),[x['itemVersionId']for x in r('gsql-dml',f'sql-order-{direction}-{limit}')['rows']]==(['1','2','3']if direction=='ASC'else['3','2','1'])[:limit])
+check('current nested WITH rejects',r('gsql-dml','with-in-subquery')['code']=='InvalidArgument')
+check('both nullable-array forms execute',all(r('gsql-dml','null-array-'+str(i))['code']=='OK'for i in [0,1]))
+check('schema UPSERT stores last updated value',r('pg-conflict-focused','pg-conflict-after')['rows']==[{'name':'name 2','widget_id':'1'}])
+check('both PG FK SET variants execute after bytea correction',all(r('pg-conflict-focused','pg-fk-conflict-'+str(i))['code']=='OK'for i in [0,1]))
+check('search dialect executes on populated rows',r('search-focused','search-dialect')['code']=='OK'and{x['id']for x in r('search-focused','search-dialect')['rows']}=={'1','2'})
+check('view security executes after qualification repair',all(r('catalog-hints-focused','view-'+x)['code']=='OK'for x in ['INVOKER','DEFINER']))
+check('routine and role metadata absence remains explicit',all(r('catalog-hints','catalog-'+x)['code']=='InvalidArgument'for x in ['ROUTINES','ROUTINE_OPTIONS','PARAMETERS','ROUTINE_PRIVILEGES','ROLES']))
+check('role API unimplemented',r('more-api','roles-api')['code']=='Unimplemented')
+check('cross-schema unique metadata duplicates and schema mismatch',sum(x['CONSTRAINT_TYPE']=='UNIQUE'and x['CONSTRAINT_SCHEMA']==''for x in r('cross-schema','foreign-TABLE_CONSTRAINTS')['rows'])==2 and r('cross-schema','foreign-join')['rows']==[])
+check('foreign-key rename engine Internal preserved',r('rename-synonym','rename-with-fk')['code']=='Internal'and'RET_CHECK'in r('rename-synonym','rename-with-fk')['error'])
+check('stream untracking prevents table drop',r('stream-ddl','drop-untracked')['code']=='FailedPrecondition')
+check('all repeated stream ALTER calls succeed',all(r('stream-ddl','alter-stream-'+str(i))['code']=='OK'for i in range(5)))
+stream=r('stream-records-focused','stream-child-records')['rows'];data=stream[0]['record'][0]['data_change_record'][0];keys=json.loads(data['mods'][0]['keys']);values=json.loads(data['mods'][0]['new_values']);check('child stream really returned data',data['table_name']=='Records'and data['mod_type']=='INSERT')
+check('stream key subsecond precision retained',keys['key_ts']=='1970-01-21T14:09:51.23456789Z')
+check('stream commit sentinel is wrong while base row resolved',values['resource_version'].startswith('9999-12-31')and not r('stream-records-focused','stream-base-values')['rows'][0]['resource_version'].startswith('9999'))
+check('ordinary timestamp precision retained',values['previous_resource_version']=='2025-02-19T13:55:36.429694Z')
+check('transaction tag empty despite submitted tag',r('stream-records-focused','stream-written')['expected_tag']=='issue-runtime-tag'and data['transaction_tag']=='')
+check('proto identical binary mutation gives paired engine failure/control',r('proto-generated-focused','ProtoNanos-binary-mutation')['code']=='Unknown'and r('proto-generated-focused','ProtoSeconds-binary-mutation')['code']=='OK')
+check('proto seconds row value correct',any(x=={'id':'binary','created_at':'2025-01-01T00:00:00Z'}for x in r('proto-generated-focused','ProtoSeconds-read')['rows']))
+for hint in ['OPTIMIZER_VERSION','OPTIMIZER_STATISTICS_PACKAGE','ALLOW_DISTRIBUTED_MERGE','EXECUTION_METHOD','USE_UNENFORCED_FOREIGN_KEY','ALLOW_TIMESTAMP_PREDICATE_PUSHDOWN','AUTO_PARAMETER']:
+ check(hint+' unknown-name bypass bounded',r('catalog-hints','hint-'+hint+'-strict')['code']=='InvalidArgument'and r('catalog-hints','hint-'+hint+'-ignore')['code']=='OK')
+check('recognized bad hint value not bypassed',r('catalog-hints','hint-SCAN_METHOD-ignore')['code']=='InvalidArgument')
+check('SNIPPET old keys and whitespace retained',all('start_position'in json.loads(x['snippet'])['snippets'][0]['highlights'][0]and'\n'in json.loads(x['snippet'])['snippets'][0]['snippet']for x in r('search-focused','snippet-indexed')['rows']))
+check('session deletion leaves orphan conflict',r('session-abort','session-delete-active')['code']=='OK'and r('session-abort','after-delete-read')['code']=='Aborted'and'active transaction 0'in r('session-abort','after-delete-read')['error'])
+check('multiplexed live session excluded from list',r('multiplexed','multiplexed-create')['code']=='OK'and r('multiplexed','multiplexed-list')['count']==0 and r('multiplexed','multiplexed-get-after-delete')['code']=='OK')
+check('multiplexed deletion explicitly rejected',r('multiplexed','multiplexed-delete')['code']=='InvalidArgument')
+check('commit stats missing when requested',r('api-controls','commit-stats')['code']=='OK'and r('api-controls','commit-stats')['commit_stats']is None)
+check('timestamp reads after actual commit return row',all(r('api-controls',f'read-after-{n}ms')['read_after_commit']and len(r('api-controls',f'read-after-{n}ms')['rows'])==1 for n in [1000,3000]))
+check('all ten PDML updates and following reads bounded',all(r('pdml',f'pdml-update-{i}')['code']=='OK'and r('pdml',f'pdml-update-{i}')['modified_lower_bound']==2 for i in range(10)))
+check('corrected default latency samples all succeed',all(r('latency-corrected',f'default-latency-{i}-{b}')['code']=='OK'for i in range(5)for b in [False,True]))
+check('equal IN/JOIN sample results',all(x['rows']==[{'count':'200'}]for x in allrows if x['phase']=='performance'and re.fullmatch(r'perf-(in|join)-\d',x['label'])))
+check('eight memory samples are actual owned-container observations',len(summary['memory_samples'])==8 and all(x['exit_code']==0 and x['metrics']['MemUsage']for x in summary['memory_samples']))
+cli=read(p/'cli-checks.json');check('corrected gateway help/flags reach actual binary',cli[0]['exit_code']==0 and'Usage of ./gateway_main'in cli[0]['stdout']+cli[0]['stderr']and all(x['exit_code']==2 and'flag provided but not defined'in x['stdout']+x['stderr']for x in cli[1:]))
+cleanup=read(p/'cleanup-summary.json');check('all 28 DB lifecycles cleaned',cleanup['owned_database_lifecycles']==28 and all(x['create_code']==x['drop_code']=='OK'and x['get_after_drop_code']=='NotFound'for x in cleanup['database_lifecycles']))
+check('all four runtime and twelve CLI containers absent',cleanup['owned_runtime_containers']==4 and cleanup['owned_cli_containers']==12 and cleanup['cli_absent']and all(len(x['owned'])==1 and x['owned'][0]['absent']for x in cleanup['runtime_containers']))
+check('short runtime has recovered image/absence proof',read(p/'last-daemon-event-identity.json')['absent'])
+coverage=read(p/'issue-coverage.json');check('all 70 reports dispositioned with honest scope',len({x['number']for x in coverage['issues']})==70 and coverage['counts']=={'runtime-attempted':43,'related-bounded-control':8,'not-executed-original-scope':19})
+check('extra producer reconstructed exactly',read(p/'extra-producer-reconstruction.json')['original_binary_sha256']==read(p/'extra-producer-reconstruction.json')['reconstructed_binary_sha256'])
+check('no full connection destinations or raw session suffixes retained',all(not re.search(r'projects/[^/\s"\x27]+/instances/|/sessions/\d+',f.read_text())for f in p.glob('emulator-*.jsonl')))
+check('raw operational transaction numbers removed',all(not re.search(r'(?i)transaction [1-9][0-9]{4,}',f.read_text())for f in p.glob('emulator-*.jsonl')))
+check('no transport deadline/unavailable results hidden',not any(x.get('code')in ['DeadlineExceeded','Unavailable']for x in allrows))
+initial=read(s/'initial-artifact-manifest.json')['files'];check('all 1342 earlier evidence bytes unchanged',len(initial)==1342 and all(sha(base/n)==v for n,v in initial.items()))
+check('123 measured implementation/dependency bytes unchanged',all(sha(root/n)==v for n,v in read(base/'managed-recheck-20261029/source-hashes.json').items()))
+receipt={'status':'pass','checks':len(checks),'scope':'Offline observation/provenance/privacy checks. Expected engine discrepancies, partial reproductions and unverified original scopes remain explicit.','assertions':checks};(task/'evidence-check.json').write_text(json.dumps(receipt,indent=2)+'\n');print(json.dumps({'status':'pass','checks':len(checks)}))

@@ -1,0 +1,45 @@
+[
+  {
+    "name": "queue-recreate-build",
+    "started_at": "2026-10-23T14:54:50.706030+00:00",
+    "completed_at": "2026-10-23T14:54:52.945211+00:00",
+    "exit_code": 0,
+    "seconds": 2.239,
+    "argv": [
+      "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go",
+      "build",
+      "-o",
+      "<LOCAL_CHECKOUT>/.tmp/managed-recheck-20261023/queue-recreate",
+      "<LOCAL_CHECKOUT>/.tmp/managed-recheck-20261023/queue-recreate.go"
+    ],
+    "cwd": "<LOCAL_CHECKOUT>/tools",
+    "gowork": "<LOCAL_CHECKOUT>/go.work"
+  },
+  {
+    "name": "queue-recreate-buildinfo",
+    "started_at": "2026-10-23T14:54:52.945401+00:00",
+    "completed_at": "2026-10-23T14:54:52.958211+00:00",
+    "exit_code": 0,
+    "seconds": 0.013,
+    "argv": [
+      "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go",
+      "version",
+      "-m",
+      "<LOCAL_CHECKOUT>/.tmp/managed-recheck-20261023/queue-recreate"
+    ],
+    "cwd": "<LOCAL_CHECKOUT>/tools",
+    "gowork": "<LOCAL_CHECKOUT>/go.work"
+  },
+  {
+    "name": "queue-recreate",
+    "started_at": "2026-10-23T14:54:52.958335+00:00",
+    "completed_at": "2026-10-23T14:55:56.998600+00:00",
+    "exit_code": 0,
+    "seconds": 64.04,
+    "argv": [
+      "<LOCAL_CHECKOUT>/.tmp/managed-recheck-20261023/queue-recreate"
+    ],
+    "cwd": "<LOCAL_CHECKOUT>/tools",
+    "gowork": "<LOCAL_CHECKOUT>/go.work"
+  }
+]

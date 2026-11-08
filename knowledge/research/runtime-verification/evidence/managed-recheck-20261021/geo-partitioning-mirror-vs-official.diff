@@ -1,0 +1,13 @@
+--- mirror
++++ official
+@@ -69,9 +69,8 @@
+ - For every node in your destination instance partition, Spanner can [move](https://docs.cloud.google.com/spanner/docs/create-manage-data-placements#move-row) around 10 placement rows per second.
+ - You can't create [incremental backups](https://docs.cloud.google.com/spanner/docs/backup#incremental-backups) or [copy the backup](https://docs.cloud.google.com/spanner/docs/backup#how-backup-copy-works) .
+ - You can't enable [asymmetric read-only autoscaling](https://docs.cloud.google.com/spanner/docs/managed-autoscaler#asymmetric-read-only-autoscaling) on non-default instance partitions.
+-- You can't move the instance partition to a different instance configuration.
++- You can't move the additional partition to a different instance configuration.
+ - You can't move an instance that has databases using additional placements pointing to the default instance partition.
+-- [Change streams](https://docs.cloud.google.com/spanner/docs/change-streams) don't support partitioned data.
+ - If you use an `INSERT` or `DELETE` DML statement for a placement table, that statement must be the only statement in the [transaction](https://docs.cloud.google.com/spanner/docs/transactions) .
+ - The read-write transaction mode lets you reference only the primary keys of a placement table in the `WHERE` clause. If you need to reference a non-primary key column of a placement table in the `WHERE` clause, then you can use one of the following alternatives:
+   - If you only need read-only access, switch to the read-only transaction mode.

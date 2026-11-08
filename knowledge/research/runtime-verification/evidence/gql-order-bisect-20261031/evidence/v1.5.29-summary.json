@@ -1,0 +1,15 @@
+{
+  "version": "1.5.29",
+  "image": "gcr.io/cloud-spanner-emulator/emulator:1.5.29@sha256:ef44e4116647d88f4f20e3a326deca3fdfa58c1ed1cdd8218e09e8d352aed70e",
+  "process_exit_code": 0,
+  "classification": "query-unavailable",
+  "primary_code": "InvalidArgument",
+  "primary_rows": [],
+  "primary_error": "spanner: code = \"InvalidArgument\", desc = \"Syntax error: Unexpected identifier \\\"GRAPH\\\" [at 1:1]\\nGRAPH FinGraph MATCH (p:Person) RETURN p.id ORDER BY p.id ASC\\n^\", requestID = \"<redacted>\"",
+  "graph_code": "InvalidArgument",
+  "graph_error": "rpc error: code = InvalidArgument desc = Error parsing Spanner DDL statement: CREATE OR REPLACE PROPERTY GRAPH FinGraph\n      NODE TABLES (Account, Person)\n      EDGE TABLES (\n        PersonOwnAccount\n          SOURCE KEY (id) REFERENCES Person (id)\n          DESTINATION KEY (account_id) REFERENCES Account (id)\n          LABEL Owns,\n        AccountTransferAccount\n          SOURCE KEY (id) REFERENCES Account (id)\n          DESTINATION KEY (to_id) REFERENCES Account (id)\n          LABEL Transfers\n      ) : Syntax error on line 1, column 19: Encountered 'PROPERTY' while parsing: create_or_replace_statement",
+  "create_database": "OK",
+  "drop_database": "OK",
+  "database_absent": "NotFound",
+  "runtime_cleanup": "OK"
+}

@@ -1,0 +1,61 @@
+[
+  {
+    "name": "infoschema",
+    "started_at": "2026-10-04T14:28:27.111660+00:00",
+    "exit_code": 0,
+    "elapsed_seconds": 19.58,
+    "cwd": "<LOCAL_CHECKOUT>/.worktrees/omni-r4-20261004/survey",
+    "args": [
+      "run",
+      "./cmd/infoschema-capture",
+      "--target",
+      "omni",
+      "--repo-root",
+      ".."
+    ]
+  },
+  {
+    "name": "spanner-sys",
+    "started_at": "2026-10-04T14:28:46.693149+00:00",
+    "exit_code": 0,
+    "elapsed_seconds": 21.25,
+    "cwd": "<LOCAL_CHECKOUT>/.worktrees/omni-r4-20261004/survey",
+    "args": [
+      "run",
+      "./cmd/spanner-sys-capture",
+      "--target",
+      "omni",
+      "--repo-root",
+      ".."
+    ]
+  },
+  {
+    "name": "omni-drift",
+    "started_at": "2026-10-04T14:29:07.938508+00:00",
+    "exit_code": 1,
+    "elapsed_seconds": 101.85,
+    "cwd": "<LOCAL_CHECKOUT>/.worktrees/omni-r4-20261004/survey",
+    "args": [
+      "test",
+      "-json",
+      "-count=1",
+      "-timeout=15m",
+      "-run",
+      "^TestDrift_OmniTableMetas$",
+      "./infoschem"
+    ]
+  },
+  {
+    "name": "omni-integration",
+    "started_at": "2026-10-04T14:30:49.783868+00:00",
+    "exit_code": 1,
+    "elapsed_seconds": 101.75,
+    "cwd": "<LOCAL_CHECKOUT>/.worktrees/omni-r4-20261004/tools",
+    "args": [
+      "run",
+      "./omni-integration-runner",
+      "--repo-root",
+      ".."
+    ]
+  }
+]

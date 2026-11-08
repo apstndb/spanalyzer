@@ -1,0 +1,12 @@
+from pathlib import Path
+from concurrent.futures import ThreadPoolExecutor
+import datetime,json,subprocess
+p=Path('<LOCAL_TASK_ROOT>/apstndb/spanalyzer/cross-engine-doc-delta-20261029');images=json.loads((p/'sources/selected-images.json').read_text())
+def pull(item):
+ name,entry=item;start=datetime.datetime.now(datetime.timezone.utc).isoformat();r=subprocess.run(['docker','pull',entry['image']],capture_output=True,text=True);(p/'evidence'/(name+'-pull.log')).write_text(r.stdout+r.stderr);result={'name':name,'image':entry['image'],'started_at':start,'completed_at':datetime.datetime.now(datetime.timezone.utc).isoformat(),'exit_code':r.returncode}
+ if r.returncode==0:
+  a=json.loads(subprocess.check_output(['docker','image','inspect',entry['image']],text=True))[0];result['local_image']={k:a[k]for k in ['Id','RepoDigests','Os','Architecture','Created']};(p/'sources'/(name+'-local-image.json')).write_text(json.dumps(result['local_image'],indent=2)+'\n')
+ print(json.dumps(result),flush=True);return result
+with ThreadPoolExecutor(max_workers=3)as pool:a=list(pool.map(pull,images.items()))
+(p/'evidence/image-pull-commands.json').write_text(json.dumps(a,indent=2)+'\n')
+if any(r['exit_code']for r in a):raise SystemExit(1)

@@ -1,0 +1,59 @@
+[
+  {
+    "name": "tuning-build",
+    "started_at": "2026-10-29T01:28:57.903306+00:00",
+    "completed_at": "2026-10-29T01:28:59.945259+00:00",
+    "exit_code": 0,
+    "seconds": 2.042,
+    "argv": [
+      "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go",
+      "build",
+      "-o",
+      "<LOCAL_CHECKOUT>/.tmp/managed-recheck-20261029/tuning-delta",
+      "<LOCAL_CHECKOUT>/.tmp/managed-recheck-20261029/tuning-delta.go"
+    ],
+    "cwd": "<LOCAL_CHECKOUT>/tools",
+    "gowork": "<LOCAL_CHECKOUT>/go.work"
+  },
+  {
+    "name": "tuning-buildinfo",
+    "started_at": "2026-10-29T01:28:59.945487+00:00",
+    "completed_at": "2026-10-29T01:28:59.960205+00:00",
+    "exit_code": 0,
+    "seconds": 0.015,
+    "argv": [
+      "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go",
+      "version",
+      "-m",
+      "<LOCAL_CHECKOUT>/.tmp/managed-recheck-20261029/tuning-delta"
+    ],
+    "cwd": "<LOCAL_CHECKOUT>/tools",
+    "gowork": "<LOCAL_CHECKOUT>/go.work"
+  },
+  {
+    "name": "tuning-google",
+    "started_at": "2026-10-29T01:28:59.960350+00:00",
+    "completed_at": "2026-10-29T01:29:01.412434+00:00",
+    "exit_code": 0,
+    "seconds": 1.452,
+    "argv": [
+      "<LOCAL_CHECKOUT>/.tmp/managed-recheck-20261029/query",
+      "<LOCAL_CHECKOUT>/.tmp/managed-recheck-20261029/tuning-google-cases.json"
+    ],
+    "cwd": "<LOCAL_CHECKOUT>/tools",
+    "gowork": "<LOCAL_CHECKOUT>/go.work"
+  },
+  {
+    "name": "tuning-pg",
+    "started_at": "2026-10-29T01:29:01.412744+00:00",
+    "completed_at": "2026-10-29T01:29:24.839082+00:00",
+    "exit_code": 0,
+    "seconds": 23.426,
+    "argv": [
+      "<LOCAL_CHECKOUT>/.tmp/managed-recheck-20261029/tuning-delta",
+      "<LOCAL_CHECKOUT>/.tmp/managed-recheck-20261029/tuning-pg-plan.json"
+    ],
+    "cwd": "<LOCAL_CHECKOUT>/tools",
+    "gowork": "<LOCAL_CHECKOUT>/go.work"
+  }
+]

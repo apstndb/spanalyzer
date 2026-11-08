@@ -1,0 +1,80 @@
+{
+  "google-features": {
+    "before_records": 53,
+    "current_records": 57,
+    "common_labeled_events": 53,
+    "code_changes": [
+      {
+        "key": [
+          "volatile-graph-1",
+          "CREATE PROPERTY GRAPH ReleaseProbe<DATE>r1VolatileGraph1 NODE TABLES(ReleaseProbe<DATE>r1VolatileView KEY(Id)) OPTIONS(validate_element_key_uniqueness=false, allow_view_with_volatile_column=false)",
+          "",
+          "",
+          1
+        ],
+        "before": "Unimplemented",
+        "after": "OK",
+        "current_error": ""
+      },
+      {
+        "key": [
+          "volatile-graph-2",
+          "CREATE PROPERTY GRAPH ReleaseProbe<DATE>r1VolatileGraph2 NODE TABLES(ReleaseProbe<DATE>r1VolatileView KEY(Id)) OPTIONS(validate_element_key_uniqueness=false, allow_view_with_volatile_column=true)",
+          "",
+          "",
+          1
+        ],
+        "before": "Unimplemented",
+        "after": "OK",
+        "current_error": ""
+      }
+    ],
+    "missing": [],
+    "added": [
+      [
+        "volatile-drop-1",
+        "DROP PROPERTY GRAPH ReleaseProbe<DATE>r1VolatileGraph1",
+        "",
+        "",
+        1
+      ],
+      [
+        "volatile-drop-2",
+        "DROP PROPERTY GRAPH ReleaseProbe<DATE>r1VolatileGraph2",
+        "",
+        "",
+        1
+      ],
+      [
+        "volatile-read-1",
+        "GRAPH ReleaseProbe<DATE>r1VolatileGraph1 MATCH(n) RETURN n.Id, n.score",
+        "",
+        "",
+        1
+      ],
+      [
+        "volatile-read-2",
+        "GRAPH ReleaseProbe<DATE>r1VolatileGraph2 MATCH(n) RETURN n.Id, n.score",
+        "",
+        "",
+        1
+      ]
+    ]
+  },
+  "pg-features": {
+    "before_records": 40,
+    "current_records": 40,
+    "common_labeled_events": 40,
+    "code_changes": [],
+    "missing": [],
+    "added": []
+  },
+  "queue": {
+    "before_records": 32,
+    "current_records": 32,
+    "common_labeled_events": 31,
+    "code_changes": [],
+    "missing": [],
+    "added": []
+  }
+}

@@ -1,0 +1,57 @@
+"""Retain completed redacted probes and compare them with October 7."""
+from pathlib import Path
+import collections, hashlib, json, re, shutil
+
+root = Path('<LOCAL_CHECKOUT>')
+task = Path(__file__).parent
+ev = task/'evidence'
+scratch = root/'.tmp/managed-recheck-20261009'
+previous = root/'knowledge/research/runtime-verification/evidence/managed-recheck-20261007'
+load = lambda p: [json.loads(x) for x in p.read_text().splitlines()]
+records = {}
+for name in ['readonly','google-features','pg-features','queue','cleanup','active-batch']:
+    records[name] = load(ev/(name+'.stdout'))
+    (ev/(name+'.jsonl')).write_text('\n'.join(json.dumps(x,ensure_ascii=False) for x in records[name])+'\n')
+(ev/'managed-tests.log').write_text((ev/'managed-tests.stdout').read_text() + (ev/'managed-tests.stderr').read_text())
+comparisons = {}
+for name in ['readonly','google-features','pg-features','queue','active-batch']:
+    before = load(previous/(name+'.jsonl'))
+    def key(row):
+        return (row.get('label'), row.get('kind'), json.dumps(row.get('sql')).replace('20261009r1','20261007r1'))
+    bs, after = collections.defaultdict(list), collections.defaultdict(list)
+    for x in before: bs[key(x)].append(x)
+    for x in records[name]: after[key(x)].append(x)
+    changed = []; compared = 0
+    for k, rows in bs.items():
+        if k not in after: continue
+        for a,b in zip(rows,after[k]):
+            compared += 1
+            if a.get('code') != b.get('code'):
+                changed.append({'label':a.get('label'),'sql':b.get('sql'),'before':a.get('code'),'after':b.get('code'),'at':b.get('at')})
+    comparisons[name] = {'baseline_records':len(before),'current_records':len(records[name]),'comparable_records':compared,'changed_codes':changed}
+(ev/'feature-comparison.json').write_text(json.dumps(comparisons,indent=2)+'\n')
+checks = []
+for name in ['infoschema','spanner-sys','spanner-sys-2','spanner-sys-3']:
+    x=json.loads((ev/(name+'.stdout')).read_text())
+    (ev/(name+'-check.json')).write_text(json.dumps(x,indent=2)+'\n')
+    checks.append({'name':name,'status':x['status'],'current':x['current'],'retained':x['retained']})
+capture_match = re.search(r'wrote (survey/[^\s]+\.json)',(ev/'spanner-sys-capture.stderr').read_text())
+capture_path = capture_match.group(1)
+capture=json.loads((root/capture_path).read_text())
+old=json.loads((previous/'spanner-sys-check.json').read_text())
+catalog={'baseline':'managed-recheck-20261007','observations':checks,'retained_new_capture':capture_path,'retained_new_capture_sha256':hashlib.sha256((root/capture_path).read_bytes()).hexdigest(),'table_count':len({x['table_name'] for x in capture['columns']}),'surface_matches_october7':capture['surface_sha256']==old['current']['surface_sha256']}
+(ev/'catalog-comparison.json').write_text(json.dumps(catalog,indent=2)+'\n')
+for name in ['google-features','pg-features','queue']:
+    shutil.copy2(ev/(name+'-buildinfo.stdout'),ev/(name+'-buildinfo.txt'))
+shutil.copy2(scratch/'run.py',ev/'run.py.txt')
+receipt={'local_date':'2026-10-09 Asia/Tokyo','target':'Configured user-level verification profile; connection coordinates omitted','server_build':'unavailable','source_revision':json.loads((task/'source-state.json').read_text())['head'],'source_state':'Existing dirty working snapshot; measured producer/dependency comparison retained separately','dependency_scope':{'survey':'Go1.26.8, GOWORK=off, Spanner v1.88.0','features':'Go1.26.8, explicit workspace, Spanner v1.91.0'},'fixture_change':'October 7 sources reused with owned fixture suffix 20261009r1; same SQL cases and controls','records':{k:len(v) for k,v in records.items()},'producer_hashes':{name:hashlib.sha256((scratch/(name+'.go')).read_bytes()).hexdigest() for name in records},'binary_hashes':{name:hashlib.sha256((scratch/name).read_bytes()).hexdigest() for name in ['google-features','pg-features','queue']},'commands':'commands.json','documentation':'documentation.json','retention_transforms':['profile coordinates redacted before persistence','JSON error strings and plain stderr request IDs redacted before persistence','lease tokens hashed in producer memory'],'durable_local_directory':str(task),'execution_start':json.loads((ev/'commands.json').read_text())[0]['started_at'],'execution_end':records['cleanup'][-1]['at'],'authority':'Read managed target and owned fixtures, retained research only; no implementation, dependency, selector, commit, push or publication changes'}
+(ev/'receipt.json').write_text(json.dumps(receipt,indent=2)+'\n')
+print('Counts:',receipt['records'])
+print('Code changes:',{k:v['changed_codes'] for k,v in comparisons.items()})
+print('Final cleanup:',[(x['label'],x.get('code'),x.get('rows')) for x in records['cleanup']])
+print('Active controls:',[(x['label'],x.get('code'),len(x.get('rows',[]))) for x in records['active-batch']])
+print('SQL NULL rows:',[(x['label'],len(x['rows'])) for x in records['readonly'] if x.get('label','').startswith('txn-nullability-')])
+print('Distribution rows:',sum(bool(x['rows']) for x in records['readonly'] if x.get('label','').startswith('distribution-')))
+for label in ['graph-metadata','semantic-metadata']:
+    x=next(x for x in records['google-features'] if x.get('label')==label)
+    print(label,json.loads(x['rows'][0]['PROPERTY_GRAPH_METADATA_JSON'])['options'])

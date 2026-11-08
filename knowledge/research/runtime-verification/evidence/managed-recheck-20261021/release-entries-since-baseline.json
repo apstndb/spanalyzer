@@ -1,0 +1,16 @@
+[
+  {
+    "title": "October 20, 2026",
+    "updated": "2026-10-20T00:00:00-07:00",
+    "id": "tag:google.com,2016:spanner-release-notes#October_20_2026",
+    "content": "<h3>Feature</h3>\n<p>Spanner supports approximate aggregate functions for both GoogleSQL and\nPostgreSQL dialects. These functions produce\nstatistical estimates of distinct counts, allowing you to compute results faster\nand save resources on large datasets compared to exact aggregation.</p>\n<p>For more information, see approximate aggregate functions\n(<a href=\"https://docs.cloud.google.com/spanner/docs/reference/standard-sql/approximate_aggregate_functions\">GoogleSQL</a> and\n<a href=\"https://docs.cloud.google.com/spanner/docs/reference/postgresql/functions#approximate-aggregate\">PostgreSQL</a>),\n<a href=\"https://docs.cloud.google.com/spanner/docs/reference/standard-sql/hll_functions\">HyperLogLog++ functions</a>, and\n<a href=\"https://docs.cloud.google.com/spanner/docs/reference/standard-sql/sketches\">Sketches</a>.</p>\n\n    ",
+    "plain_text": "Feature Spanner supports approximate aggregate functions for both GoogleSQL and PostgreSQL dialects. These functions produce statistical estimates of distinct counts, allowing you to compute results faster and save resources on large datasets compared to exact aggregation. For more information, see approximate aggregate functions ( GoogleSQL and PostgreSQL ), HyperLogLog++ functions , and Sketches ."
+  },
+  {
+    "title": "September 18, 2026",
+    "updated": "2026-09-18T00:00:00-07:00",
+    "id": "tag:google.com,2016:spanner-release-notes#September_18_2026",
+    "content": "<h3>Feature</h3>\n<p>Spanner supports automatic parameterization of SQL query literals\nto improve query performance, reduce latency, and lower CPU costs.\nSpanner converts literal values hardcoded in CRUD-style queries, such as\nprimary key lookups, index lookups, and primary key joins, into query parameters,\nallowing execution plans to be cached and reused to reduce latency and CPU costs.</p>\n<p>For more information, see\n<a href=\"https://docs.cloud.google.com/spanner/docs/sql-best-practices#query-parameters\">Use query parameters</a>\nand statement hints (<a href=\"https://docs.cloud.google.com/spanner/docs/reference/standard-sql/query-syntax#statement_hints\">GoogleSQL</a>\nand <a href=\"https://docs.cloud.google.com/spanner/docs/reference/postgresql/query-syntax#statement-hints\">PostgreSQL</a>).</p>\n\n    ",
+    "plain_text": "Feature Spanner supports automatic parameterization of SQL query literals to improve query performance, reduce latency, and lower CPU costs. Spanner converts literal values hardcoded in CRUD-style queries, such as primary key lookups, index lookups, and primary key joins, into query parameters, allowing execution plans to be cached and reused to reduce latency and CPU costs. For more information, see Use query parameters and statement hints ( GoogleSQL and PostgreSQL )."
+  }
+]

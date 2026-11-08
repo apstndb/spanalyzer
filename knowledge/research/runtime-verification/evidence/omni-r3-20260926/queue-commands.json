@@ -1,0 +1,43 @@
+[
+  {
+    "name": "queue-build",
+    "started_at": "2026-09-26T14:58:16.035557+00:00",
+    "exit_code": 0,
+    "elapsed_seconds": 2.32,
+    "cwd": "<LOCAL_CHECKOUT>/.worktrees/omni-r3-20260926/tools",
+    "args": [
+      "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go",
+      "build",
+      "-o",
+      "<LOCAL_CHECKOUT>/.tmp/omni-r3-20260926/queue-probe",
+      "<LOCAL_CHECKOUT>/.tmp/omni-r3-20260926/queue-probe.go"
+    ],
+    "env_overrides": {}
+  },
+  {
+    "name": "queue-r3",
+    "started_at": "2026-09-26T14:58:18.353391+00:00",
+    "exit_code": 0,
+    "elapsed_seconds": 80.83,
+    "cwd": "<LOCAL_CHECKOUT>/.worktrees/omni-r3-20260926/tools",
+    "args": [
+      "<LOCAL_CHECKOUT>/.tmp/omni-r3-20260926/queue-probe"
+    ],
+    "env_overrides": {
+      "OMNI_IMAGE": "us-docker.pkg.dev/spanner-omni/images/spanner-omni:2026.r3-beta@sha256:8243ce3c748b10371a16f05bc7553465fe978d7349127ad331d02c1d3a9fcc99"
+    }
+  },
+  {
+    "name": "queue-r2",
+    "started_at": "2026-09-26T14:59:39.183611+00:00",
+    "exit_code": 0,
+    "elapsed_seconds": 113.61,
+    "cwd": "<LOCAL_CHECKOUT>/.worktrees/omni-r3-20260926/tools",
+    "args": [
+      "<LOCAL_CHECKOUT>/.tmp/omni-r3-20260926/queue-probe"
+    ],
+    "env_overrides": {
+      "OMNI_IMAGE": "us-docker.pkg.dev/spanner-omni/images/spanner-omni:2026.r2.1-beta@sha256:ed31d9ee72eeee69cac78566eb3a6e72ee389b26234735f0ef449774cc006741"
+    }
+  }
+]

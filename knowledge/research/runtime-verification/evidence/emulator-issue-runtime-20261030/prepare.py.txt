@@ -1,0 +1,88 @@
+from pathlib import Path
+import json,re,shutil
+root=Path('<LOCAL_CHECKOUT>');s=root/'.tmp/emulator-issue-runtime-20261030';m=s/'module';task=Path('<LOCAL_TASK_ROOT>/apstndb/spanalyzer/emulator-issue-runtime-20261030');src=root/'knowledge/research/runtime-verification/evidence/emulator-open-issues-20261030/open-issues.json';issues={x['issue']['number']:x for x in json.loads(src.read_text())['issues']};plans={}
+def plan(name,dialect='google'):
+ p={'dialect':dialect,'steps':[]};plans[name]=p;return p['steps']
+def add(p,label,kind,sql='',requires=(),issue=None,**kw):
+ x={'label':label,'family':f'issue-{issue}'if issue else'controls','kind':kind,'sql':sql,'requires':list(requires),'timeout_seconds':15};x.update(kw);p.append(x);return label
+def ddl(p,label,sql,**kw):return add(p,label,'ddl',sql,**kw)
+def query(p,label,sql,**kw):return add(p,label,'query',sql,**kw)
+def dml(p,label,sql,**kw):return add(p,label,'dml',statements=[sql]if isinstance(sql,str)else sql,**kw)
+def mutation(p,label,table,op,values,**kw):return add(p,label,'mutation',table=table,operation=op,values=values,**kw)
+def blocks(n):return[b for lang,b in re.findall(r'```([^\n]*)\n(.*?)```',issues[n]['issue']['body']or'',re.S)]
+p=plan('defaults')
+for name,key,extra in [('KeyDefault',"id STRING(36) NOT NULL DEFAULT (GENERATE_UUID())",''),('PlainKey','id STRING(36) NOT NULL',''),('GeneratedKey','id STRING(36) NOT NULL',', k INT64 AS (LENGTH(id)) STORED'),('CompositeDefault',"id STRING(36) NOT NULL DEFAULT ('k')",', sub INT64 NOT NULL')]:
+ pk='k'if name=='GeneratedKey'else'id,sub'if name=='CompositeDefault'else'id';q=ddl(p,name+'-ddl',f"CREATE TABLE {name} ({key}, status STRING(16) DEFAULT ('draft'), n INT64 DEFAULT (0), total NUMERIC{extra}) PRIMARY KEY ({pk})",issue=395)
+ cols='id,status,n,total'+(',sub'if name=='CompositeDefault'else'');vals="'A','sent',5,10"+(',1'if name=='CompositeDefault'else'');seed=dml(p,name+'-seed',f'INSERT INTO {name} ({cols}) VALUES ({vals})',requires=[q],issue=395)
+ vals={'id':'A','total':{'type':'numeric','value':'11'}}
+ if name=='GeneratedKey':vals={'k':1,'total':{'type':'numeric','value':'11'}}
+ if name=='CompositeDefault':vals['sub']=1
+ mutation(p,name+'-mutation',name,'update',vals,requires=[seed],issue=395);query(p,name+'-after-mutation',f'SELECT id,status,n,total FROM {name}',requires=[seed],issue=395)
+ dml(p,name+'-reset',f"UPDATE {name} SET status='sent', n=5 WHERE id='A'",requires=[seed],issue=395);dml(p,name+'-dml',f"UPDATE {name} SET total=12 WHERE id='A'",requires=[seed],issue=395);query(p,name+'-after-dml',f'SELECT id,status,n,total FROM {name}',requires=[seed],issue=395)
+q=ddl(p,'key-nonkey-default-ddl',"CREATE TABLE NonkeyDefault (id STRING(36) NOT NULL, generated STRING(36) DEFAULT (GENERATE_UUID()), status STRING(16) DEFAULT ('draft'), n INT64 DEFAULT (0)) PRIMARY KEY(id)",issue=395);seed=dml(p,'key-nonkey-seed',"INSERT INTO NonkeyDefault(id,status,n) VALUES('A','sent',5)",requires=[q],issue=395);mutation(p,'key-nonkey-mutation','NonkeyDefault','update',{'id':'A','generated':'fixed'},requires=[seed],issue=395);query(p,'key-nonkey-after','SELECT id,status,n FROM NonkeyDefault',requires=[seed],issue=395)
+p=plan('commit-defaults');schema=blocks(316)[0].strip();q=ddl(p,'generated-timestamps-ddl',schema,issue=316);dml(p,'generated-timestamps-dml',"INSERT INTO TestTable(data) VALUES(JSON '{\"test_id\":\"dml-1\"}')",requires=[q],issue=316);mutation(p,'generated-timestamps-mutation','TestTable','insert',{'data':{'type':'json','value':{'test_id':'mutation-1'}}},requires=[q],issue=316);query(p,'generated-timestamps-rows','SELECT * FROM TestTable ORDER BY test_id',requires=[q],issue=316)
+q=ddl(p,'simple-timestamps-ddl',"CREATE TABLE SimpleTs(id INT64 NOT NULL, created_at TIMESTAMP DEFAULT(PENDING_COMMIT_TIMESTAMP()) OPTIONS(allow_commit_timestamp=true)) PRIMARY KEY(id)",issue=181);dml(p,'pending-in-if',"INSERT INTO SimpleTs(id,created_at) VALUES(2,IF(TRUE,PENDING_COMMIT_TIMESTAMP(),NULL))",requires=[q],issue=181);query(p,'pending-in-if-value','SELECT * FROM SimpleTs',requires=[q],issue=181)
+p=plan('graph');q=ddl(p,'graph-nodes','CREATE TABLE Nodes(id INT64 NOT NULL) PRIMARY KEY(id)',issue=265);r=ddl(p,'graph-edges','CREATE TABLE Edges(src INT64 NOT NULL,dst INT64 NOT NULL) PRIMARY KEY(src,dst)',issue=265);seed=dml(p,'graph-seed',['INSERT INTO Nodes(id) VALUES(1),(2),(3)','INSERT INTO Edges(src,dst) VALUES(1,2),(2,3)'],requires=[q,r],issue=265)
+q=ddl(p,'graph-ordinary','CREATE PROPERTY GRAPH G NODE TABLES(Nodes LABEL Node) EDGE TABLES(Edges SOURCE KEY(src) REFERENCES Nodes(id) DESTINATION KEY(dst) REFERENCES Nodes(id) LABEL Edge)',requires=[seed],issue=265)
+for mode in ['TRAIL','ACYCLIC','ANY SHORTEST']:
+ for quant in ['{0}','{0,1}','{0,3}','{,3}','{1,3}']:
+  query(p,'path-'+mode.replace(' ','-')+'-'+quant,'GRAPH G MATCH '+mode+' (a)-[e]->'+quant+'(b) RETURN DISTINCT a.id AS src,b.id AS dst ORDER BY src,dst',requires=[q],issue=265)
+g=ddl(p,'graph-reused-label','CREATE PROPERTY GRAPH SameLabel NODE TABLES(Nodes LABEL Shared) EDGE TABLES(Edges SOURCE KEY(src) REFERENCES Nodes(id) DESTINATION KEY(dst) REFERENCES Nodes(id) LABEL Shared)',requires=[seed],issue=265);query(p,'graph-reused-label-read','GRAPH SameLabel MATCH (a:Shared)-[e:Shared]->(b:Shared) RETURN a.id AS src,b.id AS dst ORDER BY src,dst',requires=[g],issue=265)
+p=plan('catalog-hints');
+for t in ['ROUTINES','ROUTINE_OPTIONS','PARAMETERS','ROUTINE_PRIVILEGES','TABLE_OPTIONS','ROLES']:query(p,'catalog-'+t,'SELECT * FROM INFORMATION_SCHEMA.'+t+' LIMIT 3',issue=386 if t!='ROLES'else 350)
+for hint,val in [('OPTIMIZER_VERSION','latest'),('OPTIMIZER_STATISTICS_PACKAGE','latest'),('ALLOW_DISTRIBUTED_MERGE','TRUE'),('EXECUTION_METHOD','BATCH'),('USE_UNENFORCED_FOREIGN_KEY','TRUE'),('ALLOW_TIMESTAMP_PREDICATE_PUSHDOWN','TRUE'),('USE_ADDITIONAL_PARALLELISM','TRUE'),('SCAN_METHOD','COLUMNAR'),('AUTO_PARAMETER','OFF')]:
+ for ignore in [False,True]:query(p,'hint-'+hint+('-ignore'if ignore else'-strict'),'@{'+('spanner_emulator.ignore_unknown_hints=TRUE,'if ignore else'')+hint+'='+val+'} SELECT 1 AS value',issue=349 if ignore else 300)
+q=ddl(p,'view-table','CREATE TABLE ViewBase(id INT64 NOT NULL) PRIMARY KEY(id)',issue=233)
+for sec in ['INVOKER','DEFINER']:ddl(p,'view-'+sec,'CREATE OR REPLACE VIEW V'+sec+' SQL SECURITY '+sec+' AS SELECT id FROM ViewBase',requires=[q],issue=233)
+r=ddl(p,'create-role','CREATE ROLE ProbeRole',issue=350);add(p,'export-roles','ddl-export',issue=350)
+q=ddl(p,'udf','CREATE FUNCTION PlusOne(x INT64) RETURNS INT64 SQL SECURITY INVOKER AS (x+1)',issue=261);query(p,'udf-value','SELECT PlusOne(4) AS value',requires=[q],issue=261)
+p=plan('search');q=ddl(p,'search-table',"CREATE TABLE Docs(id INT64 NOT NULL, content STRING(MAX), extra STRING(MAX), tok TOKENLIST AS(TOKENIZE_FULLTEXT(content)) HIDDEN, extra_tok TOKENLIST AS(TOKENIZE_FULLTEXT(extra)) HIDDEN) PRIMARY KEY(id)",issue=324);idx=ddl(p,'search-index','CREATE SEARCH INDEX SI ON Docs(tok)',requires=[q],issue=324);seed=dml(p,'search-seed',"INSERT INTO Docs(id,content,extra) VALUES(1,'test 123\nabc','one'),(2,'test       123\n abc','two')",requires=[q],issue=355)
+for n,content in enumerate(['test 123\\nabc','test       123\\n abc']):query(p,'snippet-'+str(n),f'SELECT SNIPPET("{content}", "123") AS snippet',issue=356)
+query(p,'snippet-indexed','SELECT id,SNIPPET(content,"test") AS snippet FROM Docs WHERE SEARCH(tok,"test") ORDER BY id',requires=[idx,seed],issue=355);query(p,'search-dialect',"SELECT id FROM Docs WHERE SEARCH(tok,'test',dialect=>'words_phrase')",requires=[idx,seed],issue=304);ddl(p,'alter-search-add','ALTER SEARCH INDEX SI ADD COLUMN extra_tok',requires=[idx],issue=324);query(p,'search-index-metadata',"SELECT INDEX_NAME,SEARCH_PARTITION_BY,SEARCH_ORDER_BY FROM INFORMATION_SCHEMA.INDEXES WHERE TABLE_NAME='Docs'",requires=[idx],issue=341)
+for hint in ['_BASE_TABLE','PRIMARY_KEY']:query(p,'force-index-'+hint,'SELECT id FROM Docs@{FORCE_INDEX='+hint+'} ORDER BY id',requires=[seed],issue=214)
+q=ddl(p,'parent-search',"CREATE TABLE ParentSearch(pid STRING(MAX) NOT NULL) PRIMARY KEY(pid)",issue=197);r=ddl(p,'child-search',"CREATE TABLE ChildSearch(pid STRING(MAX) NOT NULL,cid STRING(MAX) NOT NULL,title STRING(MAX),tokens TOKENLIST AS(TOKENIZE_SUBSTRING(title)) HIDDEN) PRIMARY KEY(pid,cid), INTERLEAVE IN PARENT ParentSearch",requires=[q],issue=197);ddl(p,'interleaved-search-index','CREATE SEARCH INDEX CSI ON ChildSearch(tokens) PARTITION BY pid, INTERLEAVE IN ParentSearch OPTIONS(sort_order_sharding=true)',requires=[r],issue=197)
+p=plan('gsql-dml');q=ddl(p,'conflict-table',"CREATE TABLE ConflictTable(id INT64 NOT NULL,created_on TIMESTAMP NOT NULL DEFAULT(CURRENT_TIMESTAMP())) PRIMARY KEY(id)",issue=358);seed=dml(p,'conflict-seed','INSERT INTO ConflictTable(id) VALUES(1)',requires=[q],issue=358)
+for value in [1,2]:dml(p,'conflict-nothing-'+str(value),f'INSERT INTO ConflictTable(id) VALUES({value}) ON CONFLICT DO NOTHING',requires=[seed],issue=358)
+query(p,'conflict-after','SELECT id FROM ConflictTable ORDER BY id',requires=[seed],issue=358)
+for n in [292]:
+ for j,b in enumerate(blocks(n)[:2]):query(p,'null-array-'+str(j),b,issue=n)
+query(p,'with-in-subquery','SELECT * FROM (WITH c AS (SELECT 1 AS n) SELECT * FROM c)',issue=276)
+for table,ddltext in [('Requisitions','id INT64 NOT NULL,State INT64'),('Measurements','MeasurementId INT64 NOT NULL')]:ddl(p,table+'-ddl',f'CREATE TABLE {table}({ddltext}) PRIMARY KEY({"id"if table=="Requisitions"else"MeasurementId"})',issue=236)
+seed=dml(p,'subquery-seed',['INSERT INTO Requisitions(id,State) VALUES(1,1),(2,2)','INSERT INTO Measurements(MeasurementId) VALUES(1)'],requires=['Requisitions-ddl','Measurements-ddl'],issue=236)
+for j,b in enumerate(blocks(236)[:3]):dml(p,'subquery-update-'+str(j),b,requires=[seed],issue=236,timeout_seconds=8)
+q=ddl(p,'order-items','CREATE TABLE Items(itemId STRING(MAX),itemVersionId STRING(MAX)) PRIMARY KEY(itemId,itemVersionId)',issue=143);seed=dml(p,'order-items-seed',"INSERT INTO Items(itemId,itemVersionId) VALUES('A','2'),('A','3'),('A','1')",requires=[q],issue=143)
+for direction in ['ASC','DESC']:
+ for limit in [1,2,3]:query(p,'sql-order-'+direction+'-'+str(limit),f"SELECT * FROM Items WHERE itemId='A' ORDER BY itemVersionId {direction} LIMIT {limit}",requires=[seed],issue=143)
+p=plan('pg-conflict','pg');ddl(p,'pg-schema','CREATE SCHEMA temp_schema',issue=312);q=ddl(p,'pg-table','CREATE TABLE temp_schema.widget(widget_id bigint NOT NULL PRIMARY KEY,name text NOT NULL)',requires=['pg-schema'],issue=312)
+for j,sql in enumerate(["INSERT INTO temp_schema.widget(widget_id,name) VALUES(1,'name 1') ON CONFLICT(widget_id) DO UPDATE SET name=EXCLUDED.name RETURNING name","INSERT INTO temp_schema.widget(widget_id,name) VALUES(1,'name 2') ON CONFLICT(widget_id) DO UPDATE SET name=EXCLUDED.name RETURNING name","INSERT INTO temp_schema.widget(widget_id,name) VALUES(1,'name 3') ON CONFLICT(widget_id) DO NOTHING RETURNING name"]):add(p,'pg-conflict-'+str(j),'dml-returning',sql,requires=[q],issue=312)
+query(p,'pg-conflict-after','SELECT * FROM temp_schema.widget',requires=[q],issue=312)
+ddl(p,'pg-parent','CREATE TABLE users(id varchar(36) NOT NULL PRIMARY KEY)',issue=294);q=ddl(p,'pg-fk','CREATE TABLE table_one(user_id varchar(36) NOT NULL PRIMARY KEY,attribute bytea NOT NULL,CONSTRAINT fk FOREIGN KEY(user_id) REFERENCES users(id))',requires=['pg-parent'],issue=294);seed=dml(p,'pg-fk-seed',"INSERT INTO users(id) VALUES('A')",requires=[q],issue=294)
+for j,sets in enumerate(['user_id=EXCLUDED.user_id,attribute=EXCLUDED.attribute','attribute=EXCLUDED.attribute']):dml(p,'pg-fk-conflict-'+str(j),"INSERT INTO table_one(user_id,attribute) VALUES('A',decode('01','hex')) ON CONFLICT(user_id) DO UPDATE SET "+sets,requires=[seed],issue=294)
+query(p,'pg-fk-after','SELECT * FROM table_one',requires=[seed],issue=294)
+p=plan('cross-schema');ddl(p,'foreign-schema','CREATE SCHEMA other_schema',issue=353);ddl(p,'foreign-parent','CREATE TABLE other_schema.referenced_table(id INT64 NOT NULL,unique_val INT64 NOT NULL) PRIMARY KEY(id)',requires=['foreign-schema'],issue=353);ddl(p,'foreign-unique','CREATE UNIQUE INDEX referenced_unique ON other_schema.referenced_table(unique_val)',requires=['foreign-parent'],issue=353)
+# Index names in non-default schemas must themselves be qualified.
+p[-1]['sql']='CREATE UNIQUE INDEX other_schema.referenced_unique ON other_schema.referenced_table(unique_val)'
+for i in [1,2]:ddl(p,'foreign-child-'+str(i),f'CREATE TABLE referring_table_{i}(id INT64 NOT NULL,ref_val INT64 NOT NULL,CONSTRAINT fk_ref_{i} FOREIGN KEY(ref_val) REFERENCES other_schema.referenced_table(unique_val) NOT ENFORCED) PRIMARY KEY(id)',requires=['foreign-unique'],issue=353)
+for table in ['TABLE_CONSTRAINTS','REFERENTIAL_CONSTRAINTS','KEY_COLUMN_USAGE']:query(p,'foreign-'+table,'SELECT * FROM INFORMATION_SCHEMA.'+table+(' WHERE TABLE_NAME=\'referenced_table\''if table!='REFERENTIAL_CONSTRAINTS'else''),requires=['foreign-child-1','foreign-child-2'],issue=353)
+query(p,'foreign-join',"SELECT rc.constraint_name,tc.table_name FROM INFORMATION_SCHEMA.REFERENTIAL_CONSTRAINTS rc JOIN INFORMATION_SCHEMA.TABLE_CONSTRAINTS tc ON tc.constraint_catalog=rc.unique_constraint_catalog AND tc.constraint_schema=rc.unique_constraint_schema AND tc.constraint_name=rc.unique_constraint_name WHERE rc.constraint_name='fk_ref_1'",requires=['foreign-child-1'],issue=353)
+p=plan('rename-synonym');q=ddl(p,'rename-parent','CREATE TABLE RenameParent(id INT64 NOT NULL) PRIMARY KEY(id)',issue=251);r=ddl(p,'rename-child','CREATE TABLE RenameChild(id INT64 NOT NULL,parent INT64,CONSTRAINT FK FOREIGN KEY(parent) REFERENCES RenameParent(id)) PRIMARY KEY(id)',requires=[q],issue=251);ddl(p,'rename-with-fk','RENAME TABLE RenameChild TO RenamedChild',requires=[r],issue=251,timeout_seconds=12);ddl(p,'add-synonym','ALTER TABLE RenameParent ADD SYNONYM ParentAlias',requires=[q],issue=290);query(p,'synonym-metadata',"SELECT TABLE_NAME,SYNONYM FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME='RenameParent'",requires=[q],issue=290);add(p,'rename-export','ddl-export',issue=251)
+p=plan('stream-ddl')
+for name in ['K','Z']:ddl(p,'table-'+name,f'CREATE TABLE {name}(id INT64 NOT NULL,c STRING(MAX)) PRIMARY KEY(id)',issue=352)
+q=ddl(p,'column-stream','CREATE CHANGE STREAM CS FOR K,Z(c)',requires=['table-K','table-Z'],issue=352);r=ddl(p,'column-untrack','ALTER CHANGE STREAM CS SET FOR K',requires=[q],issue=352);ddl(p,'drop-untracked','DROP TABLE Z',requires=[r],issue=352)
+for i in range(1,5):ddl(p,'stream-T'+str(i),f'CREATE TABLE T{i}(id INT64 NOT NULL'+(',numericId INT64'if i<4 else',val STRING(MAX)')+') PRIMARY KEY(id)',issue=298)
+q=ddl(p,'alter-stream-create','CREATE CHANGE STREAM S FOR T1(numericId),T2(numericId),T3(numericId)',requires=['stream-T1','stream-T2','stream-T3','stream-T4'],issue=298)
+for i,clause in enumerate(['T1(numericId),T2(numericId)','T1(numericId),T2(numericId),T3(numericId)','T1(numericId),T3(numericId)','T1(numericId),T2(numericId),T3(numericId)','T1(numericId),T2(numericId),T3(numericId),T4']):ddl(p,'alter-stream-'+str(i),'ALTER CHANGE STREAM S SET FOR '+clause,requires=[q],issue=298)
+p=plan('stream-records');ddl(p,'records-table','CREATE TABLE Records(key_ts TIMESTAMP NOT NULL,id INT64 NOT NULL,value STRING(MAX),resource_version TIMESTAMP OPTIONS(allow_commit_timestamp=true),previous_resource_version TIMESTAMP) PRIMARY KEY(key_ts,id)',issue=347);ddl(p,'records-stream',"CREATE CHANGE STREAM Changes FOR Records OPTIONS(value_capture_type='NEW_ROW_AND_OLD_VALUES')",requires=['records-table'],issue=210);add(p,'stream-precision-tag','stream-records',requires=['records-stream'],issue=347,timeout_seconds=25)
+p=plan('api-controls');ddl(p,'api-table','CREATE TABLE ApiRows(id INT64 NOT NULL,val INT64,ts TIMESTAMP OPTIONS(allow_commit_timestamp=true)) PRIMARY KEY(id)',issue=189);add(p,'api-readtimestamp-stats','api-controls',requires=['api-table'],issue=189,timeout_seconds=30)
+p=plan('session-abort');ddl(p,'session-table','CREATE TABLE ApiRows(id INT64 NOT NULL,val INT64,ts TIMESTAMP OPTIONS(allow_commit_timestamp=true)) PRIMARY KEY(id)',issue=30);add(p,'deleted-active-session','session-abort',requires=['session-table'],issue=30,timeout_seconds=12)
+p=plan('performance');ddl(p,'perf-table','CREATE TABLE Perf(id INT64 NOT NULL,val STRING(MAX) DEFAULT(\'draft\'),grp INT64) PRIMARY KEY(id)',issue=187);add(p,'perf-sample','performance',requires=['perf-table'],issue=389,timeout_seconds=50)
+p=plan('diagnostics');
+for name,sql in [('reclaim','SELECT EMULATOR_RECLAIM([\'ApiRows\'])'),('lock-stats','SELECT EMULATOR_LOCK_STATS()')]:query(p,'diagnostic-'+name,sql,issue=407)
+add(p,'retention-one-second','ddl',"ALTER DATABASE PLACEHOLDER SET OPTIONS(version_retention_period='1s')",issue=403)
+# Remaining API/proto-specific controls are implemented by producer action handlers.
+p=plan('proto-generated');add(p,'proto-generated-nanos','proto-generated',issue=332,timeout_seconds=30)
+for name,p in plans.items():
+ for x in p['steps']:
+  if x['kind']=='ddl'and x['timeout_seconds']==15:x['timeout_seconds']=30
+ (m/(name+'.json')).write_text(json.dumps(p,indent=2)+'\n')
+(s/'plans.json').write_text(json.dumps({'plans':list(plans),'steps':sum(len(x['steps'])for x in plans.values()),'issues':sorted({int(x['family'][6:])for p in plans.values()for x in p['steps']if x['family'].startswith('issue-')})},indent=2)+'\n');print((s/'plans.json').read_text())

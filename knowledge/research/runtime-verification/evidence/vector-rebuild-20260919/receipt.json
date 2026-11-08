@@ -1,0 +1,31 @@
+{
+  "date_jst": "2026-09-19",
+  "source_commit": "12599355b809e2995701ad1fa8ff4fdb0ed4fcdf",
+  "parser_module": "github.com/cloudspannerecosystem/memefish v0.8.1",
+  "process_exit": {
+    "google": 0,
+    "postgresql": 0
+  },
+  "observations": {
+    "managed.jsonl": {
+      "operation_result": "Unimplemented",
+      "ddl_unchanged": true,
+      "ann_checks_passed": true,
+      "cleanup_remaining": 0
+    },
+    "pg-managed.jsonl": {
+      "operation_result": "Unimplemented",
+      "ddl_unchanged": true,
+      "ann_checks_passed": true,
+      "cleanup_remaining": 0
+    }
+  },
+  "producer_hashes": {
+    "probe.go": "8e4b5077200edad9bb65493a3d113f6d8191882e5202648ba1abc62c2edbde43",
+    "pg-probe.go": "53bb1cb10d9b321cd0fc3ae4bd113193d4341b91e2736d4a6da0f54372de0520",
+    "probe": "4abba2f02a200202d684f20bc45d5ce9af1cc93413e61e2eedb26952ef700896",
+    "pg-probe": "acf94c6fcb4da6e1b6d430ac46217e12efe311eafda69e5158b42c46865a5309"
+  },
+  "transform": "Retained PostgreSQL source replaces temporary database name with reindex-probe-YYYYMMDD; runtime captures redact profile coordinates.",
+  "scope": "One existing managed GoogleSQL database and one temporary PostgreSQL database in the same instance; destination identifiers not retained."
+}

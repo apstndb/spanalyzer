@@ -1,0 +1,34 @@
+{
+  "date_jst": "2026-09-21",
+  "runtime": "managed Spanner GoogleSQL and temporary PostgreSQL database in the same instance via existing user-level profile",
+  "process_exit": {
+    "google": 0,
+    "postgresql": 0
+  },
+  "comparison": "Same producer as 2026-09-19, only fixture date names changed; recompiled with captured build identity.",
+  "observations": {
+    "managed.jsonl": {
+      "rebuild_code": "Unimplemented",
+      "error": "rpc error: code = Unimplemented desc = REBUILD is not supported yet for vector index `VectorRebuildProbe20260921Idx`.",
+      "ddl_unchanged": true,
+      "ann_and_write_verified": true,
+      "cleanup_remaining": 0,
+      "completed_at": "2026-09-20T20:05:09.137798Z"
+    },
+    "pg-managed.jsonl": {
+      "rebuild_code": "Unimplemented",
+      "error": "rpc error: code = Unimplemented desc = REBUILD is not supported yet for vector index `vectorrebuildprobe20260921idx`.",
+      "ddl_unchanged": true,
+      "ann_and_write_verified": true,
+      "cleanup_remaining": 0,
+      "completed_at": "2026-09-20T20:05:04.872701Z"
+    }
+  },
+  "producer_hashes": {
+    "probe.go": "fa9b5cb3e44c12ae743fd51bb4648d77a009127941b36ebd45c9f7d448db3dc5",
+    "pg-probe.go": "a05caafea73f7fac31ab3a1559c908cf93f21a1e3c58b93a4bc79dc7b72f6263",
+    "probe": "b751e875b2808594ff4e10ca3903f0f2ea231a50300e609eb5697552558ec21e",
+    "pg-probe": "e3bc4e041f02370a79dbde6027444b43846909f436c5f52d038cd78705cdd5ec"
+  },
+  "transform": "PostgreSQL source temporary database name replaced with reindex-probe-YYYYMMDD; destination coordinates redacted in runtime errors."
+}

@@ -1,0 +1,230 @@
+<h3 id="routines" data-text="ROUTINES" tabindex="-1"><code translate="no" dir="ltr">ROUTINES</code></h3>
+
+<p>This row-filtered table lists all of a database&#39;s change stream read functions.
+Principals with database-level IAM permissions and principals who
+have been granted access to the <code translate="no" dir="ltr">spanner_info_reader</code> system role or to members
+of that role can see all rows in this view. All other principals can see only
+change stream read functions on which the <code translate="no" dir="ltr">EXECUTE</code> fine-grained access control privilege is
+granted to the current database role, to roles of which the current database
+role is a member, or to <code translate="no" dir="ltr">public</code>.</p>
+
+<table>
+  <col style="width:25%">
+  <col style="width:10%">
+  <col style="width:65%">
+    <thead>
+        <tr>
+            <th>Column name</th>
+            <th>Type</th>
+            <th>Description</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><code translate="no" dir="ltr">SPECIFIC_CATALOG</code></td>
+            <td><code translate="no" dir="ltr">STRING</code></td>
+            <td>The name of the routine's catalog. Always an empty string.</td>
+        </tr>
+        <tr>
+            <td><code translate="no" dir="ltr">SPECIFIC_SCHEMA</code></td>
+            <td><code translate="no" dir="ltr">STRING</code></td>
+            <td>The name of the routine's schema. Always an empty string.</td>
+        </tr>
+        <tr>
+            <td><code translate="no" dir="ltr">SPECIFIC_NAME</code></td>
+            <td><code translate="no" dir="ltr">STRING</code></td>
+            <td>The name of the routine. Uniquely identifies the routine even if
+                its name is overloaded.</td>
+        </tr>
+        <tr>
+            <td><code translate="no" dir="ltr">ROUTINE_CATALOG</code></td>
+            <td><code translate="no" dir="ltr">STRING</code></td>
+            <td>The name of the routine's catalog. Always an empty string.
+        </td>
+        </tr>
+        <tr>
+            <td><code translate="no" dir="ltr">ROUTINE_SCHEMA</code></td>
+            <td><code translate="no" dir="ltr">STRING</code></td>
+            <td>The name of the routine's schema. Always an empty string.
+        </td>
+        </tr>
+        <tr>
+            <td><code translate="no" dir="ltr">ROUTINE_NAME</code></td>
+            <td><code translate="no" dir="ltr">STRING</code></td>
+            <td>The name of the routine. (Might be duplicated in case of
+                overloading.)</td>
+        </tr>
+        <tr>
+            <td><code translate="no" dir="ltr">ROUTINE_TYPE</code></td>
+            <td><code translate="no" dir="ltr">STRING</code></td>
+            <td>The type of the routine (<code translate="no" dir="ltr">FUNCTION</code> or
+                <code translate="no" dir="ltr">PROCEDURE</code>). Always <code translate="no" dir="ltr">FUNCTION</code></td>
+        </tr>
+        <tr>
+            <td><code translate="no" dir="ltr">DATA_TYPE</code></td>
+            <td><code translate="no" dir="ltr">STRING</code></td>
+            <td>The data type that the routine returns
+            </td>
+        </tr>
+        <tr>
+            <td><code translate="no" dir="ltr">ROUTINE_BODY</code></td>
+            <td><code translate="no" dir="ltr">STRING</code></td>
+            <td>The type of the routine body (<code translate="no" dir="ltr">SQL</code> or
+                <code translate="no" dir="ltr">EXTERNAL</code>).</td>
+        </tr>
+        <tr>
+            <td><code translate="no" dir="ltr">ROUTINE_DEFINITION</code></td>
+            <td><code translate="no" dir="ltr">STRING</code></td>
+            <td>The definition for the <code translate="no" dir="ltr">ROUTINE_BODY</code>.</td>
+        </tr>
+        <tr>
+            <td><code translate="no" dir="ltr">SECURITY_TYPE</code></td>
+            <td><code translate="no" dir="ltr">STRING</code></td>
+            <td>The security type of the routine. Always <code translate="no" dir="ltr">INVOKER</code>.</td>
+        </tr>
+    </tbody>
+</table>
+
+<h3 id="routine_options" data-text="ROUTINE_OPTIONS" tabindex="-1"><code translate="no" dir="ltr">ROUTINE_OPTIONS</code></h3>
+
+<p>This row-filtered table contains one row for each option for each defined change
+stream read function.</p>
+
+<p>Principals with database-level IAM permissions and principals who
+have been granted access to the <code translate="no" dir="ltr">spanner_info_reader</code> system role or to members
+of that role can see all rows in this view. All other principals can see only
+options for change stream read functions on which the <code translate="no" dir="ltr">EXECUTE</code> fine-grained access control
+privilege is granted to the current database role, to roles of which the current
+database role is a member, or to <code translate="no" dir="ltr">public</code>.</p>
+
+<table>
+  <col style="width:25%">
+  <col style="width:10%">
+  <col style="width:65%">
+    <thead>
+        <tr>
+            <th>Column name</th>
+            <th>Type</th>
+            <th>Description</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+                <code translate="no" dir="ltr">SPECIFIC_CATALOG</code>
+            </td>
+            <td>
+                <code translate="no" dir="ltr">STRING</code>
+            </td>
+            <td>The name of the routine's catalog. Always an empty string.</td>
+        </tr>
+        <tr>
+            <td>
+                <code translate="no" dir="ltr">SPECIFIC_SCHEMA</code>
+            </td>
+            <td>
+                <code translate="no" dir="ltr">STRING</code>
+            </td>
+            <td>The name of the routine's schema. Always an empty string.</td>
+        </tr>
+        <tr>
+            <td>
+                <code translate="no" dir="ltr">SPECIFIC_NAME</code>
+            </td>
+            <td>
+                <code translate="no" dir="ltr">STRING</code>
+            </td>
+            <td>The name of the routine. Uniquely identifies the routine in case
+                of name overloading.</td>
+        </tr>
+        <tr>
+            <td>
+                <code translate="no" dir="ltr">OPTION_NAME</code>
+            </td>
+            <td>
+                <code translate="no" dir="ltr">STRING</code>
+            </td>
+            <td>A SQL identifier that uniquely identifies the option.</td>
+        </tr>
+        <tr>
+            <td>
+                <code translate="no" dir="ltr">OPTION_TYPE</code>
+            </td>
+            <td>
+                <code translate="no" dir="ltr">STRING</code>
+            </td>
+            <td>The data type of <code translate="no" dir="ltr">OPTION_VALUE</code>.
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <code translate="no" dir="ltr">OPTION_VALUE</code>
+            </td>
+            <td>
+                <code translate="no" dir="ltr">STRING</code>
+            </td>
+            <td>A SQL literal describing the value of this option.
+                The value of this column must be parsable as part of a query.</td>
+        </tr>
+    </tbody>
+</table>
+
+<h3 id="parameters" data-text="PARAMETERS" tabindex="-1"><code translate="no" dir="ltr">PARAMETERS</code></h3>
+
+<p>This row-filtered table defines the arguments for each change stream read
+function. Each row describes one argument for one change stream read function.</p>
+
+<p>Principals with database-level IAM permissions and principals who
+have been granted access to the <code translate="no" dir="ltr">spanner_info_reader</code> system role or to members
+of that role can see all rows in this view. All other principals can see only
+parameters for change stream read functions on which the <code translate="no" dir="ltr">EXECUTE</code> fine-grained access control
+privilege is granted to the current database role, to roles of which the current
+database role is a member, or to <code translate="no" dir="ltr">public</code>.</p>
+
+<table>
+  <col style="width:25%">
+  <col style="width:10%">
+  <col style="width:65%">
+      <thead>
+        <tr>
+            <th>Column name</th>
+            <th>Type</th>
+            <th>Description</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><code translate="no" dir="ltr">SPECIFIC_CATALOG</code></td>
+            <td><code translate="no" dir="ltr">STRING</code></td>
+            <td>The name of the routine's catalog. Always an empty string.</td>
+        </tr>
+        <tr>
+            <td><code translate="no" dir="ltr">SPECIFIC_SCHEMA</code></td>
+            <td><code translate="no" dir="ltr">STRING</code></td>
+            <td>The name of the routine's schema. Always an empty string.</td>
+        </tr>
+        <tr>
+            <td><code translate="no" dir="ltr">SPECIFIC_NAME</code></td>
+            <td><code translate="no" dir="ltr">STRING</code></td>
+            <td>The name of the routine. Uniquely identifies the routine in case
+                of name overloading.</td>
+        </tr>
+        <tr>
+            <td><code translate="no" dir="ltr">ORDINAL_POSITION</code></td>
+            <td><code translate="no" dir="ltr">INT64</code></td>
+            <td>The ordinal position of the parameter in the routine, starting
+                with a value of 1.</td>
+        </tr>
+        <tr>
+            <td><code translate="no" dir="ltr">PARAMETER_NAME</code></td>
+            <td><code translate="no" dir="ltr">STRING</code></td>
+            <td>The name of the parameter.</td>
+        </tr>
+        <tr>
+            <td><code translate="no" dir="ltr">DATA_TYPE</code></td>
+            <td><code translate="no" dir="ltr">STRING</code></td>
+            <td>The data type of the parameter.</td>
+        </tr>
+    </tbody>
+</table>
+

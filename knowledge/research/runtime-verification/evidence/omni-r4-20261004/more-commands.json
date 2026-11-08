@@ -1,0 +1,52 @@
+[
+  {
+    "name": "feature-build",
+    "started_at": "2026-10-04T14:32:48.967570+00:00",
+    "exit_code": 0,
+    "elapsed_seconds": 2.54,
+    "cwd": "<LOCAL_CHECKOUT>/.worktrees/omni-r4-20261004/tools",
+    "args": [
+      "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go",
+      "build",
+      "-o",
+      "<LOCAL_CHECKOUT>/.tmp/omni-r4-20261004/feature-probe",
+      "<LOCAL_CHECKOUT>/.tmp/omni-r4-20261004/feature-probe.go"
+    ],
+    "env_overrides": {}
+  },
+  {
+    "name": "feature-r4",
+    "started_at": "2026-10-04T14:32:51.504925+00:00",
+    "exit_code": 0,
+    "elapsed_seconds": 119.1,
+    "cwd": "<LOCAL_CHECKOUT>/.worktrees/omni-r4-20261004/tools",
+    "args": [
+      "<LOCAL_CHECKOUT>/.tmp/omni-r4-20261004/feature-probe"
+    ],
+    "env_overrides": {
+      "OMNI_IMAGE": "us-docker.pkg.dev/spanner-omni/images/spanner-omni:2026.r4-lts@sha256:9f10586c5de366bec5c0ff6cf542a67c21c8363e8a12a3deb9c372a07c9aa8b6"
+    }
+  },
+  {
+    "name": "query-generator",
+    "started_at": "2026-10-04T14:34:50.604639+00:00",
+    "exit_code": 0,
+    "elapsed_seconds": 99.89,
+    "cwd": "<LOCAL_CHECKOUT>/.worktrees/omni-r4-20261004/cmd/spanner-query-gen",
+    "args": [
+      "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go",
+      "test",
+      "-json",
+      "-count=1",
+      "-timeout=30m",
+      "-tags=integration,omni",
+      "-run",
+      "^TestIntegration.*OnOmni$",
+      "./..."
+    ],
+    "env_overrides": {
+      "SPANEMUBOOST_ENABLE_OMNI_TESTS": "1",
+      "SPANALYZER_OMNI_IMAGE": "us-docker.pkg.dev/spanner-omni/images/spanner-omni:2026.r4-lts@sha256:9f10586c5de366bec5c0ff6cf542a67c21c8363e8a12a3deb9c372a07c9aa8b6"
+    }
+  }
+]

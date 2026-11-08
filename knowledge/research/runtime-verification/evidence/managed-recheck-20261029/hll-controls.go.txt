@@ -1,0 +1,148 @@
+package main
+
+import (
+	database "cloud.google.com/go/spanner/admin/database/apiv1"
+	dbpb "cloud.google.com/go/spanner/admin/database/apiv1/databasepb"
+	"context"
+	"encoding/json"
+	"fmt"
+	"os"
+	"time"
+
+	"cloud.google.com/go/spanner"
+	sppb "cloud.google.com/go/spanner/apiv1/spannerpb"
+	"google.golang.org/api/iterator"
+	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/encoding/protojson"
+)
+
+type probe struct {
+	Label   string         `json:"label"`
+	SQL     string         `json:"sql"`
+	Params  map[string]any `json:"params"`
+	Profile bool           `json:"profile"`
+}
+
+func runQueries() {
+	if os.Getenv("SPANNER_EMULATOR_HOST") != "" {
+		panic("emulator override")
+	}
+	ctx := context.Background()
+	c, err := spanner.NewClient(ctx, os.Getenv("TEST_REAL_SPANNER_DATABASE"))
+	if err != nil {
+		panic(err)
+	}
+	defer c.Close()
+	f, err := os.Open(os.Args[1])
+	if err != nil {
+		panic(err)
+	}
+	defer f.Close()
+	var cases []probe
+	if err = json.NewDecoder(f).Decode(&cases); err != nil {
+		panic(err)
+	}
+	for _, p := range cases {
+		at := time.Now().UTC()
+		cx, cancel := context.WithTimeout(ctx, 30*time.Second)
+		ro := c.Single()
+		mode := sppb.ExecuteSqlRequest_NORMAL
+		if p.Profile {
+			mode = sppb.ExecuteSqlRequest_PROFILE
+		}
+		it := ro.QueryWithOptions(cx, spanner.Statement{SQL: p.SQL, Params: p.Params}, spanner.QueryOptions{Mode: &mode})
+		rows := []map[string]any{}
+		var e error
+		for {
+			var row *spanner.Row
+			row, e = it.Next()
+			if e != nil {
+				break
+			}
+			values := map[string]any{}
+			for i, name := range row.ColumnNames() {
+				var g spanner.GenericColumnValue
+				if e = row.Column(i, &g); e != nil {
+					break
+				}
+				values[name] = g.Value.AsInterface()
+			}
+			if e != nil {
+				break
+			}
+			rows = append(rows, values)
+		}
+		if e == iterator.Done {
+			e = nil
+		}
+		result := map[string]any{"label": p.Label, "sql": p.SQL, "params": p.Params, "started_at": at.Format(time.RFC3339Nano), "completed_at": time.Now().UTC().Format(time.RFC3339Nano), "code": status.Code(e).String(), "rows": rows, "mode": mode.String(), "error": ""}
+		if e != nil {
+			result["error"] = e.Error()
+		}
+		if it.Metadata != nil {
+			b, _ := protojson.Marshal(it.Metadata)
+			result["metadata"] = json.RawMessage(b)
+		}
+		if it.QueryPlan != nil {
+			b, _ := protojson.Marshal(it.QueryPlan)
+			result["plan"] = json.RawMessage(b)
+		}
+		if it.QueryStats != nil {
+			result["stats"] = it.QueryStats
+		}
+		it.Stop()
+		ro.Close()
+		cancel()
+		if err = json.NewEncoder(os.Stdout).Encode(result); err != nil {
+			panic(err)
+		}
+	}
+}
+
+func adminOutcome(label string, err error) {
+	message := ""
+	if err != nil {
+		message = err.Error()
+	}
+	json.NewEncoder(os.Stdout).Encode(map[string]any{"label": label, "code": status.Code(err).String(), "error": message, "at": time.Now().UTC().Format(time.RFC3339Nano)})
+}
+func main() {
+	if os.Args[2] == "google" {
+		runQueries()
+		return
+	}
+	ctx := context.Background()
+	a, err := database.NewDatabaseAdminClient(ctx)
+	if err != nil {
+		panic(err)
+	}
+	defer a.Close()
+	parent := fmt.Sprintf("projects/%s/instances/%s", os.Getenv("SPANNER_PROJECT_ID"), os.Getenv("SPANNER_INSTANCE_ID"))
+	name := "hll-control-20261029p1"
+	db := parent + "/databases/" + name
+	cx, cancel := context.WithTimeout(ctx, 3*time.Minute)
+	op, err := a.CreateDatabase(cx, &dbpb.CreateDatabaseRequest{Parent: parent, CreateStatement: "CREATE DATABASE \"" + name + "\"", DatabaseDialect: dbpb.DatabaseDialect_POSTGRESQL})
+	if err != nil {
+		cancel()
+		adminOutcome("create-database", err)
+		return
+	}
+	defer func() {
+		cx, cancel := context.WithTimeout(ctx, time.Minute)
+		defer cancel()
+		err := a.DropDatabase(cx, &dbpb.DropDatabaseRequest{Database: db})
+		adminOutcome("drop-database", err)
+		if err == nil {
+			_, err = a.GetDatabase(cx, &dbpb.GetDatabaseRequest{Name: db})
+			adminOutcome("database-absent", err)
+		}
+	}()
+	_, err = op.Wait(cx)
+	cancel()
+	adminOutcome("create-database", err)
+	if err != nil {
+		return
+	}
+	os.Setenv("TEST_REAL_SPANNER_DATABASE", db)
+	runQueries()
+}

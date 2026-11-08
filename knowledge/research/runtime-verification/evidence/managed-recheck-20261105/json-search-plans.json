@@ -1,0 +1,338 @@
+[
+  {
+    "dialect": "google",
+    "predicate": "equal",
+    "mode": "auto",
+    "scan_nodes": [
+      {
+        "name": "Scan",
+        "metadata": {
+          "execution_method": "Row",
+          "scan_method": "Row",
+          "scan_target": "JsonSearch",
+          "scan_type": "SearchIndexScan"
+        }
+      }
+    ]
+  },
+  {
+    "dialect": "google",
+    "predicate": "equal",
+    "mode": "search",
+    "scan_nodes": [
+      {
+        "name": "Scan",
+        "metadata": {
+          "execution_method": "Row",
+          "scan_method": "Row",
+          "scan_target": "JsonSearch",
+          "scan_type": "SearchIndexScan"
+        }
+      }
+    ]
+  },
+  {
+    "dialect": "google",
+    "predicate": "equal",
+    "mode": "base",
+    "scan_nodes": [
+      {
+        "name": "Filter Scan",
+        "metadata": {
+          "execution_method": "Row",
+          "seekable_key_size": "0"
+        }
+      },
+      {
+        "name": "Scan",
+        "metadata": {
+          "Full scan": "true",
+          "execution_method": "Row",
+          "scan_method": "Automatic",
+          "scan_target": "JsonDocs",
+          "scan_type": "TableScan"
+        }
+      }
+    ]
+  },
+  {
+    "dialect": "google",
+    "predicate": "in",
+    "mode": "auto",
+    "scan_nodes": [
+      {
+        "name": "Scan",
+        "metadata": {
+          "execution_method": "Row",
+          "scan_method": "Row",
+          "scan_target": "JsonSearch",
+          "scan_type": "SearchIndexScan"
+        }
+      }
+    ]
+  },
+  {
+    "dialect": "google",
+    "predicate": "in",
+    "mode": "search",
+    "scan_nodes": [
+      {
+        "name": "Scan",
+        "metadata": {
+          "execution_method": "Row",
+          "scan_method": "Row",
+          "scan_target": "JsonSearch",
+          "scan_type": "SearchIndexScan"
+        }
+      }
+    ]
+  },
+  {
+    "dialect": "google",
+    "predicate": "in",
+    "mode": "base",
+    "scan_nodes": [
+      {
+        "name": "Filter Scan",
+        "metadata": {
+          "execution_method": "Row",
+          "seekable_key_size": "0"
+        }
+      },
+      {
+        "name": "Scan",
+        "metadata": {
+          "Full scan": "true",
+          "execution_method": "Row",
+          "scan_method": "Automatic",
+          "scan_target": "JsonDocs",
+          "scan_type": "TableScan"
+        }
+      }
+    ]
+  },
+  {
+    "dialect": "google",
+    "predicate": "whole",
+    "mode": "auto",
+    "scan_nodes": [
+      {
+        "name": "Scan",
+        "metadata": {
+          "execution_method": "Row",
+          "scan_method": "Row",
+          "scan_target": "JsonSearch",
+          "scan_type": "SearchIndexScan"
+        }
+      }
+    ]
+  },
+  {
+    "dialect": "google",
+    "predicate": "whole",
+    "mode": "search",
+    "scan_nodes": [
+      {
+        "name": "Scan",
+        "metadata": {
+          "execution_method": "Row",
+          "scan_method": "Row",
+          "scan_target": "JsonSearch",
+          "scan_type": "SearchIndexScan"
+        }
+      }
+    ]
+  },
+  {
+    "dialect": "google",
+    "predicate": "whole",
+    "mode": "base",
+    "scan_nodes": [
+      {
+        "name": "Filter Scan",
+        "metadata": {
+          "execution_method": "Row",
+          "seekable_key_size": "0"
+        }
+      },
+      {
+        "name": "Scan",
+        "metadata": {
+          "Full scan": "true",
+          "execution_method": "Row",
+          "scan_method": "Automatic",
+          "scan_target": "JsonDocs",
+          "scan_type": "TableScan"
+        }
+      }
+    ]
+  },
+  {
+    "dialect": "pg",
+    "predicate": "equal",
+    "mode": "auto",
+    "scan_nodes": [
+      {
+        "name": "Scan",
+        "metadata": {
+          "execution_method": "Row",
+          "scan_method": "Row",
+          "scan_target": "jsonsearch",
+          "scan_type": "SearchIndexScan"
+        }
+      }
+    ]
+  },
+  {
+    "dialect": "pg",
+    "predicate": "equal",
+    "mode": "search",
+    "scan_nodes": [
+      {
+        "name": "Scan",
+        "metadata": {
+          "execution_method": "Row",
+          "scan_method": "Row",
+          "scan_target": "jsonsearch",
+          "scan_type": "SearchIndexScan"
+        }
+      }
+    ]
+  },
+  {
+    "dialect": "pg",
+    "predicate": "equal",
+    "mode": "base",
+    "scan_nodes": [
+      {
+        "name": "Filter Scan",
+        "metadata": {
+          "execution_method": "Row",
+          "seekable_key_size": "0"
+        }
+      },
+      {
+        "name": "Scan",
+        "metadata": {
+          "Full scan": "true",
+          "execution_method": "Row",
+          "scan_method": "Automatic",
+          "scan_target": "jsondocs",
+          "scan_type": "TableScan"
+        }
+      }
+    ]
+  },
+  {
+    "dialect": "pg",
+    "predicate": "in",
+    "mode": "auto",
+    "scan_nodes": [
+      {
+        "name": "Scan",
+        "metadata": {
+          "execution_method": "Row",
+          "scan_method": "Row",
+          "scan_target": "jsonsearch",
+          "scan_type": "SearchIndexScan"
+        }
+      }
+    ]
+  },
+  {
+    "dialect": "pg",
+    "predicate": "in",
+    "mode": "search",
+    "scan_nodes": [
+      {
+        "name": "Scan",
+        "metadata": {
+          "execution_method": "Row",
+          "scan_method": "Row",
+          "scan_target": "jsonsearch",
+          "scan_type": "SearchIndexScan"
+        }
+      }
+    ]
+  },
+  {
+    "dialect": "pg",
+    "predicate": "in",
+    "mode": "base",
+    "scan_nodes": [
+      {
+        "name": "Filter Scan",
+        "metadata": {
+          "execution_method": "Row",
+          "seekable_key_size": "0"
+        }
+      },
+      {
+        "name": "Scan",
+        "metadata": {
+          "Full scan": "true",
+          "execution_method": "Row",
+          "scan_method": "Automatic",
+          "scan_target": "jsondocs",
+          "scan_type": "TableScan"
+        }
+      }
+    ]
+  },
+  {
+    "dialect": "pg",
+    "predicate": "whole",
+    "mode": "auto",
+    "scan_nodes": [
+      {
+        "name": "Scan",
+        "metadata": {
+          "execution_method": "Row",
+          "scan_method": "Row",
+          "scan_target": "jsonsearch",
+          "scan_type": "SearchIndexScan"
+        }
+      }
+    ]
+  },
+  {
+    "dialect": "pg",
+    "predicate": "whole",
+    "mode": "search",
+    "scan_nodes": [
+      {
+        "name": "Scan",
+        "metadata": {
+          "execution_method": "Row",
+          "scan_method": "Row",
+          "scan_target": "jsonsearch",
+          "scan_type": "SearchIndexScan"
+        }
+      }
+    ]
+  },
+  {
+    "dialect": "pg",
+    "predicate": "whole",
+    "mode": "base",
+    "scan_nodes": [
+      {
+        "name": "Filter Scan",
+        "metadata": {
+          "execution_method": "Row",
+          "seekable_key_size": "0"
+        }
+      },
+      {
+        "name": "Scan",
+        "metadata": {
+          "Full scan": "true",
+          "execution_method": "Row",
+          "scan_method": "Automatic",
+          "scan_target": "jsondocs",
+          "scan_type": "TableScan"
+        }
+      }
+    ]
+  }
+]

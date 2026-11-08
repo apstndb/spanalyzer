@@ -1,0 +1,23 @@
+{
+  "dialect": "google",
+  "steps": [
+    {
+      "label": "perf-table",
+      "family": "issue-187",
+      "kind": "ddl",
+      "sql": "CREATE TABLE Perf(id INT64 NOT NULL,val STRING(MAX) DEFAULT('draft'),grp INT64) PRIMARY KEY(id)",
+      "requires": [],
+      "timeout_seconds": 30
+    },
+    {
+      "label": "perf-sample",
+      "family": "issue-389",
+      "kind": "performance",
+      "sql": "",
+      "requires": [
+        "perf-table"
+      ],
+      "timeout_seconds": 50
+    }
+  ]
+}

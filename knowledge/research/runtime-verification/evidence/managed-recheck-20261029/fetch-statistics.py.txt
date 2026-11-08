@@ -1,0 +1,12 @@
+from pathlib import Path
+import datetime,hashlib,json,subprocess
+p=Path('<LOCAL_TASK_ROOT>/apstndb/spanalyzer/managed-recheck-20261029/documents')
+names=['documents/docs.cloud.google.com/spanner/docs/introspection/lock-statistics','documents/docs.cloud.google.com/spanner/docs/introspection/hot-split-statistics']
+r=subprocess.run(['dkcli','batch-get','-f','json',*names],capture_output=True,text=True,check=True)
+a=json.loads(r.stdout)
+(p/'official-statistics.json').write_text(json.dumps(a,indent=2)+'\n')
+receipt={'retrieved_at':datetime.datetime.now(datetime.timezone.utc).isoformat(),'documents':[]}
+for d in a['documents']:
+ name='statistics__'+d['name'].replace('/','__')+'.txt';(p/name).write_text(d['content']);receipt['documents'].append({key:value for key,value in d.items()if key!='content'}|{'file':name,'body_sha256':hashlib.sha256(d['content'].encode()).hexdigest()})
+(p/'statistics-retrieval.json').write_text(json.dumps(receipt,indent=2)+'\n')
+print(json.dumps(receipt))

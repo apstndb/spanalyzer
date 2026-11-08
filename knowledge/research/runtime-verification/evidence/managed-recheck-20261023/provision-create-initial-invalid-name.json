@@ -1,0 +1,13 @@
+{
+  "started_at": "2026-10-23T14:17:55.386754+00:00",
+  "completed_at": "2026-10-23T14:17:56.575089+00:00",
+  "action": "create explicitly user-authorized free trial instance",
+  "configuration": "regional-asia-northeast1",
+  "requested_instance_type": "FREE_INSTANCE",
+  "requested_expire_behavior": "REMOVE_AFTER_GRACE_PERIOD",
+  "automatic_paid_conversion": false,
+  "default_backup_schedule_type": "NONE",
+  "exit_code": 1,
+  "stderr": "ERROR: (gcloud.spanner.instances.create) INVALID_ARGUMENT: Invalid CreateInstance request.\n- '@type': type.googleapis.com/google.rpc.BadRequest\n  fieldViolations:\n  - description: 'Display name must be between 4-30 characters long. Got: Spanalyzer\n      managed verification'\n    field: instance.display_name\n",
+  "stdout": ""
+}

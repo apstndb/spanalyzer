@@ -1,0 +1,93 @@
+"""Offline integrity and scope checks; never contacts a managed instance."""
+from pathlib import Path
+from collections import Counter
+import hashlib
+import json
+import re
+
+ROOT = Path('<LOCAL_CHECKOUT>')
+SCRATCH = ROOT / '.tmp/managed-recheck-20261021'
+EVIDENCE = ROOT / 'knowledge/research/runtime-verification/evidence'
+CURRENT = EVIDENCE / 'managed-recheck-20261021'
+DURABLE = Path('<LOCAL_TASK_ROOT>/apstndb/spanalyzer/managed-recheck-20261021')
+checks = []
+
+def read(path):
+    return json.loads(path.read_text())
+
+def digest(path):
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+def check(name, condition):
+    if not condition:
+        raise AssertionError(name)
+    checks.append(name)
+
+receipt = read(CURRENT / 'receipt.json')
+commands = read(CURRENT / 'commands.json')
+direct_commands = read(CURRENT / 'connectivity-commands.json')
+records = [json.loads(s) for s in (CURRENT / 'direct-connectivity.jsonl').read_text().splitlines()]
+check('CLI stopped at preflight exit 1', len(commands) == 1 and commands[0]['name'] == 'preflight' and commands[0]['exit_code'] == 1)
+check('direct process exit 0 records RPC NotFound', direct_commands[-1]['exit_code'] == 0 and len(records) == 1 and records[0]['code'] == 'NotFound' and records[0]['rows'] == [])
+check('no current catalog, integration or feature claims', all(receipt[k] == 'not_run' for k in ['catalog_checks', 'managed_integration_tests', 'feature_probes']))
+check('no fixture creation or cleanup obligation', receipt['owned_fixture_ddl_or_database_creation_started'] is False and receipt['cleanup_status'] == 'not_applicable_no_fixtures_created')
+for name in ['preflight.log', 'direct-connectivity.jsonl']:
+    content = (CURRENT / name).read_text()
+    check(name + ' coordinates redacted', 'projects/<redacted>/instances/<redacted>' in content)
+    check(name + ' no unredacted request ID', not re.search(r'requestID\s*=\s*"(?!<redacted>)[^"]+"', content))
+
+history = read(CURRENT / 'history-retrieval.json')
+audit = read(CURRENT / 'history-audit.json')
+check('ten pinned subsequent commits', history['commits'] == len(audit['reviewed_commits']) == 10)
+check('52 net files and 50 document paths', history['net_changed_files'] == 52 and history['union_document_paths'] == len(audit['per_document_disposition']) == 50)
+check('95 full pinned bodies successfully fetched', len(history['bodies']) == 95 and all(x['exit_code'] == 0 for x in history['bodies']))
+for body in history['bodies']:
+    path = DURABLE / 'history' / body['file']
+    check('retained mirror SHA ' + body['file'], path.is_file() and digest(path) == body['sha256'])
+check('all path dispositions classified', sum(audit['body_classification_counts'].values()) == 50 and audit['body_classification_counts']['html_table_format_only'] == 8)
+ml = [x for x in history['bodies'] if x['path'].endswith('/ml-tutorial.md')]
+check('ML tutorial endpoints identical', len(ml) == 2 and ml[0]['sha256'] == ml[1]['sha256'])
+comparison = read(CURRENT / 'mirror-vs-current.json')
+check('49 head pages compared with three differences', len(comparison) == 49 and sum(x['equal_body'] for x in comparison) == 46)
+changed = {x['name'].removeprefix('documents/docs.cloud.google.com/') for x in comparison if not x['equal_body']}
+check('three known current-body gaps', changed == {'spanner/docs/reference/postgresql/functions', 'spanner/docs/reference/standard-sql/functions-all', 'spanner/docs/geo-partitioning'})
+refresh = read(CURRENT / 'mirror-head-refresh.json')
+check('main refresh unchanged', refresh['exit_code'] == 0 and refresh['sha'] == audit['head'] and refresh['same_as_reviewed_head'])
+
+docs = read(CURRENT / 'documentation.json')
+expanded = docs['expanded_retrieval']['documents']
+check('61 unique official documents plus three recovered', len({x['name'] for x in expanded}) == docs['focused_and_expanded_distinct_documents'] == 61 and len(docs['recovered_hll_documents']) == 3)
+for doc in expanded:
+    path = DURABLE / 'documents' / ('expanded__' + doc['name'].replace('/', '__') + '.md.txt')
+    check('official body SHA ' + doc['name'], path.is_file() and digest(path) == doc['body_sha256'])
+for doc in docs['recovered_hll_documents']:
+    path = CURRENT / (doc['name'].rsplit('/', 1)[-1] + '.md.txt')
+    check('recovered HLL source SHA ' + path.name, digest(path) == doc['body_sha256'] and doc['updateTime'] == '2026-10-20T16:01:44Z')
+for item in docs['live_sources']:
+    check('live source SHA ' + item['file'], digest(DURABLE / 'documents' / item['file']) == item['sha256'])
+check('live release feed and HTML October 20', docs['live_inspection']['release_feed_latest']['title'] == 'October 20, 2026' and docs['live_inspection']['release_html_first_heading'] == 'October_20_2026')
+for path in [DURABLE / 'documents/expanded__documents__docs.cloud.google.com__spanner__docs__release-notes.md.txt', DURABLE / 'history/head-release-notes.md.txt']:
+    content = path.read_text()
+    check('stale release body ' + path.name, 'September 18, 2026' in content and 'October 20, 2026' not in content)
+check('mirror release body SHA', digest(DURABLE / 'history/head-release-notes.md.txt') == docs['mirror_release_body_sha256'])
+check('live PostgreSQL approximate support documented', docs['live_inspection']['pg-functions']['has_approx_count_distinct'] and docs['live_inspection']['pg-functions']['has_hll_init'])
+check('live operators still omit distinctness', docs['live_inspection']['google-operators']['distinctness_mentions'] == 0)
+delta = (CURRENT / 'reference__standard-sql__functions-all-mirror-vs-official.diff').read_text()
+added = '\n'.join(x for x in delta.splitlines() if x.startswith('+') and not x.startswith('+++'))
+for name in ['APPROX_COUNT_DISTINCT', 'HLL_COUNT.EXTRACT', 'HLL_COUNT.INIT', 'HLL_COUNT.MERGE', 'HLL_COUNT.MERGE_PARTIAL']:
+    check('new documented function ' + name, name in added)
+
+source = read(CURRENT / 'source-hashes.json')
+check('123 implementation/dependency hashes still match', len(source) == 123 and all(digest(ROOT / name) == value for name, value in source.items()))
+plan = read(CURRENT / 'doc-delta-probe-plan.json')
+check('136 draft cases remain unexecuted', plan['status'] == 'prepared_not_executed' and len(plan['cases']) == 136 and all(x['execution_status'] == 'not_run_missing_managed_target' for x in plan['cases']))
+check('probe family counts', Counter(x['family'] for x in plan['cases']) == {'hll': 32, 'gql_column_propagation': 40, 'json_search_equality': 57, 'dynamic_json_properties': 6, 'hash_documentation': 1})
+
+initial = read(SCRATCH / 'initial-artifact-manifest.json')['files']
+manifest = read(EVIDENCE / 'artifact-sha256.json')['files']
+check('674 pre-existing evidence hashes preserved', len(initial) == 674 and all(manifest.get(name) == value and digest(EVIDENCE / name) == value for name, value in initial.items()))
+check('all current retained artifacts hashed', all(manifest.get(str(path.relative_to(EVIDENCE))) == digest(path) for path in CURRENT.iterdir() if path.is_file()))
+result = {'status': 'pass', 'checks': len(checks), 'scope': 'Offline source/integrity and honest incomplete-preflight classification only; not a managed runtime attestation', 'details': checks}
+output = DURABLE / 'offline-audit-check.json'
+output.write_text(json.dumps(result, indent=2) + '\n')
+print(json.dumps({'status': result['status'], 'checks': len(checks), 'receipt': str(output)}))

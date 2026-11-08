@@ -1,0 +1,167 @@
+{
+  "name": "emulator-repair",
+  "scope": "Active snapshot raced the sub-three-second runtime. Identity recovered from bounded daemon events for the exact image; no active command/config inspection claimed.",
+  "image": "gcr.io/cloud-spanner-emulator/emulator:1.5.59@sha256:969af6a9349948fbfb4a826c18e160e258a4005f7c759f8e7f2dcec369cccba8",
+  "container_id": "cbbd445a01ed86bcb0fcb673fe12f07ca14f6458132ec16a87336168e1693006",
+  "events": [
+    {
+      "Type": "container",
+      "Action": "create",
+      "Actor": {
+        "ID": "cbbd445a01ed86bcb0fcb673fe12f07ca14f6458132ec16a87336168e1693006",
+        "Attributes": {
+          "image": "gcr.io/cloud-spanner-emulator/emulator:1.5.59@sha256:969af6a9349948fbfb4a826c18e160e258a4005f7c759f8e7f2dcec369cccba8",
+          "name": "happy_bhabha",
+          "org.testcontainers": "true",
+          "org.testcontainers.lang": "go",
+          "org.testcontainers.reap": "true",
+          "org.testcontainers.sessionId": "742a4fc1b01125d94a36879900be07bd7c65eb7c71f56bb21171747f98ab1feb",
+          "org.testcontainers.version": "0.42.0"
+        }
+      },
+      "scope": "local",
+      "time": 1793286933,
+      "timeNano": 1793286933650856444
+    },
+    {
+      "Type": "container",
+      "Action": "start",
+      "Actor": {
+        "ID": "cbbd445a01ed86bcb0fcb673fe12f07ca14f6458132ec16a87336168e1693006",
+        "Attributes": {
+          "image": "gcr.io/cloud-spanner-emulator/emulator:1.5.59@sha256:969af6a9349948fbfb4a826c18e160e258a4005f7c759f8e7f2dcec369cccba8",
+          "name": "happy_bhabha",
+          "org.testcontainers": "true",
+          "org.testcontainers.lang": "go",
+          "org.testcontainers.reap": "true",
+          "org.testcontainers.sessionId": "742a4fc1b01125d94a36879900be07bd7c65eb7c71f56bb21171747f98ab1feb",
+          "org.testcontainers.version": "0.42.0"
+        }
+      },
+      "scope": "local",
+      "time": 1793286934,
+      "timeNano": 1793286934053227322
+    },
+    {
+      "Type": "container",
+      "Action": "exec_create: /bin/sh -c true && (\n\t\t\t\t\tcat /proc/net/tcp* | awk '{print $2}' | grep -i :2332 ||\n\t\t\t\t\tnc -vz -w 1 localhost 9010 ||\n\t\t\t\t\t/bin/sh -c '</dev/tcp/localhost/9010'\n\t\t\t\t)\n\t\t\t\t",
+      "Actor": {
+        "ID": "cbbd445a01ed86bcb0fcb673fe12f07ca14f6458132ec16a87336168e1693006",
+        "Attributes": {
+          "execID": "cc273e7a0f2e84545653be9c2f985b67b357c43607b2153a2d31e57fb124e5cf",
+          "image": "gcr.io/cloud-spanner-emulator/emulator:1.5.59@sha256:969af6a9349948fbfb4a826c18e160e258a4005f7c759f8e7f2dcec369cccba8",
+          "name": "happy_bhabha",
+          "org.testcontainers": "true",
+          "org.testcontainers.lang": "go",
+          "org.testcontainers.reap": "true",
+          "org.testcontainers.sessionId": "742a4fc1b01125d94a36879900be07bd7c65eb7c71f56bb21171747f98ab1feb",
+          "org.testcontainers.version": "0.42.0"
+        }
+      },
+      "scope": "local",
+      "time": 1793286934,
+      "timeNano": 1793286934057234076
+    },
+    {
+      "Type": "container",
+      "Action": "exec_start: /bin/sh -c true && (\n\t\t\t\t\tcat /proc/net/tcp* | awk '{print $2}' | grep -i :2332 ||\n\t\t\t\t\tnc -vz -w 1 localhost 9010 ||\n\t\t\t\t\t/bin/sh -c '</dev/tcp/localhost/9010'\n\t\t\t\t)\n\t\t\t\t",
+      "Actor": {
+        "ID": "cbbd445a01ed86bcb0fcb673fe12f07ca14f6458132ec16a87336168e1693006",
+        "Attributes": {
+          "execID": "cc273e7a0f2e84545653be9c2f985b67b357c43607b2153a2d31e57fb124e5cf",
+          "image": "gcr.io/cloud-spanner-emulator/emulator:1.5.59@sha256:969af6a9349948fbfb4a826c18e160e258a4005f7c759f8e7f2dcec369cccba8",
+          "name": "happy_bhabha",
+          "org.testcontainers": "true",
+          "org.testcontainers.lang": "go",
+          "org.testcontainers.reap": "true",
+          "org.testcontainers.sessionId": "742a4fc1b01125d94a36879900be07bd7c65eb7c71f56bb21171747f98ab1feb",
+          "org.testcontainers.version": "0.42.0"
+        }
+      },
+      "scope": "local",
+      "time": 1793286934,
+      "timeNano": 1793286934057804388
+    },
+    {
+      "Type": "container",
+      "Action": "kill",
+      "Actor": {
+        "ID": "cbbd445a01ed86bcb0fcb673fe12f07ca14f6458132ec16a87336168e1693006",
+        "Attributes": {
+          "image": "gcr.io/cloud-spanner-emulator/emulator:1.5.59@sha256:969af6a9349948fbfb4a826c18e160e258a4005f7c759f8e7f2dcec369cccba8",
+          "name": "happy_bhabha",
+          "org.testcontainers": "true",
+          "org.testcontainers.lang": "go",
+          "org.testcontainers.reap": "true",
+          "org.testcontainers.sessionId": "742a4fc1b01125d94a36879900be07bd7c65eb7c71f56bb21171747f98ab1feb",
+          "org.testcontainers.version": "0.42.0",
+          "signal": "15"
+        }
+      },
+      "scope": "local",
+      "time": 1793286935,
+      "timeNano": 1793286935307011945
+    },
+    {
+      "Type": "container",
+      "Action": "stop",
+      "Actor": {
+        "ID": "cbbd445a01ed86bcb0fcb673fe12f07ca14f6458132ec16a87336168e1693006",
+        "Attributes": {
+          "image": "gcr.io/cloud-spanner-emulator/emulator:1.5.59@sha256:969af6a9349948fbfb4a826c18e160e258a4005f7c759f8e7f2dcec369cccba8",
+          "name": "happy_bhabha",
+          "org.testcontainers": "true",
+          "org.testcontainers.lang": "go",
+          "org.testcontainers.reap": "true",
+          "org.testcontainers.sessionId": "742a4fc1b01125d94a36879900be07bd7c65eb7c71f56bb21171747f98ab1feb",
+          "org.testcontainers.version": "0.42.0"
+        }
+      },
+      "scope": "local",
+      "time": 1793286935,
+      "timeNano": 1793286935390342760
+    },
+    {
+      "Type": "container",
+      "Action": "die",
+      "Actor": {
+        "ID": "cbbd445a01ed86bcb0fcb673fe12f07ca14f6458132ec16a87336168e1693006",
+        "Attributes": {
+          "execDuration": "1",
+          "exitCode": "2",
+          "image": "gcr.io/cloud-spanner-emulator/emulator:1.5.59@sha256:969af6a9349948fbfb4a826c18e160e258a4005f7c759f8e7f2dcec369cccba8",
+          "name": "happy_bhabha",
+          "org.testcontainers": "true",
+          "org.testcontainers.lang": "go",
+          "org.testcontainers.reap": "true",
+          "org.testcontainers.sessionId": "742a4fc1b01125d94a36879900be07bd7c65eb7c71f56bb21171747f98ab1feb",
+          "org.testcontainers.version": "0.42.0"
+        }
+      },
+      "scope": "local",
+      "time": 1793286935,
+      "timeNano": 1793286935392030783
+    },
+    {
+      "Type": "container",
+      "Action": "destroy",
+      "Actor": {
+        "ID": "cbbd445a01ed86bcb0fcb673fe12f07ca14f6458132ec16a87336168e1693006",
+        "Attributes": {
+          "image": "gcr.io/cloud-spanner-emulator/emulator:1.5.59@sha256:969af6a9349948fbfb4a826c18e160e258a4005f7c759f8e7f2dcec369cccba8",
+          "name": "happy_bhabha",
+          "org.testcontainers": "true",
+          "org.testcontainers.lang": "go",
+          "org.testcontainers.reap": "true",
+          "org.testcontainers.sessionId": "742a4fc1b01125d94a36879900be07bd7c65eb7c71f56bb21171747f98ab1feb",
+          "org.testcontainers.version": "0.42.0"
+        }
+      },
+      "scope": "local",
+      "time": 1793286935,
+      "timeNano": 1793286935404410231
+    }
+  ],
+  "inspect_after_completion_exit_code": 1,
+  "absent_from_reachable_daemon": true
+}

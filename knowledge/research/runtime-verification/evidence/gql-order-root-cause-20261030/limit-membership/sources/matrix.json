@@ -1,0 +1,346 @@
+{
+  "dialect": "google",
+  "steps": [
+    {
+      "label": "schema",
+      "family": "official-FinGraph",
+      "kind": "ddl",
+      "statements": [
+        "CREATE TABLE Person (\n      id               INT64 NOT NULL,\n      name             STRING(MAX),\n      birthday         TIMESTAMP,\n      country          STRING(MAX),\n      city             STRING(MAX),\n    ) PRIMARY KEY (id)",
+        "CREATE TABLE Account (\n      id               INT64 NOT NULL,\n      create_time      TIMESTAMP,\n      is_blocked       BOOL,\n      nick_name        STRING(MAX),\n    ) PRIMARY KEY (id)",
+        "CREATE TABLE PersonOwnAccount (\n      id               INT64 NOT NULL,\n      account_id       INT64 NOT NULL,\n      create_time      TIMESTAMP,\n      FOREIGN KEY (account_id) REFERENCES Account (id)\n    ) PRIMARY KEY (id, account_id),\n      INTERLEAVE IN PARENT Person ON DELETE CASCADE",
+        "CREATE TABLE AccountTransferAccount (\n      id               INT64 NOT NULL,\n      to_id            INT64 NOT NULL,\n      amount           FLOAT64,\n      create_time      TIMESTAMP NOT NULL,\n      order_number     STRING(MAX),\n      FOREIGN KEY (to_id) REFERENCES Account (id)\n    ) PRIMARY KEY (id, to_id, create_time),\n      INTERLEAVE IN PARENT Account ON DELETE CASCADE",
+        "CREATE OR REPLACE PROPERTY GRAPH FinGraph\n      NODE TABLES (Account, Person)\n      EDGE TABLES (\n        PersonOwnAccount\n          SOURCE KEY (id) REFERENCES Person (id)\n          DESTINATION KEY (account_id) REFERENCES Account (id)\n          LABEL Owns,\n        AccountTransferAccount\n          SOURCE KEY (id) REFERENCES Account (id)\n          DESTINATION KEY (to_id) REFERENCES Account (id)\n          LABEL Transfers\n      )"
+      ]
+    },
+    {
+      "label": "seed",
+      "family": "official-FinGraph",
+      "kind": "dml",
+      "statements": [
+        "INSERT INTO Account\n      (id, create_time, is_blocked, nick_name)\n    VALUES\n      (7,\"2020-01-10 06:22:20.222\",false,\"Vacation Fund\"),\n      (16,\"2020-01-27 17:55:09.206\",true,\"Vacation Fund\"),\n      (20,\"2020-02-18 05:44:20.655\",false,\"Rainy Day Fund\")",
+        "INSERT INTO Person\n      (id, name, birthday, country, city)\n    VALUES\n      (1,\"Alex\",\"1991-12-21 00:00:00\",\"Australia\",\"Adelaide\"),\n      (2,\"Dana\",\"1980-10-31 00:00:00\",\"Czech_Republic\",\"Moravia\"),\n      (3,\"Lee\",\"1986-12-07 00:00:00\",\"India\",\"Kollam\")",
+        "INSERT INTO AccountTransferAccount\n      (id, to_id, amount, create_time, order_number)\n    VALUES\n      (7,16,300,\"2020-08-29 15:28:58.647\",\"304330008004315\"),\n      (7,16,100,\"2020-10-04 16:55:05.342\",\"304120005529714\"),\n      (16,20,300,\"2020-09-25 02:36:14.926\",\"103650009791820\"),\n      (20,7,500,\"2020-10-04 16:55:05.342\",\"304120005529714\"),\n      (20,16,200,\"2020-10-17 03:59:40.247\",\"302290001255747\")",
+        "INSERT INTO PersonOwnAccount\n      (id, account_id, create_time)\n    VALUES\n      (1,7,\"2020-01-10 06:22:20.222\"),\n      (2,20,\"2020-01-27 17:55:09.206\"),\n      (3,16,\"2020-02-18 05:44:20.655\")"
+      ],
+      "requires": [
+        "schema"
+      ]
+    },
+    {
+      "label": "person-tie-0",
+      "family": "limit-membership",
+      "kind": "query",
+      "sql": "GRAPH FinGraph MATCH(p:Person) RETURN p.id AS id,p.id>2 AS k ORDER BY k LIMIT 1",
+      "requires": [
+        "seed"
+      ]
+    },
+    {
+      "label": "person-total-0",
+      "family": "limit-membership",
+      "kind": "query",
+      "sql": "GRAPH FinGraph MATCH(p:Person) RETURN p.id AS id,p.id>2 AS k ORDER BY k,id LIMIT 1",
+      "requires": [
+        "seed"
+      ]
+    },
+    {
+      "label": "sql-person-tie-0",
+      "family": "limit-membership",
+      "kind": "query",
+      "sql": "SELECT id,id>2 AS k FROM Person ORDER BY k LIMIT 1",
+      "requires": [
+        "seed"
+      ]
+    },
+    {
+      "label": "sql-person-total-0",
+      "family": "limit-membership",
+      "kind": "query",
+      "sql": "SELECT id,id>2 AS k FROM Person ORDER BY k,id LIMIT 1",
+      "requires": [
+        "seed"
+      ]
+    },
+    {
+      "label": "transfer-tie-0",
+      "family": "limit-membership",
+      "kind": "query",
+      "sql": "GRAPH FinGraph MATCH ()-[t:Transfers]->() RETURN t.id AS src,t.to_id AS dst,t.amount AS amount ORDER BY amount LIMIT 3",
+      "requires": [
+        "seed"
+      ]
+    },
+    {
+      "label": "transfer-total-0",
+      "family": "limit-membership",
+      "kind": "query",
+      "sql": "GRAPH FinGraph MATCH ()-[t:Transfers]->() RETURN t.id AS src,t.to_id AS dst,t.amount AS amount ORDER BY amount,src,dst LIMIT 3",
+      "requires": [
+        "seed"
+      ]
+    },
+    {
+      "label": "person-tie-1",
+      "family": "limit-membership",
+      "kind": "query",
+      "sql": "GRAPH FinGraph MATCH(p:Person) RETURN p.id AS id,p.id>2 AS k ORDER BY k LIMIT 1",
+      "requires": [
+        "seed"
+      ]
+    },
+    {
+      "label": "person-total-1",
+      "family": "limit-membership",
+      "kind": "query",
+      "sql": "GRAPH FinGraph MATCH(p:Person) RETURN p.id AS id,p.id>2 AS k ORDER BY k,id LIMIT 1",
+      "requires": [
+        "seed"
+      ]
+    },
+    {
+      "label": "sql-person-tie-1",
+      "family": "limit-membership",
+      "kind": "query",
+      "sql": "SELECT id,id>2 AS k FROM Person ORDER BY k LIMIT 1",
+      "requires": [
+        "seed"
+      ]
+    },
+    {
+      "label": "sql-person-total-1",
+      "family": "limit-membership",
+      "kind": "query",
+      "sql": "SELECT id,id>2 AS k FROM Person ORDER BY k,id LIMIT 1",
+      "requires": [
+        "seed"
+      ]
+    },
+    {
+      "label": "transfer-tie-1",
+      "family": "limit-membership",
+      "kind": "query",
+      "sql": "GRAPH FinGraph MATCH ()-[t:Transfers]->() RETURN t.id AS src,t.to_id AS dst,t.amount AS amount ORDER BY amount LIMIT 3",
+      "requires": [
+        "seed"
+      ]
+    },
+    {
+      "label": "transfer-total-1",
+      "family": "limit-membership",
+      "kind": "query",
+      "sql": "GRAPH FinGraph MATCH ()-[t:Transfers]->() RETURN t.id AS src,t.to_id AS dst,t.amount AS amount ORDER BY amount,src,dst LIMIT 3",
+      "requires": [
+        "seed"
+      ]
+    },
+    {
+      "label": "person-tie-2",
+      "family": "limit-membership",
+      "kind": "query",
+      "sql": "GRAPH FinGraph MATCH(p:Person) RETURN p.id AS id,p.id>2 AS k ORDER BY k LIMIT 1",
+      "requires": [
+        "seed"
+      ]
+    },
+    {
+      "label": "person-total-2",
+      "family": "limit-membership",
+      "kind": "query",
+      "sql": "GRAPH FinGraph MATCH(p:Person) RETURN p.id AS id,p.id>2 AS k ORDER BY k,id LIMIT 1",
+      "requires": [
+        "seed"
+      ]
+    },
+    {
+      "label": "sql-person-tie-2",
+      "family": "limit-membership",
+      "kind": "query",
+      "sql": "SELECT id,id>2 AS k FROM Person ORDER BY k LIMIT 1",
+      "requires": [
+        "seed"
+      ]
+    },
+    {
+      "label": "sql-person-total-2",
+      "family": "limit-membership",
+      "kind": "query",
+      "sql": "SELECT id,id>2 AS k FROM Person ORDER BY k,id LIMIT 1",
+      "requires": [
+        "seed"
+      ]
+    },
+    {
+      "label": "transfer-tie-2",
+      "family": "limit-membership",
+      "kind": "query",
+      "sql": "GRAPH FinGraph MATCH ()-[t:Transfers]->() RETURN t.id AS src,t.to_id AS dst,t.amount AS amount ORDER BY amount LIMIT 3",
+      "requires": [
+        "seed"
+      ]
+    },
+    {
+      "label": "transfer-total-2",
+      "family": "limit-membership",
+      "kind": "query",
+      "sql": "GRAPH FinGraph MATCH ()-[t:Transfers]->() RETURN t.id AS src,t.to_id AS dst,t.amount AS amount ORDER BY amount,src,dst LIMIT 3",
+      "requires": [
+        "seed"
+      ]
+    },
+    {
+      "label": "person-tie-3",
+      "family": "limit-membership",
+      "kind": "query",
+      "sql": "GRAPH FinGraph MATCH(p:Person) RETURN p.id AS id,p.id>2 AS k ORDER BY k LIMIT 1",
+      "requires": [
+        "seed"
+      ]
+    },
+    {
+      "label": "person-total-3",
+      "family": "limit-membership",
+      "kind": "query",
+      "sql": "GRAPH FinGraph MATCH(p:Person) RETURN p.id AS id,p.id>2 AS k ORDER BY k,id LIMIT 1",
+      "requires": [
+        "seed"
+      ]
+    },
+    {
+      "label": "sql-person-tie-3",
+      "family": "limit-membership",
+      "kind": "query",
+      "sql": "SELECT id,id>2 AS k FROM Person ORDER BY k LIMIT 1",
+      "requires": [
+        "seed"
+      ]
+    },
+    {
+      "label": "sql-person-total-3",
+      "family": "limit-membership",
+      "kind": "query",
+      "sql": "SELECT id,id>2 AS k FROM Person ORDER BY k,id LIMIT 1",
+      "requires": [
+        "seed"
+      ]
+    },
+    {
+      "label": "transfer-tie-3",
+      "family": "limit-membership",
+      "kind": "query",
+      "sql": "GRAPH FinGraph MATCH ()-[t:Transfers]->() RETURN t.id AS src,t.to_id AS dst,t.amount AS amount ORDER BY amount LIMIT 3",
+      "requires": [
+        "seed"
+      ]
+    },
+    {
+      "label": "transfer-total-3",
+      "family": "limit-membership",
+      "kind": "query",
+      "sql": "GRAPH FinGraph MATCH ()-[t:Transfers]->() RETURN t.id AS src,t.to_id AS dst,t.amount AS amount ORDER BY amount,src,dst LIMIT 3",
+      "requires": [
+        "seed"
+      ]
+    },
+    {
+      "label": "unique-asc",
+      "family": "limit-membership",
+      "kind": "query",
+      "sql": "GRAPH FinGraph MATCH(p:Person) RETURN p.id AS id ORDER BY id ASC LIMIT 2",
+      "requires": [
+        "seed"
+      ]
+    },
+    {
+      "label": "unique-desc",
+      "family": "limit-membership",
+      "kind": "query",
+      "sql": "GRAPH FinGraph MATCH(p:Person) RETURN p.id AS id ORDER BY id DESC LIMIT 2",
+      "requires": [
+        "seed"
+      ]
+    },
+    {
+      "label": "unique-offset",
+      "family": "limit-membership",
+      "kind": "query",
+      "sql": "GRAPH FinGraph MATCH(p:Person) RETURN p.id AS id ORDER BY id DESC OFFSET 1 LIMIT 2",
+      "requires": [
+        "seed"
+      ]
+    },
+    {
+      "label": "literal-tie-0",
+      "family": "limit-membership",
+      "kind": "query",
+      "sql": "GRAPH FinGraph FOR x IN [1,2,3] RETURN x AS id,x>2 AS k ORDER BY k LIMIT 1",
+      "requires": [
+        "seed"
+      ]
+    },
+    {
+      "label": "literal-tie-1",
+      "family": "limit-membership",
+      "kind": "query",
+      "sql": "GRAPH FinGraph FOR x IN [2,1,3] RETURN x AS id,x>2 AS k ORDER BY k LIMIT 1",
+      "requires": [
+        "seed"
+      ]
+    },
+    {
+      "label": "literal-tie-2",
+      "family": "limit-membership",
+      "kind": "query",
+      "sql": "GRAPH FinGraph FOR x IN [3,2,1] RETURN x AS id,x>2 AS k ORDER BY k LIMIT 1",
+      "requires": [
+        "seed"
+      ]
+    },
+    {
+      "label": "literal-total-0",
+      "family": "limit-membership",
+      "kind": "query",
+      "sql": "GRAPH FinGraph FOR x IN [1,2,3] RETURN x AS id,x>2 AS k ORDER BY k,id LIMIT 1",
+      "requires": [
+        "seed"
+      ]
+    },
+    {
+      "label": "literal-total-1",
+      "family": "limit-membership",
+      "kind": "query",
+      "sql": "GRAPH FinGraph FOR x IN [2,1,3] RETURN x AS id,x>2 AS k ORDER BY k,id LIMIT 1",
+      "requires": [
+        "seed"
+      ]
+    },
+    {
+      "label": "later-limit",
+      "family": "limit-membership",
+      "kind": "query",
+      "sql": "GRAPH FinGraph FOR x IN [5,3,1,4,2] RETURN x AS id ORDER BY id LIMIT 5 NEXT RETURN id LIMIT 2",
+      "requires": [
+        "seed"
+      ]
+    },
+    {
+      "label": "later-ordered-limit",
+      "family": "limit-membership",
+      "kind": "query",
+      "sql": "GRAPH FinGraph FOR x IN [5,3,1,4,2] RETURN x AS id ORDER BY id LIMIT 5 NEXT RETURN id ORDER BY id LIMIT 2",
+      "requires": [
+        "seed"
+      ]
+    },
+    {
+      "label": "no-order",
+      "family": "limit-membership",
+      "kind": "query",
+      "sql": "GRAPH FinGraph MATCH(p:Person) RETURN p.id AS id LIMIT 2",
+      "requires": [
+        "seed"
+      ]
+    }
+  ]
+}

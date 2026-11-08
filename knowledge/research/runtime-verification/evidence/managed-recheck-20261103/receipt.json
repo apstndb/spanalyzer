@@ -1,0 +1,48 @@
+{
+  "status": "completed_with_classified_service_rejections_and_local_drift_failure",
+  "observed_on": "2026-11-03",
+  "source_checkout_head": "c2d7792dd7f83d5dd086e2d32bc22e5d253cf06c",
+  "source_checkout_dirty": true,
+  "managed_target": "existing dedicated user-level mise profile; destinations excluded",
+  "backend_build": "unavailable",
+  "runtime_scope": "managed only; previous Omni and Emulator samples remain dated",
+  "steps": {
+    "read_only": 86,
+    "google_fixture": 61,
+    "postgresql_fixture": 26,
+    "total": 173
+  },
+  "additional_lifecycle_records": 6,
+  "bounded_assertions": 157,
+  "disposable_database_lifecycles": 2,
+  "cleanup": "Both newly created disposable databases dropped; GetDatabase NotFound recorded for each",
+  "earlier_retained_database": "Excluded from all lifecycle operations; no deletion approval inferred",
+  "authorization": "User explicitly approved two disposable DB creations, verification and deletion, one per dialect. No commit, push or public posting.",
+  "owned_fixture_commands": [
+    {
+      "dialect": "google",
+      "argv": [
+        "<LOCAL_CHECKOUT>/.tmp/managed-recheck-20261103/managed",
+        "<LOCAL_TASK_ROOT>/apstndb/spanalyzer/managed-recheck-20261103/evidence/google-cases.json"
+      ],
+      "started_at": "2026-11-03T01:37:14.869785+00:00",
+      "completed_at": "2026-11-03T01:44:04.388681+00:00",
+      "exit_code": 0,
+      "authorization": "User explicitly approved two newly created disposable DBs, one per dialect, verification and their deletion; earlier retained DB excluded."
+    },
+    {
+      "dialect": "pg",
+      "argv": [
+        "<LOCAL_CHECKOUT>/.tmp/managed-recheck-20261103/managed",
+        "<LOCAL_TASK_ROOT>/apstndb/spanalyzer/managed-recheck-20261103/evidence/pg-cases.json"
+      ],
+      "started_at": "2026-11-03T01:44:04.388887+00:00",
+      "completed_at": "2026-11-03T01:47:19.185246+00:00",
+      "exit_code": 0,
+      "authorization": "User explicitly approved two newly created disposable DBs, one per dialect, verification and their deletion; earlier retained DB excluded."
+    }
+  ],
+  "prior_artifact_count": 2049,
+  "prior_artifacts_unchanged": true,
+  "retained_at": "2026-11-03T01:49:12.792021+00:00"
+}

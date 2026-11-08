@@ -1,0 +1,92 @@
+{
+  "dialect": "pg",
+  "steps": [
+    {
+      "label": "score-fixture",
+      "family": "score",
+      "kind": "ddl",
+      "sql": "CREATE TABLE ScoreDocs (id bigint NOT NULL PRIMARY KEY, body text, bodytokens spanner.tokenlist GENERATED ALWAYS AS (spanner.tokenize_fulltext(body)) VIRTUAL HIDDEN)"
+    },
+    {
+      "label": "score-search-index",
+      "family": "score",
+      "kind": "ddl",
+      "sql": "CREATE SEARCH INDEX ScoreIndex ON ScoreDocs(BodyTokens)",
+      "requires": [
+        "score-fixture"
+      ]
+    },
+    {
+      "label": "score-insert",
+      "family": "score",
+      "kind": "dml",
+      "sql": "",
+      "statements": [
+        "INSERT INTO ScoreDocs(Id,Body) VALUES (1,'cat cat dog'),(2,'cat dog'),(3,'dog')"
+      ],
+      "requires": [
+        "score-fixture"
+      ]
+    },
+    {
+      "label": "score-unpinned",
+      "family": "score",
+      "kind": "query",
+      "sql": "SELECT Id, spanner.score(BodyTokens,'cat') AS default_score, spanner.score(BodyTokens,'cat', options => '{\"version\": 1}'::jsonb) AS version1_score, spanner.score(BodyTokens,'cat', options => '{\"version\": 2}'::jsonb) AS version2_score FROM ScoreDocs ORDER BY Id",
+      "requires": [
+        "score-insert",
+        "score-search-index"
+      ]
+    },
+    {
+      "label": "score-set-db-1",
+      "family": "score",
+      "kind": "ddl",
+      "sql": "ALTER DATABASE {{DATABASE}} SET \"spanner.score_version\" = 1"
+    },
+    {
+      "label": "score-pinned-db-1",
+      "family": "score",
+      "kind": "query",
+      "sql": "SELECT Id, spanner.score(BodyTokens,'cat') AS default_score, spanner.score(BodyTokens,'cat', options => '{\"version\": 1}'::jsonb) AS version1_score, spanner.score(BodyTokens,'cat', options => '{\"version\": 2}'::jsonb) AS version2_score FROM ScoreDocs ORDER BY Id",
+      "requires": [
+        "score-insert",
+        "score-search-index",
+        "score-set-db-1"
+      ]
+    },
+    {
+      "label": "score-set-db-2",
+      "family": "score",
+      "kind": "ddl",
+      "sql": "ALTER DATABASE {{DATABASE}} SET \"spanner.score_version\" = 2"
+    },
+    {
+      "label": "score-pinned-db-2",
+      "family": "score",
+      "kind": "query",
+      "sql": "SELECT Id, spanner.score(BodyTokens,'cat') AS default_score, spanner.score(BodyTokens,'cat', options => '{\"version\": 1}'::jsonb) AS version1_score, spanner.score(BodyTokens,'cat', options => '{\"version\": 2}'::jsonb) AS version2_score FROM ScoreDocs ORDER BY Id",
+      "requires": [
+        "score-insert",
+        "score-search-index",
+        "score-set-db-2"
+      ]
+    },
+    {
+      "label": "score-explicit-independent",
+      "family": "score",
+      "kind": "query",
+      "sql": "SELECT Id, spanner.score(BodyTokens,'cat', options => '{\"version\": 1}'::jsonb) AS version1_score, spanner.score(BodyTokens,'cat', options => '{\"version\": 2}'::jsonb) AS version2_score FROM ScoreDocs ORDER BY Id",
+      "requires": [
+        "score-insert",
+        "score-search-index"
+      ]
+    },
+    {
+      "label": "bucket-pg-query",
+      "family": "bucket",
+      "kind": "query",
+      "sql": "SELECT EXTRACT(EPOCH FROM '2026-10-31 00:59:59.9Z'::timestamptz - '1970-01-01Z'::timestamptz)::bigint / 3600 AS near_hour, EXTRACT(EPOCH FROM '2026-10-31 01:00:00Z'::timestamptz - '1970-01-01Z'::timestamptz)::bigint / 3600 AS on_hour"
+    }
+  ]
+}

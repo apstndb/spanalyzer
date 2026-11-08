@@ -1,0 +1,55 @@
+"""Retain exact local documentation checks; never runs managed SQL."""
+from pathlib import Path
+import datetime
+import hashlib
+import json
+import os
+import shutil
+import subprocess
+
+root = Path('<LOCAL_CHECKOUT>')
+durable = Path('<LOCAL_TASK_ROOT>/apstndb/spanalyzer/managed-recheck-20261021')
+evidence = root / 'knowledge/research/runtime-verification/evidence'
+current = evidence / 'managed-recheck-20261021'
+goroot = '<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8'
+env = os.environ.copy()
+# The python mise shim can inject its default Go 1.26.6 GOROOT. Match the
+# explicit executable instead of mixing compilers from two installations.
+env.update({'GOROOT': goroot, 'GOTOOLCHAIN': 'local', 'GOWORK': str(root / 'go.work'), 'GOCACHE': str(root / '.tmp/managed-recheck-20260925/go-cache'), 'GOFLAGS': '-mod=readonly'})
+checks = []
+for name, args, cwd, log in [
+    ('okf-all', [goroot + '/bin/go', 'run', './okf-check', '--repo-root', '..', '--gate', 'all', '--publication-manifest', str(durable / 'publication-manifest.json')], root / 'tools', 'okf-check.log'),
+    ('markdown-language', [goroot + '/bin/go', 'run', './markdown-language-check', '--repo-root', '..'], root / 'tools', 'language-check.log'),
+    ('diff-whitespace', ['git', 'diff', '--check'], root, 'diff-check.log'),
+]:
+    started = datetime.datetime.now(datetime.timezone.utc).isoformat()
+    with (durable / log).open('w') as stream:
+        result = subprocess.run(args, cwd=cwd, env=env, stdout=stream, stderr=subprocess.STDOUT)
+    checks.append({'name': name, 'argv': args, 'cwd': str(cwd), 'exit_code': result.returncode, 'started_at': started, 'completed_at': datetime.datetime.now(datetime.timezone.utc).isoformat(), 'log': log})
+    print(name, result.returncode, flush=True)
+    shutil.copyfile(durable / log, current / log)
+    if result.returncode:
+        raise SystemExit(result.returncode)
+validation = {
+    'recorded_at': datetime.datetime.now(datetime.timezone.utc).isoformat(),
+    'scope': 'Documentation and offline evidence only; managed runtime remains stopped at instance NotFound',
+    'environment': {key: env[key] for key in ['GOROOT', 'GOTOOLCHAIN', 'GOWORK', 'GOCACHE', 'GOFLAGS']},
+    'checks': checks,
+    'prior_attempt': {'exit_code': 1, 'classification': 'Python shim injected Go 1.26.6 GOROOT for a Go 1.26.8 executable; rerun with explicit matching GOROOT', 'log': 'okf-rerun-toolchain-error.log'},
+    'offline_check': {'command': 'python3 .tmp/managed-recheck-20261021/verify-audit.py', 'exit_code': 0, 'assertions': 196, 'evidence': 'offline-audit-check.json'},
+}
+(current / 'validation.json').write_text(json.dumps(validation, indent=2) + '\n')
+shutil.copyfile(__file__, current / 'validate-docs.py.txt')
+manifest = evidence / 'artifact-sha256.json'
+contents = json.loads(manifest.read_text())
+for path in current.iterdir():
+    if path.is_file():
+        contents['files'][str(path.relative_to(evidence))] = hashlib.sha256(path.read_bytes()).hexdigest()
+contents['files'] = dict(sorted(contents['files'].items()))
+manifest.write_text(json.dumps(contents, indent=2) + '\n')
+result = subprocess.run(['python3', str(root / '.tmp/managed-recheck-20261021/verify-audit.py')], cwd=root)
+if result.returncode:
+    raise SystemExit(result.returncode)
+shutil.copyfile(root / 'knowledge/research/runtime-verification/managed-documentation-history-and-preflight-20261021.md', durable / 'report.md')
+shutil.copyfile(current / 'validation.json', durable / 'validation.json')
+print('current artifacts', len(list(current.iterdir())), 'total hashes', len(contents['files']), flush=True)

@@ -1,0 +1,73 @@
+"""Offline provenance, semantic-result, cleanup and privacy checks; no network/SQL."""
+from pathlib import Path
+from collections import Counter
+import hashlib,json,os,re
+root=Path('<LOCAL_CHECKOUT>');task=Path('<LOCAL_TASK_ROOT>/apstndb/spanalyzer/managed-recheck-20261029');scratch=root/'.tmp/managed-recheck-20261029';evidence=root/'knowledge/research/runtime-verification/evidence';current=evidence/'managed-recheck-20261029';checks=[]
+def read(p):return json.loads(p.read_text())
+def lines(p):return[json.loads(s)for s in p.read_text().splitlines()if s]
+def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
+def check(label,condition):
+ if not condition:raise AssertionError(label)
+ checks.append(label)
+r=read(current/'receipt.json');check('completed scope keeps drift failure and catalog variation explicit',r['flow_status']=='completed_with_observed_catalog_variation_and_local_drift_failure'and not r['catalog_selectors_changed']and not r['new_instance_created'])
+cmds=read(current/'all-commands.json');check('all known command failures retained',[(r['name'],r['exit_code'])for r in cmds if r['exit_code']]==[('spanner-sys',1),('spanner-sys-2',1),('spanner-sys-3',1),('managed-tests',1),('final-trial-state',1)])
+log=(current/'managed-tests.log').read_text();check('three named managed integrations pass',all('--- PASS: '+n in log for n in ['TestCanonicalDDL_RealSpanner','TestExpressionIndex_RealSpanner','TestUUID_RealSpanner']))
+check('drift failure has exactly observed unregistered tables',re.findall(r'--- FAIL: (\S+)',log)==['TestDrift_RealTableMetas']and'unknown_tables=[ACTIVE_BATCH_OPERATIONS BATCH_OPERATIONS]'in log and'unknown_columns=map[] ordinal_mismatches=[] type_mismatches=[]'in log)
+cat=read(current/'catalog-comparison.json');check('IS 310 and independently captured SYS 624',[(c['table_count'],c['column_count'])for c in cat['captures']]==[(48,310),(52,624)])
+check('producer capture files match hashes',all(sha(root/c['path'])==c['sha256']for c in cat['captures']))
+v=read(current/'catalog-volatility-summary.json');check('all four complete SYS shapes retained',{s['column_count']for s in v['surfaces']}=={598,609,613,624}and sum(v['response_counts'].values())==10)
+check('no old tuple removed or changed',all(not s['removed']and not s['changed']for s in v['surfaces']))
+check('independent additions account for all shapes',{s['column_count']:len(s['added'])for s in v['surfaces']}=={598:0,609:11,613:15,624:26})
+check('same-client timestamp samples retained without transaction IDs',len(v['read_only_transaction_samples'])==20 and all(s['read_timestamp']for s in v['read_only_transaction_samples']))
+check('thirty new-column queries retain mixed queryability',v['new_column_queries']['executed']==30 and v['new_column_queries']['codes']=={'OK':26,'InvalidArgument':4})
+check('new split-score advertised type remains STRING',all(c['spanner_type']=='STRING(MAX)'for s in v['surfaces']for c in s['added']if c['column_name']=='LATENCY_IMPACT_CORRELATION_SCORE'))
+f=read(current/'feature-comparison.json');check('existing feature codes unchanged',all(not r['code_changes']and not r['missing']and not r['added']for r in f.values()))
+c=read(current/'json-comparison.json')['corpora'];check('125 JSON and 64 distinctness results unchanged',sum(c[n]['current_cases']for n in ['queries','followup'])==125 and c['distinctness']['current_cases']==64 and all(not r['differences']for r in c.values()))
+check('distinctness positives and negatives preserved',c['distinctness']['outcomes']=={'OK':49,'InvalidArgument':15})
+check('fixture codes unchanged',all(not r['changed_codes']for r in read(current/'fixture-comparison.json').values()))
+h=read(current/'heartbeat-summary.json');check('actual 100ms child records in both dialects',all(r['code']=='OK'and r['rows']>0 and 90<r['median_ms']<110 for r in h.values()))
+c=read(current/'value-capture-summary.json');check('nine actual capture records in both dialects',all(len(r)==9 and Counter(x['value_capture_type']for x in r)=={'NEW_ROW_AND_OLD_VALUES':3,'NEW_ROW':3,'OLD_AND_NEW_VALUES':3}for r in c.values()))
+check('capture payloads exactly match October 23',c==read(evidence/'managed-recheck-20261023/value-capture-summary.json'))
+s=read(current/'doc-delta-summary.json');check('all repeated 136 cases retained',s['executed_cases']==136);check('all 36 GQL expectations pass',sum(r.get('matches_expected',False)for r in s['gql'])==36)
+check('all nineteen search triplets agree',len(s['search'])==19 and all(r['automatic_equals_base']and r['forced_search_equals_base']for r in s['search']))
+check('forced search plans and automatic split retain boundaries',all(r['variants']['forced-search']['uses_search_index_scan']for r in s['search'])and sum(r['variants']['automatic']['uses_search_index_scan']for r in s['search'])==10)
+for dialect in ['google','pg']:
+ h={r['label']:r for r in lines(current/('hll-controls-'+dialect+'.jsonl'))};expected={'corrected-init-null':[{'sketch':None}],'merge-empty':[{'estimate':'0'}],'merge-partial-empty':[{'sketch':None}],'merge-null':[{'estimate':'0'}],'merge-partial-null':[{'sketch':None}],'approx-empty':[{'estimate':'0'}],'approx-null':[{'estimate':'0'}],'mixed-precision-merge':[{'estimate':'2'}],'mixed-precision-partial':[{'estimate':'2'}]}
+ for suffix,want in expected.items():check(dialect+' HLL '+suffix,h[dialect+'-hll-'+suffix]['code']=='OK'and h[dialect+'-hll-'+suffix]['rows']==want)
+ check(dialect+' invalid/incompatible HLL sketches reject',all(h[dialect+'-hll-'+suffix]['code']=='OutOfRange'for suffix in ['mixed-type-merge','extract-invalid']))
+q={r['label']:r for r in lines(current/'queue-recreate.jsonl')if'label'in r};check('both queue generations retain exact message IDs',all(q['cycle-'+str(n)+'-expected-generation']['matches']for n in [1,2]));check('queue cleanup confirmed',q['cleanup']['code']=='OK'and q['cleanup-confirmation']['rows']==[{'remaining':'0'}])
+w=read(current/'weekly-summary.json');check('112 bounded new-case semantic assertions pass',w['semantic_assertions']['status']=='pass'and w['semantic_assertions']['count']==112)
+check('initial blocked and corrected attempts remain distinct',[r['step_records']for r in w['attempts']]==[156,84,75,8,88]and sum(r['submitted_steps']for r in w['attempts'])==265)
+check('all 24 available-view graph definitions and reads succeed',sum(r['create_code']=='OK'and r['read_code']=='OK'for r in w['volatile_graph_matrix'])==24 and all(r['read_rows']==[{'n':'3'}]for r in w['volatile_graph_matrix']if r['create_code']=='OK'))
+check('six RAND dependent graph definitions remain NOT_RUN',sum(r['create_code']=='NOT_RUN'for r in w['volatile_graph_matrix'])==6)
+check('false/default volatility acceptance remains observed',all(r['create_code']=='OK'for r in w['volatile_graph_matrix']if r['view']=='GProjection'and r['allow_volatile']in ['omit','false']))
+check('six bounded paths and eleven negative cases execute',Counter(r['code']for r in w['path_quantifiers'])=={'OK':6,'InvalidArgument':11})
+check('JSONB COUNT limitations stay separate from DISTINCT workaround',w['jsonb']['distinct_subquery_count']==[{'n':'19'}]and w['jsonb']['count_jsonb']=={'jsonb-stored-distinct-count':'Unimplemented','jsonb-count-expression':'Unimplemented','jsonb-stored-minmax':'InvalidArgument'})
+tg={r['label']:r for r in lines(current/'tuning-google.jsonl')};tp={r['label']:r for r in lines(current/'tuning-pg.jsonl')}
+check('tuning HAVING MAX/MIN returns exact selected rows',tg['tuning-any-value-having-max']['rows']==[{'concert_date':'2026-10-29','latest_begin':'2026-10-29T03:00:00Z'}]and tg['tuning-any-value-having-min']['rows']==[{'concert_date':'2026-10-29','earliest_begin':'2026-10-29T01:00:00Z'}])
+check('PostgreSQL generate_series returns all 32 integers and sum',tp['tuning-pg-generate-series']['rows']==[{'id':str(i)}for i in range(32)]and tp['tuning-pg-series-sum']['rows']==[{'n':'32','total':'496'}])
+check('additional parallelism controls execute in both dialects',tg['tuning-additional-parallelism']['code']==tp['tuning-pg-parallelism']['code']=='OK')
+cleanup=read(current/'cleanup-summary.json');check('all seventeen temporary database lifecycles absent',cleanup['temporary_database_lifecycles']==17 and len(cleanup['owned_database_fixtures'])==17 and all(r=={'drop':'OK','get_after_drop':'NotFound'}for r in cleanup['owned_database_fixtures'].values()))
+check('final base objects absent',all(r['code']=='OK'and r['rows']==[{'n':'0'}]for r in cleanup['final_user_object_counts']))
+cloud=cleanup['final_cloud_state'];check('same creation time and free trial retained',cloud['instance']['instanceType']=='FREE_INSTANCE'and cloud['instance']['state']=='READY'and cloud['instance']['createTime']=='2026-10-23T14:24:35.339918Z'and cloud['instance']['freeInstanceMetadata']['expireBehavior']=='REMOVE_AFTER_GRACE_PERIOD')
+check('only dedicated base database remains',cloud['databases']=={'total':1,'only_dedicated_database':True,'ready':True,'dialects':['GOOGLE_STANDARD_SQL']})
+h=read(current/'sources/history-audit.json');check('six commits with complete 48-path source disposition',h['commit_count']==6 and h['net_files']==48 and h['net_document_files']==45 and len(h['documents'])==48 and h['retained_full_pinned_bodies']==91 and h['current_official_bodies']==47)
+check('main refresh equals audited head',read(current/'sources/mirror-head-refresh.json')['sha']==h['head'])
+retrieval=read(current/'sources/retrieval.json');check('all 91 pinned full body hashes verified',all(sha(current/'sources'/b['file'])==b['sha256']for b in retrieval['bodies']if b['status']==200))
+check('all 47 current official full body hashes verified',all(sha(current/'sources'/('official__'+d['name'].replace('/','__')+'.md.txt'))==d['body_sha256']for d in retrieval['official']))
+current_docs=read(current/'sources/official-documents.json')['documents'];heads={b['path']:b for b in retrieval['bodies']if b['side']=='head'and b['status']==200}
+check('current official bodies independently equal mirror head',all(re.sub(r'\A---\n.*?\n---\n','',(current/'sources'/heads['docs/'+d['name'].removeprefix('documents/')+'.md']['file']).read_text(),flags=re.S).strip()==d['content'].strip()for d in current_docs))
+check('live release feed latest remains October 20',h['release_feed']['latest_title']=='October 20, 2026')
+check('123 measured implementation/dependency hashes unchanged',not read(current/'source-comparison.json')['changed_files']and all(sha(root/p)==value for p,value in read(current/'source-hashes.json').items()))
+check('all fifteen reused Go producers differ only in dates',len(read(current/'producer-comparison.json'))==15 and all(r['equal_after_fixture_date_substitution']for r in read(current/'producer-comparison.json')))
+initial=read(scratch/'initial-artifact-manifest.json')['files'];manifest=read(evidence/'artifact-sha256.json')['files'];check('all 855 prior artifact hashes remain unchanged',len(initial)==855 and all(manifest.get(p)==value and sha(evidence/p)==value for p,value in initial.items()))
+check('all current retained evidence hashes covered',all(manifest.get(str(p.relative_to(evidence)))==sha(p)for p in current.rglob('*')if p.is_file()))
+check('private destination values available only to offline checker',all(os.environ.get(k)for k in ['SPANNER_PROJECT_ID','SPANNER_INSTANCE_ID','SPANNER_DATABASE_ID']))
+private=[os.environ[k]for k in ['SPANNER_PROJECT_ID','SPANNER_INSTANCE_ID','SPANNER_DATABASE_ID']];leaks=[str(p.relative_to(current))for p in current.rglob('*')if p.is_file()and any(v in p.read_text()for v in private)];check('no target coordinates retained',not leaks)
+keys={'server_transaction_id','servertransactionid','transaction_id','transactionid','lease_id','leaseid','partition_token','partitiontoken','resume_token','resumetoken'}
+def identifiers_safe(value,parent=''):
+ if isinstance(value,list):return all(identifiers_safe(v,parent)for v in value)
+ if isinstance(value,dict):return all((not(k.lower()in keys or(parent.lower()=='transaction'and k=='id'))or not isinstance(v,str)or not v or v.startswith(('sha256:','<redacted>')))and identifiers_safe(v,k)for k,v in value.items())
+ return True
+check('operational identifiers hashed in runtime JSONL',all(identifiers_safe(r)for p in current.glob('*.jsonl')for r in lines(p)))
+result={'status':'pass','checks':len(checks),'scope':'Offline source/result/cleanup/privacy assertions only. Managed runtime gates retain separate observed failures.','details':checks};(task/'evidence-check.json').write_text(json.dumps(result,indent=2)+'\n');print(json.dumps({'status':'pass','checks':len(checks)}))

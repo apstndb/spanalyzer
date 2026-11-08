@@ -1,0 +1,343 @@
+[
+  {
+    "label": "id-ASC",
+    "kind": "ordered-rows",
+    "oracle": "sql-id-ASC",
+    "expected": null
+  },
+  {
+    "label": "sql-id-ASC",
+    "kind": "sql-oracle",
+    "oracle": null,
+    "expected": null
+  },
+  {
+    "label": "id-DESC",
+    "kind": "ordered-rows",
+    "oracle": "sql-id-DESC",
+    "expected": null
+  },
+  {
+    "label": "sql-id-DESC",
+    "kind": "sql-oracle",
+    "oracle": null,
+    "expected": null
+  },
+  {
+    "label": "name-ASC",
+    "kind": "ordered-rows",
+    "oracle": "sql-name-ASC",
+    "expected": null
+  },
+  {
+    "label": "sql-name-ASC",
+    "kind": "sql-oracle",
+    "oracle": null,
+    "expected": null
+  },
+  {
+    "label": "name-DESC",
+    "kind": "ordered-rows",
+    "oracle": "sql-name-DESC",
+    "expected": null
+  },
+  {
+    "label": "sql-name-DESC",
+    "kind": "sql-oracle",
+    "oracle": null,
+    "expected": null
+  },
+  {
+    "label": "country-ASC",
+    "kind": "ordered-rows",
+    "oracle": "sql-country-ASC",
+    "expected": null
+  },
+  {
+    "label": "sql-country-ASC",
+    "kind": "sql-oracle",
+    "oracle": null,
+    "expected": null
+  },
+  {
+    "label": "country-DESC",
+    "kind": "ordered-rows",
+    "oracle": "sql-country-DESC",
+    "expected": null
+  },
+  {
+    "label": "sql-country-DESC",
+    "kind": "sql-oracle",
+    "oracle": null,
+    "expected": null
+  },
+  {
+    "label": "timestamp-ASC",
+    "kind": "ordered-rows",
+    "oracle": "sql-timestamp-ASC",
+    "expected": null
+  },
+  {
+    "label": "sql-timestamp-ASC",
+    "kind": "sql-oracle",
+    "oracle": null,
+    "expected": null
+  },
+  {
+    "label": "timestamp-DESC",
+    "kind": "ordered-rows",
+    "oracle": "sql-timestamp-DESC",
+    "expected": null
+  },
+  {
+    "label": "sql-timestamp-DESC",
+    "kind": "sql-oracle",
+    "oracle": null,
+    "expected": null
+  },
+  {
+    "label": "arithmetic-ASC",
+    "kind": "ordered-rows",
+    "oracle": "sql-arithmetic-ASC",
+    "expected": null
+  },
+  {
+    "label": "sql-arithmetic-ASC",
+    "kind": "sql-oracle",
+    "oracle": null,
+    "expected": null
+  },
+  {
+    "label": "arithmetic-DESC",
+    "kind": "ordered-rows",
+    "oracle": "sql-arithmetic-DESC",
+    "expected": null
+  },
+  {
+    "label": "sql-arithmetic-DESC",
+    "kind": "sql-oracle",
+    "oracle": null,
+    "expected": null
+  },
+  {
+    "label": "string-cast-ASC",
+    "kind": "ordered-rows",
+    "oracle": "sql-string-cast-ASC",
+    "expected": null
+  },
+  {
+    "label": "sql-string-cast-ASC",
+    "kind": "sql-oracle",
+    "oracle": null,
+    "expected": null
+  },
+  {
+    "label": "string-cast-DESC",
+    "kind": "ordered-rows",
+    "oracle": "sql-string-cast-DESC",
+    "expected": null
+  },
+  {
+    "label": "sql-string-cast-DESC",
+    "kind": "sql-oracle",
+    "oracle": null,
+    "expected": null
+  },
+  {
+    "label": "distinct-ASC",
+    "kind": "ordered-rows",
+    "oracle": null,
+    "expected": [
+      "1",
+      "2",
+      "3"
+    ]
+  },
+  {
+    "label": "aggregate-ASC",
+    "kind": "ordered-rows",
+    "oracle": "sql-aggregate-ASC",
+    "expected": null
+  },
+  {
+    "label": "sql-aggregate-ASC",
+    "kind": "sql-oracle",
+    "oracle": null,
+    "expected": null
+  },
+  {
+    "label": "next-ASC",
+    "kind": "ordered-rows",
+    "oracle": null,
+    "expected": [
+      "1",
+      "2",
+      "3"
+    ]
+  },
+  {
+    "label": "limit1-ASC",
+    "kind": "selection",
+    "oracle": null,
+    "expected": [
+      "1"
+    ]
+  },
+  {
+    "label": "limit2-ASC",
+    "kind": "ordered-rows-and-selection",
+    "oracle": null,
+    "expected": [
+      "1",
+      "2"
+    ]
+  },
+  {
+    "label": "primitive-limit2-ASC",
+    "kind": "selection-only",
+    "oracle": null,
+    "expected": [
+      "1",
+      "2"
+    ]
+  },
+  {
+    "label": "distinct-DESC",
+    "kind": "ordered-rows",
+    "oracle": null,
+    "expected": [
+      "3",
+      "2",
+      "1"
+    ]
+  },
+  {
+    "label": "aggregate-DESC",
+    "kind": "ordered-rows",
+    "oracle": "sql-aggregate-DESC",
+    "expected": null
+  },
+  {
+    "label": "sql-aggregate-DESC",
+    "kind": "sql-oracle",
+    "oracle": null,
+    "expected": null
+  },
+  {
+    "label": "next-DESC",
+    "kind": "ordered-rows",
+    "oracle": null,
+    "expected": [
+      "3",
+      "2",
+      "1"
+    ]
+  },
+  {
+    "label": "limit1-DESC",
+    "kind": "selection",
+    "oracle": null,
+    "expected": [
+      "3"
+    ]
+  },
+  {
+    "label": "limit2-DESC",
+    "kind": "ordered-rows-and-selection",
+    "oracle": null,
+    "expected": [
+      "3",
+      "2"
+    ]
+  },
+  {
+    "label": "primitive-limit2-DESC",
+    "kind": "selection-only",
+    "oracle": null,
+    "expected": [
+      "3",
+      "2"
+    ]
+  },
+  {
+    "label": "primitive-no-page",
+    "kind": "undefined-output-order",
+    "oracle": null,
+    "expected": null
+  },
+  {
+    "label": "offset-limit",
+    "kind": "ordered-rows-and-selection",
+    "oracle": null,
+    "expected": [
+      "2",
+      "1"
+    ]
+  },
+  {
+    "label": "tie-keys",
+    "kind": "tie-keys",
+    "oracle": null,
+    "expected": null
+  },
+  {
+    "label": "tie-keys-with-id",
+    "kind": "ordered-ids",
+    "oracle": null,
+    "expected": [
+      "1",
+      "2",
+      "3"
+    ]
+  },
+  {
+    "label": "aggregate-order",
+    "kind": "array-order",
+    "oracle": null,
+    "expected": [
+      "1",
+      "2",
+      "3"
+    ]
+  },
+  {
+    "label": "aggregate-order-desc",
+    "kind": "array-order",
+    "oracle": null,
+    "expected": [
+      "3",
+      "2",
+      "1"
+    ]
+  },
+  {
+    "label": "next-array",
+    "kind": "encounter-order-observation",
+    "oracle": null,
+    "expected": [
+      "1",
+      "2",
+      "3"
+    ]
+  },
+  {
+    "label": "for-values",
+    "kind": "ordered-rows",
+    "oracle": null,
+    "expected": [
+      "1",
+      "2",
+      "3"
+    ]
+  },
+  {
+    "label": "sql-outer-graph",
+    "kind": "sql-outer-control",
+    "oracle": null,
+    "expected": [
+      "1",
+      "2",
+      "3"
+    ]
+  }
+]

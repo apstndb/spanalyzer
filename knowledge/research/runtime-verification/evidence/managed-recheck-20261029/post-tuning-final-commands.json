@@ -1,0 +1,28 @@
+[
+  {
+    "name": "post-tuning-inventory",
+    "started_at": "2026-10-29T01:29:26.002251+00:00",
+    "completed_at": "2026-10-29T01:29:27.433632+00:00",
+    "exit_code": 0,
+    "seconds": 1.431,
+    "argv": [
+      "<LOCAL_CHECKOUT>/.tmp/managed-recheck-20261029/query",
+      "<LOCAL_CHECKOUT>/.tmp/managed-recheck-20261029/final-inventory-cases.json"
+    ],
+    "cwd": "<LOCAL_CHECKOUT>/tools",
+    "gowork": "<LOCAL_CHECKOUT>/go.work"
+  },
+  {
+    "name": "post-tuning-trial-state",
+    "started_at": "2026-10-29T01:29:27.433982+00:00",
+    "completed_at": "2026-10-29T01:29:28.702525+00:00",
+    "exit_code": 0,
+    "seconds": 1.269,
+    "argv": [
+      "<LOCAL_HOME>/.local/share/mise/installs/python/3.13/bin/python3",
+      "<LOCAL_CHECKOUT>/.tmp/managed-recheck-20261029/inspect-cloud-state.py"
+    ],
+    "cwd": "<LOCAL_CHECKOUT>/tools",
+    "gowork": "<LOCAL_CHECKOUT>/go.work"
+  }
+]

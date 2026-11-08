@@ -1,0 +1,984 @@
+{
+  "dialect": "pg",
+  "steps": [
+    {
+      "label": "fk-base",
+      "family": "foreign-key",
+      "kind": "ddl",
+      "sql": "",
+      "requires": [],
+      "statements": [
+        "CREATE TABLE FkParent (Id bigint NOT NULL, PRIMARY KEY (Id))",
+        "CREATE TABLE FkAlterChild (Id bigint NOT NULL, ParentId bigint, Payload text, PRIMARY KEY (Id))",
+        "CREATE TABLE FkCascadeChild (Id bigint NOT NULL, ParentId bigint, CONSTRAINT FkCascade FOREIGN KEY (ParentId) REFERENCES FkParent(Id) ON DELETE CASCADE, PRIMARY KEY (Id))",
+        "CREATE TABLE FkNoActionChild (Id bigint NOT NULL, ParentId bigint, CONSTRAINT FkNoAction FOREIGN KEY (ParentId) REFERENCES FkParent(Id) ON DELETE NO ACTION, PRIMARY KEY (Id))"
+      ]
+    },
+    {
+      "label": "fk-inline-set-null",
+      "family": "foreign-key",
+      "kind": "ddl",
+      "sql": "CREATE TABLE FkInlineChild (Id bigint NOT NULL, ParentId bigint, Payload text, CONSTRAINT FkInline FOREIGN KEY (ParentId) REFERENCES FkParent(Id) ON DELETE SET NULL, PRIMARY KEY (Id))",
+      "requires": [
+        "fk-base"
+      ]
+    },
+    {
+      "label": "fk-alter-set-null",
+      "family": "foreign-key",
+      "kind": "ddl",
+      "sql": "ALTER TABLE FkAlterChild ADD CONSTRAINT FkAlter FOREIGN KEY (ParentId) REFERENCES FkParent(Id) ON DELETE SET NULL",
+      "requires": [
+        "fk-base"
+      ]
+    },
+    {
+      "label": "fk-reject-not-null",
+      "family": "foreign-key",
+      "kind": "ddl",
+      "sql": "CREATE TABLE FkBadnotnull (Id bigint NOT NULL, ParentId bigint NOT NULL, CONSTRAINT FkBad FOREIGN KEY (ParentId) REFERENCES FkParent(Id) ON DELETE SET NULL, PRIMARY KEY (Id))",
+      "requires": [
+        "fk-base"
+      ],
+      "control": "documented_invalid_referencing_column"
+    },
+    {
+      "label": "fk-reject-primary-key",
+      "family": "foreign-key",
+      "kind": "ddl",
+      "sql": "CREATE TABLE FkBadprimarykey (Id bigint NOT NULL, ParentId bigint, CONSTRAINT FkBad FOREIGN KEY (ParentId) REFERENCES FkParent(Id) ON DELETE SET NULL, PRIMARY KEY (Id,ParentId))",
+      "requires": [
+        "fk-base"
+      ],
+      "control": "documented_invalid_referencing_column"
+    },
+    {
+      "label": "fk-generated-control",
+      "family": "foreign-key",
+      "kind": "ddl",
+      "sql": "CREATE TABLE FkGenerated (Id bigint NOT NULL, SourceId bigint, ParentId bigint GENERATED ALWAYS AS (SourceId) STORED, PRIMARY KEY (Id))",
+      "requires": [
+        "fk-base"
+      ]
+    },
+    {
+      "label": "fk-reject-generated",
+      "family": "foreign-key",
+      "kind": "ddl",
+      "sql": "ALTER TABLE FkGenerated ADD CONSTRAINT FkGeneratedReference FOREIGN KEY (ParentId) REFERENCES FkParent(Id) ON DELETE SET NULL",
+      "requires": [
+        "fk-generated-control"
+      ],
+      "control": "documented_invalid_referencing_column"
+    },
+    {
+      "label": "fk-seed",
+      "family": "foreign-key",
+      "kind": "dml",
+      "sql": "",
+      "requires": [
+        "fk-inline-set-null",
+        "fk-alter-set-null"
+      ],
+      "statements": [
+        "INSERT INTO FkParent(Id) VALUES (1),(2),(3),(4),(5)",
+        "INSERT INTO FkInlineChild(Id,ParentId,Payload) VALUES (11,1,'keep'),(12,2,'mutation'),(15,5,'rollback'),(16,NULL,'already-null')",
+        "INSERT INTO FkAlterChild(Id,ParentId,Payload) VALUES (21,1,'keep'),(22,2,'mutation'),(25,5,'rollback'),(26,NULL,'already-null')",
+        "INSERT INTO FkCascadeChild(Id,ParentId) VALUES (31,1)",
+        "INSERT INTO FkNoActionChild(Id,ParentId) VALUES (41,3)"
+      ]
+    },
+    {
+      "label": "fk-metadata",
+      "family": "foreign-key",
+      "kind": "query",
+      "sql": "SELECT CONSTRAINT_NAME AS name,DELETE_RULE AS rule FROM INFORMATION_SCHEMA.REFERENTIAL_CONSTRAINTS WHERE LOWER(CONSTRAINT_NAME) LIKE 'fk%' ORDER BY name",
+      "requires": [
+        "fk-inline-set-null",
+        "fk-alter-set-null"
+      ]
+    },
+    {
+      "label": "fk-before",
+      "family": "foreign-key",
+      "kind": "query",
+      "sql": "SELECT 'inline' AS source,Id AS id,ParentId AS parent_id,Payload AS payload FROM FkInlineChild UNION ALL SELECT 'alter',Id,ParentId,Payload FROM FkAlterChild ORDER BY source,id",
+      "requires": [
+        "fk-seed"
+      ]
+    },
+    {
+      "label": "fk-delete-dml",
+      "family": "foreign-key",
+      "kind": "dml",
+      "sql": "",
+      "requires": [
+        "fk-seed"
+      ],
+      "statements": [
+        "DELETE FROM FkParent WHERE Id=1"
+      ]
+    },
+    {
+      "label": "fk-after-dml",
+      "family": "foreign-key",
+      "kind": "query",
+      "sql": "SELECT 'inline' AS source,Id AS id,ParentId AS parent_id,Payload AS payload FROM FkInlineChild UNION ALL SELECT 'alter',Id,ParentId,Payload FROM FkAlterChild ORDER BY source,id",
+      "requires": [
+        "fk-delete-dml"
+      ]
+    },
+    {
+      "label": "fk-cascade-control",
+      "family": "foreign-key",
+      "kind": "query",
+      "sql": "SELECT COUNT(*) AS n FROM FkCascadeChild",
+      "requires": [
+        "fk-delete-dml"
+      ]
+    },
+    {
+      "label": "fk-delete-mutation",
+      "family": "foreign-key",
+      "kind": "mutation-delete",
+      "sql": "",
+      "requires": [
+        "fk-seed"
+      ],
+      "table": "fkparent",
+      "key": [
+        2
+      ]
+    },
+    {
+      "label": "fk-after-mutation",
+      "family": "foreign-key",
+      "kind": "query",
+      "sql": "SELECT 'inline' AS source,Id AS id,ParentId AS parent_id,Payload AS payload FROM FkInlineChild UNION ALL SELECT 'alter',Id,ParentId,Payload FROM FkAlterChild ORDER BY source,id",
+      "requires": [
+        "fk-delete-mutation"
+      ]
+    },
+    {
+      "label": "fk-rollback",
+      "family": "foreign-key",
+      "kind": "rollback",
+      "sql": "DELETE FROM FkParent WHERE Id=5",
+      "requires": [
+        "fk-seed"
+      ],
+      "after": "SELECT 'inline' AS source,Id AS id,ParentId AS parent_id,Payload AS payload FROM FkInlineChild UNION ALL SELECT 'alter',Id,ParentId,Payload FROM FkAlterChild ORDER BY source,id"
+    },
+    {
+      "label": "fk-after-rollback",
+      "family": "foreign-key",
+      "kind": "query",
+      "sql": "SELECT 'inline' AS source,Id AS id,ParentId AS parent_id,Payload AS payload FROM FkInlineChild UNION ALL SELECT 'alter',Id,ParentId,Payload FROM FkAlterChild ORDER BY source,id",
+      "requires": [
+        "fk-rollback"
+      ]
+    },
+    {
+      "label": "fk-no-action-reject",
+      "family": "foreign-key",
+      "kind": "dml",
+      "sql": "",
+      "requires": [
+        "fk-seed"
+      ],
+      "statements": [
+        "DELETE FROM FkParent WHERE Id=3"
+      ],
+      "control": "NO ACTION preserves parent"
+    },
+    {
+      "label": "fk-no-action-parent-present",
+      "family": "foreign-key",
+      "kind": "query",
+      "sql": "SELECT Id AS id FROM FkParent WHERE Id=3",
+      "requires": [
+        "fk-seed"
+      ]
+    },
+    {
+      "label": "fk-reference-still-enforced",
+      "family": "foreign-key",
+      "kind": "dml",
+      "sql": "",
+      "requires": [
+        "fk-seed"
+      ],
+      "statements": [
+        "INSERT INTO FkInlineChild(Id,ParentId,Payload) VALUES (99,999,'invalid')"
+      ],
+      "control": "enforcement after SET NULL creation"
+    },
+    {
+      "label": "fk-composite-base",
+      "family": "foreign-key",
+      "kind": "ddl",
+      "sql": "",
+      "requires": [],
+      "statements": [
+        "CREATE TABLE FkCompositeParent (Id bigint NOT NULL, K bigint NOT NULL, PRIMARY KEY (Id,K))",
+        "CREATE TABLE FkCompositeChild (Id bigint NOT NULL, ParentId bigint, ParentK bigint, CONSTRAINT FkComposite FOREIGN KEY (ParentId,ParentK) REFERENCES FkCompositeParent(Id,K) ON DELETE SET NULL, PRIMARY KEY (Id))"
+      ]
+    },
+    {
+      "label": "fk-composite-seed",
+      "family": "foreign-key",
+      "kind": "dml",
+      "sql": "",
+      "requires": [
+        "fk-composite-base"
+      ],
+      "statements": [
+        "INSERT INTO FkCompositeParent(Id,K) VALUES (1,10),(2,20)",
+        "INSERT INTO FkCompositeChild(Id,ParentId,ParentK) VALUES (51,1,10),(52,1,NULL),(53,2,20)"
+      ]
+    },
+    {
+      "label": "fk-composite-delete",
+      "family": "foreign-key",
+      "kind": "dml",
+      "sql": "",
+      "requires": [
+        "fk-composite-seed"
+      ],
+      "statements": [
+        "DELETE FROM FkCompositeParent WHERE Id=1 AND K=10"
+      ]
+    },
+    {
+      "label": "fk-composite-after",
+      "family": "foreign-key",
+      "kind": "query",
+      "sql": "SELECT Id AS id,ParentId AS parent_id,ParentK AS parent_k FROM FkCompositeChild ORDER BY Id",
+      "requires": [
+        "fk-composite-delete"
+      ]
+    },
+    {
+      "label": "storage-catalog",
+      "family": "storage",
+      "kind": "query",
+      "sql": "SELECT COLUMN_NAME AS name,SPANNER_TYPE AS type,ORDINAL_POSITION AS ordinal FROM INFORMATION_SCHEMA.COLUMNS WHERE LOWER(TABLE_SCHEMA)='spanner_sys' AND LOWER(TABLE_NAME)='table_sizes_stats_1hour' ORDER BY ORDINAL_POSITION",
+      "requires": []
+    },
+    {
+      "label": "storage-columnar_used_bytes",
+      "family": "storage",
+      "kind": "query",
+      "sql": "SELECT s.COLUMNAR_USED_BYTES AS value FROM SPANNER_SYS.TABLE_SIZES_STATS_1HOUR AS s LIMIT 3",
+      "requires": []
+    },
+    {
+      "label": "storage-columnar_used_ssd_bytes",
+      "family": "storage",
+      "kind": "query",
+      "sql": "SELECT s.COLUMNAR_USED_SSD_BYTES AS value FROM SPANNER_SYS.TABLE_SIZES_STATS_1HOUR AS s LIMIT 3",
+      "requires": []
+    },
+    {
+      "label": "storage-columnar_used_hdd_bytes",
+      "family": "storage",
+      "kind": "query",
+      "sql": "SELECT s.COLUMNAR_USED_HDD_BYTES AS value FROM SPANNER_SYS.TABLE_SIZES_STATS_1HOUR AS s LIMIT 3",
+      "requires": []
+    },
+    {
+      "label": "storage-columnar_coverage_ratio",
+      "family": "storage",
+      "kind": "query",
+      "sql": "SELECT s.COLUMNAR_COVERAGE_RATIO AS value FROM SPANNER_SYS.TABLE_SIZES_STATS_1HOUR AS s LIMIT 3",
+      "requires": []
+    },
+    {
+      "label": "storage-columnar_ssd_coverage_ratio",
+      "family": "storage",
+      "kind": "query",
+      "sql": "SELECT s.COLUMNAR_SSD_COVERAGE_RATIO AS value FROM SPANNER_SYS.TABLE_SIZES_STATS_1HOUR AS s LIMIT 3",
+      "requires": []
+    },
+    {
+      "label": "storage-columnar_hdd_coverage_ratio",
+      "family": "storage",
+      "kind": "query",
+      "sql": "SELECT s.COLUMNAR_HDD_COVERAGE_RATIO AS value FROM SPANNER_SYS.TABLE_SIZES_STATS_1HOUR AS s LIMIT 3",
+      "requires": []
+    },
+    {
+      "label": "storage-combined",
+      "family": "storage",
+      "kind": "query",
+      "sql": "SELECT table_name AS name,used_bytes+columnar_used_bytes AS total_used_bytes,columnar_coverage_ratio AS coverage FROM SPANNER_SYS.TABLE_SIZES_STATS_1HOUR LIMIT 3",
+      "requires": []
+    },
+    {
+      "label": "storage-limit-zero",
+      "family": "storage",
+      "kind": "query",
+      "sql": "SELECT COLUMNAR_USED_BYTES AS columnar_used_bytes,COLUMNAR_USED_SSD_BYTES AS columnar_used_ssd_bytes,COLUMNAR_USED_HDD_BYTES AS columnar_used_hdd_bytes,COLUMNAR_COVERAGE_RATIO AS columnar_coverage_ratio,COLUMNAR_SSD_COVERAGE_RATIO AS columnar_ssd_coverage_ratio,COLUMNAR_HDD_COVERAGE_RATIO AS columnar_hdd_coverage_ratio FROM SPANNER_SYS.TABLE_SIZES_STATS_1HOUR LIMIT 0",
+      "requires": []
+    },
+    {
+      "label": "jsonb-type-null-null",
+      "family": "jsonb-order",
+      "kind": "query",
+      "sql": "SELECT 'null'::jsonb<'null'::jsonb AS lt,'null'::jsonb='null'::jsonb AS eq,'null'::jsonb>'null'::jsonb AS gt",
+      "requires": [],
+      "expected": {
+        "lt": false,
+        "eq": true,
+        "gt": false
+      }
+    },
+    {
+      "label": "jsonb-type-null-string",
+      "family": "jsonb-order",
+      "kind": "query",
+      "sql": "SELECT 'null'::jsonb<'\"x\"'::jsonb AS lt,'null'::jsonb='\"x\"'::jsonb AS eq,'null'::jsonb>'\"x\"'::jsonb AS gt",
+      "requires": [],
+      "expected": {
+        "lt": true,
+        "eq": false,
+        "gt": false
+      }
+    },
+    {
+      "label": "jsonb-type-null-number",
+      "family": "jsonb-order",
+      "kind": "query",
+      "sql": "SELECT 'null'::jsonb<'1'::jsonb AS lt,'null'::jsonb='1'::jsonb AS eq,'null'::jsonb>'1'::jsonb AS gt",
+      "requires": [],
+      "expected": {
+        "lt": true,
+        "eq": false,
+        "gt": false
+      }
+    },
+    {
+      "label": "jsonb-type-null-boolean",
+      "family": "jsonb-order",
+      "kind": "query",
+      "sql": "SELECT 'null'::jsonb<'false'::jsonb AS lt,'null'::jsonb='false'::jsonb AS eq,'null'::jsonb>'false'::jsonb AS gt",
+      "requires": [],
+      "expected": {
+        "lt": true,
+        "eq": false,
+        "gt": false
+      }
+    },
+    {
+      "label": "jsonb-type-null-array",
+      "family": "jsonb-order",
+      "kind": "query",
+      "sql": "SELECT 'null'::jsonb<'[1]'::jsonb AS lt,'null'::jsonb='[1]'::jsonb AS eq,'null'::jsonb>'[1]'::jsonb AS gt",
+      "requires": [],
+      "expected": {
+        "lt": true,
+        "eq": false,
+        "gt": false
+      }
+    },
+    {
+      "label": "jsonb-type-null-object",
+      "family": "jsonb-order",
+      "kind": "query",
+      "sql": "SELECT 'null'::jsonb<'{}'::jsonb AS lt,'null'::jsonb='{}'::jsonb AS eq,'null'::jsonb>'{}'::jsonb AS gt",
+      "requires": [],
+      "expected": {
+        "lt": true,
+        "eq": false,
+        "gt": false
+      }
+    },
+    {
+      "label": "jsonb-type-string-null",
+      "family": "jsonb-order",
+      "kind": "query",
+      "sql": "SELECT '\"x\"'::jsonb<'null'::jsonb AS lt,'\"x\"'::jsonb='null'::jsonb AS eq,'\"x\"'::jsonb>'null'::jsonb AS gt",
+      "requires": [],
+      "expected": {
+        "lt": false,
+        "eq": false,
+        "gt": true
+      }
+    },
+    {
+      "label": "jsonb-type-string-string",
+      "family": "jsonb-order",
+      "kind": "query",
+      "sql": "SELECT '\"x\"'::jsonb<'\"x\"'::jsonb AS lt,'\"x\"'::jsonb='\"x\"'::jsonb AS eq,'\"x\"'::jsonb>'\"x\"'::jsonb AS gt",
+      "requires": [],
+      "expected": {
+        "lt": false,
+        "eq": true,
+        "gt": false
+      }
+    },
+    {
+      "label": "jsonb-type-string-number",
+      "family": "jsonb-order",
+      "kind": "query",
+      "sql": "SELECT '\"x\"'::jsonb<'1'::jsonb AS lt,'\"x\"'::jsonb='1'::jsonb AS eq,'\"x\"'::jsonb>'1'::jsonb AS gt",
+      "requires": [],
+      "expected": {
+        "lt": true,
+        "eq": false,
+        "gt": false
+      }
+    },
+    {
+      "label": "jsonb-type-string-boolean",
+      "family": "jsonb-order",
+      "kind": "query",
+      "sql": "SELECT '\"x\"'::jsonb<'false'::jsonb AS lt,'\"x\"'::jsonb='false'::jsonb AS eq,'\"x\"'::jsonb>'false'::jsonb AS gt",
+      "requires": [],
+      "expected": {
+        "lt": true,
+        "eq": false,
+        "gt": false
+      }
+    },
+    {
+      "label": "jsonb-type-string-array",
+      "family": "jsonb-order",
+      "kind": "query",
+      "sql": "SELECT '\"x\"'::jsonb<'[1]'::jsonb AS lt,'\"x\"'::jsonb='[1]'::jsonb AS eq,'\"x\"'::jsonb>'[1]'::jsonb AS gt",
+      "requires": [],
+      "expected": {
+        "lt": true,
+        "eq": false,
+        "gt": false
+      }
+    },
+    {
+      "label": "jsonb-type-string-object",
+      "family": "jsonb-order",
+      "kind": "query",
+      "sql": "SELECT '\"x\"'::jsonb<'{}'::jsonb AS lt,'\"x\"'::jsonb='{}'::jsonb AS eq,'\"x\"'::jsonb>'{}'::jsonb AS gt",
+      "requires": [],
+      "expected": {
+        "lt": true,
+        "eq": false,
+        "gt": false
+      }
+    },
+    {
+      "label": "jsonb-type-number-null",
+      "family": "jsonb-order",
+      "kind": "query",
+      "sql": "SELECT '1'::jsonb<'null'::jsonb AS lt,'1'::jsonb='null'::jsonb AS eq,'1'::jsonb>'null'::jsonb AS gt",
+      "requires": [],
+      "expected": {
+        "lt": false,
+        "eq": false,
+        "gt": true
+      }
+    },
+    {
+      "label": "jsonb-type-number-string",
+      "family": "jsonb-order",
+      "kind": "query",
+      "sql": "SELECT '1'::jsonb<'\"x\"'::jsonb AS lt,'1'::jsonb='\"x\"'::jsonb AS eq,'1'::jsonb>'\"x\"'::jsonb AS gt",
+      "requires": [],
+      "expected": {
+        "lt": false,
+        "eq": false,
+        "gt": true
+      }
+    },
+    {
+      "label": "jsonb-type-number-number",
+      "family": "jsonb-order",
+      "kind": "query",
+      "sql": "SELECT '1'::jsonb<'1'::jsonb AS lt,'1'::jsonb='1'::jsonb AS eq,'1'::jsonb>'1'::jsonb AS gt",
+      "requires": [],
+      "expected": {
+        "lt": false,
+        "eq": true,
+        "gt": false
+      }
+    },
+    {
+      "label": "jsonb-type-number-boolean",
+      "family": "jsonb-order",
+      "kind": "query",
+      "sql": "SELECT '1'::jsonb<'false'::jsonb AS lt,'1'::jsonb='false'::jsonb AS eq,'1'::jsonb>'false'::jsonb AS gt",
+      "requires": [],
+      "expected": {
+        "lt": true,
+        "eq": false,
+        "gt": false
+      }
+    },
+    {
+      "label": "jsonb-type-number-array",
+      "family": "jsonb-order",
+      "kind": "query",
+      "sql": "SELECT '1'::jsonb<'[1]'::jsonb AS lt,'1'::jsonb='[1]'::jsonb AS eq,'1'::jsonb>'[1]'::jsonb AS gt",
+      "requires": [],
+      "expected": {
+        "lt": true,
+        "eq": false,
+        "gt": false
+      }
+    },
+    {
+      "label": "jsonb-type-number-object",
+      "family": "jsonb-order",
+      "kind": "query",
+      "sql": "SELECT '1'::jsonb<'{}'::jsonb AS lt,'1'::jsonb='{}'::jsonb AS eq,'1'::jsonb>'{}'::jsonb AS gt",
+      "requires": [],
+      "expected": {
+        "lt": true,
+        "eq": false,
+        "gt": false
+      }
+    },
+    {
+      "label": "jsonb-type-boolean-null",
+      "family": "jsonb-order",
+      "kind": "query",
+      "sql": "SELECT 'false'::jsonb<'null'::jsonb AS lt,'false'::jsonb='null'::jsonb AS eq,'false'::jsonb>'null'::jsonb AS gt",
+      "requires": [],
+      "expected": {
+        "lt": false,
+        "eq": false,
+        "gt": true
+      }
+    },
+    {
+      "label": "jsonb-type-boolean-string",
+      "family": "jsonb-order",
+      "kind": "query",
+      "sql": "SELECT 'false'::jsonb<'\"x\"'::jsonb AS lt,'false'::jsonb='\"x\"'::jsonb AS eq,'false'::jsonb>'\"x\"'::jsonb AS gt",
+      "requires": [],
+      "expected": {
+        "lt": false,
+        "eq": false,
+        "gt": true
+      }
+    },
+    {
+      "label": "jsonb-type-boolean-number",
+      "family": "jsonb-order",
+      "kind": "query",
+      "sql": "SELECT 'false'::jsonb<'1'::jsonb AS lt,'false'::jsonb='1'::jsonb AS eq,'false'::jsonb>'1'::jsonb AS gt",
+      "requires": [],
+      "expected": {
+        "lt": false,
+        "eq": false,
+        "gt": true
+      }
+    },
+    {
+      "label": "jsonb-type-boolean-boolean",
+      "family": "jsonb-order",
+      "kind": "query",
+      "sql": "SELECT 'false'::jsonb<'false'::jsonb AS lt,'false'::jsonb='false'::jsonb AS eq,'false'::jsonb>'false'::jsonb AS gt",
+      "requires": [],
+      "expected": {
+        "lt": false,
+        "eq": true,
+        "gt": false
+      }
+    },
+    {
+      "label": "jsonb-type-boolean-array",
+      "family": "jsonb-order",
+      "kind": "query",
+      "sql": "SELECT 'false'::jsonb<'[1]'::jsonb AS lt,'false'::jsonb='[1]'::jsonb AS eq,'false'::jsonb>'[1]'::jsonb AS gt",
+      "requires": [],
+      "expected": {
+        "lt": true,
+        "eq": false,
+        "gt": false
+      }
+    },
+    {
+      "label": "jsonb-type-boolean-object",
+      "family": "jsonb-order",
+      "kind": "query",
+      "sql": "SELECT 'false'::jsonb<'{}'::jsonb AS lt,'false'::jsonb='{}'::jsonb AS eq,'false'::jsonb>'{}'::jsonb AS gt",
+      "requires": [],
+      "expected": {
+        "lt": true,
+        "eq": false,
+        "gt": false
+      }
+    },
+    {
+      "label": "jsonb-type-array-null",
+      "family": "jsonb-order",
+      "kind": "query",
+      "sql": "SELECT '[1]'::jsonb<'null'::jsonb AS lt,'[1]'::jsonb='null'::jsonb AS eq,'[1]'::jsonb>'null'::jsonb AS gt",
+      "requires": [],
+      "expected": {
+        "lt": false,
+        "eq": false,
+        "gt": true
+      }
+    },
+    {
+      "label": "jsonb-type-array-string",
+      "family": "jsonb-order",
+      "kind": "query",
+      "sql": "SELECT '[1]'::jsonb<'\"x\"'::jsonb AS lt,'[1]'::jsonb='\"x\"'::jsonb AS eq,'[1]'::jsonb>'\"x\"'::jsonb AS gt",
+      "requires": [],
+      "expected": {
+        "lt": false,
+        "eq": false,
+        "gt": true
+      }
+    },
+    {
+      "label": "jsonb-type-array-number",
+      "family": "jsonb-order",
+      "kind": "query",
+      "sql": "SELECT '[1]'::jsonb<'1'::jsonb AS lt,'[1]'::jsonb='1'::jsonb AS eq,'[1]'::jsonb>'1'::jsonb AS gt",
+      "requires": [],
+      "expected": {
+        "lt": false,
+        "eq": false,
+        "gt": true
+      }
+    },
+    {
+      "label": "jsonb-type-array-boolean",
+      "family": "jsonb-order",
+      "kind": "query",
+      "sql": "SELECT '[1]'::jsonb<'false'::jsonb AS lt,'[1]'::jsonb='false'::jsonb AS eq,'[1]'::jsonb>'false'::jsonb AS gt",
+      "requires": [],
+      "expected": {
+        "lt": false,
+        "eq": false,
+        "gt": true
+      }
+    },
+    {
+      "label": "jsonb-type-array-array",
+      "family": "jsonb-order",
+      "kind": "query",
+      "sql": "SELECT '[1]'::jsonb<'[1]'::jsonb AS lt,'[1]'::jsonb='[1]'::jsonb AS eq,'[1]'::jsonb>'[1]'::jsonb AS gt",
+      "requires": [],
+      "expected": {
+        "lt": false,
+        "eq": true,
+        "gt": false
+      }
+    },
+    {
+      "label": "jsonb-type-array-object",
+      "family": "jsonb-order",
+      "kind": "query",
+      "sql": "SELECT '[1]'::jsonb<'{}'::jsonb AS lt,'[1]'::jsonb='{}'::jsonb AS eq,'[1]'::jsonb>'{}'::jsonb AS gt",
+      "requires": [],
+      "expected": {
+        "lt": true,
+        "eq": false,
+        "gt": false
+      }
+    },
+    {
+      "label": "jsonb-type-object-null",
+      "family": "jsonb-order",
+      "kind": "query",
+      "sql": "SELECT '{}'::jsonb<'null'::jsonb AS lt,'{}'::jsonb='null'::jsonb AS eq,'{}'::jsonb>'null'::jsonb AS gt",
+      "requires": [],
+      "expected": {
+        "lt": false,
+        "eq": false,
+        "gt": true
+      }
+    },
+    {
+      "label": "jsonb-type-object-string",
+      "family": "jsonb-order",
+      "kind": "query",
+      "sql": "SELECT '{}'::jsonb<'\"x\"'::jsonb AS lt,'{}'::jsonb='\"x\"'::jsonb AS eq,'{}'::jsonb>'\"x\"'::jsonb AS gt",
+      "requires": [],
+      "expected": {
+        "lt": false,
+        "eq": false,
+        "gt": true
+      }
+    },
+    {
+      "label": "jsonb-type-object-number",
+      "family": "jsonb-order",
+      "kind": "query",
+      "sql": "SELECT '{}'::jsonb<'1'::jsonb AS lt,'{}'::jsonb='1'::jsonb AS eq,'{}'::jsonb>'1'::jsonb AS gt",
+      "requires": [],
+      "expected": {
+        "lt": false,
+        "eq": false,
+        "gt": true
+      }
+    },
+    {
+      "label": "jsonb-type-object-boolean",
+      "family": "jsonb-order",
+      "kind": "query",
+      "sql": "SELECT '{}'::jsonb<'false'::jsonb AS lt,'{}'::jsonb='false'::jsonb AS eq,'{}'::jsonb>'false'::jsonb AS gt",
+      "requires": [],
+      "expected": {
+        "lt": false,
+        "eq": false,
+        "gt": true
+      }
+    },
+    {
+      "label": "jsonb-type-object-array",
+      "family": "jsonb-order",
+      "kind": "query",
+      "sql": "SELECT '{}'::jsonb<'[1]'::jsonb AS lt,'{}'::jsonb='[1]'::jsonb AS eq,'{}'::jsonb>'[1]'::jsonb AS gt",
+      "requires": [],
+      "expected": {
+        "lt": false,
+        "eq": false,
+        "gt": true
+      }
+    },
+    {
+      "label": "jsonb-type-object-object",
+      "family": "jsonb-order",
+      "kind": "query",
+      "sql": "SELECT '{}'::jsonb<'{}'::jsonb AS lt,'{}'::jsonb='{}'::jsonb AS eq,'{}'::jsonb>'{}'::jsonb AS gt",
+      "requires": [],
+      "expected": {
+        "lt": false,
+        "eq": true,
+        "gt": false
+      }
+    },
+    {
+      "label": "jsonb-empty-before-null",
+      "family": "jsonb-order",
+      "kind": "query",
+      "sql": "SELECT '[]'::jsonb < 'null'::jsonb AS result",
+      "requires": [],
+      "expected": {
+        "result": true
+      }
+    },
+    {
+      "label": "jsonb-null-before-nested-empty",
+      "family": "jsonb-order",
+      "kind": "query",
+      "sql": "SELECT 'null'::jsonb < '[[]]'::jsonb AS result",
+      "requires": [],
+      "expected": {
+        "result": true
+      }
+    },
+    {
+      "label": "jsonb-nested-null-before-empty",
+      "family": "jsonb-order",
+      "kind": "query",
+      "sql": "SELECT '[null]'::jsonb < '[[]]'::jsonb AS result",
+      "requires": [],
+      "expected": {
+        "result": true
+      }
+    },
+    {
+      "label": "jsonb-array-length",
+      "family": "jsonb-order",
+      "kind": "query",
+      "sql": "SELECT '[9]'::jsonb < '[0,0]'::jsonb AS result",
+      "requires": [],
+      "expected": {
+        "result": true
+      }
+    },
+    {
+      "label": "jsonb-object-count",
+      "family": "jsonb-order",
+      "kind": "query",
+      "sql": "SELECT '{\"z\":0}'::jsonb < '{\"a\":0,\"b\":0}'::jsonb AS result",
+      "requires": [],
+      "expected": {
+        "result": true
+      }
+    },
+    {
+      "label": "jsonb-object-key-length",
+      "family": "jsonb-order",
+      "kind": "query",
+      "sql": "SELECT '{\"b\":0,\"aa\":0}'::jsonb = '{\"aa\":0,\"b\":0}'::jsonb AS result",
+      "requires": [],
+      "expected": {
+        "result": true
+      }
+    },
+    {
+      "label": "jsonb-base",
+      "family": "jsonb-stored",
+      "kind": "ddl",
+      "sql": "CREATE TABLE JbValues (Id bigint NOT NULL, V jsonb, PRIMARY KEY (Id))",
+      "requires": []
+    },
+    {
+      "label": "jsonb-seed",
+      "family": "jsonb-stored",
+      "kind": "dml",
+      "sql": "",
+      "requires": [
+        "jsonb-base"
+      ],
+      "statements": [
+        "INSERT INTO JbValues(Id,V) VALUES (1,'null'::jsonb),(2,'\"\"'::jsonb),(3,'\"a\"'::jsonb),(4,'\"aa\"'::jsonb),(5,'-1'::jsonb),(6,'0'::jsonb),(7,'1'::jsonb),(8,'1.0'::jsonb),(9,'false'::jsonb),(10,'true'::jsonb),(11,'[]'::jsonb),(12,'[0]'::jsonb),(13,'[1]'::jsonb),(14,'[0,0]'::jsonb),(15,'[null]'::jsonb),(16,'[[]]'::jsonb),(17,'{}'::jsonb),(18,'{\"b\":0}'::jsonb),(19,'{\"a\":1}'::jsonb),(20,'{\"a\":1,\"b\":0}'::jsonb),(21,NULL),(22,'{\"a\":0,\"a\":1}'::jsonb)"
+      ]
+    },
+    {
+      "label": "jsonb-stored-order",
+      "family": "jsonb-stored",
+      "kind": "query",
+      "sql": "SELECT Id AS id,V AS v FROM JbValues ORDER BY V NULLS FIRST,Id",
+      "requires": [
+        "jsonb-seed"
+      ],
+      "expected_ids": [
+        21,
+        11,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        15,
+        12,
+        13,
+        16,
+        14,
+        17,
+        19,
+        22,
+        18,
+        20
+      ]
+    },
+    {
+      "label": "jsonb-stored-group",
+      "family": "jsonb-stored",
+      "kind": "query",
+      "sql": "SELECT MIN(Id) AS first_id,MAX(Id) AS last_id,COUNT(*) AS n FROM JbValues GROUP BY V ORDER BY first_id",
+      "requires": [
+        "jsonb-seed"
+      ]
+    },
+    {
+      "label": "jsonb-stored-distinct-count",
+      "family": "jsonb-stored",
+      "kind": "query",
+      "sql": "SELECT COUNT(DISTINCT V) AS n FROM JbValues",
+      "requires": [
+        "jsonb-seed"
+      ],
+      "expected": {
+        "n": "19"
+      }
+    },
+    {
+      "label": "jsonb-stored-join",
+      "family": "jsonb-stored",
+      "kind": "query",
+      "sql": "SELECT COUNT(*) AS n FROM JbValues a JOIN JbValues b ON a.V=b.V",
+      "requires": [
+        "jsonb-seed"
+      ],
+      "expected": {
+        "n": "25"
+      }
+    },
+    {
+      "label": "jsonb-stored-minmax",
+      "family": "jsonb-exploratory",
+      "kind": "query",
+      "sql": "SELECT MIN(V) AS minimum,MAX(V) AS maximum FROM JbValues",
+      "requires": [
+        "jsonb-seed"
+      ],
+      "control": "MIN/MAX not explicitly promised by comparison/sorting section"
+    },
+    {
+      "label": "jsonb-sql-null-control",
+      "family": "jsonb-order",
+      "kind": "query",
+      "sql": "SELECT NULL::jsonb IS NULL AS sql_null,'null'::jsonb IS NULL AS json_null",
+      "requires": [],
+      "expected": {
+        "sql_null": true,
+        "json_null": false
+      }
+    },
+    {
+      "label": "final-ddl-export",
+      "family": "metadata",
+      "kind": "ddl-export",
+      "sql": "",
+      "requires": []
+    },
+    {
+      "label": "jsonb-distinct-subquery-count",
+      "family": "jsonb-count-controls",
+      "kind": "query",
+      "sql": "SELECT COUNT(*) AS n FROM (SELECT DISTINCT V FROM JbValues WHERE V IS NOT NULL) AS d",
+      "requires": [
+        "jsonb-seed"
+      ],
+      "expected": {
+        "n": "19"
+      }
+    },
+    {
+      "label": "jsonb-nonnull-star-count",
+      "family": "jsonb-count-controls",
+      "kind": "query",
+      "sql": "SELECT COUNT(*) AS n FROM JbValues WHERE V IS NOT NULL",
+      "requires": [
+        "jsonb-seed"
+      ],
+      "expected": {
+        "n": "21"
+      }
+    },
+    {
+      "label": "jsonb-count-expression",
+      "family": "jsonb-count-controls",
+      "kind": "query",
+      "sql": "SELECT COUNT(V) AS n FROM JbValues",
+      "requires": [
+        "jsonb-seed"
+      ]
+    },
+    {
+      "label": "tuning-pg-generate-series",
+      "family": "query-tuning",
+      "kind": "query",
+      "sql": "SELECT * FROM generate_series(0,31) AS id",
+      "requires": []
+    },
+    {
+      "label": "tuning-pg-series-sum",
+      "family": "query-tuning",
+      "kind": "query",
+      "sql": "SELECT COUNT(*) AS n,SUM(id) AS total FROM generate_series(0,31) AS id",
+      "requires": []
+    },
+    {
+      "label": "tuning-pg-parallelism",
+      "family": "query-tuning",
+      "kind": "query",
+      "sql": "/*@ USE_ADDITIONAL_PARALLELISM=TRUE */ SELECT 1 AS n",
+      "requires": []
+    }
+  ]
+}

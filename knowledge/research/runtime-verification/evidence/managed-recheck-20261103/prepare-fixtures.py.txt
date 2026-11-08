@@ -1,0 +1,42 @@
+from pathlib import Path
+import json,shutil,subprocess,os,hashlib
+root=Path('<LOCAL_CHECKOUT>');s=root/'.tmp/managed-recheck-20261103';out=Path('<LOCAL_TASK_ROOT>/apstndb/spanalyzer/managed-recheck-20261103/evidence');old=Path('<LOCAL_TASK_ROOT>/apstndb/spanalyzer/docs-delta-runtime-20261031/evidence')
+(s/'module').mkdir(exist_ok=True)
+for name in ['go.mod','go.sum']:shutil.copyfile(root/'.tmp/docs-delta-runtime-20261031/module'/name,s/'module'/name)
+source=(root/'.tmp/docs-delta-runtime-20261031/module/managed.go').read_text().replace('ddrt1031g-','recheck1103g-').replace('ddrt1031p-','recheck1103p-')
+source=source.replace('\t\temit(result)\n','\t\temit(result)\n\t\tif status.Code(e).String() == "DeadlineExceeded" || status.Code(e).String() == "Unavailable" {\n\t\t\tbreak // Preserve inconclusive transport results and run owned-database cleanup promptly.\n\t\t}\n')
+(s/'module/managed.go').write_text(source)
+def step(label,kind,sql,family='extension',requires=None,**kw):
+    r=dict(label=label,kind=kind,sql=sql,family=family,**kw)
+    if requires:r['requires']=requires
+    return r
+for dialect in ['google','pg']:
+    d=json.loads((old/(dialect+'-final-cases.json')).read_text())
+    # These are fresh task-owned fixtures; never select or modify a retained database.
+    a=d['steps'];a[:0]=[step('fixture-connectivity','query','SELECT 1 AS connectivity')]
+    if dialect=='google':
+        for mode in ['FULL','FULL OUTER','OUTER','LEFT','LEFT OUTER','INNER']:
+            a.append(step('gql-mode-'+mode.lower().replace(' ','-'),'query',f'GRAPH ProbeGraph RETURN 1 AS a, 9 AS left_only {mode} UNION ALL RETURN 2 AS a, 8 AS right_only','gql-propagation',['graph-create']))
+        a += [step('graph-insert','dml','',requires=['graph-create'],statements=['INSERT INTO PropNodes(Id) VALUES (3),(1),(2)'])]
+        for label,clause in [('return-order','RETURN n.Id AS id ORDER BY id'),('return-order-limit','RETURN n.Id AS id ORDER BY id LIMIT 2'),('standalone-order-limit','RETURN n.Id AS id NEXT ORDER BY id LIMIT 2'),('cross-next-order-limit','RETURN n.Id AS id ORDER BY id NEXT LIMIT 2')]:
+            a.append(step('gql-'+label,'query','GRAPH ProbeGraph MATCH (n) '+clause,'gql-order',['graph-insert']))
+        for i,col in enumerate(['Payload','payload','PAYLOAD','PaYlOaD']):
+            a.append(step('queue-case-'+col,'ddl',f'CREATE QUEUE CaseQueue{i} (Id STRING(36) NOT NULL, {col} BYTES(MAX) NOT NULL) PRIMARY KEY(Id)','queue-case'))
+        a += [step('search-enhanced','query',"SELECT Id FROM ScoreDocs WHERE SEARCH(BodyTokens,'cat',enhance_query=>true) ORDER BY Id",'differences',['score-insert','score-search-index']),step('search-enhanced-required','query',"@{require_enhance_query=true} SELECT Id FROM ScoreDocs WHERE SEARCH(BodyTokens,'cat',enhance_query=>true) ORDER BY Id",'differences',['score-insert','score-search-index'])]
+        schema='CREATE TABLE JsonDocs (Id INT64 NOT NULL, Doc JSON, Tokens TOKENLIST AS (TOKENIZE_JSON(Doc)) HIDDEN) PRIMARY KEY(Id)';index='CREATE SEARCH INDEX JsonSearch ON JsonDocs(Tokens)';insert='''INSERT INTO JsonDocs(Id,Doc) VALUES (1,JSON '{"kind":"active","n":1}'),(2,JSON '{"kind":"pending","n":2}'),(3,JSON '{"kind":"active","n":3}')''';predicates=[("equal","Doc.kind=JSON '\"active\"'"),("in","Doc.kind IN (JSON '\"active\"',JSON '\"pending\"')"),("whole","Doc=JSON '{\"n\":1,\"kind\":\"active\"}'")]
+    else:
+        schema='CREATE TABLE JsonDocs (Id bigint PRIMARY KEY, Doc jsonb, Tokens spanner.tokenlist GENERATED ALWAYS AS (spanner.tokenize_jsonb(Doc)) VIRTUAL HIDDEN)';index='CREATE SEARCH INDEX JsonSearch ON JsonDocs(Tokens)';insert='''INSERT INTO JsonDocs(Id,Doc) VALUES (1,'{"kind":"active","n":1}'::jsonb),(2,'{"kind":"pending","n":2}'::jsonb),(3,'{"kind":"active","n":3}'::jsonb)''';predicates=[('equal',"Doc->'kind'='\"active\"'::jsonb"),('in',"Doc->'kind' IN ('\"active\"'::jsonb,'\"pending\"'::jsonb)"),('whole',"Doc='{\"n\":1,\"kind\":\"active\"}'::jsonb")]
+        a += [step('pg-jsonb-sort','query',"SELECT x FROM (SELECT '2'::jsonb x UNION ALL SELECT '1'::jsonb UNION ALL SELECT 'null'::jsonb) q ORDER BY x",'json'),step('pg-jsonb-count','query',"SELECT COUNT(x) AS n FROM (SELECT '1'::jsonb x) q",'json')]
+    a += [step('json-table','ddl',schema,'json-search'),step('json-index','ddl',index,'json-search',['json-table']),step('json-insert','dml','','json-search',['json-index'],statements=[insert])]
+    for label,predicate in predicates:
+        for mode in ['auto','search','base']:
+            if dialect=='google': hint='' if mode=='auto' else ('@{FORCE_INDEX=JsonSearch}' if mode=='search' else '@{FORCE_INDEX=_BASE_TABLE}')
+            else:hint='' if mode=='auto' else ('/*@ FORCE_INDEX=JsonSearch */' if mode=='search' else '/*@ FORCE_INDEX=_BASE_TABLE */')
+            a.append(step('json-search-'+label+'-'+mode,'query',f'SELECT Id FROM JsonDocs{hint} WHERE {predicate} ORDER BY Id','json-search',['json-insert'],profile=True))
+    (out/(dialect+'-cases.json')).write_text(json.dumps(d,indent=2)+'\n')
+    print(dialect,'steps',len(a))
+go='<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go';env=os.environ.copy();env.update(GOWORK='off',GOTOOLCHAIN='local',GOROOT=str(Path(go).parent.parent),GOFLAGS='-mod=readonly',GOCACHE=str(root/'.tmp/managed-recheck-20260925/go-cache'))
+args=[go,'build','-o',str(s/'managed'),'managed.go'];r=subprocess.run(args,cwd=s/'module',env=env,capture_output=True,text=True);(out/'build.log').write_text(r.stdout+r.stderr);assert r.returncode==0,r.stderr
+(out/'buildinfo.txt').write_text(subprocess.check_output([go,'version','-m',str(s/'managed')],text=True,env=env))
+(out/'build.json').write_text(json.dumps({'argv':args,'exit_code':r.returncode,'binary_sha256':hashlib.sha256((s/'managed').read_bytes()).hexdigest()},indent=2)+'\n')
+for name in ['managed.go','go.mod','go.sum']:shutil.copyfile(s/'module'/name,out/(name+'.txt'))

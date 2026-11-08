@@ -1,0 +1,23 @@
+{
+  "dialect": "google",
+  "steps": [
+    {
+      "label": "session-table",
+      "family": "issue-30",
+      "kind": "ddl",
+      "sql": "CREATE TABLE ApiRows(id INT64 NOT NULL,val INT64,ts TIMESTAMP OPTIONS(allow_commit_timestamp=true)) PRIMARY KEY(id)",
+      "requires": [],
+      "timeout_seconds": 30
+    },
+    {
+      "label": "deleted-active-session",
+      "family": "issue-30",
+      "kind": "session-abort",
+      "sql": "",
+      "requires": [
+        "session-table"
+      ],
+      "timeout_seconds": 12
+    }
+  ]
+}

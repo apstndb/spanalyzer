@@ -1,0 +1,87 @@
+{
+  "dialect": "google",
+  "steps": [
+    {
+      "label": "generated-timestamps-ddl",
+      "family": "issue-316",
+      "kind": "ddl",
+      "sql": "CREATE TABLE TestTable (\n    test_id STRING(100) AS (JSON_VALUE(data, '$.test_id')) STORED,\n    data JSON,\n    created_at TIMESTAMP DEFAULT (PENDING_COMMIT_TIMESTAMP()) OPTIONS (allow_commit_timestamp = true),\n    updated_at TIMESTAMP DEFAULT (PENDING_COMMIT_TIMESTAMP()) ON UPDATE (PENDING_COMMIT_TIMESTAMP()) OPTIONS (allow_commit_timestamp = true),\n) PRIMARY KEY (test_id)",
+      "requires": [],
+      "timeout_seconds": 30
+    },
+    {
+      "label": "generated-timestamps-dml",
+      "family": "issue-316",
+      "kind": "dml",
+      "sql": "",
+      "requires": [
+        "generated-timestamps-ddl"
+      ],
+      "timeout_seconds": 15,
+      "statements": [
+        "INSERT INTO TestTable(data) VALUES(JSON '{\"test_id\":\"dml-1\"}')"
+      ]
+    },
+    {
+      "label": "generated-timestamps-mutation",
+      "family": "issue-316",
+      "kind": "mutation",
+      "sql": "",
+      "requires": [
+        "generated-timestamps-ddl"
+      ],
+      "timeout_seconds": 15,
+      "table": "TestTable",
+      "operation": "insert",
+      "values": {
+        "data": {
+          "type": "json",
+          "value": {
+            "test_id": "mutation-1"
+          }
+        }
+      }
+    },
+    {
+      "label": "generated-timestamps-rows",
+      "family": "issue-316",
+      "kind": "query",
+      "sql": "SELECT * FROM TestTable ORDER BY test_id",
+      "requires": [
+        "generated-timestamps-ddl"
+      ],
+      "timeout_seconds": 15
+    },
+    {
+      "label": "simple-timestamps-ddl",
+      "family": "issue-181",
+      "kind": "ddl",
+      "sql": "CREATE TABLE SimpleTs(id INT64 NOT NULL, created_at TIMESTAMP DEFAULT(PENDING_COMMIT_TIMESTAMP()) OPTIONS(allow_commit_timestamp=true)) PRIMARY KEY(id)",
+      "requires": [],
+      "timeout_seconds": 30
+    },
+    {
+      "label": "pending-in-if",
+      "family": "issue-181",
+      "kind": "dml",
+      "sql": "",
+      "requires": [
+        "simple-timestamps-ddl"
+      ],
+      "timeout_seconds": 15,
+      "statements": [
+        "INSERT INTO SimpleTs(id,created_at) VALUES(2,IF(TRUE,PENDING_COMMIT_TIMESTAMP(),NULL))"
+      ]
+    },
+    {
+      "label": "pending-in-if-value",
+      "family": "issue-181",
+      "kind": "query",
+      "sql": "SELECT * FROM SimpleTs",
+      "requires": [
+        "simple-timestamps-ddl"
+      ],
+      "timeout_seconds": 15
+    }
+  ]
+}

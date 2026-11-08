@@ -1,0 +1,44 @@
+{
+  "local_date": "2026-10-09 Asia/Tokyo",
+  "target": "Configured user-level verification profile; connection coordinates omitted",
+  "server_build": "unavailable",
+  "source_revision": "c2d7792dd7f83d5dd086e2d32bc22e5d253cf06c",
+  "source_state": "Existing dirty working snapshot; measured producer/dependency comparison retained separately",
+  "dependency_scope": {
+    "survey": "Go1.26.8, GOWORK=off, Spanner v1.88.0",
+    "features": "Go1.26.8, explicit workspace, Spanner v1.91.0"
+  },
+  "fixture_change": "October 7 sources reused with owned fixture suffix 20261009r1; same SQL cases and controls",
+  "records": {
+    "readonly": 86,
+    "google-features": 53,
+    "pg-features": 40,
+    "queue": 32,
+    "cleanup": 4,
+    "active-batch": 19
+  },
+  "producer_hashes": {
+    "readonly": "ef67ce16aceb3cf75f30d47b95f81531ee0894cbff844959d83b26d69b2e9539",
+    "google-features": "415afd05a0a9a0ced5d635b57d0882da1231192447c680b3aba6ba8d2648e85d",
+    "pg-features": "02fe25c030e3d1749baf9e805a230fe3e68e0dbdf03a156827a78410d5ff9ed4",
+    "queue": "3e15685c0f3984d97a42f3ad3554356dad84d79a8cf914a7bdc35e9297e8a350",
+    "cleanup": "ba66f7a45be9d3ea8329832ae51cf927931ecc467dbc04ca6619fa7506205e40",
+    "active-batch": "f136b06f6f0c0d2cbd499ba123c962a35e8038cbfad110705e7867bfeaa117a5"
+  },
+  "binary_hashes": {
+    "google-features": "87862a4ee7c89f2ddd41a860e34b1e5635465bb065cb6689c9087224e1186263",
+    "pg-features": "294029dbada7450fb6692f3fcb7d7fc7f46831ea1fcf0f5e1918cde6ac874a9a",
+    "queue": "06f1686b5b74cea31c34feeddd24188c5ef9538c52748c1fcffc7d95d5a0b7cf"
+  },
+  "commands": "commands.json",
+  "documentation": "documentation.json",
+  "retention_transforms": [
+    "profile coordinates redacted before persistence",
+    "JSON error strings and plain stderr request IDs redacted before persistence",
+    "lease tokens hashed in producer memory"
+  ],
+  "durable_local_directory": "<LOCAL_TASK_ROOT>/apstndb/spanalyzer/managed-recheck-20261009",
+  "execution_start": "2026-10-09T02:57:53.404356+00:00",
+  "execution_end": "2026-10-09T03:11:47.057063Z",
+  "authority": "Read managed target and owned fixtures, retained research only; no implementation, dependency, selector, commit, push or publication changes"
+}

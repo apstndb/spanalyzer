@@ -1,0 +1,137 @@
+{"enabled":true,"label":"maximum-development-json-feature"}
+{"analysis_ok":true,"label":"json-equality","row_type":{"fields":[{"name":"result","type":{"code":"BOOL"}}]}}
+{"analysis_ok":true,"label":"json-number-order","row_type":{"fields":[{"name":"result","type":{"code":"BOOL"}}]}}
+{"analysis_ok":true,"label":"json-type-order","row_type":{"fields":[{"name":"result","type":{"code":"BOOL"}}]}}
+{"analysis_ok":true,"label":"bool-order","row_type":{"fields":[{"name":"result","type":{"code":"BOOL"}}]}}
+{"analysis_ok":true,"label":"string-order","row_type":{"fields":[{"name":"result","type":{"code":"BOOL"}}]}}
+{"analysis_ok":true,"label":"object-key-order","row_type":{"fields":[{"name":"result","type":{"code":"BOOL"}}]}}
+{"analysis_ok":true,"label":"object-keys-before-values","row_type":{"fields":[{"name":"result","type":{"code":"BOOL"}}]}}
+{"analysis_ok":true,"label":"object-value-order","row_type":{"fields":[{"name":"result","type":{"code":"BOOL"}}]}}
+{"analysis_ok":true,"label":"object-prefix","row_type":{"fields":[{"name":"result","type":{"code":"BOOL"}}]}}
+{"analysis_ok":true,"label":"array-prefix","row_type":{"fields":[{"name":"result","type":{"code":"BOOL"}}]}}
+{"analysis_ok":true,"label":"array-numeric","row_type":{"fields":[{"name":"result","type":{"code":"BOOL"}}]}}
+{"analysis_ok":true,"label":"json-null-equal","row_type":{"fields":[{"name":"result","type":{"code":"BOOL"}}]}}
+{"analysis_ok":true,"label":"sql-null-equal","row_type":{"fields":[{"name":"result","type":{"code":"BOOL"}}]}}
+{"analysis_ok":true,"label":"json-null-is-sql-null","row_type":{"fields":[{"name":"result","type":{"code":"BOOL"}}]}}
+{"analysis_ok":true,"label":"cast-null-is-sql-null","row_type":{"fields":[{"name":"result","type":{"code":"BOOL"}}]}}
+{"analysis_ok":false,"error":"No matching signature for operator = for argument types: JSON, STRING\n  Signature: T1 = T1\n    Unable to find common supertype for templated argument \u003cT1\u003e\n      Input types for \u003cT1\u003e: {STRING, JSON} [at 1:8]","label":"json-string-vs-object-text"}
+{"analysis_ok":false,"error":"No matching signature for operator IN for argument types JSON and {INT64} [at 1:17]","label":"in-json-first"}
+{"analysis_ok":false,"error":"No matching signature for operator IN for argument types literal INT64 and {JSON} [at 1:10]","label":"in-nonjson-first"}
+{"analysis_ok":true,"label":"in-json-unnest-json","row_type":{"fields":[{"name":"result","type":{"code":"BOOL"}}]}}
+{"analysis_ok":false,"error":"No matching signature for operator IN UNNEST for argument types: JSON, ARRAY\u003cINT64\u003e [at 1:17]","label":"in-json-unnest-int"}
+{"analysis_ok":false,"error":"Cannot execute IN subquery with uncomparable types JSON and INT64 [at 1:8]","label":"in-json-subquery-int"}
+{"analysis_ok":true,"label":"in-json-subquery-json","row_type":{"fields":[{"name":"result","type":{"code":"BOOL"}}]}}
+{"analysis_ok":false,"error":"No matching signature for operator BETWEEN\n  Argument types: JSON, INT64, INT64\n  Signature: (T1) BETWEEN (T1) AND (T1)\n    Unable to find common supertype for templated argument \u003cT1\u003e\n      Input types for \u003cT1\u003e: {INT64, JSON} [at 1:17]","label":"between-json-first"}
+{"analysis_ok":false,"error":"No matching signature for operator BETWEEN\n  Argument types: INT64, JSON, JSON\n  Signature: (T1) BETWEEN (T1) AND (T1)\n    Unable to find common supertype for templated argument \u003cT1\u003e\n      Input types for \u003cT1\u003e: {INT64, JSON} [at 1:10]","label":"between-nonjson-first"}
+{"analysis_ok":false,"error":"No matching signature for operator \u003c for argument types: JSON, BYTES\n  Signature: T1 \u003c T1\n    Unable to find common supertype for templated argument \u003cT1\u003e\n      Input types for \u003cT1\u003e: {BYTES, JSON} [at 1:8]","label":"bytes-order-reject"}
+{"analysis_ok":false,"error":"No matching signature for operator = for argument types: JSON, STRUCT\u003ca INT64\u003e\n  Signature: T1 = T1\n    Unable to find common supertype for templated argument \u003cT1\u003e\n      Input types for \u003cT1\u003e: {STRUCT\u003ca INT64\u003e, JSON} [at 1:8]","label":"struct-equality-reject"}
+{"analysis_ok":false,"error":"No matching signature for operator = for argument types: JSON, INTERVAL\n  Signature: T1 = T1\n    Unable to find common supertype for templated argument \u003cT1\u003e\n      Input types for \u003cT1\u003e: {JSON, INTERVAL} [at 1:8]","label":"interval-equality-reject"}
+{"analysis_ok":false,"error":"No matching signature for operator \u003c for argument types: JSON, ARRAY\u003cINT64\u003e\n  Signature: T1 \u003c T1\n    Unable to find common supertype for templated argument \u003cT1\u003e\n      Input types for \u003cT1\u003e: {ARRAY\u003cINT64\u003e, JSON} [at 1:8]","label":"array-order-coerce"}
+{"analysis_ok":false,"error":"No matching signature for operator \u003c for argument types: JSON, ARRAY\u003cBYTES\u003e\n  Signature: T1 \u003c T1\n    Unable to find common supertype for templated argument \u003cT1\u003e\n      Input types for \u003cT1\u003e: {ARRAY\u003cBYTES\u003e, JSON} [at 1:8]","label":"array-bytes-order-reject"}
+{"analysis_ok":true,"label":"json-case","row_type":{"fields":[{"name":"result","type":{"code":"STRING"}}]}}
+{"analysis_ok":true,"label":"json-is-distinct","row_type":{"fields":[{"name":"result","type":{"code":"BOOL"}}]}}
+{"analysis_ok":true,"label":"json-null-in","row_type":{"fields":[{"name":"result","type":{"code":"BOOL"}}]}}
+{"analysis_ok":false,"error":"Invalid cast from INT64 to JSON [at 1:13]","label":"cast-int"}
+{"analysis_ok":false,"error":"Invalid cast from FLOAT32 to JSON [at 1:13]","label":"cast-float32"}
+{"analysis_ok":false,"error":"Invalid cast from FLOAT64 to JSON [at 1:13]","label":"cast-float64"}
+{"analysis_ok":false,"error":"Invalid cast from NUMERIC to JSON [at 1:13]","label":"cast-numeric"}
+{"analysis_ok":false,"error":"Invalid cast from BOOL to JSON [at 1:13]","label":"cast-bool"}
+{"analysis_ok":false,"error":"Invalid cast from STRING to JSON [at 1:13]","label":"cast-string"}
+{"analysis_ok":false,"error":"Invalid cast from STRING to JSON [at 1:13]","label":"cast-string-json-looking"}
+{"analysis_ok":false,"error":"Invalid cast from BYTES to JSON [at 1:13]","label":"cast-bytes"}
+{"analysis_ok":false,"error":"Invalid cast from DATE to JSON [at 1:13]","label":"cast-date"}
+{"analysis_ok":false,"error":"Invalid cast from TIMESTAMP to JSON [at 1:13]","label":"cast-timestamp"}
+{"analysis_ok":false,"error":"Invalid cast from UUID to JSON [at 1:13]","label":"cast-uuid"}
+{"analysis_ok":false,"error":"Invalid cast from INTERVAL to JSON [at 1:13]","label":"cast-interval"}
+{"analysis_ok":false,"error":"Invalid cast from ARRAY\u003cINT64\u003e to JSON [at 1:13]","label":"cast-array"}
+{"analysis_ok":false,"error":"Invalid cast from STRUCT\u003ca INT64, b INT64\u003e to JSON [at 1:13]","label":"cast-struct"}
+{"analysis_ok":true,"label":"cast-json","row_type":{"fields":[{"name":"result","type":{"code":"JSON"}}]}}
+{"analysis_ok":true,"label":"cast-sql-null","row_type":{"fields":[{"name":"result","type":{"code":"JSON"}}]}}
+{"analysis_ok":false,"error":"Invalid cast from INT64 to JSON [at 1:13]","label":"cast-wide-int"}
+{"analysis_ok":false,"error":"Invalid cast from NUMERIC to JSON [at 1:13]","label":"cast-wide-numeric"}
+{"analysis_ok":false,"error":"Invalid cast from FLOAT64 to JSON [at 1:13]","label":"cast-positive-infinity"}
+{"analysis_ok":false,"error":"Invalid cast from FLOAT64 to JSON [at 1:13]","label":"cast-negative-infinity"}
+{"analysis_ok":false,"error":"Invalid cast from FLOAT64 to JSON [at 1:13]","label":"cast-nan"}
+{"analysis_ok":false,"error":"Invalid cast from ARRAY\u003cFLOAT64\u003e to JSON [at 1:13]","label":"cast-nested-infinity"}
+{"analysis_ok":true,"label":"to-json-control-sql-null","row_type":{"fields":[{"name":"result","type":{"code":"JSON"}}]}}
+{"analysis_ok":true,"label":"safe-cast-sql-null","row_type":{"fields":[{"name":"result","type":{"code":"JSON"}}]}}
+{"analysis_ok":true,"label":"to-json-control-positive-infinity","row_type":{"fields":[{"name":"result","type":{"code":"JSON"}}]}}
+{"analysis_ok":false,"error":"Invalid cast from FLOAT64 to JSON [at 1:18]","label":"safe-cast-positive-infinity"}
+{"analysis_ok":true,"label":"to-json-control-wide-int","row_type":{"fields":[{"name":"result","type":{"code":"JSON"}}]}}
+{"analysis_ok":false,"error":"Invalid cast from INT64 to JSON [at 1:18]","label":"safe-cast-wide-int"}
+{"analysis_ok":true,"label":"to-json-control-wide-numeric","row_type":{"fields":[{"name":"result","type":{"code":"JSON"}}]}}
+{"analysis_ok":false,"error":"Invalid cast from NUMERIC to JSON [at 1:18]","label":"safe-cast-wide-numeric"}
+{"analysis_ok":false,"error":"No matching signature for operator = for argument types: JSON, INT64\n  Signature: T1 = T1\n    Unable to find common supertype for templated argument \u003cT1\u003e\n      Input types for \u003cT1\u003e: {INT64, JSON} [at 1:8]","label":"coerce-equal-int"}
+{"analysis_ok":false,"error":"No matching signature for operator = for argument types: INT64, JSON\n  Signature: T1 = T1\n    Unable to find common supertype for templated argument \u003cT1\u003e\n      Input types for \u003cT1\u003e: {INT64, JSON} [at 1:8]","label":"coerce-reverse-equal-int"}
+{"analysis_ok":false,"error":"No matching signature for operator \u003c= for argument types: JSON, INT64\n  Signature: T1 \u003c= T1\n    Unable to find common supertype for templated argument \u003cT1\u003e\n      Input types for \u003cT1\u003e: {INT64, JSON} [at 1:8]","label":"coerce-order-int"}
+{"analysis_ok":false,"error":"No matching signature for operator = for argument types: JSON, FLOAT32\n  Signature: T1 = T1\n    Unable to find common supertype for templated argument \u003cT1\u003e\n      Input types for \u003cT1\u003e: {FLOAT, JSON} [at 1:8]","label":"coerce-equal-float32"}
+{"analysis_ok":false,"error":"No matching signature for operator = for argument types: FLOAT32, JSON\n  Signature: T1 = T1\n    Unable to find common supertype for templated argument \u003cT1\u003e\n      Input types for \u003cT1\u003e: {FLOAT, JSON} [at 1:8]","label":"coerce-reverse-equal-float32"}
+{"analysis_ok":false,"error":"No matching signature for operator \u003c= for argument types: JSON, FLOAT32\n  Signature: T1 \u003c= T1\n    Unable to find common supertype for templated argument \u003cT1\u003e\n      Input types for \u003cT1\u003e: {FLOAT, JSON} [at 1:8]","label":"coerce-order-float32"}
+{"analysis_ok":false,"error":"No matching signature for operator = for argument types: JSON, FLOAT64\n  Signature: T1 = T1\n    Unable to find common supertype for templated argument \u003cT1\u003e\n      Input types for \u003cT1\u003e: {DOUBLE, JSON} [at 1:8]","label":"coerce-equal-float64"}
+{"analysis_ok":false,"error":"No matching signature for operator = for argument types: FLOAT64, JSON\n  Signature: T1 = T1\n    Unable to find common supertype for templated argument \u003cT1\u003e\n      Input types for \u003cT1\u003e: {DOUBLE, JSON} [at 1:8]","label":"coerce-reverse-equal-float64"}
+{"analysis_ok":false,"error":"No matching signature for operator \u003c= for argument types: JSON, FLOAT64\n  Signature: T1 \u003c= T1\n    Unable to find common supertype for templated argument \u003cT1\u003e\n      Input types for \u003cT1\u003e: {DOUBLE, JSON} [at 1:8]","label":"coerce-order-float64"}
+{"analysis_ok":false,"error":"No matching signature for operator = for argument types: JSON, NUMERIC\n  Signature: T1 = T1\n    Unable to find common supertype for templated argument \u003cT1\u003e\n      Input types for \u003cT1\u003e: {NUMERIC, JSON} [at 1:8]","label":"coerce-equal-numeric"}
+{"analysis_ok":false,"error":"No matching signature for operator = for argument types: NUMERIC, JSON\n  Signature: T1 = T1\n    Unable to find common supertype for templated argument \u003cT1\u003e\n      Input types for \u003cT1\u003e: {NUMERIC, JSON} [at 1:8]","label":"coerce-reverse-equal-numeric"}
+{"analysis_ok":false,"error":"No matching signature for operator \u003c= for argument types: JSON, NUMERIC\n  Signature: T1 \u003c= T1\n    Unable to find common supertype for templated argument \u003cT1\u003e\n      Input types for \u003cT1\u003e: {NUMERIC, JSON} [at 1:8]","label":"coerce-order-numeric"}
+{"analysis_ok":false,"error":"No matching signature for operator = for argument types: JSON, BOOL\n  Signature: T1 = T1\n    Unable to find common supertype for templated argument \u003cT1\u003e\n      Input types for \u003cT1\u003e: {BOOL, JSON} [at 1:8]","label":"coerce-equal-bool"}
+{"analysis_ok":false,"error":"No matching signature for operator = for argument types: BOOL, JSON\n  Signature: T1 = T1\n    Unable to find common supertype for templated argument \u003cT1\u003e\n      Input types for \u003cT1\u003e: {BOOL, JSON} [at 1:8]","label":"coerce-reverse-equal-bool"}
+{"analysis_ok":false,"error":"No matching signature for operator \u003c= for argument types: JSON, BOOL\n  Signature: T1 \u003c= T1\n    Unable to find common supertype for templated argument \u003cT1\u003e\n      Input types for \u003cT1\u003e: {BOOL, JSON} [at 1:8]","label":"coerce-order-bool"}
+{"analysis_ok":false,"error":"No matching signature for operator = for argument types: JSON, STRING\n  Signature: T1 = T1\n    Unable to find common supertype for templated argument \u003cT1\u003e\n      Input types for \u003cT1\u003e: {STRING, JSON} [at 1:8]","label":"coerce-equal-string"}
+{"analysis_ok":false,"error":"No matching signature for operator = for argument types: STRING, JSON\n  Signature: T1 = T1\n    Unable to find common supertype for templated argument \u003cT1\u003e\n      Input types for \u003cT1\u003e: {STRING, JSON} [at 1:8]","label":"coerce-reverse-equal-string"}
+{"analysis_ok":false,"error":"No matching signature for operator \u003c= for argument types: JSON, STRING\n  Signature: T1 \u003c= T1\n    Unable to find common supertype for templated argument \u003cT1\u003e\n      Input types for \u003cT1\u003e: {STRING, JSON} [at 1:8]","label":"coerce-order-string"}
+{"analysis_ok":false,"error":"No matching signature for operator = for argument types: JSON, BYTES\n  Signature: T1 = T1\n    Unable to find common supertype for templated argument \u003cT1\u003e\n      Input types for \u003cT1\u003e: {BYTES, JSON} [at 1:8]","label":"coerce-equal-bytes"}
+{"analysis_ok":false,"error":"No matching signature for operator = for argument types: BYTES, JSON\n  Signature: T1 = T1\n    Unable to find common supertype for templated argument \u003cT1\u003e\n      Input types for \u003cT1\u003e: {BYTES, JSON} [at 1:8]","label":"coerce-reverse-equal-bytes"}
+{"analysis_ok":false,"error":"No matching signature for operator = for argument types: JSON, DATE\n  Signature: T1 = T1\n    Unable to find common supertype for templated argument \u003cT1\u003e\n      Input types for \u003cT1\u003e: {DATE, JSON} [at 1:8]","label":"coerce-equal-date"}
+{"analysis_ok":false,"error":"No matching signature for operator = for argument types: DATE, JSON\n  Signature: T1 = T1\n    Unable to find common supertype for templated argument \u003cT1\u003e\n      Input types for \u003cT1\u003e: {DATE, JSON} [at 1:8]","label":"coerce-reverse-equal-date"}
+{"analysis_ok":false,"error":"No matching signature for operator \u003c= for argument types: JSON, DATE\n  Signature: T1 \u003c= T1\n    Unable to find common supertype for templated argument \u003cT1\u003e\n      Input types for \u003cT1\u003e: {DATE, JSON} [at 1:8]","label":"coerce-order-date"}
+{"analysis_ok":false,"error":"No matching signature for operator = for argument types: JSON, TIMESTAMP\n  Signature: T1 = T1\n    Unable to find common supertype for templated argument \u003cT1\u003e\n      Input types for \u003cT1\u003e: {TIMESTAMP, JSON} [at 1:8]","label":"coerce-equal-timestamp"}
+{"analysis_ok":false,"error":"No matching signature for operator = for argument types: TIMESTAMP, JSON\n  Signature: T1 = T1\n    Unable to find common supertype for templated argument \u003cT1\u003e\n      Input types for \u003cT1\u003e: {TIMESTAMP, JSON} [at 1:8]","label":"coerce-reverse-equal-timestamp"}
+{"analysis_ok":false,"error":"No matching signature for operator \u003c= for argument types: JSON, TIMESTAMP\n  Signature: T1 \u003c= T1\n    Unable to find common supertype for templated argument \u003cT1\u003e\n      Input types for \u003cT1\u003e: {TIMESTAMP, JSON} [at 1:8]","label":"coerce-order-timestamp"}
+{"analysis_ok":false,"error":"No matching signature for operator = for argument types: JSON, UUID\n  Signature: T1 = T1\n    Unable to find common supertype for templated argument \u003cT1\u003e\n      Input types for \u003cT1\u003e: {JSON, UUID} [at 1:8]","label":"coerce-equal-uuid"}
+{"analysis_ok":false,"error":"No matching signature for operator = for argument types: UUID, JSON\n  Signature: T1 = T1\n    Unable to find common supertype for templated argument \u003cT1\u003e\n      Input types for \u003cT1\u003e: {JSON, UUID} [at 1:8]","label":"coerce-reverse-equal-uuid"}
+{"analysis_ok":false,"error":"No matching signature for operator \u003c= for argument types: JSON, UUID\n  Signature: T1 \u003c= T1\n    Unable to find common supertype for templated argument \u003cT1\u003e\n      Input types for \u003cT1\u003e: {JSON, UUID} [at 1:8]","label":"coerce-order-uuid"}
+{"analysis_ok":false,"error":"No matching signature for operator = for argument types: JSON, ARRAY\u003cINT64\u003e\n  Signature: T1 = T1\n    Unable to find common supertype for templated argument \u003cT1\u003e\n      Input types for \u003cT1\u003e: {ARRAY\u003cINT64\u003e, JSON} [at 1:8]","label":"coerce-equal-array"}
+{"analysis_ok":false,"error":"No matching signature for operator = for argument types: ARRAY\u003cINT64\u003e, JSON\n  Signature: T1 = T1\n    Unable to find common supertype for templated argument \u003cT1\u003e\n      Input types for \u003cT1\u003e: {ARRAY\u003cINT64\u003e, JSON} [at 1:8]","label":"coerce-reverse-equal-array"}
+{"analysis_ok":false,"error":"No matching signature for operator \u003c= for argument types: JSON, ARRAY\u003cINT64\u003e\n  Signature: T1 \u003c= T1\n    Unable to find common supertype for templated argument \u003cT1\u003e\n      Input types for \u003cT1\u003e: {ARRAY\u003cINT64\u003e, JSON} [at 1:8]","label":"coerce-order-array"}
+{"analysis_ok":true,"label":"json-sort","row_type":{"fields":[{"name":"j","type":{"code":"JSON"}},{"name":"type","type":{"code":"STRING"}}]}}
+{"analysis_ok":true,"label":"json-group","row_type":{"fields":[{"name":"j","type":{"code":"JSON"}},{"name":"n","type":{"code":"INT64"}}]}}
+{"analysis_ok":true,"label":"json-distinct","row_type":{"fields":[{"name":"j","type":{"code":"JSON"}}]}}
+{"analysis_ok":true,"label":"json-minmax","row_type":{"fields":[{"name":"lo","type":{"code":"JSON"}},{"name":"hi","type":{"code":"JSON"}}]}}
+{"analysis_ok":true,"label":"json-join","row_type":{"fields":[{"name":"n","type":{"code":"INT64"}}]}}
+{"analysis_ok":true,"label":"json-window","row_type":{"fields":[{"name":"j","type":{"code":"JSON"}},{"name":"n","type":{"code":"INT64"}}]}}
+{"analysis_ok":true,"label":"coalesce-unused","row_type":{"fields":[{"name":"result","type":{"code":"FLOAT64"}}]}}
+{"analysis_ok":true,"label":"coalesce-selected","row_type":{"fields":[{"name":"result","type":{"code":"FLOAT64"}}]}}
+{"analysis_ok":true,"label":"ifnull-unused","row_type":{"fields":[{"name":"result","type":{"code":"FLOAT64"}}]}}
+{"analysis_ok":true,"label":"ifnull-selected","row_type":{"fields":[{"name":"result","type":{"code":"FLOAT64"}}]}}
+{"analysis_ok":true,"label":"if-unused","row_type":{"fields":[{"name":"result","type":{"code":"FLOAT64"}}]}}
+{"analysis_ok":true,"label":"if-selected","row_type":{"fields":[{"name":"result","type":{"code":"FLOAT64"}}]}}
+{"analysis_ok":true,"label":"case-simple-unused","row_type":{"fields":[{"name":"result","type":{"code":"FLOAT64"}}]}}
+{"analysis_ok":true,"label":"case-simple-selected","row_type":{"fields":[{"name":"result","type":{"code":"FLOAT64"}}]}}
+{"analysis_ok":true,"label":"case-searched-unused","row_type":{"fields":[{"name":"result","type":{"code":"FLOAT64"}}]}}
+{"analysis_ok":true,"label":"case-searched-selected","row_type":{"fields":[{"name":"result","type":{"code":"FLOAT64"}}]}}
+{"analysis_ok":true,"label":"coalesce-subquery-unused","row_type":{"fields":[{"name":"result","type":{"code":"FLOAT64"}}]}}
+{"analysis_ok":true,"label":"coalesce-subquery-selected","row_type":{"fields":[{"name":"result","type":{"code":"FLOAT64"}}]}}
+{"analysis_ok":true,"label":"if-subquery-unused","row_type":{"fields":[{"name":"result","type":{"code":"FLOAT64"}}]}}
+{"analysis_ok":false,"error":"Unrecognized name: missing_probe_identifier [at 1:21]","label":"coalesce-name-resolution"}
+{"analysis_ok":true,"label":"regular-function-eager","row_type":{"fields":[{"name":"result","type":{"code":"FLOAT64"}}]}}
+{"analysis_ok":false,"error":"Syntax error: Unexpected keyword IF [at 1:1]","label":"procedural-if-suggestion"}
+{"analysis_ok":false,"error":"No matching signature for operator != for argument types: JSON, INT64\n  Signature: T1 != T1\n    Unable to find common supertype for templated argument \u003cT1\u003e\n      Input types for \u003cT1\u003e: {INT64, JSON} [at 1:8]","label":"not-equal-coercion"}
+{"analysis_ok":false,"error":"No matching signature for operator IN for argument types JSON and {INT64, BOOL, STRING, JSON} [at 1:20]","label":"in-mixed-list"}
+{"analysis_ok":false,"error":"Invalid cast from BYTES to JSON [at 1:29]","label":"explicit-bytes-cast-order"}
+{"analysis_ok":false,"error":"Invalid cast from ARRAY\u003cINT64\u003e to JSON [at 1:13]","label":"cast-all-nested-null"}
+{"analysis_ok":false,"error":"No matching signature for operator IN for argument types JSON and {INT64, NULL} [at 1:17]","label":"in-null-no-match"}
+{"analysis_ok":false,"error":"No matching signature for function COALESCE\n  Argument types: JSON, INT64\n  Signature: COALESCE([T1, ...])\n    Unable to find common supertype for templated argument \u003cT1\u003e\n      Input types for \u003cT1\u003e: {INT64, JSON} [at 1:8]","label":"generic-json-supertype-reject"}
+{"analysis_ok":false,"error":"Invalid cast from ARRAY\u003cSTRUCT\u003ca INT64\u003e\u003e to JSON [at 1:13]","label":"json-array-struct-cast"}
+{"analysis_ok":false,"error":"No matching signature for operator = for argument types: JSON, ARRAY\u003cSTRUCT\u003ca INT64\u003e\u003e\n  Signature: T1 = T1\n    Unable to find common supertype for templated argument \u003cT1\u003e\n      Input types for \u003cT1\u003e: {ARRAY\u003cSTRUCT\u003ca INT64\u003e\u003e, JSON} [at 1:8]","label":"json-array-struct-equality-reject"}
+{"analysis_ok":false,"error":"Invalid cast from ARRAY\u003cFLOAT64\u003e to JSON [at 1:18]","label":"safe-cast-nested-infinity"}
+{"analysis_ok":false,"error":"Table-valued function not found: READ_JsonChanges [at 1:15]","label":"read-heartbeat-100"}
+{"analysis_ok":false,"error":"Syntax error: Expected keyword AS but got keyword JSON [at 1:15]","label":"bad-json-cast"}
+{"analysis_ok":false,"error":"Syntax error: Unexpected end of statement [at 1:18]","label":"bad-json-comparison"}
+{"analysis_ok":false,"error":"Invalid cast from GRAPH_NODE(JsonGraph)\u003cId INT64, Value INT64\u003e to JSON [at 1:59]","label":"graph-cast-node"}
+{"analysis_ok":true,"label":"graph-to-json-node","row_type":{"fields":[{"name":"result","type":{"code":"JSON"}}]}}
+{"analysis_ok":false,"error":"Invalid cast from PATH\u003cGRAPH_NODE(JsonGraph)\u003cId INT64, Value INT64\u003e, GRAPH_EDGE(JsonGraph)\u003cDst INT64, Src INT64\u003e\u003e to JSON [at 1:72]","label":"graph-cast-path"}
+{"analysis_ok":true,"label":"graph-to-json-path","row_type":{"fields":[{"name":"result","type":{"code":"JSON"}}]}}
+{"analysis_ok":false,"error":"Invalid cast from INT64 to JSON [at 1:59]","label":"graph-property-cast"}
+{"analysis_ok":true,"label":"stored-json-group","row_type":{"fields":[{"name":"J","type":{"code":"JSON"}},{"name":"n","type":{"code":"INT64"}}]}}
+{"analysis_ok":true,"label":"stored-json-join","row_type":{"fields":[{"name":"Id","type":{"code":"INT64"}}]}}
+{"analysis_ok":true,"label":"stored-json-min-max","row_type":{"fields":[{"name":"lo","type":{"code":"JSON"}},{"name":"hi","type":{"code":"JSON"}}]}}

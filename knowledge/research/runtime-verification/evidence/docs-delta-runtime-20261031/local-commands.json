@@ -1,0 +1,99 @@
+[
+  {
+    "name": "omni-r5",
+    "argv": [
+      "<LOCAL_CHECKOUT>/.tmp/docs-delta-runtime-20261031/local",
+      "omni-r5",
+      "us-docker.pkg.dev/spanner-omni/images/spanner-omni:2026.r5@sha256:e506672206e0291cac28cbe19ad4cd470cec112c24601637bc896c65f7362396",
+      "<LOCAL_TASK_ROOT>/apstndb/spanalyzer/docs-delta-runtime-20261031/evidence/google-cases.json",
+      "<LOCAL_TASK_ROOT>/apstndb/spanalyzer/docs-delta-runtime-20261031/evidence/pg-cases.json"
+    ],
+    "started_at": "2026-10-30T20:52:18.304315+00:00",
+    "completed_at": "2026-10-30T20:55:33.786111+00:00",
+    "seconds": 195.481,
+    "exit_code": 0,
+    "owned_containers": [
+      {
+        "container_id": "c2e7034d8885feaa24e3733d69110101723a03107c478501913ccff251b3a4d9",
+        "configured_image": "us-docker.pkg.dev/spanner-omni/images/spanner-omni:2026.r5@sha256:e506672206e0291cac28cbe19ad4cd470cec112c24601637bc896c65f7362396",
+        "image_id": "sha256:e506672206e0291cac28cbe19ad4cd470cec112c24601637bc896c65f7362396",
+        "path": "/bin/tini",
+        "args": [
+          "--",
+          "/google/spanner/bin/spanner",
+          "start-single-server",
+          "--listen-addresses=0.0.0.0"
+        ],
+        "state": "running"
+      }
+    ],
+    "owned_containers_absent": true,
+    "preexisting_container_count": 279,
+    "preexisting_containers_preserved": true,
+    "preexisting_id_set_sha256": "e635df1d9b0d4a579f79dc5274d154a1e17575048c70ac49849294d8ee33f410"
+  },
+  {
+    "name": "omni-lts",
+    "argv": [
+      "<LOCAL_CHECKOUT>/.tmp/docs-delta-runtime-20261031/local",
+      "omni-lts",
+      "us-docker.pkg.dev/spanner-omni/images/spanner-omni:2026.r4-lts.1@sha256:5e3cf199f5abf3a09cd2348ab36c129b3268966eb4eb72fca278fe58252fcbdb",
+      "<LOCAL_TASK_ROOT>/apstndb/spanalyzer/docs-delta-runtime-20261031/evidence/google-cases.json",
+      "<LOCAL_TASK_ROOT>/apstndb/spanalyzer/docs-delta-runtime-20261031/evidence/pg-cases.json"
+    ],
+    "started_at": "2026-10-30T20:55:34.060061+00:00",
+    "completed_at": "2026-10-30T20:58:26.925216+00:00",
+    "seconds": 172.942,
+    "exit_code": 0,
+    "owned_containers": [
+      {
+        "container_id": "84f0ae983d5352f606a5bf386cf8ce03394b85f4c2d35dbfa017bfe9f58ef126",
+        "configured_image": "us-docker.pkg.dev/spanner-omni/images/spanner-omni:2026.r4-lts.1@sha256:5e3cf199f5abf3a09cd2348ab36c129b3268966eb4eb72fca278fe58252fcbdb",
+        "image_id": "sha256:5e3cf199f5abf3a09cd2348ab36c129b3268966eb4eb72fca278fe58252fcbdb",
+        "path": "/bin/tini",
+        "args": [
+          "--",
+          "/google/spanner/bin/spanner",
+          "start-single-server",
+          "--listen-addresses=0.0.0.0"
+        ],
+        "state": "running"
+      }
+    ],
+    "owned_containers_absent": true,
+    "preexisting_container_count": 280,
+    "preexisting_containers_preserved": true,
+    "preexisting_id_set_sha256": "134674588e8be4493ead2cc0e7c30db40b9decf3ab824c863a96ea5e81f57ef7"
+  },
+  {
+    "name": "emulator",
+    "argv": [
+      "<LOCAL_CHECKOUT>/.tmp/docs-delta-runtime-20261031/local",
+      "emulator",
+      "gcr.io/cloud-spanner-emulator/emulator:1.5.59@sha256:969af6a9349948fbfb4a826c18e160e258a4005f7c759f8e7f2dcec369cccba8",
+      "<LOCAL_TASK_ROOT>/apstndb/spanalyzer/docs-delta-runtime-20261031/evidence/google-cases.json",
+      "<LOCAL_TASK_ROOT>/apstndb/spanalyzer/docs-delta-runtime-20261031/evidence/pg-cases.json"
+    ],
+    "started_at": "2026-10-30T20:58:27.210262+00:00",
+    "completed_at": "2026-10-30T20:58:29.315257+00:00",
+    "seconds": 2.105,
+    "exit_code": 0,
+    "owned_containers": [
+      {
+        "container_id": "af6a40c1cd862281c6f256f0c8b77a5cc253b1f7ca33048ed6de4630c6f387ec",
+        "configured_image": "gcr.io/cloud-spanner-emulator/emulator:1.5.59@sha256:969af6a9349948fbfb4a826c18e160e258a4005f7c759f8e7f2dcec369cccba8",
+        "image_id": "sha256:969af6a9349948fbfb4a826c18e160e258a4005f7c759f8e7f2dcec369cccba8",
+        "path": "./gateway_main",
+        "args": [
+          "--hostname",
+          "0.0.0.0"
+        ],
+        "state": "running"
+      }
+    ],
+    "owned_containers_absent": true,
+    "preexisting_container_count": 280,
+    "preexisting_containers_preserved": true,
+    "preexisting_id_set_sha256": "134674588e8be4493ead2cc0e7c30db40b9decf3ab824c863a96ea5e81f57ef7"
+  }
+]

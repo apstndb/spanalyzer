@@ -1,0 +1,63 @@
+{
+  "observed_on": "2026-09-26",
+  "runtime": "Spanner Omni native linux/arm64 under Colima; isolated test deployments",
+  "source_revision": "c2d7792dd7f83d5dd086e2d32bc22e5d253cf06c",
+  "source_state": "dirty snapshot copied into detached investigation worktree; runtime pins changed only there; integration runner adds -json",
+  "worktree": "<LOCAL_CHECKOUT>/.worktrees/omni-r3-20260926",
+  "durable_local_directory": "<LOCAL_TASK_ROOT>/apstndb/spanalyzer/omni-r3-20260926",
+  "source_snapshot_sha256": "2c56b266dde157f971057c210484acafc7334c1d04683b327202c00a8b3dd52d",
+  "initial_dirty_patch_sha256": "0960da91d64e1d272ec840e30f7d02d83c5f4706ef7379f8067edc25f5da511b",
+  "harness_patch_sha256": "7eb4f7721559ae14be337eca6b0d42a7589c3eaa87a00a8a5a225081980d4cb3",
+  "probe_source_sha256": "64f145b3c757e96537fe706aba516c7bf4e4d598068d93e7a91becee36f3b31b",
+  "probe_binary_sha256": "34127edb8a4ce35081b6acc74283ce89821d95f8d5e04763c7f9a6a3ef48a6e3",
+  "go_version": "go1.26.8 darwin/arm64",
+  "dependency_scope": "Survey captures and drift use GOWORK=off GOFLAGS=-mod=readonly; integration and feature probe use the copied repository workspace with GOFLAGS=-mod=readonly",
+  "main_runtime_pins_changed": false,
+  "documentation": [
+    {
+      "file": "release-notes.html",
+      "url": "https://docs.cloud.google.com/spanner-omni/release-notes?hl=en",
+      "method": "curl full HTML",
+      "sha256": "29df6135beb513868ebd17b72b3541d0464399cc718b84add725144c4fdde97e"
+    },
+    {
+      "file": "download.html",
+      "url": "https://docs.cloud.google.com/spanner-omni/download?hl=en",
+      "method": "curl full HTML",
+      "sha256": "a43b7e37e869637bea145f2fa94d1b2f6e101e3422fdcbbe8c1425d28b3fdc91"
+    },
+    {
+      "file": "docs/docs.cloud.google.com/spanner-omni/release-notes.md",
+      "url": "https://docs.cloud.google.com/spanner-omni/release-notes",
+      "method": "dkcli full content",
+      "sha256": "42e518258ceb3effe272fbbc1ae4cde8f1238aeccec37a3253bcddad2a7c9a2f"
+    },
+    {
+      "file": "docs/docs.cloud.google.com/spanner-omni/download.md",
+      "url": "https://docs.cloud.google.com/spanner-omni/download",
+      "method": "dkcli full content",
+      "sha256": "0452d179b1037fd5eaff051ba4d0db52d45eb5099ca2d14722132e5a868430d4"
+    },
+    {
+      "file": "upgrade-deployment-response.html",
+      "url": "https://docs.cloud.google.com/spanner-omni/upgrade-deployment",
+      "method": "curl HTTP 404 body",
+      "sha256": "ffbe0d746f6aeae2ecb6db945cea85cedd2447205859670cfcbca89d15d28445"
+    }
+  ],
+  "feature_probes": {
+    "r3_records": 92,
+    "r2_records": 92,
+    "r3_exit_code": 0,
+    "r2_exit_code": 0,
+    "both_database_cleanups": "OK",
+    "both_runtime_cleanups": "OK"
+  },
+  "query_generator": {
+    "exit_code": 0,
+    "top_level_pass": 3,
+    "subtest_pass": 26,
+    "skips": 0
+  },
+  "remaining_running_containers": 0
+}

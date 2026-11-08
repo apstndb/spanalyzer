@@ -1,0 +1,103 @@
+> **Note:** This feature is available with the Spanner Enterprise edition and Enterprise Plus edition. For more information, see the [Spanner editions overview](https://docs.cloud.google.com/spanner/docs/editions-overview) .
+
+Spanner queues provide transactional messaging to help you manage asynchronous work. The feature pairs this capability with the scalability and reliability of Spanner, letting you build event-driven applications. Spanner queues use a pull model for message consumption, exposing a SQL interface for receivers to request and receive messages.
+
+## Choose between Spanner queues and change streams
+
+The following comparison provides guidance on choosing the right mechanism for data propagation and asynchronous processing.
+
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<tbody>
+<tr class="odd">
+<td>Spanner queues
+<p><strong>Best for</strong></p>
+<ul>
+<li>Transactional event notifications</li>
+<li>Future-scheduled work execution</li>
+<li>Per-message acknowledgement logic</li>
+</ul>
+<p><strong>Key characteristics</strong></p>
+<ul>
+<li>Small, user-defined message payloads</li>
+<li>Pull model for message consumption</li>
+<li>Scales with Spanner instance compute</li>
+</ul></td>
+<td>Spanner <a href="https://docs.cloud.google.com/spanner/docs/change-streams">change streams</a>
+<p><strong>Best for</strong></p>
+<ul>
+<li>High-throughput data replication</li>
+<li>Syncing downstream caches or indexes</li>
+<li>Audit logging of every database change</li>
+</ul>
+<p><strong>Key characteristics</strong></p>
+<ul>
+<li>Captures all record fragments (up to 10MB)</li>
+<li>Pull-based streaming using partition tokens</li>
+<li>Includes heartbeats and checkpointing</li>
+</ul></td>
+</tr>
+</tbody>
+</table>
+
+## Key advantages
+
+Spanner queues offer several advantages:
+
+- **Integrated:** messaging is integrated into the database. This eliminates the need to provision, manage, and exfiltrate data to separate messaging infrastructure, which simplifies application architecture and lowers overall costs.
+- **Transactional:** you can send and acknowledge messages atomically within a Spanner transaction alongside other database writes. Enqueued messages are rolled back and not available for delivery if the transaction fails.
+- **Durable:** messages that can't be delivered are stored in the database. Spanner continually attempts delivery with backoff until the message is explicitly acknowledged or deleted.
+- **Queryable:** messages are built on the same primitives as Spanner tables and are stored as rows. You can query, join, or filter them like standard tables.
+- **Scalable:** built with the same scalability as Spanner tables, message processing scales alongside the rest of your database.
+- **Reliable:** Spanner queues inherit all of Spanner's high availability primitives, making message sending and processing fault-tolerant and resilient to zonal or regional failures.
+- **Schedulable:** messages can be scheduled for future delivery, allowing you to defer task execution to a specific future timestamp.
+- **Atomic:** message sending ( `INSERT` or mutation APIs) and acknowledgment ( `DELETE` or mutation APIs) execute atomically within transactions, ensuring consistency with database state.
+- **Extendable:** message leases can be extended to support extremely long processing times by combining future delivery and manual leasing mechanisms.
+
+## Use cases
+
+Spanner queues are useful for orchestrating deferred tasks within a transaction. Common examples include:
+
+- **Deferring computationally heavy work:** a photo-sharing website might need to perform intensive image processing when a new photo is uploaded. The transaction that writes the new photo metadata can simultaneously write a queue message. A queue receiver later picks up the message, performs the processing, and updates the metadata transactionally.
+- **Deferring large transactional updates:** in a calendar app, inviting a large group to a meeting in a single transaction can cause lock conflicts and tail latencies. Instead, the transaction that creates the calendar entry can add a queue entry for each invitee, allowing a receiver to send the invites individually.
+- **Scheduling tasks in the future:** a software as a service (SaaS) company offering a 30-day free trial can provision the user's resources and simultaneously queue a message scheduled to be delivered in 30 days. A worker then receives the message and executes the trial expiration logic.
+- **Deferring work to external systems:** after a user registers, an application might need to send a welcome email only if the database registration succeeds. The registration transaction can add an entry to a queue, allowing a worker to invoke an external email API later.
+- **Orchestrating multi-step pipelines:** in an order management system, fulfilling an order involves multiple steps that could fail independently. By representing each step as a queue message, the system can checkpoint the pipeline's state and continue from the point of failure.
+
+## Workflow
+
+A typical workflow for Spanner queues follows these steps:
+
+- **Create a queue:** define a queue using DDL, similar to a table. It must include a `Payload` column ( `payload` in PostgreSQL) and a primary key.
+- **Send messages:** enqueue messages using standard DML ( `INSERT` ) or mutation APIs, transactionally with other database operations.
+- **Receive messages:** use the `ExecuteStreamingSQL` API to call a table-valued function (TVF) named `RECEIVE_ `` QUEUE_NAME `` ()` . This function streams messages to your client as a long-running query.
+- **Process messages:** consume the messages received from the TVF with your application logic.
+- **Acknowledge messages:** remove messages from the queue using DML ( `DELETE` ) or mutation APIs (such as `ack` ). This is typically done after processing is complete, within a transaction.
+- **Manage leases:** manage message leases to ensure that Spanner queues don't redeliver messages on lease timeout. The most common method is to use the `RENEWLEASE_ `` QUEUE_NAME `` ()` TVF.
+
+Additionally, keep in mind these core behaviors of Spanner queues:
+
+- **At-least-once delivery:** common to most cloud-based queue systems, Spanner promises at-least-once delivery. Redeliveries can be mitigated by extending leases.
+- **At-most-once acknowledgment:** because acknowledging a message happens over a transaction, Spanner [ACID semantics](https://en.wikipedia.org/wiki/ACID) ensure that a message is only acknowledged once. Following the methods on the [Exactly-once processing and at-most-once acknowledgment](https://docs.cloud.google.com/spanner/docs/queues/queues-at-most-once) page to properly implement at-most-once acknowledgment.
+
+## Limitations
+
+Spanner queues have the following limitations:
+
+- **Maximum receivers:** there is a limit of 1000 active receive queries with the same arguments per queue
+- **Concurrent receive TVF quota limit:** there is a [quota limit](https://docs.cloud.google.com/spanner/quotas#queue-limits) of 2000 concurrent receive TVFs per project per region. To increase the quota limit, fill out the [Request a Quota Increase for your Cloud Spanner project](https://docs.google.com/forms/d/e/1FAIpQLSczQOE6S_1MUTf4KBpF_i-cJVMQloUEZQ71KcNQzbAkWDDuVw/viewform) form.
+- **Manual splitting:** the `AddSplits` API is not supported for queues. Workload distribution relies entirely on load-based splitting. Interleaving the queue in a table is recommended so that users can add split points to the table.
+- **Geo-partitioning compliance:** geo-partitioned queues are not data residency compliant after executing a `DROP PARTITION` operation.
+- **Queue count limits:** instances are limited to 100 queues for instances with 1 or more nodes. The limit scales down proportionally for granular instances (for example, instances with 200 processing units are limited to 20 queues).
+- **PostgreSQL column naming:** Spanner exposes both the `deliver_time` and `DeliverTime` columns for the delivery time of a message. We recommend using the `deliver_time` column to align with standard PostgreSQL naming conventions, and because the `DeliverTime` column will be hidden from the information schema in a future release.
+- **Named schema:** queues cannot be created in named schemas.
+
+## What's next
+
+- Learn how to [use Spanner queues, including best practices and monitoring](https://docs.cloud.google.com/spanner/docs/queues/queues-using) .
+- Explore more [Spanner queues scenarios and examples](https://docs.cloud.google.com/spanner/docs/queues/queues-examples) .
+- Learn about [exactly-once processing and at-most-once acknowledgment](https://docs.cloud.google.com/spanner/docs/queues/queues-at-most-once) .
+- Configure access control with [fine-grained access control for queues](https://docs.cloud.google.com/spanner/docs/fgac-queues) .

@@ -1,0 +1,18 @@
+{
+  "name": "target2-trial-description",
+  "started_at": "2026-10-23T14:25:09.961238+00:00",
+  "completed_at": "2026-10-23T14:25:10.831273+00:00",
+  "argv": [
+    "<LOCAL_HOME>/google-cloud-sdk/bin/gcloud",
+    "spanner",
+    "instances",
+    "describe",
+    "<redacted>",
+    "--format=json",
+    "--project=<redacted>",
+    "--quiet"
+  ],
+  "exit_code": 0,
+  "stdout": "{\n  \"config\": \"projects/<redacted>/instanceConfigs/regional-asia-northeast1\",\n  \"createTime\": \"2026-10-23T14:24:35.339918Z\",\n  \"defaultBackupScheduleType\": \"NONE\",\n  \"displayName\": \"Spanalyzer verification\",\n  \"edition\": \"ENTERPRISE\",\n  \"freeInstanceMetadata\": {\n    \"expireBehavior\": \"REMOVE_AFTER_GRACE_PERIOD\",\n    \"expireTime\": \"2027-01-21T14:24:35.339918Z\"\n  },\n  \"instanceType\": \"FREE_INSTANCE\",\n  \"labels\": {\n    \"purpose\": \"<redacted>\"\n  },\n  \"name\": \"projects/<redacted>/instances/<redacted>\",\n  \"replicaComputeCapacity\": [\n    {\n      \"processingUnits\": 100,\n      \"replicaSelection\": {\n        \"location\": \"asia-northeast1\"\n      }\n    }\n  ],\n  \"resourceLocation\": \"asia-northeast1\",\n  \"state\": \"READY\",\n  \"updateTime\": \"2026-10-23T14:24:35.339918Z\"\n}\n",
+  "stderr": ""
+}

@@ -1,0 +1,272 @@
+{
+  "observed_from": "2026-10-30T08:01:03.361171Z",
+  "observed_until": "2026-10-30T08:11:46.560852Z",
+  "selected_image": {
+    "tag": "1.5.59",
+    "platform": "linux/arm64",
+    "image": "gcr.io/cloud-spanner-emulator/emulator:1.5.59@sha256:969af6a9349948fbfb4a826c18e160e258a4005f7c759f8e7f2dcec369cccba8",
+    "platform_manifest_digest": "sha256:969af6a9349948fbfb4a826c18e160e258a4005f7c759f8e7f2dcec369cccba8"
+  },
+  "dependency_versions": {
+    "go": "go1.26.8",
+    "spanner": "v1.91.0",
+    "spanemuboost": "v0.4.10-alpha.1",
+    "gowork": "off"
+  },
+  "producer_runs": {
+    "emulator-issues": {
+      "records": 291,
+      "planned_steps_recorded": 182,
+      "root_codes": {
+        "OK": 140,
+        "FailedPrecondition": 3,
+        "InvalidArgument": 28,
+        "NOT_RUN": 5,
+        "Unimplemented": 4,
+        "Internal": 1,
+        "OutOfRange": 1
+      }
+    },
+    "emulator-focused": {
+      "records": 92,
+      "planned_steps_recorded": 43,
+      "root_codes": {
+        "OK": 40,
+        "InvalidArgument": 2,
+        "FailedPrecondition": 1
+      }
+    },
+    "emulator-extra": {
+      "records": 70,
+      "planned_steps_recorded": 41,
+      "root_codes": {
+        "OK": 31,
+        "AlreadyExists": 10
+      }
+    },
+    "emulator-last": {
+      "records": 29,
+      "planned_steps_recorded": 16,
+      "root_codes": {
+        "OK": 15,
+        "AlreadyExists": 1
+      }
+    }
+  },
+  "planned_steps_recorded": 282,
+  "direct_issue_families": [
+    30,
+    40,
+    143,
+    159,
+    181,
+    187,
+    189,
+    197,
+    210,
+    214,
+    233,
+    236,
+    251,
+    261,
+    265,
+    276,
+    290,
+    291,
+    292,
+    294,
+    298,
+    300,
+    304,
+    312,
+    316,
+    324,
+    332,
+    341,
+    347,
+    349,
+    350,
+    352,
+    353,
+    355,
+    356,
+    358,
+    386,
+    389,
+    395,
+    400,
+    403,
+    406,
+    407
+  ],
+  "timings_ms": {
+    "in_subquery": [
+      1525.088,
+      1536.026,
+      1544.116,
+      1565.188,
+      1550.082
+    ],
+    "join": [
+      3.684,
+      3.752,
+      3.646,
+      3.615,
+      3.664
+    ],
+    "unique_violation": 4.6690000000000005,
+    "omitted_default": [
+      1.691,
+      1.996,
+      1.785,
+      2.144,
+      1.4569999999999999
+    ],
+    "explicit_default": [
+      2.19,
+      3.348,
+      2.725,
+      1.83,
+      1.38
+    ]
+  },
+  "memory_samples": [
+    {
+      "checkpoint": "memory-baseline",
+      "at": "2026-10-30T08:04:22.854333+00:00",
+      "exit_code": 0,
+      "metrics": {
+        "BlockIO": "737kB / 0B",
+        "CPUPerc": "0.24%",
+        "Container": "fdb5b2f143119a9c8a868a6e7dd4841f7e6c11f432bcd082984355041475ba8c",
+        "ID": "fdb5b2f14311",
+        "MemPerc": "0.35%",
+        "MemUsage": "28.08MiB / 7.737GiB",
+        "Name": "elastic_neumann",
+        "NetIO": "96.1kB / 82.2kB",
+        "PIDs": "19"
+      }
+    },
+    {
+      "checkpoint": "memory-seeded-20MiB",
+      "at": "2026-10-30T08:04:25.079840+00:00",
+      "exit_code": 0,
+      "metrics": {
+        "BlockIO": "737kB / 0B",
+        "CPUPerc": "0.23%",
+        "Container": "fdb5b2f143119a9c8a868a6e7dd4841f7e6c11f432bcd082984355041475ba8c",
+        "ID": "fdb5b2f14311",
+        "MemPerc": "0.87%",
+        "MemUsage": "68.73MiB / 7.737GiB",
+        "Name": "elastic_neumann",
+        "NetIO": "21.2MB / 130kB",
+        "PIDs": "19"
+      }
+    },
+    {
+      "checkpoint": "memory-index-0-true",
+      "at": "2026-10-30T08:04:27.142998+00:00",
+      "exit_code": 0,
+      "metrics": {
+        "BlockIO": "737kB / 0B",
+        "CPUPerc": "0.11%",
+        "Container": "fdb5b2f143119a9c8a868a6e7dd4841f7e6c11f432bcd082984355041475ba8c",
+        "ID": "fdb5b2f14311",
+        "MemPerc": "1.00%",
+        "MemUsage": "79.39MiB / 7.737GiB",
+        "Name": "elastic_neumann",
+        "NetIO": "21.2MB / 131kB",
+        "PIDs": "19"
+      }
+    },
+    {
+      "checkpoint": "memory-index-0-false",
+      "at": "2026-10-30T08:04:31.168197+00:00",
+      "exit_code": 0,
+      "metrics": {
+        "BlockIO": "737kB / 0B",
+        "CPUPerc": "0.32%",
+        "Container": "fdb5b2f143119a9c8a868a6e7dd4841f7e6c11f432bcd082984355041475ba8c",
+        "ID": "fdb5b2f14311",
+        "MemPerc": "1.00%",
+        "MemUsage": "79.39MiB / 7.737GiB",
+        "Name": "elastic_neumann",
+        "NetIO": "21.2MB / 133kB",
+        "PIDs": "19"
+      }
+    },
+    {
+      "checkpoint": "memory-index-1-true",
+      "at": "2026-10-30T08:04:33.233189+00:00",
+      "exit_code": 0,
+      "metrics": {
+        "BlockIO": "737kB / 0B",
+        "CPUPerc": "0.18%",
+        "Container": "fdb5b2f143119a9c8a868a6e7dd4841f7e6c11f432bcd082984355041475ba8c",
+        "ID": "fdb5b2f14311",
+        "MemPerc": "1.11%",
+        "MemUsage": "87.85MiB / 7.737GiB",
+        "Name": "elastic_neumann",
+        "NetIO": "21.2MB / 133kB",
+        "PIDs": "19"
+      }
+    },
+    {
+      "checkpoint": "memory-index-1-false",
+      "at": "2026-10-30T08:04:37.245224+00:00",
+      "exit_code": 0,
+      "metrics": {
+        "BlockIO": "737kB / 0B",
+        "CPUPerc": "0.16%",
+        "Container": "fdb5b2f143119a9c8a868a6e7dd4841f7e6c11f432bcd082984355041475ba8c",
+        "ID": "fdb5b2f14311",
+        "MemPerc": "1.11%",
+        "MemUsage": "87.86MiB / 7.737GiB",
+        "Name": "elastic_neumann",
+        "NetIO": "21.2MB / 135kB",
+        "PIDs": "19"
+      }
+    },
+    {
+      "checkpoint": "memory-after-delete",
+      "at": "2026-10-30T08:04:41.389627+00:00",
+      "exit_code": 0,
+      "metrics": {
+        "BlockIO": "737kB / 0B",
+        "CPUPerc": "0.04%",
+        "Container": "fdb5b2f143119a9c8a868a6e7dd4841f7e6c11f432bcd082984355041475ba8c",
+        "ID": "fdb5b2f14311",
+        "MemPerc": "1.39%",
+        "MemUsage": "110.2MiB / 7.737GiB",
+        "Name": "elastic_neumann",
+        "NetIO": "21.2MB / 136kB",
+        "PIDs": "19"
+      }
+    },
+    {
+      "checkpoint": "memory-after-drop-table",
+      "at": "2026-10-30T08:04:45.395898+00:00",
+      "exit_code": 0,
+      "metrics": {
+        "BlockIO": "737kB / 0B",
+        "CPUPerc": "0.06%",
+        "Container": "fdb5b2f143119a9c8a868a6e7dd4841f7e6c11f432bcd082984355041475ba8c",
+        "ID": "fdb5b2f14311",
+        "MemPerc": "1.39%",
+        "MemUsage": "110.2MiB / 7.737GiB",
+        "Name": "elastic_neumann",
+        "NetIO": "21.2MB / 137kB",
+        "PIDs": "19"
+      }
+    }
+  ],
+  "scope_limits": [
+    "No fresh managed or Omni execution.",
+    "No before/after version introduction claim.",
+    "ListSessions returned zero even for an explicit live multiplexed session; counts do not prove absence.",
+    "Two RPC engine-error controls (Internal foreign-key rename; Unknown proto nanos) retain successful later health queries.",
+    "CLI initial commands replaced image CMD and never reached gateway_main; corrected explicit gateway invocations are separate.",
+    "Initial strict view names, mismatched graph properties, SQL newline, bytea decode, too-early stream start and latency UNIQUE(NULL) failures are producer/fixture limits, not feature conclusions.",
+    "Ten thousand 2-KiB payload rows, two index cycles and short retention-window working-set samples do not establish internal object reclamation or long-run memory behavior."
+  ]
+}

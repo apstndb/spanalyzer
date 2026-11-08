@@ -1,0 +1,17 @@
+Start Spanner as a single server for development and testing.
+
+Usage:
+  spanner start-single-server [flags]
+
+Examples:
+$ spanner start-single-server
+
+Flags:
+      --base-dir absolute_path         Base directory for the deployment. (default /spanner)
+      --certificate-directory string   The directory containing certificates to enable TLS for client connections.
+  -h, --help                           help for start-single-server
+      --license-file-path string       The path to the file containing the license key.
+      --log-errors-inline              Whether to log errors inline.
+      --log-inline strings             A list of server names to log inline.
+      --spanner-server-path string     Path to the spanner_server binary. (default "/google/spanner/bin/spanner_server")
+      --stop-delay duration            The amount of time to wait before killing Spanner processes after receiving a signal.  The total wait time can be 3x this value as we signal processes in groups. (default 30m0s)

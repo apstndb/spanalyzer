@@ -1,0 +1,261 @@
+{
+  "status": "pass",
+  "head": "99ab0125949f842fcb98c816850140e1117746a4",
+  "branch": "fix/managed-catalog-20261105",
+  "go": "1.26.10",
+  "survey_spanner_sdk": "v1.95.1",
+  "earlier_runtime_harness_sdk": "v1.91.0",
+  "module_checks": [
+    {
+      "name": "ready-root",
+      "argv": [
+        "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.10/bin/go",
+        "test",
+        "./..."
+      ],
+      "cwd": "<LOCAL_CHECKOUT>/.worktrees/cross-engine-audit-20261005",
+      "exit_code": 0,
+      "at": "2026-11-05T03:07:11.264072+00:00"
+    },
+    {
+      "name": "ready-plancontract",
+      "argv": [
+        "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.10/bin/go",
+        "test",
+        "./..."
+      ],
+      "cwd": "<LOCAL_CHECKOUT>/.worktrees/cross-engine-audit-20261005/plancontract",
+      "exit_code": 0,
+      "at": "2026-11-05T03:07:11.429160+00:00"
+    },
+    {
+      "name": "ready-querygen",
+      "argv": [
+        "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.10/bin/go",
+        "test",
+        "./..."
+      ],
+      "cwd": "<LOCAL_CHECKOUT>/.worktrees/cross-engine-audit-20261005/cmd/spanner-query-gen",
+      "exit_code": 0,
+      "at": "2026-11-05T03:07:15.673696+00:00"
+    },
+    {
+      "name": "ready-survey",
+      "argv": [
+        "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.10/bin/go",
+        "test",
+        "-short",
+        "./..."
+      ],
+      "cwd": "<LOCAL_CHECKOUT>/.worktrees/cross-engine-audit-20261005/survey",
+      "exit_code": 0,
+      "at": "2026-11-05T03:07:19.868624+00:00"
+    },
+    {
+      "name": "ready-tools",
+      "argv": [
+        "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.10/bin/go",
+        "test",
+        "./..."
+      ],
+      "cwd": "<LOCAL_CHECKOUT>/.worktrees/cross-engine-audit-20261005/tools",
+      "exit_code": 0,
+      "at": "2026-11-05T03:07:25.072950+00:00"
+    },
+    {
+      "name": "ready-planvocab",
+      "argv": [
+        "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.10/bin/go",
+        "run",
+        "./planvocab-gen",
+        "--check"
+      ],
+      "cwd": "<LOCAL_CHECKOUT>/.worktrees/cross-engine-audit-20261005/tools",
+      "exit_code": 0,
+      "at": "2026-11-05T03:07:25.522506+00:00"
+    },
+    {
+      "name": "ready-is",
+      "argv": [
+        "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.10/bin/go",
+        "run",
+        "./infoschema-survey-check"
+      ],
+      "cwd": "<LOCAL_CHECKOUT>/.worktrees/cross-engine-audit-20261005/tools",
+      "exit_code": 0,
+      "at": "2026-11-05T03:07:26.589467+00:00"
+    },
+    {
+      "name": "ready-sys",
+      "argv": [
+        "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.10/bin/go",
+        "run",
+        "./spannersys-survey-check"
+      ],
+      "cwd": "<LOCAL_CHECKOUT>/.worktrees/cross-engine-audit-20261005/tools",
+      "exit_code": 0,
+      "at": "2026-11-05T03:07:27.565334+00:00"
+    },
+    {
+      "name": "ready-okf",
+      "argv": [
+        "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.10/bin/go",
+        "run",
+        "./okf-check",
+        "--repo-root",
+        "..",
+        "--gate",
+        "all",
+        "--publication-manifest",
+        "<LOCAL_TASK_ROOT>/apstndb/spanalyzer/managed-catalog-20261105/publication-manifest-ready.json"
+      ],
+      "cwd": "<LOCAL_CHECKOUT>/.worktrees/cross-engine-audit-20261005/tools",
+      "exit_code": 0,
+      "at": "2026-11-05T03:07:28.090472+00:00"
+    },
+    {
+      "name": "ready-language",
+      "argv": [
+        "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.10/bin/go",
+        "run",
+        "./markdown-language-check",
+        "--repo-root",
+        ".."
+      ],
+      "cwd": "<LOCAL_CHECKOUT>/.worktrees/cross-engine-audit-20261005/tools",
+      "exit_code": 0,
+      "at": "2026-11-05T03:07:28.509212+00:00"
+    },
+    {
+      "name": "commit-okf",
+      "argv": [
+        "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.10/bin/go",
+        "run",
+        "./okf-check",
+        "--repo-root",
+        "..",
+        "--gate",
+        "all",
+        "--publication-manifest",
+        "<LOCAL_TASK_ROOT>/apstndb/spanalyzer/managed-catalog-20261105/publication-manifest-commit.json"
+      ],
+      "cwd": "<LOCAL_CHECKOUT>/.worktrees/cross-engine-audit-20261005/tools",
+      "exit_code": 0,
+      "at": "2026-11-05T03:08:09.221035+00:00"
+    },
+    {
+      "name": "commit-language",
+      "argv": [
+        "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.10/bin/go",
+        "run",
+        "./markdown-language-check",
+        "--repo-root",
+        ".."
+      ],
+      "cwd": "<LOCAL_CHECKOUT>/.worktrees/cross-engine-audit-20261005/tools",
+      "exit_code": 0,
+      "at": "2026-11-05T03:08:09.334406+00:00"
+    },
+    {
+      "argv": [
+        "mise",
+        "run",
+        "pre-push"
+      ],
+      "cwd": "<LOCAL_CHECKOUT>/.worktrees/cross-engine-audit-20261005",
+      "exit_code": 0,
+      "at": "2026-11-05T03:05:56.774240+00:00"
+    }
+  ],
+  "managed_checks": [
+    {
+      "name": "capture-infoschema",
+      "argv": [
+        "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.10/bin/go",
+        "run",
+        "./cmd/infoschema-capture",
+        "--target",
+        "managed",
+        "--write",
+        "--repo-root",
+        "<LOCAL_CHECKOUT>/.worktrees/cross-engine-audit-20261005"
+      ],
+      "started_at": "2026-11-05T03:05:41.795775+00:00",
+      "completed_at": "2026-11-05T03:05:45.111770+00:00",
+      "exit_code": 0
+    },
+    {
+      "name": "capture-spannersys",
+      "argv": [
+        "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.10/bin/go",
+        "run",
+        "./cmd/spanner-sys-capture",
+        "--target",
+        "managed",
+        "--write",
+        "--repo-root",
+        "<LOCAL_CHECKOUT>/.worktrees/cross-engine-audit-20261005"
+      ],
+      "started_at": "2026-11-05T03:05:45.111896+00:00",
+      "completed_at": "2026-11-05T03:05:47.394485+00:00",
+      "exit_code": 0
+    },
+    {
+      "name": "managed-drift",
+      "argv": [
+        "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.10/bin/go",
+        "test",
+        "-count=1",
+        "-v",
+        "-run",
+        "^TestDrift_RealTableMetas$",
+        "./infoschem"
+      ],
+      "started_at": "2026-11-05T03:05:47.394771+00:00",
+      "completed_at": "2026-11-05T03:05:54.996885+00:00",
+      "exit_code": 0
+    },
+    {
+      "name": "managed-canonical",
+      "argv": [
+        "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.10/bin/go",
+        "test",
+        "-count=1",
+        "-v",
+        "-run",
+        "^TestCanonicalDDL_RealSpanner$",
+        "./infoschem"
+      ],
+      "started_at": "2026-11-05T03:05:54.997021+00:00",
+      "completed_at": "2026-11-05T03:05:58.509284+00:00",
+      "exit_code": 0
+    }
+  ],
+  "managed_surface": {
+    "registered_tables": 53,
+    "known_columns": 632,
+    "advertised_tables": 52,
+    "advertised_columns": 624,
+    "known_absent_columns": 8,
+    "has_drift": false
+  },
+  "projection": {
+    "information_schema_columns": 310,
+    "sys_tables": 50,
+    "sys_columns": 539,
+    "sys_policy": "Historical agreeing managed/Omni observations retained"
+  },
+  "security_repairs": {
+    "go": "1.26.6 to 1.26.10",
+    "x_net": "v0.58.0 to v0.60.0",
+    "otel_sdk": "v1.44.0 to v1.45.0 and minimum coordinated dependencies"
+  },
+  "sha256": {
+    "information_schema_manifest.json": "fe19a31991fc923a7223e8bffbdb1b2f2f1150f51bd1eb4be357aa20432c0052",
+    "spanner_sys_manifest.json": "42c5a900fd4b30b711e2a453945c0d2dde9ffcaf2e13fd14dd77380d4c410aa8",
+    "information_schema_projection_source.json": "57a178642c06fb9bbe252639eb40d1a6c3fb5cc14eb0dbd0cbb58c20ec10b77e",
+    "survey/infoschem/evidence/managed/20261105T030544Z-89b4ab9e231d.json": "0a0d3c15c9bed923a5a7344e679e4e2d9c4b93d2cb551f84f3c87c7dd0336072",
+    "survey/spannersys/evidence/managed/20261105T030547Z-016061fbe58e.json": "3d0e83a4d77aebf3742478bbe4b327b84291c31ad02747a28677868299dae5fb"
+  },
+  "at": "2026-11-05T03:09:20.561329+00:00"
+}

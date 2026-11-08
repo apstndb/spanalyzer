@@ -1,0 +1,1271 @@
+{
+  "status": "prepared_not_executed",
+  "blocking_condition": "Configured managed instance returns NotFound; do not interpret any prepared SQL as runtime acceptance",
+  "sources": [
+    "https://docs.cloud.google.com/spanner/docs/reference/standard-sql/graph-query-statements",
+    "https://docs.cloud.google.com/spanner/docs/full-text-search/json-indexes",
+    "https://docs.cloud.google.com/spanner/docs/reference/standard-sql/hll_functions",
+    "https://docs.cloud.google.com/spanner/docs/reference/postgresql/functions",
+    "https://docs.cloud.google.com/spanner/docs/graph/manage-schemaless-data"
+  ],
+  "fixtures": {
+    "google_ddl": [
+      "CREATE TABLE DocDeltaNodes (Id INT64 NOT NULL, Label STRING(MAX) NOT NULL, Properties JSON) PRIMARY KEY(Id)",
+      "CREATE PROPERTY GRAPH DocDeltaGraph NODE TABLES (DocDeltaNodes LABEL Node PROPERTIES(Id))",
+      "CREATE PROPERTY GRAPH DocDeltaDynamic NODE TABLES (DocDeltaNodes DYNAMIC LABEL(Label) DYNAMIC PROPERTIES(Properties))",
+      "CREATE TABLE DocDeltaDocs (Id INT64 NOT NULL, Doc JSON, DocTokens TOKENLIST AS (TOKENIZE_JSON(Doc)) HIDDEN) PRIMARY KEY(Id)",
+      "CREATE SEARCH INDEX DocDeltaSearch ON DocDeltaDocs(DocTokens)"
+    ],
+    "pg_ddl": [
+      "CREATE TABLE docdeltadocs (id bigint PRIMARY KEY, doc jsonb, doctokens spanner.tokenlist GENERATED ALWAYS AS (spanner.tokenize_jsonb(doc)) VIRTUAL HIDDEN)",
+      "CREATE SEARCH INDEX docdeltasearch ON docdeltadocs(doctokens)"
+    ],
+    "documents": [
+      {
+        "Id": 1,
+        "Doc": {
+          "kind": "active",
+          "n": 1
+        }
+      },
+      {
+        "Id": 2,
+        "Doc": {
+          "kind": "pending",
+          "n": 2
+        }
+      },
+      {
+        "Id": 3,
+        "Doc": {
+          "kind": "inactive",
+          "n": 3
+        }
+      },
+      {
+        "Id": 4,
+        "Doc": {}
+      },
+      {
+        "Id": 5,
+        "Doc": null
+      }
+    ],
+    "dynamic_properties": [
+      {
+        "Id": 1,
+        "Label": "Node",
+        "Properties": {
+          "flag": true,
+          "kind": "a",
+          "value": 2,
+          "num_string": "1"
+        }
+      },
+      {
+        "Id": 2,
+        "Label": "Node",
+        "Properties": {
+          "flag": false,
+          "kind": "a",
+          "value": 1,
+          "num_string": "2"
+        }
+      }
+    ],
+    "cleanup": "Create fresh owned date-scoped databases only after preflight; drop only after successful creation, then require GetDatabase NotFound"
+  },
+  "cases": [
+    {
+      "label": "google-approx-distinct",
+      "sql": "SELECT APPROX_COUNT_DISTINCT(x) AS estimate FROM (SELECT x FROM UNNEST([1,1,2,NULL]) AS x)",
+      "dialect": "google",
+      "family": "hll",
+      "execution_status": "not_run_missing_managed_target"
+    },
+    {
+      "label": "google-hll-precision-9",
+      "sql": "SELECT HLL_COUNT.EXTRACT(HLL_COUNT.INIT(x,9)) AS estimate FROM (SELECT x FROM UNNEST([1,1,2,NULL]) AS x)",
+      "dialect": "google",
+      "family": "hll",
+      "execution_status": "not_run_missing_managed_target",
+      "control": "precision_boundary"
+    },
+    {
+      "label": "google-hll-precision-10",
+      "sql": "SELECT HLL_COUNT.EXTRACT(HLL_COUNT.INIT(x,10)) AS estimate FROM (SELECT x FROM UNNEST([1,1,2,NULL]) AS x)",
+      "dialect": "google",
+      "family": "hll",
+      "execution_status": "not_run_missing_managed_target",
+      "control": "precision_boundary"
+    },
+    {
+      "label": "google-hll-precision-15",
+      "sql": "SELECT HLL_COUNT.EXTRACT(HLL_COUNT.INIT(x,15)) AS estimate FROM (SELECT x FROM UNNEST([1,1,2,NULL]) AS x)",
+      "dialect": "google",
+      "family": "hll",
+      "execution_status": "not_run_missing_managed_target",
+      "control": "precision_boundary"
+    },
+    {
+      "label": "google-hll-precision-24",
+      "sql": "SELECT HLL_COUNT.EXTRACT(HLL_COUNT.INIT(x,24)) AS estimate FROM (SELECT x FROM UNNEST([1,1,2,NULL]) AS x)",
+      "dialect": "google",
+      "family": "hll",
+      "execution_status": "not_run_missing_managed_target",
+      "control": "precision_boundary"
+    },
+    {
+      "label": "google-hll-precision-25",
+      "sql": "SELECT HLL_COUNT.EXTRACT(HLL_COUNT.INIT(x,25)) AS estimate FROM (SELECT x FROM UNNEST([1,1,2,NULL]) AS x)",
+      "dialect": "google",
+      "family": "hll",
+      "execution_status": "not_run_missing_managed_target",
+      "control": "precision_boundary"
+    },
+    {
+      "label": "google-hll-input-int",
+      "sql": "SELECT HLL_COUNT.EXTRACT(HLL_COUNT.INIT(v)) AS estimate FROM (SELECT 1 AS v)",
+      "dialect": "google",
+      "family": "hll",
+      "execution_status": "not_run_missing_managed_target",
+      "control": "input_type"
+    },
+    {
+      "label": "google-hll-input-string",
+      "sql": "SELECT HLL_COUNT.EXTRACT(HLL_COUNT.INIT(v)) AS estimate FROM (SELECT 'x' AS v)",
+      "dialect": "google",
+      "family": "hll",
+      "execution_status": "not_run_missing_managed_target",
+      "control": "input_type"
+    },
+    {
+      "label": "google-hll-input-bytes",
+      "sql": "SELECT HLL_COUNT.EXTRACT(HLL_COUNT.INIT(v)) AS estimate FROM (SELECT b'x' AS v)",
+      "dialect": "google",
+      "family": "hll",
+      "execution_status": "not_run_missing_managed_target",
+      "control": "input_type"
+    },
+    {
+      "label": "google-hll-input-numeric",
+      "sql": "SELECT HLL_COUNT.EXTRACT(HLL_COUNT.INIT(v)) AS estimate FROM (SELECT NUMERIC '1' AS v)",
+      "dialect": "google",
+      "family": "hll",
+      "execution_status": "not_run_missing_managed_target",
+      "control": "input_type"
+    },
+    {
+      "label": "google-hll-input-bool",
+      "sql": "SELECT HLL_COUNT.EXTRACT(HLL_COUNT.INIT(v)) AS estimate FROM (SELECT TRUE AS v)",
+      "dialect": "google",
+      "family": "hll",
+      "execution_status": "not_run_missing_managed_target",
+      "control": "input_type"
+    },
+    {
+      "label": "google-hll-input-interval",
+      "sql": "SELECT HLL_COUNT.EXTRACT(HLL_COUNT.INIT(v)) AS estimate FROM (SELECT INTERVAL 1 DAY AS v)",
+      "dialect": "google",
+      "family": "hll",
+      "execution_status": "not_run_missing_managed_target",
+      "control": "input_type"
+    },
+    {
+      "label": "google-hll-extract-null",
+      "sql": "SELECT HLL_COUNT.EXTRACT(CAST(NULL AS BYTES)) AS estimate",
+      "dialect": "google",
+      "family": "hll",
+      "execution_status": "not_run_missing_managed_target"
+    },
+    {
+      "label": "google-hll-init-null",
+      "sql": "SELECT HLL_COUNT.INIT(CAST(NULL AS INT64)) AS sketch",
+      "dialect": "google",
+      "family": "hll",
+      "execution_status": "not_run_missing_managed_target"
+    },
+    {
+      "label": "google-hll-merge",
+      "sql": "WITH s AS (SELECT HLL_COUNT.INIT(x) AS sketch FROM (SELECT x FROM UNNEST([1,1,2,NULL]) AS x)) SELECT HLL_COUNT.MERGE(sketch) AS estimate FROM s",
+      "dialect": "google",
+      "family": "hll",
+      "execution_status": "not_run_missing_managed_target"
+    },
+    {
+      "label": "google-hll-merge-partial",
+      "sql": "WITH s AS (SELECT HLL_COUNT.INIT(x) AS sketch FROM (SELECT x FROM UNNEST([1,1,2,NULL]) AS x)) SELECT HLL_COUNT.EXTRACT(HLL_COUNT.MERGE_PARTIAL(sketch)) AS estimate FROM s",
+      "dialect": "google",
+      "family": "hll",
+      "execution_status": "not_run_missing_managed_target"
+    },
+    {
+      "label": "pg-approx-distinct",
+      "sql": "SELECT spanner.approx_count_distinct(x) AS estimate FROM (SELECT x FROM (VALUES (1::bigint),(1::bigint),(2::bigint),(NULL::bigint)) AS t(x))",
+      "dialect": "pg",
+      "family": "hll",
+      "execution_status": "not_run_missing_managed_target"
+    },
+    {
+      "label": "pg-hll-precision-9",
+      "sql": "SELECT HLL_COUNT.EXTRACT(HLL_COUNT.INIT(x,9)) AS estimate FROM (SELECT x FROM (VALUES (1::bigint),(1::bigint),(2::bigint),(NULL::bigint)) AS t(x))",
+      "dialect": "pg",
+      "family": "hll",
+      "execution_status": "not_run_missing_managed_target",
+      "control": "precision_boundary"
+    },
+    {
+      "label": "pg-hll-precision-10",
+      "sql": "SELECT HLL_COUNT.EXTRACT(HLL_COUNT.INIT(x,10)) AS estimate FROM (SELECT x FROM (VALUES (1::bigint),(1::bigint),(2::bigint),(NULL::bigint)) AS t(x))",
+      "dialect": "pg",
+      "family": "hll",
+      "execution_status": "not_run_missing_managed_target",
+      "control": "precision_boundary"
+    },
+    {
+      "label": "pg-hll-precision-15",
+      "sql": "SELECT HLL_COUNT.EXTRACT(HLL_COUNT.INIT(x,15)) AS estimate FROM (SELECT x FROM (VALUES (1::bigint),(1::bigint),(2::bigint),(NULL::bigint)) AS t(x))",
+      "dialect": "pg",
+      "family": "hll",
+      "execution_status": "not_run_missing_managed_target",
+      "control": "precision_boundary"
+    },
+    {
+      "label": "pg-hll-precision-24",
+      "sql": "SELECT HLL_COUNT.EXTRACT(HLL_COUNT.INIT(x,24)) AS estimate FROM (SELECT x FROM (VALUES (1::bigint),(1::bigint),(2::bigint),(NULL::bigint)) AS t(x))",
+      "dialect": "pg",
+      "family": "hll",
+      "execution_status": "not_run_missing_managed_target",
+      "control": "precision_boundary"
+    },
+    {
+      "label": "pg-hll-precision-25",
+      "sql": "SELECT HLL_COUNT.EXTRACT(HLL_COUNT.INIT(x,25)) AS estimate FROM (SELECT x FROM (VALUES (1::bigint),(1::bigint),(2::bigint),(NULL::bigint)) AS t(x))",
+      "dialect": "pg",
+      "family": "hll",
+      "execution_status": "not_run_missing_managed_target",
+      "control": "precision_boundary"
+    },
+    {
+      "label": "pg-hll-input-int",
+      "sql": "SELECT HLL_COUNT.EXTRACT(HLL_COUNT.INIT(v)) AS estimate FROM (SELECT 1 AS v)",
+      "dialect": "pg",
+      "family": "hll",
+      "execution_status": "not_run_missing_managed_target",
+      "control": "input_type"
+    },
+    {
+      "label": "pg-hll-input-string",
+      "sql": "SELECT HLL_COUNT.EXTRACT(HLL_COUNT.INIT(v)) AS estimate FROM (SELECT 'x' AS v)",
+      "dialect": "pg",
+      "family": "hll",
+      "execution_status": "not_run_missing_managed_target",
+      "control": "input_type"
+    },
+    {
+      "label": "pg-hll-input-bytes",
+      "sql": "SELECT HLL_COUNT.EXTRACT(HLL_COUNT.INIT(v)) AS estimate FROM (SELECT 'x'::bytea AS v)",
+      "dialect": "pg",
+      "family": "hll",
+      "execution_status": "not_run_missing_managed_target",
+      "control": "input_type"
+    },
+    {
+      "label": "pg-hll-input-numeric",
+      "sql": "SELECT HLL_COUNT.EXTRACT(HLL_COUNT.INIT(v)) AS estimate FROM (SELECT 1::numeric AS v)",
+      "dialect": "pg",
+      "family": "hll",
+      "execution_status": "not_run_missing_managed_target",
+      "control": "input_type"
+    },
+    {
+      "label": "pg-hll-input-bool",
+      "sql": "SELECT HLL_COUNT.EXTRACT(HLL_COUNT.INIT(v)) AS estimate FROM (SELECT TRUE AS v)",
+      "dialect": "pg",
+      "family": "hll",
+      "execution_status": "not_run_missing_managed_target",
+      "control": "input_type"
+    },
+    {
+      "label": "pg-hll-input-interval",
+      "sql": "SELECT HLL_COUNT.EXTRACT(HLL_COUNT.INIT(v)) AS estimate FROM (SELECT INTERVAL '1 day' AS v)",
+      "dialect": "pg",
+      "family": "hll",
+      "execution_status": "not_run_missing_managed_target",
+      "control": "input_type"
+    },
+    {
+      "label": "pg-hll-extract-null",
+      "sql": "SELECT HLL_COUNT.EXTRACT(NULL::bytea) AS estimate",
+      "dialect": "pg",
+      "family": "hll",
+      "execution_status": "not_run_missing_managed_target"
+    },
+    {
+      "label": "pg-hll-init-null",
+      "sql": "SELECT HLL_COUNT.INIT(NULL::bigint) AS sketch",
+      "dialect": "pg",
+      "family": "hll",
+      "execution_status": "not_run_missing_managed_target"
+    },
+    {
+      "label": "pg-hll-merge",
+      "sql": "WITH s AS (SELECT HLL_COUNT.INIT(x) AS sketch FROM (SELECT x FROM (VALUES (1::bigint),(1::bigint),(2::bigint),(NULL::bigint)) AS t(x))) SELECT HLL_COUNT.MERGE(sketch) AS estimate FROM s",
+      "dialect": "pg",
+      "family": "hll",
+      "execution_status": "not_run_missing_managed_target"
+    },
+    {
+      "label": "pg-hll-merge-partial",
+      "sql": "WITH s AS (SELECT HLL_COUNT.INIT(x) AS sketch FROM (SELECT x FROM (VALUES (1::bigint),(1::bigint),(2::bigint),(NULL::bigint)) AS t(x))) SELECT HLL_COUNT.EXTRACT(HLL_COUNT.MERGE_PARTIAL(sketch)) AS estimate FROM s",
+      "dialect": "pg",
+      "family": "hll",
+      "execution_status": "not_run_missing_managed_target"
+    },
+    {
+      "label": "gql-full-outer-union-all",
+      "sql": "GRAPH DocDeltaGraph RETURN 1 AS left_only, 10 AS common FULL OUTER UNION ALL RETURN 10 AS common, 2 AS right_only",
+      "dialect": "google",
+      "family": "gql_column_propagation",
+      "execution_status": "not_run_missing_managed_target",
+      "compare_column_names_and_null_padding": true
+    },
+    {
+      "label": "gql-full-outer-union-distinct",
+      "sql": "GRAPH DocDeltaGraph RETURN 1 AS left_only, 10 AS common FULL OUTER UNION DISTINCT RETURN 10 AS common, 2 AS right_only",
+      "dialect": "google",
+      "family": "gql_column_propagation",
+      "execution_status": "not_run_missing_managed_target",
+      "compare_column_names_and_null_padding": true
+    },
+    {
+      "label": "gql-full-outer-intersect-all",
+      "sql": "GRAPH DocDeltaGraph RETURN 1 AS left_only, 10 AS common FULL OUTER INTERSECT ALL RETURN 10 AS common, 2 AS right_only",
+      "dialect": "google",
+      "family": "gql_column_propagation",
+      "execution_status": "not_run_missing_managed_target",
+      "compare_column_names_and_null_padding": true
+    },
+    {
+      "label": "gql-full-outer-intersect-distinct",
+      "sql": "GRAPH DocDeltaGraph RETURN 1 AS left_only, 10 AS common FULL OUTER INTERSECT DISTINCT RETURN 10 AS common, 2 AS right_only",
+      "dialect": "google",
+      "family": "gql_column_propagation",
+      "execution_status": "not_run_missing_managed_target",
+      "compare_column_names_and_null_padding": true
+    },
+    {
+      "label": "gql-full-outer-except-all",
+      "sql": "GRAPH DocDeltaGraph RETURN 1 AS left_only, 10 AS common FULL OUTER EXCEPT ALL RETURN 10 AS common, 2 AS right_only",
+      "dialect": "google",
+      "family": "gql_column_propagation",
+      "execution_status": "not_run_missing_managed_target",
+      "compare_column_names_and_null_padding": true
+    },
+    {
+      "label": "gql-full-outer-except-distinct",
+      "sql": "GRAPH DocDeltaGraph RETURN 1 AS left_only, 10 AS common FULL OUTER EXCEPT DISTINCT RETURN 10 AS common, 2 AS right_only",
+      "dialect": "google",
+      "family": "gql_column_propagation",
+      "execution_status": "not_run_missing_managed_target",
+      "compare_column_names_and_null_padding": true
+    },
+    {
+      "label": "gql-full-union-all",
+      "sql": "GRAPH DocDeltaGraph RETURN 1 AS left_only, 10 AS common FULL UNION ALL RETURN 10 AS common, 2 AS right_only",
+      "dialect": "google",
+      "family": "gql_column_propagation",
+      "execution_status": "not_run_missing_managed_target",
+      "compare_column_names_and_null_padding": true
+    },
+    {
+      "label": "gql-full-union-distinct",
+      "sql": "GRAPH DocDeltaGraph RETURN 1 AS left_only, 10 AS common FULL UNION DISTINCT RETURN 10 AS common, 2 AS right_only",
+      "dialect": "google",
+      "family": "gql_column_propagation",
+      "execution_status": "not_run_missing_managed_target",
+      "compare_column_names_and_null_padding": true
+    },
+    {
+      "label": "gql-full-intersect-all",
+      "sql": "GRAPH DocDeltaGraph RETURN 1 AS left_only, 10 AS common FULL INTERSECT ALL RETURN 10 AS common, 2 AS right_only",
+      "dialect": "google",
+      "family": "gql_column_propagation",
+      "execution_status": "not_run_missing_managed_target",
+      "compare_column_names_and_null_padding": true
+    },
+    {
+      "label": "gql-full-intersect-distinct",
+      "sql": "GRAPH DocDeltaGraph RETURN 1 AS left_only, 10 AS common FULL INTERSECT DISTINCT RETURN 10 AS common, 2 AS right_only",
+      "dialect": "google",
+      "family": "gql_column_propagation",
+      "execution_status": "not_run_missing_managed_target",
+      "compare_column_names_and_null_padding": true
+    },
+    {
+      "label": "gql-full-except-all",
+      "sql": "GRAPH DocDeltaGraph RETURN 1 AS left_only, 10 AS common FULL EXCEPT ALL RETURN 10 AS common, 2 AS right_only",
+      "dialect": "google",
+      "family": "gql_column_propagation",
+      "execution_status": "not_run_missing_managed_target",
+      "compare_column_names_and_null_padding": true
+    },
+    {
+      "label": "gql-full-except-distinct",
+      "sql": "GRAPH DocDeltaGraph RETURN 1 AS left_only, 10 AS common FULL EXCEPT DISTINCT RETURN 10 AS common, 2 AS right_only",
+      "dialect": "google",
+      "family": "gql_column_propagation",
+      "execution_status": "not_run_missing_managed_target",
+      "compare_column_names_and_null_padding": true
+    },
+    {
+      "label": "gql-outer-union-all",
+      "sql": "GRAPH DocDeltaGraph RETURN 1 AS left_only, 10 AS common OUTER UNION ALL RETURN 10 AS common, 2 AS right_only",
+      "dialect": "google",
+      "family": "gql_column_propagation",
+      "execution_status": "not_run_missing_managed_target",
+      "compare_column_names_and_null_padding": true
+    },
+    {
+      "label": "gql-outer-union-distinct",
+      "sql": "GRAPH DocDeltaGraph RETURN 1 AS left_only, 10 AS common OUTER UNION DISTINCT RETURN 10 AS common, 2 AS right_only",
+      "dialect": "google",
+      "family": "gql_column_propagation",
+      "execution_status": "not_run_missing_managed_target",
+      "compare_column_names_and_null_padding": true
+    },
+    {
+      "label": "gql-outer-intersect-all",
+      "sql": "GRAPH DocDeltaGraph RETURN 1 AS left_only, 10 AS common OUTER INTERSECT ALL RETURN 10 AS common, 2 AS right_only",
+      "dialect": "google",
+      "family": "gql_column_propagation",
+      "execution_status": "not_run_missing_managed_target",
+      "compare_column_names_and_null_padding": true
+    },
+    {
+      "label": "gql-outer-intersect-distinct",
+      "sql": "GRAPH DocDeltaGraph RETURN 1 AS left_only, 10 AS common OUTER INTERSECT DISTINCT RETURN 10 AS common, 2 AS right_only",
+      "dialect": "google",
+      "family": "gql_column_propagation",
+      "execution_status": "not_run_missing_managed_target",
+      "compare_column_names_and_null_padding": true
+    },
+    {
+      "label": "gql-outer-except-all",
+      "sql": "GRAPH DocDeltaGraph RETURN 1 AS left_only, 10 AS common OUTER EXCEPT ALL RETURN 10 AS common, 2 AS right_only",
+      "dialect": "google",
+      "family": "gql_column_propagation",
+      "execution_status": "not_run_missing_managed_target",
+      "compare_column_names_and_null_padding": true
+    },
+    {
+      "label": "gql-outer-except-distinct",
+      "sql": "GRAPH DocDeltaGraph RETURN 1 AS left_only, 10 AS common OUTER EXCEPT DISTINCT RETURN 10 AS common, 2 AS right_only",
+      "dialect": "google",
+      "family": "gql_column_propagation",
+      "execution_status": "not_run_missing_managed_target",
+      "compare_column_names_and_null_padding": true
+    },
+    {
+      "label": "gql-left-outer-union-all",
+      "sql": "GRAPH DocDeltaGraph RETURN 1 AS left_only, 10 AS common LEFT OUTER UNION ALL RETURN 10 AS common, 2 AS right_only",
+      "dialect": "google",
+      "family": "gql_column_propagation",
+      "execution_status": "not_run_missing_managed_target",
+      "compare_column_names_and_null_padding": true
+    },
+    {
+      "label": "gql-left-outer-union-distinct",
+      "sql": "GRAPH DocDeltaGraph RETURN 1 AS left_only, 10 AS common LEFT OUTER UNION DISTINCT RETURN 10 AS common, 2 AS right_only",
+      "dialect": "google",
+      "family": "gql_column_propagation",
+      "execution_status": "not_run_missing_managed_target",
+      "compare_column_names_and_null_padding": true
+    },
+    {
+      "label": "gql-left-outer-intersect-all",
+      "sql": "GRAPH DocDeltaGraph RETURN 1 AS left_only, 10 AS common LEFT OUTER INTERSECT ALL RETURN 10 AS common, 2 AS right_only",
+      "dialect": "google",
+      "family": "gql_column_propagation",
+      "execution_status": "not_run_missing_managed_target",
+      "compare_column_names_and_null_padding": true
+    },
+    {
+      "label": "gql-left-outer-intersect-distinct",
+      "sql": "GRAPH DocDeltaGraph RETURN 1 AS left_only, 10 AS common LEFT OUTER INTERSECT DISTINCT RETURN 10 AS common, 2 AS right_only",
+      "dialect": "google",
+      "family": "gql_column_propagation",
+      "execution_status": "not_run_missing_managed_target",
+      "compare_column_names_and_null_padding": true
+    },
+    {
+      "label": "gql-left-outer-except-all",
+      "sql": "GRAPH DocDeltaGraph RETURN 1 AS left_only, 10 AS common LEFT OUTER EXCEPT ALL RETURN 10 AS common, 2 AS right_only",
+      "dialect": "google",
+      "family": "gql_column_propagation",
+      "execution_status": "not_run_missing_managed_target",
+      "compare_column_names_and_null_padding": true
+    },
+    {
+      "label": "gql-left-outer-except-distinct",
+      "sql": "GRAPH DocDeltaGraph RETURN 1 AS left_only, 10 AS common LEFT OUTER EXCEPT DISTINCT RETURN 10 AS common, 2 AS right_only",
+      "dialect": "google",
+      "family": "gql_column_propagation",
+      "execution_status": "not_run_missing_managed_target",
+      "compare_column_names_and_null_padding": true
+    },
+    {
+      "label": "gql-left-union-all",
+      "sql": "GRAPH DocDeltaGraph RETURN 1 AS left_only, 10 AS common LEFT UNION ALL RETURN 10 AS common, 2 AS right_only",
+      "dialect": "google",
+      "family": "gql_column_propagation",
+      "execution_status": "not_run_missing_managed_target",
+      "compare_column_names_and_null_padding": true
+    },
+    {
+      "label": "gql-left-union-distinct",
+      "sql": "GRAPH DocDeltaGraph RETURN 1 AS left_only, 10 AS common LEFT UNION DISTINCT RETURN 10 AS common, 2 AS right_only",
+      "dialect": "google",
+      "family": "gql_column_propagation",
+      "execution_status": "not_run_missing_managed_target",
+      "compare_column_names_and_null_padding": true
+    },
+    {
+      "label": "gql-left-intersect-all",
+      "sql": "GRAPH DocDeltaGraph RETURN 1 AS left_only, 10 AS common LEFT INTERSECT ALL RETURN 10 AS common, 2 AS right_only",
+      "dialect": "google",
+      "family": "gql_column_propagation",
+      "execution_status": "not_run_missing_managed_target",
+      "compare_column_names_and_null_padding": true
+    },
+    {
+      "label": "gql-left-intersect-distinct",
+      "sql": "GRAPH DocDeltaGraph RETURN 1 AS left_only, 10 AS common LEFT INTERSECT DISTINCT RETURN 10 AS common, 2 AS right_only",
+      "dialect": "google",
+      "family": "gql_column_propagation",
+      "execution_status": "not_run_missing_managed_target",
+      "compare_column_names_and_null_padding": true
+    },
+    {
+      "label": "gql-left-except-all",
+      "sql": "GRAPH DocDeltaGraph RETURN 1 AS left_only, 10 AS common LEFT EXCEPT ALL RETURN 10 AS common, 2 AS right_only",
+      "dialect": "google",
+      "family": "gql_column_propagation",
+      "execution_status": "not_run_missing_managed_target",
+      "compare_column_names_and_null_padding": true
+    },
+    {
+      "label": "gql-left-except-distinct",
+      "sql": "GRAPH DocDeltaGraph RETURN 1 AS left_only, 10 AS common LEFT EXCEPT DISTINCT RETURN 10 AS common, 2 AS right_only",
+      "dialect": "google",
+      "family": "gql_column_propagation",
+      "execution_status": "not_run_missing_managed_target",
+      "compare_column_names_and_null_padding": true
+    },
+    {
+      "label": "gql-inner-union-all",
+      "sql": "GRAPH DocDeltaGraph RETURN 1 AS left_only, 10 AS common INNER UNION ALL RETURN 10 AS common, 2 AS right_only",
+      "dialect": "google",
+      "family": "gql_column_propagation",
+      "execution_status": "not_run_missing_managed_target",
+      "compare_column_names_and_null_padding": true
+    },
+    {
+      "label": "gql-inner-union-distinct",
+      "sql": "GRAPH DocDeltaGraph RETURN 1 AS left_only, 10 AS common INNER UNION DISTINCT RETURN 10 AS common, 2 AS right_only",
+      "dialect": "google",
+      "family": "gql_column_propagation",
+      "execution_status": "not_run_missing_managed_target",
+      "compare_column_names_and_null_padding": true
+    },
+    {
+      "label": "gql-inner-intersect-all",
+      "sql": "GRAPH DocDeltaGraph RETURN 1 AS left_only, 10 AS common INNER INTERSECT ALL RETURN 10 AS common, 2 AS right_only",
+      "dialect": "google",
+      "family": "gql_column_propagation",
+      "execution_status": "not_run_missing_managed_target",
+      "compare_column_names_and_null_padding": true
+    },
+    {
+      "label": "gql-inner-intersect-distinct",
+      "sql": "GRAPH DocDeltaGraph RETURN 1 AS left_only, 10 AS common INNER INTERSECT DISTINCT RETURN 10 AS common, 2 AS right_only",
+      "dialect": "google",
+      "family": "gql_column_propagation",
+      "execution_status": "not_run_missing_managed_target",
+      "compare_column_names_and_null_padding": true
+    },
+    {
+      "label": "gql-inner-except-all",
+      "sql": "GRAPH DocDeltaGraph RETURN 1 AS left_only, 10 AS common INNER EXCEPT ALL RETURN 10 AS common, 2 AS right_only",
+      "dialect": "google",
+      "family": "gql_column_propagation",
+      "execution_status": "not_run_missing_managed_target",
+      "compare_column_names_and_null_padding": true
+    },
+    {
+      "label": "gql-inner-except-distinct",
+      "sql": "GRAPH DocDeltaGraph RETURN 1 AS left_only, 10 AS common INNER EXCEPT DISTINCT RETURN 10 AS common, 2 AS right_only",
+      "dialect": "google",
+      "family": "gql_column_propagation",
+      "execution_status": "not_run_missing_managed_target",
+      "compare_column_names_and_null_padding": true
+    },
+    {
+      "label": "gql-default-name-mismatch",
+      "sql": "GRAPH DocDeltaGraph RETURN 1 AS left_only UNION ALL RETURN 2 AS right_only",
+      "dialect": "google",
+      "family": "gql_column_propagation",
+      "execution_status": "not_run_missing_managed_target",
+      "control": "negative_or_semantic_boundary"
+    },
+    {
+      "label": "gql-inner-no-common",
+      "sql": "GRAPH DocDeltaGraph RETURN 1 AS left_only INNER UNION ALL RETURN 2 AS right_only",
+      "dialect": "google",
+      "family": "gql_column_propagation",
+      "execution_status": "not_run_missing_managed_target",
+      "control": "negative_or_semantic_boundary"
+    },
+    {
+      "label": "gql-malformed-rhs",
+      "sql": "GRAPH DocDeltaGraph RETURN 1 AS x FULL OUTER UNION ALL",
+      "dialect": "google",
+      "family": "gql_column_propagation",
+      "execution_status": "not_run_missing_managed_target",
+      "control": "negative_or_semantic_boundary"
+    },
+    {
+      "label": "gql-malformed-alias",
+      "sql": "GRAPH DocDeltaGraph RETURN 1 AS x FULL OUTER UNION ALL RETURN 2 AS",
+      "dialect": "google",
+      "family": "gql_column_propagation",
+      "execution_status": "not_run_missing_managed_target",
+      "control": "negative_or_semantic_boundary"
+    },
+    {
+      "label": "google-json-document-equal-automatic",
+      "sql": "SELECT d.Id FROM DocDeltaDocs AS d WHERE d.doc = JSON '{\"kind\":\"active\",\"n\":1}' ORDER BY d.Id",
+      "dialect": "google",
+      "family": "json_search_equality",
+      "execution_status": "not_run_missing_managed_target",
+      "profile": true,
+      "access": "automatic",
+      "requirement": "Separate successful execution, forced access, automatic plan selection and result equivalence; no performance inference from the small fixture"
+    },
+    {
+      "label": "google-json-document-equal-forced-search",
+      "sql": "SELECT d.Id FROM DocDeltaDocs@{FORCE_INDEX=DocDeltaSearch} AS d WHERE d.doc = JSON '{\"kind\":\"active\",\"n\":1}' ORDER BY d.Id",
+      "dialect": "google",
+      "family": "json_search_equality",
+      "execution_status": "not_run_missing_managed_target",
+      "profile": true,
+      "access": "forced-search",
+      "requirement": "Separate successful execution, forced access, automatic plan selection and result equivalence; no performance inference from the small fixture"
+    },
+    {
+      "label": "google-json-document-equal-forced-base",
+      "sql": "SELECT d.Id FROM DocDeltaDocs@{FORCE_INDEX=_BASE_TABLE} AS d WHERE d.doc = JSON '{\"kind\":\"active\",\"n\":1}' ORDER BY d.Id",
+      "dialect": "google",
+      "family": "json_search_equality",
+      "execution_status": "not_run_missing_managed_target",
+      "profile": true,
+      "access": "forced-base",
+      "requirement": "Separate successful execution, forced access, automatic plan selection and result equivalence; no performance inference from the small fixture"
+    },
+    {
+      "label": "google-json-path-equal-automatic",
+      "sql": "SELECT d.Id FROM DocDeltaDocs AS d WHERE d.doc.kind = 'active' ORDER BY d.Id",
+      "dialect": "google",
+      "family": "json_search_equality",
+      "execution_status": "not_run_missing_managed_target",
+      "profile": true,
+      "access": "automatic",
+      "requirement": "Separate successful execution, forced access, automatic plan selection and result equivalence; no performance inference from the small fixture"
+    },
+    {
+      "label": "google-json-path-equal-forced-search",
+      "sql": "SELECT d.Id FROM DocDeltaDocs@{FORCE_INDEX=DocDeltaSearch} AS d WHERE d.doc.kind = 'active' ORDER BY d.Id",
+      "dialect": "google",
+      "family": "json_search_equality",
+      "execution_status": "not_run_missing_managed_target",
+      "profile": true,
+      "access": "forced-search",
+      "requirement": "Separate successful execution, forced access, automatic plan selection and result equivalence; no performance inference from the small fixture"
+    },
+    {
+      "label": "google-json-path-equal-forced-base",
+      "sql": "SELECT d.Id FROM DocDeltaDocs@{FORCE_INDEX=_BASE_TABLE} AS d WHERE d.doc.kind = 'active' ORDER BY d.Id",
+      "dialect": "google",
+      "family": "json_search_equality",
+      "execution_status": "not_run_missing_managed_target",
+      "profile": true,
+      "access": "forced-base",
+      "requirement": "Separate successful execution, forced access, automatic plan selection and result equivalence; no performance inference from the small fixture"
+    },
+    {
+      "label": "google-json-number-equal-automatic",
+      "sql": "SELECT d.Id FROM DocDeltaDocs AS d WHERE d.doc.n = 1 ORDER BY d.Id",
+      "dialect": "google",
+      "family": "json_search_equality",
+      "execution_status": "not_run_missing_managed_target",
+      "profile": true,
+      "access": "automatic",
+      "requirement": "Separate successful execution, forced access, automatic plan selection and result equivalence; no performance inference from the small fixture"
+    },
+    {
+      "label": "google-json-number-equal-forced-search",
+      "sql": "SELECT d.Id FROM DocDeltaDocs@{FORCE_INDEX=DocDeltaSearch} AS d WHERE d.doc.n = 1 ORDER BY d.Id",
+      "dialect": "google",
+      "family": "json_search_equality",
+      "execution_status": "not_run_missing_managed_target",
+      "profile": true,
+      "access": "forced-search",
+      "requirement": "Separate successful execution, forced access, automatic plan selection and result equivalence; no performance inference from the small fixture"
+    },
+    {
+      "label": "google-json-number-equal-forced-base",
+      "sql": "SELECT d.Id FROM DocDeltaDocs@{FORCE_INDEX=_BASE_TABLE} AS d WHERE d.doc.n = 1 ORDER BY d.Id",
+      "dialect": "google",
+      "family": "json_search_equality",
+      "execution_status": "not_run_missing_managed_target",
+      "profile": true,
+      "access": "forced-base",
+      "requirement": "Separate successful execution, forced access, automatic plan selection and result equivalence; no performance inference from the small fixture"
+    },
+    {
+      "label": "google-json-not-equal-automatic",
+      "sql": "SELECT d.Id FROM DocDeltaDocs AS d WHERE d.doc.kind != 'active' ORDER BY d.Id",
+      "dialect": "google",
+      "family": "json_search_equality",
+      "execution_status": "not_run_missing_managed_target",
+      "profile": true,
+      "access": "automatic",
+      "requirement": "Separate successful execution, forced access, automatic plan selection and result equivalence; no performance inference from the small fixture"
+    },
+    {
+      "label": "google-json-not-equal-forced-search",
+      "sql": "SELECT d.Id FROM DocDeltaDocs@{FORCE_INDEX=DocDeltaSearch} AS d WHERE d.doc.kind != 'active' ORDER BY d.Id",
+      "dialect": "google",
+      "family": "json_search_equality",
+      "execution_status": "not_run_missing_managed_target",
+      "profile": true,
+      "access": "forced-search",
+      "requirement": "Separate successful execution, forced access, automatic plan selection and result equivalence; no performance inference from the small fixture"
+    },
+    {
+      "label": "google-json-not-equal-forced-base",
+      "sql": "SELECT d.Id FROM DocDeltaDocs@{FORCE_INDEX=_BASE_TABLE} AS d WHERE d.doc.kind != 'active' ORDER BY d.Id",
+      "dialect": "google",
+      "family": "json_search_equality",
+      "execution_status": "not_run_missing_managed_target",
+      "profile": true,
+      "access": "forced-base",
+      "requirement": "Separate successful execution, forced access, automatic plan selection and result equivalence; no performance inference from the small fixture"
+    },
+    {
+      "label": "google-json-not-equal-alias-automatic",
+      "sql": "SELECT d.Id FROM DocDeltaDocs AS d WHERE d.doc.kind <> 'active' ORDER BY d.Id",
+      "dialect": "google",
+      "family": "json_search_equality",
+      "execution_status": "not_run_missing_managed_target",
+      "profile": true,
+      "access": "automatic",
+      "requirement": "Separate successful execution, forced access, automatic plan selection and result equivalence; no performance inference from the small fixture"
+    },
+    {
+      "label": "google-json-not-equal-alias-forced-search",
+      "sql": "SELECT d.Id FROM DocDeltaDocs@{FORCE_INDEX=DocDeltaSearch} AS d WHERE d.doc.kind <> 'active' ORDER BY d.Id",
+      "dialect": "google",
+      "family": "json_search_equality",
+      "execution_status": "not_run_missing_managed_target",
+      "profile": true,
+      "access": "forced-search",
+      "requirement": "Separate successful execution, forced access, automatic plan selection and result equivalence; no performance inference from the small fixture"
+    },
+    {
+      "label": "google-json-not-equal-alias-forced-base",
+      "sql": "SELECT d.Id FROM DocDeltaDocs@{FORCE_INDEX=_BASE_TABLE} AS d WHERE d.doc.kind <> 'active' ORDER BY d.Id",
+      "dialect": "google",
+      "family": "json_search_equality",
+      "execution_status": "not_run_missing_managed_target",
+      "profile": true,
+      "access": "forced-base",
+      "requirement": "Separate successful execution, forced access, automatic plan selection and result equivalence; no performance inference from the small fixture"
+    },
+    {
+      "label": "google-json-in-automatic",
+      "sql": "SELECT d.Id FROM DocDeltaDocs AS d WHERE d.doc.kind IN ('active','pending') ORDER BY d.Id",
+      "dialect": "google",
+      "family": "json_search_equality",
+      "execution_status": "not_run_missing_managed_target",
+      "profile": true,
+      "access": "automatic",
+      "requirement": "Separate successful execution, forced access, automatic plan selection and result equivalence; no performance inference from the small fixture"
+    },
+    {
+      "label": "google-json-in-forced-search",
+      "sql": "SELECT d.Id FROM DocDeltaDocs@{FORCE_INDEX=DocDeltaSearch} AS d WHERE d.doc.kind IN ('active','pending') ORDER BY d.Id",
+      "dialect": "google",
+      "family": "json_search_equality",
+      "execution_status": "not_run_missing_managed_target",
+      "profile": true,
+      "access": "forced-search",
+      "requirement": "Separate successful execution, forced access, automatic plan selection and result equivalence; no performance inference from the small fixture"
+    },
+    {
+      "label": "google-json-in-forced-base",
+      "sql": "SELECT d.Id FROM DocDeltaDocs@{FORCE_INDEX=_BASE_TABLE} AS d WHERE d.doc.kind IN ('active','pending') ORDER BY d.Id",
+      "dialect": "google",
+      "family": "json_search_equality",
+      "execution_status": "not_run_missing_managed_target",
+      "profile": true,
+      "access": "forced-base",
+      "requirement": "Separate successful execution, forced access, automatic plan selection and result equivalence; no performance inference from the small fixture"
+    },
+    {
+      "label": "google-json-not-in-automatic",
+      "sql": "SELECT d.Id FROM DocDeltaDocs AS d WHERE d.doc.kind NOT IN ('active','pending') ORDER BY d.Id",
+      "dialect": "google",
+      "family": "json_search_equality",
+      "execution_status": "not_run_missing_managed_target",
+      "profile": true,
+      "access": "automatic",
+      "requirement": "Separate successful execution, forced access, automatic plan selection and result equivalence; no performance inference from the small fixture"
+    },
+    {
+      "label": "google-json-not-in-forced-search",
+      "sql": "SELECT d.Id FROM DocDeltaDocs@{FORCE_INDEX=DocDeltaSearch} AS d WHERE d.doc.kind NOT IN ('active','pending') ORDER BY d.Id",
+      "dialect": "google",
+      "family": "json_search_equality",
+      "execution_status": "not_run_missing_managed_target",
+      "profile": true,
+      "access": "forced-search",
+      "requirement": "Separate successful execution, forced access, automatic plan selection and result equivalence; no performance inference from the small fixture"
+    },
+    {
+      "label": "google-json-not-in-forced-base",
+      "sql": "SELECT d.Id FROM DocDeltaDocs@{FORCE_INDEX=_BASE_TABLE} AS d WHERE d.doc.kind NOT IN ('active','pending') ORDER BY d.Id",
+      "dialect": "google",
+      "family": "json_search_equality",
+      "execution_status": "not_run_missing_managed_target",
+      "profile": true,
+      "access": "forced-base",
+      "requirement": "Separate successful execution, forced access, automatic plan selection and result equivalence; no performance inference from the small fixture"
+    },
+    {
+      "label": "google-json-exists-automatic",
+      "sql": "SELECT d.Id FROM DocDeltaDocs AS d WHERE d.doc.kind IS NOT NULL ORDER BY d.Id",
+      "dialect": "google",
+      "family": "json_search_equality",
+      "execution_status": "not_run_missing_managed_target",
+      "profile": true,
+      "access": "automatic",
+      "requirement": "Separate successful execution, forced access, automatic plan selection and result equivalence; no performance inference from the small fixture"
+    },
+    {
+      "label": "google-json-exists-forced-search",
+      "sql": "SELECT d.Id FROM DocDeltaDocs@{FORCE_INDEX=DocDeltaSearch} AS d WHERE d.doc.kind IS NOT NULL ORDER BY d.Id",
+      "dialect": "google",
+      "family": "json_search_equality",
+      "execution_status": "not_run_missing_managed_target",
+      "profile": true,
+      "access": "forced-search",
+      "requirement": "Separate successful execution, forced access, automatic plan selection and result equivalence; no performance inference from the small fixture"
+    },
+    {
+      "label": "google-json-exists-forced-base",
+      "sql": "SELECT d.Id FROM DocDeltaDocs@{FORCE_INDEX=_BASE_TABLE} AS d WHERE d.doc.kind IS NOT NULL ORDER BY d.Id",
+      "dialect": "google",
+      "family": "json_search_equality",
+      "execution_status": "not_run_missing_managed_target",
+      "profile": true,
+      "access": "forced-base",
+      "requirement": "Separate successful execution, forced access, automatic plan selection and result equivalence; no performance inference from the small fixture"
+    },
+    {
+      "label": "google-json-range-automatic",
+      "sql": "SELECT d.Id FROM DocDeltaDocs AS d WHERE d.doc.n > 1 ORDER BY d.Id",
+      "dialect": "google",
+      "family": "json_search_equality",
+      "execution_status": "not_run_missing_managed_target",
+      "profile": true,
+      "access": "automatic",
+      "requirement": "Separate successful execution, forced access, automatic plan selection and result equivalence; no performance inference from the small fixture"
+    },
+    {
+      "label": "google-json-range-forced-search",
+      "sql": "SELECT d.Id FROM DocDeltaDocs@{FORCE_INDEX=DocDeltaSearch} AS d WHERE d.doc.n > 1 ORDER BY d.Id",
+      "dialect": "google",
+      "family": "json_search_equality",
+      "execution_status": "not_run_missing_managed_target",
+      "profile": true,
+      "access": "forced-search",
+      "requirement": "Separate successful execution, forced access, automatic plan selection and result equivalence; no performance inference from the small fixture"
+    },
+    {
+      "label": "google-json-range-forced-base",
+      "sql": "SELECT d.Id FROM DocDeltaDocs@{FORCE_INDEX=_BASE_TABLE} AS d WHERE d.doc.n > 1 ORDER BY d.Id",
+      "dialect": "google",
+      "family": "json_search_equality",
+      "execution_status": "not_run_missing_managed_target",
+      "profile": true,
+      "access": "forced-base",
+      "requirement": "Separate successful execution, forced access, automatic plan selection and result equivalence; no performance inference from the small fixture"
+    },
+    {
+      "label": "pg-json-document-equal-automatic",
+      "sql": "SELECT d.Id FROM docdeltadocs AS d WHERE d.doc = '{\"kind\":\"active\",\"n\":1}'::jsonb ORDER BY d.Id",
+      "dialect": "pg",
+      "family": "json_search_equality",
+      "execution_status": "not_run_missing_managed_target",
+      "profile": true,
+      "access": "automatic",
+      "requirement": "Separate successful execution, forced access, automatic plan selection and result equivalence; no performance inference from the small fixture"
+    },
+    {
+      "label": "pg-json-document-equal-forced-search",
+      "sql": "SELECT d.Id FROM docdeltadocs /*@ FORCE_INDEX=docdeltasearch */ AS d WHERE d.doc = '{\"kind\":\"active\",\"n\":1}'::jsonb ORDER BY d.Id",
+      "dialect": "pg",
+      "family": "json_search_equality",
+      "execution_status": "not_run_missing_managed_target",
+      "profile": true,
+      "access": "forced-search",
+      "requirement": "Separate successful execution, forced access, automatic plan selection and result equivalence; no performance inference from the small fixture"
+    },
+    {
+      "label": "pg-json-document-equal-forced-base",
+      "sql": "SELECT d.Id FROM docdeltadocs /*@ FORCE_INDEX=_BASE_TABLE */ AS d WHERE d.doc = '{\"kind\":\"active\",\"n\":1}'::jsonb ORDER BY d.Id",
+      "dialect": "pg",
+      "family": "json_search_equality",
+      "execution_status": "not_run_missing_managed_target",
+      "profile": true,
+      "access": "forced-base",
+      "requirement": "Separate successful execution, forced access, automatic plan selection and result equivalence; no performance inference from the small fixture"
+    },
+    {
+      "label": "pg-json-path-equal-automatic",
+      "sql": "SELECT d.Id FROM docdeltadocs AS d WHERE d.doc->'kind' = '\"active\"'::jsonb ORDER BY d.Id",
+      "dialect": "pg",
+      "family": "json_search_equality",
+      "execution_status": "not_run_missing_managed_target",
+      "profile": true,
+      "access": "automatic",
+      "requirement": "Separate successful execution, forced access, automatic plan selection and result equivalence; no performance inference from the small fixture"
+    },
+    {
+      "label": "pg-json-path-equal-forced-search",
+      "sql": "SELECT d.Id FROM docdeltadocs /*@ FORCE_INDEX=docdeltasearch */ AS d WHERE d.doc->'kind' = '\"active\"'::jsonb ORDER BY d.Id",
+      "dialect": "pg",
+      "family": "json_search_equality",
+      "execution_status": "not_run_missing_managed_target",
+      "profile": true,
+      "access": "forced-search",
+      "requirement": "Separate successful execution, forced access, automatic plan selection and result equivalence; no performance inference from the small fixture"
+    },
+    {
+      "label": "pg-json-path-equal-forced-base",
+      "sql": "SELECT d.Id FROM docdeltadocs /*@ FORCE_INDEX=_BASE_TABLE */ AS d WHERE d.doc->'kind' = '\"active\"'::jsonb ORDER BY d.Id",
+      "dialect": "pg",
+      "family": "json_search_equality",
+      "execution_status": "not_run_missing_managed_target",
+      "profile": true,
+      "access": "forced-base",
+      "requirement": "Separate successful execution, forced access, automatic plan selection and result equivalence; no performance inference from the small fixture"
+    },
+    {
+      "label": "pg-json-number-equal-automatic",
+      "sql": "SELECT d.Id FROM docdeltadocs AS d WHERE d.doc->'n' = '1'::jsonb ORDER BY d.Id",
+      "dialect": "pg",
+      "family": "json_search_equality",
+      "execution_status": "not_run_missing_managed_target",
+      "profile": true,
+      "access": "automatic",
+      "requirement": "Separate successful execution, forced access, automatic plan selection and result equivalence; no performance inference from the small fixture"
+    },
+    {
+      "label": "pg-json-number-equal-forced-search",
+      "sql": "SELECT d.Id FROM docdeltadocs /*@ FORCE_INDEX=docdeltasearch */ AS d WHERE d.doc->'n' = '1'::jsonb ORDER BY d.Id",
+      "dialect": "pg",
+      "family": "json_search_equality",
+      "execution_status": "not_run_missing_managed_target",
+      "profile": true,
+      "access": "forced-search",
+      "requirement": "Separate successful execution, forced access, automatic plan selection and result equivalence; no performance inference from the small fixture"
+    },
+    {
+      "label": "pg-json-number-equal-forced-base",
+      "sql": "SELECT d.Id FROM docdeltadocs /*@ FORCE_INDEX=_BASE_TABLE */ AS d WHERE d.doc->'n' = '1'::jsonb ORDER BY d.Id",
+      "dialect": "pg",
+      "family": "json_search_equality",
+      "execution_status": "not_run_missing_managed_target",
+      "profile": true,
+      "access": "forced-base",
+      "requirement": "Separate successful execution, forced access, automatic plan selection and result equivalence; no performance inference from the small fixture"
+    },
+    {
+      "label": "pg-json-not-equal-automatic",
+      "sql": "SELECT d.Id FROM docdeltadocs AS d WHERE d.doc->'kind' != '\"active\"'::jsonb ORDER BY d.Id",
+      "dialect": "pg",
+      "family": "json_search_equality",
+      "execution_status": "not_run_missing_managed_target",
+      "profile": true,
+      "access": "automatic",
+      "requirement": "Separate successful execution, forced access, automatic plan selection and result equivalence; no performance inference from the small fixture"
+    },
+    {
+      "label": "pg-json-not-equal-forced-search",
+      "sql": "SELECT d.Id FROM docdeltadocs /*@ FORCE_INDEX=docdeltasearch */ AS d WHERE d.doc->'kind' != '\"active\"'::jsonb ORDER BY d.Id",
+      "dialect": "pg",
+      "family": "json_search_equality",
+      "execution_status": "not_run_missing_managed_target",
+      "profile": true,
+      "access": "forced-search",
+      "requirement": "Separate successful execution, forced access, automatic plan selection and result equivalence; no performance inference from the small fixture"
+    },
+    {
+      "label": "pg-json-not-equal-forced-base",
+      "sql": "SELECT d.Id FROM docdeltadocs /*@ FORCE_INDEX=_BASE_TABLE */ AS d WHERE d.doc->'kind' != '\"active\"'::jsonb ORDER BY d.Id",
+      "dialect": "pg",
+      "family": "json_search_equality",
+      "execution_status": "not_run_missing_managed_target",
+      "profile": true,
+      "access": "forced-base",
+      "requirement": "Separate successful execution, forced access, automatic plan selection and result equivalence; no performance inference from the small fixture"
+    },
+    {
+      "label": "pg-json-not-equal-alias-automatic",
+      "sql": "SELECT d.Id FROM docdeltadocs AS d WHERE d.doc->'kind' <> '\"active\"'::jsonb ORDER BY d.Id",
+      "dialect": "pg",
+      "family": "json_search_equality",
+      "execution_status": "not_run_missing_managed_target",
+      "profile": true,
+      "access": "automatic",
+      "requirement": "Separate successful execution, forced access, automatic plan selection and result equivalence; no performance inference from the small fixture"
+    },
+    {
+      "label": "pg-json-not-equal-alias-forced-search",
+      "sql": "SELECT d.Id FROM docdeltadocs /*@ FORCE_INDEX=docdeltasearch */ AS d WHERE d.doc->'kind' <> '\"active\"'::jsonb ORDER BY d.Id",
+      "dialect": "pg",
+      "family": "json_search_equality",
+      "execution_status": "not_run_missing_managed_target",
+      "profile": true,
+      "access": "forced-search",
+      "requirement": "Separate successful execution, forced access, automatic plan selection and result equivalence; no performance inference from the small fixture"
+    },
+    {
+      "label": "pg-json-not-equal-alias-forced-base",
+      "sql": "SELECT d.Id FROM docdeltadocs /*@ FORCE_INDEX=_BASE_TABLE */ AS d WHERE d.doc->'kind' <> '\"active\"'::jsonb ORDER BY d.Id",
+      "dialect": "pg",
+      "family": "json_search_equality",
+      "execution_status": "not_run_missing_managed_target",
+      "profile": true,
+      "access": "forced-base",
+      "requirement": "Separate successful execution, forced access, automatic plan selection and result equivalence; no performance inference from the small fixture"
+    },
+    {
+      "label": "pg-json-in-automatic",
+      "sql": "SELECT d.Id FROM docdeltadocs AS d WHERE d.doc->'kind' IN ('\"active\"'::jsonb,'\"pending\"'::jsonb) ORDER BY d.Id",
+      "dialect": "pg",
+      "family": "json_search_equality",
+      "execution_status": "not_run_missing_managed_target",
+      "profile": true,
+      "access": "automatic",
+      "requirement": "Separate successful execution, forced access, automatic plan selection and result equivalence; no performance inference from the small fixture"
+    },
+    {
+      "label": "pg-json-in-forced-search",
+      "sql": "SELECT d.Id FROM docdeltadocs /*@ FORCE_INDEX=docdeltasearch */ AS d WHERE d.doc->'kind' IN ('\"active\"'::jsonb,'\"pending\"'::jsonb) ORDER BY d.Id",
+      "dialect": "pg",
+      "family": "json_search_equality",
+      "execution_status": "not_run_missing_managed_target",
+      "profile": true,
+      "access": "forced-search",
+      "requirement": "Separate successful execution, forced access, automatic plan selection and result equivalence; no performance inference from the small fixture"
+    },
+    {
+      "label": "pg-json-in-forced-base",
+      "sql": "SELECT d.Id FROM docdeltadocs /*@ FORCE_INDEX=_BASE_TABLE */ AS d WHERE d.doc->'kind' IN ('\"active\"'::jsonb,'\"pending\"'::jsonb) ORDER BY d.Id",
+      "dialect": "pg",
+      "family": "json_search_equality",
+      "execution_status": "not_run_missing_managed_target",
+      "profile": true,
+      "access": "forced-base",
+      "requirement": "Separate successful execution, forced access, automatic plan selection and result equivalence; no performance inference from the small fixture"
+    },
+    {
+      "label": "pg-json-not-in-automatic",
+      "sql": "SELECT d.Id FROM docdeltadocs AS d WHERE d.doc->'kind' NOT IN ('\"active\"'::jsonb,'\"pending\"'::jsonb) ORDER BY d.Id",
+      "dialect": "pg",
+      "family": "json_search_equality",
+      "execution_status": "not_run_missing_managed_target",
+      "profile": true,
+      "access": "automatic",
+      "requirement": "Separate successful execution, forced access, automatic plan selection and result equivalence; no performance inference from the small fixture"
+    },
+    {
+      "label": "pg-json-not-in-forced-search",
+      "sql": "SELECT d.Id FROM docdeltadocs /*@ FORCE_INDEX=docdeltasearch */ AS d WHERE d.doc->'kind' NOT IN ('\"active\"'::jsonb,'\"pending\"'::jsonb) ORDER BY d.Id",
+      "dialect": "pg",
+      "family": "json_search_equality",
+      "execution_status": "not_run_missing_managed_target",
+      "profile": true,
+      "access": "forced-search",
+      "requirement": "Separate successful execution, forced access, automatic plan selection and result equivalence; no performance inference from the small fixture"
+    },
+    {
+      "label": "pg-json-not-in-forced-base",
+      "sql": "SELECT d.Id FROM docdeltadocs /*@ FORCE_INDEX=_BASE_TABLE */ AS d WHERE d.doc->'kind' NOT IN ('\"active\"'::jsonb,'\"pending\"'::jsonb) ORDER BY d.Id",
+      "dialect": "pg",
+      "family": "json_search_equality",
+      "execution_status": "not_run_missing_managed_target",
+      "profile": true,
+      "access": "forced-base",
+      "requirement": "Separate successful execution, forced access, automatic plan selection and result equivalence; no performance inference from the small fixture"
+    },
+    {
+      "label": "pg-json-exists-automatic",
+      "sql": "SELECT d.Id FROM docdeltadocs AS d WHERE d.doc ? 'kind' ORDER BY d.Id",
+      "dialect": "pg",
+      "family": "json_search_equality",
+      "execution_status": "not_run_missing_managed_target",
+      "profile": true,
+      "access": "automatic",
+      "requirement": "Separate successful execution, forced access, automatic plan selection and result equivalence; no performance inference from the small fixture"
+    },
+    {
+      "label": "pg-json-exists-forced-search",
+      "sql": "SELECT d.Id FROM docdeltadocs /*@ FORCE_INDEX=docdeltasearch */ AS d WHERE d.doc ? 'kind' ORDER BY d.Id",
+      "dialect": "pg",
+      "family": "json_search_equality",
+      "execution_status": "not_run_missing_managed_target",
+      "profile": true,
+      "access": "forced-search",
+      "requirement": "Separate successful execution, forced access, automatic plan selection and result equivalence; no performance inference from the small fixture"
+    },
+    {
+      "label": "pg-json-exists-forced-base",
+      "sql": "SELECT d.Id FROM docdeltadocs /*@ FORCE_INDEX=_BASE_TABLE */ AS d WHERE d.doc ? 'kind' ORDER BY d.Id",
+      "dialect": "pg",
+      "family": "json_search_equality",
+      "execution_status": "not_run_missing_managed_target",
+      "profile": true,
+      "access": "forced-base",
+      "requirement": "Separate successful execution, forced access, automatic plan selection and result equivalence; no performance inference from the small fixture"
+    },
+    {
+      "label": "pg-json-range-automatic",
+      "sql": "SELECT d.Id FROM docdeltadocs AS d WHERE d.doc->'n' > '1'::jsonb ORDER BY d.Id",
+      "dialect": "pg",
+      "family": "json_search_equality",
+      "execution_status": "not_run_missing_managed_target",
+      "profile": true,
+      "access": "automatic",
+      "requirement": "Separate successful execution, forced access, automatic plan selection and result equivalence; no performance inference from the small fixture"
+    },
+    {
+      "label": "pg-json-range-forced-search",
+      "sql": "SELECT d.Id FROM docdeltadocs /*@ FORCE_INDEX=docdeltasearch */ AS d WHERE d.doc->'n' > '1'::jsonb ORDER BY d.Id",
+      "dialect": "pg",
+      "family": "json_search_equality",
+      "execution_status": "not_run_missing_managed_target",
+      "profile": true,
+      "access": "forced-search",
+      "requirement": "Separate successful execution, forced access, automatic plan selection and result equivalence; no performance inference from the small fixture"
+    },
+    {
+      "label": "pg-json-range-forced-base",
+      "sql": "SELECT d.Id FROM docdeltadocs /*@ FORCE_INDEX=_BASE_TABLE */ AS d WHERE d.doc->'n' > '1'::jsonb ORDER BY d.Id",
+      "dialect": "pg",
+      "family": "json_search_equality",
+      "execution_status": "not_run_missing_managed_target",
+      "profile": true,
+      "access": "forced-base",
+      "requirement": "Separate successful execution, forced access, automatic plan selection and result equivalence; no performance inference from the small fixture"
+    },
+    {
+      "label": "pg-json-text-extraction-automatic",
+      "sql": "SELECT d.Id FROM docdeltadocs AS d WHERE d.doc->>'kind' = 'active' ORDER BY d.Id",
+      "dialect": "pg",
+      "family": "json_search_equality",
+      "execution_status": "not_run_missing_managed_target",
+      "profile": true,
+      "access": "automatic",
+      "requirement": "Separate successful execution, forced access, automatic plan selection and result equivalence; no performance inference from the small fixture"
+    },
+    {
+      "label": "pg-json-text-extraction-forced-search",
+      "sql": "SELECT d.Id FROM docdeltadocs /*@ FORCE_INDEX=docdeltasearch */ AS d WHERE d.doc->>'kind' = 'active' ORDER BY d.Id",
+      "dialect": "pg",
+      "family": "json_search_equality",
+      "execution_status": "not_run_missing_managed_target",
+      "profile": true,
+      "access": "forced-search",
+      "requirement": "Separate successful execution, forced access, automatic plan selection and result equivalence; no performance inference from the small fixture"
+    },
+    {
+      "label": "pg-json-text-extraction-forced-base",
+      "sql": "SELECT d.Id FROM docdeltadocs /*@ FORCE_INDEX=_BASE_TABLE */ AS d WHERE d.doc->>'kind' = 'active' ORDER BY d.Id",
+      "dialect": "pg",
+      "family": "json_search_equality",
+      "execution_status": "not_run_missing_managed_target",
+      "profile": true,
+      "access": "forced-base",
+      "requirement": "Separate successful execution, forced access, automatic plan selection and result equivalence; no performance inference from the small fixture"
+    },
+    {
+      "label": "dynamic-filter",
+      "sql": "GRAPH DocDeltaDynamic MATCH (n) WHERE n.flag = TRUE RETURN n.Id AS id",
+      "dialect": "google",
+      "family": "dynamic_json_properties",
+      "execution_status": "not_run_missing_managed_target"
+    },
+    {
+      "label": "dynamic-group",
+      "sql": "GRAPH DocDeltaDynamic MATCH (n) RETURN n.kind AS kind, COUNT(*) AS count",
+      "dialect": "google",
+      "family": "dynamic_json_properties",
+      "execution_status": "not_run_missing_managed_target"
+    },
+    {
+      "label": "dynamic-order",
+      "sql": "GRAPH DocDeltaDynamic MATCH (n) WHERE TRUE RETURN n.value AS value ORDER BY value",
+      "dialect": "google",
+      "family": "dynamic_json_properties",
+      "execution_status": "not_run_missing_managed_target"
+    },
+    {
+      "label": "dynamic-distinct",
+      "sql": "GRAPH DocDeltaDynamic MATCH (n) WHERE TRUE RETURN DISTINCT n.kind AS kind",
+      "dialect": "google",
+      "family": "dynamic_json_properties",
+      "execution_status": "not_run_missing_managed_target"
+    },
+    {
+      "label": "dynamic-bare-bool",
+      "sql": "GRAPH DocDeltaDynamic MATCH (n) WHERE n.flag RETURN n.Id AS id",
+      "dialect": "google",
+      "family": "dynamic_json_properties",
+      "execution_status": "not_run_missing_managed_target"
+    },
+    {
+      "label": "dynamic-string-number-mismatch",
+      "sql": "GRAPH DocDeltaDynamic MATCH (n) WHERE n.num_string = 1 RETURN n.Id AS id",
+      "dialect": "google",
+      "family": "dynamic_json_properties",
+      "execution_status": "not_run_missing_managed_target"
+    },
+    {
+      "label": "fingerprint-control",
+      "sql": "SELECT FARM_FINGERPRINT('1footrue') AS fingerprint, TO_HEX(SHA256('Hello World')) AS sha256",
+      "dialect": "google",
+      "family": "hash_documentation",
+      "execution_status": "not_run_missing_managed_target"
+    }
+  ],
+  "additional_future_coverage": [
+    "Mixed-precision and mixed-input-type HLL merges",
+    "GoogleSQL and PostgreSQL NUMERIC sketch interoperability negative controls",
+    "Read-write transaction restrictions for JSON search indexes",
+    "Graph analytics jobs, IAM-role changes, migration/cutover and geo-partition provisioning are tracked as documentation only here and require distinct validation setup"
+  ]
+}

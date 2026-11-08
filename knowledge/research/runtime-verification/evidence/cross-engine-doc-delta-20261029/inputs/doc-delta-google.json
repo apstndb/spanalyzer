@@ -1,0 +1,963 @@
+{
+  "dialect": "google",
+  "steps": [
+    {
+      "label": "doc-fixture-0",
+      "family": "doc-fixture",
+      "kind": "ddl",
+      "sql": "CREATE TABLE DocDeltaNodes (Id INT64 NOT NULL, Label STRING(MAX) NOT NULL, Properties JSON) PRIMARY KEY(Id)",
+      "requires": []
+    },
+    {
+      "label": "doc-fixture-1",
+      "family": "doc-fixture",
+      "kind": "ddl",
+      "sql": "CREATE PROPERTY GRAPH DocDeltaGraph NODE TABLES (DocDeltaNodes LABEL Node PROPERTIES(Id))",
+      "requires": [
+        "doc-fixture-0"
+      ]
+    },
+    {
+      "label": "doc-fixture-2",
+      "family": "doc-fixture",
+      "kind": "ddl",
+      "sql": "CREATE PROPERTY GRAPH DocDeltaDynamic NODE TABLES (DocDeltaNodes DYNAMIC LABEL(Label) DYNAMIC PROPERTIES(Properties))",
+      "requires": [
+        "doc-fixture-0"
+      ]
+    },
+    {
+      "label": "doc-fixture-3",
+      "family": "doc-fixture",
+      "kind": "ddl",
+      "sql": "CREATE TABLE DocDeltaDocs (Id INT64 NOT NULL, Doc JSON, DocTokens TOKENLIST AS (TOKENIZE_JSON(Doc)) HIDDEN) PRIMARY KEY(Id)",
+      "requires": []
+    },
+    {
+      "label": "doc-fixture-4",
+      "family": "doc-fixture",
+      "kind": "ddl",
+      "sql": "CREATE SEARCH INDEX DocDeltaSearch ON DocDeltaDocs(DocTokens)",
+      "requires": [
+        "doc-fixture-3"
+      ]
+    },
+    {
+      "label": "doc-documents-seed",
+      "family": "doc-fixture",
+      "kind": "dml",
+      "statements": [
+        "INSERT INTO DocDeltaDocs(Id,Doc) VALUES (1,JSON '{\"kind\":\"active\",\"n\":1}'),(2,JSON '{\"kind\":\"pending\",\"n\":2}'),(3,JSON '{\"kind\":\"inactive\",\"n\":3}'),(4,JSON '{}'),(5,NULL)"
+      ],
+      "requires": [
+        "doc-fixture-3"
+      ]
+    },
+    {
+      "label": "doc-dynamic-seed",
+      "family": "doc-fixture",
+      "kind": "dml",
+      "statements": [
+        "INSERT INTO DocDeltaNodes(Id,Label,Properties) VALUES (1,'Node',JSON '{\"flag\":true,\"kind\":\"a\",\"value\":2,\"num_string\":\"1\"}'),(2,'Node',JSON '{\"flag\":false,\"kind\":\"a\",\"value\":1,\"num_string\":\"2\"}')"
+      ],
+      "requires": [
+        "doc-fixture-0"
+      ]
+    },
+    {
+      "label": "google-approx-distinct",
+      "sql": "SELECT APPROX_COUNT_DISTINCT(x) AS estimate FROM (SELECT x FROM UNNEST([1,1,2,NULL]) AS x)",
+      "kind": "query",
+      "family": "hll",
+      "requires": []
+    },
+    {
+      "label": "google-hll-precision-9",
+      "sql": "SELECT HLL_COUNT.EXTRACT(HLL_COUNT.INIT(x,9)) AS estimate FROM (SELECT x FROM UNNEST([1,1,2,NULL]) AS x)",
+      "kind": "query",
+      "family": "hll",
+      "requires": []
+    },
+    {
+      "label": "google-hll-precision-10",
+      "sql": "SELECT HLL_COUNT.EXTRACT(HLL_COUNT.INIT(x,10)) AS estimate FROM (SELECT x FROM UNNEST([1,1,2,NULL]) AS x)",
+      "kind": "query",
+      "family": "hll",
+      "requires": []
+    },
+    {
+      "label": "google-hll-precision-15",
+      "sql": "SELECT HLL_COUNT.EXTRACT(HLL_COUNT.INIT(x,15)) AS estimate FROM (SELECT x FROM UNNEST([1,1,2,NULL]) AS x)",
+      "kind": "query",
+      "family": "hll",
+      "requires": []
+    },
+    {
+      "label": "google-hll-precision-24",
+      "sql": "SELECT HLL_COUNT.EXTRACT(HLL_COUNT.INIT(x,24)) AS estimate FROM (SELECT x FROM UNNEST([1,1,2,NULL]) AS x)",
+      "kind": "query",
+      "family": "hll",
+      "requires": []
+    },
+    {
+      "label": "google-hll-precision-25",
+      "sql": "SELECT HLL_COUNT.EXTRACT(HLL_COUNT.INIT(x,25)) AS estimate FROM (SELECT x FROM UNNEST([1,1,2,NULL]) AS x)",
+      "kind": "query",
+      "family": "hll",
+      "requires": []
+    },
+    {
+      "label": "google-hll-input-int",
+      "sql": "SELECT HLL_COUNT.EXTRACT(HLL_COUNT.INIT(v)) AS estimate FROM (SELECT 1 AS v)",
+      "kind": "query",
+      "family": "hll",
+      "requires": []
+    },
+    {
+      "label": "google-hll-input-string",
+      "sql": "SELECT HLL_COUNT.EXTRACT(HLL_COUNT.INIT(v)) AS estimate FROM (SELECT 'x' AS v)",
+      "kind": "query",
+      "family": "hll",
+      "requires": []
+    },
+    {
+      "label": "google-hll-input-bytes",
+      "sql": "SELECT HLL_COUNT.EXTRACT(HLL_COUNT.INIT(v)) AS estimate FROM (SELECT b'x' AS v)",
+      "kind": "query",
+      "family": "hll",
+      "requires": []
+    },
+    {
+      "label": "google-hll-input-numeric",
+      "sql": "SELECT HLL_COUNT.EXTRACT(HLL_COUNT.INIT(v)) AS estimate FROM (SELECT NUMERIC '1' AS v)",
+      "kind": "query",
+      "family": "hll",
+      "requires": []
+    },
+    {
+      "label": "google-hll-input-bool",
+      "sql": "SELECT HLL_COUNT.EXTRACT(HLL_COUNT.INIT(v)) AS estimate FROM (SELECT TRUE AS v)",
+      "kind": "query",
+      "family": "hll",
+      "requires": []
+    },
+    {
+      "label": "google-hll-input-interval",
+      "sql": "SELECT HLL_COUNT.EXTRACT(HLL_COUNT.INIT(v)) AS estimate FROM (SELECT INTERVAL 1 DAY AS v)",
+      "kind": "query",
+      "family": "hll",
+      "requires": []
+    },
+    {
+      "label": "google-hll-extract-null",
+      "sql": "SELECT HLL_COUNT.EXTRACT(CAST(NULL AS BYTES)) AS estimate",
+      "kind": "query",
+      "family": "hll",
+      "requires": []
+    },
+    {
+      "label": "google-hll-init-null",
+      "sql": "SELECT HLL_COUNT.INIT(CAST(NULL AS INT64)) AS sketch",
+      "kind": "query",
+      "family": "hll",
+      "requires": []
+    },
+    {
+      "label": "google-hll-merge",
+      "sql": "WITH s AS (SELECT HLL_COUNT.INIT(x) AS sketch FROM (SELECT x FROM UNNEST([1,1,2,NULL]) AS x)) SELECT HLL_COUNT.MERGE(sketch) AS estimate FROM s",
+      "kind": "query",
+      "family": "hll",
+      "requires": []
+    },
+    {
+      "label": "google-hll-merge-partial",
+      "sql": "WITH s AS (SELECT HLL_COUNT.INIT(x) AS sketch FROM (SELECT x FROM UNNEST([1,1,2,NULL]) AS x)) SELECT HLL_COUNT.EXTRACT(HLL_COUNT.MERGE_PARTIAL(sketch)) AS estimate FROM s",
+      "kind": "query",
+      "family": "hll",
+      "requires": []
+    },
+    {
+      "label": "gql-full-outer-union-all",
+      "sql": "GRAPH DocDeltaGraph RETURN 1 AS left_only, 10 AS common FULL OUTER UNION ALL RETURN 10 AS common, 2 AS right_only",
+      "kind": "query",
+      "family": "gql_column_propagation",
+      "requires": [
+        "doc-fixture-1"
+      ]
+    },
+    {
+      "label": "gql-full-outer-union-distinct",
+      "sql": "GRAPH DocDeltaGraph RETURN 1 AS left_only, 10 AS common FULL OUTER UNION DISTINCT RETURN 10 AS common, 2 AS right_only",
+      "kind": "query",
+      "family": "gql_column_propagation",
+      "requires": [
+        "doc-fixture-1"
+      ]
+    },
+    {
+      "label": "gql-full-outer-intersect-all",
+      "sql": "GRAPH DocDeltaGraph RETURN 1 AS left_only, 10 AS common FULL OUTER INTERSECT ALL RETURN 10 AS common, 2 AS right_only",
+      "kind": "query",
+      "family": "gql_column_propagation",
+      "requires": [
+        "doc-fixture-1"
+      ]
+    },
+    {
+      "label": "gql-full-outer-intersect-distinct",
+      "sql": "GRAPH DocDeltaGraph RETURN 1 AS left_only, 10 AS common FULL OUTER INTERSECT DISTINCT RETURN 10 AS common, 2 AS right_only",
+      "kind": "query",
+      "family": "gql_column_propagation",
+      "requires": [
+        "doc-fixture-1"
+      ]
+    },
+    {
+      "label": "gql-full-outer-except-all",
+      "sql": "GRAPH DocDeltaGraph RETURN 1 AS left_only, 10 AS common FULL OUTER EXCEPT ALL RETURN 10 AS common, 2 AS right_only",
+      "kind": "query",
+      "family": "gql_column_propagation",
+      "requires": [
+        "doc-fixture-1"
+      ]
+    },
+    {
+      "label": "gql-full-outer-except-distinct",
+      "sql": "GRAPH DocDeltaGraph RETURN 1 AS left_only, 10 AS common FULL OUTER EXCEPT DISTINCT RETURN 10 AS common, 2 AS right_only",
+      "kind": "query",
+      "family": "gql_column_propagation",
+      "requires": [
+        "doc-fixture-1"
+      ]
+    },
+    {
+      "label": "gql-full-union-all",
+      "sql": "GRAPH DocDeltaGraph RETURN 1 AS left_only, 10 AS common FULL UNION ALL RETURN 10 AS common, 2 AS right_only",
+      "kind": "query",
+      "family": "gql_column_propagation",
+      "requires": [
+        "doc-fixture-1"
+      ]
+    },
+    {
+      "label": "gql-full-union-distinct",
+      "sql": "GRAPH DocDeltaGraph RETURN 1 AS left_only, 10 AS common FULL UNION DISTINCT RETURN 10 AS common, 2 AS right_only",
+      "kind": "query",
+      "family": "gql_column_propagation",
+      "requires": [
+        "doc-fixture-1"
+      ]
+    },
+    {
+      "label": "gql-full-intersect-all",
+      "sql": "GRAPH DocDeltaGraph RETURN 1 AS left_only, 10 AS common FULL INTERSECT ALL RETURN 10 AS common, 2 AS right_only",
+      "kind": "query",
+      "family": "gql_column_propagation",
+      "requires": [
+        "doc-fixture-1"
+      ]
+    },
+    {
+      "label": "gql-full-intersect-distinct",
+      "sql": "GRAPH DocDeltaGraph RETURN 1 AS left_only, 10 AS common FULL INTERSECT DISTINCT RETURN 10 AS common, 2 AS right_only",
+      "kind": "query",
+      "family": "gql_column_propagation",
+      "requires": [
+        "doc-fixture-1"
+      ]
+    },
+    {
+      "label": "gql-full-except-all",
+      "sql": "GRAPH DocDeltaGraph RETURN 1 AS left_only, 10 AS common FULL EXCEPT ALL RETURN 10 AS common, 2 AS right_only",
+      "kind": "query",
+      "family": "gql_column_propagation",
+      "requires": [
+        "doc-fixture-1"
+      ]
+    },
+    {
+      "label": "gql-full-except-distinct",
+      "sql": "GRAPH DocDeltaGraph RETURN 1 AS left_only, 10 AS common FULL EXCEPT DISTINCT RETURN 10 AS common, 2 AS right_only",
+      "kind": "query",
+      "family": "gql_column_propagation",
+      "requires": [
+        "doc-fixture-1"
+      ]
+    },
+    {
+      "label": "gql-outer-union-all",
+      "sql": "GRAPH DocDeltaGraph RETURN 1 AS left_only, 10 AS common OUTER UNION ALL RETURN 10 AS common, 2 AS right_only",
+      "kind": "query",
+      "family": "gql_column_propagation",
+      "requires": [
+        "doc-fixture-1"
+      ]
+    },
+    {
+      "label": "gql-outer-union-distinct",
+      "sql": "GRAPH DocDeltaGraph RETURN 1 AS left_only, 10 AS common OUTER UNION DISTINCT RETURN 10 AS common, 2 AS right_only",
+      "kind": "query",
+      "family": "gql_column_propagation",
+      "requires": [
+        "doc-fixture-1"
+      ]
+    },
+    {
+      "label": "gql-outer-intersect-all",
+      "sql": "GRAPH DocDeltaGraph RETURN 1 AS left_only, 10 AS common OUTER INTERSECT ALL RETURN 10 AS common, 2 AS right_only",
+      "kind": "query",
+      "family": "gql_column_propagation",
+      "requires": [
+        "doc-fixture-1"
+      ]
+    },
+    {
+      "label": "gql-outer-intersect-distinct",
+      "sql": "GRAPH DocDeltaGraph RETURN 1 AS left_only, 10 AS common OUTER INTERSECT DISTINCT RETURN 10 AS common, 2 AS right_only",
+      "kind": "query",
+      "family": "gql_column_propagation",
+      "requires": [
+        "doc-fixture-1"
+      ]
+    },
+    {
+      "label": "gql-outer-except-all",
+      "sql": "GRAPH DocDeltaGraph RETURN 1 AS left_only, 10 AS common OUTER EXCEPT ALL RETURN 10 AS common, 2 AS right_only",
+      "kind": "query",
+      "family": "gql_column_propagation",
+      "requires": [
+        "doc-fixture-1"
+      ]
+    },
+    {
+      "label": "gql-outer-except-distinct",
+      "sql": "GRAPH DocDeltaGraph RETURN 1 AS left_only, 10 AS common OUTER EXCEPT DISTINCT RETURN 10 AS common, 2 AS right_only",
+      "kind": "query",
+      "family": "gql_column_propagation",
+      "requires": [
+        "doc-fixture-1"
+      ]
+    },
+    {
+      "label": "gql-left-outer-union-all",
+      "sql": "GRAPH DocDeltaGraph RETURN 1 AS left_only, 10 AS common LEFT OUTER UNION ALL RETURN 10 AS common, 2 AS right_only",
+      "kind": "query",
+      "family": "gql_column_propagation",
+      "requires": [
+        "doc-fixture-1"
+      ]
+    },
+    {
+      "label": "gql-left-outer-union-distinct",
+      "sql": "GRAPH DocDeltaGraph RETURN 1 AS left_only, 10 AS common LEFT OUTER UNION DISTINCT RETURN 10 AS common, 2 AS right_only",
+      "kind": "query",
+      "family": "gql_column_propagation",
+      "requires": [
+        "doc-fixture-1"
+      ]
+    },
+    {
+      "label": "gql-left-outer-intersect-all",
+      "sql": "GRAPH DocDeltaGraph RETURN 1 AS left_only, 10 AS common LEFT OUTER INTERSECT ALL RETURN 10 AS common, 2 AS right_only",
+      "kind": "query",
+      "family": "gql_column_propagation",
+      "requires": [
+        "doc-fixture-1"
+      ]
+    },
+    {
+      "label": "gql-left-outer-intersect-distinct",
+      "sql": "GRAPH DocDeltaGraph RETURN 1 AS left_only, 10 AS common LEFT OUTER INTERSECT DISTINCT RETURN 10 AS common, 2 AS right_only",
+      "kind": "query",
+      "family": "gql_column_propagation",
+      "requires": [
+        "doc-fixture-1"
+      ]
+    },
+    {
+      "label": "gql-left-outer-except-all",
+      "sql": "GRAPH DocDeltaGraph RETURN 1 AS left_only, 10 AS common LEFT OUTER EXCEPT ALL RETURN 10 AS common, 2 AS right_only",
+      "kind": "query",
+      "family": "gql_column_propagation",
+      "requires": [
+        "doc-fixture-1"
+      ]
+    },
+    {
+      "label": "gql-left-outer-except-distinct",
+      "sql": "GRAPH DocDeltaGraph RETURN 1 AS left_only, 10 AS common LEFT OUTER EXCEPT DISTINCT RETURN 10 AS common, 2 AS right_only",
+      "kind": "query",
+      "family": "gql_column_propagation",
+      "requires": [
+        "doc-fixture-1"
+      ]
+    },
+    {
+      "label": "gql-left-union-all",
+      "sql": "GRAPH DocDeltaGraph RETURN 1 AS left_only, 10 AS common LEFT UNION ALL RETURN 10 AS common, 2 AS right_only",
+      "kind": "query",
+      "family": "gql_column_propagation",
+      "requires": [
+        "doc-fixture-1"
+      ]
+    },
+    {
+      "label": "gql-left-union-distinct",
+      "sql": "GRAPH DocDeltaGraph RETURN 1 AS left_only, 10 AS common LEFT UNION DISTINCT RETURN 10 AS common, 2 AS right_only",
+      "kind": "query",
+      "family": "gql_column_propagation",
+      "requires": [
+        "doc-fixture-1"
+      ]
+    },
+    {
+      "label": "gql-left-intersect-all",
+      "sql": "GRAPH DocDeltaGraph RETURN 1 AS left_only, 10 AS common LEFT INTERSECT ALL RETURN 10 AS common, 2 AS right_only",
+      "kind": "query",
+      "family": "gql_column_propagation",
+      "requires": [
+        "doc-fixture-1"
+      ]
+    },
+    {
+      "label": "gql-left-intersect-distinct",
+      "sql": "GRAPH DocDeltaGraph RETURN 1 AS left_only, 10 AS common LEFT INTERSECT DISTINCT RETURN 10 AS common, 2 AS right_only",
+      "kind": "query",
+      "family": "gql_column_propagation",
+      "requires": [
+        "doc-fixture-1"
+      ]
+    },
+    {
+      "label": "gql-left-except-all",
+      "sql": "GRAPH DocDeltaGraph RETURN 1 AS left_only, 10 AS common LEFT EXCEPT ALL RETURN 10 AS common, 2 AS right_only",
+      "kind": "query",
+      "family": "gql_column_propagation",
+      "requires": [
+        "doc-fixture-1"
+      ]
+    },
+    {
+      "label": "gql-left-except-distinct",
+      "sql": "GRAPH DocDeltaGraph RETURN 1 AS left_only, 10 AS common LEFT EXCEPT DISTINCT RETURN 10 AS common, 2 AS right_only",
+      "kind": "query",
+      "family": "gql_column_propagation",
+      "requires": [
+        "doc-fixture-1"
+      ]
+    },
+    {
+      "label": "gql-inner-union-all",
+      "sql": "GRAPH DocDeltaGraph RETURN 1 AS left_only, 10 AS common INNER UNION ALL RETURN 10 AS common, 2 AS right_only",
+      "kind": "query",
+      "family": "gql_column_propagation",
+      "requires": [
+        "doc-fixture-1"
+      ]
+    },
+    {
+      "label": "gql-inner-union-distinct",
+      "sql": "GRAPH DocDeltaGraph RETURN 1 AS left_only, 10 AS common INNER UNION DISTINCT RETURN 10 AS common, 2 AS right_only",
+      "kind": "query",
+      "family": "gql_column_propagation",
+      "requires": [
+        "doc-fixture-1"
+      ]
+    },
+    {
+      "label": "gql-inner-intersect-all",
+      "sql": "GRAPH DocDeltaGraph RETURN 1 AS left_only, 10 AS common INNER INTERSECT ALL RETURN 10 AS common, 2 AS right_only",
+      "kind": "query",
+      "family": "gql_column_propagation",
+      "requires": [
+        "doc-fixture-1"
+      ]
+    },
+    {
+      "label": "gql-inner-intersect-distinct",
+      "sql": "GRAPH DocDeltaGraph RETURN 1 AS left_only, 10 AS common INNER INTERSECT DISTINCT RETURN 10 AS common, 2 AS right_only",
+      "kind": "query",
+      "family": "gql_column_propagation",
+      "requires": [
+        "doc-fixture-1"
+      ]
+    },
+    {
+      "label": "gql-inner-except-all",
+      "sql": "GRAPH DocDeltaGraph RETURN 1 AS left_only, 10 AS common INNER EXCEPT ALL RETURN 10 AS common, 2 AS right_only",
+      "kind": "query",
+      "family": "gql_column_propagation",
+      "requires": [
+        "doc-fixture-1"
+      ]
+    },
+    {
+      "label": "gql-inner-except-distinct",
+      "sql": "GRAPH DocDeltaGraph RETURN 1 AS left_only, 10 AS common INNER EXCEPT DISTINCT RETURN 10 AS common, 2 AS right_only",
+      "kind": "query",
+      "family": "gql_column_propagation",
+      "requires": [
+        "doc-fixture-1"
+      ]
+    },
+    {
+      "label": "gql-default-name-mismatch",
+      "sql": "GRAPH DocDeltaGraph RETURN 1 AS left_only UNION ALL RETURN 2 AS right_only",
+      "kind": "query",
+      "family": "gql_column_propagation",
+      "requires": [
+        "doc-fixture-1"
+      ]
+    },
+    {
+      "label": "gql-inner-no-common",
+      "sql": "GRAPH DocDeltaGraph RETURN 1 AS left_only INNER UNION ALL RETURN 2 AS right_only",
+      "kind": "query",
+      "family": "gql_column_propagation",
+      "requires": [
+        "doc-fixture-1"
+      ]
+    },
+    {
+      "label": "gql-malformed-rhs",
+      "sql": "GRAPH DocDeltaGraph RETURN 1 AS x FULL OUTER UNION ALL",
+      "kind": "query",
+      "family": "gql_column_propagation",
+      "requires": [
+        "doc-fixture-1"
+      ]
+    },
+    {
+      "label": "gql-malformed-alias",
+      "sql": "GRAPH DocDeltaGraph RETURN 1 AS x FULL OUTER UNION ALL RETURN 2 AS",
+      "kind": "query",
+      "family": "gql_column_propagation",
+      "requires": [
+        "doc-fixture-1"
+      ]
+    },
+    {
+      "label": "google-json-document-equal-automatic",
+      "sql": "SELECT d.Id FROM DocDeltaDocs AS d WHERE d.doc = JSON '{\"kind\":\"active\",\"n\":1}' ORDER BY d.Id",
+      "kind": "query",
+      "family": "json_search_equality",
+      "requires": [
+        "doc-documents-seed"
+      ],
+      "profile": true
+    },
+    {
+      "label": "google-json-document-equal-forced-search",
+      "sql": "SELECT d.Id FROM DocDeltaDocs@{FORCE_INDEX=DocDeltaSearch} AS d WHERE d.doc = JSON '{\"kind\":\"active\",\"n\":1}' ORDER BY d.Id",
+      "kind": "query",
+      "family": "json_search_equality",
+      "requires": [
+        "doc-documents-seed",
+        "doc-fixture-4"
+      ],
+      "profile": true
+    },
+    {
+      "label": "google-json-document-equal-forced-base",
+      "sql": "SELECT d.Id FROM DocDeltaDocs@{FORCE_INDEX=_BASE_TABLE} AS d WHERE d.doc = JSON '{\"kind\":\"active\",\"n\":1}' ORDER BY d.Id",
+      "kind": "query",
+      "family": "json_search_equality",
+      "requires": [
+        "doc-documents-seed"
+      ],
+      "profile": true
+    },
+    {
+      "label": "google-json-path-equal-automatic",
+      "sql": "SELECT d.Id FROM DocDeltaDocs AS d WHERE d.doc.kind = 'active' ORDER BY d.Id",
+      "kind": "query",
+      "family": "json_search_equality",
+      "requires": [
+        "doc-documents-seed"
+      ],
+      "profile": true
+    },
+    {
+      "label": "google-json-path-equal-forced-search",
+      "sql": "SELECT d.Id FROM DocDeltaDocs@{FORCE_INDEX=DocDeltaSearch} AS d WHERE d.doc.kind = 'active' ORDER BY d.Id",
+      "kind": "query",
+      "family": "json_search_equality",
+      "requires": [
+        "doc-documents-seed",
+        "doc-fixture-4"
+      ],
+      "profile": true
+    },
+    {
+      "label": "google-json-path-equal-forced-base",
+      "sql": "SELECT d.Id FROM DocDeltaDocs@{FORCE_INDEX=_BASE_TABLE} AS d WHERE d.doc.kind = 'active' ORDER BY d.Id",
+      "kind": "query",
+      "family": "json_search_equality",
+      "requires": [
+        "doc-documents-seed"
+      ],
+      "profile": true
+    },
+    {
+      "label": "google-json-number-equal-automatic",
+      "sql": "SELECT d.Id FROM DocDeltaDocs AS d WHERE d.doc.n = 1 ORDER BY d.Id",
+      "kind": "query",
+      "family": "json_search_equality",
+      "requires": [
+        "doc-documents-seed"
+      ],
+      "profile": true
+    },
+    {
+      "label": "google-json-number-equal-forced-search",
+      "sql": "SELECT d.Id FROM DocDeltaDocs@{FORCE_INDEX=DocDeltaSearch} AS d WHERE d.doc.n = 1 ORDER BY d.Id",
+      "kind": "query",
+      "family": "json_search_equality",
+      "requires": [
+        "doc-documents-seed",
+        "doc-fixture-4"
+      ],
+      "profile": true
+    },
+    {
+      "label": "google-json-number-equal-forced-base",
+      "sql": "SELECT d.Id FROM DocDeltaDocs@{FORCE_INDEX=_BASE_TABLE} AS d WHERE d.doc.n = 1 ORDER BY d.Id",
+      "kind": "query",
+      "family": "json_search_equality",
+      "requires": [
+        "doc-documents-seed"
+      ],
+      "profile": true
+    },
+    {
+      "label": "google-json-not-equal-automatic",
+      "sql": "SELECT d.Id FROM DocDeltaDocs AS d WHERE d.doc.kind != 'active' ORDER BY d.Id",
+      "kind": "query",
+      "family": "json_search_equality",
+      "requires": [
+        "doc-documents-seed"
+      ],
+      "profile": true
+    },
+    {
+      "label": "google-json-not-equal-forced-search",
+      "sql": "SELECT d.Id FROM DocDeltaDocs@{FORCE_INDEX=DocDeltaSearch} AS d WHERE d.doc.kind != 'active' ORDER BY d.Id",
+      "kind": "query",
+      "family": "json_search_equality",
+      "requires": [
+        "doc-documents-seed",
+        "doc-fixture-4"
+      ],
+      "profile": true
+    },
+    {
+      "label": "google-json-not-equal-forced-base",
+      "sql": "SELECT d.Id FROM DocDeltaDocs@{FORCE_INDEX=_BASE_TABLE} AS d WHERE d.doc.kind != 'active' ORDER BY d.Id",
+      "kind": "query",
+      "family": "json_search_equality",
+      "requires": [
+        "doc-documents-seed"
+      ],
+      "profile": true
+    },
+    {
+      "label": "google-json-not-equal-alias-automatic",
+      "sql": "SELECT d.Id FROM DocDeltaDocs AS d WHERE d.doc.kind <> 'active' ORDER BY d.Id",
+      "kind": "query",
+      "family": "json_search_equality",
+      "requires": [
+        "doc-documents-seed"
+      ],
+      "profile": true
+    },
+    {
+      "label": "google-json-not-equal-alias-forced-search",
+      "sql": "SELECT d.Id FROM DocDeltaDocs@{FORCE_INDEX=DocDeltaSearch} AS d WHERE d.doc.kind <> 'active' ORDER BY d.Id",
+      "kind": "query",
+      "family": "json_search_equality",
+      "requires": [
+        "doc-documents-seed",
+        "doc-fixture-4"
+      ],
+      "profile": true
+    },
+    {
+      "label": "google-json-not-equal-alias-forced-base",
+      "sql": "SELECT d.Id FROM DocDeltaDocs@{FORCE_INDEX=_BASE_TABLE} AS d WHERE d.doc.kind <> 'active' ORDER BY d.Id",
+      "kind": "query",
+      "family": "json_search_equality",
+      "requires": [
+        "doc-documents-seed"
+      ],
+      "profile": true
+    },
+    {
+      "label": "google-json-in-automatic",
+      "sql": "SELECT d.Id FROM DocDeltaDocs AS d WHERE d.doc.kind IN ('active','pending') ORDER BY d.Id",
+      "kind": "query",
+      "family": "json_search_equality",
+      "requires": [
+        "doc-documents-seed"
+      ],
+      "profile": true
+    },
+    {
+      "label": "google-json-in-forced-search",
+      "sql": "SELECT d.Id FROM DocDeltaDocs@{FORCE_INDEX=DocDeltaSearch} AS d WHERE d.doc.kind IN ('active','pending') ORDER BY d.Id",
+      "kind": "query",
+      "family": "json_search_equality",
+      "requires": [
+        "doc-documents-seed",
+        "doc-fixture-4"
+      ],
+      "profile": true
+    },
+    {
+      "label": "google-json-in-forced-base",
+      "sql": "SELECT d.Id FROM DocDeltaDocs@{FORCE_INDEX=_BASE_TABLE} AS d WHERE d.doc.kind IN ('active','pending') ORDER BY d.Id",
+      "kind": "query",
+      "family": "json_search_equality",
+      "requires": [
+        "doc-documents-seed"
+      ],
+      "profile": true
+    },
+    {
+      "label": "google-json-not-in-automatic",
+      "sql": "SELECT d.Id FROM DocDeltaDocs AS d WHERE d.doc.kind NOT IN ('active','pending') ORDER BY d.Id",
+      "kind": "query",
+      "family": "json_search_equality",
+      "requires": [
+        "doc-documents-seed"
+      ],
+      "profile": true
+    },
+    {
+      "label": "google-json-not-in-forced-search",
+      "sql": "SELECT d.Id FROM DocDeltaDocs@{FORCE_INDEX=DocDeltaSearch} AS d WHERE d.doc.kind NOT IN ('active','pending') ORDER BY d.Id",
+      "kind": "query",
+      "family": "json_search_equality",
+      "requires": [
+        "doc-documents-seed",
+        "doc-fixture-4"
+      ],
+      "profile": true
+    },
+    {
+      "label": "google-json-not-in-forced-base",
+      "sql": "SELECT d.Id FROM DocDeltaDocs@{FORCE_INDEX=_BASE_TABLE} AS d WHERE d.doc.kind NOT IN ('active','pending') ORDER BY d.Id",
+      "kind": "query",
+      "family": "json_search_equality",
+      "requires": [
+        "doc-documents-seed"
+      ],
+      "profile": true
+    },
+    {
+      "label": "google-json-exists-automatic",
+      "sql": "SELECT d.Id FROM DocDeltaDocs AS d WHERE d.doc.kind IS NOT NULL ORDER BY d.Id",
+      "kind": "query",
+      "family": "json_search_equality",
+      "requires": [
+        "doc-documents-seed"
+      ],
+      "profile": true
+    },
+    {
+      "label": "google-json-exists-forced-search",
+      "sql": "SELECT d.Id FROM DocDeltaDocs@{FORCE_INDEX=DocDeltaSearch} AS d WHERE d.doc.kind IS NOT NULL ORDER BY d.Id",
+      "kind": "query",
+      "family": "json_search_equality",
+      "requires": [
+        "doc-documents-seed",
+        "doc-fixture-4"
+      ],
+      "profile": true
+    },
+    {
+      "label": "google-json-exists-forced-base",
+      "sql": "SELECT d.Id FROM DocDeltaDocs@{FORCE_INDEX=_BASE_TABLE} AS d WHERE d.doc.kind IS NOT NULL ORDER BY d.Id",
+      "kind": "query",
+      "family": "json_search_equality",
+      "requires": [
+        "doc-documents-seed"
+      ],
+      "profile": true
+    },
+    {
+      "label": "google-json-range-automatic",
+      "sql": "SELECT d.Id FROM DocDeltaDocs AS d WHERE d.doc.n > 1 ORDER BY d.Id",
+      "kind": "query",
+      "family": "json_search_equality",
+      "requires": [
+        "doc-documents-seed"
+      ],
+      "profile": true
+    },
+    {
+      "label": "google-json-range-forced-search",
+      "sql": "SELECT d.Id FROM DocDeltaDocs@{FORCE_INDEX=DocDeltaSearch} AS d WHERE d.doc.n > 1 ORDER BY d.Id",
+      "kind": "query",
+      "family": "json_search_equality",
+      "requires": [
+        "doc-documents-seed",
+        "doc-fixture-4"
+      ],
+      "profile": true
+    },
+    {
+      "label": "google-json-range-forced-base",
+      "sql": "SELECT d.Id FROM DocDeltaDocs@{FORCE_INDEX=_BASE_TABLE} AS d WHERE d.doc.n > 1 ORDER BY d.Id",
+      "kind": "query",
+      "family": "json_search_equality",
+      "requires": [
+        "doc-documents-seed"
+      ],
+      "profile": true
+    },
+    {
+      "label": "dynamic-filter",
+      "sql": "GRAPH DocDeltaDynamic MATCH (n) WHERE n.flag = TRUE RETURN n.Id AS id",
+      "kind": "query",
+      "family": "dynamic_json_properties",
+      "requires": [
+        "doc-fixture-2",
+        "doc-dynamic-seed"
+      ]
+    },
+    {
+      "label": "dynamic-group",
+      "sql": "GRAPH DocDeltaDynamic MATCH (n) RETURN n.kind AS kind, COUNT(*) AS count",
+      "kind": "query",
+      "family": "dynamic_json_properties",
+      "requires": [
+        "doc-fixture-2",
+        "doc-dynamic-seed"
+      ]
+    },
+    {
+      "label": "dynamic-order",
+      "sql": "GRAPH DocDeltaDynamic MATCH (n) WHERE TRUE RETURN n.value AS value ORDER BY value",
+      "kind": "query",
+      "family": "dynamic_json_properties",
+      "requires": [
+        "doc-fixture-2",
+        "doc-dynamic-seed"
+      ]
+    },
+    {
+      "label": "dynamic-distinct",
+      "sql": "GRAPH DocDeltaDynamic MATCH (n) WHERE TRUE RETURN DISTINCT n.kind AS kind",
+      "kind": "query",
+      "family": "dynamic_json_properties",
+      "requires": [
+        "doc-fixture-2",
+        "doc-dynamic-seed"
+      ]
+    },
+    {
+      "label": "dynamic-bare-bool",
+      "sql": "GRAPH DocDeltaDynamic MATCH (n) WHERE n.flag RETURN n.Id AS id",
+      "kind": "query",
+      "family": "dynamic_json_properties",
+      "requires": [
+        "doc-fixture-2",
+        "doc-dynamic-seed"
+      ]
+    },
+    {
+      "label": "dynamic-string-number-mismatch",
+      "sql": "GRAPH DocDeltaDynamic MATCH (n) WHERE n.num_string = 1 RETURN n.Id AS id",
+      "kind": "query",
+      "family": "dynamic_json_properties",
+      "requires": [
+        "doc-fixture-2",
+        "doc-dynamic-seed"
+      ]
+    },
+    {
+      "label": "fingerprint-control",
+      "sql": "SELECT FARM_FINGERPRINT('1footrue') AS fingerprint, TO_HEX(SHA256('Hello World')) AS sha256",
+      "kind": "query",
+      "family": "hash_documentation",
+      "requires": []
+    },
+    {
+      "label": "google-hll-corrected-init-null",
+      "sql": "SELECT HLL_COUNT.INIT(v) AS sketch FROM (SELECT CAST(NULL AS INT64) AS v) AS input",
+      "kind": "query",
+      "family": "hll-extra",
+      "requires": []
+    },
+    {
+      "label": "google-hll-merge-empty",
+      "sql": "SELECT HLL_COUNT.MERGE(sketch) AS estimate FROM (SELECT CAST(NULL AS BYTES) AS sketch) AS input WHERE FALSE",
+      "kind": "query",
+      "family": "hll-extra",
+      "requires": []
+    },
+    {
+      "label": "google-hll-merge-partial-empty",
+      "sql": "SELECT HLL_COUNT.MERGE_PARTIAL(sketch) AS sketch FROM (SELECT CAST(NULL AS BYTES) AS sketch) AS input WHERE FALSE",
+      "kind": "query",
+      "family": "hll-extra",
+      "requires": []
+    },
+    {
+      "label": "google-hll-merge-null",
+      "sql": "SELECT HLL_COUNT.MERGE(sketch) AS estimate FROM (SELECT CAST(NULL AS BYTES) AS sketch) AS input",
+      "kind": "query",
+      "family": "hll-extra",
+      "requires": []
+    },
+    {
+      "label": "google-hll-merge-partial-null",
+      "sql": "SELECT HLL_COUNT.MERGE_PARTIAL(sketch) AS sketch FROM (SELECT CAST(NULL AS BYTES) AS sketch) AS input",
+      "kind": "query",
+      "family": "hll-extra",
+      "requires": []
+    },
+    {
+      "label": "google-hll-approx-empty",
+      "sql": "SELECT APPROX_COUNT_DISTINCT(v) AS estimate FROM (SELECT CAST(NULL AS INT64) AS v) AS input WHERE FALSE",
+      "kind": "query",
+      "family": "hll-extra",
+      "requires": []
+    },
+    {
+      "label": "google-hll-approx-null",
+      "sql": "SELECT APPROX_COUNT_DISTINCT(v) AS estimate FROM (SELECT CAST(NULL AS INT64) AS v) AS input",
+      "kind": "query",
+      "family": "hll-extra",
+      "requires": []
+    },
+    {
+      "label": "google-hll-mixed-precision-merge",
+      "sql": "WITH a AS (SELECT HLL_COUNT.INIT(x,10) AS sketch FROM (SELECT CAST(1 AS INT64) AS x UNION ALL SELECT CAST(2 AS INT64)) AS input), b AS (SELECT HLL_COUNT.INIT(x,24) AS sketch FROM (SELECT CAST(1 AS INT64) AS x UNION ALL SELECT CAST(2 AS INT64)) AS input) SELECT HLL_COUNT.MERGE(sketch) AS estimate FROM (SELECT sketch FROM a UNION ALL SELECT sketch FROM b) AS input",
+      "kind": "query",
+      "family": "hll-extra",
+      "requires": []
+    },
+    {
+      "label": "google-hll-mixed-precision-partial",
+      "sql": "WITH a AS (SELECT HLL_COUNT.INIT(x,10) AS sketch FROM (SELECT CAST(1 AS INT64) AS x UNION ALL SELECT CAST(2 AS INT64)) AS input), b AS (SELECT HLL_COUNT.INIT(x,24) AS sketch FROM (SELECT CAST(1 AS INT64) AS x UNION ALL SELECT CAST(2 AS INT64)) AS input) SELECT HLL_COUNT.EXTRACT(HLL_COUNT.MERGE_PARTIAL(sketch)) AS estimate FROM (SELECT sketch FROM a UNION ALL SELECT sketch FROM b) AS input",
+      "kind": "query",
+      "family": "hll-extra",
+      "requires": []
+    },
+    {
+      "label": "google-hll-mixed-type-merge",
+      "sql": "WITH a AS (SELECT HLL_COUNT.INIT(x) AS sketch FROM (SELECT CAST(1 AS INT64) AS x UNION ALL SELECT CAST(2 AS INT64)) AS input), b AS (SELECT HLL_COUNT.INIT(x) AS sketch FROM (SELECT CAST('a' AS STRING) AS x) AS input) SELECT HLL_COUNT.MERGE(sketch) AS estimate FROM (SELECT sketch FROM a UNION ALL SELECT sketch FROM b) AS input",
+      "kind": "query",
+      "family": "hll-extra",
+      "requires": []
+    },
+    {
+      "label": "google-hll-extract-invalid",
+      "sql": "SELECT HLL_COUNT.EXTRACT(CAST('not-sketch' AS BYTES)) AS estimate",
+      "kind": "query",
+      "family": "hll-extra",
+      "requires": []
+    }
+  ]
+}

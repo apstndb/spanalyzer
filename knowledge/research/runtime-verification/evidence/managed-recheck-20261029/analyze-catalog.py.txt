@@ -1,0 +1,34 @@
+"""Compare complete per-response tuples; metadata and queryability are independent."""
+from pathlib import Path
+from collections import Counter,defaultdict
+import hashlib,json,re
+root=Path('<LOCAL_CHECKOUT>');p=root/'.tmp/managed-recheck-20261029';out=Path('<LOCAL_TASK_ROOT>/apstndb/spanalyzer/managed-recheck-20261029/evidence')
+def rows(name):return[json.loads(s)for s in(p/(name+'.stdout')).read_text().splitlines()if s]
+def columns(raw):return[{'table_name':r['table_name'],'column_name':r['column_name'],'spanner_type':r['spanner_type'],'ordinal_position':int(r['ordinal_position'])}for r in raw]
+def digest(cols):
+ data=json.dumps(cols,ensure_ascii=False,separators=(',',':')).replace('<','\\u003c').replace('>','\\u003e').replace('&','\\u0026').encode();return hashlib.sha256(data).hexdigest()
+def keyed(cols):return{(r['table_name'],r['column_name']):r for r in cols}
+basepath=root/'survey/spannersys/evidence/managed/20261023T142718Z-9bb70c640b69.json';base=json.loads(basepath.read_text());assert digest(base['columns'])==base['surface_sha256'];old=keyed(base['columns']);surfaces={};samples=[]
+for r in rows('catalog-scope'):
+ if r['label']!='sys-columns':continue
+ c=columns(r['rows']);sha=digest(c);new=keyed(c);added=[v for k,v in new.items()if k not in old];removed=[v for k,v in old.items()if k not in new];changed=[{'before':v,'after':new[k]}for k,v in old.items()if k in new and v!=new[k]]
+ surfaces[sha]={'surface_sha256':sha,'column_count':len(c),'table_count':len({v['table_name']for v in c}),'columns':c,'added':added,'removed':removed,'changed':changed}
+ samples.append({k:r[k]for k in ['sample','started_at','completed_at','read_timestamp']}|{'column_count':len(c),'surface_sha256':sha})
+initial=json.loads((p/'spanner-sys.stdout').read_text());assert initial['current']['surface_sha256']in surfaces
+bycount=Counter(s['column_count']for s in samples)
+for n in [598,609,613,624]:assert bycount[n]>0
+assert all(not s['removed']and not s['changed']for s in surfaces.values())
+by_sample=defaultdict(list)
+for name in ['batch-scope','catalog-scope']:
+ for r in rows(name):by_sample[(name,r['sample'])].append(r)
+scoped=[]
+for (name,sample),records in by_sample.items():
+ stamps={r.get('read_timestamp')for r in records};assert len(stamps)==1 and None not in stamps
+ meta=next(r for r in records if r['label']in ['sys-column-count','sys-columns']);count=int(meta['rows'][0]['n'])if meta['label']=='sys-column-count'else len(meta['rows'])
+ advertised=next(r for r in records if r['label']=='batch-advertisement')
+ scoped.append({'probe':name,'sample':sample,'read_timestamp':next(iter(stamps)),'total_columns':count,'batch_advertised_columns':len(advertised['rows']),'queries':[{k:r[k]for k in ['label','code','error']}|{'row_count':len(r['rows'])}for r in records if r['label']not in ['sys-column-count','sys-columns','batch-advertisement']]})
+colqueries=rows('new-sys-columns');percol=defaultdict(list)
+for r in colqueries:percol[re.sub(r'^[12]-','',r['label'])].append(r)
+report={'scope':'Single dedicated trial/base database. Each complete columns response is retained independently; shared read timestamps do not prove a pinned serving binary or rollout cause.','baseline':{'path':str(basepath.relative_to(root)),'columns':598,'surface_sha256':base['surface_sha256']},'initial_check':initial,'complete_response_samples':samples,'response_counts':dict(bycount),'surfaces':list(surfaces.values()),'read_only_transaction_samples':scoped,'new_column_queries':{'executed':len(colqueries),'codes':dict(Counter(r['code']for r in colqueries)),'columns':[{ 'column':k,'codes':[r['code']for r in v],'row_counts':[len(r['rows'])for r in v],'types':[r.get('metadata',{}).get('rowType',{}).get('fields',[])for r in v]}for k,v in sorted(percol.items())]}}
+(out/'catalog-volatility-summary.json').write_text(json.dumps(report,indent=2)+'\n')
+print(json.dumps({'surfaces':[{k:v for k,v in s.items()if k in ['column_count','table_count','surface_sha256']}for s in surfaces.values()],'observed_counts':dict(bycount),'new_column_queries':report['new_column_queries']['codes'],'timestamp_scopes':len(scoped)}))

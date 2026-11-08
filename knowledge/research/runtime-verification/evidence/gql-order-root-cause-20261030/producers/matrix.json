@@ -1,0 +1,297 @@
+{
+  "dialect": "google",
+  "steps": [
+    {
+      "label": "nodes",
+      "family": "gql-order-causal-matrix",
+      "kind": "ddl",
+      "sql": "CREATE TABLE OrderNodes(id INT64 NOT NULL,val INT64) PRIMARY KEY(id)",
+      "requires": []
+    },
+    {
+      "label": "graph",
+      "family": "gql-order-causal-matrix",
+      "kind": "ddl",
+      "sql": "CREATE PROPERTY GRAPH OrderGraph NODE TABLES(OrderNodes LABEL Node PROPERTIES(id,val))",
+      "requires": [
+        "nodes"
+      ]
+    },
+    {
+      "label": "seed",
+      "family": "gql-order-causal-matrix",
+      "kind": "dml",
+      "sql": "",
+      "requires": [
+        "nodes"
+      ],
+      "statements": [
+        "INSERT INTO OrderNodes(id,val) VALUES(1,50),(2,10),(3,40),(4,20),(5,30)"
+      ]
+    },
+    {
+      "label": "gql-value-ASC-all-r0",
+      "family": "gql-order-causal-matrix",
+      "kind": "query",
+      "sql": "GRAPH OrderGraph MATCH(n) RETURN n.val AS value ORDER BY value ASC",
+      "requires": [
+        "graph",
+        "seed"
+      ]
+    },
+    {
+      "label": "gql-value-ASC-top3-r0",
+      "family": "gql-order-causal-matrix",
+      "kind": "query",
+      "sql": "GRAPH OrderGraph MATCH(n) RETURN n.val AS value ORDER BY value ASC LIMIT 3",
+      "requires": [
+        "graph",
+        "seed"
+      ]
+    },
+    {
+      "label": "gql-value-DESC-all-r0",
+      "family": "gql-order-causal-matrix",
+      "kind": "query",
+      "sql": "GRAPH OrderGraph MATCH(n) RETURN n.val AS value ORDER BY value DESC",
+      "requires": [
+        "graph",
+        "seed"
+      ]
+    },
+    {
+      "label": "gql-value-DESC-top3-r0",
+      "family": "gql-order-causal-matrix",
+      "kind": "query",
+      "sql": "GRAPH OrderGraph MATCH(n) RETURN n.val AS value ORDER BY value DESC LIMIT 3",
+      "requires": [
+        "graph",
+        "seed"
+      ]
+    },
+    {
+      "label": "gql-value-ASC-all-r1",
+      "family": "gql-order-causal-matrix",
+      "kind": "query",
+      "sql": "GRAPH OrderGraph MATCH(n) RETURN n.val AS value ORDER BY value ASC",
+      "requires": [
+        "graph",
+        "seed"
+      ]
+    },
+    {
+      "label": "gql-value-ASC-top3-r1",
+      "family": "gql-order-causal-matrix",
+      "kind": "query",
+      "sql": "GRAPH OrderGraph MATCH(n) RETURN n.val AS value ORDER BY value ASC LIMIT 3",
+      "requires": [
+        "graph",
+        "seed"
+      ]
+    },
+    {
+      "label": "gql-value-DESC-all-r1",
+      "family": "gql-order-causal-matrix",
+      "kind": "query",
+      "sql": "GRAPH OrderGraph MATCH(n) RETURN n.val AS value ORDER BY value DESC",
+      "requires": [
+        "graph",
+        "seed"
+      ]
+    },
+    {
+      "label": "gql-value-DESC-top3-r1",
+      "family": "gql-order-causal-matrix",
+      "kind": "query",
+      "sql": "GRAPH OrderGraph MATCH(n) RETURN n.val AS value ORDER BY value DESC LIMIT 3",
+      "requires": [
+        "graph",
+        "seed"
+      ]
+    },
+    {
+      "label": "gql-value-ASC-all-r2",
+      "family": "gql-order-causal-matrix",
+      "kind": "query",
+      "sql": "GRAPH OrderGraph MATCH(n) RETURN n.val AS value ORDER BY value ASC",
+      "requires": [
+        "graph",
+        "seed"
+      ]
+    },
+    {
+      "label": "gql-value-ASC-top3-r2",
+      "family": "gql-order-causal-matrix",
+      "kind": "query",
+      "sql": "GRAPH OrderGraph MATCH(n) RETURN n.val AS value ORDER BY value ASC LIMIT 3",
+      "requires": [
+        "graph",
+        "seed"
+      ]
+    },
+    {
+      "label": "gql-value-DESC-all-r2",
+      "family": "gql-order-causal-matrix",
+      "kind": "query",
+      "sql": "GRAPH OrderGraph MATCH(n) RETURN n.val AS value ORDER BY value DESC",
+      "requires": [
+        "graph",
+        "seed"
+      ]
+    },
+    {
+      "label": "gql-value-DESC-top3-r2",
+      "family": "gql-order-causal-matrix",
+      "kind": "query",
+      "sql": "GRAPH OrderGraph MATCH(n) RETURN n.val AS value ORDER BY value DESC LIMIT 3",
+      "requires": [
+        "graph",
+        "seed"
+      ]
+    },
+    {
+      "label": "gql-id-ASC",
+      "family": "gql-order-causal-matrix",
+      "kind": "query",
+      "sql": "GRAPH OrderGraph MATCH(n) RETURN n.id AS value ORDER BY value ASC",
+      "requires": [
+        "graph",
+        "seed"
+      ]
+    },
+    {
+      "label": "gql-id-DESC",
+      "family": "gql-order-causal-matrix",
+      "kind": "query",
+      "sql": "GRAPH OrderGraph MATCH(n) RETURN n.id AS value ORDER BY value DESC",
+      "requires": [
+        "graph",
+        "seed"
+      ]
+    },
+    {
+      "label": "gql-expression-ASC",
+      "family": "gql-order-causal-matrix",
+      "kind": "query",
+      "sql": "GRAPH OrderGraph MATCH(n) RETURN n.id+10 AS value ORDER BY value ASC",
+      "requires": [
+        "graph",
+        "seed"
+      ]
+    },
+    {
+      "label": "gql-expression-DESC",
+      "family": "gql-order-causal-matrix",
+      "kind": "query",
+      "sql": "GRAPH OrderGraph MATCH(n) RETURN n.id+10 AS value ORDER BY value DESC",
+      "requires": [
+        "graph",
+        "seed"
+      ]
+    },
+    {
+      "label": "gql-string-ASC",
+      "family": "gql-order-causal-matrix",
+      "kind": "query",
+      "sql": "GRAPH OrderGraph MATCH(n) RETURN CAST(n.id AS STRING) AS value ORDER BY value ASC",
+      "requires": [
+        "graph",
+        "seed"
+      ]
+    },
+    {
+      "label": "gql-string-DESC",
+      "family": "gql-order-causal-matrix",
+      "kind": "query",
+      "sql": "GRAPH OrderGraph MATCH(n) RETURN CAST(n.id AS STRING) AS value ORDER BY value DESC",
+      "requires": [
+        "graph",
+        "seed"
+      ]
+    },
+    {
+      "label": "sql-value-ASC",
+      "family": "gql-order-causal-matrix",
+      "kind": "query",
+      "sql": "SELECT val AS value FROM OrderNodes ORDER BY value ASC",
+      "requires": [
+        "seed"
+      ]
+    },
+    {
+      "label": "sql-outer-gql-ASC",
+      "family": "gql-order-causal-matrix",
+      "kind": "query",
+      "sql": "SELECT value FROM GRAPH_TABLE(OrderGraph MATCH(n) RETURN n.val AS value ORDER BY value ASC) ORDER BY value ASC",
+      "requires": [
+        "graph",
+        "seed"
+      ]
+    },
+    {
+      "label": "sql-inner-gql-only-ASC",
+      "family": "gql-order-causal-matrix",
+      "kind": "query",
+      "sql": "SELECT value FROM GRAPH_TABLE(OrderGraph MATCH(n) RETURN n.val AS value ORDER BY value ASC)",
+      "requires": [
+        "graph",
+        "seed"
+      ]
+    },
+    {
+      "label": "sql-value-DESC",
+      "family": "gql-order-causal-matrix",
+      "kind": "query",
+      "sql": "SELECT val AS value FROM OrderNodes ORDER BY value DESC",
+      "requires": [
+        "seed"
+      ]
+    },
+    {
+      "label": "sql-outer-gql-DESC",
+      "family": "gql-order-causal-matrix",
+      "kind": "query",
+      "sql": "SELECT value FROM GRAPH_TABLE(OrderGraph MATCH(n) RETURN n.val AS value ORDER BY value DESC) ORDER BY value DESC",
+      "requires": [
+        "graph",
+        "seed"
+      ]
+    },
+    {
+      "label": "sql-inner-gql-only-DESC",
+      "family": "gql-order-causal-matrix",
+      "kind": "query",
+      "sql": "SELECT value FROM GRAPH_TABLE(OrderGraph MATCH(n) RETURN n.val AS value ORDER BY value DESC)",
+      "requires": [
+        "graph",
+        "seed"
+      ]
+    },
+    {
+      "label": "gql-unspecified",
+      "family": "gql-order-causal-matrix",
+      "kind": "query",
+      "sql": "GRAPH OrderGraph MATCH(n) RETURN n.val AS value",
+      "requires": [
+        "graph",
+        "seed"
+      ]
+    },
+    {
+      "label": "sql-unspecified",
+      "family": "gql-order-causal-matrix",
+      "kind": "query",
+      "sql": "SELECT val AS value FROM OrderNodes",
+      "requires": [
+        "seed"
+      ]
+    },
+    {
+      "label": "sql-scalar-control",
+      "family": "gql-order-causal-matrix",
+      "kind": "query",
+      "sql": "SELECT 7 AS value",
+      "requires": []
+    }
+  ]
+}

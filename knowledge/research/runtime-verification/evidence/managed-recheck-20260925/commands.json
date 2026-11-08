@@ -1,0 +1,48 @@
+[
+  {
+    "name": "infoschema",
+    "exit_code": 0,
+    "elapsed_seconds": 16.24,
+    "command": [
+      "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go",
+      "run",
+      "./cmd/infoschema-capture",
+      "check",
+      "--target",
+      "managed",
+      "--repo-root",
+      "..",
+      "--observations",
+      "3"
+    ]
+  },
+  {
+    "name": "spanner-sys",
+    "exit_code": 0,
+    "elapsed_seconds": 5.02,
+    "command": [
+      "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go",
+      "run",
+      "./cmd/spanner-sys-capture",
+      "check",
+      "--target",
+      "managed",
+      "--repo-root",
+      ".."
+    ]
+  },
+  {
+    "name": "managed-tests",
+    "exit_code": 0,
+    "elapsed_seconds": 336.21,
+    "command": [
+      "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go",
+      "test",
+      "-count=1",
+      "-v",
+      "-run",
+      "Test(CanonicalDDL_RealSpanner|Drift_RealTableMetas|ExpressionIndex_RealSpanner|UUID_RealSpanner)$",
+      "./infoschem"
+    ]
+  }
+]

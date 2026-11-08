@@ -1,0 +1,26 @@
+[
+  {
+    "name": "managed",
+    "argv": [
+      "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go",
+      "build",
+      "-o",
+      "<LOCAL_CHECKOUT>/.tmp/docs-delta-runtime-20261031/managed",
+      "./managed.go"
+    ],
+    "exit_code": 0,
+    "at": "2026-10-30T20:50:37.379068+00:00"
+  },
+  {
+    "name": "local",
+    "argv": [
+      "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go",
+      "build",
+      "-o",
+      "<LOCAL_CHECKOUT>/.tmp/docs-delta-runtime-20261031/local",
+      "./local.go"
+    ],
+    "exit_code": 0,
+    "at": "2026-10-30T20:50:38.668460+00:00"
+  }
+]

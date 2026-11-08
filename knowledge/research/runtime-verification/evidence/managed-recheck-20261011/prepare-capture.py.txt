@@ -1,0 +1,81 @@
+"""Build a bounded capture-mode producer from the verified direct-API helpers."""
+from pathlib import Path
+
+task = Path('<LOCAL_CHECKOUT>/.tmp/managed-recheck-20261011')
+source = (task / 'json-pg.go').read_text().split('func main() {')[0]
+source = source.replace('\tinstance "cloud.google.com/go/spanner/admin/instance/apiv1"\n', '').replace('\tipb "cloud.google.com/go/spanner/admin/instance/apiv1/instancepb"\n', '')
+source = source.replace('func read(label string, start, end time.Time, token *string, hb int64, options string) string {', 'func read(label string, start, end time.Time, token *string, hb int64, options string) []string {')
+source = source.replace('found := ""', 'found := []string{}')
+source = source.replace('if found == "" {\n\t\t\tfound = findToken(record)\n\t\t}', 'found = append(found, findTokens(record)...)')
+source += r'''
+// Follow all root partition tokens in memory; only hashes enter evidence.
+func findTokens(v any) []string {
+    result := []string{}
+    switch x := v.(type) {
+    case map[string]any:
+        if token, ok := x["token"].(string); ok { result = append(result, token) }
+        for key, value := range x { if key != "token" { result = append(result, findTokens(value)...)} }
+    case []any:
+        for _, value := range x { result = append(result, findTokens(value)...)}
+    }
+    return result
+}
+func main() {
+    if os.Getenv("SPANNER_EMULATOR_HOST") != "" { panic("emulator override") }
+    pg = os.Args[1] == "pg"
+    table, stream = "CaptureProbe", "CaptureProbeStream"
+    if pg { table, stream = strings.ToLower(table), strings.ToLower(stream) }
+    parent := fmt.Sprintf("projects/%s/instances/%s", os.Getenv("SPANNER_PROJECT_ID"), os.Getenv("SPANNER_INSTANCE_ID"))
+    name := "capture-20261011g1"
+    dialect := dbpb.DatabaseDialect_GOOGLE_STANDARD_SQL
+    statement := "CREATE DATABASE `"+name+"`"
+    if pg { name="capture-20261011p1"; dialect=dbpb.DatabaseDialect_POSTGRESQL; statement="CREATE DATABASE \""+name+"\"" }
+    db=parent+"/databases/"+name
+    var e error
+    a,e=database.NewDatabaseAdminClient(ctx); if e!=nil {panic(e)}; defer a.Close()
+    cx,cancel:=context.WithTimeout(ctx,3*time.Minute)
+    op,e:=a.CreateDatabase(cx,&dbpb.CreateDatabaseRequest{Parent:parent,CreateStatement:statement,DatabaseDialect:dialect})
+    if e==nil { _,e=op.Wait(cx) }; cancel(); outcome("create-database",e); if e!=nil {return}
+    defer func(){cx,cancel:=context.WithTimeout(ctx,time.Minute); defer cancel(); e:=a.DropDatabase(cx,&dbpb.DropDatabaseRequest{Database:db}); outcome("drop-database",e); if e==nil {_,e=a.GetDatabase(cx,&dbpb.GetDatabaseRequest{Name:db});outcome("database-absent",e)}}()
+    c,e=spanner.NewClient(ctx,db); if e!=nil {panic(e)}; defer c.Close()
+    createTable:="CREATE TABLE "+table+" (Id INT64 NOT NULL, Value INT64, Other STRING(MAX), Nullable INT64) PRIMARY KEY(Id)"
+    createStream:="CREATE CHANGE STREAM "+stream+" FOR ALL OPTIONS (value_capture_type='NEW_ROW_AND_OLD_VALUES')"
+    columns:=[]string{"Id","Value","Other","Nullable"}
+    if pg {createTable="CREATE TABLE "+table+" (id bigint PRIMARY KEY, value bigint, other text, nullable bigint)";createStream="CREATE CHANGE STREAM "+stream+" FOR ALL WITH (value_capture_type='NEW_ROW_AND_OLD_VALUES')";columns=[]string{"id","value","other","nullable"}}
+    if !ddl("setup",createTable,createStream){return}
+    for i,mode:=range []string{"NEW_ROW_AND_OLD_VALUES","NEW_ROW","OLD_AND_NEW_VALUES"} {
+        if i>0 {
+            clause:=" SET OPTIONS (value_capture_type='"+mode+"')"
+            if pg {clause=" SET (value_capture_type='"+mode+"')"}
+            if !ddl("set-mode-"+mode,"ALTER CHANGE STREAM "+stream+clause){return}
+        }
+        inspectScope("mode-"+mode)
+        start:=time.Now().UTC()
+        key:=int64(i+1)
+        mutations:=[]struct{name string; mutation *spanner.Mutation}{
+            {"insert",spanner.Insert(table,columns,[]any{key,int64(10),"stable",nil})},
+            {"update",spanner.Update(table,columns[:2],[]any{key,int64(20)})},
+            {"delete",spanner.Delete(table,spanner.Key{key})},
+        }
+        for _, m:=range mutations {
+            cx,cancel:=context.WithTimeout(ctx,30*time.Second)
+            commit,e:=c.Apply(cx,[]*spanner.Mutation{m.mutation});cancel()
+            outcome(mode+"-"+m.name,e)
+            if e!=nil{return}
+            emit(map[string]any{"label":mode+"-"+m.name+"-commit","commit_timestamp":commit,"key":key})
+        }
+        end:=time.Now().UTC().Add(2*time.Second)
+        tokens:=read(mode+"-root",start,end,nil,100,",NULL")
+        seen:=map[string]bool{}
+        for _,token:=range tokens {if !seen[token]{seen[token]=true;read(fmt.Sprintf("%s-child-%d",mode,len(seen)),start,end,&token,100,",NULL")}}
+        emit(map[string]any{"label":mode+"-partition-count","root_tokens_followed":len(seen)})
+    }
+}
+'''
+(task/'value-capture.go').write_text(source)
+runner=(task/'run-json.py').read_text()
+runner=runner.replace("'graph-controls','stream-options']", "'graph-controls','stream-options','value-capture']")
+runner=runner.replace("for name, source, dialect in [", "baseline_receipts=durable/'evidence/commands.json'\nwait_started=time.time()\nprint('Waiting for the serial baseline fixture suite before additional DDL',flush=True)\nwhile True:\n    baseline=json.loads(baseline_receipts.read_text())\n    if any(x['name']=='cleanup' and x['exit_code']==0 for x in baseline):break\n    if time.time()-wait_started>1200:raise SystemExit('Baseline completion unavailable; no follow-up fixture DDL started')\n    time.sleep(5)\nfor name, source, dialect in [")
+runner=runner.replace("('pg-options','stream-options','pg')]:", "('pg-options','stream-options','pg'),('google-capture','value-capture','google'),('pg-capture','value-capture','pg')]:")
+(task/'run-json.py').write_text(runner)
+print('Prepared 7 serial temporary database probes, including paired capture-mode controls')

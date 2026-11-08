@@ -1,0 +1,14 @@
+from pathlib import Path
+import os,subprocess,json,datetime,re,hashlib
+out=Path('<LOCAL_TASK_ROOT>/apstndb/spanalyzer/docs-delta-runtime-20261031/evidence');cmds=json.loads((out/'managed-corrected-commands.json').read_text());start=datetime.datetime.fromisoformat(cmds[0]['started_at']);rows=list(map(json.loads,(out/'managed-corrected-google.jsonl').read_text().splitlines()));created=datetime.datetime.fromisoformat(next(r['at']for r in rows if r['label']=='create-database').replace('Z','+00:00'));flags=['--project',os.environ['SPANNER_PROJECT_ID'],'--instance',os.environ['SPANNER_INSTANCE_ID']];p=subprocess.run(['gcloud','spanner','databases','list',*flags,'--format=json'],capture_output=True,text=True,timeout=90);assert p.returncode==0,'Database inventory failed';candidates=[]
+for d in json.loads(p.stdout):
+ name=d['name'].split('/')[-1];m=re.fullmatch(r'ddrt1031g-([a-f0-9]+)',name)
+ if not m:continue
+ stamp=datetime.datetime.fromtimestamp(int(m.group(1),16)/1e9,datetime.timezone.utc)
+ if start.timestamp()-1<=stamp.timestamp()<=created.timestamp():candidates.append((name,stamp,d))
+receipt={'run_started':start.isoformat(),'create_observed':created.isoformat(),'matching_candidates':len(candidates),'selection':'Exact task prefix plus encoded creation timestamp inside the recorded create window; read-only; no deletion','objects':[]}
+for name,stamp,d in candidates:
+ p=subprocess.run(['gcloud','spanner','databases','ddl','describe',name,*flags,'--format=json'],capture_output=True,text=True,timeout=90);text=p.stdout.replace(name,'<database>')
+ for key in ['SPANNER_PROJECT_ID','SPANNER_INSTANCE_ID','SPANNER_DATABASE_ID']:text=text.replace(os.environ[key],'<redacted>')
+ receipt['objects'].append({'database_name_sha256':hashlib.sha256(name.encode()).hexdigest(),'encoded_name_time':stamp.isoformat(),'server_create_time':d.get('createTime'),'state':d.get('state'),'ddl_read_exit_code':p.returncode,'ddl':json.loads(text)if p.returncode==0 else None})
+receipt['status']='read-only-inspected';(out/'interrupted-managed-inspection.json').write_text(json.dumps(receipt,indent=2)+'\n');print(json.dumps(receipt,indent=2))

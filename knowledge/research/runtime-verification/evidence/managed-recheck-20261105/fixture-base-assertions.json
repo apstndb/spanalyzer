@@ -1,0 +1,803 @@
+{
+  "status": "pass",
+  "checks": 155,
+  "failed": [],
+  "assertions": [
+    {
+      "name": "readonly-complete",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "readonly-no-transport-failure",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "supplemental-complete",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "supplemental-no-transport-failure",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "google-all-steps",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "google-owned-lifecycle",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "google-no-transport-failure",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "google-json-equal-auto",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "google-json-equal-search",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "google-json-equal-base",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "google-json-in-auto",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "google-json-in-search",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "google-json-in-base",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "google-json-whole-auto",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "google-json-whole-search",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "google-json-whole-base",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "google-scorer-different",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "google-scorer-default-2",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "google-explicit-stable",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "google-default-1",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "google-default-2",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "pg-all-steps",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "pg-owned-lifecycle",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "pg-no-transport-failure",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "pg-json-equal-auto",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "pg-json-equal-search",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "pg-json-equal-base",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "pg-json-in-auto",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "pg-json-in-search",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "pg-json-in-base",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "pg-json-whole-auto",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "pg-json-whole-search",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "pg-json-whole-base",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "pg-scorer-different",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "pg-scorer-default-2",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "pg-explicit-stable",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "pg-option-rejected-1",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "pg-option-rejected-2",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "infoschema-columns-same-prior-surface",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "infoschema-columns-size",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "infoschema-columns-tables",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "sys-columns-0-same-prior-surface",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "sys-columns-0-size",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "sys-columns-0-tables",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "sys-columns-1-same-prior-surface",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "sys-columns-1-size",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "sys-columns-1-tables",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "sys-columns-2-same-prior-surface",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "sys-columns-2-size",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "sys-columns-2-tables",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "pipe-select-same-code",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "pipe-select-same-values",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "pipe-extend-same-code",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "pipe-extend-same-values",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "pipe-set-same-code",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "pipe-set-same-values",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "pipe-drop-same-code",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "pipe-drop-same-values",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "pipe-rename-same-code",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "pipe-rename-same-values",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "pipe-as-same-code",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "pipe-as-same-values",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "pipe-where-same-code",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "pipe-where-same-values",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "pipe-aggregate-same-code",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "pipe-aggregate-same-values",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "pipe-join-same-code",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "pipe-join-same-values",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "pipe-order-by-same-code",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "pipe-order-by-same-values",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "pipe-limit-same-code",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "pipe-limit-same-values",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "pipe-union-same-code",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "pipe-union-same-values",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "pipe-intersect-same-code",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "pipe-intersect-same-values",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "pipe-except-same-code",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "pipe-except-same-values",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "pipe-tablesample-same-code",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "pipe-tablesample-same-values",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "pipe-standard-ordinal-same-code",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "pipe-standard-ordinal-same-values",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "pipe-group-alias-same-code",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "pipe-group-alias-same-values",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "pipe-group-bare-alias-same-code",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "pipe-group-bare-alias-same-values",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "pipe-group-two-aliases-same-code",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "pipe-group-two-aliases-same-values",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "pipe-group-ordinal-same-code",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "pipe-group-output-alias-same-code",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "pipe-group-input-alias-same-code",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "pipe-group-input-alias-same-values",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "pipe-group-and-order-same-code",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "pipe-group-and-order-same-values",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "pipe-order-sequence",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "json-expressions",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "json-group",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "distinctness",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "hll",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "approx",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "rand-unsupported",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "gql-full-columns",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "gql-full-values",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "gql-full-outer-columns",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "gql-full-outer-values",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "gql-outer-columns",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "gql-outer-values",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "gql-left-columns",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "gql-left-values",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "gql-left-outer-columns",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "gql-left-outer-values",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "gql-inner-columns",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "gql-inner-values",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "gql-order",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "gql-top2",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "gql-standalone-order-limit-malformed-control",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "gql-cross-next-order-limit-malformed-control",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "queue-Payload",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "queue-payload",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "queue-PAYLOAD",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "queue-PaYlOaD",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "tvf-star-plain",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "tvf-star-as",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "tvf-star-bare",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "search-enhanced",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "search-enhanced-required",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "bucket-index-seconds",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "bucket-index-hour",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "bucket-index-none",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "hour-bucket-values",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "pg-boundary-values",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "pg-count-jsonb-unsupported",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "drift-retained-failure",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "plan-google-equal-auto",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "plan-google-equal-search",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "plan-google-equal-base",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "plan-google-in-auto",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "plan-google-in-search",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "plan-google-in-base",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "plan-google-whole-auto",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "plan-google-whole-search",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "plan-google-whole-base",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "plan-pg-equal-auto",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "plan-pg-equal-search",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "plan-pg-equal-base",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "plan-pg-in-auto",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "plan-pg-in-search",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "plan-pg-in-base",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "plan-pg-whole-auto",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "plan-pg-whole-search",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "plan-pg-whole-base",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "omni-r5-google-dated-scorer-comparison",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "omni-r5-pg-dated-scorer-comparison",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "omni-lts-google-dated-scorer-comparison",
+      "pass_": true,
+      "detail": null
+    },
+    {
+      "name": "omni-lts-pg-dated-scorer-comparison",
+      "pass_": true,
+      "detail": null
+    }
+  ],
+  "case_counts": {
+    "readonly": 131,
+    "google_steps": 77,
+    "postgresql_steps": 50
+  },
+  "code_counts": {
+    "google": {
+      "OK": 65,
+      "InvalidArgument": 5,
+      "NOT_RUN": 9,
+      "NotFound": 1
+    },
+    "pg": {
+      "OK": 46,
+      "InvalidArgument": 3,
+      "NOT_RUN": 2,
+      "Unimplemented": 1,
+      "NotFound": 1
+    }
+  },
+  "boundary": "Assertions test bounded observed values. Known service rejections and local drift failure remain classified failures, not a passing integration gate."
+}

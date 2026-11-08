@@ -1,0 +1,47 @@
+{
+  "at": "2026-10-30T09:25:18.986214+00:00",
+  "records": [
+    {
+      "path": "MODULE.bazel",
+      "file": "emulator-MODULE.bazel",
+      "exit_code": 0,
+      "sha256": "afaeab68c638e347c596dfe05d1a28c814413e775260c753e45fa3feb99bf5fb",
+      "stderr": ""
+    },
+    {
+      "path": "WORKSPACE",
+      "file": "emulator-WORKSPACE",
+      "exit_code": 1,
+      "sha256": "e45906ce02e79f16fb87a838d86bb4e497e37a9591f97608fa013bbcd8b9cbc2",
+      "stderr": "gh: Not Found (HTTP 404)\n"
+    },
+    {
+      "path": "backend/query/query_engine.cc",
+      "file": "emulator-backend__query__query_engine.cc",
+      "exit_code": 0,
+      "sha256": "0e9c716e4bfa58897feb923f875de0bd7ff269188d312b087d76fd6299edf2f0",
+      "stderr": ""
+    },
+    {
+      "path": "build/bazel/zetasql.patch",
+      "file": "emulator-build__bazel__zetasql.patch",
+      "exit_code": 0,
+      "sha256": "dde550c858aef55d8e01538e5807b8173ac9ddaf383ff92a016caf2e556d0b62",
+      "stderr": ""
+    },
+    {
+      "path": "build/bazel/googlesql.patch",
+      "file": "emulator-build__bazel__googlesql.patch",
+      "exit_code": 0,
+      "sha256": "4f34b5ee708ecf1051e51600c33d24651e49ee872dca3a19c4c3c48ade9acd2d",
+      "stderr": ""
+    },
+    {
+      "path": "backend/query/query_engine_test.cc",
+      "file": "emulator-backend__query__query_engine_test.cc",
+      "exit_code": 0,
+      "sha256": "83b1a36abafdff55eb0661ead63b4c1224f8e99f72eaf12ad3aa7b05a624c2de",
+      "stderr": ""
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+from pathlib import Path
+import json,hashlib,subprocess,shutil,os,datetime
+r=Path('<LOCAL_CHECKOUT>');s=r/'.tmp/managed-recheck-20261105';t=Path('<LOCAL_TASK_ROOT>/apstndb/spanalyzer/managed-recheck-20261105');base=r/'knowledge/research/runtime-verification/evidence';out=base/'managed-recheck-20261105';out.mkdir(exist_ok=True);sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();old=json.loads((s/'evidence-baseline.json').read_text());assert all(sha(base/p)==v for p,v in old['files'].items())
+assert json.loads((t/'sources/final-head-refresh.json').read_text())['sha']==json.loads((t/'sources/mirror-head.json').read_text())['sha']
+a=json.loads((t/'evidence/readonly-assertions.json').read_text());assert a['status']=='pass'
+for f in (t/'sources').iterdir():
+ if f.is_file():p=out/'sources'/f.name;p.parent.mkdir(exist_ok=True);shutil.copyfile(f,p)
+for f in (t/'evidence').iterdir():
+ if f.is_file():shutil.copyfile(f,out/f.name)
+for f in s.glob('*.py'):shutil.copyfile(f,out/(f.name+'.txt'))
+shutil.copyfile(r/'.tmp/managed-recheck-20261029/query.go',out/'query.go.txt');shutil.copyfile(r/'survey/infoschem/drift_test.go',out/'drift_test.go.txt')
+assert sha(out/'drift_test.go.txt')==json.loads((out/'drift-command.json').read_text())['source_sha256']
+receipt={'status':'read_only_phase_complete_fixture_authorization_pending','observed_on':'2026-11-05','target':'existing dedicated user-level mise profile; destinations excluded','backend_build':'unavailable','source_checkout_head':subprocess.check_output(['git','rev-parse','HEAD'],cwd=r,text=True).strip(),'source_checkout_dirty':True,'scope':'managed only; existing base database reads','read_only_steps':a['executed_readonly_steps'],'bounded_assertions':a['checks'],'local_catalog_drift':'test failure retained','new_databases_created':0,'new_databases_deleted':0,'pending_fixture_steps':a['pending_fixture_steps'],'authorization':'New 2-database lifecycle question pending. November 3 approval consumed by that completed run. Earlier retained candidate excluded. No commit, push, public posting or paid resource change.','prior_artifact_count':len(old['files']),'prior_artifacts_unchanged':True,'at':datetime.datetime.now(datetime.timezone.utc).isoformat()};(out/'receipt.json').write_text(json.dumps(receipt,indent=2)+'\n');(t/'evidence/receipt.json').write_text(json.dumps(receipt,indent=2)+'\n')
+(out/'validation.json').write_text(json.dumps({'status':'pending','commands':[]},indent=2)+'\n')
+go='<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go';env=os.environ.copy();env.update(GOROOT=str(Path(go).parent.parent),GOTOOLCHAIN='local',GOFLAGS='-mod=readonly',GOCACHE=str(r/'.tmp/managed-recheck-20260925/go-cache'),GOWORK=str(r/'go.work'));rows=[]
+for name,args,cwd in [('okf-all',[go,'run','./okf-check','--repo-root','..','--gate','all','--publication-manifest',str(t/'publication-manifest.json')],r/'tools'),('markdown-language',[go,'run','./markdown-language-check','--repo-root','..'],r/'tools'),('diff-check',['git','diff','--check'],r)]:
+ log=out/(name+'.log')
+ with log.open('wb')as f:result=subprocess.run(args,cwd=cwd,env=env,stdout=f,stderr=subprocess.STDOUT)
+ rows.append({'name':name,'argv':args,'cwd':str(cwd),'exit_code':result.returncode,'log':log.name});print(name,result.returncode,flush=True)
+ if result.returncode:print(log.read_text()[-2500:]);raise SystemExit(result.returncode)
+(out/'validation.json').write_text(json.dumps({'status':'pass','commands':rows},indent=2)+'\n');shutil.copyfile(out/'validation.json',t/'evidence/validation.json');assert all(sha(base/p)==v for p,v in old['files'].items());manifest=base/'artifact-sha256.json';d=json.loads(manifest.read_text());d['files']={str(p.relative_to(base)):sha(p)for p in sorted(base.rglob('*'))if p.is_file()and p!=manifest};manifest.write_text(json.dumps(d,indent=2)+'\n');assert all(sha(base/p)==v for p,v in d['files'].items());print('Prior artifacts preserved',len(old['files']),'all current artifacts verified',len(d['files']))
+shutil.copyfile(r/'knowledge/research/runtime-verification/managed-revalidation-20261105.md',t/'read-only-report-snapshot.md.txt');(t/'checkpoint.json').write_text(json.dumps({'status':'read_only_complete_fixture_authorization_pending','read_only_steps':a['executed_readonly_steps'],'bounded_assertions':a['checks'],'documentation_gates':'pass','prior_artifacts_preserved':len(old['files']),'artifacts_verified':len(d['files'])},indent=2)+'\n')

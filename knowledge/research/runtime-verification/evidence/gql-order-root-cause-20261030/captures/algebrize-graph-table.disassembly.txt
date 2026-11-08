@@ -1,0 +1,271 @@
+
+.tmp/gql-order-root-cause-20261030/emulator_main.original:	file format elf64-littleaarch64
+
+Disassembly of section .text:
+
+000000000094dc90 <googlesql::Algebrizer::AlgebrizeGraphTableScan(googlesql::ResolvedGraphTableScan const*, std::vector<googlesql::Algebrizer::FilterConjunctInfo*, std::allocator<googlesql::Algebrizer::FilterConjunctInfo*>>*)>:
+  94dc90: a9b67bfd     	stp	x29, x30, [sp, #-0xa0]!
+  94dc94: 910003fd     	mov	x29, sp
+  94dc98: a90153f3     	stp	x19, x20, [sp, #0x10]
+  94dc9c: aa0103f3     	mov	x19, x1
+  94dca0: a9025bf5     	stp	x21, x22, [sp, #0x20]
+  94dca4: aa0003f5     	mov	x21, x0
+  94dca8: 91028276     	add	x22, x19, #0xa0
+  94dcac: aa0103e0     	mov	x0, x1
+  94dcb0: a90363f7     	stp	x23, x24, [sp, #0x30]
+  94dcb4: aa0803f7     	mov	x23, x8
+  94dcb8: aa0203f8     	mov	x24, x2
+  94dcbc: a9046bf9     	stp	x25, x26, [sp, #0x40]
+  94dcc0: 945a2fec     	bl	0x1fd9c70 <googlesql::ResolvedGraphTableScan::MarkFieldsAccessed() const>
+  94dcc4: aa1603e1     	mov	x1, x22
+  94dcc8: 52800020     	mov	w0, #0x1                // =1
+  94dccc: 948e2555     	bl	0x2cd7220 <__aarch64_ldset4_acq_rel>
+  94dcd0: f9403e79     	ldr	x25, [x19, #0x78]
+  94dcd4: b4000ad9     	cbz	x25, 0x94de2c <googlesql::Algebrizer::AlgebrizeGraphTableScan(googlesql::ResolvedGraphTableScan const*, std::vector<googlesql::Algebrizer::FilterConjunctInfo*, std::allocator<googlesql::Algebrizer::FilterConjunctInfo*>>*)+0x19c>
+  94dcd8: f941caa0     	ldr	x0, [x21, #0x390]
+  94dcdc: a90573fb     	stp	x27, x28, [sp, #0x50]
+  94dce0: 910d42b4     	add	x20, x21, #0x350
+  94dce4: f9401a81     	ldr	x1, [x20, #0x30]
+  94dce8: d1002000     	sub	x0, x0, #0x8
+  94dcec: eb00003f     	cmp	x1, x0
+  94dcf0: 54000540     	b.eq	0x94dd98 <googlesql::Algebrizer::AlgebrizeGraphTableScan(googlesql::ResolvedGraphTableScan const*, std::vector<googlesql::Algebrizer::FilterConjunctInfo*, std::allocator<googlesql::Algebrizer::FilterConjunctInfo*>>*)+0x108>
+  94dcf4: f8008439     	str	x25, [x1], #0x8
+  94dcf8: f9001a81     	str	x1, [x20, #0x30]
+  94dcfc: 9101c27a     	add	x26, x19, #0x70
+  94dd00: aa1a03e1     	mov	x1, x26
+  94dd04: 52800020     	mov	w0, #0x1                // =1
+  94dd08: 948e2546     	bl	0x2cd7220 <__aarch64_ldset4_acq_rel>
+  94dd0c: aa1603e1     	mov	x1, x22
+  94dd10: 52800080     	mov	w0, #0x4                // =4
+  94dd14: 948e2543     	bl	0x2cd7220 <__aarch64_ldset4_acq_rel>
+  94dd18: aa1603e1     	mov	x1, x22
+  94dd1c: 52800040     	mov	w0, #0x2                // =2
+  94dd20: a948da79     	ldp	x25, x22, [x19, #0x88]
+  94dd24: 948e253f     	bl	0x2cd7220 <__aarch64_ldset4_acq_rel>
+  94dd28: f940427b     	ldr	x27, [x19, #0x80]
+  94dd2c: aa1a03e1     	mov	x1, x26
+  94dd30: 52800080     	mov	w0, #0x4                // =4
+  94dd34: 948e253b     	bl	0x2cd7220 <__aarch64_ldset4_acq_rel>
+  94dd38: 39412265     	ldrb	w5, [x19, #0x48]
+  94dd3c: aa1703e8     	mov	x8, x23
+  94dd40: cb1902d6     	sub	x22, x22, x25
+  94dd44: aa1803e6     	mov	x6, x24
+  94dd48: aa1b03e4     	mov	x4, x27
+  94dd4c: aa1903e2     	mov	x2, x25
+  94dd50: 9343fed6     	asr	x22, x22, #3
+  94dd54: 91006261     	add	x1, x19, #0x18
+  94dd58: aa1603e3     	mov	x3, x22
+  94dd5c: aa1503e0     	mov	x0, x21
+  94dd60: 97fee140     	bl	0x906260 <googlesql::Algebrizer::AlgebrizeProjectScanInternal(std::vector<googlesql::ResolvedColumn, std::allocator<googlesql::ResolvedColumn>> const&, absl::lts_20260107::Span<std::unique_ptr<googlesql::ResolvedComputedColumn const, std::default_delete<googlesql::ResolvedComputedColumn const>> const>, googlesql::ResolvedScan const*, bool, std::vector<googlesql::Algebrizer::FilterConjunctInfo*, std::allocator<googlesql::Algebrizer::FilterConjunctInfo*>>*)>
+  94dd64: a9430680     	ldp	x0, x1, [x20, #0x30]
+  94dd68: eb01001f     	cmp	x0, x1
+  94dd6c: 54000ea0     	b.eq	0x94df40 <googlesql::Algebrizer::AlgebrizeGraphTableScan(googlesql::ResolvedGraphTableScan const*, std::vector<googlesql::Algebrizer::FilterConjunctInfo*, std::allocator<googlesql::Algebrizer::FilterConjunctInfo*>>*)+0x2b0>
+  94dd70: a94573fb     	ldp	x27, x28, [sp, #0x50]
+  94dd74: d1002000     	sub	x0, x0, #0x8
+  94dd78: f9001a80     	str	x0, [x20, #0x30]
+  94dd7c: a94153f3     	ldp	x19, x20, [sp, #0x10]
+  94dd80: aa1703e0     	mov	x0, x23
+  94dd84: a9425bf5     	ldp	x21, x22, [sp, #0x20]
+  94dd88: a94363f7     	ldp	x23, x24, [sp, #0x30]
+  94dd8c: a9446bf9     	ldp	x25, x26, [sp, #0x40]
+  94dd90: a8ca7bfd     	ldp	x29, x30, [sp], #0xa0
+  94dd94: d65f03c0     	ret
+  94dd98: 910d82a4     	add	x4, x21, #0x360
+  94dd9c: 910e02ba     	add	x26, x21, #0x380
+  94dda0: f9400f5b     	ldr	x27, [x26, #0x18]
+  94dda4: 92fc0008     	mov	x8, #0x1fffffffffffffff // =2305843009213693951
+  94dda8: a9411c80     	ldp	x0, x7, [x4, #0x10]
+  94ddac: f100037f     	cmp	x27, #0x0
+  94ddb0: f9400743     	ldr	x3, [x26, #0x8]
+  94ddb4: 9a9f07e2     	cset	x2, ne
+  94ddb8: f941b2a9     	ldr	x9, [x21, #0x360]
+  94ddbc: cb030023     	sub	x3, x1, x3
+  94ddc0: cb07037c     	sub	x28, x27, x7
+  94ddc4: cb090000     	sub	x0, x0, x9
+  94ddc8: 9343fc63     	asr	x3, x3, #3
+  94ddcc: 9343ff86     	asr	x6, x28, #3
+  94ddd0: cb0200c2     	sub	x2, x6, x2
+  94ddd4: 8b021862     	add	x2, x3, x2, lsl #6
+  94ddd8: 8b800c40     	add	x0, x2, x0, asr #3
+  94dddc: eb08001f     	cmp	x0, x8
+  94dde0: 54001280     	b.eq	0x94e030 <googlesql::Algebrizer::AlgebrizeGraphTableScan(googlesql::ResolvedGraphTableScan const*, std::vector<googlesql::Algebrizer::FilterConjunctInfo*, std::allocator<googlesql::Algebrizer::FilterConjunctInfo*>>*)+0x3a0>
+  94dde4: f941aaa1     	ldr	x1, [x21, #0x350]
+  94dde8: f9400680     	ldr	x0, [x20, #0x8]
+  94ddec: cb010362     	sub	x2, x27, x1
+  94ddf0: cb820c02     	sub	x2, x0, x2, asr #3
+  94ddf4: f100045f     	cmp	x2, #0x1
+  94ddf8: 54000429     	b.ls	0x94de7c <googlesql::Algebrizer::AlgebrizeGraphTableScan(googlesql::ResolvedGraphTableScan const*, std::vector<googlesql::Algebrizer::FilterConjunctInfo*, std::allocator<googlesql::Algebrizer::FilterConjunctInfo*>>*)+0x1ec>
+  94ddfc: d2804000     	mov	x0, #0x200              // =512
+  94de00: 948e5290     	bl	0x2ce2840 <operator new(unsigned long)>
+  94de04: f9000760     	str	x0, [x27, #0x8]
+  94de08: f9402680     	ldr	x0, [x20, #0x48]
+  94de0c: f9401a83     	ldr	x3, [x20, #0x30]
+  94de10: 91002002     	add	x2, x0, #0x8
+  94de14: f9400401     	ldr	x1, [x0, #0x8]
+  94de18: f9000079     	str	x25, [x3]
+  94de1c: 91080020     	add	x0, x1, #0x200
+  94de20: a9008341     	stp	x1, x0, [x26, #0x8]
+  94de24: f9000f42     	str	x2, [x26, #0x18]
+  94de28: 17ffffb4     	b	0x94dcf8 <googlesql::Algebrizer::AlgebrizeGraphTableScan(googlesql::ResolvedGraphTableScan const*, std::vector<googlesql::Algebrizer::FilterConjunctInfo*, std::allocator<googlesql::Algebrizer::FilterConjunctInfo*>>*)+0x68>
+  94de2c: f0014e21     	adrp	x1, 0x3314000 <typeinfo name for std::_Sp_counted_ptr_inplace<googlesql_base::UnsafeArena, std::allocator<void>, (__gnu_cxx::_Lock_policy)2>+0x33f8>
+  94de30: 913f8021     	add	x1, x1, #0xfe0
+  94de34: 912a2022     	add	x2, x1, #0xa88
+  94de38: 91020021     	add	x1, x1, #0x80
+  94de3c: 910203f3     	add	x19, sp, #0x80
+  94de40: d2803140     	mov	x0, #0x18a              // =394
+  94de44: aa1303e8     	mov	x8, x19
+  94de48: 94699a0e     	bl	0x23b4680 <googlesql_base::internal_ret_check::RetCheckFailSlowPath(googlesql_base::SourceLocation, char const*)>
+  94de4c: aa1703e8     	mov	x8, x23
+  94de50: aa1303e0     	mov	x0, x19
+  94de54: 97fe2d07     	bl	0x8d9270 <googlesql_base::StatusBuilder::operator absl::lts_20260107::StatusOr<std::unique_ptr<googlesql::RelationalOp, std::default_delete<googlesql::RelationalOp>>><std::unique_ptr<googlesql::RelationalOp, std::default_delete<googlesql::RelationalOp>>>() &&>
+  94de58: aa1303e0     	mov	x0, x19
+  94de5c: 97eef2bd     	bl	0x50a950 <googlesql_base::StatusBuilder::~StatusBuilder()>
+  94de60: a94153f3     	ldp	x19, x20, [sp, #0x10]
+  94de64: aa1703e0     	mov	x0, x23
+  94de68: a9425bf5     	ldp	x21, x22, [sp, #0x20]
+  94de6c: a94363f7     	ldp	x23, x24, [sp, #0x30]
+  94de70: a9446bf9     	ldp	x25, x26, [sp, #0x40]
+  94de74: a8ca7bfd     	ldp	x29, x30, [sp], #0xa0
+  94de78: d65f03c0     	ret
+  94de7c: 910008c6     	add	x6, x6, #0x2
+  94de80: eb06041f     	cmp	x0, x6, lsl #1
+  94de84: 54000788     	b.hi	0x94df74 <googlesql::Algebrizer::AlgebrizeGraphTableScan(googlesql::ResolvedGraphTableScan const*, std::vector<googlesql::Algebrizer::FilterConjunctInfo*, std::allocator<googlesql::Algebrizer::FilterConjunctInfo*>>*)+0x2e4>
+  94de88: b4000ac0     	cbz	x0, 0x94dfe0 <googlesql::Algebrizer::AlgebrizeGraphTableScan(googlesql::ResolvedGraphTableScan const*, std::vector<googlesql::Algebrizer::FilterConjunctInfo*, std::allocator<googlesql::Algebrizer::FilterConjunctInfo*>>*)+0x350>
+  94de8c: 91000400     	add	x0, x0, #0x1
+  94de90: 92fe0001     	mov	x1, #0xfffffffffffffff  // =1152921504606846975
+  94de94: d37ff81b     	lsl	x27, x0, #1
+  94de98: eb01037f     	cmp	x27, x1
+  94de9c: 54000a88     	b.hi	0x94dfec <googlesql::Algebrizer::AlgebrizeGraphTableScan(googlesql::ResolvedGraphTableScan const*, std::vector<googlesql::Algebrizer::FilterConjunctInfo*, std::allocator<googlesql::Algebrizer::FilterConjunctInfo*>>*)+0x35c>
+  94dea0: d37cec00     	lsl	x0, x0, #4
+  94dea4: a90693e6     	stp	x6, x4, [sp, #0x68]
+  94dea8: 948e5266     	bl	0x2ce2840 <operator new(unsigned long)>
+  94deac: a94693e6     	ldp	x6, x4, [sp, #0x68]
+  94deb0: f90037e0     	str	x0, [sp, #0x68]
+  94deb4: f9402682     	ldr	x2, [x20, #0x48]
+  94deb8: f9401681     	ldr	x1, [x20, #0x28]
+  94debc: 91002042     	add	x2, x2, #0x8
+  94dec0: cb060363     	sub	x3, x27, x6
+  94dec4: cb010042     	sub	x2, x2, x1
+  94dec8: d341fc63     	lsr	x3, x3, #1
+  94decc: f100205f     	cmp	x2, #0x8
+  94ded0: d37df063     	lsl	x3, x3, #3
+  94ded4: 8b030006     	add	x6, x0, x3
+  94ded8: 5400090d     	b.le	0x94dff8 <googlesql::Algebrizer::AlgebrizeGraphTableScan(googlesql::ResolvedGraphTableScan const*, std::vector<googlesql::Algebrizer::FilterConjunctInfo*, std::allocator<googlesql::Algebrizer::FilterConjunctInfo*>>*)+0x368>
+  94dedc: aa0603e0     	mov	x0, x6
+  94dee0: 97ecd174     	bl	0x4824b0 <memmove@plt>
+  94dee4: f9403be4     	ldr	x4, [sp, #0x70]
+  94dee8: aa0003e6     	mov	x6, x0
+  94deec: f9400681     	ldr	x1, [x20, #0x8]
+  94def0: a90713e6     	stp	x6, x4, [sp, #0x70]
+  94def4: f941aaa0     	ldr	x0, [x21, #0x350]
+  94def8: d37df021     	lsl	x1, x1, #3
+  94defc: 948e57e1     	bl	0x2ce3e80 <operator delete(void*, unsigned long)>
+  94df00: a9469be0     	ldp	x0, x6, [sp, #0x68]
+  94df04: f901aaa0     	str	x0, [x21, #0x350]
+  94df08: f9403fe4     	ldr	x4, [sp, #0x78]
+  94df0c: f900069b     	str	x27, [x20, #0x8]
+  94df10: f94000c0     	ldr	x0, [x6]
+  94df14: f9000480     	str	x0, [x4, #0x8]
+  94df18: f9000c86     	str	x6, [x4, #0x18]
+  94df1c: 8b1c00db     	add	x27, x6, x28
+  94df20: 91080000     	add	x0, x0, #0x200
+  94df24: f9000880     	str	x0, [x4, #0x10]
+  94df28: f87c68c0     	ldr	x0, [x6, x28]
+  94df2c: f9000740     	str	x0, [x26, #0x8]
+  94df30: f9000f5b     	str	x27, [x26, #0x18]
+  94df34: 91080000     	add	x0, x0, #0x200
+  94df38: f9000b40     	str	x0, [x26, #0x10]
+  94df3c: 17ffffb0     	b	0x94ddfc <googlesql::Algebrizer::AlgebrizeGraphTableScan(googlesql::ResolvedGraphTableScan const*, std::vector<googlesql::Algebrizer::FilterConjunctInfo*, std::allocator<googlesql::Algebrizer::FilterConjunctInfo*>>*)+0x16c>
+  94df40: d2804001     	mov	x1, #0x200              // =512
+  94df44: 948e57cf     	bl	0x2ce3e80 <operator delete(void*, unsigned long)>
+  94df48: f9402680     	ldr	x0, [x20, #0x48]
+  94df4c: a94573fb     	ldp	x27, x28, [sp, #0x50]
+  94df50: d1002001     	sub	x1, x0, #0x8
+  94df54: f85f8000     	ldur	x0, [x0, #-0x8]
+  94df58: f901c6a0     	str	x0, [x21, #0x388]
+  94df5c: f901cea1     	str	x1, [x21, #0x398]
+  94df60: 91080001     	add	x1, x0, #0x200
+  94df64: f901caa1     	str	x1, [x21, #0x390]
+  94df68: 9107e000     	add	x0, x0, #0x1f8
+  94df6c: f9001a80     	str	x0, [x20, #0x30]
+  94df70: 17ffff83     	b	0x94dd7c <googlesql::Algebrizer::AlgebrizeGraphTableScan(googlesql::ResolvedGraphTableScan const*, std::vector<googlesql::Algebrizer::FilterConjunctInfo*, std::allocator<googlesql::Algebrizer::FilterConjunctInfo*>>*)+0xec>
+  94df74: cb060000     	sub	x0, x0, x6
+  94df78: 91002362     	add	x2, x27, #0x8
+  94df7c: cb070042     	sub	x2, x2, x7
+  94df80: d341fc00     	lsr	x0, x0, #1
+  94df84: d37df000     	lsl	x0, x0, #3
+  94df88: 8b000026     	add	x6, x1, x0
+  94df8c: eb0600ff     	cmp	x7, x6
+  94df90: 54000149     	b.ls	0x94dfb8 <googlesql::Algebrizer::AlgebrizeGraphTableScan(googlesql::ResolvedGraphTableScan const*, std::vector<googlesql::Algebrizer::FilterConjunctInfo*, std::allocator<googlesql::Algebrizer::FilterConjunctInfo*>>*)+0x328>
+  94df94: f100205f     	cmp	x2, #0x8
+  94df98: 540003ad     	b.le	0x94e00c <googlesql::Algebrizer::AlgebrizeGraphTableScan(googlesql::ResolvedGraphTableScan const*, std::vector<googlesql::Algebrizer::FilterConjunctInfo*, std::allocator<googlesql::Algebrizer::FilterConjunctInfo*>>*)+0x37c>
+  94df9c: aa0603e0     	mov	x0, x6
+  94dfa0: aa0703e1     	mov	x1, x7
+  94dfa4: f90037e4     	str	x4, [sp, #0x68]
+  94dfa8: 97ecd142     	bl	0x4824b0 <memmove@plt>
+  94dfac: f94037e4     	ldr	x4, [sp, #0x68]
+  94dfb0: aa0003e6     	mov	x6, x0
+  94dfb4: 17ffffd7     	b	0x94df10 <googlesql::Algebrizer::AlgebrizeGraphTableScan(googlesql::ResolvedGraphTableScan const*, std::vector<googlesql::Algebrizer::FilterConjunctInfo*, std::allocator<googlesql::Algebrizer::FilterConjunctInfo*>>*)+0x280>
+  94dfb8: 91002380     	add	x0, x28, #0x8
+  94dfbc: 8b0000c0     	add	x0, x6, x0
+  94dfc0: f100205f     	cmp	x2, #0x8
+  94dfc4: 540002cd     	b.le	0x94e01c <googlesql::Algebrizer::AlgebrizeGraphTableScan(googlesql::ResolvedGraphTableScan const*, std::vector<googlesql::Algebrizer::FilterConjunctInfo*, std::allocator<googlesql::Algebrizer::FilterConjunctInfo*>>*)+0x38c>
+  94dfc8: aa0703e1     	mov	x1, x7
+  94dfcc: cb020000     	sub	x0, x0, x2
+  94dfd0: a90693e6     	stp	x6, x4, [sp, #0x68]
+  94dfd4: 97ecd137     	bl	0x4824b0 <memmove@plt>
+  94dfd8: a94693e6     	ldp	x6, x4, [sp, #0x68]
+  94dfdc: 17ffffcd     	b	0x94df10 <googlesql::Algebrizer::AlgebrizeGraphTableScan(googlesql::ResolvedGraphTableScan const*, std::vector<googlesql::Algebrizer::FilterConjunctInfo*, std::allocator<googlesql::Algebrizer::FilterConjunctInfo*>>*)+0x280>
+  94dfe0: d2800300     	mov	x0, #0x18               // =24
+  94dfe4: d280007b     	mov	x27, #0x3               // =3
+  94dfe8: 17ffffaf     	b	0x94dea4 <googlesql::Algebrizer::AlgebrizeGraphTableScan(googlesql::ResolvedGraphTableScan const*, std::vector<googlesql::Algebrizer::FilterConjunctInfo*, std::allocator<googlesql::Algebrizer::FilterConjunctInfo*>>*)+0x214>
+  94dfec: eb08037f     	cmp	x27, x8
+  94dff0: 540001e9     	b.ls	0x94e02c <googlesql::Algebrizer::AlgebrizeGraphTableScan(googlesql::ResolvedGraphTableScan const*, std::vector<googlesql::Algebrizer::FilterConjunctInfo*, std::allocator<googlesql::Algebrizer::FilterConjunctInfo*>>*)+0x39c>
+  94dff4: 97ecd1a7     	bl	0x482690 <_ZSt28__throw_bad_array_new_lengthv@plt>
+  94dff8: 54fff7a1     	b.ne	0x94deec <googlesql::Algebrizer::AlgebrizeGraphTableScan(googlesql::ResolvedGraphTableScan const*, std::vector<googlesql::Algebrizer::FilterConjunctInfo*, std::allocator<googlesql::Algebrizer::FilterConjunctInfo*>>*)+0x25c>
+  94dffc: f9400020     	ldr	x0, [x1]
+  94e000: f94037e1     	ldr	x1, [sp, #0x68]
+  94e004: f8236820     	str	x0, [x1, x3]
+  94e008: 17ffffb9     	b	0x94deec <googlesql::Algebrizer::AlgebrizeGraphTableScan(googlesql::ResolvedGraphTableScan const*, std::vector<googlesql::Algebrizer::FilterConjunctInfo*, std::allocator<googlesql::Algebrizer::FilterConjunctInfo*>>*)+0x25c>
+  94e00c: 54fff821     	b.ne	0x94df10 <googlesql::Algebrizer::AlgebrizeGraphTableScan(googlesql::ResolvedGraphTableScan const*, std::vector<googlesql::Algebrizer::FilterConjunctInfo*, std::allocator<googlesql::Algebrizer::FilterConjunctInfo*>>*)+0x280>
+  94e010: f94000e2     	ldr	x2, [x7]
+  94e014: f8206822     	str	x2, [x1, x0]
+  94e018: 17ffffbe     	b	0x94df10 <googlesql::Algebrizer::AlgebrizeGraphTableScan(googlesql::ResolvedGraphTableScan const*, std::vector<googlesql::Algebrizer::FilterConjunctInfo*, std::allocator<googlesql::Algebrizer::FilterConjunctInfo*>>*)+0x280>
+  94e01c: 54fff7a1     	b.ne	0x94df10 <googlesql::Algebrizer::AlgebrizeGraphTableScan(googlesql::ResolvedGraphTableScan const*, std::vector<googlesql::Algebrizer::FilterConjunctInfo*, std::allocator<googlesql::Algebrizer::FilterConjunctInfo*>>*)+0x280>
+  94e020: f94000e1     	ldr	x1, [x7]
+  94e024: f81f8001     	stur	x1, [x0, #-0x8]
+  94e028: 17ffffba     	b	0x94df10 <googlesql::Algebrizer::AlgebrizeGraphTableScan(googlesql::ResolvedGraphTableScan const*, std::vector<googlesql::Algebrizer::FilterConjunctInfo*, std::allocator<googlesql::Algebrizer::FilterConjunctInfo*>>*)+0x280>
+  94e02c: 97ecd109     	bl	0x482450 <_ZSt17__throw_bad_allocv@plt>
+  94e030: d0014e20     	adrp	x0, 0x3314000 <typeinfo name for std::_Sp_counted_ptr_inplace<googlesql_base::UnsafeArena, std::allocator<void>, (__gnu_cxx::_Lock_policy)2>+0x33f8>
+  94e034: 913f8000     	add	x0, x0, #0xfe0
+  94e038: 912aa000     	add	x0, x0, #0xaa8
+  94e03c: 97ecd109     	bl	0x482460 <_ZSt20__throw_length_errorPKc@plt>
+  94e040: aa0003e1     	mov	x1, x0
+  94e044: aa1303e0     	mov	x0, x19
+  94e048: aa0103f3     	mov	x19, x1
+  94e04c: a90573fb     	stp	x27, x28, [sp, #0x50]
+  94e050: 97eef240     	bl	0x50a950 <googlesql_base::StatusBuilder::~StatusBuilder()>
+  94e054: aa1303e0     	mov	x0, x19
+  94e058: 948e440e     	bl	0x2cdf090 <_Unwind_Resume>
+  94e05c: a9430a81     	ldp	x1, x2, [x20, #0x30]
+  94e060: aa0003f3     	mov	x19, x0
+  94e064: eb02003f     	cmp	x1, x2
+  94e068: 540000a0     	b.eq	0x94e07c <googlesql::Algebrizer::AlgebrizeGraphTableScan(googlesql::ResolvedGraphTableScan const*, std::vector<googlesql::Algebrizer::FilterConjunctInfo*, std::allocator<googlesql::Algebrizer::FilterConjunctInfo*>>*)+0x3ec>
+  94e06c: d1002021     	sub	x1, x1, #0x8
+  94e070: f9001a81     	str	x1, [x20, #0x30]
+  94e074: aa1303e0     	mov	x0, x19
+  94e078: 948e4406     	bl	0x2cdf090 <_Unwind_Resume>
+  94e07c: aa0103e0     	mov	x0, x1
+  94e080: d2804001     	mov	x1, #0x200              // =512
+  94e084: 948e577f     	bl	0x2ce3e80 <operator delete(void*, unsigned long)>
+  94e088: 910e02b5     	add	x21, x21, #0x380
+  94e08c: f9402680     	ldr	x0, [x20, #0x48]
+  94e090: d1002001     	sub	x1, x0, #0x8
+  94e094: f85f8000     	ldur	x0, [x0, #-0x8]
+  94e098: f90006a0     	str	x0, [x21, #0x8]
+  94e09c: f9000ea1     	str	x1, [x21, #0x18]
+  94e0a0: 91080001     	add	x1, x0, #0x200
+  94e0a4: f9000aa1     	str	x1, [x21, #0x10]
+  94e0a8: 9107e000     	add	x0, x0, #0x1f8
+  94e0ac: f9001a80     	str	x0, [x20, #0x30]
+  94e0b0: 17fffff1     	b	0x94e074 <googlesql::Algebrizer::AlgebrizeGraphTableScan(googlesql::ResolvedGraphTableScan const*, std::vector<googlesql::Algebrizer::FilterConjunctInfo*, std::allocator<googlesql::Algebrizer::FilterConjunctInfo*>>*)+0x3e4>

@@ -1,0 +1,62 @@
+{
+  "retrieved_on_utc": "2026-09-26",
+  "latest_managed_announcement": "2026-09-18",
+  "exclusive_cutoff": "2026-09-03",
+  "documents": [
+    {
+      "file": "managed-release-notes-followup.md",
+      "url": "https://docs.cloud.google.com/spanner/docs/release-notes",
+      "method": "dkcli full content",
+      "sha256": "8c4950b13a3c7489b967cec442ec1dda140d6b187f0a270da4403a0cbb2faef9"
+    },
+    {
+      "file": "managed-release-notes-followup.html",
+      "url": "https://docs.cloud.google.com/spanner/docs/release-notes",
+      "method": "curl full HTML",
+      "sha256": "ae2282eb34e9a384ced0fbde93e72c70a8c7415e1e2650900ccc330ef07c3633"
+    },
+    {
+      "file": "queue-overview-followup.md",
+      "url": "https://docs.cloud.google.com/spanner/docs/queues/queues-overview",
+      "method": "dkcli full content",
+      "sha256": "02cc67cd3ab9521f653eac5e954918abc3822f2fb8612aa2b4df9828e9939437"
+    },
+    {
+      "file": "queue-using-followup.md",
+      "url": "https://docs.cloud.google.com/spanner/docs/queues/queues-using",
+      "method": "dkcli full content",
+      "sha256": "0928c8dc45b2d24afe0ca2b95a582e7afac649b17b2341d9c616d54ec9c90189"
+    }
+  ],
+  "release_note_excerpt": "## September 18, 2026\n\nFeature\n\nSpanner supports automatic parameterization of SQL query literals to improve query performance, reduce latency, and lower CPU costs. Spanner converts literal values hardcoded in CRUD-style queries, such as primary key lookups, index lookups, and primary key joins, into query parameters, allowing execution plans to be cached and reused to reduce latency and CPU costs.\n\nFor more information, see [Use query parameters](https://docs.cloud.google.com/spanner/docs/sql-best-practices#query-parameters) and statement hints ( [GoogleSQL](https://docs.cloud.google.com/spanner/docs/reference/standard-sql/query-syntax#statement_hints) and [PostgreSQL](https://docs.cloud.google.com/spanner/docs/reference/postgresql/query-syntax#statement-hints) ).\n\n## September 17, 2026\n\nFeature\n\nSpanner queues are [generally available (GA)](https://cloud.google.com/products/#product-launch-stages) . Spanner queues provide transactional messaging to help you manage asynchronous work. The feature pairs this capability with the scalability and reliability of Spanner, letting you build event-driven applications. For more information, see the [Spanner queues overview](https://docs.cloud.google.com/spanner/docs/queues/queues-overview) .\n\n## September 11, 2026\n\nFeature\n\nSpanner Graph supports the following enhancements for `CREATE PROPERTY GRAPH` :\n\n  - **Semantic options for labels and properties** : You can configure `OPTIONS` ( `description` and `synonyms` ) on labels and properties to provide context and improve discoverability for natural language querying interfaces.\n  - **Element key uniqueness validation option** : You can configure the `validate_element_key_uniqueness` option in the property graph `OPTIONS` clause to control whether Spanner Graph validates element key uniqueness at schema creation time.\n\nFor more information, see [CREATE PROPERTY GRAPH statement](https://docs.cloud.google.com/spanner/docs/reference/standard-sql/graph-schema-statements#create_property_graph) and [Disabled key validation](https://docs.cloud.google.com/spanner/docs/graph/graph-with-views-overview#disabled-key-validation) .\n\n",
+  "coverage": [
+    {
+      "date": "2026-09-11",
+      "item": "Graph label/property description and synonyms",
+      "r3": "Accepted and retained by catalog and DDL export",
+      "r2_1": "Same",
+      "evidence": "feature-{r2,r3}.jsonl: graph-semantic, semantic-metadata, semantic-export"
+    },
+    {
+      "date": "2026-09-11",
+      "item": "Graph validate_element_key_uniqueness",
+      "r3": "default and true reject join-view fixture; false accepts and MATCH returns 2",
+      "r2_1": "Same",
+      "evidence": "feature-{r2,r3}.jsonl: graph-uniqueness, graph-match"
+    },
+    {
+      "date": "2026-09-17",
+      "item": "Spanner queues GA announcement",
+      "r3": "GoogleSQL create/send/receive/renew/ack/rollback/future-delivery controls succeed",
+      "r2_1": "Same",
+      "evidence": "queue-{r2,r3}.jsonl"
+    },
+    {
+      "date": "2026-09-18",
+      "item": "Automatic parameterization",
+      "r3": "Primary-key SELECT PROFILE exposes auto_parameters in default/AUTO/ON, absent with OFF",
+      "r2_1": "No generated auto_parameters observed",
+      "evidence": "feature-{r2,r3}.jsonl: auto-parameter-*"
+    }
+  ]
+}
