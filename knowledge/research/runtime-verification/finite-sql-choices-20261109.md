@@ -26,14 +26,20 @@ sources:
   - id: alternatives
     resource: ../../../cmd/spanner-query-gen/DESIGN.md
     title: Design alternatives and finite verification boundary
+  - id: followup
+    resource: evidence/finite-sql-choices-20261109/followup/receipt.json
+    title: Corrected immutable root dependency and focused runtime recheck
+  - id: binding-fix
+    resource: https://github.com/apstndb/spanalyzer/blob/dfcf679fab547c1dbb1ca93ea5e2b9e9af2453d4/internal/optparam/emit.go
+    title: Complete-statement binding pruning and canonical repeated-marker labels
 ---
 
 # Closed SQL choices on local runtimes
 
 Observed November 9, 2026 JST (November 8 UTC). This verifies the generator's
 new finite alternatives, not a change in Spanner syntax or an engine release.
-The retained receipt gives exact timestamps and the dirty CLI producer hashes.
-The CLI resolves root implementation commit
+The initial receipt gives exact timestamps and the dirty CLI producer hashes.
+That run's CLI resolves root implementation commit
 `beb4f5761002ee5a6d826a0a03cceab34e8a97df` through the immutable pseudo-version
 `v0.2.2-0.20261108145506-beb4f5761002`, with `GOWORK=off`.
 
@@ -106,3 +112,27 @@ nullable omission blocks remain separate. Required TIMESTAMP values use
 BigQuery and row-count DML optional variants remain unsupported. No managed
 Spanner or Omni r5 execution is performed here. Earlier observations retain
 their dates and are not promoted by this local run.
+
+## Review correction and focused follow-up
+
+Independent review found that fragment-local binding detection could disagree
+with the complete SQL: a choice ending in `-- comment` hides a later fixed
+`@value`, while the generated builder still supplied that argument. The
+initial six-case runtime fixture did not cover this comment boundary. Its
+successful results remain scoped to those cases and the original producer.
+
+The correction derives omitted-binding masks from each complete verified SQL
+statement and groups equal masks in a generated label dispatch. Repeated
+markers contribute one axis to that label. This preserves byte-identical SQL,
+choice selection and binding agreement without a runtime lexer. A compiled
+regression covers the comment boundary, a repeated choice marker and an
+independent optional gate, checking actual SQL, labels and argument names.
+
+The CLI then resolves corrected root commit
+`dfcf679fab547c1dbb1ca93ea5e2b9e9af2453d4` as
+`v0.2.2-0.20261108152247-dfcf679fab54`. Full root and standalone CLI unit suites
+pass. A focused recheck repeats all six memberships on each pinned runtime
+and all six direct PLAN and collector successes on Omni. All three container
+identities from that follow-up are absent after test exit. Its separate
+receipt retains exact times, module-only patch and source hashes; the initial
+receipt is not rewritten as execution of the corrected producer.

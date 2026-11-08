@@ -1,0 +1,138 @@
+{
+  "recorded_at": "2026-11-08T15:29:58.097800+00:00",
+  "observation_window": {
+    "started_at": "2026-11-09T00:26:30.774538+09:00",
+    "finished_at": "2026-11-09T00:26:57.907206+09:00"
+  },
+  "command": "GOWORK=off SPANEMUBOOST_ENABLE_OMNI_TESTS=1 go test -json -count=1 -tags=integration,omni -run TestIntegrationSQLChoices ./...",
+  "exit_code": 0,
+  "working_module": "cmd/spanner-query-gen",
+  "go_version": "go1.26.10",
+  "producer": {
+    "started_at": "2026-11-08T15:26:25.016391+00:00",
+    "base_commit": "dfcf679fab547c1dbb1ca93ea5e2b9e9af2453d4",
+    "source_state": "dirty-worktree-with-updated-immutable-CLI-root-pin",
+    "sources": {
+      "cmd/spanner-query-gen/config_schema.go": "67e7252982766d11268ba3050ba8bd852218c8730446e49ab8c6679cbfb7f580",
+      "cmd/spanner-query-gen/plan_report.go": "91b648500dd4ca8d50ccf1bb8331b93c64e1c3ee0fc1c9dd73e949d7dedc1921",
+      "cmd/spanner-query-gen/go.mod": "dfc6df933c6ec9905b49d74fd5652ae035560c8873f831f749ef601235ea144f",
+      "cmd/spanner-query-gen/go.sum": "c9c620db7b0e1d6cf5218b8d409d7cfc65d138505a37cb0b6b68115e507e6d75",
+      "cmd/spanner-query-gen/sql_choice_test.go": "a5064a90b54a3ff8894a638bace7b8c3e81233bb11a6e27ff51becf4e2509d7d",
+      "cmd/spanner-query-gen/sql_choice_integration_test.go": "3169b272aca1b1e6238a3a59c43239777bb2ca5327f38721df2549219f3557ef",
+      "cmd/spanner-query-gen/sql_choice_omni_test.go": "9ba6e8b769a9c1fd85ff5e50024d603667eaecbb666bf1e2f5807ef8a6671fc2",
+      "schemas/spanner-query-gen.v1alpha.schema.json": "86f7098c55d0fca83e5d5ac61243cb369a7c405de952aaaf0c00d35ae7f09c6a",
+      "runtime_targets.json": "8628282a73afcaa7e8e7a3883f2f3efaf621c141e3696c6c2cf0f4297b124119"
+    },
+    "root_dependency": "v0.2.2-0.20261108152247-dfcf679fab54",
+    "runtime_targets": {
+      "$schema": "schemas/runtime-targets.v0alpha1.schema.json",
+      "schema_version": "v0alpha1",
+      "targets": [
+        {
+          "kind": "emulator",
+          "image_family": "gcr.io/cloud-spanner-emulator/emulator",
+          "tag": "1.5.59",
+          "platforms": [
+            {
+              "platform": "linux/amd64",
+              "digest": "sha256:f9212d99a52ee9bf39b6e4b397eab09b90d87327dca7a985110801456b40dc9d"
+            },
+            {
+              "platform": "linux/arm64",
+              "digest": "sha256:969af6a9349948fbfb4a826c18e160e258a4005f7c759f8e7f2dcec369cccba8"
+            }
+          ]
+        },
+        {
+          "kind": "omni",
+          "image_family": "us-docker.pkg.dev/spanner-omni/images/spanner-omni",
+          "tag": "2026.r4-lts.2",
+          "platforms": [
+            {
+              "platform": "linux/amd64",
+              "digest": "sha256:5c585b2e7d0a25730abf7db86dab75e47070de01d0de074e8d653ecbf84a50ef"
+            },
+            {
+              "platform": "linux/arm64",
+              "digest": "sha256:b607b10bee3c1903f0a7f88f99bece67cb0dd9d9a028aee64226fc311bd78dae"
+            }
+          ],
+          "alternatives": [
+            {
+              "tag": "2026.r5.1",
+              "platforms": [
+                {
+                  "platform": "linux/amd64",
+                  "digest": "sha256:9a811aa0230d43a8dcf20fa053699a1c08f15b24c39a1e7db6966e59d516d9bd"
+                },
+                {
+                  "platform": "linux/arm64",
+                  "digest": "sha256:b918acd3c785bd13733d7dca6e6c029ef4ab8d7b63a0cd28800210a9bf976516"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "scope": "Targeted SQL-choice integration tests on both pinned local runtimes after complete-statement binding pruning. No managed execution."
+  },
+  "scope": "Focused recheck after complete-statement binding pruning: six memberships on each backend, six direct PLANs and six collector successes on Omni. No managed or r5 execution.",
+  "optimizer": "SQL-choice controls do not pin or independently observe optimizer/statistics versions.",
+  "passed_top_level_tests": [
+    "TestIntegrationSQLChoicesOnEmulator",
+    "TestIntegrationSQLChoicesOnOmni"
+  ],
+  "passed_sql_choice_subtests": [
+    "TestIntegrationSQLChoicesOnEmulator/bounds=both+flag=active",
+    "TestIntegrationSQLChoicesOnEmulator/bounds=both+flag=pending",
+    "TestIntegrationSQLChoicesOnEmulator/bounds=end+flag=active",
+    "TestIntegrationSQLChoicesOnEmulator/bounds=end+flag=pending",
+    "TestIntegrationSQLChoicesOnEmulator/bounds=start+flag=active",
+    "TestIntegrationSQLChoicesOnEmulator/bounds=start+flag=pending",
+    "TestIntegrationSQLChoicesOnOmni/bounds=both+flag=active",
+    "TestIntegrationSQLChoicesOnOmni/bounds=both+flag=pending",
+    "TestIntegrationSQLChoicesOnOmni/bounds=end+flag=active",
+    "TestIntegrationSQLChoicesOnOmni/bounds=end+flag=pending",
+    "TestIntegrationSQLChoicesOnOmni/bounds=start+flag=active",
+    "TestIntegrationSQLChoicesOnOmni/bounds=start+flag=pending"
+  ],
+  "runtime_log": {
+    "original_sha256": "41c0dd466bc57bfd6e443273a269fdb3347b10f4619901a8ef0cb6c0b368f4b2",
+    "retained_sha256": "f9597c9a4ceae36b35c9c4803adb7bc5828f33eaf1d1abda40b07712edb5c5a6",
+    "transformations": [
+      "Mask local Docker socket, home prefixes and loopback endpoints."
+    ]
+  },
+  "unit_checks": [
+    {
+      "module": "root",
+      "command": "go test -count=1 ./...",
+      "exit_code": 0,
+      "source_commit": "dfcf679fab547c1dbb1ca93ea5e2b9e9af2453d4",
+      "source_state": "Tested the dirty precommit source subsequently committed at this revision; not a clean-commit execution attestation."
+    },
+    {
+      "module": "cmd/spanner-query-gen",
+      "command": "GOWORK=off go test -count=1 ./...",
+      "exit_code": 0,
+      "source_state": "Same updated CLI pin and source hashes as this runtime producer."
+    }
+  ],
+  "cleanup": {
+    "task_container_ids": [
+      "2cff89d399ad",
+      "615fd1c805d5",
+      "64689c0b189d"
+    ],
+    "remaining_task_container_ids": [],
+    "method": "Intersect this run IDs with docker ps -a after test exit; do not remove unrelated containers."
+  },
+  "retained_source_scope": "Apply producer.patch to producer.base_commit. Integration test sources are already tracked at that base and hash-identical to the retained initial sources; root dependency includes the complete-SQL pruning correction.",
+  "files": {
+    "cli-unit-tests.log": "a702de59c0bea98434ee8f744b000ab7d73082600f6578735469edec2816229f",
+    "producer.patch": "217bdd95cebeed0aa4cdb2a654a061aed3a3cccb291db3debd06935e0c6d1cfa",
+    "root-unit-tests.log": "155142c2d62e2965258e295f32111f7c691c28f8c18c44778e27840dc895efcd",
+    "runtime.jsonl": "f9597c9a4ceae36b35c9c4803adb7bc5828f33eaf1d1abda40b07712edb5c5a6"
+  }
+}
