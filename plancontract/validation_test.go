@@ -82,8 +82,35 @@ func TestEvaluateDynamicCELRequiresBooleanValue(t *testing.T) {
 	if err := Validate(file); err != nil {
 		t.Fatalf("Validate() rejected dynamic result: %v", err)
 	}
-	if _, err := Evaluate(Report{Queries: []Query{{Name: "Q", TargetID: "query/Q", Status: "ok"}}}, file); err == nil || !strings.Contains(err.Error(), "bool") {
-		t.Fatalf("Evaluate() error = %v, want boolean result error", err)
+	result, err := Evaluate(Report{Queries: []Query{{Name: "Q", TargetID: "query/Q", Status: "ok"}}}, file)
+	if err != nil || len(result.Evaluations) != 1 || result.Evaluations[0].Reason != ReasonEvaluationError || !strings.Contains(result.Evaluations[0].Error, "bool") {
+		t.Fatalf("Evaluate() = %+v, %v, want isolated boolean result error", result, err)
+	}
+}
+
+func TestEvaluateIsolatesRuntimeErrors(t *testing.T) {
+	for _, expression := range []string{"access_paths[0].has_seek_condition", "1 / size(access_paths) > 0", "query.name"} {
+		t.Run(expression, func(t *testing.T) {
+			file := File{Version: FileVersionV1Alpha, Contracts: []Contract{
+				{Name: "Before", Target: "query/Q", Use: []string{"no_full_sort"}},
+				{Name: "RuntimeError", Target: "query/Q", CEL: expression},
+				{Name: "After", Target: "query/Q", CEL: "true"},
+			}}
+			if err := Validate(file); err != nil {
+				t.Fatal(err)
+			}
+			result, err := Evaluate(Report{Queries: []Query{{Name: "Q", TargetID: "query/Q", Scope: "query", Status: "ok"}}}, file)
+			if err != nil || len(result.Evaluations) != 3 {
+				t.Fatalf("Evaluate() = %+v, %v", result, err)
+			}
+			before, failed, after := result.Evaluations[0], result.Evaluations[1], result.Evaluations[2]
+			if before.Status != StatusPass || after.Status != StatusPass || failed.Status != StatusNotEvaluated || failed.Reason != ReasonEvaluationError || failed.Error == "" || failed.Query != "Q" || failed.TargetID != "query/Q" {
+				t.Fatalf("evaluations = %+v", result.Evaluations)
+			}
+			if result.EvaluatorVersion != EvaluatorVersionV2 || result.Summary.Passed != 2 || result.Summary.NotEvaluated != 1 || result.Summary.Status != StatusFail || CheckFailureCount(result.Evaluations) != 1 {
+				t.Fatalf("result = %+v", result)
+			}
+		})
 	}
 }
 

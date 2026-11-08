@@ -26,6 +26,9 @@ func analyzeCodegenQuerySpannerVariants(ddlPath, ddl string, schema QueryCodegen
 	if err != nil {
 		return nil, nil, err
 	}
+	if err := optparam.ValidateGoFields(opParams); err != nil {
+		return nil, nil, err
+	}
 	segments, err := optparam.SegmentTemplate(query.SQL, opParams)
 	if err != nil {
 		return nil, nil, err
