@@ -28,11 +28,10 @@ func TestSelectPlanReportRuntimeColdStartUsesExactPlatformPin(t *testing.T) {
 			selected, err := selectPlanReportRuntime(planReportOptions{Backend: "omni"}, t.TempDir(), planReportRuntimeDeps{
 				InspectOmniEndpoint: func() (bool, error) { return false, nil },
 				HostGOARCH:          tt.arch,
-				FindRepositoryRoot:  func(string) (string, error) { return "/repo", nil },
-				ImageForPlatform: func(repoRoot, kind, platform string) (string, error) {
+				ResolveImage: func(registry, kind, platform string) (string, error) {
 					pinCalls++
-					if repoRoot != "/repo" || kind != "omni" || platform != "linux/"+tt.arch {
-						t.Fatalf("ImageForPlatform(%q, %q, %q)", repoRoot, kind, platform)
+					if registry != "" || kind != "omni" || platform != "linux/"+tt.arch {
+						t.Fatalf("ResolveImage(%q, %q, %q)", registry, kind, platform)
 					}
 					if platform == "linux/amd64" {
 						return amd64, nil
@@ -80,8 +79,7 @@ func TestSelectPlanReportRuntimeMissingPinDoesNotConstructRuntime(t *testing.T) 
 	_, err := selectPlanReportRuntime(planReportOptions{Backend: "omni"}, ".", planReportRuntimeDeps{
 		InspectOmniEndpoint: func() (bool, error) { return false, nil },
 		HostGOARCH:          "arm64",
-		FindRepositoryRoot:  func(string) (string, error) { return "/repo", nil },
-		ImageForPlatform: func(string, string, string) (string, error) {
+		ResolveImage: func(string, string, string) (string, error) {
 			return "", errors.New("runtime target \"omni\" has no platform \"linux/arm64\"")
 		},
 		NewColdStartRuntime: func(string) (spanemuboost.RuntimeHandle, error) {
@@ -134,11 +132,7 @@ func TestSelectPlanReportRuntimeAttachedNeverResolvesPin(t *testing.T) {
 			var pinCalls, attachedCalls, coldCalls int
 			selected, err := selectPlanReportRuntime(planReportOptions{Backend: "omni", Identity: tt.assertion}, ".", planReportRuntimeDeps{
 				InspectOmniEndpoint: func() (bool, error) { return true, nil },
-				FindRepositoryRoot: func(string) (string, error) {
-					pinCalls++
-					return "", errors.New("pin resolver must not run")
-				},
-				ImageForPlatform: func(string, string, string) (string, error) {
+				ResolveImage: func(string, string, string) (string, error) {
 					pinCalls++
 					return "", errors.New("pin resolver must not run")
 				},
@@ -167,6 +161,33 @@ func TestSelectPlanReportRuntimeAttachedNeverResolvesPin(t *testing.T) {
 	}
 }
 
+func TestPlanReportRuntimePinsArePortableAndOverridable(t *testing.T) {
+	for _, arch := range []string{"arm64", "amd64"} {
+		t.Run(arch, func(t *testing.T) {
+			deps := defaultPlanReportRuntimeDeps()
+			deps.HostGOARCH = arch
+			deps.InspectOmniEndpoint = func() (bool, error) { return false, nil }
+			var image string
+			deps.NewColdStartRuntime = func(pin string) (spanemuboost.RuntimeHandle, error) { image = pin; return nil, nil }
+			selected, err := selectPlanReportRuntime(planReportOptions{Backend: "omni"}, t.TempDir(), deps)
+			if err != nil || !strings.Contains(image, ":2026.r4-lts.2@sha256:") || selected.Identity.Source != planReportIdentitySourceRuntimeTargets {
+				t.Fatalf("external config pin = %+v, %q, %v", selected, image, err)
+			}
+			// Explicit overrides must be read and validated rather than silently
+			// falling back to bundled defaults on typos or malformed input.
+			path := filepath.Join(t.TempDir(), "custom.json")
+			if err := os.WriteFile(path, []byte(`{}`), 0600); err != nil {
+				t.Fatal(err)
+			}
+			image = ""
+			_, err = selectPlanReportRuntime(planReportOptions{RuntimeTargets: path}, ".", deps)
+			if err == nil || image != "" {
+				t.Fatalf("invalid override started runtime: %q, %v", image, err)
+			}
+		})
+	}
+}
+
 func TestSelectPlanReportRuntimeEmulatorEndpointFileIsNotAttachedOmni(t *testing.T) {
 	endpointPath := filepath.Join(t.TempDir(), "endpoint.json")
 	if err := os.WriteFile(endpointPath, []byte(`{
@@ -185,8 +206,7 @@ func TestSelectPlanReportRuntimeEmulatorEndpointFileIsNotAttachedOmni(t *testing
 	deps := defaultPlanReportRuntimeDeps()
 	var attachedCalls, coldCalls int
 	deps.HostGOARCH = "arm64"
-	deps.FindRepositoryRoot = func(string) (string, error) { return "/repo", nil }
-	deps.ImageForPlatform = func(string, string, string) (string, error) { return image, nil }
+	deps.ResolveImage = func(string, string, string) (string, error) { return image, nil }
 	deps.NewAttachedRuntime = func() (spanemuboost.RuntimeHandle, error) {
 		attachedCalls++
 		return spanemuboost.NewLazyRuntime(spanemuboost.BackendOmni), nil
@@ -250,8 +270,7 @@ func TestSelectPlanReportRuntimeRejectsConflictingColdStartAssertion(t *testing.
 	}, ".", planReportRuntimeDeps{
 		InspectOmniEndpoint: func() (bool, error) { return false, nil },
 		HostGOARCH:          "arm64",
-		FindRepositoryRoot:  func(string) (string, error) { return "/repo", nil },
-		ImageForPlatform:    func(string, string, string) (string, error) { return image, nil },
+		ResolveImage:        func(string, string, string) (string, error) { return image, nil },
 		NewColdStartRuntime: func(string) (spanemuboost.RuntimeHandle, error) {
 			constructed++
 			return nil, nil
@@ -278,8 +297,7 @@ func TestSelectPlanReportRuntimeMatchingColdStartAssertionKeepsConfiguredIdentit
 	}, ".", planReportRuntimeDeps{
 		InspectOmniEndpoint: func() (bool, error) { return false, nil },
 		HostGOARCH:          "arm64",
-		FindRepositoryRoot:  func(string) (string, error) { return "/repo", nil },
-		ImageForPlatform:    func(string, string, string) (string, error) { return image, nil },
+		ResolveImage:        func(string, string, string) (string, error) { return image, nil },
 		NewColdStartRuntime: func(string) (spanemuboost.RuntimeHandle, error) {
 			return spanemuboost.NewLazyRuntime(spanemuboost.BackendOmni), nil
 		},

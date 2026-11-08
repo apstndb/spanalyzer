@@ -332,6 +332,14 @@ INFORMATION_SCHEMA.ROUTINES stores UDFs, not procedures.
 
 ### `CREATE FUNCTION` (SQL UDF)
 
+Live recovery depends on the backend exposing routine metadata. On November 8,
+2026, the pinned Emulator 1.5.59 executed a named SQL UDF and dependent view but
+returned zero routine rows through `LoadSchema`, so live export omitted that
+function. AST export and Omni LTS2 live export reapplied the same dependency
+successfully. See the [verification note](../knowledge/research/runtime-verification/repository-hardening-20261108.md)
+for the precise runtime boundary. Dependency ordering cannot recover absent
+metadata; retain source DDL for such objects.
+
 SQL UDFs are not yet documented in the official DDL reference but are
 already GA and used in production (e.g., 80 MySQL-compatible functions
 via https://github.com/googleapis/spanner-sql-udf).

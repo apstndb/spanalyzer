@@ -8,23 +8,24 @@ const planReportSummaryVersionV1Alpha = "v1alpha-plan-summary-v1"
 // accidentally add bulky fields to summaries. Contracts are evaluated against
 // the full in-memory report before this serialization-only projection.
 type planReportSummary struct {
-	ReportVersion       string                         `json:"report_version"`
-	Status              string                         `json:"status"`
-	Backend             string                         `json:"backend"`
-	Input               planReportInput                `json:"input"`
-	PlanSource          planReportSummarySource        `json:"plan_source"`
-	BackendIdentity     planReportBackendIdentity      `json:"backend_identity"`
-	Normalization       planReportNormalization        `json:"normalization"`
-	TargetSummary       planReportTargetSummary        `json:"target_summary"`
-	Stable              bool                           `json:"stable"`
-	Queries             []planReportSummaryQuery       `json:"queries"`
-	ContractEvalMode    string                         `json:"contract_evaluation_mode"`
-	ContractFileVersion string                         `json:"contract_file_version,omitempty"`
-	ContractEvaluator   string                         `json:"contract_evaluator_version,omitempty"`
-	ContractEvaluations []planContractEvaluation       `json:"contract_evaluations,omitempty"`
-	ContractSummary     *planContractEvaluationSummary `json:"contract_summary,omitempty"`
-	Warnings            []planReportDiagnostic         `json:"warnings"`
-	Optimizer           planReportOptimizer            `json:"optimizer"`
+	ReportVersion          string                         `json:"report_version"`
+	Status                 string                         `json:"status"`
+	Backend                string                         `json:"backend"`
+	CreatedDatabaseCleanup string                         `json:"created_database_cleanup,omitempty"`
+	Input                  planReportInput                `json:"input"`
+	PlanSource             planReportSummarySource        `json:"plan_source"`
+	BackendIdentity        planReportBackendIdentity      `json:"backend_identity"`
+	Normalization          planReportNormalization        `json:"normalization"`
+	TargetSummary          planReportTargetSummary        `json:"target_summary"`
+	Stable                 bool                           `json:"stable"`
+	Queries                []planReportSummaryQuery       `json:"queries"`
+	ContractEvalMode       string                         `json:"contract_evaluation_mode"`
+	ContractFileVersion    string                         `json:"contract_file_version,omitempty"`
+	ContractEvaluator      string                         `json:"contract_evaluator_version,omitempty"`
+	ContractEvaluations    []planContractEvaluation       `json:"contract_evaluations,omitempty"`
+	ContractSummary        *planContractEvaluationSummary `json:"contract_summary,omitempty"`
+	Warnings               []planReportDiagnostic         `json:"warnings"`
+	Optimizer              planReportOptimizer            `json:"optimizer"`
 }
 
 type planReportSummarySource struct {
@@ -60,22 +61,23 @@ type planReportSummaryVariant struct {
 
 func summarizePlanReport(report planReport) planReportSummary {
 	summary := planReportSummary{
-		ReportVersion:       planReportSummaryVersionV1Alpha,
-		Status:              report.Status,
-		Backend:             report.Backend,
-		Input:               report.Input,
-		PlanSource:          planReportSummarySource{Backend: report.PlanSource.Backend, API: report.PlanSource.API},
-		BackendIdentity:     report.BackendIdentity,
-		Normalization:       report.Normalization,
-		TargetSummary:       report.TargetSummary,
-		Stable:              report.Stable,
-		Queries:             make([]planReportSummaryQuery, 0, len(report.Queries)),
-		ContractEvalMode:    report.ContractEvalMode,
-		ContractFileVersion: report.ContractFileVersion,
-		ContractEvaluator:   report.ContractEvaluator,
-		ContractSummary:     report.ContractSummary,
-		Warnings:            report.Warnings,
-		Optimizer:           report.Optimizer,
+		ReportVersion:          planReportSummaryVersionV1Alpha,
+		Status:                 report.Status,
+		Backend:                report.Backend,
+		CreatedDatabaseCleanup: report.CreatedDatabaseCleanup,
+		Input:                  report.Input,
+		PlanSource:             planReportSummarySource{Backend: report.PlanSource.Backend, API: report.PlanSource.API},
+		BackendIdentity:        report.BackendIdentity,
+		Normalization:          report.Normalization,
+		TargetSummary:          report.TargetSummary,
+		Stable:                 report.Stable,
+		Queries:                make([]planReportSummaryQuery, 0, len(report.Queries)),
+		ContractEvalMode:       report.ContractEvalMode,
+		ContractFileVersion:    report.ContractFileVersion,
+		ContractEvaluator:      report.ContractEvaluator,
+		ContractSummary:        report.ContractSummary,
+		Warnings:               report.Warnings,
+		Optimizer:              report.Optimizer,
 	}
 	for _, query := range report.Queries {
 		q := planReportSummaryQuery{

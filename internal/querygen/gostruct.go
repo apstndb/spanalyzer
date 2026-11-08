@@ -668,7 +668,14 @@ func writeGeneratedStruct(b *bytes.Buffer, st generatedStruct) {
 	for _, field := range st.Fields {
 		fmt.Fprintf(b, "\t%s %s", field.Name, field.Type)
 		if len(field.Tags) > 0 {
-			fmt.Fprintf(b, " `%s`", structTag(field.Tags))
+			tag := structTag(field.Tags)
+			if strings.ContainsRune(tag, '`') {
+				// Raw Go literals cannot escape backticks. An interpreted
+				// literal preserves the same reflect.StructTag value.
+				fmt.Fprintf(b, " %s", strconv.Quote(tag))
+			} else {
+				fmt.Fprintf(b, " `%s`", tag)
+			}
 		}
 		b.WriteByte('\n')
 	}
@@ -1110,7 +1117,7 @@ func structTag(tags map[string]string) string {
 	sort.Strings(keys)
 	parts := make([]string, 0, len(keys))
 	for _, key := range keys {
-		parts = append(parts, fmt.Sprintf(`%s:"%s"`, key, tags[key]))
+		parts = append(parts, key+":"+strconv.Quote(tags[key]))
 	}
 	return strings.Join(parts, " ")
 }

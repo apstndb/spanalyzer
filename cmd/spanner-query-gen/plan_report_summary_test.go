@@ -126,6 +126,33 @@ func TestPlanReportSummaryEmptyAccessPathsAndRejectedMarkdown(t *testing.T) {
 	}
 }
 
+func TestPlanReportKeepsArtifactsAfterContractRuntimeError(t *testing.T) {
+	for _, summary := range []bool{false, true} {
+		report := newPlanReportInvariantTestReport(t)
+		report.Summary = summary
+		target := report.Queries[0].TargetID
+		contracts := planContractsFile{Version: planContractFileVersionV1Alpha, Contracts: []planContract{
+			{Name: "Before", Target: target, CEL: "true"},
+			{Name: "RuntimeError", Target: target, CEL: "access_paths[999].has_seek_condition"},
+			{Name: "After", Target: target, CEL: "true"},
+		}}
+		if err := applyPlanContracts(&report, contracts); err != nil {
+			t.Fatal(err)
+		}
+		report.ContractEvalMode = planContractEvaluationModeCheck
+		if len(report.ContractEvaluations) != 3 || report.ContractEvaluations[1].Reason != planContractReasonEvaluationError || planReportContractCheckFailureCount(report) != 1 || report.ContractEvaluator != planContractEvaluatorVersion {
+			t.Fatalf("contract result = %+v", report)
+		}
+		var buf bytes.Buffer
+		if err := writePlanReport(&buf, "json", report); err != nil {
+			t.Fatal(err)
+		}
+		if !strings.Contains(buf.String(), `"evaluation_error"`) || !strings.Contains(buf.String(), `"After"`) || !strings.Contains(buf.String(), `"queries"`) {
+			t.Fatal("runtime error discarded artifact")
+		}
+	}
+}
+
 func TestPlanReportCollectorSeparatesVersionAndStatisticsPinning(t *testing.T) {
 	for _, tc := range []struct {
 		version, stats, warnings string

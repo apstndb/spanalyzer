@@ -36,10 +36,21 @@ run = [
   "GOWORK=off mise -C survey x -- govulncheck ./...",
 ]
 
+[tasks.check-standalone-builds]
+description = "Build each published module without workspace replacements"
+run = [
+  "GOWORK=off mise x -- go build ./...",
+  "GOWORK=off mise -C plancontract x -- go build ./...",
+  "GOWORK=off mise -C cmd/spanner-query-gen x -- go build ./...",
+  "GOWORK=off mise -C survey x -- go build ./...",
+  "GOWORK=off mise -C tools x -- go build ./...",
+]
+
 [tasks.pre-push]
-description = "Push gate matching CI tidy, lint, and govulncheck"
+description = "Push gate matching CI tidy, standalone builds, lint, and govulncheck"
 run = [
   "mise run check-mod-tidy",
+  "mise run check-standalone-builds",
   "mise run lint",
   "mise run govulncheck",
 ]

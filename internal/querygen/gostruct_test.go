@@ -2,6 +2,7 @@ package querygen
 
 import (
 	_ "embed"
+	"fmt"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -16,6 +17,63 @@ var generatedClientGoMod string
 
 //go:embed testdata/spannerclient.sum
 var generatedClientGoSum string
+
+func TestGeneratedTagsPreserveColumnNames(t *testing.T) {
+	names := []string{"ordinary", "quote\"name", "slash\\name", "tick`name", "line\nname", "carriage\rname", "tab\tname"}
+	fields := make([]goResultField, len(names))
+	for i, name := range names {
+		fields[i] = goResultField{Name: name, Kind: "INT64", Nullable: true}
+	}
+	code, err := generateGoStruct(fields, GoStructOptions{PackageName: "result", StructName: "Row", Target: GoStructTargetBoth})
+	if err != nil {
+		t.Fatal(err)
+	}
+	dir := t.TempDir()
+	writeGeneratedLoadTestFile(t, filepath.Join(dir, "go.mod"), generatedClientGoMod)
+	writeGeneratedLoadTestFile(t, filepath.Join(dir, "go.sum"), generatedClientGoSum)
+	writeGeneratedLoadTestFile(t, filepath.Join(dir, "generated.go"), code)
+	writeGeneratedLoadTestFile(t, filepath.Join(dir, "generated_test.go"), fmt.Sprintf(`package result
+import (
+    "reflect"
+    "testing"
+    "cloud.google.com/go/spanner"
+    "cloud.google.com/go/bigquery"
+)
+func TestTagsAndSDKDecode(t *testing.T) {
+    names := %#v
+    values := make([]interface{}, len(names))
+    schema := make(bigquery.Schema, len(names))
+    bqValues := make([]bigquery.Value, len(names))
+    typ := reflect.TypeFor[Row]()
+    for i, name := range names {
+        for _, key := range []string{"spanner", "bigquery"} {
+            if typ.Field(i).Tag.Get(key) != name { t.Fatalf("field %%d %%s tag = %%q, want %%q", i, key, typ.Field(i).Tag.Get(key), name) }
+        }
+        values[i] = int64(i+1)
+        schema[i] = &bigquery.FieldSchema{Name: name, Type: bigquery.IntegerFieldType}
+        bqValues[i] = int64(i+1)
+    }
+    row, err := spanner.NewRow(names, values)
+    if err != nil { t.Fatal(err) }
+    var decoded, loaded Row
+    if err := row.ToStruct(&decoded); err != nil { t.Fatal(err) }
+    if err := loaded.Load(bqValues, schema); err != nil { t.Fatal(err) }
+    for _, result := range []Row{decoded, loaded} {
+        value := reflect.ValueOf(result)
+        for i := range names {
+            field := value.Field(i)
+            if !field.FieldByName("Valid").Bool() || field.FieldByName("Value").Int() != int64(i+1) { t.Fatalf("field %%d = %%v", i, field) }
+        }
+    }
+}
+`, names))
+	cmd := exec.Command("go", "test", ".")
+	cmd.Dir = dir
+	cmd.Env = append(os.Environ(), "GOWORK=off", "GOTOOLCHAIN=local")
+	if out, err := cmd.CombinedOutput(); err != nil {
+		t.Fatalf("generated tag/SDK regression: %v\n%s\n%s", err, out, code)
+	}
+}
 
 func TestGenerateGoStructFromBigQueryTableSchemaBoth(t *testing.T) {
 	code, err := GenerateGoStructFromBigQueryTableSchema(&BigQueryTableSchema{

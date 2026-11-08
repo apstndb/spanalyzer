@@ -24,6 +24,7 @@ type feedbackPlanAnalyzer struct {
 	statements []spanner.Statement
 	dml        []bool
 	closed     bool
+	closeError error
 }
 
 func (a *feedbackPlanAnalyzer) AnalyzePlan(_ context.Context, stmt spanner.Statement, dml bool) (*spannerpb.QueryPlan, error) {
@@ -42,7 +43,36 @@ func (a *feedbackPlanAnalyzer) AnalyzePlan(_ context.Context, stmt spanner.State
 	return &spannerpb.QueryPlan{PlanNodes: []*spannerpb.PlanNode{{Index: 0, Kind: spannerpb.PlanNode_RELATIONAL, DisplayName: "Scan", Metadata: metadata}}}, nil
 }
 
-func (a *feedbackPlanAnalyzer) Close() error { a.closed = true; return nil }
+func (a *feedbackPlanAnalyzer) Close() error { a.closed = true; return a.closeError }
+
+func TestPlanReportRecordsRetentionPolicyAndCleanupErrors(t *testing.T) {
+	for _, drop := range []bool{false, true} {
+		config, dir, opts := feedbackReportFixture(t)
+		opts.DropCreatedDatabases = drop
+		model := &querygen.QueryCodegenPlan{Queries: []querygen.QueryCodegenPlanQuery{{Name: "Q", Catalog: "good", Kind: "sql", SQL: "SELECT Id FROM T"}}}
+		analyzer := &feedbackPlanAnalyzer{closeError: errors.New("cleanup unavailable")}
+		open := func(context.Context, spanemuboost.RuntimeHandle, querygen.QueryCodegenSchema, string, *spanalyzer.ProtoDescriptorSet, planReportOptimizer) (planReportAnalyzer, error) {
+			return analyzer, nil
+		}
+		report, err := buildPlanReportWithAnalyzer(t.Context(), config, model, dir, opts, nil, open)
+		want := "retain"
+		if drop {
+			want = "drop_created"
+		}
+		if err != nil || report.CreatedDatabaseCleanup != want || !analyzer.closed || report.Queries[0].Status != "ok" {
+			t.Fatalf("report = %+v, %v", report, err)
+		}
+		found := false
+		for _, warning := range report.Warnings {
+			if warning.ID == "plan-report-cleanup-error" && strings.Contains(warning.Message, "cleanup unavailable") {
+				found = true
+			}
+		}
+		if !found || summarizePlanReport(report).CreatedDatabaseCleanup != want {
+			t.Fatalf("cleanup policy/error missing: %+v", report)
+		}
+	}
+}
 
 func feedbackReportFixture(t *testing.T) (querygen.QueryCodegenConfig, string, planReportOptions) {
 	t.Helper()

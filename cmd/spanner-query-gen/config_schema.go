@@ -238,6 +238,7 @@ func planReportJSONSchema() map[string]interface{} {
 			"input":                      map[string]interface{}{"$ref": "#/$defs/input"},
 			"plan_source":                map[string]interface{}{"$ref": "#/$defs/plan_source"},
 			"backend_identity":           map[string]interface{}{"$ref": "#/$defs/backend_identity"},
+			"created_database_cleanup":   enumSchema([]interface{}{"retain", "drop_created"}, "Requested policy for databases created by this command. Attached endpoints retain them by default; owned containers are removed on exit."),
 			"normalization":              map[string]interface{}{"$ref": "#/$defs/normalization"},
 			"target_summary":             map[string]interface{}{"$ref": "#/$defs/target_summary"},
 			"format":                     enumSchema([]interface{}{"CURRENT", "TRADITIONAL", "COMPACT"}, "spannerplan tree format used for rendered plan text."),
@@ -344,7 +345,7 @@ func planReportJSONSchema() map[string]interface{} {
 				"contracts":            nonNegativeIntegerSchema("Number of configured contracts."),
 				"passed":               nonNegativeIntegerSchema("Number of contracts that passed."),
 				"failed":               nonNegativeIntegerSchema("Number of contracts that failed."),
-				"not_evaluated":        nonNegativeIntegerSchema("Number of contracts that could not be evaluated because the target plan was unavailable."),
+				"not_evaluated":        nonNegativeIntegerSchema("Number of contracts with unavailable targets or runtime evaluation errors."),
 				"environment_warnings": stringListSchema("Environment warnings that affect contract interpretation."),
 			}),
 			"contract_evaluation":  planReportContractEvaluationJSONSchema(),
@@ -528,8 +529,8 @@ func planReportContractEvaluationJSONSchema() map[string]interface{} {
 		"target_id": targetIDSchema("Canonical target ID resolved for the contract."),
 		"scope":     planReportScopeSchema("Resolved target scope."),
 		"status":    enumSchema([]interface{}{planContractStatusPass, planContractStatusFail, planContractStatusNotEvaluated}, "Contract evaluation status."),
-		"reason":    enumSchema([]interface{}{planContractReasonTargetNotFound, planContractReasonTargetError}, "Reason when status is not_evaluated."),
-		"error":     stringSchema("Target availability error when status is not_evaluated because target acquisition failed."),
+		"reason":    enumSchema([]interface{}{planContractReasonTargetNotFound, planContractReasonTargetError, planContractReasonEvaluationError}, "Reason when status is not_evaluated."),
+		"error":     stringSchema("Target acquisition or runtime contract evaluation error."),
 		"stability": map[string]interface{}{"$ref": "#/$defs/contract_stability"},
 		"results":   arraySchema(map[string]interface{}{"$ref": "#/$defs/contract_rule_result"}),
 	})
@@ -561,12 +562,11 @@ func planReportContractEvaluationJSONSchema() map[string]interface{} {
 			},
 			"then": map[string]interface{}{
 				"required": []interface{}{"reason"},
-				"not":      anyRequired("results"),
 			},
 		},
 		map[string]interface{}{
 			"if": map[string]interface{}{
-				"properties": map[string]interface{}{"reason": map[string]interface{}{"const": planContractReasonTargetError}},
+				"properties": map[string]interface{}{"reason": map[string]interface{}{"enum": []interface{}{planContractReasonTargetError, planContractReasonEvaluationError}}},
 				"required":   []interface{}{"reason"},
 			},
 			"then": map[string]interface{}{"required": []interface{}{"error"}},
@@ -577,6 +577,13 @@ func planReportContractEvaluationJSONSchema() map[string]interface{} {
 				"required":   []interface{}{"reason"},
 			},
 			"then": map[string]interface{}{"not": anyRequired("error")},
+		},
+		map[string]interface{}{
+			"if": map[string]interface{}{
+				"properties": map[string]interface{}{"reason": map[string]interface{}{"enum": []interface{}{planContractReasonTargetNotFound, planContractReasonTargetError}}},
+				"required":   []interface{}{"reason"},
+			},
+			"then": map[string]interface{}{"not": anyRequired("results")},
 		},
 	}
 	return schema

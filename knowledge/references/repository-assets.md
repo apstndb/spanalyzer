@@ -12,6 +12,7 @@ asset_families:
   - id: runtime-target-contract
     paths:
       - runtime_targets.json
+      - cmd/spanner-query-gen/internal/runtimepins/pins.generated.json
   - id: okf-publication-contract
     paths:
       - tools/okf-check/publication-inventory.json
@@ -76,6 +77,9 @@ The [`runtime_targets.json`](../../runtime_targets.json) contract centralizes
 the descriptive release tags and platform-specific OCI manifest digests used
 by every Emulator and Omni test or capture path. A tag remains human-readable;
 the digest is the execution identity.
+The CLI bundles a generated copy so installed binaries can cold-start from an
+external project. Its bytes are checked against the canonical registry by the
+tools module; it is not a second editable pin source.
 
 ## Plan vocabulary
 

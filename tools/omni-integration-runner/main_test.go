@@ -10,10 +10,10 @@ import (
 
 func TestIntegrationSteps(t *testing.T) {
 	steps := integrationSteps("/repo")
-	if len(steps) != 2 {
-		t.Fatalf("integration step count = %d, want 2", len(steps))
+	if len(steps) != 3 {
+		t.Fatalf("integration step count = %d, want 3", len(steps))
 	}
-	if steps[0].name != "plan-shape" || steps[1].name != "query-generator" {
+	if steps[0].name != "plan-shape" || steps[1].name != "query-generator" || steps[2].name != "schema-reconstruction" {
 		t.Fatalf("integration steps = %#v", steps)
 	}
 	for _, current := range steps {

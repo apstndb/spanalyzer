@@ -902,7 +902,7 @@ func TestPlanReportSchemaContractConditionals(t *testing.T) {
 		t.Fatalf("normalized_operator replayable_from_report const = %v, want true", got)
 	}
 	evaluation := defs["contract_evaluation"].(map[string]interface{})
-	if got, want := len(evaluation["allOf"].([]interface{})), 5; got != want {
+	if got, want := len(evaluation["allOf"].([]interface{})), 6; got != want {
 		t.Fatalf("contract_evaluation allOf length = %d, want %d", got, want)
 	}
 	result := defs["contract_rule_result"].(map[string]interface{})

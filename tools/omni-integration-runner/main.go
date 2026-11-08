@@ -167,6 +167,11 @@ func integrationSteps(repoRoot string) []step {
 			workdir: filepath.Join(repoRoot, "cmd", "spanner-query-gen"),
 			args:    []string{"test", "-count=1", "-timeout=30m", "-tags=integration,omni", "-run", "^TestIntegration.*OnOmni$", "./..."},
 		},
+		{
+			name:    "schema-reconstruction",
+			workdir: filepath.Join(repoRoot, "survey"),
+			args:    []string{"test", "-count=1", "-timeout=10m", "-tags=integration,omni", "-run", "^TestIntegrationDDLDependenciesOnOmni$", "./astconv"},
+		},
 	}
 }
 

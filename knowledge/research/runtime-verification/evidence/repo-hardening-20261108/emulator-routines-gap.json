@@ -1,0 +1,14 @@
+{
+  "status": "observed_metadata_gap",
+  "engine": "Emulator 1.5.59",
+  "platform": "linux/arm64",
+  "image_digest": "sha256:969af6a9349948fbfb4a826c18e160e258a4005f7c759f8e7f2dcec369cccba8",
+  "source_control_ddl": [
+    "CREATE SCHEMA app",
+    "CREATE FUNCTION app.F(x INT64) RETURNS INT64 SQL SECURITY INVOKER AS (x + 1)",
+    "CREATE VIEW V SQL SECURITY INVOKER AS SELECT app.F(1) AS Id"
+  ],
+  "observation": "Control DDL succeeded; LoadSchema returned zero routine rows. Reapplying live-metadata export failed while creating V: Function not found: app.F. AST export reapplication passed in the preceding run.",
+  "original_log_sha256": "3082f3747cd41f161e8818cb68759102b8681b48fca0d7985f63496eb778367b",
+  "boundary": "Derived observation from a failing regression run, not a complete INFORMATION_SCHEMA capture or a managed/Omni claim."
+}

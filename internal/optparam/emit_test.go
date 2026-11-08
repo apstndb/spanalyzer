@@ -8,6 +8,26 @@ import (
 	"testing"
 )
 
+func TestEmitGoBuilderRejectsFieldCollisions(t *testing.T) {
+	for _, mode := range []Mode{ModeRequired, ModeOmitWhenNull, ModeOmitWhenEmpty, ModeNullIsNull, ModeOrderByChoice} {
+		t.Run(mode.String(), func(t *testing.T) {
+			params := []Param{{Name: "user_id", Type: "INT64", Mode: ModeOmitWhenNull}, {Name: "userId", Type: "INT64", Mode: mode}}
+			var first string
+			for range 3 {
+				code, err := EmitGoBuilder(nil, params, BuilderOptions{Package: "db", FuncName: "Build"})
+				if err == nil || !strings.Contains(err.Error(), `params "userId" and "user_id" generate the same Go field UserId`) || code != "" {
+					t.Fatalf("code = %q, error = %v", code, err)
+				}
+				if first != "" && first != err.Error() {
+					t.Fatal("nondeterministic collision diagnostic")
+				}
+				first = err.Error()
+				params[0], params[1] = params[1], params[0]
+			}
+		})
+	}
+}
+
 func TestEmitGoBuilder_FormatsAndContainsSegments(t *testing.T) {
 	sql := singersTemplate
 	params := singersParams()

@@ -6,6 +6,28 @@ import (
 	"testing"
 )
 
+func TestOptionalParamFieldCollisionRejectedBeforeGeneration(t *testing.T) {
+	dir := t.TempDir()
+	writeTestFile(t, filepath.Join(dir, "schema.sql"), `CREATE TABLE T (Id INT64 NOT NULL) PRIMARY KEY (Id)`)
+	config := QueryCodegenConfig{Package: "db", Client: GoStructTargetSpanner,
+		Schemas: []QueryCodegenSchema{{Name: "app", Dialect: "spanner", DDL: "schema.sql"}},
+		Queries: []QueryCodegenQuery{{Name: "List", Catalog: "app", ResultStruct: "Row",
+			SQL:    `SELECT Id FROM T WHERE TRUE /*?optional:user_id*/ AND Id = @user_id /*?end*/ /*?optional:userId*/ AND Id = @userId /*?end*/`,
+			Params: []QueryCodegenParam{{Name: "user_id", Type: "INT64", Optional: "omit_when_null"}, {Name: "userId", Type: "INT64", Optional: "omit_when_null"}},
+		}},
+	}
+	if code, err := GenerateQueryCode(config, dir); err == nil || !strings.Contains(err.Error(), "same Go field UserId") || code != "" {
+		t.Fatalf("code = %q, error = %v", code, err)
+	}
+	if _, err := BuildQueryCodegenPlan(config, dir); err == nil || !strings.Contains(err.Error(), "same Go field UserId") {
+		t.Fatalf("plan error = %v", err)
+	}
+	report := BuildQueryCodegenReportPlan(config, dir)
+	if len(report.Queries) != 1 || !strings.Contains(report.Queries[0].PlanningError, "same Go field UserId") {
+		t.Fatalf("report targets = %#v", report.Queries)
+	}
+}
+
 // TestBuildQueryCodegenPlan_OmitWhenNullVariants exercises the
 // optparam -> querygen integration end-to-end: a YAML config that
 // declares two omit_when_null params plus matching SQL markers must

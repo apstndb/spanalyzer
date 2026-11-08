@@ -27,6 +27,10 @@ const (
 
 	FileVersionV1Alpha = "v1alpha-plan-contracts"
 	EvaluatorVersionV1 = "v1"
+	// EvaluatorVersionV2 isolates runtime evaluation errors per contract.
+	// V1 identifies historical artifacts whose evaluator aborted the whole batch.
+	EvaluatorVersionV2      = "v2"
+	CurrentEvaluatorVersion = EvaluatorVersionV2
 
 	StabilityNormalized = "normalized_operator"
 	StabilityRawPlan    = "raw_query_plan"
@@ -39,6 +43,7 @@ const (
 	FailureKindClassificationUnknown = "classification_unknown"
 	ReasonTargetNotFound             = "target_not_found"
 	ReasonTargetError                = "target_error"
+	ReasonEvaluationError            = "evaluation_error"
 )
 
 const (
@@ -343,7 +348,10 @@ func compileContracts(contracts File) ([]compiledContract, error) {
 	return compiled, nil
 }
 
-// Evaluate evaluates contracts against a plan report projection.
+// Evaluate evaluates contracts against a plan report projection using
+// CurrentEvaluatorVersion. Invalid contract configuration returns an error
+// before evaluating any targets. Runtime errors instead produce a not_evaluated
+// evaluation with ReasonEvaluationError, preserving the rest of the batch.
 func Evaluate(report Report, contracts File) (ApplyResult, error) {
 	// Validate the complete input before target lookup; unavailable targets must
 	// not hide malformed contracts. Reuse the compiled programs in evaluation.
@@ -355,7 +363,14 @@ func Evaluate(report Report, contracts File) (ApplyResult, error) {
 	for _, contract := range compiled {
 		evaluation, err := evaluateContract(report, contract)
 		if err != nil {
-			return ApplyResult{}, err
+			evaluation.Name = contract.Name
+			if evaluation.TargetID == "" {
+				evaluation.TargetID = strings.TrimSpace(contract.Target)
+			}
+			evaluation.Stability = stabilityFor(contract.Contract)
+			evaluation.Status = StatusNotEvaluated
+			evaluation.Reason = ReasonEvaluationError
+			evaluation.Error = err.Error()
 		}
 		evaluations = append(evaluations, evaluation)
 	}
@@ -363,7 +378,7 @@ func Evaluate(report Report, contracts File) (ApplyResult, error) {
 	summary.EnvironmentWarnings = EnvironmentWarnings(report)
 	return ApplyResult{
 		FileVersion:      contracts.Version,
-		EvaluatorVersion: EvaluatorVersionV1,
+		EvaluatorVersion: CurrentEvaluatorVersion,
 		Evaluations:      evaluations,
 		Summary:          summary,
 	}, nil
@@ -404,7 +419,7 @@ func evaluateContract(report Report, contract compiledContract) (Evaluation, err
 	for _, predicate := range contract.predicates {
 		result, err := evaluatePredicate(query, predicate)
 		if err != nil {
-			return Evaluation{}, err
+			return evaluation, err
 		}
 		if result.Status == StatusFail {
 			evaluation.Status = StatusFail
@@ -414,7 +429,7 @@ func evaluateContract(report Report, contract compiledContract) (Evaluation, err
 	if expression := strings.TrimSpace(contract.CEL); expression != "" {
 		matched, err := evaluateCEL(report, query, contract.program)
 		if err != nil {
-			return Evaluation{}, fmt.Errorf("plan contract %s cel: %w", contract.Name, err)
+			return evaluation, fmt.Errorf("plan contract %s cel: %w", contract.Name, err)
 		}
 		result := RuleResult{
 			Rule:       "cel",

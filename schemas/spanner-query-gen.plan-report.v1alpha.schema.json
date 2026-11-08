@@ -596,15 +596,6 @@
             ]
           },
           "then": {
-            "not": {
-              "anyOf": [
-                {
-                  "required": [
-                    "results"
-                  ]
-                }
-              ]
-            },
             "required": [
               "reason"
             ]
@@ -614,7 +605,10 @@
           "if": {
             "properties": {
               "reason": {
-                "const": "target_error"
+                "enum": [
+                  "target_error",
+                  "evaluation_error"
+                ]
               }
             },
             "required": [
@@ -649,11 +643,37 @@
               ]
             }
           }
+        },
+        {
+          "if": {
+            "properties": {
+              "reason": {
+                "enum": [
+                  "target_not_found",
+                  "target_error"
+                ]
+              }
+            },
+            "required": [
+              "reason"
+            ]
+          },
+          "then": {
+            "not": {
+              "anyOf": [
+                {
+                  "required": [
+                    "results"
+                  ]
+                }
+              ]
+            }
+          }
         }
       ],
       "properties": {
         "error": {
-          "description": "Target availability error when status is not_evaluated because target acquisition failed.",
+          "description": "Target acquisition or runtime contract evaluation error.",
           "minLength": 1,
           "type": "string"
         },
@@ -673,7 +693,8 @@
           "description": "Reason when status is not_evaluated.",
           "enum": [
             "target_not_found",
-            "target_error"
+            "target_error",
+            "evaluation_error"
           ]
         },
         "results": {
@@ -1359,7 +1380,7 @@
           "type": "integer"
         },
         "not_evaluated": {
-          "description": "Number of contracts that could not be evaluated because the target plan was unavailable.",
+          "description": "Number of contracts with unavailable targets or runtime evaluation errors.",
           "minimum": 0,
           "type": "integer"
         },
@@ -3138,6 +3159,13 @@
     },
     "contract_summary": {
       "$ref": "#/$defs/contract_summary"
+    },
+    "created_database_cleanup": {
+      "description": "Requested policy for databases created by this command. Attached endpoints retain them by default; owned containers are removed on exit.",
+      "enum": [
+        "retain",
+        "drop_created"
+      ]
     },
     "format": {
       "description": "spannerplan tree format used for rendered plan text.",

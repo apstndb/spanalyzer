@@ -87,7 +87,12 @@ func ImageForVersion(repoRoot, kind, tag, wantedPlatform string) (string, error)
 		return "", fmt.Errorf("open runtime target registry: %w", err)
 	}
 	defer func() { _ = file.Close() }()
-	decoder := json.NewDecoder(file)
+	return ImageFromReader(file, kind, tag, wantedPlatform)
+}
+
+// ImageFromReader validates a registry and selects one exact platform image.
+func ImageFromReader(reader io.Reader, kind, tag, wantedPlatform string) (string, error) {
+	decoder := json.NewDecoder(reader)
 	decoder.DisallowUnknownFields()
 	var document struct {
 		Schema string `json:"$schema"`

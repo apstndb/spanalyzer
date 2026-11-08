@@ -40,6 +40,9 @@ func EmitGoBuilder(segments []Segment, params []Param, opts BuilderOptions) (str
 	if opts.FuncName == "" {
 		return "", fmt.Errorf("BuilderOptions.FuncName is required")
 	}
+	if err := ValidateGoFields(params); err != nil {
+		return "", err
+	}
 	paramsTypeName := opts.ParamsTypeName
 	if paramsTypeName == "" {
 		paramsTypeName = opts.FuncName + "Params"
@@ -149,6 +152,26 @@ func EmitGoBuilder(segments []Segment, params []Param, opts BuilderOptions) (str
 		return "", fmt.Errorf("gofmt generated source: %w\n%s", err, b.String())
 	}
 	return string(formatted), nil
+}
+
+// ValidateGoFields rejects parameter names that map to the same exported Go
+// field. Rejecting before emission keeps the generated API deterministic rather
+// than silently renaming fields that callers would otherwise use.
+func ValidateGoFields(params []Param) error {
+	names := make([]string, len(params))
+	for i, param := range params {
+		names[i] = param.Name
+	}
+	sort.Strings(names)
+	seen := make(map[string]string, len(names))
+	for _, name := range names {
+		field := exportIdent(name)
+		if previous, exists := seen[field]; exists {
+			return fmt.Errorf("params %q and %q generate the same Go field %s", previous, name, field)
+		}
+		seen[field] = name
+	}
+	return nil
 }
 
 func emitOrderByChoice(b *strings.Builder, seg Segment) {

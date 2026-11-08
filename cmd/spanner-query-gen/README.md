@@ -132,6 +132,26 @@ Catalog `proto_descriptors` are merged by descriptor file name and passed to
 Omni together with DDL, so CREATE/ALTER PROTO BUNDLE setup uses the same proto
 definitions as static query analysis; conflicting duplicate definitions fail
 before database creation.
+Random databases are retained by default on attached endpoints. This avoids
+collisions and repeated database deletion operations; it also consumes database
+capacity over successive invocations. Use `--drop-created-databases` to delete
+only the random databases created by the current command. Previously retained
+databases are never automatically evicted. When capacity is exhausted, database
+creation is recorded as a catalog/target error; choose cleanup before that point
+or remove retained databases explicitly outside this command. A command-owned
+container is removed on exit regardless of this client cleanup policy.
+Structured reports record the requested policy in `created_database_cleanup`
+(`retain` or `drop_created`). Cleanup failures are recorded in the report and
+cause a nonzero exit after the artifact has been written.
+
+Cold starts use the runtime pins bundled with the binary, independent of the
+config's location or working directory. `--runtime-targets <file>` explicitly
+overrides that registry (relative paths use the current working directory).
+The file must satisfy the same strict registry validation; invalid overrides
+fail before starting Omni. Repository maintainers update the canonical root
+`runtime_targets.json`, then run `go generate ./internal/runtimepins` from this
+module to refresh its checked bundled copy.
+
 It depends on Spanner Omni execution-plan support and is intended for review,
 testing, and prototyping. Do not treat plan contracts as production performance
 guarantees; they are review contracts for a described plan environment.
@@ -283,6 +303,8 @@ Usage of spanner-query-gen plan-report:
         query code generation config file (default "spanner-query-gen.yaml")
   -contracts string
         experimental plan contracts YAML file
+  -drop-created-databases
+        drop databases created by this command when closing clients; default retains random databases on attached endpoints
   -format string
         spannerplan tree format: current, traditional, or compact (default "current")
   -optimizer-statistics-package string
@@ -295,6 +317,8 @@ Usage of spanner-query-gen plan-report:
         fail when optimizer version or statistics package is not pinned
   -require-targets
         fail when no Spanner query targets are available
+  -runtime-targets string
+        runtime target registry file for cold starts; default uses pins bundled with this binary
   -stable
         omit volatile metadata from report output
   -summary
@@ -584,6 +608,14 @@ are no targets excluded from the report target set. Skipped targets appear in
 target/input identity fields and the error message are reliable; SQL, DDL, and
 proto descriptor digests are reliable only when present, and plan
 normalization fields are absent.
+
+Contract evaluator `v2` isolates runtime CEL errors such as an out-of-bounds
+`access_paths[0]`. The affected contract is `not_evaluated` with
+`reason: evaluation_error` and an error message; other contracts and acquired
+plans remain in the artifact. `--check` fails for this state. Contract syntax,
+type-checking, and configuration errors still fail before backend startup.
+Historical `v1` artifacts retain their original evaluator identity. Guard
+optional access with checks such as `size(access_paths) > 0` before indexing.
 
 ```yaml
 queries:

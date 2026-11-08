@@ -4,7 +4,7 @@ go 1.26.2
 
 require (
 	cloud.google.com/go v0.123.0
-	github.com/apstndb/spanalyzer v0.2.1
+	github.com/apstndb/spanalyzer v0.2.2-0.20261108075420-ec5bb1879b1b
 	github.com/apstndb/spanemuboost v0.4.10
 	github.com/cloudspannerecosystem/memefish v0.8.1
 	github.com/moby/moby/api v1.56.0
@@ -111,7 +111,7 @@ require (
 
 require (
 	cloud.google.com/go/spanner v1.95.1
-	github.com/apstndb/spanalyzer/plancontract v0.1.0
+	github.com/apstndb/spanalyzer/plancontract v0.1.1-0.20261108075420-ec5bb1879b1b
 	github.com/apstndb/spannerplan v0.3.2
 	github.com/goccy/go-yaml v1.19.2
 	github.com/samber/lo v1.53.0 // indirect
@@ -120,6 +120,6 @@ require (
 	golang.org/x/text v0.42.0 // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20260630182238-925bb5da69e7 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20260630182238-925bb5da69e7 // indirect
-	google.golang.org/grpc v1.83.2 // indirect
+	google.golang.org/grpc v1.83.2
 	google.golang.org/protobuf v1.36.12
 )
