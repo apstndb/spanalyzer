@@ -63,10 +63,12 @@ type surfaceColumnFields struct {
 }
 
 type rollingQueryabilityChange struct {
-	TableName      string `json:"table_name"`
-	ColumnName     string `json:"column_name"`
-	RetainedStatus string `json:"retained_status"`
-	CurrentStatus  string `json:"current_status"`
+	TableName          string `json:"table_name"`
+	ColumnName         string `json:"column_name"`
+	RetainedStatus     string `json:"retained_status"`
+	CurrentStatus      string `json:"current_status"`
+	RetainedStatusCode string `json:"retained_status_code,omitempty"`
+	CurrentStatusCode  string `json:"current_status_code,omitempty"`
 }
 
 type columnIdentity struct {
@@ -241,16 +243,18 @@ func computeSurfaceDelta(retained, current *infoschem.CaptureDocument) *surfaceD
 	retainedRolling := indexRollingQueryability(retained.RollingQueryability)
 	currentRolling := indexRollingQueryability(current.RollingQueryability)
 	for _, key := range sortedColumnIdentities(retainedRolling, currentRolling) {
-		retainedStatus := rollingStatus(retainedRolling, key)
-		currentStatus := rollingStatus(currentRolling, key)
-		if retainedStatus == currentStatus {
+		retainedResult := retainedRolling[key]
+		currentResult := currentRolling[key]
+		if retainedResult.Status == currentResult.Status && retainedResult.StatusCode == currentResult.StatusCode {
 			continue
 		}
 		delta.RollingQueryabilityChanges = append(delta.RollingQueryabilityChanges, rollingQueryabilityChange{
-			TableName:      key.table,
-			ColumnName:     key.column,
-			RetainedStatus: retainedStatus,
-			CurrentStatus:  currentStatus,
+			TableName:          key.table,
+			ColumnName:         key.column,
+			RetainedStatus:     retainedResult.Status,
+			CurrentStatus:      currentResult.Status,
+			RetainedStatusCode: retainedResult.StatusCode,
+			CurrentStatusCode:  currentResult.StatusCode,
 		})
 	}
 	return delta
@@ -279,14 +283,6 @@ func indexRollingQueryability(results []infoschem.RollingQueryability) map[colum
 		index[columnIdentity{table: result.TableName, column: result.ColumnName}] = result
 	}
 	return index
-}
-
-func rollingStatus(index map[columnIdentity]infoschem.RollingQueryability, key columnIdentity) string {
-	result, ok := index[key]
-	if !ok {
-		return ""
-	}
-	return result.Status
 }
 
 func sortedColumnIdentities[T any](left, right map[columnIdentity]T) []columnIdentity {

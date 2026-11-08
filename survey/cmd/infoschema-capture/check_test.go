@@ -200,6 +200,7 @@ func TestAggregateCheckObservationsRollingQueryabilityChange(t *testing.T) {
 	want := []rollingQueryabilityChange{{
 		TableName: "INDEXES", ColumnName: "SEARCH_UNNEST",
 		RetainedStatus: "queryable", CurrentStatus: "advertised_not_queryable",
+		CurrentStatusCode: "UNIMPLEMENTED",
 	}}
 	if len(report.SurfaceDelta.RollingQueryabilityChanges) != 1 || report.SurfaceDelta.RollingQueryabilityChanges[0] != want[0] {
 		t.Fatalf("rolling changes = %#v, want %#v", report.SurfaceDelta.RollingQueryabilityChanges, want)
@@ -365,4 +366,24 @@ func cloneCapture(t *testing.T, capture *infoschem.CaptureDocument) *infoschem.C
 		t.Fatal(err)
 	}
 	return clone
+}
+
+func TestComparisonIncludesQueryabilityErrorCodeChange(t *testing.T) {
+	metadata := infoschem.DiscoveredColumnMetadata{
+		"INDEXES": {"SEARCH_UNNEST": {Name: "SEARCH_UNNEST", SpannerType: "BOOL", OrdinalPosition: 1}},
+	}
+	build := func(code string) *infoschem.CaptureDocument {
+		return syntheticCapture(t, metadata, []infoschem.RollingQueryability{
+			{TableName: "INDEXES", ColumnName: "SEARCH_UNNEST", Status: "advertised_not_queryable", StatusCode: code},
+			{TableName: "INDEX_COLUMNS", ColumnName: "EXPRESSION", Status: "not_advertised"},
+		}, time.Date(2026, 1, 1, 0, 0, 0, 0, time.UTC))
+	}
+	report := aggregateCheckObservations("retained.json", build("UNIMPLEMENTED"), false, []*infoschem.CaptureDocument{build("INVALID_ARGUMENT")})
+	if report.SchemaVersion != "v0alpha2" || report.Status != "surface_changed" || report.SurfaceDelta == nil {
+		t.Fatalf("comparison = %#v", report)
+	}
+	changes := report.SurfaceDelta.RollingQueryabilityChanges
+	if len(changes) != 1 || changes[0].RetainedStatusCode != "UNIMPLEMENTED" || changes[0].CurrentStatusCode != "INVALID_ARGUMENT" {
+		t.Fatalf("error-code-only change was hidden: %#v", changes)
+	}
 }
