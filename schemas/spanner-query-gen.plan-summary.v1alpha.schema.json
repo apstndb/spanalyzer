@@ -1,0 +1,2721 @@
+{
+  "$defs": {
+    "access_path": {
+      "additionalProperties": false,
+      "properties": {
+        "base_table": {
+          "description": "Catalog-resolved base table, or empty when unknown.",
+          "type": "string"
+        },
+        "conditions_complete": {
+          "description": "Observed scan signal; conditions_complete requires an unambiguous wrapper pairing.",
+          "type": "boolean"
+        },
+        "declared_key_count": {
+          "minimum": 0,
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "filter_index": {
+          "minimum": 0,
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "full_scan": {
+          "description": "Observed scan signal; conditions_complete requires an unambiguous wrapper pairing.",
+          "type": "boolean"
+        },
+        "has_residual_condition": {
+          "description": "Observed scan signal; conditions_complete requires an unambiguous wrapper pairing.",
+          "type": "boolean"
+        },
+        "has_search_condition": {
+          "description": "Observed scan signal; conditions_complete requires an unambiguous wrapper pairing.",
+          "type": "boolean"
+        },
+        "has_seek_condition": {
+          "description": "Observed scan signal; conditions_complete requires an unambiguous wrapper pairing.",
+          "type": "boolean"
+        },
+        "has_timestamp_condition": {
+          "description": "Observed scan signal; conditions_complete requires an unambiguous wrapper pairing.",
+          "type": "boolean"
+        },
+        "key_columns": {
+          "description": "Catalog key columns in declared key order; empty when schema facts are unavailable.",
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
+        "null_filtered": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "range_seekable_key_size": {
+          "minimum": 1,
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "residual_columns": {
+          "description": "Sorted, duplicate-free set of proven column references, not declared key order. Use membership tests against key_columns for key prefixes; empty does not prove no columns when bindings are unavailable.",
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
+        "residual_conditions": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "columns": {
+                "description": "Sorted, duplicate-free set of column references proven by this scan's Reference bindings.",
+                "items": {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "type": "array",
+                "uniqueItems": true
+              },
+              "expression": {
+                "description": "Verbatim backend short description; empty when unavailable.",
+                "type": "string"
+              },
+              "index": {
+                "description": "Immediate condition child PlanNode index.",
+                "minimum": 0,
+                "type": "integer"
+              }
+            },
+            "required": [
+              "index",
+              "expression",
+              "columns"
+            ],
+            "type": "object"
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
+        "scan_index": {
+          "description": "Owning Scan PlanNode index.",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "scan_target": {
+          "description": "Raw scan target identity; empty when unavailable.",
+          "type": "string"
+        },
+        "scan_target_kind": {
+          "description": "Catalog target kind, explicit vector component kind, or unknown.",
+          "minLength": 1,
+          "type": "string"
+        },
+        "scan_type": {
+          "description": "Normalized backend scan type; empty when unavailable.",
+          "type": "string"
+        },
+        "search_conditions": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "columns": {
+                "description": "Sorted, duplicate-free set of column references proven by this scan's Reference bindings.",
+                "items": {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "type": "array",
+                "uniqueItems": true
+              },
+              "expression": {
+                "description": "Verbatim backend short description; empty when unavailable.",
+                "type": "string"
+              },
+              "index": {
+                "description": "Immediate condition child PlanNode index.",
+                "minimum": 0,
+                "type": "integer"
+              }
+            },
+            "required": [
+              "index",
+              "expression",
+              "columns"
+            ],
+            "type": "object"
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
+        "seek_columns": {
+          "description": "Sorted, duplicate-free set of proven column references, not declared key order. Use membership tests against key_columns for key prefixes; empty does not prove no columns when bindings are unavailable.",
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
+        "seek_conditions": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "columns": {
+                "description": "Sorted, duplicate-free set of column references proven by this scan's Reference bindings.",
+                "items": {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "type": "array",
+                "uniqueItems": true
+              },
+              "expression": {
+                "description": "Verbatim backend short description; empty when unavailable.",
+                "type": "string"
+              },
+              "index": {
+                "description": "Immediate condition child PlanNode index.",
+                "minimum": 0,
+                "type": "integer"
+              }
+            },
+            "required": [
+              "index",
+              "expression",
+              "columns"
+            ],
+            "type": "object"
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
+        "seekable_key_size": {
+          "description": "Raw range-key metadata; empty when unavailable, and zero does not mean no seek.",
+          "type": "string"
+        },
+        "stored_columns": {
+          "description": "Catalog stored columns; empty when schema facts are unavailable.",
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
+        "timestamp_conditions": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "columns": {
+                "description": "Sorted, duplicate-free set of column references proven by this scan's Reference bindings.",
+                "items": {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "type": "array",
+                "uniqueItems": true
+              },
+              "expression": {
+                "description": "Verbatim backend short description; empty when unavailable.",
+                "type": "string"
+              },
+              "index": {
+                "description": "Immediate condition child PlanNode index.",
+                "minimum": 0,
+                "type": "integer"
+              }
+            },
+            "required": [
+              "index",
+              "expression",
+              "columns"
+            ],
+            "type": "object"
+          },
+          "type": "array",
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "base_table",
+        "conditions_complete",
+        "declared_key_count",
+        "filter_index",
+        "full_scan",
+        "has_residual_condition",
+        "has_search_condition",
+        "has_seek_condition",
+        "has_timestamp_condition",
+        "key_columns",
+        "null_filtered",
+        "range_seekable_key_size",
+        "residual_columns",
+        "residual_conditions",
+        "scan_index",
+        "scan_target",
+        "scan_target_kind",
+        "scan_type",
+        "search_conditions",
+        "seek_columns",
+        "seek_conditions",
+        "seekable_key_size",
+        "stored_columns",
+        "timestamp_conditions"
+      ],
+      "type": "object"
+    },
+    "backend_identity": {
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "source": {
+                "const": "manual"
+              }
+            },
+            "required": [
+              "source"
+            ]
+          },
+          "then": {
+            "not": {
+              "properties": {
+                "image_digest": {
+                  "const": "not_recorded"
+                },
+                "version": {
+                  "const": "not_recorded"
+                }
+              },
+              "required": [
+                "version",
+                "image_digest"
+              ]
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "source": {
+                "const": "external_unverified"
+              }
+            },
+            "required": [
+              "source"
+            ]
+          },
+          "then": {
+            "properties": {
+              "image_digest": {
+                "const": "not_recorded"
+              },
+              "version": {
+                "const": "not_recorded"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "source": {
+                "const": "runtime_targets"
+              }
+            },
+            "required": [
+              "source"
+            ]
+          },
+          "then": {
+            "properties": {
+              "image_digest": {
+                "pattern": "^sha256:[a-f0-9]{64}$"
+              },
+              "version": {
+                "not": {
+                  "const": "not_recorded"
+                }
+              }
+            },
+            "required": [
+              "version",
+              "image_digest"
+            ]
+          }
+        }
+      ],
+      "properties": {
+        "image_digest": {
+          "anyOf": [
+            {
+              "const": "not_recorded"
+            },
+            {
+              "description": "Backend image digest, or not_recorded when unavailable.",
+              "minLength": 1,
+              "pattern": "^sha256:[a-f0-9]{64}$",
+              "type": "string"
+            }
+          ],
+          "description": "Backend image digest, or not_recorded when unavailable."
+        },
+        "kind": {
+          "description": "Runtime backend kind.",
+          "enum": [
+            "omni"
+          ]
+        },
+        "source": {
+          "description": "Backend identity provenance. runtime_targets is the exact Omni image configured from runtime_targets.json for a command-owned cold start, not an observation of a running container. manual means the caller supplied the value as an assertion for an attached endpoint, not observed evidence. external_unverified means an attached endpoint had no caller identity assertion.",
+          "enum": [
+            "runtime_targets",
+            "manual",
+            "external_unverified"
+          ]
+        },
+        "version": {
+          "anyOf": [
+            {
+              "const": "not_recorded"
+            },
+            {
+              "description": "Backend version, or not_recorded when unavailable.",
+              "minLength": 1,
+              "pattern": "^[0-9A-Za-z._:+/-]+$",
+              "type": "string"
+            }
+          ],
+          "description": "Backend version, or not_recorded when unavailable."
+        }
+      },
+      "required": [
+        "kind",
+        "version",
+        "image_digest",
+        "source"
+      ],
+      "type": "object"
+    },
+    "cel_input_defaults": {
+      "additionalProperties": false,
+      "properties": {
+        "applies_to": {
+          "items": {
+            "description": "Normalized report arrays whose optional fields use these CEL defaults.",
+            "enum": [
+              "operators[]",
+              "operator_edges[]"
+            ]
+          },
+          "maxItems": 2,
+          "minItems": 2,
+          "prefixItems": [
+            {
+              "const": "operators[]"
+            },
+            {
+              "const": "operator_edges[]"
+            }
+          ],
+          "type": "array",
+          "uniqueItems": true
+        },
+        "optional_boolean": {
+          "const": false,
+          "description": "Default value applied to absent optional boolean fields in the internal CEL input."
+        },
+        "optional_string": {
+          "const": "",
+          "description": "Default value applied to absent optional string fields in the internal CEL input."
+        }
+      },
+      "required": [
+        "optional_string",
+        "optional_boolean",
+        "applies_to"
+      ],
+      "type": "object"
+    },
+    "concrete_operator_family": {
+      "description": "Concrete normalized operator family that can appear in normalized_operators[].family.",
+      "enum": [
+        "aggregate",
+        "anti_semi_apply",
+        "apply_mutations",
+        "array_subquery",
+        "array_unnest",
+        "bloom_filter_build",
+        "change_stream_tvf",
+        "compute",
+        "compute_struct",
+        "create_batch",
+        "crowd",
+        "data_block_to_row",
+        "apply_join",
+        "distributed_anti_semi_apply",
+        "distributed_anti_semi_apply_internal_apply",
+        "distributed_merge_union",
+        "distributed_cross_apply",
+        "distributed_cross_apply_internal_apply",
+        "distributed_semi_apply",
+        "distributed_semi_apply_internal_apply",
+        "distributed_union",
+        "empty_relation",
+        "filter",
+        "filter_scan",
+        "full_sort",
+        "generate_relation",
+        "hash_aggregate",
+        "hash_join",
+        "join",
+        "key_range_accumulator",
+        "limit",
+        "local_split_union",
+        "merge_join",
+        "mini_batch_assign",
+        "mini_batch_key_order",
+        "minor_sort",
+        "push_broadcast_hash_join",
+        "push_broadcast_hash_join_internal_hash_join",
+        "recursive_spool_scan",
+        "random_id_assign",
+        "recursive_union",
+        "row_count",
+        "row_to_data_block",
+        "scalar",
+        "scan",
+        "scalar_subquery",
+        "search_predicate",
+        "search_query_conversion_tvf",
+        "serialize_result",
+        "semi_apply",
+        "spool_build",
+        "spool_scan",
+        "stream_aggregate",
+        "tvf",
+        "union_all",
+        "union_input",
+        "unit_relation",
+        "verify_determinism",
+        "unknown"
+      ]
+    },
+    "contract_evaluation": {
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "pass"
+              }
+            },
+            "required": [
+              "status"
+            ]
+          },
+          "then": {
+            "not": {
+              "anyOf": [
+                {
+                  "required": [
+                    "reason"
+                  ]
+                },
+                {
+                  "required": [
+                    "error"
+                  ]
+                }
+              ]
+            },
+            "required": [
+              "query",
+              "scope",
+              "results"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "fail"
+              }
+            },
+            "required": [
+              "status"
+            ]
+          },
+          "then": {
+            "not": {
+              "anyOf": [
+                {
+                  "required": [
+                    "reason"
+                  ]
+                },
+                {
+                  "required": [
+                    "error"
+                  ]
+                }
+              ]
+            },
+            "required": [
+              "query",
+              "scope",
+              "results"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "not_evaluated"
+              }
+            },
+            "required": [
+              "status"
+            ]
+          },
+          "then": {
+            "not": {
+              "anyOf": [
+                {
+                  "required": [
+                    "results"
+                  ]
+                }
+              ]
+            },
+            "required": [
+              "reason"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "reason": {
+                "const": "target_error"
+              }
+            },
+            "required": [
+              "reason"
+            ]
+          },
+          "then": {
+            "required": [
+              "error"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "reason": {
+                "const": "target_not_found"
+              }
+            },
+            "required": [
+              "reason"
+            ]
+          },
+          "then": {
+            "not": {
+              "anyOf": [
+                {
+                  "required": [
+                    "error"
+                  ]
+                }
+              ]
+            }
+          }
+        }
+      ],
+      "properties": {
+        "error": {
+          "description": "Target availability error when status is not_evaluated because target acquisition failed.",
+          "minLength": 1,
+          "type": "string"
+        },
+        "name": {
+          "description": "Contract name.",
+          "minLength": 1,
+          "pattern": "^[A-Za-z_][A-Za-z0-9_]*$",
+          "type": "string"
+        },
+        "query": {
+          "description": "Target query name.",
+          "minLength": 1,
+          "pattern": "^[A-Za-z_][A-Za-z0-9_]*$",
+          "type": "string"
+        },
+        "reason": {
+          "description": "Reason when status is not_evaluated.",
+          "enum": [
+            "target_not_found",
+            "target_error"
+          ]
+        },
+        "results": {
+          "items": {
+            "$ref": "#/$defs/contract_rule_result"
+          },
+          "minItems": 1,
+          "type": "array",
+          "uniqueItems": true
+        },
+        "scope": {
+          "description": "Resolved target scope.",
+          "enum": [
+            "query",
+            "external_query.inner",
+            "write"
+          ]
+        },
+        "stability": {
+          "$ref": "#/$defs/contract_stability"
+        },
+        "status": {
+          "description": "Contract evaluation status.",
+          "enum": [
+            "pass",
+            "fail",
+            "not_evaluated"
+          ]
+        },
+        "target_id": {
+          "description": "Canonical target ID resolved for the contract.",
+          "minLength": 1,
+          "pattern": "^(query|write)/[A-Za-z_][A-Za-z0-9_]*(/variant/[A-Za-z0-9_-]+)?(#inner)?$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "target_id",
+        "status",
+        "stability"
+      ],
+      "type": "object"
+    },
+    "contract_rule_result": {
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "rule": {
+                "const": "forbid_operator_family"
+              }
+            },
+            "required": [
+              "rule"
+            ]
+          },
+          "then": {
+            "not": {
+              "anyOf": [
+                {
+                  "required": [
+                    "expression"
+                  ]
+                }
+              ]
+            },
+            "properties": {
+              "source": {
+                "description": "Predefined or direct forbid contract rule source.",
+                "minLength": 1,
+                "pattern": "^(use/(no_explicit_sort|no_full_sort|no_minor_sort|no_hash_join|no_standalone_hash_join|no_push_broadcast_hash_join|no_apply_join|no_standalone_apply_join|no_distributed_cross_apply|no_merge_join|no_hash_aggregate|no_stream_aggregate)|forbid\\[[0-9]+\\])$",
+                "type": "string"
+              }
+            },
+            "required": [
+              "operator_family",
+              "observed_count",
+              "max_count",
+              "matched_operator_indexes"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "rule": {
+                "const": "cel"
+              }
+            },
+            "required": [
+              "rule"
+            ]
+          },
+          "then": {
+            "not": {
+              "anyOf": [
+                {
+                  "required": [
+                    "predefined"
+                  ]
+                },
+                {
+                  "required": [
+                    "operator_family"
+                  ]
+                },
+                {
+                  "required": [
+                    "observed_count"
+                  ]
+                },
+                {
+                  "required": [
+                    "max_count"
+                  ]
+                },
+                {
+                  "required": [
+                    "matched_operator_indexes"
+                  ]
+                }
+              ]
+            },
+            "properties": {
+              "source": {
+                "const": "cel"
+              }
+            },
+            "required": [
+              "expression"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "rule": {
+                "const": "forbid_blocking_operator_under_limit"
+              }
+            },
+            "required": [
+              "rule"
+            ]
+          },
+          "then": {
+            "not": {
+              "anyOf": [
+                {
+                  "required": [
+                    "expression"
+                  ]
+                },
+                {
+                  "required": [
+                    "operator_family"
+                  ]
+                },
+                {
+                  "required": [
+                    "diagnostic_id"
+                  ]
+                }
+              ]
+            },
+            "properties": {
+              "source": {
+                "const": "use/no_blocking_operator_under_limit"
+              }
+            },
+            "required": [
+              "predefined",
+              "observed_count",
+              "max_count",
+              "matched_operator_indexes"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "rule": {
+                "const": "forbid_full_scan"
+              }
+            },
+            "required": [
+              "rule"
+            ]
+          },
+          "then": {
+            "not": {
+              "anyOf": [
+                {
+                  "required": [
+                    "expression"
+                  ]
+                },
+                {
+                  "required": [
+                    "operator_family"
+                  ]
+                },
+                {
+                  "required": [
+                    "diagnostic_id"
+                  ]
+                }
+              ]
+            },
+            "properties": {
+              "source": {
+                "const": "use/no_full_scan"
+              }
+            },
+            "required": [
+              "predefined",
+              "observed_count",
+              "max_count",
+              "matched_operator_indexes"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "rule": {
+                "const": "forbid_full_scan_without_timestamp_condition"
+              }
+            },
+            "required": [
+              "rule"
+            ]
+          },
+          "then": {
+            "not": {
+              "anyOf": [
+                {
+                  "required": [
+                    "expression"
+                  ]
+                },
+                {
+                  "required": [
+                    "operator_family"
+                  ]
+                },
+                {
+                  "required": [
+                    "diagnostic_id"
+                  ]
+                }
+              ]
+            },
+            "properties": {
+              "source": {
+                "const": "use/no_full_scan_without_timestamp_condition"
+              }
+            },
+            "required": [
+              "predefined",
+              "observed_count",
+              "max_count",
+              "matched_operator_indexes"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "rule": {
+                "const": "require_timestamp_condition"
+              }
+            },
+            "required": [
+              "rule"
+            ]
+          },
+          "then": {
+            "not": {
+              "anyOf": [
+                {
+                  "required": [
+                    "expression"
+                  ]
+                },
+                {
+                  "required": [
+                    "operator_family"
+                  ]
+                },
+                {
+                  "required": [
+                    "diagnostic_id"
+                  ]
+                }
+              ]
+            },
+            "properties": {
+              "source": {
+                "const": "use/require_timestamp_condition"
+              }
+            },
+            "required": [
+              "predefined",
+              "observed_count",
+              "max_count",
+              "matched_operator_indexes"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "rule": {
+                "const": "cel"
+              },
+              "status": {
+                "const": "fail"
+              }
+            },
+            "required": [
+              "rule",
+              "status"
+            ]
+          },
+          "then": {
+            "not": {
+              "anyOf": [
+                {
+                  "required": [
+                    "diagnostic_id"
+                  ]
+                }
+              ]
+            },
+            "properties": {
+              "failure_kind": {
+                "const": "violation"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "fail"
+              }
+            },
+            "required": [
+              "status"
+            ]
+          },
+          "then": {
+            "required": [
+              "failure_kind"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "pass"
+              }
+            },
+            "required": [
+              "status"
+            ]
+          },
+          "then": {
+            "not": {
+              "anyOf": [
+                {
+                  "required": [
+                    "failure_kind"
+                  ]
+                },
+                {
+                  "required": [
+                    "diagnostic_id"
+                  ]
+                },
+                {
+                  "required": [
+                    "remediation"
+                  ]
+                }
+              ]
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "failure_kind": {
+                "const": "classification_unknown"
+              }
+            },
+            "required": [
+              "failure_kind"
+            ]
+          },
+          "then": {
+            "required": [
+              "diagnostic_id"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "failure_kind": {
+                "const": "violation"
+              }
+            },
+            "required": [
+              "failure_kind"
+            ]
+          },
+          "then": {
+            "not": {
+              "anyOf": [
+                {
+                  "required": [
+                    "diagnostic_id"
+                  ]
+                }
+              ]
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "source": {
+                "description": "Predefined contract expansion source.",
+                "minLength": 1,
+                "pattern": "^use/",
+                "type": "string"
+              }
+            },
+            "required": [
+              "source"
+            ]
+          },
+          "then": {
+            "required": [
+              "predefined"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "source": {
+                "description": "Direct contract rule source.",
+                "minLength": 1,
+                "pattern": "^(forbid\\[[0-9]+\\]|cel)$",
+                "type": "string"
+              }
+            },
+            "required": [
+              "source"
+            ]
+          },
+          "then": {
+            "not": {
+              "anyOf": [
+                {
+                  "required": [
+                    "predefined"
+                  ]
+                }
+              ]
+            }
+          }
+        }
+      ],
+      "properties": {
+        "diagnostic_id": {
+          "description": "Diagnostic ID associated with a non-violation failure kind.",
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9_]*(\\.[a-z0-9_]+)+$",
+          "type": "string"
+        },
+        "expression": {
+          "description": "CEL expression for cel rules.",
+          "minLength": 1,
+          "type": "string"
+        },
+        "failure_kind": {
+          "description": "Reason class when status is fail.",
+          "enum": [
+            "violation",
+            "classification_unknown"
+          ]
+        },
+        "matched_operator_indexes": {
+          "description": "PlanNode indexes from normalized_operators[].index that matched this operator-family rule.",
+          "items": {
+            "description": "PlanNode index.",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
+        "max_count": {
+          "description": "Allowed normalized operator count.",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "observed_count": {
+          "description": "Observed normalized operator count.",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "operator_family": {
+          "$ref": "#/$defs/operator_family"
+        },
+        "predefined": {
+          "description": "Predefined contract name when this result was expanded from use.",
+          "enum": [
+            "no_explicit_sort",
+            "no_full_sort",
+            "no_minor_sort",
+            "no_hash_join",
+            "no_standalone_hash_join",
+            "no_push_broadcast_hash_join",
+            "no_apply_join",
+            "no_standalone_apply_join",
+            "no_distributed_cross_apply",
+            "no_merge_join",
+            "no_hash_aggregate",
+            "no_stream_aggregate",
+            "no_full_scan",
+            "no_full_scan_without_timestamp_condition",
+            "require_timestamp_condition",
+            "no_blocking_operator_under_limit"
+          ]
+        },
+        "remediation": {
+          "items": {
+            "$ref": "#/$defs/remediation"
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
+        "rule": {
+          "description": "Rule kind.",
+          "enum": [
+            "forbid_operator_family",
+            "forbid_blocking_operator_under_limit",
+            "forbid_full_scan",
+            "forbid_full_scan_without_timestamp_condition",
+            "require_timestamp_condition",
+            "cel"
+          ]
+        },
+        "source": {
+          "description": "Original contract source that produced this result, such as use/no_hash_join, forbid[0], or cel.",
+          "minLength": 1,
+          "pattern": "^(use/(no_explicit_sort|no_full_sort|no_minor_sort|no_hash_join|no_standalone_hash_join|no_push_broadcast_hash_join|no_apply_join|no_standalone_apply_join|no_distributed_cross_apply|no_merge_join|no_hash_aggregate|no_stream_aggregate|no_full_scan|no_full_scan_without_timestamp_condition|require_timestamp_condition|no_blocking_operator_under_limit)|forbid\\[[0-9]+\\]|cel)$",
+          "type": "string"
+        },
+        "status": {
+          "description": "Rule evaluation status.",
+          "enum": [
+            "pass",
+            "fail"
+          ]
+        }
+      },
+      "required": [
+        "rule",
+        "source",
+        "status"
+      ],
+      "type": "object"
+    },
+    "contract_stability": {
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "tier": {
+                "const": "raw_query_plan"
+              }
+            },
+            "required": [
+              "tier"
+            ]
+          },
+          "then": {
+            "properties": {
+              "check_recommended": {
+                "const": false
+              },
+              "replayable_from_report": {
+                "const": false
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "tier": {
+                "const": "normalized_operator"
+              }
+            },
+            "required": [
+              "tier"
+            ]
+          },
+          "then": {
+            "properties": {
+              "replayable_from_report": {
+                "const": false
+              }
+            }
+          }
+        }
+      ],
+      "properties": {
+        "check_recommended": {
+          "description": "Whether this contract tier is recommended for --check without additional review.",
+          "type": "boolean"
+        },
+        "reasons": {
+          "description": "Why this stability tier was assigned.",
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "minItems": 1,
+          "type": "array",
+          "uniqueItems": true
+        },
+        "replayable_from_report": {
+          "description": "Whether the contract can be re-evaluated from the serialized YAML/JSON report alone.",
+          "type": "boolean"
+        },
+        "tier": {
+          "description": "Contract stability tier.",
+          "enum": [
+            "normalized_operator",
+            "raw_query_plan"
+          ]
+        }
+      },
+      "required": [
+        "tier",
+        "reasons",
+        "check_recommended",
+        "replayable_from_report"
+      ],
+      "type": "object"
+    },
+    "contract_summary": {
+      "additionalProperties": false,
+      "properties": {
+        "contracts": {
+          "description": "Number of configured contracts.",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "environment_warnings": {
+          "description": "Environment warnings that affect contract interpretation.",
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
+        "failed": {
+          "description": "Number of contracts that failed.",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "not_evaluated": {
+          "description": "Number of contracts that could not be evaluated because the target plan was unavailable.",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "passed": {
+          "description": "Number of contracts that passed.",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "status": {
+          "description": "Overall contract evaluation status.",
+          "enum": [
+            "pass",
+            "fail"
+          ]
+        }
+      },
+      "required": [
+        "status",
+        "contracts",
+        "passed",
+        "failed",
+        "not_evaluated",
+        "environment_warnings"
+      ],
+      "type": "object"
+    },
+    "diagnostic": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "description": "Diagnostic ID.",
+          "minLength": 1,
+          "type": "string"
+        },
+        "message": {
+          "description": "Human-readable diagnostic text.",
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "message"
+      ],
+      "type": "object"
+    },
+    "excluded_target": {
+      "additionalProperties": false,
+      "properties": {
+        "catalog": {
+          "description": "Configured or derived query source catalog.",
+          "minLength": 1,
+          "type": "string"
+        },
+        "id": {
+          "description": "Canonical target ID.",
+          "minLength": 1,
+          "pattern": "^(query|write)/[A-Za-z_][A-Za-z0-9_]*(/variant/[A-Za-z0-9_-]+)?(#inner)?$",
+          "type": "string"
+        },
+        "query": {
+          "description": "Configured query name.",
+          "minLength": 1,
+          "type": "string"
+        },
+        "reason": {
+          "description": "Machine-readable namespaced exclusion reason.",
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9_]*(\\.[a-z0-9_]+)+$",
+          "type": "string"
+        },
+        "scope": {
+          "description": "Plan-report target scope.",
+          "enum": [
+            "query",
+            "external_query.inner",
+            "write"
+          ]
+        }
+      },
+      "required": [
+        "id",
+        "query",
+        "scope",
+        "reason"
+      ],
+      "type": "object"
+    },
+    "input": {
+      "additionalProperties": false,
+      "properties": {
+        "config_sha256": {
+          "description": "SHA-256 of the resolved spanner-query-gen config file bytes.",
+          "minLength": 1,
+          "pattern": "^[a-f0-9]{64}$",
+          "type": "string"
+        },
+        "contract_file_path": {
+          "description": "Relative plan contract file path when stable output does not omit it.",
+          "minLength": 1,
+          "type": "string"
+        },
+        "contract_file_sha256": {
+          "description": "SHA-256 of the resolved plan contract file bytes.",
+          "minLength": 1,
+          "pattern": "^[a-f0-9]{64}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "config_sha256"
+      ],
+      "type": "object"
+    },
+    "normalization": {
+      "additionalProperties": false,
+      "properties": {
+        "access_paths_version": {
+          "description": "Access-path normalization compatibility revision.",
+          "minLength": 1,
+          "type": "string"
+        },
+        "cel_input_defaults": {
+          "$ref": "#/$defs/cel_input_defaults"
+        },
+        "operator_family_mapping_version": {
+          "description": "Operator family mapping version.",
+          "minLength": 1,
+          "type": "string"
+        },
+        "operator_tree_version": {
+          "description": "Normalized operator tree digest input version.",
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "operator_tree_version",
+        "operator_family_mapping_version",
+        "access_paths_version",
+        "cel_input_defaults"
+      ],
+      "type": "object"
+    },
+    "operator": {
+      "additionalProperties": false,
+      "properties": {
+        "call_type": {
+          "description": "Normalized call_type metadata.",
+          "minLength": 1,
+          "type": "string"
+        },
+        "child_indexes": {
+          "description": "Direct child PlanNode indexes from child_links.",
+          "items": {
+            "description": "PlanNode index.",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
+        "descendant_indexes": {
+          "description": "Transitive child PlanNode indexes reachable through child_links.",
+          "items": {
+            "description": "PlanNode index.",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
+        "display_name": {
+          "description": "PlanNode display name.",
+          "minLength": 1,
+          "type": "string"
+        },
+        "distribution_table": {
+          "description": "Raw distribution_table metadata.",
+          "minLength": 1,
+          "type": "string"
+        },
+        "execution_method": {
+          "description": "Normalized execution_method metadata.",
+          "minLength": 1,
+          "type": "string"
+        },
+        "expression": {
+          "description": "Verbatim backend short representation.",
+          "minLength": 1,
+          "type": "string"
+        },
+        "family": {
+          "$ref": "#/$defs/concrete_operator_family"
+        },
+        "full_scan": {
+          "description": "Whether the PlanNode metadata marks a full scan.",
+          "type": "boolean"
+        },
+        "index": {
+          "description": "PlanNode index.",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "iterator_type": {
+          "description": "Normalized iterator_type metadata.",
+          "minLength": 1,
+          "type": "string"
+        },
+        "join_configuration": {
+          "description": "Normalized join_configuration metadata.",
+          "minLength": 1,
+          "type": "string"
+        },
+        "join_type": {
+          "description": "Normalized join_type metadata.",
+          "minLength": 1,
+          "type": "string"
+        },
+        "scalar_aggregate": {
+          "description": "Whether a stream aggregate consumes its full input before emitting one scalar result.",
+          "type": "boolean"
+        },
+        "scan_format": {
+          "description": "Normalized scan_format metadata.",
+          "minLength": 1,
+          "type": "string"
+        },
+        "scan_method": {
+          "description": "Normalized scan_method metadata.",
+          "minLength": 1,
+          "type": "string"
+        },
+        "scan_target": {
+          "description": "Raw scan target metadata.",
+          "minLength": 1,
+          "type": "string"
+        },
+        "scan_type": {
+          "description": "Normalized scan_type metadata, for example table_scan, index_scan, batch_scan, search_index_scan, vector_index_metadata_scan, vector_index_root_scan, vector_index_leaf_scan, or filter_scan.",
+          "minLength": 1,
+          "type": "string"
+        },
+        "seekable_key_size": {
+          "description": "Raw seekable key size metadata.",
+          "minLength": 1,
+          "type": "string"
+        },
+        "spool_name": {
+          "description": "Raw spool_name metadata for SpoolBuild and SpoolScan operators.",
+          "minLength": 1,
+          "type": "string"
+        },
+        "subquery_cluster_node": {
+          "description": "Raw subquery_cluster_node metadata.",
+          "minLength": 1,
+          "type": "string"
+        },
+        "subtree_family_counts": {
+          "additionalProperties": false,
+          "description": "Complete operator family counts for this PlanNode subtree, including the operator itself. Contains every operator_family enum value; absent families are represented by 0.",
+          "properties": {
+            "aggregate": {
+              "description": "Count for normalized operator family aggregate.",
+              "minimum": 0,
+              "type": "integer"
+            },
+            "anti_semi_apply": {
+              "description": "Count for normalized operator family anti_semi_apply.",
+              "minimum": 0,
+              "type": "integer"
+            },
+            "apply_join": {
+              "description": "Count for normalized operator family apply_join.",
+              "minimum": 0,
+              "type": "integer"
+            },
+            "apply_mutations": {
+              "description": "Count for normalized operator family apply_mutations.",
+              "minimum": 0,
+              "type": "integer"
+            },
+            "array_subquery": {
+              "description": "Count for normalized operator family array_subquery.",
+              "minimum": 0,
+              "type": "integer"
+            },
+            "array_unnest": {
+              "description": "Count for normalized operator family array_unnest.",
+              "minimum": 0,
+              "type": "integer"
+            },
+            "blocking_operator": {
+              "description": "Count for normalized operator family blocking_operator.",
+              "minimum": 0,
+              "type": "integer"
+            },
+            "bloom_filter_build": {
+              "description": "Count for normalized operator family bloom_filter_build.",
+              "minimum": 0,
+              "type": "integer"
+            },
+            "change_stream_tvf": {
+              "description": "Count for normalized operator family change_stream_tvf.",
+              "minimum": 0,
+              "type": "integer"
+            },
+            "compute": {
+              "description": "Count for normalized operator family compute.",
+              "minimum": 0,
+              "type": "integer"
+            },
+            "compute_struct": {
+              "description": "Count for normalized operator family compute_struct.",
+              "minimum": 0,
+              "type": "integer"
+            },
+            "create_batch": {
+              "description": "Count for normalized operator family create_batch.",
+              "minimum": 0,
+              "type": "integer"
+            },
+            "crowd": {
+              "description": "Count for normalized operator family crowd.",
+              "minimum": 0,
+              "type": "integer"
+            },
+            "data_block_to_row": {
+              "description": "Count for normalized operator family data_block_to_row.",
+              "minimum": 0,
+              "type": "integer"
+            },
+            "distributed_anti_semi_apply": {
+              "description": "Count for normalized operator family distributed_anti_semi_apply.",
+              "minimum": 0,
+              "type": "integer"
+            },
+            "distributed_anti_semi_apply_internal_apply": {
+              "description": "Count for normalized operator family distributed_anti_semi_apply_internal_apply.",
+              "minimum": 0,
+              "type": "integer"
+            },
+            "distributed_cross_apply": {
+              "description": "Count for normalized operator family distributed_cross_apply.",
+              "minimum": 0,
+              "type": "integer"
+            },
+            "distributed_cross_apply_internal_apply": {
+              "description": "Count for normalized operator family distributed_cross_apply_internal_apply.",
+              "minimum": 0,
+              "type": "integer"
+            },
+            "distributed_merge_union": {
+              "description": "Count for normalized operator family distributed_merge_union.",
+              "minimum": 0,
+              "type": "integer"
+            },
+            "distributed_semi_apply": {
+              "description": "Count for normalized operator family distributed_semi_apply.",
+              "minimum": 0,
+              "type": "integer"
+            },
+            "distributed_semi_apply_internal_apply": {
+              "description": "Count for normalized operator family distributed_semi_apply_internal_apply.",
+              "minimum": 0,
+              "type": "integer"
+            },
+            "distributed_union": {
+              "description": "Count for normalized operator family distributed_union.",
+              "minimum": 0,
+              "type": "integer"
+            },
+            "empty_relation": {
+              "description": "Count for normalized operator family empty_relation.",
+              "minimum": 0,
+              "type": "integer"
+            },
+            "explicit_sort": {
+              "description": "Count for normalized operator family explicit_sort.",
+              "minimum": 0,
+              "type": "integer"
+            },
+            "filter": {
+              "description": "Count for normalized operator family filter.",
+              "minimum": 0,
+              "type": "integer"
+            },
+            "filter_scan": {
+              "description": "Count for normalized operator family filter_scan.",
+              "minimum": 0,
+              "type": "integer"
+            },
+            "full_sort": {
+              "description": "Count for normalized operator family full_sort.",
+              "minimum": 0,
+              "type": "integer"
+            },
+            "generate_relation": {
+              "description": "Count for normalized operator family generate_relation.",
+              "minimum": 0,
+              "type": "integer"
+            },
+            "hash_aggregate": {
+              "description": "Count for normalized operator family hash_aggregate.",
+              "minimum": 0,
+              "type": "integer"
+            },
+            "hash_join": {
+              "description": "Count for normalized operator family hash_join.",
+              "minimum": 0,
+              "type": "integer"
+            },
+            "join": {
+              "description": "Count for normalized operator family join.",
+              "minimum": 0,
+              "type": "integer"
+            },
+            "key_range_accumulator": {
+              "description": "Count for normalized operator family key_range_accumulator.",
+              "minimum": 0,
+              "type": "integer"
+            },
+            "limit": {
+              "description": "Count for normalized operator family limit.",
+              "minimum": 0,
+              "type": "integer"
+            },
+            "local_split_union": {
+              "description": "Count for normalized operator family local_split_union.",
+              "minimum": 0,
+              "type": "integer"
+            },
+            "merge_join": {
+              "description": "Count for normalized operator family merge_join.",
+              "minimum": 0,
+              "type": "integer"
+            },
+            "mini_batch_assign": {
+              "description": "Count for normalized operator family mini_batch_assign.",
+              "minimum": 0,
+              "type": "integer"
+            },
+            "mini_batch_key_order": {
+              "description": "Count for normalized operator family mini_batch_key_order.",
+              "minimum": 0,
+              "type": "integer"
+            },
+            "minor_sort": {
+              "description": "Count for normalized operator family minor_sort.",
+              "minimum": 0,
+              "type": "integer"
+            },
+            "push_broadcast_hash_join": {
+              "description": "Count for normalized operator family push_broadcast_hash_join.",
+              "minimum": 0,
+              "type": "integer"
+            },
+            "push_broadcast_hash_join_internal_hash_join": {
+              "description": "Count for normalized operator family push_broadcast_hash_join_internal_hash_join.",
+              "minimum": 0,
+              "type": "integer"
+            },
+            "random_id_assign": {
+              "description": "Count for normalized operator family random_id_assign.",
+              "minimum": 0,
+              "type": "integer"
+            },
+            "recursive_spool_scan": {
+              "description": "Count for normalized operator family recursive_spool_scan.",
+              "minimum": 0,
+              "type": "integer"
+            },
+            "recursive_union": {
+              "description": "Count for normalized operator family recursive_union.",
+              "minimum": 0,
+              "type": "integer"
+            },
+            "row_count": {
+              "description": "Count for normalized operator family row_count.",
+              "minimum": 0,
+              "type": "integer"
+            },
+            "row_to_data_block": {
+              "description": "Count for normalized operator family row_to_data_block.",
+              "minimum": 0,
+              "type": "integer"
+            },
+            "scalar": {
+              "description": "Count for normalized operator family scalar.",
+              "minimum": 0,
+              "type": "integer"
+            },
+            "scalar_subquery": {
+              "description": "Count for normalized operator family scalar_subquery.",
+              "minimum": 0,
+              "type": "integer"
+            },
+            "scan": {
+              "description": "Count for normalized operator family scan.",
+              "minimum": 0,
+              "type": "integer"
+            },
+            "search_predicate": {
+              "description": "Count for normalized operator family search_predicate.",
+              "minimum": 0,
+              "type": "integer"
+            },
+            "search_query_conversion_tvf": {
+              "description": "Count for normalized operator family search_query_conversion_tvf.",
+              "minimum": 0,
+              "type": "integer"
+            },
+            "semi_apply": {
+              "description": "Count for normalized operator family semi_apply.",
+              "minimum": 0,
+              "type": "integer"
+            },
+            "serialize_result": {
+              "description": "Count for normalized operator family serialize_result.",
+              "minimum": 0,
+              "type": "integer"
+            },
+            "spool_build": {
+              "description": "Count for normalized operator family spool_build.",
+              "minimum": 0,
+              "type": "integer"
+            },
+            "spool_scan": {
+              "description": "Count for normalized operator family spool_scan.",
+              "minimum": 0,
+              "type": "integer"
+            },
+            "stream_aggregate": {
+              "description": "Count for normalized operator family stream_aggregate.",
+              "minimum": 0,
+              "type": "integer"
+            },
+            "tvf": {
+              "description": "Count for normalized operator family tvf.",
+              "minimum": 0,
+              "type": "integer"
+            },
+            "union_all": {
+              "description": "Count for normalized operator family union_all.",
+              "minimum": 0,
+              "type": "integer"
+            },
+            "union_input": {
+              "description": "Count for normalized operator family union_input.",
+              "minimum": 0,
+              "type": "integer"
+            },
+            "unit_relation": {
+              "description": "Count for normalized operator family unit_relation.",
+              "minimum": 0,
+              "type": "integer"
+            },
+            "unknown": {
+              "description": "Count for normalized operator family unknown.",
+              "minimum": 0,
+              "type": "integer"
+            },
+            "verify_determinism": {
+              "description": "Count for normalized operator family verify_determinism.",
+              "minimum": 0,
+              "type": "integer"
+            }
+          },
+          "required": [
+            "aggregate",
+            "anti_semi_apply",
+            "apply_mutations",
+            "array_subquery",
+            "array_unnest",
+            "bloom_filter_build",
+            "blocking_operator",
+            "change_stream_tvf",
+            "compute",
+            "compute_struct",
+            "create_batch",
+            "crowd",
+            "data_block_to_row",
+            "apply_join",
+            "distributed_anti_semi_apply",
+            "distributed_anti_semi_apply_internal_apply",
+            "distributed_merge_union",
+            "distributed_cross_apply",
+            "distributed_cross_apply_internal_apply",
+            "distributed_semi_apply",
+            "distributed_semi_apply_internal_apply",
+            "distributed_union",
+            "empty_relation",
+            "explicit_sort",
+            "filter",
+            "filter_scan",
+            "full_sort",
+            "generate_relation",
+            "hash_aggregate",
+            "hash_join",
+            "join",
+            "key_range_accumulator",
+            "limit",
+            "local_split_union",
+            "merge_join",
+            "mini_batch_assign",
+            "mini_batch_key_order",
+            "minor_sort",
+            "push_broadcast_hash_join",
+            "push_broadcast_hash_join_internal_hash_join",
+            "recursive_spool_scan",
+            "random_id_assign",
+            "recursive_union",
+            "row_count",
+            "row_to_data_block",
+            "scalar",
+            "scan",
+            "scalar_subquery",
+            "search_predicate",
+            "search_query_conversion_tvf",
+            "serialize_result",
+            "semi_apply",
+            "spool_build",
+            "spool_scan",
+            "stream_aggregate",
+            "tvf",
+            "union_all",
+            "union_input",
+            "unit_relation",
+            "verify_determinism",
+            "unknown"
+          ],
+          "type": "object"
+        },
+        "tvf_name": {
+          "description": "Raw table-valued function name for TVF operators.",
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "index",
+        "display_name",
+        "family",
+        "child_indexes",
+        "descendant_indexes",
+        "subtree_family_counts"
+      ],
+      "type": "object"
+    },
+    "operator_edge": {
+      "additionalProperties": false,
+      "properties": {
+        "child_index": {
+          "description": "Child PlanNode index.",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "expression": {
+          "description": "Verbatim child short representation.",
+          "minLength": 1,
+          "type": "string"
+        },
+        "parent_index": {
+          "description": "Parent PlanNode index.",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "type": {
+          "description": "PlanNode child-link type.",
+          "minLength": 1,
+          "type": "string"
+        },
+        "variable": {
+          "description": "PlanNode child-link variable.",
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "parent_index",
+        "child_index"
+      ],
+      "type": "object"
+    },
+    "operator_family": {
+      "description": "Normalized operator family, including derived umbrella families usable in counts and contracts.",
+      "enum": [
+        "aggregate",
+        "anti_semi_apply",
+        "apply_mutations",
+        "array_subquery",
+        "array_unnest",
+        "bloom_filter_build",
+        "blocking_operator",
+        "change_stream_tvf",
+        "compute",
+        "compute_struct",
+        "create_batch",
+        "crowd",
+        "data_block_to_row",
+        "apply_join",
+        "distributed_anti_semi_apply",
+        "distributed_anti_semi_apply_internal_apply",
+        "distributed_merge_union",
+        "distributed_cross_apply",
+        "distributed_cross_apply_internal_apply",
+        "distributed_semi_apply",
+        "distributed_semi_apply_internal_apply",
+        "distributed_union",
+        "empty_relation",
+        "explicit_sort",
+        "filter",
+        "filter_scan",
+        "full_sort",
+        "generate_relation",
+        "hash_aggregate",
+        "hash_join",
+        "join",
+        "key_range_accumulator",
+        "limit",
+        "local_split_union",
+        "merge_join",
+        "mini_batch_assign",
+        "mini_batch_key_order",
+        "minor_sort",
+        "push_broadcast_hash_join",
+        "push_broadcast_hash_join_internal_hash_join",
+        "recursive_spool_scan",
+        "random_id_assign",
+        "recursive_union",
+        "row_count",
+        "row_to_data_block",
+        "scalar",
+        "scan",
+        "scalar_subquery",
+        "search_predicate",
+        "search_query_conversion_tvf",
+        "serialize_result",
+        "semi_apply",
+        "spool_build",
+        "spool_scan",
+        "stream_aggregate",
+        "tvf",
+        "union_all",
+        "union_input",
+        "unit_relation",
+        "verify_determinism",
+        "unknown"
+      ]
+    },
+    "optimizer": {
+      "additionalProperties": false,
+      "properties": {
+        "effective": {
+          "additionalProperties": false,
+          "properties": {
+            "statistics_package": {
+              "anyOf": [
+                {
+                  "const": "not_recorded"
+                },
+                {
+                  "description": "Effective optimizer statistics package observed from the backend, or not_recorded when unavailable.",
+                  "minLength": 1,
+                  "pattern": "^[0-9A-Za-z._:+/-]+$",
+                  "type": "string"
+                }
+              ],
+              "description": "Effective optimizer statistics package observed from the backend, or not_recorded when unavailable."
+            },
+            "version": {
+              "anyOf": [
+                {
+                  "const": "not_recorded"
+                },
+                {
+                  "description": "Effective optimizer version observed from the backend, or not_recorded when unavailable.",
+                  "minLength": 1,
+                  "pattern": "^[0-9A-Za-z._:+/-]+$",
+                  "type": "string"
+                }
+              ],
+              "description": "Effective optimizer version observed from the backend, or not_recorded when unavailable."
+            }
+          },
+          "required": [
+            "version",
+            "statistics_package"
+          ],
+          "type": "object"
+        },
+        "requested": {
+          "additionalProperties": false,
+          "properties": {
+            "statistics_package": {
+              "anyOf": [
+                {
+                  "const": "not_pinned"
+                },
+                {
+                  "description": "Requested optimizer statistics package passed to AnalyzeQuery, or not_pinned.",
+                  "minLength": 1,
+                  "pattern": "^[0-9A-Za-z._:+/-]+$",
+                  "type": "string"
+                }
+              ],
+              "description": "Requested optimizer statistics package passed to AnalyzeQuery, or not_pinned."
+            },
+            "version": {
+              "anyOf": [
+                {
+                  "const": "not_pinned"
+                },
+                {
+                  "description": "Requested optimizer version passed to AnalyzeQuery, or not_pinned.",
+                  "minLength": 1,
+                  "pattern": "^[0-9A-Za-z._:+/-]+$",
+                  "type": "string"
+                }
+              ],
+              "description": "Requested optimizer version passed to AnalyzeQuery, or not_pinned."
+            }
+          },
+          "required": [
+            "version",
+            "statistics_package"
+          ],
+          "type": "object"
+        }
+      },
+      "required": [
+        "requested",
+        "effective"
+      ],
+      "type": "object"
+    },
+    "plan_source": {
+      "additionalProperties": false,
+      "properties": {
+        "api": {
+          "description": "Plan acquisition API.",
+          "enum": [
+            "analyze_query"
+          ]
+        },
+        "backend": {
+          "description": "Runtime backend used to obtain query plans.",
+          "enum": [
+            "omni"
+          ]
+        }
+      },
+      "required": [
+        "backend",
+        "api"
+      ],
+      "type": "object"
+    },
+    "query": {
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "ok"
+              }
+            },
+            "required": [
+              "status"
+            ]
+          },
+          "then": {
+            "required": [
+              "sql_sha256",
+              "ddl_sha256",
+              "operator_tree_sha256",
+              "access_paths"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "error"
+              }
+            },
+            "required": [
+              "status"
+            ]
+          },
+          "then": {
+            "not": {
+              "anyOf": [
+                {
+                  "required": [
+                    "operator_tree_sha256"
+                  ]
+                },
+                {
+                  "required": [
+                    "access_paths"
+                  ]
+                },
+                {
+                  "required": [
+                    "classification_warnings"
+                  ]
+                }
+              ]
+            },
+            "required": [
+              "error"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "skipped"
+              }
+            },
+            "required": [
+              "status"
+            ]
+          },
+          "then": {
+            "not": {
+              "anyOf": [
+                {
+                  "required": [
+                    "operator_tree_sha256"
+                  ]
+                },
+                {
+                  "required": [
+                    "access_paths"
+                  ]
+                },
+                {
+                  "required": [
+                    "classification_warnings"
+                  ]
+                }
+              ]
+            },
+            "required": [
+              "error"
+            ]
+          }
+        }
+      ],
+      "properties": {
+        "access_paths": {
+          "items": {
+            "$ref": "#/$defs/access_path"
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
+        "catalog": {
+          "description": "Spanner catalog used for analysis.",
+          "minLength": 1,
+          "type": "string"
+        },
+        "classification_warnings": {
+          "items": {
+            "$ref": "#/$defs/diagnostic"
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
+        "ddl_sha256": {
+          "description": "SHA-256 of resolved catalog DDL bytes.",
+          "minLength": 1,
+          "pattern": "^[a-f0-9]{64}$",
+          "type": "string"
+        },
+        "error": {
+          "description": "Target acquisition error or skip message.",
+          "minLength": 1,
+          "type": "string"
+        },
+        "kind": {
+          "description": "Configured query kind.",
+          "enum": [
+            "sql",
+            "table",
+            "index",
+            "external_query",
+            "write"
+          ]
+        },
+        "name": {
+          "description": "Configured query name.",
+          "minLength": 1,
+          "pattern": "^[A-Za-z_][A-Za-z0-9_]*$",
+          "type": "string"
+        },
+        "operator_tree_sha256": {
+          "description": "SHA-256 of normalized operator tree digest input.",
+          "minLength": 1,
+          "pattern": "^[a-f0-9]{64}$",
+          "type": "string"
+        },
+        "optimizer_not_pinned": {
+          "description": "Whether this query's requested optimizer version is unpinned. Statistics-package pinning is reported separately in environment warnings.",
+          "type": "boolean"
+        },
+        "plan_environment_notes": {
+          "description": "Review notes about the plan acquisition environment.",
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
+        "proto_descriptor_sha256": {
+          "description": "SHA-256 of the canonical merged proto descriptor set used for catalog setup.",
+          "minLength": 1,
+          "pattern": "^[a-f0-9]{64}$",
+          "type": "string"
+        },
+        "scope": {
+          "description": "Plan-report target scope.",
+          "enum": [
+            "query",
+            "external_query.inner",
+            "write"
+          ]
+        },
+        "sql_sha256": {
+          "description": "SHA-256 of analyzed SQL bytes.",
+          "minLength": 1,
+          "pattern": "^[a-f0-9]{64}$",
+          "type": "string"
+        },
+        "status": {
+          "description": "Per-query analysis status. Status ok means plan fields are valid. Status error or skipped means only the input identity fields and error field are reliable; plan normalization fields must not be interpreted as a successful plan.",
+          "enum": [
+            "ok",
+            "skipped",
+            "error"
+          ]
+        },
+        "target_id": {
+          "description": "Canonical target ID, for example query/ListSingers or query/ExternalQuery#inner.",
+          "minLength": 1,
+          "pattern": "^(query|write)/[A-Za-z_][A-Za-z0-9_]*(/variant/[A-Za-z0-9_-]+)?(#inner)?$",
+          "type": "string"
+        },
+        "variant": {
+          "$ref": "#/$defs/variant"
+        }
+      },
+      "required": [
+        "target_id",
+        "name",
+        "catalog",
+        "kind",
+        "status"
+      ],
+      "type": "object"
+    },
+    "remediation": {
+      "additionalProperties": false,
+      "properties": {
+        "applies_to": {
+          "description": "Surface the suggestion applies to.",
+          "enum": [
+            "config",
+            "ddl",
+            "sql",
+            "contract"
+          ]
+        },
+        "auto_fix": {
+          "const": false,
+          "description": "Remediation is advisory in v1alpha and is never applied automatically."
+        },
+        "confidence": {
+          "description": "Suggestion confidence.",
+          "enum": [
+            "low",
+            "medium",
+            "high"
+          ]
+        },
+        "kind": {
+          "description": "Suggestion kind.",
+          "minLength": 1,
+          "type": "string"
+        },
+        "message": {
+          "description": "Human-readable suggestion text.",
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "auto_fix",
+        "message"
+      ],
+      "type": "object"
+    },
+    "target_summary": {
+      "additionalProperties": false,
+      "properties": {
+        "errors": {
+          "description": "Number of query targets with status error.",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "excluded": {
+          "items": {
+            "$ref": "#/$defs/excluded_target"
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
+        "included_count": {
+          "description": "Number of query targets included in queries[]. Must equal planned + errors + skipped.",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "planned": {
+          "description": "Number of query targets with status ok.",
+          "minimum": 0,
+          "type": "integer"
+        },
+        "skipped": {
+          "description": "Number of query targets with status skipped.",
+          "minimum": 0,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "included_count",
+        "planned",
+        "errors",
+        "skipped",
+        "excluded"
+      ],
+      "type": "object"
+    },
+    "variant": {
+      "additionalProperties": false,
+      "properties": {
+        "absent_params": {
+          "description": "Omitted optional parameters.",
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
+        "choice_assignments": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "type": "object"
+        },
+        "label": {
+          "description": "Human-readable optional SQL shape.",
+          "minLength": 1,
+          "type": "string"
+        },
+        "present_params": {
+          "description": "Present optional parameters.",
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "type": "array",
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "label"
+      ],
+      "type": "object"
+    }
+  },
+  "$id": "https://github.com/apstndb/spanalyzer/schemas/spanner-query-gen.plan-summary.v1alpha.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "allOf": [
+    {
+      "else": {
+        "not": {
+          "anyOf": [
+            {
+              "required": [
+                "contract_file_version"
+              ]
+            },
+            {
+              "required": [
+                "contract_evaluator_version"
+              ]
+            },
+            {
+              "required": [
+                "contract_evaluations"
+              ]
+            },
+            {
+              "required": [
+                "contract_summary"
+              ]
+            }
+          ]
+        },
+        "properties": {
+          "contract_evaluation_mode": {
+            "const": "none"
+          }
+        }
+      },
+      "if": {
+        "properties": {
+          "contract_evaluation_mode": {
+            "description": "Contract evaluation modes that require contract result fields.",
+            "enum": [
+              "report_only",
+              "check"
+            ]
+          }
+        },
+        "required": [
+          "contract_evaluation_mode"
+        ]
+      },
+      "then": {
+        "properties": {
+          "contract_evaluations": {
+            "minItems": 1
+          },
+          "input": {
+            "required": [
+              "contract_file_sha256"
+            ]
+          }
+        },
+        "required": [
+          "contract_file_version",
+          "contract_evaluator_version",
+          "contract_evaluations",
+          "contract_summary"
+        ]
+      }
+    }
+  ],
+  "description": "Lightweight structured evidence. Full operator graphs and SQL are omitted; contract results cannot generally be replayed from this artifact.",
+  "properties": {
+    "backend": {
+      "description": "Runtime backend used to obtain query plans.",
+      "enum": [
+        "omni"
+      ]
+    },
+    "backend_identity": {
+      "$ref": "#/$defs/backend_identity"
+    },
+    "contract_evaluation_mode": {
+      "description": "Contract evaluation mode for this report.",
+      "enum": [
+        "none",
+        "report_only",
+        "check"
+      ]
+    },
+    "contract_evaluations": {
+      "items": {
+        "$ref": "#/$defs/contract_evaluation"
+      },
+      "type": "array",
+      "uniqueItems": true
+    },
+    "contract_evaluator_version": {
+      "description": "Plan contract evaluator version used for contract evaluation.",
+      "minLength": 1,
+      "type": "string"
+    },
+    "contract_file_version": {
+      "description": "Plan contract file version used for contract evaluation.",
+      "minLength": 1,
+      "type": "string"
+    },
+    "contract_summary": {
+      "$ref": "#/$defs/contract_summary"
+    },
+    "input": {
+      "$ref": "#/$defs/input"
+    },
+    "normalization": {
+      "$ref": "#/$defs/normalization"
+    },
+    "optimizer": {
+      "$ref": "#/$defs/optimizer"
+    },
+    "plan_source": {
+      "$ref": "#/$defs/plan_source"
+    },
+    "queries": {
+      "items": {
+        "$ref": "#/$defs/query"
+      },
+      "type": "array",
+      "uniqueItems": true
+    },
+    "report_version": {
+      "const": "v1alpha-plan-summary-v1"
+    },
+    "stable": {
+      "description": "Whether stable-output mode was requested.",
+      "type": "boolean"
+    },
+    "status": {
+      "description": "Artifact production status. This does not mean every query target was successfully planned; use target_summary and queries[].status for target-level success.",
+      "enum": [
+        "ok",
+        "no_targets"
+      ]
+    },
+    "target_summary": {
+      "$ref": "#/$defs/target_summary"
+    },
+    "warnings": {
+      "items": {
+        "$ref": "#/$defs/diagnostic"
+      },
+      "type": "array",
+      "uniqueItems": true
+    }
+  },
+  "required": [
+    "report_version",
+    "status",
+    "backend",
+    "input",
+    "plan_source",
+    "backend_identity",
+    "normalization",
+    "target_summary",
+    "stable",
+    "queries",
+    "contract_evaluation_mode",
+    "optimizer",
+    "warnings"
+  ],
+  "title": "spanner-query-gen plan-report summary output",
+  "type": "object"
+}

@@ -1,0 +1,10 @@
+{
+  "version": "v1alpha-plan-contracts",
+  "contracts": [
+    {
+      "name": "RangeSeek",
+      "target": "query/Range",
+      "cel": "access_paths.exists(p, p.scan_target == \"Events\" \u0026\u0026 \"Shard\" in p.seek_columns \u0026\u0026 \"CreatedAt\" in p.seek_columns)"
+    }
+  ]
+}

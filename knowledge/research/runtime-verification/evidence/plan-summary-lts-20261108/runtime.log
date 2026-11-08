@@ -1,0 +1,30 @@
+2026/11/08 13:07:35 github.com/testcontainers/testcontainers-go - Connected to docker: 
+  Server Version: 29.2.1
+  API Version: 1.53
+  Operating System: Ubuntu 24.04.4 LTS
+  Total Memory: 7922 MB
+  Testcontainers for Go Version: v0.44.0
+  Resolved Docker Host: unix://<host-docker-socket>
+  Resolved Docker Socket Path: /var/run/docker.sock
+  Test SessionID: b7b29d41bcad90f94679102e4c591ee896904e65e24787d4b134b055bc0b8b2c
+  Test ProcessID: cc67f347-b2e9-4f18-82e1-fa192eef47c2
+2026/11/08 13:07:35 🐳 Creating container for image us-docker.pkg.dev/spanner-omni/images/spanner-omni:2026.r4-lts.2@sha256:b607b10bee3c1903f0a7f88f99bece67cb0dd9d9a028aee64226fc311bd78dae
+2026/11/08 13:07:35 🐳 Creating container for image testcontainers/ryuk:0.14.0
+2026/11/08 13:07:35 ✅ Container created: e083b3132c49
+2026/11/08 13:07:35 🐳 Starting container: e083b3132c49
+2026/11/08 13:07:35 ✅ Container started: e083b3132c49
+2026/11/08 13:07:35 ⏳ Waiting for container id e083b3132c49 image: testcontainers/ryuk:0.14.0. Waiting for: all of: [log message "Started", port 8080/tcp to be listening]
+2026/11/08 13:07:35 Shell not found in container
+2026/11/08 13:07:35 🔔 Container is ready: e083b3132c49
+2026/11/08 13:07:35 ✅ Container created: 5207498da8e1
+2026/11/08 13:07:35 🐳 Starting container: 5207498da8e1
+2026/11/08 13:07:35 ✅ Container started: 5207498da8e1
+2026/11/08 13:07:35 ⏳ Waiting for container id 5207498da8e1 image: us-docker.pkg.dev/spanner-omni/images/spanner-omni:2026.r4-lts.2@sha256:b607b10bee3c1903f0a7f88f99bece67cb0dd9d9a028aee64226fc311bd78dae. Waiting for: all of: [log message "Spanner is ready", first exposed port to be accessible externally]
+2026/11/08 13:07:42 🔔 Container is ready: 5207498da8e1
+ok  	github.com/apstndb/spanalyzer/tools/spanner-query-plan-shape	66.262s
+ok  	github.com/apstndb/spanalyzer/cmd/spanner-query-gen	2.817s
+ok  	github.com/apstndb/spanalyzer/cmd/spanner-query-gen/internal/runtimepins	0.178s [no tests to run]
+2026/11/08 13:08:56 🐳 Stopping container: 5207498da8e1
+2026/11/08 13:09:06 ✅ Container stopped: 5207498da8e1
+2026/11/08 13:09:06 🐳 Terminating container: 5207498da8e1
+2026/11/08 13:09:06 🚫 Container terminated: 5207498da8e1

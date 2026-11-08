@@ -63,6 +63,14 @@ Passing `--contracts` evaluates contracts and includes results in the report
 while keeping exit code 0 on violations or unavailable targets. Adding
 `--check` makes violations and `not_evaluated` contract targets exit non-zero.
 
+Add `--summary --output json` (or `yaml`) to skip rendered plans and retain
+compact access-path and contract-result evidence. Evaluation and `--check`
+behavior stay the same. Summary artifacts use `v1alpha-plan-summary-v1` and
+always mark `stability.replayable_from_report: false`: full operator graphs are
+omitted, even when the contract tier remains `normalized_operator`. Replay
+examples below describe full reports. Use `plan-report-schema --summary` for
+the separate summary schema.
+
 `contract_summary.status` describes contract truth, not process exit status:
 it is `pass` only when every configured contract was evaluated and passed, and
 it is `fail` when any contract failed or was `not_evaluated`. Process exit is
@@ -898,6 +906,16 @@ counts exclude implicit base-table primary-key suffixes.
 the owning scan's bindings, so a foreign join variable or a string literal is
 not guessed to be a local column. Empty column evidence does not prove that a
 predicate has no columns when a binding is unavailable.
+
+`seek_columns`, `residual_columns`, and each condition's `columns` are
+duplicate-free sets serialized in lexicographic order. `key_columns` preserves
+the catalog's declared key order. For a key `(Shard, CreatedAt)`, seek evidence
+for both columns is `[CreatedAt, Shard]`; comparing those two lists for equality
+is incorrect. Use `"Shard" in p.seek_columns`, or test
+`p.key_columns[0] in p.seek_columns && p.key_columns[1] in p.seek_columns`
+after checking the key count, to verify membership for a declared prefix.
+Membership establishes the participating columns; it does not by itself prove
+range bounds, scan direction, or their runtime selectivity.
 
 `seekable_key_size` preserves raw metadata. `range_seekable_key_size` is a
 positive integer or null. In particular, zero never means "no seek": an equality

@@ -141,9 +141,29 @@ records that stable-output mode was requested while keeping semantic fields such
 as backend, config digest, SQL digest, DDL digest, canonical proto descriptor
 digest when configured, contract file digest, operator tree digest, and
 optimizer pinning status.
+For compact structured evidence, use
+`plan-report --summary --output json` (or `--output yaml`). Summary mode skips
+plan rendering and omits query SQL, variant SQL, operator lists, edges, and
+family counts. It retains target identity/status/errors, digests, variant
+choices, access paths, environment warnings, and contract results. Contracts
+still run against the full in-memory evidence, so `--check` has the same
+meaning. Summaries use `report_version: v1alpha-plan-summary-v1` and set every
+contract's `stability.replayable_from_report` to false because omitted operator
+graphs may be required for re-evaluation. Keep a full report when offline replay
+is needed. `--summary` requires JSON/YAML; Markdown retains full plan trees.
+Rendering flags have no effect in summary mode. `--stable` alone does not reduce
+plan detail. Summary mode reduces rendering and output work, but still acquires
+and normalizes plans in memory. It is not a redaction feature: access-path
+expressions and errors can retain SQL fragments.
 In v1alpha, `--require-optimizer-pinning` checks optimizer options requested by
 `plan-report` flags. It does not infer pinning from SQL statement hints, and
 `optimizer.effective` is reported as `not_recorded`.
+`queries[].optimizer_not_pinned` and `query_optimizer_not_pinned` refer to the
+requested optimizer version. With `--optimizer-version=9` alone, the remaining
+pinning warning is `statistics_package_not_pinned`; the strict
+`--require-optimizer-pinning` gate still requires both fixed values. An empty
+database without a statistics package cannot satisfy that strict gate merely
+by pinning its optimizer version.
 Moving aliases are not pins: optimizer versions `latest`, `latest_version`,
 and `default_version`, and optimizer statistics package `latest`, cause
 `--require-optimizer-pinning` to fail just like an omitted value.
@@ -184,6 +204,9 @@ The latest `plan-report` output schema is checked in at
 [`schemas/spanner-query-gen.plan-report.v1alpha.schema.json`](../../schemas/spanner-query-gen.plan-report.v1alpha.schema.json);
 regenerate it with `plan-report-schema --out` when the report YAML/JSON shape
 changes.
+The separate summary schema is checked in at
+[`schemas/spanner-query-gen.plan-summary.v1alpha.schema.json`](../../schemas/spanner-query-gen.plan-summary.v1alpha.schema.json);
+regenerate it with `plan-report-schema --summary --out`.
 The latest plan contract file schema is checked in at
 [`schemas/spanner-query-gen.plan-contracts.v1alpha.schema.json`](../../schemas/spanner-query-gen.plan-contracts.v1alpha.schema.json);
 regenerate it with `plan-contract-schema --out` when the contract file shape
@@ -228,6 +251,8 @@ Usage of spanner-query-gen plan-report-schema:
         write schema to file instead of stdout; use - for stdout
   -output string
         schema output format: json or yaml (default "json")
+  -summary
+        emit the schema for plan-report --summary
 ```
 
 Current `plan-contract-schema --help` output:
@@ -272,6 +297,8 @@ Usage of spanner-query-gen plan-report:
         fail when no Spanner query targets are available
   -stable
         omit volatile metadata from report output
+  -summary
+        emit a lightweight JSON/YAML summary without rendered plans, SQL, or operator graphs
   -wrap-width int
         maximum rendered plan width; 0 disables wrapping
 ```
@@ -521,10 +548,12 @@ direct `forbid.operator_family` rules, CEL inputs, normalized topology fields,
   `kind: table`, or `kind: index` SQL
 - included: `kind: external_query` `inner_sql`, because the inner query is
   Spanner SQL
-- excluded: BigQuery outer SQL, BigQuery external dataset bindings, and writes
-  until future DML/mutation plan support exists
+- included: configured DML with `row_count` / `row_set`, and generated write
+  helpers with the `dml` method; PLAN acquisition rolls back without executing
+- excluded: BigQuery outer SQL, BigQuery external dataset bindings, and
+  mutation-only write helpers
 
-Machine-readable reports include `plan_source.api: analyze_query`,
+Full machine-readable reports include `plan_source.api: analyze_query`,
 `plan_source.render_tool: spannerplan`, backend identity fields with
 `source: runtime_targets` for a command-owned Omni cold-start pin,
 `source: manual` when `--backend-version` / `--backend-image-digest` supplied

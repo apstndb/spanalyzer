@@ -1,0 +1,20 @@
+{
+  "checked_at": "2026-11-08T04:11:52.745366+00:00",
+  "scope": "Only container identities created by this task; unrelated containers excluded",
+  "containers": [
+    {
+      "role": "omni",
+      "id_prefix": "5207498da8e1",
+      "inspect_exit_code": 1,
+      "absent": true,
+      "stderr": "Error response from daemon: No such container: 5207498da8e1"
+    },
+    {
+      "role": "reaper",
+      "id_prefix": "e083b3132c49",
+      "inspect_exit_code": 1,
+      "absent": true,
+      "stderr": "Error response from daemon: No such container: e083b3132c49"
+    }
+  ]
+}

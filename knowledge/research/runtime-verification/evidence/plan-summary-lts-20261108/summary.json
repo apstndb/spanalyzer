@@ -1,0 +1,587 @@
+{
+  "report_version": "v1alpha-plan-summary-v1",
+  "status": "ok",
+  "backend": "omni",
+  "input": {
+    "config_sha256": "5a4b2d2cfc94bbc86be2c660aa0bcf74ed485b304a6cedcd582a329078482214",
+    "contract_file_sha256": "e420ac07ae05225529809e76f24633579dbad655276083c1ac23be99e0d0f863"
+  },
+  "plan_source": {
+    "backend": "omni",
+    "api": "analyze_query"
+  },
+  "backend_identity": {
+    "kind": "omni",
+    "version": "not_recorded",
+    "image_digest": "not_recorded",
+    "source": "external_unverified"
+  },
+  "normalization": {
+    "access_paths_version": "v1alpha.1",
+    "operator_tree_version": "v1alpha.4",
+    "operator_family_mapping_version": "v1alpha.2",
+    "cel_input_defaults": {
+      "optional_string": "",
+      "optional_boolean": false,
+      "applies_to": [
+        "operators[]",
+        "operator_edges[]"
+      ]
+    }
+  },
+  "target_summary": {
+    "included_count": 10,
+    "planned": 9,
+    "errors": 1,
+    "skipped": 0,
+    "excluded": []
+  },
+  "stable": false,
+  "queries": [
+    {
+      "target_id": "query/Optional/variant/KG5vbmUp",
+      "name": "Optional",
+      "catalog": "app",
+      "scope": "query",
+      "kind": "sql",
+      "status": "ok",
+      "sql_sha256": "1e6050662e23cd1f51112d300b217907205431d88b6a7b6a414ce5e7d0912d41",
+      "ddl_sha256": "003d3c185d4dcd19b63119a75c2d3100d39777039ed25487232df309428668da",
+      "operator_tree_sha256": "c44d73a85933f27d1b55e72b802366a5fc1f5b49383d1ae9867baa24ed40f02e",
+      "access_paths": [
+        {
+          "scan_index": 3,
+          "filter_index": null,
+          "scan_target": "T",
+          "scan_type": "table_scan",
+          "scan_target_kind": "table",
+          "base_table": "T",
+          "full_scan": true,
+          "conditions_complete": true,
+          "has_seek_condition": false,
+          "has_residual_condition": false,
+          "has_timestamp_condition": false,
+          "has_search_condition": false,
+          "seek_conditions": [],
+          "residual_conditions": [],
+          "timestamp_conditions": [],
+          "search_conditions": [],
+          "seek_columns": [],
+          "residual_columns": [],
+          "seekable_key_size": "",
+          "range_seekable_key_size": null,
+          "declared_key_count": 1,
+          "key_columns": [
+            "Id"
+          ],
+          "stored_columns": [],
+          "null_filtered": null
+        }
+      ],
+      "variant": {
+        "label": "(none)",
+        "absent_params": [
+          "id",
+          "value"
+        ]
+      },
+      "plan_environment_notes": [
+        "requested optimizer statistics package is not pinned to a fixed value"
+      ]
+    },
+    {
+      "target_id": "query/Optional/variant/aWQ",
+      "name": "Optional",
+      "catalog": "app",
+      "scope": "query",
+      "kind": "sql",
+      "status": "ok",
+      "sql_sha256": "77043c6891623ece065382a9dd9583a6ecc25f8a42439debecc95264da2cf009",
+      "ddl_sha256": "003d3c185d4dcd19b63119a75c2d3100d39777039ed25487232df309428668da",
+      "operator_tree_sha256": "edb742fc7b5157b65f0b78dd30b2eb9c9c459ea1ec4e085a5f21be23130db2f0",
+      "access_paths": [
+        {
+          "scan_index": 4,
+          "filter_index": 3,
+          "scan_target": "T",
+          "scan_type": "table_scan",
+          "scan_target_kind": "table",
+          "base_table": "T",
+          "full_scan": false,
+          "conditions_complete": true,
+          "has_seek_condition": true,
+          "has_residual_condition": false,
+          "has_timestamp_condition": false,
+          "has_search_condition": false,
+          "seek_conditions": [
+            {
+              "index": 9,
+              "expression": "($Id = @id)",
+              "columns": [
+                "Id"
+              ]
+            }
+          ],
+          "residual_conditions": [],
+          "timestamp_conditions": [],
+          "search_conditions": [],
+          "seek_columns": [
+            "Id"
+          ],
+          "residual_columns": [],
+          "seekable_key_size": "0",
+          "range_seekable_key_size": null,
+          "declared_key_count": 1,
+          "key_columns": [
+            "Id"
+          ],
+          "stored_columns": [],
+          "null_filtered": null
+        }
+      ],
+      "variant": {
+        "label": "id",
+        "present_params": [
+          "id"
+        ],
+        "absent_params": [
+          "value"
+        ]
+      },
+      "plan_environment_notes": [
+        "requested optimizer statistics package is not pinned to a fixed value"
+      ]
+    },
+    {
+      "target_id": "query/Optional",
+      "name": "Optional",
+      "catalog": "app",
+      "scope": "query",
+      "kind": "sql",
+      "status": "ok",
+      "sql_sha256": "76f77ce3823809cead5f356c98406883f695644bd8c8df77ca70dd49db70998c",
+      "ddl_sha256": "003d3c185d4dcd19b63119a75c2d3100d39777039ed25487232df309428668da",
+      "operator_tree_sha256": "27cb61badcb33f1a0d4610d54d0039f132a842590fdafa3547c9422592dee4f5",
+      "access_paths": [
+        {
+          "scan_index": 4,
+          "filter_index": 3,
+          "scan_target": "T",
+          "scan_type": "table_scan",
+          "scan_target_kind": "table",
+          "base_table": "T",
+          "full_scan": false,
+          "conditions_complete": true,
+          "has_seek_condition": true,
+          "has_residual_condition": true,
+          "has_timestamp_condition": false,
+          "has_search_condition": false,
+          "seek_conditions": [
+            {
+              "index": 13,
+              "expression": "($Id = @id)",
+              "columns": [
+                "Id"
+              ]
+            }
+          ],
+          "residual_conditions": [
+            {
+              "index": 14,
+              "expression": "($Value = @value)",
+              "columns": [
+                "Value"
+              ]
+            }
+          ],
+          "timestamp_conditions": [],
+          "search_conditions": [],
+          "seek_columns": [
+            "Id"
+          ],
+          "residual_columns": [
+            "Value"
+          ],
+          "seekable_key_size": "0",
+          "range_seekable_key_size": null,
+          "declared_key_count": 1,
+          "key_columns": [
+            "Id"
+          ],
+          "stored_columns": [],
+          "null_filtered": null
+        }
+      ],
+      "variant": {
+        "label": "id+value",
+        "present_params": [
+          "id",
+          "value"
+        ]
+      },
+      "plan_environment_notes": [
+        "requested optimizer statistics package is not pinned to a fixed value"
+      ]
+    },
+    {
+      "target_id": "query/Optional/variant/dmFsdWU",
+      "name": "Optional",
+      "catalog": "app",
+      "scope": "query",
+      "kind": "sql",
+      "status": "ok",
+      "sql_sha256": "36b178128f54488f7e785f5c57e71446f6dffd31623ff51113457fc7a55768e1",
+      "ddl_sha256": "003d3c185d4dcd19b63119a75c2d3100d39777039ed25487232df309428668da",
+      "operator_tree_sha256": "7cb9c2448d8cb70f85cda824c72ce3493394711a6702d1ac974f572d3d6ed044",
+      "access_paths": [
+        {
+          "scan_index": 4,
+          "filter_index": 3,
+          "scan_target": "T",
+          "scan_type": "table_scan",
+          "scan_target_kind": "table",
+          "base_table": "T",
+          "full_scan": true,
+          "conditions_complete": true,
+          "has_seek_condition": false,
+          "has_residual_condition": true,
+          "has_timestamp_condition": false,
+          "has_search_condition": false,
+          "seek_conditions": [],
+          "residual_conditions": [
+            {
+              "index": 10,
+              "expression": "($Value = @value)",
+              "columns": [
+                "Value"
+              ]
+            }
+          ],
+          "timestamp_conditions": [],
+          "search_conditions": [],
+          "seek_columns": [],
+          "residual_columns": [
+            "Value"
+          ],
+          "seekable_key_size": "0",
+          "range_seekable_key_size": null,
+          "declared_key_count": 1,
+          "key_columns": [
+            "Id"
+          ],
+          "stored_columns": [],
+          "null_filtered": null
+        }
+      ],
+      "variant": {
+        "label": "value",
+        "present_params": [
+          "value"
+        ],
+        "absent_params": [
+          "id"
+        ]
+      },
+      "plan_environment_notes": [
+        "requested optimizer statistics package is not pinned to a fixed value"
+      ]
+    },
+    {
+      "target_id": "query/Delete",
+      "name": "Delete",
+      "catalog": "app",
+      "scope": "query",
+      "kind": "sql",
+      "status": "ok",
+      "sql_sha256": "39fcc765bd7f1d4cc699db1bf2a62a1314999f7b2ded056c83f055d7b449cb37",
+      "ddl_sha256": "003d3c185d4dcd19b63119a75c2d3100d39777039ed25487232df309428668da",
+      "operator_tree_sha256": "57e8c6b133ccd208ecdd647b41d68a825430d42b99871de7dfbe241bccff835a",
+      "access_paths": [
+        {
+          "scan_index": 5,
+          "filter_index": 4,
+          "scan_target": "T",
+          "scan_type": "table_scan",
+          "scan_target_kind": "table",
+          "base_table": "T",
+          "full_scan": false,
+          "conditions_complete": true,
+          "has_seek_condition": true,
+          "has_residual_condition": false,
+          "has_timestamp_condition": false,
+          "has_search_condition": false,
+          "seek_conditions": [
+            {
+              "index": 10,
+              "expression": "($Id = @id)",
+              "columns": [
+                "Id"
+              ]
+            }
+          ],
+          "residual_conditions": [],
+          "timestamp_conditions": [],
+          "search_conditions": [],
+          "seek_columns": [
+            "Id"
+          ],
+          "residual_columns": [],
+          "seekable_key_size": "0",
+          "range_seekable_key_size": null,
+          "declared_key_count": 1,
+          "key_columns": [
+            "Id"
+          ],
+          "stored_columns": [],
+          "null_filtered": null
+        }
+      ],
+      "plan_environment_notes": [
+        "requested optimizer statistics package is not pinned to a fixed value"
+      ]
+    },
+    {
+      "target_id": "query/UpdateReturning",
+      "name": "UpdateReturning",
+      "catalog": "app",
+      "scope": "query",
+      "kind": "sql",
+      "status": "ok",
+      "sql_sha256": "a247032c4f32db635964b16624c117612ee6e4e291d09eba9938267d9b1ec77e",
+      "ddl_sha256": "003d3c185d4dcd19b63119a75c2d3100d39777039ed25487232df309428668da",
+      "operator_tree_sha256": "9404df80d4dd904622a6283f56a60e373ecec86ae1d21bec066eaaa76e59204a",
+      "access_paths": [
+        {
+          "scan_index": 5,
+          "filter_index": 4,
+          "scan_target": "T",
+          "scan_type": "table_scan",
+          "scan_target_kind": "table",
+          "base_table": "T",
+          "full_scan": false,
+          "conditions_complete": true,
+          "has_seek_condition": true,
+          "has_residual_condition": false,
+          "has_timestamp_condition": false,
+          "has_search_condition": false,
+          "seek_conditions": [
+            {
+              "index": 10,
+              "expression": "($Id = @id)",
+              "columns": [
+                "Id"
+              ]
+            }
+          ],
+          "residual_conditions": [],
+          "timestamp_conditions": [],
+          "search_conditions": [],
+          "seek_columns": [
+            "Id"
+          ],
+          "residual_columns": [],
+          "seekable_key_size": "0",
+          "range_seekable_key_size": null,
+          "declared_key_count": 1,
+          "key_columns": [
+            "Id"
+          ],
+          "stored_columns": [],
+          "null_filtered": null
+        }
+      ],
+      "plan_environment_notes": [
+        "requested optimizer statistics package is not pinned to a fixed value"
+      ]
+    },
+    {
+      "target_id": "query/BadLimit",
+      "name": "BadLimit",
+      "catalog": "app",
+      "scope": "query",
+      "kind": "sql",
+      "status": "error",
+      "sql_sha256": "38b0a45de9ebcd00102a07110445cf76ea33b3c2dfc961fae57ae8aa693b6c9c",
+      "error": "query BadLimit: LIMIT ... OFFSET ... expects INT64, got STRING [at 1:24]"
+    },
+    {
+      "target_id": "query/Nested",
+      "name": "Nested",
+      "catalog": "app",
+      "scope": "query",
+      "kind": "sql",
+      "status": "ok",
+      "sql_sha256": "77133cefd2f78e112119b43712e4976023704b3b729cd5592bec3e5c2e678fb5",
+      "ddl_sha256": "003d3c185d4dcd19b63119a75c2d3100d39777039ed25487232df309428668da",
+      "operator_tree_sha256": "06df44954118843bb61bd1fee52b66ba89a31ae249e9300c11926182a3de97be",
+      "access_paths": [],
+      "plan_environment_notes": [
+        "requested optimizer statistics package is not pinned to a fixed value"
+      ]
+    },
+    {
+      "target_id": "query/Range",
+      "name": "Range",
+      "catalog": "app",
+      "scope": "query",
+      "kind": "sql",
+      "status": "ok",
+      "sql_sha256": "a6efaa5fd9cafd55ba9c58e3f9c6eb30a48a619e8afb8e6cedadf8d37f413873",
+      "ddl_sha256": "003d3c185d4dcd19b63119a75c2d3100d39777039ed25487232df309428668da",
+      "operator_tree_sha256": "0bf159ad70956a58ed74c15d04470f98bde7e094a39c1cfe55f9c5c7a3df5e11",
+      "access_paths": [
+        {
+          "scan_index": 4,
+          "filter_index": 3,
+          "scan_target": "Events",
+          "scan_type": "table_scan",
+          "scan_target_kind": "table",
+          "base_table": "Events",
+          "full_scan": false,
+          "conditions_complete": true,
+          "has_seek_condition": true,
+          "has_residual_condition": false,
+          "has_timestamp_condition": false,
+          "has_search_condition": false,
+          "seek_conditions": [
+            {
+              "index": 14,
+              "expression": "($Shard = @shard) AND ($CreatedAt \u003e= @start)",
+              "columns": [
+                "CreatedAt",
+                "Shard"
+              ]
+            }
+          ],
+          "residual_conditions": [],
+          "timestamp_conditions": [],
+          "search_conditions": [],
+          "seek_columns": [
+            "CreatedAt",
+            "Shard"
+          ],
+          "residual_columns": [],
+          "seekable_key_size": "2",
+          "range_seekable_key_size": 2,
+          "declared_key_count": 3,
+          "key_columns": [
+            "Shard",
+            "CreatedAt",
+            "Id"
+          ],
+          "stored_columns": [],
+          "null_filtered": null
+        }
+      ],
+      "plan_environment_notes": [
+        "requested optimizer statistics package is not pinned to a fixed value"
+      ]
+    },
+    {
+      "target_id": "write/Remove",
+      "name": "Remove",
+      "catalog": "app",
+      "scope": "write",
+      "kind": "write",
+      "status": "ok",
+      "sql_sha256": "f510e74787e8410310a2dac3fe5d604aeb06a4dc8c1a62d9f45d2c1f40ba11a3",
+      "ddl_sha256": "003d3c185d4dcd19b63119a75c2d3100d39777039ed25487232df309428668da",
+      "operator_tree_sha256": "57e8c6b133ccd208ecdd647b41d68a825430d42b99871de7dfbe241bccff835a",
+      "access_paths": [
+        {
+          "scan_index": 5,
+          "filter_index": 4,
+          "scan_target": "T",
+          "scan_type": "table_scan",
+          "scan_target_kind": "table",
+          "base_table": "T",
+          "full_scan": false,
+          "conditions_complete": true,
+          "has_seek_condition": true,
+          "has_residual_condition": false,
+          "has_timestamp_condition": false,
+          "has_search_condition": false,
+          "seek_conditions": [
+            {
+              "index": 10,
+              "expression": "($Id = @id)",
+              "columns": [
+                "Id"
+              ]
+            }
+          ],
+          "residual_conditions": [],
+          "timestamp_conditions": [],
+          "search_conditions": [],
+          "seek_columns": [
+            "Id"
+          ],
+          "residual_columns": [],
+          "seekable_key_size": "0",
+          "range_seekable_key_size": null,
+          "declared_key_count": 1,
+          "key_columns": [
+            "Id"
+          ],
+          "stored_columns": [],
+          "null_filtered": null
+        }
+      ],
+      "plan_environment_notes": [
+        "requested optimizer statistics package is not pinned to a fixed value"
+      ]
+    }
+  ],
+  "contract_evaluation_mode": "check",
+  "contract_file_version": "v1alpha-plan-contracts",
+  "contract_evaluator_version": "v1",
+  "contract_evaluations": [
+    {
+      "name": "RangeSeek",
+      "query": "Range",
+      "target_id": "query/Range",
+      "scope": "query",
+      "status": "pass",
+      "stability": {
+        "tier": "normalized_operator",
+        "reasons": [
+          "contract uses the normalized plan-report view",
+          "contract reads metadata-derived normalized fields: scan_target",
+          "summary_projection_omits_full_plan_evidence"
+        ],
+        "check_recommended": true,
+        "replayable_from_report": false
+      },
+      "results": [
+        {
+          "rule": "cel",
+          "source": "cel",
+          "expression": "access_paths.exists(p, p.scan_target == \"Events\" \u0026\u0026 \"Shard\" in p.seek_columns \u0026\u0026 \"CreatedAt\" in p.seek_columns)",
+          "status": "pass"
+        }
+      ]
+    }
+  ],
+  "contract_summary": {
+    "status": "pass",
+    "contracts": 1,
+    "passed": 1,
+    "failed": 0,
+    "not_evaluated": 0,
+    "environment_warnings": [
+      "statistics_package_not_pinned",
+      "backend_identity_not_recorded"
+    ]
+  },
+  "warnings": [],
+  "optimizer": {
+    "requested": {
+      "version": "9",
+      "statistics_package": "not_pinned"
+    },
+    "effective": {
+      "version": "not_recorded",
+      "statistics_package": "not_recorded"
+    }
+  }
+}

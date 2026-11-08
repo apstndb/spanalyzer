@@ -1,0 +1,208 @@
+{
+  "version": "",
+  "package": "db",
+  "out": "",
+  "client": "",
+  "schemas": [
+    {
+      "name": "app",
+      "dialect": "spanner",
+      "ddl": "schema.sql",
+      "proto_descriptors": null,
+      "external_schemas": null,
+      "external_query_connections": null,
+      "spanner_external_datasets": null
+    }
+  ],
+  "queries": [
+    {
+      "name": "Optional",
+      "kind": "sql",
+      "catalog": "app",
+      "sql": "SELECT Id FROM T WHERE TRUE /*?optional:id*/ AND Id=@id /*?end*/ /*?optional:value*/ AND Value=@value /*?end*/",
+      "federated": {
+        "connection": "",
+        "spanner_source": "",
+        "inner_sql": "",
+        "outer_sql": ""
+      },
+      "key_prefix": null,
+      "result": "",
+      "result_struct": "OptionalRow",
+      "required": null,
+      "required_policy": "",
+      "params": [
+        {
+          "name": "id",
+          "type": "INT64",
+          "optional": "omit_when_null"
+        },
+        {
+          "name": "value",
+          "type": "STRING",
+          "optional": "omit_when_null"
+        }
+      ],
+      "vet": {
+        "disable": null
+      }
+    },
+    {
+      "name": "Delete",
+      "kind": "sql",
+      "catalog": "app",
+      "sql": "DELETE FROM T WHERE Id=@id",
+      "federated": {
+        "connection": "",
+        "spanner_source": "",
+        "inner_sql": "",
+        "outer_sql": ""
+      },
+      "key_prefix": null,
+      "result": "row_count",
+      "result_struct": "",
+      "required": null,
+      "required_policy": "",
+      "params": [
+        {
+          "name": "id",
+          "type": "INT64"
+        }
+      ],
+      "vet": {
+        "disable": null
+      }
+    },
+    {
+      "name": "UpdateReturning",
+      "kind": "sql",
+      "catalog": "app",
+      "sql": "UPDATE T SET Value=@value WHERE Id=@id THEN RETURN Id",
+      "federated": {
+        "connection": "",
+        "spanner_source": "",
+        "inner_sql": "",
+        "outer_sql": ""
+      },
+      "key_prefix": null,
+      "result": "row_set",
+      "result_struct": "UpdatedRow",
+      "required": null,
+      "required_policy": "",
+      "params": [
+        {
+          "name": "id",
+          "type": "INT64"
+        },
+        {
+          "name": "value",
+          "type": "STRING"
+        }
+      ],
+      "vet": {
+        "disable": null
+      }
+    },
+    {
+      "name": "BadLimit",
+      "kind": "sql",
+      "catalog": "app",
+      "sql": "SELECT Id FROM T LIMIT @limit",
+      "federated": {
+        "connection": "",
+        "spanner_source": "",
+        "inner_sql": "",
+        "outer_sql": ""
+      },
+      "key_prefix": null,
+      "result": "",
+      "result_struct": "BadRow",
+      "required": null,
+      "required_policy": "",
+      "params": [
+        {
+          "name": "limit",
+          "type": "STRING"
+        }
+      ],
+      "vet": {
+        "disable": null
+      }
+    },
+    {
+      "name": "Nested",
+      "kind": "sql",
+      "catalog": "app",
+      "sql": "SELECT item.id FROM UNNEST(@items) AS item",
+      "federated": {
+        "connection": "",
+        "spanner_source": "",
+        "inner_sql": "",
+        "outer_sql": ""
+      },
+      "key_prefix": null,
+      "result": "",
+      "result_struct": "NestedRow",
+      "required": null,
+      "required_policy": "",
+      "params": [
+        {
+          "name": "items",
+          "type": "ARRAY\u003cSTRUCT\u003cid INT64\u003e\u003e"
+        }
+      ],
+      "vet": {
+        "disable": null
+      }
+    },
+    {
+      "name": "Range",
+      "kind": "sql",
+      "catalog": "app",
+      "sql": "SELECT Id FROM Events WHERE Shard=@shard AND CreatedAt\u003e=@start",
+      "federated": {
+        "connection": "",
+        "spanner_source": "",
+        "inner_sql": "",
+        "outer_sql": ""
+      },
+      "key_prefix": null,
+      "result": "",
+      "result_struct": "EventRow",
+      "required": null,
+      "required_policy": "",
+      "params": [
+        {
+          "name": "shard",
+          "type": "INT64"
+        },
+        {
+          "name": "start",
+          "type": "TIMESTAMP"
+        }
+      ],
+      "vet": {
+        "disable": null
+      }
+    }
+  ],
+  "writes": [
+    {
+      "name": "Remove",
+      "catalog": "app",
+      "table": "T",
+      "operation": "delete",
+      "input_struct": "RemoveInput",
+      "keys": null,
+      "insert": {},
+      "update": {},
+      "conflict": {},
+      "methods": [
+        "dml"
+      ],
+      "vet": {
+        "disable": null
+      }
+    }
+  ]
+}

@@ -143,10 +143,12 @@ type Query struct {
 	OperatorEdges         []OperatorEdge
 	AccessPaths           []AccessPath
 	Error                 string
-	OptimizerNotPinned    bool
-	PlanEnvironmentNotes  []string
-	ClassificationNotes   []Diagnostic
-	RawPlan               *spannerpb.QueryPlan
+	// OptimizerNotPinned refers to the requested optimizer version. Statistics
+	// package pinning is diagnosed independently from Report.Optimizer.
+	OptimizerNotPinned   bool
+	PlanEnvironmentNotes []string
+	ClassificationNotes  []Diagnostic
+	RawPlan              *spannerpb.QueryPlan
 }
 
 // Operator is the normalized operator view used by stable predefined contracts.

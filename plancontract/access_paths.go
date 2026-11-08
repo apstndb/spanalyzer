@@ -27,6 +27,7 @@ type ScanTarget struct {
 // ScanCondition retains the immediate condition root and its backend expression.
 // Columns are proven by Reference nodes bound by this scan's output links;
 // unrelated join variables and text that merely resembles a column are omitted.
+// Columns is a sorted, duplicate-free set, not a predicate or key order.
 type ScanCondition struct {
 	Index      int32    `json:"index" yaml:"index"`
 	Expression string   `json:"expression" yaml:"expression"`
@@ -37,6 +38,9 @@ type ScanCondition struct {
 // ConditionsComplete is false when multiple relational children or wrappers
 // prevent an unambiguous pairing. Zero range-key metadata never establishes
 // absence of a seek; HasSeekCondition is derived only from condition links.
+// SeekColumns and ResidualColumns are sorted, duplicate-free sets. KeyColumns
+// preserves declared key order. Test membership in SeekColumns when checking
+// key prefixes; slice equality does not express that relationship.
 type AccessPath struct {
 	ScanIndex             int32           `json:"scan_index" yaml:"scan_index"`
 	FilterIndex           *int32          `json:"filter_index" yaml:"filter_index"`

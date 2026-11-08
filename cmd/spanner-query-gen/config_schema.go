@@ -40,6 +40,7 @@ func runPlanReportSchema(args []string, stdout, stderr io.Writer) error {
 	fs := flag.NewFlagSet("spanner-query-gen plan-report-schema", flag.ContinueOnError)
 	fs.SetOutput(flagOutput(args, stdout, stderr))
 	output := fs.String("output", "json", "schema output format: json or yaml")
+	summary := fs.Bool("summary", false, "emit the schema for plan-report --summary")
 	outPath := fs.String("out", "", "write schema to file instead of stdout; use - for stdout")
 	if err := fs.Parse(args); err != nil {
 		if errors.Is(err, flag.ErrHelp) {
@@ -51,7 +52,11 @@ func runPlanReportSchema(args []string, stdout, stderr io.Writer) error {
 	if fs.NArg() != 0 {
 		return fmt.Errorf("unexpected positional arguments: %v", fs.Args())
 	}
-	data, err := planReportSchemaBytes(*output)
+	schema := planReportJSONSchema()
+	if *summary {
+		schema = planReportSummaryJSONSchema()
+	}
+	data, err := schemaBytes(*output, schema)
 	if err != nil {
 		return err
 	}
@@ -436,7 +441,7 @@ func planReportQueryJSONSchema() map[string]interface{} {
 		"variant":                 map[string]interface{}{"$ref": "#/$defs/variant"},
 		"plan":                    stringSchema("Rendered human-readable query plan."),
 		"error":                   stringSchema("Target acquisition error or skip message."),
-		"optimizer_not_pinned":    boolSchema("Whether this query used unpinned optimizer settings."),
+		"optimizer_not_pinned":    boolSchema("Whether this query's requested optimizer version is unpinned. Statistics-package pinning is reported separately in environment warnings."),
 		"plan_environment_notes":  stringListSchema("Review notes about the plan acquisition environment."),
 		"classification_warnings": arraySchemaAllowEmpty(map[string]interface{}{"$ref": "#/$defs/diagnostic"}),
 	})
@@ -478,6 +483,10 @@ func planReportQuerySuccessOnlyFields() []string {
 }
 
 func planReportContractStabilityJSONSchema() map[string]interface{} {
+	return planReportContractStabilitySchema(true)
+}
+
+func planReportContractStabilitySchema(normalizedReplayable bool) map[string]interface{} {
 	schema := objectSchema([]interface{}{"tier", "reasons", "check_recommended", "replayable_from_report"}, map[string]interface{}{
 		"tier":                   enumSchema([]interface{}{planContractStabilityNormalized, planContractStabilityRawPlan}, "Contract stability tier."),
 		"reasons":                nonEmptyStringListSchema("Why this stability tier was assigned."),
@@ -504,7 +513,7 @@ func planReportContractStabilityJSONSchema() map[string]interface{} {
 			},
 			"then": map[string]interface{}{
 				"properties": map[string]interface{}{
-					"replayable_from_report": map[string]interface{}{"const": true},
+					"replayable_from_report": map[string]interface{}{"const": normalizedReplayable},
 				},
 			},
 		},

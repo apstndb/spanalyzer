@@ -322,6 +322,27 @@ Spanner receives optimizer/operator changes before the next Omni release. It is
 not part of the primary DDL-first generation path and does not provide
 production performance guarantees.
 
+Full JSON/YAML reports retain rendered trees and normalized operator graphs for
+review and normalized-contract replay. The opt-in `--summary` projection skips
+rendering and retains compact target, digest, access-path, environment, and
+contract-result evidence under its own `v1alpha-plan-summary-v1` wire version
+and schema. Contracts evaluate before projection against the same complete
+in-memory evidence; serialized summary evaluations explicitly disable replay.
+The default full format and its replay guarantee remain unchanged.
+
+Postprocessing full JSON would still pay rendering and serialization costs.
+Omitting only the rendered string would retain the large normalized graph.
+Changing the default or relaxing the full schema would silently weaken existing
+consumers' evidence and replay assumptions. A separate summary command would
+duplicate the runtime/configuration surface. One output flag with a distinct
+artifact version avoids those tradeoffs. This optimization does not provide
+streaming collection or SQL redaction.
+
+Optimizer warnings distinguish a requested version pin from a requested
+statistics-package pin. The per-target `optimizer_not_pinned` flag concerns the
+version only; the strict environment gate continues to require both pins.
+Effective optimizer metadata is not inferred from PLAN output or SQL hints.
+
 Plan contracts are intentionally outside the main v1alpha config for now.
 They are an optional extension of `plan-report`, not part of the primary
 DDL-first `generate` / `check` / `vet` workflow. The first experimental shape is

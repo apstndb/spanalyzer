@@ -7,6 +7,7 @@ source evidence, results and unverified boundaries travel with each note.
 
 | Runtime and observation scope | Research Note |
 | --- | --- |
+| Omni r4 LTS.2, 2026-11-08 | [Compact PLAN summaries](plan-summary-omni-lts-20261108.md): full/summary parity, separate pinning warnings, output size and actual JSON/YAML schema checks |
 | Managed Spanner, 2026-11-08 | [Managed revalidation and documentation audit](managed-revalidation-20261108.md): all three new mirror commits, search pagination, queue batch defaults and unchanged catalog surfaces |
 | Emulator 1.5.59 and Omni r4 LTS.2 / r5.1, 2026-11-08 | [Runtime upgrades and compatibility verification](runtime-upgrades-20261108.md): new defaults, explicit r5 selection, expression-index metadata loss and a Remote Function PLAN regression candidate |
 | Omni 2026.r2.1-beta, 2026-11-08 | [Scan-local PLAN contracts and partial collection](plan-report-access-paths-omni-20261108.md): seek/residual evidence, optional targets, structured parameters, annotations and non-executing DML |
