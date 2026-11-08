@@ -3,6 +3,13 @@
 This file documents Spanner DDL features that cannot be fully supported due to
 limitations in memefish (the SQL parser) or the INFORMATION_SCHEMA model.
 
+Known input `ALTER TABLE ... ADD CONSTRAINT` and `ADD ROW DELETION POLICY`
+statements after `CREATE TABLE` are folded into the corresponding table
+metadata. The latter reconstructs as an inline `ROW DELETION POLICY` and rejects
+duplicate additions. Other ALTER operations, including policy REPLACE/DROP,
+remain explicit errors. Silently skipping them would produce an incomplete
+schema while claiming success.
+
 ## Unsupported or AST-only surfaces
 
 These features either lack a corresponding memefish AST node or cannot be

@@ -1,0 +1,15 @@
+{
+  "diagnostics": [
+    {
+      "id": "planning-error",
+      "stage": "planning",
+      "scope": "query",
+      "name": "Bad",
+      "rule": "planning-error",
+      "severity": "error",
+      "message": "query Bad: Values referenced in UNNEST must be arrays. UNNEST contains expression of type INT64 [at 1:22]",
+      "suppressible": false,
+      "suppressed": false
+    }
+  ]
+}

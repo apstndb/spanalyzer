@@ -1,0 +1,44 @@
+{
+  "status": "pass",
+  "baseline_commit": "55262a224d9f40ec5d1882452e1aac6e804e5926",
+  "source_dirty": true,
+  "scope": "Public minimal fixtures only; local GoogleSQL frontend and pinned Emulator, no new managed or Omni execution.",
+  "before": {
+    "cli_log_sha256": "749e0ee5bfdaf60f55c4902d07f5451bbd75b6d765d47fbef9c07023f0c4b18b",
+    "ddl_log_sha256": "6aa6365024ac725fab196c0be15821cf547b8b31edbc66c6f8e6759fd1723590",
+    "observed": "explain-plan returned no later query fields; vet lost later warnings/suppressions; ADD policy was rejected as unsupported ALTER."
+  },
+  "emulator": {
+    "image": "gcr.io/cloud-spanner-emulator/emulator:1.5.59@sha256:969af6a9349948fbfb4a826c18e160e258a4005f7c759f8e7f2dcec369cccba8",
+    "image_identity": "Configured arm64 platform pin, not independent server-version discovery.",
+    "command": "GOWORK=off go test -count=1 -v -timeout=5m ./astconv -run '^TestRowDeletionPolicyAlterReappliesOnEmulator$'",
+    "exit_code": 0,
+    "original_log_sha256": "43b116f78328784252f0e866ff705815e06c103559965210b9f659dc055e0437",
+    "checks": [
+      "Source CREATE plus ALTER accepted",
+      "AST export folds policy into CREATE TABLE",
+      "Live-metadata export retains policy",
+      "Both exports reapply to fresh databases",
+      "Owned runtime closed successfully"
+    ]
+  },
+  "source_sha256": {
+    "cmd/spanner-query-gen/main.go": "91d110a500638cea5aee854f327ab47490bc3320c6bf8bfd1bfca369be656baa",
+    "cmd/spanner-query-gen/inspection_plan.go": "79d8676df0c04c62898e4f64ba53be16cdc39d3ed44bd484137ee157f258a245",
+    "cmd/spanner-query-gen/inspection_feedback_test.go": "f2d09a5394b952b0e41b4d2e0c68fc8c6cba2dd58288db48c49ea02fb1bfdf9b",
+    "survey/astconv/from_ast_alter_table.go": "521609465e99836dd2eb9d3b5de9232bea2e510cbbd0ce94c64cd9d3f0da23c8",
+    "survey/astconv/from_ast_table.go": "db6f840bf0a505b9cd2c46a3a34808783b2e4fb61a734e6846b43db77f951b46",
+    "survey/astconv/row_deletion_alter_test.go": "d3eb90fe7732a15c6d9d405f5d2f3408385f50a344e45e5d28fd132c62a68a37"
+  },
+  "boundary": "Post-run source hashes identify the local implementation and regression files, not a clean-commit execution attestation. Historical feedback observations on other engines are not promoted to current results.",
+  "transformations": [
+    {
+      "artifact": "explain.json",
+      "original_sha256": "1be7746b8ea20f99a7840fdf2349145b520b912bad5e776816c9abf85d551467",
+      "field": "schema_digests[].path",
+      "retained_value": "schema.sql",
+      "reason": "Remove the absolute local public-fixture prefix; SQL, type fields and semantic digests are unchanged."
+    }
+  ],
+  "unit_followup": "Reject VIEW targets instead of silently dropping their policy during export; final astconv short tests and pinned Emulator reapplication both passed."
+}

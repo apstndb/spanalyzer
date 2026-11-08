@@ -1,0 +1,79 @@
+{
+  "status": "partial",
+  "planning_errors": [
+    {
+      "id": "planning-error",
+      "stage": "planning",
+      "scope": "query",
+      "name": "Bad",
+      "rule": "planning-error",
+      "severity": "error",
+      "message": "query Bad: Values referenced in UNNEST must be arrays. UNNEST contains expression of type INT64 [at 1:22]",
+      "suppressible": false,
+      "suppressed": false
+    }
+  ],
+  "plan_version": 1,
+  "generator": {
+    "name": "spanner-query-gen",
+    "version": "0.0.0-dev"
+  },
+  "package": "db",
+  "client": "both",
+  "schema_digests": [
+    {
+      "catalog": "app",
+      "kind": "ddl",
+      "path": "schema.sql",
+      "sha256": "6f9feb016252c251d0e4803aea333e223b9404a0be0d812a14618388ef5871ff"
+    }
+  ],
+  "queries": [
+    {
+      "status": "error",
+      "error": "query Bad: Values referenced in UNNEST must be arrays. UNNEST contains expression of type INT64 [at 1:22]",
+      "name": "Bad",
+      "catalog": "app",
+      "kind": "sql",
+      "result": "many",
+      "sql": "SELECT * FROM UNNEST(1)",
+      "sql_sha256": "",
+      "result_struct": ""
+    },
+    {
+      "status": "ok",
+      "name": "Good",
+      "catalog": "app",
+      "kind": "sql",
+      "result": "many",
+      "sql": "SELECT Id FROM T",
+      "sql_sha256": "8692230a55575a120b4059adc34c6140f7eda154492a82a81ce8c604ea9a27b4",
+      "result_struct": "GoodRow",
+      "constants": [
+        {
+          "name": "Good",
+          "value": "SELECT Id FROM T"
+        }
+      ],
+      "fields": [
+        {
+          "name": "Id",
+          "kind": "INT64",
+          "nullable": true
+        }
+      ]
+    }
+  ],
+  "structs": [
+    {
+      "name": "GoodRow",
+      "fields": [
+        {
+          "name": "Id",
+          "kind": "INT64",
+          "nullable": true
+        }
+      ]
+    }
+  ]
+}

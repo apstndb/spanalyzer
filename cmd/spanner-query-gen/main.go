@@ -137,36 +137,54 @@ func runExplainPlan(args []string, stdout, stderr io.Writer) error {
 	if err != nil {
 		return err
 	}
-	plan, err := querygen.BuildQueryCodegenPlan(config, filepath.Dir(*configPath))
-	if err != nil {
-		return err
-	}
+	inspection := buildInspectionPlan(config, filepath.Dir(*configPath))
+	plan := inspection.Plan
 	if !*audit {
 		makePlanConcise(plan)
 	}
 	if *stable {
 		makePlanStable(plan)
 	}
+	explained := newExplainPlan(plan)
+	explained.PlanningErrors = inspection.Errors
+	if len(inspection.Errors) > 0 {
+		explained.Status = "partial"
+	}
 	switch *output {
 	case "yaml":
-		data, err := marshalYAMLViaJSON(newExplainPlan(plan))
+		data, err := marshalYAMLViaJSON(explained)
 		if err != nil {
 			return err
 		}
-		_, err = stdout.Write(data)
-		return err
+		if _, err = stdout.Write(data); err != nil {
+			return err
+		}
 	case "json":
-		data, err := marshalIndentedJSON(newExplainPlan(plan))
+		data, err := marshalIndentedJSON(explained)
 		if err != nil {
 			return err
 		}
-		_, err = stdout.Write(data)
-		return err
+		if _, err = stdout.Write(data); err != nil {
+			return err
+		}
 	case "summary":
-		return writePlanSummary(stdout, plan)
+		for _, diagnostic := range inspection.Errors {
+			if diagnostic.Scope != "query" {
+				if _, err := fmt.Fprintf(stdout, "Error: %s %s: %s\n", diagnostic.Scope, diagnostic.Name, diagnostic.Message); err != nil {
+					return err
+				}
+			}
+		}
+		if err := writePlanSummary(stdout, plan); err != nil {
+			return err
+		}
 	default:
 		return fmt.Errorf("unsupported --output %q", *output)
 	}
+	if inspection.cause != nil {
+		return silentExitError{err: inspection.cause}
+	}
+	return nil
 }
 
 func makePlanConcise(plan *querygen.QueryCodegenPlan) {
@@ -197,6 +215,8 @@ func makePlanStable(plan *querygen.QueryCodegenPlan) {
 }
 
 type explainPlan struct {
+	Status          string                             `json:"status" yaml:"status"`
+	PlanningErrors  []vetDiagnostic                    `json:"planning_errors,omitempty" yaml:"planning_errors,omitempty"`
 	PlanVersion     int                                `json:"plan_version" yaml:"plan_version"`
 	Generator       querygen.QueryCodegenPlanGenerator `json:"generator" yaml:"generator"`
 	Package         string                             `json:"package,omitempty" yaml:"package,omitempty"`
@@ -252,6 +272,8 @@ type explainCatalogBindingProjection struct {
 }
 
 type explainPlanQuery struct {
+	Status          string                                    `json:"status" yaml:"status"`
+	Error           string                                    `json:"error,omitempty" yaml:"error,omitempty"`
 	Name            string                                    `json:"name" yaml:"name"`
 	Catalog         string                                    `json:"catalog" yaml:"catalog"`
 	Kind            string                                    `json:"kind" yaml:"kind"`
@@ -289,6 +311,7 @@ func newExplainPlan(plan *querygen.QueryCodegenPlan) explainPlan {
 		return explainPlan{}
 	}
 	out := explainPlan{
+		Status:        "ok",
 		PlanVersion:   plan.PlanVersion,
 		Generator:     plan.Generator,
 		Package:       plan.Package,
@@ -359,6 +382,7 @@ func newExplainCatalogBinding(binding spanalyzer.BigQuerySpannerExternalDatasetB
 
 func newExplainPlanQuery(query querygen.QueryCodegenPlanQuery) explainPlanQuery {
 	out := explainPlanQuery{
+		Status:          "ok",
 		Name:            query.Name,
 		Catalog:         query.Catalog,
 		Kind:            query.Kind,
@@ -372,6 +396,10 @@ func newExplainPlanQuery(query querygen.QueryCodegenPlanQuery) explainPlanQuery 
 		VetSuppressions: append([]querygen.QueryCodegenPlanVetSuppression(nil), query.VetSuppressions...),
 		Warnings:        append([]querygen.QueryCodegenPlanWarning(nil), query.Warnings...),
 		Fields:          append([]querygen.QueryCodegenPlanField(nil), query.Fields...),
+	}
+	if query.PlanningError != "" {
+		out.Status, out.Error = "error", query.PlanningError
+		out.Fields = nil
 	}
 	if query.StarExpansion != nil {
 		out.StarExpansion = &explainPlanStarExpansion{
@@ -464,6 +492,10 @@ func writePlanSummary(w io.Writer, plan *querygen.QueryCodegenPlan) error {
 		}
 		appendSummaryf(&b, "Query: %s (%s, result: %s, catalog: %s)\n", query.Name, query.Kind, query.Result, query.Catalog)
 		appendSummaryf(&b, "  SQL: %s\n", query.SQL)
+		if query.PlanningError != "" {
+			appendSummaryf(&b, "  Error: %s\n", query.PlanningError)
+			continue
+		}
 		if len(query.Params) > 0 {
 			b.WriteString("  Params:\n")
 			for _, param := range query.Params {
@@ -570,14 +602,15 @@ func runVet(args []string, stdout, stderr io.Writer) error {
 		}
 		return err
 	}
-	plan, err := querygen.BuildQueryCodegenPlan(config, filepath.Dir(*configPath))
-	if err != nil {
-		if isMachineVetOutput(*output) {
-			return writeVetFailureReport(stdout, *output, vetDiagnosticFromError(err), err)
+	inspection := buildInspectionPlan(config, filepath.Dir(*configPath))
+	report := vetReportFromPlan(inspection.Plan)
+	report.Diagnostics = append(inspection.Errors, report.Diagnostics...)
+	if inspection.cause != nil {
+		if err := writeVetReportOutput(stdout, stderr, *output, report); err != nil {
+			return err
 		}
-		return err
+		return silentExitError{err: inspection.cause}
 	}
-	report := vetReportFromPlan(plan)
 	return writeVetReport(stdout, stderr, *output, report)
 }
 
@@ -813,6 +846,13 @@ func reportHasUnsuppressedErrors(report vetReport) bool {
 }
 
 func writeVetReportText(w io.Writer, report vetReport) error {
+	for _, diagnostic := range report.Diagnostics {
+		if diagnostic.Severity == "error" && !diagnostic.Suppressible && !diagnostic.Suppressed {
+			if _, err := fmt.Fprintf(w, "error: %s %s: %s: %s\n", diagnostic.Scope, diagnostic.Name, diagnostic.Rule, diagnostic.Message); err != nil {
+				return err
+			}
+		}
+	}
 	for _, warning := range report.Warnings {
 		severity := warning.Severity
 		if severity == "" {

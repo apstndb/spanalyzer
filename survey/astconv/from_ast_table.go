@@ -57,8 +57,10 @@ func fromCreateTable(s *Schema, ct *ast.CreateTable) error {
 
 	// Row deletion policy
 	if ct.RowDeletionPolicy != nil {
-		rdp := ct.RowDeletionPolicy.RowDeletionPolicy
-		expr := fmt.Sprintf("OLDER_THAN(%s, INTERVAL %s DAY)", rdp.ColumnName.SQL(), rdp.NumDays.SQL())
+		expr, err := rowDeletionPolicyExpression(ct.RowDeletionPolicy.RowDeletionPolicy)
+		if err != nil {
+			return fmt.Errorf("table %s: %w", tableDisplayName(tableSchema, tableName), err)
+		}
 		t.RowDeletionPolicyExpression = new(expr)
 	}
 
@@ -190,6 +192,13 @@ func fromCreateTable(s *Schema, ct *ast.CreateTable) error {
 	}
 
 	return nil
+}
+
+func rowDeletionPolicyExpression(policy *ast.RowDeletionPolicy) (string, error) {
+	if policy == nil || policy.ColumnName == nil || policy.NumDays == nil {
+		return "", fmt.Errorf("row deletion policy requires a column and interval")
+	}
+	return fmt.Sprintf("OLDER_THAN(%s, INTERVAL %s DAY)", policy.ColumnName.SQL(), policy.NumDays.SQL()), nil
 }
 
 func fromTableConstraint(

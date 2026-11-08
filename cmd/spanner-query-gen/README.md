@@ -112,7 +112,17 @@ Spanner mutations and DML statements. The explicit
 surface and are rejected in v1alpha.
 
 `explain-plan` prints the resolved generation plan as YAML, JSON, or a human
-summary. The default machine-readable plan omits heavy audit-only projection
+summary. It continues after individual query/write planning errors, retaining
+later result fields and reporting failures in `planning_errors`. Structured
+output has top-level `status: ok | partial` and query `status: ok | error`; an
+error query includes `error` and no result fields. For a failed target, only
+its input identity and error are reliable. A partial plan can omit unavailable
+package, catalog, struct or write metadata; independent plan-wide failures are
+also recorded instead of being silently ignored. The command writes the report
+before returning nonzero for any planning error. Config parse errors remain
+fatal. `generate` and `check` continue to require a fully valid generation plan.
+
+The default machine-readable plan omits heavy audit-only projection
 matrix rows. Use `--audit` to include those rows, and `--stable` to omit
 volatile audit fields such as verification timestamps from snapshot-oriented
 output. In v1alpha, `--stable` keeps semantic fields and removes volatile audit
@@ -202,9 +212,13 @@ fields are reliable when present; plan normalization fields are absent and are
 not successful plan evidence.
 
 `vet` validates the same plan without rendering code. Text output writes
-warning and suppression summaries to stderr and keeps stdout empty.
+error, warning and suppression summaries to stderr and keeps stdout empty.
 Machine-readable JSON/YAML output writes reports to stdout and keeps stderr
 empty unless there is a fatal CLI error.
+Planning errors are unsuppressible diagnostics scoped to the affected query or
+write, while independent package/catalog failures retain plan scope. A failed
+target does not discard later warnings or suppressions. The report is written
+before a nonzero exit; successful partial targets do not make generation valid.
 
 `config-schema` prints a JSON Schema for the public v1alpha YAML config. It is
 intended for review, editor integration, and CI checks outside this command.

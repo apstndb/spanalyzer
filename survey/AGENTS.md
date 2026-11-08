@@ -19,7 +19,10 @@ and converted back to DDL via `astconv`.
 Scope is bounded by what `GetDatabaseDdl` (`gcloud spanner databases ddl describe`) emits:
 primarily `CREATE` statements, `GRANT`, and `ALTER DATABASE`. Managed
 Spanner can also retain `ALTER TABLE ... ADD CONSTRAINT`; AST-to-schema conversion folds its
-check or foreign-key constraint into the target table metadata. Whether
+check or foreign-key constraint into the target table metadata. Input
+`ALTER TABLE ... ADD ROW DELETION POLICY` after a table's creation is also folded
+into the same metadata as an inline policy; missing targets and duplicate
+policies fail closed. Whether
 `GetDatabaseDdl` retains `ALTER STATISTICS` pins is unconfirmed. Other `ALTER` operations and
 all `DROP`/`RENAME` statements are intentionally out of scope. Items that cannot be expressed
 (no memefish AST node, or INFORMATION_SCHEMA loses information) are tracked in

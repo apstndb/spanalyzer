@@ -1,0 +1,34 @@
+{
+  "status": "pass",
+  "scope": "Actual standalone CLI process and local GoogleSQL frontend only; no service calls.",
+  "checks": [
+    {
+      "command": "explain-plan",
+      "output": "json",
+      "exit_code": 1,
+      "stdout_bytes": 1923,
+      "stderr_bytes": 0
+    },
+    {
+      "command": "explain-plan",
+      "output": "summary",
+      "exit_code": 1,
+      "stdout_bytes": 295,
+      "stderr_bytes": 0
+    },
+    {
+      "command": "vet",
+      "output": "json",
+      "exit_code": 1,
+      "stdout_bytes": 381,
+      "stderr_bytes": 0
+    },
+    {
+      "command": "generate",
+      "output": null,
+      "exit_code": 1,
+      "stdout_bytes": 0,
+      "stderr_bytes": 113
+    }
+  ]
+}
