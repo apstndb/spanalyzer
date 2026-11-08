@@ -147,12 +147,18 @@ func (s *Schema) toTablesDDL() ([]ast.DDL, error) {
 
 	var ddls []ast.DDL
 	for _, t := range tables {
-		// Skip non-BASE TABLE (views are handled separately)
-		if t.TableType != "BASE TABLE" {
-			continue
-		}
 		// Skip only schemas managed by Spanner.
 		if isSystemSchemaName(t.TableSchema) {
+			continue
+		}
+		// Queues are user DDL, not views. Until CREATE QUEUE has an AST and
+		// conversion path, fail rather than silently losing the queue and its
+		// generated TVFs. See UNSUPPORTED_DDL.md (Spanner queues).
+		if t.TableType == "QUEUE" {
+			return nil, fmt.Errorf("unsupported queue %q: CREATE QUEUE reconstruction is not supported by the current memefish AST and converter", tableDisplayName(t.TableSchema, t.TableName))
+		}
+		// Views are handled separately.
+		if t.TableType != "BASE TABLE" {
 			continue
 		}
 

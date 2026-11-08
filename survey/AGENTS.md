@@ -212,7 +212,8 @@ observation is deliberately retained.
   including optionless groups. Option values retain their expression text rather
   than being quoted a second time on regeneration.
 
-- **Unsupported surfaces fail closed.** Model grants lack a memefish AST node.
+- **Unsupported surfaces fail closed.** User queues and model grants lack a
+  supported memefish AST/conversion path and return explicit errors.
   Named-schema tables, non-interleaved regular/search indexes, views, sequences,
   scalar functions, and path-backed grant targets are supported; DDL families
   or clauses whose AST still exposes only an unqualified identifier remain
