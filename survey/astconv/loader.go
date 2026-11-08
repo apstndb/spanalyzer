@@ -155,13 +155,16 @@ func compatibilityFlagCandidates(table string, discovered infoschem.DiscoveredCo
 	return candidates
 }
 
-// SelectAll may append rows before returning an error. Keep failed attempts
-// out of the schema so a compatibility retry cannot duplicate partial rows.
-func selectSchemaRowsAtomically(rows interface {
+// schemaRowIterator matches the iterator contract consumed by SDK SelectAll.
+type schemaRowIterator interface {
 	Next() (*spanner.Row, error)
 	Do(func(*spanner.Row) error) error
 	Stop()
-}, dest any) error {
+}
+
+// SelectAll may append rows before returning an error. Keep failed attempts
+// out of the schema so a compatibility retry cannot duplicate partial rows.
+func selectSchemaRowsAtomically(rows schemaRowIterator, dest any) error {
 	value := reflect.ValueOf(dest)
 	if !value.IsValid() || value.Kind() != reflect.Pointer || value.IsNil() || value.Elem().Kind() != reflect.Slice {
 		return fmt.Errorf("schema destination must be a non-nil pointer to slice")
