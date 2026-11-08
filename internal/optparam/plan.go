@@ -21,7 +21,8 @@ type PlanQueryVariant struct {
 	SQLSHA256 string `json:"sql_sha256" yaml:"sql_sha256"`
 	// PresentParams lists the OmitWhenNull params kept in this variant.
 	PresentParams []string `json:"present_params,omitempty" yaml:"present_params,omitempty"`
-	// AbsentParams lists the OmitWhenNull params dropped in this variant.
+	// AbsentParams lists bindings dropped in this variant, including unused
+	// required bindings when a SQL choice selects a different fragment.
 	AbsentParams []string `json:"absent_params,omitempty" yaml:"absent_params,omitempty"`
 }
 

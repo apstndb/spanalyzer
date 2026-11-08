@@ -404,6 +404,35 @@ of adding suffixes that silently change the caller API. DTO tag values use Go
 string escaping; a tag containing a backtick uses an interpreted literal so
 the SDK receives the exact original column name.
 
+Closed arbitrary SQL alternatives use a distinct `sql_choice` mode and a
+`/*?choice:NAME*/ ... /*?end*/` marker on `kind: sql` Spanner queries. It shares
+choice enumeration, row-type verification and generated closed switches with
+`orderby_choice` while preserving that mode's ORDER BY meaning. A correlated
+range is one three-way selector (both/start/end), not two independent nullable
+axes; a closed column predicate can be another independent selector. Defaults
+select declared candidates only. Every concrete statement must analyze to the
+same row type, and the existing 4,096-variant limit applies.
+
+Bind references are lexed from each complete candidate statement at generation
+time, excluding quoted text and comments. Choice selectors are never bindings. Required value params may be
+used by only some candidates; generated builders and per-variant PLAN inputs
+omit unused values. Generated pruning dispatches by the verified variant label
+and groups identical omitted-binding sets. Fragment-local used-bind maps were
+rejected because a line comment can cross a fragment boundary and hide a later
+binding. Repeated markers still contribute one selector or presence axis to
+the label. This does not require a runtime parser. Nullable omission
+gates remain independent blocks; choice fragments require ordinary required
+bindings so two mechanisms do not compete to decide a value's presence.
+
+Separate named queries were considered and remain appropriate for different
+row shapes, but duplicate shared text and caller dispatch for same-type closed
+branches. A presence-constraint DSL would exclude invalid Cartesian points
+without naturally expressing column choice. Broadening `orderby_choice`
+would obscure an existing contract. Open SQL holes or a runtime AST factory
+cannot promise finite coverage or a uniform row shape without another
+contract, so they remain outside this preview. `null_is_null` retains NULL
+matching; omission modes remove predicates. These are separate semantics.
+
 The CLI and developer tools pin root/library dependencies to immutable published
 revisions that contain the APIs they use. Local workspace replacements and
 filesystem `replace` directives were rejected as standalone-build fixes because

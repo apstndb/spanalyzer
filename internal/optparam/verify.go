@@ -44,10 +44,10 @@ func VerifyVariants(ddlPath, ddlSQL, sql string, params []Param) (*VerifyResult,
 			return nil, fmt.Errorf("variant %s: build analyzer: %w", v.Key(), err)
 		}
 		for _, p := range params {
-			// ModeOrderByChoice never reaches the analyzer as a query
+			// Choice selectors never reach the analyzer as query
 			// parameter: the choice is resolved into a literal SQL
 			// fragment at codegen time.
-			if p.Mode == ModeOrderByChoice {
+			if p.Mode == ModeOrderByChoice || p.Mode == ModeSQLChoice {
 				continue
 			}
 			spec, err := spanalyzer.ParseTypeSpec("param", p.Type)

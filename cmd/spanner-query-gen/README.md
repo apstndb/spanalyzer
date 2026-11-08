@@ -511,6 +511,57 @@ go run ./cmd/spanner-query-gen plan-report \
 - Contract evaluation mode: `none`
 - Included targets: `1`
 
+## Closed SQL choices
+
+For `kind: sql` Spanner queries, `optional: sql_choice` selects exactly one
+configured fragment at each `/*?choice:NAME*/ ... /*?end*/` marker. Every
+concrete statement is analyzed and must have the same result row type. This
+is part of the mutable `v1alpha` preview.
+
+For a query with `Shard = @shard`, the following range selector permits exactly
+three branches, without inventing a branch that has neither bound:
+
+```yaml
+sql: |
+  SELECT Id FROM Events WHERE Shard = @shard
+  /*?choice:bounds*/ AND CreatedAt BETWEEN @start AND @end /*?end*/
+params:
+- {name: shard, type: INT64}
+- {name: start, type: TIMESTAMP}
+- {name: end, type: TIMESTAMP}
+- name: bounds
+  type: STRING
+  optional: sql_choice
+  default: both
+  choices:
+    both: " AND CreatedAt BETWEEN @start AND @end"
+    start: " AND CreatedAt >= @start"
+    end: " AND CreatedAt <= @end"
+```
+
+The generated params struct has a string `Bounds` selector and `time.Time`
+values for `Start` and `End`. An empty selector uses `default`; an unknown key
+panics, matching the existing closed `orderby_choice` builder behavior. Only
+the selected branch's real bind parameters enter the statement. Selectors
+never become Spanner bind parameters. Bind names in comments and quoted text
+are ignored. Values in choice fragments must be declared as required params;
+the selector determines which values apply.
+
+A second independent selector can choose `AND Active = "1"` or
+`AND Pending = "1"`, producing six statements with the range selector. Put
+correlated decisions into one selector rather than declaring independent
+axes. Independent `omit_when_null` and `omit_when_empty` blocks still compose
+with choices; the total is limited to 4,096 variants. Plan reports retain each
+choice assignment, SQL digest and omitted binding list.
+
+`null_is_null` retains a predicate and compares NULL safely. Use
+`omit_when_null` to remove that predicate when no value is supplied. SQL choice
+does not change either meaning, and `orderby_choice` remains available for
+closed ORDER BY clauses. Open runtime ORDER BY expressions, table names,
+projection lists and INSERT columns need an explicit finite allowlist before
+they can be verified this way. Use separate named queries when row types
+differ. Row-count DML and BigQuery optional variants remain unsupported.
+
 ## GetLiteral
 
 - Target ID: `query/GetLiteral`

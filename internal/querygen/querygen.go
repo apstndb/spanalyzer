@@ -126,13 +126,13 @@ type QueryCodegenParam struct {
 	// internal/optparam for the full data model.
 	//
 	// Supported values: "required", "null_is_null", "omit_when_null",
-	// "omit_when_empty", "orderby_choice".
+	// "omit_when_empty", "orderby_choice", "sql_choice".
 	Optional string `json:"optional,omitempty" yaml:"optional,omitempty"`
-	// Choices is the allowlist of ORDER BY clauses for an
-	// orderby_choice param, keyed by the runtime choice key.
+	// Choices is the allowlist of SQL fragments for a choice selector,
+	// keyed by the runtime choice key. orderby_choice uses ORDER BY clauses.
 	Choices map[string]string `json:"choices,omitempty" yaml:"choices,omitempty"`
 	// Default is the choice key used when the runtime caller does not
-	// specify one. Required for orderby_choice; must match a key in
+	// specify one. Required for choice selectors; must match a key in
 	// Choices.
 	Default string `json:"default,omitempty" yaml:"default,omitempty"`
 }
@@ -228,8 +228,8 @@ type QueryCodegenPlanQuery struct {
 	// Variants is the per-shape plan-contract entry produced by
 	// optparam.BuildPlanVariants. It is populated only for queries
 	// that use one or more optional markers. The top-level SQL /
-	// SQLSHA256 fields stay populated with the all-on variant so
-	// existing consumers continue to work.
+	// SQLSHA256 fields retain the most-present representative (alphabetical
+	// label breaks ties), so existing single-SQL consumers continue to work.
 	Variants []QueryCodegenPlanQueryVariant `json:"variants,omitempty" yaml:"variants,omitempty"`
 }
 
@@ -1309,6 +1309,9 @@ func validateQueryCodegenParams(query QueryCodegenQuery) error {
 		if param.Name == "" {
 			return fmt.Errorf("query %s: param name is required", query.Name)
 		}
+		if strings.EqualFold(strings.TrimSpace(param.Optional), "sql_choice") && queryKind(query) != "sql" {
+			return fmt.Errorf("query %s param %s: sql_choice requires kind: sql", query.Name, param.Name)
+		}
 		scope := strings.ToLower(strings.TrimSpace(param.Scope))
 		switch scope {
 		case "", "inner", "outer":
@@ -1350,26 +1353,26 @@ func validateQueryCodegenOptionalParam(queryName string, param QueryCodegenParam
 	switch mode {
 	case "", "required":
 		if len(param.Choices) > 0 {
-			return fmt.Errorf("query %s param %s: choices is only valid for optional: orderby_choice", queryName, param.Name)
+			return fmt.Errorf("query %s param %s: choices is only valid for optional: orderby_choice or sql_choice", queryName, param.Name)
 		}
 		if param.Default != "" {
-			return fmt.Errorf("query %s param %s: default is only valid for optional: orderby_choice", queryName, param.Name)
+			return fmt.Errorf("query %s param %s: default is only valid for optional: orderby_choice or sql_choice", queryName, param.Name)
 		}
 		return nil
 	case "null_is_null", "omit_when_null", "omit_when_empty":
 		if len(param.Choices) > 0 {
-			return fmt.Errorf("query %s param %s: choices is only valid for optional: orderby_choice", queryName, param.Name)
+			return fmt.Errorf("query %s param %s: choices is only valid for optional: orderby_choice or sql_choice", queryName, param.Name)
 		}
 		if param.Default != "" {
-			return fmt.Errorf("query %s param %s: default is only valid for optional: orderby_choice", queryName, param.Name)
+			return fmt.Errorf("query %s param %s: default is only valid for optional: orderby_choice or sql_choice", queryName, param.Name)
 		}
 		return nil
-	case "orderby_choice":
+	case "orderby_choice", "sql_choice":
 		if len(param.Choices) == 0 {
-			return fmt.Errorf("query %s param %s: optional: orderby_choice requires choices", queryName, param.Name)
+			return fmt.Errorf("query %s param %s: optional: %s requires choices", queryName, param.Name, mode)
 		}
 		if param.Default == "" {
-			return fmt.Errorf("query %s param %s: optional: orderby_choice requires default", queryName, param.Name)
+			return fmt.Errorf("query %s param %s: optional: %s requires default", queryName, param.Name, mode)
 		}
 		for key := range param.Choices {
 			if !optionalChoiceKeyPattern.MatchString(key) {
@@ -1384,7 +1387,7 @@ func validateQueryCodegenOptionalParam(queryName string, param QueryCodegenParam
 		}
 		return nil
 	default:
-		return fmt.Errorf("query %s param %s: unsupported optional %q; use required, null_is_null, omit_when_null, omit_when_empty, or orderby_choice", queryName, param.Name, param.Optional)
+		return fmt.Errorf("query %s param %s: unsupported optional %q; use required, null_is_null, omit_when_null, omit_when_empty, orderby_choice, or sql_choice", queryName, param.Name, param.Optional)
 	}
 }
 
@@ -1674,7 +1677,7 @@ func queryOptionalMode(optionalModes map[string]string, paramName string) string
 func queryHasOptionalMarkers(query QueryCodegenQuery) bool {
 	for _, p := range query.Params {
 		switch strings.ToLower(strings.TrimSpace(p.Optional)) {
-		case "null_is_null", "omit_when_null", "omit_when_empty", "orderby_choice":
+		case "null_is_null", "omit_when_null", "omit_when_empty", "orderby_choice", "sql_choice":
 			return true
 		}
 	}

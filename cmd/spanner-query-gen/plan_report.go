@@ -958,9 +958,10 @@ func planReportParamValues(params []querygen.QueryCodegenParam) (map[string]inte
 	}
 	values := make(map[string]interface{}, len(params))
 	for _, param := range params {
-		// orderby_choice is resolved into a literal SQL fragment during
-		// generation and never becomes a Spanner bind parameter.
-		if strings.EqualFold(strings.TrimSpace(param.Optional), "orderby_choice") {
+		// Choice selectors are resolved into SQL fragments during generation
+		// and never become Spanner bind parameters.
+		switch strings.ToLower(strings.TrimSpace(param.Optional)) {
+		case "orderby_choice", "sql_choice":
 			continue
 		}
 		spec, err := spanalyzer.ParseTypeSpec("param", param.Type)

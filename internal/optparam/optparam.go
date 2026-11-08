@@ -5,7 +5,7 @@
 // variant enumeration, and runtime builder generation remain reusable and easy
 // to test apart from the v1alpha config shape.
 //
-// Four optional shapes are modeled by per-segment markers in the SQL
+// Optional shapes are modeled by per-segment markers in the SQL
 // template:
 //
 //   - ModeRequired: parameter is always supplied; no SQL variation.
@@ -27,6 +27,11 @@
 //   - ModeOrderByChoice (marker /*?orderby:NAME*/ <default> /*?end*/):
 //     the body of the marker is replaced wholesale by one of the
 //     declared Choices. Multiplies the variant count by len(Choices).
+//
+//   - ModeSQLChoice (marker /*?choice:NAME*/ <default> /*?end*/):
+//     substitutes one declared SQL fragment, including correlated predicates
+//     or a column selection. Only bindings referenced by the selected SQL
+//     are supplied. Choices must all produce the same result row type.
 //
 // EnumerateVariants takes the Cartesian product across every kind of
 // segment. VerifyVariants confirms every product point analyzes to the
@@ -60,6 +65,7 @@ const (
 	ModeOmitWhenNull
 	ModeOmitWhenEmpty
 	ModeOrderByChoice
+	ModeSQLChoice
 )
 
 func (m Mode) String() string {
@@ -74,6 +80,8 @@ func (m Mode) String() string {
 		return "omit_when_empty"
 	case ModeOrderByChoice:
 		return "orderby_choice"
+	case ModeSQLChoice:
+		return "sql_choice"
 	default:
 		return fmt.Sprintf("mode(%d)", int(m))
 	}
@@ -83,12 +91,12 @@ func (m Mode) String() string {
 type Param struct {
 	Name string
 	// Type is the GoogleSQL type spec, e.g. "STRING", "INT64",
-	// "ARRAY<STRING>". For ModeOrderByChoice this is ignored.
+	// "ARRAY<STRING>". For choice selectors this is ignored.
 	Type string
 	Mode Mode
-	// Choices is the set of allowed ORDER BY clauses for an
-	// ModeOrderByChoice param, keyed by an identifier the runtime
-	// caller selects. Each value is a full ORDER BY ... clause.
+	// Choices is the set of allowed fragments for a choice selector,
+	// keyed by the identifier the runtime caller selects. ModeOrderByChoice
+	// values are full ORDER BY clauses; ModeSQLChoice values are SQL fragments.
 	Choices map[string]string
 	// Default is the choice key used when the caller does not specify
 	// one. Must match a key in Choices.
@@ -109,6 +117,8 @@ const (
 	// choice string. Text holds the default-choice body (used when
 	// the SQL is interpreted without the framework).
 	SegOrderByChoice
+	// SegSQLChoice substitutes a closed SQL fragment and tracks its bindings.
+	SegSQLChoice
 )
 
 // Segment is the unit of the parsed SQL template. The template is a flat
@@ -121,10 +131,10 @@ type Segment struct {
 	// Param is the parameter that gates or selects the segment. Empty
 	// for SegFixed.
 	Param string
-	// Choices is populated for SegOrderByChoice with the same map as
+	// Choices is populated for choice segments with the same map as
 	// Param.Choices, snapshotted at parse time.
 	Choices map[string]string
-	// Default is populated for SegOrderByChoice with the default choice
+	// Default is populated for choice segments with the default choice
 	// key.
 	Default string
 }
@@ -134,10 +144,11 @@ type Variant struct {
 	SQL string
 	// PresentParams names omit/empty params whose block is kept.
 	PresentParams []string
-	// AbsentParams names omit/empty params whose block is removed.
+	// AbsentParams names omit/empty params whose block is removed. For templates
+	// with SQL choices it includes every real bind not referenced by this SQL.
 	AbsentParams []string
 	// ChoiceAssignments records the choice picked for each
-	// ModeOrderByChoice param, keyed by param name.
+	// choice selector, keyed by param name.
 	ChoiceAssignments map[string]string
 }
 
@@ -155,7 +166,7 @@ func (v Variant) Key() string {
 }
 
 var markerRegexp = regexp.MustCompile(
-	`(?s)/\*\?(optional|empty|null_is_null|orderby):([A-Za-z_][A-Za-z0-9_]*)\*/(.*?)/\*\?end\*/`)
+	`(?s)/\*\?(optional|empty|null_is_null|orderby|choice):([A-Za-z_][A-Za-z0-9_]*)\*/(.*?)/\*\?end\*/`)
 
 // SegmentTemplate splits sql at every recognized marker pair, validating
 // each block against params. The returned slice preserves source order.
@@ -199,15 +210,15 @@ func SegmentTemplate(sql string, params []Param) ([]Segment, error) {
 		switch segKind {
 		case SegOmitWhenNull, SegOmitWhenEmpty:
 			seg.Text = body
-		case SegOrderByChoice:
+		case SegOrderByChoice, SegSQLChoice:
 			if len(p.Choices) == 0 {
-				return nil, fmt.Errorf("param %q (orderby): Choices is empty", name)
+				return nil, fmt.Errorf("param %q (%s): Choices is empty", name, markerKind)
 			}
 			if p.Default == "" {
-				return nil, fmt.Errorf("param %q (orderby): Default is required", name)
+				return nil, fmt.Errorf("param %q (%s): Default is required", name, markerKind)
 			}
 			if _, ok := p.Choices[p.Default]; !ok {
-				return nil, fmt.Errorf("param %q (orderby): Default %q is not in Choices", name, p.Default)
+				return nil, fmt.Errorf("param %q (%s): Default %q is not in Choices", name, markerKind, p.Default)
 			}
 			seg.Text = body
 			seg.Choices = maps.Clone(p.Choices)
@@ -231,7 +242,7 @@ func SegmentTemplate(sql string, params []Param) ([]Segment, error) {
 
 	for _, p := range params {
 		switch p.Mode {
-		case ModeOmitWhenNull, ModeOmitWhenEmpty, ModeOrderByChoice:
+		case ModeOmitWhenNull, ModeOmitWhenEmpty, ModeOrderByChoice, ModeSQLChoice:
 			// These modes change the SQL string at codegen time, so the
 			// template must contain the marker for us to know where to
 			// gate or substitute.
@@ -243,6 +254,11 @@ func SegmentTemplate(sql string, params []Param) ([]Segment, error) {
 			// marker (kind: sql) the body is rewritten in place; without
 			// one (kind: index, kind: table) the rewrite was already
 			// emitted by the SQL generator.
+		}
+	}
+	if hasSQLChoice(segments) {
+		if err := validateSQLChoiceBindings(segments, params); err != nil {
+			return nil, err
 		}
 	}
 	return segments, nil
@@ -258,6 +274,8 @@ func markerExpectedMode(markerKind string) (Mode, SegmentKind, error) {
 		return ModeNullIsNull, SegFixed, nil
 	case "orderby":
 		return ModeOrderByChoice, SegOrderByChoice, nil
+	case "choice":
+		return ModeSQLChoice, SegSQLChoice, nil
 	default:
 		return ModeRequired, SegFixed, fmt.Errorf("unknown marker kind %q", markerKind)
 	}
@@ -308,10 +326,10 @@ func lexSQLFragment(body string) ([]token.Token, error) {
 	var tokens []token.Token
 	for {
 		if err := lexer.NextToken(); err != nil {
-			return nil, fmt.Errorf("null_is_null body: %w", err)
+			return nil, fmt.Errorf("SQL fragment: %w", err)
 		}
 		if lexer.Token.Kind == token.TokenBad {
-			return nil, fmt.Errorf("null_is_null body: invalid SQL token at %d", lexer.Token.Pos)
+			return nil, fmt.Errorf("SQL fragment: invalid SQL token at %d", lexer.Token.Pos)
 		}
 		if lexer.Token.Kind == token.TokenEOF {
 			return tokens, nil
@@ -365,7 +383,7 @@ func ComposeVariant(segments []Segment, p Presence) string {
 			if p.Present[s.Param] {
 				b.WriteString(s.Text)
 			}
-		case SegOrderByChoice:
+		case SegOrderByChoice, SegSQLChoice:
 			key := p.Choices[s.Param]
 			if key == "" {
 				key = s.Default
@@ -383,6 +401,10 @@ func EnumerateVariants(sql string, params []Param) ([]Variant, error) {
 	if err != nil {
 		return nil, err
 	}
+	return enumerateSegmentVariants(segments, params)
+}
+
+func enumerateSegmentVariants(segments []Segment, params []Param) ([]Variant, error) {
 	gateable, choiceable := segmentAxes(segments)
 
 	// Two-dimensional Cartesian product: 2^k presence combinations ×
@@ -395,7 +417,7 @@ func EnumerateVariants(sql string, params []Param) ([]Variant, error) {
 	for _, name := range choiceable {
 		var seg *Segment
 		for i := range segments {
-			if segments[i].Kind == SegOrderByChoice && segments[i].Param == name {
+			if (segments[i].Kind == SegOrderByChoice || segments[i].Kind == SegSQLChoice) && segments[i].Param == name {
 				seg = &segments[i]
 				break
 			}
@@ -455,6 +477,23 @@ func EnumerateVariants(sql string, params []Param) ([]Variant, error) {
 					v.AbsentParams = append(v.AbsentParams, name)
 				}
 			}
+			if hasSQLChoice(segments) {
+				bound, err := bindingNames(v.SQL, params)
+				if err != nil {
+					return nil, fmt.Errorf("variant %s: %w", v.Key(), err)
+				}
+				used := map[string]bool{}
+				for _, name := range bound {
+					used[name] = true
+				}
+				v.AbsentParams = nil
+				for _, p := range params {
+					if p.Mode != ModeOrderByChoice && p.Mode != ModeSQLChoice && !used[p.Name] {
+						v.AbsentParams = append(v.AbsentParams, p.Name)
+					}
+				}
+				sort.Strings(v.AbsentParams)
+			}
 			variants = append(variants, v)
 		}
 	}
@@ -465,11 +504,11 @@ func EnumerateVariants(sql string, params []Param) ([]Variant, error) {
 }
 
 func variantLimitError() error {
-	return fmt.Errorf("optional parameter variants exceed limit %d; reduce optional parameters or ORDER BY choices", maxEnumeratedVariants)
+	return fmt.Errorf("optional parameter variants exceed limit %d; reduce optional parameters or choices", maxEnumeratedVariants)
 }
 
 // segmentAxes returns the sorted names of (gateable, choiceable)
-// segments. Gateable = omit/empty. Choiceable = orderby.
+// segments. Gateable = omit/empty. Choiceable = orderby/SQL choice.
 func segmentAxes(segments []Segment) (gateable, choiceable []string) {
 	seenG, seenC := map[string]bool{}, map[string]bool{}
 	for _, s := range segments {
@@ -479,7 +518,7 @@ func segmentAxes(segments []Segment) (gateable, choiceable []string) {
 				seenG[s.Param] = true
 				gateable = append(gateable, s.Param)
 			}
-		case SegOrderByChoice:
+		case SegOrderByChoice, SegSQLChoice:
 			if !seenC[s.Param] {
 				seenC[s.Param] = true
 				choiceable = append(choiceable, s.Param)
@@ -489,4 +528,92 @@ func segmentAxes(segments []Segment) (gateable, choiceable []string) {
 	sort.Strings(gateable)
 	sort.Strings(choiceable)
 	return
+}
+
+func hasSQLChoice(segments []Segment) bool {
+	for _, seg := range segments {
+		if seg.Kind == SegSQLChoice {
+			return true
+		}
+	}
+	return false
+}
+
+// bindingNames uses SQL tokens, not text substitution: comments, quoted
+// identifiers and string literals containing @names never become bindings.
+// Returned names use the configured spelling so argument maps stay consistent.
+func bindingNames(sql string, params []Param) ([]string, error) {
+	byName := make(map[string]Param, len(params))
+	for _, p := range params {
+		key := strings.ToLower(p.Name)
+		if _, exists := byName[key]; exists {
+			return nil, fmt.Errorf("duplicate bind/selector name %q", p.Name)
+		}
+		byName[key] = p
+	}
+	tokens, err := lexSQLFragment(sql)
+	if err != nil {
+		return nil, err
+	}
+	seen := map[string]bool{}
+	var names []string
+	for _, tok := range tokens {
+		if tok.Kind != token.TokenParam {
+			continue
+		}
+		p, ok := byName[strings.ToLower(tok.AsString)]
+		if !ok {
+			return nil, fmt.Errorf("undeclared bind parameter @%s", tok.AsString)
+		}
+		if p.Mode == ModeSQLChoice || p.Mode == ModeOrderByChoice {
+			return nil, fmt.Errorf("choice selector %q cannot be a bind parameter", p.Name)
+		}
+		if !seen[p.Name] {
+			seen[p.Name] = true
+			names = append(names, p.Name)
+		}
+	}
+	sort.Strings(names)
+	return names, nil
+}
+
+func validateSQLChoiceBindings(segments []Segment, params []Param) error {
+	byName := make(map[string]Param, len(params))
+	for _, p := range params {
+		byName[p.Name] = p
+	}
+	for _, seg := range segments {
+		fragments := []string{seg.Text}
+		if seg.Kind == SegSQLChoice || seg.Kind == SegOrderByChoice {
+			fragments = nil
+			for _, key := range sortedChoiceKeys(seg.Choices) {
+				fragments = append(fragments, seg.Choices[key])
+			}
+		}
+		for _, fragment := range fragments {
+			names, err := bindingNames(fragment, params)
+			if err != nil {
+				return fmt.Errorf("segment %q: %w", seg.Param, err)
+			}
+			for _, name := range names {
+				p := byName[name]
+				if seg.Kind == SegSQLChoice && p.Mode != ModeRequired {
+					return fmt.Errorf("SQL choice %q: bind parameter %q must be required; the choice controls its presence", seg.Param, name)
+				}
+				if (p.Mode == ModeOmitWhenNull || p.Mode == ModeOmitWhenEmpty) && seg.Param != name {
+					return fmt.Errorf("bind parameter %q must stay inside its own optional block", name)
+				}
+			}
+		}
+	}
+	return nil
+}
+
+func sortedChoiceKeys(choices map[string]string) []string {
+	keys := make([]string, 0, len(choices))
+	for key := range choices {
+		keys = append(keys, key)
+	}
+	sort.Strings(keys)
+	return keys
 }

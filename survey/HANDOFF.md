@@ -1,5 +1,11 @@
 # Handoff — Spanner schema survey
 
+This is the August 25, 2026 import snapshot. Support statements, "latest"
+comparisons and registry counts in that snapshot describe that date. Current
+conversion boundaries live in [`UNSUPPORTED_DDL.md`](UNSUPPORTED_DDL.md),
+producer guidance in [`AGENTS.md`](AGENTS.md), and later observations in the
+[runtime histories](../knowledge/research/runtime-verification/index.md).
+
 ## Retained in spanalyzer (2026-08-25)
 
 The final tracked source tree is retained as the independently testable
@@ -30,9 +36,9 @@ The managed canonical set also proves that `GetDatabaseDdl` can retain an
 check and foreign-key additions and folds them into reconstructed `CREATE TABLE`;
 all other `ALTER TABLE` variants remain fail-closed.
 
-Managed Spanner and Omni `2026.r2.1-beta` both passed the current
+Managed Spanner and Omni `2026.r2.1-beta` both passed the August 25
 `SPANNER_SYS` audit at 50 advertised tables and 539 columns against the
-51-table package superset. The extra table is the officially documented
+then-51-table package superset. The extra table is the officially documented
 Enterprise-only `VECTOR_INDEX_STATS`, which neither tested target advertised.
 Managed Spanner, Omni, and Emulator v1.5.56 agree on the UUID metadata contract:
 `DATA_TYPE` is SQL `NULL`, `SPANNER_TYPE = UUID`, and
@@ -41,7 +47,7 @@ table option rows; index `columnar_policy` remains in canonical DDL without an
 `INDEX_OPTIONS` row. Emulator v1.5.56 has the narrower option surface recorded
 in the regression tests.
 
-The latest managed canonical comparison completes successfully: 330 canonical
+The August 25 managed canonical comparison completed successfully: 330 canonical
 statements, one memefish parse error in the `CREATE TABLE` family, and 341
 reconstructed statements. Parsed family counts match for change streams,
 functions, regular and search indexes, property graphs, proto bundles, roles,
@@ -112,6 +118,12 @@ or the selector; they do not create another dated Markdown report unless a
 material disagreement requires interpretation.
 
 ## Historical evidence
+
+Later [managed](../knowledge/research/runtime-verification/managed/index.md),
+[Omni](../knowledge/research/runtime-verification/omni/index.md) and
+[Emulator](../knowledge/research/runtime-verification/emulator/index.md)
+timelines retain dated changes, rechecks and corrections. They do not replace
+the import measurements above or update analyzer selectors implicitly.
 
 The dated Emulator-versus-managed metadata observations are retained in:
 

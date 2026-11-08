@@ -7,6 +7,7 @@ source evidence, results and unverified boundaries travel with each note.
 
 | Runtime and observation scope | Research Note |
 | --- | --- |
+| Emulator 1.5.59 and Omni r4 LTS.2, 2026-11-09 JST | [Closed SQL choices](finite-sql-choices-20261109.md): correlated ranges, column selection, selected bindings and six-target PLAN collection |
 | Local frontend and Emulator 1.5.59, 2026-11-08 | [Inspection continuation and row deletion policy folding](inspection-feedback-20261108.md): current-baseline reproduction, partial CLI artifacts and AST/live TTL reapplication |
 | Emulator 1.5.59 and Omni r4 LTS.2, 2026-11-08 | [Repository hardening verification](repository-hardening-20261108.md): seven review fixes, dependency-safe DDL, explicit DB retention, standalone builds and isolated CEL errors |
 | Omni r4 LTS.2, 2026-11-08 | [Compact PLAN summaries](plan-summary-omni-lts-20261108.md): full/summary parity, separate pinning warnings, output size and actual JSON/YAML schema checks |
@@ -55,7 +56,8 @@ These notes were imported on November 8 without rerunning their experiments.
 They preserve dated findings, including failed attempts and later corrections,
 without replacing current runtime pins, catalog manifests or projection
 selectors. The [import receipt](evidence/history-import-20261108/receipt.json)
-records original and retained hashes and publication transformations. Raw
+records original and retained hashes at the pinned import revision and its
+publication transformations. Later timeline edits keep their own history. Raw
 producer hashes within older receipts continue to identify their original
 inputs; transformed publication copies are not byte-identical reproductions.
 

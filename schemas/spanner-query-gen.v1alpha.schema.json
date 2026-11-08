@@ -521,7 +521,7 @@
           "type": "object"
         },
         "default": {
-          "description": "Default allowlisted ORDER BY choice.",
+          "description": "Default allowlisted SQL fragment or ORDER BY choice.",
           "minLength": 1,
           "type": "string"
         },
@@ -537,7 +537,8 @@
             "null_is_null",
             "omit_when_null",
             "omit_when_empty",
-            "orderby_choice"
+            "orderby_choice",
+            "sql_choice"
           ]
         },
         "scope": {
