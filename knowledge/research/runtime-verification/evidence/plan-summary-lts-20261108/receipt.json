@@ -1,0 +1,41 @@
+{
+  "recorded_at": "2026-11-08T04:12:25.929013+00:00",
+  "producer_head": "4fe4ff1ebff7c7f30e68c8f1ebb4d0936df3d17e",
+  "producer_dirty": false,
+  "producer_test": "cmd/spanner-query-gen/plan_report_feedback_omni_test.go",
+  "command": "go run ./omni-integration-runner --repo-root ..",
+  "workdir": "tools",
+  "exit_code": 0,
+  "runtime_identity": "Configured platform-specific Omni image pin from runner.json and runtime_targets.json; not an independently observed server version",
+  "query_environment": "optimizer version 9 requested through client options; effective optimizer/statistics values are not separately recorded",
+  "fixture": "Public ten-target integration fixture: nine PLAN successes and one deliberate STRING LIMIT planning error; access-path tables empty and a separate sentinel row proves DML plans do not execute",
+  "config_digest_scope": "config.json and contracts.json are serialized in-memory integration fixtures; the test directly calls the collector, rather than reading these files through the CLI",
+  "summary_comparison": {
+    "target_accounting": "identical",
+    "target_ids_and_plan_digests": "identical",
+    "access_paths": "identical",
+    "live_contract_evaluations": "identical",
+    "range_seek_contract": "pass in both modes",
+    "rendered_summary_plans": "none"
+  },
+  "schema_validation": {
+    "status": "pass",
+    "checks": 112,
+    "schema_sha256": {
+      "spanner-query-gen.plan-report.v1alpha.schema.json": "e2f4b2d9290a14e8b70b796973042f52dbbdf2b026d62f157b0e1d5e1692d9a8",
+      "spanner-query-gen.plan-summary.v1alpha.schema.json": "bf768e4641657d1670b10be5aa32b0fc403b1cbac26fcdb1ca0a3f6141656711"
+    },
+    "source_boundary": "Runtime artifacts were produced at producer_head. The validator uses the follow-up schema-only empty-evidence correction; retained schema hashes identify those bytes."
+  },
+  "runtime_log_transformation": {
+    "raw_sha256": "a24b9b0994a8951e02e2a0b606d8b7716d6707f17cdfa061857dbe9408bb6001",
+    "retained_sha256": "6ba1c6135b768ceecfa8e801afa7347b5c135aeb54f92c6b26440c15d37134ef",
+    "operation": "Replace the single host Docker socket URL with unix://<host-docker-socket>; preserve all other bytes"
+  },
+  "excluded_claims": [
+    "No reproduction of the feedback authors private 82-config/153-target corpus or its byte counts",
+    "No PROFILE, latency or scan-row measurement",
+    "No fresh managed Spanner or Emulator execution"
+  ],
+  "local_startup_retry": "The first attempt failed before creating a Docker provider. The successful run explicitly selected the existing Colima socket. The failed attempt is retained only in local task scratch."
+}

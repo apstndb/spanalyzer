@@ -5,7 +5,6 @@
       "properties": {
         "base_table": {
           "description": "Catalog-resolved base table, or empty when unknown.",
-          "minLength": 1,
           "type": "string"
         },
         "conditions_complete": {
@@ -92,7 +91,6 @@
               },
               "expression": {
                 "description": "Verbatim backend short description; empty when unavailable.",
-                "minLength": 1,
                 "type": "string"
               },
               "index": {
@@ -117,8 +115,7 @@
           "type": "integer"
         },
         "scan_target": {
-          "description": "Raw scan target identity.",
-          "minLength": 1,
+          "description": "Raw scan target identity; empty when unavailable.",
           "type": "string"
         },
         "scan_target_kind": {
@@ -127,8 +124,7 @@
           "type": "string"
         },
         "scan_type": {
-          "description": "Normalized backend scan type.",
-          "minLength": 1,
+          "description": "Normalized backend scan type; empty when unavailable.",
           "type": "string"
         },
         "search_conditions": {
@@ -146,7 +142,6 @@
               },
               "expression": {
                 "description": "Verbatim backend short description; empty when unavailable.",
-                "minLength": 1,
                 "type": "string"
               },
               "index": {
@@ -189,7 +184,6 @@
               },
               "expression": {
                 "description": "Verbatim backend short description; empty when unavailable.",
-                "minLength": 1,
                 "type": "string"
               },
               "index": {
@@ -209,8 +203,7 @@
           "uniqueItems": true
         },
         "seekable_key_size": {
-          "description": "Raw range-key metadata; zero does not mean no seek.",
-          "minLength": 1,
+          "description": "Raw range-key metadata; empty when unavailable, and zero does not mean no seek.",
           "type": "string"
         },
         "stored_columns": {
@@ -237,7 +230,6 @@
               },
               "expression": {
                 "description": "Verbatim backend short description; empty when unavailable.",
-                "minLength": 1,
                 "type": "string"
               },
               "index": {

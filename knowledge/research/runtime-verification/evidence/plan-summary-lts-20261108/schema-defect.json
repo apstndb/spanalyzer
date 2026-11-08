@@ -1,0 +1,40 @@
+{
+  "source_head": "4fe4ff1ebff7c7f30e68c8f1ebb4d0936df3d17e",
+  "scope": "Schema-only incompatibility reproduced against retained live artifacts; runtime behavior is unchanged by the correction",
+  "reports": {
+    "full": {
+      "schema_path": "schemas/spanner-query-gen.plan-report.v1alpha.schema.json",
+      "schema_sha256": "1706ae691b0044d24fc631d89f63550dad8df7af47b341fa80ea36dd1038b53c",
+      "errors": [
+        {
+          "instance_path": [
+            "queries",
+            0,
+            "access_paths",
+            0,
+            "seekable_key_size"
+          ],
+          "value": "",
+          "message": "'' should be non-empty"
+        }
+      ]
+    },
+    "summary": {
+      "schema_path": "schemas/spanner-query-gen.plan-summary.v1alpha.schema.json",
+      "schema_sha256": "f58669c13639d6009a0c1af0eebf9c749a164966844cb367ac5fe5f5f018f12e",
+      "errors": [
+        {
+          "instance_path": [
+            "queries",
+            0,
+            "access_paths",
+            0,
+            "seekable_key_size"
+          ],
+          "value": "",
+          "message": "'' should be non-empty"
+        }
+      ]
+    }
+  }
+}
