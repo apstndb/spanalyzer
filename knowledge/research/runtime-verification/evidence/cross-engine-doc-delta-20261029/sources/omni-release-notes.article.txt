@@ -1,0 +1,427 @@
+
+  
+  
+  
+  
+  
+
+  
+    
+    
+    
+  
+  
+
+    
+    
+    
+      
+        
+  
+    
+          Home
+        
+  
+  
+      
+    
+  
+  
+  
+
+    
+      
+      
+    
+    
+    
+      
+        
+  
+    
+          Documentation
+        
+  
+  
+      
+    
+  
+  
+  
+
+    
+      
+      
+    
+    
+    
+      
+        
+  
+    
+          Databases
+        
+  
+  
+      
+    
+  
+  
+  
+
+    
+      
+      
+    
+    
+    
+      
+        
+  
+    
+          Spanner Omni
+        
+  
+  
+      
+    
+  
+  
+  
+
+    
+      
+      
+    
+    
+    
+      
+        
+  
+    
+          Resources
+        
+  
+  
+      
+    
+  
+  
+
+    
+      
+    
+    
+  
+    
+  
+  
+    
+
+  
+  
+    
+    Send feedback
+  
+  
+
+  
+    
+
+      Spanner Omni release notes
+
+    
+    
+      
+    
+
+    
+      
+      Stay organized with collections
+    
+    
+      
+      Save and categorize content based on your preferences.
+    
+  
+    
+  
+      
+    
+  
+
+  
+  
+  
+    
+  
+
+  
+    
+    
+    
+    
+    
+
+    
+    
+This page documents production updates to Spanner Omni.
+Check this page for announcements about new or updated features, bug fixes,
+known issues, and deprecated functionality.
+
+    
+
+    
+    
+      
+
+        You can see the latest product updates for all of Google Cloud on the
+        
+        Google Cloud page, browse and filter all release notes in the
+        Google Cloud console,
+        or programmatically access release notes in
+        BigQuery.
+      
+    
+    
+
+    
+    
+    
+
+    
+      
+        
+
+
+September 30, 2026
+    
+      Feature
+      
+Spanner Omni is generally available
+(GA) with long-term
+support (LTS) release 2026.r4-lts. For more information, see the
+Spanner Omni overview.
+
+
+Release 2026.r4-lts includes the following updates:
+
+
+
+
+Includes all Spanner changes up to the
+September 18, 2026 release,
+including
+Spanner queues.
+
+
+Release 2026.r4-lts is a long-term support (LTS) release, and Google
+supports this release with security fixes for up to one year. For
+information about upgrading from release 2026.r3-beta, see
+Upgrade a deployment.
+
+
+Supports approximate nearest neighbor (ANN) vector search for datasets of up
+to 1 billion vectors using dedicated, stateless compute workers in the
+Commercial edition.
+For more information, see
+Vector search overview and
+Create and manage workers.
+
+
+Supports security configurations, including TLS and mutual TLS (mTLS)
+encryption and authentication, in the
+Developer edition. For
+more information, see
+Spanner Omni editions overview,
+Create a deployment with TLS encryption on VMs,
+and
+Create a deployment with TLS encryption on Kubernetes.
+
+
+Updates the Helm chart to use
+separate StatefulSet configurations for root and non-root servers. For
+more information, see
+Create a deployment on Kubernetes and
+Scale a Kubernetes deployment.
+
+
+Supports username and password login authentication over TLS in the
+Java (version 6.119.0 or later),
+Go (version v1.94.0 or later), and
+Python (version 3.72.0 or later)
+client libraries.
+
+    
+
+September 17, 2026
+    
+      Feature
+      
+Spanner Omni patch release 2026.r3-beta is available.
+
+
+
+
+This release includes all the Spanner changes up to the
+September 3, 2026 release.
+
+
+You must upgrade to this release before
+you upgrade to future releases.
+
+    
+
+August 20, 2026
+    
+      Feature
+      
+Spanner Omni release 2026.r2.1-beta is available.
+
+
+In-place upgrades from earlier versions to 2026.r2.1-beta aren't supported. If
+you upgrade from an earlier release, you must migrate data from earlier
+deployments to a new deployment created with release 2026.r2.1-beta. For more
+information, see
+Restore a Spanner Omni backup and
+Import and export data.
+
+
+Release 2026.r2.1-beta includes the following updates:
+
+
+
+
+Two editions are available:
+developer and
+commercial.For more
+information, see
+Spanner Omni editions overview.
+
+
+A standalone server package is available to run on virtual machines. For
+more information, see
+Download Spanner Omni.
+
+
+Support for the --insecure-mode and
+--enable-client-certificate-authentication flags for the spanner start
+command has been deprecated. Specify this information when you configure
+your deployment. For more information, see
+Create a deployment on VMs and
+Create a Helm chart configuration.
+
+    
+
+June 18, 2026
+    
+      Fixed
+      
+Spanner Omni patch release 2026.r1-beta.2 is
+available. This patch includes the following update:
+
+
+
+Fixed an issue related to importing a backup in regional and multi-regional
+deployments. For more information, see
+Restore a Spanner Omni backup.
+
+    
+
+June 04, 2026
+    
+      Fixed
+      
+Spanner Omni patch release 2026.r1-beta.1 is
+available. This patch includes the following updates:
+
+
+
+
+Fixed a TrueTime issue in
+which time servers entered a repeated failover mode, causing the uncertainty
+window to spike.
+
+
+Enables any client with a network path to the servers to reach health check
+and metrics endpoints. Earlier releases restricted access to internal IP
+addresses.
+
+
+The following Helm chart updates:
+
+
+
+
+Added support for nodeSelector, tolerations, and job resource
+configurations.
+
+
+Added an init container to provide permissions to /dev/vmclock in
+Amazon Web Services (AWS) deployments.
+
+
+    
+
+April 22, 2026
+    
+      Feature
+      
+Spanner Omni is available in
+Preview.
+Spanner Omni a self-managed version of
+Spanner that you run in your own environment,
+such as on-premises data centers, public clouds or on your laptop. For more
+information, see the following:
+
+
+
+
+Spanner Omni overview.
+
+
+Create a deployment on VMs.
+
+
+Create a deployment on Kubernetes.
+
+    
+
+
+
+      
+    
+
+  
+  
+
+  
+    
+  
+
+  
+
+
+  
+    
+    
+      
+    
+    
+  
+       
+         
+
+  
+  
+    
+    Send feedback
+  
+  
+
+       
+    
+    
+  
+
+  

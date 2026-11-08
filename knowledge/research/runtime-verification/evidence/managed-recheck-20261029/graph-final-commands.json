@@ -1,0 +1,46 @@
+[
+  {
+    "name": "graph-final-build",
+    "started_at": "2026-10-29T01:11:40.805049+00:00",
+    "completed_at": "2026-10-29T01:11:43.003517+00:00",
+    "exit_code": 0,
+    "seconds": 2.198,
+    "argv": [
+      "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go",
+      "build",
+      "-o",
+      "<LOCAL_CHECKOUT>/.tmp/managed-recheck-20261029/weekly-graph",
+      "<LOCAL_CHECKOUT>/.tmp/managed-recheck-20261029/weekly-graph.go"
+    ],
+    "cwd": "<LOCAL_CHECKOUT>/tools",
+    "gowork": "<LOCAL_CHECKOUT>/go.work"
+  },
+  {
+    "name": "graph-final-buildinfo",
+    "started_at": "2026-10-29T01:11:43.003759+00:00",
+    "completed_at": "2026-10-29T01:11:43.016421+00:00",
+    "exit_code": 0,
+    "seconds": 0.013,
+    "argv": [
+      "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go",
+      "version",
+      "-m",
+      "<LOCAL_CHECKOUT>/.tmp/managed-recheck-20261029/weekly-graph"
+    ],
+    "cwd": "<LOCAL_CHECKOUT>/tools",
+    "gowork": "<LOCAL_CHECKOUT>/go.work"
+  },
+  {
+    "name": "graph-final",
+    "started_at": "2026-10-29T01:11:43.016560+00:00",
+    "completed_at": "2026-10-29T01:17:27.030842+00:00",
+    "exit_code": 0,
+    "seconds": 344.014,
+    "argv": [
+      "<LOCAL_CHECKOUT>/.tmp/managed-recheck-20261029/weekly-graph",
+      "<LOCAL_CHECKOUT>/.tmp/managed-recheck-20261029/graph-final-plan.json"
+    ],
+    "cwd": "<LOCAL_CHECKOUT>/tools",
+    "gowork": "<LOCAL_CHECKOUT>/go.work"
+  }
+]

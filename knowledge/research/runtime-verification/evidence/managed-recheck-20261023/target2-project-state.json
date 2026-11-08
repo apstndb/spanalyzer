@@ -1,0 +1,17 @@
+{
+  "name": "target2-project-state",
+  "started_at": "2026-10-23T14:22:54.827795+00:00",
+  "completed_at": "2026-10-23T14:22:55.921839+00:00",
+  "argv": [
+    "<LOCAL_HOME>/google-cloud-sdk/bin/gcloud",
+    "projects",
+    "describe",
+    "<redacted>",
+    "--format=value(lifecycleState)",
+    "--project=<redacted>",
+    "--quiet"
+  ],
+  "exit_code": 0,
+  "stdout": "ACTIVE\n",
+  "stderr": ""
+}

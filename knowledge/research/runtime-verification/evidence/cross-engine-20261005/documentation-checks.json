@@ -1,0 +1,51 @@
+[
+  {
+    "name": "okf",
+    "exit_code": 0,
+    "elapsed_seconds": 0.51,
+    "cwd": "<LOCAL_CHECKOUT>/tools",
+    "command": [
+      "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go",
+      "run",
+      "./okf-check",
+      "--repo-root",
+      "..",
+      "--gate",
+      "all"
+    ]
+  },
+  {
+    "name": "language",
+    "exit_code": 0,
+    "elapsed_seconds": 0.08,
+    "cwd": "<LOCAL_CHECKOUT>/tools",
+    "command": [
+      "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go",
+      "run",
+      "./markdown-language-check",
+      "--repo-root",
+      ".."
+    ]
+  },
+  {
+    "name": "evidence-assertions",
+    "exit_code": 0,
+    "elapsed_seconds": 0.03,
+    "cwd": "<LOCAL_CHECKOUT>",
+    "command": [
+      "python3",
+      "<LOCAL_CHECKOUT>/.tmp/cross-engine-20261005/summarize.py"
+    ]
+  },
+  {
+    "name": "diff-check",
+    "exit_code": 0,
+    "elapsed_seconds": 0.02,
+    "cwd": "<LOCAL_CHECKOUT>",
+    "command": [
+      "git",
+      "diff",
+      "--check"
+    ]
+  }
+]

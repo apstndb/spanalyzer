@@ -1,0 +1,41 @@
+from pathlib import Path
+import json,datetime
+root=Path('<LOCAL_CHECKOUT>');task=Path('<LOCAL_TASK_ROOT>/apstndb/spanalyzer/docs-delta-runtime-20261031');out=task/'evidence';checks=[]
+def records(name):
+ p=out/(name+'.jsonl');return[json.loads(l)for l in p.read_text().splitlines()]if p.exists()else[]
+def check(name,ok):
+ checks.append({'check':name,'passed':bool(ok)})
+ if not ok:raise AssertionError(name)
+def select(rows,label,pg=False):
+ found=[r for r in rows if r['label']==label and(('pg-'in r.get('phase',''))if pg else('pg-'not in r.get('phase','')))];return found[-1]if found else None
+summary={'observed_at_utc':datetime.datetime.now(datetime.timezone.utc).isoformat(),'targets':{},'boundaries':{'managed_final_requires_user_approval':not bool(records('managed-final-google')),'interrupted_managed_database':'Retained pending explicit deletion approval; see interrupted-managed-inspection.json','performance_measurement':False,'automatic_future_scorer_advance_exercised':False},'fixture_corrections':['SCORE requires a generated TOKENLIST column and compatible SEARCH predicate','Search-index order columns require INT64 and NOT NULL; use generated epoch seconds, not a TIMESTAMP','Queue TVF control uses SELECT * rather than COUNT(*)','LEFT propagation needs a shared column; retain the disjoint-column negative control']}
+for target in ['managed','omni-r5','omni-lts','emulator']:
+ core=records('managed-google')+records('managed-pg')if target=='managed'else records(target);corrected=records('managed-corrected-google')if target=='managed'else records(target+'-corrected');final=records('managed-final-google')+records('managed-final-pg')if target=='managed'else records(target+'-final');r={x['label']:x for x in core if'pg-'not in x.get('phase','')};entry={'core_records':len(core),'corrected_records':len(corrected),'final_records':len(final),'pipe_operator_codes':{x['label']:x['code']for x in core if x.get('family')=='pipe-operator'},'queue_case_codes':{k:r['queue-create-'+k]['code']for k in['title','lower','upper','mixed']}}
+ if target!='emulator':check(target+' all 15 pipe operators execute',len(entry['pipe_operator_codes'])==15 and set(entry['pipe_operator_codes'].values())=={'OK'});check(target+' exact payload declarations enforced',entry['queue_case_codes']=={'title':'OK','lower':'OK','upper':'InvalidArgument','mixed':'InvalidArgument'})
+ else:check('Emulator accepts all four queue declaration spellings',set(entry['queue_case_codes'].values())=={'OK'})
+ if target!='emulator':
+  expected=sorted([{'k':'1','total':'30'},{'k':'2','total':'30'}],key=lambda x:x['k'])
+  for label in['pipe-group-alias','pipe-group-bare-alias']:
+   row=r[label];check(target+' '+label+' grouping members and aliases',sorted(row['rows'],key=lambda x:x['k'])==expected);check(target+' '+label+' output column order',[f['name']for f in row['metadata']['rowType']['fields']]==['k','total'])
+  check(target+' SQL pipe ORDER BY sequence',[x['b']for x in r['pipe-order-by']['rows']]==['30','20','10'])
+  check(target+' unordered pipe LIMIT count only',len(r['pipe-limit']['rows'])==2)
+ if target!='managed'and final and final[-1]['label']=='runtime-cleanup':
+  check(target+' final runtime cleanup succeeds',final[-1]['code']=='OK');entry['pipe_isolation']={k:select(final,k)for k in['select-led-select','select-led-where','select-led-aggregate','from-only']};entry['scorer_google']={k:select(final,k)for k in['score-unpinned','score-set-db-1','score-pinned-db-1','score-set-db-2','score-pinned-db-2','score-explicit-independent']};entry['scorer_pg']={k:select(final,k,True)for k in['score-unpinned','score-set-db-1','score-pinned-db-1','score-set-db-2','score-pinned-db-2','score-explicit-independent']};entry['pg_bucket_boundary']=select(final,'bucket-pg-boundaries',True)
+  check(target+' PostgreSQL explicit scorer versions execute',entry['scorer_pg']['score-explicit-independent']['code']=='OK')
+  g=entry['scorer_google']
+  for key in['score-unpinned','score-pinned-db-1','score-pinned-db-2','score-explicit-independent']:check(target+' '+key+' executes',g[key]['code']=='OK')
+  for ver in[1,2]:check(target+' scorer default matches explicit version '+str(ver),all(row['default_score']==row['version'+str(ver)+'_score']for row in g['score-pinned-db-'+str(ver)]['rows']))
+  first=g['score-pinned-db-1']['rows'];second=g['score-pinned-db-2']['rows'];check(target+' explicit scorer values remain stable across database defaults',all(a['version1_score']==b['version1_score']and a['version2_score']==b['version2_score']for a,b in zip(first,second)))
+  start=select(final,'bucket-values-start')['rows'][0];same=select(final,'bucket-values-same-hour')['rows'][0];nxt=select(final,'bucket-values-next-hour')['rows'][0];check(target+' generated hour bucket stable within hour',start['HourBucket']==same['HourBucket']and start['UpdatedSeconds']!=same['UpdatedSeconds']);check(target+' generated hour bucket advances by 3600',int(nxt['HourBucket'])-int(same['HourBucket'])==3600)
+  entry['scorer_versions_distinguished_by_values']=any(row['version1_score']!=row['version2_score']for row in g['score-explicit-independent']['rows'])
+  for key in['tvf-star-plain','tvf-star-as','tvf-star-bare','bucket-index-seconds','bucket-index-hour','bucket-index-none']:check(target+' '+key+' executes',select(final,key)['code']=='OK')
+  bucket=entry['pg_bucket_boundary'];check(target+' PG boundary query executes',bucket['code']=='OK');bad=[row for row in bucket['rows']if row['documented_hour']!=row['floored_hour']];entry['pg_documented_bucket_mismatches']=bad;check(target+' PG bucket exposes fractional and negative boundary errors',len(bad)==2)
+ summary['targets'][target]=entry
+for ledger in ['local-commands.json','local-corrected-commands.json','local-final-commands.json']:
+ rows=json.loads((out/ledger).read_text());check(ledger+' has three completed runtimes',len(rows)==3 and all(r['exit_code']==0 for r in rows))
+ for row in rows:
+  check(ledger+' '+row['name']+' exactly one owned runtime inspected',len(row['owned_containers'])==1)
+  check(ledger+' '+row['name']+' owned container absent',row['owned_containers_absent'])
+  check(ledger+' '+row['name']+' preexisting containers preserved',row['preexisting_containers_preserved'])
+  events=records(row['name']);check(ledger+' '+row['name']+' both owned databases removed',sum(r['label']=='drop-database'and r['code']=='OK'for r in events)==2 and sum(r['label']=='database-absent'and r['code']=='NotFound'for r in events)==2)
+(out/'summary.json').write_text(json.dumps(summary,indent=2)+'\n');(out/'assertions.json').write_text(json.dumps({'status':'passed','checks':checks,'scope':'Dated completed samples; pending managed final controls are not counted as passed'},indent=2)+'\n');print('Targets',[(k,v['core_records'],v['corrected_records'],v['final_records'])for k,v in summary['targets'].items()],'checks',len(checks))

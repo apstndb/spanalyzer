@@ -1,0 +1,2 @@
+capture SPANNER_SYS: start omni image "us-docker.pkg.dev/spanner-omni/images/spanner-omni:2026.r4-lts@sha256:9f10586c5de366bec5c0ff6cf542a67c21c8363e8a12a3deb9c372a07c9aa8b6": spanemuboost: bootstrap omni backend: rpc error: code = Unavailable desc = connection error: desc = "error reading server preface: EOF"; verify that the environment satisfies the Spanner Omni software requirements: https://docs.cloud.google.com/spanner-omni/system-requirements#software-requirements
+exit status 1

@@ -1,0 +1,113 @@
+{
+  "retrieved_at": "2026-10-30T19:35:11.440526+00:00",
+  "searches": [
+    {
+      "term": "RENEWLEASE",
+      "query": "repo:GoogleCloudPlatform/cloud-spanner-emulator is:issue RENEWLEASE in:title,body,comments",
+      "file": "search-0.json",
+      "count": 0,
+      "incomplete": false,
+      "matches": []
+    },
+    {
+      "term": "\"lease token\"",
+      "query": "repo:GoogleCloudPlatform/cloud-spanner-emulator is:issue \"lease token\" in:title,body,comments",
+      "file": "search-1.json",
+      "count": 0,
+      "incomplete": false,
+      "matches": []
+    },
+    {
+      "term": "TABLE_OPTIONS",
+      "query": "repo:GoogleCloudPlatform/cloud-spanner-emulator is:issue TABLE_OPTIONS in:title,body,comments",
+      "file": "search-2.json",
+      "count": 0,
+      "incomplete": false,
+      "matches": []
+    },
+    {
+      "term": "\"null-filtered\" \"search\"",
+      "query": "repo:GoogleCloudPlatform/cloud-spanner-emulator is:issue \"null-filtered\" \"search\" in:title,body,comments",
+      "file": "search-3.json",
+      "count": 1,
+      "incomplete": false,
+      "matches": [
+        {
+          "number": 341,
+          "title": "Missing INFORMATION_SCHEMA.INDEXES.SEARCH_(PARTITION_BY|ORDER_BY)",
+          "state": "open"
+        }
+      ]
+    },
+    {
+      "term": "\"TO_JSON\" \"graph\"",
+      "query": "repo:GoogleCloudPlatform/cloud-spanner-emulator is:issue \"TO_JSON\" \"graph\" in:title,body,comments",
+      "file": "search-4.json",
+      "count": 1,
+      "incomplete": false,
+      "matches": [
+        {
+          "number": 186,
+          "title": "Does the emulator support Spanner graph?",
+          "state": "closed"
+        }
+      ]
+    },
+    {
+      "term": "\"CORRESPONDING\"",
+      "query": "repo:GoogleCloudPlatform/cloud-spanner-emulator is:issue \"CORRESPONDING\" in:title,body,comments",
+      "file": "search-5.json",
+      "count": 5,
+      "incomplete": false,
+      "matches": [
+        {
+          "number": 300,
+          "title": "Support all documented query hints",
+          "state": "open"
+        },
+        {
+          "number": 370,
+          "title": "EmulatorFeatureFlags::flags() returns guarded state after releasing its lock",
+          "state": "closed"
+        },
+        {
+          "number": 196,
+          "title": "Internal error on generated columns",
+          "state": "closed"
+        },
+        {
+          "number": 72,
+          "title": "Memory Leak + Performance Decrease per Connection",
+          "state": "closed"
+        },
+        {
+          "number": 65,
+          "title": "Cloud Spanner Emulator version 1.4.1 (linux binary) no longer works on CentOS Stream 8",
+          "state": "closed"
+        }
+      ]
+    },
+    {
+      "term": "\"HLL_COUNT\"",
+      "query": "repo:GoogleCloudPlatform/cloud-spanner-emulator is:issue \"HLL_COUNT\" in:title,body,comments",
+      "file": "search-6.json",
+      "count": 0,
+      "incomplete": false,
+      "matches": []
+    },
+    {
+      "term": "\"multiplexed\" \"ListSessions\"",
+      "query": "repo:GoogleCloudPlatform/cloud-spanner-emulator is:issue \"multiplexed\" \"ListSessions\" in:title,body,comments",
+      "file": "search-7.json",
+      "count": 1,
+      "incomplete": false,
+      "matches": [
+        {
+          "number": 159,
+          "title": "Performance Degradation in Long-Running Spanner Emulator Sessions",
+          "state": "open"
+        }
+      ]
+    }
+  ]
+}

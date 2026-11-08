@@ -1,0 +1,44 @@
+"""Reuse retained Change Streams and queue controls with owned local clients."""
+from pathlib import Path
+import json
+root=Path('<LOCAL_CHECKOUT>');p=root/'.tmp/cross-engine-doc-delta-20261029/module';src=root/'knowledge/research/runtime-verification/evidence';old=src/'managed-recheck-20261029'
+(p/'legacy.go').write_bytes((src/'json-cross-engine-20261010/probe.go.txt').read_bytes())
+for name in ['cases.json','followup-cases.json']:(p/name).write_bytes((old/name).read_bytes())
+s=(old/'queue.go.txt').read_text();body=s[s.index('\tquery("preflight"',s.index('func main()')):s.rfind('\n}')];s=s[:s.index('func main()')];s=s.replace('"os"','"os"\n "regexp"\n "github.com/apstndb/spanemuboost"');s=s.replace('var ctx = context.Background()','var backend,phase string\nvar ctx = context.Background()')
+s=s.replace('json.NewEncoder(os.Stdout).Encode(v)','v["backend"]=backend;v["phase"]=phase;json.NewEncoder(os.Stdout).Encode(scrub(v))');s=s.replace('s = strings.ReplaceAll(s, db, "<database>")','if db!=""{s = strings.ReplaceAll(s, db, "<database>")}')
+r=(old/'queue-recreate.go.txt').read_text();cycle=r[r.index('\tquery("preflight"',r.index('func main()')):r.rfind('\n}')]
+common=(p/'probe.go').read_text();scrub=common[common.index('func scrub('):common.index('func emit(')]
+s+='\n'+scrub+'\nfunc lifecycle(){\n'+body+'\n}\nfunc recreate(){\nq="QueueRecreate20261029"\n'+cycle+'\n}\n'
+s+='''
+func event(label string,e error){emit(map[string]any{"label":label,"code":status.Code(e).String(),"error":clean(e)})}
+func runStage(rt spanemuboost.Runtime,name string,probe func()){
+ phase=name;dialect="GOOGLE_STANDARD_SQL"
+ opts:=[]spanemuboost.Option{spanemuboost.WithRandomDatabaseID(),spanemuboost.ForceSchemaTeardown()}
+ if backend=="emulator"{opts=append(opts,spanemuboost.EnableAutoConfig())}else{opts=append(opts,spanemuboost.EnableDatabaseAutoConfigOnly())}
+ clients,e:=spanemuboost.OpenClients(ctx,rt,opts...);event("create-database",e);if e!=nil{return};db=clients.DatabasePath();c=clients.Client;a=clients.DatabaseClient
+ defer func(){event("drop-database",clients.Close());inspector,e:=database.NewDatabaseAdminClient(ctx,rt.ClientOptions()...);if e!=nil{event("cleanup-inspector",e);return};defer inspector.Close();_,e=inspector.GetDatabase(ctx,&dbpb.GetDatabaseRequest{Name:db});event("database-absent",e)}()
+ probe()
+}
+func main(){
+ backend=os.Args[1];image:=os.Args[2];phase="bootstrap";kind:=spanemuboost.BackendOmni;if backend=="emulator"{kind=spanemuboost.BackendEmulator}
+ rt,e:=spanemuboost.Run(ctx,kind,spanemuboost.WithContainerImage(image),spanemuboost.DisableAutoConfig());event("runtime-start",e);if e!=nil{os.Exit(1)};defer func(){phase="cleanup";event("runtime-cleanup",rt.Close())}()
+ platform,e:=spanemuboost.RuntimePlatform(ctx,rt);if e!=nil{panic(e)};emit(map[string]any{"label":"identity","image":image,"platform":platform})
+ runStage(rt,"queue-lifecycle",lifecycle);runStage(rt,"queue-recreate",recreate)
+}
+''';(p/'queues.go').write_text(s)
+s=(root/'.tmp/cross-engine-doc-delta-20261029/run.py').read_text();s=s[:s.index("if run('probe-build'")];s=s.replace("out/'commands.json'","out/'extra-commands.json'")
+s+='''
+wait_started=time.monotonic()
+while True:
+    prior=out/'commands.json'
+    rows=json.loads(prior.read_text())if prior.exists()else[]
+    if any(r['name']=='emulator'and r['exit_code']==0 for r in rows):break
+    if time.monotonic()-wait_started>3600:raise SystemExit('Core probe completion unavailable')
+    time.sleep(5)
+for program in ['legacy','queues']:
+    if run(program+'-build',[go,'build','-o',str(scratch/program),'./'+program+'.go']):raise SystemExit('Extra probe build failed')
+    run(program+'-buildinfo',[go,'version','-m',str(scratch/program)])
+    for name,entry in images.items():
+        if run(name+'-'+program,[str(scratch/program),name,entry['image']],image=entry['image']):raise SystemExit('Extra probe process failed')
+print('COMPLETE: matched Change Streams/JSON/queue controls recorded',flush=True)
+''';(root/'.tmp/cross-engine-doc-delta-20261029/run-extras.py').write_text(s)

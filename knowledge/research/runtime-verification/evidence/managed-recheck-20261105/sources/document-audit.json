@@ -1,0 +1,36 @@
+{
+  "status": "pass",
+  "base": "ec91ce497a621dd3d318cad40a58944367415165",
+  "head": "293fe78b6da4b70bfe8f693161c5fc784f0364a8",
+  "commits": [
+    {
+      "sha": "28532761a37ec33c986bc1c75a10f25fb22a0e9a",
+      "at": "2026-11-03T18:02:04Z"
+    },
+    {
+      "sha": "293fe78b6da4b70bfe8f693161c5fc784f0364a8",
+      "at": "2026-11-04T18:01:46Z"
+    }
+  ],
+  "changed_documents": [
+    {
+      "path": "docs/docs.cloud.google.com/spanner/docs/introspection/query-statistics.md",
+      "official_matches_target_body": true,
+      "official_updateTime": "2026-11-02T20:33:09Z",
+      "disposition": "Thirty already-advertised statistics columns documented, percentile array/element controls exercised; summary SQL subquery fixed to use TOTAL table."
+    },
+    {
+      "path": "docs/docs.cloud.google.com/spanner/docs/leader-aware-routing.md",
+      "official_matches_target_body": true,
+      "official_updateTime": "2026-11-02T23:55:26Z",
+      "disposition": "Geo-partitioning-aware routing prose clarified; source-only, no multi-placement or region-routing experiment on the regional trial."
+    }
+  ],
+  "bookkeeping_paths": [
+    "logs/urls.txt",
+    "metadata.yaml"
+  ],
+  "official_and_mirror_body_match_count": 2,
+  "release_head": "October 30, 2026 in API body, live HTML and Atom feed; bodies retained",
+  "runtime_boundary": "New documentation does not establish new runtime introduction dates."
+}

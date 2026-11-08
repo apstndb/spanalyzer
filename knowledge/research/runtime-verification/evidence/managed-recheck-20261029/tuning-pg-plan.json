@@ -1,0 +1,26 @@
+{
+  "dialect": "pg",
+  "steps": [
+    {
+      "label": "tuning-pg-generate-series",
+      "family": "query-tuning",
+      "kind": "query",
+      "sql": "SELECT * FROM generate_series(0,31) AS id",
+      "requires": []
+    },
+    {
+      "label": "tuning-pg-series-sum",
+      "family": "query-tuning",
+      "kind": "query",
+      "sql": "SELECT COUNT(*) AS n,SUM(id) AS total FROM generate_series(0,31) AS id",
+      "requires": []
+    },
+    {
+      "label": "tuning-pg-parallelism",
+      "family": "query-tuning",
+      "kind": "query",
+      "sql": "/*@ USE_ADDITIONAL_PARALLELISM=TRUE */ SELECT 1 AS n",
+      "requires": []
+    }
+  ]
+}

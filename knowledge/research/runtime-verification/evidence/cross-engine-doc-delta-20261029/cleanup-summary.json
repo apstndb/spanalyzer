@@ -1,0 +1,412 @@
+{
+  "database_lifecycles": [
+    {
+      "file": "emulator-legacy.stdout",
+      "phase": "google-fixtures",
+      "drop_code": "OK",
+      "get_after_drop_code": "NotFound"
+    },
+    {
+      "file": "emulator-legacy.stdout",
+      "phase": "pg-fixtures",
+      "drop_code": "OK",
+      "get_after_drop_code": "NotFound"
+    },
+    {
+      "file": "emulator-order.stdout",
+      "phase": "order-matrix",
+      "drop_code": "OK",
+      "get_after_drop_code": "NotFound"
+    },
+    {
+      "file": "emulator-queue-focus.stdout",
+      "phase": "queue-lifecycle-no-stale",
+      "drop_code": "OK",
+      "get_after_drop_code": "NotFound"
+    },
+    {
+      "file": "emulator-queue-single.stdout",
+      "phase": "queue-single-message-lease",
+      "drop_code": "OK",
+      "get_after_drop_code": "NotFound"
+    },
+    {
+      "file": "emulator-queues.stdout",
+      "phase": "queue-lifecycle",
+      "drop_code": "OK",
+      "get_after_drop_code": "NotFound"
+    },
+    {
+      "file": "emulator-queues.stdout",
+      "phase": "queue-recreate",
+      "drop_code": "OK",
+      "get_after_drop_code": "NotFound"
+    },
+    {
+      "file": "emulator-repair.stdout",
+      "phase": "graphs-repair",
+      "drop_code": "OK",
+      "get_after_drop_code": "NotFound"
+    },
+    {
+      "file": "emulator-repair.stdout",
+      "phase": "dynamic-order-repro",
+      "drop_code": "OK",
+      "get_after_drop_code": "NotFound"
+    },
+    {
+      "file": "emulator.stdout",
+      "phase": "constants-catalog",
+      "drop_code": "OK",
+      "get_after_drop_code": "NotFound"
+    },
+    {
+      "file": "emulator.stdout",
+      "phase": "google-new",
+      "drop_code": "OK",
+      "get_after_drop_code": "NotFound"
+    },
+    {
+      "file": "emulator.stdout",
+      "phase": "graphs",
+      "drop_code": "OK",
+      "get_after_drop_code": "NotFound"
+    },
+    {
+      "file": "emulator.stdout",
+      "phase": "pg-new",
+      "drop_code": "OK",
+      "get_after_drop_code": "NotFound"
+    },
+    {
+      "file": "emulator.stdout",
+      "phase": "doc-delta-google",
+      "drop_code": "OK",
+      "get_after_drop_code": "NotFound"
+    },
+    {
+      "file": "emulator.stdout",
+      "phase": "doc-delta-pg",
+      "drop_code": "OK",
+      "get_after_drop_code": "NotFound"
+    },
+    {
+      "file": "omni-lts-legacy.stdout",
+      "phase": "google-fixtures",
+      "drop_code": "OK",
+      "get_after_drop_code": "NotFound"
+    },
+    {
+      "file": "omni-lts-legacy.stdout",
+      "phase": "pg-fixtures",
+      "drop_code": "OK",
+      "get_after_drop_code": "NotFound"
+    },
+    {
+      "file": "omni-lts-order.stdout",
+      "phase": "order-matrix",
+      "drop_code": "OK",
+      "get_after_drop_code": "NotFound"
+    },
+    {
+      "file": "omni-lts-queues.stdout",
+      "phase": "queue-lifecycle",
+      "drop_code": "OK",
+      "get_after_drop_code": "NotFound"
+    },
+    {
+      "file": "omni-lts-queues.stdout",
+      "phase": "queue-recreate",
+      "drop_code": "OK",
+      "get_after_drop_code": "NotFound"
+    },
+    {
+      "file": "omni-lts.stdout",
+      "phase": "constants-catalog",
+      "drop_code": "OK",
+      "get_after_drop_code": "NotFound"
+    },
+    {
+      "file": "omni-lts.stdout",
+      "phase": "google-new",
+      "drop_code": "OK",
+      "get_after_drop_code": "NotFound"
+    },
+    {
+      "file": "omni-lts.stdout",
+      "phase": "graphs",
+      "drop_code": "OK",
+      "get_after_drop_code": "NotFound"
+    },
+    {
+      "file": "omni-lts.stdout",
+      "phase": "pg-new",
+      "drop_code": "OK",
+      "get_after_drop_code": "NotFound"
+    },
+    {
+      "file": "omni-lts.stdout",
+      "phase": "doc-delta-google",
+      "drop_code": "OK",
+      "get_after_drop_code": "NotFound"
+    },
+    {
+      "file": "omni-lts.stdout",
+      "phase": "doc-delta-pg",
+      "drop_code": "OK",
+      "get_after_drop_code": "NotFound"
+    },
+    {
+      "file": "omni-r5-legacy.stdout",
+      "phase": "google-fixtures",
+      "drop_code": "OK",
+      "get_after_drop_code": "NotFound"
+    },
+    {
+      "file": "omni-r5-legacy.stdout",
+      "phase": "pg-fixtures",
+      "drop_code": "OK",
+      "get_after_drop_code": "NotFound"
+    },
+    {
+      "file": "omni-r5-order.stdout",
+      "phase": "order-matrix",
+      "drop_code": "OK",
+      "get_after_drop_code": "NotFound"
+    },
+    {
+      "file": "omni-r5-queues.stdout",
+      "phase": "queue-lifecycle",
+      "drop_code": "OK",
+      "get_after_drop_code": "NotFound"
+    },
+    {
+      "file": "omni-r5-queues.stdout",
+      "phase": "queue-recreate",
+      "drop_code": "OK",
+      "get_after_drop_code": "NotFound"
+    },
+    {
+      "file": "omni-r5.stdout",
+      "phase": "constants-catalog",
+      "drop_code": "OK",
+      "get_after_drop_code": "NotFound"
+    },
+    {
+      "file": "omni-r5.stdout",
+      "phase": "google-new",
+      "drop_code": "OK",
+      "get_after_drop_code": "NotFound"
+    },
+    {
+      "file": "omni-r5.stdout",
+      "phase": "graphs",
+      "drop_code": "OK",
+      "get_after_drop_code": "NotFound"
+    },
+    {
+      "file": "omni-r5.stdout",
+      "phase": "pg-new",
+      "drop_code": "OK",
+      "get_after_drop_code": "NotFound"
+    },
+    {
+      "file": "omni-r5.stdout",
+      "phase": "doc-delta-google",
+      "drop_code": "OK",
+      "get_after_drop_code": "NotFound"
+    },
+    {
+      "file": "omni-r5.stdout",
+      "phase": "doc-delta-pg",
+      "drop_code": "OK",
+      "get_after_drop_code": "NotFound"
+    }
+  ],
+  "owned_temporary_databases": 37,
+  "containers": [
+    {
+      "file": "emulator-container-cleanup.json",
+      "active_count": 1,
+      "owned": [
+        {
+          "id": "242c9cac873926ff73474b4876716f2b477a29c020087d13b8e70b418cde8ac6",
+          "inspect_exit_code": 1,
+          "absent": true
+        }
+      ],
+      "preexisting_containers_preserved": true
+    },
+    {
+      "file": "emulator-legacy-container-cleanup.json",
+      "active_count": 1,
+      "owned": [
+        {
+          "id": "b19a5bda40f135e3a8cf8bece5cf3ec65f410dad6c9131805256da94742151b7",
+          "inspect_exit_code": 1,
+          "absent": true
+        }
+      ],
+      "preexisting_containers_preserved": true
+    },
+    {
+      "file": "emulator-order-container-cleanup.json",
+      "active_count": 0,
+      "owned": [
+        {
+          "id": "844e290a68ae2f44f60ad87cde38ae8758db688fab1695a7b5f95ea62f72d03e",
+          "inspect_exit_code": 1,
+          "absent": true
+        }
+      ],
+      "preexisting_containers_preserved": true,
+      "identity_recovery": "emulator-order-event-identity.json"
+    },
+    {
+      "file": "emulator-queue-focus-container-cleanup.json",
+      "active_count": 1,
+      "owned": [
+        {
+          "id": "1e1fa6f9b72d410e30a4d6cba54b575dd1ace3cac65f0b7b769195cb8648c86b",
+          "inspect_exit_code": 1,
+          "absent": true
+        }
+      ],
+      "preexisting_containers_preserved": true
+    },
+    {
+      "file": "emulator-queue-single-container-cleanup.json",
+      "active_count": 1,
+      "owned": [
+        {
+          "id": "5b712ed5d6bc0179a4ee82937f3bfc382771ca5578c5d7dd906f1e3be0a2f7b5",
+          "inspect_exit_code": 1,
+          "absent": true
+        }
+      ],
+      "preexisting_containers_preserved": true
+    },
+    {
+      "file": "emulator-queues-container-cleanup.json",
+      "active_count": 1,
+      "owned": [
+        {
+          "id": "f6bae4b3f3fa0062936f988ecc2d02c7cab7cedbff773f1474677f8d3f7dc2a8",
+          "inspect_exit_code": 1,
+          "absent": true
+        }
+      ],
+      "preexisting_containers_preserved": true
+    },
+    {
+      "file": "emulator-repair-container-cleanup.json",
+      "active_count": 0,
+      "owned": [
+        {
+          "id": "cbbd445a01ed86bcb0fcb673fe12f07ca14f6458132ec16a87336168e1693006",
+          "inspect_exit_code": 1,
+          "absent": true
+        }
+      ],
+      "preexisting_containers_preserved": true,
+      "identity_recovery": "emulator-repair-event-identity.json"
+    },
+    {
+      "file": "omni-lts-container-cleanup.json",
+      "active_count": 1,
+      "owned": [
+        {
+          "id": "a0973da3dd5d8140d5c7ec639839820513f1e5bdb077659ad2ff5a4e0179d95d",
+          "inspect_exit_code": 1,
+          "absent": true
+        }
+      ],
+      "preexisting_containers_preserved": true
+    },
+    {
+      "file": "omni-lts-legacy-container-cleanup.json",
+      "active_count": 1,
+      "owned": [
+        {
+          "id": "3778f8c2814bb6cf5dc12bb037b33e3e97eefe1e81269bdd8d072e1123d10020",
+          "inspect_exit_code": 1,
+          "absent": true
+        }
+      ],
+      "preexisting_containers_preserved": true
+    },
+    {
+      "file": "omni-lts-order-container-cleanup.json",
+      "active_count": 1,
+      "owned": [
+        {
+          "id": "8198acf2b5493a991a94f4f19a7998eced4ea0d9150d4a34fac569a65db2da10",
+          "inspect_exit_code": 1,
+          "absent": true
+        }
+      ],
+      "preexisting_containers_preserved": true
+    },
+    {
+      "file": "omni-lts-queues-container-cleanup.json",
+      "active_count": 1,
+      "owned": [
+        {
+          "id": "2a319ea243e8cf71e24e120dfa347b957d83965b743f2dcbc17d55eeb7e2e621",
+          "inspect_exit_code": 1,
+          "absent": true
+        }
+      ],
+      "preexisting_containers_preserved": true
+    },
+    {
+      "file": "omni-r5-container-cleanup.json",
+      "active_count": 1,
+      "owned": [
+        {
+          "id": "72b233e0210280636a9719a4dae574a485b0f5befc0d5aef7c3fec0eb503c7cb",
+          "inspect_exit_code": 1,
+          "absent": true
+        }
+      ],
+      "preexisting_containers_preserved": true
+    },
+    {
+      "file": "omni-r5-legacy-container-cleanup.json",
+      "active_count": 1,
+      "owned": [
+        {
+          "id": "92381ed8582baf81df0fb441542a09ac44c5a549418be23b87fb363e75b423a7",
+          "inspect_exit_code": 1,
+          "absent": true
+        }
+      ],
+      "preexisting_containers_preserved": false
+    },
+    {
+      "file": "omni-r5-order-container-cleanup.json",
+      "active_count": 1,
+      "owned": [
+        {
+          "id": "dfa6fd617c11e0789d5379054f503313435f6556815e10599bde2dd4ea6153d9",
+          "inspect_exit_code": 1,
+          "absent": true
+        }
+      ],
+      "preexisting_containers_preserved": false
+    },
+    {
+      "file": "omni-r5-queues-container-cleanup.json",
+      "active_count": 1,
+      "owned": [
+        {
+          "id": "6590669c1e61dd454aa0c5841f6dcdc62d3542acfda8d3269c84e353359d19d8",
+          "inspect_exit_code": 1,
+          "absent": true
+        }
+      ],
+      "preexisting_containers_preserved": true
+    }
+  ],
+  "owned_runtime_containers": 15
+}

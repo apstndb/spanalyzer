@@ -1,0 +1,3087 @@
+{
+  "scope": "First coverage of current documentation changes; no inferred engine introduction date or performance claim. Original failed and dependency-blocked attempts remain in attempt ledger.",
+  "attempts": [
+    {
+      "name": "weekly-google",
+      "step_records": 156,
+      "submitted_steps": 89,
+      "codes": {
+        "OK": 73,
+        "InvalidArgument": 12,
+        "Unimplemented": 1,
+        "FailedPrecondition": 3,
+        "NOT_RUN": 67
+      },
+      "families": {
+        "filtered-search": {
+          "OK": 14,
+          "InvalidArgument": 6
+        },
+        "foreign-key": {
+          "OK": 19,
+          "InvalidArgument": 2,
+          "Unimplemented": 1,
+          "FailedPrecondition": 3
+        },
+        "json-dialect-control": {
+          "OK": 3
+        },
+        "metadata": {
+          "OK": 1
+        },
+        "numeric-search": {
+          "OK": 27,
+          "InvalidArgument": 3
+        },
+        "path-quantifier": {
+          "NOT_RUN": 18
+        },
+        "storage": {
+          "OK": 9
+        },
+        "volatile-graph": {
+          "InvalidArgument": 1,
+          "NOT_RUN": 49
+        }
+      }
+    },
+    {
+      "name": "weekly-pg",
+      "step_records": 84,
+      "submitted_steps": 84,
+      "codes": {
+        "OK": 77,
+        "InvalidArgument": 2,
+        "Unimplemented": 2,
+        "FailedPrecondition": 3
+      },
+      "families": {
+        "foreign-key": {
+          "OK": 19,
+          "InvalidArgument": 1,
+          "Unimplemented": 1,
+          "FailedPrecondition": 3
+        },
+        "jsonb-exploratory": {
+          "InvalidArgument": 1
+        },
+        "jsonb-order": {
+          "OK": 43
+        },
+        "jsonb-stored": {
+          "OK": 5,
+          "Unimplemented": 1
+        },
+        "metadata": {
+          "OK": 1
+        },
+        "storage": {
+          "OK": 9
+        }
+      }
+    },
+    {
+      "name": "repair-google",
+      "step_records": 75,
+      "submitted_steps": 8,
+      "codes": {
+        "OK": 4,
+        "InvalidArgument": 4,
+        "NOT_RUN": 67
+      },
+      "families": {
+        "foreign-key": {
+          "OK": 2,
+          "InvalidArgument": 1
+        },
+        "numeric-type-controls": {
+          "OK": 2,
+          "InvalidArgument": 2
+        },
+        "path-quantifier": {
+          "NOT_RUN": 18
+        },
+        "volatile-graph": {
+          "InvalidArgument": 1,
+          "NOT_RUN": 49
+        }
+      }
+    },
+    {
+      "name": "repair-pg",
+      "step_records": 8,
+      "submitted_steps": 8,
+      "codes": {
+        "OK": 6,
+        "InvalidArgument": 1,
+        "Unimplemented": 1
+      },
+      "families": {
+        "foreign-key": {
+          "OK": 2,
+          "InvalidArgument": 1
+        },
+        "jsonb-count-controls": {
+          "OK": 2,
+          "Unimplemented": 1
+        },
+        "jsonb-stored": {
+          "OK": 2
+        }
+      }
+    },
+    {
+      "name": "graph-final",
+      "step_records": 88,
+      "submitted_steps": 76,
+      "codes": {
+        "OK": 62,
+        "InvalidArgument": 13,
+        "NOT_RUN": 12,
+        "Unimplemented": 1
+      },
+      "families": {
+        "graph-fixture": {
+          "OK": 1
+        },
+        "path-quantifier": {
+          "OK": 7,
+          "InvalidArgument": 11
+        },
+        "view-volatility": {
+          "OK": 5,
+          "InvalidArgument": 2,
+          "Unimplemented": 1
+        },
+        "volatile-graph": {
+          "OK": 49,
+          "NOT_RUN": 12
+        }
+      }
+    }
+  ],
+  "semantic_assertions": {
+    "status": "pass",
+    "count": 112,
+    "checks": [
+      "google SET NULL preserves all child rows",
+      "google DML nulls referencing value and preserves payload",
+      "google mutation delete performs SET NULL",
+      "google rollback isolates referential action",
+      "google CASCADE removes child",
+      "google NO ACTION rejects parent removal",
+      "google referencing insert remains enforced",
+      "google composite full reference nulls all fields; partial NULL stays unchanged",
+      "google metadata DELETE_RULE records SET NULL",
+      "google NOT NULL/key/generated restrictions have isolated outcomes",
+      "google exported DDL preserves all three SET NULL constraints",
+      "pg SET NULL preserves all child rows",
+      "pg DML nulls referencing value and preserves payload",
+      "pg mutation delete performs SET NULL",
+      "pg rollback isolates referential action",
+      "pg CASCADE removes child",
+      "pg NO ACTION rejects parent removal",
+      "pg referencing insert remains enforced",
+      "pg composite full reference nulls all fields; partial NULL stays unchanged",
+      "pg metadata DELETE_RULE records SET NULL",
+      "pg NOT NULL/key/generated restrictions have isolated outcomes",
+      "pg exported DDL preserves all three SET NULL constraints",
+      "JSONB declared rows jsonb-type-null-null",
+      "JSONB declared rows jsonb-type-null-string",
+      "JSONB declared rows jsonb-type-null-number",
+      "JSONB declared rows jsonb-type-null-boolean",
+      "JSONB declared rows jsonb-type-null-array",
+      "JSONB declared rows jsonb-type-null-object",
+      "JSONB declared rows jsonb-type-string-null",
+      "JSONB declared rows jsonb-type-string-string",
+      "JSONB declared rows jsonb-type-string-number",
+      "JSONB declared rows jsonb-type-string-boolean",
+      "JSONB declared rows jsonb-type-string-array",
+      "JSONB declared rows jsonb-type-string-object",
+      "JSONB declared rows jsonb-type-number-null",
+      "JSONB declared rows jsonb-type-number-string",
+      "JSONB declared rows jsonb-type-number-number",
+      "JSONB declared rows jsonb-type-number-boolean",
+      "JSONB declared rows jsonb-type-number-array",
+      "JSONB declared rows jsonb-type-number-object",
+      "JSONB declared rows jsonb-type-boolean-null",
+      "JSONB declared rows jsonb-type-boolean-string",
+      "JSONB declared rows jsonb-type-boolean-number",
+      "JSONB declared rows jsonb-type-boolean-boolean",
+      "JSONB declared rows jsonb-type-boolean-array",
+      "JSONB declared rows jsonb-type-boolean-object",
+      "JSONB declared rows jsonb-type-array-null",
+      "JSONB declared rows jsonb-type-array-string",
+      "JSONB declared rows jsonb-type-array-number",
+      "JSONB declared rows jsonb-type-array-boolean",
+      "JSONB declared rows jsonb-type-array-array",
+      "JSONB declared rows jsonb-type-array-object",
+      "JSONB declared rows jsonb-type-object-null",
+      "JSONB declared rows jsonb-type-object-string",
+      "JSONB declared rows jsonb-type-object-number",
+      "JSONB declared rows jsonb-type-object-boolean",
+      "JSONB declared rows jsonb-type-object-array",
+      "JSONB declared rows jsonb-type-object-object",
+      "JSONB declared rows jsonb-empty-before-null",
+      "JSONB declared rows jsonb-null-before-nested-empty",
+      "JSONB declared rows jsonb-nested-null-before-empty",
+      "JSONB declared rows jsonb-array-length",
+      "JSONB declared rows jsonb-object-count",
+      "JSONB declared rows jsonb-object-key-length",
+      "JSONB declared rows jsonb-stored-join",
+      "JSONB declared rows jsonb-sql-null-control",
+      "JSONB stored sort order matches all 22 IDs",
+      "JSONB grouping merges numeric scale and duplicate-key normalization",
+      "JSONB DISTINCT-subquery COUNT(*) works",
+      "COUNT(jsonb), including DISTINCT, remains unsupported",
+      "MIN/MAX(jsonb) exploratory control rejects",
+      "Numeric eq rows agree across four access variants",
+      "Numeric eq prefix uses actual SearchIndexScan",
+      "Numeric eq log uses actual SearchIndexScan",
+      "Numeric le rows agree across four access variants",
+      "Numeric le prefix uses actual SearchIndexScan",
+      "Numeric le log uses actual SearchIndexScan",
+      "Numeric gt rows agree across four access variants",
+      "Numeric gt prefix uses actual SearchIndexScan",
+      "Numeric gt log uses actual SearchIndexScan",
+      "Numeric between rows agree across four access variants",
+      "Numeric between prefix uses actual SearchIndexScan",
+      "Numeric between log uses actual SearchIndexScan",
+      "Numeric not-eq rows agree across four access variants",
+      "Numeric not-eq prefix uses actual SearchIndexScan",
+      "Numeric not-eq log uses actual SearchIndexScan",
+      "Numeric in rows agree across four access variants",
+      "Numeric in prefix uses actual SearchIndexScan",
+      "Numeric in log uses actual SearchIndexScan",
+      "Filtered search omitted accepts only safe predicates",
+      "Filtered search explicit accepts only safe predicates",
+      "Filtered search explicit matches rows and uses index",
+      "Filtered search implied-equality accepts only safe predicates",
+      "Filtered search implied-equality matches rows and uses index",
+      "Filtered search implied-in accepts only safe predicates",
+      "Filtered search implied-in matches rows and uses index",
+      "Filtered search admits-null accepts only safe predicates",
+      "Filtered search only-null accepts only safe predicates",
+      "FLOAT64 tokenization works with correct typed options",
+      "Missing granularity/native NUMERIC/BIGNUMERIC controls remain separate rejections",
+      "All finite-graph path cases submitted independently of view support",
+      "All 24 available-view graph definitions create; six RAND-view graphs remain dependency-blocked",
+      "All available-view graph reads succeed, including false/default volatile option",
+      "RAND view rejection and direct builtin rejection remain distinct",
+      "Six bounded path controls succeed and eleven unbounded/invalid controls reject",
+      "Finite path endpoint pairs path-trail-bounded",
+      "Finite path endpoint pairs path-trail-no-lower",
+      "Finite path endpoint pairs path-acyclic-bounded",
+      "Finite path endpoint pairs path-acyclic-no-lower",
+      "Finite path endpoint pairs path-any-shortest-bounded",
+      "Finite path endpoint pairs path-any-shortest-no-lower",
+      "Storage column queries all execute in both dialects"
+    ]
+  },
+  "foreign_keys": {
+    "google": {
+      "checks": "pass",
+      "child_rows": 8,
+      "nullified_after_dml": [
+        11,
+        21
+      ],
+      "additional_nullified_after_mutation": [
+        12,
+        22
+      ],
+      "rollback_preserved": [
+        15,
+        25
+      ],
+      "invalid_column_codes": {
+        "fk-reject-not-null": "InvalidArgument",
+        "fk-reject-primary-key": "Unimplemented",
+        "fk-reject-generated": "InvalidArgument"
+      },
+      "metadata": [
+        {
+          "name": "FkAlter",
+          "rule": "SET NULL"
+        },
+        {
+          "name": "FkCascade",
+          "rule": "CASCADE"
+        },
+        {
+          "name": "FkInline",
+          "rule": "SET NULL"
+        },
+        {
+          "name": "FkNoAction",
+          "rule": "NO ACTION"
+        }
+      ]
+    },
+    "pg": {
+      "checks": "pass",
+      "child_rows": 8,
+      "nullified_after_dml": [
+        11,
+        21
+      ],
+      "additional_nullified_after_mutation": [
+        12,
+        22
+      ],
+      "rollback_preserved": [
+        15,
+        25
+      ],
+      "invalid_column_codes": {
+        "fk-reject-not-null": "InvalidArgument",
+        "fk-reject-primary-key": "Unimplemented",
+        "fk-reject-generated": "InvalidArgument"
+      },
+      "metadata": [
+        {
+          "name": "fkalter",
+          "rule": "SET NULL"
+        },
+        {
+          "name": "fkcascade",
+          "rule": "CASCADE"
+        },
+        {
+          "name": "fkinline",
+          "rule": "SET NULL"
+        },
+        {
+          "name": "fknoaction",
+          "rule": "NO ACTION"
+        }
+      ]
+    }
+  },
+  "jsonb": {
+    "declared_expectations": [
+      {
+        "label": "jsonb-type-null-null",
+        "code": "OK",
+        "expected": {
+          "lt": false,
+          "eq": true,
+          "gt": false
+        },
+        "observed": [
+          {
+            "eq": true,
+            "gt": false,
+            "lt": false
+          }
+        ],
+        "matches": true
+      },
+      {
+        "label": "jsonb-type-null-string",
+        "code": "OK",
+        "expected": {
+          "lt": true,
+          "eq": false,
+          "gt": false
+        },
+        "observed": [
+          {
+            "eq": false,
+            "gt": false,
+            "lt": true
+          }
+        ],
+        "matches": true
+      },
+      {
+        "label": "jsonb-type-null-number",
+        "code": "OK",
+        "expected": {
+          "lt": true,
+          "eq": false,
+          "gt": false
+        },
+        "observed": [
+          {
+            "eq": false,
+            "gt": false,
+            "lt": true
+          }
+        ],
+        "matches": true
+      },
+      {
+        "label": "jsonb-type-null-boolean",
+        "code": "OK",
+        "expected": {
+          "lt": true,
+          "eq": false,
+          "gt": false
+        },
+        "observed": [
+          {
+            "eq": false,
+            "gt": false,
+            "lt": true
+          }
+        ],
+        "matches": true
+      },
+      {
+        "label": "jsonb-type-null-array",
+        "code": "OK",
+        "expected": {
+          "lt": true,
+          "eq": false,
+          "gt": false
+        },
+        "observed": [
+          {
+            "eq": false,
+            "gt": false,
+            "lt": true
+          }
+        ],
+        "matches": true
+      },
+      {
+        "label": "jsonb-type-null-object",
+        "code": "OK",
+        "expected": {
+          "lt": true,
+          "eq": false,
+          "gt": false
+        },
+        "observed": [
+          {
+            "eq": false,
+            "gt": false,
+            "lt": true
+          }
+        ],
+        "matches": true
+      },
+      {
+        "label": "jsonb-type-string-null",
+        "code": "OK",
+        "expected": {
+          "lt": false,
+          "eq": false,
+          "gt": true
+        },
+        "observed": [
+          {
+            "eq": false,
+            "gt": true,
+            "lt": false
+          }
+        ],
+        "matches": true
+      },
+      {
+        "label": "jsonb-type-string-string",
+        "code": "OK",
+        "expected": {
+          "lt": false,
+          "eq": true,
+          "gt": false
+        },
+        "observed": [
+          {
+            "eq": true,
+            "gt": false,
+            "lt": false
+          }
+        ],
+        "matches": true
+      },
+      {
+        "label": "jsonb-type-string-number",
+        "code": "OK",
+        "expected": {
+          "lt": true,
+          "eq": false,
+          "gt": false
+        },
+        "observed": [
+          {
+            "eq": false,
+            "gt": false,
+            "lt": true
+          }
+        ],
+        "matches": true
+      },
+      {
+        "label": "jsonb-type-string-boolean",
+        "code": "OK",
+        "expected": {
+          "lt": true,
+          "eq": false,
+          "gt": false
+        },
+        "observed": [
+          {
+            "eq": false,
+            "gt": false,
+            "lt": true
+          }
+        ],
+        "matches": true
+      },
+      {
+        "label": "jsonb-type-string-array",
+        "code": "OK",
+        "expected": {
+          "lt": true,
+          "eq": false,
+          "gt": false
+        },
+        "observed": [
+          {
+            "eq": false,
+            "gt": false,
+            "lt": true
+          }
+        ],
+        "matches": true
+      },
+      {
+        "label": "jsonb-type-string-object",
+        "code": "OK",
+        "expected": {
+          "lt": true,
+          "eq": false,
+          "gt": false
+        },
+        "observed": [
+          {
+            "eq": false,
+            "gt": false,
+            "lt": true
+          }
+        ],
+        "matches": true
+      },
+      {
+        "label": "jsonb-type-number-null",
+        "code": "OK",
+        "expected": {
+          "lt": false,
+          "eq": false,
+          "gt": true
+        },
+        "observed": [
+          {
+            "eq": false,
+            "gt": true,
+            "lt": false
+          }
+        ],
+        "matches": true
+      },
+      {
+        "label": "jsonb-type-number-string",
+        "code": "OK",
+        "expected": {
+          "lt": false,
+          "eq": false,
+          "gt": true
+        },
+        "observed": [
+          {
+            "eq": false,
+            "gt": true,
+            "lt": false
+          }
+        ],
+        "matches": true
+      },
+      {
+        "label": "jsonb-type-number-number",
+        "code": "OK",
+        "expected": {
+          "lt": false,
+          "eq": true,
+          "gt": false
+        },
+        "observed": [
+          {
+            "eq": true,
+            "gt": false,
+            "lt": false
+          }
+        ],
+        "matches": true
+      },
+      {
+        "label": "jsonb-type-number-boolean",
+        "code": "OK",
+        "expected": {
+          "lt": true,
+          "eq": false,
+          "gt": false
+        },
+        "observed": [
+          {
+            "eq": false,
+            "gt": false,
+            "lt": true
+          }
+        ],
+        "matches": true
+      },
+      {
+        "label": "jsonb-type-number-array",
+        "code": "OK",
+        "expected": {
+          "lt": true,
+          "eq": false,
+          "gt": false
+        },
+        "observed": [
+          {
+            "eq": false,
+            "gt": false,
+            "lt": true
+          }
+        ],
+        "matches": true
+      },
+      {
+        "label": "jsonb-type-number-object",
+        "code": "OK",
+        "expected": {
+          "lt": true,
+          "eq": false,
+          "gt": false
+        },
+        "observed": [
+          {
+            "eq": false,
+            "gt": false,
+            "lt": true
+          }
+        ],
+        "matches": true
+      },
+      {
+        "label": "jsonb-type-boolean-null",
+        "code": "OK",
+        "expected": {
+          "lt": false,
+          "eq": false,
+          "gt": true
+        },
+        "observed": [
+          {
+            "eq": false,
+            "gt": true,
+            "lt": false
+          }
+        ],
+        "matches": true
+      },
+      {
+        "label": "jsonb-type-boolean-string",
+        "code": "OK",
+        "expected": {
+          "lt": false,
+          "eq": false,
+          "gt": true
+        },
+        "observed": [
+          {
+            "eq": false,
+            "gt": true,
+            "lt": false
+          }
+        ],
+        "matches": true
+      },
+      {
+        "label": "jsonb-type-boolean-number",
+        "code": "OK",
+        "expected": {
+          "lt": false,
+          "eq": false,
+          "gt": true
+        },
+        "observed": [
+          {
+            "eq": false,
+            "gt": true,
+            "lt": false
+          }
+        ],
+        "matches": true
+      },
+      {
+        "label": "jsonb-type-boolean-boolean",
+        "code": "OK",
+        "expected": {
+          "lt": false,
+          "eq": true,
+          "gt": false
+        },
+        "observed": [
+          {
+            "eq": true,
+            "gt": false,
+            "lt": false
+          }
+        ],
+        "matches": true
+      },
+      {
+        "label": "jsonb-type-boolean-array",
+        "code": "OK",
+        "expected": {
+          "lt": true,
+          "eq": false,
+          "gt": false
+        },
+        "observed": [
+          {
+            "eq": false,
+            "gt": false,
+            "lt": true
+          }
+        ],
+        "matches": true
+      },
+      {
+        "label": "jsonb-type-boolean-object",
+        "code": "OK",
+        "expected": {
+          "lt": true,
+          "eq": false,
+          "gt": false
+        },
+        "observed": [
+          {
+            "eq": false,
+            "gt": false,
+            "lt": true
+          }
+        ],
+        "matches": true
+      },
+      {
+        "label": "jsonb-type-array-null",
+        "code": "OK",
+        "expected": {
+          "lt": false,
+          "eq": false,
+          "gt": true
+        },
+        "observed": [
+          {
+            "eq": false,
+            "gt": true,
+            "lt": false
+          }
+        ],
+        "matches": true
+      },
+      {
+        "label": "jsonb-type-array-string",
+        "code": "OK",
+        "expected": {
+          "lt": false,
+          "eq": false,
+          "gt": true
+        },
+        "observed": [
+          {
+            "eq": false,
+            "gt": true,
+            "lt": false
+          }
+        ],
+        "matches": true
+      },
+      {
+        "label": "jsonb-type-array-number",
+        "code": "OK",
+        "expected": {
+          "lt": false,
+          "eq": false,
+          "gt": true
+        },
+        "observed": [
+          {
+            "eq": false,
+            "gt": true,
+            "lt": false
+          }
+        ],
+        "matches": true
+      },
+      {
+        "label": "jsonb-type-array-boolean",
+        "code": "OK",
+        "expected": {
+          "lt": false,
+          "eq": false,
+          "gt": true
+        },
+        "observed": [
+          {
+            "eq": false,
+            "gt": true,
+            "lt": false
+          }
+        ],
+        "matches": true
+      },
+      {
+        "label": "jsonb-type-array-array",
+        "code": "OK",
+        "expected": {
+          "lt": false,
+          "eq": true,
+          "gt": false
+        },
+        "observed": [
+          {
+            "eq": true,
+            "gt": false,
+            "lt": false
+          }
+        ],
+        "matches": true
+      },
+      {
+        "label": "jsonb-type-array-object",
+        "code": "OK",
+        "expected": {
+          "lt": true,
+          "eq": false,
+          "gt": false
+        },
+        "observed": [
+          {
+            "eq": false,
+            "gt": false,
+            "lt": true
+          }
+        ],
+        "matches": true
+      },
+      {
+        "label": "jsonb-type-object-null",
+        "code": "OK",
+        "expected": {
+          "lt": false,
+          "eq": false,
+          "gt": true
+        },
+        "observed": [
+          {
+            "eq": false,
+            "gt": true,
+            "lt": false
+          }
+        ],
+        "matches": true
+      },
+      {
+        "label": "jsonb-type-object-string",
+        "code": "OK",
+        "expected": {
+          "lt": false,
+          "eq": false,
+          "gt": true
+        },
+        "observed": [
+          {
+            "eq": false,
+            "gt": true,
+            "lt": false
+          }
+        ],
+        "matches": true
+      },
+      {
+        "label": "jsonb-type-object-number",
+        "code": "OK",
+        "expected": {
+          "lt": false,
+          "eq": false,
+          "gt": true
+        },
+        "observed": [
+          {
+            "eq": false,
+            "gt": true,
+            "lt": false
+          }
+        ],
+        "matches": true
+      },
+      {
+        "label": "jsonb-type-object-boolean",
+        "code": "OK",
+        "expected": {
+          "lt": false,
+          "eq": false,
+          "gt": true
+        },
+        "observed": [
+          {
+            "eq": false,
+            "gt": true,
+            "lt": false
+          }
+        ],
+        "matches": true
+      },
+      {
+        "label": "jsonb-type-object-array",
+        "code": "OK",
+        "expected": {
+          "lt": false,
+          "eq": false,
+          "gt": true
+        },
+        "observed": [
+          {
+            "eq": false,
+            "gt": true,
+            "lt": false
+          }
+        ],
+        "matches": true
+      },
+      {
+        "label": "jsonb-type-object-object",
+        "code": "OK",
+        "expected": {
+          "lt": false,
+          "eq": true,
+          "gt": false
+        },
+        "observed": [
+          {
+            "eq": true,
+            "gt": false,
+            "lt": false
+          }
+        ],
+        "matches": true
+      },
+      {
+        "label": "jsonb-empty-before-null",
+        "code": "OK",
+        "expected": {
+          "result": true
+        },
+        "observed": [
+          {
+            "result": true
+          }
+        ],
+        "matches": true
+      },
+      {
+        "label": "jsonb-null-before-nested-empty",
+        "code": "OK",
+        "expected": {
+          "result": true
+        },
+        "observed": [
+          {
+            "result": true
+          }
+        ],
+        "matches": true
+      },
+      {
+        "label": "jsonb-nested-null-before-empty",
+        "code": "OK",
+        "expected": {
+          "result": true
+        },
+        "observed": [
+          {
+            "result": true
+          }
+        ],
+        "matches": true
+      },
+      {
+        "label": "jsonb-array-length",
+        "code": "OK",
+        "expected": {
+          "result": true
+        },
+        "observed": [
+          {
+            "result": true
+          }
+        ],
+        "matches": true
+      },
+      {
+        "label": "jsonb-object-count",
+        "code": "OK",
+        "expected": {
+          "result": true
+        },
+        "observed": [
+          {
+            "result": true
+          }
+        ],
+        "matches": true
+      },
+      {
+        "label": "jsonb-object-key-length",
+        "code": "OK",
+        "expected": {
+          "result": true
+        },
+        "observed": [
+          {
+            "result": true
+          }
+        ],
+        "matches": true
+      },
+      {
+        "label": "jsonb-stored-distinct-count",
+        "code": "Unimplemented",
+        "expected": {
+          "n": "19"
+        },
+        "observed": [],
+        "matches": false
+      },
+      {
+        "label": "jsonb-stored-join",
+        "code": "OK",
+        "expected": {
+          "n": "25"
+        },
+        "observed": [
+          {
+            "n": "25"
+          }
+        ],
+        "matches": true
+      },
+      {
+        "label": "jsonb-sql-null-control",
+        "code": "OK",
+        "expected": {
+          "sql_null": true,
+          "json_null": false
+        },
+        "observed": [
+          {
+            "json_null": false,
+            "sql_null": true
+          }
+        ],
+        "matches": true
+      }
+    ],
+    "stored_order_ids": [
+      21,
+      11,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      15,
+      12,
+      13,
+      16,
+      14,
+      17,
+      19,
+      22,
+      18,
+      20
+    ],
+    "group_count": 20,
+    "join": [
+      {
+        "n": "25"
+      }
+    ],
+    "distinct_subquery_count": [
+      {
+        "n": "19"
+      }
+    ],
+    "count_jsonb": {
+      "jsonb-stored-distinct-count": "Unimplemented",
+      "jsonb-count-expression": "Unimplemented",
+      "jsonb-stored-minmax": "InvalidArgument"
+    }
+  },
+  "numeric_search": {
+    "eq": {
+      "auto": {
+        "code": "OK",
+        "rows": [
+          {
+            "id": "5"
+          }
+        ],
+        "scans": [
+          {
+            "execution_method": "Row",
+            "scan_method": "Row",
+            "scan_target": "NumLog",
+            "scan_type": "SearchIndexScan"
+          }
+        ]
+      },
+      "prefix": {
+        "code": "OK",
+        "rows": [
+          {
+            "id": "5"
+          }
+        ],
+        "scans": [
+          {
+            "execution_method": "Row",
+            "scan_method": "Row",
+            "scan_target": "NumPre",
+            "scan_type": "SearchIndexScan"
+          }
+        ]
+      },
+      "log": {
+        "code": "OK",
+        "rows": [
+          {
+            "id": "5"
+          }
+        ],
+        "scans": [
+          {
+            "execution_method": "Row",
+            "scan_method": "Row",
+            "scan_target": "NumLog",
+            "scan_type": "SearchIndexScan"
+          }
+        ]
+      },
+      "base": {
+        "code": "OK",
+        "rows": [
+          {
+            "id": "5"
+          }
+        ],
+        "scans": [
+          {
+            "Full scan": "true",
+            "execution_method": "Row",
+            "scan_method": "Automatic",
+            "scan_target": "NumDocs",
+            "scan_type": "TableScan"
+          }
+        ]
+      }
+    },
+    "le": {
+      "auto": {
+        "code": "OK",
+        "rows": [
+          {
+            "id": "1"
+          },
+          {
+            "id": "2"
+          },
+          {
+            "id": "3"
+          },
+          {
+            "id": "4"
+          },
+          {
+            "id": "5"
+          },
+          {
+            "id": "6"
+          }
+        ],
+        "scans": [
+          {
+            "execution_method": "Row",
+            "scan_method": "Row",
+            "scan_target": "NumLog",
+            "scan_type": "SearchIndexScan"
+          }
+        ]
+      },
+      "prefix": {
+        "code": "OK",
+        "rows": [
+          {
+            "id": "1"
+          },
+          {
+            "id": "2"
+          },
+          {
+            "id": "3"
+          },
+          {
+            "id": "4"
+          },
+          {
+            "id": "5"
+          },
+          {
+            "id": "6"
+          }
+        ],
+        "scans": [
+          {
+            "execution_method": "Row",
+            "scan_method": "Row",
+            "scan_target": "NumPre",
+            "scan_type": "SearchIndexScan"
+          }
+        ]
+      },
+      "log": {
+        "code": "OK",
+        "rows": [
+          {
+            "id": "1"
+          },
+          {
+            "id": "2"
+          },
+          {
+            "id": "3"
+          },
+          {
+            "id": "4"
+          },
+          {
+            "id": "5"
+          },
+          {
+            "id": "6"
+          }
+        ],
+        "scans": [
+          {
+            "execution_method": "Row",
+            "scan_method": "Row",
+            "scan_target": "NumLog",
+            "scan_type": "SearchIndexScan"
+          }
+        ]
+      },
+      "base": {
+        "code": "OK",
+        "rows": [
+          {
+            "id": "1"
+          },
+          {
+            "id": "2"
+          },
+          {
+            "id": "3"
+          },
+          {
+            "id": "4"
+          },
+          {
+            "id": "5"
+          },
+          {
+            "id": "6"
+          }
+        ],
+        "scans": [
+          {
+            "Full scan": "true",
+            "execution_method": "Row",
+            "scan_method": "Automatic",
+            "scan_target": "NumDocs",
+            "scan_type": "TableScan"
+          }
+        ]
+      }
+    },
+    "gt": {
+      "auto": {
+        "code": "OK",
+        "rows": [
+          {
+            "id": "5"
+          },
+          {
+            "id": "6"
+          },
+          {
+            "id": "7"
+          },
+          {
+            "id": "8"
+          },
+          {
+            "id": "9"
+          }
+        ],
+        "scans": [
+          {
+            "execution_method": "Row",
+            "scan_method": "Row",
+            "scan_target": "NumLog",
+            "scan_type": "SearchIndexScan"
+          }
+        ]
+      },
+      "prefix": {
+        "code": "OK",
+        "rows": [
+          {
+            "id": "5"
+          },
+          {
+            "id": "6"
+          },
+          {
+            "id": "7"
+          },
+          {
+            "id": "8"
+          },
+          {
+            "id": "9"
+          }
+        ],
+        "scans": [
+          {
+            "execution_method": "Row",
+            "scan_method": "Row",
+            "scan_target": "NumPre",
+            "scan_type": "SearchIndexScan"
+          }
+        ]
+      },
+      "log": {
+        "code": "OK",
+        "rows": [
+          {
+            "id": "5"
+          },
+          {
+            "id": "6"
+          },
+          {
+            "id": "7"
+          },
+          {
+            "id": "8"
+          },
+          {
+            "id": "9"
+          }
+        ],
+        "scans": [
+          {
+            "execution_method": "Row",
+            "scan_method": "Row",
+            "scan_target": "NumLog",
+            "scan_type": "SearchIndexScan"
+          }
+        ]
+      },
+      "base": {
+        "code": "OK",
+        "rows": [
+          {
+            "id": "5"
+          },
+          {
+            "id": "6"
+          },
+          {
+            "id": "7"
+          },
+          {
+            "id": "8"
+          },
+          {
+            "id": "9"
+          }
+        ],
+        "scans": [
+          {
+            "Full scan": "true",
+            "execution_method": "Row",
+            "scan_method": "Automatic",
+            "scan_target": "NumDocs",
+            "scan_type": "TableScan"
+          }
+        ]
+      }
+    },
+    "between": {
+      "auto": {
+        "code": "OK",
+        "rows": [
+          {
+            "id": "3"
+          },
+          {
+            "id": "4"
+          },
+          {
+            "id": "5"
+          },
+          {
+            "id": "6"
+          },
+          {
+            "id": "7"
+          },
+          {
+            "id": "8"
+          }
+        ],
+        "scans": [
+          {
+            "execution_method": "Row",
+            "scan_method": "Row",
+            "scan_target": "NumLog",
+            "scan_type": "SearchIndexScan"
+          }
+        ]
+      },
+      "prefix": {
+        "code": "OK",
+        "rows": [
+          {
+            "id": "3"
+          },
+          {
+            "id": "4"
+          },
+          {
+            "id": "5"
+          },
+          {
+            "id": "6"
+          },
+          {
+            "id": "7"
+          },
+          {
+            "id": "8"
+          }
+        ],
+        "scans": [
+          {
+            "execution_method": "Row",
+            "scan_method": "Row",
+            "scan_target": "NumPre",
+            "scan_type": "SearchIndexScan"
+          }
+        ]
+      },
+      "log": {
+        "code": "OK",
+        "rows": [
+          {
+            "id": "3"
+          },
+          {
+            "id": "4"
+          },
+          {
+            "id": "5"
+          },
+          {
+            "id": "6"
+          },
+          {
+            "id": "7"
+          },
+          {
+            "id": "8"
+          }
+        ],
+        "scans": [
+          {
+            "execution_method": "Row",
+            "scan_method": "Row",
+            "scan_target": "NumLog",
+            "scan_type": "SearchIndexScan"
+          }
+        ]
+      },
+      "base": {
+        "code": "OK",
+        "rows": [
+          {
+            "id": "3"
+          },
+          {
+            "id": "4"
+          },
+          {
+            "id": "5"
+          },
+          {
+            "id": "6"
+          },
+          {
+            "id": "7"
+          },
+          {
+            "id": "8"
+          }
+        ],
+        "scans": [
+          {
+            "Full scan": "true",
+            "execution_method": "Row",
+            "scan_method": "Automatic",
+            "scan_target": "NumDocs",
+            "scan_type": "TableScan"
+          }
+        ]
+      }
+    },
+    "not-eq": {
+      "auto": {
+        "code": "OK",
+        "rows": [
+          {
+            "id": "1"
+          },
+          {
+            "id": "2"
+          },
+          {
+            "id": "3"
+          },
+          {
+            "id": "4"
+          },
+          {
+            "id": "5"
+          },
+          {
+            "id": "7"
+          },
+          {
+            "id": "8"
+          },
+          {
+            "id": "9"
+          }
+        ],
+        "scans": [
+          {
+            "Full scan": "true",
+            "execution_method": "Row",
+            "scan_method": "Automatic",
+            "scan_target": "NumDocs",
+            "scan_type": "TableScan"
+          }
+        ]
+      },
+      "prefix": {
+        "code": "OK",
+        "rows": [
+          {
+            "id": "1"
+          },
+          {
+            "id": "2"
+          },
+          {
+            "id": "3"
+          },
+          {
+            "id": "4"
+          },
+          {
+            "id": "5"
+          },
+          {
+            "id": "7"
+          },
+          {
+            "id": "8"
+          },
+          {
+            "id": "9"
+          }
+        ],
+        "scans": [
+          {
+            "execution_method": "Row",
+            "scan_method": "Row",
+            "scan_target": "NumPre",
+            "scan_type": "SearchIndexScan"
+          }
+        ]
+      },
+      "log": {
+        "code": "OK",
+        "rows": [
+          {
+            "id": "1"
+          },
+          {
+            "id": "2"
+          },
+          {
+            "id": "3"
+          },
+          {
+            "id": "4"
+          },
+          {
+            "id": "5"
+          },
+          {
+            "id": "7"
+          },
+          {
+            "id": "8"
+          },
+          {
+            "id": "9"
+          }
+        ],
+        "scans": [
+          {
+            "execution_method": "Row",
+            "scan_method": "Row",
+            "scan_target": "NumLog",
+            "scan_type": "SearchIndexScan"
+          }
+        ]
+      },
+      "base": {
+        "code": "OK",
+        "rows": [
+          {
+            "id": "1"
+          },
+          {
+            "id": "2"
+          },
+          {
+            "id": "3"
+          },
+          {
+            "id": "4"
+          },
+          {
+            "id": "5"
+          },
+          {
+            "id": "7"
+          },
+          {
+            "id": "8"
+          },
+          {
+            "id": "9"
+          }
+        ],
+        "scans": [
+          {
+            "Full scan": "true",
+            "execution_method": "Row",
+            "scan_method": "Automatic",
+            "scan_target": "NumDocs",
+            "scan_type": "TableScan"
+          }
+        ]
+      }
+    },
+    "in": {
+      "auto": {
+        "code": "OK",
+        "rows": [
+          {
+            "id": "5"
+          },
+          {
+            "id": "7"
+          },
+          {
+            "id": "9"
+          }
+        ],
+        "scans": [
+          {
+            "execution_method": "Row",
+            "scan_method": "Row",
+            "scan_target": "NumLog",
+            "scan_type": "SearchIndexScan"
+          }
+        ]
+      },
+      "prefix": {
+        "code": "OK",
+        "rows": [
+          {
+            "id": "5"
+          },
+          {
+            "id": "7"
+          },
+          {
+            "id": "9"
+          }
+        ],
+        "scans": [
+          {
+            "execution_method": "Row",
+            "scan_method": "Row",
+            "scan_target": "NumPre",
+            "scan_type": "SearchIndexScan"
+          }
+        ]
+      },
+      "log": {
+        "code": "OK",
+        "rows": [
+          {
+            "id": "5"
+          },
+          {
+            "id": "7"
+          },
+          {
+            "id": "9"
+          }
+        ],
+        "scans": [
+          {
+            "execution_method": "Row",
+            "scan_method": "Row",
+            "scan_target": "NumLog",
+            "scan_type": "SearchIndexScan"
+          }
+        ]
+      },
+      "base": {
+        "code": "OK",
+        "rows": [
+          {
+            "id": "5"
+          },
+          {
+            "id": "7"
+          },
+          {
+            "id": "9"
+          }
+        ],
+        "scans": [
+          {
+            "Full scan": "true",
+            "execution_method": "Row",
+            "scan_method": "Automatic",
+            "scan_target": "NumDocs",
+            "scan_type": "TableScan"
+          }
+        ]
+      }
+    }
+  },
+  "numeric_type_controls": {
+    "tokenize-float-prefix-typed": {
+      "code": "OK",
+      "error": "",
+      "rows": [
+        {
+          "tokens": "==1.25, [-15.625, 4.61169e+18], [-15.125, 4.61169e+18], [-14.125, 4.61169e+18], [-12.125, 4.61169e+18], [-8.125, 4.61169e+18], [-0.125, 4.61169e+18], [-0.125, 1.875], [-0.125, 3.875], [-0.125, 7.875], [-0.125, 15.875], [0.875, 1.375], [0.875, 1.875], [1.125, 1.375], <warning(printed values for DOUBLE tokens are approximate)>"
+        }
+      ]
+    },
+    "tokenize-float-default": {
+      "code": "OK",
+      "error": "",
+      "rows": [
+        {
+          "tokens": "==1.25, [1e-323, 1e189), [1e-323, 1e701), [0, 2.00000000000001e0), [0, 4.00000000000001e0), [1e0, 2.00000000000001e0), [1.0e0, 1.40000000000001e0), [1.2e0, 1.30000000000001e0), [1.2e0, 1.40000000000001e0), [1.24e0, 1.25000000000001e0), [1.24e0, 1.26000000000001e0), [1.24e0, 1.28000000000001e0), [1.25e0, 1.25000000000001e0), [1.25e0, 1.26000000000001e0), [1e-67, 1e61), [1e-67, 1e189), [1e-3, 1e1), [1e-3, 1e5), [1e-3, 1e13), [1e-3, 1e29), [1e-3, 1e61), [1e-1, 1e1), [1e0, 1e1), <warning(printed values for DOUBLE tokens are approximate)>"
+        }
+      ]
+    },
+    "tokenize-float-missing-granularity": {
+      "code": "InvalidArgument",
+      "error": "spanner: code = \"InvalidArgument\", desc = \"TOKENIZE_NUMBER: when indexing DOUBLE with logtree or prefixtree algorithm, you must set the \\\\'granularity\\\\' argument to a non-null value. [at 1:24]\\\\nSELECT DEBUG_TOKENLIST(TOKENIZE_NUMBER(CAST(1.25 AS FLOAT64),comparison_type=...\\\\n                       ^\", requestID = \"<redacted>\"",
+      "rows": []
+    },
+    "tokenize-numeric-typed-options": {
+      "code": "InvalidArgument",
+      "error": "spanner: code = \"InvalidArgument\", desc = \"No matching signature for function SPANNER:TOKENIZE_NUMBER\\\\n  Argument types: NUMERIC, comparison_type => STRING, algorithm => STRING, min => NUMERIC, max => NUMERIC, granularity => NUMERIC\\\\n  Signature: TOKENIZE_NUMBER([value=>]FLOAT64, [comparison_type => STRING], [algorithm => STRING], [min => FLOAT64], [max => FLOAT64], [granularity => FLOAT64], [tree_base => INT64], [precision => INT64])\\\\n    Argument 1: Unable to coerce type NUMERIC to expected type FLOAT64\\\\n  Signature: TOKENIZE_NUMBER([value=>]ARRAY<FLOAT64>, [comparison_type => STRING], [algorithm => STRING], [min => FLOAT64], [max => FLOAT64], [granularity => FLOAT64], [tree_base => INT64], [precision => INT64])\\\\n    Argument 1: Unable to coerce type NUMERIC to expected type ARRAY<FLOAT64>\\\\n  Signature: TOKENIZE_NUMBER([value=>]INT64, [comparison_type => STRING], [algorithm => STRING], [min => INT64], [max => INT64], [granularity => INT64], [tree_base => INT64], [precision => INT64])\\\\n    Argument 1: Unable to coerce type NUMERIC to expected type...\", requestID = \"<redacted>\"",
+      "rows": []
+    },
+    "bignumeric-type-control": {
+      "code": "InvalidArgument",
+      "error": "spanner: code = \"InvalidArgument\", desc = \"Type not found: BIGNUMERIC [at 1:23]\\\\nSELECT CAST(\\\\'1.25\\\\' AS BIGNUMERIC) AS value\\\\n                      ^\", requestID = \"<redacted>\"",
+      "rows": []
+    }
+  },
+  "null_filtered_search": {
+    "omitted": {
+      "auto": {
+        "code": "InvalidArgument",
+        "rows": [],
+        "error": "spanner: code = \"InvalidArgument\", desc = \"SEARCH is not supported in this query. Possible reasons are: There is no appropriate search index to use, or the function is used in unsupported query shapes. You can get more details on why a specific search index cannot be used by adding @{force_index} hint to the query.\", requestID = \"<redacted>\"",
+        "scans": []
+      },
+      "forced": {
+        "code": "InvalidArgument",
+        "rows": [],
+        "error": "spanner: code = \"InvalidArgument\", desc = \"The index FilteredSearch cannot be used because it filters nulls that are required to answer the query for column Genre.\", requestID = \"<redacted>\"",
+        "scans": []
+      },
+      "base-control": {
+        "code": "OK",
+        "rows": [
+          {
+            "id": "1"
+          },
+          {
+            "id": "2"
+          }
+        ],
+        "error": "",
+        "scans": []
+      }
+    },
+    "explicit": {
+      "auto": {
+        "code": "OK",
+        "rows": [
+          {
+            "id": "1"
+          }
+        ],
+        "error": "",
+        "scans": [
+          {
+            "execution_method": "Row",
+            "scan_method": "Row",
+            "scan_target": "FilteredSearch",
+            "scan_type": "SearchIndexScan"
+          }
+        ]
+      },
+      "forced": {
+        "code": "OK",
+        "rows": [
+          {
+            "id": "1"
+          }
+        ],
+        "error": "",
+        "scans": [
+          {
+            "execution_method": "Row",
+            "scan_method": "Row",
+            "scan_target": "FilteredSearch",
+            "scan_type": "SearchIndexScan"
+          }
+        ]
+      },
+      "base-control": {
+        "code": "OK",
+        "rows": [
+          {
+            "id": "1"
+          }
+        ],
+        "error": "",
+        "scans": []
+      }
+    },
+    "implied-equality": {
+      "auto": {
+        "code": "OK",
+        "rows": [
+          {
+            "id": "1"
+          }
+        ],
+        "error": "",
+        "scans": [
+          {
+            "execution_method": "Row",
+            "scan_method": "Row",
+            "scan_target": "FilteredSearch",
+            "scan_type": "SearchIndexScan"
+          }
+        ]
+      },
+      "forced": {
+        "code": "OK",
+        "rows": [
+          {
+            "id": "1"
+          }
+        ],
+        "error": "",
+        "scans": [
+          {
+            "execution_method": "Row",
+            "scan_method": "Row",
+            "scan_target": "FilteredSearch",
+            "scan_type": "SearchIndexScan"
+          }
+        ]
+      },
+      "base-control": {
+        "code": "OK",
+        "rows": [
+          {
+            "id": "1"
+          }
+        ],
+        "error": "",
+        "scans": []
+      }
+    },
+    "implied-in": {
+      "auto": {
+        "code": "OK",
+        "rows": [
+          {
+            "id": "1"
+          }
+        ],
+        "error": "",
+        "scans": [
+          {
+            "execution_method": "Row",
+            "scan_method": "Row",
+            "scan_target": "FilteredSearch",
+            "scan_type": "SearchIndexScan"
+          }
+        ]
+      },
+      "forced": {
+        "code": "OK",
+        "rows": [
+          {
+            "id": "1"
+          }
+        ],
+        "error": "",
+        "scans": [
+          {
+            "execution_method": "Row",
+            "scan_method": "Row",
+            "scan_target": "FilteredSearch",
+            "scan_type": "SearchIndexScan"
+          }
+        ]
+      },
+      "base-control": {
+        "code": "OK",
+        "rows": [
+          {
+            "id": "1"
+          }
+        ],
+        "error": "",
+        "scans": []
+      }
+    },
+    "admits-null": {
+      "auto": {
+        "code": "InvalidArgument",
+        "rows": [],
+        "error": "spanner: code = \"InvalidArgument\", desc = \"SEARCH is not supported in this query. Possible reasons are: There is no appropriate search index to use, or the function is used in unsupported query shapes. You can get more details on why a specific search index cannot be used by adding @{force_index} hint to the query.\", requestID = \"<redacted>\"",
+        "scans": []
+      },
+      "forced": {
+        "code": "InvalidArgument",
+        "rows": [],
+        "error": "spanner: code = \"InvalidArgument\", desc = \"The index FilteredSearch cannot be used because it filters nulls that are required to answer the query for column Genre.\", requestID = \"<redacted>\"",
+        "scans": []
+      },
+      "base-control": {
+        "code": "OK",
+        "rows": [
+          {
+            "id": "1"
+          },
+          {
+            "id": "2"
+          }
+        ],
+        "error": "",
+        "scans": []
+      }
+    },
+    "only-null": {
+      "auto": {
+        "code": "InvalidArgument",
+        "rows": [],
+        "error": "spanner: code = \"InvalidArgument\", desc = \"SEARCH is not supported in this query. Possible reasons are: There is no appropriate search index to use, or the function is used in unsupported query shapes. You can get more details on why a specific search index cannot be used by adding @{force_index} hint to the query.\", requestID = \"<redacted>\"",
+        "scans": []
+      },
+      "forced": {
+        "code": "InvalidArgument",
+        "rows": [],
+        "error": "spanner: code = \"InvalidArgument\", desc = \"The index FilteredSearch cannot be used because it filters nulls that are required to answer the query for column Genre.\", requestID = \"<redacted>\"",
+        "scans": []
+      },
+      "base-control": {
+        "code": "OK",
+        "rows": [
+          {
+            "id": "2"
+          }
+        ],
+        "error": "",
+        "scans": []
+      }
+    }
+  },
+  "volatile_graph_matrix": [
+    {
+      "label": "volatile-gstable-key-false-allow-omit",
+      "view": "GStable",
+      "uniqueness": "false",
+      "allow_volatile": "omit",
+      "create_code": "OK",
+      "create_error": "",
+      "read_code": "OK",
+      "read_rows": [
+        {
+          "n": "3"
+        }
+      ]
+    },
+    {
+      "label": "volatile-gstable-key-false-allow-false",
+      "view": "GStable",
+      "uniqueness": "false",
+      "allow_volatile": "false",
+      "create_code": "OK",
+      "create_error": "",
+      "read_code": "OK",
+      "read_rows": [
+        {
+          "n": "3"
+        }
+      ]
+    },
+    {
+      "label": "volatile-gstable-key-false-allow-true",
+      "view": "GStable",
+      "uniqueness": "false",
+      "allow_volatile": "true",
+      "create_code": "OK",
+      "create_error": "",
+      "read_code": "OK",
+      "read_rows": [
+        {
+          "n": "3"
+        }
+      ]
+    },
+    {
+      "label": "volatile-gprojection-key-omit-allow-omit",
+      "view": "GProjection",
+      "uniqueness": "omit",
+      "allow_volatile": "omit",
+      "create_code": "OK",
+      "create_error": "",
+      "read_code": "OK",
+      "read_rows": [
+        {
+          "n": "3"
+        }
+      ]
+    },
+    {
+      "label": "volatile-gprojection-key-omit-allow-false",
+      "view": "GProjection",
+      "uniqueness": "omit",
+      "allow_volatile": "false",
+      "create_code": "OK",
+      "create_error": "",
+      "read_code": "OK",
+      "read_rows": [
+        {
+          "n": "3"
+        }
+      ]
+    },
+    {
+      "label": "volatile-gprojection-key-omit-allow-true",
+      "view": "GProjection",
+      "uniqueness": "omit",
+      "allow_volatile": "true",
+      "create_code": "OK",
+      "create_error": "",
+      "read_code": "OK",
+      "read_rows": [
+        {
+          "n": "3"
+        }
+      ]
+    },
+    {
+      "label": "volatile-gprojection-key-false-allow-omit",
+      "view": "GProjection",
+      "uniqueness": "false",
+      "allow_volatile": "omit",
+      "create_code": "OK",
+      "create_error": "",
+      "read_code": "OK",
+      "read_rows": [
+        {
+          "n": "3"
+        }
+      ]
+    },
+    {
+      "label": "volatile-gprojection-key-false-allow-false",
+      "view": "GProjection",
+      "uniqueness": "false",
+      "allow_volatile": "false",
+      "create_code": "OK",
+      "create_error": "",
+      "read_code": "OK",
+      "read_rows": [
+        {
+          "n": "3"
+        }
+      ]
+    },
+    {
+      "label": "volatile-gprojection-key-false-allow-true",
+      "view": "GProjection",
+      "uniqueness": "false",
+      "allow_volatile": "true",
+      "create_code": "OK",
+      "create_error": "",
+      "read_code": "OK",
+      "read_rows": [
+        {
+          "n": "3"
+        }
+      ]
+    },
+    {
+      "label": "volatile-gprojection-key-true-allow-omit",
+      "view": "GProjection",
+      "uniqueness": "true",
+      "allow_volatile": "omit",
+      "create_code": "OK",
+      "create_error": "",
+      "read_code": "OK",
+      "read_rows": [
+        {
+          "n": "3"
+        }
+      ]
+    },
+    {
+      "label": "volatile-gprojection-key-true-allow-false",
+      "view": "GProjection",
+      "uniqueness": "true",
+      "allow_volatile": "false",
+      "create_code": "OK",
+      "create_error": "",
+      "read_code": "OK",
+      "read_rows": [
+        {
+          "n": "3"
+        }
+      ]
+    },
+    {
+      "label": "volatile-gprojection-key-true-allow-true",
+      "view": "GProjection",
+      "uniqueness": "true",
+      "allow_volatile": "true",
+      "create_code": "OK",
+      "create_error": "",
+      "read_code": "OK",
+      "read_rows": [
+        {
+          "n": "3"
+        }
+      ]
+    },
+    {
+      "label": "volatile-gbody-key-false-allow-omit",
+      "view": "GBody",
+      "uniqueness": "false",
+      "allow_volatile": "omit",
+      "create_code": "NOT_RUN",
+      "create_error": "",
+      "read_code": "NOT_RUN",
+      "read_rows": null
+    },
+    {
+      "label": "volatile-gbody-key-false-allow-false",
+      "view": "GBody",
+      "uniqueness": "false",
+      "allow_volatile": "false",
+      "create_code": "NOT_RUN",
+      "create_error": "",
+      "read_code": "NOT_RUN",
+      "read_rows": null
+    },
+    {
+      "label": "volatile-gbody-key-false-allow-true",
+      "view": "GBody",
+      "uniqueness": "false",
+      "allow_volatile": "true",
+      "create_code": "NOT_RUN",
+      "create_error": "",
+      "read_code": "NOT_RUN",
+      "read_rows": null
+    },
+    {
+      "label": "volatile-gjoin-key-false-allow-omit",
+      "view": "GJoin",
+      "uniqueness": "false",
+      "allow_volatile": "omit",
+      "create_code": "NOT_RUN",
+      "create_error": "",
+      "read_code": "NOT_RUN",
+      "read_rows": null
+    },
+    {
+      "label": "volatile-gjoin-key-false-allow-false",
+      "view": "GJoin",
+      "uniqueness": "false",
+      "allow_volatile": "false",
+      "create_code": "NOT_RUN",
+      "create_error": "",
+      "read_code": "NOT_RUN",
+      "read_rows": null
+    },
+    {
+      "label": "volatile-gjoin-key-false-allow-true",
+      "view": "GJoin",
+      "uniqueness": "false",
+      "allow_volatile": "true",
+      "create_code": "NOT_RUN",
+      "create_error": "",
+      "read_code": "NOT_RUN",
+      "read_rows": null
+    },
+    {
+      "label": "volatile-gkey-key-false-allow-omit",
+      "view": "GKey",
+      "uniqueness": "false",
+      "allow_volatile": "omit",
+      "create_code": "OK",
+      "create_error": "",
+      "read_code": "OK",
+      "read_rows": [
+        {
+          "n": "3"
+        }
+      ]
+    },
+    {
+      "label": "volatile-gkey-key-false-allow-false",
+      "view": "GKey",
+      "uniqueness": "false",
+      "allow_volatile": "false",
+      "create_code": "OK",
+      "create_error": "",
+      "read_code": "OK",
+      "read_rows": [
+        {
+          "n": "3"
+        }
+      ]
+    },
+    {
+      "label": "volatile-gkey-key-false-allow-true",
+      "view": "GKey",
+      "uniqueness": "false",
+      "allow_volatile": "true",
+      "create_code": "OK",
+      "create_error": "",
+      "read_code": "OK",
+      "read_rows": [
+        {
+          "n": "3"
+        }
+      ]
+    },
+    {
+      "label": "volatile-gprojectionunused-key-false-allow-omit",
+      "view": "GProjectionUnused",
+      "uniqueness": "false",
+      "allow_volatile": "omit",
+      "create_code": "OK",
+      "create_error": "",
+      "read_code": "OK",
+      "read_rows": [
+        {
+          "n": "3"
+        }
+      ]
+    },
+    {
+      "label": "volatile-gprojectionunused-key-false-allow-false",
+      "view": "GProjectionUnused",
+      "uniqueness": "false",
+      "allow_volatile": "false",
+      "create_code": "OK",
+      "create_error": "",
+      "read_code": "OK",
+      "read_rows": [
+        {
+          "n": "3"
+        }
+      ]
+    },
+    {
+      "label": "volatile-gprojectionunused-key-false-allow-true",
+      "view": "GProjectionUnused",
+      "uniqueness": "false",
+      "allow_volatile": "true",
+      "create_code": "OK",
+      "create_error": "",
+      "read_code": "OK",
+      "read_rows": [
+        {
+          "n": "3"
+        }
+      ]
+    },
+    {
+      "label": "volatile-gbodyuuid-key-false-allow-omit",
+      "view": "GBodyUuid",
+      "uniqueness": "false",
+      "allow_volatile": "omit",
+      "create_code": "OK",
+      "create_error": "",
+      "read_code": "OK",
+      "read_rows": [
+        {
+          "n": "3"
+        }
+      ]
+    },
+    {
+      "label": "volatile-gbodyuuid-key-false-allow-false",
+      "view": "GBodyUuid",
+      "uniqueness": "false",
+      "allow_volatile": "false",
+      "create_code": "OK",
+      "create_error": "",
+      "read_code": "OK",
+      "read_rows": [
+        {
+          "n": "3"
+        }
+      ]
+    },
+    {
+      "label": "volatile-gbodyuuid-key-false-allow-true",
+      "view": "GBodyUuid",
+      "uniqueness": "false",
+      "allow_volatile": "true",
+      "create_code": "OK",
+      "create_error": "",
+      "read_code": "OK",
+      "read_rows": [
+        {
+          "n": "3"
+        }
+      ]
+    },
+    {
+      "label": "volatile-gjoinuuid-key-false-allow-omit",
+      "view": "GJoinUuid",
+      "uniqueness": "false",
+      "allow_volatile": "omit",
+      "create_code": "OK",
+      "create_error": "",
+      "read_code": "OK",
+      "read_rows": [
+        {
+          "n": "3"
+        }
+      ]
+    },
+    {
+      "label": "volatile-gjoinuuid-key-false-allow-false",
+      "view": "GJoinUuid",
+      "uniqueness": "false",
+      "allow_volatile": "false",
+      "create_code": "OK",
+      "create_error": "",
+      "read_code": "OK",
+      "read_rows": [
+        {
+          "n": "3"
+        }
+      ]
+    },
+    {
+      "label": "volatile-gjoinuuid-key-false-allow-true",
+      "view": "GJoinUuid",
+      "uniqueness": "false",
+      "allow_volatile": "true",
+      "create_code": "OK",
+      "create_error": "",
+      "read_code": "OK",
+      "read_rows": [
+        {
+          "n": "3"
+        }
+      ]
+    }
+  ],
+  "view_ddl_and_rand": [
+    {
+      "label": "view-gstable",
+      "code": "OK",
+      "error": ""
+    },
+    {
+      "label": "view-gprojection",
+      "code": "OK",
+      "error": ""
+    },
+    {
+      "label": "view-gbody",
+      "code": "InvalidArgument",
+      "error": "rpc error: code = InvalidArgument desc = Error analyzing the definition of view `GBody`: Unsupported built-in function: rand."
+    },
+    {
+      "label": "view-gjoin",
+      "code": "InvalidArgument",
+      "error": "rpc error: code = InvalidArgument desc = Error analyzing the definition of view `GJoin`: Unsupported built-in function: rand."
+    },
+    {
+      "label": "view-gkey",
+      "code": "OK",
+      "error": ""
+    },
+    {
+      "label": "view-gbodyuuid",
+      "code": "OK",
+      "error": ""
+    },
+    {
+      "label": "view-gjoinuuid",
+      "code": "OK",
+      "error": ""
+    },
+    {
+      "label": "rand-direct-control",
+      "code": "Unimplemented",
+      "error": "spanner: code = \"Unimplemented\", desc = \"Unsupported built-in function: rand.\", requestID = \"<redacted>\""
+    }
+  ],
+  "path_quantifiers": [
+    {
+      "label": "path-trail-bounded",
+      "code": "OK",
+      "error": "",
+      "rows": [
+        {
+          "dst": "1",
+          "src": "1"
+        },
+        {
+          "dst": "2",
+          "src": "1"
+        },
+        {
+          "dst": "3",
+          "src": "1"
+        },
+        {
+          "dst": "1",
+          "src": "2"
+        },
+        {
+          "dst": "2",
+          "src": "2"
+        },
+        {
+          "dst": "3",
+          "src": "2"
+        },
+        {
+          "dst": "1",
+          "src": "3"
+        },
+        {
+          "dst": "2",
+          "src": "3"
+        },
+        {
+          "dst": "3",
+          "src": "3"
+        }
+      ]
+    },
+    {
+      "label": "path-trail-no-lower",
+      "code": "OK",
+      "error": "",
+      "rows": [
+        {
+          "dst": "1",
+          "src": "1"
+        },
+        {
+          "dst": "2",
+          "src": "1"
+        },
+        {
+          "dst": "3",
+          "src": "1"
+        },
+        {
+          "dst": "1",
+          "src": "2"
+        },
+        {
+          "dst": "2",
+          "src": "2"
+        },
+        {
+          "dst": "3",
+          "src": "2"
+        },
+        {
+          "dst": "1",
+          "src": "3"
+        },
+        {
+          "dst": "2",
+          "src": "3"
+        },
+        {
+          "dst": "3",
+          "src": "3"
+        }
+      ]
+    },
+    {
+      "label": "path-trail-no-upper",
+      "code": "InvalidArgument",
+      "error": "spanner: code = \"InvalidArgument\", desc = \"Unbounded quantifier is not supported [at 1:40]\\\\nGRAPH FiniteGraph MATCH TRAIL (a)-[e]->{1,}(b) RETURN DISTINCT a.Id AS src,b....\\\\n                                       ^\", requestID = \"<redacted>\"",
+      "rows": []
+    },
+    {
+      "label": "path-trail-star",
+      "code": "InvalidArgument",
+      "error": "spanner: code = \"InvalidArgument\", desc = \"Unbounded quantifier is not supported [at 1:40]\\\\nGRAPH FiniteGraph MATCH TRAIL (a)-[e]->*(b) RETURN DISTINCT a.Id AS src,b.Id ...\\\\n                                       ^\", requestID = \"<redacted>\"",
+      "rows": []
+    },
+    {
+      "label": "path-trail-plus",
+      "code": "InvalidArgument",
+      "error": "spanner: code = \"InvalidArgument\", desc = \"Unbounded quantifier is not supported [at 1:40]\\\\nGRAPH FiniteGraph MATCH TRAIL (a)-[e]->+(b) RETURN DISTINCT a.Id AS src,b.Id ...\\\\n                                       ^\", requestID = \"<redacted>\"",
+      "rows": []
+    },
+    {
+      "label": "path-acyclic-bounded",
+      "code": "OK",
+      "error": "",
+      "rows": [
+        {
+          "dst": "2",
+          "src": "1"
+        },
+        {
+          "dst": "3",
+          "src": "1"
+        },
+        {
+          "dst": "1",
+          "src": "2"
+        },
+        {
+          "dst": "3",
+          "src": "2"
+        },
+        {
+          "dst": "1",
+          "src": "3"
+        },
+        {
+          "dst": "2",
+          "src": "3"
+        }
+      ]
+    },
+    {
+      "label": "path-acyclic-no-lower",
+      "code": "OK",
+      "error": "",
+      "rows": [
+        {
+          "dst": "1",
+          "src": "1"
+        },
+        {
+          "dst": "2",
+          "src": "1"
+        },
+        {
+          "dst": "3",
+          "src": "1"
+        },
+        {
+          "dst": "1",
+          "src": "2"
+        },
+        {
+          "dst": "2",
+          "src": "2"
+        },
+        {
+          "dst": "3",
+          "src": "2"
+        },
+        {
+          "dst": "1",
+          "src": "3"
+        },
+        {
+          "dst": "2",
+          "src": "3"
+        },
+        {
+          "dst": "3",
+          "src": "3"
+        }
+      ]
+    },
+    {
+      "label": "path-acyclic-no-upper",
+      "code": "InvalidArgument",
+      "error": "spanner: code = \"InvalidArgument\", desc = \"Unbounded quantifier is not supported [at 1:42]\\\\nGRAPH FiniteGraph MATCH ACYCLIC (a)-[e]->{1,}(b) RETURN DISTINCT a.Id AS src,...\\\\n                                         ^\", requestID = \"<redacted>\"",
+      "rows": []
+    },
+    {
+      "label": "path-acyclic-star",
+      "code": "InvalidArgument",
+      "error": "spanner: code = \"InvalidArgument\", desc = \"Unbounded quantifier is not supported [at 1:42]\\\\nGRAPH FiniteGraph MATCH ACYCLIC (a)-[e]->*(b) RETURN DISTINCT a.Id AS src,b.I...\\\\n                                         ^\", requestID = \"<redacted>\"",
+      "rows": []
+    },
+    {
+      "label": "path-acyclic-plus",
+      "code": "InvalidArgument",
+      "error": "spanner: code = \"InvalidArgument\", desc = \"Unbounded quantifier is not supported [at 1:42]\\\\nGRAPH FiniteGraph MATCH ACYCLIC (a)-[e]->+(b) RETURN DISTINCT a.Id AS src,b.I...\\\\n                                         ^\", requestID = \"<redacted>\"",
+      "rows": []
+    },
+    {
+      "label": "path-any-shortest-bounded",
+      "code": "OK",
+      "error": "",
+      "rows": [
+        {
+          "dst": "1",
+          "src": "1"
+        },
+        {
+          "dst": "2",
+          "src": "1"
+        },
+        {
+          "dst": "3",
+          "src": "1"
+        },
+        {
+          "dst": "1",
+          "src": "2"
+        },
+        {
+          "dst": "2",
+          "src": "2"
+        },
+        {
+          "dst": "3",
+          "src": "2"
+        },
+        {
+          "dst": "1",
+          "src": "3"
+        },
+        {
+          "dst": "2",
+          "src": "3"
+        },
+        {
+          "dst": "3",
+          "src": "3"
+        }
+      ]
+    },
+    {
+      "label": "path-any-shortest-no-lower",
+      "code": "OK",
+      "error": "",
+      "rows": [
+        {
+          "dst": "1",
+          "src": "1"
+        },
+        {
+          "dst": "2",
+          "src": "1"
+        },
+        {
+          "dst": "3",
+          "src": "1"
+        },
+        {
+          "dst": "1",
+          "src": "2"
+        },
+        {
+          "dst": "2",
+          "src": "2"
+        },
+        {
+          "dst": "3",
+          "src": "2"
+        },
+        {
+          "dst": "1",
+          "src": "3"
+        },
+        {
+          "dst": "2",
+          "src": "3"
+        },
+        {
+          "dst": "3",
+          "src": "3"
+        }
+      ]
+    },
+    {
+      "label": "path-any-shortest-no-upper",
+      "code": "InvalidArgument",
+      "error": "spanner: code = \"InvalidArgument\", desc = \"Unbounded quantifier is not supported [at 1:47]\\\\nGRAPH FiniteGraph MATCH ANY SHORTEST (a)-[e]->{1,}(b) RETURN DISTINCT a.Id AS...\\\\n                                              ^\", requestID = \"<redacted>\"",
+      "rows": []
+    },
+    {
+      "label": "path-any-shortest-star",
+      "code": "InvalidArgument",
+      "error": "spanner: code = \"InvalidArgument\", desc = \"Unbounded quantifier is not supported [at 1:47]\\\\nGRAPH FiniteGraph MATCH ANY SHORTEST (a)-[e]->*(b) RETURN DISTINCT a.Id AS sr...\\\\n                                              ^\", requestID = \"<redacted>\"",
+      "rows": []
+    },
+    {
+      "label": "path-any-shortest-plus",
+      "code": "InvalidArgument",
+      "error": "spanner: code = \"InvalidArgument\", desc = \"Unbounded quantifier is not supported [at 1:47]\\\\nGRAPH FiniteGraph MATCH ANY SHORTEST (a)-[e]->+(b) RETURN DISTINCT a.Id AS sr...\\\\n                                              ^\", requestID = \"<redacted>\"",
+      "rows": []
+    },
+    {
+      "label": "path-invalid-bounds",
+      "code": "InvalidArgument",
+      "error": "spanner: code = \"InvalidArgument\", desc = \"Invalid ast_lower_quantifier: lower bound cannot be greater than upper bound: 3 > 1 [at 1:41]\\\\nGRAPH FiniteGraph MATCH TRAIL (a)-[e]->{3,1}(b) RETURN a.Id AS src,b.Id AS dst\\\\n                                        ^\", requestID = \"<redacted>\"",
+      "rows": []
+    },
+    {
+      "label": "path-group-star",
+      "code": "InvalidArgument",
+      "error": "spanner: code = \"InvalidArgument\", desc = \"Unbounded quantifier is not supported [at 1:49]\\\\nGRAPH FiniteGraph MATCH ANY SHORTEST (a)(-[e]->)*(b) RETURN DISTINCT a.Id AS ...\\\\n                                                ^\", requestID = \"<redacted>\"",
+      "rows": []
+    }
+  ],
+  "columnar_storage": {
+    "google": [
+      {
+        "label": "storage-catalog",
+        "code": "OK",
+        "rows": [
+          {
+            "name": "INTERVAL_END",
+            "ordinal": "1",
+            "type": "TIMESTAMP"
+          },
+          {
+            "name": "TABLE_NAME",
+            "ordinal": "2",
+            "type": "STRING(MAX)"
+          },
+          {
+            "name": "USED_BYTES",
+            "ordinal": "3",
+            "type": "FLOAT64"
+          },
+          {
+            "name": "USED_SSD_BYTES",
+            "ordinal": "4",
+            "type": "FLOAT64"
+          },
+          {
+            "name": "USED_HDD_BYTES",
+            "ordinal": "5",
+            "type": "FLOAT64"
+          },
+          {
+            "name": "COLUMNAR_USED_BYTES",
+            "ordinal": "6",
+            "type": "FLOAT64"
+          },
+          {
+            "name": "COLUMNAR_USED_SSD_BYTES",
+            "ordinal": "7",
+            "type": "FLOAT64"
+          },
+          {
+            "name": "COLUMNAR_USED_HDD_BYTES",
+            "ordinal": "8",
+            "type": "FLOAT64"
+          },
+          {
+            "name": "COLUMNAR_COVERAGE_RATIO",
+            "ordinal": "9",
+            "type": "FLOAT64"
+          },
+          {
+            "name": "COLUMNAR_SSD_COVERAGE_RATIO",
+            "ordinal": "10",
+            "type": "FLOAT64"
+          },
+          {
+            "name": "COLUMNAR_HDD_COVERAGE_RATIO",
+            "ordinal": "11",
+            "type": "FLOAT64"
+          }
+        ]
+      },
+      {
+        "label": "storage-columnar_used_bytes",
+        "code": "OK",
+        "rows": [
+          {
+            "value": 0
+          }
+        ]
+      },
+      {
+        "label": "storage-columnar_used_ssd_bytes",
+        "code": "OK",
+        "rows": [
+          {
+            "value": 0
+          }
+        ]
+      },
+      {
+        "label": "storage-columnar_used_hdd_bytes",
+        "code": "OK",
+        "rows": [
+          {
+            "value": 0
+          }
+        ]
+      },
+      {
+        "label": "storage-columnar_coverage_ratio",
+        "code": "OK",
+        "rows": [
+          {
+            "value": 0
+          }
+        ]
+      },
+      {
+        "label": "storage-columnar_ssd_coverage_ratio",
+        "code": "OK",
+        "rows": [
+          {
+            "value": 0
+          }
+        ]
+      },
+      {
+        "label": "storage-columnar_hdd_coverage_ratio",
+        "code": "OK",
+        "rows": [
+          {
+            "value": 0
+          }
+        ]
+      },
+      {
+        "label": "storage-combined",
+        "code": "OK",
+        "rows": [
+          {
+            "coverage": 0,
+            "name": "unknown_table_name",
+            "total_used_bytes": 0
+          }
+        ]
+      },
+      {
+        "label": "storage-limit-zero",
+        "code": "OK",
+        "rows": []
+      }
+    ],
+    "pg": [
+      {
+        "label": "storage-catalog",
+        "code": "OK",
+        "rows": [
+          {
+            "name": "interval_end",
+            "ordinal": "1",
+            "type": "timestamp with time zone"
+          },
+          {
+            "name": "table_name",
+            "ordinal": "2",
+            "type": "character varying"
+          },
+          {
+            "name": "used_bytes",
+            "ordinal": "3",
+            "type": "double precision"
+          },
+          {
+            "name": "used_ssd_bytes",
+            "ordinal": "4",
+            "type": "double precision"
+          },
+          {
+            "name": "used_hdd_bytes",
+            "ordinal": "5",
+            "type": "double precision"
+          },
+          {
+            "name": "columnar_used_bytes",
+            "ordinal": "6",
+            "type": "double precision"
+          },
+          {
+            "name": "columnar_used_ssd_bytes",
+            "ordinal": "7",
+            "type": "double precision"
+          },
+          {
+            "name": "columnar_used_hdd_bytes",
+            "ordinal": "8",
+            "type": "double precision"
+          },
+          {
+            "name": "columnar_coverage_ratio",
+            "ordinal": "9",
+            "type": "double precision"
+          },
+          {
+            "name": "columnar_ssd_coverage_ratio",
+            "ordinal": "10",
+            "type": "double precision"
+          },
+          {
+            "name": "columnar_hdd_coverage_ratio",
+            "ordinal": "11",
+            "type": "double precision"
+          }
+        ]
+      },
+      {
+        "label": "storage-columnar_used_bytes",
+        "code": "OK",
+        "rows": []
+      },
+      {
+        "label": "storage-columnar_used_ssd_bytes",
+        "code": "OK",
+        "rows": []
+      },
+      {
+        "label": "storage-columnar_used_hdd_bytes",
+        "code": "OK",
+        "rows": []
+      },
+      {
+        "label": "storage-columnar_coverage_ratio",
+        "code": "OK",
+        "rows": []
+      },
+      {
+        "label": "storage-columnar_ssd_coverage_ratio",
+        "code": "OK",
+        "rows": []
+      },
+      {
+        "label": "storage-columnar_hdd_coverage_ratio",
+        "code": "OK",
+        "rows": []
+      },
+      {
+        "label": "storage-combined",
+        "code": "OK",
+        "rows": []
+      },
+      {
+        "label": "storage-limit-zero",
+        "code": "OK",
+        "rows": []
+      }
+    ]
+  },
+  "google_json_boundary_controls": [
+    {
+      "label": "google-json-control-array-length",
+      "code": "OK",
+      "rows": [
+        {
+          "result": false
+        }
+      ]
+    },
+    {
+      "label": "google-json-control-object-count",
+      "code": "OK",
+      "rows": [
+        {
+          "result": false
+        }
+      ]
+    },
+    {
+      "label": "google-json-control-empty-v-null",
+      "code": "OK",
+      "rows": [
+        {
+          "result": false
+        }
+      ]
+    }
+  ]
+}

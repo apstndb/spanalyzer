@@ -1,0 +1,97 @@
+package main
+
+import (
+	"context"
+	"encoding/json"
+	"os"
+	"time"
+
+	"cloud.google.com/go/spanner"
+	sppb "cloud.google.com/go/spanner/apiv1/spannerpb"
+	"google.golang.org/api/iterator"
+	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/encoding/protojson"
+)
+
+type probe struct {
+	Label   string         `json:"label"`
+	SQL     string         `json:"sql"`
+	Params  map[string]any `json:"params"`
+	Profile bool           `json:"profile"`
+}
+
+func main() {
+	if os.Getenv("SPANNER_EMULATOR_HOST") != "" {
+		panic("emulator override")
+	}
+	ctx := context.Background()
+	c, err := spanner.NewClient(ctx, os.Getenv("TEST_REAL_SPANNER_DATABASE"))
+	if err != nil {
+		panic(err)
+	}
+	defer c.Close()
+	f, err := os.Open(os.Args[1])
+	if err != nil {
+		panic(err)
+	}
+	defer f.Close()
+	var cases []probe
+	if err = json.NewDecoder(f).Decode(&cases); err != nil {
+		panic(err)
+	}
+	for _, p := range cases {
+		at := time.Now().UTC()
+		cx, cancel := context.WithTimeout(ctx, 30*time.Second)
+		ro := c.Single()
+		mode := sppb.ExecuteSqlRequest_NORMAL
+		if p.Profile {
+			mode = sppb.ExecuteSqlRequest_PROFILE
+		}
+		it := ro.QueryWithOptions(cx, spanner.Statement{SQL: p.SQL, Params: p.Params}, spanner.QueryOptions{Mode: &mode})
+		rows := []map[string]any{}
+		var e error
+		for {
+			var row *spanner.Row
+			row, e = it.Next()
+			if e != nil {
+				break
+			}
+			values := map[string]any{}
+			for i, name := range row.ColumnNames() {
+				var g spanner.GenericColumnValue
+				if e = row.Column(i, &g); e != nil {
+					break
+				}
+				values[name] = g.Value.AsInterface()
+			}
+			if e != nil {
+				break
+			}
+			rows = append(rows, values)
+		}
+		if e == iterator.Done {
+			e = nil
+		}
+		result := map[string]any{"label": p.Label, "sql": p.SQL, "params": p.Params, "started_at": at.Format(time.RFC3339Nano), "completed_at": time.Now().UTC().Format(time.RFC3339Nano), "code": status.Code(e).String(), "rows": rows, "mode": mode.String(), "error": ""}
+		if e != nil {
+			result["error"] = e.Error()
+		}
+		if it.Metadata != nil {
+			b, _ := protojson.Marshal(it.Metadata)
+			result["metadata"] = json.RawMessage(b)
+		}
+		if it.QueryPlan != nil {
+			b, _ := protojson.Marshal(it.QueryPlan)
+			result["plan"] = json.RawMessage(b)
+		}
+		if it.QueryStats != nil {
+			result["stats"] = it.QueryStats
+		}
+		it.Stop()
+		ro.Close()
+		cancel()
+		if err = json.NewEncoder(os.Stdout).Encode(result); err != nil {
+			panic(err)
+		}
+	}
+}

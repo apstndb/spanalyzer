@@ -1,0 +1,65 @@
+QueryStmt
++-output_column_list=
+| +-$graph_table.value#2 AS value [INT64]
++-query=
+  +-OrderByScan
+    +-column_list=[$graph_table.value#2]
+    +-is_ordered=TRUE
+    +-input_scan=
+    | +-GraphTableScan
+    |   +-column_list=[$graph_table.value#2]
+    |   +-property_graph=OrderGraph
+    |   +-input_scan=
+    |     +-GraphLinearScan
+    |       +-column_list=[$graph_table.value#2]
+    |       +-scan_list=
+    |         +-GraphLinearScan
+    |           +-column_list=[$graph_table.value#2]
+    |           +-scan_list=
+    |             +-GraphScan
+    |             | +-column_list=[$element_table.n#1]
+    |             | +-input_scan_list=
+    |             | | +-GraphPathScan
+    |             | |   +-column_list=[$element_table.n#1]
+    |             | |   +-input_scan_list=
+    |             | |   | +-GraphNodeScan
+    |             | |   |   +-column_list=[$element_table.n#1]
+    |             | |   |   +-label_expr=
+    |             | |   |   | +-GraphLabelNaryExpr
+    |             | |   |   |   +-op=OR
+    |             | |   |   |   +-operand_list=
+    |             | |   |   |     +-GraphWildCardLabel
+    |             | |   |   |     +-GraphLabelNaryExpr
+    |             | |   |   |       +-op=NOT
+    |             | |   |   |       +-operand_list=
+    |             | |   |   |         +-GraphWildCardLabel
+    |             | |   |   +-target_element_table_list=[OrderGraph.OrderNodes]
+    |             | |   +-head=$element_table.n#1
+    |             | |   +-tail=$element_table.n#1
+    |             | +-input_scan=
+    |             |   +-SingleRowScan
+    |             +-OrderByScan
+    |               +-column_list=[$graph_table.value#2]
+    |               +-is_ordered=TRUE
+    |               +-input_scan=
+    |               | +-ProjectScan
+    |               |   +-column_list=[$element_table.n#1, $graph_table.value#2]
+    |               |   +-expr_list=
+    |               |   | +-value#2 :=
+    |               |   |   +-GraphGetElementProperty
+    |               |   |     +-type=INT64
+    |               |   |     +-expr=
+    |               |   |     | +-ColumnRef(type=GRAPH_NODE(OrderGraph)<id INT64, val INT64>, column=$element_table.n#1)
+    |               |   |     +-property=val(INT64)
+    |               |   |     +-property_name=
+    |               |   |       +-Literal(type=STRING, value="val", has_explicit_type=TRUE)
+    |               |   +-input_scan=
+    |               |     +-GraphRefScan(column_list=[$element_table.n#1])
+    |               +-order_by_item_list=
+    |                 +-OrderByItem
+    |                   +-column_ref=
+    |                     +-ColumnRef(type=INT64, column=$graph_table.value#2)
+    +-order_by_item_list=
+      +-OrderByItem
+        +-column_ref=
+          +-ColumnRef(type=INT64, column=$graph_table.value#2)

@@ -1,0 +1,152 @@
+
+.tmp/gql-order-root-cause-20261030/emulator_main.original:	file format elf64-littleaarch64
+
+Disassembly of section .text:
+
+0000000000682c90 <google::spanner::emulator::backend::(anonymous namespace)::CommonEvaluatorOptions(googlesql::TypeFactory*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>>, bool)>:
+  682c90: d101c3ff     	sub	sp, sp, #0x70
+  682c94: d002bca3     	adrp	x3, 0x5e18000 <vtable for grpc_core::AsyncConnectivityStateWatcherInterface+0x30>
+  682c98: f9469063     	ldr	x3, [x3, #0xd20]
+  682c9c: a9037bfd     	stp	x29, x30, [sp, #0x30]
+  682ca0: 9100c3fd     	add	x29, sp, #0x30
+  682ca4: a90453f3     	stp	x19, x20, [sp, #0x40]
+  682ca8: aa0003f4     	mov	x20, x0
+  682cac: aa0803f3     	mov	x19, x8
+  682cb0: a9055bf5     	stp	x21, x22, [sp, #0x50]
+  682cb4: aa0103f5     	mov	x21, x1
+  682cb8: 12001c56     	and	w22, w2, #0xff
+  682cbc: f90033f7     	str	x23, [sp, #0x60]
+  682cc0: f9400060     	ldr	x0, [x3]
+  682cc4: f90017e0     	str	x0, [sp, #0x28]
+  682cc8: d2800000     	mov	x0, #0x0                // =0
+  682ccc: 94775739     	bl	0x24589b0 <googlesql_base::Clock::RealClock()>
+  682cd0: a9000274     	stp	x20, x0, [x19]
+  682cd4: d0016181     	adrp	x1, 0x32b4000 <kCommitTimestampIdentifier+0x660>
+  682cd8: f94006b4     	ldr	x20, [x21, #0x8]
+  682cdc: 3900627f     	strb	wzr, [x19, #0x18]
+  682ce0: 3dc00820     	ldr	q0, [x1, #0x20]
+  682ce4: 3900827f     	strb	wzr, [x19, #0x20]
+  682ce8: 7900727f     	strh	wzr, [x19, #0x38]
+  682cec: f94002b7     	ldr	x23, [x21]
+  682cf0: 3c828260     	stur	q0, [x19, #0x28]
+  682cf4: f100269f     	cmp	x20, #0x9
+  682cf8: 54000700     	b.eq	0x682dd8 <google::spanner::emulator::backend::(anonymous namespace)::CommonEvaluatorOptions(googlesql::TypeFactory*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>>, bool)+0x148>
+  682cfc: 910063f5     	add	x21, sp, #0x18
+  682d00: a90057ff     	stp	xzr, x21, [sp]
+  682d04: f10002ff     	cmp	x23, #0x0
+  682d08: fa400a84     	ccmp	x20, #0x0, #0x4, eq
+  682d0c: 54000b61     	b.ne	0x682e78 <google::spanner::emulator::backend::(anonymous namespace)::CommonEvaluatorOptions(googlesql::TypeFactory*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>>, bool)+0x1e8>
+  682d10: f1003e9f     	cmp	x20, #0xf
+  682d14: 540004c8     	b.hi	0x682dac <google::spanner::emulator::backend::(anonymous namespace)::CommonEvaluatorOptions(googlesql::TypeFactory*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>>, bool)+0x11c>
+  682d18: f100069f     	cmp	x20, #0x1
+  682d1c: 54000740     	b.eq	0x682e04 <google::spanner::emulator::backend::(anonymous namespace)::CommonEvaluatorOptions(googlesql::TypeFactory*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>>, bool)+0x174>
+  682d20: aa1503e0     	mov	x0, x21
+  682d24: b50006d4     	cbnz	x20, 0x682dfc <google::spanner::emulator::backend::(anonymous namespace)::CommonEvaluatorOptions(googlesql::TypeFactory*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>>, bool)+0x16c>
+  682d28: f9000bf4     	str	x20, [sp, #0x10]
+  682d2c: 910003e1     	mov	x1, sp
+  682d30: 3834681f     	strb	wzr, [x0, x20]
+  682d34: 910023f4     	add	x20, sp, #0x8
+  682d38: aa1403e0     	mov	x0, x20
+  682d3c: 94992b61     	bl	0x2ccdac0 <absl::lts_20260107::time_internal::cctz::load_time_zone(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>> const&, absl::lts_20260107::time_internal::cctz::time_zone*)>
+  682d40: f94007e0     	ldr	x0, [sp, #0x8]
+  682d44: eb15001f     	cmp	x0, x21
+  682d48: 54000080     	b.eq	0x682d58 <google::spanner::emulator::backend::(anonymous namespace)::CommonEvaluatorOptions(googlesql::TypeFactory*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>>, bool)+0xc8>
+  682d4c: f9400fe1     	ldr	x1, [sp, #0x18]
+  682d50: 91000421     	add	x1, x1, #0x1
+  682d54: 9499844b     	bl	0x2ce3e80 <operator delete(void*, unsigned long)>
+  682d58: f94003e3     	ldr	x3, [sp]
+  682d5c: 52800021     	mov	w1, #0x1                // =1
+  682d60: d002bca0     	adrp	x0, 0x5e18000 <vtable for grpc_core::AsyncConnectivityStateWatcherInterface+0x30>
+  682d64: f9469000     	ldr	x0, [x0, #0xd20]
+  682d68: d2a01402     	mov	x2, #0xa00000           // =10485760
+  682d6c: f9000a63     	str	x3, [x19, #0x10]
+  682d70: 39006261     	strb	w1, [x19, #0x18]
+  682d74: 39008261     	strb	w1, [x19, #0x20]
+  682d78: f9001662     	str	x2, [x19, #0x28]
+  682d7c: 3900e276     	strb	w22, [x19, #0x38]
+  682d80: f94017e2     	ldr	x2, [sp, #0x28]
+  682d84: f9400001     	ldr	x1, [x0]
+  682d88: eb010042     	subs	x2, x2, x1
+  682d8c: d2800001     	mov	x1, #0x0                // =0
+  682d90: 54000721     	b.ne	0x682e74 <google::spanner::emulator::backend::(anonymous namespace)::CommonEvaluatorOptions(googlesql::TypeFactory*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>>, bool)+0x1e4>
+  682d94: a9437bfd     	ldp	x29, x30, [sp, #0x30]
+  682d98: a94453f3     	ldp	x19, x20, [sp, #0x40]
+  682d9c: a9455bf5     	ldp	x21, x22, [sp, #0x50]
+  682da0: f94033f7     	ldr	x23, [sp, #0x60]
+  682da4: 9101c3ff     	add	sp, sp, #0x70
+  682da8: d65f03c0     	ret
+  682dac: b7f807d4     	tbnz	x20, #0x3f, 0x682ea4 <google::spanner::emulator::backend::(anonymous namespace)::CommonEvaluatorOptions(googlesql::TypeFactory*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>>, bool)+0x214>
+  682db0: b1000680     	adds	x0, x20, #0x1
+  682db4: 540003c4     	b.mi	0x682e2c <google::spanner::emulator::backend::(anonymous namespace)::CommonEvaluatorOptions(googlesql::TypeFactory*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>>, bool)+0x19c>
+  682db8: 94997ea2     	bl	0x2ce2840 <operator new(unsigned long)>
+  682dbc: f90007e0     	str	x0, [sp, #0x8]
+  682dc0: f9000ff4     	str	x20, [sp, #0x18]
+  682dc4: aa1703e1     	mov	x1, x23
+  682dc8: aa1403e2     	mov	x2, x20
+  682dcc: 97f7fd9d     	bl	0x482440 <memcpy@plt>
+  682dd0: f94007e0     	ldr	x0, [sp, #0x8]
+  682dd4: 17ffffd5     	b	0x682d28 <google::spanner::emulator::backend::(anonymous namespace)::CommonEvaluatorOptions(googlesql::TypeFactory*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>>, bool)+0x98>
+  682dd8: f94002e1     	ldr	x1, [x23]
+  682ddc: d28ded80     	mov	x0, #0x6f6c             // =28524
+  682de0: f2ac2c60     	movk	x0, #0x6163, lsl #16
+  682de4: f2ce8d80     	movk	x0, #0x746c, lsl #32
+  682de8: f2edad20     	movk	x0, #0x6d69, lsl #48
+  682dec: eb00003f     	cmp	x1, x0
+  682df0: 54000120     	b.eq	0x682e14 <google::spanner::emulator::backend::(anonymous namespace)::CommonEvaluatorOptions(googlesql::TypeFactory*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>>, bool)+0x184>
+  682df4: 910063f5     	add	x21, sp, #0x18
+  682df8: a90057ff     	stp	xzr, x21, [sp]
+  682dfc: aa1503e0     	mov	x0, x21
+  682e00: 17fffff1     	b	0x682dc4 <google::spanner::emulator::backend::(anonymous namespace)::CommonEvaluatorOptions(googlesql::TypeFactory*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>>, bool)+0x134>
+  682e04: 394002e1     	ldrb	w1, [x23]
+  682e08: aa1503e0     	mov	x0, x21
+  682e0c: 390063e1     	strb	w1, [sp, #0x18]
+  682e10: 17ffffc6     	b	0x682d28 <google::spanner::emulator::backend::(anonymous namespace)::CommonEvaluatorOptions(googlesql::TypeFactory*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>>, bool)+0x98>
+  682e14: 394022e0     	ldrb	w0, [x23, #0x8]
+  682e18: 7101941f     	cmp	w0, #0x65
+  682e1c: 54fffec1     	b.ne	0x682df4 <google::spanner::emulator::backend::(anonymous namespace)::CommonEvaluatorOptions(googlesql::TypeFactory*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>>, bool)+0x164>
+  682e20: 94992b64     	bl	0x2ccdbb0 <absl::lts_20260107::time_internal::cctz::local_time_zone()>
+  682e24: aa0003e3     	mov	x3, x0
+  682e28: 17ffffcd     	b	0x682d5c <google::spanner::emulator::backend::(anonymous namespace)::CommonEvaluatorOptions(googlesql::TypeFactory*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>>, bool)+0xcc>
+  682e2c: d002bca0     	adrp	x0, 0x5e18000 <vtable for grpc_core::AsyncConnectivityStateWatcherInterface+0x30>
+  682e30: f9469000     	ldr	x0, [x0, #0xd20]
+  682e34: f94017e2     	ldr	x2, [sp, #0x28]
+  682e38: f9400001     	ldr	x1, [x0]
+  682e3c: eb010042     	subs	x2, x2, x1
+  682e40: d2800001     	mov	x1, #0x0                // =0
+  682e44: 54000181     	b.ne	0x682e74 <google::spanner::emulator::backend::(anonymous namespace)::CommonEvaluatorOptions(googlesql::TypeFactory*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>>, bool)+0x1e4>
+  682e48: 97f7fd82     	bl	0x482450 <_ZSt17__throw_bad_allocv@plt>
+  682e4c: aa0003f3     	mov	x19, x0
+  682e50: aa1403e0     	mov	x0, x20
+  682e54: 97f9b707     	bl	0x4f0a70 <std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>>::_M_dispose()>
+  682e58: d002bca0     	adrp	x0, 0x5e18000 <vtable for grpc_core::AsyncConnectivityStateWatcherInterface+0x30>
+  682e5c: f9469000     	ldr	x0, [x0, #0xd20]
+  682e60: f94017e2     	ldr	x2, [sp, #0x28]
+  682e64: f9400001     	ldr	x1, [x0]
+  682e68: eb010042     	subs	x2, x2, x1
+  682e6c: d2800001     	mov	x1, #0x0                // =0
+  682e70: 54000300     	b.eq	0x682ed0 <google::spanner::emulator::backend::(anonymous namespace)::CommonEvaluatorOptions(googlesql::TypeFactory*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>>, bool)+0x240>
+  682e74: 97f7fd7f     	bl	0x482470 <__stack_chk_fail@plt>
+  682e78: d002bca0     	adrp	x0, 0x5e18000 <vtable for grpc_core::AsyncConnectivityStateWatcherInterface+0x30>
+  682e7c: f9469000     	ldr	x0, [x0, #0xd20]
+  682e80: f94017e2     	ldr	x2, [sp, #0x28]
+  682e84: f9400001     	ldr	x1, [x0]
+  682e88: eb010042     	subs	x2, x2, x1
+  682e8c: d2800001     	mov	x1, #0x0                // =0
+  682e90: 54ffff21     	b.ne	0x682e74 <google::spanner::emulator::backend::(anonymous namespace)::CommonEvaluatorOptions(googlesql::TypeFactory*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>>, bool)+0x1e4>
+  682e94: b0016180     	adrp	x0, 0x32b3000 <postgres_translator::spangres::internal::PostgreSQLConstants::kInternalLocalityGroupStorageOptionName+0x23a8>
+  682e98: 91270000     	add	x0, x0, #0x9c0
+  682e9c: 91006000     	add	x0, x0, #0x18
+  682ea0: 97f7fd80     	bl	0x4824a0 <_ZSt19__throw_logic_errorPKc@plt>
+  682ea4: d002bca0     	adrp	x0, 0x5e18000 <vtable for grpc_core::AsyncConnectivityStateWatcherInterface+0x30>
+  682ea8: f9469000     	ldr	x0, [x0, #0xd20]
+  682eac: f94017e2     	ldr	x2, [sp, #0x28]
+  682eb0: f9400001     	ldr	x1, [x0]
+  682eb4: eb010042     	subs	x2, x2, x1
+  682eb8: d2800001     	mov	x1, #0x0                // =0
+  682ebc: 54fffdc1     	b.ne	0x682e74 <google::spanner::emulator::backend::(anonymous namespace)::CommonEvaluatorOptions(googlesql::TypeFactory*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>>, bool)+0x1e4>
+  682ec0: b0016180     	adrp	x0, 0x32b3000 <postgres_translator::spangres::internal::PostgreSQLConstants::kInternalLocalityGroupStorageOptionName+0x23a8>
+  682ec4: 91270000     	add	x0, x0, #0x9c0
+  682ec8: 91032000     	add	x0, x0, #0xc8
+  682ecc: 97f7fd65     	bl	0x482460 <_ZSt20__throw_length_errorPKc@plt>
+  682ed0: aa1303e0     	mov	x0, x19
+  682ed4: 9499706f     	bl	0x2cdf090 <_Unwind_Resume>

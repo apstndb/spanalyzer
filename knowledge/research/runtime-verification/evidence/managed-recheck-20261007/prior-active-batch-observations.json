@@ -1,0 +1,14 @@
+[
+  {
+    "evidence": "managed-recheck-20261005/readonly.jsonl",
+    "at": "2026-10-04T15:36:02.933659Z",
+    "code": "InvalidArgument",
+    "error": "spanner: code = \"InvalidArgument\", desc = \"Table not found: SPANNER_SYS.ACTIVE_BATCH_OPERATIONS [at 1:15]\\\\nSELECT * FROM SPANNER_SYS.ACTIVE_BATCH_OPERATIONS LIMIT 1\\\\n              ^\""
+  },
+  {
+    "evidence": "cross-engine-20261005/managed-readonly.jsonl",
+    "at": "2026-10-05T00:20:00.850782Z",
+    "code": "InvalidArgument",
+    "error": "spanner: code = \"InvalidArgument\", desc = \"Table not found: SPANNER_SYS.ACTIVE_BATCH_OPERATIONS [at 1:15]\\\\nSELECT * FROM SPANNER_SYS.ACTIVE_BATCH_OPERATIONS LIMIT 1\\\\n              ^\""
+  }
+]

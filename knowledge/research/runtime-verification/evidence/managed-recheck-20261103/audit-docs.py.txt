@@ -1,0 +1,38 @@
+from pathlib import Path
+import json,re,hashlib
+p=Path('<LOCAL_TASK_ROOT>/apstndb/spanalyzer/managed-recheck-20261103/sources')
+strip=lambda s:re.sub(r'^---\n.*?\n---\n','',s,flags=re.S).strip()
+comp=json.loads((p/'mirror-compare.json').read_text());records=[]
+dispositions={
+'spanner-omni/create-helm-configuration':'Helm examples advance from 1.0.0 to 1.1.0; no Kubernetes deployment performed.',
+'spanner-omni/deploy-multi-cluster-on-kubernetes':'Helm chart version examples advance to 1.1.0; source-only.',
+'spanner-omni/deploy-on-kubernetes':'Helm chart version examples advance to 1.1.0; source-only.',
+'spanner-omni/download':'Container/server/CLI examples advance from r4-lts.1 to r5, chart to 1.1.0, release date October 29; not proof that older images disappeared.',
+'spanner-omni/quickstart':'Image example advances to r5; previous exact-image runtime observations remain dated.',
+'spanner-omni/release-notes':'Adds October 28 r4-lts.1 patch notice and October 29 r5 notice, with managed incorporation cutoff October 27. Publication capture differs from release label date.',
+'spanner-omni/scale-kubernetes-deployment':'Helm chart examples advance to 1.1.0; source-only.',
+'spanner-omni/setup':'Image example advances to r5; no installer execution.',
+'spanner-omni/upgrade-deployment':'Version examples advance to r5; no upgrade/rollback execution.',
+'spanner-omni/use-console':'Image example advances to r5; no console execution.',
+'spanner/docs/create-manage-instances':'Asymmetric autoscaling Java sample explicitly sets Enterprise Plus. No instance/edition change performed.',
+'spanner/docs/getting-started/java':'Adds dependency installation instructions, BOM 26.90.0 and Spanner 6.125.0; no Java dependency upgrade performed.',
+'spanner/docs/metrics':'Adds BETA api/tvf_request_count and api/tvf_request_latencies; retains labels and 60s sampling/180s visibility guidance. No Monitoring emission/time-series assertion.',
+'spanner/docs/reference/libraries':'Java BOM 26.78.0 to 26.90.0, Spanner 6.113.0 to 6.125.0, closes XML dependencies; source-only.',
+'spanner/docs/reference/standard-sql/search_functions':'Documents raw-score/ranking and in-flight pagination discontinuity when default scorer changes; version pinning mitigation. Current-version controls tested; future switch not simulated.',
+'spanner/docs/release-notes':'October 30 JSON/JSONB equality/order/group/casts/coercion/search announcement; runtime functionality had prior coverage and is rechecked.',
+'spanner/docs/use-cmek':'Java backup sample wait changes 1200 to 3600 seconds in two snippets; no backup operation performed.'}
+for f in comp['files']:
+    if not f['filename'].startswith('docs/'):continue
+    name=f['filename'].removeprefix('docs/docs.cloud.google.com/').removesuffix('.md')
+    assert name in dispositions,name
+    records.append({'path':f['filename'],'status':'reviewed','disposition':dispositions[name]})
+assert len(records)==17
+matches=[]
+for short,path in [('differences','spanner-omni/differences'),('managed-release','spanner/docs/release-notes'),('omni-release','spanner-omni/release-notes'),('omni-download','spanner-omni/download'),('spanner__docs__reference__standard-sql__search_functions','spanner/docs/reference/standard-sql/search_functions')]:
+    api=json.loads((p/(short+'.json')).read_text());target=(p/'target/docs.cloud.google.com'/(path+'.md.txt')).read_text()
+    matches.append({'document':path,'official_updateTime':api.get('updateTime'),'matches_mirror_target_body':api['content'].strip()==strip(target)})
+assert all(x['matches_mirror_target_body']for x in matches),matches
+diff=(p/'baseline/docs.cloud.google.com/spanner-omni/differences.md.txt').read_bytes()==(p/'target/docs.cloud.google.com/spanner-omni/differences.md.txt').read_bytes()
+assert diff
+result={'status':'pass','base':comp['base_commit']['sha'],'head':comp['commits'][-1]['sha'],'commit_count':comp['total_commits'],'changed_documents':records,'bookkeeping_paths':[x['filename']for x in comp['files']if not x['filename'].startswith('docs/')],'official_body_comparisons':matches,'differences_body_unchanged_in_interval':diff,'interpretation_boundary':'Document updateTime, mirror commit time, release label date and runtime observation time are distinct.'}
+(p/'document-audit.json').write_text(json.dumps(result,indent=2)+'\n');print('Reviewed',len(records),'document paths; official matches',len(matches))

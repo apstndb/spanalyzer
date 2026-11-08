@@ -1,0 +1,29 @@
+from pathlib import Path
+import re,json,difflib
+p=Path('<LOCAL_TASK_ROOT>/apstndb/spanalyzer/docs-delta-20261031/sources');net=json.loads((p/'since-baseline.json').read_text())
+def norm(t):
+ t=t.replace('Google Cloud CLI','<CLI>').replace('gcloud CLI','<CLI>').replace('Identity and Access Management (IAM)','<IAM>').replace('Identity and Access Management','<IAM>');return t
+for f in net['files']:
+ path=f['filename']
+ if not path.startswith('docs/'):continue
+ rel=path.removeprefix('docs/');old=(p/'baseline'/rel).read_text();new=(p/'target'/rel).read_text();mechanical=norm(old)==norm(new)
+ print(('MECHANICAL 'if mechanical else'REVIEW ')+rel)
+ if not mechanical and'spanner-omni/'not in rel and'instance-configurations'not in rel:
+  for line in difflib.unified_diff(norm(old).splitlines(),norm(new).splitlines(),n=1):
+   if not line.startswith(('---','+++','@@')):print(line)
+# Regional table cells: report identifier changes without enormous Markdown padding.
+rel='docs.cloud.google.com/spanner/docs/instance-configurations.md'
+def rows(t):
+ out={}
+ for line in t.splitlines():
+  if not line.startswith('|')or'regional-'not in line.split('|')[1]:continue
+  cells=[x.strip()for x in line.split('|')[1:-1]];key=re.search(r'`(regional-[^`]+)`',cells[0]);
+  if key:out[key.group(1)]=cells
+ return out
+for label in ['baseline','parent']:
+ before=rows((p/label/rel).read_text());after=rows((p/'target'/rel).read_text());print('REGIONS',label,'added',set(after)-set(before),'removed',set(before)-set(after),'row counts',len(before),len(after))
+ for key in sorted(set(before)&set(after)):
+  if before[key]!=after[key]:
+   for i,(a,b)in enumerate(zip(before[key],after[key])):
+    if a!=b:
+     ids=lambda s:set(re.findall(r'`([^`]+)`',s));print(key,'cell',i,'code adds',sorted(ids(b)-ids(a)),'code removes',sorted(ids(a)-ids(b)),'old',a[:300],'new',b[:300])

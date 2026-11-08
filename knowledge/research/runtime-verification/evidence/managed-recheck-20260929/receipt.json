@@ -1,0 +1,61 @@
+{
+  "observed_on_utc": "2026-09-29",
+  "local_date": "2026-09-29 Asia/Tokyo",
+  "runtime": "Managed Spanner GoogleSQL and temporary managed PostgreSQL; default/PROFILE optimizer 9; server build unavailable",
+  "target": "Existing verification profile; credentials and target coordinates omitted",
+  "source_revision": "c2d7792dd7f83d5dd086e2d32bc22e5d253cf06c",
+  "source_state": "Pre-existing dirty snapshot; see source-hashes.json; no Go implementation changes in this task",
+  "go_version": "go1.26.8 darwin/arm64",
+  "dependency_scope": {
+    "catalog_integration_readonly_cleanup": "survey, GOWORK=off GOFLAGS=-mod=readonly; Spanner v1.88.0 and memefish v0.8.1",
+    "feature_probes": "Existing Go workspace, GOFLAGS=-mod=readonly; Spanner v1.91.0"
+  },
+  "feature_producers": {
+    "google-features": {
+      "source_sha256": "91f381822a4e1113a03b09a29332f1010df73ffce1c09aa6d4023727c8cadaa8",
+      "binary_sha256": "cfb16b8eca9689923ff8b28568e1a045bfcf8367a51a57f02e6e8c2848eef294",
+      "build_info": "google-features-buildinfo.txt"
+    },
+    "pg-features": {
+      "source_sha256": "e9ca64d24f59ea6295e52153db64b2c3651741f5cfdf0b209d8d841f80a62a19",
+      "binary_sha256": "7f86fdd57c6ef3f84301790b55f6648ca0622b64b39b2a56bfc180488023cec3",
+      "build_info": "pg-features-buildinfo.txt"
+    },
+    "queue": {
+      "source_sha256": "a2885598fc464bf6febb93973dffc9c145f10a213f3a78672789a90dc569d0f0",
+      "binary_sha256": "654e040b79854b2d82de5994dc8ce80806807589848e7ae7d02a55f757f2f5a1",
+      "build_info": "queue-buildinfo.txt"
+    }
+  },
+  "go_run_producers": {
+    "readonly": "23a7cc2abe582d78f530e37a06f8daa9ba19b630b2ae57e5e229e3bb0835f07e",
+    "cleanup": "e58f30f5d6d76aad2d10a7a0a2d27715c57cb0025784a0dd130f85667159a1bb"
+  },
+  "documentation": {
+    "release-notes.md": "8c4950b13a3c7489b967cec442ec1dda140d6b187f0a270da4403a0cbb2faef9",
+    "release-notes.html": "2db28ba969f2d9dbd836c5745fbf83456dbac388a4c510b183046a0c6d734bfa",
+    "queues-using.md": "0928c8dc45b2d24afe0ca2b95a582e7afac649b17b2341d9c616d54ec9c90189",
+    "pg-functions.md": "179bb461daea2b4df06bd5abe9456ac9cd61a7d761a5f98c2e73cd3699c057c3"
+  },
+  "durable_local_directory": "<LOCAL_TASK_ROOT>/apstndb/spanalyzer/managed-recheck-20260929",
+  "commands": [
+    "commands.json",
+    "readonly-command.json",
+    "feature-commands.json",
+    "cleanup-command.json"
+  ],
+  "records": {
+    "readonly": 79,
+    "google-features": 37,
+    "pg-features": 40,
+    "queue": 32,
+    "cleanup": 4
+  },
+  "retention_transforms": [
+    "Connection coordinates redacted by producers/runner",
+    "Lease tokens replaced with SHA-256 hashes in producer; original tokens remain in memory only",
+    "Request IDs removed from retained errors"
+  ],
+  "cleanup": "All fixture drop operations succeeded; final TABLES, PROPERTY_GRAPHS, and ROUTINES prefix scans empty; temporary PostgreSQL GetDatabase returned NotFound",
+  "note_correction": "September 18 queue raw logs already report InvalidArgument for scalar-inside-array leases. The Omni September 26 narrative mistakenly described zero rows as a different managed result; corrected on September 29 without changing raw evidence."
+}

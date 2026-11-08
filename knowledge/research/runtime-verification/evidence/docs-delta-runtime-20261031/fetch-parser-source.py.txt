@@ -1,0 +1,10 @@
+from pathlib import Path
+from concurrent.futures import ThreadPoolExecutor
+import subprocess,json,hashlib,datetime
+out=Path('<LOCAL_TASK_ROOT>/apstndb/spanalyzer/docs-delta-runtime-20261031/sources');ref=json.loads((out/'memefish-main.json').read_text())['sha'];files=['parser.go','ast/ast.go','parse_helpers.go'];rows=[]
+def get(path):
+ args=['gh','api','-H','Accept: application/vnd.github.raw+json',f'repos/cloudspannerecosystem/memefish/contents/{path}?ref={ref}'];r=subprocess.run(args,capture_output=True);assert r.returncode==0,r.stderr;name='memefish-'+path.replace('/','__')+'.txt';(out/name).write_bytes(r.stdout);return{'path':path,'file':name,'revision':ref,'sha256':hashlib.sha256(r.stdout).hexdigest(),'at':datetime.datetime.now(datetime.timezone.utc).isoformat()}
+with ThreadPoolExecutor(max_workers=3)as p:rows=list(p.map(get,files))
+mod=json.loads((out/'memefish-module.json').read_text());cache=Path(mod['Dir'])
+for r in rows:r['module_cache_matches']=hashlib.sha256((cache/r['path']).read_bytes()).hexdigest()==r['sha256'];assert r['module_cache_matches']
+(out/'parser-source-provenance.json').write_text(json.dumps({'head':ref,'module_version':mod['Version'],'module_origin':mod.get('Origin'),'sources':rows},indent=2)+'\n');print('Verified parser source files',len(rows))

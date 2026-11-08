@@ -1,0 +1,23 @@
+{
+  "status": "failed before SQL probes",
+  "exit_code": 2,
+  "cause": "EnableDatabaseAutoConfigOnly assumes an existing instance; fresh Emulator requires EnableAutoConfig",
+  "stdout": [
+    {
+      "at": "2026-10-05T00:29:24.990626Z",
+      "dialect": "",
+      "image": "gcr.io/cloud-spanner-emulator/emulator:1.5.58@sha256:5f42f55ad4129ea0d86cf60f0d385e8a6be60a7e8e0cc791adcdedc8982bcb55",
+      "label": "identity",
+      "runtime": "emulator"
+    },
+    {
+      "at": "2026-10-05T00:29:25.108161Z",
+      "code": "OK",
+      "dialect": "GOOGLE_STANDARD_SQL",
+      "error": "",
+      "label": "runtime-cleanup"
+    }
+  ],
+  "stderr": "panic: rpc error: code = NotFound desc = Instance not found: projects/emulator-project/instances/emulator-instance\n\terror details: name = ResourceInfo type = type.googleapis.com/google.spanner.admin.instance.v1.Instance resourcename = projects/emulator-project/instances/emulator-instance owner =  desc = Instance does not exist.\n\ngoroutine 1 [running]:\nmain.setup({0x1045a9908, 0x2062bfff6498}, 0x1)\n\t<LOCAL_CHECKOUT>/.tmp/cross-engine-20261005/feature-probe.go:168 +0x24c\nmain.runGoogle({0x1045a9908?, 0x2062bfff6498?})\n\t<LOCAL_CHECKOUT>/.tmp/cross-engine-20261005/feature-probe.go:201 +0x3c\nmain.main()\n\t<LOCAL_CHECKOUT>/.tmp/cross-engine-20261005/feature-probe.go:197 +0x258\n",
+  "recovery": "Emulator-only probe copies enable instance and database creation; original Omni producer bytes preserved"
+}

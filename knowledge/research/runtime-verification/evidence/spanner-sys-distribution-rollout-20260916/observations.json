@@ -1,0 +1,76 @@
+{
+  "recorded_on": "2026-09-16",
+  "scope": "Redacted managed Cloud Spanner SPANNER_SYS observations from managed-cycle-20260917 (post-integration run); counts only, no database identifiers.",
+  "runtime": {
+    "kind": "managed",
+    "observation_scope": "single_database",
+    "producers": [
+      "survey/cmd/spanner-sys-capture check --target managed",
+      "survey/cmd/spanner-sys-capture --target managed --write",
+      "TestDrift_RealTableMetas (spannersys.Audit)",
+      "direct INFORMATION_SCHEMA.COLUMNS queries with TABLE_SCHEMA='SPANNER_SYS' through spanner-mycli"
+    ]
+  },
+  "legacy_baseline": {
+    "path": "survey/spannersys/evidence/managed.json",
+    "schema_version": "v0alpha1",
+    "captured_at": "2026-08-25",
+    "column_count": 539,
+    "surface_sha256": "2f1acd9eeff25dcccde68758984e35698f41338d3b4674b7fc7b25d36536fd44"
+  },
+  "new_observation": {
+    "path": "survey/spannersys/evidence/managed/20260916T175741Z-58205fd318c3.json",
+    "schema_version": "v0alpha2",
+    "file_sha256": "5941c929063184797d3be9f47a4828e24e8cde8c0ea0778dc7c588dfe8aa3a01",
+    "observed_at": "2026-09-16T17:57:41.707458Z",
+    "column_count": 587,
+    "table_count": 50,
+    "surface_sha256": "58205fd318c3b38615f801290c44b78a3dddcbdd2e8916298c6c7a8ff4a2d727",
+    "removed_columns": [],
+    "changed_columns": [],
+    "added_column_count": 48,
+    "added_columns_file": "lane-f-spannersys-added-columns.json"
+  },
+  "added_column_pattern": {
+    "tables": [
+      "QUERY_STATS_TOP_MINUTE", "QUERY_STATS_TOP_10MINUTE", "QUERY_STATS_TOP_HOUR",
+      "QUERY_STATS_TOTAL_MINUTE", "QUERY_STATS_TOTAL_10MINUTE", "QUERY_STATS_TOTAL_HOUR",
+      "TXN_STATS_TOP_MINUTE", "TXN_STATS_TOP_10MINUTE", "TXN_STATS_TOP_HOUR",
+      "TXN_STATS_TOTAL_MINUTE", "TXN_STATS_TOTAL_10MINUTE", "TXN_STATS_TOTAL_HOUR"
+    ],
+    "query_stats_columns": ["CPU_SECONDS_DISTRIBUTION", "CPU_SECONDS_DISTRIBUTION_JSON_STRING", "ROW_SCANNED_DISTRIBUTION", "ROW_SCANNED_DISTRIBUTION_JSON_STRING"],
+    "txn_stats_columns": ["COMMIT_LATENCY_DISTRIBUTION", "COMMIT_LATENCY_DISTRIBUTION_JSON_STRING", "PARTICIPANTS_DISTRIBUTION", "PARTICIPANTS_DISTRIBUTION_JSON_STRING"],
+    "distribution_type": "ARRAY<STRUCT<COUNT INT64, MEAN FLOAT64, SUM_OF_SQUARED_DEVIATION FLOAT64, NUM_FINITE_BUCKETS INT64, GROWTH_FACTOR FLOAT64, SCALE FLOAT64, BUCKET_COUNTS ARRAY<INT64>>>",
+    "json_string_type": "STRING(MAX)",
+    "placement": "appended after the last previously known column of each table; no ordinal or type change for existing columns"
+  },
+  "check_runs": [
+    {"observed_at": "2026-09-16T17:48:17.668838Z", "status": "surface_changed", "column_count": 587, "surface_sha256_prefix": "58205fd318c3", "retained": "legacy v0alpha1 managed.json (539)", "surface_delta": "not available for legacy baselines (hash and count only)"}
+  ],
+  "drift_test_run": {
+    "test": "TestDrift_RealTableMetas",
+    "observed_at_approx": "2026-09-16T17:49Z",
+    "advertised_tables": 50,
+    "advertised_columns": 587,
+    "known_absent_columns": 8,
+    "expected_by_test": {"tables": 50, "columns": 539, "known_absent": 8},
+    "has_drift": true,
+    "unknown_tables": [],
+    "unknown_column_count": 48,
+    "ordinal_mismatches": 0,
+    "type_mismatches": 0,
+    "result": "FAIL (fail-closed on unknown advertised columns)"
+  },
+  "type_query_samples": {
+    "query": "SELECT COLUMN_NAME, SPANNER_TYPE, COUNT(*) ... FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA='SPANNER_SYS' AND COLUMN_NAME LIKE '%_DISTRIBUTION%' GROUP BY 1,2 with a scalar subquery counting all SPANNER_SYS columns",
+    "surface_column_counts_in_order": [587, 539, 539],
+    "note": "The SPANNER_SYS surface flaps between 539 and 587 columns across consecutive strong reads, like the INFORMATION_SCHEMA IS_INHERITED rollout observed in the same window."
+  },
+  "container_targets_at_pinned_versions": {
+    "omni": {"image": "us-docker.pkg.dev/spanner-omni/images/spanner-omni:2026.r2.1-beta", "spanner_sys_column_count": 539, "check_status": "unchanged_legacy_baseline", "advertises_new_distribution_columns": false}
+  },
+  "repository_contract_notes": {
+    "manifest_required_targets": "managed and omni legacy v0alpha1 sidecars; buildManifestColumn fails closed when required targets disagree on presence, so managed-only columns cannot become observed_both until an Omni release exposes them",
+    "descriptor_superset_policy": "survey/spannersys structs hold the superset of all known columns; registry-known columns absent from a target are known_absent, not drift"
+  }
+}

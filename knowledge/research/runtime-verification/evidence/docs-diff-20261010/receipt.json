@@ -1,0 +1,68 @@
+{
+  "observed_on": "2026-10-10",
+  "timezone": "UTC; client timezone Asia/Tokyo",
+  "interval": {
+    "first_command_started_at": "2026-10-10T01:24:13.081403+00:00",
+    "last_command_completed_at": "2026-10-10T01:39:51.519216+00:00"
+  },
+  "source_head": "c2d7792dd7f83d5dd086e2d32bc22e5d253cf06c",
+  "source_checkout_dirty": true,
+  "managed_identity": "via dedicated user-level verification profile; deployment build unavailable",
+  "dependencies": {
+    "go": "go1.26.8",
+    "cloud.google.com/go/spanner": "v1.91.0",
+    "module_context": "tools, with root go.work and -mod=readonly"
+  },
+  "direct_api_without_local_sql_parser": true,
+  "record_counts": {
+    "google-features": 29,
+    "pg-options": 30,
+    "diagnostic-pg-quota": 1,
+    "graph-controls": 12,
+    "diagnostic-pg-tracking-control": 20,
+    "diagnostic-pg-parameter-syntax": 14,
+    "diagnostic-pg-catalog-case": 30,
+    "queries": 115,
+    "diagnostic-google-tracking-control": 20,
+    "pg-features": 15,
+    "google-options": 30,
+    "followup": 10
+  },
+  "source_sha256": {
+    "fixtures-pg-v5.go.txt": "862d058d22384af16e6baa10404f726a20f9fdb855a57d35fcb38066a8aedf85",
+    "fixtures-v2.go.txt": "285ba7754114dd9cefa39228e4808bb583d3362f7ff475048f0aad3ade0c79bc",
+    "fixtures-v3.go.txt": "4d974f8573d7b5e55efdf3b5e2e56c866451058138a5514edc245cb103a4e258",
+    "fixtures-v4.go.txt": "2dd1ff45d4f5069bfa97e65e1c7c30ee3fc7750efce7bc16cc34a01d1b486b3f",
+    "fixtures.go.txt": "5e550c1748a533015492703889aee770e096b96c55ca61b114f7c00ac3565b52",
+    "graph-controls.go.txt": "c14afaa62f439fc050d848672ecee19c2a5712dab88f8ad3bfa300108c32fa63",
+    "query.go.txt": "74e726e0ca9000b80b74704ce6d3d04cb7f435dd19667c7247920d507465f205"
+  },
+  "probe_binary_buildinfo": [
+    "fixtures-buildinfo.txt",
+    "fixtures-pg-v5-buildinfo.txt",
+    "fixtures-v2-buildinfo.txt",
+    "fixtures-v3-buildinfo.txt",
+    "fixtures-v4-buildinfo.txt",
+    "graph-controls-buildinfo.txt",
+    "query-buildinfo.txt"
+  ],
+  "retained_raw_documents": "<LOCAL_TASK_ROOT>/apstndb/spanalyzer/docs-diff-20261010/evidence",
+  "temporary_database_runs": {
+    "created_and_deleted": [
+      "fixtures-google",
+      "fixtures-pg",
+      "fixtures-pg-corrected",
+      "fixtures-v3-google",
+      "fixtures-v3-pg",
+      "fixtures-v4-google",
+      "fixtures-v4-pg-retry",
+      "graph-controls",
+      "fixtures-pg-v5"
+    ],
+    "not_created": [
+      "fixtures-v4-pg: ResourceExhausted"
+    ]
+  },
+  "receipt_recovery": "Early concurrently running wrappers overwrote their shared command file. Command entries were merged from retained checkpoints and exact completion objects emitted by the wrappers. Later runners use independent receipt files.",
+  "authority": "Local research and owned fixture verification only; no commit, push, PR or publication."
+}

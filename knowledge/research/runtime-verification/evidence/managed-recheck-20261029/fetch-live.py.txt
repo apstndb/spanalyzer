@@ -1,0 +1,16 @@
+"""Retain current full HTML/feed as an independent document freshness check."""
+from pathlib import Path
+import datetime
+import hashlib
+import json
+import urllib.request
+
+out=Path('<LOCAL_TASK_ROOT>/apstndb/spanalyzer/managed-recheck-20261029/documents')
+sources=[('release-notes.html','https://docs.cloud.google.com/spanner/docs/release-notes'),('graph-schema.html','https://docs.cloud.google.com/spanner/docs/reference/standard-sql/graph-schema-statements'),('graph-patterns.html','https://docs.cloud.google.com/spanner/docs/reference/standard-sql/graph-patterns'),('jsonb.html','https://docs.cloud.google.com/spanner/docs/working-with-jsonb'),('search-indexes.html','https://docs.cloud.google.com/spanner/docs/full-text-search/search-indexes'),('release-notes.xml','https://docs.cloud.google.com/feeds/spanner-release-notes.xml'),('search-functions.html','https://docs.cloud.google.com/spanner/docs/reference/standard-sql/search_functions'),('databoost-monitor.html','https://docs.cloud.google.com/spanner/docs/databoost/databoost-monitor')]
+receipt=[]
+for name,url in sources:
+    with urllib.request.urlopen(url,timeout=45) as response: content=response.read()
+    (out/name).write_bytes(content)
+    receipt.append({'uri':url,'file':name,'retrieved_at':datetime.datetime.now(datetime.timezone.utc).isoformat(),'sha256':hashlib.sha256(content).hexdigest(),'bytes':len(content)})
+(out/'live-retrieval.json').write_text(json.dumps(receipt,indent=2)+'\n')
+print(json.dumps({'sources':len(receipt)}))

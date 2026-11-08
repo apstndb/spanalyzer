@@ -1,0 +1,28 @@
+[
+  {
+    "name": "final-inventory",
+    "started_at": "2026-10-29T01:10:30.767909+00:00",
+    "completed_at": "2026-10-29T01:10:32.327257+00:00",
+    "exit_code": 0,
+    "seconds": 1.558,
+    "argv": [
+      "<LOCAL_CHECKOUT>/.tmp/managed-recheck-20261029/query",
+      "<LOCAL_CHECKOUT>/.tmp/managed-recheck-20261029/final-inventory-cases.json"
+    ],
+    "cwd": "<LOCAL_CHECKOUT>/tools",
+    "gowork": "<LOCAL_CHECKOUT>/go.work"
+  },
+  {
+    "name": "final-trial-state",
+    "started_at": "2026-10-29T01:10:32.327698+00:00",
+    "completed_at": "2026-10-29T01:10:32.367535+00:00",
+    "exit_code": 1,
+    "seconds": 0.04,
+    "argv": [
+      "<LOCAL_HOME>/.local/share/mise/installs/python/3.13/bin/python3",
+      "<LOCAL_CHECKOUT>/.tmp/managed-recheck-20261029/inspect-cloud-state.py"
+    ],
+    "cwd": "<LOCAL_CHECKOUT>/tools",
+    "gowork": "<LOCAL_CHECKOUT>/go.work"
+  }
+]

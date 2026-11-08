@@ -1,0 +1,733 @@
+DEBUG_TOKENLIST(tokenlist)
+
+
+SELECT DEBUG_TOKENLIST(TOKENIZE_FULLTEXT('Hello DB #World')) AS Result;
+
+/*------------------------------------------------+
+ | Result                                         |
+ +------------------------------------------------+
+ | hello(boundary), db, [#world, world](boundary) |
+ +------------------------------------------------*/
+
+
+SELECT DEBUG_TOKENLIST(TOKENIZE_NUMBER([1, 10], min=> 1, max=>10)) AS Result;
+
+/*--------------------------------------------------------------------------------+
+ | Result                                                                         |
+ +--------------------------------------------------------------------------------+
+ | ==1, ==10, [1, 1], [1, 2], [1, 4], [1, 8], [9, 10], [9, 12], [9, 16], [10, 10] |
+ +--------------------------------------------------------------------------------*/
+
+
+SCORE(
+  tokens,
+  search_query
+  [, dialect => { "rquery" | "words" | "words_phrase" } ]
+  [, language_tag => value ]
+  [, enhance_query => { TRUE | FALSE } ]
+  [, dictionary => value]
+  [, options => value ]
+)
+
+
+CREATE TABLE Albums (
+  SingerId INT64 NOT NULL,
+  AlbumId INT64 NOT NULL,
+  Description STRING(MAX),
+  DescriptionTokens TOKENLIST AS (TOKENIZE_FULLTEXT(Description)) HIDDEN
+) PRIMARY KEY (SingerId, AlbumId);
+
+CREATE SEARCH INDEX AlbumsIndex ON Albums(DescriptionTokens);
+
+INSERT INTO Albums (SingerId, AlbumId, Description) VALUES (1, 1, 'classical album');
+INSERT INTO Albums (SingerId, AlbumId, Description) VALUES (1, 2, 'classical and rock album');
+
+
+SELECT
+  a.Description, SCORE(a.DescriptionTokens, 'classical album') AS Score
+FROM
+  Albums a
+WHERE
+  SEARCH(a.DescriptionTokens, 'classical album');
+
+/*--------------------------+---------------------+
+ | Description              | Score               |
+ +--------------------------+---------------------+
+ | classical album          | 1.2818930149078369  |
+ | classical and rock album | 0.50003194808959961 |
+ +--------------------------+---------------------*/
+
+
+SELECT
+  a.Description,
+  SCORE(
+    a.DescriptionTokens,
+    'classical album',
+    options=>JSON '{"bigram_weight": 3.0}'
+  ) AS Score
+FROM Albums a
+WHERE SEARCH(a.DescriptionTokens, 'classical album');
+
+/*--------------------------+---------------------+
+ | Description              | Score               |
+ +--------------------------+---------------------+
+ | classical album          | 1.7417128086090088  |
+ | classical and rock album | 0.50003194808959961 |
+ +--------------------------+---------------------*/
+
+
+SELECT a.Description
+FROM Albums a
+WHERE SEARCH(a.DescriptionTokens, 'classical album')
+ORDER BY SCORE(a.DescriptionTokens, 'classical album') DESC
+LIMIT 1;
+
+/*--------------------------+
+ | Description              |
+ +--------------------------+
+ | classical album          |
+ +--------------------------*/
+
+
+SCORE_NGRAMS(
+  tokens,
+  ngrams_query
+  [, language_tag => value ]
+  [, algorithm => value ]
+  [, array_aggregator => value ]
+)
+
+
+CREATE TABLE Albums (
+  AlbumId INT64 NOT NULL,
+  Description STRING(MAX),
+  DescriptionSubstrTokens TOKENLIST AS
+    (TOKENIZE_SUBSTRING(Description, ngram_size_max=>3)) HIDDEN
+) PRIMARY KEY (AlbumId);
+
+CREATE SEARCH INDEX AlbumsIndex ON Albums(DescriptionSubstrTokens)
+  STORING(Description);
+
+INSERT INTO Albums (AlbumId, Description) VALUES (1, 'rock album');
+INSERT INTO Albums (AlbumId, Description) VALUES (2, 'classical album');
+
+
+SELECT
+  a.Description, SCORE_NGRAMS(a.DescriptionSubstrTokens, 'clasic albun') AS Score
+FROM
+  Albums a
+
+/*-----------------+---------------------+
+ | Description     | Score               |
+ +-----------------+---------------------+
+ | rock album      | 0.14285714285714285 |
+ | classical album | 0.38095238095238093 |
+ +-----------------+---------------------*/
+
+
+SELECT a.Description
+FROM Albums a
+WHERE SEARCH_NGRAMS(a.DescriptionSubstrTokens, 'clasic albun')
+ORDER BY SCORE_NGRAMS(a.DescriptionSubstrTokens, 'clasic albun') DESC
+LIMIT 1
+
+/*-----------------+
+ | Description     |
+ +-----------------+
+ | classical album |
+ +-----------------*/
+
+
+SEARCH(
+  tokens,
+  search_query
+  [, dialect => { "rquery" | "words" | "words_phrase" } ]
+  [, language_tag => value]
+  [, enhance_query => { TRUE | FALSE }]
+  [, dictionary => value]
+)
+
+
+SEARCH(tl, 'big')
+AND (SEARCH(tl, 'time')
+    OR SEARCH(tl, 'fast'))
+AND SEARCH(tl, 'car');
+
+
+CREATE TABLE Albums (
+  SingerId INT64 NOT NULL,
+  AlbumId INT64 NOT NULL,
+  Description STRING(MAX),
+  DescriptionTokens TOKENLIST AS (TOKENIZE_FULLTEXT(Description)) HIDDEN
+) PRIMARY KEY (SingerId, AlbumId);
+
+CREATE SEARCH INDEX AlbumsIndex ON Albums(DescriptionTokens)
+PARTITION BY SingerId;
+
+INSERT INTO Albums (SingerId, AlbumId, Description) VALUES (1, 1, 'rock album');
+INSERT INTO Albums (SingerId, AlbumId, Description) VALUES (1, 2, 'classical album');
+
+
+SELECT a.AlbumId, a.Description
+FROM Albums a
+WHERE a.SingerId = 1 AND SEARCH(a.DescriptionTokens, 'classical');
+
+/*---------------------------+
+ | AlbumId | Description     |
+ +---------------------------+
+ | 2       | classical album |
+ +---------------------------*/
+
+
+SELECT a.AlbumId, a.Description
+FROM Albums a
+WHERE a.SingerId = 1 AND SEARCH(a.DescriptionTokens, 'classical OR rock');
+
+/*---------------------------+
+ | AlbumId | Description     |
+ +---------------------------+
+ | 2       | classical album |
+ | 1       | rock album      |
+ +---------------------------*/
+
+
+SELECT a.AlbumId, a.Description
+FROM Albums a
+WHERE a.SingerId = 1 AND SEARCH(a.DescriptionTokens, 'classic albums', enhance_query => TRUE);
+
+/*---------------------------+
+ | AlbumId | Description     |
+ +---------------------------+
+ | 2       | classical album |
+ +---------------------------*/
+
+
+SEARCH_NGRAMS(
+  tokens,
+  ngrams_query
+  [, language_tag => value ]
+  [, min_ngrams => value ]
+  [, min_ngrams_percent => value ]
+)
+
+
+CREATE TABLE Albums (
+  AlbumId INT64 NOT NULL,
+  Description STRING(MAX),
+  DescriptionSubstrTokens TOKENLIST AS
+    (TOKENIZE_SUBSTRING(Description, ngram_size_min=>3, ngram_size_max=>3)) HIDDEN,
+  DescriptionNgramsTokens TOKENLIST AS
+    (TOKENIZE_NGRAMS(Description, ngram_size_min=>3, ngram_size_max=>3)) HIDDEN
+) PRIMARY KEY (SingerId, AlbumId);
+
+CREATE SEARCH INDEX AlbumsIndex ON Albums(DescriptionSubstrTokens, DescriptionNgramsTokens);
+
+INSERT INTO Albums (AlbumId, Description) VALUES (1, 'rock album');
+INSERT INTO Albums (AlbumId, Description) VALUES (2, 'classical album');
+INSERT INTO Albums (AlbumId, Description) VALUES (3, 'last note');
+
+
+SELECT
+  a.AlbumId, a.Description
+FROM
+  Albums a
+WHERE
+  SEARCH_NGRAMS(a.DescriptionSubstrTokens, 'clasic');
+
+/*---------------------------+
+ | AlbumId | Description     |
+ +---------------------------+
+ | 2       | classical album |
+ +---------------------------*/
+
+
+SELECT
+  a.AlbumId, a.Description
+FROM
+  Albums a
+WHERE
+  SEARCH_NGRAMS(a.DescriptionSubstrTokens, 'clasic', min_ngrams=>1);
+
+/*---------------------------+
+ | AlbumId | Description     |
+ +---------------------------+
+ | 2       | classical album |
+ | 3       | last notes      |
+ +---------------------------*/
+
+
+SELECT
+  a.AlbumId, a.Description
+FROM
+  Albums a
+WHERE
+  SEARCH_NGRAMS(a.DescriptionSubstrTokens, 'clasic albun');
+
+/*---------------------------+
+ | AlbumId | Description     |
+ +---------------------------+
+ | 2       | classical album |
+ | 1       | rock album      |
+ +---------------------------*/
+
+
+SELECT
+  a.AlbumId, a.Description
+FROM
+  Albums a
+WHERE
+  SEARCH_NGRAMS(a.DescriptionNgramsTokens, 'l al');
+
+/*---------------------------+
+ | AlbumId | Description     |
+ +---------------------------+
+ | 2       | classical album |
+ +---------------------------*/
+
+
+SEARCH_SUBSTRING(
+  tokens,
+  substring_query
+  [, language_tag => value ]
+  [, relative_search_type => value ]
+)
+
+
+CREATE TABLE Albums (
+  SingerId INT64 NOT NULL,
+  AlbumId INT64 NOT NULL,
+  Description STRING(MAX),
+  DescriptionSubstrTokens TOKENLIST AS (TOKENIZE_SUBSTRING(Description, relative_search_types => ['all'])) HIDDEN
+) PRIMARY KEY (SingerId, AlbumId);
+
+CREATE SEARCH INDEX AlbumsIndex ON Albums(DescriptionSubstrTokens)
+PARTITION BY SingerId;
+
+INSERT INTO Albums (SingerId, AlbumId, Description) VALUES (1, 1, 'rock album');
+INSERT INTO Albums (SingerId, AlbumId, Description) VALUES (1, 2, 'classical album');
+
+
+SELECT
+  a.AlbumId, a.Description
+FROM
+  Albums a
+WHERE
+  a.SingerId = 1 AND SEARCH_SUBSTRING(a.DescriptionSubstrTokens, 'ssic');
+
+/*---------------------------+
+ | AlbumId | Description     |
+ +---------------------------+
+ | 2       | classical album |
+ +---------------------------*/
+
+
+SELECT
+  a.AlbumId, a.Description
+FROM
+  Albums a
+WHERE
+  a.SingerId = 1 AND SEARCH_SUBSTRING(a.DescriptionSubstrTokens, 'lbu oc');
+
+/*-----------------------+
+ | AlbumId | Description |
+ +-----------------------+
+ | 1       | rock album  |
+ +-----------------------*/
+
+
+SELECT
+  a.AlbumId, a.Description
+FROM
+  Albums a
+WHERE
+  a.SingerId = 1 AND SEARCH_SUBSTRING(a.DescriptionSubstrTokens, 'al', relative_search_type=>'word_prefix');
+
+/*---------------------------+
+ | AlbumId | Description     |
+ +---------------------------+
+ | 2       | classical album |
+ | 1       | rock album      |
+ +---------------------------*/
+
+
+SELECT
+  a.AlbumId, a.Description
+FROM
+  Albums a
+WHERE
+  a.SingerId = 1 AND SEARCH_SUBSTRING(a.DescriptionSubstrTokens, 'al', relative_search_type=>'value_prefix');
+
+/*---------------------------+
+ | AlbumId | Description     |
+ +---------------------------+
+ |         |                 |
+ +---------------------------*/
+
+
+SNIPPET(
+  data_to_search,
+  raw_search_query
+  [, language_tag => value ]
+  [, enhance_query => { TRUE | FALSE } ]
+  [, dictionary => value]
+  [, max_snippet_width => value ]
+  [, max_snippets => value ]
+  [, content_type => { "text/plain" | "text/html" } ]
+)
+
+
+{
+  "snippets":[
+    {
+      "highlights":[
+        {
+          "begin": json_number,
+          "end": json_number
+        },
+      ],
+      "snippet": json_string,
+      "source_begin": json_number,
+      "source_end": json_number
+    }
+  ]
+}
+
+
+SELECT SNIPPET('Rock albums rock.', 'rock') AS Snippet;
+
+/*--------------------------------------------------------------------------------------------------------------------------------------------------+
+ | Snippet                                                                                                                                          |
+ +--------------------------------------------------------------------------------------------------------------------------------------------------+
+ | {"snippets":[{"highlights":[{"begin":"1","end":"5"},{"begin":"13","end":"17"}],"snippet":"Rock albums rock.","source_begin":1,"source_end":18}]} |
+ +--------------------------------------------------------------------------------------------------------------------------------------------------*/
+
+
+
+TOKEN(value_to_tokenize)
+
+
+CREATE TABLE Albums (
+  SingerId INT64 NOT NULL,
+  AlbumId INT64 NOT NULL,
+  SingerName STRING(MAX),
+  SingerNameToken TOKENLIST AS (TOKEN(SingerName)) HIDDEN,
+  SongTitles ARRAY<STRING(MAX)>,
+  SongTitlesToken TOKENLIST AS (TOKEN(SongTitles)) HIDDEN
+) PRIMARY KEY (SingerId, AlbumId);
+
+CREATE SEARCH INDEX AlbumsIndex ON Albums(SingerNameToken, SongTitlesToken);
+
+-- For example, the INSERT statement below generates SingerNameToken of
+-- 'Catalina Smith', and SongTitlesToken of
+-- ['Starting Again', 'The Second Title'].
+INSERT INTO Albums (SingerId, AlbumId, SingerName, SongTitles)
+  VALUES (1, 1, 'Catalina Smith', ['Starting Again', 'The Second Time']);
+
+
+SELECT a.AlbumId
+FROM Albums @{force_index = AlbumsIndex} a
+WHERE a.SingerName = 'Catalina Smith';
+
+/*---------+
+ | AlbumId |
+ +---------+
+ | 1       |
+ +---------*/
+
+
+SELECT a.AlbumId
+FROM Albums a
+WHERE ARRAY_INCLUDES(a.SongTitles, 'Starting Again');
+
+/*---------+
+ | AlbumId |
+ +---------+
+ | 1       |
+ +---------*/
+
+
+TOKENIZE_BOOL(value_to_tokenize)
+
+
+CREATE TABLE Albums (
+  SingerId INT64 NOT NULL,
+  AlbumId INT64 NOT NULL,
+  IsAwarded BOOL,
+  IsAwardedToken TOKENLIST AS (TOKENIZE_BOOL(IsAwarded)) HIDDEN
+) PRIMARY KEY (SingerId, AlbumId);
+
+CREATE SEARCH INDEX AlbumsIndex ON Albums(IsAwardedToken);
+
+-- IsAwarded with TRUE generates IsAwardedToken with value 'y'.
+INSERT INTO Albums (SingerId, AlbumId, IsAwarded) VALUES (1, 1, TRUE);
+
+-- IsAwarded with FALSE generates IsAwardedToken with value 'n'.
+INSERT INTO Albums (SingerId, AlbumId, IsAwarded) VALUES (1, 2, FALSE);
+
+-- NULL IsAwarded generates IsAwardedToken with value NULL.
+INSERT INTO Albums (SingerId, AlbumId) VALUES (1, 3);
+
+
+SELECT a.AlbumId
+FROM Albums @{force_index = AlbumsIndex} a
+WHERE IsAwarded = TRUE;
+
+
+TOKENIZE_FULLTEXT(
+  value_to_tokenize
+  [, language_tag => value ]
+  [, content_type => { "text/plain" | "text/html" } ]
+  [, token_category => { "small" | "medium" | "large" | "title" } ]
+  [, remove_diacritics => { TRUE | FALSE }]
+)
+
+
+CREATE TABLE Albums (
+  SingerId INT64 NOT NULL,
+  AlbumId INT64 NOT NULL,
+  Title STRING(MAX),
+  Description STRING(MAX),
+  DescriptionTokens TOKENLIST AS (TOKENIZE_FULLTEXT(Description)) HIDDEN,
+  TitleTokens TOKENLIST AS (
+    TOKENIZE_FULLTEXT(Title, token_category=>"title")) HIDDEN
+) PRIMARY KEY (SingerId, AlbumId);
+
+-- DescriptionTokens is generated from the Description value, using the
+-- TOKENIZE_FULLTEXT function. For example, the following INSERT statement
+-- generates DescriptionTokens with the tokens ['rock', 'album']. TitleTokens
+-- will contain ['abbey', 'road'] and these tokens will be assigned to the
+-- "title" token category.
+INSERT INTO Albums (SingerId, AlbumId, Description) VALUES (1, 1, 'rock album');
+
+-- Capitalization and delimiters are removed during tokenization. For example,
+-- the following INSERT statement generates DescriptionTokens with the tokens
+-- ['classical', 'albums'].
+INSERT INTO Albums (SingerId, AlbumId, Description) VALUES (1, 1, 'Classical, Albums.');
+
+
+TOKENIZE_JSON(value_to_tokenize)
+
+
+CREATE TABLE Albums (
+  SingerId INT64 NOT NULL,
+  AlbumId INT64 NOT NULL,
+  Metadata JSON,
+  MetadataTokens TOKENLIST AS (TOKENIZE_JSON(Metadata)) HIDDEN
+) PRIMARY KEY (SingerId, AlbumId);
+
+CREATE SEARCH INDEX AlbumsIndex ON Albums(MetadataTokens);
+
+-- Albums can be stored with varying metadata.
+INSERT INTO Albums (SingerId, AlbumId, Metadata)
+  VALUES (1, 1, JSON '{"AvailableFormats": ["vinyl", "cd"]}'),
+         (1, 2, JSON '{"ReissueDate": "1999-07-13", "MultiDiscCount": 2}'),
+         (1, 3, JSON '{"RegionalReleases": [{"Region": "Japan", "ReleaseDate": "2025-01-05"}]}');
+
+
+-- Query for albums with a multi-disc count of 2.
+SELECT a.AlbumId
+FROM Albums a
+WHERE a.Metadata.MultiDiscCount = 2;
+
+/*---------+
+ | AlbumId |
+ +---------+
+ | 2       |
+ +---------*/
+
+-- Query for albums available on vinyl.
+SELECT a.AlbumId
+FROM Albums a
+WHERE JSON_CONTAINS(a.Metadata, JSON '{"AvailableFormats": ["vinyl"]}');
+
+/*---------+
+ | AlbumId |
+ +---------+
+ | 1       |
+ +---------*/
+
+-- Query for albums with a regional release in Japan.
+SELECT a.AlbumId
+FROM Albums a
+WHERE JSON_CONTAINS(a.Metadata, JSON '{"RegionalReleases": [{"Region": "Japan"}]}');
+
+/*---------+
+ | AlbumId |
+ +---------+
+ | 3       |
+ +---------*/
+
+-- Query for reissued albums (those with a reissue date).
+SELECT a.AlbumId
+FROM Albums a
+WHERE a.Metadata.ReissueDate IS NOT NULL;
+
+/*---------+
+ | AlbumId |
+ +---------+
+ | 2       |
+ +---------*/
+
+
+TOKENIZE_NGRAMS(
+  value_to_tokenize
+  [, ngram_size_min => value ]
+  [, ngram_size_max => value ]
+  [, remove_diacritics => { TRUE | FALSE } ]
+)
+
+
+CREATE TABLE Albums (
+  AlbumId INT64 NOT NULL,
+  Description STRING(MAX),
+  DescriptionNgramTokens TOKENLIST AS (TOKENIZE_NGRAMS(Description)) HIDDEN
+) PRIMARY KEY (AlbumId);
+
+CREATE SEARCH INDEX AlbumsIndex ON Albums(DescriptionNgramTokens);
+
+INSERT INTO Albums (AlbumId, Description) VALUES (1, 'Heavy Metal');
+
+
+
+TOKENIZE_NUMBER(
+  value_to_tokenize,
+  [, comparison_type => { "all" | "equality" } ]
+  [, algorithm => { "logtree" | "prefixtree" | "floatingpoint" } ]
+  [, min => value ]
+  [, max => value ]
+  [, granularity => value ]
+  [, tree_base => value ]
+  [, precision => value ]
+)
+
+
+CREATE TABLE Albums (
+  SingerId INT64 NOT NULL,
+  AlbumId INT64 NOT NULL,
+  Rating INT64,
+  RatingTokens TOKENLIST AS (TOKENIZE_NUMBER(Rating)) HIDDEN,
+  TrackRating ARRAY<INT64>,
+  TrackRatingTokens TOKENLIST AS (TOKENIZE_NUMBER(TrackRating)) HIDDEN
+) PRIMARY KEY (SingerId, AlbumId);
+
+CREATE SEARCH INDEX AlbumsIndex ON Albums(RatingTokens, TrackRatingTokens);
+
+-- RatingTokens and TrackRatingTokens are generated from Rating and TrackRating
+-- values, respectively, using the TOKENIZE_NUMBER function.
+INSERT INTO Albums (SingerId, AlbumId, Rating, TrackRating) VALUES (1, 1, 2, [2, 3]);
+INSERT INTO Albums (SingerId, AlbumId, Rating, TrackRating) VALUES (1, 2, 5, [3, 5]);
+
+
+SELECT a.AlbumId
+FROM Albums @{force_index = AlbumsIndex} a
+WHERE a.Rating = 5;
+
+/*---------+
+ | AlbumId |
+ +---------+
+ | 2       |
+ +---------*/
+
+
+SELECT a.AlbumId
+FROM Albums a
+WHERE ARRAY_INCLUDES_ALL(a.TrackRating, [2, 3]);
+
+/*---------+
+ | AlbumId |
+ +---------+
+ | 1       |
+ +---------*/
+
+SELECT a.AlbumId
+FROM Albums a
+WHERE ARRAY_INCLUDES_ANY(a.TrackRating, [3, 4, 5]);
+
+/*---------+
+ | AlbumId |
+ +---------+
+ | 1       |
+ | 2       |
+ +---------*/
+
+
+SELECT a.AlbumId
+FROM Albums a
+WHERE a.Rating >= 2;
+
+/*---------+
+ | AlbumId |
+ +---------+
+ | 1       |
+ | 2       |
+ +---------*/
+
+
+TOKENIZE_SUBSTRING(
+  value_to_tokenize
+  [, language_tag => value ]
+  [, ngram_size_min => value ]
+  [, ngram_size_max => value ]
+  [, relative_search_types => value ]
+  [, content_type => { "text/plain" | "text/html" } ]
+  [, short_tokens_only_for_anchors => {TRUE | FALSE } ]
+  [, remove_diacritics => { TRUE | FALSE } ]
+)
+
+
+CREATE TABLE Albums (
+  SingerId INT64 NOT NULL,
+  AlbumId INT64 NOT NULL,
+  Description STRING(MAX),
+  DescriptionSubstrTokens TOKENLIST
+    AS (TOKENIZE_SUBSTRING(Description, ngram_size_min=>1, ngram_size_max=>4)) HIDDEN
+) PRIMARY KEY (SingerId, AlbumId);
+
+INSERT INTO Albums (SingerId, AlbumId, Description)
+  VALUES (1, 1, 'Heavy Metal');
+
+
+TOKENLIST_CONCAT(value1 [, ...])
+
+
+CREATE TABLE Albums (
+  SingerId INT64 NOT NULL,
+  AlbumId INT64 NOT NULL,
+  SingerName STRING(MAX),
+  SingerNameTokens TOKENLIST AS (TOKENIZE_FULLTEXT(SingerName)) HIDDEN,
+  AlbumName STRING(MAX),
+  AlbumNameTokens TOKENLIST AS (TOKENIZE_FULLTEXT(AlbumName)) HIDDEN,
+  SingerOrAlbumNameTokens TOKENLIST AS (TOKENLIST_CONCAT([SingerNameTokens, AlbumNameTokens])) HIDDEN
+) PRIMARY KEY (SingerId, AlbumId);
+
+CREATE SEARCH INDEX AlbumsIndex ON Albums(SingerNameTokens, AlbumNameTokens, SingerOrAlbumNameTokens);
+
+-- The INSERT statement below generates SingerOrAlbumNameTokens by concatenating
+-- all the tokens in SingerNameTokens and AlbumNameTokens.
+INSERT INTO Albums (SingerId, AlbumId, SingerName, AlbumName) VALUES (1, 1, 'Alice Trentor', 'Go Go Go');
+INSERT INTO Albums (SingerId, AlbumId, SingerName, AlbumName) VALUES (2, 1, 'Catalina Smith', 'Alice Wonderland');
+
+
+SELECT a.SingerId, a.AlbumId
+FROM Albums a
+WHERE SEARCH(a.SingerOrAlbumNameTokens, 'alice');
+
+/*--------------------+
+ | SingerId | AlbumId |
+ +--------------------+
+ | 2        | 1       |
+ | 1        | 1       |
+ +--------------------*/
+
+
+SELECT a.SingerId, a.AlbumId
+FROM Albums a
+WHERE SEARCH(TOKENLIST_CONCAT([a.SingerNameTokens, a.AlbumNameTokens]), 'alice');
+
+/*--------------------+
+ | SingerId | AlbumId |
+ +--------------------+
+ | 2        | 1       |
+ | 1        | 1       |
+ +--------------------*/
+

@@ -1,0 +1,39 @@
+{
+  "observed_at": "2026-10-10T01:55:12.919736+00:00",
+  "targets": {
+    "omni": {
+      "image": "us-docker.pkg.dev/spanner-omni/images/spanner-omni:2026.r4-lts@sha256:9f10586c5de366bec5c0ff6cf542a67c21c8363e8a12a3deb9c372a07c9aa8b6",
+      "containers_remaining": [],
+      "local_pinned_image": {
+        "Id": "sha256:9f10586c5de366bec5c0ff6cf542a67c21c8363e8a12a3deb9c372a07c9aa8b6",
+        "RepoDigests": [
+          "us-docker.pkg.dev/spanner-omni/images/spanner-omni@sha256:9f10586c5de366bec5c0ff6cf542a67c21c8363e8a12a3deb9c372a07c9aa8b6"
+        ],
+        "Architecture": "arm64",
+        "Os": "linux",
+        "Descriptor": {
+          "mediaType": "application/vnd.oci.image.manifest.v1+json",
+          "digest": "sha256:9f10586c5de366bec5c0ff6cf542a67c21c8363e8a12a3deb9c372a07c9aa8b6",
+          "size": 2006
+        }
+      }
+    },
+    "emulator": {
+      "image": "gcr.io/cloud-spanner-emulator/emulator:1.5.58@sha256:5f42f55ad4129ea0d86cf60f0d385e8a6be60a7e8e0cc791adcdedc8982bcb55",
+      "containers_remaining": [],
+      "local_pinned_image": {
+        "Id": "sha256:5f42f55ad4129ea0d86cf60f0d385e8a6be60a7e8e0cc791adcdedc8982bcb55",
+        "RepoDigests": [
+          "gcr.io/cloud-spanner-emulator/emulator@sha256:5f42f55ad4129ea0d86cf60f0d385e8a6be60a7e8e0cc791adcdedc8982bcb55"
+        ],
+        "Architecture": "arm64",
+        "Os": "linux",
+        "Descriptor": {
+          "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
+          "digest": "sha256:5f42f55ad4129ea0d86cf60f0d385e8a6be60a7e8e0cc791adcdedc8982bcb55",
+          "size": 5120
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,76 @@
+{
+  "observed_date_utc": "2026-09-18",
+  "source_head": "c2d7792dd7f83d5dd086e2d32bc22e5d253cf06c",
+  "source_state": "Pre-existing unrelated dirty files preserved; stand-alone probe imports the Spanner client only.",
+  "toolchain": "go1.26.6 darwin/arm64",
+  "spanner_client": "v1.91.0, verified from executable build info",
+  "runs": [
+    {
+      "source": "probe-initial.go.txt",
+      "source_sha256": "244b748e75cd5535695d6e0b79c0f2a3256835ed41ad6921999ed63792b092fb",
+      "binary_sha256": "b0ec4fa36c37747bb78570eaff41074a9efc3f6a5ee0256a448463ea8169f82c",
+      "capture": "managed-initial.jsonl",
+      "build_exit_code": 0,
+      "run_exit_code": 0
+    },
+    {
+      "source": "probe.go.txt",
+      "source_sha256": "4237e027c199990e218713e1836071fa584f77d1604950705565b482066ce882",
+      "binary_sha256": "aebdb43e66fa5a6914844da28666cabaf7b7e3cad9b2d86878019c14f637e5cc",
+      "capture": "managed-r2.jsonl",
+      "build_exit_code": 0,
+      "run_exit_code": 0
+    },
+    {
+      "source": "schema.go.txt",
+      "source_sha256": "70f6a140df670bde3344f0c70a00db75b71d4b0791bb4e0247bf39f5ba36bdfd",
+      "binary_sha256": "207597abdb0eb2ccda74cb1a1efb251589329ec765a016a9942b05064d41b0c6",
+      "capture": "schema.jsonl",
+      "build_exit_code": 0,
+      "run_exit_code": 0
+    },
+    {
+      "source": "lease-initial.go.txt",
+      "source_sha256": "aea24d334d7cf03ae8780c1e3be7b48b7135bb32be2608ef5d8ab1d565f1eee6",
+      "binary_sha256": "4dbcd76f0a0da3afa7751f4069f117db7195d81a62412c989cc7681da069409d",
+      "capture": "lease.jsonl",
+      "build_exit_code": 0,
+      "run_exit_code": 0
+    },
+    {
+      "source": "lease.go.txt",
+      "source_sha256": "ca1d5615065cbc8ed4c5c704d506bd242b5fd2a60d9a0c20cc31601300af80d5",
+      "binary_sha256": "4d6e969e32165efee2f5dc5673b01c7b018dc79a65aa30ce72b990953c9edeba",
+      "capture": "lease-r2.jsonl",
+      "build_exit_code": 0,
+      "run_exit_code": 0
+    },
+    {
+      "source": "plan.go.txt",
+      "source_sha256": "024e1bccbe0edbebb0b178a6955b05a6754ba2fa224dfca4a6f9a8293bb70e8d",
+      "binary_sha256": "00fc2897fd0a90c6bfd75d0b79ca4f3b40fd90c6123411e7937704ce0e71c5ff",
+      "capture": "plan.jsonl",
+      "build_exit_code": 0,
+      "run_exit_code": 0
+    },
+    {
+      "source": "catalog.go.txt",
+      "source_sha256": "6cfe7f995f34124690ceaa18b2e30dbedc5363dca3de4e1374366435a56a0bb3",
+      "binary_sha256": "b6dc525bdeed33cf501e749a9a7778b763bcaf0deee142aaf0e990b1db0f7444",
+      "capture": "catalog.jsonl",
+      "build_exit_code": 0,
+      "run_exit_code": 0,
+      "spanner_client": "v1.88.0",
+      "memefish": "v0.8.1",
+      "module_mode": "GOWORK=off GOFLAGS=-mod=readonly; survey module",
+      "reconstruction_source_state": "Executed before the queue fail-closed fix on a dirty checkout; producer source is not a full dependency source snapshot."
+    }
+  ],
+  "retention_transforms": [
+    "Destination coordinates redacted by producer",
+    "Lease tokens omitted in initial run and SHA-256 hashed in later runs",
+    "Request IDs removed from retained errors"
+  ],
+  "cleanup_exit_code": 0,
+  "verification_exit_code": 0
+}

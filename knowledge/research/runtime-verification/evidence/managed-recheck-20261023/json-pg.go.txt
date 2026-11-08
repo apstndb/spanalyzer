@@ -1,0 +1,405 @@
+package main
+
+import (
+	"context"
+	"crypto/sha256"
+	"encoding/json"
+	"fmt"
+	"os"
+	"strings"
+	"time"
+
+	"cloud.google.com/go/spanner"
+	database "cloud.google.com/go/spanner/admin/database/apiv1"
+	dbpb "cloud.google.com/go/spanner/admin/database/apiv1/databasepb"
+	instance "cloud.google.com/go/spanner/admin/instance/apiv1"
+	ipb "cloud.google.com/go/spanner/admin/instance/apiv1/instancepb"
+	sppb "cloud.google.com/go/spanner/apiv1/spannerpb"
+	"google.golang.org/api/iterator"
+	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/encoding/protojson"
+	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/types/descriptorpb"
+)
+
+var ctx = context.Background()
+var c *spanner.Client
+var a *database.DatabaseAdminClient
+var db string
+var pg bool
+
+var table = "DocDiffNodes"
+var stream = "DocDiffStream"
+
+func emit(v map[string]any) {
+	v["at"] = time.Now().UTC().Format(time.RFC3339Nano)
+	json.NewEncoder(os.Stdout).Encode(v)
+}
+func outcome(label string, e error) {
+	s := ""
+	if e != nil {
+		s = e.Error()
+	}
+	emit(map[string]any{"label": label, "code": status.Code(e).String(), "error": s})
+}
+func ddl(label string, sqls ...string) bool {
+	cx, cancel := context.WithTimeout(ctx, 3*time.Minute)
+	defer cancel()
+	op, e := a.UpdateDatabaseDdl(cx, &dbpb.UpdateDatabaseDdlRequest{Database: db, Statements: sqls})
+	if e == nil {
+		e = op.Wait(cx)
+	}
+	s := ""
+	if e != nil {
+		s = e.Error()
+	}
+	emit(map[string]any{"label": label, "sql": sqls, "code": status.Code(e).String(), "error": s})
+	return e == nil
+}
+func decode(t *sppb.Type, v any) any {
+	if v == nil {
+		return nil
+	}
+	if t.Code == sppb.TypeCode_ARRAY {
+		xs := v.([]any)
+		out := make([]any, len(xs))
+		for i, x := range xs {
+			out[i] = decode(t.ArrayElementType, x)
+		}
+		return out
+	}
+	if t.Code == sppb.TypeCode_STRUCT {
+		xs := v.([]any)
+		out := map[string]any{}
+		for i, f := range t.StructType.Fields {
+			out[f.Name] = decode(f.Type, xs[i])
+		}
+		return out
+	}
+	return v
+}
+func findToken(v any) string {
+	switch x := v.(type) {
+	case map[string]any:
+		if t, ok := x["token"].(string); ok {
+			return t
+		}
+		for _, value := range x {
+			if s := findToken(value); s != "" {
+				return s
+			}
+		}
+	case []any:
+		for _, value := range x {
+			if s := findToken(value); s != "" {
+				return s
+			}
+		}
+	}
+	return ""
+}
+func redactTokens(v any) any {
+	switch x := v.(type) {
+	case map[string]any:
+		out := map[string]any{}
+		for k, value := range x {
+			if strings.Contains(strings.ToLower(k), "token") && value != nil {
+				out[k] = fmt.Sprintf("sha256:%x", sha256.Sum256([]byte(fmt.Sprint(value))))
+			} else {
+				out[k] = redactTokens(value)
+			}
+		}
+		return out
+	case []any:
+		out := make([]any, len(x))
+		for i, value := range x {
+			out[i] = redactTokens(value)
+		}
+		return out
+	default:
+		return v
+	}
+}
+func query(label, sql string, params map[string]any, profile bool) []map[string]any {
+	cx, cancel := context.WithTimeout(ctx, 30*time.Second)
+	defer cancel()
+	ro := c.Single()
+	defer ro.Close()
+	mode := sppb.ExecuteSqlRequest_NORMAL
+	if profile {
+		mode = sppb.ExecuteSqlRequest_PROFILE
+	}
+	it := ro.QueryWithOptions(cx, spanner.Statement{SQL: sql, Params: params}, spanner.QueryOptions{Mode: &mode})
+	defer it.Stop()
+	rows := []map[string]any{}
+	var e error
+	for {
+		var row *spanner.Row
+		row, e = it.Next()
+		if e != nil {
+			break
+		}
+		m := map[string]any{}
+		for i, n := range row.ColumnNames() {
+			var g spanner.GenericColumnValue
+			e = row.Column(i, &g)
+			if e != nil {
+				break
+			}
+			m[n] = decode(g.Type, g.Value.AsInterface())
+		}
+		if e != nil {
+			break
+		}
+		rows = append(rows, m)
+	}
+	if e == iterator.Done {
+		e = nil
+	}
+	s := ""
+	if e != nil {
+		s = e.Error()
+	}
+	out := map[string]any{"label": label, "sql": sql, "params": params, "mode": mode.String(), "rows": rows, "code": status.Code(e).String(), "error": s}
+	if it.Metadata != nil {
+		b, _ := protojson.Marshal(it.Metadata)
+		out["metadata"] = json.RawMessage(b)
+	}
+	if it.QueryPlan != nil {
+		b, _ := protojson.Marshal(it.QueryPlan)
+		out["plan"] = json.RawMessage(b)
+	}
+	if it.QueryStats != nil {
+		out["stats"] = it.QueryStats
+	}
+	emit(out)
+	return rows
+}
+func read(label string, start, end time.Time, token *string, hb int64, options string) string {
+	sql := fmt.Sprintf("SELECT ChangeRecord FROM READ_%s(@start,@end,@token,%d%s)", stream, hb, options)
+	if pg {
+		sql = fmt.Sprintf("SELECT * FROM spanner.\"read_json_%s\"($1,$2,$3,%d%s)", stream, hb, options)
+	}
+	params := map[string]any{"start": start, "end": end, "token": spanner.NullString{}}
+	if token != nil {
+		params["token"] = *token
+	}
+	if pg {
+		params = map[string]any{"p1": params["start"], "p2": params["end"], "p3": params["token"]}
+	}
+	cx, cancel := context.WithTimeout(ctx, 15*time.Second)
+	defer cancel()
+	ro := c.Single()
+	defer ro.Close()
+	it := ro.Query(cx, spanner.Statement{SQL: sql, Params: params})
+	defer it.Stop()
+	rows := []map[string]any{}
+	var e error
+	found := ""
+	for {
+		var r *spanner.Row
+		r, e = it.Next()
+		if e != nil {
+			break
+		}
+		record := map[string]any{}
+		for i, n := range r.ColumnNames() {
+			var g spanner.GenericColumnValue
+			if e = r.Column(i, &g); e != nil {
+				break
+			}
+			v := decode(g.Type, g.Value.AsInterface())
+			if pg {
+				if s, ok := v.(string); ok {
+					var obj any
+					if json.Unmarshal([]byte(s), &obj) == nil {
+						v = obj
+					}
+				}
+			}
+			record[n] = v
+		}
+		if e != nil {
+			break
+		}
+		if found == "" {
+			found = findToken(record)
+		}
+		rows = append(rows, map[string]any{"received_at": time.Now().UTC().Format(time.RFC3339Nano), "record": redactTokens(record)})
+	}
+	if e == iterator.Done {
+		e = nil
+	}
+	s := ""
+	if e != nil {
+		s = e.Error()
+	}
+	emit(map[string]any{"label": label, "sql": sql, "start": start, "end": end, "partition": "root", "child_partition": token != nil, "heartbeat_ms": hb, "rows": rows, "code": status.Code(e).String(), "error": s})
+	return found
+}
+func inspectScope(label string) {
+	for _, view := range []string{"CHANGE_STREAMS", "CHANGE_STREAM_TABLES", "CHANGE_STREAM_COLUMNS", "CHANGE_STREAM_OPTIONS"} {
+		query(label+"-"+view, "SELECT * FROM INFORMATION_SCHEMA."+view+" WHERE CHANGE_STREAM_NAME='"+stream+"'", nil, false)
+	}
+}
+func descriptor() []byte {
+	f := &descriptorpb.FileDescriptorProto{Name: proto.String("docdiff.proto"), Package: proto.String("docdiff"), Syntax: proto.String("proto2"), EnumType: []*descriptorpb.EnumDescriptorProto{{Name: proto.String("Color"), Value: []*descriptorpb.EnumValueDescriptorProto{{Name: proto.String("NEGATIVE"), Number: proto.Int32(-1)}, {Name: proto.String("ZERO"), Number: proto.Int32(0)}, {Name: proto.String("ONE"), Number: proto.Int32(1)}}}}, MessageType: []*descriptorpb.DescriptorProto{{Name: proto.String("Item"), Field: []*descriptorpb.FieldDescriptorProto{{Name: proto.String("value"), Number: proto.Int32(1), Label: descriptorpb.FieldDescriptorProto_LABEL_OPTIONAL.Enum(), Type: descriptorpb.FieldDescriptorProto_TYPE_INT64.Enum()}, {Name: proto.String("name"), Number: proto.Int32(2), Label: descriptorpb.FieldDescriptorProto_LABEL_OPTIONAL.Enum(), Type: descriptorpb.FieldDescriptorProto_TYPE_STRING.Enum()}}}}}
+	b, e := proto.Marshal(&descriptorpb.FileDescriptorSet{File: []*descriptorpb.FileDescriptorProto{f}})
+	if e != nil {
+		panic(e)
+	}
+	return b
+}
+func main() {
+	if os.Getenv("SPANNER_EMULATOR_HOST") != "" {
+		panic("emulator override")
+	}
+	pg = os.Args[1] == "pg"
+	if pg {
+		table = strings.ToLower(table)
+		stream = strings.ToLower(stream)
+	}
+	parent := fmt.Sprintf("projects/%s/instances/%s", os.Getenv("SPANNER_PROJECT_ID"), os.Getenv("SPANNER_INSTANCE_ID"))
+	name := "docdiff-20261023g3"
+	dialect := dbpb.DatabaseDialect_GOOGLE_STANDARD_SQL
+	statement := "CREATE DATABASE `" + name + "`"
+	if pg {
+		name = "docdiff-20261023p5"
+		dialect = dbpb.DatabaseDialect_POSTGRESQL
+		statement = "CREATE DATABASE \"" + name + "\""
+	}
+	db = parent + "/databases/" + name
+	var e error
+	a, e = database.NewDatabaseAdminClient(ctx)
+	if e != nil {
+		panic(e)
+	}
+	defer a.Close()
+	cx, cancel := context.WithTimeout(ctx, 3*time.Minute)
+	op, e := a.CreateDatabase(cx, &dbpb.CreateDatabaseRequest{Parent: parent, CreateStatement: statement, DatabaseDialect: dialect})
+	if e == nil {
+		_, e = op.Wait(cx)
+	}
+	cancel()
+	outcome("create-database", e)
+	if e != nil {
+		return
+	}
+	defer func() {
+		cx, cancel := context.WithTimeout(ctx, time.Minute)
+		defer cancel()
+		e := a.DropDatabase(cx, &dbpb.DropDatabaseRequest{Database: db})
+		outcome("drop-database", e)
+		if e == nil {
+			_, e = a.GetDatabase(cx, &dbpb.GetDatabaseRequest{Name: db})
+			outcome("database-absent", e)
+		}
+	}()
+	c, e = spanner.NewClient(ctx, db)
+	if e != nil {
+		panic(e)
+	}
+	defer c.Close()
+	if pg {
+		if !ddl("setup", "CREATE TABLE "+table+" (Id bigint PRIMARY KEY, Value bigint, Other bigint)", "CREATE CHANGE STREAM "+stream+" FOR "+table+"(Value)") {
+			return
+		}
+	} else {
+		if !ddl("setup", "CREATE TABLE "+table+" (Id INT64 NOT NULL, Value INT64, Other INT64, J JSON) PRIMARY KEY(Id)", "CREATE TABLE DocDiffEdges (Src INT64 NOT NULL, Dst INT64 NOT NULL) PRIMARY KEY(Src,Dst)", "CREATE PROPERTY GRAPH DocDiffGraph NODE TABLES ("+table+" KEY(Id) LABEL Node PROPERTIES(Id,Value)) EDGE TABLES (DocDiffEdges KEY(Src,Dst) SOURCE KEY(Src) REFERENCES "+table+"(Id) DESTINATION KEY(Dst) REFERENCES "+table+"(Id) LABEL Edge PROPERTIES(Src,Dst))", "CREATE CHANGE STREAM "+stream+" FOR "+table+"(Value)") {
+			return
+		}
+	}
+	var mutations []*spanner.Mutation
+	for i := int64(1); i <= 4; i++ {
+		cols := []string{"Id", "Value", "Other"}
+		if pg {
+			cols = []string{"id", "value", "other"}
+		}
+		values := []any{i, i * 10, i * 100}
+		if !pg {
+			cols = append(cols, "J")
+			values = append(values, spanner.NullJSON{Value: map[string]any{"n": i % 2}, Valid: true})
+		}
+		mutations = append(mutations, spanner.Insert(table, cols, values))
+	}
+	if !pg {
+		mutations = append(mutations, spanner.Insert("DocDiffEdges", []string{"Src", "Dst"}, []any{int64(1), int64(2)}))
+	}
+	_, e = c.Apply(ctx, mutations)
+	outcome("seed", e)
+	if e != nil {
+		return
+	}
+	now := time.Now().UTC()
+	token := ""
+	for _, hb := range []int64{99, 100, 999, 1000, 300000, 300001} {
+		t := read(fmt.Sprintf("heartbeat-boundary-%d", hb), now, now.Add(time.Second), nil, hb, ",NULL")
+		if t != "" {
+			token = t
+		}
+	}
+	read("read-options-omitted", now, now.Add(time.Second), nil, 100, "")
+	options := ",ARRAY<STRING>[]"
+	if pg {
+		options = ",ARRAY[]::text[]"
+	}
+	read("read-options-empty", now, now.Add(time.Second), nil, 100, options)
+	options = ",['unknown']"
+	if pg {
+		options = ",ARRAY['unknown']::text[]"
+	}
+	read("read-options-nonnull", now, now.Add(time.Second), nil, 100, options)
+	if token != "" {
+		now = time.Now().UTC()
+		read("heartbeat-child-100", now, now.Add(2*time.Second), &token, 100, ",NULL")
+	}
+	if pg {
+		return
+	}
+	for label, sql := range map[string]string{
+		"stored-json-sort":                      "SELECT Id,J FROM " + table + " ORDER BY J,Id",
+		"stored-json-group":                     "SELECT J,COUNT(*) AS n FROM " + table + " GROUP BY J ORDER BY J",
+		"conditional-profile":                   "SELECT COALESCE((SELECT Value FROM " + table + " WHERE Id=1),(SELECT MAX(Value) FROM " + table + " WHERE Id>=2),(SELECT SUM(Other) FROM " + table + ")) AS result",
+		"conditional-profile-error-suppression": "SELECT COALESCE((SELECT Value FROM " + table + " WHERE Id=1),(SELECT MAX(Value/0) FROM " + table + " WHERE Id>=2)) AS result",
+		"graph-element-cast":                    "SELECT * FROM GRAPH_TABLE(DocDiffGraph MATCH (n) RETURN CAST(n AS JSON) AS j)",
+		"graph-path-cast":                       "SELECT * FROM GRAPH_TABLE(DocDiffGraph MATCH p=(n)-[e]->(m) RETURN CAST(p AS JSON) AS j)",
+	} {
+		query(label, sql, nil, true)
+	}
+	descriptors := descriptor()
+	op2, e := a.UpdateDatabaseDdl(ctx, &dbpb.UpdateDatabaseDdlRequest{Database: db, Statements: []string{"CREATE PROTO BUNDLE (docdiff.Color,docdiff.Item)"}, ProtoDescriptors: descriptors})
+	if e == nil {
+		e = op2.Wait(ctx)
+	}
+	outcome("proto-bundle-setup", e)
+	if e == nil {
+		for label, expr := range map[string]string{
+			"cast-enum":               "CAST(CAST('ONE' AS docdiff.Color) AS JSON)",
+			"cast-proto":              "CAST(NEW docdiff.Item(1 AS value,'x' AS name) AS JSON)",
+			"enum-equality":           "JSON '\"ONE\"' = CAST('ONE' AS docdiff.Color)",
+			"enum-order-reject":       "JSON '\"ONE\"' < CAST('ZERO' AS docdiff.Color)",
+			"enum-array-equality":     "JSON '[\"ONE\"]' = [CAST('ONE' AS docdiff.Color)]",
+			"enum-array-order-reject": "JSON '[\"ONE\"]' < [CAST('ZERO' AS docdiff.Color)]",
+		} {
+			query(label, "SELECT "+expr+" AS result", nil, false)
+		}
+	}
+	ia, e := instance.NewInstanceAdminClient(ctx)
+	if e != nil {
+		outcome("nam15-client", e)
+		return
+	}
+	defer ia.Close()
+	config, e := ia.GetInstanceConfig(ctx, &ipb.GetInstanceConfigRequest{Name: "projects/" + os.Getenv("SPANNER_PROJECT_ID") + "/instanceConfigs/nam15"})
+	if e != nil {
+		outcome("nam15", e)
+	} else {
+		locations := []string{}
+		for _, replica := range config.OptionalReplicas {
+			if replica.Type == ipb.ReplicaInfo_READ_ONLY {
+				locations = append(locations, replica.Location)
+			}
+		}
+		emit(map[string]any{"label": "nam15", "code": "OK", "optional_read_only_locations": locations})
+	}
+}

@@ -1,0 +1,147 @@
+{
+  "dialect": "google",
+  "steps": [
+    {
+      "label": "table-K",
+      "family": "issue-352",
+      "kind": "ddl",
+      "sql": "CREATE TABLE K(id INT64 NOT NULL,c STRING(MAX)) PRIMARY KEY(id)",
+      "requires": [],
+      "timeout_seconds": 30
+    },
+    {
+      "label": "table-Z",
+      "family": "issue-352",
+      "kind": "ddl",
+      "sql": "CREATE TABLE Z(id INT64 NOT NULL,c STRING(MAX)) PRIMARY KEY(id)",
+      "requires": [],
+      "timeout_seconds": 30
+    },
+    {
+      "label": "column-stream",
+      "family": "issue-352",
+      "kind": "ddl",
+      "sql": "CREATE CHANGE STREAM CS FOR K,Z(c)",
+      "requires": [
+        "table-K",
+        "table-Z"
+      ],
+      "timeout_seconds": 30
+    },
+    {
+      "label": "column-untrack",
+      "family": "issue-352",
+      "kind": "ddl",
+      "sql": "ALTER CHANGE STREAM CS SET FOR K",
+      "requires": [
+        "column-stream"
+      ],
+      "timeout_seconds": 30
+    },
+    {
+      "label": "drop-untracked",
+      "family": "issue-352",
+      "kind": "ddl",
+      "sql": "DROP TABLE Z",
+      "requires": [
+        "column-untrack"
+      ],
+      "timeout_seconds": 30
+    },
+    {
+      "label": "stream-T1",
+      "family": "issue-298",
+      "kind": "ddl",
+      "sql": "CREATE TABLE T1(id INT64 NOT NULL,numericId INT64) PRIMARY KEY(id)",
+      "requires": [],
+      "timeout_seconds": 30
+    },
+    {
+      "label": "stream-T2",
+      "family": "issue-298",
+      "kind": "ddl",
+      "sql": "CREATE TABLE T2(id INT64 NOT NULL,numericId INT64) PRIMARY KEY(id)",
+      "requires": [],
+      "timeout_seconds": 30
+    },
+    {
+      "label": "stream-T3",
+      "family": "issue-298",
+      "kind": "ddl",
+      "sql": "CREATE TABLE T3(id INT64 NOT NULL,numericId INT64) PRIMARY KEY(id)",
+      "requires": [],
+      "timeout_seconds": 30
+    },
+    {
+      "label": "stream-T4",
+      "family": "issue-298",
+      "kind": "ddl",
+      "sql": "CREATE TABLE T4(id INT64 NOT NULL,val STRING(MAX)) PRIMARY KEY(id)",
+      "requires": [],
+      "timeout_seconds": 30
+    },
+    {
+      "label": "alter-stream-create",
+      "family": "issue-298",
+      "kind": "ddl",
+      "sql": "CREATE CHANGE STREAM S FOR T1(numericId),T2(numericId),T3(numericId)",
+      "requires": [
+        "stream-T1",
+        "stream-T2",
+        "stream-T3",
+        "stream-T4"
+      ],
+      "timeout_seconds": 30
+    },
+    {
+      "label": "alter-stream-0",
+      "family": "issue-298",
+      "kind": "ddl",
+      "sql": "ALTER CHANGE STREAM S SET FOR T1(numericId),T2(numericId)",
+      "requires": [
+        "alter-stream-create"
+      ],
+      "timeout_seconds": 30
+    },
+    {
+      "label": "alter-stream-1",
+      "family": "issue-298",
+      "kind": "ddl",
+      "sql": "ALTER CHANGE STREAM S SET FOR T1(numericId),T2(numericId),T3(numericId)",
+      "requires": [
+        "alter-stream-create"
+      ],
+      "timeout_seconds": 30
+    },
+    {
+      "label": "alter-stream-2",
+      "family": "issue-298",
+      "kind": "ddl",
+      "sql": "ALTER CHANGE STREAM S SET FOR T1(numericId),T3(numericId)",
+      "requires": [
+        "alter-stream-create"
+      ],
+      "timeout_seconds": 30
+    },
+    {
+      "label": "alter-stream-3",
+      "family": "issue-298",
+      "kind": "ddl",
+      "sql": "ALTER CHANGE STREAM S SET FOR T1(numericId),T2(numericId),T3(numericId)",
+      "requires": [
+        "alter-stream-create"
+      ],
+      "timeout_seconds": 30
+    },
+    {
+      "label": "alter-stream-4",
+      "family": "issue-298",
+      "kind": "ddl",
+      "sql": "ALTER CHANGE STREAM S SET FOR T1(numericId),T2(numericId),T3(numericId),T4",
+      "requires": [
+        "alter-stream-create"
+      ],
+      "timeout_seconds": 30
+    }
+  ]
+}

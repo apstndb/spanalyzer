@@ -1,0 +1,14 @@
+"""Run offline module gates; managed/Omni flags are deliberately absent."""
+from pathlib import Path
+from concurrent.futures import ThreadPoolExecutor
+import datetime,json,os,shutil,subprocess,sys
+root=Path('<LOCAL_CHECKOUT>');task=Path('<LOCAL_TASK_ROOT>/apstndb/spanalyzer/cross-engine-doc-delta-20261029');out=root/'knowledge/research/runtime-verification/evidence/cross-engine-doc-delta-20261029';goroot='<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8';env=os.environ.copy();env.update(GOROOT=goroot,GOTOOLCHAIN='local',GOCACHE=str(root/'.tmp/managed-recheck-20260925/go-cache'),GOFLAGS='-mod=readonly')
+for key in list(env):
+ if key.startswith(('SPANEMUBOOST_','REQUIRE_REAL_SPANNER_'))or key=='TEST_REAL_SPANNER_DATABASE':env.pop(key,None)
+work=[('survey-short',root/'survey',[goroot+'/bin/go','test','-short','./...'],'off'),('tools-unit',root/'tools',[goroot+'/bin/go','test','./...'],str(root/'go.work'))]
+def run(item):
+ name,cwd,args,gowork=item;caseenv=env|{'GOWORK':gowork};started=datetime.datetime.now(datetime.timezone.utc).isoformat();print('START '+name,flush=True)
+ with(task/(name+'.log')).open('w')as log:r=subprocess.run(args,cwd=cwd,env=caseenv,stdout=log,stderr=subprocess.STDOUT)
+ entry={'name':name,'argv':args,'cwd':str(cwd),'gowork':gowork,'started_at':started,'completed_at':datetime.datetime.now(datetime.timezone.utc).isoformat(),'exit_code':r.returncode,'log':name+'.log'};shutil.copyfile(task/(name+'.log'),out/(name+'.log'));print(name,r.returncode,flush=True);return entry
+with ThreadPoolExecutor(max_workers=2)as pool:checks=list(pool.map(run,work))
+a={'status':'pass'if all(c['exit_code']==0 for c in checks)else'failed','scope':'Offline module tests; survey short mode skips container integration; no managed/Omni requirement flags. No managed endpoint or cloud test flags.','checks':checks};(out/'module-validation.json').write_text(json.dumps(a,indent=2)+'\n');shutil.copyfile(__file__,out/'validate-modules.py.txt');sys.exit(0 if a['status']=='pass'else 1)

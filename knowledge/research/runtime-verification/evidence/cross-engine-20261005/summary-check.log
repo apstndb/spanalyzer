@@ -1,0 +1,61 @@
+{
+  "records": {
+    "emulator-feature-probe.jsonl": 98,
+    "emulator-option-control.jsonl": 18,
+    "emulator-queue-probe.jsonl": 5,
+    "emulator-volatile-probe.jsonl": 17,
+    "managed-catalog.jsonl": 2,
+    "managed-cleanup.jsonl": 4,
+    "managed-google-features.jsonl": 53,
+    "managed-pg-features.jsonl": 40,
+    "managed-queue.jsonl": 32,
+    "managed-readonly.jsonl": 80,
+    "omni-feature-probe.jsonl": 95,
+    "omni-queue-control.jsonl": 14,
+    "omni-queue-probe.jsonl": 32,
+    "omni-volatile-probe.jsonl": 13
+  },
+  "catalogs": {
+    "managed": {
+      "information-schema": {
+        "tables": 48,
+        "columns": 310,
+        "tuple_sha256": "8e85f93b85a90a6d24ca305df5056cfc18d3255e3dd902cfdd8fc5b9a45c1399"
+      },
+      "spanner-sys": {
+        "tables": 50,
+        "columns": 587,
+        "tuple_sha256": "8025345db5bbc1d176597aa1a300aa055f7926ea0fbcfd43db2801f3d1035794"
+      }
+    },
+    "omni": {
+      "information-schema": {
+        "tables": 48,
+        "columns": 310,
+        "tuple_sha256": "8e85f93b85a90a6d24ca305df5056cfc18d3255e3dd902cfdd8fc5b9a45c1399"
+      },
+      "spanner-sys": {
+        "tables": 51,
+        "columns": 598,
+        "tuple_sha256": "5fcb336c13ebe210053a477acd65e4e42a71b74ba30de7b10cdee0539916fe6e"
+      }
+    },
+    "emulator": {
+      "information-schema": {
+        "tables": 28,
+        "columns": 198,
+        "tuple_sha256": "62ef013fbf2a56659eb9be840c9be4d0b84ff8b803015857b72fef42139f9403"
+      },
+      "spanner-sys": {
+        "tables": 0,
+        "columns": 0,
+        "tuple_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      }
+    }
+  },
+  "cleanup": {
+    "omni": "Database and runtime cleanup records OK; no container remains for tested image",
+    "emulator": "Database and runtime cleanup records OK; no container remains for tested image",
+    "managed": "Owned GoogleSQL fixture scans empty; temporary PostgreSQL database NotFound"
+  }
+}

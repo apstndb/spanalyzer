@@ -1,0 +1,71 @@
+{
+  "recorded_at": "2026-10-21T10:20:01.367999+00:00",
+  "scope": "Documentation and offline evidence only; managed runtime remains stopped at instance NotFound",
+  "environment": {
+    "GOROOT": "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8",
+    "GOTOOLCHAIN": "local",
+    "GOWORK": "<LOCAL_CHECKOUT>/go.work",
+    "GOCACHE": "<LOCAL_CHECKOUT>/.tmp/managed-recheck-20260925/go-cache",
+    "GOFLAGS": "-mod=readonly"
+  },
+  "checks": [
+    {
+      "name": "okf-all",
+      "argv": [
+        "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go",
+        "run",
+        "./okf-check",
+        "--repo-root",
+        "..",
+        "--gate",
+        "all",
+        "--publication-manifest",
+        "<LOCAL_TASK_ROOT>/apstndb/spanalyzer/managed-recheck-20261021/publication-manifest.json"
+      ],
+      "cwd": "<LOCAL_CHECKOUT>/tools",
+      "exit_code": 0,
+      "started_at": "2026-10-21T10:20:00.551366+00:00",
+      "completed_at": "2026-10-21T10:20:01.130407+00:00",
+      "log": "okf-check.log"
+    },
+    {
+      "name": "markdown-language",
+      "argv": [
+        "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go",
+        "run",
+        "./markdown-language-check",
+        "--repo-root",
+        ".."
+      ],
+      "cwd": "<LOCAL_CHECKOUT>/tools",
+      "exit_code": 0,
+      "started_at": "2026-10-21T10:20:01.130755+00:00",
+      "completed_at": "2026-10-21T10:20:01.348331+00:00",
+      "log": "language-check.log"
+    },
+    {
+      "name": "diff-whitespace",
+      "argv": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "cwd": "<LOCAL_CHECKOUT>",
+      "exit_code": 0,
+      "started_at": "2026-10-21T10:20:01.348575+00:00",
+      "completed_at": "2026-10-21T10:20:01.367698+00:00",
+      "log": "diff-check.log"
+    }
+  ],
+  "prior_attempt": {
+    "exit_code": 1,
+    "classification": "Python shim injected Go 1.26.6 GOROOT for a Go 1.26.8 executable; rerun with explicit matching GOROOT",
+    "log": "okf-rerun-toolchain-error.log"
+  },
+  "offline_check": {
+    "command": "python3 .tmp/managed-recheck-20261021/verify-audit.py",
+    "exit_code": 0,
+    "assertions": 196,
+    "evidence": "offline-audit-check.json"
+  }
+}

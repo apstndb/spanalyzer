@@ -1,0 +1,44 @@
+# GQL results are incorrectly randomized despite ORDER BY
+
+Reproduced on Cloud Spanner Emulator **1.5.30, 1.5.31, 1.5.37, 1.5.44, 1.5.52, 1.5.58 and 1.5.59**, **linux/arm64**, using the Go client v1.91.0.
+
+This already reproduces in [1.5.30](https://github.com/GoogleCloudPlatform/cloud-spanner-emulator/releases/tag/v1.5.30), which announced PropertyGraph support; 1.5.29 rejects GRAPH syntax.
+
+Example image: `gcr.io/cloud-spanner-emulator/emulator:1.5.59`  
+Digest: `sha256:969af6a9349948fbfb4a826c18e160e258a4005f7c759f8e7f2dcec369cccba8`
+
+## Reproduction
+
+Load the [official FinGraph sample schema and data](https://docs.cloud.google.com/spanner/docs/graph/set-up#insert-graph-data), then run:
+
+```sql
+GRAPH FinGraph
+MATCH (p:Person)
+RETURN p.id
+ORDER BY p.id;
+```
+
+- Expected row sequence: **1, 2, 3**.
+- Actual row sequence: **2, 1, 3**.
+
+The SQL control `SELECT id FROM Person ORDER BY id` correctly returns **1, 2, 3**.
+
+Replacing the RETURN with `RETURN p.id AS v ORDER BY v DESC LIMIT 2` also reproduces the issue: expected **3, 2**, actual **2, 3**. The selected rows are correct, but their order is wrong.
+
+## Expected behavior
+
+The upstream [README](https://github.com/GoogleCloudPlatform/cloud-spanner-emulator/blob/d357ec1d2b08ae92ce1da4c5078de82fda0c07ab/README.md#L305) states:
+
+> The emulator intentionally randomizes query results with no ORDER BY clause. You should not depend on ordering done by the Cloud Spanner service in the absence of an ORDER BY clause.
+
+This query explicitly orders by the unique `Person.id`. Its output order is therefore specified, so it should honor `ORDER BY` rather than be randomized.
+
+## Source investigation
+
+In 1.5.59, the pinned GoogleSQL dependency is 2026.7.2. For this query,
+[AlgebrizeGraphTableScan](https://github.com/google/googlesql/blob/0e7d7073ed0360be587a5efa0fa78abeee00f17b/googlesql/reference_impl/algebrizer_graph.cc#L389)
+passes `GraphTableScan::is_ordered()` (false) to projection algebrization. The
+[empty-projection path](https://github.com/google/googlesql/blob/0e7d7073ed0360be587a5efa0fa78abeee00f17b/googlesql/reference_impl/algebrizer.cc#L6652)
+clears the underlying sort's order-preserving flag. Since Emulator enables
+[scramble_undefined_orderings](https://github.com/GoogleCloudPlatform/cloud-spanner-emulator/blob/d357ec1d2b08ae92ce1da4c5078de82fda0c07ab/backend/query/query_engine.cc#L159),
+the evaluator then scrambles the already sorted output.

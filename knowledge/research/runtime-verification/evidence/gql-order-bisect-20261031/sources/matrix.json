@@ -1,0 +1,145 @@
+{
+  "dialect": "google",
+  "steps": [
+    {
+      "label": "tables",
+      "family": "FinGraph",
+      "kind": "ddl",
+      "statements": [
+        "CREATE TABLE Person (\n      id               INT64 NOT NULL,\n      name             STRING(MAX),\n      birthday         TIMESTAMP,\n      country          STRING(MAX),\n      city             STRING(MAX),\n    ) PRIMARY KEY (id)",
+        "CREATE TABLE Account (\n      id               INT64 NOT NULL,\n      create_time      TIMESTAMP,\n      is_blocked       BOOL,\n      nick_name        STRING(MAX),\n    ) PRIMARY KEY (id)",
+        "CREATE TABLE PersonOwnAccount (\n      id               INT64 NOT NULL,\n      account_id       INT64 NOT NULL,\n      create_time      TIMESTAMP,\n      FOREIGN KEY (account_id) REFERENCES Account (id)\n    ) PRIMARY KEY (id, account_id),\n      INTERLEAVE IN PARENT Person ON DELETE CASCADE",
+        "CREATE TABLE AccountTransferAccount (\n      id               INT64 NOT NULL,\n      to_id            INT64 NOT NULL,\n      amount           FLOAT64,\n      create_time      TIMESTAMP NOT NULL,\n      order_number     STRING(MAX),\n      FOREIGN KEY (to_id) REFERENCES Account (id)\n    ) PRIMARY KEY (id, to_id, create_time),\n      INTERLEAVE IN PARENT Account ON DELETE CASCADE"
+      ]
+    },
+    {
+      "label": "graph",
+      "family": "FinGraph",
+      "kind": "ddl",
+      "sql": "CREATE OR REPLACE PROPERTY GRAPH FinGraph\n      NODE TABLES (Account, Person)\n      EDGE TABLES (\n        PersonOwnAccount\n          SOURCE KEY (id) REFERENCES Person (id)\n          DESTINATION KEY (account_id) REFERENCES Account (id)\n          LABEL Owns,\n        AccountTransferAccount\n          SOURCE KEY (id) REFERENCES Account (id)\n          DESTINATION KEY (to_id) REFERENCES Account (id)\n          LABEL Transfers\n      )",
+      "requires": [
+        "tables"
+      ]
+    },
+    {
+      "label": "seed",
+      "family": "official-FinGraph",
+      "kind": "dml",
+      "statements": [
+        "INSERT INTO Account\n      (id, create_time, is_blocked, nick_name)\n    VALUES\n      (7,\"2020-01-10 06:22:20.222\",false,\"Vacation Fund\"),\n      (16,\"2020-01-27 17:55:09.206\",true,\"Vacation Fund\"),\n      (20,\"2020-02-18 05:44:20.655\",false,\"Rainy Day Fund\")",
+        "INSERT INTO Person\n      (id, name, birthday, country, city)\n    VALUES\n      (1,\"Alex\",\"1991-12-21 00:00:00\",\"Australia\",\"Adelaide\"),\n      (2,\"Dana\",\"1980-10-31 00:00:00\",\"Czech_Republic\",\"Moravia\"),\n      (3,\"Lee\",\"1986-12-07 00:00:00\",\"India\",\"Kollam\")",
+        "INSERT INTO AccountTransferAccount\n      (id, to_id, amount, create_time, order_number)\n    VALUES\n      (7,16,300,\"2020-08-29 15:28:58.647\",\"304330008004315\"),\n      (7,16,100,\"2020-10-04 16:55:05.342\",\"304120005529714\"),\n      (16,20,300,\"2020-09-25 02:36:14.926\",\"103650009791820\"),\n      (20,7,500,\"2020-10-04 16:55:05.342\",\"304120005529714\"),\n      (20,16,200,\"2020-10-17 03:59:40.247\",\"302290001255747\")",
+        "INSERT INTO PersonOwnAccount\n      (id, account_id, create_time)\n    VALUES\n      (1,7,\"2020-01-10 06:22:20.222\"),\n      (2,20,\"2020-01-27 17:55:09.206\"),\n      (3,16,\"2020-02-18 05:44:20.655\")"
+      ],
+      "requires": [
+        "tables"
+      ]
+    },
+    {
+      "label": "sql-id-ASC",
+      "family": "historical-ordering",
+      "kind": "query",
+      "sql": "SELECT id FROM Person ORDER BY id ASC",
+      "requires": [
+        "seed"
+      ]
+    },
+    {
+      "label": "gql-id-ASC",
+      "family": "historical-ordering",
+      "kind": "query",
+      "sql": "GRAPH FinGraph MATCH (p:Person) RETURN p.id ORDER BY p.id ASC",
+      "requires": [
+        "seed"
+      ]
+    },
+    {
+      "label": "gql-limit-ASC",
+      "family": "historical-ordering",
+      "kind": "query",
+      "sql": "GRAPH FinGraph MATCH(p:Person) RETURN p.id AS v ORDER BY v ASC LIMIT 2",
+      "requires": [
+        "seed",
+        "graph"
+      ]
+    },
+    {
+      "label": "sql-id-DESC",
+      "family": "historical-ordering",
+      "kind": "query",
+      "sql": "SELECT id FROM Person ORDER BY id DESC",
+      "requires": [
+        "seed"
+      ]
+    },
+    {
+      "label": "gql-id-DESC",
+      "family": "historical-ordering",
+      "kind": "query",
+      "sql": "GRAPH FinGraph MATCH (p:Person) RETURN p.id ORDER BY p.id DESC",
+      "requires": [
+        "seed",
+        "graph"
+      ]
+    },
+    {
+      "label": "gql-limit-DESC",
+      "family": "historical-ordering",
+      "kind": "query",
+      "sql": "GRAPH FinGraph MATCH(p:Person) RETURN p.id AS v ORDER BY v DESC LIMIT 2",
+      "requires": [
+        "seed",
+        "graph"
+      ]
+    },
+    {
+      "label": "gql-id-alias",
+      "family": "historical-ordering",
+      "kind": "query",
+      "sql": "GRAPH FinGraph MATCH(p:Person) RETURN p.id AS id ORDER BY id",
+      "requires": [
+        "seed",
+        "graph"
+      ]
+    },
+    {
+      "label": "gql-name",
+      "family": "historical-ordering",
+      "kind": "query",
+      "sql": "GRAPH FinGraph MATCH(p:Person) RETURN p.name AS name ORDER BY name",
+      "requires": [
+        "seed",
+        "graph"
+      ]
+    },
+    {
+      "label": "gql-for-five",
+      "family": "historical-ordering",
+      "kind": "query",
+      "sql": "GRAPH FinGraph FOR x IN [5,3,1,4,2] RETURN x AS v ORDER BY v LIMIT 5",
+      "requires": [
+        "seed",
+        "graph"
+      ]
+    },
+    {
+      "label": "sql-outer-graph",
+      "family": "historical-ordering",
+      "kind": "query",
+      "sql": "SELECT id FROM GRAPH_TABLE(FinGraph MATCH(p:Person) RETURN p.id AS id ORDER BY id) ORDER BY id",
+      "requires": [
+        "seed",
+        "graph"
+      ]
+    },
+    {
+      "label": "sql-unspecified",
+      "family": "historical-ordering",
+      "kind": "query",
+      "sql": "SELECT id FROM Person",
+      "requires": [
+        "seed"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,130 @@
+{
+  "dialect": "pg",
+  "steps": [
+    {
+      "label": "pg-schema",
+      "family": "issue-312",
+      "kind": "ddl",
+      "sql": "CREATE SCHEMA temp_schema",
+      "requires": [],
+      "timeout_seconds": 30
+    },
+    {
+      "label": "pg-table",
+      "family": "issue-312",
+      "kind": "ddl",
+      "sql": "CREATE TABLE temp_schema.widget(widget_id bigint NOT NULL PRIMARY KEY,name text NOT NULL)",
+      "requires": [
+        "pg-schema"
+      ],
+      "timeout_seconds": 30
+    },
+    {
+      "label": "pg-conflict-0",
+      "family": "issue-312",
+      "kind": "dml-returning",
+      "sql": "INSERT INTO temp_schema.widget(widget_id,name) VALUES(1,'name 1') ON CONFLICT(widget_id) DO UPDATE SET name=EXCLUDED.name RETURNING name",
+      "requires": [
+        "pg-table"
+      ],
+      "timeout_seconds": 15
+    },
+    {
+      "label": "pg-conflict-1",
+      "family": "issue-312",
+      "kind": "dml-returning",
+      "sql": "INSERT INTO temp_schema.widget(widget_id,name) VALUES(1,'name 2') ON CONFLICT(widget_id) DO UPDATE SET name=EXCLUDED.name RETURNING name",
+      "requires": [
+        "pg-table"
+      ],
+      "timeout_seconds": 15
+    },
+    {
+      "label": "pg-conflict-2",
+      "family": "issue-312",
+      "kind": "dml-returning",
+      "sql": "INSERT INTO temp_schema.widget(widget_id,name) VALUES(1,'name 3') ON CONFLICT(widget_id) DO NOTHING RETURNING name",
+      "requires": [
+        "pg-table"
+      ],
+      "timeout_seconds": 15
+    },
+    {
+      "label": "pg-conflict-after",
+      "family": "issue-312",
+      "kind": "query",
+      "sql": "SELECT * FROM temp_schema.widget",
+      "requires": [
+        "pg-table"
+      ],
+      "timeout_seconds": 15
+    },
+    {
+      "label": "pg-parent",
+      "family": "issue-294",
+      "kind": "ddl",
+      "sql": "CREATE TABLE users(id varchar(36) NOT NULL PRIMARY KEY)",
+      "requires": [],
+      "timeout_seconds": 30
+    },
+    {
+      "label": "pg-fk",
+      "family": "issue-294",
+      "kind": "ddl",
+      "sql": "CREATE TABLE table_one(user_id varchar(36) NOT NULL PRIMARY KEY,attribute bytea NOT NULL,CONSTRAINT fk FOREIGN KEY(user_id) REFERENCES users(id))",
+      "requires": [
+        "pg-parent"
+      ],
+      "timeout_seconds": 30
+    },
+    {
+      "label": "pg-fk-seed",
+      "family": "issue-294",
+      "kind": "dml",
+      "sql": "",
+      "requires": [
+        "pg-fk"
+      ],
+      "timeout_seconds": 15,
+      "statements": [
+        "INSERT INTO users(id) VALUES('A')"
+      ]
+    },
+    {
+      "label": "pg-fk-conflict-0",
+      "family": "issue-294",
+      "kind": "dml",
+      "sql": "",
+      "requires": [
+        "pg-fk-seed"
+      ],
+      "timeout_seconds": 15,
+      "statements": [
+        "INSERT INTO table_one(user_id,attribute) VALUES('A',decode('01','hex')) ON CONFLICT(user_id) DO UPDATE SET user_id=EXCLUDED.user_id,attribute=EXCLUDED.attribute"
+      ]
+    },
+    {
+      "label": "pg-fk-conflict-1",
+      "family": "issue-294",
+      "kind": "dml",
+      "sql": "",
+      "requires": [
+        "pg-fk-seed"
+      ],
+      "timeout_seconds": 15,
+      "statements": [
+        "INSERT INTO table_one(user_id,attribute) VALUES('A',decode('01','hex')) ON CONFLICT(user_id) DO UPDATE SET attribute=EXCLUDED.attribute"
+      ]
+    },
+    {
+      "label": "pg-fk-after",
+      "family": "issue-294",
+      "kind": "query",
+      "sql": "SELECT * FROM table_one",
+      "requires": [
+        "pg-fk-seed"
+      ],
+      "timeout_seconds": 15
+    }
+  ]
+}

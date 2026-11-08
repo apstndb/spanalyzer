@@ -1,0 +1,24 @@
+[
+  {
+    "dialect": "google",
+    "argv": [
+      "<LOCAL_CHECKOUT>/.tmp/managed-recheck-20261105/managed",
+      "<LOCAL_TASK_ROOT>/apstndb/spanalyzer/managed-recheck-20261105/evidence/google-cases.json"
+    ],
+    "started_at": "2026-11-05T02:25:34.203878+00:00",
+    "completed_at": "2026-11-05T02:34:11.162580+00:00",
+    "exit_code": 0,
+    "authorization": "Current managed revalidation request; two fresh task-owned database lifecycles, prior retained fixture excluded."
+  },
+  {
+    "dialect": "pg",
+    "argv": [
+      "<LOCAL_CHECKOUT>/.tmp/managed-recheck-20261105/managed",
+      "<LOCAL_TASK_ROOT>/apstndb/spanalyzer/managed-recheck-20261105/evidence/pg-cases.json"
+    ],
+    "started_at": "2026-11-05T02:34:11.163024+00:00",
+    "completed_at": "2026-11-05T02:37:39.128466+00:00",
+    "exit_code": 0,
+    "authorization": "Current managed revalidation request; two fresh task-owned database lifecycles, prior retained fixture excluded."
+  }
+]

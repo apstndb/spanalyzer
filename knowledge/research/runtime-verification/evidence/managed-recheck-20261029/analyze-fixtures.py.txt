@@ -1,0 +1,53 @@
+from collections import Counter,defaultdict
+from pathlib import Path
+import datetime,json,re,statistics
+root=Path('<LOCAL_CHECKOUT>')
+scratch=root/'.tmp/managed-recheck-20261029'
+ev=Path('<LOCAL_TASK_ROOT>/apstndb/spanalyzer/managed-recheck-20261029/evidence')
+old=root/'knowledge/research/runtime-verification/evidence/managed-recheck-20261023'
+def load(path):return[json.loads(line)for line in path.read_text().splitlines()if line.strip()]
+names=['readonly','active-batch','google-json','pg-streams','graph-controls','google-options','pg-options','google-capture','pg-capture']
+records={name:load(scratch/(name+'.stdout'))for name in names}
+def normalized(value):
+    return re.sub(r'202610(?:23|29)','<DATE>',json.dumps(value,sort_keys=True))
+def paired(before,after):
+    left,right=defaultdict(list),defaultdict(list)
+    for row in before:left[(row.get('label'),row.get('kind'),normalized(row.get('sql')))].append(row)
+    for row in after:right[(row.get('label'),row.get('kind'),normalized(row.get('sql')))].append(row)
+    changes=[];count=0
+    for key,rows in left.items():
+        for a,b in zip(rows,right.get(key,[])):
+            count+=1
+            if a.get('code')!=b.get('code'):changes.append({'label':b.get('label'),'before':a.get('code'),'after':b.get('code'),'sql':b.get('sql')})
+    return {'baseline_records':len(before),'current_records':len(after),'comparable_records':count,'changed_codes':changes,'value_scope':'Not compared: workload, tokens, timestamps, sampled rows and plan costs can vary'}
+(ev/'fixture-comparison.json').write_text(json.dumps({name:paired(load(old/(name+'.jsonl')),records[name])for name in ['readonly','active-batch','google-json','pg-streams','graph-controls','google-options','pg-options']},indent=2)+'\n')
+def walk(value):
+    if isinstance(value,dict):
+        yield value
+        for item in value.values():yield from walk(item)
+    elif isinstance(value,list):
+        for item in value:yield from walk(item)
+heartbeats={}
+for name in ['google-json','pg-streams']:
+    child=next(row for row in records[name]if row['label']=='heartbeat-child-100')
+    stamps=sorted(item['timestamp']for row in child['rows']for item in walk(row['record'])if set(item)=={'timestamp'}and isinstance(item['timestamp'],str))
+    times=[datetime.datetime.fromisoformat(stamp.replace('Z','+00:00'))for stamp in stamps]
+    intervals=[(b-a).total_seconds()*1000 for a,b in zip(times,times[1:])]
+    heartbeats[name]={'code':child['code'],'rows':len(child['rows']),'record_timestamps':stamps,'intervals_ms':intervals,'median_ms':statistics.median(intervals)if intervals else None}
+(ev/'heartbeat-summary.json').write_text(json.dumps(heartbeats,indent=2)+'\n')
+capture_records={}
+for name in ['google-capture','pg-capture']:
+    data=[]
+    for event in records[name]:
+        if '-child-'not in event['label']:continue
+        for row in event.get('rows',[]):
+            for item in walk(row['record']):
+                if {'mod_type','value_capture_type','mods'}<=item.keys():
+                    simplified={key:item[key]for key in ['mod_type','value_capture_type','mods','column_types']}
+                    for mod in simplified['mods']:
+                        for key in ['keys','new_values','old_values']:
+                            if isinstance(mod.get(key),str):mod[key]=json.loads(mod[key])
+                    data.append(simplified)
+    capture_records[name]=data
+(ev/'value-capture-summary.json').write_text(json.dumps(capture_records,indent=2)+'\n')
+print(json.dumps({'fixture_code_changes':{k:len(v['changed_codes'])for k,v in json.loads((ev/'fixture-comparison.json').read_text()).items()},'heartbeat_medians':{k:v['median_ms']for k,v in heartbeats.items()},'captured_records':{k:len(v)for k,v in capture_records.items()}}))

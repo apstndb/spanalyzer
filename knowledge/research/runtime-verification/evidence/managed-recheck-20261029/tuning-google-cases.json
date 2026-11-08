@@ -1,0 +1,14 @@
+[
+  {
+    "label": "tuning-any-value-having-max",
+    "sql": "SELECT concert_date,ANY_VALUE(begin_time HAVING MAX(end_time)) AS latest_begin FROM UNNEST([STRUCT(DATE '2026-10-29' AS concert_date,TIMESTAMP '2026-10-29T01:00:00Z' AS begin_time,TIMESTAMP '2026-10-29T02:00:00Z' AS end_time),STRUCT(DATE '2026-10-29',TIMESTAMP '2026-10-29T03:00:00Z',TIMESTAMP '2026-10-29T04:00:00Z')]) GROUP BY concert_date"
+  },
+  {
+    "label": "tuning-any-value-having-min",
+    "sql": "SELECT concert_date,ANY_VALUE(begin_time HAVING MIN(end_time)) AS earliest_begin FROM UNNEST([STRUCT(DATE '2026-10-29' AS concert_date,TIMESTAMP '2026-10-29T01:00:00Z' AS begin_time,TIMESTAMP '2026-10-29T02:00:00Z' AS end_time),STRUCT(DATE '2026-10-29',TIMESTAMP '2026-10-29T03:00:00Z',TIMESTAMP '2026-10-29T04:00:00Z')]) GROUP BY concert_date"
+  },
+  {
+    "label": "tuning-additional-parallelism",
+    "sql": "@{USE_ADDITIONAL_PARALLELISM=TRUE} SELECT x FROM UNNEST([1,2,3]) x ORDER BY x"
+  }
+]

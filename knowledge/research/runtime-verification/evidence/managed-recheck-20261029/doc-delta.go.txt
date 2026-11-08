@@ -1,0 +1,213 @@
+package main
+
+import (
+	"context"
+	"encoding/json"
+	"fmt"
+	"os"
+	"time"
+
+	"cloud.google.com/go/spanner"
+	database "cloud.google.com/go/spanner/admin/database/apiv1"
+	dbpb "cloud.google.com/go/spanner/admin/database/apiv1/databasepb"
+	sppb "cloud.google.com/go/spanner/apiv1/spannerpb"
+	"google.golang.org/api/iterator"
+	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/encoding/protojson"
+)
+
+type probe struct {
+	Label   string `json:"label"`
+	SQL     string `json:"sql"`
+	Dialect string `json:"dialect"`
+	Family  string `json:"family"`
+	Profile bool   `json:"profile"`
+}
+type plan struct {
+	Cases    []probe `json:"cases"`
+	Fixtures struct {
+		GoogleDDL []string `json:"google_ddl"`
+		PGDDL     []string `json:"pg_ddl"`
+		Documents []struct {
+			ID  int64 `json:"Id"`
+			Doc any   `json:"Doc"`
+		} `json:"documents"`
+		Dynamic []struct {
+			ID         int64  `json:"Id"`
+			Label      string `json:"Label"`
+			Properties any    `json:"Properties"`
+		} `json:"dynamic_properties"`
+	} `json:"fixtures"`
+}
+
+func emit(v map[string]any) {
+	v["at"] = time.Now().UTC().Format(time.RFC3339Nano)
+	if err := json.NewEncoder(os.Stdout).Encode(v); err != nil {
+		panic(err)
+	}
+}
+func outcome(label string, err error) {
+	message := ""
+	if err != nil {
+		message = err.Error()
+	}
+	emit(map[string]any{"label": label, "code": status.Code(err).String(), "error": message})
+}
+func query(client *spanner.Client, p probe) {
+	ctx, cancel := context.WithTimeout(context.Background(), 35*time.Second)
+	defer cancel()
+	ro := client.Single()
+	defer ro.Close()
+	mode := sppb.ExecuteSqlRequest_NORMAL
+	if p.Profile {
+		mode = sppb.ExecuteSqlRequest_PROFILE
+	}
+	it := ro.QueryWithOptions(ctx, spanner.Statement{SQL: p.SQL}, spanner.QueryOptions{Mode: &mode})
+	defer it.Stop()
+	rows := []map[string]any{}
+	var err error
+	for {
+		var row *spanner.Row
+		row, err = it.Next()
+		if err != nil {
+			break
+		}
+		values := map[string]any{}
+		for i, name := range row.ColumnNames() {
+			var value spanner.GenericColumnValue
+			if err = row.Column(i, &value); err != nil {
+				break
+			}
+			values[name] = value.Value.AsInterface()
+		}
+		if err != nil {
+			break
+		}
+		rows = append(rows, values)
+	}
+	if err == iterator.Done {
+		err = nil
+	}
+	message := ""
+	if err != nil {
+		message = err.Error()
+	}
+	result := map[string]any{"label": p.Label, "sql": p.SQL, "dialect": p.Dialect, "family": p.Family, "mode": mode.String(), "code": status.Code(err).String(), "error": message, "rows": rows}
+	if it.Metadata != nil {
+		data, _ := protojson.Marshal(it.Metadata)
+		result["metadata"] = json.RawMessage(data)
+	}
+	if it.QueryPlan != nil {
+		data, _ := protojson.Marshal(it.QueryPlan)
+		result["plan"] = json.RawMessage(data)
+	}
+	if it.QueryStats != nil {
+		result["stats"] = it.QueryStats
+	}
+	emit(result)
+}
+func main() {
+	if os.Getenv("SPANNER_EMULATOR_HOST") != "" {
+		panic("emulator override")
+	}
+	if len(os.Args) != 3 {
+		panic("expected plan file and dialect")
+	}
+	data, err := os.ReadFile(os.Args[1])
+	if err != nil {
+		panic(err)
+	}
+	var input plan
+	if err = json.Unmarshal(data, &input); err != nil {
+		panic(err)
+	}
+	dialect := os.Args[2]
+	ctx := context.Background()
+	admin, err := database.NewDatabaseAdminClient(ctx)
+	if err != nil {
+		panic(err)
+	}
+	defer admin.Close()
+	parent := fmt.Sprintf("projects/%s/instances/%s", os.Getenv("SPANNER_PROJECT_ID"), os.Getenv("SPANNER_INSTANCE_ID"))
+	name := "docdelta-20261029g1"
+	typeName := dbpb.DatabaseDialect_GOOGLE_STANDARD_SQL
+	statement := "CREATE DATABASE `" + name + "`"
+	ddls := input.Fixtures.GoogleDDL
+	if dialect == "pg" {
+		name = "docdelta-20261029p1"
+		typeName = dbpb.DatabaseDialect_POSTGRESQL
+		statement = "CREATE DATABASE \"" + name + "\""
+		ddls = input.Fixtures.PGDDL
+	}
+	db := parent + "/databases/" + name
+	cx, cancel := context.WithTimeout(ctx, 3*time.Minute)
+	op, err := admin.CreateDatabase(cx, &dbpb.CreateDatabaseRequest{Parent: parent, CreateStatement: statement, DatabaseDialect: typeName})
+	if err != nil {
+		cancel()
+		outcome("create-database", err)
+		return
+	}
+	// Successful submission establishes ownership; preserve cleanup on Wait errors.
+	defer func() {
+		cx, cancel := context.WithTimeout(ctx, time.Minute)
+		defer cancel()
+		err := admin.DropDatabase(cx, &dbpb.DropDatabaseRequest{Database: db})
+		outcome("drop-database", err)
+		if err == nil {
+			_, err = admin.GetDatabase(cx, &dbpb.GetDatabaseRequest{Name: db})
+			outcome("database-absent", err)
+		}
+	}()
+	_, err = op.Wait(cx)
+	cancel()
+	outcome("create-database", err)
+	if err != nil {
+		return
+	}
+	client, err := spanner.NewClient(ctx, db)
+	if err != nil {
+		panic(err)
+	}
+	defer client.Close()
+	for i, sql := range ddls {
+		cx, cancel := context.WithTimeout(ctx, 3*time.Minute)
+		op, err := admin.UpdateDatabaseDdl(cx, &dbpb.UpdateDatabaseDdlRequest{Database: db, Statements: []string{sql}})
+		if err == nil {
+			err = op.Wait(cx)
+		}
+		cancel()
+		outcome(fmt.Sprintf("setup-ddl-%d", i), err)
+		if err != nil {
+			return
+		}
+	}
+	outcome("setup", nil)
+	var mutations []*spanner.Mutation
+	for _, row := range input.Fixtures.Documents {
+		table, columns := "DocDeltaDocs", []string{"Id", "Doc"}
+		if dialect == "pg" {
+			table = "docdeltadocs"
+			columns = []string{"id", "doc"}
+		}
+		var value any = spanner.NullJSON{Value: row.Doc, Valid: row.Doc != nil}
+		if dialect == "pg" {
+			value = spanner.PGJsonB{Value: row.Doc, Valid: row.Doc != nil}
+		}
+		mutations = append(mutations, spanner.Insert(table, columns, []any{row.ID, value}))
+	}
+	if dialect == "google" {
+		for _, row := range input.Fixtures.Dynamic {
+			mutations = append(mutations, spanner.Insert("DocDeltaNodes", []string{"Id", "Label", "Properties"}, []any{row.ID, row.Label, spanner.NullJSON{Value: row.Properties, Valid: true}}))
+		}
+	}
+	_, err = client.Apply(ctx, mutations)
+	outcome("seed", err)
+	if err != nil {
+		return
+	}
+	for _, p := range input.Cases {
+		if p.Dialect == dialect {
+			query(client, p)
+		}
+	}
+}

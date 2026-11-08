@@ -1,0 +1,11 @@
+"""Recover fast owned-container identities from bounded daemon event history."""
+from pathlib import Path
+import datetime,json,subprocess
+p=Path('<LOCAL_TASK_ROOT>/apstndb/spanalyzer/cross-engine-doc-delta-20261029/evidence');ledgers=[]
+for name in ['commands.json','extra-commands.json','repair-commands.json','order-commands.json']:ledgers+=json.loads((p/name).read_text())
+result=[]
+for name in ['emulator-repair','emulator-order']:
+ c=next(c for c in ledgers if c['name']==name);start=datetime.datetime.fromisoformat(c['started_at'])-datetime.timedelta(seconds=5);end=datetime.datetime.fromisoformat(c['completed_at'])+datetime.timedelta(seconds=5);image=c['argv'][2]
+ r=subprocess.run(['docker','events','--since',start.isoformat(),'--until',end.isoformat(),'--filter','type=container','--format','{{json .}}'],capture_output=True,text=True,check=True);events=[json.loads(s)for s in r.stdout.splitlines()if s];selected=[e for e in events if e.get('Actor',{}).get('Attributes',{}).get('image')==image];ids={e['Actor']['ID']for e in selected};assert len(ids)==1,(name,len(ids));cid=next(iter(ids));observed=subprocess.run(['docker','inspect',cid],capture_output=True,text=True);live=subprocess.run(['docker','ps','-aq','--no-trunc'],capture_output=True,text=True,check=True);assert observed.returncode!=0 and cid not in live.stdout.splitlines()
+ receipt={'name':name,'scope':'Active snapshot raced the sub-three-second runtime. Identity recovered from bounded daemon events for the exact image; no active command/config inspection claimed.','image':image,'container_id':cid,'events':selected,'inspect_after_completion_exit_code':observed.returncode,'absent_from_reachable_daemon':True};(p/(name+'-event-identity.json')).write_text(json.dumps(receipt,indent=2)+'\n');result.append({'name':name,'events':len(selected),'actions':[e.get('Action')for e in selected],'absent':True})
+print(json.dumps(result))

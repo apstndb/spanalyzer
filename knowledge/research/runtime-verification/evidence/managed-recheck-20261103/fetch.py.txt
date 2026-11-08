@@ -1,0 +1,29 @@
+from pathlib import Path
+from concurrent.futures import ThreadPoolExecutor
+import subprocess,json,hashlib,datetime
+
+out=Path('<LOCAL_TASK_ROOT>/apstndb/spanalyzer/managed-recheck-20261103/sources')
+base='1e880188144a326e383778ebc165a63197efbf70'
+items=[('mirror-head.json',['gh','api','repos/apstndb/spanner-docs-mirror/commits/main']),('mirror-commits.json',['gh','api','repos/apstndb/spanner-docs-mirror/commits?per_page=15']),('differences-history.json',['gh','api','repos/apstndb/spanner-docs-mirror/commits?path=docs/docs.cloud.google.com/spanner-omni/differences.md&per_page=10'])]
+for name,path in [('differences','spanner-omni/differences'),('managed-release','spanner/docs/release-notes'),('omni-release','spanner-omni/release-notes'),('omni-download','spanner-omni/download')]:
+    items.append((name+'.json',['dkcli','get','-f','json','docs.cloud.google.com/'+path]))
+def fetch(item):
+    name,args=item
+    r=subprocess.run(args,capture_output=True,timeout=120)
+    if r.returncode:
+        raise RuntimeError((name,r.returncode,r.stderr.decode()[-600:]))
+    (out/name).write_bytes(r.stdout)
+    return {'file':name,'argv':args,'at':datetime.datetime.now(datetime.timezone.utc).isoformat(),'sha256':hashlib.sha256(r.stdout).hexdigest()}
+with ThreadPoolExecutor(max_workers=5) as pool:
+    rows=list(pool.map(fetch,items))
+head=json.loads((out/'mirror-head.json').read_text())['sha']
+rows.append(fetch(('mirror-compare.json',['gh','api',f'repos/apstndb/spanner-docs-mirror/compare/{base}...{head}'])))
+(out/'retrieval.json').write_text(json.dumps(rows,indent=2)+'\n')
+for name in ['differences','managed-release','omni-release','omni-download']:
+    d=json.loads((out/(name+'.json')).read_text())
+    (out/(name+'.md')).write_text(d.get('content',''))
+    print(name, {k:d.get(k) for k in ['name','updateTime','title']},len(d.get('content','')))
+c=json.loads((out/'mirror-compare.json').read_text())
+print('mirror',head,c['status'],'commits',c['total_commits'],'files',len(c['files']))
+print('commits',[(v['sha'],v['commit']['message']) for v in c['commits']])
+print('files',[v['filename'] for v in c['files']])

@@ -1,0 +1,16 @@
+{
+  "argv": [
+    "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go",
+    "test",
+    "-count=1",
+    "-run",
+    "^TestDrift_RealTableMetas$",
+    "-v",
+    "./infoschem"
+  ],
+  "started_at": "2026-11-05T02:16:24.717425+00:00",
+  "completed_at": "2026-11-05T02:16:37.091197+00:00",
+  "exit_code": 1,
+  "scope": "Existing read-only drift test against base database; no fixture operations",
+  "source_sha256": "11138ffcee41e82c9a223ffb3251541e09b1d3b3a71084c245f469867f530aac"
+}

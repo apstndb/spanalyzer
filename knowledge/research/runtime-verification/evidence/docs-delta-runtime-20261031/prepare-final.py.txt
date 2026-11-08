@@ -1,0 +1,15 @@
+from pathlib import Path
+import json
+root=Path('<LOCAL_CHECKOUT>');s=root/'.tmp/docs-delta-runtime-20261031';out=Path('<LOCAL_TASK_ROOT>/apstndb/spanalyzer/docs-delta-runtime-20261031/evidence')
+for dialect in ['google','pg']:
+ data=json.loads((out/(dialect+'-corrected-cases.json')).read_text())
+ for row in data['steps']:
+  if row['kind']=='query'and row['label'].startswith('score-'):row['sql']=row['sql'].replace(' FROM ScoreDocs ORDER BY Id'," FROM ScoreDocs WHERE "+('spanner.search'if dialect=='pg'else'SEARCH')+"(BodyTokens,'cat') ORDER BY Id")
+ if dialect=='google':
+  for label,sql in [('select-led-select','SELECT 1 AS x |> SELECT x'),('select-led-where','SELECT 1 AS x |> WHERE x=1'),('select-led-aggregate','SELECT 1 AS x |> AGGREGATE SUM(x) AS n'),('from-only','FROM (SELECT 1 AS x)')]:data['steps'].append({'label':label,'family':'pipe-isolation','kind':'query','sql':sql})
+ else:
+  sql="SELECT t, EXTRACT(EPOCH FROM t - '1970-01-01Z'::timestamptz)::bigint / 3600 AS documented_hour, FLOOR(EXTRACT(EPOCH FROM t - '1970-01-01Z'::timestamptz) / 3600)::bigint AS floored_hour FROM (SELECT '1969-12-31 23:59:59Z'::timestamptz AS t UNION ALL SELECT '2026-10-31 00:00:00Z'::timestamptz UNION ALL SELECT '2026-10-31 00:59:59.4Z'::timestamptz UNION ALL SELECT '2026-10-31 00:59:59.9Z'::timestamptz UNION ALL SELECT '2026-10-31 01:00:00Z'::timestamptz) q ORDER BY t"
+  data['steps'].append({'label':'bucket-pg-boundaries','family':'bucket-boundary','kind':'query','sql':sql})
+ (out/(dialect+'-final-cases.json')).write_text(json.dumps(data,indent=2)+'\n')
+text=(s/'run-managed-corrected.py').read_text().replace('managed-corrected','managed-final').replace('-corrected-cases','-final-cases');(s/'run-managed-final.py').write_text(text)
+text=(s/'run-local-corrected.py').read_text().replace("name=backend+'-corrected'","name=backend+'-final'").replace('-corrected-cases','-final-cases').replace('local-corrected-commands','local-final-commands');(s/'run-local-final.py').write_text(text)

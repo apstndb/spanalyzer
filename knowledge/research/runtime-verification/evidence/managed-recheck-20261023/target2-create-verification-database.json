@@ -1,0 +1,20 @@
+{
+  "name": "target2-create-verification-database",
+  "started_at": "2026-10-23T14:26:01.331472+00:00",
+  "completed_at": "2026-10-23T14:26:12.257878+00:00",
+  "argv": [
+    "<LOCAL_HOME>/google-cloud-sdk/bin/gcloud",
+    "spanner",
+    "databases",
+    "create",
+    "<redacted>",
+    "--instance=<redacted>",
+    "--database-dialect=GOOGLE_STANDARD_SQL",
+    "--format=json",
+    "--project=<redacted>",
+    "--quiet"
+  ],
+  "exit_code": 0,
+  "stdout": "[\n  {\n    \"@type\": \"type.googleapis.com/google.spanner.admin.database.v1.Database\",\n    \"createTime\": \"2026-10-23T14:26:08.523693Z\",\n    \"databaseDialect\": \"GOOGLE_STANDARD_SQL\",\n    \"earliestVersionTime\": \"2026-10-23T14:26:08.523693Z\",\n    \"name\": \"projects/<redacted>/instances/<redacted>/databases/<redacted>\",\n    \"resourceLocationId\": \"asia-northeast1\",\n    \"state\": \"READY\",\n    \"versionRetentionPeriod\": \"1h\"\n  }\n]\n",
+  "stderr": "Creating database...\n......done.\n"
+}

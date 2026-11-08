@@ -1,0 +1,24 @@
+{
+  "id": "sha256:969af6a9349948fbfb4a826c18e160e258a4005f7c759f8e7f2dcec369cccba8",
+  "architecture": "arm64",
+  "os": "linux",
+  "created": "2026-10-14T05:24:16.38901439Z",
+  "config": {
+    "User": "0",
+    "ExposedPorts": {
+      "9010/tcp": {},
+      "9020/tcp": {}
+    },
+    "Env": [
+      "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+      "SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt"
+    ],
+    "Cmd": [
+      "./gateway_main",
+      "--hostname",
+      "0.0.0.0"
+    ],
+    "WorkingDir": "/",
+    "ArgsEscaped": true
+  }
+}

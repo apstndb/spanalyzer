@@ -1,0 +1,168 @@
+[
+  {
+    "label": "sql-id-ASC",
+    "sql": "SELECT id FROM Person ORDER BY id ASC",
+    "expected": [
+      {
+        "id": "1"
+      },
+      {
+        "id": "2"
+      },
+      {
+        "id": "3"
+      }
+    ],
+    "gql": false
+  },
+  {
+    "label": "gql-id-ASC",
+    "sql": "GRAPH FinGraph MATCH (p:Person) RETURN p.id ORDER BY p.id ASC",
+    "expected": [
+      {
+        "id": "1"
+      },
+      {
+        "id": "2"
+      },
+      {
+        "id": "3"
+      }
+    ],
+    "gql": true
+  },
+  {
+    "label": "gql-limit-ASC",
+    "sql": "GRAPH FinGraph MATCH(p:Person) RETURN p.id AS v ORDER BY v ASC LIMIT 2",
+    "expected": [
+      {
+        "v": "1"
+      },
+      {
+        "v": "2"
+      }
+    ],
+    "gql": true
+  },
+  {
+    "label": "sql-id-DESC",
+    "sql": "SELECT id FROM Person ORDER BY id DESC",
+    "expected": [
+      {
+        "id": "3"
+      },
+      {
+        "id": "2"
+      },
+      {
+        "id": "1"
+      }
+    ],
+    "gql": false
+  },
+  {
+    "label": "gql-id-DESC",
+    "sql": "GRAPH FinGraph MATCH (p:Person) RETURN p.id ORDER BY p.id DESC",
+    "expected": [
+      {
+        "id": "3"
+      },
+      {
+        "id": "2"
+      },
+      {
+        "id": "1"
+      }
+    ],
+    "gql": true
+  },
+  {
+    "label": "gql-limit-DESC",
+    "sql": "GRAPH FinGraph MATCH(p:Person) RETURN p.id AS v ORDER BY v DESC LIMIT 2",
+    "expected": [
+      {
+        "v": "3"
+      },
+      {
+        "v": "2"
+      }
+    ],
+    "gql": true
+  },
+  {
+    "label": "gql-id-alias",
+    "sql": "GRAPH FinGraph MATCH(p:Person) RETURN p.id AS id ORDER BY id",
+    "expected": [
+      {
+        "id": "1"
+      },
+      {
+        "id": "2"
+      },
+      {
+        "id": "3"
+      }
+    ],
+    "gql": true
+  },
+  {
+    "label": "gql-name",
+    "sql": "GRAPH FinGraph MATCH(p:Person) RETURN p.name AS name ORDER BY name",
+    "expected": [
+      {
+        "name": "Alex"
+      },
+      {
+        "name": "Dana"
+      },
+      {
+        "name": "Lee"
+      }
+    ],
+    "gql": true
+  },
+  {
+    "label": "gql-for-five",
+    "sql": "GRAPH FinGraph FOR x IN [5,3,1,4,2] RETURN x AS v ORDER BY v LIMIT 5",
+    "expected": [
+      {
+        "v": "1"
+      },
+      {
+        "v": "2"
+      },
+      {
+        "v": "3"
+      },
+      {
+        "v": "4"
+      },
+      {
+        "v": "5"
+      }
+    ],
+    "gql": true
+  },
+  {
+    "label": "sql-outer-graph",
+    "sql": "SELECT id FROM GRAPH_TABLE(FinGraph MATCH(p:Person) RETURN p.id AS id ORDER BY id) ORDER BY id",
+    "expected": [
+      {
+        "id": "1"
+      },
+      {
+        "id": "2"
+      },
+      {
+        "id": "3"
+      }
+    ],
+    "gql": false
+  },
+  {
+    "label": "sql-unspecified",
+    "sql": "SELECT id FROM Person",
+    "expected": null,
+    "gql": false
+  }
+]

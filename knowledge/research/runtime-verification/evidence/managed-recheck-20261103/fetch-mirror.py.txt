@@ -1,0 +1,16 @@
+from pathlib import Path
+from concurrent.futures import ThreadPoolExecutor
+import subprocess,json,datetime,hashlib
+out=Path('<LOCAL_TASK_ROOT>/apstndb/spanalyzer/managed-recheck-20261103/sources')
+base='1e880188144a326e383778ebc165a63197efbf70';head=json.loads((out/'mirror-head.json').read_text())['sha'];comp=json.loads((out/'mirror-compare.json').read_text());items=[]
+for c in comp['commits']:items.append(('commit-'+c['sha']+'.json',['gh','api','repos/apstndb/spanner-docs-mirror/commits/'+c['sha']]))
+paths=[x['filename']for x in comp['files']if x['filename'].startswith('docs/')]+['docs/docs.cloud.google.com/spanner-omni/differences.md']
+for phase,ref in [('baseline',base),('target',head)]:
+    for path in paths:
+        name=phase+'/'+path.removeprefix('docs/')+'.txt'
+        items.append((name,['curl','--fail','--silent','--show-error','https://raw.githubusercontent.com/apstndb/spanner-docs-mirror/'+ref+'/'+path]))
+def run(item):
+    name,args=item;r=subprocess.run(args,capture_output=True,timeout=90);assert r.returncode==0,(name,r.stderr.decode());p=out/name;p.parent.mkdir(parents=True,exist_ok=True);p.write_bytes(r.stdout)
+    return {'file':name,'argv':args,'at':datetime.datetime.now(datetime.timezone.utc).isoformat(),'sha256':hashlib.sha256(r.stdout).hexdigest()}
+with ThreadPoolExecutor(max_workers=6)as pool:rows=list(pool.map(run,items))
+(out/'mirror-body-retrieval.json').write_text(json.dumps(rows,indent=2)+'\n');print('Retained',len(rows),'full mirror documents and commit records')

@@ -1,0 +1,94 @@
+"""Run under the dedicated user-level mise profile; retain redacted output only."""
+from pathlib import Path
+import datetime, json, os, re, subprocess, sys, time
+
+root = Path('<LOCAL_CHECKOUT>')
+out = root / '.tmp/managed-recheck-20261029'
+durable = Path('<LOCAL_TASK_ROOT>/apstndb/spanalyzer/managed-recheck-20261029')
+go = '<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go'
+env = os.environ.copy()
+for key in ['SPANNER_PROJECT_ID', 'SPANNER_INSTANCE_ID', 'SPANNER_DATABASE_ID']:
+    if not env.get(key):
+        raise RuntimeError('Dedicated profile missing ' + key)
+if env.get('SPANNER_EMULATOR_HOST'):
+    raise RuntimeError('Emulator override is present')
+env['TEST_REAL_SPANNER_DATABASE'] = 'projects/{SPANNER_PROJECT_ID}/instances/{SPANNER_INSTANCE_ID}/databases/{SPANNER_DATABASE_ID}'.format(**env)
+for key in list(env):
+    if key.startswith('SPANEMUBOOST_') or key.startswith('REQUIRE_REAL_SPANNER_'):
+        env.pop(key, None)
+env.update(GOTOOLCHAIN='local', GOROOT=str(Path(go).parent.parent), GOFLAGS='-mod=readonly')
+env['PATH'] = str(Path(go).parent) + ':' + env['PATH']
+env['GOCACHE'] = str(root / '.tmp/managed-recheck-20260925/go-cache')
+env.update({k:'1' for k in ['REQUIRE_REAL_SPANNER_CANONICAL','REQUIRE_REAL_SPANNER_DRIFT','REQUIRE_REAL_SPANNER_EXPRESSION_INDEX','REQUIRE_REAL_SPANNER_UUID']})
+secrets = [env[k] for k in ['TEST_REAL_SPANNER_DATABASE','SPANNER_PROJECT_ID','SPANNER_INSTANCE_ID','SPANNER_DATABASE_ID']]
+receipts_path = durable/'evidence/json-commands.json'
+receipts = json.loads(receipts_path.read_text()) if receipts_path.exists() else []
+
+def scrub(value):
+    if isinstance(value,str):
+        for secret in secrets:
+            value=value.replace(secret,'<redacted>')
+        value=re.sub(r'requestID = "[^"]*"','requestID = "<redacted>"',value)
+        return re.sub(r'projects/<redacted>/instances/<redacted>/databases/[A-Za-z0-9_-]+','<database>',value)
+    if isinstance(value,list):return [scrub(x) for x in value]
+    if isinstance(value,dict):return {k:scrub(x) for k,x in value.items()}
+    return value
+
+def redact(text):
+    lines=[]
+    for line in text.splitlines():
+        try:line=json.dumps(scrub(json.loads(line)),ensure_ascii=False)
+        except ValueError:line=scrub(line)
+        lines.append(line)
+    return '\n'.join(lines)+('\n' if lines else '')
+
+def run(name, args, cwd, workspace=False, timeout=1200):
+    previous = next((x for x in receipts if x['name']==name),None)
+    if previous:
+        print('RETAINED '+name+' exit='+str(previous['exit_code']),flush=True)
+        return previous['exit_code']
+    case_env = env.copy()
+    case_env['GOWORK'] = str(root/'go.work') if workspace else 'off'
+    print('START ' + name, flush=True)
+    at = datetime.datetime.now(datetime.timezone.utc).isoformat()
+    started = time.time()
+    proc = subprocess.run(args, cwd=cwd, env=case_env, capture_output=True, text=True, timeout=timeout)
+    for stream in ['stdout','stderr']:
+        text = redact(getattr(proc,stream))
+        (out/(name+'.'+stream)).write_text(text)
+        (durable/'evidence'/(name+'.'+stream)).write_text(text)
+    entry = {'name':name,'started_at':at,'completed_at':datetime.datetime.now(datetime.timezone.utc).isoformat(),'exit_code':proc.returncode,'seconds':round(time.time()-started,3),'argv':args,'cwd':str(cwd),'gowork':case_env['GOWORK']}
+    receipts.append(entry)
+    (durable/'evidence/json-commands.json').write_text(json.dumps(receipts,indent=2)+'\n')
+    print(json.dumps(entry),flush=True)
+    return proc.returncode
+
+
+cli = '<LOCAL_HOME>/.agents/skills/apstndb-spanner-syntax-verify/scripts/run-managed-spanner.sh'
+if run('json-preflight',[cli,'--execute','SELECT 1 AS ready','--timeout','30s'],root,timeout=90):
+    raise SystemExit('Managed preflight failed')
+for source in ['query','json-fixtures','json-pg','graph-controls','stream-options','value-capture']:
+    if run(source+'-build',[go,'build','-o',str(out/source),str(out/(source+'.go'))],root/'tools',workspace=True):
+        raise SystemExit('Build failed: '+source)
+    if run(source+'-buildinfo',[go,'version','-m',str(out/source)],root/'tools',workspace=True):
+        raise SystemExit('Build identity unavailable: '+source)
+for name, cases in [('queries','cases.json'),('followup','followup-cases.json'),('distinctness','distinctness-cases.json')]:
+    if run(name,[str(out/'query'),str(out/cases)],root/'tools',workspace=True):
+        raise SystemExit('Query process failed: '+name)
+baseline_receipts=durable/'evidence/commands.json'
+wait_started=time.time()
+print('Waiting for the serial baseline fixture suite before additional DDL',flush=True)
+while True:
+    baseline=json.loads(baseline_receipts.read_text())
+    if any(x['name']=='cleanup' and x['exit_code']==0 for x in baseline):break
+    if time.time()-wait_started>1200:raise SystemExit('Baseline completion unavailable; no follow-up fixture DDL started')
+    time.sleep(5)
+for name, source, dialect in [('google-json','json-fixtures','google'),('pg-streams','json-pg','pg'),('graph-controls','graph-controls','google'),('google-options','stream-options','google'),('pg-options','stream-options','pg'),('google-capture','value-capture','google'),('pg-capture','value-capture','pg')]:
+    if run(name,[str(out/source),dialect],root/'tools',workspace=True):
+        raise SystemExit('Fixture process failed: '+name)
+    rows=[json.loads(x) for x in (out/(name+'.stdout')).read_text().splitlines()]
+    bylabel={x['label']:x for x in rows}
+    for label,code in [('create-database','OK'),('setup','OK'),('drop-database','OK'),('database-absent','NotFound')]:
+        if bylabel.get(label,{}).get('code') != code:
+            raise SystemExit('Inspect fixture outcome before continuing: '+name+' '+label)
+print('COMPLETE: JSON, distinctness and serial owned-database probes',flush=True)

@@ -1,0 +1,16 @@
+=== RUN   TestCanonicalDDL_RealSpanner
+    canonical_integration_test.go:106: canonical DDL diagnostic_metrics canonical_total=0 canonical_parse_errors=0 canonical_allowlisted=0 generated_total=0
+--- PASS: TestCanonicalDDL_RealSpanner (3.23s)
+=== RUN   TestDrift_RealTableMetas
+    drift_test.go:118: SPANNER_SYS surface (real_spanner): got 51 tables / 598 columns / 8 known absent, accepted [{50 587 8} {50 539 56}]
+    drift_test.go:118: SPANNER_SYS contract_metrics target=real_spanner registered_tables=51 advertised_tables=51 advertised_columns=598 known_absent_columns=8 has_drift=true
+    drift_test.go:118: SPANNER_SYS diagnostic_metrics target=real_spanner checked_tables=50 decoded_rows=3 advertised_not_queryable=0
+    drift_test.go:118: SPANNER_SYS drift (real_spanner): unknown_tables=[ACTIVE_BATCH_OPERATIONS] unknown_columns=map[] ordinal_mismatches=[] type_mismatches=[]
+--- FAIL: TestDrift_RealTableMetas (8.73s)
+=== RUN   TestExpressionIndex_RealSpanner
+--- PASS: TestExpressionIndex_RealSpanner (95.99s)
+=== RUN   TestUUID_RealSpanner
+--- PASS: TestUUID_RealSpanner (14.82s)
+FAIL
+FAIL	github.com/apstndb/spanalyzer/survey/infoschem	123.345s
+FAIL

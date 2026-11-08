@@ -1,0 +1,170 @@
+package main
+
+import (
+	"cloud.google.com/go/spanner"
+	database "cloud.google.com/go/spanner/admin/database/apiv1"
+	dbpb "cloud.google.com/go/spanner/admin/database/apiv1/databasepb"
+	"context"
+	"crypto/sha256"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"google.golang.org/api/iterator"
+	"google.golang.org/grpc/status"
+	"os"
+	"strings"
+	"time"
+)
+
+var ctx = context.Background()
+var c *spanner.Client
+var a *database.DatabaseAdminClient
+var db string
+var q = "QueueProbe20260918G"
+
+func emit(v map[string]any) {
+	v["at"] = time.Now().UTC().Format(time.RFC3339Nano)
+	json.NewEncoder(os.Stdout).Encode(v)
+}
+func clean(e error) string {
+	if e == nil {
+		return ""
+	}
+	s := e.Error()
+	s = strings.ReplaceAll(s, db, "<database>")
+	for _, k := range []string{"SPANNER_PROJECT_ID", "SPANNER_INSTANCE_ID", "SPANNER_DATABASE_ID"} {
+		if v := os.Getenv(k); v != "" {
+			s = strings.ReplaceAll(s, v, "<redacted>")
+		}
+	}
+	return s
+}
+func query(label, sql string, params map[string]any, stale bool, first bool) []map[string]any {
+	start := time.Now()
+	cx, cancel := context.WithTimeout(ctx, 35*time.Second)
+	defer cancel()
+	tx := c.Single()
+	defer tx.Close()
+	if stale {
+		tx = tx.WithTimestampBound(spanner.ExactStaleness(time.Minute))
+	}
+	it := tx.Query(cx, spanner.Statement{SQL: sql, Params: params})
+	defer it.Stop()
+	rows := []map[string]any{}
+	retained := []map[string]any{}
+	types := map[string]string{}
+	var err error
+	for {
+		var r *spanner.Row
+		r, err = it.Next()
+		if err != nil {
+			break
+		}
+		row := map[string]any{}
+		rr := map[string]any{}
+		for i, n := range r.ColumnNames() {
+			var g spanner.GenericColumnValue
+			if err = r.Column(i, &g); err != nil {
+				break
+			}
+			types[n] = g.Type.Code.String()
+			v := g.Value.AsInterface()
+			row[n] = v
+			rr[n] = v
+			if strings.Contains(n, "Token") && v != nil {
+				rr[n] = fmt.Sprintf("sha256:%x", sha256.Sum256([]byte(fmt.Sprint(v))))
+			}
+		}
+		if err != nil {
+			break
+		}
+		rows = append(rows, row)
+		retained = append(retained, rr)
+		if first {
+			if label == "receive-immediate" {
+				if token, ok := row["SpannerLeaseToken"].(string); ok {
+					query("renew-while-stream-open", "SELECT * FROM RENEWLEASE_"+q+"(lease_tokens=>[@token])", map[string]any{"token": token}, false, false)
+				}
+			}
+			break
+		}
+	}
+	if err == iterator.Done {
+		err = nil
+	}
+	emit(map[string]any{"kind": "query", "label": label, "sql": sql, "stale": stale, "stop_after_first": first, "rows": retained, "column_types": types, "error": clean(err), "code": status.Code(err).String(), "elapsed_ms": time.Since(start).Milliseconds()})
+	return rows
+}
+func tx(label string, sqls []string, rollback bool) {
+	var counts []int64
+	_, err := c.ReadWriteTransaction(ctx, func(cx context.Context, t *spanner.ReadWriteTransaction) error {
+		counts = nil
+		for _, sql := range sqls {
+			n, e := t.Update(cx, spanner.Statement{SQL: sql})
+			counts = append(counts, n)
+			if e != nil {
+				return e
+			}
+		}
+		if rollback {
+			return errors.New("intentional probe rollback")
+		}
+		return nil
+	})
+	emit(map[string]any{"kind": "transaction", "label": label, "sql": sqls, "rows_modified": counts, "intentional_rollback": rollback, "error": clean(err), "code": status.Code(err).String()})
+}
+func ddl(label, sql string) bool {
+	cx, cancel := context.WithTimeout(ctx, 4*time.Minute)
+	defer cancel()
+	op, e := a.UpdateDatabaseDdl(cx, &dbpb.UpdateDatabaseDdlRequest{Database: db, Statements: []string{sql}})
+	if e == nil {
+		e = op.Wait(cx)
+	}
+	emit(map[string]any{"kind": "ddl", "label": label, "sql": sql, "error": clean(e), "code": status.Code(e).String()})
+	return e == nil
+}
+
+func main() {
+	if os.Getenv("SPANNER_EMULATOR_HOST") != "" {
+		panic("emulator override")
+	}
+	db = fmt.Sprintf("projects/%s/instances/%s/databases/%s", os.Getenv("SPANNER_PROJECT_ID"), os.Getenv("SPANNER_INSTANCE_ID"), os.Getenv("SPANNER_DATABASE_ID"))
+	var e error
+	c, e = spanner.NewClient(ctx, db)
+	if e != nil {
+		panic(clean(e))
+	}
+	defer c.Close()
+	a, e = database.NewDatabaseAdminClient(ctx)
+	if e != nil {
+		panic(clean(e))
+	}
+	defer a.Close()
+
+ query("preflight", "SELECT 1 AS ready", nil, false, false)
+ base := "ColumnSemanticProbe20260918"
+ capture := func(table string) {
+  query("column-options-"+table, "SELECT * FROM INFORMATION_SCHEMA.COLUMN_OPTIONS WHERE TABLE_NAME='"+table+"'", nil,false,false)
+  r,e:=a.GetDatabaseDdl(ctx,&dbpb.GetDatabaseDdlRequest{Database:db})
+  statements:=[]string{}
+  if e==nil { for _,s:=range r.Statements { if strings.Contains(s,table) {statements=append(statements,s)} } }
+  emit(map[string]any{"label":"export-"+table,"statements":statements,"error":clean(e),"code":status.Code(e).String()})
+ }
+ options:=[]string{"description='Ordinary column'", "synonyms=['display name','full name']", "description='Ordinary column', synonyms=['display name']"}
+ for i,opt:=range options {
+  table:=fmt.Sprintf("%sC%d",base,i)
+  if ddl("create-option", "CREATE TABLE "+table+" (Id INT64 NOT NULL, Name STRING(MAX) OPTIONS ("+opt+")) PRIMARY KEY(Id)") {
+   capture(table)
+   ddl("drop-create-case", "DROP TABLE "+table)
+  }
+ }
+ table:=base+"Alter"
+ if ddl("create-control", "CREATE TABLE "+table+" (Id INT64 NOT NULL, Name STRING(MAX), Updated TIMESTAMP OPTIONS(allow_commit_timestamp=true)) PRIMARY KEY(Id)") {
+  for _,opt:=range options {
+   ddl("alter-option", "ALTER TABLE "+table+" ALTER COLUMN Name SET OPTIONS ("+opt+")")
+   capture(table)
+  }
+  ddl("drop-control", "DROP TABLE "+table)
+ }
+ query("cleanup", "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE STARTS_WITH(TABLE_NAME,'"+base+"')",nil,false,false)
+}

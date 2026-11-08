@@ -1,0 +1,11 @@
+from pathlib import Path
+import os,json,subprocess,datetime,shutil,hashlib
+root=Path('<LOCAL_CHECKOUT>');task=Path('<LOCAL_TASK_ROOT>/apstndb/spanalyzer/docs-delta-20261031');out=root/'knowledge/research/runtime-verification/evidence/docs-delta-20261031';logs=out/'validation-logs';logs.mkdir(exist_ok=True);env=os.environ.copy();goroot='<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8';env.update(GOROOT=goroot,GOTOOLCHAIN='local',GOFLAGS='-mod=readonly',GOCACHE=str(root/'.tmp/managed-recheck-20260925/go-cache'),GOWORK=str(root/'go.work'));go=goroot+'/bin/go';cmds=[('tools-tests',[go,'test','./...'],root/'tools'),('okf-all',[go,'run','./okf-check','--repo-root','..','--gate','all','--publication-manifest',str(task/'publication-manifest.json')],root/'tools'),('markdown-language',[go,'run','./markdown-language-check','--repo-root','..'],root/'tools'),('diff-check',['git','diff','--check'],root)];rows=[]
+for name,args,cwd in cmds:
+ start=datetime.datetime.now(datetime.timezone.utc).isoformat();p=logs/(name+'.log')
+ with p.open('wb')as log:r=subprocess.run(args,cwd=cwd,env=env,stdout=log,stderr=subprocess.STDOUT)
+ rows.append({'name':name,'argv':args,'cwd':str(cwd),'started_at':start,'exit_code':r.returncode,'log':str(p.relative_to(out))});print(name,'exit',r.returncode,flush=True)
+ if r.returncode:print(p.read_text()[-6000:],flush=True)
+(out/'validation.json').write_text(json.dumps({'status':'passed'if all(r['exit_code']==0 for r in rows)else'failed','commands':rows},indent=2)+'\n')
+shutil.copyfile(root/'.tmp/docs-delta-20261031/validate.py',out/'validate.py.txt');area=out.parent;manifest=area/'artifact-sha256.json';d=json.loads(manifest.read_text());d['files']={str(p.relative_to(area)):hashlib.sha256(p.read_bytes()).hexdigest()for p in sorted(area.rglob('*'))if p.is_file()and p!=manifest};manifest.write_text(json.dumps(d,indent=2)+'\n');print('Manifest artifacts',len(d['files']),flush=True)
+raise SystemExit(0 if all(r['exit_code']==0 for r in rows)else 1)

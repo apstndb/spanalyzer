@@ -1,0 +1,70 @@
+[
+  {
+    "name": "module-tidy",
+    "argv": [
+      "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go",
+      "mod",
+      "tidy"
+    ],
+    "cwd": "<LOCAL_CHECKOUT>/.tmp/json-cross-engine-20261010/module",
+    "started_at": "2026-10-10T01:50:35.656000+00:00",
+    "completed_at": "2026-10-10T01:50:35.879653+00:00",
+    "seconds": 0.224,
+    "exit_code": 0
+  },
+  {
+    "name": "probe-build",
+    "argv": [
+      "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go",
+      "build",
+      "-o",
+      "<LOCAL_CHECKOUT>/.tmp/json-cross-engine-20261010/probe",
+      "./probe.go"
+    ],
+    "cwd": "<LOCAL_CHECKOUT>/.tmp/json-cross-engine-20261010/module",
+    "started_at": "2026-10-10T01:50:35.879811+00:00",
+    "completed_at": "2026-10-10T01:50:39.199087+00:00",
+    "seconds": 3.319,
+    "exit_code": 0
+  },
+  {
+    "name": "probe-buildinfo",
+    "argv": [
+      "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go",
+      "version",
+      "-m",
+      "<LOCAL_CHECKOUT>/.tmp/json-cross-engine-20261010/probe"
+    ],
+    "cwd": "<LOCAL_CHECKOUT>/.tmp/json-cross-engine-20261010/module",
+    "started_at": "2026-10-10T01:50:39.199276+00:00",
+    "completed_at": "2026-10-10T01:50:39.211580+00:00",
+    "seconds": 0.012,
+    "exit_code": 0
+  },
+  {
+    "name": "omni",
+    "argv": [
+      "<LOCAL_CHECKOUT>/.tmp/json-cross-engine-20261010/probe",
+      "omni",
+      "us-docker.pkg.dev/spanner-omni/images/spanner-omni:2026.r4-lts@sha256:9f10586c5de366bec5c0ff6cf542a67c21c8363e8a12a3deb9c372a07c9aa8b6"
+    ],
+    "cwd": "<LOCAL_CHECKOUT>/.tmp/json-cross-engine-20261010/module",
+    "started_at": "2026-10-10T01:50:39.211713+00:00",
+    "completed_at": "2026-10-10T01:53:55.036684+00:00",
+    "seconds": 195.825,
+    "exit_code": 0
+  },
+  {
+    "name": "emulator",
+    "argv": [
+      "<LOCAL_CHECKOUT>/.tmp/json-cross-engine-20261010/probe",
+      "emulator",
+      "gcr.io/cloud-spanner-emulator/emulator:1.5.58@sha256:5f42f55ad4129ea0d86cf60f0d385e8a6be60a7e8e0cc791adcdedc8982bcb55"
+    ],
+    "cwd": "<LOCAL_CHECKOUT>/.tmp/json-cross-engine-20261010/module",
+    "started_at": "2026-10-10T01:53:55.037098+00:00",
+    "completed_at": "2026-10-10T01:54:01.316185+00:00",
+    "seconds": 6.279,
+    "exit_code": 0
+  }
+]

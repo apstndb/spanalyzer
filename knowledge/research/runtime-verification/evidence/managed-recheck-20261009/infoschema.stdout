@@ -1,0 +1,56 @@
+{
+  "schema_version": "v0alpha1",
+  "status": "producer_changed_only",
+  "material_change": false,
+  "current": {
+    "target": {
+      "kind": "managed",
+      "observation_scope": "single_database"
+    },
+    "observed_at": "2026-10-09T02:57:57.630718Z",
+    "surface_sha256": "89b4ab9e231d7d61bf417669b6f5d29d1715c3999058b905f60698bc1047c6b0",
+    "column_count": 310,
+    "rolling_queryability": [
+      {
+        "table_name": "INDEXES",
+        "column_name": "SEARCH_UNNEST",
+        "status": "queryable"
+      },
+      {
+        "table_name": "INDEX_COLUMNS",
+        "column_name": "EXPRESSION",
+        "status": "queryable"
+      }
+    ],
+    "producer_source_sha256": "6dc7ba9212558654df6624bea8ff6a7b92da9dce17308d57562b30c393457a94",
+    "invocation_sha256": "394c27273867ee16446472b5131b47283bcdb06d902be6a30c98982a205aa676"
+  },
+  "retained": {
+    "path": "survey/infoschem/evidence/managed/20260916T171439Z-89b4ab9e231d.json",
+    "target": {
+      "kind": "managed",
+      "observation_scope": "single_database"
+    },
+    "observed_at": "2026-09-16T17:14:39.178882Z",
+    "surface_sha256": "89b4ab9e231d7d61bf417669b6f5d29d1715c3999058b905f60698bc1047c6b0",
+    "column_count": 310,
+    "rolling_queryability": [
+      {
+        "table_name": "INDEXES",
+        "column_name": "SEARCH_UNNEST",
+        "status": "queryable"
+      },
+      {
+        "table_name": "INDEX_COLUMNS",
+        "column_name": "EXPRESSION",
+        "status": "queryable"
+      }
+    ],
+    "producer_source_sha256": "da0fa2e56edd38957dc24275c9fedac3b595b176d7b598f180b9c9f5878407ac",
+    "invocation_sha256": "394c27273867ee16446472b5131b47283bcdb06d902be6a30c98982a205aa676"
+  },
+  "producer_change": {
+    "source_changed": true,
+    "invocation_changed": false
+  }
+}

@@ -1,0 +1,145 @@
+{
+  "base": "9f3859b9ea131f481bca92225c4cd4c020d5885b",
+  "head": "3dcf9df46b1a7bdb261991f0b4197e9b4dda6acf",
+  "commits": [
+    {
+      "sha": "13fdf35fcd2e2600bae836e88509409afad0c697",
+      "committed_at": "2026-10-21T18:01:49Z",
+      "file_count": 16
+    },
+    {
+      "sha": "3dcf9df46b1a7bdb261991f0b4197e9b4dda6acf",
+      "committed_at": "2026-10-22T18:01:41Z",
+      "file_count": 7
+    }
+  ],
+  "net_changed_files": 19,
+  "unique_document_paths": 16,
+  "retained_full_mirror_bodies": 29,
+  "current_full_official_documents": 16,
+  "head_official_body_matches": 16,
+  "dispositions": [
+    {
+      "path": "docs/docs.cloud.google.com/spanner-omni/deploy-encryption-kubernetes.md",
+      "review_group": "omni_wrapper_keyset_documentation_only",
+      "base_status": 200,
+      "head_status": 200,
+      "head_sha256": "5ade37f1fa0e52a9456be8ba0dee32fca972460326b8edbe694f77b1590abaeb"
+    },
+    {
+      "path": "docs/docs.cloud.google.com/spanner-omni/deploy-encryption-vms.md",
+      "review_group": "omni_wrapper_keyset_documentation_only",
+      "base_status": 200,
+      "head_status": 200,
+      "head_sha256": "9ffcdb6798699a53559b23cb3beec0c51b4c0321e95371f3b72dead6f8236d5d"
+    },
+    {
+      "path": "docs/docs.cloud.google.com/spanner/docs/databoost/databoost-monitor.md",
+      "review_group": "mirror_and_api_code_corruption_absent_from_live_html",
+      "base_status": 200,
+      "head_status": 200,
+      "head_sha256": "ffef3f6bd165f45344d483cd824c58807cfaa4efec50e96a6750e0f11fa1a7d7"
+    },
+    {
+      "path": "docs/docs.cloud.google.com/spanner/docs/geo-partitioning.md",
+      "review_group": "partition_limit_and_restrictions_source_only",
+      "base_status": 200,
+      "head_status": 200,
+      "head_sha256": "e6adb8d66ec7005f04189b49e824e4617b6e444a7cc0dc817cb0252122a8d5ac"
+    },
+    {
+      "path": "docs/docs.cloud.google.com/spanner/docs/introspection/transaction-statistics.md",
+      "review_group": "previously_observed_transaction_distribution_columns_newly_documented",
+      "base_status": 200,
+      "head_status": 200,
+      "head_sha256": "bdfe31ec25831a0eda9a383d548f10e84b1436d099c4042eafd98fdf58197bd3"
+    },
+    {
+      "path": "docs/docs.cloud.google.com/spanner/docs/queues/queues-overview.md",
+      "review_group": "same_name_queue_recreation_warning_removed",
+      "base_status": 200,
+      "head_status": 200,
+      "head_sha256": "c3dd81ba67fdfbde875b37743ab521d987cd86f222df9a0a1f763ec9d3def9e8"
+    },
+    {
+      "path": "docs/docs.cloud.google.com/spanner/docs/reference/postgresql/functions.md",
+      "review_group": "approximate_and_hll_documentation_catches_up",
+      "base_status": 200,
+      "head_status": 200,
+      "head_sha256": "0f34e607801b9209ab25c75d60abaa54c72501f0d4df8344e7f4ef8815fae741"
+    },
+    {
+      "path": "docs/docs.cloud.google.com/spanner/docs/reference/postgresql/known-issues-postgresql-interface.md",
+      "review_group": "approximate_and_hll_documentation_catches_up",
+      "base_status": 200,
+      "head_status": 200,
+      "head_sha256": "449b96cf85228424e2b2ddcdedfddae00741ba24fc3dd7c982145f6089fe118b"
+    },
+    {
+      "path": "docs/docs.cloud.google.com/spanner/docs/reference/standard-sql/aggregate_functions.md",
+      "review_group": "table_padding_only",
+      "base_status": 200,
+      "head_status": 200,
+      "head_sha256": "79ca037b9031f8aa76f4ad9bd8992c77723cc14c34f98ac7cfee4e1b4a631892"
+    },
+    {
+      "path": "docs/docs.cloud.google.com/spanner/docs/reference/standard-sql/approximate_aggregate_functions.md",
+      "review_group": "approximate_and_hll_documentation_catches_up",
+      "base_status": 404,
+      "head_status": 200,
+      "head_sha256": "e4b880d5a3a90b209d64f20cb2e534b33842b3eda3719576d1154b1e98156a07"
+    },
+    {
+      "path": "docs/docs.cloud.google.com/spanner/docs/reference/standard-sql/functions-all.md",
+      "review_group": "approximate_and_hll_documentation_catches_up",
+      "base_status": 200,
+      "head_status": 200,
+      "head_sha256": "eb0c8cc8e397884a18e1d4190c05edad060bd77b0b68ab9c1d95fbd6352f84b9"
+    },
+    {
+      "path": "docs/docs.cloud.google.com/spanner/docs/reference/standard-sql/hll_functions.md",
+      "review_group": "approximate_and_hll_documentation_catches_up",
+      "base_status": 404,
+      "head_status": 200,
+      "head_sha256": "f909301af8849502274a9ff6fbe24a67ec607e7715cae2f449448086567e2073"
+    },
+    {
+      "path": "docs/docs.cloud.google.com/spanner/docs/reference/standard-sql/search_functions.md",
+      "review_group": "mirror_and_api_code_corruption_absent_from_live_html",
+      "base_status": 200,
+      "head_status": 200,
+      "head_sha256": "9036049554fe7d0135549f79434910bf6e270e5d5178e094a36a12b8a2a1b2e4"
+    },
+    {
+      "path": "docs/docs.cloud.google.com/spanner/docs/reference/standard-sql/sketches.md",
+      "review_group": "approximate_and_hll_documentation_catches_up",
+      "base_status": 404,
+      "head_status": 200,
+      "head_sha256": "d9bfed0a54d8558e1d882972df14dfd1aa9c67c3dd80607ee5635400c95dd28f"
+    },
+    {
+      "path": "docs/docs.cloud.google.com/spanner/docs/release-notes.md",
+      "review_group": "approximate_and_hll_documentation_catches_up",
+      "base_status": 200,
+      "head_status": 200,
+      "head_sha256": "c1ddb498a8a2f78ea3ed522de589082f4e91eab246882f2555ff89f6b11d91c3"
+    },
+    {
+      "path": "docs/docs.cloud.google.com/spanner/docs/use-spanner-mcp.md",
+      "review_group": "client_name_editorial",
+      "base_status": 200,
+      "head_status": 200,
+      "head_sha256": "c773e5cae2fafb2ec17c6264ad1c114e97b533cba7206533f7e7b60a3cbafa55"
+    }
+  ],
+  "release_freshness": "Mirror and current Developer Knowledge release body now include October 20; live feed still latest October 20. The October 21 source gap is historical and has caught up.",
+  "source_layer_warning": "Malformed search named-argument/code and Data Boost timestamp snippets agree in mirror/API, while current live HTML has normal arrows/predicates. These are source divergences, not SQL grammar changes.",
+  "other_source_changes": [
+    "Geo-partition maximum 10 to 20; partitioned-data change-stream limitation bullet removed; provisioning not exercised on the free trial",
+    "Four transaction distribution fields now documented for both aggregate and top tables; already present in retained September/October runtime evidence",
+    "Queue same-name recreation warning removed; execute bounded lifecycle control independently",
+    "Omni KEK wrapper-keyset generation/distribution added; no Omni runtime run",
+    "HLL failure-log entries replaced by an Omni replicate-data entry; retrieval failure does not establish product status"
+  ],
+  "date_scope": "Mirror commit times, official updateTime, release announcement dates and current runtime times remain separate"
+}

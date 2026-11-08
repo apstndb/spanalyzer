@@ -1,0 +1,45 @@
+[
+  {
+    "variant": "original-copy",
+    "original_binary_sha256": "de255862e81c429b606bf7eb97c542efdc4ed4cd32ff5eddd0f18e64d226a12b",
+    "variant_binary_sha256": "de255862e81c429b606bf7eb97c542efdc4ed4cd32ff5eddd0f18e64d226a12b",
+    "size": 119961736,
+    "instruction_address": null,
+    "file_offset": null,
+    "before_instruction": null,
+    "after_instruction": null,
+    "changed_byte_offsets": [],
+    "meaning": "Identical binary copied into the same base image."
+  },
+  {
+    "variant": "no-scramble",
+    "original_binary_sha256": "de255862e81c429b606bf7eb97c542efdc4ed4cd32ff5eddd0f18e64d226a12b",
+    "variant_binary_sha256": "6ef6d4b64472d1eb5d2c470038e29dc570a355b6c3ef90864ba624b745df88eb",
+    "size": 119961736,
+    "instruction_address": "0x682d74",
+    "file_offset": 6827380,
+    "before_instruction": "0x39008261",
+    "after_instruction": "0x3900827f",
+    "changed_byte_offsets": [
+      6827380
+    ],
+    "meaning": "CommonEvaluatorOptions: strb w1,[x19,#0x20] -> strb wzr,[x19,#0x20]; only scramble_undefined_orderings is false."
+  },
+  {
+    "variant": "graph-ordered",
+    "original_binary_sha256": "de255862e81c429b606bf7eb97c542efdc4ed4cd32ff5eddd0f18e64d226a12b",
+    "variant_binary_sha256": "020e2d2f206ab28307579b1b36a1e99e2737aa316016eb646231540d809f1c4a",
+    "size": 119961736,
+    "instruction_address": "0x94dd38",
+    "file_offset": 9755960,
+    "before_instruction": "0x39412265",
+    "after_instruction": "0x52800025",
+    "changed_byte_offsets": [
+      9755960,
+      9755961,
+      9755962,
+      9755963
+    ],
+    "meaning": "AlgebrizeGraphTableScan: load graph_table_scan->is_ordered into w5 -> mov w5,#1 before AlgebrizeProjectScanInternal; global scrambling remains true. Diagnostic intervention, not a reviewed general fix."
+  }
+]

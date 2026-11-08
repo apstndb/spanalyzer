@@ -1,0 +1,76 @@
+package main
+
+import (
+	"encoding/json"
+	"os"
+
+	spanalyzer "github.com/apstndb/spanalyzer"
+	googlesql "github.com/goccy/go-googlesql"
+	"google.golang.org/protobuf/encoding/protojson"
+)
+
+func main() {
+	data, err := os.ReadFile(os.Args[1])
+	if err != nil {
+		panic(err)
+	}
+	var cases []struct {
+		Label string `json:"label"`
+		Kind  string `json:"kind"`
+		SQL   string `json:"sql"`
+	}
+	if err := json.Unmarshal(data, &cases); err != nil {
+		panic(err)
+	}
+	a, err := spanalyzer.NewAnalyzerFromDDL("schema.sql", `
+CREATE TABLE JsonValues (Id INT64, Value INT64, J JSON) PRIMARY KEY(Id);
+CREATE TABLE JsonEdges (Src INT64, Dst INT64) PRIMARY KEY(Src, Dst);
+CREATE PROPERTY GRAPH JsonGraph NODE TABLES (JsonValues KEY(Id) LABEL Node PROPERTIES(Id, Value))
+EDGE TABLES (JsonEdges KEY(Src, Dst) SOURCE KEY(Src) REFERENCES JsonValues(Id) DESTINATION KEY(Dst) REFERENCES JsonValues(Id) LABEL Edge PROPERTIES(Src, Dst));
+`)
+	if err != nil {
+		panic(err)
+	}
+	param, err := spanalyzer.ParseTypeSpec("param", "BOOL")
+	if err != nil {
+		panic(err)
+	}
+	if err := a.AddQueryParameter("choose", param); err != nil {
+		panic(err)
+	}
+	enc := json.NewEncoder(os.Stdout)
+	lang, err := googlesql.NewLanguageOptions()
+	if err != nil {
+		panic(err)
+	}
+	if err := lang.EnableMaximumLanguageFeaturesForDevelopment(); err != nil {
+		panic(err)
+	}
+	enabled, err := lang.LanguageFeatureEnabled(googlesql.LanguageFeatureFeatureJsonTypeComparison)
+	if err != nil {
+		panic(err)
+	}
+	if err := enc.Encode(map[string]any{"label": "maximum-development-json-feature", "enabled": enabled}); err != nil {
+		panic(err)
+	}
+	for _, c := range cases {
+		if c.Kind != "query" {
+			continue
+		}
+		r := map[string]any{"label": c.Label}
+		row, err := a.RowTypeForStatement(c.SQL)
+		r["analysis_ok"] = err == nil
+		if err != nil {
+			r["error"] = err.Error()
+		} else {
+			b, err := protojson.Marshal(row)
+			if err != nil {
+				panic(err)
+			}
+			r["row_type"] = json.RawMessage(b)
+		}
+		if err := enc.Encode(r); err != nil {
+			panic(err)
+		}
+	}
+}

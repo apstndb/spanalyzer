@@ -1,0 +1,35 @@
+{
+  "status": "pass",
+  "scope": "Offline module tests; survey short mode skips container integration; no managed/Omni requirement flags. Separate managed gate failure remains explicit.",
+  "checks": [
+    {
+      "name": "survey-short",
+      "argv": [
+        "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go",
+        "test",
+        "-short",
+        "./..."
+      ],
+      "cwd": "<LOCAL_CHECKOUT>/survey",
+      "gowork": "off",
+      "started_at": "2026-10-29T01:39:03.224948+00:00",
+      "completed_at": "2026-10-29T01:39:10.558109+00:00",
+      "exit_code": 0,
+      "log": "survey-short.log"
+    },
+    {
+      "name": "tools-unit",
+      "argv": [
+        "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go",
+        "test",
+        "./..."
+      ],
+      "cwd": "<LOCAL_CHECKOUT>/tools",
+      "gowork": "<LOCAL_CHECKOUT>/go.work",
+      "started_at": "2026-10-29T01:39:03.225208+00:00",
+      "completed_at": "2026-10-29T01:39:48.841211+00:00",
+      "exit_code": 0,
+      "log": "tools-unit.log"
+    }
+  ]
+}

@@ -1,0 +1,78 @@
+"""Map every changed/intermediate document to execution or explicit source scope."""
+from pathlib import Path
+from collections import Counter
+import hashlib,json,re,xml.etree.ElementTree as ET
+from html.parser import HTMLParser
+p=Path('<LOCAL_TASK_ROOT>/apstndb/spanalyzer/managed-recheck-20261029/documents');retrieval=json.loads((p/'retrieval.json').read_text());details=json.loads((p/'commit-details.json').read_text());compare=json.loads((p/'mirror-compare.json').read_text())
+scopes={
+'spanner-omni/backups':('Backup/restore interoperability boundary, one external storage per deployment, credentials and backup import guidance.','source_only','No Omni deployment, external bucket or backup transfer in this managed SQL run.'),
+'spanner-omni/beam':('Link to new managed-to-Omni replication guide.','source_only','No external Beam replication pipeline deployed.'),
+'spanner-omni/replicate-data':('New asynchronous change-stream DR topology, networking, IAM, pipeline and cutover guidance.','source_only','Managed Change Streams controls are repeated, but do not establish replication latency, replay correctness, RPO or RTO.'),
+'spanner-omni/restores':('Backup and replication cross-links.','source_only','No Omni backup/restore performed.'),
+'spanner/docs':('Documentation navigation links.','source_only','Navigation is not a SQL capability change.'),
+'spanner/docs/audit-logging':('Knowledge Catalog terminology and links.','source_only','Audit log emission and external catalog integration are not exercised.'),
+'spanner/docs/create-manage-saved-queries':('Spanner Studio introduction wording.','source_only','Console saved-query UI is not exercised.'),
+'spanner/docs/databoost/databoost-monitor':('Repair angle-bracket placeholders in monitoring examples.','source_only','Live HTML code blocks retained; no Data Boost workload or monitoring API metric read.'),
+'spanner/docs/databoost/databoost-run-queries':('Add Java BigQuery Cloud Resource connection creation example.','source_only','No BigQuery connection, service account or federated workload created.'),
+'spanner/docs/dc-integration':('Replace Data Catalog tags with Knowledge Catalog aspects, Dataplex lookup/update/export/import and move synchronization guidance.','source_only','No external catalog synchronization, aspect mutation, IAM change or instance move.'),
+'spanner/docs/deadline-exceeded':('Updated troubleshooting page link.','source_only','Link maintenance.'),
+'spanner/docs/dml-best-practices':('Remove insert_or_update as a mutation-only operation example.','source_only','Does not independently introduce a new DML grammar; no new upsert claim inferred.'),
+'spanner/docs/foreign-keys/how-to':('Add ON DELETE SET NULL creation/alteration and restrictions.','foreign-key','Both dialects: DDL, metadata/export, DML/mutation delete, rollback, enforcement, composite and invalid-column controls.'),
+'spanner/docs/foreign-keys/overview':('Describe SET NULL referential action and limitations.','foreign-key','First tested here; publication time is not feature introduction time.'),
+'spanner/docs/full-text-search/numeric-indexes':('Recommend prefixtree for range predicates; outline mapping unsupported high-precision types.','numeric-search','Compare six predicates through automatic/prefix/log/base plans; native type controls. No throughput/storage improvement claim.'),
+'spanner/docs/full-text-search/search-indexes':('Add optimizer paragraph adjacent to explicit NULL-filter predicate requirement.','filtered-search','Distinguish implied non-NULL predicates from omitted predicates and predicates admitting NULL.'),
+'spanner/docs/geo-partitioning':('IAM link title correction.','source_only','No instance partition or IAM mutation.'),
+'spanner/docs/graph/graph-with-views-how-to':('Add volatility handling and graph examples.','volatile-graph','Explicit/default allow flags, uniqueness flags, projection/body/join/key volatility and unused volatile projection.'),
+'spanner/docs/graph/graph-with-views-overview':('Clarify volatile-column effects and support option.','volatile-graph','Built-ins only; no remote service deployed or invoked.'),
+'spanner/docs/index-advisor':('Query tuning link replacement.','source_only','No new index advisor execution performed.'),
+'spanner/docs/information-schema-pg':('Add SET NULL to DELETE_RULE value documentation.','foreign-key','Catalog row value change, not an added INFORMATION_SCHEMA column.'),
+'spanner/docs/information-schema':('Add SET NULL to DELETE_RULE value documentation.','foreign-key','Catalog row value change, not an added INFORMATION_SCHEMA column.'),
+'spanner/docs/instance-configurations':('Configuration terminology, optional replica and performance guidance wording.','source_only','No topology, region, edition or capacity mutation; no benchmark.'),
+'spanner/docs/introspection/table-sizes-statistics':('Document six columnar storage fields and used-byte summation.','storage','Qualified queryability in both dialects; fields already present in the October 23 598-column capture.'),
+'spanner/docs/metrics':('Add lock wait latency distribution metric and mark four queue metrics GA; generated table timestamp updates.','source_only','Monitoring descriptor text is not runtime metric emission; queue product GA was already announced September 17.'),
+'spanner/docs/monitor-columnar-engine':('Link columnar coverage/storage fields in table size statistics.','storage','Metadata/queryability measured; no columnar workload or coverage population promise.'),
+'spanner/docs/move-instance':('Expand move phases, limitations, backup handling and post-move guidance.','source_only','Trial cannot move without paid conversion; no move/upgrade/backup operation performed.'),
+'spanner/docs/performance':('Peak throughput explanation and troubleshooting links.','source_only','Published sizing guidance is not measured throughput on this trial.'),
+'spanner/docs/query-execution-plans':('Restructure plan guidance and introduce visualizer/tuning links.','source_only','PROFILE plans retained for bounded search cases; no console visualizer UI or performance benchmark.'),
+'spanner/docs/query-plan-visualizer-overview':('New visualizer navigation, summaries, prominent operators and execution timeline guide.','source_only','Console interaction is outside this SDK validation.'),
+'spanner/docs/query-tuning':('New consolidated tuning guide: indexes, joins, aggregation, limits, scans and batch execution.','query-tuning','Execute ANY_VALUE HAVING MAX/MIN and PostgreSQL generate_series plus additional-parallelism controls; other index/scan hints already appear in inspected base docs. No performance claim.'),
+'spanner/docs/reference/postgresql/data-definition-language':('Add SET NULL FK action.','foreign-key','Executed via direct SDK DDL; local parser compatibility not inferred.'),
+'spanner/docs/reference/postgresql/operators':('Add JSONB comparison operator rows.','jsonb','Pairwise ordering, edge rules, stored ORDER BY/GROUP BY/join, aggregate limitations and SQL NULL controls.'),
+'spanner/docs/reference/standard-sql/conversion_rules':('Fix duplicate word and table padding.','source_only','No new conversion rule inferred; existing JSON conversion corpus repeated.'),
+'spanner/docs/reference/standard-sql/data-definition-language':('Add SET NULL FK action.','foreign-key','Executed via direct SDK DDL; local parser compatibility not inferred.'),
+'spanner/docs/reference/standard-sql/graph-patterns':('Remove unbounded quantifier forms/examples from documentation.','path-quantifier','Bounded/no-lower/no-upper/star/plus controls on a finite cyclic graph, grouped star and invalid bounds.'),
+'spanner/docs/reference/standard-sql/graph-schema-statements':('Specify volatile functions/body effects and false-default/true graph option behavior.','volatile-graph','Separate documented contract from observed enforcement; initial harness failure remains NOT_RUN.'),
+'spanner/docs/reference/standard-sql/json_functions':('Spelling fix: unparsable.','source_only','No semantic change inferred; retained JSON corpus repeated.'),
+'spanner/docs/reference/standard-sql/query-syntax':('Remove duplicate word in LIMIT guidance.','source_only','No syntax addition inferred.'),
+'spanner/docs/reference/standard-sql/search_functions':('Repair comparison/named-argument characters in examples and numeric function text.','numeric-search','Current full body compared with mirror and live HTML code; repaired extraction is not a new backend capability.'),
+'spanner/docs/saved-queries':('Spanner Studio introduction wording.','source_only','Console UI not exercised.'),
+'spanner/docs/secondary-indexes':('Repair escaped brackets in GQL example link.','source_only','Link correction.'),
+'spanner/docs/sql-best-practices':('Move detailed batch scan/execution guidance into query tuning and reorganize references.','source_only','Content movement not a new engine release.'),
+'spanner/docs/troubleshooting-query-performance-regressions':('Rename and expand performance troubleshooting guide; profile REST examples, index/queue/client-wait/data-statistics guidance.','source_only','PROFILE collected through SDK; REST session creation and console timing workflows not separately exercised.'),
+'spanner/docs/troubleshooting-performance-regressions':('Retired path renamed to troubleshooting-query-performance-regressions.','source_only','Preserve base body and rename identity; not a product removal.'),
+'spanner/docs/working-with-jsonb':('New JSONB comparison/sorting rules; remove obsolete unsupported-ordering bullet.','jsonb','Ordering differs from GoogleSQL JSON in specific edge cases; COUNT(jsonb)/MIN(jsonb) tested separately.'),
+'spanner/docs/create-manage-databases':('Intermediate commit touch; endpoint bodies equal.','source_only','Per-commit patch retained even though net body comparison is equal.'),
+'spanner/docs/use-pitr':('Intermediate commit touch; endpoint bodies equal.','source_only','Per-commit patch retained even though net body comparison is equal.')}
+rows=[]
+for path in sorted({x['path']for x in retrieval['bodies']}):
+ short=path.removeprefix('docs/docs.cloud.google.com/').removesuffix('.md');assert short in scopes,short
+ summary,verification,limits=scopes[short];body_records=[x for x in retrieval['bodies']if x['path']==path];touches=[]
+ for commit in details:
+  for f in commit['files']:
+   if path in [f['filename'],f.get('previous_filename')]:touches.append({'sha':commit['sha'],'committed_at':commit['committed_at'],'status':f['status'],'previous_filename':f.get('previous_filename')})
+ rows.append({'path':path,'summary':summary,'verification_group':verification,'limits':limits,'commits':touches,'body_receipts':body_records})
+assert len(rows)==48 and not retrieval['official_failures']
+ns={'a':'http://www.w3.org/2005/Atom'};feed=ET.parse(p/'release-notes.xml').getroot();entries=feed.findall('a:entry',ns)
+class Code(HTMLParser):
+ def __init__(self):super().__init__();self.depth=0;self.current=[];self.blocks=[]
+ def handle_starttag(self,tag,attrs):
+  if tag=='pre':self.depth+=1;self.current=[]
+ def handle_endtag(self,tag):
+  if tag=='pre':self.depth-=1;self.blocks.append(''.join(self.current))
+ def handle_data(self,text):
+  if self.depth:self.current.append(text)
+live=[]
+for filename in ['search-functions.html','databoost-monitor.html']:
+ a=Code();a.feed((p/filename).read_text());name=filename+'.codes.txt';(p/name).write_text('\n\n'.join(a.blocks)+'\n');live.append({'source':filename,'code_blocks':len(a.blocks),'extracted_file':name,'extracted_sha256':hashlib.sha256((p/name).read_bytes()).hexdigest()})
+result={'base':retrieval['base'],'head':retrieval['head'],'commit_count':len(details),'net_files':len(compare['files']),'net_document_files':sum(f['filename'].startswith('docs/')for f in compare['files']),'union_document_paths':len(rows),'retained_full_pinned_bodies':sum(x['status']==200 for x in retrieval['bodies']),'current_official_bodies':len(retrieval['official']),'body_comparison':'47/47 current official bodies equal mirror head after removing mirror frontmatter','commits':[{key:c[key]for key in ['sha','committed_at','parents']}|{'file_count':len(c['files'])}for c in details],'documents':rows,'non_document_net_changes':[f for f in compare['files']if not f['filename'].startswith('docs/')],'release_feed':{'updated':feed.findtext('a:updated',namespaces=ns),'latest_title':entries[0].findtext('a:title',namespaces=ns),'latest_updated':entries[0].findtext('a:updated',namespaces=ns),'scope':'Current live HTML, API and Atom feed latest dated entry remains October 20; no release introduction date inferred for later document edits.'},'live_code_extraction':live,'scope_notes':['Mirror commit time is a documentation capture time, not managed deployment time.','BATCH_OPERATIONS and 15 new statistics columns are additional runtime catalog observations, not names introduced in the inspected document diffs.','Omni and Emulator execution is not included.']}
+(p/'history-audit.json').write_text(json.dumps(result,indent=2)+'\n');print(json.dumps({'documents':len(rows),'groups':dict(Counter(r['verification_group']for r in rows)),'release_feed':result['release_feed']}))

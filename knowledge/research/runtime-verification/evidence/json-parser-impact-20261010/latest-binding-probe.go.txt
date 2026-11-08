@@ -1,0 +1,69 @@
+package main
+
+import (
+	"encoding/json"
+	"os"
+
+	googlesql "github.com/goccy/go-googlesql"
+)
+
+func main() {
+	if err := googlesql.Init(); err != nil {
+		panic(err)
+	}
+	tf, err := googlesql.NewTypeFactory()
+	if err != nil {
+		panic(err)
+	}
+	lang, err := googlesql.NewLanguageOptions()
+	if err != nil {
+		panic(err)
+	}
+	if err := lang.EnableMaximumLanguageFeaturesForDevelopment(); err != nil {
+		panic(err)
+	}
+	catalog, err := googlesql.NewSimpleCatalog("spanner", tf)
+	if err != nil {
+		panic(err)
+	}
+	if err := catalog.AddBuiltinFunctionsAndTypes(&googlesql.BuiltinFunctionOptions{LanguageOptions: lang}); err != nil {
+		panic(err)
+	}
+	options, err := googlesql.NewAnalyzerOptions2()
+	if err != nil {
+		panic(err)
+	}
+	if err := options.SetLanguage(lang); err != nil {
+		panic(err)
+	}
+	enc := json.NewEncoder(os.Stdout)
+	enabled, err := lang.LanguageFeatureEnabled(googlesql.LanguageFeatureFeatureJsonTypeComparison)
+	if err != nil {
+		panic(err)
+	}
+	if err := enc.Encode(map[string]any{"label": "json-feature", "enabled": enabled}); err != nil {
+		panic(err)
+	}
+	for _, c := range []struct{ Label, SQL string }{
+		{"equality", "SELECT JSON '1' = JSON '1.0' AS result"},
+		{"group-order", "SELECT j, COUNT(*) AS n FROM UNNEST([JSON '1',JSON '1.0']) j GROUP BY j ORDER BY j"},
+		{"is-distinct", "SELECT JSON '1' IS DISTINCT FROM JSON '1.0' AS result"},
+		{"cast-int", "SELECT CAST(1 AS JSON) AS result"},
+		{"cast-string", "SELECT CAST('foo' AS JSON) AS result"},
+		{"cast-array", "SELECT CAST([1,NULL,3] AS JSON) AS result"},
+		{"safe-cast-int", "SELECT SAFE_CAST(1 AS JSON) AS result"},
+		{"coerce-int", "SELECT JSON '1' = 1 AS result"},
+		{"coerce-string", "SELECT JSON '\"foo\"' = 'foo' AS result"},
+		{"coerce-in", "SELECT JSON '2' IN (1,2,3) AS result"},
+		{"coerce-between", "SELECT JSON '2' BETWEEN 1 AND 3 AS result"},
+	} {
+		_, err := googlesql.AnalyzeStatement(c.SQL, options, catalog, tf)
+		r := map[string]any{"label": c.Label, "sql": c.SQL, "analysis_ok": err == nil}
+		if err != nil {
+			r["error"] = err.Error()
+		}
+		if err := enc.Encode(r); err != nil {
+			panic(err)
+		}
+	}
+}

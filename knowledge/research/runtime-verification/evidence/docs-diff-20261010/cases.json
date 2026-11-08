@@ -1,0 +1,694 @@
+[
+  {
+    "label": "json-equality",
+    "sql": "SELECT JSON '1' = JSON '1.0' AS result",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "json-number-order",
+    "sql": "SELECT JSON '10' > JSON '2' AS result",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "json-type-order",
+    "sql": "SELECT JSON 'null' < JSON '\"a\"' AND JSON '\"z\"' < JSON '-1' AND JSON '999' < JSON 'false' AND JSON 'true' < JSON '[]' AND JSON '[999]' < JSON '{}'  AS result",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "bool-order",
+    "sql": "SELECT JSON 'false' < JSON 'true' AS result",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "string-order",
+    "sql": "SELECT JSON '\"a\"' < JSON '\"b\"' AS result",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "object-key-order",
+    "sql": "SELECT JSON '{\"b\":2,\"a\":1}' = JSON '{\"a\":1,\"b\":2}' AS result",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "object-keys-before-values",
+    "sql": "SELECT JSON '{\"a\":999}' < JSON '{\"b\":0}' AS result",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "object-value-order",
+    "sql": "SELECT JSON '{\"a\":2}' < JSON '{\"a\":10}' AS result",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "object-prefix",
+    "sql": "SELECT JSON '{\"a\":1}' < JSON '{\"a\":1,\"b\":0}' AS result",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "array-prefix",
+    "sql": "SELECT JSON '[1,2]' < JSON '[1,2,0]' AS result",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "array-numeric",
+    "sql": "SELECT JSON '[2]' < JSON '[10]' AS result",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "json-null-equal",
+    "sql": "SELECT JSON 'null' = JSON 'null' AS result",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "sql-null-equal",
+    "sql": "SELECT JSON 'null' = CAST(NULL AS JSON) AS result",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "json-null-is-sql-null",
+    "sql": "SELECT JSON 'null' IS NULL AS result",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "cast-null-is-sql-null",
+    "sql": "SELECT CAST(NULL AS JSON) IS NULL AS result",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "json-string-vs-object-text",
+    "sql": "SELECT JSON '{\"a\":1}' = '{\"a\":1}' AS result",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "in-json-first",
+    "sql": "SELECT JSON '2' IN (1, 2, 3) AS result",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "in-nonjson-first",
+    "sql": "SELECT 2 IN (JSON '1', JSON '2') AS result",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "in-json-unnest-json",
+    "sql": "SELECT JSON '2' IN UNNEST([JSON '1', JSON '2']) AS result",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "in-json-unnest-int",
+    "sql": "SELECT JSON '2' IN UNNEST([1,2]) AS result",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "in-json-subquery-int",
+    "sql": "SELECT JSON '2' IN (SELECT 2) AS result",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "in-json-subquery-json",
+    "sql": "SELECT JSON '2' IN (SELECT JSON '2') AS result",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "between-json-first",
+    "sql": "SELECT JSON '2' BETWEEN 1 AND 3 AS result",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "between-nonjson-first",
+    "sql": "SELECT 2 BETWEEN JSON '1' AND JSON '3' AS result",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "bytes-order-reject",
+    "sql": "SELECT JSON '\"YQ==\"' < b'b' AS result",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "struct-equality-reject",
+    "sql": "SELECT JSON '{\"a\":1}' = STRUCT(1 AS a) AS result",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "interval-equality-reject",
+    "sql": "SELECT JSON '\"0-0 1 0:0:0\"' = INTERVAL 1 DAY AS result",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "array-order-coerce",
+    "sql": "SELECT JSON '[1,2]' < [1,3] AS result",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "array-bytes-order-reject",
+    "sql": "SELECT JSON '[\"YQ==\"]' < [b'b'] AS result",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "json-case",
+    "sql": "SELECT CASE JSON '1' WHEN JSON '1.0' THEN 'yes' ELSE 'no' END AS result",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "json-is-distinct",
+    "sql": "SELECT JSON '1' IS DISTINCT FROM JSON '1.0' AS result",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "json-null-in",
+    "sql": "SELECT JSON 'null' IN (NULL, JSON 'null') AS result",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "cast-int",
+    "sql": "SELECT CAST(1 AS JSON) AS result",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "cast-float32",
+    "sql": "SELECT CAST(CAST(1.25 AS FLOAT32) AS JSON) AS result",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "cast-float64",
+    "sql": "SELECT CAST(1.25 AS JSON) AS result",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "cast-numeric",
+    "sql": "SELECT CAST(NUMERIC '1.25' AS JSON) AS result",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "cast-bool",
+    "sql": "SELECT CAST(TRUE AS JSON) AS result",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "cast-string",
+    "sql": "SELECT CAST('foo' AS JSON) AS result",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "cast-string-json-looking",
+    "sql": "SELECT CAST('{\"a\":1}' AS JSON) AS result",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "cast-bytes",
+    "sql": "SELECT CAST(b'a' AS JSON) AS result",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "cast-date",
+    "sql": "SELECT CAST(DATE '2026-10-10' AS JSON) AS result",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "cast-timestamp",
+    "sql": "SELECT CAST(TIMESTAMP '2026-10-10 00:00:00+00' AS JSON) AS result",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "cast-uuid",
+    "sql": "SELECT CAST(CAST('00000000-0000-0000-0000-000000000001' AS UUID) AS JSON) AS result",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "cast-interval",
+    "sql": "SELECT CAST(INTERVAL 1 DAY AS JSON) AS result",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "cast-array",
+    "sql": "SELECT CAST([1, NULL, 3] AS JSON) AS result",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "cast-struct",
+    "sql": "SELECT CAST(STRUCT(1 AS a, NULL AS b) AS JSON) AS result",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "cast-json",
+    "sql": "SELECT CAST(JSON '{\"a\":1}' AS JSON) AS result",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "cast-sql-null",
+    "sql": "SELECT CAST(NULL AS JSON) AS result",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "cast-wide-int",
+    "sql": "SELECT CAST(9223372036854775807 AS JSON) AS result",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "cast-wide-numeric",
+    "sql": "SELECT CAST(NUMERIC '99999999999999999999999999999.123456789' AS JSON) AS result",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "cast-positive-infinity",
+    "sql": "SELECT CAST(CAST('inf' AS FLOAT64) AS JSON) AS result",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "cast-negative-infinity",
+    "sql": "SELECT CAST(CAST('-inf' AS FLOAT64) AS JSON) AS result",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "cast-nan",
+    "sql": "SELECT CAST(CAST('NaN' AS FLOAT64) AS JSON) AS result",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "cast-nested-infinity",
+    "sql": "SELECT CAST([CAST('inf' AS FLOAT64)] AS JSON) AS result",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "to-json-control-sql-null",
+    "sql": "SELECT TO_JSON(NULL) AS result",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "safe-cast-sql-null",
+    "sql": "SELECT SAFE_CAST(NULL AS JSON) AS result",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "to-json-control-positive-infinity",
+    "sql": "SELECT TO_JSON(CAST('inf' AS FLOAT64)) AS result",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "safe-cast-positive-infinity",
+    "sql": "SELECT SAFE_CAST(CAST('inf' AS FLOAT64) AS JSON) AS result",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "to-json-control-wide-int",
+    "sql": "SELECT TO_JSON(9223372036854775807) AS result",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "safe-cast-wide-int",
+    "sql": "SELECT SAFE_CAST(9223372036854775807 AS JSON) AS result",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "to-json-control-wide-numeric",
+    "sql": "SELECT TO_JSON(NUMERIC '99999999999999999999999999999.123456789') AS result",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "safe-cast-wide-numeric",
+    "sql": "SELECT SAFE_CAST(NUMERIC '99999999999999999999999999999.123456789' AS JSON) AS result",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "coerce-equal-int",
+    "sql": "SELECT JSON '1' = 1 AS result",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "coerce-reverse-equal-int",
+    "sql": "SELECT 1 = JSON '1' AS result",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "coerce-order-int",
+    "sql": "SELECT JSON '1' <= 1 AS result",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "coerce-equal-float32",
+    "sql": "SELECT JSON '1.25' = CAST(1.25 AS FLOAT32) AS result",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "coerce-reverse-equal-float32",
+    "sql": "SELECT CAST(1.25 AS FLOAT32) = JSON '1.25' AS result",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "coerce-order-float32",
+    "sql": "SELECT JSON '1.25' <= CAST(1.25 AS FLOAT32) AS result",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "coerce-equal-float64",
+    "sql": "SELECT JSON '1.25' = 1.25 AS result",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "coerce-reverse-equal-float64",
+    "sql": "SELECT 1.25 = JSON '1.25' AS result",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "coerce-order-float64",
+    "sql": "SELECT JSON '1.25' <= 1.25 AS result",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "coerce-equal-numeric",
+    "sql": "SELECT JSON '1.25' = NUMERIC '1.25' AS result",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "coerce-reverse-equal-numeric",
+    "sql": "SELECT NUMERIC '1.25' = JSON '1.25' AS result",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "coerce-order-numeric",
+    "sql": "SELECT JSON '1.25' <= NUMERIC '1.25' AS result",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "coerce-equal-bool",
+    "sql": "SELECT JSON 'true' = TRUE AS result",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "coerce-reverse-equal-bool",
+    "sql": "SELECT TRUE = JSON 'true' AS result",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "coerce-order-bool",
+    "sql": "SELECT JSON 'true' <= TRUE AS result",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "coerce-equal-string",
+    "sql": "SELECT JSON '\"foo\"' = 'foo' AS result",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "coerce-reverse-equal-string",
+    "sql": "SELECT 'foo' = JSON '\"foo\"' AS result",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "coerce-order-string",
+    "sql": "SELECT JSON '\"foo\"' <= 'foo' AS result",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "coerce-equal-bytes",
+    "sql": "SELECT JSON '\"YQ==\"' = b'a' AS result",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "coerce-reverse-equal-bytes",
+    "sql": "SELECT b'a' = JSON '\"YQ==\"' AS result",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "coerce-equal-date",
+    "sql": "SELECT JSON '\"2026-10-10\"' = DATE '2026-10-10' AS result",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "coerce-reverse-equal-date",
+    "sql": "SELECT DATE '2026-10-10' = JSON '\"2026-10-10\"' AS result",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "coerce-order-date",
+    "sql": "SELECT JSON '\"2026-10-10\"' <= DATE '2026-10-10' AS result",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "coerce-equal-timestamp",
+    "sql": "SELECT JSON '\"2026-10-10T00:00:00Z\"' = TIMESTAMP '2026-10-10 00:00:00+00' AS result",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "coerce-reverse-equal-timestamp",
+    "sql": "SELECT TIMESTAMP '2026-10-10 00:00:00+00' = JSON '\"2026-10-10T00:00:00Z\"' AS result",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "coerce-order-timestamp",
+    "sql": "SELECT JSON '\"2026-10-10T00:00:00Z\"' <= TIMESTAMP '2026-10-10 00:00:00+00' AS result",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "coerce-equal-uuid",
+    "sql": "SELECT JSON '\"00000000-0000-0000-0000-000000000001\"' = CAST('00000000-0000-0000-0000-000000000001' AS UUID) AS result",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "coerce-reverse-equal-uuid",
+    "sql": "SELECT CAST('00000000-0000-0000-0000-000000000001' AS UUID) = JSON '\"00000000-0000-0000-0000-000000000001\"' AS result",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "coerce-order-uuid",
+    "sql": "SELECT JSON '\"00000000-0000-0000-0000-000000000001\"' <= CAST('00000000-0000-0000-0000-000000000001' AS UUID) AS result",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "coerce-equal-array",
+    "sql": "SELECT JSON '[1,null,3]' = [1, NULL, 3] AS result",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "coerce-reverse-equal-array",
+    "sql": "SELECT [1, NULL, 3] = JSON '[1,null,3]' AS result",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "coerce-order-array",
+    "sql": "SELECT JSON '[1,null,3]' <= [1, NULL, 3] AS result",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "json-sort",
+    "sql": "SELECT j, JSON_TYPE(j) AS type FROM UNNEST([JSON '{}', JSON '[]', JSON 'true', JSON 'false', JSON '10', JSON '2', JSON '\"b\"', JSON '\"a\"', JSON 'null', CAST(NULL AS JSON)]) j ORDER BY j",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "json-group",
+    "sql": "SELECT j, COUNT(*) AS n FROM UNNEST([JSON '{\"b\":2,\"a\":1}',JSON '{\"a\":1,\"b\":2}',JSON '1',JSON '1.0',JSON 'null',JSON 'null',CAST(NULL AS JSON)]) j GROUP BY j ORDER BY j",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "json-distinct",
+    "sql": "SELECT DISTINCT j FROM UNNEST([JSON '1',JSON '1.0',JSON '2']) j ORDER BY j",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "json-minmax",
+    "sql": "SELECT MIN(j) AS lo, MAX(j) AS hi FROM UNNEST([JSON '1',JSON '2']) j",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "json-join",
+    "sql": "SELECT COUNT(*) AS n FROM UNNEST([JSON '1',JSON '2']) a JOIN UNNEST([JSON '1.0',JSON '3']) b ON a=b",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "json-window",
+    "sql": "SELECT j, ROW_NUMBER() OVER(ORDER BY j) AS n FROM UNNEST([JSON '2',JSON '1']) j",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "coalesce-unused",
+    "sql": "SELECT COALESCE(10, 1 / 0) AS result",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "coalesce-selected",
+    "sql": "SELECT COALESCE(CAST(NULL AS FLOAT64), 1 / 0) AS result",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "ifnull-unused",
+    "sql": "SELECT IFNULL(10, 1 / 0) AS result",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "ifnull-selected",
+    "sql": "SELECT IFNULL(CAST(NULL AS FLOAT64), 1 / 0) AS result",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "if-unused",
+    "sql": "SELECT IF(TRUE, 10, 1 / 0) AS result",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "if-selected",
+    "sql": "SELECT IF(FALSE, 10, 1 / 0) AS result",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "case-simple-unused",
+    "sql": "SELECT CASE 1 WHEN 1 THEN 10 WHEN CAST(1/0 AS INT64) THEN 20 ELSE 1/0 END AS result",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "case-simple-selected",
+    "sql": "SELECT CASE 2 WHEN 1 THEN 10 ELSE 1/0 END AS result",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "case-searched-unused",
+    "sql": "SELECT CASE WHEN TRUE THEN 10 WHEN 1/0=1 THEN 20 ELSE 1/0 END AS result",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "case-searched-selected",
+    "sql": "SELECT CASE WHEN FALSE THEN 10 ELSE 1/0 END AS result",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "coalesce-subquery-unused",
+    "sql": "SELECT COALESCE((SELECT 10), (SELECT 1/0)) AS result",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "coalesce-subquery-selected",
+    "sql": "SELECT COALESCE((SELECT CAST(NULL AS FLOAT64)), (SELECT 1/0)) AS result",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "if-subquery-unused",
+    "sql": "SELECT IF(@choose, (SELECT 10), (SELECT 1/0)) AS result",
+    "params": {
+      "choose": true
+    },
+    "profile": false
+  },
+  {
+    "label": "coalesce-name-resolution",
+    "sql": "SELECT COALESCE(10, missing_probe_identifier) AS result",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "regular-function-eager",
+    "sql": "SELECT GREATEST(10,1/0) AS result",
+    "params": null,
+    "profile": false
+  }
+]

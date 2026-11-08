@@ -1,0 +1,219 @@
+[
+  {
+    "name": "feature-probe-build",
+    "started_at": "2026-10-05T00:22:04.892077+00:00",
+    "exit_code": 0,
+    "elapsed_seconds": 2.84,
+    "cwd": "<LOCAL_CHECKOUT>/.worktrees/omni-r4-20261004/tools",
+    "args": [
+      "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go",
+      "build",
+      "-o",
+      "<LOCAL_CHECKOUT>/.tmp/cross-engine-20261005/feature-probe",
+      "<LOCAL_CHECKOUT>/.tmp/cross-engine-20261005/feature-probe.go"
+    ],
+    "env_overrides": {}
+  },
+  {
+    "name": "feature-probe-buildinfo",
+    "started_at": "2026-10-05T00:22:07.733559+00:00",
+    "exit_code": 0,
+    "elapsed_seconds": 0.02,
+    "cwd": "<LOCAL_CHECKOUT>/.worktrees/omni-r4-20261004/tools",
+    "args": [
+      "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go",
+      "version",
+      "-m",
+      "<LOCAL_CHECKOUT>/.tmp/cross-engine-20261005/feature-probe"
+    ],
+    "env_overrides": {}
+  },
+  {
+    "name": "queue-probe-build",
+    "started_at": "2026-10-05T00:22:07.756284+00:00",
+    "exit_code": 0,
+    "elapsed_seconds": 1.29,
+    "cwd": "<LOCAL_CHECKOUT>/.worktrees/omni-r4-20261004/tools",
+    "args": [
+      "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go",
+      "build",
+      "-o",
+      "<LOCAL_CHECKOUT>/.tmp/cross-engine-20261005/queue-probe",
+      "<LOCAL_CHECKOUT>/.tmp/cross-engine-20261005/queue-probe.go"
+    ],
+    "env_overrides": {}
+  },
+  {
+    "name": "queue-probe-buildinfo",
+    "started_at": "2026-10-05T00:22:09.043445+00:00",
+    "exit_code": 0,
+    "elapsed_seconds": 0.02,
+    "cwd": "<LOCAL_CHECKOUT>/.worktrees/omni-r4-20261004/tools",
+    "args": [
+      "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go",
+      "version",
+      "-m",
+      "<LOCAL_CHECKOUT>/.tmp/cross-engine-20261005/queue-probe"
+    ],
+    "env_overrides": {}
+  },
+  {
+    "name": "queue-control-build",
+    "started_at": "2026-10-05T00:22:09.066571+00:00",
+    "exit_code": 0,
+    "elapsed_seconds": 1.21,
+    "cwd": "<LOCAL_CHECKOUT>/.worktrees/omni-r4-20261004/tools",
+    "args": [
+      "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go",
+      "build",
+      "-o",
+      "<LOCAL_CHECKOUT>/.tmp/cross-engine-20261005/queue-control",
+      "<LOCAL_CHECKOUT>/.tmp/cross-engine-20261005/queue-control.go"
+    ],
+    "env_overrides": {}
+  },
+  {
+    "name": "queue-control-buildinfo",
+    "started_at": "2026-10-05T00:22:10.280222+00:00",
+    "exit_code": 0,
+    "elapsed_seconds": 0.02,
+    "cwd": "<LOCAL_CHECKOUT>/.worktrees/omni-r4-20261004/tools",
+    "args": [
+      "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go",
+      "version",
+      "-m",
+      "<LOCAL_CHECKOUT>/.tmp/cross-engine-20261005/queue-control"
+    ],
+    "env_overrides": {}
+  },
+  {
+    "name": "volatile-probe-build",
+    "started_at": "2026-10-05T00:22:10.301639+00:00",
+    "exit_code": 0,
+    "elapsed_seconds": 1.26,
+    "cwd": "<LOCAL_CHECKOUT>/.worktrees/omni-r4-20261004/tools",
+    "args": [
+      "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go",
+      "build",
+      "-o",
+      "<LOCAL_CHECKOUT>/.tmp/cross-engine-20261005/volatile-probe",
+      "<LOCAL_CHECKOUT>/.tmp/cross-engine-20261005/volatile-probe.go"
+    ],
+    "env_overrides": {}
+  },
+  {
+    "name": "volatile-probe-buildinfo",
+    "started_at": "2026-10-05T00:22:11.560587+00:00",
+    "exit_code": 0,
+    "elapsed_seconds": 0.02,
+    "cwd": "<LOCAL_CHECKOUT>/.worktrees/omni-r4-20261004/tools",
+    "args": [
+      "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go",
+      "version",
+      "-m",
+      "<LOCAL_CHECKOUT>/.tmp/cross-engine-20261005/volatile-probe"
+    ],
+    "env_overrides": {}
+  },
+  {
+    "name": "omni-feature-probe",
+    "started_at": "2026-10-05T00:22:11.584942+00:00",
+    "exit_code": 0,
+    "elapsed_seconds": 171.66,
+    "cwd": "<LOCAL_CHECKOUT>/.worktrees/omni-r4-20261004/tools",
+    "args": [
+      "<LOCAL_CHECKOUT>/.tmp/cross-engine-20261005/feature-probe"
+    ],
+    "env_overrides": {
+      "PROBE_BACKEND": "omni",
+      "PROBE_IMAGE": "us-docker.pkg.dev/spanner-omni/images/spanner-omni:2026.r4-lts@sha256:9f10586c5de366bec5c0ff6cf542a67c21c8363e8a12a3deb9c372a07c9aa8b6"
+    }
+  },
+  {
+    "name": "omni-queue-probe",
+    "started_at": "2026-10-05T00:25:03.240835+00:00",
+    "exit_code": 0,
+    "elapsed_seconds": 112.14,
+    "cwd": "<LOCAL_CHECKOUT>/.worktrees/omni-r4-20261004/tools",
+    "args": [
+      "<LOCAL_CHECKOUT>/.tmp/cross-engine-20261005/queue-probe"
+    ],
+    "env_overrides": {
+      "PROBE_BACKEND": "omni",
+      "PROBE_IMAGE": "us-docker.pkg.dev/spanner-omni/images/spanner-omni:2026.r4-lts@sha256:9f10586c5de366bec5c0ff6cf542a67c21c8363e8a12a3deb9c372a07c9aa8b6"
+    }
+  },
+  {
+    "name": "omni-queue-control",
+    "started_at": "2026-10-05T00:26:55.379126+00:00",
+    "exit_code": 0,
+    "elapsed_seconds": 64.36,
+    "cwd": "<LOCAL_CHECKOUT>/.worktrees/omni-r4-20261004/tools",
+    "args": [
+      "<LOCAL_CHECKOUT>/.tmp/cross-engine-20261005/queue-control"
+    ],
+    "env_overrides": {
+      "PROBE_BACKEND": "omni",
+      "PROBE_IMAGE": "us-docker.pkg.dev/spanner-omni/images/spanner-omni:2026.r4-lts@sha256:9f10586c5de366bec5c0ff6cf542a67c21c8363e8a12a3deb9c372a07c9aa8b6"
+    }
+  },
+  {
+    "name": "omni-volatile-probe",
+    "started_at": "2026-10-05T00:27:59.735987+00:00",
+    "exit_code": 0,
+    "elapsed_seconds": 83.57,
+    "cwd": "<LOCAL_CHECKOUT>/.worktrees/omni-r4-20261004/tools",
+    "args": [
+      "<LOCAL_CHECKOUT>/.tmp/cross-engine-20261005/volatile-probe"
+    ],
+    "env_overrides": {
+      "PROBE_BACKEND": "omni",
+      "PROBE_IMAGE": "us-docker.pkg.dev/spanner-omni/images/spanner-omni:2026.r4-lts@sha256:9f10586c5de366bec5c0ff6cf542a67c21c8363e8a12a3deb9c372a07c9aa8b6"
+    }
+  },
+  {
+    "name": "omni-image",
+    "started_at": "2026-10-05T00:29:23.302278+00:00",
+    "exit_code": 0,
+    "elapsed_seconds": 0.04,
+    "cwd": "<LOCAL_CHECKOUT>/.worktrees/omni-r4-20261004/tools",
+    "args": [
+      "docker",
+      "image",
+      "inspect",
+      "us-docker.pkg.dev/spanner-omni/images/spanner-omni:2026.r4-lts@sha256:9f10586c5de366bec5c0ff6cf542a67c21c8363e8a12a3deb9c372a07c9aa8b6"
+    ],
+    "env_overrides": {}
+  },
+  {
+    "name": "omni-containers-after",
+    "started_at": "2026-10-05T00:29:23.342106+00:00",
+    "exit_code": 0,
+    "elapsed_seconds": 0.02,
+    "cwd": "<LOCAL_CHECKOUT>/.worktrees/omni-r4-20261004/tools",
+    "args": [
+      "docker",
+      "ps",
+      "-a",
+      "--filter",
+      "ancestor=us-docker.pkg.dev/spanner-omni/images/spanner-omni:2026.r4-lts@sha256:9f10586c5de366bec5c0ff6cf542a67c21c8363e8a12a3deb9c372a07c9aa8b6",
+      "--format",
+      "{{json .}}"
+    ],
+    "env_overrides": {}
+  },
+  {
+    "name": "emulator-feature-probe",
+    "started_at": "2026-10-05T00:29:23.367450+00:00",
+    "exit_code": 2,
+    "elapsed_seconds": 1.78,
+    "cwd": "<LOCAL_CHECKOUT>/.worktrees/omni-r4-20261004/tools",
+    "args": [
+      "<LOCAL_CHECKOUT>/.tmp/cross-engine-20261005/feature-probe"
+    ],
+    "env_overrides": {
+      "PROBE_BACKEND": "emulator",
+      "PROBE_IMAGE": "gcr.io/cloud-spanner-emulator/emulator:1.5.58@sha256:5f42f55ad4129ea0d86cf60f0d385e8a6be60a7e8e0cc791adcdedc8982bcb55"
+    }
+  }
+]

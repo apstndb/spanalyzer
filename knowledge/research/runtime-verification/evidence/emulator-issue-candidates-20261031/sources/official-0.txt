@@ -1,0 +1,460 @@
+This document describes how to use Spanner queues. It explains how to create a queue, send and receive messages, extend message leases, and acknowledge messages. It also includes best practices, information on monitoring queues, and troubleshooting guidance.
+
+## Create a queue
+
+To create a queue, use the `CREATE QUEUE` statement.
+
+### GoogleSQL
+
+```
+-- Example table for interleaving
+CREATE TABLE Users (
+  UserId   INT64 NOT NULL,
+  UserName STRING(MAX)
+) PRIMARY KEY (UserId);
+
+-- Queue for processing user-related tasks
+-- NOTE: Queues do not have to be interleaved, but for locality and
+-- pre-warming purposes, it's recommended if you are inserting into a table
+-- and a queue simultaneously.
+CREATE QUEUE UserTasks (
+  UserId     INT64 NOT NULL,
+  MessageId  STRING(36) NOT NULL, -- UUID recommended
+  Payload    BYTES(MAX) NOT NULL  -- Also: Proto, JSON, String are possible.
+) PRIMARY KEY (UserId, MessageId),
+INTERLEAVE IN PARENT Users ON DELETE CASCADE;
+```
+
+### PostgreSQL
+
+```
+-- Example table for interleaving
+CREATE TABLE users (
+  userid   bigint NOT NULL,
+  username varchar,
+  PRIMARY KEY (userid)
+);
+
+-- Queue for processing user-related tasks
+-- NOTE: Queues do not have to be interleaved, but for locality and
+-- pre-warming purposes, it's recommended if you are inserting into a table
+-- and a queue simultaneously.
+CREATE QUEUE usertasks (
+  userid     bigint NOT NULL,
+  messageid  varchar(36) NOT NULL, -- UUID recommended
+  payload    bytea NOT NULL, -- Also: text, varchar, jsonb are possible.
+  PRIMARY KEY (userid, messageid)
+) INTERLEAVE IN PARENT users ON DELETE CASCADE;
+```
+
+The only column that doesn't need to be explicitly created in the `CREATE QUEUE` statement is called `DeliverTime` in GoogleSQL and `deliver_time` in PostgreSQL. They are automatically created by Spanner.
+
+Queues support [time to live (TTL) policies](https://docs.cloud.google.com/spanner/docs/ttl) , which can help to manage the message backlog for old, unacknowledged messages.
+
+## Send a message
+
+To send a message to a queue, use the [`INSERT` DML](https://docs.cloud.google.com/spanner/docs/reference/standard-sql/dml-syntax#insert-statement) statement:
+
+### GoogleSQL
+
+```
+-- Send message immediately
+INSERT INTO Users (UserId) VALUES (123);
+INSERT INTO UserTasks (UserId, MessageId, Payload, DeliverTime)
+VALUES (123, 'some-unique-id-1', b'Your task payload here', CURRENT_TIMESTAMP());
+
+-- Schedule a message delivery
+INSERT INTO UserTasks (UserId, MessageId, Payload, DeliverTime)
+VALUES (123, 'some-unique-id-2', b'Scheduled task', TIMESTAMP_ADD(CURRENT_TIMESTAMP(), INTERVAL 1 HOUR));
+```
+
+### PostgreSQL
+
+```
+-- Send message immediately
+INSERT INTO users (userid) VALUES (123);
+INSERT INTO usertasks (userid, messageid, payload, deliver_time)
+VALUES (123, 'some-unique-id-1', CAST('Your task payload here' AS bytea), CURRENT_TIMESTAMP);
+
+-- Schedule a message delivery
+INSERT INTO usertasks (userid, messageid, payload, deliver_time)
+VALUES (123, 'some-unique-id-2', CAST('Scheduled task' AS bytea), CURRENT_TIMESTAMP + INTERVAL '1 HOUR');
+```
+
+Alternatively use the client library `Send` mutations for inserting a message:
+
+### Go
+
+```
+m := spanner.Send("UserTasks", spanner.Key{int64(123), "some-unique-id-1"}, []byte("Your task payload here"), spanner.WithDeliveryTime(futureTime))
+_, err := client.Apply(ctx, []*spanner.Mutation{m})
+```
+
+### Java
+
+```
+dbClient.write(
+        Collections.singletonList(
+            Mutation.newSendBuilder("UserTasks")
+                .setKey(Key.of(123L, "some-unique-id-1"))
+                .setPayload(Value.bytes(ByteArray.copyFrom("message3")))
+                .setDeliveryTime(futureTime)
+                .build()));
+```
+
+## Receive messages
+
+Use the `RECEIVE_ `` QUEUE_NAME `` ()` table-valued function (TVF) with `ExecuteStreamingSQL` to receive messages. This is a long-running call. You must execute one of these calls per worker, per queue, in a looping manner. Execute the query using a [strong read](https://docs.cloud.google.com/spanner/docs/reads#read_types) because Spanner rejects stale reads.
+
+### GoogleSQL
+
+```
+-- SQL query to stream messages
+SELECT
+  UserId,
+  MessageId,
+  Payload,
+  DeliverTime,
+  SpannerLeaseExpirationTimestamp,
+  SpannerLeaseToken
+FROM RECEIVE_UserTasks(max_duration=>'20m');
+```
+
+### PostgreSQL
+
+```
+-- SQL query to stream messages
+SELECT
+  userid,
+  messageid,
+  payload,
+  deliver_time,
+  spanner_lease_expiration_timestamp,
+  spanner_lease_token
+FROM spanner.receive_usertasks(
+    max_batch_size=>NULL, priority=>NULL, max_duration=>'20m');
+```
+
+Your client code should iterate through the results using a streaming query. Each returned row is a message.
+
+## Receive messages in a batch
+
+To increase throughput by processing multiple messages together, you can receive messages in batches by specifying the `max_batch_size` argument:
+
+### GoogleSQL
+
+```
+-- SQL query to stream messages
+SELECT
+  UserId,
+  MessageId,
+  Payload,
+  DeliverTime,
+  SpannerLeaseExpirationTimestamp,
+  SpannerLeaseToken,
+  SpannerLastBatchMessage -- Special boolean column returns TRUE if the
+                          -- last message is in a batch.
+FROM RECEIVE_UserTasks(max_duration=>'20m', max_batch_size=>20);
+```
+
+### PostgreSQL
+
+```
+-- SQL query to stream messages
+SELECT
+  userid,
+  messageid,
+  payload,
+  deliver_time,
+  spanner_lease_expiration_timestamp,
+  spanner_lease_token,
+  spanner_last_batch_message -- Special boolean column returns TRUE if the
+                             -- last message is in a batch.
+FROM spanner.receive_usertasks(
+    max_batch_size=>20, priority=>NULL, max_duration=>'20m');
+```
+
+Alternatively, use the client library. This Go example demonstrates how to stream messages from a queue, verify lease expiration, and acknowledge messages asynchronously:
+
+```
+// import "cloud.google.com/go/spanner"
+// import "google.golang.org/api/iterator"
+
+stmt := spanner.Statement{SQL: "SELECT * FROM RECEIVE_UserTasks(max_duration=>'20m')"}
+iter := client.Single().Query(ctx, stmt)
+defer iter.Stop()
+
+for {
+    row, err := iter.Next()
+    if err == iterator.Done {
+        break // Or potentially restart the query
+    }
+    if err != nil {
+        // Handle error
+        return err
+    }
+
+    var userId int64
+    var messageId string
+    var payload []byte
+    var deliverTime time.Time
+    var leaseExpiration time.Time
+    var leaseToken string
+    var lastBatchMessage bool
+
+    if err := row.Columns(&userId, &messageId, &payload, &deliverTime, &leaseExpiration, &leaseToken, &lastBatchMessage); err != nil {
+        // Handle column parsing error
+        return err
+    }
+
+    if time.Now().After(leaseExpiration) {
+        log.Printf("Lease expired for message %s, skipping", messageId)
+        continue
+    }
+
+    // Process and acknowledge the message asynchronously so that we don't
+    // block receiving subsequent messages.
+    go func(userId int64, messageId string, payload []byte) {
+        // Process the message (payload)
+        // ... potentially long-running work ...
+        // Need to extend the lease if processing is long
+
+        // Acknowledge the message upon success
+        _, err := client.Apply(ctx, []*spanner.Mutation{
+            spanner.Ack("UserTasks", spanner.Key{userId, messageId}),
+        })
+        if err != nil {
+            // Handle ack error
+        }
+    }(userId, messageId, payload)
+}
+```
+
+## Extend the message lease
+
+If processing a message takes longer than the initial lease (10 seconds), use the following syntax:
+
+### GoogleSQL
+
+```
+-- Extends the lease and returns new expiration time lease_token.
+-- The lease will be extended by 10s (not configurable).
+SELECT * FROM RENEWLEASE_UserTasks(lease_tokens => ['token1', ..., 'tokenN'])
+
+-- Returns rows of tokens and whether they were successfully extended
+SpannerOldLeaseToken   SpannerNewLeaseToken  SpannerLeaseExpirationTimestamp
+        <old_token1>           <new_token1>  "2025-09-27T12:10:00.0Z"
+            'token2'                 <NULL>  "2025-09-27T12:09:51.0Z"
+...
+            'tokenN'           'tokenN_new'  "2025-09-27T12:10:01.0Z"
+```
+
+### PostgreSQL
+
+```
+-- Extends the lease and returns new expiration time lease_token.
+-- The lease will be extended by 10s (not configurable).
+SELECT * FROM spanner.renewlease_usertasks(lease_tokens => ARRAY['token1', ..., 'tokenN'])
+
+-- Returns rows of tokens and whether they were successfully extended
+spanner_old_lease_token   spanner_new_lease_token  spanner_lease_expiration_timestamp
+           <old_token1>              <new_token1>  "2025-09-27T12:10:00.0Z"
+               'token2'                    <NULL>  "2025-09-27T12:09:51.0Z"
+...
+               'tokenN'              'tokenN_new'  "2025-09-27T12:10:01.0Z"
+```
+
+Lease tokens are returned according to the following logic:
+
+1.  Unparseable lease tokens don't return a row.
+2.  Already expired lease tokens don't return a row.
+3.  Un-renewable lease tokens *do* return a row with a `SpannerNewLeaseToken` of NULL. This can occur if the message was already acknowledged but the lease token has not expired.
+
+Alternatively, use the client library. This Go example demonstrates how to extend a message lease:
+
+```
+// Inside message processing loop...
+
+// Before leaseExpiration, for example, in a separate goroutine or timed check
+// leaseToken is from the SELECT query
+extendStmt := spanner.Statement{
+    SQL: "SELECT * FROM RENEWLEASE_UserTasks(lease_tokens => [@token1])",
+    Params: map[string]interface{}{
+        "token1": leaseToken,
+    },
+}
+_, err := client.Single().Query(ctx, extendStmt).Next() // Simplified call
+if err != nil {
+    log.Printf("Failed to extend lease for %s: %v", messageId, err)
+    // Processing should probably stop as redelivery is likely
+} else {
+    // New lease expiration is typically approximately 10s from now
+    log.Printf("Lease extended for %s", messageId)
+    // Update local leaseExpiration time if needed
+}
+```
+
+## Acknowledge a message
+
+Use the [`DELETE` DML](https://docs.cloud.google.com/spanner/docs/reference/standard-sql/dml-syntax#delete-statement) to acknowledge a message. This must be transactional with any other writes related to the message processing.
+
+### GoogleSQL
+
+```
+-- DML for acknowledging
+DELETE FROM UserTasks WHERE UserId = @userId AND MessageId = @messageId ASSERT_ROWS_MODIFIED 1;
+```
+
+### PostgreSQL
+
+```
+-- DML for acknowledging
+DELETE FROM usertasks WHERE userid = $1 AND messageid = $2 ASSERT_ROWS_MODIFIED 1;
+```
+
+Alternatively, use the client library `Ack` mutation for acknowledging a message:
+
+### Go
+
+```
+_, err := client.Apply(ctx, []*spanner.Mutation{
+    spanner.Ack("UserTasks", spanner.Key{1}),
+})
+```
+
+### Java
+
+```
+dbClient.write(
+    Collections.singletonList(
+        Mutation.newAckBuilder("UserTasks")
+            .setKey(Key.of(2L))
+            .build()));
+```
+
+## Best practices
+
+The following are best practices for using Spanner queues:
+
+- **Small payloads:** keep queue message payloads small under 4 KB. Use the [out-of-band storage pattern](https://docs.cloud.google.com/spanner/docs/queues/queues-examples#handle_large_message_payloads) for larger data.
+- **Lease management:** extend leases for tasks that might exceed the default message lease of 10 seconds. Failure to extend message leases can cause redeliveries and potential double processing.
+- **Error handling:** Spanner queues retry messages that fail processing with back-off within the first hour, and older messages will be retried once per hour. Consider moving messages that fail permanently to a separate queue.
+- **Monitoring:** monitor queue depths and oldest unacknowledged message age to ensure your receivers aren't limiting your pipeline intake.
+- **Idempotency:** design your message processors to tolerate repeat operations, because at-least-once delivery means occasional duplicates are possible. See the [Exactly-once processing and at-most-once acknowledgment](https://docs.cloud.google.com/spanner/docs/queues/queues-exactly-once-processing) page for more information.
+- **Table-value function duration:** avoid both extremely short and excessively long durations for table-valued functions. A moderate duration, such as 20 minutes, is recommended.
+- **Batch sizing:** tune `max_batch_size` to your workload. Use smaller batches for high fan-out events to avoid lock contention on shared rows. Use larger batches for independent, high queries-per-second tasks. Acknowledge or extend message leases for a batch in a single transaction for the best performance.
+
+## Monitor
+
+You can monitor queue operations using Spanner introspection tables. Although these tables don't include queue-specific columns, you can identify queue activity by searching for your user-defined queue names in the following tables:
+
+- [Read statistics](https://docs.cloud.google.com/spanner/docs/introspection/read-statistics)
+- [Transaction statistics](https://docs.cloud.google.com/spanner/docs/introspection/transaction-statistics)
+- [Lock statistics](https://docs.cloud.google.com/spanner/docs/introspection/lock-statistics)
+- [Table sizes statistics](https://docs.cloud.google.com/spanner/docs/introspection/table-sizes-statistics)
+- [Table operations statistics](https://docs.cloud.google.com/spanner/docs/introspection/table-operations-statistics)
+
+The following Spanner queue metrics are found under the `spanner.googleapis.com/queue/*` prefix in [Cloud Monitoring](https://docs.cloud.google.com/monitoring/docs) :
+
+- `buffered_ready_messages` : (GAUGE, INT64, 1) The count of messages that are held in memory and are ready for delivery to a receiver.
+- `message_send_count` : (DELTA, INT64, 1) The number of messages sent in Spanner during the interval for a queue.
+- `message_ack_count` : (DELTA, INT64, 1) The number of messages acknowledged in Spanner during the interval for a queue.
+- `oldest_unacked_message_age` : (GAUGE, INT64, 1) The age (in seconds) of the oldest unacknowledged message in a queue.
+- `lease_expiration_count` : (DELTA, INT64, 1) The number of lease expirations in Spanner during the interval for a queue.
+
+All of the previous metrics are sampled approximately every 60 seconds. After sampling, data may not be visible for up to 120 seconds. [Spanner audit logging](https://docs.cloud.google.com/spanner/docs/audit-logging) covers writes, reads, and schema operations on queues.
+
+## Troubleshoot
+
+The following sections describe how to identify and resolve common issues when using Spanner queues.
+
+### Message backlog is growing
+
+#### Diagnosis
+
+Both `oldest_unacked_message_age` and `buffered_ready_messages` are elevated. This indicates an imbalance between your message send rate and your application's message processing capacity.
+
+#### Resolution
+
+To resolve this issue, do the following:
+
+- **Check the acknowledgment rate:** if the `message_ack_count` metric has dropped, check your client workers to ensure that they are running properly and haven't stalled or crashed.
+- **Check the send rate:** if `message_send_count` has spiked, scale up message processing workers to handle the increased load.
+- **Confirm resource exhaustion:** check whether `buffered_ready_messages` and `lease_expiration_count` counts are elevated. This combination indicates a shortage of active table-valued function (TVF) receivers or slow client processing.
+
+### Individual messages are stuck
+
+#### Diagnosis
+
+The `oldest_unacked_message_age` metric is high, but `buffered_ready_messages` is low or stable. This indicates that individual messages are failing to process or acknowledge rather than an overall capacity bottleneck.
+
+#### Resolution
+
+To resolve this issue, do the following:
+
+- **Identify stuck messages:** query the queue table and order results by delivery time to find the oldest unacknowledged messages:
+
+  ### GoogleSQL
+
+  ```
+  SELECT *
+  FROM UserTasks
+  ORDER BY DeliverTime ASC
+  LIMIT 10;
+  ```
+
+  ### PostgreSQL
+
+  ```
+  SELECT *
+  FROM usertasks
+  ORDER BY deliver_time ASC
+  LIMIT 10;
+  ```
+
+- **Investigate processing failures:** check your application logs to determine why workers aren't acknowledging the identified messages. Unacknowledged messages are automatically redelivered after their lease expires.
+
+### Message leases expire before processing completes
+
+#### Diagnosis
+
+The `lease_expiration_count` metric is elevated or increasing. This indicates that message processing time exceeds the lease duration (default 10 seconds) before workers can acknowledge the messages.
+
+#### Resolution
+
+To resolve this issue, do the following:
+
+- **Renew leases proactively:** if message processing takes longer than 10 seconds, call the `RENEWLEASE_ `` QUEUE_NAME `` ()` TVF periodically. Renew the lease approximately 7-8 seconds into processing to safely account for network latency.
+- **Investigate slow processing:** if your application already renews leases actively but `lease_expiration_count` remains high, check your backend code for processing bottlenecks, slow RPC calls, or deadlocks.
+
+### Cannot scale the message send rate
+
+#### Diagnosis
+
+The `message_send_count` metric reaches a throughput plateau or publishing requests encounter elevated write latency when you attempt to increase the send rate.
+
+#### Resolution
+
+To resolve this issue, consider the following structural changes:
+
+- **Scale up compute resources:** add nodes or processing units to your Spanner instance to increase overall database capacity.
+- **Check splits:** evaluate whether you can add more splits to distribute the write load across multiple servers.
+- **Optimize routing:** ensure that your publishing application writes directly to the leader region of your Spanner instance to minimize write latency.
+
+### Ready messages are not being processed
+
+#### Diagnosis
+
+The `buffered_ready_messages` metric is high and increasing. This indicates that messages are buffered and ready for delivery in memory, but receiver workers aren't pulling them.
+
+#### Resolution
+
+To resolve this issue, do the following:
+
+- **Check active TVF connections:** check your active receiver TVF count to ensure that reader workers are actively connecting and pulling messages. If workers have disconnected or aren't running enough concurrent `RECEIVE_ `` QUEUE_NAME `` ()` queries, messages remain unpolled in the buffer.
+
+## What's next
+
+- Explore more [Spanner queues scenarios and examples](https://docs.cloud.google.com/spanner/docs/queues/queues-examples) .
+- Learn about [exactly-once processing and at-most-once acknowledgment](https://docs.cloud.google.com/spanner/docs/queues/queues-at-most-once) .
+- Configure access control with [fine-grained access control for queues](https://docs.cloud.google.com/spanner/docs/fgac-queues) .

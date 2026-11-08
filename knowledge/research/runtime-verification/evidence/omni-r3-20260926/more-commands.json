@@ -1,0 +1,65 @@
+[
+  {
+    "name": "feature-build",
+    "started_at": "2026-09-26T14:44:07.739847+00:00",
+    "exit_code": 0,
+    "elapsed_seconds": 1.91,
+    "cwd": "<LOCAL_CHECKOUT>/.worktrees/omni-r3-20260926/tools",
+    "args": [
+      "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go",
+      "build",
+      "-o",
+      "<LOCAL_CHECKOUT>/.tmp/omni-r3-20260926/feature-probe",
+      "<LOCAL_CHECKOUT>/.tmp/omni-r3-20260926/feature-probe.go"
+    ],
+    "env_overrides": {}
+  },
+  {
+    "name": "feature-r3",
+    "started_at": "2026-09-26T14:44:09.651481+00:00",
+    "exit_code": 0,
+    "elapsed_seconds": 135.9,
+    "cwd": "<LOCAL_CHECKOUT>/.worktrees/omni-r3-20260926/tools",
+    "args": [
+      "<LOCAL_CHECKOUT>/.tmp/omni-r3-20260926/feature-probe"
+    ],
+    "env_overrides": {
+      "OMNI_IMAGE": "us-docker.pkg.dev/spanner-omni/images/spanner-omni:2026.r3-beta@sha256:8243ce3c748b10371a16f05bc7553465fe978d7349127ad331d02c1d3a9fcc99"
+    }
+  },
+  {
+    "name": "feature-r2",
+    "started_at": "2026-09-26T14:46:25.551469+00:00",
+    "exit_code": 0,
+    "elapsed_seconds": 156.97,
+    "cwd": "<LOCAL_CHECKOUT>/.worktrees/omni-r3-20260926/tools",
+    "args": [
+      "<LOCAL_CHECKOUT>/.tmp/omni-r3-20260926/feature-probe"
+    ],
+    "env_overrides": {
+      "OMNI_IMAGE": "us-docker.pkg.dev/spanner-omni/images/spanner-omni:2026.r2.1-beta@sha256:ed31d9ee72eeee69cac78566eb3a6e72ee389b26234735f0ef449774cc006741"
+    }
+  },
+  {
+    "name": "query-generator",
+    "started_at": "2026-09-26T14:49:02.525602+00:00",
+    "exit_code": 0,
+    "elapsed_seconds": 95.64,
+    "cwd": "<LOCAL_CHECKOUT>/.worktrees/omni-r3-20260926/cmd/spanner-query-gen",
+    "args": [
+      "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go",
+      "test",
+      "-json",
+      "-count=1",
+      "-timeout=30m",
+      "-tags=integration,omni",
+      "-run",
+      "^TestIntegration.*OnOmni$",
+      "./..."
+    ],
+    "env_overrides": {
+      "SPANEMUBOOST_ENABLE_OMNI_TESTS": "1",
+      "SPANALYZER_OMNI_IMAGE": "us-docker.pkg.dev/spanner-omni/images/spanner-omni:2026.r3-beta@sha256:8243ce3c748b10371a16f05bc7553465fe978d7349127ad331d02c1d3a9fcc99"
+    }
+  }
+]

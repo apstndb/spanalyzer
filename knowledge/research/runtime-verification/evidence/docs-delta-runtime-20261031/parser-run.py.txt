@@ -1,0 +1,8 @@
+from pathlib import Path
+import os,subprocess,json
+root=Path('<LOCAL_CHECKOUT>');scratch=root/'.tmp/docs-delta-runtime-20261031';out=Path('<LOCAL_TASK_ROOT>/apstndb/spanalyzer/docs-delta-runtime-20261031/evidence');go='<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go';env=os.environ.copy();env.update(GOWORK='off',GOTOOLCHAIN='local',GOROOT=str(Path(go).parent.parent),GOCACHE=str(root/'.tmp/managed-recheck-20260925/go-cache'));rows=[]
+commands=[('parser-tidy',[go,'mod','tidy']),('parser-build',[go,'build','-mod=readonly','-o',str(scratch/'parser-probe'),'.']),('parser-buildinfo',[go,'version','-m',str(scratch/'parser-probe')]),('parser-results',[str(scratch/'parser-probe'),str(out/'google-cases.json'),str(out/'parser-extra-cases.json')])]
+for name,args in commands:
+ p=subprocess.run(args,cwd=scratch/'parser',env=env,capture_output=True,text=True);(out/(name+('.jsonl'if name=='parser-results'else'.stdout'))).write_text(p.stdout);(out/(name+'.stderr')).write_text(p.stderr);rows.append({'name':name,'argv':args,'exit_code':p.returncode});print(name,'exit',p.returncode,flush=True)
+ if p.returncode:print(p.stderr);raise SystemExit(p.returncode)
+(out/'parser-commands.json').write_text(json.dumps(rows,indent=2)+'\n');results=[json.loads(l)for l in(out/'parser-results.jsonl').read_text().splitlines()];print('Parsed',sum(r['accepted']for r in results),'rejected',sum(not r['accepted']for r in results));print('Pipe',{r['label']:r['accepted']for r in results if r['label'].startswith('pipe-')})

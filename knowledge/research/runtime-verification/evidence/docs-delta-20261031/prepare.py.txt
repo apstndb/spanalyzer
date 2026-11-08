@@ -1,0 +1,76 @@
+from pathlib import Path
+import json,hashlib,re,shutil,datetime,subprocess,runpy
+root=Path('<LOCAL_CHECKOUT>');task=Path('<LOCAL_TASK_ROOT>/apstndb/spanalyzer/docs-delta-20261031');src=task/'sources';out=root/'knowledge/research/runtime-verification/evidence/docs-delta-20261031';out.mkdir(parents=True,exist_ok=True)
+def save(path,data):path.parent.mkdir(parents=True,exist_ok=True);path.write_text(json.dumps(data,indent=2,ensure_ascii=False)+'\n')
+def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
+def retained(rel):return rel+'.txt'if rel.endswith('.md')else rel
+checks=[]
+def check(label,value):
+ assert value,label
+ checks.append({'check':label,'passed':True})
+base='6d7397601456dc5602c0926d254424f64643a64f';parent='51280d38ddf737240e6ee86b0da9138f6f790c1b';target='1e880188144a326e383778ebc165a63197efbf70';direct=json.loads((src/'target-commit.json').read_text());net=json.loads((src/'since-baseline.json').read_text())
+check('Designated target exact SHA',direct['sha']==target);check('Designated target parent',direct['parents'][0]['sha']==parent);check('Observed remote main equals target',json.loads((src/'current-head.json').read_text())['sha']==target);check('Two intervening commits',net['total_commits']==2 and [c['sha']for c in net['commits']]==[parent,target]);check('Direct file total and five document paths',len(direct['files'])==7 and sum(f['filename'].startswith('docs/')for f in direct['files'])==5);check('Net file total and forty-three document paths',len(net['files'])==45 and sum(f['filename'].startswith('docs/')for f in net['files'])==43)
+for file in src.rglob('*'):
+ if file.is_file():
+  dest=out/'sources'/retained(str(file.relative_to(src)));dest.parent.mkdir(parents=True,exist_ok=True);shutil.copyfile(file,dest)
+body=json.loads((src/'body-retrieval.json').read_text())
+for entry in body['snapshots']:
+ check('Original snapshot '+entry['file'],sha(src/entry['file'])==entry['sha256'])
+ entry['file']=retained(entry['file'])
+save(out/'sources/body-retrieval.json',body)
+api_matches=[]
+for f in sorted(src.glob('current-official*.json')):
+ for d in json.loads(f.read_text())['documents']:
+  rel=d['name'].removeprefix('documents/')+'.md';mirror=(src/'target'/rel).read_text().split('---\n',2)[2].strip();content=d['content'].strip();check('Current official full body matches '+rel,mirror==content);api_matches.append({'uri':d['uri'],'source_file':'sources/'+f.name,'mirror_file':'sources/target/'+retained(rel),'equal_after_frontmatter_and_outer_whitespace':True,'body_sha256':hashlib.sha256(content.encode()).hexdigest()})
+save(out/'official-comparison.json',{'retrieved_via':'dkcli batch-get full document content; no answer or synthesis endpoint','documents':api_matches})
+editorial=runpy.run_path(str(root/'.tmp/docs-delta-20261031/check-editorial.py'));editorial_rows=json.loads((src/'editorial-check.json').read_text());check('Thirty editorial-only paths exactly explained by retained normalization rules',len(editorial_rows)==30 and all(r['matches']for r in editorial_rows))
+rel='docs.cloud.google.com/spanner/docs/instance-configurations.md'
+def tables(t):
+ rows={}
+ for line in t.splitlines():
+  if line.startswith('|'):
+   cells=[c.strip()for c in line.split('|')[1:-1]];match=re.fullmatch(r'`((?:regional-|dual-region-|nam|eur|asia)[^`]*)`',cells[0])if cells else None
+   if match:rows[match.group(1)]=cells
+ return rows
+def normalize_cell(s):
+ s=re.sub(r'\[([^\]]+)\]\([^)]+\)',r'\1',s).replace('Zürich','Zurich');return re.sub(r'\s+',' ',re.sub(r'[()]','',s)).strip()
+a=tables((src/'parent'/rel).read_text());b=tables((src/'target'/rel).read_text());changed=[k for k in a if[normalize_cell(c)for c in a[k]]!=[normalize_cell(c)for c in b[k]]];check('All 69 configuration identifiers unchanged',set(a)==set(b) and len(a)==69);check('All 69 replica/topology rows unchanged after explicit presentation normalization',not changed)
+baseline_rows=tables((src/'baseline'/rel).read_text());check('All 69 baseline topology rows match the target',set(baseline_rows)==set(b) and all([normalize_cell(c)for c in baseline_rows[k]]==[normalize_cell(c)for c in b[k]]for k in b))
+save(out/'configuration-table-comparison.json',{'before':parent,'after':target,'rows':len(a),'regional':43,'dual_region':5,'multi_region':21,'added':sorted(set(b)-set(a)),'removed':sorted(set(a)-set(b)),'changed_after_normalization':changed,'normalization':['Trim table-cell padding and collapse whitespace','Strip Markdown link destinations while retaining displayed footnote labels','Ignore parentheses around displayed replica labels','Normalize the documented Zurich spelling change'],'raw_rows_before':a,'raw_rows_after':b,'additional_non_table_changes':['Define regional 1-OR/2-OR and dual-region L/2RW+1W labels with matching anchors','Describe default-leader-region changes as metadata operations using a long-running operation, replacing schema-change wording','Add table introductions and standardize headings','Earlier interval commit adds Canada to prose already listing its configuration in the unchanged table','Describe asia2 as three read-write regions with five read-write replicas and no witness, consistent with its unchanged table row','Clarify multi-region automatic leader failover, dual-region compute placement, instance moves including dual-region, and eligible default-leader read-write regions']})
+special={
+'spanner-omni/download':'Documented LTS patch 2026.r4-lts.1, release date October 28, image and archive examples',
+'spanner-omni/quickstart':'LTS patch tag in startup example',
+'spanner-omni/setup':'Current documented version changes to LTS patch',
+'spanner-omni/upgrade-deployment':'LTS patch tag in upgrade examples',
+'spanner-omni/use-console':'LTS patch version display example',
+'spanner/docs/emulator':'Correct C# heading; earlier CLI naming changes are editorial',
+'spanner/docs/full-text-search/ranked-search':'Unpinned scorer defaults advance automatically when later scorer versions are released',
+'spanner/docs/full-text-search/search-indexes':'Updating a search-index sort-order key rewrites secondary and associated token rows; suggest coarse generated buckets',
+'spanner/docs/instance-configurations':'Topology table unchanged; correct Canada and asia2 prose and clarify failover, dual-region placement, instance moves, leader eligibility and metadata operations',
+'spanner/docs/spanner-custom-constraints':'Generic example REST resource changes from GKE NodePool to Cluster',
+'spanner/docs/reference/standard-sql/data-definition-language':'Queue payload declaration names become explicitly Payload or payload, replacing case-insensitive wording',
+'spanner/docs/reference/standard-sql/pipe-syntax':'AGGREGATE grouping forbids ordinals/output-list aliases and permits standalone input-expression aliases',
+'spanner/docs/release-notes':'October 27 ON DELETE SET NULL announcement in both SQL dialects; runtime feature already covered'
+}
+rows=[]
+for f in net['files']:
+ key=f['filename'].removeprefix('docs/docs.cloud.google.com/').removesuffix('.md');is_doc=f['filename'].startswith('docs/');row={'path':f['filename'],'direct_target_change':f['filename']in{x['filename']for x in direct['files']},'additions':f['additions'],'deletions':f['deletions'],'classification':'bookkeeping','finding':'Mirror URLs or capture metadata'}
+ if is_doc:
+  row.update(classification='reviewed-documentation-change'if key in special else'editorial-only',finding=special.get(key,'Product names, IAM/CLI naming, spelling, title text or table whitespace only'),runtime_execution_this_audit=False)
+ rows.append(row)
+save(out/'file-audit.json',{'baseline':base,'target_parent':parent,'target':target,'commits':[{'sha':c['sha'],'message':c['commit']['message']}for c in net['commits']],'files':rows})
+plan=[
+{'id':'queue-payload-name-case','priority':1,'targets':['managed','omni-r5','omni-r4-lts.1','emulator'],'dialect':'GoogleSQL','status':'NOT_RUN','cases':['Declare payload column Payload','Declare payload column payload','Declare payload column PAYLOAD','Declare payload column PaYlOaD'],'source_contract':'The declaration must be named Payload or payload; do not infer declaration acceptance from case-insensitive column references','prior_coverage':'Retained queue producers use Payload only; no four-way declaration control established','assertions':['Record DDL operation completion and exact code, not merely parser/name-resolution acceptance','Read back actual schema for successful cases; drop only owned fixtures']},
+{'id':'pipe-aggregate-grouping','priority':1,'targets':['managed','omni-r5','omni-r4-lts.1','emulator'],'dialect':'GoogleSQL','status':'NOT_RUN','cases':['Standard SELECT GROUP BY ordinal as control','Pipe AGGREGATE GROUP BY ordinal','Pipe GROUP BY references an AGGREGATE-list output alias absent from the input','Pipe GROUP BY an input expression AS a new grouping alias','Include both a non-grouped aggregate and a grouping key; compare output-column order'],'source_contract':'Ordinals and output-list aliases disallowed; standalone input expressions may receive aliases','assertions':['Separate grammar acceptance from semantic rejection','Include input-alias shadowing controls before interpreting name resolution']},
+{'id':'explicit-scorer-version','priority':2,'targets':['managed','omni-r5','omni-r4-lts.1','emulator'],'dialects':['GoogleSQL','PostgreSQL'],'status':'NOT_RUN','cases':['Database score_version 1 and 2','SCORE options version 1 and 2 overriding database default','Unpinned control recorded with observation date'],'assertions':['Do not treat unpinned score changes across observations as a regression by themselves','A single execution cannot demonstrate automatic advance on a future scorer release']},
+{'id':'mutable-search-sort-key','priority':3,'targets':['managed'],'status':'NOT_RUN','cases':['Mutable search ORDER BY timestamp versus hourly generated bucket versus omitted sort key'],'assertions':['Separate write-cost measurements from correct query results','No benchmark is implied by the documentation statement or a successful DDL submission','Keep this search-index DDL ORDER BY scope separate from GQL issue 408']}
+]
+save(out/'follow-up-plan.json',{'status':'planned-not-executed','runtime_cases_executed':0,'items':plan})
+old=json.loads((root/'.tmp/docs-delta-20261031/initial-artifact-manifest.json').read_text());bad=[f for f,h in old['files'].items()if sha(root/'knowledge/research/runtime-verification/evidence'/f)!=h];check('All 1798 preceding retained artifacts preserved',not bad and len(old['files'])==1798)
+measured=json.loads((root/'knowledge/research/runtime-verification/evidence/managed-recheck-20261029/source-hashes.json').read_text());bad=[f for f,h in measured.items()if sha(root/f)!=h];check('All 123 measured implementation and dependency files preserved',not bad and len(measured)==123)
+for name in ['fetch.py','fetch-bodies.py','check-editorial.py','compact-audit.py','prepare.py']:
+ shutil.copyfile(root/'.tmp/docs-delta-20261031'/name,out/(name+'.txt'))
+save(out/'assertions.json',{'status':'passed','checks':checks,'runtime_executions':0,'preserved_preceding_artifacts':1798,'preserved_measured_files':123})
+save(out/'receipt.json',{'observed_on_jst':'2026-10-31','prepared_at_utc':datetime.datetime.now(datetime.timezone.utc).isoformat(),'repository_head':subprocess.check_output(['git','rev-parse','HEAD'],cwd=root,text=True).strip(),'mirror_baseline':base,'mirror_parent':parent,'mirror_target':target,'observed_main':target,'official_full_bodies':9,'snapshot_count':91,'complete_diffs':['sources/prior.diff','sources/target.diff','sources/net.diff'],'authority':'Read-only source inspection and local research updates; no commit, push or external post','runtime_executions':0,'prior_runtime_window':'Managed and container samples remain October 29, 2026, as recorded in the linked research notes','retained_markdown_format':'Raw Markdown snapshot bodies use .md.txt extensions so evidence is not mistaken for a writable knowledge concept'})
+save(out/'validation.json',{'status':'pending','commands':[]})
+print('Prepared',len(checks),'checks,',len(rows),'paths,',len(list(out.rglob('*'))),'files and directories')

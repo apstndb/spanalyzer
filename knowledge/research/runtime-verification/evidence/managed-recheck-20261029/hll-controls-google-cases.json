@@ -1,0 +1,46 @@
+[
+  {
+    "label": "google-hll-corrected-init-null",
+    "sql": "SELECT HLL_COUNT.INIT(v) AS sketch FROM (SELECT CAST(NULL AS INT64) AS v) AS input"
+  },
+  {
+    "label": "google-hll-merge-empty",
+    "sql": "SELECT HLL_COUNT.MERGE(sketch) AS estimate FROM (SELECT CAST(NULL AS BYTES) AS sketch) AS input WHERE FALSE"
+  },
+  {
+    "label": "google-hll-merge-partial-empty",
+    "sql": "SELECT HLL_COUNT.MERGE_PARTIAL(sketch) AS sketch FROM (SELECT CAST(NULL AS BYTES) AS sketch) AS input WHERE FALSE"
+  },
+  {
+    "label": "google-hll-merge-null",
+    "sql": "SELECT HLL_COUNT.MERGE(sketch) AS estimate FROM (SELECT CAST(NULL AS BYTES) AS sketch) AS input"
+  },
+  {
+    "label": "google-hll-merge-partial-null",
+    "sql": "SELECT HLL_COUNT.MERGE_PARTIAL(sketch) AS sketch FROM (SELECT CAST(NULL AS BYTES) AS sketch) AS input"
+  },
+  {
+    "label": "google-hll-approx-empty",
+    "sql": "SELECT APPROX_COUNT_DISTINCT(v) AS estimate FROM (SELECT CAST(NULL AS INT64) AS v) AS input WHERE FALSE"
+  },
+  {
+    "label": "google-hll-approx-null",
+    "sql": "SELECT APPROX_COUNT_DISTINCT(v) AS estimate FROM (SELECT CAST(NULL AS INT64) AS v) AS input"
+  },
+  {
+    "label": "google-hll-mixed-precision-merge",
+    "sql": "WITH a AS (SELECT HLL_COUNT.INIT(x,10) AS sketch FROM (SELECT CAST(1 AS INT64) AS x UNION ALL SELECT CAST(2 AS INT64)) AS input), b AS (SELECT HLL_COUNT.INIT(x,24) AS sketch FROM (SELECT CAST(1 AS INT64) AS x UNION ALL SELECT CAST(2 AS INT64)) AS input) SELECT HLL_COUNT.MERGE(sketch) AS estimate FROM (SELECT sketch FROM a UNION ALL SELECT sketch FROM b) AS input"
+  },
+  {
+    "label": "google-hll-mixed-precision-partial",
+    "sql": "WITH a AS (SELECT HLL_COUNT.INIT(x,10) AS sketch FROM (SELECT CAST(1 AS INT64) AS x UNION ALL SELECT CAST(2 AS INT64)) AS input), b AS (SELECT HLL_COUNT.INIT(x,24) AS sketch FROM (SELECT CAST(1 AS INT64) AS x UNION ALL SELECT CAST(2 AS INT64)) AS input) SELECT HLL_COUNT.EXTRACT(HLL_COUNT.MERGE_PARTIAL(sketch)) AS estimate FROM (SELECT sketch FROM a UNION ALL SELECT sketch FROM b) AS input"
+  },
+  {
+    "label": "google-hll-mixed-type-merge",
+    "sql": "WITH a AS (SELECT HLL_COUNT.INIT(x) AS sketch FROM (SELECT CAST(1 AS INT64) AS x UNION ALL SELECT CAST(2 AS INT64)) AS input), b AS (SELECT HLL_COUNT.INIT(x) AS sketch FROM (SELECT CAST('a' AS STRING) AS x) AS input) SELECT HLL_COUNT.MERGE(sketch) AS estimate FROM (SELECT sketch FROM a UNION ALL SELECT sketch FROM b) AS input"
+  },
+  {
+    "label": "google-hll-extract-invalid",
+    "sql": "SELECT HLL_COUNT.EXTRACT(CAST('not-sketch' AS BYTES)) AS estimate"
+  }
+]

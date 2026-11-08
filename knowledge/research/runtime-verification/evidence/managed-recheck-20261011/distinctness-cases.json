@@ -1,0 +1,386 @@
+[
+  {
+    "label": "int-equal",
+    "sql": "SELECT (1) IS DISTINCT FROM (1) AS d, (1) IS NOT DISTINCT FROM (1) AS nd",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "int-different",
+    "sql": "SELECT (1) IS DISTINCT FROM (2) AS d, (1) IS NOT DISTINCT FROM (2) AS nd",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "null-null",
+    "sql": "SELECT (NULL) IS DISTINCT FROM (NULL) AS d, (NULL) IS NOT DISTINCT FROM (NULL) AS nd",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "null-int",
+    "sql": "SELECT (CAST(NULL AS INT64)) IS DISTINCT FROM (1) AS d, (CAST(NULL AS INT64)) IS NOT DISTINCT FROM (1) AS nd",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "int-null",
+    "sql": "SELECT (1) IS DISTINCT FROM (CAST(NULL AS INT64)) AS d, (1) IS NOT DISTINCT FROM (CAST(NULL AS INT64)) AS nd",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "string-equal",
+    "sql": "SELECT ('x') IS DISTINCT FROM ('x') AS d, ('x') IS NOT DISTINCT FROM ('x') AS nd",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "string-different",
+    "sql": "SELECT ('x') IS DISTINCT FROM ('y') AS d, ('x') IS NOT DISTINCT FROM ('y') AS nd",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "bool-different",
+    "sql": "SELECT (TRUE) IS DISTINCT FROM (FALSE) AS d, (TRUE) IS NOT DISTINCT FROM (FALSE) AS nd",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "bytes-equal",
+    "sql": "SELECT (b'x') IS DISTINCT FROM (b'x') AS d, (b'x') IS NOT DISTINCT FROM (b'x') AS nd",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "bytes-different",
+    "sql": "SELECT (b'x') IS DISTINCT FROM (b'y') AS d, (b'x') IS NOT DISTINCT FROM (b'y') AS nd",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "date-equal",
+    "sql": "SELECT (DATE '2026-10-11') IS DISTINCT FROM (DATE '2026-10-11') AS d, (DATE '2026-10-11') IS NOT DISTINCT FROM (DATE '2026-10-11') AS nd",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "timestamp-equal",
+    "sql": "SELECT (TIMESTAMP '2026-10-11 00:00:00+00') IS DISTINCT FROM (TIMESTAMP '2026-10-11 00:00:00+00') AS d, (TIMESTAMP '2026-10-11 00:00:00+00') IS NOT DISTINCT FROM (TIMESTAMP '2026-10-11 00:00:00+00') AS nd",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "numeric-equal",
+    "sql": "SELECT (NUMERIC '1') IS DISTINCT FROM (NUMERIC '1.0') AS d, (NUMERIC '1') IS NOT DISTINCT FROM (NUMERIC '1.0') AS nd",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "float-equal",
+    "sql": "SELECT (1.0) IS DISTINCT FROM (1.0) AS d, (1.0) IS NOT DISTINCT FROM (1.0) AS nd",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "float-signed-zero",
+    "sql": "SELECT (0.0) IS DISTINCT FROM (-0.0) AS d, (0.0) IS NOT DISTINCT FROM (-0.0) AS nd",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "nan-nan",
+    "sql": "SELECT (CAST('NaN' AS FLOAT64)) IS DISTINCT FROM (CAST('NaN' AS FLOAT64)) AS d, (CAST('NaN' AS FLOAT64)) IS NOT DISTINCT FROM (CAST('NaN' AS FLOAT64)) AS nd",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "nan-finite",
+    "sql": "SELECT (CAST('NaN' AS FLOAT64)) IS DISTINCT FROM (1.0) AS d, (CAST('NaN' AS FLOAT64)) IS NOT DISTINCT FROM (1.0) AS nd",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "finite-nan",
+    "sql": "SELECT (1.0) IS DISTINCT FROM (CAST('NaN' AS FLOAT64)) AS d, (1.0) IS NOT DISTINCT FROM (CAST('NaN' AS FLOAT64)) AS nd",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "nan-null",
+    "sql": "SELECT (CAST('NaN' AS FLOAT64)) IS DISTINCT FROM (CAST(NULL AS FLOAT64)) AS d, (CAST('NaN' AS FLOAT64)) IS NOT DISTINCT FROM (CAST(NULL AS FLOAT64)) AS nd",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "infinity-equal",
+    "sql": "SELECT (CAST('inf' AS FLOAT64)) IS DISTINCT FROM (CAST('inf' AS FLOAT64)) AS d, (CAST('inf' AS FLOAT64)) IS NOT DISTINCT FROM (CAST('inf' AS FLOAT64)) AS nd",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "infinity-sign",
+    "sql": "SELECT (CAST('inf' AS FLOAT64)) IS DISTINCT FROM (CAST('-inf' AS FLOAT64)) AS d, (CAST('inf' AS FLOAT64)) IS NOT DISTINCT FROM (CAST('-inf' AS FLOAT64)) AS nd",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "json-number-equal",
+    "sql": "SELECT (JSON '1') IS DISTINCT FROM (JSON '1.0') AS d, (JSON '1') IS NOT DISTINCT FROM (JSON '1.0') AS nd",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "json-number-different",
+    "sql": "SELECT (JSON '1') IS DISTINCT FROM (JSON '2') AS d, (JSON '1') IS NOT DISTINCT FROM (JSON '2') AS nd",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "json-null-equal",
+    "sql": "SELECT (JSON 'null') IS DISTINCT FROM (JSON 'null') AS d, (JSON 'null') IS NOT DISTINCT FROM (JSON 'null') AS nd",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "sql-null-json-null",
+    "sql": "SELECT (CAST(NULL AS JSON)) IS DISTINCT FROM (JSON 'null') AS d, (CAST(NULL AS JSON)) IS NOT DISTINCT FROM (JSON 'null') AS nd",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "json-null-sql-null",
+    "sql": "SELECT (JSON 'null') IS DISTINCT FROM (CAST(NULL AS JSON)) AS d, (JSON 'null') IS NOT DISTINCT FROM (CAST(NULL AS JSON)) AS nd",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "json-typed-null-pair",
+    "sql": "SELECT (CAST(NULL AS JSON)) IS DISTINCT FROM (CAST(NULL AS JSON)) AS d, (CAST(NULL AS JSON)) IS NOT DISTINCT FROM (CAST(NULL AS JSON)) AS nd",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "json-object-order",
+    "sql": "SELECT (JSON '{\"a\":1,\"b\":2}') IS DISTINCT FROM (JSON '{\"b\":2,\"a\":1}') AS d, (JSON '{\"a\":1,\"b\":2}') IS NOT DISTINCT FROM (JSON '{\"b\":2,\"a\":1}') AS nd",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "json-object-value",
+    "sql": "SELECT (JSON '{\"a\":1}') IS DISTINCT FROM (JSON '{\"a\":2}') AS d, (JSON '{\"a\":1}') IS NOT DISTINCT FROM (JSON '{\"a\":2}') AS nd",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "json-array-equal",
+    "sql": "SELECT (JSON '[1,null]') IS DISTINCT FROM (JSON '[1.0,null]') AS d, (JSON '[1,null]') IS NOT DISTINCT FROM (JSON '[1.0,null]') AS nd",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "json-array-length",
+    "sql": "SELECT (JSON '[1]') IS DISTINCT FROM (JSON '[1,2]') AS d, (JSON '[1]') IS NOT DISTINCT FROM (JSON '[1,2]') AS nd",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "json-type-difference",
+    "sql": "SELECT (JSON '1') IS DISTINCT FROM (JSON '\"1\"') AS d, (JSON '1') IS NOT DISTINCT FROM (JSON '\"1\"') AS nd",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "json-int",
+    "sql": "SELECT (JSON '1') IS DISTINCT FROM (1) AS d, (JSON '1') IS NOT DISTINCT FROM (1) AS nd",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "int-json",
+    "sql": "SELECT (1) IS DISTINCT FROM (JSON '1') AS d, (1) IS NOT DISTINCT FROM (JSON '1') AS nd",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "json-string",
+    "sql": "SELECT (JSON '\"x\"') IS DISTINCT FROM ('x') AS d, (JSON '\"x\"') IS NOT DISTINCT FROM ('x') AS nd",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "string-json",
+    "sql": "SELECT ('x') IS DISTINCT FROM (JSON '\"x\"') AS d, ('x') IS NOT DISTINCT FROM (JSON '\"x\"') AS nd",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "json-bool",
+    "sql": "SELECT (JSON 'true') IS DISTINCT FROM (TRUE) AS d, (JSON 'true') IS NOT DISTINCT FROM (TRUE) AS nd",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "bool-json",
+    "sql": "SELECT (TRUE) IS DISTINCT FROM (JSON 'true') AS d, (TRUE) IS NOT DISTINCT FROM (JSON 'true') AS nd",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "json-bytes",
+    "sql": "SELECT (JSON '\"eA==\"') IS DISTINCT FROM (b'x') AS d, (JSON '\"eA==\"') IS NOT DISTINCT FROM (b'x') AS nd",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "bytes-json",
+    "sql": "SELECT (b'x') IS DISTINCT FROM (JSON '\"eA==\"') AS d, (b'x') IS NOT DISTINCT FROM (JSON '\"eA==\"') AS nd",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "json-array",
+    "sql": "SELECT (JSON '[1,null]') IS DISTINCT FROM ([1,NULL]) AS d, (JSON '[1,null]') IS NOT DISTINCT FROM ([1,NULL]) AS nd",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "array-json",
+    "sql": "SELECT ([1,NULL]) IS DISTINCT FROM (JSON '[1,null]') AS d, ([1,NULL]) IS NOT DISTINCT FROM (JSON '[1,null]') AS nd",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "array-equal",
+    "sql": "SELECT ([1,2]) IS DISTINCT FROM ([1,2]) AS d, ([1,2]) IS NOT DISTINCT FROM ([1,2]) AS nd",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "array-different",
+    "sql": "SELECT ([1,2]) IS DISTINCT FROM ([1,3]) AS d, ([1,2]) IS NOT DISTINCT FROM ([1,3]) AS nd",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "array-null-elements",
+    "sql": "SELECT ([1,NULL]) IS DISTINCT FROM ([1,NULL]) AS d, ([1,NULL]) IS NOT DISTINCT FROM ([1,NULL]) AS nd",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "array-null-versus-value",
+    "sql": "SELECT ([1,NULL]) IS DISTINCT FROM ([1,2]) AS d, ([1,NULL]) IS NOT DISTINCT FROM ([1,2]) AS nd",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "array-empty",
+    "sql": "SELECT (ARRAY<INT64>[]) IS DISTINCT FROM (ARRAY<INT64>[]) AS d, (ARRAY<INT64>[]) IS NOT DISTINCT FROM (ARRAY<INT64>[]) AS nd",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "array-sql-null",
+    "sql": "SELECT (CAST(NULL AS ARRAY<INT64>)) IS DISTINCT FROM (ARRAY<INT64>[]) AS d, (CAST(NULL AS ARRAY<INT64>)) IS NOT DISTINCT FROM (ARRAY<INT64>[]) AS nd",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "struct-equal",
+    "sql": "SELECT (STRUCT(1 AS x)) IS DISTINCT FROM (STRUCT(1 AS x)) AS d, (STRUCT(1 AS x)) IS NOT DISTINCT FROM (STRUCT(1 AS x)) AS nd",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "struct-different",
+    "sql": "SELECT (STRUCT(1 AS x)) IS DISTINCT FROM (STRUCT(2 AS x)) AS d, (STRUCT(1 AS x)) IS NOT DISTINCT FROM (STRUCT(2 AS x)) AS nd",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "struct-null-elements",
+    "sql": "SELECT (STRUCT(CAST(NULL AS INT64) AS x)) IS DISTINCT FROM (STRUCT(CAST(NULL AS INT64) AS x)) AS d, (STRUCT(CAST(NULL AS INT64) AS x)) IS NOT DISTINCT FROM (STRUCT(CAST(NULL AS INT64) AS x)) AS nd",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "interval-equal",
+    "sql": "SELECT (INTERVAL 1 DAY) IS DISTINCT FROM (INTERVAL 1 DAY) AS d, (INTERVAL 1 DAY) IS NOT DISTINCT FROM (INTERVAL 1 DAY) AS nd",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "incompatible-string-int",
+    "sql": "SELECT ('x') IS DISTINCT FROM (1) AS d, ('x') IS NOT DISTINCT FROM (1) AS nd",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "incompatible-struct-int",
+    "sql": "SELECT (STRUCT(1 AS x)) IS DISTINCT FROM (1) AS d, (STRUCT(1 AS x)) IS NOT DISTINCT FROM (1) AS nd",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "equality-nan-control",
+    "sql": "SELECT CAST('NaN' AS FLOAT64) = CAST('NaN' AS FLOAT64) AS eq",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "equality-null-control",
+    "sql": "SELECT CAST(NULL AS INT64) = CAST(NULL AS INT64) AS eq",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "missing-from-control",
+    "sql": "SELECT 1 IS DISTINCT 2 AS result",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "missing-rhs-control",
+    "sql": "SELECT 1 IS NOT DISTINCT FROM",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "missing-distinct-control",
+    "sql": "SELECT 1 IS NOT FROM 1 AS result",
+    "params": null,
+    "profile": false
+  },
+  {
+    "label": "int-equal-profile",
+    "sql": "SELECT (1) IS DISTINCT FROM (1) AS d, (1) IS NOT DISTINCT FROM (1) AS nd",
+    "params": null,
+    "profile": true
+  },
+  {
+    "label": "nan-nan-profile",
+    "sql": "SELECT (CAST('NaN' AS FLOAT64)) IS DISTINCT FROM (CAST('NaN' AS FLOAT64)) AS d, (CAST('NaN' AS FLOAT64)) IS NOT DISTINCT FROM (CAST('NaN' AS FLOAT64)) AS nd",
+    "params": null,
+    "profile": true
+  },
+  {
+    "label": "sql-null-json-null-profile",
+    "sql": "SELECT (CAST(NULL AS JSON)) IS DISTINCT FROM (JSON 'null') AS d, (CAST(NULL AS JSON)) IS NOT DISTINCT FROM (JSON 'null') AS nd",
+    "params": null,
+    "profile": true
+  },
+  {
+    "label": "json-object-order-profile",
+    "sql": "SELECT (JSON '{\"a\":1,\"b\":2}') IS DISTINCT FROM (JSON '{\"b\":2,\"a\":1}') AS d, (JSON '{\"a\":1,\"b\":2}') IS NOT DISTINCT FROM (JSON '{\"b\":2,\"a\":1}') AS nd",
+    "params": null,
+    "profile": true
+  },
+  {
+    "label": "array-null-elements-profile",
+    "sql": "SELECT ([1,NULL]) IS DISTINCT FROM ([1,NULL]) AS d, ([1,NULL]) IS NOT DISTINCT FROM ([1,NULL]) AS nd",
+    "params": null,
+    "profile": true
+  }
+]

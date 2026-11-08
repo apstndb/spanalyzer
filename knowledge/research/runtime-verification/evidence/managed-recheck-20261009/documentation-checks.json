@@ -1,0 +1,28 @@
+[
+  {
+    "name": "okf",
+    "argv": [
+      "go",
+      "run",
+      "./okf-check",
+      "--repo-root",
+      "..",
+      "--gate",
+      "all",
+      "--publication-manifest",
+      "<LOCAL_TASK_ROOT>/apstndb/spanalyzer/managed-recheck-20261009/candidate-publication-manifest.json"
+    ],
+    "exit_code": 0
+  },
+  {
+    "name": "language",
+    "argv": [
+      "go",
+      "run",
+      "./markdown-language-check",
+      "--repo-root",
+      ".."
+    ],
+    "exit_code": 0
+  }
+]

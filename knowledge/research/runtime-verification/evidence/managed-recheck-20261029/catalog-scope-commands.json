@@ -1,0 +1,45 @@
+[
+  {
+    "name": "catalog-scope-build",
+    "started_at": "2026-10-29T00:48:38.988891+00:00",
+    "completed_at": "2026-10-29T00:48:41.176806+00:00",
+    "exit_code": 0,
+    "seconds": 2.188,
+    "argv": [
+      "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go",
+      "build",
+      "-o",
+      "<LOCAL_CHECKOUT>/.tmp/managed-recheck-20261029/catalog-scope",
+      "<LOCAL_CHECKOUT>/.tmp/managed-recheck-20261029/catalog-scope.go"
+    ],
+    "cwd": "<LOCAL_CHECKOUT>/tools",
+    "gowork": "<LOCAL_CHECKOUT>/go.work"
+  },
+  {
+    "name": "catalog-scope-buildinfo",
+    "started_at": "2026-10-29T00:48:41.177049+00:00",
+    "completed_at": "2026-10-29T00:48:41.189529+00:00",
+    "exit_code": 0,
+    "seconds": 0.012,
+    "argv": [
+      "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go",
+      "version",
+      "-m",
+      "<LOCAL_CHECKOUT>/.tmp/managed-recheck-20261029/catalog-scope"
+    ],
+    "cwd": "<LOCAL_CHECKOUT>/tools",
+    "gowork": "<LOCAL_CHECKOUT>/go.work"
+  },
+  {
+    "name": "catalog-scope",
+    "started_at": "2026-10-29T00:48:41.189666+00:00",
+    "completed_at": "2026-10-29T00:48:44.143950+00:00",
+    "exit_code": 0,
+    "seconds": 2.954,
+    "argv": [
+      "<LOCAL_CHECKOUT>/.tmp/managed-recheck-20261029/catalog-scope"
+    ],
+    "cwd": "<LOCAL_CHECKOUT>/tools",
+    "gowork": "<LOCAL_CHECKOUT>/go.work"
+  }
+]

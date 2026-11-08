@@ -1,0 +1,73 @@
+"""Retain redacted execution, complete source bodies, comparisons and cleanup."""
+from pathlib import Path
+from collections import Counter
+import datetime,hashlib,json,re,shutil
+root=Path('<LOCAL_CHECKOUT>');scratch=root/'.tmp/managed-recheck-20261029';task=Path('<LOCAL_TASK_ROOT>/apstndb/spanalyzer/managed-recheck-20261029');ev=task/'evidence';canonical=root/'knowledge/research/runtime-verification/evidence/managed-recheck-20261029';old=root/'knowledge/research/runtime-verification/evidence/managed-recheck-20261023'
+def sha(path):return hashlib.sha256(path.read_bytes()).hexdigest()
+def load(path):return[json.loads(s)for s in path.read_text().splitlines()if s]
+commands=[]
+for path in sorted(ev.glob('*commands.json')):
+ if path.name=='all-commands.json':continue
+ commands.extend(json.loads(path.read_text()))
+commands.sort(key=lambda row:row['started_at']);(ev/'all-commands.json').write_text(json.dumps(commands,indent=2)+'\n')
+assert any(r['name']=='post-tuning-trial-state'and r['exit_code']==0 for r in commands)
+names=['readonly','google-features','pg-features','queue','cleanup','active-batch','batch-operations','batch-scope','catalog-scope','new-sys-columns','queries','followup','distinctness','google-json','pg-streams','graph-controls','google-options','pg-options','google-capture','pg-capture','doc-delta-google','doc-delta-pg','queue-recreate','hll-controls-google','hll-controls-pg','weekly-google','weekly-pg','repair-google','repair-pg','graph-final','tuning-google','tuning-pg','final-inventory','post-tuning-inventory']
+records={name:load(ev/(name+'.stdout'))for name in names}
+for name,rows in records.items():
+ if all(isinstance(row,dict)for row in rows):(ev/(name+'.jsonl')).write_text('\n'.join(json.dumps(row,ensure_ascii=False)for row in rows)+'\n')
+(ev/'managed-tests.log').write_text((ev/'managed-tests.stdout').read_text()+(ev/'managed-tests.stderr').read_text())
+catalog=[]
+for name in ['infoschema','spanner-sys','spanner-sys-2','spanner-sys-3']:
+ value=json.loads((ev/(name+'.stdout')).read_text());(ev/(name+'-check.json')).write_text(json.dumps(value,indent=2)+'\n');catalog.append({'name':name,**value})
+captures=[]
+for name in ['infoschema-capture','spanner-sys-capture']:
+ match=re.search(r'wrote (survey/[^\s]+\.json)',(ev/(name+'.stderr')).read_text());assert match;path=root/match.group(1);capture=json.loads(path.read_text());captures.append({'path':str(path.relative_to(root)),'sha256':sha(path),'surface_sha256':capture['surface_sha256'],'column_count':len(capture['columns']),'table_count':len({r['table_name']for r in capture['columns']})})
+(ev/'catalog-comparison.json').write_text(json.dumps({'scope':'One existing dedicated trial; independent reads can advertise different surfaces. Analyzer selectors unchanged.','observations':catalog,'captures':captures},indent=2)+'\n')
+cleanup={}
+for name in ['google-json','pg-streams','graph-controls','google-options','pg-options','google-capture','pg-capture','doc-delta-google','doc-delta-pg','hll-controls-pg','weekly-google','weekly-pg','repair-google','repair-pg','graph-final','tuning-pg']:
+ labels={r['label']:r for r in records[name]};assert labels['drop-database']['code']=='OK'and labels['database-absent']['code']=='NotFound',name;cleanup[name]={'drop':'OK','get_after_drop':'NotFound'}
+base={r['label']:r for r in records['cleanup']};assert base['temporary-pg-absent']['code']=='NotFound';assert all(not r.get('rows')for k,r in base.items()if k.startswith('remaining-'))
+cleanup['baseline-pg']={'drop':'OK','get_after_drop':'NotFound'}
+assert len(cleanup)==17
+final=json.loads((ev/'post-tuning-trial-state.stdout').read_text());inventory=records['post-tuning-inventory'];assert all(r['code']=='OK'and r['rows']==[{'n':'0'}]for r in inventory);assert final['databases']['only_dedicated_database']
+(ev/'cleanup-summary.json').write_text(json.dumps({'owned_database_fixtures':cleanup,'temporary_database_lifecycles':len(cleanup),'final_cloud_state':final,'final_user_object_counts':[{k:r[k]for k in ['label','code','rows']}for r in inventory],'scope':'Only accepted owned temporary resources were removed. Existing trial and dedicated base database remain.'},indent=2)+'\n')
+producer=[]
+for path in sorted(scratch.glob('*.go')):
+ baseline=old/(path.name+'.txt')
+ if not baseline.exists():continue
+ norm=lambda text:re.sub(r'202610(?:23|29)','<DATE>',text)
+ producer.append({'file':path.name,'baseline_sha256':sha(baseline),'current_sha256':sha(path),'equal_after_fixture_date_substitution':norm(baseline.read_text())==norm(path.read_text())})
+assert all(r['equal_after_fixture_date_substitution']for r in producer);(ev/'producer-comparison.json').write_text(json.dumps(producer,indent=2)+'\n')
+expected=json.loads((scratch/'distinctness-expected.json').read_text());actual={r['label']:r for r in records['distinctness']}
+assert all(all(actual[label][field]==value for field,value in want.items())for label,want in expected.items());(ev/'distinctness-summary.json').write_text(json.dumps({'cases':len(actual),'codes':dict(Counter(r['code']for r in actual.values())),'explicit_expected_cases':len(expected),'expectations_pass':True},indent=2)+'\n')
+for pattern in ['*.go','*.py']:
+ for path in scratch.glob(pattern):shutil.copyfile(path,ev/(path.name+'.txt'))
+for path in scratch.glob('*.json'):
+ if path.name not in ['initial-artifact-manifest.json']:shutil.copyfile(path,ev/path.name)
+for path in ev.glob('*-buildinfo.stdout'):shutil.copyfile(path,ev/path.with_suffix('.txt'))
+docs=task/'documents';sources=ev/'sources';sources.mkdir(exist_ok=True)
+for path in docs.iterdir():
+ if path.is_file()and path.suffix!='.html':shutil.copyfile(path,sources/path.name)
+receipt={'observed_on':'2026-10-29','client_timezone':'Asia/Tokyo','execution_start':commands[0]['started_at'],'execution_end':commands[-1]['completed_at'],'runtime_identity':'Existing October 23 dedicated regional free trial; no new instance or paid conversion. Managed build identifier unavailable.','source_head':json.loads((task/'initial-source-state.json').read_text())['head'],'source_state':'Pre-existing dirty/untracked work preserved; all 123 measured implementation/dependency hashes unchanged.','dependencies':{'go':'go1.26.8','catalog_and_integration':'GOWORK=off; Spanner v1.88.0','feature_clients':'Explicit workspace; Spanner v1.91.0'},'flow_status':'completed_with_observed_catalog_variation_and_local_drift_failure','managed_gate':'Canonical DDL, expression index and UUID pass; drift fails on unregistered ACTIVE_BATCH_OPERATIONS and BATCH_OPERATIONS. Diagnostic catalog checks retain nonzero exits.','harness_attempts':'Original unqualified views, duplicate generated-column constraint name and FLOAT64 option mismatch remain explicit; focused corrected attempts retained. Rejected RAND views isolated. Initial final-state CLI lookup failed before RPC; absolute SDK path succeeds in final state.','owned_fixture_cleanup':'All seventeen temporary database lifecycles and owned base fixtures confirmed absent; dedicated base and trial retained.','catalog_selectors_changed':False,'new_instance_created':False,'commands':'all-commands.json','durable_task_directory':str(task),'authority':'Bounded current managed verification, owned temporary fixtures/cleanup, source research and local documentation. No implementation change, commit, push, PR, merge, release, paid conversion, instance move or external synchronization.'}
+(ev/'receipt.json').write_text(json.dumps(receipt,indent=2)+'\n')
+canonical.mkdir(parents=True,exist_ok=True);transforms=[]
+privatekeys={'server_transaction_id','servertransactionid','transaction_id','transactionid','lease_id','leaseid','partition_token','partitiontoken','resume_token','resumetoken'}
+def sanitize(value,parent=''):
+ if isinstance(value,list):return[sanitize(v,parent)for v in value]
+ if isinstance(value,dict):
+  result={}
+  for k,v in value.items():
+   if (k.lower()in privatekeys or(parent.lower()=='transaction'and k=='id'))and isinstance(v,str)and v and not v.startswith(('sha256:','<redacted>')):result[k]='sha256:'+hashlib.sha256(v.encode()).hexdigest()
+   else:result[k]=sanitize(v,k)
+  return result
+ return value
+for path in ev.rglob('*'):
+ if not path.is_file()or path.suffix in ['.stdout','.stderr']:continue
+ relative=path.relative_to(ev);target=canonical/relative;target.parent.mkdir(parents=True,exist_ok=True)
+ data=path.read_bytes()
+ if path.suffix=='.jsonl':
+  text='\n'.join(json.dumps(sanitize(json.loads(s)),ensure_ascii=False)for s in data.decode().splitlines()if s)+'\n';data=text.encode()
+ target.write_bytes(data)
+ if hashlib.sha256(data).hexdigest()!=sha(path):transforms.append({'file':str(relative),'original_sha256':sha(path),'retained_sha256':sha(target),'reason':'Hash opaque operational transaction/lease/partition identifiers; codes and fixture payloads preserved.'})
+(canonical/'retention-transformations.json').write_text(json.dumps({'scope':'Additional operational identifier redaction in runtime JSONL only. Complete public source bodies unchanged.','transformations':transforms},indent=2)+'\n')
+print(json.dumps({'retained_files':sum(x.is_file()for x in canonical.rglob('*')),'temporary_database_lifecycles':len(cleanup),'matching_producers':len(producer),'transformed_runtime_files':len(transforms),'nonzero_commands':[(r['name'],r['exit_code'])for r in commands if r['exit_code']]}))

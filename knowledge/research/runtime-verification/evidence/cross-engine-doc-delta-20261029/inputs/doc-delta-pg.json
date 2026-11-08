@@ -1,0 +1,531 @@
+{
+  "dialect": "pg",
+  "steps": [
+    {
+      "label": "doc-fixture-0",
+      "family": "doc-fixture",
+      "kind": "ddl",
+      "sql": "CREATE TABLE docdeltadocs (id bigint PRIMARY KEY, doc jsonb, doctokens spanner.tokenlist GENERATED ALWAYS AS (spanner.tokenize_jsonb(doc)) VIRTUAL HIDDEN)",
+      "requires": []
+    },
+    {
+      "label": "doc-fixture-1",
+      "family": "doc-fixture",
+      "kind": "ddl",
+      "sql": "CREATE SEARCH INDEX docdeltasearch ON docdeltadocs(doctokens)",
+      "requires": [
+        "doc-fixture-0"
+      ]
+    },
+    {
+      "label": "doc-documents-seed",
+      "family": "doc-fixture",
+      "kind": "dml",
+      "statements": [
+        "INSERT INTO docdeltadocs(Id,Doc) VALUES (1,'{\"kind\":\"active\",\"n\":1}'::jsonb),(2,'{\"kind\":\"pending\",\"n\":2}'::jsonb),(3,'{\"kind\":\"inactive\",\"n\":3}'::jsonb),(4,'{}'::jsonb),(5,NULL)"
+      ],
+      "requires": [
+        "doc-fixture-0"
+      ]
+    },
+    {
+      "label": "pg-approx-distinct",
+      "sql": "SELECT spanner.approx_count_distinct(x) AS estimate FROM unnest(ARRAY[1::bigint,1::bigint,2::bigint,NULL::bigint]) AS t(x)",
+      "kind": "query",
+      "family": "hll",
+      "requires": []
+    },
+    {
+      "label": "pg-hll-precision-9",
+      "sql": "SELECT HLL_COUNT.EXTRACT(HLL_COUNT.INIT(x,9)) AS estimate FROM unnest(ARRAY[1::bigint,1::bigint,2::bigint,NULL::bigint]) AS t(x)",
+      "kind": "query",
+      "family": "hll",
+      "requires": []
+    },
+    {
+      "label": "pg-hll-precision-10",
+      "sql": "SELECT HLL_COUNT.EXTRACT(HLL_COUNT.INIT(x,10)) AS estimate FROM unnest(ARRAY[1::bigint,1::bigint,2::bigint,NULL::bigint]) AS t(x)",
+      "kind": "query",
+      "family": "hll",
+      "requires": []
+    },
+    {
+      "label": "pg-hll-precision-15",
+      "sql": "SELECT HLL_COUNT.EXTRACT(HLL_COUNT.INIT(x,15)) AS estimate FROM unnest(ARRAY[1::bigint,1::bigint,2::bigint,NULL::bigint]) AS t(x)",
+      "kind": "query",
+      "family": "hll",
+      "requires": []
+    },
+    {
+      "label": "pg-hll-precision-24",
+      "sql": "SELECT HLL_COUNT.EXTRACT(HLL_COUNT.INIT(x,24)) AS estimate FROM unnest(ARRAY[1::bigint,1::bigint,2::bigint,NULL::bigint]) AS t(x)",
+      "kind": "query",
+      "family": "hll",
+      "requires": []
+    },
+    {
+      "label": "pg-hll-precision-25",
+      "sql": "SELECT HLL_COUNT.EXTRACT(HLL_COUNT.INIT(x,25)) AS estimate FROM unnest(ARRAY[1::bigint,1::bigint,2::bigint,NULL::bigint]) AS t(x)",
+      "kind": "query",
+      "family": "hll",
+      "requires": []
+    },
+    {
+      "label": "pg-hll-input-int",
+      "sql": "SELECT HLL_COUNT.EXTRACT(HLL_COUNT.INIT(v)) AS estimate FROM (SELECT 1 AS v) AS input",
+      "kind": "query",
+      "family": "hll",
+      "requires": []
+    },
+    {
+      "label": "pg-hll-input-string",
+      "sql": "SELECT HLL_COUNT.EXTRACT(HLL_COUNT.INIT(v)) AS estimate FROM (SELECT 'x' AS v) AS input",
+      "kind": "query",
+      "family": "hll",
+      "requires": []
+    },
+    {
+      "label": "pg-hll-input-bytes",
+      "sql": "SELECT HLL_COUNT.EXTRACT(HLL_COUNT.INIT(v)) AS estimate FROM (SELECT 'x'::bytea AS v) AS input",
+      "kind": "query",
+      "family": "hll",
+      "requires": []
+    },
+    {
+      "label": "pg-hll-input-numeric",
+      "sql": "SELECT HLL_COUNT.EXTRACT(HLL_COUNT.INIT(v)) AS estimate FROM (SELECT 1::numeric AS v) AS input",
+      "kind": "query",
+      "family": "hll",
+      "requires": []
+    },
+    {
+      "label": "pg-hll-input-bool",
+      "sql": "SELECT HLL_COUNT.EXTRACT(HLL_COUNT.INIT(v)) AS estimate FROM (SELECT TRUE AS v) AS input",
+      "kind": "query",
+      "family": "hll",
+      "requires": []
+    },
+    {
+      "label": "pg-hll-input-interval",
+      "sql": "SELECT HLL_COUNT.EXTRACT(HLL_COUNT.INIT(v)) AS estimate FROM (SELECT INTERVAL '1 day' AS v) AS input",
+      "kind": "query",
+      "family": "hll",
+      "requires": []
+    },
+    {
+      "label": "pg-hll-extract-null",
+      "sql": "SELECT HLL_COUNT.EXTRACT(NULL::bytea) AS estimate",
+      "kind": "query",
+      "family": "hll",
+      "requires": []
+    },
+    {
+      "label": "pg-hll-init-null",
+      "sql": "SELECT HLL_COUNT.INIT(NULL::bigint) AS sketch",
+      "kind": "query",
+      "family": "hll",
+      "requires": []
+    },
+    {
+      "label": "pg-hll-merge",
+      "sql": "WITH s AS (SELECT HLL_COUNT.INIT(x) AS sketch FROM unnest(ARRAY[1::bigint,1::bigint,2::bigint,NULL::bigint]) AS t(x)) SELECT HLL_COUNT.MERGE(sketch) AS estimate FROM s",
+      "kind": "query",
+      "family": "hll",
+      "requires": []
+    },
+    {
+      "label": "pg-hll-merge-partial",
+      "sql": "WITH s AS (SELECT HLL_COUNT.INIT(x) AS sketch FROM unnest(ARRAY[1::bigint,1::bigint,2::bigint,NULL::bigint]) AS t(x)) SELECT HLL_COUNT.EXTRACT(HLL_COUNT.MERGE_PARTIAL(sketch)) AS estimate FROM s",
+      "kind": "query",
+      "family": "hll",
+      "requires": []
+    },
+    {
+      "label": "pg-json-document-equal-automatic",
+      "sql": "SELECT d.Id FROM docdeltadocs AS d WHERE d.doc = '{\"kind\":\"active\",\"n\":1}'::jsonb ORDER BY d.Id",
+      "kind": "query",
+      "family": "json_search_equality",
+      "requires": [
+        "doc-documents-seed"
+      ],
+      "profile": true
+    },
+    {
+      "label": "pg-json-document-equal-forced-search",
+      "sql": "SELECT d.Id FROM docdeltadocs /*@ FORCE_INDEX=docdeltasearch */ AS d WHERE d.doc = '{\"kind\":\"active\",\"n\":1}'::jsonb ORDER BY d.Id",
+      "kind": "query",
+      "family": "json_search_equality",
+      "requires": [
+        "doc-documents-seed",
+        "doc-fixture-1"
+      ],
+      "profile": true
+    },
+    {
+      "label": "pg-json-document-equal-forced-base",
+      "sql": "SELECT d.Id FROM docdeltadocs /*@ FORCE_INDEX=_BASE_TABLE */ AS d WHERE d.doc = '{\"kind\":\"active\",\"n\":1}'::jsonb ORDER BY d.Id",
+      "kind": "query",
+      "family": "json_search_equality",
+      "requires": [
+        "doc-documents-seed"
+      ],
+      "profile": true
+    },
+    {
+      "label": "pg-json-path-equal-automatic",
+      "sql": "SELECT d.Id FROM docdeltadocs AS d WHERE d.doc->'kind' = '\"active\"'::jsonb ORDER BY d.Id",
+      "kind": "query",
+      "family": "json_search_equality",
+      "requires": [
+        "doc-documents-seed"
+      ],
+      "profile": true
+    },
+    {
+      "label": "pg-json-path-equal-forced-search",
+      "sql": "SELECT d.Id FROM docdeltadocs /*@ FORCE_INDEX=docdeltasearch */ AS d WHERE d.doc->'kind' = '\"active\"'::jsonb ORDER BY d.Id",
+      "kind": "query",
+      "family": "json_search_equality",
+      "requires": [
+        "doc-documents-seed",
+        "doc-fixture-1"
+      ],
+      "profile": true
+    },
+    {
+      "label": "pg-json-path-equal-forced-base",
+      "sql": "SELECT d.Id FROM docdeltadocs /*@ FORCE_INDEX=_BASE_TABLE */ AS d WHERE d.doc->'kind' = '\"active\"'::jsonb ORDER BY d.Id",
+      "kind": "query",
+      "family": "json_search_equality",
+      "requires": [
+        "doc-documents-seed"
+      ],
+      "profile": true
+    },
+    {
+      "label": "pg-json-number-equal-automatic",
+      "sql": "SELECT d.Id FROM docdeltadocs AS d WHERE d.doc->'n' = '1'::jsonb ORDER BY d.Id",
+      "kind": "query",
+      "family": "json_search_equality",
+      "requires": [
+        "doc-documents-seed"
+      ],
+      "profile": true
+    },
+    {
+      "label": "pg-json-number-equal-forced-search",
+      "sql": "SELECT d.Id FROM docdeltadocs /*@ FORCE_INDEX=docdeltasearch */ AS d WHERE d.doc->'n' = '1'::jsonb ORDER BY d.Id",
+      "kind": "query",
+      "family": "json_search_equality",
+      "requires": [
+        "doc-documents-seed",
+        "doc-fixture-1"
+      ],
+      "profile": true
+    },
+    {
+      "label": "pg-json-number-equal-forced-base",
+      "sql": "SELECT d.Id FROM docdeltadocs /*@ FORCE_INDEX=_BASE_TABLE */ AS d WHERE d.doc->'n' = '1'::jsonb ORDER BY d.Id",
+      "kind": "query",
+      "family": "json_search_equality",
+      "requires": [
+        "doc-documents-seed"
+      ],
+      "profile": true
+    },
+    {
+      "label": "pg-json-not-equal-automatic",
+      "sql": "SELECT d.Id FROM docdeltadocs AS d WHERE d.doc->'kind' != '\"active\"'::jsonb ORDER BY d.Id",
+      "kind": "query",
+      "family": "json_search_equality",
+      "requires": [
+        "doc-documents-seed"
+      ],
+      "profile": true
+    },
+    {
+      "label": "pg-json-not-equal-forced-search",
+      "sql": "SELECT d.Id FROM docdeltadocs /*@ FORCE_INDEX=docdeltasearch */ AS d WHERE d.doc->'kind' != '\"active\"'::jsonb ORDER BY d.Id",
+      "kind": "query",
+      "family": "json_search_equality",
+      "requires": [
+        "doc-documents-seed",
+        "doc-fixture-1"
+      ],
+      "profile": true
+    },
+    {
+      "label": "pg-json-not-equal-forced-base",
+      "sql": "SELECT d.Id FROM docdeltadocs /*@ FORCE_INDEX=_BASE_TABLE */ AS d WHERE d.doc->'kind' != '\"active\"'::jsonb ORDER BY d.Id",
+      "kind": "query",
+      "family": "json_search_equality",
+      "requires": [
+        "doc-documents-seed"
+      ],
+      "profile": true
+    },
+    {
+      "label": "pg-json-not-equal-alias-automatic",
+      "sql": "SELECT d.Id FROM docdeltadocs AS d WHERE d.doc->'kind' <> '\"active\"'::jsonb ORDER BY d.Id",
+      "kind": "query",
+      "family": "json_search_equality",
+      "requires": [
+        "doc-documents-seed"
+      ],
+      "profile": true
+    },
+    {
+      "label": "pg-json-not-equal-alias-forced-search",
+      "sql": "SELECT d.Id FROM docdeltadocs /*@ FORCE_INDEX=docdeltasearch */ AS d WHERE d.doc->'kind' <> '\"active\"'::jsonb ORDER BY d.Id",
+      "kind": "query",
+      "family": "json_search_equality",
+      "requires": [
+        "doc-documents-seed",
+        "doc-fixture-1"
+      ],
+      "profile": true
+    },
+    {
+      "label": "pg-json-not-equal-alias-forced-base",
+      "sql": "SELECT d.Id FROM docdeltadocs /*@ FORCE_INDEX=_BASE_TABLE */ AS d WHERE d.doc->'kind' <> '\"active\"'::jsonb ORDER BY d.Id",
+      "kind": "query",
+      "family": "json_search_equality",
+      "requires": [
+        "doc-documents-seed"
+      ],
+      "profile": true
+    },
+    {
+      "label": "pg-json-in-automatic",
+      "sql": "SELECT d.Id FROM docdeltadocs AS d WHERE d.doc->'kind' IN ('\"active\"'::jsonb,'\"pending\"'::jsonb) ORDER BY d.Id",
+      "kind": "query",
+      "family": "json_search_equality",
+      "requires": [
+        "doc-documents-seed"
+      ],
+      "profile": true
+    },
+    {
+      "label": "pg-json-in-forced-search",
+      "sql": "SELECT d.Id FROM docdeltadocs /*@ FORCE_INDEX=docdeltasearch */ AS d WHERE d.doc->'kind' IN ('\"active\"'::jsonb,'\"pending\"'::jsonb) ORDER BY d.Id",
+      "kind": "query",
+      "family": "json_search_equality",
+      "requires": [
+        "doc-documents-seed",
+        "doc-fixture-1"
+      ],
+      "profile": true
+    },
+    {
+      "label": "pg-json-in-forced-base",
+      "sql": "SELECT d.Id FROM docdeltadocs /*@ FORCE_INDEX=_BASE_TABLE */ AS d WHERE d.doc->'kind' IN ('\"active\"'::jsonb,'\"pending\"'::jsonb) ORDER BY d.Id",
+      "kind": "query",
+      "family": "json_search_equality",
+      "requires": [
+        "doc-documents-seed"
+      ],
+      "profile": true
+    },
+    {
+      "label": "pg-json-not-in-automatic",
+      "sql": "SELECT d.Id FROM docdeltadocs AS d WHERE d.doc->'kind' NOT IN ('\"active\"'::jsonb,'\"pending\"'::jsonb) ORDER BY d.Id",
+      "kind": "query",
+      "family": "json_search_equality",
+      "requires": [
+        "doc-documents-seed"
+      ],
+      "profile": true
+    },
+    {
+      "label": "pg-json-not-in-forced-search",
+      "sql": "SELECT d.Id FROM docdeltadocs /*@ FORCE_INDEX=docdeltasearch */ AS d WHERE d.doc->'kind' NOT IN ('\"active\"'::jsonb,'\"pending\"'::jsonb) ORDER BY d.Id",
+      "kind": "query",
+      "family": "json_search_equality",
+      "requires": [
+        "doc-documents-seed",
+        "doc-fixture-1"
+      ],
+      "profile": true
+    },
+    {
+      "label": "pg-json-not-in-forced-base",
+      "sql": "SELECT d.Id FROM docdeltadocs /*@ FORCE_INDEX=_BASE_TABLE */ AS d WHERE d.doc->'kind' NOT IN ('\"active\"'::jsonb,'\"pending\"'::jsonb) ORDER BY d.Id",
+      "kind": "query",
+      "family": "json_search_equality",
+      "requires": [
+        "doc-documents-seed"
+      ],
+      "profile": true
+    },
+    {
+      "label": "pg-json-exists-automatic",
+      "sql": "SELECT d.Id FROM docdeltadocs AS d WHERE d.doc ? 'kind' ORDER BY d.Id",
+      "kind": "query",
+      "family": "json_search_equality",
+      "requires": [
+        "doc-documents-seed"
+      ],
+      "profile": true
+    },
+    {
+      "label": "pg-json-exists-forced-search",
+      "sql": "SELECT d.Id FROM docdeltadocs /*@ FORCE_INDEX=docdeltasearch */ AS d WHERE d.doc ? 'kind' ORDER BY d.Id",
+      "kind": "query",
+      "family": "json_search_equality",
+      "requires": [
+        "doc-documents-seed",
+        "doc-fixture-1"
+      ],
+      "profile": true
+    },
+    {
+      "label": "pg-json-exists-forced-base",
+      "sql": "SELECT d.Id FROM docdeltadocs /*@ FORCE_INDEX=_BASE_TABLE */ AS d WHERE d.doc ? 'kind' ORDER BY d.Id",
+      "kind": "query",
+      "family": "json_search_equality",
+      "requires": [
+        "doc-documents-seed"
+      ],
+      "profile": true
+    },
+    {
+      "label": "pg-json-range-automatic",
+      "sql": "SELECT d.Id FROM docdeltadocs AS d WHERE d.doc->'n' > '1'::jsonb ORDER BY d.Id",
+      "kind": "query",
+      "family": "json_search_equality",
+      "requires": [
+        "doc-documents-seed"
+      ],
+      "profile": true
+    },
+    {
+      "label": "pg-json-range-forced-search",
+      "sql": "SELECT d.Id FROM docdeltadocs /*@ FORCE_INDEX=docdeltasearch */ AS d WHERE d.doc->'n' > '1'::jsonb ORDER BY d.Id",
+      "kind": "query",
+      "family": "json_search_equality",
+      "requires": [
+        "doc-documents-seed",
+        "doc-fixture-1"
+      ],
+      "profile": true
+    },
+    {
+      "label": "pg-json-range-forced-base",
+      "sql": "SELECT d.Id FROM docdeltadocs /*@ FORCE_INDEX=_BASE_TABLE */ AS d WHERE d.doc->'n' > '1'::jsonb ORDER BY d.Id",
+      "kind": "query",
+      "family": "json_search_equality",
+      "requires": [
+        "doc-documents-seed"
+      ],
+      "profile": true
+    },
+    {
+      "label": "pg-json-text-extraction-automatic",
+      "sql": "SELECT d.Id FROM docdeltadocs AS d WHERE d.doc->>'kind' = 'active' ORDER BY d.Id",
+      "kind": "query",
+      "family": "json_search_equality",
+      "requires": [
+        "doc-documents-seed"
+      ],
+      "profile": true
+    },
+    {
+      "label": "pg-json-text-extraction-forced-search",
+      "sql": "SELECT d.Id FROM docdeltadocs /*@ FORCE_INDEX=docdeltasearch */ AS d WHERE d.doc->>'kind' = 'active' ORDER BY d.Id",
+      "kind": "query",
+      "family": "json_search_equality",
+      "requires": [
+        "doc-documents-seed",
+        "doc-fixture-1"
+      ],
+      "profile": true
+    },
+    {
+      "label": "pg-json-text-extraction-forced-base",
+      "sql": "SELECT d.Id FROM docdeltadocs /*@ FORCE_INDEX=_BASE_TABLE */ AS d WHERE d.doc->>'kind' = 'active' ORDER BY d.Id",
+      "kind": "query",
+      "family": "json_search_equality",
+      "requires": [
+        "doc-documents-seed"
+      ],
+      "profile": true
+    },
+    {
+      "label": "pg-hll-corrected-init-null",
+      "sql": "SELECT HLL_COUNT.INIT(v) AS sketch FROM (SELECT CAST(NULL AS bigint) AS v) AS input",
+      "kind": "query",
+      "family": "hll-extra",
+      "requires": []
+    },
+    {
+      "label": "pg-hll-merge-empty",
+      "sql": "SELECT HLL_COUNT.MERGE(sketch) AS estimate FROM (SELECT CAST(NULL AS bytea) AS sketch) AS input WHERE FALSE",
+      "kind": "query",
+      "family": "hll-extra",
+      "requires": []
+    },
+    {
+      "label": "pg-hll-merge-partial-empty",
+      "sql": "SELECT HLL_COUNT.MERGE_PARTIAL(sketch) AS sketch FROM (SELECT CAST(NULL AS bytea) AS sketch) AS input WHERE FALSE",
+      "kind": "query",
+      "family": "hll-extra",
+      "requires": []
+    },
+    {
+      "label": "pg-hll-merge-null",
+      "sql": "SELECT HLL_COUNT.MERGE(sketch) AS estimate FROM (SELECT CAST(NULL AS bytea) AS sketch) AS input",
+      "kind": "query",
+      "family": "hll-extra",
+      "requires": []
+    },
+    {
+      "label": "pg-hll-merge-partial-null",
+      "sql": "SELECT HLL_COUNT.MERGE_PARTIAL(sketch) AS sketch FROM (SELECT CAST(NULL AS bytea) AS sketch) AS input",
+      "kind": "query",
+      "family": "hll-extra",
+      "requires": []
+    },
+    {
+      "label": "pg-hll-approx-empty",
+      "sql": "SELECT spanner.approx_count_distinct(v) AS estimate FROM (SELECT CAST(NULL AS bigint) AS v) AS input WHERE FALSE",
+      "kind": "query",
+      "family": "hll-extra",
+      "requires": []
+    },
+    {
+      "label": "pg-hll-approx-null",
+      "sql": "SELECT spanner.approx_count_distinct(v) AS estimate FROM (SELECT CAST(NULL AS bigint) AS v) AS input",
+      "kind": "query",
+      "family": "hll-extra",
+      "requires": []
+    },
+    {
+      "label": "pg-hll-mixed-precision-merge",
+      "sql": "WITH a AS (SELECT HLL_COUNT.INIT(x,10) AS sketch FROM (SELECT CAST(1 AS bigint) AS x UNION ALL SELECT CAST(2 AS bigint)) AS input), b AS (SELECT HLL_COUNT.INIT(x,24) AS sketch FROM (SELECT CAST(1 AS bigint) AS x UNION ALL SELECT CAST(2 AS bigint)) AS input) SELECT HLL_COUNT.MERGE(sketch) AS estimate FROM (SELECT sketch FROM a UNION ALL SELECT sketch FROM b) AS input",
+      "kind": "query",
+      "family": "hll-extra",
+      "requires": []
+    },
+    {
+      "label": "pg-hll-mixed-precision-partial",
+      "sql": "WITH a AS (SELECT HLL_COUNT.INIT(x,10) AS sketch FROM (SELECT CAST(1 AS bigint) AS x UNION ALL SELECT CAST(2 AS bigint)) AS input), b AS (SELECT HLL_COUNT.INIT(x,24) AS sketch FROM (SELECT CAST(1 AS bigint) AS x UNION ALL SELECT CAST(2 AS bigint)) AS input) SELECT HLL_COUNT.EXTRACT(HLL_COUNT.MERGE_PARTIAL(sketch)) AS estimate FROM (SELECT sketch FROM a UNION ALL SELECT sketch FROM b) AS input",
+      "kind": "query",
+      "family": "hll-extra",
+      "requires": []
+    },
+    {
+      "label": "pg-hll-mixed-type-merge",
+      "sql": "WITH a AS (SELECT HLL_COUNT.INIT(x) AS sketch FROM (SELECT CAST(1 AS bigint) AS x UNION ALL SELECT CAST(2 AS bigint)) AS input), b AS (SELECT HLL_COUNT.INIT(x) AS sketch FROM (SELECT CAST('a' AS text) AS x) AS input) SELECT HLL_COUNT.MERGE(sketch) AS estimate FROM (SELECT sketch FROM a UNION ALL SELECT sketch FROM b) AS input",
+      "kind": "query",
+      "family": "hll-extra",
+      "requires": []
+    },
+    {
+      "label": "pg-hll-extract-invalid",
+      "sql": "SELECT HLL_COUNT.EXTRACT(CAST('not-sketch' AS bytea)) AS estimate",
+      "kind": "query",
+      "family": "hll-extra",
+      "requires": []
+    }
+  ]
+}

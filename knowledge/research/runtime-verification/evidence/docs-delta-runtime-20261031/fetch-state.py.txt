@@ -1,0 +1,9 @@
+from pathlib import Path
+from concurrent.futures import ThreadPoolExecutor
+import subprocess,json,datetime,hashlib
+p=Path('<LOCAL_TASK_ROOT>/apstndb/spanalyzer/docs-delta-runtime-20261031/sources')
+items=[('memefish-main.json',['gh','api','repos/cloudspannerecosystem/memefish/commits/main']),('memefish-open-prs.json',['gh','api','--paginate','--slurp','repos/cloudspannerecosystem/memefish/pulls?state=open&per_page=100']),('memefish-all-prs.json',['gh','api','--paginate','--slurp','repos/cloudspannerecosystem/memefish/pulls?state=all&per_page=100']),('memefish-open-issues.json',['gh','api','--paginate','--slurp','repos/cloudspannerecosystem/memefish/issues?state=open&per_page=100']),('emulator-latest.json',['gh','api','repos/GoogleCloudPlatform/cloud-spanner-emulator/releases/latest'])]
+def run(item):
+ name,args=item;r=subprocess.run(args,capture_output=True);assert r.returncode==0,(name,r.stderr.decode());(p/name).write_bytes(r.stdout);return{'file':name,'argv':args,'retrieved_at':datetime.datetime.now(datetime.timezone.utc).isoformat(),'sha256':hashlib.sha256(r.stdout).hexdigest()}
+with ThreadPoolExecutor(max_workers=5)as pool:rows=list(pool.map(run,items))
+(p/'retrieval.json').write_text(json.dumps(rows,indent=2)+'\n');print('Main',json.loads((p/'memefish-main.json').read_text())['sha']);prs=[pr for page in json.loads((p/'memefish-open-prs.json').read_text())for pr in page];print('Open PRs',[(p['number'],p['title'],p['head']['ref'])for p in prs]);print('All PR count',sum(len(page)for page in json.loads((p/'memefish-all-prs.json').read_text())));print('Emulator',json.loads((p/'emulator-latest.json').read_text())['tag_name'])

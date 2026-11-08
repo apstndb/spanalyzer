@@ -1,0 +1,26 @@
+[
+  {
+    "label": "final-tables",
+    "sql": "SELECT COUNT(*) AS n FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA=''"
+  },
+  {
+    "label": "final-views",
+    "sql": "SELECT COUNT(*) AS n FROM INFORMATION_SCHEMA.VIEWS WHERE TABLE_SCHEMA=''"
+  },
+  {
+    "label": "final-graphs",
+    "sql": "SELECT COUNT(*) AS n FROM INFORMATION_SCHEMA.PROPERTY_GRAPHS"
+  },
+  {
+    "label": "final-streams",
+    "sql": "SELECT COUNT(*) AS n FROM INFORMATION_SCHEMA.CHANGE_STREAMS"
+  },
+  {
+    "label": "final-routines",
+    "sql": "SELECT COUNT(*) AS n FROM INFORMATION_SCHEMA.ROUTINES"
+  },
+  {
+    "label": "final-models",
+    "sql": "SELECT COUNT(*) AS n FROM INFORMATION_SCHEMA.MODELS"
+  }
+]

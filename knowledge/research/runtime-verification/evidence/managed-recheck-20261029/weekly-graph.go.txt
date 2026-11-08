@@ -1,0 +1,252 @@
+package main
+
+import (
+	"context"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"os"
+	"time"
+
+	"cloud.google.com/go/spanner"
+	database "cloud.google.com/go/spanner/admin/database/apiv1"
+	dbpb "cloud.google.com/go/spanner/admin/database/apiv1/databasepb"
+	sppb "cloud.google.com/go/spanner/apiv1/spannerpb"
+	"google.golang.org/api/iterator"
+	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/encoding/protojson"
+)
+
+type step struct {
+	Label      string   `json:"label"`
+	Family     string   `json:"family"`
+	Kind       string   `json:"kind"`
+	SQL        string   `json:"sql"`
+	Statements []string `json:"statements"`
+	Requires   []string `json:"requires"`
+	Table      string   `json:"table"`
+	Key        []any    `json:"key"`
+	After      string   `json:"after"`
+	Profile    bool     `json:"profile"`
+	Timeout    int      `json:"timeout_seconds"`
+}
+type input struct {
+	Dialect string `json:"dialect"`
+	Steps   []step `json:"steps"`
+}
+
+func emit(row map[string]any) {
+	row["at"] = time.Now().UTC().Format(time.RFC3339Nano)
+	if err := json.NewEncoder(os.Stdout).Encode(row); err != nil {
+		panic(err)
+	}
+}
+func outcome(label string, err error) {
+	message := ""
+	if err != nil {
+		message = err.Error()
+	}
+	emit(map[string]any{"label": label, "code": status.Code(err).String(), "error": message})
+}
+func scan(it *spanner.RowIterator) ([]map[string]any, error) {
+	rows := []map[string]any{}
+	for {
+		row, err := it.Next()
+		if err == iterator.Done {
+			return rows, nil
+		}
+		if err != nil {
+			return rows, err
+		}
+		values := map[string]any{}
+		for i, name := range row.ColumnNames() {
+			var value spanner.GenericColumnValue
+			if err := row.Column(i, &value); err != nil {
+				return rows, err
+			}
+			values[name] = value.Value.AsInterface()
+		}
+		rows = append(rows, values)
+	}
+}
+func main() {
+	if os.Getenv("SPANNER_EMULATOR_HOST") != "" {
+		panic("emulator override")
+	}
+	bytes, err := os.ReadFile(os.Args[1])
+	if err != nil {
+		panic(err)
+	}
+	var plan input
+	if err = json.Unmarshal(bytes, &plan); err != nil {
+		panic(err)
+	}
+	ctx := context.Background()
+	admin, err := database.NewDatabaseAdminClient(ctx)
+	if err != nil {
+		panic(err)
+	}
+	defer admin.Close()
+	parent := fmt.Sprintf("projects/%s/instances/%s", os.Getenv("SPANNER_PROJECT_ID"), os.Getenv("SPANNER_INSTANCE_ID"))
+	name := "weekly-graph-20261029g1"
+	dialect := dbpb.DatabaseDialect_GOOGLE_STANDARD_SQL
+	statement := "CREATE DATABASE `" + name + "`"
+	if plan.Dialect == "pg" {
+		name = "weekly-graph-20261029p1"
+		dialect = dbpb.DatabaseDialect_POSTGRESQL
+		statement = "CREATE DATABASE \"" + name + "\""
+	}
+	db := parent + "/databases/" + name
+	cx, cancel := context.WithTimeout(ctx, 3*time.Minute)
+	op, err := admin.CreateDatabase(cx, &dbpb.CreateDatabaseRequest{Parent: parent, CreateStatement: statement, DatabaseDialect: dialect})
+	if err != nil {
+		cancel()
+		outcome("create-database", err)
+		return
+	}
+	// Successful submission establishes ownership; a failed create never grants deletion.
+	defer func() {
+		cx, cancel := context.WithTimeout(ctx, time.Minute)
+		defer cancel()
+		err := admin.DropDatabase(cx, &dbpb.DropDatabaseRequest{Database: db})
+		outcome("drop-database", err)
+		if err == nil {
+			_, err = admin.GetDatabase(cx, &dbpb.GetDatabaseRequest{Name: db})
+			outcome("database-absent", err)
+		}
+	}()
+	_, err = op.Wait(cx)
+	cancel()
+	outcome("create-database", err)
+	if err != nil {
+		return
+	}
+	client, err := spanner.NewClient(ctx, db)
+	if err != nil {
+		panic(err)
+	}
+	defer client.Close()
+	codes := map[string]string{}
+	rollbackSentinel := errors.New("owned fixture rollback control")
+	for _, s := range plan.Steps {
+		blocked := []string{}
+		for _, label := range s.Requires {
+			if codes[label] != "OK" {
+				blocked = append(blocked, label)
+			}
+		}
+		if len(blocked) > 0 {
+			codes[s.Label] = "NOT_RUN"
+			emit(map[string]any{"label": s.Label, "family": s.Family, "kind": s.Kind, "code": "NOT_RUN", "execution_status": "blocked_by_fixture_dependency", "requires": blocked})
+			continue
+		}
+		started := time.Now().UTC()
+		seconds := s.Timeout
+		if seconds == 0 {
+			seconds = 45
+		}
+		if s.Kind == "ddl" {
+			seconds = 180
+		}
+		cx, cancel := context.WithTimeout(ctx, time.Duration(seconds)*time.Second)
+		result := map[string]any{"label": s.Label, "family": s.Family, "kind": s.Kind, "sql": s.SQL, "statements": s.Statements, "started_at": started.Format(time.RFC3339Nano)}
+		var e error
+		switch s.Kind {
+		case "ddl":
+			statements := s.Statements
+			if len(statements) == 0 {
+				statements = []string{s.SQL}
+			}
+			op, err := admin.UpdateDatabaseDdl(cx, &dbpb.UpdateDatabaseDdlRequest{Database: db, Statements: statements})
+			e = err
+			if e == nil {
+				e = op.Wait(cx)
+			}
+		case "query":
+			ro := client.Single()
+			mode := sppb.ExecuteSqlRequest_NORMAL
+			if s.Profile {
+				mode = sppb.ExecuteSqlRequest_PROFILE
+			}
+			it := ro.QueryWithOptions(cx, spanner.Statement{SQL: s.SQL}, spanner.QueryOptions{Mode: &mode})
+			result["rows"], e = scan(it)
+			if it.Metadata != nil {
+				bytes, _ := protojson.Marshal(it.Metadata)
+				result["metadata"] = json.RawMessage(bytes)
+			}
+			if it.QueryPlan != nil {
+				bytes, _ := protojson.Marshal(it.QueryPlan)
+				result["plan"] = json.RawMessage(bytes)
+			}
+			if it.QueryStats != nil {
+				result["stats"] = it.QueryStats
+			}
+			it.Stop()
+			ro.Close()
+		case "dml":
+			var counts []int64
+			_, e = client.ReadWriteTransaction(cx, func(ctx context.Context, tx *spanner.ReadWriteTransaction) error {
+				counts = nil
+				for _, sql := range s.Statements {
+					n, err := tx.Update(ctx, spanner.Statement{SQL: sql})
+					if err != nil {
+						return err
+					}
+					counts = append(counts, n)
+				}
+				return nil
+			})
+			result["modified_counts"] = counts
+			result["transaction_committed"] = e == nil
+		case "mutation-delete":
+			key := make(spanner.Key, len(s.Key))
+			for i, value := range s.Key {
+				if number, ok := value.(float64); ok {
+					value = int64(number)
+				}
+				key[i] = value
+			}
+			_, e = client.Apply(cx, []*spanner.Mutation{spanner.Delete(s.Table, key)})
+			result["table"] = s.Table
+			result["key"] = s.Key
+		case "rollback":
+			var inside []map[string]any
+			_, e = client.ReadWriteTransaction(cx, func(ctx context.Context, tx *spanner.ReadWriteTransaction) error {
+				_, err := tx.Update(ctx, spanner.Statement{SQL: s.SQL})
+				if err != nil {
+					return err
+				}
+				it := tx.Query(ctx, spanner.Statement{SQL: s.After})
+				defer it.Stop()
+				inside, err = scan(it)
+				if err != nil {
+					return err
+				}
+				return rollbackSentinel
+			})
+			result["rollback_expected"] = errors.Is(e, rollbackSentinel)
+			result["rows_inside_rollback"] = inside
+			result["transaction_committed"] = false
+			if errors.Is(e, rollbackSentinel) {
+				e = nil
+			}
+		case "ddl-export":
+			response, err := admin.GetDatabaseDdl(cx, &dbpb.GetDatabaseDdlRequest{Database: db})
+			e = err
+			if e == nil {
+				result["ddl"] = response.Statements
+			}
+		default:
+			panic("unknown step kind")
+		}
+		cancel()
+		codes[s.Label] = status.Code(e).String()
+		result["code"] = codes[s.Label]
+		result["error"] = ""
+		if e != nil {
+			result["error"] = e.Error()
+		}
+		result["completed_at"] = time.Now().UTC().Format(time.RFC3339Nano)
+		emit(result)
+	}
+}

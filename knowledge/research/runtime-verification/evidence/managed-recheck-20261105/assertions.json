@@ -1,0 +1,1714 @@
+{
+  "status": "pass",
+  "checks": 422,
+  "failures": [],
+  "assertions": [
+    {
+      "name": "readonly-assertions.json:readonly-complete",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:readonly-process",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:readonly-no-transport-failure",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:supplemental-complete",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:supplemental-process",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:supplemental-no-transport-failure",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:statistics-complete",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:statistics-process",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:statistics-no-transport-failure",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:statistics-controls-complete",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:statistics-controls-process",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:statistics-controls-no-transport-failure",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:histogram-controls-complete",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:histogram-controls-process",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:histogram-controls-no-transport-failure",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:observed-histogram-complete",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:observed-histogram-process",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:observed-histogram-no-transport-failure",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:connectivity-same-code",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:connectivity-same-values",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:final-tables-same-code",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:final-tables-same-values",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:final-views-same-code",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:final-views-same-values",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:final-graphs-same-code",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:final-graphs-same-values",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:final-streams-same-code",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:final-streams-same-values",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:final-routines-same-code",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:final-routines-same-values",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:final-models-same-code",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:final-models-same-values",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:pipe-select-same-code",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:pipe-select-same-values",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:pipe-extend-same-code",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:pipe-extend-same-values",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:pipe-set-same-code",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:pipe-set-same-values",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:pipe-drop-same-code",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:pipe-drop-same-values",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:pipe-rename-same-code",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:pipe-rename-same-values",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:pipe-as-same-code",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:pipe-as-same-values",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:pipe-where-same-code",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:pipe-where-same-values",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:pipe-aggregate-same-code",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:pipe-aggregate-same-values",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:pipe-join-same-code",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:pipe-join-same-values",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:pipe-order-by-same-code",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:pipe-order-by-same-values",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:pipe-limit-same-code",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:pipe-union-same-code",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:pipe-union-same-values",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:pipe-intersect-same-code",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:pipe-intersect-same-values",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:pipe-except-same-code",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:pipe-except-same-values",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:pipe-tablesample-same-code",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:pipe-tablesample-same-values",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:pipe-standard-ordinal-same-code",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:pipe-standard-ordinal-same-values",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:pipe-group-alias-same-code",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:pipe-group-alias-same-values",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:pipe-group-bare-alias-same-code",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:pipe-group-bare-alias-same-values",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:pipe-group-two-aliases-same-code",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:pipe-group-two-aliases-same-values",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:pipe-group-ordinal-same-code",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:pipe-group-ordinal-same-values",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:pipe-group-output-alias-same-code",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:pipe-group-output-alias-same-values",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:pipe-group-input-alias-same-code",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:pipe-group-input-alias-same-values",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:pipe-group-and-order-same-code",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:pipe-group-and-order-same-values",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:select-led-select-same-code",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:select-led-select-same-values",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:select-led-where-same-code",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:select-led-where-same-values",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:select-led-aggregate-same-code",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:select-led-aggregate-same-values",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:from-only-same-code",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:from-only-same-values",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:json-equality-same-code",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:json-equality-same-values",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:json-group-same-code",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:json-group-same-values",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:distinctness-same-code",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:distinctness-same-values",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:hll-count-same-code",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:hll-count-same-values",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:approx-count-same-code",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:approx-count-same-values",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:rand-same-code",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:rand-same-values",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:infoschema-columns-same-code",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:infoschema-columns-same-catalog-tuples",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:sys-columns-0-same-code",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:sys-columns-0-same-catalog-tuples",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:sys-query-0-ACTIVE_BATCH_OPERATIONS-same-code",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:sys-query-0-BATCH_OPERATIONS-same-code",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:sys-query-0-LOCK_STATS_TOTAL_10MINUTE-same-code",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:sys-query-0-SPLIT_STATS_TOP_10MINUTE-same-code",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:sys-columns-1-same-code",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:sys-columns-1-same-catalog-tuples",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:sys-query-1-ACTIVE_BATCH_OPERATIONS-same-code",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:sys-query-1-BATCH_OPERATIONS-same-code",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:sys-query-1-LOCK_STATS_TOTAL_10MINUTE-same-code",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:sys-query-1-SPLIT_STATS_TOP_10MINUTE-same-code",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:sys-columns-2-same-code",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:sys-columns-2-same-catalog-tuples",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:sys-query-2-ACTIVE_BATCH_OPERATIONS-same-code",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:sys-query-2-BATCH_OPERATIONS-same-code",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:sys-query-2-LOCK_STATS_TOTAL_10MINUTE-same-code",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:sys-query-2-SPLIT_STATS_TOP_10MINUTE-same-code",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:ordered-pipe-sequence",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:documented-30-columns",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:stats-QUERY_STATS_TOP_MINUTE-scalar-executes",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:stats-QUERY_STATS_TOP_MINUTE-scalar-columnar-bound",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:stats-QUERY_STATS_TOP_MINUTE-scalarCPU_SECONDS_DISTRIBUTION-json",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:stats-QUERY_STATS_TOP_MINUTE-scalarROW_SCANNED_DISTRIBUTION-json",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:stats-QUERY_STATS_TOP_MINUTE-CPU_SECONDS_DISTRIBUTION-struct-array-negative-control",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:stats-QUERY_STATS_TOP_MINUTE-CPU_SECONDS_DISTRIBUTION-json-json-executes",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:stats-QUERY_STATS_TOP_MINUTE-ROW_SCANNED_DISTRIBUTION-struct-array-negative-control",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:stats-QUERY_STATS_TOP_MINUTE-ROW_SCANNED_DISTRIBUTION-json-json-executes",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:stats-QUERY_STATS_TOP_10MINUTE-scalar-executes",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:stats-QUERY_STATS_TOP_10MINUTE-scalar-columnar-bound",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:stats-QUERY_STATS_TOP_10MINUTE-scalarCPU_SECONDS_DISTRIBUTION-json",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:stats-QUERY_STATS_TOP_10MINUTE-scalarROW_SCANNED_DISTRIBUTION-json",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:stats-QUERY_STATS_TOP_10MINUTE-CPU_SECONDS_DISTRIBUTION-struct-array-negative-control",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:stats-QUERY_STATS_TOP_10MINUTE-CPU_SECONDS_DISTRIBUTION-json-json-executes",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:stats-QUERY_STATS_TOP_10MINUTE-ROW_SCANNED_DISTRIBUTION-struct-array-negative-control",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:stats-QUERY_STATS_TOP_10MINUTE-ROW_SCANNED_DISTRIBUTION-json-json-executes",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:stats-QUERY_STATS_TOP_HOUR-scalar-executes",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:stats-QUERY_STATS_TOP_HOUR-scalar-columnar-bound",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:stats-QUERY_STATS_TOP_HOUR-scalarCPU_SECONDS_DISTRIBUTION-json",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:stats-QUERY_STATS_TOP_HOUR-scalarROW_SCANNED_DISTRIBUTION-json",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:stats-QUERY_STATS_TOP_HOUR-CPU_SECONDS_DISTRIBUTION-struct-array-negative-control",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:stats-QUERY_STATS_TOP_HOUR-CPU_SECONDS_DISTRIBUTION-json-json-executes",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:stats-QUERY_STATS_TOP_HOUR-ROW_SCANNED_DISTRIBUTION-struct-array-negative-control",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:stats-QUERY_STATS_TOP_HOUR-ROW_SCANNED_DISTRIBUTION-json-json-executes",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:stats-QUERY_STATS_TOTAL_MINUTE-scalar-executes",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:stats-QUERY_STATS_TOTAL_MINUTE-scalar-columnar-bound",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:stats-QUERY_STATS_TOTAL_MINUTE-scalarCPU_SECONDS_DISTRIBUTION-json",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:stats-QUERY_STATS_TOTAL_MINUTE-scalarROW_SCANNED_DISTRIBUTION-json",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:stats-QUERY_STATS_TOTAL_MINUTE-CPU_SECONDS_DISTRIBUTION-struct-array-negative-control",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:stats-QUERY_STATS_TOTAL_MINUTE-CPU_SECONDS_DISTRIBUTION-json-json-executes",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:stats-QUERY_STATS_TOTAL_MINUTE-ROW_SCANNED_DISTRIBUTION-struct-array-negative-control",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:stats-QUERY_STATS_TOTAL_MINUTE-ROW_SCANNED_DISTRIBUTION-json-json-executes",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:stats-QUERY_STATS_TOTAL_10MINUTE-scalar-executes",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:stats-QUERY_STATS_TOTAL_10MINUTE-scalar-columnar-bound",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:stats-QUERY_STATS_TOTAL_10MINUTE-scalarCPU_SECONDS_DISTRIBUTION-json",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:stats-QUERY_STATS_TOTAL_10MINUTE-scalarROW_SCANNED_DISTRIBUTION-json",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:stats-QUERY_STATS_TOTAL_10MINUTE-CPU_SECONDS_DISTRIBUTION-struct-array-negative-control",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:stats-QUERY_STATS_TOTAL_10MINUTE-CPU_SECONDS_DISTRIBUTION-json-json-executes",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:stats-QUERY_STATS_TOTAL_10MINUTE-ROW_SCANNED_DISTRIBUTION-struct-array-negative-control",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:stats-QUERY_STATS_TOTAL_10MINUTE-ROW_SCANNED_DISTRIBUTION-json-json-executes",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:stats-QUERY_STATS_TOTAL_HOUR-scalar-executes",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:stats-QUERY_STATS_TOTAL_HOUR-scalar-columnar-bound",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:stats-QUERY_STATS_TOTAL_HOUR-scalarCPU_SECONDS_DISTRIBUTION-json",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:stats-QUERY_STATS_TOTAL_HOUR-scalarROW_SCANNED_DISTRIBUTION-json",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:stats-QUERY_STATS_TOTAL_HOUR-CPU_SECONDS_DISTRIBUTION-struct-array-negative-control",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:stats-QUERY_STATS_TOTAL_HOUR-CPU_SECONDS_DISTRIBUTION-json-json-executes",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:stats-QUERY_STATS_TOTAL_HOUR-ROW_SCANNED_DISTRIBUTION-struct-array-negative-control",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:stats-QUERY_STATS_TOTAL_HOUR-ROW_SCANNED_DISTRIBUTION-json-json-executes",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:QUERY_STATS_TOP_MINUTE-CPU_SECONDS_DISTRIBUTION-element-executes",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:QUERY_STATS_TOP_MINUTE-CPU_SECONDS_DISTRIBUTION-element-paired-value",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:QUERY_STATS_TOP_MINUTE-ROW_SCANNED_DISTRIBUTION-element-executes",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:QUERY_STATS_TOP_MINUTE-ROW_SCANNED_DISTRIBUTION-element-paired-value",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:QUERY_STATS_TOP_10MINUTE-CPU_SECONDS_DISTRIBUTION-element-executes",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:QUERY_STATS_TOP_10MINUTE-CPU_SECONDS_DISTRIBUTION-element-paired-value",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:QUERY_STATS_TOP_10MINUTE-ROW_SCANNED_DISTRIBUTION-element-executes",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:QUERY_STATS_TOP_10MINUTE-ROW_SCANNED_DISTRIBUTION-element-paired-value",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:QUERY_STATS_TOP_HOUR-CPU_SECONDS_DISTRIBUTION-element-executes",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:QUERY_STATS_TOP_HOUR-CPU_SECONDS_DISTRIBUTION-element-paired-value",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:QUERY_STATS_TOP_HOUR-ROW_SCANNED_DISTRIBUTION-element-executes",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:QUERY_STATS_TOP_HOUR-ROW_SCANNED_DISTRIBUTION-element-paired-value",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:QUERY_STATS_TOTAL_MINUTE-CPU_SECONDS_DISTRIBUTION-element-executes",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:QUERY_STATS_TOTAL_MINUTE-CPU_SECONDS_DISTRIBUTION-element-paired-value",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:QUERY_STATS_TOTAL_MINUTE-ROW_SCANNED_DISTRIBUTION-element-executes",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:QUERY_STATS_TOTAL_MINUTE-ROW_SCANNED_DISTRIBUTION-element-paired-value",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:QUERY_STATS_TOTAL_10MINUTE-CPU_SECONDS_DISTRIBUTION-element-executes",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:QUERY_STATS_TOTAL_10MINUTE-CPU_SECONDS_DISTRIBUTION-element-paired-value",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:QUERY_STATS_TOTAL_10MINUTE-ROW_SCANNED_DISTRIBUTION-element-executes",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:QUERY_STATS_TOTAL_10MINUTE-ROW_SCANNED_DISTRIBUTION-element-paired-value",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:QUERY_STATS_TOTAL_HOUR-CPU_SECONDS_DISTRIBUTION-element-executes",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:QUERY_STATS_TOTAL_HOUR-CPU_SECONDS_DISTRIBUTION-element-paired-value",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:QUERY_STATS_TOTAL_HOUR-ROW_SCANNED_DISTRIBUTION-element-executes",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:QUERY_STATS_TOTAL_HOUR-ROW_SCANNED_DISTRIBUTION-element-paired-value",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:observed-encoded-json-valid",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:expanded-histogram-negative-control",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:synthetic-json-inconclusive",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json:local-drift-failure-retained",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:readonly-complete",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:readonly-no-transport-failure",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:supplemental-complete",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:supplemental-no-transport-failure",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:google-all-steps",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:google-owned-lifecycle",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:google-no-transport-failure",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:google-json-equal-auto",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:google-json-equal-search",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:google-json-equal-base",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:google-json-in-auto",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:google-json-in-search",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:google-json-in-base",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:google-json-whole-auto",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:google-json-whole-search",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:google-json-whole-base",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:google-scorer-different",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:google-scorer-default-2",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:google-explicit-stable",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:google-default-1",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:google-default-2",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:pg-all-steps",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:pg-owned-lifecycle",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:pg-no-transport-failure",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:pg-json-equal-auto",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:pg-json-equal-search",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:pg-json-equal-base",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:pg-json-in-auto",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:pg-json-in-search",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:pg-json-in-base",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:pg-json-whole-auto",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:pg-json-whole-search",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:pg-json-whole-base",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:pg-scorer-different",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:pg-scorer-default-2",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:pg-explicit-stable",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:pg-option-rejected-1",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:pg-option-rejected-2",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:infoschema-columns-same-prior-surface",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:infoschema-columns-size",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:infoschema-columns-tables",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:sys-columns-0-same-prior-surface",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:sys-columns-0-size",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:sys-columns-0-tables",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:sys-columns-1-same-prior-surface",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:sys-columns-1-size",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:sys-columns-1-tables",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:sys-columns-2-same-prior-surface",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:sys-columns-2-size",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:sys-columns-2-tables",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:pipe-select-same-code",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:pipe-select-same-values",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:pipe-extend-same-code",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:pipe-extend-same-values",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:pipe-set-same-code",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:pipe-set-same-values",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:pipe-drop-same-code",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:pipe-drop-same-values",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:pipe-rename-same-code",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:pipe-rename-same-values",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:pipe-as-same-code",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:pipe-as-same-values",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:pipe-where-same-code",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:pipe-where-same-values",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:pipe-aggregate-same-code",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:pipe-aggregate-same-values",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:pipe-join-same-code",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:pipe-join-same-values",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:pipe-order-by-same-code",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:pipe-order-by-same-values",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:pipe-limit-same-code",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:pipe-limit-same-values",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:pipe-union-same-code",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:pipe-union-same-values",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:pipe-intersect-same-code",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:pipe-intersect-same-values",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:pipe-except-same-code",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:pipe-except-same-values",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:pipe-tablesample-same-code",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:pipe-tablesample-same-values",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:pipe-standard-ordinal-same-code",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:pipe-standard-ordinal-same-values",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:pipe-group-alias-same-code",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:pipe-group-alias-same-values",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:pipe-group-bare-alias-same-code",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:pipe-group-bare-alias-same-values",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:pipe-group-two-aliases-same-code",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:pipe-group-two-aliases-same-values",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:pipe-group-ordinal-same-code",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:pipe-group-output-alias-same-code",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:pipe-group-input-alias-same-code",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:pipe-group-input-alias-same-values",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:pipe-group-and-order-same-code",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:pipe-group-and-order-same-values",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:pipe-order-sequence",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:json-expressions",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:json-group",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:distinctness",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:hll",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:approx",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:rand-unsupported",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:gql-full-columns",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:gql-full-values",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:gql-full-outer-columns",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:gql-full-outer-values",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:gql-outer-columns",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:gql-outer-values",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:gql-left-columns",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:gql-left-values",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:gql-left-outer-columns",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:gql-left-outer-values",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:gql-inner-columns",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:gql-inner-values",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:gql-order",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:gql-top2",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:gql-standalone-order-limit-malformed-control",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:gql-cross-next-order-limit-malformed-control",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:queue-Payload",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:queue-payload",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:queue-PAYLOAD",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:queue-PaYlOaD",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:tvf-star-plain",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:tvf-star-as",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:tvf-star-bare",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:search-enhanced",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:search-enhanced-required",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:bucket-index-seconds",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:bucket-index-hour",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:bucket-index-none",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:hour-bucket-values",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:pg-boundary-values",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:pg-count-jsonb-unsupported",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:drift-retained-failure",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:plan-google-equal-auto",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:plan-google-equal-search",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:plan-google-equal-base",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:plan-google-in-auto",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:plan-google-in-search",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:plan-google-in-base",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:plan-google-whole-auto",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:plan-google-whole-search",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:plan-google-whole-base",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:plan-pg-equal-auto",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:plan-pg-equal-search",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:plan-pg-equal-base",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:plan-pg-in-auto",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:plan-pg-in-search",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:plan-pg-in-base",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:plan-pg-whole-auto",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:plan-pg-whole-search",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:plan-pg-whole-base",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:omni-r5-google-dated-scorer-comparison",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:omni-r5-pg-dated-scorer-comparison",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:omni-lts-google-dated-scorer-comparison",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json:omni-lts-pg-dated-scorer-comparison",
+      "pass": true
+    },
+    {
+      "name": "repair-complete",
+      "pass": true
+    },
+    {
+      "name": "repair-owned-lifecycle",
+      "pass": true
+    },
+    {
+      "name": "repair-code-create-database",
+      "pass": true
+    },
+    {
+      "name": "repair-code-repair-node-table",
+      "pass": true
+    },
+    {
+      "name": "repair-code-repair-node-insert",
+      "pass": true
+    },
+    {
+      "name": "repair-code-repair-view",
+      "pass": true
+    },
+    {
+      "name": "repair-code-repair-graph-default",
+      "pass": true
+    },
+    {
+      "name": "repair-code-repair-read-default-1",
+      "pass": true
+    },
+    {
+      "name": "repair-code-repair-read-default-2",
+      "pass": true
+    },
+    {
+      "name": "repair-code-repair-graph-false",
+      "pass": true
+    },
+    {
+      "name": "repair-code-repair-read-false-1",
+      "pass": true
+    },
+    {
+      "name": "repair-code-repair-read-false-2",
+      "pass": true
+    },
+    {
+      "name": "repair-code-repair-graph-true",
+      "pass": true
+    },
+    {
+      "name": "repair-code-repair-read-true-1",
+      "pass": true
+    },
+    {
+      "name": "repair-code-repair-read-true-2",
+      "pass": true
+    },
+    {
+      "name": "repair-code-drop-database",
+      "pass": true
+    },
+    {
+      "name": "repair-code-database-absent",
+      "pass": true
+    },
+    {
+      "name": "volatile-default-ids",
+      "pass": true
+    },
+    {
+      "name": "volatile-default-changes",
+      "pass": true
+    },
+    {
+      "name": "volatile-default-uuid",
+      "pass": true
+    },
+    {
+      "name": "volatile-default-uuid",
+      "pass": true
+    },
+    {
+      "name": "volatile-default-uuid",
+      "pass": true
+    },
+    {
+      "name": "volatile-default-uuid",
+      "pass": true
+    },
+    {
+      "name": "volatile-default-uuid",
+      "pass": true
+    },
+    {
+      "name": "volatile-default-uuid",
+      "pass": true
+    },
+    {
+      "name": "volatile-false-ids",
+      "pass": true
+    },
+    {
+      "name": "volatile-false-changes",
+      "pass": true
+    },
+    {
+      "name": "volatile-false-uuid",
+      "pass": true
+    },
+    {
+      "name": "volatile-false-uuid",
+      "pass": true
+    },
+    {
+      "name": "volatile-false-uuid",
+      "pass": true
+    },
+    {
+      "name": "volatile-false-uuid",
+      "pass": true
+    },
+    {
+      "name": "volatile-false-uuid",
+      "pass": true
+    },
+    {
+      "name": "volatile-false-uuid",
+      "pass": true
+    },
+    {
+      "name": "volatile-true-ids",
+      "pass": true
+    },
+    {
+      "name": "volatile-true-changes",
+      "pass": true
+    },
+    {
+      "name": "volatile-true-uuid",
+      "pass": true
+    },
+    {
+      "name": "volatile-true-uuid",
+      "pass": true
+    },
+    {
+      "name": "volatile-true-uuid",
+      "pass": true
+    },
+    {
+      "name": "volatile-true-uuid",
+      "pass": true
+    },
+    {
+      "name": "volatile-true-uuid",
+      "pass": true
+    },
+    {
+      "name": "volatile-true-uuid",
+      "pass": true
+    },
+    {
+      "name": "initial-volatile-setup-error-retained",
+      "pass": true
+    },
+    {
+      "name": "initial-volatile-dependent-cases-blocked",
+      "pass": true
+    },
+    {
+      "name": "set-null-google",
+      "pass": true
+    },
+    {
+      "name": "set-null-pg",
+      "pass": true
+    },
+    {
+      "name": "gql-standalone-corrected-executes",
+      "pass": true
+    },
+    {
+      "name": "gql-standalone-corrected-membership",
+      "pass": true
+    },
+    {
+      "name": "gql-next-corrected-executes",
+      "pass": true
+    },
+    {
+      "name": "gql-next-corrected-membership",
+      "pass": true
+    },
+    {
+      "name": "pg-stats-metadata-executes",
+      "pass": true
+    },
+    {
+      "name": "pg-stats-query_stats_top_minute-executes",
+      "pass": true
+    },
+    {
+      "name": "pg-stats-query_stats_top_minute-cpu_seconds_distribution-executes",
+      "pass": true
+    },
+    {
+      "name": "pg-stats-query_stats_top_minute-row_scanned_distribution-executes",
+      "pass": true
+    },
+    {
+      "name": "pg-stats-query_stats_top_10minute-executes",
+      "pass": true
+    },
+    {
+      "name": "pg-stats-query_stats_top_10minute-cpu_seconds_distribution-executes",
+      "pass": true
+    },
+    {
+      "name": "pg-stats-query_stats_top_10minute-row_scanned_distribution-executes",
+      "pass": true
+    },
+    {
+      "name": "pg-stats-query_stats_top_hour-executes",
+      "pass": true
+    },
+    {
+      "name": "pg-stats-query_stats_top_hour-cpu_seconds_distribution-executes",
+      "pass": true
+    },
+    {
+      "name": "pg-stats-query_stats_top_hour-row_scanned_distribution-executes",
+      "pass": true
+    },
+    {
+      "name": "pg-stats-query_stats_total_minute-executes",
+      "pass": true
+    },
+    {
+      "name": "pg-stats-query_stats_total_minute-cpu_seconds_distribution-executes",
+      "pass": true
+    },
+    {
+      "name": "pg-stats-query_stats_total_minute-row_scanned_distribution-executes",
+      "pass": true
+    },
+    {
+      "name": "pg-stats-query_stats_total_10minute-executes",
+      "pass": true
+    },
+    {
+      "name": "pg-stats-query_stats_total_10minute-cpu_seconds_distribution-executes",
+      "pass": true
+    },
+    {
+      "name": "pg-stats-query_stats_total_10minute-row_scanned_distribution-executes",
+      "pass": true
+    },
+    {
+      "name": "pg-stats-query_stats_total_hour-executes",
+      "pass": true
+    },
+    {
+      "name": "pg-stats-query_stats_total_hour-cpu_seconds_distribution-executes",
+      "pass": true
+    },
+    {
+      "name": "pg-stats-query_stats_total_hour-row_scanned_distribution-executes",
+      "pass": true
+    },
+    {
+      "name": "pg-statistics-18-columns",
+      "pass": true
+    },
+    {
+      "name": "pg-struct-absent",
+      "pass": true
+    },
+    {
+      "name": "readonly-assertions.json-passed",
+      "pass": true
+    },
+    {
+      "name": "fixture-base-assertions.json-passed",
+      "pass": true
+    }
+  ],
+  "steps": {
+    "read_only": 131,
+    "initial_fixtures": 127,
+    "corrected_volatile_fixture": 12,
+    "total": 270
+  },
+  "additional_lifecycle_records": 9,
+  "new_databases_created_and_deleted": 3,
+  "cleanup": "All three current owned databases have DropDatabase OK and GetDatabase NotFound. The additional repair lifecycle has separate explicit authorization.",
+  "initial_volatile_fixture": "Invalid qualified-name setup retained; nine dependent steps NOT_RUN. Corrected twelve-step fixture completes independently.",
+  "runtime_findings": [
+    "Scorer and JSON search agree with November 3",
+    "PG score_version database option remains unsupported",
+    "PG JSON bucket boundary discrepancy remains",
+    "All three volatile-view modes execute; generated UUID properties change between reads",
+    "All six PG statistics JSON/scalar projections execute; struct columns absent",
+    "SET NULL child key becomes SQL NULL in both dialects"
+  ],
+  "local_drift": "Initial read-only gate failed before the separately authorized catalog update; preserve that dated result."
+}

@@ -1,0 +1,53 @@
+[
+  {
+    "variant": "original-copy",
+    "argv": [
+      "docker",
+      "build",
+      "--platform",
+      "linux/arm64",
+      "--tag",
+      "spanalyzer-gql-order-diagnostic:original-copy-97542508",
+      "<LOCAL_CHECKOUT>/.tmp/gql-order-root-cause-20261030/images/original-copy"
+    ],
+    "started_at": "2026-10-30T09:35:44.827582+00:00",
+    "tag": "spanalyzer-gql-order-diagnostic:original-copy-97542508",
+    "image_id": "sha256:100965267ce51cddc7b8b9bec85b8cadc8d711d215b30e7ca6841aee35f88e18",
+    "os": "linux",
+    "architecture": "arm64"
+  },
+  {
+    "variant": "no-scramble",
+    "argv": [
+      "docker",
+      "build",
+      "--platform",
+      "linux/arm64",
+      "--tag",
+      "spanalyzer-gql-order-diagnostic:no-scramble-7a306d65",
+      "<LOCAL_CHECKOUT>/.tmp/gql-order-root-cause-20261030/images/no-scramble"
+    ],
+    "started_at": "2026-10-30T09:35:49.329478+00:00",
+    "tag": "spanalyzer-gql-order-diagnostic:no-scramble-7a306d65",
+    "image_id": "sha256:83619e5830c5a5c11066f7f41a8ebf029802909ecd45806e73843d37cda085cc",
+    "os": "linux",
+    "architecture": "arm64"
+  },
+  {
+    "variant": "graph-ordered",
+    "argv": [
+      "docker",
+      "build",
+      "--platform",
+      "linux/arm64",
+      "--tag",
+      "spanalyzer-gql-order-diagnostic:graph-ordered-a956036b",
+      "<LOCAL_CHECKOUT>/.tmp/gql-order-root-cause-20261030/images/graph-ordered"
+    ],
+    "started_at": "2026-10-30T09:35:52.668897+00:00",
+    "tag": "spanalyzer-gql-order-diagnostic:graph-ordered-a956036b",
+    "image_id": "sha256:9f07e6b01884e5e668b1bcdbe6009e68753d001177e51d45993a4d648b573c96",
+    "os": "linux",
+    "architecture": "arm64"
+  }
+]

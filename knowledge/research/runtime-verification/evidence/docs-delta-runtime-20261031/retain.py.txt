@@ -1,0 +1,14 @@
+from pathlib import Path
+import json,hashlib,shutil,subprocess,datetime
+root=Path('<LOCAL_CHECKOUT>');scratch=root/'.tmp/docs-delta-runtime-20261031';task=Path('<LOCAL_TASK_ROOT>/apstndb/spanalyzer/docs-delta-runtime-20261031');dest=root/'knowledge/research/runtime-verification/evidence/docs-delta-runtime-20261031';dest.mkdir(parents=True,exist_ok=True)
+for folder in ['sources','evidence']:
+ for file in(task/folder).rglob('*'):
+  if file.is_file():
+   rel=file.relative_to(task/folder);out=dest/(('sources/'+str(rel))if folder=='sources'else str(rel));out.parent.mkdir(parents=True,exist_ok=True);shutil.copyfile(file,out)
+for file in scratch.glob('*.py'):shutil.copyfile(file,dest/(file.name+'.txt'))
+for folder in ['module','parser']:
+ for f in(scratch/folder).iterdir():
+  if f.is_file()and f.suffix in['.go','.mod','.sum']:
+   out=dest/'producers'/folder/(f.name+'.txt');out.parent.mkdir(parents=True,exist_ok=True);shutil.copyfile(f,out)
+initial=json.loads((scratch/'initial-artifact-manifest.json').read_text());base=dest.parent;sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest();assert len(initial['files'])==1917 and all(sha(base/p)==h for p,h in initial['files'].items());measured=json.loads((base/'managed-recheck-20261029/source-hashes.json').read_text());assert len(measured)==123 and all(sha(root/p)==h for p,h in measured.items());receipt={'recorded_on_jst':'2026-10-31','prepared_at_utc':datetime.datetime.now(datetime.timezone.utc).isoformat(),'spanalyzer_head':subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip(),'preserved_preceding_artifacts':1917,'preserved_measured_files':123,'runtimes':'Managed reference via dedicated user-level profile; digest-pinned native arm64 Omni r5, Omni r4 LTS patch and Emulator 1.5.59','no_implementation_change':True,'external_posts':False,'managed_final_status':'Awaiting explicit approval after automatic approval review rejected DB creation/deletion','interrupted_managed_cleanup_status':'One matching candidate remains; deletion rejected by automatic approval review; read-only schema inspected; explicit approval requested'};(dest/'receipt.json').write_text(json.dumps(receipt,indent=2)+'\n');(dest/'validation.json').write_text(json.dumps({'status':'pending','commands':[]},indent=2)+'\n')
+print('Retained evidence files',sum(f.is_file()for f in dest.rglob('*')))

@@ -38,3 +38,57 @@ Historical reports recovered without full logs are identified as such. Each
 source/image pair is independently pinned unless binary reproducibility was
 actually established. Repeated runs without new findings update evidence
 rather than create duplicate research bodies.
+
+## Engine histories
+
+Read the [managed](managed/index.md), [Omni](omni/index.md) and
+[Emulator](emulator/index.md) timelines oldest to newest. Their rows distinguish
+changes, first coverage, rechecks and corrections. Same-day rows without exact
+times have no claimed internal order. [History conventions](organization.md)
+explain how to append observations without rewriting earlier conclusions.
+The November 8 notes above remain the newest selected investigations; older
+cross-engine comparisons retain their own per-engine observation dates.
+
+## Retained historical research
+
+These notes were imported on November 8 without rerunning their experiments.
+They preserve dated findings, including failed attempts and later corrections,
+without replacing current runtime pins, catalog manifests or projection
+selectors. The [import receipt](evidence/history-import-20261108/receipt.json)
+records original and retained hashes and publication transformations. Raw
+producer hashes within older receipts continue to identify their original
+inputs; transformed publication copies are not byte-identical reproductions.
+
+- [Managed Spanner, Omni r4, and Emulator comparison, 2026-10-05](cross-engine-comparison-20261005.md)
+- [Managed documentation cases on Omni r5, r4 LTS patch and Emulator 1.5.59](cross-engine-doc-delta-20261030.md)
+- [JSON and Change Streams across managed Spanner, Omni r4, and Emulator 1.5.58](cross-engine-json-and-change-streams-20261010.md)
+- [Spanner documentation delta through October 30, reviewed October 31](documentation-delta-review-20261031.md)
+- [October 31 documentation controls across engines and memefish gaps](documentation-runtime-and-memefish-audit-20261031.md)
+- [Emulator GQL ordering is already broken in the first announced graph release](emulator-gql-ordering-release-bisect-20261031.md)
+- [Emulator GQL ordering: verified loss of order metadata](emulator-gql-ordering-root-cause-20261030.md)
+- [Emulator issue candidates after the GQL ordering report](emulator-issue-candidates-20261031.md)
+- [Emulator 1.5.59 open-issue runtime follow-up](emulator-open-issue-runtime-20261030.md)
+- [Parser and analyzer impact of the October 10 JSON verification](json-parser-analyzer-impact-20261010.md)
+- [Managed Spanner ordinary column semantic options, 2026-09-18](managed-column-semantic-options-20260918.md)
+- [Managed Spanner documentation-delta revalidation, 2026-10-29](managed-documentation-delta-revalidation-20261029.md)
+- [Managed Spanner documentation history and incomplete preflight, 2026-10-21](managed-documentation-history-and-preflight-20261021.md)
+- [Managed INFORMATION_SCHEMA IS_INHERITED rollout, 2026-09-16](managed-information-schema-is-inherited-rollout-20260916.md)
+- [Managed Spanner JSON and documentation-diff verification, 2026-10-10](managed-json-comparison-and-change-streams-20261010.md)
+- [Managed quantified comparison probes, 2026-09-21](managed-quantified-comparisons-20260921.md)
+- [Managed Spanner September release verification, 2026-09-22](managed-release-notes-20260922.md)
+- [Managed Spanner revalidation, 2026-09-25](managed-revalidation-20260925.md)
+- [Managed Spanner revalidation, 2026-09-29](managed-revalidation-20260929.md)
+- [Managed Spanner revalidation, 2026-10-05](managed-revalidation-20261005.md)
+- [Managed Spanner revalidation, 2026-10-07](managed-revalidation-20261007.md)
+- [Managed Spanner revalidation, 2026-10-09](managed-revalidation-20261009.md)
+- [Managed Spanner revalidation, 2026-10-11](managed-revalidation-20261011.md)
+- [Managed Spanner revalidation and query-statistics documentation, November 5](managed-revalidation-20261105.md)
+- [Managed Spanner revalidation and Omni differences review, November 3](managed-revalidation-and-omni-differences-20261103.md)
+- [Managed Spanner queues verification, 2026-09-18](managed-spanner-queues-20260918.md)
+- [Managed SPANNER_SYS distribution-column rollout](managed-spanner-sys-distribution-columns-rollout-20260916.md)
+- [Managed Spanner trial revalidation, 2026-10-23](managed-trial-revalidation-20261023.md)
+- [Managed vector index rebuild verification, 2026-09-19](managed-vector-rebuild-20260919.md)
+- [Memefish origin audit, 2026-09-23](memefish-origin-audit-20260923.md)
+- [Runtime Verification History Organization](organization.md)
+- [Spanner Omni 2026.r3-beta verification](spanner-omni-2026.r3-beta-verification.md)
+- [Spanner Omni 2026.r4-lts verification](spanner-omni-2026.r4-lts-verification.md)

@@ -1,0 +1,23 @@
+[
+  {
+    "id": "8198acf2b5493a991a94f4f19a7998eced4ea0d9150d4a34fac569a65db2da10",
+    "image_id": "sha256:5e3cf199f5abf3a09cd2348ab36c129b3268966eb4eb72fca278fe58252fcbdb",
+    "configured_image": "us-docker.pkg.dev/spanner-omni/images/spanner-omni:2026.r4-lts.1@sha256:5e3cf199f5abf3a09cd2348ab36c129b3268966eb4eb72fca278fe58252fcbdb",
+    "path": "/bin/tini",
+    "args": [
+      "--",
+      "/google/spanner/bin/spanner",
+      "start-single-server",
+      "--listen-addresses=0.0.0.0"
+    ],
+    "state": "running",
+    "platform": "linux",
+    "labels": {
+      "org.testcontainers": "true",
+      "org.testcontainers.lang": "go",
+      "org.testcontainers.reap": "true",
+      "org.testcontainers.sessionId": "573a2b8e83d76a92864cb47dc1853b0d23dd6f0a2a8ef0208691cdc510ec8c5b",
+      "org.testcontainers.version": "0.42.0"
+    }
+  }
+]

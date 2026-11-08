@@ -1,0 +1,61 @@
+{
+  "status": "passed",
+  "commands": [
+    {
+      "name": "tools-tests",
+      "argv": [
+        "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go",
+        "test",
+        "./..."
+      ],
+      "cwd": "<LOCAL_CHECKOUT>/tools",
+      "started_at": "2026-10-30T20:07:09.442095+00:00",
+      "exit_code": 0,
+      "log": "validation-logs/tools-tests.log"
+    },
+    {
+      "name": "okf-all",
+      "argv": [
+        "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go",
+        "run",
+        "./okf-check",
+        "--repo-root",
+        "..",
+        "--gate",
+        "all",
+        "--publication-manifest",
+        "<LOCAL_TASK_ROOT>/apstndb/spanalyzer/docs-delta-20261031/publication-manifest.json"
+      ],
+      "cwd": "<LOCAL_CHECKOUT>/tools",
+      "started_at": "2026-10-30T20:07:11.447421+00:00",
+      "exit_code": 0,
+      "log": "validation-logs/okf-all.log"
+    },
+    {
+      "name": "markdown-language",
+      "argv": [
+        "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go",
+        "run",
+        "./markdown-language-check",
+        "--repo-root",
+        ".."
+      ],
+      "cwd": "<LOCAL_CHECKOUT>/tools",
+      "started_at": "2026-10-30T20:07:12.331328+00:00",
+      "exit_code": 0,
+      "log": "validation-logs/markdown-language.log"
+    },
+    {
+      "name": "diff-check",
+      "argv": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "cwd": "<LOCAL_CHECKOUT>",
+      "started_at": "2026-10-30T20:07:12.409770+00:00",
+      "exit_code": 0,
+      "log": "validation-logs/diff-check.log"
+    }
+  ]
+}

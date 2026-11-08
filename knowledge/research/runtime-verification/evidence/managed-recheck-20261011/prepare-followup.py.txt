@@ -1,0 +1,128 @@
+"""Prepare dated copies and bounded direct-API distinctness cases; no service calls."""
+from pathlib import Path
+import json
+
+root = Path('<LOCAL_CHECKOUT>')
+task = root / '.tmp/managed-recheck-20261011'
+prior = root / 'knowledge/research/runtime-verification/evidence/docs-diff-20261010'
+sources = {
+    'json-fixtures.go': 'fixtures-v4.go.txt',
+    'json-pg.go': 'fixtures-pg-v5.go.txt',
+    'graph-controls.go': 'graph-controls.go.txt',
+    'stream-options.go': 'fixtures-v2.go.txt',
+}
+for dest, source in sources.items():
+    text = (prior / source).read_text().replace('20261010', '20261011')
+    (task / dest).write_text(text)
+
+# Each row evaluates both spellings independently; success is not assumed
+# for container and mixed-type probes without an explicit expected value.
+pairs = [
+    ('int-equal', '1', '1', False),
+    ('int-different', '1', '2', True),
+    ('null-null', 'NULL', 'NULL', False),
+    ('null-int', 'CAST(NULL AS INT64)', '1', True),
+    ('int-null', '1', 'CAST(NULL AS INT64)', True),
+    ('string-equal', "'x'", "'x'", False),
+    ('string-different', "'x'", "'y'", True),
+    ('bool-different', 'TRUE', 'FALSE', True),
+    ('bytes-equal', "b'x'", "b'x'", False),
+    ('bytes-different', "b'x'", "b'y'", True),
+    ('date-equal', "DATE '2026-10-11'", "DATE '2026-10-11'", False),
+    ('timestamp-equal', "TIMESTAMP '2026-10-11 00:00:00+00'", "TIMESTAMP '2026-10-11 00:00:00+00'", False),
+    ('numeric-equal', "NUMERIC '1'", "NUMERIC '1.0'", False),
+    ('float-equal', '1.0', '1.0', False),
+    ('float-signed-zero', '0.0', '-0.0', False),
+    ('nan-nan', "CAST('NaN' AS FLOAT64)", "CAST('NaN' AS FLOAT64)", False),
+    ('nan-finite', "CAST('NaN' AS FLOAT64)", '1.0', True),
+    ('finite-nan', '1.0', "CAST('NaN' AS FLOAT64)", True),
+    ('nan-null', "CAST('NaN' AS FLOAT64)", 'CAST(NULL AS FLOAT64)', True),
+    ('infinity-equal', "CAST('inf' AS FLOAT64)", "CAST('inf' AS FLOAT64)", False),
+    ('infinity-sign', "CAST('inf' AS FLOAT64)", "CAST('-inf' AS FLOAT64)", True),
+    ('json-number-equal', "JSON '1'", "JSON '1.0'", False),
+    ('json-number-different', "JSON '1'", "JSON '2'", True),
+    ('json-null-equal', "JSON 'null'", "JSON 'null'", False),
+    ('sql-null-json-null', 'CAST(NULL AS JSON)', "JSON 'null'", True),
+    ('json-null-sql-null', "JSON 'null'", 'CAST(NULL AS JSON)', True),
+    ('json-typed-null-pair', 'CAST(NULL AS JSON)', 'CAST(NULL AS JSON)', False),
+    ('json-object-order', "JSON '{\"a\":1,\"b\":2}'", "JSON '{\"b\":2,\"a\":1}'", False),
+    ('json-object-value', "JSON '{\"a\":1}'", "JSON '{\"a\":2}'", True),
+    ('json-array-equal', "JSON '[1,null]'", "JSON '[1.0,null]'", False),
+    ('json-array-length', "JSON '[1]'", "JSON '[1,2]'", True),
+    ('json-type-difference', "JSON '1'", "JSON '\"1\"'", True),
+    ('json-int', "JSON '1'", '1', None),
+    ('int-json', '1', "JSON '1'", None),
+    ('json-string', "JSON '\"x\"'", "'x'", None),
+    ('string-json', "'x'", "JSON '\"x\"'", None),
+    ('json-bool', "JSON 'true'", 'TRUE', None),
+    ('bool-json', 'TRUE', "JSON 'true'", None),
+    ('json-bytes', "JSON '\"eA==\"'", "b'x'", None),
+    ('bytes-json', "b'x'", "JSON '\"eA==\"'", None),
+    ('json-array', "JSON '[1,null]'", '[1,NULL]', None),
+    ('array-json', '[1,NULL]', "JSON '[1,null]'", None),
+    ('array-equal', '[1,2]', '[1,2]', None),
+    ('array-different', '[1,2]', '[1,3]', None),
+    ('array-null-elements', '[1,NULL]', '[1,NULL]', None),
+    ('array-null-versus-value', '[1,NULL]', '[1,2]', None),
+    ('array-empty', 'ARRAY<INT64>[]', 'ARRAY<INT64>[]', None),
+    ('array-sql-null', 'CAST(NULL AS ARRAY<INT64>)', 'ARRAY<INT64>[]', None),
+    ('struct-equal', 'STRUCT(1 AS x)', 'STRUCT(1 AS x)', None),
+    ('struct-different', 'STRUCT(1 AS x)', 'STRUCT(2 AS x)', None),
+    ('struct-null-elements', 'STRUCT(CAST(NULL AS INT64) AS x)', 'STRUCT(CAST(NULL AS INT64) AS x)', None),
+    ('interval-equal', 'INTERVAL 1 DAY', 'INTERVAL 1 DAY', None),
+    ('incompatible-string-int', "'x'", '1', None),
+    ('incompatible-struct-int', 'STRUCT(1 AS x)', '1', None),
+]
+cases, expected = [], {}
+for name, left, right, value in pairs:
+    cases.append({'label': name, 'sql': f'SELECT ({left}) IS DISTINCT FROM ({right}) AS d, ({left}) IS NOT DISTINCT FROM ({right}) AS nd', 'params': None, 'profile': False})
+    if value is not None:
+        expected[name] = {'code': 'OK', 'rows': [{'d': value, 'nd': not value}]}
+for name, sql in [
+    ('equality-nan-control', "SELECT CAST('NaN' AS FLOAT64) = CAST('NaN' AS FLOAT64) AS eq"),
+    ('equality-null-control', 'SELECT CAST(NULL AS INT64) = CAST(NULL AS INT64) AS eq'),
+    ('missing-from-control', 'SELECT 1 IS DISTINCT 2 AS result'),
+    ('missing-rhs-control', 'SELECT 1 IS NOT DISTINCT FROM'),
+    ('missing-distinct-control', 'SELECT 1 IS NOT FROM 1 AS result'),
+]:
+    cases.append({'label': name, 'sql': sql, 'params': None, 'profile': False})
+expected['equality-nan-control'] = {'code': 'OK', 'rows': [{'eq': False}]}
+expected['equality-null-control'] = {'code': 'OK', 'rows': [{'eq': None}]}
+for name in ['missing-from-control', 'missing-rhs-control', 'missing-distinct-control']:
+    expected[name] = {'code': 'InvalidArgument'}
+for name in ['int-equal', 'nan-nan', 'sql-null-json-null', 'json-object-order', 'array-null-elements']:
+    case = next(x for x in cases if x['label'] == name).copy()
+    case.update(label=name+'-profile', profile=True)
+    cases.append(case)
+    if name in expected:
+        expected[case['label']] = expected[name]
+(task / 'distinctness-cases.json').write_text(json.dumps(cases, indent=2)+'\n')
+(task / 'distinctness-expected.json').write_text(json.dumps(expected, indent=2)+'\n')
+
+# Reuse the known redacting child-process wrapper, with an independent ledger.
+prefix = (task / 'run-baseline.py').read_text().split("cli = ")[0]
+prefix = prefix.replace("durable/'evidence/commands.json'", "durable/'evidence/json-commands.json'")
+suffix = '''
+cli = '<LOCAL_HOME>/.agents/skills/apstndb-spanner-syntax-verify/scripts/run-managed-spanner.sh'
+if run('json-preflight',[cli,'--execute','SELECT 1 AS ready','--timeout','30s'],root,timeout=90):
+    raise SystemExit('Managed preflight failed')
+for source in ['query','json-fixtures','json-pg','graph-controls','stream-options']:
+    if run(source+'-build',[go,'build','-o',str(out/source),str(out/(source+'.go'))],root/'tools',workspace=True):
+        raise SystemExit('Build failed: '+source)
+    if run(source+'-buildinfo',[go,'version','-m',str(out/source)],root/'tools',workspace=True):
+        raise SystemExit('Build identity unavailable: '+source)
+for name, cases in [('queries','cases.json'),('followup','followup-cases.json'),('distinctness','distinctness-cases.json')]:
+    if run(name,[str(out/'query'),str(out/cases)],root/'tools',workspace=True):
+        raise SystemExit('Query process failed: '+name)
+for name, source, dialect in [('google-json','json-fixtures','google'),('pg-streams','json-pg','pg'),('graph-controls','graph-controls','google'),('google-options','stream-options','google'),('pg-options','stream-options','pg')]:
+    if run(name,[str(out/source),dialect],root/'tools',workspace=True):
+        raise SystemExit('Fixture process failed: '+name)
+    rows=[json.loads(x) for x in (out/(name+'.stdout')).read_text().splitlines()]
+    bylabel={x['label']:x for x in rows}
+    for label,code in [('create-database','OK'),('setup','OK'),('drop-database','OK'),('database-absent','NotFound')]:
+        if bylabel.get(label,{}).get('code') != code:
+            raise SystemExit('Inspect fixture outcome before continuing: '+name+' '+label)
+print('COMPLETE: JSON, distinctness and serial owned-database probes',flush=True)
+'''
+(task / 'run-json.py').write_text(prefix+suffix)
+print(json.dumps({'distinctness_cases':len(cases),'explicit_expectations':len(expected),'serial_temporary_databases':5}))

@@ -1,0 +1,40 @@
+{
+  "dialect": "google",
+  "steps": [
+    {
+      "label": "more-api-ddl",
+      "family": "issue-406",
+      "kind": "ddl",
+      "sql": "CREATE TABLE ApiRows(id INT64 NOT NULL,val INT64) PRIMARY KEY(id)",
+      "timeout_seconds": 30
+    },
+    {
+      "label": "more-api-seed",
+      "family": "issue-406",
+      "kind": "dml",
+      "statements": [
+        "INSERT INTO ApiRows(id,val) VALUES(1,1)"
+      ],
+      "requires": [
+        "more-api-ddl"
+      ]
+    },
+    {
+      "label": "more-role",
+      "family": "issue-350",
+      "kind": "ddl",
+      "sql": "CREATE ROLE ProbeRole",
+      "timeout_seconds": 30
+    },
+    {
+      "label": "more-api-controls",
+      "family": "issue-159",
+      "kind": "api-more",
+      "requires": [
+        "more-api-seed",
+        "more-role"
+      ],
+      "timeout_seconds": 35
+    }
+  ]
+}

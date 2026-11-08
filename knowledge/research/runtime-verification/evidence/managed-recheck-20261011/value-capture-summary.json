@@ -1,0 +1,820 @@
+{
+  "google-capture": [
+    {
+      "mod_type": "INSERT",
+      "value_capture_type": "NEW_ROW_AND_OLD_VALUES",
+      "mods": [
+        {
+          "keys": {
+            "Id": "1"
+          },
+          "new_values": {
+            "Nullable": null,
+            "Other": "stable",
+            "Value": "10"
+          },
+          "old_values": {}
+        }
+      ],
+      "column_types": [
+        {
+          "is_primary_key": true,
+          "name": "Id",
+          "ordinal_position": "1",
+          "type": "{\"code\":\"INT64\"}"
+        },
+        {
+          "is_primary_key": false,
+          "name": "Value",
+          "ordinal_position": "2",
+          "type": "{\"code\":\"INT64\"}"
+        },
+        {
+          "is_primary_key": false,
+          "name": "Other",
+          "ordinal_position": "3",
+          "type": "{\"code\":\"STRING\"}"
+        },
+        {
+          "is_primary_key": false,
+          "name": "Nullable",
+          "ordinal_position": "4",
+          "type": "{\"code\":\"INT64\"}"
+        }
+      ]
+    },
+    {
+      "mod_type": "UPDATE",
+      "value_capture_type": "NEW_ROW_AND_OLD_VALUES",
+      "mods": [
+        {
+          "keys": {
+            "Id": "1"
+          },
+          "new_values": {
+            "Nullable": null,
+            "Other": "stable",
+            "Value": "20"
+          },
+          "old_values": {
+            "Value": "10"
+          }
+        }
+      ],
+      "column_types": [
+        {
+          "is_primary_key": true,
+          "name": "Id",
+          "ordinal_position": "1",
+          "type": "{\"code\":\"INT64\"}"
+        },
+        {
+          "is_primary_key": false,
+          "name": "Value",
+          "ordinal_position": "2",
+          "type": "{\"code\":\"INT64\"}"
+        },
+        {
+          "is_primary_key": false,
+          "name": "Other",
+          "ordinal_position": "3",
+          "type": "{\"code\":\"STRING\"}"
+        },
+        {
+          "is_primary_key": false,
+          "name": "Nullable",
+          "ordinal_position": "4",
+          "type": "{\"code\":\"INT64\"}"
+        }
+      ]
+    },
+    {
+      "mod_type": "DELETE",
+      "value_capture_type": "NEW_ROW_AND_OLD_VALUES",
+      "mods": [
+        {
+          "keys": {
+            "Id": "1"
+          },
+          "new_values": {},
+          "old_values": {
+            "Nullable": null,
+            "Other": "stable",
+            "Value": "20"
+          }
+        }
+      ],
+      "column_types": [
+        {
+          "is_primary_key": true,
+          "name": "Id",
+          "ordinal_position": "1",
+          "type": "{\"code\":\"INT64\"}"
+        },
+        {
+          "is_primary_key": false,
+          "name": "Value",
+          "ordinal_position": "2",
+          "type": "{\"code\":\"INT64\"}"
+        },
+        {
+          "is_primary_key": false,
+          "name": "Other",
+          "ordinal_position": "3",
+          "type": "{\"code\":\"STRING\"}"
+        },
+        {
+          "is_primary_key": false,
+          "name": "Nullable",
+          "ordinal_position": "4",
+          "type": "{\"code\":\"INT64\"}"
+        }
+      ]
+    },
+    {
+      "mod_type": "INSERT",
+      "value_capture_type": "NEW_ROW",
+      "mods": [
+        {
+          "keys": {
+            "Id": "2"
+          },
+          "new_values": {
+            "Nullable": null,
+            "Other": "stable",
+            "Value": "10"
+          },
+          "old_values": {}
+        }
+      ],
+      "column_types": [
+        {
+          "is_primary_key": true,
+          "name": "Id",
+          "ordinal_position": "1",
+          "type": "{\"code\":\"INT64\"}"
+        },
+        {
+          "is_primary_key": false,
+          "name": "Value",
+          "ordinal_position": "2",
+          "type": "{\"code\":\"INT64\"}"
+        },
+        {
+          "is_primary_key": false,
+          "name": "Other",
+          "ordinal_position": "3",
+          "type": "{\"code\":\"STRING\"}"
+        },
+        {
+          "is_primary_key": false,
+          "name": "Nullable",
+          "ordinal_position": "4",
+          "type": "{\"code\":\"INT64\"}"
+        }
+      ]
+    },
+    {
+      "mod_type": "UPDATE",
+      "value_capture_type": "NEW_ROW",
+      "mods": [
+        {
+          "keys": {
+            "Id": "2"
+          },
+          "new_values": {
+            "Nullable": null,
+            "Other": "stable",
+            "Value": "20"
+          },
+          "old_values": {}
+        }
+      ],
+      "column_types": [
+        {
+          "is_primary_key": true,
+          "name": "Id",
+          "ordinal_position": "1",
+          "type": "{\"code\":\"INT64\"}"
+        },
+        {
+          "is_primary_key": false,
+          "name": "Value",
+          "ordinal_position": "2",
+          "type": "{\"code\":\"INT64\"}"
+        },
+        {
+          "is_primary_key": false,
+          "name": "Other",
+          "ordinal_position": "3",
+          "type": "{\"code\":\"STRING\"}"
+        },
+        {
+          "is_primary_key": false,
+          "name": "Nullable",
+          "ordinal_position": "4",
+          "type": "{\"code\":\"INT64\"}"
+        }
+      ]
+    },
+    {
+      "mod_type": "DELETE",
+      "value_capture_type": "NEW_ROW",
+      "mods": [
+        {
+          "keys": {
+            "Id": "2"
+          },
+          "new_values": {},
+          "old_values": {}
+        }
+      ],
+      "column_types": [
+        {
+          "is_primary_key": true,
+          "name": "Id",
+          "ordinal_position": "1",
+          "type": "{\"code\":\"INT64\"}"
+        },
+        {
+          "is_primary_key": false,
+          "name": "Value",
+          "ordinal_position": "2",
+          "type": "{\"code\":\"INT64\"}"
+        },
+        {
+          "is_primary_key": false,
+          "name": "Other",
+          "ordinal_position": "3",
+          "type": "{\"code\":\"STRING\"}"
+        },
+        {
+          "is_primary_key": false,
+          "name": "Nullable",
+          "ordinal_position": "4",
+          "type": "{\"code\":\"INT64\"}"
+        }
+      ]
+    },
+    {
+      "mod_type": "INSERT",
+      "value_capture_type": "OLD_AND_NEW_VALUES",
+      "mods": [
+        {
+          "keys": {
+            "Id": "3"
+          },
+          "new_values": {
+            "Nullable": null,
+            "Other": "stable",
+            "Value": "10"
+          },
+          "old_values": {}
+        }
+      ],
+      "column_types": [
+        {
+          "is_primary_key": true,
+          "name": "Id",
+          "ordinal_position": "1",
+          "type": "{\"code\":\"INT64\"}"
+        },
+        {
+          "is_primary_key": false,
+          "name": "Value",
+          "ordinal_position": "2",
+          "type": "{\"code\":\"INT64\"}"
+        },
+        {
+          "is_primary_key": false,
+          "name": "Other",
+          "ordinal_position": "3",
+          "type": "{\"code\":\"STRING\"}"
+        },
+        {
+          "is_primary_key": false,
+          "name": "Nullable",
+          "ordinal_position": "4",
+          "type": "{\"code\":\"INT64\"}"
+        }
+      ]
+    },
+    {
+      "mod_type": "UPDATE",
+      "value_capture_type": "OLD_AND_NEW_VALUES",
+      "mods": [
+        {
+          "keys": {
+            "Id": "3"
+          },
+          "new_values": {
+            "Value": "20"
+          },
+          "old_values": {
+            "Value": "10"
+          }
+        }
+      ],
+      "column_types": [
+        {
+          "is_primary_key": true,
+          "name": "Id",
+          "ordinal_position": "1",
+          "type": "{\"code\":\"INT64\"}"
+        },
+        {
+          "is_primary_key": false,
+          "name": "Value",
+          "ordinal_position": "2",
+          "type": "{\"code\":\"INT64\"}"
+        }
+      ]
+    },
+    {
+      "mod_type": "DELETE",
+      "value_capture_type": "OLD_AND_NEW_VALUES",
+      "mods": [
+        {
+          "keys": {
+            "Id": "3"
+          },
+          "new_values": {},
+          "old_values": {
+            "Nullable": null,
+            "Other": "stable",
+            "Value": "20"
+          }
+        }
+      ],
+      "column_types": [
+        {
+          "is_primary_key": true,
+          "name": "Id",
+          "ordinal_position": "1",
+          "type": "{\"code\":\"INT64\"}"
+        },
+        {
+          "is_primary_key": false,
+          "name": "Value",
+          "ordinal_position": "2",
+          "type": "{\"code\":\"INT64\"}"
+        },
+        {
+          "is_primary_key": false,
+          "name": "Other",
+          "ordinal_position": "3",
+          "type": "{\"code\":\"STRING\"}"
+        },
+        {
+          "is_primary_key": false,
+          "name": "Nullable",
+          "ordinal_position": "4",
+          "type": "{\"code\":\"INT64\"}"
+        }
+      ]
+    }
+  ],
+  "pg-capture": [
+    {
+      "mod_type": "INSERT",
+      "value_capture_type": "NEW_ROW_AND_OLD_VALUES",
+      "mods": [
+        {
+          "keys": {
+            "id": "1"
+          },
+          "new_values": {
+            "nullable": null,
+            "other": "stable",
+            "value": "10"
+          },
+          "old_values": {}
+        }
+      ],
+      "column_types": [
+        {
+          "is_primary_key": true,
+          "name": "id",
+          "ordinal_position": 1,
+          "type": {
+            "code": "INT64"
+          }
+        },
+        {
+          "is_primary_key": false,
+          "name": "value",
+          "ordinal_position": 2,
+          "type": {
+            "code": "INT64"
+          }
+        },
+        {
+          "is_primary_key": false,
+          "name": "other",
+          "ordinal_position": 3,
+          "type": {
+            "code": "STRING"
+          }
+        },
+        {
+          "is_primary_key": false,
+          "name": "nullable",
+          "ordinal_position": 4,
+          "type": {
+            "code": "INT64"
+          }
+        }
+      ]
+    },
+    {
+      "mod_type": "UPDATE",
+      "value_capture_type": "NEW_ROW_AND_OLD_VALUES",
+      "mods": [
+        {
+          "keys": {
+            "id": "1"
+          },
+          "new_values": {
+            "nullable": null,
+            "other": "stable",
+            "value": "20"
+          },
+          "old_values": {
+            "value": "10"
+          }
+        }
+      ],
+      "column_types": [
+        {
+          "is_primary_key": true,
+          "name": "id",
+          "ordinal_position": 1,
+          "type": {
+            "code": "INT64"
+          }
+        },
+        {
+          "is_primary_key": false,
+          "name": "value",
+          "ordinal_position": 2,
+          "type": {
+            "code": "INT64"
+          }
+        },
+        {
+          "is_primary_key": false,
+          "name": "other",
+          "ordinal_position": 3,
+          "type": {
+            "code": "STRING"
+          }
+        },
+        {
+          "is_primary_key": false,
+          "name": "nullable",
+          "ordinal_position": 4,
+          "type": {
+            "code": "INT64"
+          }
+        }
+      ]
+    },
+    {
+      "mod_type": "DELETE",
+      "value_capture_type": "NEW_ROW_AND_OLD_VALUES",
+      "mods": [
+        {
+          "keys": {
+            "id": "1"
+          },
+          "new_values": {},
+          "old_values": {
+            "nullable": null,
+            "other": "stable",
+            "value": "20"
+          }
+        }
+      ],
+      "column_types": [
+        {
+          "is_primary_key": true,
+          "name": "id",
+          "ordinal_position": 1,
+          "type": {
+            "code": "INT64"
+          }
+        },
+        {
+          "is_primary_key": false,
+          "name": "value",
+          "ordinal_position": 2,
+          "type": {
+            "code": "INT64"
+          }
+        },
+        {
+          "is_primary_key": false,
+          "name": "other",
+          "ordinal_position": 3,
+          "type": {
+            "code": "STRING"
+          }
+        },
+        {
+          "is_primary_key": false,
+          "name": "nullable",
+          "ordinal_position": 4,
+          "type": {
+            "code": "INT64"
+          }
+        }
+      ]
+    },
+    {
+      "mod_type": "INSERT",
+      "value_capture_type": "NEW_ROW",
+      "mods": [
+        {
+          "keys": {
+            "id": "2"
+          },
+          "new_values": {
+            "nullable": null,
+            "other": "stable",
+            "value": "10"
+          },
+          "old_values": {}
+        }
+      ],
+      "column_types": [
+        {
+          "is_primary_key": true,
+          "name": "id",
+          "ordinal_position": 1,
+          "type": {
+            "code": "INT64"
+          }
+        },
+        {
+          "is_primary_key": false,
+          "name": "value",
+          "ordinal_position": 2,
+          "type": {
+            "code": "INT64"
+          }
+        },
+        {
+          "is_primary_key": false,
+          "name": "other",
+          "ordinal_position": 3,
+          "type": {
+            "code": "STRING"
+          }
+        },
+        {
+          "is_primary_key": false,
+          "name": "nullable",
+          "ordinal_position": 4,
+          "type": {
+            "code": "INT64"
+          }
+        }
+      ]
+    },
+    {
+      "mod_type": "UPDATE",
+      "value_capture_type": "NEW_ROW",
+      "mods": [
+        {
+          "keys": {
+            "id": "2"
+          },
+          "new_values": {
+            "nullable": null,
+            "other": "stable",
+            "value": "20"
+          },
+          "old_values": {}
+        }
+      ],
+      "column_types": [
+        {
+          "is_primary_key": true,
+          "name": "id",
+          "ordinal_position": 1,
+          "type": {
+            "code": "INT64"
+          }
+        },
+        {
+          "is_primary_key": false,
+          "name": "value",
+          "ordinal_position": 2,
+          "type": {
+            "code": "INT64"
+          }
+        },
+        {
+          "is_primary_key": false,
+          "name": "other",
+          "ordinal_position": 3,
+          "type": {
+            "code": "STRING"
+          }
+        },
+        {
+          "is_primary_key": false,
+          "name": "nullable",
+          "ordinal_position": 4,
+          "type": {
+            "code": "INT64"
+          }
+        }
+      ]
+    },
+    {
+      "mod_type": "DELETE",
+      "value_capture_type": "NEW_ROW",
+      "mods": [
+        {
+          "keys": {
+            "id": "2"
+          },
+          "new_values": {},
+          "old_values": {}
+        }
+      ],
+      "column_types": [
+        {
+          "is_primary_key": true,
+          "name": "id",
+          "ordinal_position": 1,
+          "type": {
+            "code": "INT64"
+          }
+        },
+        {
+          "is_primary_key": false,
+          "name": "value",
+          "ordinal_position": 2,
+          "type": {
+            "code": "INT64"
+          }
+        },
+        {
+          "is_primary_key": false,
+          "name": "other",
+          "ordinal_position": 3,
+          "type": {
+            "code": "STRING"
+          }
+        },
+        {
+          "is_primary_key": false,
+          "name": "nullable",
+          "ordinal_position": 4,
+          "type": {
+            "code": "INT64"
+          }
+        }
+      ]
+    },
+    {
+      "mod_type": "INSERT",
+      "value_capture_type": "OLD_AND_NEW_VALUES",
+      "mods": [
+        {
+          "keys": {
+            "id": "3"
+          },
+          "new_values": {
+            "nullable": null,
+            "other": "stable",
+            "value": "10"
+          },
+          "old_values": {}
+        }
+      ],
+      "column_types": [
+        {
+          "is_primary_key": true,
+          "name": "id",
+          "ordinal_position": 1,
+          "type": {
+            "code": "INT64"
+          }
+        },
+        {
+          "is_primary_key": false,
+          "name": "value",
+          "ordinal_position": 2,
+          "type": {
+            "code": "INT64"
+          }
+        },
+        {
+          "is_primary_key": false,
+          "name": "other",
+          "ordinal_position": 3,
+          "type": {
+            "code": "STRING"
+          }
+        },
+        {
+          "is_primary_key": false,
+          "name": "nullable",
+          "ordinal_position": 4,
+          "type": {
+            "code": "INT64"
+          }
+        }
+      ]
+    },
+    {
+      "mod_type": "UPDATE",
+      "value_capture_type": "OLD_AND_NEW_VALUES",
+      "mods": [
+        {
+          "keys": {
+            "id": "3"
+          },
+          "new_values": {
+            "value": "20"
+          },
+          "old_values": {
+            "value": "10"
+          }
+        }
+      ],
+      "column_types": [
+        {
+          "is_primary_key": true,
+          "name": "id",
+          "ordinal_position": 1,
+          "type": {
+            "code": "INT64"
+          }
+        },
+        {
+          "is_primary_key": false,
+          "name": "value",
+          "ordinal_position": 2,
+          "type": {
+            "code": "INT64"
+          }
+        }
+      ]
+    },
+    {
+      "mod_type": "DELETE",
+      "value_capture_type": "OLD_AND_NEW_VALUES",
+      "mods": [
+        {
+          "keys": {
+            "id": "3"
+          },
+          "new_values": {},
+          "old_values": {
+            "nullable": null,
+            "other": "stable",
+            "value": "20"
+          }
+        }
+      ],
+      "column_types": [
+        {
+          "is_primary_key": true,
+          "name": "id",
+          "ordinal_position": 1,
+          "type": {
+            "code": "INT64"
+          }
+        },
+        {
+          "is_primary_key": false,
+          "name": "value",
+          "ordinal_position": 2,
+          "type": {
+            "code": "INT64"
+          }
+        },
+        {
+          "is_primary_key": false,
+          "name": "other",
+          "ordinal_position": 3,
+          "type": {
+            "code": "STRING"
+          }
+        },
+        {
+          "is_primary_key": false,
+          "name": "nullable",
+          "ordinal_position": 4,
+          "type": {
+            "code": "INT64"
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,101 @@
+{
+  "status": "pass",
+  "recorded_at": "2026-10-29T01:40:26.616083+00:00",
+  "scope": "Local research gates; managed suite retains its separate known drift failure",
+  "checks": [
+    {
+      "name": "okf-all",
+      "argv": [
+        "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go",
+        "run",
+        "./okf-check",
+        "--repo-root",
+        "..",
+        "--gate",
+        "all",
+        "--publication-manifest",
+        "<LOCAL_TASK_ROOT>/apstndb/spanalyzer/managed-recheck-20261029/publication-manifest.json"
+      ],
+      "cwd": "<LOCAL_CHECKOUT>/tools",
+      "started_at": "2026-10-29T01:40:26.616495+00:00",
+      "completed_at": "2026-10-29T01:40:26.805398+00:00",
+      "exit_code": 0,
+      "log": "okf-check.log"
+    },
+    {
+      "name": "markdown-language",
+      "argv": [
+        "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go",
+        "run",
+        "./markdown-language-check",
+        "--repo-root",
+        ".."
+      ],
+      "cwd": "<LOCAL_CHECKOUT>/tools",
+      "started_at": "2026-10-29T01:40:26.805739+00:00",
+      "completed_at": "2026-10-29T01:40:26.881237+00:00",
+      "exit_code": 0,
+      "log": "language-check.log"
+    },
+    {
+      "name": "diff-whitespace",
+      "argv": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "cwd": "<LOCAL_CHECKOUT>",
+      "started_at": "2026-10-29T01:40:26.881459+00:00",
+      "completed_at": "2026-10-29T01:40:26.896368+00:00",
+      "exit_code": 0,
+      "log": "diff-check.log"
+    }
+  ],
+  "offline_evidence_check": {
+    "exit_code": 0,
+    "assertions": 72,
+    "receipt": "evidence-check.json"
+  },
+  "module_validation": {
+    "status": "pass",
+    "scope": "Offline module tests; survey short mode skips container integration; no managed/Omni requirement flags. Separate managed gate failure remains explicit.",
+    "checks": [
+      {
+        "name": "survey-short",
+        "argv": [
+          "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go",
+          "test",
+          "-short",
+          "./..."
+        ],
+        "cwd": "<LOCAL_CHECKOUT>/survey",
+        "gowork": "off",
+        "started_at": "2026-10-29T01:39:03.224948+00:00",
+        "completed_at": "2026-10-29T01:39:10.558109+00:00",
+        "exit_code": 0,
+        "log": "survey-short.log"
+      },
+      {
+        "name": "tools-unit",
+        "argv": [
+          "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go",
+          "test",
+          "./..."
+        ],
+        "cwd": "<LOCAL_CHECKOUT>/tools",
+        "gowork": "<LOCAL_CHECKOUT>/go.work",
+        "started_at": "2026-10-29T01:39:03.225208+00:00",
+        "completed_at": "2026-10-29T01:39:48.841211+00:00",
+        "exit_code": 0,
+        "log": "tools-unit.log"
+      }
+    ]
+  },
+  "environment": {
+    "GOROOT": "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8",
+    "GOTOOLCHAIN": "local",
+    "GOWORK": "<LOCAL_CHECKOUT>/go.work",
+    "GOCACHE": "<LOCAL_CHECKOUT>/.tmp/managed-recheck-20260925/go-cache",
+    "GOFLAGS": "-mod=readonly"
+  }
+}

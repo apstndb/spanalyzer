@@ -1,0 +1,11 @@
+from pathlib import Path
+import os,json,subprocess,re,datetime,time
+root=Path('<LOCAL_CHECKOUT>');scratch=root/'.tmp/docs-delta-runtime-20261031';out=Path('<LOCAL_TASK_ROOT>/apstndb/spanalyzer/docs-delta-runtime-20261031/evidence');secrets=[os.environ[k]for k in ['SPANNER_PROJECT_ID','SPANNER_INSTANCE_ID','SPANNER_DATABASE_ID']];assert not os.getenv('SPANNER_EMULATOR_HOST');rows=[]
+def clean(s):
+ for secret in sorted(secrets,key=len,reverse=True):s=s.replace(secret,'<redacted>')
+ s=re.sub(r'projects/[^/\s"\']+/instances/[^/\s"\']+/databases/[^/\s"\']+','<database>',s);s=re.sub(r'ddrt1031[gp]-[a-f0-9]+','<owned-database>',s);return re.sub(r'requestID = "[^"]*"','requestID = "<redacted>"',s)
+for dialect in ['google','pg']:
+ name='managed-corrected-'+dialect;args=[str(scratch/'managed'),str(out/(dialect+'-corrected-cases.json'))];start=datetime.datetime.now(datetime.timezone.utc).isoformat();print('START',name,flush=True);at=time.monotonic();p=subprocess.run(args,capture_output=True,text=True,timeout=1500);(out/(name+'.jsonl')).write_text(clean(p.stdout));(out/(name+'.stderr')).write_text(clean(p.stderr));row={'name':name,'argv':args,'started_at':start,'completed_at':datetime.datetime.now(datetime.timezone.utc).isoformat(),'seconds':round(time.monotonic()-at,3),'exit_code':p.returncode};rows.append(row);(out/'managed-corrected-commands.json').write_text(json.dumps(rows,indent=2)+'\n');print(name,'exit',p.returncode,'seconds',row['seconds'],flush=True)
+ if p.returncode:print(clean(p.stderr)[-1000:]);raise SystemExit(p.returncode)
+ checks=[json.loads(l)for l in clean(p.stdout).splitlines()];codes={r['label']:r['code']for r in checks};print(name,'records',len(checks),'create',codes.get('create-database'),'drop',codes.get('drop-database'),'absent',codes.get('database-absent'),flush=True)
+ if codes.get('create-database')!='OK'or codes.get('drop-database')!='OK'or codes.get('database-absent')!='NotFound':raise SystemExit('Fixture lifecycle incomplete')

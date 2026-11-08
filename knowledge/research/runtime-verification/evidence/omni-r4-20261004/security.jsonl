@@ -1,0 +1,6 @@
+{"at":"2026-10-04T14:32:41.679671Z","code":"OK","error":"","label":"create-mtls","value":null}
+{"at":"2026-10-04T14:32:41.71688Z","code":"OK","error":"","label":"mtls","value":1}
+{"at":"2026-10-04T14:32:41.753064Z","code":"OK","error":"","label":"password","value":1}
+{"at":"2026-10-04T14:32:41.784337Z","code":"Unauthenticated","error":"spanner: code = \"Unauthenticated\", desc = \"transport: per-RPC creds failed due to error: auth tag mismatch\", requestID = \"1.cbfb8eb70fd1e253.3.1.1.1\"","label":"bad-password","value":0}
+{"at":"2026-10-04T14:32:41.804879Z","code":"Unauthenticated","error":"spanner: code = \"Unauthenticated\", desc = \"Not authenticated, please ensure your account is active and either login or ensure your client certificate has not expired.\", requestID = \"1.cbfb8eb70fd1e253.4.1.1.1\"","label":"no-credentials","value":0}
+{"at":"2026-10-04T14:32:43.47328Z","code":"OK","error":"","label":"drop-mtls","value":null}

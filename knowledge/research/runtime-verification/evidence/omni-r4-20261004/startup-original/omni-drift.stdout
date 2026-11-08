@@ -1,0 +1,9 @@
+{"Time":"2026-10-04T23:24:58.319555+09:00","Action":"start","Package":"github.com/apstndb/spanalyzer/survey/infoschem"}
+{"Time":"2026-10-04T23:24:58.88614+09:00","Action":"run","Package":"github.com/apstndb/spanalyzer/survey/infoschem","Test":"TestDrift_OmniTableMetas"}
+{"Time":"2026-10-04T23:24:58.886203+09:00","Action":"output","Package":"github.com/apstndb/spanalyzer/survey/infoschem","Test":"TestDrift_OmniTableMetas","Output":"=== RUN   TestDrift_OmniTableMetas\n"}
+{"Time":"2026-10-04T23:25:10.712455+09:00","Action":"output","Package":"github.com/apstndb/spanalyzer/survey/infoschem","Test":"TestDrift_OmniTableMetas","Output":"    drift_test.go:70: RunWithClients: spanemuboost: bootstrap omni backend: rpc error: code = Unavailable desc = connection error: desc = \"error reading server preface: EOF\"; verify that the environment satisfies the Spanner Omni software requirements: https://docs.cloud.google.com/spanner-omni/system-requirements#software-requirements\n"}
+{"Time":"2026-10-04T23:25:10.712613+09:00","Action":"output","Package":"github.com/apstndb/spanalyzer/survey/infoschem","Test":"TestDrift_OmniTableMetas","Output":"--- FAIL: TestDrift_OmniTableMetas (11.83s)\n"}
+{"Time":"2026-10-04T23:25:10.712652+09:00","Action":"fail","Package":"github.com/apstndb/spanalyzer/survey/infoschem","Test":"TestDrift_OmniTableMetas","Elapsed":11.83}
+{"Time":"2026-10-04T23:25:10.712695+09:00","Action":"output","Package":"github.com/apstndb/spanalyzer/survey/infoschem","Output":"FAIL\n"}
+{"Time":"2026-10-04T23:25:10.715174+09:00","Action":"output","Package":"github.com/apstndb/spanalyzer/survey/infoschem","Output":"FAIL\tgithub.com/apstndb/spanalyzer/survey/infoschem\t12.395s\n"}
+{"Time":"2026-10-04T23:25:10.715224+09:00","Action":"fail","Package":"github.com/apstndb/spanalyzer/survey/infoschem","Elapsed":12.396}

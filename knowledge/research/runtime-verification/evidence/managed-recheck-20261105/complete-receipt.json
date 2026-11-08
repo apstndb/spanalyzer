@@ -1,0 +1,60 @@
+{
+  "status": "complete",
+  "observed_on": "2026-11-05",
+  "target": "Existing dedicated user-level mise profile; destinations excluded",
+  "backend_build": "unavailable",
+  "source_checkout_head": "c2d7792dd7f83d5dd086e2d32bc22e5d253cf06c",
+  "source_checkout_dirty": true,
+  "recorded_steps": {
+    "read_only": 131,
+    "initial_fixtures": 127,
+    "corrected_volatile_fixture": 12,
+    "total": 270
+  },
+  "bounded_assertions": 422,
+  "additional_lifecycle_records": 9,
+  "initial_not_run": {
+    "volatile_view_dependents": 9,
+    "unsupported_pg_score_database_option_dependents": 2
+  },
+  "initial_view_setup_error": "Strict name resolution rejects unqualified Id; initial failure retained, then corrected twelve-step separately authorized fixture succeeds.",
+  "new_databases_created": 3,
+  "new_databases_deleted": 3,
+  "cleanup": "All three current owned databases have DropDatabase OK and GetDatabase NotFound. The additional repair lifecycle has separate explicit authorization.",
+  "authorization": "User explicitly approved two disposable databases, then one corrected volatile-view database. Separate catalog update and push request covers its isolated branch. No earlier database deletion, PR, merge, release or public issue.",
+  "local_catalog_before": "Initial drift test fails; dated log retained",
+  "local_catalog_after": "Isolated branch passes managed drift and canonical DDL; 53 registered / 632 known, managed 52 / 624 with eight known absent",
+  "catalog_push": {
+    "status": "pushed",
+    "branch": "fix/managed-catalog-20261105",
+    "local_head": "99ab0125949f842fcb98c816850140e1117746a4",
+    "remote_head": "99ab0125949f842fcb98c816850140e1117746a4",
+    "base": "aa8871dc1965dbe2f00ee7be75cace24ddb056a3",
+    "argv": [
+      "git",
+      "push",
+      "-u",
+      "origin",
+      "fix/managed-catalog-20261105"
+    ],
+    "at": "2026-11-05T03:09:08.561013+00:00",
+    "url": "https://github.com/apstndb/spanalyzer/tree/fix/managed-catalog-20261105",
+    "merge_or_pr_created": false,
+    "working_tree_clean": true
+  },
+  "analyzer_projections": {
+    "information_schema_columns": 310,
+    "spanner_sys_tables": 50,
+    "spanner_sys_columns": 539,
+    "sys_policy": "Historical matching managed/Omni common projection preserved"
+  },
+  "not_rerun": [
+    "Omni",
+    "Emulator",
+    "local parser compatibility",
+    "authenticated Omni clients",
+    "cross-region routing"
+  ],
+  "earlier_artifacts_preserved": 2234,
+  "at": "2026-11-05T03:09:35.270251+00:00"
+}

@@ -1,0 +1,142 @@
+{
+  "dialect": "google",
+  "steps": [
+    {
+      "label": "search-table",
+      "family": "issue-324",
+      "kind": "ddl",
+      "sql": "CREATE TABLE Docs(id INT64 NOT NULL, content STRING(MAX), extra STRING(MAX), tok TOKENLIST AS(TOKENIZE_FULLTEXT(content)) HIDDEN, extra_tok TOKENLIST AS(TOKENIZE_FULLTEXT(extra)) HIDDEN) PRIMARY KEY(id)",
+      "requires": [],
+      "timeout_seconds": 30
+    },
+    {
+      "label": "search-index",
+      "family": "issue-324",
+      "kind": "ddl",
+      "sql": "CREATE SEARCH INDEX SI ON Docs(tok)",
+      "requires": [
+        "search-table"
+      ],
+      "timeout_seconds": 30
+    },
+    {
+      "label": "search-seed",
+      "family": "issue-355",
+      "kind": "dml",
+      "sql": "",
+      "requires": [
+        "search-table"
+      ],
+      "timeout_seconds": 15,
+      "statements": [
+        "INSERT INTO Docs(id,content,extra) VALUES(1,'test 123\nabc','one'),(2,'test       123\n abc','two')"
+      ]
+    },
+    {
+      "label": "snippet-0",
+      "family": "issue-356",
+      "kind": "query",
+      "sql": "SELECT SNIPPET(\"test 123\\nabc\", \"123\") AS snippet",
+      "requires": [],
+      "timeout_seconds": 15
+    },
+    {
+      "label": "snippet-1",
+      "family": "issue-356",
+      "kind": "query",
+      "sql": "SELECT SNIPPET(\"test       123\\n abc\", \"123\") AS snippet",
+      "requires": [],
+      "timeout_seconds": 15
+    },
+    {
+      "label": "snippet-indexed",
+      "family": "issue-355",
+      "kind": "query",
+      "sql": "SELECT id,SNIPPET(content,\"test\") AS snippet FROM Docs WHERE SEARCH(tok,\"test\") ORDER BY id",
+      "requires": [
+        "search-index",
+        "search-seed"
+      ],
+      "timeout_seconds": 15
+    },
+    {
+      "label": "search-dialect",
+      "family": "issue-304",
+      "kind": "query",
+      "sql": "SELECT id FROM Docs WHERE SEARCH(tok,'test',dialect=>'words_phrase')",
+      "requires": [
+        "search-index",
+        "search-seed"
+      ],
+      "timeout_seconds": 15
+    },
+    {
+      "label": "alter-search-add",
+      "family": "issue-324",
+      "kind": "ddl",
+      "sql": "ALTER SEARCH INDEX SI ADD COLUMN extra_tok",
+      "requires": [
+        "search-index"
+      ],
+      "timeout_seconds": 30
+    },
+    {
+      "label": "search-index-metadata",
+      "family": "issue-341",
+      "kind": "query",
+      "sql": "SELECT INDEX_NAME,SEARCH_PARTITION_BY,SEARCH_ORDER_BY FROM INFORMATION_SCHEMA.INDEXES WHERE TABLE_NAME='Docs'",
+      "requires": [
+        "search-index"
+      ],
+      "timeout_seconds": 15
+    },
+    {
+      "label": "force-index-_BASE_TABLE",
+      "family": "issue-214",
+      "kind": "query",
+      "sql": "SELECT id FROM Docs@{FORCE_INDEX=_BASE_TABLE} ORDER BY id",
+      "requires": [
+        "search-seed"
+      ],
+      "timeout_seconds": 15
+    },
+    {
+      "label": "force-index-PRIMARY_KEY",
+      "family": "issue-214",
+      "kind": "query",
+      "sql": "SELECT id FROM Docs@{FORCE_INDEX=PRIMARY_KEY} ORDER BY id",
+      "requires": [
+        "search-seed"
+      ],
+      "timeout_seconds": 15
+    },
+    {
+      "label": "parent-search",
+      "family": "issue-197",
+      "kind": "ddl",
+      "sql": "CREATE TABLE ParentSearch(pid STRING(MAX) NOT NULL) PRIMARY KEY(pid)",
+      "requires": [],
+      "timeout_seconds": 30
+    },
+    {
+      "label": "child-search",
+      "family": "issue-197",
+      "kind": "ddl",
+      "sql": "CREATE TABLE ChildSearch(pid STRING(MAX) NOT NULL,cid STRING(MAX) NOT NULL,title STRING(MAX),tokens TOKENLIST AS(TOKENIZE_SUBSTRING(title)) HIDDEN) PRIMARY KEY(pid,cid), INTERLEAVE IN PARENT ParentSearch",
+      "requires": [
+        "parent-search"
+      ],
+      "timeout_seconds": 30
+    },
+    {
+      "label": "interleaved-search-index",
+      "family": "issue-197",
+      "kind": "ddl",
+      "sql": "CREATE SEARCH INDEX CSI ON ChildSearch(tokens) PARTITION BY pid, INTERLEAVE IN ParentSearch OPTIONS(sort_order_sharding=true)",
+      "requires": [
+        "child-search"
+      ],
+      "timeout_seconds": 30
+    }
+  ]
+}

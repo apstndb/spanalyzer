@@ -1,0 +1,28 @@
+import os,pathlib,subprocess,tomllib,json,sys,time
+root=pathlib.Path('<LOCAL_CHECKOUT>')
+out=root/'.tmp/managed-recheck-20260925'
+env=os.environ.copy()
+profile=tomllib.loads((pathlib.Path.home()/'.config/mise/environments/spanner-syntax-verify/mise.toml').read_text())['env']
+env.update(profile)
+env['TEST_REAL_SPANNER_DATABASE']='projects/{SPANNER_PROJECT_ID}/instances/{SPANNER_INSTANCE_ID}/databases/{SPANNER_DATABASE_ID}'.format(**env)
+env.update(GOWORK='off',GOFLAGS='-mod=readonly')
+assert not env.get('SPANNER_EMULATOR_HOST')
+go='<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go'
+env['GOCACHE']=str(out/'go-cache')
+env['GOTOOLCHAIN']='local'
+env['GOROOT']=str(pathlib.Path(go).parent.parent)
+env['PATH']=str(pathlib.Path(go).parent)+':'+env['PATH']
+cases=[('read-only-probes',['run',str(out/'probe.go')])]
+env.update({k:'1' for k in ['REQUIRE_REAL_SPANNER_CANONICAL','REQUIRE_REAL_SPANNER_DRIFT','REQUIRE_REAL_SPANNER_EXPRESSION_INDEX','REQUIRE_REAL_SPANNER_UUID']})
+receipts=[]
+for name,args in cases:
+ start=time.time()
+ p=subprocess.run([go,*args],cwd=root/'survey',env=env,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+ for stream,data in [('stdout',p.stdout),('stderr',p.stderr)]:
+  txt=data.decode(errors='replace')
+  for val in [env['TEST_REAL_SPANNER_DATABASE'],*profile.values()]:txt=txt.replace(val,'<redacted>')
+  (out/(name+'.'+stream)).write_text(txt)
+ receipt={'name':name,'exit_code':p.returncode,'elapsed_seconds':round(time.time()-start,2),'command':[go,*args]}
+ receipts.append(receipt)
+ (out/'probe-command.json').write_text(json.dumps(receipts,indent=2)+'\n')
+ print(json.dumps(receipt),flush=True)

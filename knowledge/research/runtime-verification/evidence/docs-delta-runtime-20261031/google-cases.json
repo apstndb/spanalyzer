@@ -1,0 +1,386 @@
+{
+  "dialect": "google",
+  "steps": [
+    {
+      "label": "pipe-select",
+      "family": "pipe-operator",
+      "kind": "query",
+      "sql": "FROM (SELECT 1 AS a, 10 AS b UNION ALL SELECT 1, 20 UNION ALL SELECT 2, 30) |> SELECT a, b"
+    },
+    {
+      "label": "pipe-extend",
+      "family": "pipe-operator",
+      "kind": "query",
+      "sql": "FROM (SELECT 1 AS a, 10 AS b UNION ALL SELECT 1, 20 UNION ALL SELECT 2, 30) |> EXTEND a+b AS total"
+    },
+    {
+      "label": "pipe-set",
+      "family": "pipe-operator",
+      "kind": "query",
+      "sql": "FROM (SELECT 1 AS a, 10 AS b UNION ALL SELECT 1, 20 UNION ALL SELECT 2, 30) |> SET b=b+1"
+    },
+    {
+      "label": "pipe-drop",
+      "family": "pipe-operator",
+      "kind": "query",
+      "sql": "FROM (SELECT 1 AS a, 10 AS b UNION ALL SELECT 1, 20 UNION ALL SELECT 2, 30) |> DROP b"
+    },
+    {
+      "label": "pipe-rename",
+      "family": "pipe-operator",
+      "kind": "query",
+      "sql": "FROM (SELECT 1 AS a, 10 AS b UNION ALL SELECT 1, 20 UNION ALL SELECT 2, 30) |> RENAME b AS c"
+    },
+    {
+      "label": "pipe-as",
+      "family": "pipe-operator",
+      "kind": "query",
+      "sql": "FROM (SELECT 1 AS a, 10 AS b UNION ALL SELECT 1, 20 UNION ALL SELECT 2, 30) |> AS t |> SELECT t.a, t.b"
+    },
+    {
+      "label": "pipe-where",
+      "family": "pipe-operator",
+      "kind": "query",
+      "sql": "FROM (SELECT 1 AS a, 10 AS b UNION ALL SELECT 1, 20 UNION ALL SELECT 2, 30) |> WHERE a=1"
+    },
+    {
+      "label": "pipe-aggregate",
+      "family": "pipe-operator",
+      "kind": "query",
+      "sql": "FROM (SELECT 1 AS a, 10 AS b UNION ALL SELECT 1, 20 UNION ALL SELECT 2, 30) |> AGGREGATE SUM(b) AS total GROUP BY a"
+    },
+    {
+      "label": "pipe-join",
+      "family": "pipe-operator",
+      "kind": "query",
+      "sql": "FROM (SELECT 1 AS a, 10 AS b UNION ALL SELECT 1, 20 UNION ALL SELECT 2, 30) |> JOIN (SELECT 1 AS a, 'match' AS tag) AS r USING (a)"
+    },
+    {
+      "label": "pipe-order-by",
+      "family": "pipe-operator",
+      "kind": "query",
+      "sql": "FROM (SELECT 1 AS a, 10 AS b UNION ALL SELECT 1, 20 UNION ALL SELECT 2, 30) |> ORDER BY b DESC"
+    },
+    {
+      "label": "pipe-limit",
+      "family": "pipe-operator",
+      "kind": "query",
+      "sql": "FROM (SELECT 1 AS a, 10 AS b UNION ALL SELECT 1, 20 UNION ALL SELECT 2, 30) |> LIMIT 2"
+    },
+    {
+      "label": "pipe-union",
+      "family": "pipe-operator",
+      "kind": "query",
+      "sql": "FROM (SELECT 1 AS a, 10 AS b UNION ALL SELECT 1, 20 UNION ALL SELECT 2, 30) |> UNION ALL (SELECT 3 AS a, 40 AS b)"
+    },
+    {
+      "label": "pipe-intersect",
+      "family": "pipe-operator",
+      "kind": "query",
+      "sql": "FROM (SELECT 1 AS a, 10 AS b UNION ALL SELECT 1, 20 UNION ALL SELECT 2, 30) |> INTERSECT DISTINCT (SELECT 1 AS a, 10 AS b)"
+    },
+    {
+      "label": "pipe-except",
+      "family": "pipe-operator",
+      "kind": "query",
+      "sql": "FROM (SELECT 1 AS a, 10 AS b UNION ALL SELECT 1, 20 UNION ALL SELECT 2, 30) |> EXCEPT DISTINCT (SELECT 1 AS a, 10 AS b)"
+    },
+    {
+      "label": "pipe-tablesample",
+      "family": "pipe-operator",
+      "kind": "query",
+      "sql": "FROM (SELECT 1 AS a, 10 AS b UNION ALL SELECT 1, 20 UNION ALL SELECT 2, 30) |> TABLESAMPLE BERNOULLI (100 PERCENT)"
+    },
+    {
+      "label": "pipe-standard-ordinal",
+      "family": "pipe-grouping",
+      "kind": "query",
+      "sql": "SELECT a AS k, SUM(b) AS total FROM (SELECT 1 AS a, 10 AS b UNION ALL SELECT 1,20 UNION ALL SELECT 2,30) GROUP BY 1"
+    },
+    {
+      "label": "pipe-group-alias",
+      "family": "pipe-grouping",
+      "kind": "query",
+      "sql": "FROM (SELECT 1 AS a, 10 AS b UNION ALL SELECT 1, 20 UNION ALL SELECT 2, 30) |> AGGREGATE SUM(b) AS total GROUP BY a AS k"
+    },
+    {
+      "label": "pipe-group-bare-alias",
+      "family": "pipe-grouping",
+      "kind": "query",
+      "sql": "FROM (SELECT 1 AS a, 10 AS b UNION ALL SELECT 1, 20 UNION ALL SELECT 2, 30) |> AGGREGATE SUM(b) AS total GROUP BY a k"
+    },
+    {
+      "label": "pipe-group-two-aliases",
+      "family": "pipe-grouping",
+      "kind": "query",
+      "sql": "FROM (SELECT 1 AS a, 10 AS b UNION ALL SELECT 1, 20 UNION ALL SELECT 2, 30) |> AGGREGATE COUNT(*) AS n GROUP BY a AS k, b AS v"
+    },
+    {
+      "label": "pipe-group-ordinal",
+      "family": "pipe-grouping",
+      "kind": "query",
+      "sql": "FROM (SELECT 1 AS a, 10 AS b UNION ALL SELECT 1, 20 UNION ALL SELECT 2, 30) |> AGGREGATE SUM(b) AS total GROUP BY 1"
+    },
+    {
+      "label": "pipe-group-output-alias",
+      "family": "pipe-grouping",
+      "kind": "query",
+      "sql": "FROM (SELECT 1 AS a, 10 AS b UNION ALL SELECT 1, 20 UNION ALL SELECT 2, 30) |> AGGREGATE SUM(b) AS total GROUP BY total"
+    },
+    {
+      "label": "pipe-group-input-alias",
+      "family": "pipe-grouping",
+      "kind": "query",
+      "sql": "FROM (SELECT 1 AS a, 10 AS b UNION ALL SELECT 1, 20 UNION ALL SELECT 2, 30) |> EXTEND a+1 AS k |> AGGREGATE SUM(b) AS total GROUP BY k"
+    },
+    {
+      "label": "pipe-group-and-order",
+      "family": "pipe-grouping",
+      "kind": "query",
+      "sql": "FROM (SELECT 1 AS a, 10 AS b UNION ALL SELECT 1, 20 UNION ALL SELECT 2, 30) |> AGGREGATE SUM(b) AS total GROUP AND ORDER BY a DESC"
+    },
+    {
+      "label": "queue-create-title",
+      "family": "queue-case",
+      "kind": "ddl",
+      "sql": "CREATE QUEUE QueueCasetitle (MessageId STRING(36) NOT NULL, Payload BYTES(MAX) NOT NULL) PRIMARY KEY(MessageId)"
+    },
+    {
+      "label": "queue-create-lower",
+      "family": "queue-case",
+      "kind": "ddl",
+      "sql": "CREATE QUEUE QueueCaselower (MessageId STRING(36) NOT NULL, payload BYTES(MAX) NOT NULL) PRIMARY KEY(MessageId)"
+    },
+    {
+      "label": "queue-create-upper",
+      "family": "queue-case",
+      "kind": "ddl",
+      "sql": "CREATE QUEUE QueueCaseupper (MessageId STRING(36) NOT NULL, PAYLOAD BYTES(MAX) NOT NULL) PRIMARY KEY(MessageId)"
+    },
+    {
+      "label": "queue-create-mixed",
+      "family": "queue-case",
+      "kind": "ddl",
+      "sql": "CREATE QUEUE QueueCasemixed (MessageId STRING(36) NOT NULL, PaYlOaD BYTES(MAX) NOT NULL) PRIMARY KEY(MessageId)"
+    },
+    {
+      "label": "queue-schema",
+      "family": "queue-case",
+      "kind": "ddl-export",
+      "sql": ""
+    },
+    {
+      "label": "tvf-alias-plain",
+      "family": "tvf-alias",
+      "kind": "query",
+      "sql": "SELECT COUNT(*) AS n FROM RENEWLEASE_QueueCasetitle(lease_tokens => ARRAY<STRING>[])",
+      "requires": [
+        "queue-create-title"
+      ]
+    },
+    {
+      "label": "tvf-alias-as",
+      "family": "tvf-alias",
+      "kind": "query",
+      "sql": "SELECT COUNT(*) AS n FROM RENEWLEASE_QueueCasetitle(lease_tokens => ARRAY<STRING>[]) AS r",
+      "requires": [
+        "queue-create-title"
+      ]
+    },
+    {
+      "label": "tvf-alias-bare",
+      "family": "tvf-alias",
+      "kind": "query",
+      "sql": "SELECT COUNT(*) AS n FROM RENEWLEASE_QueueCasetitle(lease_tokens => ARRAY<STRING>[]) r",
+      "requires": [
+        "queue-create-title"
+      ]
+    },
+    {
+      "label": "model-tvf-alias-plain",
+      "family": "tvf-alias-resolution",
+      "kind": "query",
+      "sql": "SELECT * FROM ML.PREDICT(MODEL MissingModel, (SELECT 1 AS x))"
+    },
+    {
+      "label": "model-tvf-alias-as",
+      "family": "tvf-alias-resolution",
+      "kind": "query",
+      "sql": "SELECT * FROM ML.PREDICT(MODEL MissingModel, (SELECT 1 AS x)) AS p"
+    },
+    {
+      "label": "model-tvf-alias-bare",
+      "family": "tvf-alias-resolution",
+      "kind": "query",
+      "sql": "SELECT * FROM ML.PREDICT(MODEL MissingModel, (SELECT 1 AS x)) p"
+    },
+    {
+      "label": "score-set-db-1",
+      "family": "scorer",
+      "kind": "ddl",
+      "sql": "ALTER DATABASE {{DATABASE}} SET OPTIONS (score_version = 1)"
+    },
+    {
+      "label": "score-values-db-1",
+      "family": "scorer",
+      "kind": "query",
+      "sql": "SELECT SCORE(TOKENIZE_FULLTEXT('cat cat dog'), 'cat') AS default_score, SCORE(TOKENIZE_FULLTEXT('cat cat dog'), 'cat', options => JSON '{\"version\": 1}') AS version1_score, SCORE(TOKENIZE_FULLTEXT('cat cat dog'), 'cat', options => JSON '{\"version\": 2}') AS version2_score",
+      "requires": [
+        "score-set-db-1"
+      ]
+    },
+    {
+      "label": "score-set-db-2",
+      "family": "scorer",
+      "kind": "ddl",
+      "sql": "ALTER DATABASE {{DATABASE}} SET OPTIONS (score_version = 2)"
+    },
+    {
+      "label": "score-values-db-2",
+      "family": "scorer",
+      "kind": "query",
+      "sql": "SELECT SCORE(TOKENIZE_FULLTEXT('cat cat dog'), 'cat') AS default_score, SCORE(TOKENIZE_FULLTEXT('cat cat dog'), 'cat', options => JSON '{\"version\": 1}') AS version1_score, SCORE(TOKENIZE_FULLTEXT('cat cat dog'), 'cat', options => JSON '{\"version\": 2}') AS version2_score",
+      "requires": [
+        "score-set-db-2"
+      ]
+    },
+    {
+      "label": "bucket-create",
+      "family": "bucket",
+      "kind": "ddl",
+      "sql": "CREATE TABLE BucketDocs (Id INT64 NOT NULL, Body STRING(MAX), UpdatedAt TIMESTAMP NOT NULL, HourBucket INT64 AS (UNIX_SECONDS(TIMESTAMP_TRUNC(UpdatedAt,HOUR))) STORED, BodyTokens TOKENLIST AS (TOKENIZE_FULLTEXT(Body)) HIDDEN) PRIMARY KEY(Id)"
+    },
+    {
+      "label": "bucket-index-timestamp",
+      "family": "bucket",
+      "kind": "ddl",
+      "sql": "CREATE SEARCH INDEX BucketIndextimestamp ON BucketDocs(BodyTokens) ORDER BY UpdatedAt DESC",
+      "requires": [
+        "bucket-create"
+      ]
+    },
+    {
+      "label": "bucket-index-hour",
+      "family": "bucket",
+      "kind": "ddl",
+      "sql": "CREATE SEARCH INDEX BucketIndexhour ON BucketDocs(BodyTokens) ORDER BY HourBucket DESC",
+      "requires": [
+        "bucket-create"
+      ]
+    },
+    {
+      "label": "bucket-index-none",
+      "family": "bucket",
+      "kind": "ddl",
+      "sql": "CREATE SEARCH INDEX BucketIndexnone ON BucketDocs(BodyTokens)",
+      "requires": [
+        "bucket-create"
+      ]
+    },
+    {
+      "label": "bucket-insert",
+      "family": "bucket",
+      "kind": "dml",
+      "sql": "",
+      "statements": [
+        "INSERT INTO BucketDocs(Id,Body,UpdatedAt) VALUES (1,'cat cat dog',TIMESTAMP '2026-10-31 00:01:00+00')"
+      ],
+      "requires": [
+        "bucket-create"
+      ]
+    },
+    {
+      "label": "bucket-before",
+      "family": "bucket",
+      "kind": "query",
+      "sql": "SELECT Id, UpdatedAt, HourBucket FROM BucketDocs",
+      "requires": [
+        "bucket-insert"
+      ]
+    },
+    {
+      "label": "bucket-update-same-hour",
+      "family": "bucket",
+      "kind": "dml",
+      "sql": "",
+      "statements": [
+        "UPDATE BucketDocs SET UpdatedAt=TIMESTAMP '2026-10-31 00:59:00+00' WHERE Id=1"
+      ],
+      "requires": [
+        "bucket-insert"
+      ]
+    },
+    {
+      "label": "bucket-same-hour",
+      "family": "bucket",
+      "kind": "query",
+      "sql": "SELECT Id, UpdatedAt, HourBucket FROM BucketDocs",
+      "requires": [
+        "bucket-update-same-hour"
+      ]
+    },
+    {
+      "label": "bucket-update-next-hour",
+      "family": "bucket",
+      "kind": "dml",
+      "sql": "",
+      "statements": [
+        "UPDATE BucketDocs SET UpdatedAt=TIMESTAMP '2026-10-31 01:00:00+00' WHERE Id=1"
+      ],
+      "requires": [
+        "bucket-insert"
+      ]
+    },
+    {
+      "label": "bucket-next-hour",
+      "family": "bucket",
+      "kind": "query",
+      "sql": "SELECT Id, UpdatedAt, HourBucket FROM BucketDocs",
+      "requires": [
+        "bucket-update-next-hour"
+      ]
+    },
+    {
+      "label": "graph-node-table",
+      "family": "gql-propagation",
+      "kind": "ddl",
+      "sql": "CREATE TABLE PropNodes (Id INT64 NOT NULL) PRIMARY KEY(Id)"
+    },
+    {
+      "label": "graph-create",
+      "family": "gql-propagation",
+      "kind": "ddl",
+      "sql": "CREATE PROPERTY GRAPH ProbeGraph NODE TABLES (PropNodes)",
+      "requires": [
+        "graph-node-table"
+      ]
+    },
+    {
+      "label": "gql-propagation-full",
+      "family": "gql-propagation",
+      "kind": "query",
+      "sql": "GRAPH ProbeGraph RETURN 1 AS a FULL OUTER UNION ALL RETURN 2 AS b",
+      "requires": [
+        "graph-create"
+      ]
+    },
+    {
+      "label": "gql-propagation-left",
+      "family": "gql-propagation",
+      "kind": "query",
+      "sql": "GRAPH ProbeGraph RETURN 1 AS a LEFT OUTER UNION ALL RETURN 2 AS b",
+      "requires": [
+        "graph-create"
+      ]
+    },
+    {
+      "label": "gql-propagation-inner",
+      "family": "gql-propagation",
+      "kind": "query",
+      "sql": "GRAPH ProbeGraph RETURN 1 AS a INNER UNION ALL RETURN 2 AS a",
+      "requires": [
+        "graph-create"
+      ]
+    }
+  ]
+}

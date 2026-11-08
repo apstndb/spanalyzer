@@ -1,0 +1,31 @@
+package main
+import (
+ "encoding/json"
+ "fmt"
+ "os"
+ "strings"
+ "github.com/cloudspannerecosystem/memefish"
+)
+type item struct { Label string `json:"label"`; Kind string `json:"kind"`; SQL string `json:"sql"`; Statements []string `json:"statements"` }
+type plan struct { Steps []item `json:"steps"` }
+func main() {
+ for _,file:=range os.Args[1:] {
+  data,err:=os.ReadFile(file);if err!=nil {panic(err)}
+  var input plan;if err=json.Unmarshal(data,&input);err!=nil {panic(err)}
+  for _,s:=range input.Steps {
+   texts:=s.Statements;if len(texts)==0&&s.SQL!="" {texts=[]string{s.SQL}}
+   for i,sql:=range texts {
+    sql=strings.ReplaceAll(sql,"{{DATABASE}}","`ProbeDB`")
+    stmts,e:=memefish.ParseStatements(s.Label,sql)
+    row:=map[string]any{"label":s.Label,"statement_index":i,"sql":sql,"accepted":e==nil&&len(stmts)>0,"error":""}
+    if e!=nil {row["error"]=e.Error()} else {
+     var rendered,types []string
+     for _,n:=range stmts {rendered=append(rendered,n.SQL());types=append(types,fmt.Sprintf("%T",n))}
+     row["node_types"]=types;row["unparsed"]=rendered;_,reparseErr:=memefish.ParseStatements(s.Label,strings.Join(rendered,"; "));row["reparse_ok"]=reparseErr==nil
+     if reparseErr!=nil {row["reparse_error"]=reparseErr.Error()}
+    }
+    if err=json.NewEncoder(os.Stdout).Encode(row);err!=nil {panic(err)}
+   }
+  }
+ }
+}

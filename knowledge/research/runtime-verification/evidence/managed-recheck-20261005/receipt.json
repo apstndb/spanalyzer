@@ -1,0 +1,62 @@
+{
+  "observed_on_utc": "2026-10-04",
+  "local_date": "2026-10-05 Asia/Tokyo",
+  "runtime": "Managed Spanner GoogleSQL and temporary managed PostgreSQL; default/PROFILE optimizer 9; server build unavailable",
+  "target": "Existing verification profile; credentials and target coordinates omitted",
+  "source_revision": "c2d7792dd7f83d5dd086e2d32bc22e5d253cf06c",
+  "source_state": "Existing dirty snapshot; source-hashes.json matches the September 29 producer files. No Go implementation changes.",
+  "go_version": "go1.26.8 darwin/arm64",
+  "dependency_scope": {
+    "catalog_integration_readonly_cleanup": "survey, GOWORK=off GOFLAGS=-mod=readonly; Spanner v1.88.0 and memefish v0.8.1",
+    "feature_probes": "Existing workspace, GOFLAGS=-mod=readonly; Spanner v1.91.0"
+  },
+  "feature_producers": {
+    "google-features": {
+      "source_sha256": "5f08e8cbf6e39f1c65667681a98c408541554497158503a0d3510ac16ea7d69c",
+      "binary_sha256": "20e5c0539caeb95dda972fe44ab6f58edf8703bce1dd900539ddef66f1b9b05a",
+      "build_info": "google-features-buildinfo.txt"
+    },
+    "pg-features": {
+      "source_sha256": "002367cc2ce4698f65507d002f5c58eb9bba71cb15d76605c29f4f56a3b8c075",
+      "binary_sha256": "31ba1ec2564a25b06c221ddaf198051cf7405132488dd98cd9d0eadaf54ad106",
+      "build_info": "pg-features-buildinfo.txt"
+    },
+    "queue": {
+      "source_sha256": "a7d26edcac41d2d33f79cfa2e3a35fd00186d0a9f2e0ecbdecb7bc7368ac32f7",
+      "binary_sha256": "1c0c6fc5ea80afcae9527209a4439a7bff39474add52a88be36866116669c8a4",
+      "build_info": "queue-buildinfo.txt"
+    }
+  },
+  "go_run_producers": {
+    "readonly": "41b711a3492c6393e8ae868b284c0222c5ac9ef793893125504cb6fe5613cfaf",
+    "cleanup": "a221735f2f112c93ff45838dd84919b909628bb994e5b4388a1173f069d6730a"
+  },
+  "documentation": {
+    "release-notes.md": "3896f2cdad2895898215c2cdcb213d3f776eb7f1061c9714810c3dc32995a43c",
+    "release-notes.html": "2a159045cbf256753d2ab08a45bbad249529fad3274363867822a6915b750a01",
+    "queues-using.md": "e865dfbf7c4a002dcec2172af2847c4837572624978ef91a1b0a5210e7de9d9d",
+    "pg-functions.md": "98fea3a683e5266ec53067080582e225a26887e0ce964ad744f8a138cadccdd9"
+  },
+  "durable_local_directory": "<LOCAL_TASK_ROOT>/apstndb/spanalyzer/managed-recheck-20261005",
+  "records": {
+    "readonly": 80,
+    "google-features": 53,
+    "pg-features": 40,
+    "queue": 32,
+    "cleanup": 4
+  },
+  "commands": [
+    "commands.json",
+    "readonly-command.json",
+    "feature-commands.json",
+    "cleanup-command.json"
+  ],
+  "retention_transforms": [
+    "Connection coordinates redacted by producers/runner",
+    "Lease tokens replaced with SHA-256 hashes by producer; originals remain in memory only",
+    "Request IDs removed from retained errors"
+  ],
+  "authority": "Isolated owned fixtures and retained research; no changes to existing database objects, dependencies, canonical projections, commit, push, or publication.",
+  "cleanup": "All created fixture drop operations succeeded; final date-prefix TABLES, PROPERTY_GRAPHS, ROUTINES scans empty; temporary PostgreSQL database NotFound.",
+  "documentation_checks": "documentation-checks.json"
+}

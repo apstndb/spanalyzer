@@ -1,0 +1,103 @@
+"""Offline source, semantic-result, cleanup and privacy checks; no SQL requests."""
+from collections import Counter
+from pathlib import Path
+import hashlib
+import json
+import os
+import re
+
+root=Path('<LOCAL_CHECKOUT>')
+scratch=root/'.tmp/managed-recheck-20261023'
+task=Path('<LOCAL_TASK_ROOT>/apstndb/spanalyzer/managed-recheck-20261023')
+evidence=root/'knowledge/research/runtime-verification/evidence'
+current=evidence/'managed-recheck-20261023'
+checks=[]
+def read(path):return json.loads(path.read_text())
+def lines(path):return [json.loads(line)for line in path.read_text().splitlines()if line.strip()]
+def sha(path):return hashlib.sha256(path.read_bytes()).hexdigest()
+def check(name,condition):
+    if not condition:raise AssertionError(name)
+    checks.append(name)
+
+receipt=read(current/'receipt.json')
+check('completed scope keeps known failed gate explicit',receipt['flow_status']=='completed_with_known_local_drift_failure')
+refusal=read(current/'provision-target1-lifecycle-refusal.json')
+check('first target lifecycle refusal retained',refusal['exit_code']==1 and '1 per project lifecycle'in refusal['stderr'])
+trial=receipt['trial']
+check('actual free instance ready in selected region',trial['instanceType']=='FREE_INSTANCE'and trial['state']=='READY'and trial['resourceLocation']=='asia-northeast1')
+check('actual expiry disables paid conversion',trial['freeInstanceMetadata']['expireBehavior']=='REMOVE_AFTER_GRACE_PERIOD'and trial['freeInstanceMetadata']['expireTime']=='2027-01-21T14:24:35.339918Z')
+profile=read(current/'profile-update.json')
+check('profile was updated privately without credentials',profile['command_exits']==[0,0,0]and profile['values_match_authorized_target']and profile['profile_permissions']=='0o600'and not profile['credentials_modified'])
+commands=read(current/'all-commands.json')
+check('only known aggregate gate exits nonzero',[(row['name'],row['exit_code'])for row in commands if row['exit_code']] == [('managed-tests',1)])
+log=(current/'managed-tests.log').read_text()
+check('three named integrations pass',all('--- PASS: '+name in log for name in ['TestCanonicalDDL_RealSpanner','TestExpressionIndex_RealSpanner','TestUUID_RealSpanner']))
+check('only drift integration fails',re.findall(r'--- FAIL: (\S+)',log)==['TestDrift_RealTableMetas']and 'unknown_tables=[ACTIVE_BATCH_OPERATIONS]'in log)
+catalog=read(current/'catalog-comparison.json')
+check('IS 48/310 and SYS 51/598 captures',[(row['table_count'],row['column_count'])for row in catalog['captures']]==[(48,310),(51,598)])
+for capture in catalog['captures']:check('new catalog capture hash '+capture['path'],sha(root/capture['path'])==capture['sha256'])
+check('three SYS reads agree',len({row['current']['surface_sha256']for row in catalog['observations']if row['name'].startswith('spanner-sys')})==1)
+features=read(current/'feature-comparison.json')
+check('explicit volatile graph options changed outcomes',len(features['google-features']['code_changes'])==2 and all(row['before']=='Unimplemented'and row['after']=='OK'for row in features['google-features']['code_changes']))
+check('existing PG and queue codes unchanged',not features['pg-features']['code_changes']and not features['queue']['code_changes'])
+constants=read(current/'json-comparison.json')['corpora']
+check('125 JSON and 64 distinctness cases unchanged',sum(constants[name]['current_cases']for name in ['queries','followup'])==125 and constants['distinctness']['current_cases']==64 and all(not row['differences']for row in constants.values()))
+check('distinctness negative and positive outcomes retained',constants['distinctness']['outcomes']=={'OK':49,'InvalidArgument':15})
+check('other fixture outcome comparisons unchanged',all(not row['changed_codes']for row in read(current/'fixture-comparison.json').values()))
+heartbeats=read(current/'heartbeat-summary.json')
+check('actual child heartbeat records in both dialects',all(row['code']=='OK'and row['rows']==20 and 90<row['median_ms']<110 for row in heartbeats.values()))
+captures=read(current/'value-capture-summary.json')
+check('all three capture modes have actual mutations',all(len(rows)==9 and Counter(row['value_capture_type']for row in rows)=={'NEW_ROW_AND_OLD_VALUES':3,'NEW_ROW':3,'OLD_AND_NEW_VALUES':3}for rows in captures.values()))
+check('capture payloads equal historical bounded fixture',captures==read(evidence/'managed-recheck-20261011/value-capture-summary.json'))
+summary=read(current/'doc-delta-summary.json')
+check('all 136 documentation cases recorded',summary['executed_cases']==136)
+mode_cases=[row for row in summary['gql']if 'matches_expected'in row]
+check('36 GQL rows columns and padding match',len(mode_cases)==36 and all(row['matches_expected']for row in mode_cases))
+check('JSON search 19 triplets agree',len(summary['search'])==19 and all(row['automatic_equals_base']and row['forced_search_equals_base']for row in summary['search']))
+check('automatic small-fixture plans split ten search and nine base',sum(row['variants']['automatic']['uses_search_index_scan']for row in summary['search'])==10)
+full_scans={row['label']for row in summary['search']if row['variants']['forced-search']['full_search_scan']}
+check('range and PG text extraction retain full scan boundary',full_scans=={'google-json-range','pg-json-range','pg-json-text-extraction'})
+check('forced search plans actually scan search index',all(row['variants']['forced-search']['uses_search_index_scan']for row in summary['search']))
+for dialect in ['google','pg']:
+    hll={row['label']:row for row in lines(current/('hll-controls-'+dialect+'.jsonl'))}
+    expected={'corrected-init-null':[{'sketch':None}],'merge-empty':[{'estimate':'0'}],'merge-partial-empty':[{'sketch':None}],'merge-null':[{'estimate':'0'}],'merge-partial-null':[{'sketch':None}],'approx-empty':[{'estimate':'0'}],'approx-null':[{'estimate':'0'}],'mixed-precision-merge':[{'estimate':'2'}],'mixed-precision-partial':[{'estimate':'2'}]}
+    for suffix,rows in expected.items():
+        actual=hll[dialect+'-hll-'+suffix]
+        check(dialect+' HLL '+suffix,actual['code']=='OK'and actual['rows']==rows)
+    check(dialect+' rejects incompatible and invalid sketches',all(hll[dialect+'-hll-'+suffix]['code']=='OutOfRange'for suffix in ['mixed-type-merge','extract-invalid']))
+original={row['label']:row for row in summary['hll']}
+check('original missing-FROM control remains distinct',original['google-hll-init-null']['code']=='InvalidArgument'and 'without FROM'in original['google-hll-init-null']['error'])
+for dialect in ['google','pg']:
+    check(dialect+' precision boundaries',all(original[dialect+'-hll-precision-'+str(value)]['code']=='OutOfRange'for value in [9,25])and all(original[dialect+'-hll-precision-'+str(value)]['rows']==[{'estimate':'2'}]for value in [10,15,24]))
+queue={row['label']:row for row in lines(current/'queue-recreate.jsonl')if 'label'in row}
+check('same-name queue generations match',all(queue['cycle-'+str(value)+'-expected-generation']['matches']for value in [1,2]))
+check('queue cleanup succeeds',queue['cleanup']['code']=='OK'and queue['cleanup-confirmation']['rows']==[{'remaining':'0'}])
+cleanup=read(current/'cleanup-summary.json')['owned_database_fixtures']
+check('ten extra fixture DBs absent',len(cleanup)==10 and all(row=={'drop':'OK','get_after_drop':'NotFound'}for row in cleanup.values()))
+baseline_cleanup={row['label']:row for row in lines(current/'cleanup.jsonl')}
+check('baseline fixture DB and objects absent',baseline_cleanup['temporary-pg-absent']['code']=='NotFound'and all(not row.get('rows')for name,row in baseline_cleanup.items()if name.startswith('remaining-')))
+remaining=json.loads(read(current/'target2-final-databases.json')['stdout'])
+check('final admin list contains only dedicated base DB',len(remaining)==1 and remaining[0]['databaseDialect']=='GOOGLE_STANDARD_SQL'and remaining[0]['state']=='READY')
+history=read(current/'documentation-history-audit.json')
+check('two commits and full source coverage',len(history['commits'])==2 and history['net_changed_files']==19 and history['unique_document_paths']==16 and history['retained_full_mirror_bodies']==29 and history['head_official_body_matches']==16)
+check('reviewed head still main',read(current/'documentation-mirror-head-refresh.json')['sha']==history['head'])
+retrieval=read(current/'documentation-retrieval.json')
+for body in retrieval['bodies']:
+    if body['status']==200:check('pinned document SHA '+body['file'],sha(task/'documents'/body['file'])==body['sha256'])
+for doc in retrieval['official']:
+    path=task/'documents'/('official__'+doc['name'].replace('/','__')+'.md.txt')
+    check('official document SHA '+doc['name'],sha(path)==doc['body_sha256'])
+live=read(current/'documentation-live-inspection.json')
+check('release remains October 20',live['release_feed_latest']['title']=='October 20, 2026')
+check('live HTML differs from broken API snippets',live['search-functions.html']['normal_language_tag_arrow']and not live['search-functions.html']['corrupt_search_marker']and live['databoost-monitor.html']['normal_timestamp_predicate']and not live['databoost-monitor.html']['corrupt_databoost_marker'])
+check('123 implementation hashes unchanged',not read(current/'source-comparison.json')['changed_files']and all(sha(root/path)==value for path,value in read(current/'source-hashes.json').items()))
+check('twelve existing producers only change dates',all(row['equal_after_fixture_date_substitution']for row in read(current/'producer-comparison.json')))
+initial=read(scratch/'initial-artifact-manifest.json')['files'];manifest=read(evidence/'artifact-sha256.json')['files']
+check('716 prior artifact hashes preserved',len(initial)==716 and all(manifest.get(path)==value and sha(evidence/path)==value for path,value in initial.items()))
+check('all current retained artifacts hashed',all(manifest.get(str(path.relative_to(evidence)))==sha(path)for path in current.iterdir()if path.is_file()))
+destinations=[os.environ.get(key,'')for key in ['SPANNER_PROJECT_ID','SPANNER_INSTANCE_ID','SPANNER_DATABASE_ID']]
+check('privacy check receives dedicated profile',all(destinations))
+check('no connection destinations retained',all(not any(value in path.read_text()for value in destinations)for path in current.iterdir()if path.is_file()))
+result={'status':'pass','checks':len(checks),'scope':'Offline source/result/cleanup/privacy assertions only; managed execution evidence is retained separately','details':checks}
+(task/'evidence-check.json').write_text(json.dumps(result,indent=2)+'\n')
+print(json.dumps({'status':'pass','checks':len(checks)}))

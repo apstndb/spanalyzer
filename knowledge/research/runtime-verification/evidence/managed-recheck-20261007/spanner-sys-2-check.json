@@ -1,0 +1,100 @@
+{
+  "schema_version": "v0alpha1",
+  "status": "surface_changed",
+  "material_change": true,
+  "current": {
+    "schema_version": "v0alpha2",
+    "target": {
+      "kind": "managed",
+      "observation_scope": "single_database"
+    },
+    "observed_at": "2026-10-07T14:29:26.993198Z",
+    "surface_sha256": "9bb70c640b69e4929e4b44ed834d69e1dfcd5fc17cc53e017f541b9f58f9ec8f",
+    "column_count": 598,
+    "producer_source_sha256": "3cf070ae5909bb26babeb3ca5bcfa20a161e2440eac934ca14d42de41a82a12a",
+    "invocation_sha256": "911f8d0021d67bf33420131130a46c1b258f3c30665bf390510113ad931a342c"
+  },
+  "retained": {
+    "path": "survey/spannersys/evidence/managed/20260916T175741Z-58205fd318c3.json",
+    "schema_version": "v0alpha2",
+    "target": {
+      "kind": "managed",
+      "observation_scope": "single_database"
+    },
+    "observed_at": "2026-09-16T17:57:41.707458Z",
+    "surface_sha256": "58205fd318c3b38615f801290c44b78a3dddcbdd2e8916298c6c7a8ff4a2d727",
+    "column_count": 587,
+    "producer_source_sha256": "9a8de6fc60e9a4949fb6a999340f97f5fd5ffd54718a90cacd7f744e51b45a1d",
+    "invocation_sha256": "911f8d0021d67bf33420131130a46c1b258f3c30665bf390510113ad931a342c"
+  },
+  "surface_delta": {
+    "added_columns": [
+      {
+        "table_name": "ACTIVE_BATCH_OPERATIONS",
+        "column_name": "LAST_UPDATE_TIMESTAMP",
+        "spanner_type": "TIMESTAMP",
+        "ordinal_position": 11
+      },
+      {
+        "table_name": "ACTIVE_BATCH_OPERATIONS",
+        "column_name": "NUM_PARTITIONS_COMPLETE",
+        "spanner_type": "INT64",
+        "ordinal_position": 4
+      },
+      {
+        "table_name": "ACTIVE_BATCH_OPERATIONS",
+        "column_name": "NUM_PARTITIONS_TOTAL",
+        "spanner_type": "INT64",
+        "ordinal_position": 3
+      },
+      {
+        "table_name": "ACTIVE_BATCH_OPERATIONS",
+        "column_name": "NUM_TRIVIAL_PARTITIONS_COMPLETE",
+        "spanner_type": "INT64",
+        "ordinal_position": 5
+      },
+      {
+        "table_name": "ACTIVE_BATCH_OPERATIONS",
+        "column_name": "PROGRESS",
+        "spanner_type": "STRING(MAX)",
+        "ordinal_position": 6
+      },
+      {
+        "table_name": "ACTIVE_BATCH_OPERATIONS",
+        "column_name": "QUERY_ID",
+        "spanner_type": "STRING(MAX)",
+        "ordinal_position": 2
+      },
+      {
+        "table_name": "ACTIVE_BATCH_OPERATIONS",
+        "column_name": "RESULT",
+        "spanner_type": "STRING(MAX)",
+        "ordinal_position": 9
+      },
+      {
+        "table_name": "ACTIVE_BATCH_OPERATIONS",
+        "column_name": "ROWS_PROCESSED",
+        "spanner_type": "INT64",
+        "ordinal_position": 7
+      },
+      {
+        "table_name": "ACTIVE_BATCH_OPERATIONS",
+        "column_name": "START_TIMESTAMP",
+        "spanner_type": "TIMESTAMP",
+        "ordinal_position": 10
+      },
+      {
+        "table_name": "ACTIVE_BATCH_OPERATIONS",
+        "column_name": "STATUS",
+        "spanner_type": "STRING(MAX)",
+        "ordinal_position": 8
+      },
+      {
+        "table_name": "ACTIVE_BATCH_OPERATIONS",
+        "column_name": "TEXT",
+        "spanner_type": "STRING(MAX)",
+        "ordinal_position": 1
+      }
+    ]
+  }
+}

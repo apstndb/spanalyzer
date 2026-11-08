@@ -1,0 +1,78 @@
+{
+  "observed_on": "2026-10-10",
+  "managed_baseline_interval": {
+    "first_command_started_at": "2026-10-10T01:24:13.081403+00:00",
+    "last_command_completed_at": "2026-10-10T01:39:51.519216+00:00"
+  },
+  "interval": {
+    "started_at": "2026-10-10T01:50:39.211713+00:00",
+    "completed_at": "2026-10-10T01:54:01.316185+00:00"
+  },
+  "root_head": "c2d7792dd7f83d5dd086e2d32bc22e5d253cf06c",
+  "root_checkout_dirty": true,
+  "images": {
+    "omni": {
+      "requested": "us-docker.pkg.dev/spanner-omni/images/spanner-omni:2026.r4-lts@sha256:9f10586c5de366bec5c0ff6cf542a67c21c8363e8a12a3deb9c372a07c9aa8b6",
+      "observed_platform": "linux/arm64",
+      "pinned_local_image": {
+        "Id": "sha256:9f10586c5de366bec5c0ff6cf542a67c21c8363e8a12a3deb9c372a07c9aa8b6",
+        "RepoDigests": [
+          "us-docker.pkg.dev/spanner-omni/images/spanner-omni@sha256:9f10586c5de366bec5c0ff6cf542a67c21c8363e8a12a3deb9c372a07c9aa8b6"
+        ],
+        "Architecture": "arm64",
+        "Os": "linux",
+        "Descriptor": {
+          "mediaType": "application/vnd.oci.image.manifest.v1+json",
+          "digest": "sha256:9f10586c5de366bec5c0ff6cf542a67c21c8363e8a12a3deb9c372a07c9aa8b6",
+          "size": 2006
+        }
+      }
+    },
+    "emulator": {
+      "requested": "gcr.io/cloud-spanner-emulator/emulator:1.5.58@sha256:5f42f55ad4129ea0d86cf60f0d385e8a6be60a7e8e0cc791adcdedc8982bcb55",
+      "observed_platform": "linux/arm64",
+      "pinned_local_image": {
+        "Id": "sha256:5f42f55ad4129ea0d86cf60f0d385e8a6be60a7e8e0cc791adcdedc8982bcb55",
+        "RepoDigests": [
+          "gcr.io/cloud-spanner-emulator/emulator@sha256:5f42f55ad4129ea0d86cf60f0d385e8a6be60a7e8e0cc791adcdedc8982bcb55"
+        ],
+        "Architecture": "arm64",
+        "Os": "linux",
+        "Descriptor": {
+          "mediaType": "application/vnd.docker.distribution.manifest.v2+json",
+          "digest": "sha256:5f42f55ad4129ea0d86cf60f0d385e8a6be60a7e8e0cc791adcdedc8982bcb55",
+          "size": 5120
+        }
+      }
+    }
+  },
+  "explicit_image_overrides": true,
+  "runtime_targets_json_modified": false,
+  "dependencies": {
+    "go": "go1.26.8",
+    "cloud.google.com/go/spanner": "v1.91.0",
+    "github.com/apstndb/spanemuboost": "v0.4.10-alpha.1",
+    "workspace": "off; standalone scratch-only module"
+  },
+  "sdk_matches_managed_baseline": true,
+  "source_sha256": {
+    "probe.go.txt": "cdaed061685f0e71eaaedd66eabb5b041f02066aaf332caf84b9051a7c510589",
+    "go.mod.txt": "f6267794f45db151d404ebd1b6d33e8805b9df986bd04a972741d2f1700f275f",
+    "go.sum.txt": "d5480d7367294a6c0ef1fabab4f0fc4f64436c7d9f2ecc9a5de8b6f5ba77c10e",
+    "run.py.txt": "dc42a0df64b53e4b0997d9645d0694fd681f2bfdae65c71478027ff4f83e4f18",
+    "probe-buildinfo.txt": "33ee344212e5e78e6319d50ae166e5bb2ae9a1d7c97d4803f24ee51b753c5c86"
+  },
+  "emulator_source_commit": "a081a7e71aba5f4d05fc8c6b21ef1a269dcbac28",
+  "durable_task_directory": "<LOCAL_TASK_ROOT>/apstndb/spanalyzer/json-cross-engine-20261010",
+  "commands_exit_zero": true,
+  "database_cleanup": "Both owned GoogleSQL/PostgreSQL fixtures in each runtime: cleanup OK and subsequent GetDatabase NotFound",
+  "container_cleanup": "Both runtime Close calls OK and Docker ancestor inspections empty",
+  "limits": [
+    "Existing managed evidence was compared, not rerun.",
+    "One bounded corpus and one architecture; no fleet-wide or full-engine compatibility claim.",
+    "No version-paired prior baseline establishes a runtime introduction date.",
+    "Negative label-propagation seeds and export-based analytics jobs remain unverified.",
+    "Cloud-only instance configuration and metrics changes do not have container equivalents."
+  ],
+  "authority": "Local verification and documentation only; no commit, push, PR, merge or publication."
+}

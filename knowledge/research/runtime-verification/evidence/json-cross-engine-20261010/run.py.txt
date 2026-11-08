@@ -1,0 +1,62 @@
+"""Owned container probes; no managed credentials or endpoint are used."""
+from pathlib import Path
+import datetime, json, os, re, subprocess, time
+
+root = Path('<LOCAL_CHECKOUT>')
+scratch = root / '.tmp/json-cross-engine-20261010'
+module = scratch / 'module'
+durable = Path('<LOCAL_TASK_ROOT>/apstndb/spanalyzer/json-cross-engine-20261010/evidence')
+go = '<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go'
+env = os.environ.copy()
+for key in list(env):
+    if key.startswith(('SPANEMUBOOST_', 'SPANNER_', 'TEST_REAL_SPANNER_', 'GOOGLE_APPLICATION_CREDENTIALS')):
+        env.pop(key, None)
+env.update(GOWORK='off', GOTOOLCHAIN='local', GOROOT=str(Path(go).parent.parent),
+           GOCACHE=str(root / '.tmp/managed-recheck-20260925/go-cache'),
+           GOFLAGS='-mod=readonly', TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE='/var/run/docker.sock')
+env['PATH'] = str(Path(go).parent) + ':' + env['PATH']
+env['DOCKER_HOST'] = subprocess.check_output(['docker', 'context', 'inspect', '--format', '{{.Endpoints.docker.Host}}'], text=True).strip()
+images = {
+    'omni': 'us-docker.pkg.dev/spanner-omni/images/spanner-omni:2026.r4-lts@sha256:9f10586c5de366bec5c0ff6cf542a67c21c8363e8a12a3deb9c372a07c9aa8b6',
+    'emulator': 'gcr.io/cloud-spanner-emulator/emulator:1.5.58@sha256:5f42f55ad4129ea0d86cf60f0d385e8a6be60a7e8e0cc791adcdedc8982bcb55',
+}
+receipts_path = durable / 'commands.json'
+receipts = json.loads(receipts_path.read_text()) if receipts_path.exists() else []
+
+def scrub(text):
+    text = re.sub(r'projects/[^/\s]+/instances/[^/\s]+/databases/[^\s"\x27]+', '<database>', text)
+    return re.sub(r'requestID = "[^"]*"', 'requestID = "<redacted>"', text)
+
+def run(name, args, timeout=1800):
+    if any(r['name'] == name and r['exit_code'] == 0 for r in receipts):
+        print('RETAINED ' + name, flush=True)
+        return 0
+    print('START ' + name, flush=True)
+    started = datetime.datetime.now(datetime.timezone.utc).isoformat()
+    at = time.time()
+    stderr_path = scratch / (name + '.stderr')
+    # Structured records are redacted by the producer before leaving the child.
+    # Stream them to disk to retain progress if an endpoint aborts mid-suite.
+    with stderr_path.open('w') as stderr, (scratch / (name + '.stdout')).open('w') as stdout:
+        p = subprocess.Popen(args, cwd=module, env=env, stdout=subprocess.PIPE, stderr=stderr, text=True)
+        for line in p.stdout:
+            stdout.write(scrub(line)); stdout.flush()
+        code = p.wait(timeout=timeout)
+    text = scrub(stderr_path.read_text()); stderr_path.write_text(text)
+    for stream in ['stdout', 'stderr']:
+        (durable / (name + '.' + stream)).write_text((scratch / (name + '.' + stream)).read_text())
+    r = {'name': name, 'argv': args, 'cwd': str(module), 'started_at': started,
+         'completed_at': datetime.datetime.now(datetime.timezone.utc).isoformat(),
+         'seconds': round(time.time() - at, 3), 'exit_code': code}
+    receipts.append(r); receipts_path.write_text(json.dumps(receipts, indent=2) + '\n')
+    print(json.dumps(r), flush=True)
+    return code
+
+if run('module-tidy', [go, 'mod', 'tidy']):
+    raise SystemExit('Scratch-only module resolution failed')
+if run('probe-build', [go, 'build', '-o', str(scratch / 'probe'), './probe.go']):
+    raise SystemExit('Probe build failed')
+run('probe-buildinfo', [go, 'version', '-m', str(scratch / 'probe')])
+for backend, image in images.items():
+    run(backend, [str(scratch / 'probe'), backend, image])
+print('Finished both runs; inspect all query outcomes and cleanup records.', flush=True)

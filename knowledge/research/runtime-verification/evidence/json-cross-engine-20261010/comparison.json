@@ -1,0 +1,1237 @@
+{
+  "managed_baseline": "../docs-diff-20261010",
+  "cases_sha256": {
+    "cases.json": "88ea7a8f08ad047dbe6c294b89e836f51138cf5fd7a241fe2d43ca23cd0b5e8b",
+    "followup-cases.json": "4459272c98fb1132394d1fc23d9674d143e469189ae157e7698b046859617c60"
+  },
+  "runtimes": {
+    "omni": {
+      "records": 230,
+      "constant_codes": {
+        "OK": 99,
+        "InvalidArgument": 12,
+        "OutOfRange": 13,
+        "Unimplemented": 1
+      },
+      "matching_managed_constant_codes": 125,
+      "matching_successful_constant_results": 99,
+      "constant_differences": [],
+      "phases": {
+        "google-fixtures": {
+          "old-for-all-control": {
+            "code": "InvalidArgument",
+            "row_count": 0,
+            "rows": null
+          },
+          "heartbeat-boundary-99": {
+            "code": "InvalidArgument",
+            "row_count": 0,
+            "rows": null
+          },
+          "heartbeat-boundary-100": {
+            "code": "OK",
+            "row_count": 2,
+            "rows": null
+          },
+          "heartbeat-boundary-999": {
+            "code": "OK",
+            "row_count": 2,
+            "rows": null
+          },
+          "heartbeat-boundary-1000": {
+            "code": "OK",
+            "row_count": 2,
+            "rows": null
+          },
+          "heartbeat-boundary-300000": {
+            "code": "OK",
+            "row_count": 2,
+            "rows": null
+          },
+          "heartbeat-boundary-300001": {
+            "code": "InvalidArgument",
+            "row_count": 0,
+            "rows": null
+          },
+          "read-options-omitted": {
+            "code": "OK",
+            "row_count": 2,
+            "rows": null
+          },
+          "read-options-empty": {
+            "code": "InvalidArgument",
+            "row_count": 0,
+            "rows": null
+          },
+          "read-options-nonnull": {
+            "code": "InvalidArgument",
+            "row_count": 0,
+            "rows": null
+          },
+          "heartbeat-child-100": {
+            "code": "OK",
+            "row_count": 19,
+            "rows": null
+          },
+          "stored-json-sort": {
+            "code": "OK",
+            "row_count": 4,
+            "rows": [
+              {
+                "Id": "2",
+                "J": "{\"n\":0}"
+              },
+              {
+                "Id": "4",
+                "J": "{\"n\":0}"
+              },
+              {
+                "Id": "1",
+                "J": "{\"n\":1}"
+              },
+              {
+                "Id": "3",
+                "J": "{\"n\":1}"
+              }
+            ]
+          },
+          "stored-json-group": {
+            "code": "OK",
+            "row_count": 2,
+            "rows": [
+              {
+                "J": "{\"n\":0}",
+                "n": "2"
+              },
+              {
+                "J": "{\"n\":1}",
+                "n": "2"
+              }
+            ]
+          },
+          "conditional-profile": {
+            "code": "OK",
+            "row_count": 1,
+            "rows": [
+              {
+                "result": "10"
+              }
+            ]
+          },
+          "conditional-profile-error-suppression": {
+            "code": "OK",
+            "row_count": 1,
+            "rows": [
+              {
+                "result": 10
+              }
+            ]
+          },
+          "graph-node-control": {
+            "code": "OK",
+            "row_count": 4,
+            "rows": null
+          },
+          "graph-edge-control": {
+            "code": "OK",
+            "row_count": 1,
+            "rows": null
+          },
+          "graph-element-cast-normal": {
+            "code": "Unimplemented",
+            "row_count": 0,
+            "rows": null
+          },
+          "graph-path-cast-normal": {
+            "code": "Unimplemented",
+            "row_count": 0,
+            "rows": null
+          },
+          "graph-element-to-json-control": {
+            "code": "OK",
+            "row_count": 4,
+            "rows": null
+          },
+          "graph-path-to-json-control": {
+            "code": "OK",
+            "row_count": 1,
+            "rows": null
+          },
+          "graph-property-cast-control": {
+            "code": "OK",
+            "row_count": 4,
+            "rows": null
+          },
+          "cast-enum": {
+            "code": "OK",
+            "row_count": 1,
+            "rows": [
+              {
+                "result": "\"ONE\""
+              }
+            ]
+          },
+          "cast-proto": {
+            "code": "OK",
+            "row_count": 1,
+            "rows": [
+              {
+                "result": "{\"name\":\"x\",\"value\":\"1\"}"
+              }
+            ]
+          },
+          "enum-equality": {
+            "code": "OK",
+            "row_count": 1,
+            "rows": [
+              {
+                "result": true
+              }
+            ]
+          },
+          "enum-order-reject": {
+            "code": "InvalidArgument",
+            "row_count": 0,
+            "rows": []
+          },
+          "enum-array-equality": {
+            "code": "OK",
+            "row_count": 1,
+            "rows": [
+              {
+                "result": true
+              }
+            ]
+          },
+          "enum-array-order-reject": {
+            "code": "InvalidArgument",
+            "row_count": 0,
+            "rows": []
+          },
+          "database-cleanup": {
+            "code": "OK",
+            "row_count": 0,
+            "rows": null
+          },
+          "database-absent": {
+            "code": "NotFound",
+            "row_count": 0,
+            "rows": null
+          }
+        },
+        "pg-fixtures": {
+          "database-setup": {
+            "code": "OK",
+            "row_count": 0,
+            "rows": null
+          },
+          "old-for-all-control": {
+            "code": "InvalidArgument",
+            "row_count": 0,
+            "rows": null
+          },
+          "heartbeat-boundary-99": {
+            "code": "InvalidArgument",
+            "row_count": 0,
+            "rows": null
+          },
+          "heartbeat-boundary-100": {
+            "code": "OK",
+            "row_count": 2,
+            "rows": null
+          },
+          "heartbeat-boundary-999": {
+            "code": "OK",
+            "row_count": 2,
+            "rows": null
+          },
+          "heartbeat-boundary-1000": {
+            "code": "OK",
+            "row_count": 2,
+            "rows": null
+          },
+          "heartbeat-boundary-300000": {
+            "code": "OK",
+            "row_count": 2,
+            "rows": null
+          },
+          "heartbeat-boundary-300001": {
+            "code": "InvalidArgument",
+            "row_count": 0,
+            "rows": null
+          },
+          "read-options-omitted": {
+            "code": "OK",
+            "row_count": 2,
+            "rows": null
+          },
+          "read-options-empty": {
+            "code": "InvalidArgument",
+            "row_count": 0,
+            "rows": null
+          },
+          "read-options-nonnull": {
+            "code": "InvalidArgument",
+            "row_count": 0,
+            "rows": null
+          },
+          "heartbeat-child-100": {
+            "code": "OK",
+            "row_count": 18,
+            "rows": null
+          },
+          "database-cleanup": {
+            "code": "OK",
+            "row_count": 0,
+            "rows": null
+          },
+          "database-absent": {
+            "code": "NotFound",
+            "row_count": 0,
+            "rows": null
+          }
+        }
+      },
+      "heartbeats": {
+        "google-fixtures": {
+          "records": 19,
+          "timestamp_gap_ms": {
+            "min": 77.692,
+            "median": 104.24549999999999,
+            "max": 125.36500000000001
+          },
+          "arrival_gap_ms": {
+            "min": 83.388,
+            "median": 103.51650000000001,
+            "max": 131.356
+          },
+          "end_timestamp": "2026-10-10T01:52:15.225001Z",
+          "note": "Record timestamps measure progress; SDK buffering and independent host/container clocks prevent arrival-time or latency guarantees."
+        },
+        "pg-fixtures": {
+          "records": 18,
+          "timestamp_gap_ms": {
+            "min": 101.28,
+            "median": 101.782,
+            "max": 227.834
+          },
+          "arrival_gap_ms": {
+            "min": 100.738,
+            "median": 102.022,
+            "max": 233.62
+          },
+          "end_timestamp": "2026-10-10T01:53:43.571922Z",
+          "note": "Record timestamps measure progress; SDK buffering and independent host/container clocks prevent arrival-time or latency guarantees."
+        }
+      }
+    },
+    "emulator": {
+      "records": 230,
+      "constant_codes": {
+        "InvalidArgument": 102,
+        "OK": 15,
+        "OutOfRange": 8
+      },
+      "matching_managed_constant_codes": 35,
+      "matching_successful_constant_results": 15,
+      "constant_differences": [
+        {
+          "label": "json-equality",
+          "managed_code": "OK",
+          "runtime_code": "InvalidArgument",
+          "rows": [],
+          "error": "spanner: code = \"InvalidArgument\", desc = \"Equality is not defined for arguments of type JSON [at 1:8]\\nSELECT JSON '1' = JSON '1.0' AS result\\n       ^\", requestID = \"<redacted>\""
+        },
+        {
+          "label": "json-number-order",
+          "managed_code": "OK",
+          "runtime_code": "InvalidArgument",
+          "rows": [],
+          "error": "spanner: code = \"InvalidArgument\", desc = \"Greater than is not defined for arguments of type JSON [at 1:8]\\nSELECT JSON '10' > JSON '2' AS result\\n       ^\", requestID = \"<redacted>\""
+        },
+        {
+          "label": "json-type-order",
+          "managed_code": "OK",
+          "runtime_code": "InvalidArgument",
+          "rows": [],
+          "error": "spanner: code = \"InvalidArgument\", desc = \"Less than is not defined for arguments of type JSON [at 1:8]\\nSELECT JSON 'null' < JSON '\\\"a\\\"' AND JSON '\\\"z\\\"' < JSON '-1' AND JSON '999' < J...\\n       ^\", requestID = \"<redacted>\""
+        },
+        {
+          "label": "bool-order",
+          "managed_code": "OK",
+          "runtime_code": "InvalidArgument",
+          "rows": [],
+          "error": "spanner: code = \"InvalidArgument\", desc = \"Less than is not defined for arguments of type JSON [at 1:8]\\nSELECT JSON 'false' < JSON 'true' AS result\\n       ^\", requestID = \"<redacted>\""
+        },
+        {
+          "label": "string-order",
+          "managed_code": "OK",
+          "runtime_code": "InvalidArgument",
+          "rows": [],
+          "error": "spanner: code = \"InvalidArgument\", desc = \"Less than is not defined for arguments of type JSON [at 1:8]\\nSELECT JSON '\\\"a\\\"' < JSON '\\\"b\\\"' AS result\\n       ^\", requestID = \"<redacted>\""
+        },
+        {
+          "label": "object-key-order",
+          "managed_code": "OK",
+          "runtime_code": "InvalidArgument",
+          "rows": [],
+          "error": "spanner: code = \"InvalidArgument\", desc = \"Equality is not defined for arguments of type JSON [at 1:8]\\nSELECT JSON '{\\\"b\\\":2,\\\"a\\\":1}' = JSON '{\\\"a\\\":1,\\\"b\\\":2}' AS result\\n       ^\", requestID = \"<redacted>\""
+        },
+        {
+          "label": "object-keys-before-values",
+          "managed_code": "OK",
+          "runtime_code": "InvalidArgument",
+          "rows": [],
+          "error": "spanner: code = \"InvalidArgument\", desc = \"Less than is not defined for arguments of type JSON [at 1:8]\\nSELECT JSON '{\\\"a\\\":999}' < JSON '{\\\"b\\\":0}' AS result\\n       ^\", requestID = \"<redacted>\""
+        },
+        {
+          "label": "object-value-order",
+          "managed_code": "OK",
+          "runtime_code": "InvalidArgument",
+          "rows": [],
+          "error": "spanner: code = \"InvalidArgument\", desc = \"Less than is not defined for arguments of type JSON [at 1:8]\\nSELECT JSON '{\\\"a\\\":2}' < JSON '{\\\"a\\\":10}' AS result\\n       ^\", requestID = \"<redacted>\""
+        },
+        {
+          "label": "object-prefix",
+          "managed_code": "OK",
+          "runtime_code": "InvalidArgument",
+          "rows": [],
+          "error": "spanner: code = \"InvalidArgument\", desc = \"Less than is not defined for arguments of type JSON [at 1:8]\\nSELECT JSON '{\\\"a\\\":1}' < JSON '{\\\"a\\\":1,\\\"b\\\":0}' AS result\\n       ^\", requestID = \"<redacted>\""
+        },
+        {
+          "label": "array-prefix",
+          "managed_code": "OK",
+          "runtime_code": "InvalidArgument",
+          "rows": [],
+          "error": "spanner: code = \"InvalidArgument\", desc = \"Less than is not defined for arguments of type JSON [at 1:8]\\nSELECT JSON '[1,2]' < JSON '[1,2,0]' AS result\\n       ^\", requestID = \"<redacted>\""
+        },
+        {
+          "label": "array-numeric",
+          "managed_code": "OK",
+          "runtime_code": "InvalidArgument",
+          "rows": [],
+          "error": "spanner: code = \"InvalidArgument\", desc = \"Less than is not defined for arguments of type JSON [at 1:8]\\nSELECT JSON '[2]' < JSON '[10]' AS result\\n       ^\", requestID = \"<redacted>\""
+        },
+        {
+          "label": "json-null-equal",
+          "managed_code": "OK",
+          "runtime_code": "InvalidArgument",
+          "rows": [],
+          "error": "spanner: code = \"InvalidArgument\", desc = \"Equality is not defined for arguments of type JSON [at 1:8]\\nSELECT JSON 'null' = JSON 'null' AS result\\n       ^\", requestID = \"<redacted>\""
+        },
+        {
+          "label": "sql-null-equal",
+          "managed_code": "OK",
+          "runtime_code": "InvalidArgument",
+          "rows": [],
+          "error": "spanner: code = \"InvalidArgument\", desc = \"Equality is not defined for arguments of type JSON [at 1:8]\\nSELECT JSON 'null' = CAST(NULL AS JSON) AS result\\n       ^\", requestID = \"<redacted>\""
+        },
+        {
+          "label": "json-string-vs-object-text",
+          "managed_code": "OK",
+          "runtime_code": "InvalidArgument",
+          "rows": [],
+          "error": "spanner: code = \"InvalidArgument\", desc = \"No matching signature for operator = for argument types: JSON, STRING\\n  Signature: T1 = T1\\n    Unable to find common supertype for templated argument <T1>\\n      Input types for <T1>: {STRING, JSON} [at 1:8]\\nSELECT JSON '{\\\"a\\\":1}' = '{\\\"a\\\":1}' AS result\\n       ^\", requestID = \"<redacted>\""
+        },
+        {
+          "label": "in-json-first",
+          "managed_code": "OK",
+          "runtime_code": "InvalidArgument",
+          "rows": [],
+          "error": "spanner: code = \"InvalidArgument\", desc = \"No matching signature for operator IN for argument types JSON and {INT64} [at 1:17]\\nSELECT JSON '2' IN (1, 2, 3) AS result\\n                ^\", requestID = \"<redacted>\""
+        },
+        {
+          "label": "in-json-unnest-json",
+          "managed_code": "OK",
+          "runtime_code": "InvalidArgument",
+          "rows": [],
+          "error": "spanner: code = \"InvalidArgument\", desc = \"First argument to IN UNNEST of type JSON does not support equality comparison [at 1:17]\\nSELECT JSON '2' IN UNNEST([JSON '1', JSON '2']) AS result\\n                ^\", requestID = \"<redacted>\""
+        },
+        {
+          "label": "in-json-subquery-json",
+          "managed_code": "OK",
+          "runtime_code": "InvalidArgument",
+          "rows": [],
+          "error": "spanner: code = \"InvalidArgument\", desc = \"Cannot execute IN subquery with uncomparable types JSON and JSON [at 1:8]\\nSELECT JSON '2' IN (SELECT JSON '2') AS result\\n       ^\", requestID = \"<redacted>\""
+        },
+        {
+          "label": "between-json-first",
+          "managed_code": "OK",
+          "runtime_code": "InvalidArgument",
+          "rows": [],
+          "error": "spanner: code = \"InvalidArgument\", desc = \"No matching signature for operator BETWEEN\\n  Argument types: JSON, INT64, INT64\\n  Signature: (T1) BETWEEN (T1) AND (T1)\\n    Unable to find common supertype for templated argument <T1>\\n      Input types for <T1>: {INT64, JSON} [at 1:17]\\nSELECT JSON '2' BETWEEN 1 AND 3 AS result\\n                ^\", requestID = \"<redacted>\""
+        },
+        {
+          "label": "array-order-coerce",
+          "managed_code": "OK",
+          "runtime_code": "InvalidArgument",
+          "rows": [],
+          "error": "spanner: code = \"InvalidArgument\", desc = \"No matching signature for operator < for argument types: JSON, ARRAY<INT64>\\n  Signature: T1 < T1\\n    Unable to find common supertype for templated argument <T1>\\n      Input types for <T1>: {ARRAY<INT64>, JSON} [at 1:8]\\nSELECT JSON '[1,2]' < [1,3] AS result\\n       ^\", requestID = \"<redacted>\""
+        },
+        {
+          "label": "json-case",
+          "managed_code": "OK",
+          "runtime_code": "InvalidArgument",
+          "rows": [],
+          "error": "spanner: code = \"InvalidArgument\", desc = \"Argument 1 to CASE must support equality; Type JSON does not [at 1:13]\\nSELECT CASE JSON '1' WHEN JSON '1.0' THEN 'yes' ELSE 'no' END AS result\\n            ^\", requestID = \"<redacted>\""
+        },
+        {
+          "label": "json-is-distinct",
+          "managed_code": "OK",
+          "runtime_code": "InvalidArgument",
+          "rows": [],
+          "error": "spanner: code = \"InvalidArgument\", desc = \"Grouping is not defined for arguments of type JSON [at 1:8]\\nSELECT JSON '1' IS DISTINCT FROM JSON '1.0' AS result\\n       ^\", requestID = \"<redacted>\""
+        },
+        {
+          "label": "json-null-in",
+          "managed_code": "OK",
+          "runtime_code": "InvalidArgument",
+          "rows": [],
+          "error": "spanner: code = \"InvalidArgument\", desc = \"IN is not defined for arguments of type JSON [at 1:20]\\nSELECT JSON 'null' IN (NULL, JSON 'null') AS result\\n                   ^\", requestID = \"<redacted>\""
+        },
+        {
+          "label": "cast-int",
+          "managed_code": "OK",
+          "runtime_code": "InvalidArgument",
+          "rows": [],
+          "error": "spanner: code = \"InvalidArgument\", desc = \"Invalid cast from INT64 to JSON [at 1:13]\\nSELECT CAST(1 AS JSON) AS result\\n            ^\", requestID = \"<redacted>\""
+        },
+        {
+          "label": "cast-float32",
+          "managed_code": "OK",
+          "runtime_code": "InvalidArgument",
+          "rows": [],
+          "error": "spanner: code = \"InvalidArgument\", desc = \"Invalid cast from FLOAT32 to JSON [at 1:13]\\nSELECT CAST(CAST(1.25 AS FLOAT32) AS JSON) AS result\\n            ^\", requestID = \"<redacted>\""
+        },
+        {
+          "label": "cast-float64",
+          "managed_code": "OK",
+          "runtime_code": "InvalidArgument",
+          "rows": [],
+          "error": "spanner: code = \"InvalidArgument\", desc = \"Invalid cast from FLOAT64 to JSON [at 1:13]\\nSELECT CAST(1.25 AS JSON) AS result\\n            ^\", requestID = \"<redacted>\""
+        },
+        {
+          "label": "cast-numeric",
+          "managed_code": "OK",
+          "runtime_code": "InvalidArgument",
+          "rows": [],
+          "error": "spanner: code = \"InvalidArgument\", desc = \"Invalid cast from NUMERIC to JSON [at 1:13]\\nSELECT CAST(NUMERIC '1.25' AS JSON) AS result\\n            ^\", requestID = \"<redacted>\""
+        },
+        {
+          "label": "cast-bool",
+          "managed_code": "OK",
+          "runtime_code": "InvalidArgument",
+          "rows": [],
+          "error": "spanner: code = \"InvalidArgument\", desc = \"Invalid cast from BOOL to JSON [at 1:13]\\nSELECT CAST(TRUE AS JSON) AS result\\n            ^\", requestID = \"<redacted>\""
+        },
+        {
+          "label": "cast-string",
+          "managed_code": "OK",
+          "runtime_code": "InvalidArgument",
+          "rows": [],
+          "error": "spanner: code = \"InvalidArgument\", desc = \"Invalid cast from STRING to JSON [at 1:13]\\nSELECT CAST('foo' AS JSON) AS result\\n            ^\", requestID = \"<redacted>\""
+        },
+        {
+          "label": "cast-string-json-looking",
+          "managed_code": "OK",
+          "runtime_code": "InvalidArgument",
+          "rows": [],
+          "error": "spanner: code = \"InvalidArgument\", desc = \"Invalid cast from STRING to JSON [at 1:13]\\nSELECT CAST('{\\\"a\\\":1}' AS JSON) AS result\\n            ^\", requestID = \"<redacted>\""
+        },
+        {
+          "label": "cast-bytes",
+          "managed_code": "OK",
+          "runtime_code": "InvalidArgument",
+          "rows": [],
+          "error": "spanner: code = \"InvalidArgument\", desc = \"Invalid cast from BYTES to JSON [at 1:13]\\nSELECT CAST(b'a' AS JSON) AS result\\n            ^\", requestID = \"<redacted>\""
+        },
+        {
+          "label": "cast-date",
+          "managed_code": "OK",
+          "runtime_code": "InvalidArgument",
+          "rows": [],
+          "error": "spanner: code = \"InvalidArgument\", desc = \"Invalid cast from DATE to JSON [at 1:13]\\nSELECT CAST(DATE '2026-10-10' AS JSON) AS result\\n            ^\", requestID = \"<redacted>\""
+        },
+        {
+          "label": "cast-timestamp",
+          "managed_code": "OK",
+          "runtime_code": "InvalidArgument",
+          "rows": [],
+          "error": "spanner: code = \"InvalidArgument\", desc = \"Invalid cast from TIMESTAMP to JSON [at 1:13]\\nSELECT CAST(TIMESTAMP '2026-10-10 00:00:00+00' AS JSON) AS result\\n            ^\", requestID = \"<redacted>\""
+        },
+        {
+          "label": "cast-uuid",
+          "managed_code": "OK",
+          "runtime_code": "InvalidArgument",
+          "rows": [],
+          "error": "spanner: code = \"InvalidArgument\", desc = \"Invalid cast from UUID to JSON [at 1:13]\\nSELECT CAST(CAST('00000000-0000-0000-0000-000000000001' AS UUID) AS JSON) AS ...\\n            ^\", requestID = \"<redacted>\""
+        },
+        {
+          "label": "cast-interval",
+          "managed_code": "OK",
+          "runtime_code": "InvalidArgument",
+          "rows": [],
+          "error": "spanner: code = \"InvalidArgument\", desc = \"Invalid cast from INTERVAL to JSON [at 1:13]\\nSELECT CAST(INTERVAL 1 DAY AS JSON) AS result\\n            ^\", requestID = \"<redacted>\""
+        },
+        {
+          "label": "cast-array",
+          "managed_code": "OK",
+          "runtime_code": "InvalidArgument",
+          "rows": [],
+          "error": "spanner: code = \"InvalidArgument\", desc = \"Invalid cast from ARRAY<INT64> to JSON [at 1:13]\\nSELECT CAST([1, NULL, 3] AS JSON) AS result\\n            ^\", requestID = \"<redacted>\""
+        },
+        {
+          "label": "cast-struct",
+          "managed_code": "OK",
+          "runtime_code": "InvalidArgument",
+          "rows": [],
+          "error": "spanner: code = \"InvalidArgument\", desc = \"Invalid cast from STRUCT<a INT64, b INT64> to JSON [at 1:13]\\nSELECT CAST(STRUCT(1 AS a, NULL AS b) AS JSON) AS result\\n            ^\", requestID = \"<redacted>\""
+        },
+        {
+          "label": "cast-wide-int",
+          "managed_code": "OK",
+          "runtime_code": "InvalidArgument",
+          "rows": [],
+          "error": "spanner: code = \"InvalidArgument\", desc = \"Invalid cast from INT64 to JSON [at 1:13]\\nSELECT CAST(9223372036854775807 AS JSON) AS result\\n            ^\", requestID = \"<redacted>\""
+        },
+        {
+          "label": "cast-wide-numeric",
+          "managed_code": "OutOfRange",
+          "runtime_code": "InvalidArgument",
+          "rows": [],
+          "error": "spanner: code = \"InvalidArgument\", desc = \"Invalid cast from NUMERIC to JSON [at 1:13]\\nSELECT CAST(NUMERIC '99999999999999999999999999999.123456789' AS JSON) AS result\\n            ^\", requestID = \"<redacted>\""
+        },
+        {
+          "label": "cast-positive-infinity",
+          "managed_code": "OutOfRange",
+          "runtime_code": "InvalidArgument",
+          "rows": [],
+          "error": "spanner: code = \"InvalidArgument\", desc = \"Invalid cast from FLOAT64 to JSON [at 1:13]\\nSELECT CAST(CAST('inf' AS FLOAT64) AS JSON) AS result\\n            ^\", requestID = \"<redacted>\""
+        },
+        {
+          "label": "cast-negative-infinity",
+          "managed_code": "OutOfRange",
+          "runtime_code": "InvalidArgument",
+          "rows": [],
+          "error": "spanner: code = \"InvalidArgument\", desc = \"Invalid cast from FLOAT64 to JSON [at 1:13]\\nSELECT CAST(CAST('-inf' AS FLOAT64) AS JSON) AS result\\n            ^\", requestID = \"<redacted>\""
+        },
+        {
+          "label": "cast-nan",
+          "managed_code": "OutOfRange",
+          "runtime_code": "InvalidArgument",
+          "rows": [],
+          "error": "spanner: code = \"InvalidArgument\", desc = \"Invalid cast from FLOAT64 to JSON [at 1:13]\\nSELECT CAST(CAST('NaN' AS FLOAT64) AS JSON) AS result\\n            ^\", requestID = \"<redacted>\""
+        },
+        {
+          "label": "cast-nested-infinity",
+          "managed_code": "OutOfRange",
+          "runtime_code": "InvalidArgument",
+          "rows": [],
+          "error": "spanner: code = \"InvalidArgument\", desc = \"Invalid cast from ARRAY<FLOAT64> to JSON [at 1:13]\\nSELECT CAST([CAST('inf' AS FLOAT64)] AS JSON) AS result\\n            ^\", requestID = \"<redacted>\""
+        },
+        {
+          "label": "safe-cast-positive-infinity",
+          "managed_code": "OK",
+          "runtime_code": "InvalidArgument",
+          "rows": [],
+          "error": "spanner: code = \"InvalidArgument\", desc = \"Invalid cast from FLOAT64 to JSON [at 1:18]\\nSELECT SAFE_CAST(CAST('inf' AS FLOAT64) AS JSON) AS result\\n                 ^\", requestID = \"<redacted>\""
+        },
+        {
+          "label": "safe-cast-wide-int",
+          "managed_code": "OK",
+          "runtime_code": "InvalidArgument",
+          "rows": [],
+          "error": "spanner: code = \"InvalidArgument\", desc = \"Invalid cast from INT64 to JSON [at 1:18]\\nSELECT SAFE_CAST(9223372036854775807 AS JSON) AS result\\n                 ^\", requestID = \"<redacted>\""
+        },
+        {
+          "label": "safe-cast-wide-numeric",
+          "managed_code": "OK",
+          "runtime_code": "InvalidArgument",
+          "rows": [],
+          "error": "spanner: code = \"InvalidArgument\", desc = \"Invalid cast from NUMERIC to JSON [at 1:18]\\nSELECT SAFE_CAST(NUMERIC '99999999999999999999999999999.123456789' AS JSON) A...\\n                 ^\", requestID = \"<redacted>\""
+        },
+        {
+          "label": "coerce-equal-int",
+          "managed_code": "OK",
+          "runtime_code": "InvalidArgument",
+          "rows": [],
+          "error": "spanner: code = \"InvalidArgument\", desc = \"No matching signature for operator = for argument types: JSON, INT64\\n  Signature: T1 = T1\\n    Unable to find common supertype for templated argument <T1>\\n      Input types for <T1>: {INT64, JSON} [at 1:8]\\nSELECT JSON '1' = 1 AS result\\n       ^\", requestID = \"<redacted>\""
+        },
+        {
+          "label": "coerce-reverse-equal-int",
+          "managed_code": "OK",
+          "runtime_code": "InvalidArgument",
+          "rows": [],
+          "error": "spanner: code = \"InvalidArgument\", desc = \"No matching signature for operator = for argument types: INT64, JSON\\n  Signature: T1 = T1\\n    Unable to find common supertype for templated argument <T1>\\n      Input types for <T1>: {INT64, JSON} [at 1:8]\\nSELECT 1 = JSON '1' AS result\\n       ^\", requestID = \"<redacted>\""
+        },
+        {
+          "label": "coerce-order-int",
+          "managed_code": "OK",
+          "runtime_code": "InvalidArgument",
+          "rows": [],
+          "error": "spanner: code = \"InvalidArgument\", desc = \"No matching signature for operator <= for argument types: JSON, INT64\\n  Signature: T1 <= T1\\n    Unable to find common supertype for templated argument <T1>\\n      Input types for <T1>: {INT64, JSON} [at 1:8]\\nSELECT JSON '1' <= 1 AS result\\n       ^\", requestID = \"<redacted>\""
+        },
+        {
+          "label": "coerce-equal-float32",
+          "managed_code": "OK",
+          "runtime_code": "InvalidArgument",
+          "rows": [],
+          "error": "spanner: code = \"InvalidArgument\", desc = \"No matching signature for operator = for argument types: JSON, FLOAT32\\n  Signature: T1 = T1\\n    Unable to find common supertype for templated argument <T1>\\n      Input types for <T1>: {FLOAT, JSON} [at 1:8]\\nSELECT JSON '1.25' = CAST(1.25 AS FLOAT32) AS result\\n       ^\", requestID = \"<redacted>\""
+        },
+        {
+          "label": "coerce-reverse-equal-float32",
+          "managed_code": "OK",
+          "runtime_code": "InvalidArgument",
+          "rows": [],
+          "error": "spanner: code = \"InvalidArgument\", desc = \"No matching signature for operator = for argument types: FLOAT32, JSON\\n  Signature: T1 = T1\\n    Unable to find common supertype for templated argument <T1>\\n      Input types for <T1>: {FLOAT, JSON} [at 1:8]\\nSELECT CAST(1.25 AS FLOAT32) = JSON '1.25' AS result\\n       ^\", requestID = \"<redacted>\""
+        },
+        {
+          "label": "coerce-order-float32",
+          "managed_code": "OK",
+          "runtime_code": "InvalidArgument",
+          "rows": [],
+          "error": "spanner: code = \"InvalidArgument\", desc = \"No matching signature for operator <= for argument types: JSON, FLOAT32\\n  Signature: T1 <= T1\\n    Unable to find common supertype for templated argument <T1>\\n      Input types for <T1>: {FLOAT, JSON} [at 1:8]\\nSELECT JSON '1.25' <= CAST(1.25 AS FLOAT32) AS result\\n       ^\", requestID = \"<redacted>\""
+        },
+        {
+          "label": "coerce-equal-float64",
+          "managed_code": "OK",
+          "runtime_code": "InvalidArgument",
+          "rows": [],
+          "error": "spanner: code = \"InvalidArgument\", desc = \"No matching signature for operator = for argument types: JSON, FLOAT64\\n  Signature: T1 = T1\\n    Unable to find common supertype for templated argument <T1>\\n      Input types for <T1>: {DOUBLE, JSON} [at 1:8]\\nSELECT JSON '1.25' = 1.25 AS result\\n       ^\", requestID = \"<redacted>\""
+        },
+        {
+          "label": "coerce-reverse-equal-float64",
+          "managed_code": "OK",
+          "runtime_code": "InvalidArgument",
+          "rows": [],
+          "error": "spanner: code = \"InvalidArgument\", desc = \"No matching signature for operator = for argument types: FLOAT64, JSON\\n  Signature: T1 = T1\\n    Unable to find common supertype for templated argument <T1>\\n      Input types for <T1>: {DOUBLE, JSON} [at 1:8]\\nSELECT 1.25 = JSON '1.25' AS result\\n       ^\", requestID = \"<redacted>\""
+        },
+        {
+          "label": "coerce-order-float64",
+          "managed_code": "OK",
+          "runtime_code": "InvalidArgument",
+          "rows": [],
+          "error": "spanner: code = \"InvalidArgument\", desc = \"No matching signature for operator <= for argument types: JSON, FLOAT64\\n  Signature: T1 <= T1\\n    Unable to find common supertype for templated argument <T1>\\n      Input types for <T1>: {DOUBLE, JSON} [at 1:8]\\nSELECT JSON '1.25' <= 1.25 AS result\\n       ^\", requestID = \"<redacted>\""
+        },
+        {
+          "label": "coerce-equal-numeric",
+          "managed_code": "OK",
+          "runtime_code": "InvalidArgument",
+          "rows": [],
+          "error": "spanner: code = \"InvalidArgument\", desc = \"No matching signature for operator = for argument types: JSON, NUMERIC\\n  Signature: T1 = T1\\n    Unable to find common supertype for templated argument <T1>\\n      Input types for <T1>: {NUMERIC, JSON} [at 1:8]\\nSELECT JSON '1.25' = NUMERIC '1.25' AS result\\n       ^\", requestID = \"<redacted>\""
+        },
+        {
+          "label": "coerce-reverse-equal-numeric",
+          "managed_code": "OK",
+          "runtime_code": "InvalidArgument",
+          "rows": [],
+          "error": "spanner: code = \"InvalidArgument\", desc = \"No matching signature for operator = for argument types: NUMERIC, JSON\\n  Signature: T1 = T1\\n    Unable to find common supertype for templated argument <T1>\\n      Input types for <T1>: {NUMERIC, JSON} [at 1:8]\\nSELECT NUMERIC '1.25' = JSON '1.25' AS result\\n       ^\", requestID = \"<redacted>\""
+        },
+        {
+          "label": "coerce-order-numeric",
+          "managed_code": "OK",
+          "runtime_code": "InvalidArgument",
+          "rows": [],
+          "error": "spanner: code = \"InvalidArgument\", desc = \"No matching signature for operator <= for argument types: JSON, NUMERIC\\n  Signature: T1 <= T1\\n    Unable to find common supertype for templated argument <T1>\\n      Input types for <T1>: {NUMERIC, JSON} [at 1:8]\\nSELECT JSON '1.25' <= NUMERIC '1.25' AS result\\n       ^\", requestID = \"<redacted>\""
+        },
+        {
+          "label": "coerce-equal-bool",
+          "managed_code": "OK",
+          "runtime_code": "InvalidArgument",
+          "rows": [],
+          "error": "spanner: code = \"InvalidArgument\", desc = \"No matching signature for operator = for argument types: JSON, BOOL\\n  Signature: T1 = T1\\n    Unable to find common supertype for templated argument <T1>\\n      Input types for <T1>: {BOOL, JSON} [at 1:8]\\nSELECT JSON 'true' = TRUE AS result\\n       ^\", requestID = \"<redacted>\""
+        },
+        {
+          "label": "coerce-reverse-equal-bool",
+          "managed_code": "OK",
+          "runtime_code": "InvalidArgument",
+          "rows": [],
+          "error": "spanner: code = \"InvalidArgument\", desc = \"No matching signature for operator = for argument types: BOOL, JSON\\n  Signature: T1 = T1\\n    Unable to find common supertype for templated argument <T1>\\n      Input types for <T1>: {BOOL, JSON} [at 1:8]\\nSELECT TRUE = JSON 'true' AS result\\n       ^\", requestID = \"<redacted>\""
+        },
+        {
+          "label": "coerce-order-bool",
+          "managed_code": "OK",
+          "runtime_code": "InvalidArgument",
+          "rows": [],
+          "error": "spanner: code = \"InvalidArgument\", desc = \"No matching signature for operator <= for argument types: JSON, BOOL\\n  Signature: T1 <= T1\\n    Unable to find common supertype for templated argument <T1>\\n      Input types for <T1>: {BOOL, JSON} [at 1:8]\\nSELECT JSON 'true' <= TRUE AS result\\n       ^\", requestID = \"<redacted>\""
+        },
+        {
+          "label": "coerce-equal-string",
+          "managed_code": "OK",
+          "runtime_code": "InvalidArgument",
+          "rows": [],
+          "error": "spanner: code = \"InvalidArgument\", desc = \"No matching signature for operator = for argument types: JSON, STRING\\n  Signature: T1 = T1\\n    Unable to find common supertype for templated argument <T1>\\n      Input types for <T1>: {STRING, JSON} [at 1:8]\\nSELECT JSON '\\\"foo\\\"' = 'foo' AS result\\n       ^\", requestID = \"<redacted>\""
+        },
+        {
+          "label": "coerce-reverse-equal-string",
+          "managed_code": "OK",
+          "runtime_code": "InvalidArgument",
+          "rows": [],
+          "error": "spanner: code = \"InvalidArgument\", desc = \"No matching signature for operator = for argument types: STRING, JSON\\n  Signature: T1 = T1\\n    Unable to find common supertype for templated argument <T1>\\n      Input types for <T1>: {STRING, JSON} [at 1:8]\\nSELECT 'foo' = JSON '\\\"foo\\\"' AS result\\n       ^\", requestID = \"<redacted>\""
+        },
+        {
+          "label": "coerce-order-string",
+          "managed_code": "OK",
+          "runtime_code": "InvalidArgument",
+          "rows": [],
+          "error": "spanner: code = \"InvalidArgument\", desc = \"No matching signature for operator <= for argument types: JSON, STRING\\n  Signature: T1 <= T1\\n    Unable to find common supertype for templated argument <T1>\\n      Input types for <T1>: {STRING, JSON} [at 1:8]\\nSELECT JSON '\\\"foo\\\"' <= 'foo' AS result\\n       ^\", requestID = \"<redacted>\""
+        },
+        {
+          "label": "coerce-equal-bytes",
+          "managed_code": "OK",
+          "runtime_code": "InvalidArgument",
+          "rows": [],
+          "error": "spanner: code = \"InvalidArgument\", desc = \"No matching signature for operator = for argument types: JSON, BYTES\\n  Signature: T1 = T1\\n    Unable to find common supertype for templated argument <T1>\\n      Input types for <T1>: {BYTES, JSON} [at 1:8]\\nSELECT JSON '\\\"YQ==\\\"' = b'a' AS result\\n       ^\", requestID = \"<redacted>\""
+        },
+        {
+          "label": "coerce-reverse-equal-bytes",
+          "managed_code": "OK",
+          "runtime_code": "InvalidArgument",
+          "rows": [],
+          "error": "spanner: code = \"InvalidArgument\", desc = \"No matching signature for operator = for argument types: BYTES, JSON\\n  Signature: T1 = T1\\n    Unable to find common supertype for templated argument <T1>\\n      Input types for <T1>: {BYTES, JSON} [at 1:8]\\nSELECT b'a' = JSON '\\\"YQ==\\\"' AS result\\n       ^\", requestID = \"<redacted>\""
+        },
+        {
+          "label": "coerce-equal-date",
+          "managed_code": "OK",
+          "runtime_code": "InvalidArgument",
+          "rows": [],
+          "error": "spanner: code = \"InvalidArgument\", desc = \"No matching signature for operator = for argument types: JSON, DATE\\n  Signature: T1 = T1\\n    Unable to find common supertype for templated argument <T1>\\n      Input types for <T1>: {DATE, JSON} [at 1:8]\\nSELECT JSON '\\\"2026-10-10\\\"' = DATE '2026-10-10' AS result\\n       ^\", requestID = \"<redacted>\""
+        },
+        {
+          "label": "coerce-reverse-equal-date",
+          "managed_code": "OK",
+          "runtime_code": "InvalidArgument",
+          "rows": [],
+          "error": "spanner: code = \"InvalidArgument\", desc = \"No matching signature for operator = for argument types: DATE, JSON\\n  Signature: T1 = T1\\n    Unable to find common supertype for templated argument <T1>\\n      Input types for <T1>: {DATE, JSON} [at 1:8]\\nSELECT DATE '2026-10-10' = JSON '\\\"2026-10-10\\\"' AS result\\n       ^\", requestID = \"<redacted>\""
+        },
+        {
+          "label": "coerce-order-date",
+          "managed_code": "OK",
+          "runtime_code": "InvalidArgument",
+          "rows": [],
+          "error": "spanner: code = \"InvalidArgument\", desc = \"No matching signature for operator <= for argument types: JSON, DATE\\n  Signature: T1 <= T1\\n    Unable to find common supertype for templated argument <T1>\\n      Input types for <T1>: {DATE, JSON} [at 1:8]\\nSELECT JSON '\\\"2026-10-10\\\"' <= DATE '2026-10-10' AS result\\n       ^\", requestID = \"<redacted>\""
+        },
+        {
+          "label": "coerce-equal-timestamp",
+          "managed_code": "OK",
+          "runtime_code": "InvalidArgument",
+          "rows": [],
+          "error": "spanner: code = \"InvalidArgument\", desc = \"No matching signature for operator = for argument types: JSON, TIMESTAMP\\n  Signature: T1 = T1\\n    Unable to find common supertype for templated argument <T1>\\n      Input types for <T1>: {TIMESTAMP, JSON} [at 1:8]\\nSELECT JSON '\\\"2026-10-10T00:00:00Z\\\"' = TIMESTAMP '2026-10-10 00:00:00+00' AS ...\\n       ^\", requestID = \"<redacted>\""
+        },
+        {
+          "label": "coerce-reverse-equal-timestamp",
+          "managed_code": "OK",
+          "runtime_code": "InvalidArgument",
+          "rows": [],
+          "error": "spanner: code = \"InvalidArgument\", desc = \"No matching signature for operator = for argument types: TIMESTAMP, JSON\\n  Signature: T1 = T1\\n    Unable to find common supertype for templated argument <T1>\\n      Input types for <T1>: {TIMESTAMP, JSON} [at 1:8]\\nSELECT TIMESTAMP '2026-10-10 00:00:00+00' = JSON '\\\"2026-10-10T00:00:00Z\\\"' AS ...\\n       ^\", requestID = \"<redacted>\""
+        },
+        {
+          "label": "coerce-order-timestamp",
+          "managed_code": "OK",
+          "runtime_code": "InvalidArgument",
+          "rows": [],
+          "error": "spanner: code = \"InvalidArgument\", desc = \"No matching signature for operator <= for argument types: JSON, TIMESTAMP\\n  Signature: T1 <= T1\\n    Unable to find common supertype for templated argument <T1>\\n      Input types for <T1>: {TIMESTAMP, JSON} [at 1:8]\\nSELECT JSON '\\\"2026-10-10T00:00:00Z\\\"' <= TIMESTAMP '2026-10-10 00:00:00+00' AS...\\n       ^\", requestID = \"<redacted>\""
+        },
+        {
+          "label": "coerce-equal-uuid",
+          "managed_code": "OK",
+          "runtime_code": "InvalidArgument",
+          "rows": [],
+          "error": "spanner: code = \"InvalidArgument\", desc = \"No matching signature for operator = for argument types: JSON, UUID\\n  Signature: T1 = T1\\n    Unable to find common supertype for templated argument <T1>\\n      Input types for <T1>: {JSON, UUID} [at 1:8]\\nSELECT JSON '\\\"00000000-0000-0000-0000-000000000001\\\"' = CAST('00000000-0000-00...\\n       ^\", requestID = \"<redacted>\""
+        },
+        {
+          "label": "coerce-reverse-equal-uuid",
+          "managed_code": "OK",
+          "runtime_code": "InvalidArgument",
+          "rows": [],
+          "error": "spanner: code = \"InvalidArgument\", desc = \"No matching signature for operator = for argument types: UUID, JSON\\n  Signature: T1 = T1\\n    Unable to find common supertype for templated argument <T1>\\n      Input types for <T1>: {JSON, UUID} [at 1:8]\\nSELECT CAST('00000000-0000-0000-0000-000000000001' AS UUID) = JSON '\\\"00000000...\\n       ^\", requestID = \"<redacted>\""
+        },
+        {
+          "label": "coerce-order-uuid",
+          "managed_code": "OK",
+          "runtime_code": "InvalidArgument",
+          "rows": [],
+          "error": "spanner: code = \"InvalidArgument\", desc = \"No matching signature for operator <= for argument types: JSON, UUID\\n  Signature: T1 <= T1\\n    Unable to find common supertype for templated argument <T1>\\n      Input types for <T1>: {JSON, UUID} [at 1:8]\\nSELECT JSON '\\\"00000000-0000-0000-0000-000000000001\\\"' <= CAST('00000000-0000-0...\\n       ^\", requestID = \"<redacted>\""
+        },
+        {
+          "label": "coerce-equal-array",
+          "managed_code": "OK",
+          "runtime_code": "InvalidArgument",
+          "rows": [],
+          "error": "spanner: code = \"InvalidArgument\", desc = \"No matching signature for operator = for argument types: JSON, ARRAY<INT64>\\n  Signature: T1 = T1\\n    Unable to find common supertype for templated argument <T1>\\n      Input types for <T1>: {ARRAY<INT64>, JSON} [at 1:8]\\nSELECT JSON '[1,null,3]' = [1, NULL, 3] AS result\\n       ^\", requestID = \"<redacted>\""
+        },
+        {
+          "label": "coerce-reverse-equal-array",
+          "managed_code": "OK",
+          "runtime_code": "InvalidArgument",
+          "rows": [],
+          "error": "spanner: code = \"InvalidArgument\", desc = \"No matching signature for operator = for argument types: ARRAY<INT64>, JSON\\n  Signature: T1 = T1\\n    Unable to find common supertype for templated argument <T1>\\n      Input types for <T1>: {ARRAY<INT64>, JSON} [at 1:8]\\nSELECT [1, NULL, 3] = JSON '[1,null,3]' AS result\\n       ^\", requestID = \"<redacted>\""
+        },
+        {
+          "label": "coerce-order-array",
+          "managed_code": "OK",
+          "runtime_code": "InvalidArgument",
+          "rows": [],
+          "error": "spanner: code = \"InvalidArgument\", desc = \"No matching signature for operator <= for argument types: JSON, ARRAY<INT64>\\n  Signature: T1 <= T1\\n    Unable to find common supertype for templated argument <T1>\\n      Input types for <T1>: {ARRAY<INT64>, JSON} [at 1:8]\\nSELECT JSON '[1,null,3]' <= [1, NULL, 3] AS result\\n       ^\", requestID = \"<redacted>\""
+        },
+        {
+          "label": "json-sort",
+          "managed_code": "OK",
+          "runtime_code": "InvalidArgument",
+          "rows": [],
+          "error": "spanner: code = \"InvalidArgument\", desc = \"ORDER BY does not support expressions of type JSON [at 1:184]\\n...a\\\"', JSON 'null', CAST(NULL AS JSON)]) j ORDER BY j\\n                                                     ^\", requestID = \"<redacted>\""
+        },
+        {
+          "label": "json-group",
+          "managed_code": "OK",
+          "runtime_code": "InvalidArgument",
+          "rows": [],
+          "error": "spanner: code = \"InvalidArgument\", desc = \"Grouping by expressions of type JSON is not allowed [at 1:156]\\n...null',JSON 'null',CAST(NULL AS JSON)]) j GROUP BY j ORDER BY j\\n                                                     ^\", requestID = \"<redacted>\""
+        },
+        {
+          "label": "json-distinct",
+          "managed_code": "OK",
+          "runtime_code": "InvalidArgument",
+          "rows": [],
+          "error": "spanner: code = \"InvalidArgument\", desc = \"Column j of type JSON cannot be used in SELECT DISTINCT [at 1:17]\\nSELECT DISTINCT j FROM UNNEST([JSON '1',JSON '1.0',JSON '2']) j ORDER BY j\\n                ^\", requestID = \"<redacted>\""
+        },
+        {
+          "label": "json-minmax",
+          "managed_code": "OK",
+          "runtime_code": "InvalidArgument",
+          "rows": [],
+          "error": "spanner: code = \"InvalidArgument\", desc = \"MIN is not defined for arguments of type JSON [at 1:8]\\nSELECT MIN(j) AS lo, MAX(j) AS hi FROM UNNEST([JSON '1',JSON '2']) j\\n       ^\", requestID = \"<redacted>\""
+        },
+        {
+          "label": "json-join",
+          "managed_code": "OK",
+          "runtime_code": "InvalidArgument",
+          "rows": [],
+          "error": "spanner: code = \"InvalidArgument\", desc = \"Equality is not defined for arguments of type JSON [at 1:97]\\n...2']) a JOIN UNNEST([JSON '1.0',JSON '3']) b ON a=b\\n                                                  ^\", requestID = \"<redacted>\""
+        },
+        {
+          "label": "json-window",
+          "managed_code": "Unimplemented",
+          "runtime_code": "InvalidArgument",
+          "rows": [],
+          "error": "spanner: code = \"InvalidArgument\", desc = \"Analytic functions not supported [at 1:11]\\nSELECT j, ROW_NUMBER() OVER(ORDER BY j) AS n FROM UNNEST([JSON '2',JSON '1']) j\\n          ^\", requestID = \"<redacted>\""
+        },
+        {
+          "label": "not-equal-coercion",
+          "managed_code": "OK",
+          "runtime_code": "InvalidArgument",
+          "rows": [],
+          "error": "spanner: code = \"InvalidArgument\", desc = \"No matching signature for operator != for argument types: JSON, INT64\\n  Signature: T1 != T1\\n    Unable to find common supertype for templated argument <T1>\\n      Input types for <T1>: {INT64, JSON} [at 1:8]\\nSELECT JSON '1' != 2 AS result\\n       ^\", requestID = \"<redacted>\""
+        },
+        {
+          "label": "in-mixed-list",
+          "managed_code": "OK",
+          "runtime_code": "InvalidArgument",
+          "rows": [],
+          "error": "spanner: code = \"InvalidArgument\", desc = \"No matching signature for operator IN for argument types JSON and {INT64, BOOL, STRING, JSON} [at 1:20]\\nSELECT JSON 'true' IN (1,TRUE,'true',JSON '[]') AS result\\n                   ^\", requestID = \"<redacted>\""
+        },
+        {
+          "label": "explicit-bytes-cast-order",
+          "managed_code": "OK",
+          "runtime_code": "InvalidArgument",
+          "rows": [],
+          "error": "spanner: code = \"InvalidArgument\", desc = \"Invalid cast from BYTES to JSON [at 1:29]\\nSELECT JSON '\\\"YQ==\\\"' < CAST(b'b' AS JSON) AS result\\n                            ^\", requestID = \"<redacted>\""
+        },
+        {
+          "label": "cast-all-nested-null",
+          "managed_code": "OK",
+          "runtime_code": "InvalidArgument",
+          "rows": [],
+          "error": "spanner: code = \"InvalidArgument\", desc = \"Invalid cast from ARRAY<INT64> to JSON [at 1:13]\\nSELECT CAST(ARRAY<INT64>[NULL] AS JSON) AS a, CAST(STRUCT(CAST(NULL AS INT64)...\\n            ^\", requestID = \"<redacted>\""
+        },
+        {
+          "label": "in-null-no-match",
+          "managed_code": "OK",
+          "runtime_code": "InvalidArgument",
+          "rows": [],
+          "error": "spanner: code = \"InvalidArgument\", desc = \"No matching signature for operator IN for argument types JSON and {INT64, NULL} [at 1:17]\\nSELECT JSON '5' IN (1,NULL) AS result\\n                ^\", requestID = \"<redacted>\""
+        },
+        {
+          "label": "json-array-struct-cast",
+          "managed_code": "OK",
+          "runtime_code": "InvalidArgument",
+          "rows": [],
+          "error": "spanner: code = \"InvalidArgument\", desc = \"Invalid cast from ARRAY<STRUCT<a INT64>> to JSON [at 1:13]\\nSELECT CAST([STRUCT(1 AS a),STRUCT(2 AS a)] AS JSON) AS result\\n            ^\", requestID = \"<redacted>\""
+        },
+        {
+          "label": "safe-cast-nested-infinity",
+          "managed_code": "OK",
+          "runtime_code": "InvalidArgument",
+          "rows": [],
+          "error": "spanner: code = \"InvalidArgument\", desc = \"Invalid cast from ARRAY<FLOAT64> to JSON [at 1:18]\\nSELECT SAFE_CAST([CAST('inf' AS FLOAT64)] AS JSON) AS result\\n                 ^\", requestID = \"<redacted>\""
+        }
+      ],
+      "phases": {
+        "google-fixtures": {
+          "old-for-all-control": {
+            "code": "InvalidArgument",
+            "row_count": 0,
+            "rows": null
+          },
+          "heartbeat-boundary-99": {
+            "code": "OutOfRange",
+            "row_count": 0,
+            "rows": null
+          },
+          "heartbeat-boundary-100": {
+            "code": "OK",
+            "row_count": 2,
+            "rows": null
+          },
+          "heartbeat-boundary-999": {
+            "code": "OK",
+            "row_count": 2,
+            "rows": null
+          },
+          "heartbeat-boundary-1000": {
+            "code": "OK",
+            "row_count": 2,
+            "rows": null
+          },
+          "heartbeat-boundary-300000": {
+            "code": "OK",
+            "row_count": 2,
+            "rows": null
+          },
+          "heartbeat-boundary-300001": {
+            "code": "OutOfRange",
+            "row_count": 0,
+            "rows": null
+          },
+          "read-options-omitted": {
+            "code": "OK",
+            "row_count": 2,
+            "rows": null
+          },
+          "read-options-empty": {
+            "code": "Unimplemented",
+            "row_count": 0,
+            "rows": null
+          },
+          "read-options-nonnull": {
+            "code": "Unimplemented",
+            "row_count": 0,
+            "rows": null
+          },
+          "heartbeat-child-100": {
+            "code": "OK",
+            "row_count": 18,
+            "rows": null
+          },
+          "stored-json-sort": {
+            "code": "InvalidArgument",
+            "row_count": 0,
+            "rows": []
+          },
+          "stored-json-group": {
+            "code": "InvalidArgument",
+            "row_count": 0,
+            "rows": []
+          },
+          "conditional-profile": {
+            "code": "OK",
+            "row_count": 1,
+            "rows": [
+              {
+                "result": "10"
+              }
+            ]
+          },
+          "conditional-profile-error-suppression": {
+            "code": "OK",
+            "row_count": 1,
+            "rows": [
+              {
+                "result": 10
+              }
+            ]
+          },
+          "graph-node-control": {
+            "code": "OK",
+            "row_count": 4,
+            "rows": null
+          },
+          "graph-edge-control": {
+            "code": "OK",
+            "row_count": 1,
+            "rows": null
+          },
+          "graph-element-cast-normal": {
+            "code": "InvalidArgument",
+            "row_count": 0,
+            "rows": null
+          },
+          "graph-path-cast-normal": {
+            "code": "InvalidArgument",
+            "row_count": 0,
+            "rows": null
+          },
+          "graph-element-to-json-control": {
+            "code": "InvalidArgument",
+            "row_count": 0,
+            "rows": null
+          },
+          "graph-path-to-json-control": {
+            "code": "OK",
+            "row_count": 1,
+            "rows": null
+          },
+          "graph-property-cast-control": {
+            "code": "InvalidArgument",
+            "row_count": 0,
+            "rows": null
+          },
+          "enum-array-equality": {
+            "code": "InvalidArgument",
+            "row_count": 0,
+            "rows": []
+          },
+          "enum-array-order-reject": {
+            "code": "InvalidArgument",
+            "row_count": 0,
+            "rows": []
+          },
+          "cast-enum": {
+            "code": "InvalidArgument",
+            "row_count": 0,
+            "rows": []
+          },
+          "cast-proto": {
+            "code": "InvalidArgument",
+            "row_count": 0,
+            "rows": []
+          },
+          "enum-equality": {
+            "code": "InvalidArgument",
+            "row_count": 0,
+            "rows": []
+          },
+          "enum-order-reject": {
+            "code": "InvalidArgument",
+            "row_count": 0,
+            "rows": []
+          },
+          "database-cleanup": {
+            "code": "OK",
+            "row_count": 0,
+            "rows": null
+          },
+          "database-absent": {
+            "code": "NotFound",
+            "row_count": 0,
+            "rows": null
+          }
+        },
+        "pg-fixtures": {
+          "database-setup": {
+            "code": "OK",
+            "row_count": 0,
+            "rows": null
+          },
+          "old-for-all-control": {
+            "code": "InvalidArgument",
+            "row_count": 0,
+            "rows": null
+          },
+          "heartbeat-boundary-99": {
+            "code": "OutOfRange",
+            "row_count": 0,
+            "rows": null
+          },
+          "heartbeat-boundary-100": {
+            "code": "OK",
+            "row_count": 2,
+            "rows": null
+          },
+          "heartbeat-boundary-999": {
+            "code": "OK",
+            "row_count": 2,
+            "rows": null
+          },
+          "heartbeat-boundary-1000": {
+            "code": "OK",
+            "row_count": 2,
+            "rows": null
+          },
+          "heartbeat-boundary-300000": {
+            "code": "OK",
+            "row_count": 2,
+            "rows": null
+          },
+          "heartbeat-boundary-300001": {
+            "code": "OutOfRange",
+            "row_count": 0,
+            "rows": null
+          },
+          "read-options-omitted": {
+            "code": "OK",
+            "row_count": 2,
+            "rows": null
+          },
+          "read-options-empty": {
+            "code": "Unimplemented",
+            "row_count": 0,
+            "rows": null
+          },
+          "read-options-nonnull": {
+            "code": "Unimplemented",
+            "row_count": 0,
+            "rows": null
+          },
+          "heartbeat-child-100": {
+            "code": "OK",
+            "row_count": 18,
+            "rows": null
+          },
+          "database-cleanup": {
+            "code": "OK",
+            "row_count": 0,
+            "rows": null
+          },
+          "database-absent": {
+            "code": "NotFound",
+            "row_count": 0,
+            "rows": null
+          }
+        }
+      },
+      "heartbeats": {
+        "google-fixtures": {
+          "records": 18,
+          "timestamp_gap_ms": {
+            "min": 100.001,
+            "median": 100.001,
+            "max": 100.001
+          },
+          "arrival_gap_ms": {
+            "min": 0.005,
+            "median": 0.008,
+            "max": 1783.876
+          },
+          "end_timestamp": "2026-10-10T01:53:58.731805Z",
+          "note": "Record timestamps measure progress; SDK buffering and independent host/container clocks prevent arrival-time or latency guarantees."
+        },
+        "pg-fixtures": {
+          "records": 18,
+          "timestamp_gap_ms": {
+            "min": 100.001,
+            "median": 100.001,
+            "max": 100.001
+          },
+          "arrival_gap_ms": {
+            "min": 0.002,
+            "median": 0.004,
+            "max": 1790.75
+          },
+          "end_timestamp": "2026-10-10T01:54:01.244395Z",
+          "note": "Record timestamps measure progress; SDK buffering and independent host/container clocks prevent arrival-time or latency guarantees."
+        }
+      }
+    }
+  }
+}

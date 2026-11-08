@@ -1,0 +1,28 @@
+"""Explicitly authorized trial provisioning; destination values stay in memory."""
+from pathlib import Path
+import datetime
+import json
+import os
+import re
+import subprocess
+import sys
+
+project, instance, config = sys.argv[1:4]
+out = Path('<LOCAL_TASK_ROOT>/apstndb/spanalyzer/managed-recheck-20261023/evidence')
+sdk = '<LOCAL_HOME>/google-cloud-sdk/bin/gcloud'
+env = os.environ.copy()
+env.update(CLOUDSDK_CORE_DISABLE_FILE_LOGGING='true', CLOUDSDK_COMPONENT_MANAGER_DISABLE_UPDATE_CHECK='true')
+
+def scrub(text):
+    text = text.replace(project, '<redacted>').replace(instance, '<redacted>')
+    text = re.sub(r'projects/[^/\s"\]]+', 'projects/<redacted>', text)
+    return re.sub(r'requestID\s*=\s*"[^"]+"', 'requestID = "<redacted>"', text)
+
+started = datetime.datetime.now(datetime.timezone.utc).isoformat()
+print('Creating explicit FREE_INSTANCE with remove-after-grace-period; no paid conversion', flush=True)
+args = [sdk, 'spanner', 'instances', 'create', instance, '--project=' + project, '--config=' + config, '--instance-type=free-instance', '--expire-behavior=remove-after-grace-period', '--default-backup-schedule-type=NONE', '--description=Spanalyzer verification', '--labels=purpose=<redacted>', '--quiet', '--format=json']
+result = subprocess.run(args, env=env, text=True, capture_output=True, timeout=600)
+receipt = {'started_at': started, 'completed_at': datetime.datetime.now(datetime.timezone.utc).isoformat(), 'action': 'create explicitly user-authorized free trial instance', 'configuration': config, 'requested_instance_type': 'FREE_INSTANCE', 'requested_expire_behavior': 'REMOVE_AFTER_GRACE_PERIOD', 'automatic_paid_conversion': False, 'default_backup_schedule_type': 'NONE', 'exit_code': result.returncode, 'stderr': scrub(result.stderr), 'stdout': scrub(result.stdout)}
+(out / 'provision-create.json').write_text(json.dumps(receipt, indent=2) + '\n')
+print(json.dumps(receipt), flush=True)
+raise SystemExit(result.returncode)

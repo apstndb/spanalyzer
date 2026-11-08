@@ -1,0 +1,25 @@
+{
+  "version": "1.5.31",
+  "image": "gcr.io/cloud-spanner-emulator/emulator:1.5.31@sha256:d9650c946a2af4275b1322a790cf054c4cd4f51736ef1babbd8736d3a308d871",
+  "process_exit_code": 0,
+  "classification": "wrong-order",
+  "primary_code": "OK",
+  "primary_rows": [
+    {
+      "id": "2"
+    },
+    {
+      "id": "1"
+    },
+    {
+      "id": "3"
+    }
+  ],
+  "primary_error": "",
+  "graph_code": "OK",
+  "graph_error": "",
+  "create_database": "OK",
+  "drop_database": "OK",
+  "database_absent": "NotFound",
+  "runtime_cleanup": "OK"
+}

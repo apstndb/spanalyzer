@@ -1,0 +1,21 @@
+[
+  {
+    "id": "96e0a0c4a236f3bdc22444aed4b8da580e09570a0130ec29f34387859e2b80c2",
+    "image_id": "sha256:ef44e4116647d88f4f20e3a326deca3fdfa58c1ed1cdd8218e09e8d352aed70e",
+    "configured_image": "gcr.io/cloud-spanner-emulator/emulator:1.5.29@sha256:ef44e4116647d88f4f20e3a326deca3fdfa58c1ed1cdd8218e09e8d352aed70e",
+    "path": "./gateway_main",
+    "args": [
+      "--hostname",
+      "0.0.0.0"
+    ],
+    "state": "running",
+    "platform": "linux",
+    "labels": {
+      "org.testcontainers": "true",
+      "org.testcontainers.lang": "go",
+      "org.testcontainers.reap": "true",
+      "org.testcontainers.sessionId": "6ec5555c69f6837486938c3127220a1d25ce1f28fdabf24cca8b0b06a718fd2e",
+      "org.testcontainers.version": "0.42.0"
+    }
+  }
+]

@@ -1,0 +1,74 @@
+package main
+
+import (
+	"encoding/json"
+	"fmt"
+	"os"
+
+	"github.com/cloudspannerecosystem/memefish"
+	"github.com/cloudspannerecosystem/memefish/ast"
+)
+
+type caseDef struct {
+	Label       string `json:"label"`
+	Kind        string `json:"kind"`
+	SQL         string `json:"sql"`
+	ExpectParse bool   `json:"expect_parse"`
+}
+
+func parse(c caseDef, sql string) (ast.Node, error) {
+	if c.Kind == "ddl" {
+		return memefish.ParseDDL(c.Label, sql)
+	}
+	return memefish.ParseQuery(c.Label, sql)
+}
+
+func main() {
+	data, err := os.ReadFile(os.Args[1])
+	if err != nil {
+		panic(err)
+	}
+	var cases []caseDef
+	if err := json.Unmarshal(data, &cases); err != nil {
+		panic(err)
+	}
+	enc := json.NewEncoder(os.Stdout)
+	failed := 0
+	for _, c := range cases {
+		node, err := parse(c, c.SQL)
+		r := map[string]any{"label": c.Label, "kind": c.Kind, "expected_parse": c.ExpectParse, "parse_ok": err == nil}
+		ok := (err == nil) == c.ExpectParse
+		if err != nil {
+			r["error"] = err.Error()
+		}
+		if err == nil {
+			r["node_type"] = fmt.Sprintf("%T", node)
+			r["pos"] = node.Pos()
+			r["end"] = node.End()
+			r["input_bytes"] = len(c.SQL)
+			r["sql"] = node.SQL()
+			r["range_ok"] = node.Pos() >= 0 && node.End() >= node.Pos() && int(node.End()) <= len(c.SQL)
+			next, err := parse(c, node.SQL())
+			r["reparse_ok"] = err == nil
+			if err != nil {
+				r["reparse_error"] = err.Error()
+				ok = false
+			} else {
+				r["idempotent"] = next.SQL() == node.SQL()
+				ok = ok && next.SQL() == node.SQL()
+			}
+			ok = ok && r["range_ok"].(bool)
+		}
+		r["passed"] = ok
+		if !ok {
+			failed++
+		}
+		if err := enc.Encode(r); err != nil {
+			panic(err)
+		}
+	}
+	if failed != 0 {
+		fmt.Fprintf(os.Stderr, "%d parser assertions failed\n", failed)
+		os.Exit(1)
+	}
+}

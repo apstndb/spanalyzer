@@ -1,0 +1,454 @@
+{
+  "dialect": "google",
+  "steps": [
+    {
+      "label": "schema",
+      "family": "official-FinGraph",
+      "kind": "ddl",
+      "statements": [
+        "CREATE TABLE Person (\n      id               INT64 NOT NULL,\n      name             STRING(MAX),\n      birthday         TIMESTAMP,\n      country          STRING(MAX),\n      city             STRING(MAX),\n    ) PRIMARY KEY (id)",
+        "CREATE TABLE Account (\n      id               INT64 NOT NULL,\n      create_time      TIMESTAMP,\n      is_blocked       BOOL,\n      nick_name        STRING(MAX),\n    ) PRIMARY KEY (id)",
+        "CREATE TABLE PersonOwnAccount (\n      id               INT64 NOT NULL,\n      account_id       INT64 NOT NULL,\n      create_time      TIMESTAMP,\n      FOREIGN KEY (account_id) REFERENCES Account (id)\n    ) PRIMARY KEY (id, account_id),\n      INTERLEAVE IN PARENT Person ON DELETE CASCADE",
+        "CREATE TABLE AccountTransferAccount (\n      id               INT64 NOT NULL,\n      to_id            INT64 NOT NULL,\n      amount           FLOAT64,\n      create_time      TIMESTAMP NOT NULL,\n      order_number     STRING(MAX),\n      FOREIGN KEY (to_id) REFERENCES Account (id)\n    ) PRIMARY KEY (id, to_id, create_time),\n      INTERLEAVE IN PARENT Account ON DELETE CASCADE",
+        "CREATE OR REPLACE PROPERTY GRAPH FinGraph\n      NODE TABLES (Account, Person)\n      EDGE TABLES (\n        PersonOwnAccount\n          SOURCE KEY (id) REFERENCES Person (id)\n          DESTINATION KEY (account_id) REFERENCES Account (id)\n          LABEL Owns,\n        AccountTransferAccount\n          SOURCE KEY (id) REFERENCES Account (id)\n          DESTINATION KEY (to_id) REFERENCES Account (id)\n          LABEL Transfers\n      )"
+      ]
+    },
+    {
+      "label": "seed",
+      "family": "official-FinGraph",
+      "kind": "dml",
+      "statements": [
+        "INSERT INTO Account\n      (id, create_time, is_blocked, nick_name)\n    VALUES\n      (7,\"2020-01-10 06:22:20.222\",false,\"Vacation Fund\"),\n      (16,\"2020-01-27 17:55:09.206\",true,\"Vacation Fund\"),\n      (20,\"2020-02-18 05:44:20.655\",false,\"Rainy Day Fund\")",
+        "INSERT INTO Person\n      (id, name, birthday, country, city)\n    VALUES\n      (1,\"Alex\",\"1991-12-21 00:00:00\",\"Australia\",\"Adelaide\"),\n      (2,\"Dana\",\"1980-10-31 00:00:00\",\"Czech_Republic\",\"Moravia\"),\n      (3,\"Lee\",\"1986-12-07 00:00:00\",\"India\",\"Kollam\")",
+        "INSERT INTO AccountTransferAccount\n      (id, to_id, amount, create_time, order_number)\n    VALUES\n      (7,16,300,\"2020-08-29 15:28:58.647\",\"304330008004315\"),\n      (7,16,100,\"2020-10-04 16:55:05.342\",\"304120005529714\"),\n      (16,20,300,\"2020-09-25 02:36:14.926\",\"103650009791820\"),\n      (20,7,500,\"2020-10-04 16:55:05.342\",\"304120005529714\"),\n      (20,16,200,\"2020-10-17 03:59:40.247\",\"302290001255747\")",
+        "INSERT INTO PersonOwnAccount\n      (id, account_id, create_time)\n    VALUES\n      (1,7,\"2020-01-10 06:22:20.222\"),\n      (2,20,\"2020-01-27 17:55:09.206\"),\n      (3,16,\"2020-02-18 05:44:20.655\")"
+      ],
+      "requires": [
+        "schema"
+      ]
+    },
+    {
+      "label": "id-ASC",
+      "family": "GQL-order-query-shapes",
+      "kind": "query",
+      "sql": "GRAPH FinGraph MATCH(p:Person) RETURN p.id AS v ORDER BY v ASC",
+      "requires": [
+        "seed"
+      ]
+    },
+    {
+      "label": "sql-id-ASC",
+      "family": "GQL-order-query-shapes",
+      "kind": "query",
+      "sql": "SELECT id AS v FROM Person ORDER BY v ASC",
+      "requires": [
+        "seed"
+      ]
+    },
+    {
+      "label": "id-DESC",
+      "family": "GQL-order-query-shapes",
+      "kind": "query",
+      "sql": "GRAPH FinGraph MATCH(p:Person) RETURN p.id AS v ORDER BY v DESC",
+      "requires": [
+        "seed"
+      ]
+    },
+    {
+      "label": "sql-id-DESC",
+      "family": "GQL-order-query-shapes",
+      "kind": "query",
+      "sql": "SELECT id AS v FROM Person ORDER BY v DESC",
+      "requires": [
+        "seed"
+      ]
+    },
+    {
+      "label": "name-ASC",
+      "family": "GQL-order-query-shapes",
+      "kind": "query",
+      "sql": "GRAPH FinGraph MATCH(p:Person) RETURN p.name AS v ORDER BY v ASC",
+      "requires": [
+        "seed"
+      ]
+    },
+    {
+      "label": "sql-name-ASC",
+      "family": "GQL-order-query-shapes",
+      "kind": "query",
+      "sql": "SELECT name AS v FROM Person ORDER BY v ASC",
+      "requires": [
+        "seed"
+      ]
+    },
+    {
+      "label": "name-DESC",
+      "family": "GQL-order-query-shapes",
+      "kind": "query",
+      "sql": "GRAPH FinGraph MATCH(p:Person) RETURN p.name AS v ORDER BY v DESC",
+      "requires": [
+        "seed"
+      ]
+    },
+    {
+      "label": "sql-name-DESC",
+      "family": "GQL-order-query-shapes",
+      "kind": "query",
+      "sql": "SELECT name AS v FROM Person ORDER BY v DESC",
+      "requires": [
+        "seed"
+      ]
+    },
+    {
+      "label": "country-ASC",
+      "family": "GQL-order-query-shapes",
+      "kind": "query",
+      "sql": "GRAPH FinGraph MATCH(p:Person) RETURN p.country AS v ORDER BY v ASC",
+      "requires": [
+        "seed"
+      ]
+    },
+    {
+      "label": "sql-country-ASC",
+      "family": "GQL-order-query-shapes",
+      "kind": "query",
+      "sql": "SELECT country AS v FROM Person ORDER BY v ASC",
+      "requires": [
+        "seed"
+      ]
+    },
+    {
+      "label": "country-DESC",
+      "family": "GQL-order-query-shapes",
+      "kind": "query",
+      "sql": "GRAPH FinGraph MATCH(p:Person) RETURN p.country AS v ORDER BY v DESC",
+      "requires": [
+        "seed"
+      ]
+    },
+    {
+      "label": "sql-country-DESC",
+      "family": "GQL-order-query-shapes",
+      "kind": "query",
+      "sql": "SELECT country AS v FROM Person ORDER BY v DESC",
+      "requires": [
+        "seed"
+      ]
+    },
+    {
+      "label": "timestamp-ASC",
+      "family": "GQL-order-query-shapes",
+      "kind": "query",
+      "sql": "GRAPH FinGraph MATCH(p:Person) RETURN p.birthday AS v ORDER BY v ASC",
+      "requires": [
+        "seed"
+      ]
+    },
+    {
+      "label": "sql-timestamp-ASC",
+      "family": "GQL-order-query-shapes",
+      "kind": "query",
+      "sql": "SELECT birthday AS v FROM Person ORDER BY v ASC",
+      "requires": [
+        "seed"
+      ]
+    },
+    {
+      "label": "timestamp-DESC",
+      "family": "GQL-order-query-shapes",
+      "kind": "query",
+      "sql": "GRAPH FinGraph MATCH(p:Person) RETURN p.birthday AS v ORDER BY v DESC",
+      "requires": [
+        "seed"
+      ]
+    },
+    {
+      "label": "sql-timestamp-DESC",
+      "family": "GQL-order-query-shapes",
+      "kind": "query",
+      "sql": "SELECT birthday AS v FROM Person ORDER BY v DESC",
+      "requires": [
+        "seed"
+      ]
+    },
+    {
+      "label": "arithmetic-ASC",
+      "family": "GQL-order-query-shapes",
+      "kind": "query",
+      "sql": "GRAPH FinGraph MATCH(p:Person) RETURN p.id+10 AS v ORDER BY v ASC",
+      "requires": [
+        "seed"
+      ]
+    },
+    {
+      "label": "sql-arithmetic-ASC",
+      "family": "GQL-order-query-shapes",
+      "kind": "query",
+      "sql": "SELECT id+10 AS v FROM Person ORDER BY v ASC",
+      "requires": [
+        "seed"
+      ]
+    },
+    {
+      "label": "arithmetic-DESC",
+      "family": "GQL-order-query-shapes",
+      "kind": "query",
+      "sql": "GRAPH FinGraph MATCH(p:Person) RETURN p.id+10 AS v ORDER BY v DESC",
+      "requires": [
+        "seed"
+      ]
+    },
+    {
+      "label": "sql-arithmetic-DESC",
+      "family": "GQL-order-query-shapes",
+      "kind": "query",
+      "sql": "SELECT id+10 AS v FROM Person ORDER BY v DESC",
+      "requires": [
+        "seed"
+      ]
+    },
+    {
+      "label": "string-cast-ASC",
+      "family": "GQL-order-query-shapes",
+      "kind": "query",
+      "sql": "GRAPH FinGraph MATCH(p:Person) RETURN CAST(p.id AS STRING) AS v ORDER BY v ASC",
+      "requires": [
+        "seed"
+      ]
+    },
+    {
+      "label": "sql-string-cast-ASC",
+      "family": "GQL-order-query-shapes",
+      "kind": "query",
+      "sql": "SELECT CAST(id AS STRING) AS v FROM Person ORDER BY v ASC",
+      "requires": [
+        "seed"
+      ]
+    },
+    {
+      "label": "string-cast-DESC",
+      "family": "GQL-order-query-shapes",
+      "kind": "query",
+      "sql": "GRAPH FinGraph MATCH(p:Person) RETURN CAST(p.id AS STRING) AS v ORDER BY v DESC",
+      "requires": [
+        "seed"
+      ]
+    },
+    {
+      "label": "sql-string-cast-DESC",
+      "family": "GQL-order-query-shapes",
+      "kind": "query",
+      "sql": "SELECT CAST(id AS STRING) AS v FROM Person ORDER BY v DESC",
+      "requires": [
+        "seed"
+      ]
+    },
+    {
+      "label": "distinct-ASC",
+      "family": "GQL-order-query-shapes",
+      "kind": "query",
+      "sql": "GRAPH FinGraph MATCH(p:Person) RETURN DISTINCT p.id AS v ORDER BY v ASC",
+      "requires": [
+        "seed"
+      ]
+    },
+    {
+      "label": "aggregate-ASC",
+      "family": "GQL-order-query-shapes",
+      "kind": "query",
+      "sql": "GRAPH FinGraph MATCH(a:Account)-[t:Transfers]->() RETURN a.id AS id, SUM(t.amount) AS total GROUP BY id ORDER BY total ASC",
+      "requires": [
+        "seed"
+      ]
+    },
+    {
+      "label": "sql-aggregate-ASC",
+      "family": "GQL-order-query-shapes",
+      "kind": "query",
+      "sql": "SELECT id, SUM(amount) AS total FROM AccountTransferAccount GROUP BY id ORDER BY total ASC",
+      "requires": [
+        "seed"
+      ]
+    },
+    {
+      "label": "next-ASC",
+      "family": "GQL-order-query-shapes",
+      "kind": "query",
+      "sql": "GRAPH FinGraph MATCH(p:Person) RETURN p.id AS id NEXT RETURN id AS v ORDER BY v ASC",
+      "requires": [
+        "seed"
+      ]
+    },
+    {
+      "label": "limit1-ASC",
+      "family": "GQL-order-query-shapes",
+      "kind": "query",
+      "sql": "GRAPH FinGraph MATCH(p:Person) RETURN p.id AS v ORDER BY v ASC LIMIT 1",
+      "requires": [
+        "seed"
+      ]
+    },
+    {
+      "label": "limit2-ASC",
+      "family": "GQL-order-query-shapes",
+      "kind": "query",
+      "sql": "GRAPH FinGraph MATCH(p:Person) RETURN p.id AS v ORDER BY v ASC LIMIT 2",
+      "requires": [
+        "seed"
+      ]
+    },
+    {
+      "label": "primitive-limit2-ASC",
+      "family": "GQL-order-query-shapes",
+      "kind": "query",
+      "sql": "GRAPH FinGraph MATCH(p:Person) ORDER BY p.id ASC LIMIT 2 RETURN p.id AS v",
+      "requires": [
+        "seed"
+      ]
+    },
+    {
+      "label": "distinct-DESC",
+      "family": "GQL-order-query-shapes",
+      "kind": "query",
+      "sql": "GRAPH FinGraph MATCH(p:Person) RETURN DISTINCT p.id AS v ORDER BY v DESC",
+      "requires": [
+        "seed"
+      ]
+    },
+    {
+      "label": "aggregate-DESC",
+      "family": "GQL-order-query-shapes",
+      "kind": "query",
+      "sql": "GRAPH FinGraph MATCH(a:Account)-[t:Transfers]->() RETURN a.id AS id, SUM(t.amount) AS total GROUP BY id ORDER BY total DESC",
+      "requires": [
+        "seed"
+      ]
+    },
+    {
+      "label": "sql-aggregate-DESC",
+      "family": "GQL-order-query-shapes",
+      "kind": "query",
+      "sql": "SELECT id, SUM(amount) AS total FROM AccountTransferAccount GROUP BY id ORDER BY total DESC",
+      "requires": [
+        "seed"
+      ]
+    },
+    {
+      "label": "next-DESC",
+      "family": "GQL-order-query-shapes",
+      "kind": "query",
+      "sql": "GRAPH FinGraph MATCH(p:Person) RETURN p.id AS id NEXT RETURN id AS v ORDER BY v DESC",
+      "requires": [
+        "seed"
+      ]
+    },
+    {
+      "label": "limit1-DESC",
+      "family": "GQL-order-query-shapes",
+      "kind": "query",
+      "sql": "GRAPH FinGraph MATCH(p:Person) RETURN p.id AS v ORDER BY v DESC LIMIT 1",
+      "requires": [
+        "seed"
+      ]
+    },
+    {
+      "label": "limit2-DESC",
+      "family": "GQL-order-query-shapes",
+      "kind": "query",
+      "sql": "GRAPH FinGraph MATCH(p:Person) RETURN p.id AS v ORDER BY v DESC LIMIT 2",
+      "requires": [
+        "seed"
+      ]
+    },
+    {
+      "label": "primitive-limit2-DESC",
+      "family": "GQL-order-query-shapes",
+      "kind": "query",
+      "sql": "GRAPH FinGraph MATCH(p:Person) ORDER BY p.id DESC LIMIT 2 RETURN p.id AS v",
+      "requires": [
+        "seed"
+      ]
+    },
+    {
+      "label": "primitive-no-page",
+      "family": "GQL-order-query-shapes",
+      "kind": "query",
+      "sql": "GRAPH FinGraph MATCH(p:Person) ORDER BY p.id DESC RETURN p.id AS v",
+      "requires": [
+        "seed"
+      ]
+    },
+    {
+      "label": "offset-limit",
+      "family": "GQL-order-query-shapes",
+      "kind": "query",
+      "sql": "GRAPH FinGraph MATCH(p:Person) RETURN p.id AS v ORDER BY v DESC OFFSET 1 LIMIT 2",
+      "requires": [
+        "seed"
+      ]
+    },
+    {
+      "label": "tie-keys",
+      "family": "GQL-order-query-shapes",
+      "kind": "query",
+      "sql": "GRAPH FinGraph MATCH(p:Person) RETURN p.id AS id, p.id>2 AS k ORDER BY k",
+      "requires": [
+        "seed"
+      ]
+    },
+    {
+      "label": "tie-keys-with-id",
+      "family": "GQL-order-query-shapes",
+      "kind": "query",
+      "sql": "GRAPH FinGraph MATCH(p:Person) RETURN p.id AS id, p.id>2 AS k ORDER BY k,id",
+      "requires": [
+        "seed"
+      ]
+    },
+    {
+      "label": "aggregate-order",
+      "family": "GQL-order-query-shapes",
+      "kind": "query",
+      "sql": "GRAPH FinGraph MATCH(p:Person) RETURN ARRAY_AGG(p.id ORDER BY p.id) AS ids",
+      "requires": [
+        "seed"
+      ]
+    },
+    {
+      "label": "aggregate-order-desc",
+      "family": "GQL-order-query-shapes",
+      "kind": "query",
+      "sql": "GRAPH FinGraph MATCH(p:Person) RETURN ARRAY_AGG(p.id ORDER BY p.id DESC) AS ids",
+      "requires": [
+        "seed"
+      ]
+    },
+    {
+      "label": "next-array",
+      "family": "GQL-order-query-shapes",
+      "kind": "query",
+      "sql": "GRAPH FinGraph MATCH(p:Person) RETURN p.id AS id ORDER BY id NEXT RETURN ARRAY_AGG(id) AS ids",
+      "requires": [
+        "seed"
+      ]
+    },
+    {
+      "label": "for-values",
+      "family": "GQL-order-query-shapes",
+      "kind": "query",
+      "sql": "GRAPH FinGraph FOR x IN [3,1,2] RETURN x AS v ORDER BY v",
+      "requires": [
+        "seed"
+      ]
+    },
+    {
+      "label": "sql-outer-graph",
+      "family": "GQL-order-query-shapes",
+      "kind": "query",
+      "sql": "SELECT v FROM GRAPH_TABLE(FinGraph MATCH(p:Person) RETURN p.id AS v ORDER BY v) ORDER BY v",
+      "requires": [
+        "seed"
+      ]
+    }
+  ]
+}

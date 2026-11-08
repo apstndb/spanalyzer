@@ -1,0 +1,20 @@
+from pathlib import Path
+import re,json,difflib
+p=Path('<LOCAL_TASK_ROOT>/apstndb/spanalyzer/docs-delta-20261031/sources')
+review={'spanner-omni/download','spanner-omni/quickstart','spanner-omni/setup','spanner-omni/upgrade-deployment','spanner-omni/use-console','spanner/docs/emulator','spanner/docs/full-text-search/ranked-search','spanner/docs/full-text-search/search-indexes','spanner/docs/instance-configurations','spanner/docs/spanner-custom-constraints','spanner/docs/reference/standard-sql/data-definition-language','spanner/docs/reference/standard-sql/pipe-syntax','spanner/docs/release-notes'}
+def norm(t):
+ for a,b in [('Google Cloud CLI','CLI'),('gcloud CLI','CLI'),('`gcloud`','CLI'),(' command-line tool',''),('Identity and Access Management (IAM)','IAM'),('Identity and Access Management','IAM'),('Spanner Spanner Data Boost','Data Boost'),('Spanner Data Boost','Data Boost'),('Data Boost for Spanner','Data Boost'),('Cloud KMS','Cloud Key Management Service'),('Cloud Monitoring','Monitoring'),('Cloud Logging','Logging'),('Dataplex Entry and EntryLink Owner','Knowledge Catalog Entry and EntryLink Owner'),('Google SQL','GoogleSQL'),('FGAC','fine-grained access control'),('Cloud Functions','Cloud Run functions'),('Query Insights','Query insights'),('Hotspot Insights','Hotspot insights'),('Google Cloud Platform','Google Cloud'),('committment','commitment'),('[Spanner free trial instances overview]','[Free trial instances overview]'),(') .',').')]:t=t.replace(a,b)
+ t=re.sub(r'(\[IAM\]\([^\n)]+\)) \(IAM\)',r'\1',t)
+ t='\n'.join('|'.join(c.strip()for c in l.split('|'))if l.startswith('|')else l for l in t.splitlines())
+ return t
+rows=[]
+for f in json.loads((p/'since-baseline.json').read_text())['files']:
+ if not f['filename'].startswith('docs/'):continue
+ rel=f['filename'].removeprefix('docs/');key=rel.removeprefix('docs.cloud.google.com/').removesuffix('.md')
+ if key in review:continue
+ a=norm((p/'baseline'/rel).read_text());b=norm((p/'target'/rel).read_text());rows.append({'path':rel,'matches':a==b})
+ if a!=b:
+  print('UNEXPLAINED',rel)
+  for l in difflib.unified_diff(a.splitlines(),b.splitlines(),n=0):
+   if l.startswith(('+','-'))and not l.startswith(('---','+++')):print(l)
+print('Editorial paths',len(rows),'fully explained',sum(r['matches']for r in rows));(p/'editorial-check.json').write_text(json.dumps(rows,indent=2)+'\n')

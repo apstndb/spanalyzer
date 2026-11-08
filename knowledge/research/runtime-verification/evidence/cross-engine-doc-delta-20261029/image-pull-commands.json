@@ -1,0 +1,50 @@
+[
+  {
+    "name": "omni-r5",
+    "image": "us-docker.pkg.dev/spanner-omni/images/spanner-omni:2026.r5@sha256:e506672206e0291cac28cbe19ad4cd470cec112c24601637bc896c65f7362396",
+    "started_at": "2026-10-29T14:50:50.840203+00:00",
+    "completed_at": "2026-10-29T14:51:15.672670+00:00",
+    "exit_code": 0,
+    "local_image": {
+      "Id": "sha256:e506672206e0291cac28cbe19ad4cd470cec112c24601637bc896c65f7362396",
+      "RepoDigests": [
+        "us-docker.pkg.dev/spanner-omni/images/spanner-omni@sha256:e506672206e0291cac28cbe19ad4cd470cec112c24601637bc896c65f7362396"
+      ],
+      "Os": "linux",
+      "Architecture": "arm64",
+      "Created": "2026-10-24T20:11:53.826695383Z"
+    }
+  },
+  {
+    "name": "omni-lts",
+    "image": "us-docker.pkg.dev/spanner-omni/images/spanner-omni:2026.r4-lts.1@sha256:5e3cf199f5abf3a09cd2348ab36c129b3268966eb4eb72fca278fe58252fcbdb",
+    "started_at": "2026-10-29T14:50:50.841468+00:00",
+    "completed_at": "2026-10-29T14:51:20.406586+00:00",
+    "exit_code": 0,
+    "local_image": {
+      "Id": "sha256:5e3cf199f5abf3a09cd2348ab36c129b3268966eb4eb72fca278fe58252fcbdb",
+      "RepoDigests": [
+        "us-docker.pkg.dev/spanner-omni/images/spanner-omni@sha256:5e3cf199f5abf3a09cd2348ab36c129b3268966eb4eb72fca278fe58252fcbdb"
+      ],
+      "Os": "linux",
+      "Architecture": "arm64",
+      "Created": "2026-10-22T06:42:02.932107242Z"
+    }
+  },
+  {
+    "name": "emulator",
+    "image": "gcr.io/cloud-spanner-emulator/emulator:1.5.59@sha256:969af6a9349948fbfb4a826c18e160e258a4005f7c759f8e7f2dcec369cccba8",
+    "started_at": "2026-10-29T14:50:50.842523+00:00",
+    "completed_at": "2026-10-29T14:50:58.444146+00:00",
+    "exit_code": 0,
+    "local_image": {
+      "Id": "sha256:969af6a9349948fbfb4a826c18e160e258a4005f7c759f8e7f2dcec369cccba8",
+      "RepoDigests": [
+        "gcr.io/cloud-spanner-emulator/emulator@sha256:969af6a9349948fbfb4a826c18e160e258a4005f7c759f8e7f2dcec369cccba8"
+      ],
+      "Os": "linux",
+      "Architecture": "arm64",
+      "Created": "2026-10-14T05:24:16.38901439Z"
+    }
+  }
+]

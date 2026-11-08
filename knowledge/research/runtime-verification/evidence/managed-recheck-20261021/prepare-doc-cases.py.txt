@@ -1,0 +1,92 @@
+"""Prepare explicit, unexecuted cases for the current primary-document deltas."""
+from pathlib import Path
+import json
+
+task=Path('<LOCAL_CHECKOUT>/.tmp/managed-recheck-20261021')
+cases=[]
+def add(label,sql,dialect='google',family='hll',**extra):
+    cases.append(dict(label=label,sql=sql,dialect=dialect,family=family,execution_status='not_run_missing_managed_target',**extra))
+
+for dialect in ['google','pg']:
+    approx='APPROX_COUNT_DISTINCT' if dialect=='google' else 'spanner.approx_count_distinct'
+    values='SELECT x FROM UNNEST([1,1,2,NULL]) AS x' if dialect=='google' else 'SELECT x FROM (VALUES (1::bigint),(1::bigint),(2::bigint),(NULL::bigint)) AS t(x)'
+    add(dialect+'-approx-distinct',f'SELECT {approx}(x) AS estimate FROM ({values})',dialect)
+    for precision in [9,10,15,24,25]:
+        add(f'{dialect}-hll-precision-{precision}',f'SELECT HLL_COUNT.EXTRACT(HLL_COUNT.INIT(x,{precision})) AS estimate FROM ({values})',dialect,control='precision_boundary')
+    for name,cast in [('int','1'),('string',"'x'"),('bytes',"b'x'" if dialect=='google' else "'x'::bytea"),('numeric',"NUMERIC '1'" if dialect=='google' else '1::numeric'),('bool','TRUE'),('interval','INTERVAL 1 DAY' if dialect=='google' else "INTERVAL '1 day'")]:
+        add(f'{dialect}-hll-input-{name}',f'SELECT HLL_COUNT.EXTRACT(HLL_COUNT.INIT(v)) AS estimate FROM (SELECT {cast} AS v)',dialect,control='input_type')
+    nullbytes='CAST(NULL AS BYTES)' if dialect=='google' else 'NULL::bytea'
+    nullint='CAST(NULL AS INT64)' if dialect=='google' else 'NULL::bigint'
+    add(dialect+'-hll-extract-null',f'SELECT HLL_COUNT.EXTRACT({nullbytes}) AS estimate',dialect)
+    add(dialect+'-hll-init-null',f'SELECT HLL_COUNT.INIT({nullint}) AS sketch',dialect)
+    add(dialect+'-hll-merge',f'WITH s AS (SELECT HLL_COUNT.INIT(x) AS sketch FROM ({values})) SELECT HLL_COUNT.MERGE(sketch) AS estimate FROM s',dialect)
+    add(dialect+'-hll-merge-partial',f'WITH s AS (SELECT HLL_COUNT.INIT(x) AS sketch FROM ({values})) SELECT HLL_COUNT.EXTRACT(HLL_COUNT.MERGE_PARTIAL(sketch)) AS estimate FROM s',dialect)
+
+for mode in ['FULL OUTER','FULL','OUTER','LEFT OUTER','LEFT','INNER']:
+    for operator in ['UNION ALL','UNION DISTINCT','INTERSECT ALL','INTERSECT DISTINCT','EXCEPT ALL','EXCEPT DISTINCT']:
+        add('gql-'+mode.lower().replace(' ','-')+'-'+operator.lower().replace(' ','-'),f'GRAPH DocDeltaGraph RETURN 1 AS left_only, 10 AS common {mode} {operator} RETURN 10 AS common, 2 AS right_only',family='gql_column_propagation',compare_column_names_and_null_padding=True)
+for label,sql in [
+    ('gql-default-name-mismatch','GRAPH DocDeltaGraph RETURN 1 AS left_only UNION ALL RETURN 2 AS right_only'),
+    ('gql-inner-no-common','GRAPH DocDeltaGraph RETURN 1 AS left_only INNER UNION ALL RETURN 2 AS right_only'),
+    ('gql-malformed-rhs','GRAPH DocDeltaGraph RETURN 1 AS x FULL OUTER UNION ALL'),
+    ('gql-malformed-alias','GRAPH DocDeltaGraph RETURN 1 AS x FULL OUTER UNION ALL RETURN 2 AS'),
+]:add(label,sql,family='gql_column_propagation',control='negative_or_semantic_boundary')
+
+google_predicates={
+ 'document-equal':"d.doc = JSON '{\"kind\":\"active\",\"n\":1}'",
+ 'path-equal':"d.doc.kind = 'active'",'number-equal':'d.doc.n = 1',
+ 'not-equal':"d.doc.kind != 'active'",'not-equal-alias':"d.doc.kind <> 'active'",
+ 'in':"d.doc.kind IN ('active','pending')",'not-in':"d.doc.kind NOT IN ('active','pending')",
+ 'exists':'d.doc.kind IS NOT NULL','range':'d.doc.n > 1',
+}
+pg_predicates={
+ 'document-equal':"d.doc = '{\"kind\":\"active\",\"n\":1}'::jsonb",
+ 'path-equal':"d.doc->'kind' = '\"active\"'::jsonb",'number-equal':"d.doc->'n' = '1'::jsonb",
+ 'not-equal':"d.doc->'kind' != '\"active\"'::jsonb",'not-equal-alias':"d.doc->'kind' <> '\"active\"'::jsonb",
+ 'in':"d.doc->'kind' IN ('\"active\"'::jsonb,'\"pending\"'::jsonb)",
+ 'not-in':"d.doc->'kind' NOT IN ('\"active\"'::jsonb,'\"pending\"'::jsonb)",
+ 'exists':"d.doc ? 'kind'",'range':"d.doc->'n' > '1'::jsonb",'text-extraction':"d.doc->>'kind' = 'active'",
+}
+for dialect,predicates in [('google',google_predicates),('pg',pg_predicates)]:
+    for label,predicate in predicates.items():
+        for access in ['automatic','forced-search','forced-base']:
+            relation='DocDeltaDocs' if dialect=='google' else 'docdeltadocs'
+            index='DocDeltaSearch' if dialect=='google' else 'docdeltasearch'
+            if access!='automatic':
+                hint=index if access=='forced-search' else '_BASE_TABLE'
+                relation+=f'@{{FORCE_INDEX={hint}}}' if dialect=='google' else f' /*@ FORCE_INDEX={hint} */'
+            add(f'{dialect}-json-{label}-{access}',f'SELECT d.Id FROM {relation} AS d WHERE {predicate} ORDER BY d.Id',dialect,'json_search_equality',profile=True,access=access,requirement='Separate successful execution, forced access, automatic plan selection and result equivalence; no performance inference from the small fixture')
+
+for label,expression in [
+ ('filter',"n.flag = TRUE"),('group','TRUE'),('order','TRUE'),('distinct','TRUE'),
+ ('bare-bool','n.flag'),('string-number-mismatch','n.num_string = 1'),
+]:
+    tail={'group':'RETURN n.kind AS kind, COUNT(*) AS count','order':'RETURN n.value AS value ORDER BY value','distinct':'RETURN DISTINCT n.kind AS kind'}.get(label,'RETURN n.Id AS id')
+    add('dynamic-'+label,'GRAPH DocDeltaDynamic MATCH (n) WHERE '+expression+' '+tail,family='dynamic_json_properties')
+add('fingerprint-control',"SELECT FARM_FINGERPRINT('1footrue') AS fingerprint, TO_HEX(SHA256('Hello World')) AS sha256",family='hash_documentation')
+
+spec={
+ 'status':'prepared_not_executed',
+ 'blocking_condition':'Configured managed instance returns NotFound; do not interpret any prepared SQL as runtime acceptance',
+ 'sources':['https://docs.cloud.google.com/spanner/docs/reference/standard-sql/graph-query-statements','https://docs.cloud.google.com/spanner/docs/full-text-search/json-indexes','https://docs.cloud.google.com/spanner/docs/reference/standard-sql/hll_functions','https://docs.cloud.google.com/spanner/docs/reference/postgresql/functions','https://docs.cloud.google.com/spanner/docs/graph/manage-schemaless-data'],
+ 'fixtures':{
+  'google_ddl':[
+   'CREATE TABLE DocDeltaNodes (Id INT64 NOT NULL, Label STRING(MAX) NOT NULL, Properties JSON) PRIMARY KEY(Id)',
+   'CREATE PROPERTY GRAPH DocDeltaGraph NODE TABLES (DocDeltaNodes LABEL Node PROPERTIES(Id))',
+   'CREATE PROPERTY GRAPH DocDeltaDynamic NODE TABLES (DocDeltaNodes DYNAMIC LABEL(Label) DYNAMIC PROPERTIES(Properties))',
+   'CREATE TABLE DocDeltaDocs (Id INT64 NOT NULL, Doc JSON, DocTokens TOKENLIST AS (TOKENIZE_JSON(Doc)) HIDDEN) PRIMARY KEY(Id)',
+   'CREATE SEARCH INDEX DocDeltaSearch ON DocDeltaDocs(DocTokens)',
+  ],
+  'pg_ddl':[
+   'CREATE TABLE docdeltadocs (id bigint PRIMARY KEY, doc jsonb, doctokens spanner.tokenlist GENERATED ALWAYS AS (spanner.tokenize_jsonb(doc)) VIRTUAL HIDDEN)',
+   'CREATE SEARCH INDEX docdeltasearch ON docdeltadocs(doctokens)',
+  ],
+  'documents':[{'Id':1,'Doc':{'kind':'active','n':1}},{'Id':2,'Doc':{'kind':'pending','n':2}},{'Id':3,'Doc':{'kind':'inactive','n':3}},{'Id':4,'Doc':{}},{'Id':5,'Doc':None}],
+  'dynamic_properties':[{'Id':1,'Label':'Node','Properties':{'flag':True,'kind':'a','value':2,'num_string':'1'}},{'Id':2,'Label':'Node','Properties':{'flag':False,'kind':'a','value':1,'num_string':'2'}}],
+  'cleanup':'Create fresh owned date-scoped databases only after preflight; drop only after successful creation, then require GetDatabase NotFound',
+ },
+ 'cases':cases,
+ 'additional_future_coverage':['Mixed-precision and mixed-input-type HLL merges','GoogleSQL and PostgreSQL NUMERIC sketch interoperability negative controls','Read-write transaction restrictions for JSON search indexes','Graph analytics jobs, IAM-role changes, migration/cutover and geo-partition provisioning are tracked as documentation only here and require distinct validation setup'],
+}
+(task/'doc-delta-probe-plan.json').write_text(json.dumps(spec,indent=2)+'\n')
+print('Prepared unexecuted cases:',len(cases))

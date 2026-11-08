@@ -1,0 +1,6 @@
+{"at":"2026-10-04T14:39:37.385939Z","dialect":"","image":"us-docker.pkg.dev/spanner-omni/images/spanner-omni:2026.r4-lts@sha256:9f10586c5de366bec5c0ff6cf542a67c21c8363e8a12a3deb9c372a07c9aa8b6","label":"identity","runtime":"Spanner Omni"}
+{"at":"2026-10-04T14:40:21.416728Z","code":"OK","dialect":"GOOGLE_STANDARD_SQL","error":"","kind":"ddl","label":"table","sql":"CREATE TABLE VolatileProbe(Id INT64 NOT NULL) PRIMARY KEY(Id)"}
+{"at":"2026-10-04T14:40:21.426903Z","code":"OK","dialect":"GOOGLE_STANDARD_SQL","error":"","label":"seed"}
+{"at":"2026-10-04T14:40:22.16588Z","code":"InvalidArgument","dialect":"GOOGLE_STANDARD_SQL","error":"rpc error: code = InvalidArgument desc = Error analyzing the definition of view `VolatileProbeView`: Unsupported built-in function: rand.","kind":"ddl","label":"view","sql":"CREATE VIEW VolatileProbeView SQL SECURITY INVOKER AS SELECT v.Id, RAND() AS score FROM VolatileProbe v"}
+{"at":"2026-10-04T14:40:23.797878Z","code":"OK","dialect":"GOOGLE_STANDARD_SQL","error":"","label":"database-cleanup"}
+{"at":"2026-10-04T14:40:33.963163Z","code":"OK","dialect":"GOOGLE_STANDARD_SQL","error":"","label":"runtime-cleanup"}

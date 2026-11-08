@@ -1,0 +1,35 @@
+from pathlib import Path
+import os,subprocess,json,datetime,re,hashlib,sys
+root=Path('<LOCAL_CHECKOUT>')
+task=Path('<LOCAL_TASK_ROOT>/apstndb/spanalyzer/managed-recheck-20261105')
+out=task/'evidence'
+env=os.environ.copy()
+keys=['SPANNER_PROJECT_ID','SPANNER_INSTANCE_ID','SPANNER_DATABASE_ID']
+assert all(env.get(k) for k in keys)
+assert not env.get('SPANNER_EMULATOR_HOST')
+env['TEST_REAL_SPANNER_DATABASE']='projects/{SPANNER_PROJECT_ID}/instances/{SPANNER_INSTANCE_ID}/databases/{SPANNER_DATABASE_ID}'.format(**env)
+secrets=[env['TEST_REAL_SPANNER_DATABASE']]+[env[k] for k in keys]
+def clean(s):
+    for value in sorted(secrets,key=len,reverse=True):s=s.replace(value,'<redacted>')
+    s=re.sub(r'projects/[^/\s"\']+/instances/[^/\s"\']+/databases/[^/\s"\']+','<database>',s)
+    return re.sub(r'requestID = "[^"]*"','requestID = "<redacted>"',s)
+phase=sys.argv[1] if len(sys.argv)>1 else 'readonly'
+cases=json.loads((out/(phase+'-cases.json')).read_text())
+assert cases and cases[0]['sql']=='SELECT 1 AS connectivity'
+assert all(re.match(r'^\s*(SELECT|WITH|FROM|GRAPH)\b',c['sql'],re.I) for c in cases)
+args=[str(root/'.tmp/managed-recheck-20261029/query'),str(out/(phase+'-cases.json'))]
+at=datetime.datetime.now(datetime.timezone.utc).isoformat()
+r=subprocess.run(args,env=env,capture_output=True,text=True,timeout=900)
+rows=[json.loads(v) for v in r.stdout.splitlines()]
+for row in rows:row['error']=clean(row['error'])
+(out/(phase+'.jsonl')).write_text(''.join(clean(json.dumps(v))+'\n' for v in rows))
+(out/(phase+'.stderr')).write_text(clean(r.stderr))
+receipt={'argv':args,'started_at':at,'completed_at':datetime.datetime.now(datetime.timezone.utc).isoformat(),'exit_code':r.returncode,'binary_sha256':hashlib.sha256(Path(args[0]).read_bytes()).hexdigest(),'source_sha256':hashlib.sha256((root/'.tmp/managed-recheck-20261029/query.go').read_bytes()).hexdigest(),'connection':'existing dedicated user-level mise profile','scope':'read-only query API; no DDL, DML, or resource lifecycle operations'}
+(out/(phase+'-command.json')).write_text(json.dumps(receipt,indent=2)+'\n')
+print('Process exit',r.returncode)
+rows=[json.loads(v) for v in (out/(phase+'.jsonl')).read_text().splitlines()]
+print('Results',len(rows))
+for row in rows:
+    print(row['label'],row['code'],'rows',len(row['rows']),row['error'][:180])
+assert r.returncode==0 and len(rows)==len(cases)
+assert rows[0]['code']=='OK' and rows[0]['rows']==[{'connectivity':'1'}]

@@ -1,0 +1,41 @@
+"""Isolate rejected RAND views so independent views and finite paths execute."""
+from pathlib import Path
+import copy,json
+p=Path('<LOCAL_CHECKOUT>/.tmp/managed-recheck-20261029');original=json.loads((p/'repair-google-plan.json').read_text());bylabel={s['label']:s for s in original['steps']};graphbase=bylabel['graph-base'];steps=[{'label':'graph-base','family':'graph-fixture','kind':'ddl','statements':graphbase['statements'][:2],'requires':[]}]
+for sql in graphbase['statements'][2:]:
+ view=sql.split()[2];steps.append({'label':'view-'+view.lower(),'family':'view-volatility','kind':'ddl','sql':sql,'requires':['graph-base']})
+for view,sql in [
+ ('GBodyUuid','CREATE VIEW GBodyUuid SQL SECURITY INVOKER AS SELECT n.Id FROM GNodes n WHERE LENGTH(GENERATE_UUID())>0'),
+ ('GJoinUuid','CREATE VIEW GJoinUuid SQL SECURITY INVOKER AS SELECT a.Id FROM GNodes a JOIN GNodes b ON a.Id=b.Id AND LENGTH(GENERATE_UUID())>0')]:
+ steps.append({'label':'view-'+view.lower(),'family':'view-volatility','kind':'ddl','sql':sql,'requires':['graph-base']})
+seed=copy.deepcopy(bylabel['graph-seed']);seed['requires']=['graph-base'];steps.append(seed)
+for old in original['steps']:
+ if old['family']not in ['volatile-graph','path-quantifier']or old['label']in ['graph-base','graph-seed']:continue
+ s=copy.deepcopy(old)
+ if s['family']=='volatile-graph'and s['kind']=='ddl':
+  view=s['view'];actual='GProjection'if view=='GProjectionUnused'else view;s['requires']=['graph-seed','view-'+actual.lower()]
+ steps.append(s)
+for view in ['GBodyUuid','GJoinUuid']:
+ for allow in ['omit','false','true']:
+  name='Uuid'+view+allow;label='volatile-'+view.lower()+'-key-false-allow-'+allow;options=['validate_element_key_uniqueness=false']
+  if allow!='omit':options.append('allow_view_with_volatile_column='+allow)
+  steps.append({'label':label,'family':'volatile-graph','kind':'ddl','sql':'CREATE PROPERTY GRAPH '+name+' NODE TABLES('+view+' KEY(Id) LABEL Node) OPTIONS('+','.join(options)+')','requires':['graph-seed','view-'+view.lower()],'view':view,'uniqueness':'false','allow_volatile':allow})
+  steps.append({'label':label+'-read','family':'volatile-graph','kind':'query','sql':'GRAPH '+name+' MATCH(n) RETURN COUNT(*) AS n','requires':[label]})
+steps.append({'label':'rand-direct-control','family':'view-volatility','kind':'query','sql':'SELECT RAND() AS value','requires':[]})
+plan={'dialect':'google','scope':'Independently submitted view DDL and valid UUID body/join controls; prior failed fixture attempts remain separate.','steps':steps};(p/'graph-final-plan.json').write_text(json.dumps(plan,indent=2)+'\n')
+s=(p/'weekly-delta.go').read_text().replace('weekly-delta-20261029g1','weekly-graph-20261029g1').replace('weekly-delta-20261029p1','weekly-graph-20261029p1');(p/'weekly-graph.go').write_text(s)
+s=(p/'run-weekly.py').read_text();s=s[:s.index("\nfor name,args in [('weekly-build'")];s=s.replace('weekly-commands.json','graph-final-commands.json')
+s+='''
+for name,args in [('graph-final-build',[go,'build','-o',str(out/'weekly-graph'),str(out/'weekly-graph.go')]),('graph-final-buildinfo',[go,'version','-m',str(out/'weekly-graph')]),('graph-final',[str(out/'weekly-graph'),str(out/'graph-final-plan.json')])]:
+    if run(name,args,root/'tools',workspace=True,timeout=1800):raise SystemExit('Graph case process failed')
+rows=[json.loads(line)for line in(out/'graph-final.stdout').read_text().splitlines()]
+labels={r['label']:r for r in rows}
+for label,code in [('create-database','OK'),('drop-database','OK'),('database-absent','NotFound')]:
+    if labels.get(label,{}).get('code')!=code:raise SystemExit('Graph fixture ownership/cleanup incomplete')
+expected={s['label']for s in json.loads((out/'graph-final-plan.json').read_text())['steps']}
+if not expected.issubset(labels):raise SystemExit('Graph cases missing')
+print('COMPLETE: isolated views and finite graph paths recorded',flush=True)
+''';(p/'run-graph-final.py').write_text(s)
+q=p/'inspect-cloud-state.py';(p/'inspect-cloud-state-attempt1.py').write_text(q.read_text());s=q.read_text().replace("['gcloud','--quiet'","['<LOCAL_HOME>/google-cloud-sdk/bin/gcloud','--quiet'");s=s.replace("project=os.environ", "os.environ.update(CLOUDSDK_CORE_DISABLE_FILE_LOGGING='true',CLOUDSDK_COMPONENT_MANAGER_DISABLE_UPDATE_CHECK='true')\nproject=os.environ");q.write_text(s)
+s=(p/'run-final-state.py').read_text().replace('final-commands.json','post-graph-final-commands.json').replace("durable/'evidence/repair-commands.json'","durable/'evidence/graph-final-commands.json'").replace("r['name']=='repair-pg'","r['name']=='graph-final'").replace("'final-inventory'","'post-graph-inventory'").replace("'final-trial-state'","'post-graph-trial-state'");(p/'run-post-graph-final.py').write_text(s)
+print('graph_steps',len(steps))

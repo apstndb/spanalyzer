@@ -1,0 +1,17 @@
+{
+  "scope": "Additional operational identifier redaction in runtime JSONL only. Complete public source bodies unchanged.",
+  "transformations": [
+    {
+      "file": "pg-capture.jsonl",
+      "original_sha256": "413a9ab7797244238495051058f55769729e645a66d12a744a40a6b7a992629c",
+      "retained_sha256": "5de3d19be3d660dd187da68d650acb3f697f915e1585d8b44f4b99dd30fc668b",
+      "reason": "Hash opaque operational transaction/lease/partition identifiers; codes and fixture payloads preserved."
+    },
+    {
+      "file": "google-capture.jsonl",
+      "original_sha256": "9dcedb03976004fa9755e9608983eb3ad77fa3ba1348e00b0b56ee73b1c8021b",
+      "retained_sha256": "7872746bb168e0fa196d875ec4388710d9fea79ed2491a3ed207f4a8e6cd303b",
+      "reason": "Hash opaque operational transaction/lease/partition identifiers; codes and fixture payloads preserved."
+    }
+  ]
+}

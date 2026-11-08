@@ -1,0 +1,46 @@
+{
+  "status": "pass",
+  "commands": [
+    {
+      "name": "okf-all",
+      "argv": [
+        "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go",
+        "run",
+        "./okf-check",
+        "--repo-root",
+        "..",
+        "--gate",
+        "all",
+        "--publication-manifest",
+        "<LOCAL_TASK_ROOT>/apstndb/spanalyzer/managed-recheck-20261105/publication-manifest.json"
+      ],
+      "cwd": "<LOCAL_CHECKOUT>/tools",
+      "exit_code": 0,
+      "log": "okf-all.log"
+    },
+    {
+      "name": "markdown-language",
+      "argv": [
+        "<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go",
+        "run",
+        "./markdown-language-check",
+        "--repo-root",
+        ".."
+      ],
+      "cwd": "<LOCAL_CHECKOUT>/tools",
+      "exit_code": 0,
+      "log": "markdown-language.log"
+    },
+    {
+      "name": "diff-check",
+      "argv": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "cwd": "<LOCAL_CHECKOUT>",
+      "exit_code": 0,
+      "log": "diff-check.log"
+    }
+  ]
+}

@@ -1,0 +1,43 @@
+from pathlib import Path
+import json,subprocess,os,shutil,hashlib
+r=Path('<LOCAL_CHECKOUT>');s=r/'.tmp/managed-recheck-20261105';t=Path('<LOCAL_TASK_ROOT>/apstndb/spanalyzer/managed-recheck-20261105');out=t/'evidence';old=r/'knowledge/research/runtime-verification/evidence/managed-recheck-20261103'
+for name in ['go.mod','go.sum']:shutil.copyfile(r/'.tmp/managed-recheck-20261103/module'/name,s/'module'/name)
+source=(r/'.tmp/managed-recheck-20261103/module/managed.go').read_text().replace('recheck1103','recheck1105');(s/'module/managed.go').write_text(source)
+def step(label,kind,sql='',family='extension',requires=None,**kw):
+ d=dict(label=label,kind=kind,sql=sql,family=family,**kw)
+ if requires:d['requires']=requires
+ return d
+cols=['AVG_COLUMNAR_READ_SHARE','CPU_SECONDS_DISTRIBUTION','CPU_SECONDS_DISTRIBUTION_JSON_STRING','ROW_SCANNED_DISTRIBUTION','ROW_SCANNED_DISTRIBUTION_JSON_STRING']
+stats=[]
+for scope in ['TOP','TOTAL']:
+ for interval in ['MINUTE','10MINUTE','HOUR']:
+  table='QUERY_STATS_'+scope+'_'+interval
+  stats.append(step('stats-'+table+'-scalar','query',f'SELECT AVG_COLUMNAR_READ_SHARE, ARRAY_LENGTH(CPU_SECONDS_DISTRIBUTION) AS cpu_distributions, ARRAY_LENGTH(ROW_SCANNED_DISTRIBUTION) AS row_distributions, CPU_SECONDS_DISTRIBUTION_JSON_STRING, ROW_SCANNED_DISTRIBUTION_JSON_STRING FROM SPANNER_SYS.{table} LIMIT 1','new-stats'))
+  for col in ['CPU_SECONDS_DISTRIBUTION','ROW_SCANNED_DISTRIBUTION']:
+   for form in ['struct','json']:
+    arg=col if form=='struct'else col+'_JSON_STRING';stats.append(step('stats-'+table+'-'+col+'-'+form,'query',f'SELECT SPANNER_SYS.DISTRIBUTION_PERCENTILE({arg}, 99.0) AS p99 FROM SPANNER_SYS.{table} LIMIT 1','new-stats'))
+(out/'statistics-cases.json').write_text(json.dumps([{'label':'connectivity','sql':'SELECT 1 AS connectivity'}]+[{k:v for k,v in c.items()if k in ['label','sql']}for c in stats],indent=2)+'\n')
+for dialect in ['google','pg']:
+ d=json.loads((old/(dialect+'-cases.json')).read_text());a=d['steps']
+ if dialect=='google':
+  a += [step('gql-standalone-corrected','query','GRAPH ProbeGraph MATCH(n) ORDER BY n.Id LIMIT 2 RETURN n.Id AS id','gql-order',['graph-insert']),step('gql-next-corrected','query','GRAPH ProbeGraph MATCH(n) RETURN n.Id AS id ORDER BY id NEXT LIMIT 2 RETURN id','gql-order',['graph-insert'])]
+  a.append(step('volatile-view','ddl','CREATE VIEW VolatileView SQL SECURITY INVOKER AS SELECT Id,GENERATE_UUID() AS V FROM PropNodes','volatile-view',['graph-insert']))
+  for suffix,option in [('default',''),('false',' OPTIONS(allow_view_with_volatile_column=false)'),('true',' OPTIONS(allow_view_with_volatile_column=true)')]:
+   a.append(step('volatile-graph-'+suffix,'ddl','CREATE PROPERTY GRAPH Volatile'+suffix+' NODE TABLES(VolatileView KEY(Id))'+option,'volatile-view',['volatile-view']))
+   for repeat in [1,2]:a.append(step('volatile-read-'+suffix+'-'+str(repeat),'query','GRAPH Volatile'+suffix+' MATCH(n) RETURN n.Id AS id,n.V AS v ORDER BY id','volatile-view',['volatile-graph-'+suffix]))
+  schema=['CREATE TABLE NullParent (Id INT64 NOT NULL) PRIMARY KEY(Id)','CREATE TABLE NullChild (Id INT64 NOT NULL, ParentId INT64, CONSTRAINT ParentFk FOREIGN KEY(ParentId) REFERENCES NullParent(Id) ON DELETE SET NULL) PRIMARY KEY(Id)'];insert=['INSERT INTO NullParent(Id) VALUES(1)','INSERT INTO NullChild(Id,ParentId) VALUES(1,1)'];delete='DELETE FROM NullParent WHERE Id=1';query='SELECT Id,ParentId FROM NullChild'
+ else:
+  schema=['CREATE TABLE NullParent (Id bigint PRIMARY KEY)','CREATE TABLE NullChild (Id bigint PRIMARY KEY, ParentId bigint, CONSTRAINT ParentFk FOREIGN KEY(ParentId) REFERENCES NullParent(Id) ON DELETE SET NULL)'];insert=['INSERT INTO NullParent(Id) VALUES(1)','INSERT INTO NullChild(Id,ParentId) VALUES(1,1)'];delete='DELETE FROM NullParent WHERE Id=1';query='SELECT Id,ParentId FROM NullChild'
+  a.append(step('pg-stats-metadata','query',"SELECT table_name,column_name,data_type FROM information_schema.columns WHERE table_schema='spanner_sys' AND column_name IN ('avg_columnar_read_share','cpu_seconds_distribution','cpu_seconds_distribution_json_string','row_scanned_distribution','row_scanned_distribution_json_string') ORDER BY table_name,column_name",'new-stats'))
+  for scope in ['top','total']:
+   for interval in ['minute','10minute','hour']:
+    table='query_stats_'+scope+'_'+interval
+    a.append(step('pg-stats-'+table,'query',f'SELECT avg_columnar_read_share,cpu_seconds_distribution_json_string,row_scanned_distribution_json_string FROM spanner_sys.{table} LIMIT 1','new-stats'))
+    for col in ['cpu_seconds_distribution','row_scanned_distribution']:
+     a.append(step('pg-stats-'+table+'-'+col,'query',f'SELECT spanner_sys.distribution_percentile({col}_json_string,99.0) AS p99 FROM spanner_sys.{table} LIMIT 1','new-stats'))
+  a.append(step('pg-stats-struct-negative','query','SELECT cpu_seconds_distribution FROM spanner_sys.query_stats_total_minute LIMIT 0','new-stats'))
+ a += [step('set-null-schema','ddl',family='set-null',statements=schema),step('set-null-insert','dml',family='set-null',requires=['set-null-schema'],statements=insert),step('set-null-delete','dml',family='set-null',requires=['set-null-insert'],statements=[delete]),step('set-null-result','query',query,'set-null',['set-null-delete'])]
+ (out/(dialect+'-cases.json')).write_text(json.dumps(d,indent=2)+'\n');print(dialect,'prepared steps',len(a))
+go='<LOCAL_HOME>/.local/share/mise/installs/go/1.26.8/bin/go';env=os.environ.copy();env.update(GOWORK='off',GOROOT=str(Path(go).parent.parent),GOTOOLCHAIN='local',GOFLAGS='-mod=readonly',GOCACHE=str(r/'.tmp/managed-recheck-20260925/go-cache'));args=[go,'build','-o',str(s/'managed'),'managed.go'];res=subprocess.run(args,cwd=s/'module',env=env,capture_output=True,text=True);(out/'build.log').write_text(res.stdout+res.stderr);assert res.returncode==0,res.stderr
+(out/'buildinfo.txt').write_text(subprocess.check_output([go,'version','-m',str(s/'managed')],env=env,text=True));(out/'build.json').write_text(json.dumps({'argv':args,'exit_code':res.returncode,'binary_sha256':hashlib.sha256((s/'managed').read_bytes()).hexdigest()},indent=2)+'\n')
+for name in ['managed.go','go.mod','go.sum']:shutil.copyfile(s/'module'/name,out/(name+'.txt'))
