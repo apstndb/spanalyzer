@@ -24,8 +24,8 @@ type spannerPlanReportAnalyzer struct {
 	clients *spanemuboost.Clients
 }
 
-func openPlanReportAnalyzer(ctx context.Context, runtime spanemuboost.RuntimeHandle, schema querygen.QueryCodegenSchema, baseDir string, descriptors *spanalyzer.ProtoDescriptorSet, optimizer planReportOptimizer) (planReportAnalyzer, error) {
-	clients, err := openPlanReportClients(ctx, runtime, schema, baseDir, descriptors, optimizer)
+func openPlanReportAnalyzer(ctx context.Context, runtime spanemuboost.RuntimeHandle, schema querygen.QueryCodegenSchema, baseDir string, descriptors *spanalyzer.ProtoDescriptorSet, optimizer planReportOptimizer, dropCreatedDatabases bool) (planReportAnalyzer, error) {
+	clients, err := openPlanReportClients(ctx, runtime, schema, baseDir, descriptors, optimizer, dropCreatedDatabases)
 	if err != nil {
 		return nil, err
 	}

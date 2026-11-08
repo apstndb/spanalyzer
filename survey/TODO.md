@@ -1,5 +1,14 @@
 # TODO
 
+## Repository hardening (2026-11-08)
+
+- [x] Order reconstructed DDL by known object dependencies, including sequence
+  defaults and SQL functions used by views; diagnose cycles deterministically.
+- [x] Verify from-AST and live-metadata reconstruction by applying the exported
+  statements to a fresh pinned runtime database.
+- [x] Document ordering guarantees and preserve partial-schema exports whose
+  external dependencies are intentionally outside the supplied metadata.
+
 ## Refresh container runtimes (2026-11-08)
 
 - [x] Upgrade spanemuboost to v0.4.10-alpha.1 and pin Emulator 1.5.59 and

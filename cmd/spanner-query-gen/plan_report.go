@@ -39,6 +39,8 @@ func runPlanReport(args []string, stdout, stderr io.Writer) error {
 	output := fs.String("output", "markdown", "report output format: markdown, yaml, or json")
 	summary := fs.Bool("summary", false, "emit a lightweight JSON/YAML summary without rendered plans, SQL, or operator graphs")
 	backend := fs.String("backend", "omni", "runtime backend: omni")
+	dropCreatedDatabases := fs.Bool("drop-created-databases", false, "drop databases created by this command when closing clients; default retains random databases on attached endpoints")
+	runtimeTargets := fs.String("runtime-targets", "", "runtime target registry file for cold starts; default uses pins bundled with this binary")
 	renderFormat := fs.String("format", "current", "spannerplan tree format: current, traditional, or compact")
 	annotate := fs.String("annotate", "", "rendered-plan annotation: seekability")
 	wrapWidth := fs.Int("wrap-width", 0, "maximum rendered plan width; 0 disables wrapping")
@@ -107,14 +109,16 @@ func runPlanReport(args []string, stdout, stderr io.Writer) error {
 
 	plan := querygen.BuildQueryCodegenReportPlan(config, baseDir)
 	report, err := buildPlanReport(context.Background(), config, plan, baseDir, planReportOptions{
-		Backend:             strings.ToLower(strings.TrimSpace(*backend)),
-		Format:              format,
-		RenderMode:          reference.RenderModePlan,
-		WrapWidth:           *wrapWidth,
-		AnnotateSeekability: strings.TrimSpace(*annotate) == "seekability",
-		Stable:              *stable,
-		Summary:             *summary,
-		Identity:            identity,
+		Backend:              strings.ToLower(strings.TrimSpace(*backend)),
+		Format:               format,
+		RenderMode:           reference.RenderModePlan,
+		WrapWidth:            *wrapWidth,
+		AnnotateSeekability:  strings.TrimSpace(*annotate) == "seekability",
+		Stable:               *stable,
+		Summary:              *summary,
+		DropCreatedDatabases: *dropCreatedDatabases,
+		RuntimeTargets:       *runtimeTargets,
+		Identity:             identity,
 		Optimizer: planReportOptimizerEnvironment{
 			Version:           strings.TrimSpace(*optimizerVersion),
 			StatisticsPackage: strings.TrimSpace(*optimizerStatisticsPackage),
@@ -140,6 +144,11 @@ func runPlanReport(args []string, stdout, stderr io.Writer) error {
 	if err := writePlanReport(stdout, *output, report); err != nil {
 		return err
 	}
+	for _, warning := range report.Warnings {
+		if warning.ID == "plan-report-cleanup-error" {
+			return fmt.Errorf("plan-report cleanup failed: %s", warning.Message)
+		}
+	}
 	if *requireTargets && report.Status == planReportStatusNoTargets {
 		return fmt.Errorf("plan-report found no Spanner query targets")
 	}
@@ -157,15 +166,17 @@ func runPlanReport(args []string, stdout, stderr io.Writer) error {
 }
 
 type planReportOptions struct {
-	AnnotateSeekability bool
-	Backend             string
-	Format              reference.Format
-	RenderMode          reference.RenderMode
-	WrapWidth           int
-	Stable              bool
-	Summary             bool
-	Identity            planReportBackendIdentity
-	Optimizer           planReportOptimizerEnvironment
+	AnnotateSeekability  bool
+	Backend              string
+	Format               reference.Format
+	RenderMode           reference.RenderMode
+	WrapWidth            int
+	Stable               bool
+	Summary              bool
+	DropCreatedDatabases bool
+	RuntimeTargets       string
+	Identity             planReportBackendIdentity
+	Optimizer            planReportOptimizerEnvironment
 }
 
 const (
@@ -184,7 +195,7 @@ const (
 	planReportIdentitySourceExternalUnverified = "external_unverified"
 	planReportFamilyMappingVersion             = "v1alpha.2"
 	planContractFileVersionV1Alpha             = plancontract.FileVersionV1Alpha
-	planContractEvaluatorVersionV1             = plancontract.EvaluatorVersionV1
+	planContractEvaluatorVersion               = plancontract.CurrentEvaluatorVersion
 	planContractStabilityNormalized            = plancontract.StabilityNormalized
 	planContractStabilityRawPlan               = plancontract.StabilityRawPlan
 
@@ -196,6 +207,7 @@ const (
 	planContractFailureKindClassificationUnknown = plancontract.FailureKindClassificationUnknown
 	planContractReasonTargetNotFound             = plancontract.ReasonTargetNotFound
 	planContractReasonTargetError                = plancontract.ReasonTargetError
+	planContractReasonEvaluationError            = plancontract.ReasonEvaluationError
 )
 
 const (
@@ -204,26 +216,27 @@ const (
 )
 
 type planReport struct {
-	Summary             bool                           `json:"-" yaml:"-"`
-	ReportVersion       string                         `json:"report_version" yaml:"report_version"`
-	Status              string                         `json:"status" yaml:"status"`
-	Backend             string                         `json:"backend" yaml:"backend"`
-	Input               planReportInput                `json:"input" yaml:"input"`
-	PlanSource          planReportPlanSource           `json:"plan_source" yaml:"plan_source"`
-	BackendIdentity     planReportBackendIdentity      `json:"backend_identity" yaml:"backend_identity"`
-	Normalization       planReportNormalization        `json:"normalization" yaml:"normalization"`
-	TargetSummary       planReportTargetSummary        `json:"target_summary" yaml:"target_summary"`
-	Format              string                         `json:"format" yaml:"format"`
-	RenderMode          string                         `json:"render_mode" yaml:"render_mode"`
-	Stable              bool                           `json:"stable" yaml:"stable"`
-	Queries             []planReportQuery              `json:"queries" yaml:"queries"`
-	ContractEvalMode    string                         `json:"contract_evaluation_mode" yaml:"contract_evaluation_mode"`
-	ContractFileVersion string                         `json:"contract_file_version,omitempty" yaml:"contract_file_version,omitempty"`
-	ContractEvaluator   string                         `json:"contract_evaluator_version,omitempty" yaml:"contract_evaluator_version,omitempty"`
-	ContractEvaluations []planContractEvaluation       `json:"contract_evaluations,omitempty" yaml:"contract_evaluations,omitempty"`
-	ContractSummary     *planContractEvaluationSummary `json:"contract_summary,omitempty" yaml:"contract_summary,omitempty"`
-	Warnings            []planReportDiagnostic         `json:"warnings" yaml:"warnings"`
-	Optimizer           planReportOptimizer            `json:"optimizer" yaml:"optimizer"`
+	Summary                bool                           `json:"-" yaml:"-"`
+	ReportVersion          string                         `json:"report_version" yaml:"report_version"`
+	Status                 string                         `json:"status" yaml:"status"`
+	Backend                string                         `json:"backend" yaml:"backend"`
+	CreatedDatabaseCleanup string                         `json:"created_database_cleanup,omitempty" yaml:"created_database_cleanup,omitempty"`
+	Input                  planReportInput                `json:"input" yaml:"input"`
+	PlanSource             planReportPlanSource           `json:"plan_source" yaml:"plan_source"`
+	BackendIdentity        planReportBackendIdentity      `json:"backend_identity" yaml:"backend_identity"`
+	Normalization          planReportNormalization        `json:"normalization" yaml:"normalization"`
+	TargetSummary          planReportTargetSummary        `json:"target_summary" yaml:"target_summary"`
+	Format                 string                         `json:"format" yaml:"format"`
+	RenderMode             string                         `json:"render_mode" yaml:"render_mode"`
+	Stable                 bool                           `json:"stable" yaml:"stable"`
+	Queries                []planReportQuery              `json:"queries" yaml:"queries"`
+	ContractEvalMode       string                         `json:"contract_evaluation_mode" yaml:"contract_evaluation_mode"`
+	ContractFileVersion    string                         `json:"contract_file_version,omitempty" yaml:"contract_file_version,omitempty"`
+	ContractEvaluator      string                         `json:"contract_evaluator_version,omitempty" yaml:"contract_evaluator_version,omitempty"`
+	ContractEvaluations    []planContractEvaluation       `json:"contract_evaluations,omitempty" yaml:"contract_evaluations,omitempty"`
+	ContractSummary        *planContractEvaluationSummary `json:"contract_summary,omitempty" yaml:"contract_summary,omitempty"`
+	Warnings               []planReportDiagnostic         `json:"warnings" yaml:"warnings"`
+	Optimizer              planReportOptimizer            `json:"optimizer" yaml:"optimizer"`
 }
 
 type planReportInput struct {
@@ -380,7 +393,7 @@ type planReportOptimizer = plancontract.Optimizer
 type planReportOptimizerEnvironment = plancontract.OptimizerEnvironment
 type planReportOptimizerEffective = plancontract.OptimizerEffective
 
-func buildPlanReport(ctx context.Context, config querygen.QueryCodegenConfig, plan *querygen.QueryCodegenPlan, baseDir string, opts planReportOptions) (planReport, error) {
+func buildPlanReport(ctx context.Context, config querygen.QueryCodegenConfig, plan *querygen.QueryCodegenPlan, baseDir string, opts planReportOptions) (report planReport, err error) {
 	if !planReportNeedsRuntime(config, plan) {
 		opts.Identity = attachedPlanReportIdentity(emptyDefault(opts.Backend, "omni"), opts.Identity)
 		return buildPlanReportWithRuntime(ctx, config, plan, baseDir, opts, nil)
@@ -391,7 +404,9 @@ func buildPlanReport(ctx context.Context, config querygen.QueryCodegenConfig, pl
 	}
 	if selected.Close {
 		defer func() {
-			_ = closePlanReportRuntime(selected.Runtime)
+			if closeErr := closePlanReportRuntime(selected.Runtime); closeErr != nil {
+				report.Warnings = append(report.Warnings, planReportDiagnostic{ID: "plan-report-cleanup-error", Message: fmt.Sprintf("close runtime: %v", closeErr)})
+			}
 		}()
 	}
 	opts.Identity = selected.Identity
@@ -422,19 +437,23 @@ func planReportNeedsRuntime(config querygen.QueryCodegenConfig, plan *querygen.Q
 }
 
 func buildPlanReportWithRuntime(ctx context.Context, config querygen.QueryCodegenConfig, plan *querygen.QueryCodegenPlan, baseDir string, opts planReportOptions, runtime spanemuboost.RuntimeHandle) (planReport, error) {
-	return buildPlanReportWithAnalyzer(ctx, config, plan, baseDir, opts, runtime, openPlanReportAnalyzer)
+	open := func(ctx context.Context, runtime spanemuboost.RuntimeHandle, schema querygen.QueryCodegenSchema, baseDir string, descriptors *spanalyzer.ProtoDescriptorSet, optimizer planReportOptimizer) (planReportAnalyzer, error) {
+		return openPlanReportAnalyzer(ctx, runtime, schema, baseDir, descriptors, optimizer, opts.DropCreatedDatabases)
+	}
+	return buildPlanReportWithAnalyzer(ctx, config, plan, baseDir, opts, runtime, open)
 }
 
-func buildPlanReportWithAnalyzer(ctx context.Context, config querygen.QueryCodegenConfig, plan *querygen.QueryCodegenPlan, baseDir string, opts planReportOptions, runtime spanemuboost.RuntimeHandle, open planReportOpenAnalyzer) (planReport, error) {
-	report := planReport{
-		ReportVersion:    planReportVersionV1Alpha,
-		Status:           planReportStatusOK,
-		Backend:          opts.Backend,
-		Format:           string(opts.Format),
-		RenderMode:       string(opts.RenderMode),
-		Stable:           opts.Stable,
-		Summary:          opts.Summary,
-		ContractEvalMode: planContractEvaluationModeNone,
+func buildPlanReportWithAnalyzer(ctx context.Context, config querygen.QueryCodegenConfig, plan *querygen.QueryCodegenPlan, baseDir string, opts planReportOptions, runtime spanemuboost.RuntimeHandle, open planReportOpenAnalyzer) (report planReport, err error) {
+	report = planReport{
+		ReportVersion:          planReportVersionV1Alpha,
+		Status:                 planReportStatusOK,
+		Backend:                opts.Backend,
+		CreatedDatabaseCleanup: "retain",
+		Format:                 string(opts.Format),
+		RenderMode:             string(opts.RenderMode),
+		Stable:                 opts.Stable,
+		Summary:                opts.Summary,
+		ContractEvalMode:       planContractEvaluationModeNone,
 		PlanSource: planReportPlanSource{
 			Backend:    opts.Backend,
 			API:        "analyze_query",
@@ -453,6 +472,9 @@ func buildPlanReportWithAnalyzer(ctx context.Context, config querygen.QueryCodeg
 		Warnings:  []planReportDiagnostic{},
 		Optimizer: planReportResolvedOptimizer(opts.Optimizer),
 	}
+	if opts.DropCreatedDatabases {
+		report.CreatedDatabaseCleanup = "drop_created"
+	}
 	if opts.Identity.Kind != "" {
 		report.BackendIdentity = opts.Identity
 	}
@@ -464,8 +486,15 @@ func buildPlanReportWithAnalyzer(ctx context.Context, config querygen.QueryCodeg
 	protoDescriptorsBySource := map[string]*spanalyzer.ProtoDescriptorSet{}
 	protoDescriptorDigestsBySource := map[string]string{}
 	defer func() {
-		for _, clients := range clientsBySource {
-			_ = clients.Close()
+		var sources []string
+		for source := range clientsBySource {
+			sources = append(sources, source)
+		}
+		sort.Strings(sources)
+		for _, source := range sources {
+			if closeErr := clientsBySource[source].Close(); closeErr != nil {
+				report.Warnings = append(report.Warnings, planReportDiagnostic{ID: "plan-report-cleanup-error", Message: fmt.Sprintf("close catalog %s: %v", source, closeErr)})
+			}
 		}
 	}()
 
@@ -685,14 +714,24 @@ func openPlanReportClients(
 	baseDir string,
 	descriptors *spanalyzer.ProtoDescriptorSet,
 	optimizer planReportOptimizer,
+	dropCreatedDatabases bool,
 ) (*spanemuboost.Clients, error) {
 	ddls, err := planReportDDLs(schema, baseDir)
 	if err != nil {
 		return nil, err
 	}
 	options := []spanemuboost.Option{
+		spanemuboost.EnableDatabaseAutoConfigOnly(),
 		spanemuboost.WithRandomDatabaseID(),
 		spanemuboost.WithSetupDDLs(ddls),
+	}
+	// Retention is intentional: random names avoid collisions and attached
+	// endpoints can amortize database-operation costs. The opt-in policy is
+	// limited by spanemuboost to resources created by this OpenClients call.
+	if dropCreatedDatabases {
+		options = append(options, spanemuboost.ForceSchemaTeardown())
+	} else {
+		options = append(options, spanemuboost.SkipSchemaTeardown())
 	}
 	if descriptors != nil {
 		options = append(options, spanemuboost.WithSetupFileDescriptorSet(descriptors.FileDescriptorSet()))
@@ -1379,6 +1418,9 @@ func writePlanReportMarkdown(w io.Writer, report planReport) error {
 	fmt.Fprintf(&b, "- Report version: `%s`\n", report.ReportVersion)
 	fmt.Fprintf(&b, "- Status: `%s`\n", report.Status)
 	fmt.Fprintf(&b, "- Backend: `%s`\n", report.Backend)
+	if report.CreatedDatabaseCleanup != "" {
+		fmt.Fprintf(&b, "- Created database cleanup policy: `%s`\n", report.CreatedDatabaseCleanup)
+	}
 	fmt.Fprintf(&b, "- Backend identity source: `%s`\n", report.BackendIdentity.Source)
 	fmt.Fprintf(&b, "- Backend version: `%s`\n", report.BackendIdentity.Version)
 	fmt.Fprintf(&b, "- Backend image digest: `%s`\n", report.BackendIdentity.ImageDigest)

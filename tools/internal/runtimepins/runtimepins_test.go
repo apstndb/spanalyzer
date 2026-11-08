@@ -48,6 +48,24 @@ func TestModuleLocalLoadersStayIdentical(t *testing.T) {
 	}
 }
 
+func TestBundledCLIPinsMatchCanonicalRegistry(t *testing.T) {
+	root, err := FindRepositoryRoot(".")
+	if err != nil {
+		t.Fatal(err)
+	}
+	canonical, err := os.ReadFile(filepath.Join(root, "runtime_targets.json"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	bundled, err := os.ReadFile(filepath.Join(root, "cmd/spanner-query-gen/internal/runtimepins/pins.generated.json"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !bytes.Equal(canonical, bundled) {
+		t.Fatal("bundled CLI runtime pins are stale; run go generate ./internal/runtimepins from cmd/spanner-query-gen")
+	}
+}
+
 func TestImageForVersionKeepsDefaultAndAlternativeSeparate(t *testing.T) {
 	root, err := FindRepositoryRoot(".")
 	if err != nil {

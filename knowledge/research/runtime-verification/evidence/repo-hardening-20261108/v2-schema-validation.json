@@ -1,0 +1,17 @@
+{
+  "status": "pass",
+  "scope": "Local evaluator output adapted into historical full/summary fixtures; schema validation only, no new service execution.",
+  "checks": 10,
+  "assertions": [
+    "full evaluator v2 with isolated error validates",
+    "full explicit cleanup policy validates",
+    "full rejects invalid cleanup policy",
+    "full rejects runtime error without error text",
+    "full rejects target error with completed results",
+    "summary evaluator v2 with isolated error validates",
+    "summary explicit cleanup policy validates",
+    "summary rejects invalid cleanup policy",
+    "summary rejects runtime error without error text",
+    "summary rejects target error with completed results"
+  ]
+}

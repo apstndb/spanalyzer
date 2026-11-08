@@ -141,10 +141,12 @@ observation is deliberately retained.
   locality_group). `schema.go` declares `Schema` and the entry points
   `ToDDLStatements()` / `FromDDLStatements()`; `from_ast.go` dispatches on AST node type;
   `helpers.go` holds `ident`/`path` and option/options builders.
-  `ToDDLStatements` emits in the order Spanner uses (proto bundle → schemata → ALTER
-  DATABASE → tables → indexes → vector indexes → views → change streams → sequences →
-  models → graphs → placements → functions → locality groups → roles+grants → ALTER
-  STATISTICS).
+  `ToDDLStatements` stably orders known DDL dependencies, including sequence
+  defaults, SQL function calls, view references, named schemas and locality
+  groups. Family/name order breaks ties; cycles fail with object diagnostics.
+  External references remain allowed for partial-schema exports. The exporter
+  is not a general migration planner and does not validate missing external
+  objects or reconstruct dependencies hidden in opaque remote function bodies.
   Expression indexes are loaded from `INDEX_COLUMNS.EXPRESSION`, but memefish
   v0.8.1 cannot represent expression keys. Reconstruction therefore fails
   closed instead of emitting the service's internal `_ExpressionIndex_*`

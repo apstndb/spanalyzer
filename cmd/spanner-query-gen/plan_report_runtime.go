@@ -20,8 +20,7 @@ type planReportRuntimeSelection struct {
 type planReportRuntimeDeps struct {
 	InspectOmniEndpoint func() (attached bool, err error)
 	HostGOARCH          string
-	FindRepositoryRoot  func(start string) (string, error)
-	ImageForPlatform    func(repoRoot, kind, platform string) (string, error)
+	ResolveImage        func(registry, kind, platform string) (string, error)
 	NewAttachedRuntime  func() (spanemuboost.RuntimeHandle, error)
 	NewColdStartRuntime func(image string) (spanemuboost.RuntimeHandle, error)
 }
@@ -30,8 +29,7 @@ func defaultPlanReportRuntimeDeps() planReportRuntimeDeps {
 	return planReportRuntimeDeps{
 		InspectOmniEndpoint: inspectOmniEndpointAttached,
 		HostGOARCH:          runtime.GOARCH,
-		FindRepositoryRoot:  runtimepins.FindRepositoryRoot,
-		ImageForPlatform:    runtimepins.ImageForPlatform,
+		ResolveImage:        runtimepins.ImageFromRegistry,
 		NewAttachedRuntime: func() (spanemuboost.RuntimeHandle, error) {
 			return spanemuboost.NewLazyRuntimeFromEnvOrStart(spanemuboost.BackendOmni)
 		},
@@ -58,7 +56,7 @@ func inspectOmniEndpointAttached() (bool, error) {
 	return true, nil
 }
 
-func selectPlanReportRuntime(opts planReportOptions, startDir string, deps planReportRuntimeDeps) (planReportRuntimeSelection, error) {
+func selectPlanReportRuntime(opts planReportOptions, _ string, deps planReportRuntimeDeps) (planReportRuntimeSelection, error) {
 	backend := emptyDefault(opts.Backend, "omni")
 	if deps.InspectOmniEndpoint != nil {
 		attached, err := deps.InspectOmniEndpoint()
@@ -85,17 +83,10 @@ func selectPlanReportRuntime(opts planReportOptions, startDir string, deps planR
 		arch = runtime.GOARCH
 	}
 	platform := "linux/" + arch
-	if deps.FindRepositoryRoot == nil || deps.ImageForPlatform == nil {
+	if deps.ResolveImage == nil {
 		return planReportRuntimeSelection{}, fmt.Errorf("resolve Omni runtime pin for %s: pin resolver is required", platform)
 	}
-	if startDir == "" {
-		startDir = "."
-	}
-	root, err := deps.FindRepositoryRoot(startDir)
-	if err != nil {
-		return planReportRuntimeSelection{}, fmt.Errorf("resolve Omni runtime pin for %s: %w", platform, err)
-	}
-	image, err := deps.ImageForPlatform(root, "omni", platform)
+	image, err := deps.ResolveImage(opts.RuntimeTargets, "omni", platform)
 	if err != nil {
 		return planReportRuntimeSelection{}, fmt.Errorf("resolve Omni runtime pin for %s: %w", platform, err)
 	}

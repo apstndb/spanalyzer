@@ -375,6 +375,42 @@ The current experimental set covers `no_explicit_sort`, `no_full_sort`,
 `no_full_scan_without_timestamp_condition`, `require_timestamp_condition`, and
 `no_blocking_operator_under_limit`.
 
+Evaluator `v2` keeps configuration and compilation errors fatal before backend
+startup, but represents runtime evaluation errors as per-contract
+`not_evaluated/evaluation_error` results. This preserves acquired plans and
+successful contracts and still fails `--check`. Aborting the whole artifact
+on a single data-dependent CEL error was rejected because it discards the
+evidence needed to diagnose the error. Evaluator identity changes rather than
+silently reinterpreting historical `v1` results.
+
+Runtime pin selection uses a generated, byte-checked copy of the canonical
+root registry bundled in the CLI module, with `--runtime-targets` as an explicit
+override. Searching upward from a user config was rejected because a valid
+external project and an installed binary need not live under this repository.
+There is no implicit working-directory override that could change execution
+identity unnoticed.
+
+Random database retention is an intentional default for attached endpoints:
+unique names avoid collisions while deferring deletion operation cost. An
+explicit `--drop-created-databases` policy bounds each invocation's retained
+capacity use. Automatic eviction near a guessed database limit was rejected:
+the command has no reliable ownership inventory or retention permission for
+previous invocations. Backend capacity errors remain target evidence, and
+cleanup errors remain visible after report serialization. Container ownership
+still determines whether a cold-start container is removed.
+
+Generated optional-parameter fields reject normalization collisions instead
+of adding suffixes that silently change the caller API. DTO tag values use Go
+string escaping; a tag containing a backtick uses an interpreted literal so
+the SDK receives the exact original column name.
+
+The CLI and developer tools pin root/library dependencies to immutable published
+revisions that contain the APIs they use. Local workspace replacements and
+filesystem `replace` directives were rejected as standalone-build fixes because
+consumers cannot reproduce them. Development pseudo-versions preserve the
+experimental status without creating a stable release or tag. CI and pre-push
+build all five modules with `GOWORK=off` to exercise that dependency closure.
+
 Contract matching should use semantic predicates over a normalized operator
 family list, not full rendered-plan snapshots. The report records the rendered
 plan for humans plus stable review fields such as SQL digest, DDL digest,

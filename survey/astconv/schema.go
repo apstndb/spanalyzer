@@ -65,23 +65,11 @@ type Schema struct {
 }
 
 // ToDDLStatements converts all INFORMATION_SCHEMA data into DDL statements.
-// The output order follows Spanner's convention:
-//  1. CREATE PROTO BUNDLE
-//  2. CREATE SCHEMA (named schemas)
-//  3. ALTER DATABASE (database options)
-//  4. CREATE TABLE (topologically sorted by parent-child)
-//  5. CREATE INDEX / CREATE SEARCH INDEX
-//  6. CREATE VECTOR INDEX
-//  7. CREATE VIEW
-//  8. CREATE CHANGE STREAM
-//  9. CREATE SEQUENCE
-//  10. CREATE MODEL
-//  11. CREATE PROPERTY GRAPH
-//  12. CREATE PLACEMENT
-//  13. CREATE FUNCTION
-//  14. CREATE LOCALITY GROUP
-//  15. CREATE ROLE + GRANT
-//  16. ALTER STATISTICS
+// Known object dependencies determine the output order, with the existing
+// family/name order breaking ties. For example, sequences precede table defaults
+// that use them, and SQL functions precede dependent views. Cycles are errors.
+// References outside the supplied metadata remain external dependencies: this
+// method also supports exporting a partial schema, not just an empty-DB restore.
 func (s *Schema) ToDDLStatements() ([]ast.DDL, error) {
 	var ddls []ast.DDL
 
@@ -115,5 +103,5 @@ func (s *Schema) ToDDLStatements() ([]ast.DDL, error) {
 		ddls = append(ddls, out...)
 	}
 
-	return ddls, nil
+	return orderDDLDependencies(ddls)
 }

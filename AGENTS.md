@@ -48,6 +48,7 @@ Use the Go toolchain declared in `go.mod`.
 ```sh
 mise run lint
 mise run check-mod-tidy
+mise run check-standalone-builds
 mise run govulncheck
 mise run pre-push
 go test ./...
@@ -62,8 +63,8 @@ go run ./cmd/spanner-analyzer --ddl testdata/order-proto-schema.sql \
 ```
 
 Run `mise run hooks-install` once per clone to activate the versioned pre-push
-hook. It invokes `mise run pre-push`, which is the same tidy, lint, and
-govulncheck gate used by CI. CI remains authoritative because local hooks can
+hook. It invokes `mise run pre-push`, which is the same tidy, standalone-build,
+lint, and govulncheck gate used by CI. CI remains authoritative because local hooks can
 be bypassed.
 
 Run `gofmt` on edited Go files. Run the per-module tests above (at least the
