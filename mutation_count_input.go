@@ -283,16 +283,53 @@ func validateMutationRowFacts(s *mutationCountSchemaModel, op mutationCountOpera
 		normalized[key] = v
 	}
 	f.Old = normalized
-	known := map[string]bool{}
+	rows := op.Rows
+	if f.Rows != nil {
+		rows = mutationFixed(*f.Rows)
+	}
+	if op.DeleteKey && f.Exists != nil {
+		rows = mutationFixed(0)
+		if *f.Exists {
+			rows = mutationFixed(1)
+		}
+	}
+	deleting := op.Kind == "delete" || op.Kind == "delete_range"
+	known := map[string]MutationCountIndex{}
 	for _, i := range s.Indexes[strings.ToLower(op.Table)] {
-		known[i.Name] = true
+		known[i.Name] = i
+		if n, ok := f.IndexRows[i.Name]; ok {
+			if n < 0 {
+				return fmt.Errorf("negative index rows for %s", i.Name)
+			}
+			if deleting && !i.NullFiltered && !i.PredicateUnknown {
+				// An unconditional index has one entry per matched base row.
+				// Infer that cardinality even when Rows was omitted, and require
+				// all such index assertions to describe the same deletion.
+				var ok bool
+				rows, ok = intersectMutationCounts(rows, mutationFixed(n))
+				if !ok {
+					return fmt.Errorf("index rows contradict matched rows for %s", i.Name)
+				}
+			}
+		}
 	}
 	for name, n := range f.IndexRows {
-		if !known[name] {
+		i, ok := known[name]
+		if !ok {
 			return fmt.Errorf("unknown physical index fact %q", name)
 		}
-		if f.Rows != nil && n > *f.Rows {
-			return fmt.Errorf("index rows exceed asserted matched rows for %s", name)
+		allowed := mutationUncertain(0, rows.Upper)
+		if deleting && !i.NullFiltered && !i.PredicateUnknown {
+			allowed = rows
+		} else if deleting && op.DeleteKey {
+			old := mutationLowerMap(f.Old)
+			for key, value := range op.Values {
+				old[key] = value
+			}
+			allowed = mutationMultiply(rows, mutationIndexMembership(i, old))
+		}
+		if n < allowed.Lower || allowed.Upper != nil && n > *allowed.Upper {
+			return fmt.Errorf("index rows contradict matched rows or membership for %s", name)
 		}
 	}
 	children := map[string]bool{}
@@ -301,9 +338,12 @@ func validateMutationRowFacts(s *mutationCountSchemaModel, op mutationCountOpera
 			children[i.Name] = true
 		}
 	}
-	for name := range f.CascadeIndexRows {
+	for name, n := range f.CascadeIndexRows {
 		if !children[name] {
 			return fmt.Errorf("unknown cascade index fact %q", name)
+		}
+		if rows.Upper != nil && *rows.Upper == 0 && n > 0 {
+			return fmt.Errorf("cascade index rows require a matched parent row")
 		}
 	}
 	for _, counts := range []map[string]int64{f.IndexRows, f.CascadeIndexRows} {

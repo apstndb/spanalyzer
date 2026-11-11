@@ -70,6 +70,8 @@ func mutationUnion(a, b MutationCountInterval) MutationCountInterval {
 // MutationCountRowFacts contains caller assertions, not automatically read data.
 // Old uses wire scalar encodings. IndexRows/CascadeIndexRows use physical index
 // names; generated FK suffixes must come from an observed snapshot.
+// IndexRows cannot override known cardinality or index membership. Unconditional
+// indexes on a deleted table must agree on the number of matched rows.
 type MutationCountRowFacts struct {
 	Exists           *bool                  `json:"exists,omitempty" yaml:"exists,omitempty"`
 	Old              map[string]interface{} `json:"old,omitempty" yaml:"old,omitempty"`

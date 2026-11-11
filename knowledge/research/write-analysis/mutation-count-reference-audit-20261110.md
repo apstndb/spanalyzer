@@ -47,6 +47,9 @@ sources:
   - id: expression-indexes
     resource: ../../observations/spanner-expression-indexes.md
     title: Existing environment-scoped expression-index and parser boundaries
+  - id: go-advisory
+    resource: https://pkg.go.dev/vuln/GO-2026-6859
+    title: November 11 standard-library advisory requiring the Go 1.26.11 push-gate toolchain
 ---
 
 # Mutation-count reference audit
@@ -215,3 +218,17 @@ columns have modeled totals 2/4/5 with the declared old values. Source-backed
 corrections and examples are separate from the retained managed observations.
 The validation receipts describe their original local snapshots; subsequent
 publication and review revisions are recorded by Git history.
+
+The November 12 independent review additionally identifies contradictory
+deleted-index assertions: a missing full-key row could claim an index entry,
+or an unconditional index could claim fewer entries than matched rows. The
+core now rejects these cases, reconciles unconditional-index cardinalities,
+and validates known NULL-filtered membership. Unresolved predicate membership
+remains conditional. Explicit delete-shape bounds cannot exceed one full key.
+Focused local regressions cover invalid and valid conditional cases; no new
+managed measurement is claimed.
+
+The fresh November 12 push gate also detects GO-2026-6859, published November
+11 and fixed in Go 1.26.11. The build-tool pin advances from 1.26.10 to 1.26.11
+to restore the required security check. Historical compiler identities and
+validation receipts retain the versions actually used for those observations.

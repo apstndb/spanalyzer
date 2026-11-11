@@ -49,3 +49,59 @@ CREATE INDEX ByV ON C(V);`)
 	// effects across this unmodeled operation interaction.
 	assertMutationInterval(t, r.Effective, 0, mutationTestInt(4))
 }
+
+func TestMutationCountRejectsContradictoryIndexRows(t *testing.T) {
+	a := mutationTestAnalyzer(t, `CREATE TABLE T(Id INT64 NOT NULL,V STRING(MAX)) PRIMARY KEY(Id);
+CREATE INDEX ByV ON T(V);
+CREATE NULL_FILTERED INDEX FilteredByV ON T(V);`)
+	data := []byte(`[{"delete":{"table":"T","keySet":{"keys":[["1"]]}}}]`)
+	for _, facts := range []MutationCountRowFacts{
+		{Exists: mutationTestBool(false), IndexRows: map[string]int64{"ByV": 1}},
+		{Rows: mutationTestInt(1), IndexRows: map[string]int64{"ByV": 0}},
+		{Exists: mutationTestBool(true), Old: map[string]interface{}{"V": nil}, IndexRows: map[string]int64{"FilteredByV": 1}},
+		{Exists: mutationTestBool(true), Old: map[string]interface{}{"V": "a"}, IndexRows: map[string]int64{"FilteredByV": 0}},
+		{IndexRows: map[string]int64{"FilteredByV": 2}},
+	} {
+		if _, err := a.AnalyzeMutationsJSON(data, MutationCountOptions{Facts: []MutationCountRowFacts{facts}}); err == nil {
+			t.Fatal("index rows contradicting cardinality or known membership accepted", facts)
+		}
+	}
+	// A NULL-filtered index need not contain an existing row. Unknown values
+	// must retain that conditional membership rather than imply one entry.
+	for _, count := range []int64{0, 1} {
+		if _, err := a.AnalyzeMutationsJSON(data, MutationCountOptions{Facts: []MutationCountRowFacts{{Exists: mutationTestBool(true), IndexRows: map[string]int64{"ByV": 1, "FilteredByV": count}}}}); err != nil {
+			t.Fatal("valid conditional membership rejected", err)
+		}
+	}
+	if _, err := a.AnalyzeMutationsJSON(data, MutationCountOptions{Facts: []MutationCountRowFacts{{Exists: mutationTestBool(true), Old: map[string]interface{}{"V": nil}, IndexRows: map[string]int64{"ByV": 1, "FilteredByV": 0}}}}); err != nil {
+		t.Fatal(err)
+	}
+	// Ordinary indexes must agree on cardinality even without an explicit Rows
+	// fact. A range's unknown cardinality cannot reconcile unequal assertions.
+	a = mutationTestAnalyzer(t, `CREATE TABLE T(Id INT64 NOT NULL,V STRING(MAX)) PRIMARY KEY(Id);
+CREATE INDEX ByV ON T(V); CREATE INDEX ById ON T(Id);`)
+	data = []byte(`[{"delete":{"table":"T","keySet":{"all":true}}}]`)
+	if _, err := a.AnalyzeMutationsJSON(data, MutationCountOptions{Facts: []MutationCountRowFacts{{IndexRows: map[string]int64{"ByV": 1, "ById": 2}}}}); err == nil {
+		t.Fatal("ordinary indexes cannot assert different deleted-row counts")
+	}
+	a = mutationTestAnalyzer(t, `CREATE TABLE P(Id INT64 NOT NULL) PRIMARY KEY(Id);
+CREATE TABLE C(Id INT64 NOT NULL,N INT64 NOT NULL,V STRING(MAX)) PRIMARY KEY(Id,N), INTERLEAVE IN PARENT P ON DELETE CASCADE;
+CREATE INDEX ByV ON C(V);`)
+	data = []byte(`[{"delete":{"table":"P","keySet":{"keys":[["1"]]}}}]`)
+	if _, err := a.AnalyzeMutationsJSON(data, MutationCountOptions{Facts: []MutationCountRowFacts{{Exists: mutationTestBool(false), CascadeIndexRows: map[string]int64{"ByV": 1}}}}); err == nil {
+		t.Fatal("absent parent cannot assert cascading index removals")
+	}
+}
+
+func TestMutationCountDeleteShapeBounds(t *testing.T) {
+	a := mutationTestAnalyzer(t, `CREATE TABLE T(Id INT64 NOT NULL) PRIMARY KEY(Id);`)
+	for _, bounds := range []MutationCountInterval{{Lower: 0}, {Lower: 0, Upper: mutationTestInt(2)}} {
+		if _, err := a.AnalyzeWriteShape(MutationWriteShape{Operation: "delete", Table: "T", RowBounds: &bounds}, MutationCountOptions{}); err == nil {
+			t.Fatal("one-key delete shape accepted cardinality above one", bounds)
+		}
+	}
+	bounds := MutationCountInterval{Lower: 0, Upper: mutationTestInt(1)}
+	if _, err := a.AnalyzeWriteShape(MutationWriteShape{Operation: "delete", Table: "T", RowBounds: &bounds}, MutationCountOptions{}); err != nil {
+		t.Fatal(err)
+	}
+}

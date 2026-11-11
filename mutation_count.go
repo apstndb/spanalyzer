@@ -219,6 +219,9 @@ func (a *MutationCountAnalyzer) AnalyzeWriteShape(shape MutationWriteShape, opti
 		if shape.Rows != nil || shape.RowBounds.Lower < 0 || shape.RowBounds.Upper != nil && *shape.RowBounds.Upper < shape.RowBounds.Lower {
 			return MutationCountReport{}, fmt.Errorf("invalid or conflicting shape row bounds")
 		}
+		if op.Kind == "delete" && (shape.RowBounds.Upper == nil || *shape.RowBounds.Upper > 1) {
+			return MutationCountReport{}, fmt.Errorf("delete shape is one full key; row bounds cannot exceed one")
+		}
 		op.Rows = *shape.RowBounds
 	}
 	b, err := json.Marshal(shape)

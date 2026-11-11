@@ -288,6 +288,10 @@ it is not an additional managed measurement or a universal multiplier.
 
 Pre-PR review also tightens caller assertions: supplied row counts must fit
 the normalized input bounds and must not contradict singular existence facts.
+Deleted-index assertions must also fit derived cardinality and known membership;
+unconditional indexes must agree on matched-row counts, while NULL-filtered or
+unevaluated predicates can retain conditional membership. A delete shape's
+explicit bounds remain limited to its single full key.
 Parent/child deletes with potentially overlapping cascades no longer add
 independent old-row index removals into an unjustified lower bound. Their
 independent upper estimate remains available while overlap is unresolved.
