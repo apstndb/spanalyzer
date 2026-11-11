@@ -122,6 +122,16 @@ also recorded instead of being silently ignored. The command writes the report
 before returning nonzero for any planning error. Config parse errors remain
 fatal. `generate` and `check` continue to require a fully valid generation plan.
 
+Configured writes additionally expose `mutation_counts` in structured
+`explain-plan` output, separately for Mutation API and DML methods. Each preview
+report retains schema intervals and per-index contributions. Full-key DML
+updates/deletes include the possibility of matching zero rows. Missing runtime
+values stay unknown, rather than being interpreted as SQL NULL. Unsupported
+accounting metadata is retained in `mutation_count_error` without losing an
+otherwise valid write plan. This projection performs no database reads or
+writes; the core analyzer CLI accepts explicit old-row and measurement files
+for more specific scenarios. Mutation units do not measure bytes or latency.
+
 The default machine-readable plan omits heavy audit-only projection
 matrix rows. Use `--audit` to include those rows, and `--stable` to omit
 volatile audit fields such as verification timestamps from snapshot-oriented

@@ -1593,6 +1593,30 @@ work that makes that binding safer for production review.
 
 ## Open Questions
 
+### Mutation-count preview
+
+The root `MutationCountAnalyzer` owns write accounting. The generator projects
+its intervals into `writes[].mutation_counts`, using resolved mutation/DML
+column lists and separate API limit scopes. It does not infer an existing row
+from a primary-key predicate: generated full-key DML has zero-or-one matched
+row bounds. The count catalog is cached by schema during plan construction.
+An unsupported accounting history emits `mutation_count_error` while preserving
+valid DTO planning. Generated Go and normal PLAN collection acquire no write
+side effects from this projection.
+
+The reusable core API retains its baseline, old-row refinement and qualified
+measurement independently. A finite maximum batch size is conditional on a
+homogeneous write and a finite per-row upper bound, and does not check bytes.
+Queue Send/Ack wire messages and queue DML are analyzed through the core API;
+this change does not add queue Send/Ack SDK generation to the `writes` config.
+Queue receive/lease queries explicitly lack caller CommitStats. Unknown internal
+effects remain unknown. The
+[alternatives and integration research](../../knowledge/research/write-analysis/mutation-count-alternatives-20261110.md)
+retain calibration and upstream-parser boundaries. No new enforcing CI contract
+is introduced by the mutable preview projection.
+
+### Remaining questions
+
 - Should generated query methods return pointers by default?
 - Should BigQuery method generation use `cloud.google.com/go/bigquery` directly
   or only generate DTO/schema metadata at first?

@@ -20,7 +20,12 @@ func main() {
 	ddlPath := flag.String("ddl", "", "optional path to a dialect-specific GoogleSQL DDL file")
 	sql := flag.String("sql", "", "SQL query or expression to analyze")
 	dialect := flag.String("dialect", "spanner", "SQL dialect/catalog mode: spanner or bigquery")
-	mode := flag.String("mode", "", "comma-separated modes: spanner_type, bigquery_type, go_struct, parse, analyze, unparse")
+	mode := flag.String("mode", "", "comma-separated modes: spanner_type, bigquery_type, go_struct, parse, analyze, unparse; or standalone mutation_count")
+	mutationsFile := flag.String("mutations-file", "", "JSON array of google.spanner.v1.Mutation for --mode=mutation_count")
+	mutationFacts := flag.String("mutation-facts-file", "", "old-row/cardinality assertions for --mode=mutation_count")
+	mutationIndexes := flag.String("mutation-indexes-file", "", "complete schema-digest-qualified index snapshot for --mode=mutation_count")
+	mutationObservation := flag.String("mutation-observation-file", "", "same-execution CommitStats observation for --mode=mutation_count")
+	mutationCalibration := flag.String("mutation-calibration", "", "optional explicitly named automatic-column calibration")
 	sqlMode := flag.String("sql-mode", "query", "how to interpret --sql: query or expression")
 	output := flag.String("output", defaultOutputFormat, "output format: yaml, json, or textproto where supported")
 	goPackage := flag.String("go-package", "main", "package name for --mode=go_struct")
@@ -44,7 +49,7 @@ func main() {
 	flag.Var(&positionalParams, "positional-param", "positional query parameter TYPE; repeatable")
 	flag.Parse()
 
-	if *sql == "" {
+	if *sql == "" && *mutationsFile == "" {
 		flag.Usage()
 		os.Exit(2)
 	}
@@ -52,6 +57,23 @@ func main() {
 	ddlPathForAnalyzer, ddl, err := readDDL(*ddlPath)
 	if err != nil {
 		exitErr(err)
+	}
+	if strings.EqualFold(*mode, "mutation_count") {
+		if !strings.EqualFold(*dialect, "spanner") {
+			exitErr(fmt.Errorf("mutation_count requires --dialect=spanner"))
+		}
+		if len(params)+len(positionalParams)+len(protoDescriptorFiles)+len(externalDDLs)+len(externalProtoDescriptorFiles) > 0 {
+			exitErr(fmt.Errorf("mutation_count does not use query parameters, descriptor flags or external schemas"))
+		}
+		result, err := runMutationCountCLI(ddl, *sql, *output, *mutationsFile, *mutationFacts, *mutationIndexes, *mutationObservation, *mutationCalibration)
+		if err != nil {
+			exitErr(err)
+		}
+		fmt.Print(result)
+		return
+	}
+	if *mutationsFile != "" || *mutationFacts != "" || *mutationIndexes != "" || *mutationObservation != "" || *mutationCalibration != "" {
+		exitErr(fmt.Errorf("mutation flags require --mode=mutation_count as the only mode"))
 	}
 	externalSchemas, err := readExternalSchemas(externalDDLs, externalProtoDescriptorFiles)
 	if err != nil {

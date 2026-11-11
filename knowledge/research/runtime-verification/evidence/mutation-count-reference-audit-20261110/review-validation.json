@@ -1,0 +1,93 @@
+{
+  "recorded_on_jst": "2026-11-10",
+  "source_base_commit": "f53e0a8d66d179c1c1cc4d9d798bb6f3e7f7d42a",
+  "source_branch": "feat/mutation-count-investigation-20261110",
+  "purpose": "Post-review local validation; independent head review and hosted CI remain separate evidence.",
+  "go_source_sha256": {
+    "cmd/spanner-analyzer/main.go": "b347d2854a4171aed44364af4527c4c8815d9c186263c3311fff94e446b23492",
+    "cmd/spanner-analyzer/mutation_count.go": "599e08802c01147e7dc07b47acfd1e0bd9337d4199c63f13983e91d4620c6750",
+    "cmd/spanner-analyzer/mutation_count_test.go": "3a1a1360335fee0c75d3fa1015bae251618fe04be1a04efcef9ffe0cfa6c5079",
+    "doc.go": "a9a9723673ffffba660475b4459504b43bcdf84b4c1e88423112d73c883e4a14",
+    "internal/querygen/mutation_count.go": "58c35a1ea3912bc44f20c5511f2f57a70eda7f8fca0d9fb95f982529792013a5",
+    "internal/querygen/mutation_count_test.go": "cf4cf37c9490469c70edcc39f908a4af051306f45d81de3d8b20c712f58dc2d2",
+    "internal/querygen/querygen.go": "1a3f643dd75de744cea0bda57fa439582c50ac73da04a64f9933b4c75d8761a8",
+    "mutation_count.go": "9f2e6aba080b5b8f36d29f9287c8f4f82ac968ff09083f181426cfd244399c84",
+    "mutation_count_batch.go": "fb0c22040224dfc2edc32ff4813337c568ba739c4813e28ebe7539ed92ae235b",
+    "mutation_count_dependencies_test.go": "a30276a186e6943686a17381302ae5bfb3d1d2b6f4ac8add8b34fe0ed14a9c01",
+    "mutation_count_input.go": "826fc78983cab3f454f98ba4de0fd2cc74b8b0ade08650a9b4ee382d602eea5e",
+    "mutation_count_managed_test.go": "f9d3b62e560fe8da47a91fe31513e3cf59ed7716152126f8dccc2b7dbadc82fc",
+    "mutation_count_model.go": "c0e89b4d7cc96f0786ae818edd26213aa50a651bc8240b0fb49eda8710bd30ca",
+    "mutation_count_queue.go": "ca9f947417c07752d1b75352f428214db97abcb437d629fb9defd424b159b3a7",
+    "mutation_count_queues_managed_test.go": "53190331ec05c33a7db3d2d13bc4f1e3aa2463d72e85bd19bd0d64b811e5ed0f",
+    "mutation_count_review_test.go": "46280b71c5b6ffa9215ff463f593b274da075cc9d0ca940e40c5f2f15c883fc4",
+    "mutation_count_schema.go": "9f1021a860e919aad56d58260436d114c71397633de64e35d27b1ec97a8e8bd5",
+    "mutation_count_test.go": "e4307afe13a8c028d1e0b5bef424a7ecbd3b273ca872e2b259bcf3b285065b35",
+    "tools/mutation-count-lab/batch.go": "d6286fb4bc5a7d5628e3f93f49d96dc09c8ff61af21b0147ec4ab3daa7e29894",
+    "tools/mutation-count-lab/count.go": "552d00d82032e79700b3ece4c37c524b5f054c149d700bb650c00cd8f5b5fa82",
+    "tools/mutation-count-lab/count_test.go": "6bb29e22eb6e169777fc386124d4b91ce909b84c092b3372e7356118e7f077b5",
+    "tools/mutation-count-lab/input.go": "f3f6b6ff792334a89a60819e64fc7162d77b371ff812be4cee4b81a5584dbcca",
+    "tools/mutation-count-lab/main.go": "185d2d0f2e658a0efaae8b8c95af1b8a874d93ec8f76bb6bfb5ff4460bf64d3f",
+    "tools/mutation-count-lab/managed-probe/extended.go": "71fc1e71c1f2c31d7f3e6cb884b5c290deb347371a25a27d29641f3d24dba6fc",
+    "tools/mutation-count-lab/managed-probe/lease.go": "e2bfae2e2b70b0ee9f16a0357a4b4e2c560bd45f9c9a4c6561305d5254cbaf6e",
+    "tools/mutation-count-lab/managed-probe/lifecycle.go": "983990256f028dd24d9847250c956defa56d9cc5510cfe28f04b20effd46484a",
+    "tools/mutation-count-lab/managed-probe/lifecycle_test.go": "4ebfce8c03f22a298ab56328a4d33ce38cebaae513fe4b9c03f8f9259388f075",
+    "tools/mutation-count-lab/managed-probe/main.go": "10dfd72070e362c61c0cd7cb0a8fdbbcb038cf0ec8ffb19273e1691423967cdd",
+    "tools/mutation-count-lab/managed-probe/queue_ignore.go": "4480d5724276e6608f5b02e7b6293790418a0799edcc34629d6a80f2fd87454b",
+    "tools/mutation-count-lab/managed-probe/queue_matrix.go": "3f33f3db035e8e94fedc5989484c232e04f837e3b53c65df1d7ad7609181f6ae",
+    "tools/mutation-count-lab/managed-probe/queue_matrix_runtime.go": "b59eb3a42ced1eaaf38fc5155e541b808d9d7fc7bea9b3c08cc2bc0ada3b75e0",
+    "tools/mutation-count-lab/managed-probe/queue_matrix_test.go": "469ba3a64b46ddba0889b143571f93086a04543b7357cdd2f9946f2b58979068",
+    "tools/mutation-count-lab/managed-probe/resume.go": "fa2b3564bc1b44af17d89321fbadb81d2488a0bc3503fa927464f9524eb90cf1",
+    "tools/mutation-count-lab/managed-probe/schema.go": "0127cff5edd1d36196fbeb77091d161c41b68b8a0be6bf332d01abd6686fd061",
+    "tools/mutation-count-lab/probe/main.go": "fdc57f236ee84b0e121aeeaf78f11774bda4b46d43338cf40c866e217f73dc92",
+    "tools/mutation-count-lab/schema.go": "a915c0bb955bbfc3e79919995e571a08b39514d9e7570d7ab35529f1977e1bc6"
+  },
+  "source_backed_model_fixes": [
+    "Reject affected-row facts outside normalized cardinality bounds and contradictory singular existence assertions",
+    "Clear additive lower bounds for potentially overlapping parent/child delete cascades while retaining independent upper estimates"
+  ],
+  "documentation_change": "Runnable indexed/stored/unrelated partial-update example under explicit old-row assertions; frozen calibration lab distinguished from current preview",
+  "commands": [
+    {
+      "directory": ".",
+      "command": "go test -race -shuffle=on -count=1 ./...",
+      "exit_code": 0
+    },
+    {
+      "directory": "cmd/spanner-query-gen",
+      "command": "go test -race -shuffle=on -count=1 ./...",
+      "exit_code": 0
+    },
+    {
+      "directory": "tools",
+      "command": "GOWORK=off go test -race -shuffle=on -count=1 ./...",
+      "exit_code": 0
+    },
+    {
+      "directory": "plancontract",
+      "command": "go test -race -shuffle=on -count=1 ./...",
+      "exit_code": 0
+    },
+    {
+      "directory": "survey",
+      "command": "GOWORK=off go test -race -shuffle=on -count=1 -short ./...",
+      "exit_code": 0
+    },
+    {
+      "directory": ".",
+      "command": "mise run pre-push",
+      "exit_code": 0
+    }
+  ],
+  "logs_sha256": {
+    "consumer": "1deac3609430d9adf0fded9efcada3da8e74c6f23279719caa34e7f49a3fa4d6",
+    "mutation-tests": "d261e00893d2b4a7710c4ff73840e0ad72df2826d0c52c161e8ad59b3e16c670",
+    "plancontract": "13cc25b3bebd522983c1bdd71e83828c3106a2f48fee99d2ebd3b06b46fdcea2",
+    "pre-push": "ec58f6ce769ff70f0fa1add3a723e2423b114113198bb4ded0213d4f91789746",
+    "regressions-before": "4e89b568ef5631d6d5b13988bf2ebb0fbcfbe632a82572fa846feb6f72e67340",
+    "root-race": "5f0a146e7f22fd8dd5ba8dafda26aeb76f4d482a11b4f192eef7c6fc15177826",
+    "survey-short": "d5395988318a1485f9d6e4c0496ba07bed01bb2375ef9bcc3d0ec6c08e8c3f77",
+    "tools": "267ed2facf92fc6979345bbe241a0fb3b69f0ec748ecaf7ecbe6b059fb9c736b"
+  },
+  "runtime_boundary": "No new managed or local container execution. Existing measured fixtures are replayed; source-backed corrections are not represented as additional live observations.",
+  "publication_boundary": "Mutable v0alpha1 preview; no tag, release or dependency promotion."
+}

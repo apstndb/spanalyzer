@@ -1,0 +1,31 @@
+{
+  "fixture_status": "partial",
+  "case_records": 211,
+  "not_run": [
+    "limit/dml-single-80004",
+    "limit/dml-two-statements-120000"
+  ],
+  "attempted": 209,
+  "successful_with_stats": 197,
+  "finite_baseline_upper": 185,
+  "baseline_contains_observation": 197,
+  "old_row_exact_matches": 161,
+  "same_input_measured_refinements": 197,
+  "failed_cases": [
+    "fk/invalid-reference: FailedPrecondition",
+    "limit/80004: InvalidArgument",
+    "queue/wire/insert: NotFound",
+    "queue/wire/update: NotFound",
+    "queue/wire/upsert: NotFound",
+    "queue/wire/replace: NotFound",
+    "queue/wire/delete: NotFound",
+    "queue/ack/missing: NotFound",
+    "queue/dml/update: InvalidArgument",
+    "queue/dml/upsert: InvalidArgument",
+    "queue/dml/replace: Unimplemented",
+    "queue/wire/insert-no-delivery: NotFound"
+  ],
+  "analysis_errors": null,
+  "disagreements": null,
+  "scope": "Derived from finalized commits in a partial capture; not a completed lease flow or held-out accuracy."
+}

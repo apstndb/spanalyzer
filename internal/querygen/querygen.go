@@ -14,6 +14,7 @@ import (
 	"time"
 
 	"cloud.google.com/go/spanner/apiv1/spannerpb"
+	spanalyzer "github.com/apstndb/spanalyzer"
 )
 
 type QueryCodegenConfig struct {
@@ -276,18 +277,20 @@ type QueryCodegenPlanConstant struct {
 }
 
 type QueryCodegenPlanWrite struct {
-	Name                    string                             `json:"name" yaml:"name"`
-	Catalog                 string                             `json:"catalog" yaml:"catalog"`
-	Table                   string                             `json:"table" yaml:"table"`
-	Operation               string                             `json:"operation" yaml:"operation"`
-	InputStruct             string                             `json:"input_struct" yaml:"input_struct"`
-	Keys                    []string                           `json:"keys,omitempty" yaml:"keys,omitempty"`
-	InsertColumns           []string                           `json:"insert_columns,omitempty" yaml:"insert_columns,omitempty"`
-	UpdateColumns           []string                           `json:"update_columns,omitempty" yaml:"update_columns,omitempty"`
-	Methods                 []string                           `json:"methods,omitempty" yaml:"methods,omitempty"`
-	ColumnCapabilities      []QueryCodegenPlanColumnCapability `json:"column_capabilities,omitempty" yaml:"column_capabilities,omitempty"`
-	ServerSideUpdateEffects []QueryCodegenPlanServerSideEffect `json:"server_side_update_effects,omitempty" yaml:"server_side_update_effects,omitempty"`
-	VetSuppressions         []QueryCodegenPlanVetSuppression   `json:"vet_suppressions,omitempty" yaml:"vet_suppressions,omitempty"`
+	MutationCounts          map[string]spanalyzer.MutationCountReport `json:"mutation_counts,omitempty" yaml:"mutation_counts,omitempty"`
+	MutationCountError      string                                    `json:"mutation_count_error,omitempty" yaml:"mutation_count_error,omitempty"`
+	Name                    string                                    `json:"name" yaml:"name"`
+	Catalog                 string                                    `json:"catalog" yaml:"catalog"`
+	Table                   string                                    `json:"table" yaml:"table"`
+	Operation               string                                    `json:"operation" yaml:"operation"`
+	InputStruct             string                                    `json:"input_struct" yaml:"input_struct"`
+	Keys                    []string                                  `json:"keys,omitempty" yaml:"keys,omitempty"`
+	InsertColumns           []string                                  `json:"insert_columns,omitempty" yaml:"insert_columns,omitempty"`
+	UpdateColumns           []string                                  `json:"update_columns,omitempty" yaml:"update_columns,omitempty"`
+	Methods                 []string                                  `json:"methods,omitempty" yaml:"methods,omitempty"`
+	ColumnCapabilities      []QueryCodegenPlanColumnCapability        `json:"column_capabilities,omitempty" yaml:"column_capabilities,omitempty"`
+	ServerSideUpdateEffects []QueryCodegenPlanServerSideEffect        `json:"server_side_update_effects,omitempty" yaml:"server_side_update_effects,omitempty"`
+	VetSuppressions         []QueryCodegenPlanVetSuppression          `json:"vet_suppressions,omitempty" yaml:"vet_suppressions,omitempty"`
 }
 
 type QueryCodegenPlanColumnCapability struct {
@@ -880,8 +883,30 @@ func BuildQueryCodegenPlan(config QueryCodegenConfig, baseDir string) (*QueryCod
 			Fields:          planFields(fields),
 		})
 	}
+	mutationCatalogs := map[string]*spanalyzer.MutationCountAnalyzer{}
+	mutationCatalogErrors := map[string]string{}
 	for _, spec := range writeSpecs {
+		model, loaded := mutationCatalogs[spec.Catalog]
+		if !loaded {
+			var err error
+			model, err = mutationCountCatalog(schemas[spec.Catalog], baseDir)
+			if err != nil {
+				mutationCatalogErrors[spec.Catalog] = err.Error()
+			}
+			mutationCatalogs[spec.Catalog] = model
+		}
+		countError := mutationCatalogErrors[spec.Catalog]
+		var counts map[string]spanalyzer.MutationCountReport
+		if model != nil {
+			var err error
+			counts, err = writeMutationCounts(model, spec)
+			if err != nil {
+				countError = err.Error()
+			}
+		}
 		plan.Writes = append(plan.Writes, QueryCodegenPlanWrite{
+			MutationCounts:          counts,
+			MutationCountError:      countError,
 			Name:                    spec.Name,
 			Catalog:                 spec.Catalog,
 			Table:                   spec.Table,

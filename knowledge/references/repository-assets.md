@@ -52,6 +52,14 @@ asset_families:
     paths:
       - cmd/spanner-query-gen/testdata/plan_fixtures/*.json
       - testdata/querygen.yaml
+  - id: write-accounting-fixtures
+    paths:
+      - testdata/mutation-count/*.json
+      - testdata/mutation-count/*.json.gz
+      - testdata/mutation-count/*.sql
+      - tools/mutation-count-lab/testdata/*.json.gz
+      - tools/mutation-count-lab/testdata/*.json
+      - tools/mutation-count-lab/testdata/*.sql
   - id: analyzer-fixtures
     paths:
       - testdata/*.sql
@@ -161,6 +169,20 @@ The query-generator fixture family includes the representative
 [`plan_fixtures`](../../cmd/spanner-query-gen/testdata/plan_fixtures/) used by
 plan-report and classification tests, plus the repository's
 [`querygen.yaml`](../../testdata/querygen.yaml) example configuration.
+
+## Write-accounting fixtures
+
+The experimental [mutation-count lab](../../tools/mutation-count-lab/) retains
+compressed primary local-runtime receipts alongside small wire-input and DDL
+examples. The [runtime note](../research/runtime-verification/mutation-count-20261110.md)
+links the producer, identity receipt and derived comparison. Calibration
+fixtures do not independently establish managed-service behavior.
+The [managed fixture](../../testdata/mutation-count/managed-20261110.json.gz)
+and its [dated note](../research/runtime-verification/mutation-count-managed-20261110.md)
+retain a separate source, partial-completion boundary and verified cleanup.
+The [expanded queue corpus](../../testdata/mutation-count/managed-queues-20261110.json.gz)
+is separately scoped in its [matrix note](../research/runtime-verification/queue-mutation-count-managed-20261110.md),
+including large successful boundary commits and unavailable query/API statistics.
 
 ## Analyzer fixtures
 

@@ -1,0 +1,104 @@
+{
+  "recorded_on_jst": "2026-11-10",
+  "source_base_commit": "f53e0a8d66d179c1c1cc4d9d798bb6f3e7f7d42a",
+  "source_branch": "feat/mutation-count-investigation-20261110",
+  "source_status": "local uncommitted preview implementation",
+  "runtime": "managed Spanner; backend build not exposed",
+  "producer_platform": "darwin/arm64",
+  "go": "1.26.10",
+  "spanner_sdk": "v1.95.1",
+  "authorization": "Explicit user approval of one temporary GoogleSQL DB create/verify/delete on the existing dedicated instance",
+  "resource_boundary": "No instance creation or changes; existing databases untouched; private ownership journal excluded",
+  "database_lifecycles_created": 1,
+  "initial_attempt": {
+    "authorization": "explicit current user approval: exactly one GoogleSQL DB create/test/drop",
+    "started_at": "2026-11-09T22:03:18.050250+00:00",
+    "binary_sha256": "b26cfec7f4f5e7f891b89d8a26309dc75100251a0e37bb411214f6569b10c13f",
+    "source_sha256": {
+      "tools/mutation-count-lab/managed-probe/extended.go": "2b9b9b4dace0738dcb701c9935db464979c76f75d4ee92b5ddf3f072ccd4746e",
+      "tools/mutation-count-lab/managed-probe/lifecycle.go": "ebd0514b3b5fdfa36b911b7a5d6c75cda6e050725bee81650897edbfc6aa2c1f",
+      "tools/mutation-count-lab/managed-probe/lifecycle_test.go": "9104a7a7a7e22e9323f9cd3e2ad575c8f36ca3db375beba81156ab89359d22f3",
+      "tools/mutation-count-lab/managed-probe/main.go": "5bc9eb88a610af720757ab9ea4fc1b3eed20208893db334e1b88c46b2c54f3e1",
+      "tools/mutation-count-lab/managed-probe/schema.go": "4da1c3f0d787fa492f86bb1350caa5dabd65e3f6e55d3d4827e4ab2e5c9d646a"
+    },
+    "invocation": [
+      "managed-probe",
+      "-allow-create-test-drop-one-database",
+      "-out",
+      "<private-task-area>/managed/result.json"
+    ],
+    "scope": "existing dedicated instance only; no instance or old database modification; ownership journal stays private",
+    "completion": "interrupted without finalized numerical results; not a completed observation"
+  },
+  "recovery": {
+    "mode": "resume-existing-owned-database",
+    "create_database_called": false,
+    "source_base_commit": "f53e0a8d66d179c1c1cc4d9d798bb6f3e7f7d42a",
+    "branch": "feat/mutation-count-investigation-20261110",
+    "binary_sha256": "7b07d7e060e695d1e7f34a357336bf09c54c9383435288aa59bfe0a56a01faaf",
+    "compiled_source_sha256": {
+      "tools/mutation-count-lab/managed-probe/extended.go": "71fc1e71c1f2c31d7f3e6cb884b5c290deb347371a25a27d29641f3d24dba6fc",
+      "tools/mutation-count-lab/managed-probe/lifecycle.go": "ebd0514b3b5fdfa36b911b7a5d6c75cda6e050725bee81650897edbfc6aa2c1f",
+      "tools/mutation-count-lab/managed-probe/lifecycle_test.go": "9104a7a7a7e22e9323f9cd3e2ad575c8f36ca3db375beba81156ab89359d22f3",
+      "tools/mutation-count-lab/managed-probe/main.go": "28384ad3834654b7fff38cc5933c8ca155b2292488252f400c6f3eeeb09fb8d8",
+      "tools/mutation-count-lab/managed-probe/resume.go": "fa2b3564bc1b44af17d89321fbadb81d2488a0bc3503fa927464f9524eb90cf1",
+      "tools/mutation-count-lab/managed-probe/schema.go": "4da1c3f0d787fa492f86bb1350caa5dabd65e3f6e55d3d4827e4ab2e5c9d646a"
+    },
+    "recovery_reason": "initial process was interrupted without finalized numerical results; same owned database only",
+    "skipped_controls": [
+      "limit/dml-single-80004",
+      "limit/dml-two-statements-120000"
+    ],
+    "started_at": "2026-11-09T22:23:50.423334Z",
+    "finished_at": "2026-11-09T22:29:38.510042Z",
+    "status": "partial",
+    "fatal_error": "queue renew: InvalidArgument",
+    "lifecycle": {
+      "absence": "NotFound",
+      "drop": "OK",
+      "resume_existing_owned_database": "OK"
+    },
+    "cleanup_errors": []
+  },
+  "raw_capture": "testdata/mutation-count/managed-20261110.json.gz",
+  "raw_capture_sha256": "1ba20aa27b09c3f82b0d0beaaf221c091d6b658c4b11082f933f25da8544b224",
+  "case_records": 211,
+  "statuses": {
+    "OK": 197,
+    "FailedPrecondition": 1,
+    "InvalidArgument": 3,
+    "NOT_RUN": 2,
+    "NotFound": 7,
+    "Unimplemented": 1
+  },
+  "successful_with_stats": 197,
+  "schema_phases": 2,
+  "queue_reads": [
+    {
+      "ID": "receive",
+      "SQL": "SELECT SpannerLeaseToken FROM RECEIVE_ReceiveMessages(max_duration=>'2s',max_batch_size=>1)",
+      "Status": "OK",
+      "Rows": 1,
+      "StatsScope": "no Commit RPC; not an observed zero mutation count"
+    },
+    {
+      "ID": "renew",
+      "SQL": "SELECT SpannerNewLeaseToken FROM RENEWLEASE_ReceiveMessages(lease_tokens=>[@token])",
+      "Status": "InvalidArgument",
+      "Rows": 0,
+      "StatsScope": "no Commit RPC; not an observed zero mutation count"
+    }
+  ],
+  "retained_producer_relationship": "Invocation digests record the source/binary used for each attempt; retained producer includes later lease diagnostics and formatting. Neither a retained reproducer nor an agent-recorded digest is independent execution attestation.",
+  "raw_retention": "Synthetic schemas, mutations and DML only; resource IDs, sessions, credentials and lease tokens excluded.",
+  "remaining_unverified": [
+    "positive RENEWLEASE result",
+    "ACK after successful receive/renew",
+    "two large literal DML quota controls",
+    "queue PROTO payloads",
+    "queue internal mutation-price formula",
+    "BatchWrite and Partitioned DML",
+    "transaction bytes and latency",
+    "fleet-wide backend version or rollout timing"
+  ]
+}

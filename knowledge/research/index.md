@@ -13,6 +13,8 @@ and Research Notes outside this subtree are rejected by the repository gate.
 
 - [Runtime verification](runtime-verification/index.md): Emulator releases,
   source audits, Spanner Omni captures and managed-runtime comparisons.
+- [Write analysis](write-analysis/index.md): Mutation API and DML count models,
+  schema reconciliation and data-dependent bounds.
 
 Keep runtime verification findings in the Research Notes, with evidence linked
 from their sources. `.cursor/handoffs` is for coordination and links to these

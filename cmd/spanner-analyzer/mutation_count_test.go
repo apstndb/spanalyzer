@@ -1,0 +1,50 @@
+package main
+
+import (
+	"encoding/json"
+	"os"
+	"path/filepath"
+	"testing"
+
+	spanalyzer "github.com/apstndb/spanalyzer"
+	"github.com/goccy/go-yaml"
+)
+
+func TestRunMutationCountCLI(t *testing.T) {
+	dir := t.TempDir()
+	mut := filepath.Join(dir, "mutations.json")
+	facts := filepath.Join(dir, "facts.json")
+	if err := os.WriteFile(mut, []byte(`[{"update":{"table":"Events","columns":["Id","V"],"values":[["1","a"]]}}]`), 0600); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(facts, []byte(`[{"exists":true,"old":{"V":"a"}}]`), 0600); err != nil {
+		t.Fatal(err)
+	}
+	ddl := `CREATE TABLE Events(Id INT64 NOT NULL,V STRING(MAX)) PRIMARY KEY(Id); CREATE INDEX ByV ON Events(V);`
+	for _, format := range []string{"json", "yaml"} {
+		out, err := runMutationCountCLI(ddl, "", format, mut, facts, "", "", "")
+		if err != nil {
+			t.Fatal(err)
+		}
+		b := []byte(out)
+		if format == "yaml" {
+			b, err = yaml.YAMLToJSON(b)
+			if err != nil {
+				t.Fatal(err)
+			}
+		}
+		var r spanalyzer.MutationCountReport
+		if err := json.Unmarshal(b, &r); err != nil {
+			t.Fatal(err)
+		}
+		if r.Bounds.Count.Upper == nil || *r.Bounds.Count.Upper != 4 || r.Effective.Upper == nil || *r.Effective.Upper != 2 {
+			t.Fatal(r)
+		}
+	}
+	if _, err := runMutationCountCLI(ddl, "SELECT 1", "json", "", "", "", "", ""); err == nil {
+		t.Fatal("ordinary SELECT is not a write estimate")
+	}
+	if _, err := runMutationCountCLI(`CREATE QUEUE Tasks(Id STRING(36) NOT NULL,Payload BYTES(MAX) NOT NULL) PRIMARY KEY(Id)`, "SELECT * FROM RECEIVE_Tasks(max_duration=>'1s')", "json", "", "", "", "", ""); err != nil {
+		t.Fatal(err)
+	}
+}

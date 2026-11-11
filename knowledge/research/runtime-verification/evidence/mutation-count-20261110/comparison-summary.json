@@ -1,0 +1,646 @@
+{
+  "kind": "derived_projection_not_execution_attestation",
+  "derivation": "mutation-count-lab -compare <backend>.json.gz -index-source <ddl|observed>; selected identity, scores, and reconciled indexes",
+  "results": [
+    {
+      "backend": "omni",
+      "image": "us-docker.pkg.dev/spanner-omni/images/spanner-omni:2026.r4-lts.2@sha256:b607b10bee3c1903f0a7f88f99bece67cb0dd9d9a028aee64226fc311bd78dae",
+      "receipt_status": "complete",
+      "index_source": "ddl_declared_only",
+      "schema_sha256": "6e8e3a893bee913173fdebf6928d8d48baa091ad915d05d49cfc512fb548b5c5",
+      "scores": {
+        "bounds": {
+          "with_observed_stats": 84,
+          "interval_contains_observation": 84,
+          "exact_matches": 46,
+          "outside_interval": 0,
+          "unavailable_stats": 0,
+          "failed_operations": 1
+        },
+        "row-image": {
+          "with_observed_stats": 84,
+          "interval_contains_observation": 84,
+          "exact_matches": 82,
+          "outside_interval": 0,
+          "unavailable_stats": 0,
+          "failed_operations": 1
+        },
+        "shape": {
+          "with_observed_stats": 84,
+          "interval_contains_observation": 43,
+          "exact_matches": 43,
+          "outside_interval": 41,
+          "unavailable_stats": 0,
+          "failed_operations": 1
+        }
+      },
+      "indexes": {
+        "childrows": [
+          {
+            "name": "ChildNote",
+            "table": "ChildRows",
+            "keys": [
+              "Note"
+            ],
+            "null_filtered": false,
+            "managed": false,
+            "origin": "ddl"
+          }
+        ],
+        "compositeindex": [
+          {
+            "name": "CompositeActiveNote",
+            "table": "CompositeIndex",
+            "keys": [
+              "Active",
+              "Note"
+            ],
+            "null_filtered": false,
+            "managed": false,
+            "origin": "ddl"
+          }
+        ],
+        "nullindex": [
+          {
+            "name": "NullActive",
+            "table": "NullIndex",
+            "keys": [
+              "Active"
+            ],
+            "stored": [
+              "Note"
+            ],
+            "null_filtered": true,
+            "managed": false,
+            "origin": "ddl"
+          }
+        ],
+        "oneindex": [
+          {
+            "name": "OneActive",
+            "table": "OneIndex",
+            "keys": [
+              "Active"
+            ],
+            "null_filtered": false,
+            "managed": false,
+            "origin": "ddl"
+          }
+        ],
+        "storeindex": [
+          {
+            "name": "StoreActive",
+            "table": "StoreIndex",
+            "keys": [
+              "Active"
+            ],
+            "stored": [
+              "Note"
+            ],
+            "null_filtered": false,
+            "managed": false,
+            "origin": "ddl"
+          }
+        ],
+        "twoindexes": [
+          {
+            "name": "TwoActive",
+            "table": "TwoIndexes",
+            "keys": [
+              "Active"
+            ],
+            "null_filtered": false,
+            "managed": false,
+            "origin": "ddl"
+          },
+          {
+            "name": "TwoNote",
+            "table": "TwoIndexes",
+            "keys": [
+              "Note"
+            ],
+            "null_filtered": false,
+            "managed": false,
+            "origin": "ddl"
+          }
+        ]
+      }
+    },
+    {
+      "backend": "omni",
+      "image": "us-docker.pkg.dev/spanner-omni/images/spanner-omni:2026.r4-lts.2@sha256:b607b10bee3c1903f0a7f88f99bece67cb0dd9d9a028aee64226fc311bd78dae",
+      "receipt_status": "complete",
+      "index_source": "observed_snapshot_requires_freshness_assumption",
+      "schema_sha256": "6e8e3a893bee913173fdebf6928d8d48baa091ad915d05d49cfc512fb548b5c5",
+      "scores": {
+        "bounds": {
+          "with_observed_stats": 84,
+          "interval_contains_observation": 84,
+          "exact_matches": 48,
+          "outside_interval": 0,
+          "unavailable_stats": 0,
+          "failed_operations": 1
+        },
+        "row-image": {
+          "with_observed_stats": 84,
+          "interval_contains_observation": 84,
+          "exact_matches": 84,
+          "outside_interval": 0,
+          "unavailable_stats": 0,
+          "failed_operations": 1
+        },
+        "shape": {
+          "with_observed_stats": 84,
+          "interval_contains_observation": 45,
+          "exact_matches": 45,
+          "outside_interval": 39,
+          "unavailable_stats": 0,
+          "failed_operations": 1
+        }
+      },
+      "indexes": {
+        "aliasforeign": [
+          {
+            "name": "IDX_AliasForeign_OwnerAlias_N_F993BB342D3C655D",
+            "table": "AliasForeign",
+            "keys": [
+              "OwnerAlias"
+            ],
+            "null_filtered": true,
+            "managed": true,
+            "observed_unique": false,
+            "inferred_constraint_selectors": [
+              "FK_Alias:referencing"
+            ],
+            "origin": "observed_snapshot"
+          }
+        ],
+        "childrows": [
+          {
+            "name": "ChildNote",
+            "table": "ChildRows",
+            "keys": [
+              "Note"
+            ],
+            "null_filtered": false,
+            "managed": false,
+            "observed_unique": false,
+            "origin": "observed_snapshot"
+          }
+        ],
+        "compositeindex": [
+          {
+            "name": "CompositeActiveNote",
+            "table": "CompositeIndex",
+            "keys": [
+              "Active",
+              "Note"
+            ],
+            "null_filtered": false,
+            "managed": false,
+            "observed_unique": false,
+            "origin": "observed_snapshot"
+          }
+        ],
+        "foreignevents": [
+          {
+            "name": "IDX_ForeignEvents_OwnerId_N_82D47DE899E4F4BF",
+            "table": "ForeignEvents",
+            "keys": [
+              "OwnerId"
+            ],
+            "null_filtered": true,
+            "managed": true,
+            "observed_unique": false,
+            "inferred_constraint_selectors": [
+              "FK_Events_Owner:referencing"
+            ],
+            "origin": "observed_snapshot"
+          }
+        ],
+        "nullindex": [
+          {
+            "name": "NullActive",
+            "table": "NullIndex",
+            "keys": [
+              "Active"
+            ],
+            "stored": [
+              "Note"
+            ],
+            "null_filtered": true,
+            "managed": false,
+            "observed_unique": false,
+            "origin": "observed_snapshot"
+          }
+        ],
+        "oneindex": [
+          {
+            "name": "OneActive",
+            "table": "OneIndex",
+            "keys": [
+              "Active"
+            ],
+            "null_filtered": false,
+            "managed": false,
+            "observed_unique": false,
+            "origin": "observed_snapshot"
+          }
+        ],
+        "owners": [
+          {
+            "name": "IDX_Owners_Alias_U_B08B982A3755FE9B",
+            "table": "Owners",
+            "keys": [
+              "Alias"
+            ],
+            "null_filtered": true,
+            "managed": true,
+            "observed_unique": true,
+            "inferred_constraint_selectors": [
+              "FK_Alias:referenced"
+            ],
+            "origin": "observed_snapshot"
+          }
+        ],
+        "sharedforeign": [
+          {
+            "name": "IDX_SharedForeign_OwnerId_N_FD438C8778DFD5C2",
+            "table": "SharedForeign",
+            "keys": [
+              "OwnerId"
+            ],
+            "null_filtered": true,
+            "managed": true,
+            "observed_unique": false,
+            "inferred_constraint_selectors": [
+              "FK_Shared_A:referencing",
+              "FK_Shared_B:referencing"
+            ],
+            "origin": "observed_snapshot"
+          }
+        ],
+        "storeindex": [
+          {
+            "name": "StoreActive",
+            "table": "StoreIndex",
+            "keys": [
+              "Active"
+            ],
+            "stored": [
+              "Note"
+            ],
+            "null_filtered": false,
+            "managed": false,
+            "observed_unique": false,
+            "origin": "observed_snapshot"
+          }
+        ],
+        "twoindexes": [
+          {
+            "name": "TwoActive",
+            "table": "TwoIndexes",
+            "keys": [
+              "Active"
+            ],
+            "null_filtered": false,
+            "managed": false,
+            "observed_unique": false,
+            "origin": "observed_snapshot"
+          },
+          {
+            "name": "TwoNote",
+            "table": "TwoIndexes",
+            "keys": [
+              "Note"
+            ],
+            "null_filtered": false,
+            "managed": false,
+            "observed_unique": false,
+            "origin": "observed_snapshot"
+          }
+        ]
+      }
+    },
+    {
+      "backend": "emulator",
+      "image": "gcr.io/cloud-spanner-emulator/emulator:1.5.59@sha256:969af6a9349948fbfb4a826c18e160e258a4005f7c759f8e7f2dcec369cccba8",
+      "receipt_status": "complete",
+      "index_source": "ddl_declared_only",
+      "schema_sha256": "6e8e3a893bee913173fdebf6928d8d48baa091ad915d05d49cfc512fb548b5c5",
+      "scores": {
+        "bounds": {
+          "with_observed_stats": 0,
+          "interval_contains_observation": 0,
+          "exact_matches": 0,
+          "outside_interval": 0,
+          "unavailable_stats": 84,
+          "failed_operations": 1
+        },
+        "row-image": {
+          "with_observed_stats": 0,
+          "interval_contains_observation": 0,
+          "exact_matches": 0,
+          "outside_interval": 0,
+          "unavailable_stats": 84,
+          "failed_operations": 1
+        },
+        "shape": {
+          "with_observed_stats": 0,
+          "interval_contains_observation": 0,
+          "exact_matches": 0,
+          "outside_interval": 0,
+          "unavailable_stats": 84,
+          "failed_operations": 1
+        }
+      },
+      "indexes": {
+        "childrows": [
+          {
+            "name": "ChildNote",
+            "table": "ChildRows",
+            "keys": [
+              "Note"
+            ],
+            "null_filtered": false,
+            "managed": false,
+            "origin": "ddl"
+          }
+        ],
+        "compositeindex": [
+          {
+            "name": "CompositeActiveNote",
+            "table": "CompositeIndex",
+            "keys": [
+              "Active",
+              "Note"
+            ],
+            "null_filtered": false,
+            "managed": false,
+            "origin": "ddl"
+          }
+        ],
+        "nullindex": [
+          {
+            "name": "NullActive",
+            "table": "NullIndex",
+            "keys": [
+              "Active"
+            ],
+            "stored": [
+              "Note"
+            ],
+            "null_filtered": true,
+            "managed": false,
+            "origin": "ddl"
+          }
+        ],
+        "oneindex": [
+          {
+            "name": "OneActive",
+            "table": "OneIndex",
+            "keys": [
+              "Active"
+            ],
+            "null_filtered": false,
+            "managed": false,
+            "origin": "ddl"
+          }
+        ],
+        "storeindex": [
+          {
+            "name": "StoreActive",
+            "table": "StoreIndex",
+            "keys": [
+              "Active"
+            ],
+            "stored": [
+              "Note"
+            ],
+            "null_filtered": false,
+            "managed": false,
+            "origin": "ddl"
+          }
+        ],
+        "twoindexes": [
+          {
+            "name": "TwoActive",
+            "table": "TwoIndexes",
+            "keys": [
+              "Active"
+            ],
+            "null_filtered": false,
+            "managed": false,
+            "origin": "ddl"
+          },
+          {
+            "name": "TwoNote",
+            "table": "TwoIndexes",
+            "keys": [
+              "Note"
+            ],
+            "null_filtered": false,
+            "managed": false,
+            "origin": "ddl"
+          }
+        ]
+      }
+    },
+    {
+      "backend": "emulator",
+      "image": "gcr.io/cloud-spanner-emulator/emulator:1.5.59@sha256:969af6a9349948fbfb4a826c18e160e258a4005f7c759f8e7f2dcec369cccba8",
+      "receipt_status": "complete",
+      "index_source": "observed_snapshot_requires_freshness_assumption",
+      "schema_sha256": "6e8e3a893bee913173fdebf6928d8d48baa091ad915d05d49cfc512fb548b5c5",
+      "scores": {
+        "bounds": {
+          "with_observed_stats": 0,
+          "interval_contains_observation": 0,
+          "exact_matches": 0,
+          "outside_interval": 0,
+          "unavailable_stats": 84,
+          "failed_operations": 1
+        },
+        "row-image": {
+          "with_observed_stats": 0,
+          "interval_contains_observation": 0,
+          "exact_matches": 0,
+          "outside_interval": 0,
+          "unavailable_stats": 84,
+          "failed_operations": 1
+        },
+        "shape": {
+          "with_observed_stats": 0,
+          "interval_contains_observation": 0,
+          "exact_matches": 0,
+          "outside_interval": 0,
+          "unavailable_stats": 84,
+          "failed_operations": 1
+        }
+      },
+      "indexes": {
+        "aliasforeign": [
+          {
+            "name": "IDX_AliasForeign_OwnerAlias_N_68021FE7E149CA4B",
+            "table": "AliasForeign",
+            "keys": [
+              "OwnerAlias"
+            ],
+            "null_filtered": true,
+            "managed": true,
+            "observed_unique": false,
+            "inferred_constraint_selectors": [
+              "FK_Alias:referencing"
+            ],
+            "origin": "observed_snapshot"
+          }
+        ],
+        "childrows": [
+          {
+            "name": "ChildNote",
+            "table": "ChildRows",
+            "keys": [
+              "Note"
+            ],
+            "null_filtered": false,
+            "managed": false,
+            "observed_unique": false,
+            "origin": "observed_snapshot"
+          }
+        ],
+        "compositeindex": [
+          {
+            "name": "CompositeActiveNote",
+            "table": "CompositeIndex",
+            "keys": [
+              "Active",
+              "Note"
+            ],
+            "null_filtered": false,
+            "managed": false,
+            "observed_unique": false,
+            "origin": "observed_snapshot"
+          }
+        ],
+        "foreignevents": [
+          {
+            "name": "IDX_ForeignEvents_OwnerId_N_E0C19FA86835EB4F",
+            "table": "ForeignEvents",
+            "keys": [
+              "OwnerId"
+            ],
+            "null_filtered": true,
+            "managed": true,
+            "observed_unique": false,
+            "inferred_constraint_selectors": [
+              "FK_Events_Owner:referencing"
+            ],
+            "origin": "observed_snapshot"
+          }
+        ],
+        "nullindex": [
+          {
+            "name": "NullActive",
+            "table": "NullIndex",
+            "keys": [
+              "Active"
+            ],
+            "stored": [
+              "Note"
+            ],
+            "null_filtered": true,
+            "managed": false,
+            "observed_unique": false,
+            "origin": "observed_snapshot"
+          }
+        ],
+        "oneindex": [
+          {
+            "name": "OneActive",
+            "table": "OneIndex",
+            "keys": [
+              "Active"
+            ],
+            "null_filtered": false,
+            "managed": false,
+            "observed_unique": false,
+            "origin": "observed_snapshot"
+          }
+        ],
+        "owners": [
+          {
+            "name": "IDX_Owners_Alias_U_63D7C894109BFC67",
+            "table": "Owners",
+            "keys": [
+              "Alias"
+            ],
+            "null_filtered": true,
+            "managed": true,
+            "observed_unique": true,
+            "inferred_constraint_selectors": [
+              "FK_Alias:referenced"
+            ],
+            "origin": "observed_snapshot"
+          }
+        ],
+        "sharedforeign": [
+          {
+            "name": "IDX_SharedForeign_OwnerId_N_88C19D37D72A270A",
+            "table": "SharedForeign",
+            "keys": [
+              "OwnerId"
+            ],
+            "null_filtered": true,
+            "managed": true,
+            "observed_unique": false,
+            "inferred_constraint_selectors": [
+              "FK_Shared_A:referencing",
+              "FK_Shared_B:referencing"
+            ],
+            "origin": "observed_snapshot"
+          }
+        ],
+        "storeindex": [
+          {
+            "name": "StoreActive",
+            "table": "StoreIndex",
+            "keys": [
+              "Active"
+            ],
+            "stored": [
+              "Note"
+            ],
+            "null_filtered": false,
+            "managed": false,
+            "observed_unique": false,
+            "origin": "observed_snapshot"
+          }
+        ],
+        "twoindexes": [
+          {
+            "name": "TwoActive",
+            "table": "TwoIndexes",
+            "keys": [
+              "Active"
+            ],
+            "null_filtered": false,
+            "managed": false,
+            "observed_unique": false,
+            "origin": "observed_snapshot"
+          },
+          {
+            "name": "TwoNote",
+            "table": "TwoIndexes",
+            "keys": [
+              "Note"
+            ],
+            "null_filtered": false,
+            "managed": false,
+            "observed_unique": false,
+            "origin": "observed_snapshot"
+          }
+        ]
+      }
+    }
+  ]
+}

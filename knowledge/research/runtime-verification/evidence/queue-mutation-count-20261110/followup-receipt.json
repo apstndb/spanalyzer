@@ -1,0 +1,82 @@
+{
+  "recorded_on_jst": "2026-11-10",
+  "source_base_commit": "f53e0a8d66d179c1c1cc4d9d798bb6f3e7f7d42a",
+  "source_branch": "feat/mutation-count-investigation-20261110",
+  "source_status": "local uncommitted preview investigation",
+  "runtime": "managed Spanner; backend build is not exposed",
+  "producer_platform": "darwin/arm64",
+  "go": "1.26.10",
+  "spanner_sdk": "v1.95.1",
+  "authorization": "Explicit current user approval: one additional GoogleSQL DB creation, 43 prepared follow-up attempts, and deletion of only that created DB; reflect results in docs/core.",
+  "owned_database_lifecycles_created": 1,
+  "existing_databases_or_instance_modified": false,
+  "started_at": "2026-11-10T06:35:23.764988Z",
+  "finished_at": "2026-11-10T06:36:48.140536Z",
+  "status": "complete",
+  "lifecycle": {
+    "absence": "NotFound",
+    "create_request": "OK",
+    "create_wait": "OK",
+    "drop": "OK"
+  },
+  "cleanup_errors": [],
+  "transaction_attempts": 43,
+  "successful_with_stats": 32,
+  "status_counts": {
+    "OK": 32,
+    "FailedPrecondition": 1,
+    "OutOfRange": 2,
+    "InvalidArgument": 8
+  },
+  "queue_queries": 2,
+  "raw_capture": "testdata/mutation-count/managed-queues-ignore-20261110.json.gz",
+  "raw_capture_sha256": "f82162ffec45e31e4f941dfb4d566e1299bab6f694df72d305e57876eb0a8a96",
+  "pre_execution_invocation_record": {
+    "authorization": "Explicit current user approval: one additional GoogleSQL DB creation, 43 prepared follow-up attempts, and deletion of only that created DB; reflect results in docs/core.",
+    "database_lifecycles_allowed": 1,
+    "phase": "before_execution",
+    "recorded_at": "2026-11-10T06:35:19.154373+00:00",
+    "source_base_commit": "f53e0a8d66d179c1c1cc4d9d798bb6f3e7f7d42a",
+    "binary_sha256": "1da092109e99afde997cb83e127e8f6fde1c81bb9b87a0c4062abd42522cac23",
+    "source_sha256": {
+      "tools/mutation-count-lab/managed-probe/extended.go": "71fc1e71c1f2c31d7f3e6cb884b5c290deb347371a25a27d29641f3d24dba6fc",
+      "tools/mutation-count-lab/managed-probe/lease.go": "e2bfae2e2b70b0ee9f16a0357a4b4e2c560bd45f9c9a4c6561305d5254cbaf6e",
+      "tools/mutation-count-lab/managed-probe/lifecycle.go": "983990256f028dd24d9847250c956defa56d9cc5510cfe28f04b20effd46484a",
+      "tools/mutation-count-lab/managed-probe/lifecycle_test.go": "4ebfce8c03f22a298ab56328a4d33ce38cebaae513fe4b9c03f8f9259388f075",
+      "tools/mutation-count-lab/managed-probe/main.go": "10dfd72070e362c61c0cd7cb0a8fdbbcb038cf0ec8ffb19273e1691423967cdd",
+      "tools/mutation-count-lab/managed-probe/queue_ignore.go": "4480d5724276e6608f5b02e7b6293790418a0799edcc34629d6a80f2fd87454b",
+      "tools/mutation-count-lab/managed-probe/queue_matrix.go": "3f33f3db035e8e94fedc5989484c232e04f837e3b53c65df1d7ad7609181f6ae",
+      "tools/mutation-count-lab/managed-probe/queue_matrix_runtime.go": "b59eb3a42ced1eaaf38fc5155e541b808d9d7fc7bea9b3c08cc2bc0ada3b75e0",
+      "tools/mutation-count-lab/managed-probe/queue_matrix_test.go": "469ba3a64b46ddba0889b143571f93086a04543b7357cdd2f9946f2b58979068",
+      "tools/mutation-count-lab/managed-probe/resume.go": "fa2b3564bc1b44af17d89321fbadb81d2488a0bc3503fa927464f9524eb90cf1",
+      "tools/mutation-count-lab/managed-probe/schema.go": "0127cff5edd1d36196fbeb77091d161c41b68b8a0be6bf332d01abd6686fd061"
+    },
+    "planned_attempts": 43,
+    "planned_dml_attempts": 41,
+    "planned_rw_renew_attempts": 2,
+    "invocation": [
+      "queue-ignore-probe",
+      "-allow-create-test-drop-one-database",
+      "-queue-ignore-only",
+      "-out",
+      "<private-task>/managed/ignore.json"
+    ],
+    "scope": "one queue in one new owned GoogleSQL DB on existing dedicated instance; existing DBs and instance unchanged"
+  },
+  "retained_source_relationship": "All recorded producer source hashes match retained files. The receipt is producer-scoped evidence, not independent execution attestation.",
+  "raw_retention": "Synthetic SQL, DDL and sanitized responses only; excludes destinations, sessions, credentials, lease tokens and the private ownership journal.",
+  "replay_boundary": "30 of 32 measured inputs are representable. Two successful DELETE ASSERT_ROWS_MODIFIED inputs are rejected by the pinned parser; no assertion text is stripped to attach measurements to different SQL.",
+  "metadata_origins": {
+    "schema_phases.ddl": "submitted fixture DDL whose initialization completed, not canonical GetDatabaseDdl output",
+    "schema_phases.queue_columns": "observed INFORMATION_SCHEMA tuples"
+  },
+  "unverified": [
+    "a public queue internal-cost formula",
+    "PostgreSQL and other SDKs",
+    "concurrent conflicts and background TTL deletion",
+    "generated queue primary keys",
+    "future backend versions",
+    "RECEIVE/RENEWLEASE internal mutation units",
+    "complete DELETE assertion grammar and upstream parser design"
+  ]
+}
