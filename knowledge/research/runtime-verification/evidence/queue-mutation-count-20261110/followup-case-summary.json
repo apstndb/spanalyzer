@@ -1,0 +1,475 @@
+{
+  "producer": "Derived from the separately retained 43-attempt primary response; no failed or unmeasured case is assigned zero.",
+  "cases": [
+    {
+      "id": "ignore/one/state=absent/delivery=false",
+      "kind": "dml_insert_ignore",
+      "before_state": "absent",
+      "status": "OK",
+      "stats_present": true,
+      "mutation_count": 5,
+      "dml_rows": [
+        1
+      ]
+    },
+    {
+      "id": "ignore/one/state=absent/delivery=true",
+      "kind": "dml_insert_ignore",
+      "before_state": "absent",
+      "status": "OK",
+      "stats_present": true,
+      "mutation_count": 5,
+      "dml_rows": [
+        1
+      ]
+    },
+    {
+      "id": "ignore/one/state=same/delivery=false",
+      "kind": "dml_insert_ignore",
+      "before_state": "same",
+      "status": "OK",
+      "stats_present": true,
+      "mutation_count": 0,
+      "dml_rows": [
+        0
+      ]
+    },
+    {
+      "id": "ignore/one/state=same/delivery=true",
+      "kind": "dml_insert_ignore",
+      "before_state": "same",
+      "status": "OK",
+      "stats_present": true,
+      "mutation_count": 0,
+      "dml_rows": [
+        0
+      ]
+    },
+    {
+      "id": "ignore/one/state=changed/delivery=false",
+      "kind": "dml_insert_ignore",
+      "before_state": "changed",
+      "status": "OK",
+      "stats_present": true,
+      "mutation_count": 0,
+      "dml_rows": [
+        0
+      ]
+    },
+    {
+      "id": "ignore/one/state=changed/delivery=true",
+      "kind": "dml_insert_ignore",
+      "before_state": "changed",
+      "status": "OK",
+      "stats_present": true,
+      "mutation_count": 0,
+      "dml_rows": [
+        0
+      ]
+    },
+    {
+      "id": "ignore/mixed3/present=0/delivery=false",
+      "kind": "dml_insert_ignore",
+      "before_state": "0 of 3 target rows present",
+      "status": "OK",
+      "stats_present": true,
+      "mutation_count": 15,
+      "dml_rows": [
+        3
+      ]
+    },
+    {
+      "id": "ignore/mixed3/present=0/delivery=true",
+      "kind": "dml_insert_ignore",
+      "before_state": "0 of 3 target rows present",
+      "status": "OK",
+      "stats_present": true,
+      "mutation_count": 15,
+      "dml_rows": [
+        3
+      ]
+    },
+    {
+      "id": "ignore/mixed3/present=1/delivery=false",
+      "kind": "dml_insert_ignore",
+      "before_state": "1 of 3 target rows present",
+      "status": "OK",
+      "stats_present": true,
+      "mutation_count": 10,
+      "dml_rows": [
+        2
+      ]
+    },
+    {
+      "id": "ignore/mixed3/present=1/delivery=true",
+      "kind": "dml_insert_ignore",
+      "before_state": "1 of 3 target rows present",
+      "status": "OK",
+      "stats_present": true,
+      "mutation_count": 10,
+      "dml_rows": [
+        2
+      ]
+    },
+    {
+      "id": "ignore/mixed3/present=2/delivery=false",
+      "kind": "dml_insert_ignore",
+      "before_state": "2 of 3 target rows present",
+      "status": "OK",
+      "stats_present": true,
+      "mutation_count": 5,
+      "dml_rows": [
+        1
+      ]
+    },
+    {
+      "id": "ignore/mixed3/present=2/delivery=true",
+      "kind": "dml_insert_ignore",
+      "before_state": "2 of 3 target rows present",
+      "status": "OK",
+      "stats_present": true,
+      "mutation_count": 5,
+      "dml_rows": [
+        1
+      ]
+    },
+    {
+      "id": "ignore/mixed3/present=3/delivery=false",
+      "kind": "dml_insert_ignore",
+      "before_state": "3 of 3 target rows present",
+      "status": "OK",
+      "stats_present": true,
+      "mutation_count": 0,
+      "dml_rows": [
+        0
+      ]
+    },
+    {
+      "id": "ignore/mixed3/present=3/delivery=true",
+      "kind": "dml_insert_ignore",
+      "before_state": "3 of 3 target rows present",
+      "status": "OK",
+      "stats_present": true,
+      "mutation_count": 0,
+      "dml_rows": [
+        0
+      ]
+    },
+    {
+      "id": "ignore/repeated-key/present=false/different=false",
+      "kind": "dml_insert_ignore",
+      "before_state": "target present=false; two values rows",
+      "status": "OK",
+      "stats_present": true,
+      "mutation_count": 5,
+      "dml_rows": [
+        1
+      ]
+    },
+    {
+      "id": "ignore/repeated-key/present=false/different=true",
+      "kind": "dml_insert_ignore",
+      "before_state": "target present=false; two values rows",
+      "status": "OK",
+      "stats_present": true,
+      "mutation_count": 5,
+      "dml_rows": [
+        1
+      ]
+    },
+    {
+      "id": "ignore/repeated-key/present=true/different=false",
+      "kind": "dml_insert_ignore",
+      "before_state": "target present=true; two values rows",
+      "status": "OK",
+      "stats_present": true,
+      "mutation_count": 0,
+      "dml_rows": [
+        0
+      ]
+    },
+    {
+      "id": "ignore/repeated-key/present=true/different=true",
+      "kind": "dml_insert_ignore",
+      "before_state": "target present=true; two values rows",
+      "status": "OK",
+      "stats_present": true,
+      "mutation_count": 0,
+      "dml_rows": [
+        0
+      ]
+    },
+    {
+      "id": "ignore/null-payload/present=false",
+      "kind": "dml_insert_ignore",
+      "before_state": "target present=false",
+      "status": "FailedPrecondition",
+      "stats_present": false,
+      "mutation_count": null,
+      "error": "Payload must not be NULL in table _Queue_Data_Messages."
+    },
+    {
+      "id": "ignore/null-payload/present=true",
+      "kind": "dml_insert_ignore",
+      "before_state": "target present=true",
+      "status": "OK",
+      "stats_present": true,
+      "mutation_count": 0,
+      "dml_rows": [
+        0
+      ]
+    },
+    {
+      "id": "select/insert/n=0/present=0",
+      "kind": "dml_insert_select",
+      "before_state": "0 source rows; 0 targets present",
+      "status": "OK",
+      "stats_present": true,
+      "mutation_count": 0,
+      "dml_rows": [
+        0
+      ]
+    },
+    {
+      "id": "select/insert/n=1/present=0",
+      "kind": "dml_insert_select",
+      "before_state": "1 source rows; 0 targets present",
+      "status": "OK",
+      "stats_present": true,
+      "mutation_count": 5,
+      "dml_rows": [
+        1
+      ]
+    },
+    {
+      "id": "select/insert/n=3/present=0",
+      "kind": "dml_insert_select",
+      "before_state": "3 source rows; 0 targets present",
+      "status": "OK",
+      "stats_present": true,
+      "mutation_count": 15,
+      "dml_rows": [
+        3
+      ]
+    },
+    {
+      "id": "select/ignore/n=0/present=0",
+      "kind": "dml_insert_select",
+      "before_state": "0 source rows; 0 targets present",
+      "status": "OK",
+      "stats_present": true,
+      "mutation_count": 0,
+      "dml_rows": [
+        0
+      ]
+    },
+    {
+      "id": "select/ignore/n=1/present=0",
+      "kind": "dml_insert_select",
+      "before_state": "1 source rows; 0 targets present",
+      "status": "OK",
+      "stats_present": true,
+      "mutation_count": 5,
+      "dml_rows": [
+        1
+      ]
+    },
+    {
+      "id": "select/ignore/n=3/present=0",
+      "kind": "dml_insert_select",
+      "before_state": "3 source rows; 0 targets present",
+      "status": "OK",
+      "stats_present": true,
+      "mutation_count": 15,
+      "dml_rows": [
+        3
+      ]
+    },
+    {
+      "id": "select/ignore/n=3/present=1",
+      "kind": "dml_insert_select",
+      "before_state": "3 source rows; 1 targets present",
+      "status": "OK",
+      "stats_present": true,
+      "mutation_count": 10,
+      "dml_rows": [
+        2
+      ]
+    },
+    {
+      "id": "select/ignore/n=3/present=3",
+      "kind": "dml_insert_select",
+      "before_state": "3 source rows; 3 targets present",
+      "status": "OK",
+      "stats_present": true,
+      "mutation_count": 0,
+      "dml_rows": [
+        0
+      ]
+    },
+    {
+      "id": "ignore/then-delete/present=false",
+      "kind": "dml_mixed",
+      "before_state": "target present=false",
+      "status": "OK",
+      "stats_present": true,
+      "mutation_count": 7,
+      "dml_rows": [
+        1,
+        1
+      ]
+    },
+    {
+      "id": "ignore/then-delete/present=true",
+      "kind": "dml_mixed",
+      "before_state": "target present=true",
+      "status": "OK",
+      "stats_present": true,
+      "mutation_count": 2,
+      "dml_rows": [
+        0,
+        1
+      ]
+    },
+    {
+      "id": "ignore/two-statements",
+      "kind": "dml_insert_ignore",
+      "before_state": "absent before first statement",
+      "status": "OK",
+      "stats_present": true,
+      "mutation_count": 5,
+      "dml_rows": [
+        1,
+        0
+      ]
+    },
+    {
+      "id": "delete/assert-rows/present=false/assert=0",
+      "kind": "dml_delete",
+      "before_state": "target present=false",
+      "status": "OK",
+      "stats_present": true,
+      "mutation_count": 0,
+      "dml_rows": [
+        0
+      ]
+    },
+    {
+      "id": "delete/assert-rows/present=false/assert=1",
+      "kind": "dml_delete",
+      "before_state": "target present=false",
+      "status": "OutOfRange",
+      "stats_present": false,
+      "mutation_count": null,
+      "error": "DML statement modified an unexpected number of rows. Expected: 1, Actual: 0."
+    },
+    {
+      "id": "delete/assert-rows/present=true/assert=0",
+      "kind": "dml_delete",
+      "before_state": "target present=true",
+      "status": "OutOfRange",
+      "stats_present": false,
+      "mutation_count": null,
+      "error": "DML statement modified an unexpected number of rows. Expected: 0, Actual: 1."
+    },
+    {
+      "id": "delete/assert-rows/present=true/assert=1",
+      "kind": "dml_delete",
+      "before_state": "target present=true",
+      "status": "OK",
+      "stats_present": true,
+      "mutation_count": 2,
+      "dml_rows": [
+        1
+      ]
+    },
+    {
+      "id": "conflict/present=false/ON CONFLICT DO NOTHING",
+      "kind": "dml_conflict",
+      "before_state": "target present=false",
+      "status": "InvalidArgument",
+      "stats_present": false,
+      "mutation_count": null,
+      "error": "On conflict action NOTHING is not supported on queues."
+    },
+    {
+      "id": "conflict/present=false/ON CONFLICT (Id) DO NOTHING",
+      "kind": "dml_conflict",
+      "before_state": "target present=false",
+      "status": "InvalidArgument",
+      "stats_present": false,
+      "mutation_count": null,
+      "error": "On conflict action NOTHING is not supported on queues."
+    },
+    {
+      "id": "conflict/present=false/ON CONFLICT (Id) DO UPDATE SET Payload=excluded.Payload",
+      "kind": "dml_conflict",
+      "before_state": "target present=false",
+      "status": "InvalidArgument",
+      "stats_present": false,
+      "mutation_count": null,
+      "error": "On conflict action UPDATE is not supported on queues."
+    },
+    {
+      "id": "conflict/present=true/ON CONFLICT DO NOTHING",
+      "kind": "dml_conflict",
+      "before_state": "target present=true",
+      "status": "InvalidArgument",
+      "stats_present": false,
+      "mutation_count": null,
+      "error": "On conflict action NOTHING is not supported on queues."
+    },
+    {
+      "id": "conflict/present=true/ON CONFLICT (Id) DO NOTHING",
+      "kind": "dml_conflict",
+      "before_state": "target present=true",
+      "status": "InvalidArgument",
+      "stats_present": false,
+      "mutation_count": null,
+      "error": "On conflict action NOTHING is not supported on queues."
+    },
+    {
+      "id": "conflict/present=true/ON CONFLICT (Id) DO UPDATE SET Payload=excluded.Payload",
+      "kind": "dml_conflict",
+      "before_state": "target present=true",
+      "status": "InvalidArgument",
+      "stats_present": false,
+      "mutation_count": null,
+      "error": "On conflict action UPDATE is not supported on queues."
+    },
+    {
+      "id": "lease/renew-in-rw/ack=false",
+      "kind": "queue_renew_rw",
+      "before_state": "one fresh unacknowledged lease",
+      "status": "InvalidArgument",
+      "stats_present": false,
+      "mutation_count": null,
+      "error": "Queue renew lease queries must be single-use only."
+    },
+    {
+      "id": "lease/renew-in-rw/ack=true",
+      "kind": "queue_renew_rw",
+      "before_state": "one fresh unacknowledged lease",
+      "status": "InvalidArgument",
+      "stats_present": false,
+      "mutation_count": null,
+      "error": "Queue renew lease queries must be single-use only."
+    }
+  ],
+  "queue_reads": [
+    {
+      "ID": "lease/renew-in-rw/ack=false/receive",
+      "SQL": "SELECT Id,SpannerLeaseToken,SpannerLeaseExpirationTimestamp FROM RECEIVE_Messages(max_duration=>'20m',max_batch_size=>1)",
+      "Status": "OK",
+      "Rows": 1,
+      "StatsScope": "streaming query; no caller CommitStats"
+    },
+    {
+      "ID": "lease/renew-in-rw/ack=true/receive",
+      "SQL": "SELECT Id,SpannerLeaseToken,SpannerLeaseExpirationTimestamp FROM RECEIVE_Messages(max_duration=>'20m',max_batch_size=>1)",
+      "Status": "OK",
+      "Rows": 1,
+      "StatsScope": "streaming query; no caller CommitStats"
+    }
+  ]
+}

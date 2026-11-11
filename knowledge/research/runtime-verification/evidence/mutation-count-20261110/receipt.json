@@ -1,0 +1,68 @@
+{
+  "recorded_on_jst": "2026-11-10",
+  "source_base_commit": "f53e0a8d66d179c1c1cc4d9d798bb6f3e7f7d42a",
+  "source_branch": "feat/mutation-count-investigation-20261110",
+  "source_status": "local uncommitted experiment, not a published release",
+  "go": "1.26.10",
+  "dependencies": {
+    "cloud.google.com/go/spanner": "v1.95.1",
+    "github.com/apstndb/spanemuboost": "v0.4.10"
+  },
+  "probe_source_relationship": "Retained implementation; gofmt was applied after capture. Source hashes identify the retained reproducer, not a binary execution attestation.",
+  "retained_implementation_sha256": {
+    "tools/mutation-count-lab/batch.go": "d6286fb4bc5a7d5628e3f93f49d96dc09c8ff61af21b0147ec4ab3daa7e29894",
+    "tools/mutation-count-lab/count.go": "552d00d82032e79700b3ece4c37c524b5f054c149d700bb650c00cd8f5b5fa82",
+    "tools/mutation-count-lab/count_test.go": "6bb29e22eb6e169777fc386124d4b91ce909b84c092b3372e7356118e7f077b5",
+    "tools/mutation-count-lab/input.go": "f3f6b6ff792334a89a60819e64fc7162d77b371ff812be4cee4b81a5584dbcca",
+    "tools/mutation-count-lab/main.go": "185d2d0f2e658a0efaae8b8c95af1b8a874d93ec8f76bb6bfb5ff4460bf64d3f",
+    "tools/mutation-count-lab/probe/main.go": "fdc57f236ee84b0e121aeeaf78f11774bda4b46d43338cf40c866e217f73dc92",
+    "tools/mutation-count-lab/schema.go": "a915c0bb955bbfc3e79919995e571a08b39514d9e7570d7ab35529f1977e1bc6"
+  },
+  "runtime_observations": [
+    {
+      "backend": "omni",
+      "configured_image": "us-docker.pkg.dev/spanner-omni/images/spanner-omni:2026.r4-lts.2@sha256:b607b10bee3c1903f0a7f88f99bece67cb0dd9d9a028aee64226fc311bd78dae",
+      "container_platform": "linux/arm64",
+      "producer_platform": "darwin/arm64",
+      "started_at": "2026-11-09T20:26:43.025909Z",
+      "finished_at": "2026-11-09T20:28:21.602464Z",
+      "attempts": 85,
+      "successful": 84,
+      "stats_present": 84,
+      "runtime_container_id_prefix": "fd7878c7365f",
+      "cleanup_errors": [],
+      "absent_from_post_run_docker_inventory": true,
+      "raw_receipt": "tools/mutation-count-lab/testdata/omni.json.gz",
+      "raw_receipt_sha256": "cfce387508a1e86f719e97b227a388cf9f7f732f7a790bad693d1060a67182a6"
+    },
+    {
+      "backend": "emulator",
+      "configured_image": "gcr.io/cloud-spanner-emulator/emulator:1.5.59@sha256:969af6a9349948fbfb4a826c18e160e258a4005f7c759f8e7f2dcec369cccba8",
+      "container_platform": "linux/arm64",
+      "producer_platform": "darwin/arm64",
+      "started_at": "2026-11-09T20:26:45.446012Z",
+      "finished_at": "2026-11-09T20:26:47.261664Z",
+      "attempts": 85,
+      "successful": 84,
+      "stats_present": 0,
+      "runtime_container_id_prefix": "ea090636ffcc",
+      "cleanup_errors": [],
+      "absent_from_post_run_docker_inventory": true,
+      "raw_receipt": "tools/mutation-count-lab/testdata/emulator.json.gz",
+      "raw_receipt_sha256": "b480abbfb8799eb6c8c0cdd7ce44ca43759c374cbd174a24d6937c886bd9f314"
+    }
+  ],
+  "raw_retention": "Synthetic schema and mutation payloads only; no sessions, endpoints, credentials or application data",
+  "model_results": "comparison-summary.json is a derived projection on the same calibration corpus, not held-out accuracy",
+  "unverified": [
+    "managed Spanner execution",
+    "managed quota enforcement",
+    "Omni r5 execution",
+    "optimizer version",
+    "transaction bytes, lock costs and latency",
+    "BatchWrite and Partitioned DML",
+    "Java SDK execution",
+    "arbitrary mixed same-key operation accounting"
+  ],
+  "local_attempts": "Earlier bootstrap and final-metadata decode errors were probe failures. Only complete final runs are retained as calibration inputs."
+}

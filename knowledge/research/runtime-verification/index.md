@@ -7,6 +7,9 @@ source evidence, results and unverified boundaries travel with each note.
 
 | Runtime and observation scope | Research Note |
 | --- | --- |
+| Managed Spanner, 2026-11-10 JST, later runs | [Queue mutation-count matrix and follow-up](queue-mutation-count-managed-20261110.md): 319 + 43 attempts, 270 + 32 CommitStats, OR IGNORE/source inserts, RW renewal rejection, cascades, quota boundaries and explicit parser/API gaps |
+| Managed Spanner, 2026-11-10 JST | [Mutation-count integration](mutation-count-managed-20261110.md): 197 CommitStats observations, index-sensitive partial writes, queue restrictions, lease failure and verified owned-DB cleanup |
+| Omni r4 LTS.2 and Emulator 1.5.59, 2026-11-10 JST | [Mutation-count verification](mutation-count-20261110.md): 85 attempts each, API-specific automatic cells, same-key composition, shared FK indexes and unavailable Emulator statistics |
 | Emulator 1.5.59 and Omni r4 LTS.2, 2026-11-09 JST | [Closed SQL choices](finite-sql-choices-20261109.md): correlated ranges, column selection, selected bindings and six-target PLAN collection |
 | Local frontend and Emulator 1.5.59, 2026-11-08 | [Inspection continuation and row deletion policy folding](inspection-feedback-20261108.md): current-baseline reproduction, partial CLI artifacts and AST/live TTL reapplication |
 | Emulator 1.5.59 and Omni r4 LTS.2, 2026-11-08 | [Repository hardening verification](repository-hardening-20261108.md): seven review fixes, dependency-safe DDL, explicit DB retention, standalone builds and isolated CEL errors |
@@ -47,7 +50,7 @@ Read the [managed](managed/index.md), [Omni](omni/index.md) and
 changes, first coverage, rechecks and corrections. Same-day rows without exact
 times have no claimed internal order. [History conventions](organization.md)
 explain how to append observations without rewriting earlier conclusions.
-The November 8 notes above remain the newest selected investigations; older
+The November 10 mutation-count notes are the newest selected investigations; older
 cross-engine comparisons retain their own per-engine observation dates.
 
 ## Retained historical research

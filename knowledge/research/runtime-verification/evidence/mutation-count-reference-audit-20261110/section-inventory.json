@@ -1,0 +1,1968 @@
+{
+  "method": "Markdown headings outside fenced examples; each end_line ends before the next heading rather than covering nested descendants.",
+  "documents": [
+    {
+      "name": "documents/docs.cloud.google.com/spanner/docs/reference/standard-sql/data-definition-language",
+      "uri": "https://docs.cloud.google.com/spanner/docs/reference/standard-sql/data-definition-language",
+      "update_time": "2026-10-28T17:49:56Z",
+      "line_count": 2973,
+      "headings": [
+        {
+          "level": 2,
+          "title": "Notation",
+          "line": 17,
+          "end_line": 28
+        },
+        {
+          "level": 2,
+          "title": "Reserved keywords",
+          "line": 29,
+          "end_line": 41
+        },
+        {
+          "level": 2,
+          "title": "Names",
+          "line": 42,
+          "end_line": 126
+        },
+        {
+          "level": 2,
+          "title": "Data types",
+          "line": 127,
+          "end_line": 130
+        },
+        {
+          "level": 3,
+          "title": "Scalars",
+          "line": 131,
+          "end_line": 163
+        },
+        {
+          "level": 4,
+          "title": "STRING",
+          "line": 164,
+          "end_line": 183
+        },
+        {
+          "level": 4,
+          "title": "JSON",
+          "line": 184,
+          "end_line": 189
+        },
+        {
+          "level": 4,
+          "title": "BYTES",
+          "line": 190,
+          "end_line": 203
+        },
+        {
+          "level": 4,
+          "title": "DATE",
+          "line": 204,
+          "end_line": 209
+        },
+        {
+          "level": 4,
+          "title": "TIMESTAMP",
+          "line": 210,
+          "end_line": 215
+        },
+        {
+          "level": 3,
+          "title": "Arrays",
+          "line": 216,
+          "end_line": 251
+        },
+        {
+          "level": 3,
+          "title": "Protocol buffers",
+          "line": 252,
+          "end_line": 290
+        },
+        {
+          "level": 2,
+          "title": "SCHEMA statements",
+          "line": 291,
+          "end_line": 294
+        },
+        {
+          "level": 3,
+          "title": "CREATE SCHEMA",
+          "line": 295,
+          "end_line": 302
+        },
+        {
+          "level": 4,
+          "title": "Parameters",
+          "line": 303,
+          "end_line": 309
+        },
+        {
+          "level": 3,
+          "title": "DROP SCHEMA",
+          "line": 310,
+          "end_line": 317
+        },
+        {
+          "level": 4,
+          "title": "Parameters",
+          "line": 318,
+          "end_line": 323
+        },
+        {
+          "level": 4,
+          "title": "Parameters",
+          "line": 324,
+          "end_line": 329
+        },
+        {
+          "level": 2,
+          "title": "DATABASE statements",
+          "line": 330,
+          "end_line": 333
+        },
+        {
+          "level": 3,
+          "title": "CREATE DATABASE",
+          "line": 334,
+          "end_line": 344
+        },
+        {
+          "level": 4,
+          "title": "Parameters",
+          "line": 345,
+          "end_line": 350
+        },
+        {
+          "level": 3,
+          "title": "ALTER DATABASE",
+          "line": 351,
+          "end_line": 354
+        },
+        {
+          "level": 4,
+          "title": "Syntax",
+          "line": 355,
+          "end_line": 377
+        },
+        {
+          "level": 4,
+          "title": "Description",
+          "line": 378,
+          "end_line": 385
+        },
+        {
+          "level": 4,
+          "title": "Parameters",
+          "line": 386,
+          "end_line": 411
+        },
+        {
+          "level": 2,
+          "title": "LOCALITY GROUP statements",
+          "line": 412,
+          "end_line": 415
+        },
+        {
+          "level": 3,
+          "title": "CREATE LOCALITY GROUP",
+          "line": 416,
+          "end_line": 419
+        },
+        {
+          "level": 4,
+          "title": "Syntax",
+          "line": 420,
+          "end_line": 428
+        },
+        {
+          "level": 4,
+          "title": "Description",
+          "line": 429,
+          "end_line": 432
+        },
+        {
+          "level": 4,
+          "title": "Parameters",
+          "line": 433,
+          "end_line": 444
+        },
+        {
+          "level": 3,
+          "title": "ALTER LOCALITY GROUP",
+          "line": 445,
+          "end_line": 448
+        },
+        {
+          "level": 4,
+          "title": "Syntax",
+          "line": 449,
+          "end_line": 457
+        },
+        {
+          "level": 4,
+          "title": "Description",
+          "line": 458,
+          "end_line": 461
+        },
+        {
+          "level": 4,
+          "title": "Parameters",
+          "line": 462,
+          "end_line": 473
+        },
+        {
+          "level": 3,
+          "title": "DROP LOCALITY GROUP",
+          "line": 474,
+          "end_line": 477
+        },
+        {
+          "level": 4,
+          "title": "Syntax",
+          "line": 478,
+          "end_line": 483
+        },
+        {
+          "level": 4,
+          "title": "Description",
+          "line": 484,
+          "end_line": 487
+        },
+        {
+          "level": 2,
+          "title": "PLACEMENT statements",
+          "line": 488,
+          "end_line": 495
+        },
+        {
+          "level": 3,
+          "title": "CREATE PLACEMENT",
+          "line": 496,
+          "end_line": 499
+        },
+        {
+          "level": 4,
+          "title": "Syntax",
+          "line": 500,
+          "end_line": 509
+        },
+        {
+          "level": 4,
+          "title": "Description",
+          "line": 510,
+          "end_line": 513
+        },
+        {
+          "level": 4,
+          "title": "Parameters",
+          "line": 514,
+          "end_line": 529
+        },
+        {
+          "level": 3,
+          "title": "DROP PLACEMENT",
+          "line": 530,
+          "end_line": 533
+        },
+        {
+          "level": 4,
+          "title": "Syntax",
+          "line": 534,
+          "end_line": 539
+        },
+        {
+          "level": 4,
+          "title": "Description",
+          "line": 540,
+          "end_line": 543
+        },
+        {
+          "level": 4,
+          "title": "Parameters",
+          "line": 544,
+          "end_line": 549
+        },
+        {
+          "level": 2,
+          "title": "PROTO BUNDLE statements",
+          "line": 550,
+          "end_line": 553
+        },
+        {
+          "level": 3,
+          "title": "CREATE PROTO BUNDLE",
+          "line": 554,
+          "end_line": 557
+        },
+        {
+          "level": 4,
+          "title": "Syntax",
+          "line": 558,
+          "end_line": 565
+        },
+        {
+          "level": 4,
+          "title": "Description",
+          "line": 566,
+          "end_line": 569
+        },
+        {
+          "level": 4,
+          "title": "Parameters",
+          "line": 570,
+          "end_line": 586
+        },
+        {
+          "level": 3,
+          "title": "ALTER PROTO BUNDLE",
+          "line": 587,
+          "end_line": 590
+        },
+        {
+          "level": 4,
+          "title": "Syntax",
+          "line": 591,
+          "end_line": 599
+        },
+        {
+          "level": 4,
+          "title": "Description",
+          "line": 600,
+          "end_line": 603
+        },
+        {
+          "level": 4,
+          "title": "Parameters",
+          "line": 604,
+          "end_line": 614
+        },
+        {
+          "level": 3,
+          "title": "DROP PROTO BUNDLE",
+          "line": 615,
+          "end_line": 618
+        },
+        {
+          "level": 4,
+          "title": "Syntax",
+          "line": 619,
+          "end_line": 624
+        },
+        {
+          "level": 4,
+          "title": "Description",
+          "line": 625,
+          "end_line": 632
+        },
+        {
+          "level": 2,
+          "title": "TABLE statements",
+          "line": 633,
+          "end_line": 636
+        },
+        {
+          "level": 3,
+          "title": "CREATE TABLE",
+          "line": 637,
+          "end_line": 640
+        },
+        {
+          "level": 4,
+          "title": "Syntax",
+          "line": 641,
+          "end_line": 691
+        },
+        {
+          "level": 4,
+          "title": "Description",
+          "line": 692,
+          "end_line": 695
+        },
+        {
+          "level": 4,
+          "title": "Parameters",
+          "line": 696,
+          "end_line": 960
+        },
+        {
+          "level": 3,
+          "title": "ALTER TABLE",
+          "line": 961,
+          "end_line": 964
+        },
+        {
+          "level": 4,
+          "title": "Syntax",
+          "line": 965,
+          "end_line": 1030
+        },
+        {
+          "level": 4,
+          "title": "Description",
+          "line": 1031,
+          "end_line": 1201
+        },
+        {
+          "level": 4,
+          "title": "Parameters",
+          "line": 1202,
+          "end_line": 1244
+        },
+        {
+          "level": 3,
+          "title": "DROP TABLE",
+          "line": 1245,
+          "end_line": 1248
+        },
+        {
+          "level": 4,
+          "title": "Syntax",
+          "line": 1249,
+          "end_line": 1254
+        },
+        {
+          "level": 4,
+          "title": "Description",
+          "line": 1255,
+          "end_line": 1264
+        },
+        {
+          "level": 4,
+          "title": "Parameters",
+          "line": 1265,
+          "end_line": 1274
+        },
+        {
+          "level": 3,
+          "title": "RENAME TABLE",
+          "line": 1275,
+          "end_line": 1278
+        },
+        {
+          "level": 4,
+          "title": "Syntax",
+          "line": 1279,
+          "end_line": 1285
+        },
+        {
+          "level": 4,
+          "title": "Description",
+          "line": 1286,
+          "end_line": 1289
+        },
+        {
+          "level": 4,
+          "title": "Parameters",
+          "line": 1290,
+          "end_line": 1299
+        },
+        {
+          "level": 4,
+          "title": "Example",
+          "line": 1300,
+          "end_line": 1307
+        },
+        {
+          "level": 2,
+          "title": "INDEX statements",
+          "line": 1308,
+          "end_line": 1311
+        },
+        {
+          "level": 3,
+          "title": "CREATE INDEX",
+          "line": 1312,
+          "end_line": 1315
+        },
+        {
+          "level": 4,
+          "title": "Syntax",
+          "line": 1316,
+          "end_line": 1343
+        },
+        {
+          "level": 4,
+          "title": "Description",
+          "line": 1344,
+          "end_line": 1351
+        },
+        {
+          "level": 4,
+          "title": "Parameters",
+          "line": 1352,
+          "end_line": 1405
+        },
+        {
+          "level": 3,
+          "title": "ALTER INDEX",
+          "line": 1406,
+          "end_line": 1409
+        },
+        {
+          "level": 4,
+          "title": "Syntax",
+          "line": 1410,
+          "end_line": 1420
+        },
+        {
+          "level": 4,
+          "title": "Description",
+          "line": 1421,
+          "end_line": 1424
+        },
+        {
+          "level": 4,
+          "title": "Parameters",
+          "line": 1425,
+          "end_line": 1440
+        },
+        {
+          "level": 3,
+          "title": "DROP INDEX",
+          "line": 1441,
+          "end_line": 1444
+        },
+        {
+          "level": 4,
+          "title": "Syntax",
+          "line": 1445,
+          "end_line": 1450
+        },
+        {
+          "level": 4,
+          "title": "Description",
+          "line": 1451,
+          "end_line": 1454
+        },
+        {
+          "level": 4,
+          "title": "Parameters",
+          "line": 1455,
+          "end_line": 1464
+        },
+        {
+          "level": 2,
+          "title": "SEARCH INDEX statements",
+          "line": 1465,
+          "end_line": 1468
+        },
+        {
+          "level": 3,
+          "title": "CREATE SEARCH INDEX",
+          "line": 1469,
+          "end_line": 1472
+        },
+        {
+          "level": 4,
+          "title": "Syntax",
+          "line": 1473,
+          "end_line": 1506
+        },
+        {
+          "level": 4,
+          "title": "Description",
+          "line": 1507,
+          "end_line": 1510
+        },
+        {
+          "level": 4,
+          "title": "Parameters",
+          "line": 1511,
+          "end_line": 1556
+        },
+        {
+          "level": 3,
+          "title": "ALTER SEARCH INDEX",
+          "line": 1557,
+          "end_line": 1560
+        },
+        {
+          "level": 4,
+          "title": "Syntax",
+          "line": 1561,
+          "end_line": 1566
+        },
+        {
+          "level": 4,
+          "title": "Description",
+          "line": 1567,
+          "end_line": 1570
+        },
+        {
+          "level": 4,
+          "title": "Parameters",
+          "line": 1571,
+          "end_line": 1580
+        },
+        {
+          "level": 3,
+          "title": "DROP SEARCH INDEX",
+          "line": 1581,
+          "end_line": 1584
+        },
+        {
+          "level": 4,
+          "title": "Syntax",
+          "line": 1585,
+          "end_line": 1590
+        },
+        {
+          "level": 4,
+          "title": "Description",
+          "line": 1591,
+          "end_line": 1594
+        },
+        {
+          "level": 4,
+          "title": "Parameters",
+          "line": 1595,
+          "end_line": 1604
+        },
+        {
+          "level": 2,
+          "title": "VIEW statements",
+          "line": 1605,
+          "end_line": 1608
+        },
+        {
+          "level": 3,
+          "title": "CREATE VIEW and CREATE OR REPLACE VIEW",
+          "line": 1609,
+          "end_line": 1612
+        },
+        {
+          "level": 4,
+          "title": "Syntax",
+          "line": 1613,
+          "end_line": 1620
+        },
+        {
+          "level": 4,
+          "title": "Description",
+          "line": 1621,
+          "end_line": 1626
+        },
+        {
+          "level": 4,
+          "title": "Parameters",
+          "line": 1627,
+          "end_line": 1648
+        },
+        {
+          "level": 3,
+          "title": "DROP VIEW",
+          "line": 1649,
+          "end_line": 1652
+        },
+        {
+          "level": 4,
+          "title": "Syntax",
+          "line": 1653,
+          "end_line": 1658
+        },
+        {
+          "level": 4,
+          "title": "Description",
+          "line": 1659,
+          "end_line": 1662
+        },
+        {
+          "level": 4,
+          "title": "Parameters",
+          "line": 1663,
+          "end_line": 1672
+        },
+        {
+          "level": 2,
+          "title": "QUEUE statements",
+          "line": 1673,
+          "end_line": 1676
+        },
+        {
+          "level": 3,
+          "title": "CREATE QUEUE",
+          "line": 1677,
+          "end_line": 1680
+        },
+        {
+          "level": 4,
+          "title": "Syntax",
+          "line": 1681,
+          "end_line": 1715
+        },
+        {
+          "level": 4,
+          "title": "Description",
+          "line": 1716,
+          "end_line": 1719
+        },
+        {
+          "level": 4,
+          "title": "Parameters",
+          "line": 1720,
+          "end_line": 1790
+        },
+        {
+          "level": 3,
+          "title": "ALTER QUEUE",
+          "line": 1791,
+          "end_line": 1794
+        },
+        {
+          "level": 4,
+          "title": "Syntax",
+          "line": 1795,
+          "end_line": 1815
+        },
+        {
+          "level": 4,
+          "title": "Description",
+          "line": 1816,
+          "end_line": 1859
+        },
+        {
+          "level": 4,
+          "title": "Parameters",
+          "line": 1860,
+          "end_line": 1881
+        },
+        {
+          "level": 3,
+          "title": "DROP QUEUE",
+          "line": 1882,
+          "end_line": 1885
+        },
+        {
+          "level": 4,
+          "title": "Syntax",
+          "line": 1886,
+          "end_line": 1891
+        },
+        {
+          "level": 4,
+          "title": "Description",
+          "line": 1892,
+          "end_line": 1895
+        },
+        {
+          "level": 4,
+          "title": "Parameters",
+          "line": 1896,
+          "end_line": 1905
+        },
+        {
+          "level": 2,
+          "title": "CHANGE STREAM statements",
+          "line": 1906,
+          "end_line": 1909
+        },
+        {
+          "level": 3,
+          "title": "CREATE CHANGE STREAM",
+          "line": 1910,
+          "end_line": 1913
+        },
+        {
+          "level": 4,
+          "title": "Syntax",
+          "line": 1914,
+          "end_line": 1933
+        },
+        {
+          "level": 4,
+          "title": "Description",
+          "line": 1934,
+          "end_line": 1937
+        },
+        {
+          "level": 4,
+          "title": "Parameters",
+          "line": 1938,
+          "end_line": 1979
+        },
+        {
+          "level": 3,
+          "title": "ALTER CHANGE STREAM",
+          "line": 1980,
+          "end_line": 1983
+        },
+        {
+          "level": 4,
+          "title": "Syntax",
+          "line": 1984,
+          "end_line": 2007
+        },
+        {
+          "level": 4,
+          "title": "Description",
+          "line": 2008,
+          "end_line": 2011
+        },
+        {
+          "level": 4,
+          "title": "Parameters",
+          "line": 2012,
+          "end_line": 2031
+        },
+        {
+          "level": 3,
+          "title": "DROP CHANGE STREAM",
+          "line": 2032,
+          "end_line": 2035
+        },
+        {
+          "level": 4,
+          "title": "Syntax",
+          "line": 2036,
+          "end_line": 2041
+        },
+        {
+          "level": 4,
+          "title": "Description",
+          "line": 2042,
+          "end_line": 2045
+        },
+        {
+          "level": 4,
+          "title": "Parameters",
+          "line": 2046,
+          "end_line": 2055
+        },
+        {
+          "level": 2,
+          "title": "ROLE statements",
+          "line": 2056,
+          "end_line": 2059
+        },
+        {
+          "level": 3,
+          "title": "CREATE ROLE",
+          "line": 2060,
+          "end_line": 2063
+        },
+        {
+          "level": 4,
+          "title": "Syntax",
+          "line": 2064,
+          "end_line": 2069
+        },
+        {
+          "level": 4,
+          "title": "Description",
+          "line": 2070,
+          "end_line": 2073
+        },
+        {
+          "level": 4,
+          "title": "Parameters",
+          "line": 2074,
+          "end_line": 2079
+        },
+        {
+          "level": 4,
+          "title": "Example",
+          "line": 2080,
+          "end_line": 2085
+        },
+        {
+          "level": 3,
+          "title": "DROP ROLE",
+          "line": 2086,
+          "end_line": 2089
+        },
+        {
+          "level": 4,
+          "title": "Syntax",
+          "line": 2090,
+          "end_line": 2095
+        },
+        {
+          "level": 4,
+          "title": "Description",
+          "line": 2096,
+          "end_line": 2105
+        },
+        {
+          "level": 4,
+          "title": "Parameters",
+          "line": 2106,
+          "end_line": 2111
+        },
+        {
+          "level": 4,
+          "title": "Example",
+          "line": 2112,
+          "end_line": 2117
+        },
+        {
+          "level": 2,
+          "title": "GRANT and REVOKE statements",
+          "line": 2118,
+          "end_line": 2121
+        },
+        {
+          "level": 3,
+          "title": "GRANT",
+          "line": 2122,
+          "end_line": 2125
+        },
+        {
+          "level": 4,
+          "title": "Syntax",
+          "line": 2126,
+          "end_line": 2182
+        },
+        {
+          "level": 4,
+          "title": "Description",
+          "line": 2183,
+          "end_line": 2186
+        },
+        {
+          "level": 4,
+          "title": "Parameters",
+          "line": 2187,
+          "end_line": 2220
+        },
+        {
+          "level": 4,
+          "title": "Notes and restrictions",
+          "line": 2221,
+          "end_line": 2234
+        },
+        {
+          "level": 4,
+          "title": "Examples",
+          "line": 2235,
+          "end_line": 2284
+        },
+        {
+          "level": 3,
+          "title": "REVOKE",
+          "line": 2285,
+          "end_line": 2288
+        },
+        {
+          "level": 4,
+          "title": "Syntax",
+          "line": 2289,
+          "end_line": 2341
+        },
+        {
+          "level": 4,
+          "title": "Description",
+          "line": 2342,
+          "end_line": 2345
+        },
+        {
+          "level": 4,
+          "title": "Parameters",
+          "line": 2346,
+          "end_line": 2375
+        },
+        {
+          "level": 4,
+          "title": "Notes and restrictions",
+          "line": 2376,
+          "end_line": 2387
+        },
+        {
+          "level": 4,
+          "title": "Examples",
+          "line": 2388,
+          "end_line": 2417
+        },
+        {
+          "level": 2,
+          "title": "SEQUENCE statements",
+          "line": 2418,
+          "end_line": 2421
+        },
+        {
+          "level": 3,
+          "title": "CREATE SEQUENCE",
+          "line": 2422,
+          "end_line": 2425
+        },
+        {
+          "level": 4,
+          "title": "Syntax",
+          "line": 2426,
+          "end_line": 2439
+        },
+        {
+          "level": 4,
+          "title": "Description",
+          "line": 2440,
+          "end_line": 2443
+        },
+        {
+          "level": 4,
+          "title": "Parameters",
+          "line": 2444,
+          "end_line": 2467
+        },
+        {
+          "level": 4,
+          "title": "Examples",
+          "line": 2468,
+          "end_line": 2495
+        },
+        {
+          "level": 3,
+          "title": "ALTER SEQUENCE",
+          "line": 2496,
+          "end_line": 2499
+        },
+        {
+          "level": 4,
+          "title": "Syntax",
+          "line": 2500,
+          "end_line": 2510
+        },
+        {
+          "level": 4,
+          "title": "Description",
+          "line": 2511,
+          "end_line": 2514
+        },
+        {
+          "level": 4,
+          "title": "Parameters",
+          "line": 2515,
+          "end_line": 2530
+        },
+        {
+          "level": 4,
+          "title": "Examples",
+          "line": 2531,
+          "end_line": 2539
+        },
+        {
+          "level": 3,
+          "title": "DROP SEQUENCE",
+          "line": 2540,
+          "end_line": 2543
+        },
+        {
+          "level": 4,
+          "title": "Syntax",
+          "line": 2544,
+          "end_line": 2549
+        },
+        {
+          "level": 4,
+          "title": "Description",
+          "line": 2550,
+          "end_line": 2553
+        },
+        {
+          "level": 4,
+          "title": "Parameters",
+          "line": 2554,
+          "end_line": 2561
+        },
+        {
+          "level": 2,
+          "title": "STATISTICS statements",
+          "line": 2562,
+          "end_line": 2565
+        },
+        {
+          "level": 3,
+          "title": "ALTER STATISTICS",
+          "line": 2566,
+          "end_line": 2569
+        },
+        {
+          "level": 4,
+          "title": "Syntax",
+          "line": 2570,
+          "end_line": 2585
+        },
+        {
+          "level": 4,
+          "title": "Description",
+          "line": 2586,
+          "end_line": 2593
+        },
+        {
+          "level": 4,
+          "title": "Parameters",
+          "line": 2594,
+          "end_line": 2609
+        },
+        {
+          "level": 3,
+          "title": "ANALYZE",
+          "line": 2610,
+          "end_line": 2613
+        },
+        {
+          "level": 4,
+          "title": "Syntax",
+          "line": 2614,
+          "end_line": 2619
+        },
+        {
+          "level": 4,
+          "title": "Description",
+          "line": 2620,
+          "end_line": 2623
+        },
+        {
+          "level": 2,
+          "title": "MODEL statements",
+          "line": 2624,
+          "end_line": 2627
+        },
+        {
+          "level": 3,
+          "title": "CREATE MODEL and CREATE OR REPLACE MODEL",
+          "line": 2628,
+          "end_line": 2633
+        },
+        {
+          "level": 4,
+          "title": "Syntax",
+          "line": 2634,
+          "end_line": 2657
+        },
+        {
+          "level": 4,
+          "title": "Description",
+          "line": 2658,
+          "end_line": 2669
+        },
+        {
+          "level": 4,
+          "title": "Model endpoint access control",
+          "line": 2670,
+          "end_line": 2683
+        },
+        {
+          "level": 4,
+          "title": "Parameters",
+          "line": 2684,
+          "end_line": 2727
+        },
+        {
+          "level": 3,
+          "title": "ALTER MODEL",
+          "line": 2728,
+          "end_line": 2733
+        },
+        {
+          "level": 4,
+          "title": "Syntax",
+          "line": 2734,
+          "end_line": 2747
+        },
+        {
+          "level": 4,
+          "title": "Description",
+          "line": 2748,
+          "end_line": 2751
+        },
+        {
+          "level": 4,
+          "title": "Parameters",
+          "line": 2752,
+          "end_line": 2769
+        },
+        {
+          "level": 3,
+          "title": "DROP MODEL",
+          "line": 2770,
+          "end_line": 2773
+        },
+        {
+          "level": 4,
+          "title": "Syntax",
+          "line": 2774,
+          "end_line": 2779
+        },
+        {
+          "level": 4,
+          "title": "Description",
+          "line": 2780,
+          "end_line": 2785
+        },
+        {
+          "level": 4,
+          "title": "Parameters",
+          "line": 2786,
+          "end_line": 2791
+        },
+        {
+          "level": 2,
+          "title": "VECTOR INDEX statements",
+          "line": 2792,
+          "end_line": 2795
+        },
+        {
+          "level": 3,
+          "title": "CREATE VECTOR INDEX",
+          "line": 2796,
+          "end_line": 2799
+        },
+        {
+          "level": 4,
+          "title": "Syntax",
+          "line": 2800,
+          "end_line": 2809
+        },
+        {
+          "level": 4,
+          "title": "Parameters",
+          "line": 2810,
+          "end_line": 2847
+        },
+        {
+          "level": 4,
+          "title": "Description",
+          "line": 2848,
+          "end_line": 2851
+        },
+        {
+          "level": 4,
+          "title": "`index_option_list`",
+          "line": 2852,
+          "end_line": 2865
+        },
+        {
+          "level": 4,
+          "title": "Examples",
+          "line": 2866,
+          "end_line": 2891
+        },
+        {
+          "level": 3,
+          "title": "`ALTER VECTOR INDEX` statement",
+          "line": 2892,
+          "end_line": 2895
+        },
+        {
+          "level": 4,
+          "title": "Syntax",
+          "line": 2896,
+          "end_line": 2911
+        },
+        {
+          "level": 4,
+          "title": "Description",
+          "line": 2912,
+          "end_line": 2929
+        },
+        {
+          "level": 4,
+          "title": "Parameters",
+          "line": 2930,
+          "end_line": 2943
+        },
+        {
+          "level": 4,
+          "title": "Examples",
+          "line": 2944,
+          "end_line": 2952
+        },
+        {
+          "level": 3,
+          "title": "`DROP VECTOR INDEX` statement",
+          "line": 2953,
+          "end_line": 2956
+        },
+        {
+          "level": 4,
+          "title": "Syntax",
+          "line": 2957,
+          "end_line": 2962
+        },
+        {
+          "level": 4,
+          "title": "Parameters",
+          "line": 2963,
+          "end_line": 2966
+        },
+        {
+          "level": 4,
+          "title": "Example",
+          "line": 2967,
+          "end_line": 2973
+        }
+      ],
+      "review_status": "all reference sections read and dispositioned in the associated Research Note",
+      "heading_count": 214,
+      "content_sha256": "e6048b4725138b57cffb8c0d488410a3e28c56477fc54b44f2d533b848d909b9"
+    },
+    {
+      "name": "documents/docs.cloud.google.com/spanner/docs/reference/standard-sql/dml-syntax",
+      "uri": "https://docs.cloud.google.com/spanner/docs/reference/standard-sql/dml-syntax",
+      "update_time": "2026-10-01T01:23:56Z",
+      "line_count": 1292,
+      "headings": [
+        {
+          "level": 2,
+          "title": "Tables used in examples",
+          "line": 5,
+          "end_line": 61
+        },
+        {
+          "level": 3,
+          "title": "Definitions for protocol buffers used in examples",
+          "line": 62,
+          "end_line": 97
+        },
+        {
+          "level": 2,
+          "title": "Notation used in the syntax",
+          "line": 98,
+          "end_line": 109
+        },
+        {
+          "level": 2,
+          "title": "INSERT statement",
+          "line": 110,
+          "end_line": 192
+        },
+        {
+          "level": 3,
+          "title": "Value type compatibility",
+          "line": 193,
+          "end_line": 199
+        },
+        {
+          "level": 3,
+          "title": "Default values",
+          "line": 200,
+          "end_line": 215
+        },
+        {
+          "level": 3,
+          "title": "INSERT OR IGNORE",
+          "line": 216,
+          "end_line": 230
+        },
+        {
+          "level": 3,
+          "title": "INSERT OR UPDATE",
+          "line": 231,
+          "end_line": 248
+        },
+        {
+          "level": 3,
+          "title": "`ON CONFLICT DO NOTHING`",
+          "line": 249,
+          "end_line": 258
+        },
+        {
+          "level": 3,
+          "title": "`ON CONFLICT DO UPDATE`",
+          "line": 259,
+          "end_line": 275
+        },
+        {
+          "level": 3,
+          "title": "`conflict_target` parameter",
+          "line": 276,
+          "end_line": 294
+        },
+        {
+          "level": 3,
+          "title": "THEN RETURN",
+          "line": 295,
+          "end_line": 312
+        },
+        {
+          "level": 2,
+          "title": "INSERT examples",
+          "line": 313,
+          "end_line": 316
+        },
+        {
+          "level": 3,
+          "title": "INSERT using literal values examples",
+          "line": 317,
+          "end_line": 335
+        },
+        {
+          "level": 3,
+          "title": "INSERT using a SELECT statement example",
+          "line": 336,
+          "end_line": 374
+        },
+        {
+          "level": 3,
+          "title": "INSERT using a subquery example",
+          "line": 375,
+          "end_line": 418
+        },
+        {
+          "level": 3,
+          "title": "INSERT with THEN RETURN examples",
+          "line": 419,
+          "end_line": 463
+        },
+        {
+          "level": 3,
+          "title": "INSERT OR IGNORE example",
+          "line": 464,
+          "end_line": 476
+        },
+        {
+          "level": 3,
+          "title": "INSERT with ON CONFLICT DO UPDATE examples",
+          "line": 477,
+          "end_line": 535
+        },
+        {
+          "level": 3,
+          "title": "INSERT with ON CONFLICT DO NOTHING examples",
+          "line": 536,
+          "end_line": 552
+        },
+        {
+          "level": 2,
+          "title": "DELETE statement",
+          "line": 553,
+          "end_line": 572
+        },
+        {
+          "level": 3,
+          "title": "WHERE clause",
+          "line": 573,
+          "end_line": 582
+        },
+        {
+          "level": 3,
+          "title": "Aliases",
+          "line": 583,
+          "end_line": 592
+        },
+        {
+          "level": 3,
+          "title": "THEN RETURN",
+          "line": 593,
+          "end_line": 596
+        },
+        {
+          "level": 3,
+          "title": "Statement hints",
+          "line": 597,
+          "end_line": 604
+        },
+        {
+          "level": 3,
+          "title": "Table hints",
+          "line": 605,
+          "end_line": 613
+        },
+        {
+          "level": 2,
+          "title": "DELETE examples",
+          "line": 614,
+          "end_line": 617
+        },
+        {
+          "level": 3,
+          "title": "DELETE with WHERE clause example",
+          "line": 618,
+          "end_line": 640
+        },
+        {
+          "level": 3,
+          "title": "DELETE with subquery example",
+          "line": 641,
+          "end_line": 680
+        },
+        {
+          "level": 3,
+          "title": "DELETE with THEN RETURN example",
+          "line": 681,
+          "end_line": 695
+        },
+        {
+          "level": 2,
+          "title": "UPDATE statement",
+          "line": 696,
+          "end_line": 759
+        },
+        {
+          "level": 3,
+          "title": "Value type compatibility",
+          "line": 760,
+          "end_line": 766
+        },
+        {
+          "level": 3,
+          "title": "Default values",
+          "line": 767,
+          "end_line": 781
+        },
+        {
+          "level": 3,
+          "title": "`ON UPDATE`",
+          "line": 782,
+          "end_line": 799
+        },
+        {
+          "level": 3,
+          "title": "WHERE clause",
+          "line": 800,
+          "end_line": 805
+        },
+        {
+          "level": 3,
+          "title": "THEN RETURN",
+          "line": 806,
+          "end_line": 809
+        },
+        {
+          "level": 3,
+          "title": "Aliases",
+          "line": 810,
+          "end_line": 821
+        },
+        {
+          "level": 2,
+          "title": "UPDATE examples",
+          "line": 822,
+          "end_line": 825
+        },
+        {
+          "level": 3,
+          "title": "UPDATE with literal values example",
+          "line": 826,
+          "end_line": 851
+        },
+        {
+          "level": 3,
+          "title": "UPDATE ARRAY columns example",
+          "line": 852,
+          "end_line": 875
+        },
+        {
+          "level": 3,
+          "title": "UPDATE with THEN RETURN example",
+          "line": 876,
+          "end_line": 892
+        },
+        {
+          "level": 2,
+          "title": "Bound STRUCT parameters",
+          "line": 893,
+          "end_line": 896
+        },
+        {
+          "level": 3,
+          "title": "C#",
+          "line": 897,
+          "end_line": 927
+        },
+        {
+          "level": 3,
+          "title": "Go",
+          "line": 928,
+          "end_line": 969
+        },
+        {
+          "level": 3,
+          "title": "Java",
+          "line": 970,
+          "end_line": 993
+        },
+        {
+          "level": 3,
+          "title": "Node.js",
+          "line": 994,
+          "end_line": 1045
+        },
+        {
+          "level": 3,
+          "title": "PHP",
+          "line": 1046,
+          "end_line": 1099
+        },
+        {
+          "level": 3,
+          "title": "Python",
+          "line": 1100,
+          "end_line": 1130
+        },
+        {
+          "level": 3,
+          "title": "Ruby",
+          "line": 1131,
+          "end_line": 1155
+        },
+        {
+          "level": 2,
+          "title": "Commit timestamps",
+          "line": 1156,
+          "end_line": 1165
+        },
+        {
+          "level": 2,
+          "title": "Update fields in protocol buffers",
+          "line": 1166,
+          "end_line": 1185
+        },
+        {
+          "level": 3,
+          "title": "Nested updates",
+          "line": 1186,
+          "end_line": 1244
+        },
+        {
+          "level": 3,
+          "title": "Modify multiple fields",
+          "line": 1245,
+          "end_line": 1292
+        }
+      ],
+      "review_status": "all reference sections read and dispositioned in the associated Research Note",
+      "heading_count": 53,
+      "content_sha256": "07a531c5a8f4c24fd4f2063ea7481e47b38810c0c28a0f6410cd463f4f79f948"
+    },
+    {
+      "name": "documents/docs.cloud.google.com/spanner/quotas",
+      "uri": "https://docs.cloud.google.com/spanner/quotas",
+      "update_time": "2026-10-10T21:28:22Z",
+      "line_count": 318,
+      "headings": [
+        {
+          "level": 2,
+          "title": "Permissions to check and edit quotas",
+          "line": 5,
+          "end_line": 12
+        },
+        {
+          "level": 2,
+          "title": "Check your quotas",
+          "line": 13,
+          "end_line": 18
+        },
+        {
+          "level": 2,
+          "title": "Increase your quotas",
+          "line": 19,
+          "end_line": 26
+        },
+        {
+          "level": 2,
+          "title": "Node limits",
+          "line": 27,
+          "end_line": 32
+        },
+        {
+          "level": 2,
+          "title": "Instance limits",
+          "line": 33,
+          "end_line": 38
+        },
+        {
+          "level": 3,
+          "title": "Free trial instance limits",
+          "line": 39,
+          "end_line": 50
+        },
+        {
+          "level": 3,
+          "title": "Geo-partitioning limits",
+          "line": 51,
+          "end_line": 62
+        },
+        {
+          "level": 3,
+          "title": "Saved queries limits",
+          "line": 63,
+          "end_line": 73
+        },
+        {
+          "level": 2,
+          "title": "Instance configuration limits",
+          "line": 74,
+          "end_line": 80
+        },
+        {
+          "level": 2,
+          "title": "Database limits",
+          "line": 81,
+          "end_line": 122
+        },
+        {
+          "level": 2,
+          "title": "Backup and restore limits",
+          "line": 123,
+          "end_line": 130
+        },
+        {
+          "level": 2,
+          "title": "Schema limits",
+          "line": 131,
+          "end_line": 132
+        },
+        {
+          "level": 3,
+          "title": "Schema objects",
+          "line": 133,
+          "end_line": 138
+        },
+        {
+          "level": 3,
+          "title": "DDL statements",
+          "line": 139,
+          "end_line": 145
+        },
+        {
+          "level": 3,
+          "title": "Graphs",
+          "line": 146,
+          "end_line": 152
+        },
+        {
+          "level": 3,
+          "title": "Tables",
+          "line": 153,
+          "end_line": 167
+        },
+        {
+          "level": 3,
+          "title": "Indexes",
+          "line": 168,
+          "end_line": 176
+        },
+        {
+          "level": 3,
+          "title": "Views",
+          "line": 177,
+          "end_line": 184
+        },
+        {
+          "level": 3,
+          "title": "Locality groups",
+          "line": 185,
+          "end_line": 192
+        },
+        {
+          "level": 2,
+          "title": "Query limits",
+          "line": 193,
+          "end_line": 212
+        },
+        {
+          "level": 2,
+          "title": "Limits for creating, reading, updating, and deleting data",
+          "line": 213,
+          "end_line": 223
+        },
+        {
+          "level": 2,
+          "title": "Administrative limits",
+          "line": 224,
+          "end_line": 230
+        },
+        {
+          "level": 2,
+          "title": "Request limits",
+          "line": 231,
+          "end_line": 236
+        },
+        {
+          "level": 2,
+          "title": "Change stream limits",
+          "line": 237,
+          "end_line": 244
+        },
+        {
+          "level": 2,
+          "title": "Data Boost limits",
+          "line": 245,
+          "end_line": 252
+        },
+        {
+          "level": 2,
+          "title": "Queue limits",
+          "line": 253,
+          "end_line": 259
+        },
+        {
+          "level": 2,
+          "title": "Pre-splitting API limits",
+          "line": 260,
+          "end_line": 269
+        },
+        {
+          "level": 2,
+          "title": "Notes",
+          "line": 270,
+          "end_line": 318
+        }
+      ],
+      "review_status": "supporting mutation-count and API-scope sections read; inventory is not a claim of exhaustive non-write quota analysis",
+      "heading_count": 28,
+      "content_sha256": "1016f89f24edb38eeac94f6324b7a78b2585faae64a9c38d1ec7e2470d8b6c1d"
+    },
+    {
+      "name": "documents/docs.cloud.google.com/spanner/docs/dml-versus-mutations",
+      "uri": "https://docs.cloud.google.com/spanner/docs/dml-versus-mutations",
+      "update_time": "2026-10-07T09:39:47Z",
+      "line_count": 127,
+      "headings": [
+        {
+          "level": 2,
+          "title": "What is Data Manipulation Language (DML)?",
+          "line": 3,
+          "end_line": 22
+        },
+        {
+          "level": 2,
+          "title": "What are mutations?",
+          "line": 23,
+          "end_line": 28
+        },
+        {
+          "level": 2,
+          "title": "Feature comparison between DML and mutations",
+          "line": 29,
+          "end_line": 54
+        },
+        {
+          "level": 2,
+          "title": "Best practice - avoid mixing DML and mutation in the same transaction",
+          "line": 55,
+          "end_line": 118
+        },
+        {
+          "level": 2,
+          "title": "What's next?",
+          "line": 119,
+          "end_line": 127
+        }
+      ],
+      "review_status": "supporting mutation-count and API-scope sections read; inventory is not a claim of exhaustive non-write quota analysis",
+      "heading_count": 5,
+      "content_sha256": "2723793662f37d6b222b77e7410f22a4a9172c179036008fb5562d21ec6a5773"
+    },
+    {
+      "name": "documents/docs.cloud.google.com/spanner/docs/dml-best-practices",
+      "uri": "https://docs.cloud.google.com/spanner/docs/dml-best-practices",
+      "update_time": "2026-10-23T19:40:06Z",
+      "line_count": 328,
+      "headings": [
+        {
+          "level": 2,
+          "title": "Use a `WHERE` clause to reduce the scope of locks",
+          "line": 3,
+          "end_line": 44
+        },
+        {
+          "level": 2,
+          "title": "Avoid using DML statements and mutations in the same transaction",
+          "line": 45,
+          "end_line": 52
+        },
+        {
+          "level": 2,
+          "title": "Use the `PENDING_COMMIT_TIMESTAMP` function to write commit timestamps",
+          "line": 53,
+          "end_line": 54
+        },
+        {
+          "level": 3,
+          "title": "GoogleSQL",
+          "line": 55,
+          "end_line": 60
+        },
+        {
+          "level": 3,
+          "title": "PostgreSQL",
+          "line": 61,
+          "end_line": 66
+        },
+        {
+          "level": 2,
+          "title": "Partitioned DML and date and timestamp functions",
+          "line": 67,
+          "end_line": 70
+        },
+        {
+          "level": 2,
+          "title": "Improve latency with batch DML",
+          "line": 71,
+          "end_line": 105
+        },
+        {
+          "level": 3,
+          "title": "Enable client-side batching in JDBC",
+          "line": 106,
+          "end_line": 124
+        },
+        {
+          "level": 2,
+          "title": "Use the `last_statement` option to reduce DML latency",
+          "line": 125,
+          "end_line": 145
+        },
+        {
+          "level": 3,
+          "title": "Go",
+          "line": 146,
+          "end_line": 147
+        },
+        {
+          "level": 3,
+          "title": "GoogleSQL",
+          "line": 148,
+          "end_line": 190
+        },
+        {
+          "level": 3,
+          "title": "PostgreSQL",
+          "line": 191,
+          "end_line": 233
+        },
+        {
+          "level": 3,
+          "title": "Java",
+          "line": 234,
+          "end_line": 235
+        },
+        {
+          "level": 3,
+          "title": "GoogleSQL",
+          "line": 236,
+          "end_line": 257
+        },
+        {
+          "level": 3,
+          "title": "PostgreSQL",
+          "line": 258,
+          "end_line": 278
+        },
+        {
+          "level": 3,
+          "title": "Python",
+          "line": 279,
+          "end_line": 280
+        },
+        {
+          "level": 3,
+          "title": "GoogleSQL",
+          "line": 281,
+          "end_line": 305
+        },
+        {
+          "level": 3,
+          "title": "PostgreSQL",
+          "line": 306,
+          "end_line": 328
+        }
+      ],
+      "review_status": "supporting mutation-count and API-scope sections read; inventory is not a claim of exhaustive non-write quota analysis",
+      "heading_count": 18,
+      "content_sha256": "8e2765587dece3f04c9f3b9ae0677588fff3a6cb84cbb389b6740a80cf5eb270"
+    }
+  ]
+}

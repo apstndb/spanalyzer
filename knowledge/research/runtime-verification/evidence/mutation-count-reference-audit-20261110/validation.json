@@ -1,0 +1,93 @@
+{
+  "recorded_on_jst": "2026-11-10",
+  "source_base_commit": "f53e0a8d66d179c1c1cc4d9d798bb6f3e7f7d42a",
+  "source_branch": "feat/mutation-count-investigation-20261110",
+  "source_status": "local uncommitted preview",
+  "commands": [
+    {
+      "command": "go test -race -count=1 ./...",
+      "directory": ".",
+      "exit_code": 0
+    },
+    {
+      "command": "go test -count=1 ./...",
+      "directory": "cmd/spanner-query-gen",
+      "exit_code": 0
+    },
+    {
+      "command": "GOWORK=off go test -count=1 ./...",
+      "directory": "tools",
+      "exit_code": 0
+    },
+    {
+      "command": "mise run pre-push",
+      "directory": ".",
+      "exit_code": 0
+    },
+    {
+      "command": "go run ./okf-check --repo-root .. --gate all",
+      "directory": "tools",
+      "exit_code": 0
+    },
+    {
+      "command": "go run ./markdown-language-check --repo-root ..",
+      "directory": "tools",
+      "exit_code": 0
+    }
+  ],
+  "producer_and_core_go_source_sha256": {
+    "cmd/spanner-analyzer/main.go": "b347d2854a4171aed44364af4527c4c8815d9c186263c3311fff94e446b23492",
+    "cmd/spanner-analyzer/mutation_count.go": "599e08802c01147e7dc07b47acfd1e0bd9337d4199c63f13983e91d4620c6750",
+    "cmd/spanner-analyzer/mutation_count_test.go": "3a1a1360335fee0c75d3fa1015bae251618fe04be1a04efcef9ffe0cfa6c5079",
+    "doc.go": "01ed296bb2f7b586397f8f235e794cc648a903a7407c4eab8efd7a5625312ec7",
+    "internal/querygen/mutation_count.go": "58c35a1ea3912bc44f20c5511f2f57a70eda7f8fca0d9fb95f982529792013a5",
+    "internal/querygen/mutation_count_test.go": "cf4cf37c9490469c70edcc39f908a4af051306f45d81de3d8b20c712f58dc2d2",
+    "internal/querygen/querygen.go": "1a3f643dd75de744cea0bda57fa439582c50ac73da04a64f9933b4c75d8761a8",
+    "mutation_count.go": "9f2e6aba080b5b8f36d29f9287c8f4f82ac968ff09083f181426cfd244399c84",
+    "mutation_count_batch.go": "ae1f3f29bcf91d0081cc52b99e175efb7dc41c29e5ad1e63364b5ae9074aeeb9",
+    "mutation_count_dependencies_test.go": "a30276a186e6943686a17381302ae5bfb3d1d2b6f4ac8add8b34fe0ed14a9c01",
+    "mutation_count_input.go": "d09310370756ae1bb16b30ef1150f5be4e63c2d181f026cd3ef9d6f75081fc43",
+    "mutation_count_managed_test.go": "f9d3b62e560fe8da47a91fe31513e3cf59ed7716152126f8dccc2b7dbadc82fc",
+    "mutation_count_model.go": "c0e89b4d7cc96f0786ae818edd26213aa50a651bc8240b0fb49eda8710bd30ca",
+    "mutation_count_queue.go": "ca9f947417c07752d1b75352f428214db97abcb437d629fb9defd424b159b3a7",
+    "mutation_count_queues_managed_test.go": "53190331ec05c33a7db3d2d13bc4f1e3aa2463d72e85bd19bd0d64b811e5ed0f",
+    "mutation_count_schema.go": "9f1021a860e919aad56d58260436d114c71397633de64e35d27b1ec97a8e8bd5",
+    "mutation_count_test.go": "8b09fc9408699fd0f28dc652a3aa9a3cfd15bfac99c3133727d8c3f418939fe3",
+    "tools/mutation-count-lab/batch.go": "d6286fb4bc5a7d5628e3f93f49d96dc09c8ff61af21b0147ec4ab3daa7e29894",
+    "tools/mutation-count-lab/count.go": "552d00d82032e79700b3ece4c37c524b5f054c149d700bb650c00cd8f5b5fa82",
+    "tools/mutation-count-lab/count_test.go": "6bb29e22eb6e169777fc386124d4b91ce909b84c092b3372e7356118e7f077b5",
+    "tools/mutation-count-lab/input.go": "f3f6b6ff792334a89a60819e64fc7162d77b371ff812be4cee4b81a5584dbcca",
+    "tools/mutation-count-lab/main.go": "185d2d0f2e658a0efaae8b8c95af1b8a874d93ec8f76bb6bfb5ff4460bf64d3f",
+    "tools/mutation-count-lab/managed-probe/extended.go": "71fc1e71c1f2c31d7f3e6cb884b5c290deb347371a25a27d29641f3d24dba6fc",
+    "tools/mutation-count-lab/managed-probe/lease.go": "e2bfae2e2b70b0ee9f16a0357a4b4e2c560bd45f9c9a4c6561305d5254cbaf6e",
+    "tools/mutation-count-lab/managed-probe/lifecycle.go": "983990256f028dd24d9847250c956defa56d9cc5510cfe28f04b20effd46484a",
+    "tools/mutation-count-lab/managed-probe/lifecycle_test.go": "4ebfce8c03f22a298ab56328a4d33ce38cebaae513fe4b9c03f8f9259388f075",
+    "tools/mutation-count-lab/managed-probe/main.go": "10dfd72070e362c61c0cd7cb0a8fdbbcb038cf0ec8ffb19273e1691423967cdd",
+    "tools/mutation-count-lab/managed-probe/queue_ignore.go": "4480d5724276e6608f5b02e7b6293790418a0799edcc34629d6a80f2fd87454b",
+    "tools/mutation-count-lab/managed-probe/queue_matrix.go": "3f33f3db035e8e94fedc5989484c232e04f837e3b53c65df1d7ad7609181f6ae",
+    "tools/mutation-count-lab/managed-probe/queue_matrix_runtime.go": "b59eb3a42ced1eaaf38fc5155e541b808d9d7fc7bea9b3c08cc2bc0ada3b75e0",
+    "tools/mutation-count-lab/managed-probe/queue_matrix_test.go": "469ba3a64b46ddba0889b143571f93086a04543b7357cdd2f9946f2b58979068",
+    "tools/mutation-count-lab/managed-probe/resume.go": "fa2b3564bc1b44af17d89321fbadb81d2488a0bc3503fa927464f9524eb90cf1",
+    "tools/mutation-count-lab/managed-probe/schema.go": "0127cff5edd1d36196fbeb77091d161c41b68b8a0be6bf332d01abd6686fd061",
+    "tools/mutation-count-lab/probe/main.go": "fdc57f236ee84b0e121aeeaf78f11774bda4b46d43338cf40c866e217f73dc92",
+    "tools/mutation-count-lab/schema.go": "a915c0bb955bbfc3e79919995e571a08b39514d9e7570d7ab35529f1977e1bc6"
+  },
+  "primary_fixtures_sha256": {
+    "testdata/mutation-count/managed-20261110.json.gz": "1ba20aa27b09c3f82b0d0beaaf221c091d6b658c4b11082f933f25da8544b224",
+    "testdata/mutation-count/managed-queues-20261110.json.gz": "6e235b73015ce2d86a6345c4e47d57a9eefc1b2073248bb3c92551958750ee1b",
+    "testdata/mutation-count/managed-queues-ignore-20261110.json.gz": "f82162ffec45e31e4f941dfb4d566e1299bab6f694df72d305e57876eb0a8a96"
+  },
+  "log_sha256": {
+    "root-race": "c350a0ce3c42362e09c173b5120dd500f7d6dde9f8a7337e2818608c6b8212ea",
+    "consumer": "e4e6ee1b2d6f25a3a4042cefacacf6b2ca0da95c906321ca89e56949d1cc6fc9",
+    "tools": "ebbbdef5e118d7adce99a340fa1c86dc8149da92da9e71809e1038d288c39445",
+    "okf": "215b3d053ac8e5274c4c33a4e2fac65c410990f964cb2cf3066735d39e8f196e",
+    "language": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "pre-push-host": "ec58f6ce769ff70f0fa1add3a723e2423b114113198bb4ded0213d4f91789746"
+  },
+  "pre_push_retry": "The sandbox gate passed lint but vuln.go.dev DNS failed; the same gate with host networking completed successfully. Task-local lint cache avoids sandbox cache warnings.",
+  "security_scan_boundary": "Zero called vulnerabilities in all five modules; module-level advisories without called symbols are not represented as reachable findings.",
+  "managed_boundary": "Only the explicitly approved one-DB follow-up ran; 43 attempts, 32 CommitStats, drop OK and NotFound. Automatic-column corrections are source-backed local tests, not extra managed probes.",
+  "replay_boundary": "30 follow-up measurements replay; two successful DELETE assertion inputs remain explicit pinned-parser gaps.",
+  "evidence_boundary": "Agent-recorded source/log digests support integrity and provenance, not independent execution attestation."
+}

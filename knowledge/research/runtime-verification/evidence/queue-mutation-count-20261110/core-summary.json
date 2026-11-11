@@ -1,0 +1,3805 @@
+{
+  "fixture_status": "complete",
+  "transaction_attempts": 319,
+  "successful_with_stats": 270,
+  "modeled_measurements": 268,
+  "baseline_contains_observation": 268,
+  "same_input_measured_refinements": 268,
+  "unknown_queue_query_reports": 17,
+  "unmodeled_scopes": [
+    "composition/dml-insert-buffered-ack: combined DML and buffered mutations need a combined scope",
+    "composition/dml-table-buffered-send: combined DML and buffered mutations need a combined scope"
+  ],
+  "analysis_errors": null,
+  "disagreements": null,
+  "cases": [
+    {
+      "id": "send/Messages/bytes=0/delivery=default",
+      "status": "OK",
+      "observed": 5,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 5,
+        "upper": 5
+      }
+    },
+    {
+      "id": "send/Messages/bytes=0/delivery=past",
+      "status": "OK",
+      "observed": 5,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 5,
+        "upper": 5
+      }
+    },
+    {
+      "id": "send/Messages/bytes=0/delivery=future",
+      "status": "OK",
+      "observed": 5,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 5,
+        "upper": 5
+      }
+    },
+    {
+      "id": "send/Messages/bytes=1/delivery=default",
+      "status": "OK",
+      "observed": 5,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 5,
+        "upper": 5
+      }
+    },
+    {
+      "id": "send/Messages/bytes=1/delivery=past",
+      "status": "OK",
+      "observed": 5,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 5,
+        "upper": 5
+      }
+    },
+    {
+      "id": "send/Messages/bytes=1/delivery=future",
+      "status": "OK",
+      "observed": 5,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 5,
+        "upper": 5
+      }
+    },
+    {
+      "id": "send/Messages/bytes=8192/delivery=default",
+      "status": "OK",
+      "observed": 5,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 5,
+        "upper": 5
+      }
+    },
+    {
+      "id": "send/Messages/bytes=8192/delivery=past",
+      "status": "OK",
+      "observed": 5,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 5,
+        "upper": 5
+      }
+    },
+    {
+      "id": "send/Messages/bytes=8192/delivery=future",
+      "status": "OK",
+      "observed": 5,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 5,
+        "upper": 5
+      }
+    },
+    {
+      "id": "send/duplicate/Messages/same=true",
+      "status": "AlreadyExists",
+      "error": "Row [<internal>,<internal>,2,<internal>,m-0000010] in table _Queue_Index_Messages already exists",
+      "observed": null
+    },
+    {
+      "id": "send/duplicate/Messages/same=false",
+      "status": "AlreadyExists",
+      "error": "Row [<internal>,<internal>,2,<internal>,m-0000011] in table _Queue_Index_Messages already exists",
+      "observed": null
+    },
+    {
+      "id": "ack/Messages/present=false/ignore=false",
+      "status": "NotFound",
+      "error": "Message not found: Messages(m-0000012)",
+      "observed": null
+    },
+    {
+      "id": "ack/Messages/present=false/ignore=true",
+      "status": "OK",
+      "observed": 1,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 1,
+        "upper": 1
+      }
+    },
+    {
+      "id": "ack/Messages/present=true/ignore=false",
+      "status": "OK",
+      "observed": 2,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 2,
+        "upper": 2
+      }
+    },
+    {
+      "id": "ack/Messages/present=true/ignore=true",
+      "status": "OK",
+      "observed": 2,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 2,
+        "upper": 2
+      }
+    },
+    {
+      "id": "batch/send/Messages/n=2",
+      "status": "OK",
+      "observed": 10,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 10,
+        "upper": 10
+      }
+    },
+    {
+      "id": "batch/ack/Messages/n=2",
+      "status": "OK",
+      "observed": 4,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 4,
+        "upper": 4
+      }
+    },
+    {
+      "id": "batch/send/Messages/n=10",
+      "status": "OK",
+      "observed": 50,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 50,
+        "upper": 50
+      }
+    },
+    {
+      "id": "batch/ack/Messages/n=10",
+      "status": "OK",
+      "observed": 20,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 20,
+        "upper": 20
+      }
+    },
+    {
+      "id": "dml/insert/Messages/n=1/delivery=false",
+      "status": "OK",
+      "observed": 5,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 5,
+        "upper": 5
+      }
+    },
+    {
+      "id": "dml/insert/Messages/n=1/delivery=true",
+      "status": "OK",
+      "observed": 5,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 5,
+        "upper": 5
+      }
+    },
+    {
+      "id": "dml/insert/Messages/n=2/delivery=false",
+      "status": "OK",
+      "observed": 10,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 10,
+        "upper": 10
+      }
+    },
+    {
+      "id": "dml/insert/Messages/n=2/delivery=true",
+      "status": "OK",
+      "observed": 10,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 10,
+        "upper": 10
+      }
+    },
+    {
+      "id": "dml/insert/Messages/n=10/delivery=false",
+      "status": "OK",
+      "observed": 50,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 50,
+        "upper": 50
+      }
+    },
+    {
+      "id": "dml/insert/Messages/n=10/delivery=true",
+      "status": "OK",
+      "observed": 50,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 50,
+        "upper": 50
+      }
+    },
+    {
+      "id": "dml/delete/Messages/n=0",
+      "status": "OK",
+      "observed": 0,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 0,
+        "upper": 0
+      }
+    },
+    {
+      "id": "dml/delete/Messages/n=1",
+      "status": "OK",
+      "observed": 2,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 2,
+        "upper": 2
+      }
+    },
+    {
+      "id": "dml/delete/Messages/n=3",
+      "status": "OK",
+      "observed": 6,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 6,
+        "upper": 6
+      }
+    },
+    {
+      "id": "dml/delete/Messages/n=10",
+      "status": "OK",
+      "observed": 20,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 20,
+        "upper": 20
+      }
+    },
+    {
+      "id": "send/TwoKeyMessages/bytes=0/delivery=default",
+      "status": "OK",
+      "observed": 5,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 5,
+        "upper": 5
+      }
+    },
+    {
+      "id": "send/TwoKeyMessages/bytes=0/delivery=past",
+      "status": "OK",
+      "observed": 5,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 5,
+        "upper": 5
+      }
+    },
+    {
+      "id": "send/TwoKeyMessages/bytes=0/delivery=future",
+      "status": "OK",
+      "observed": 5,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 5,
+        "upper": 5
+      }
+    },
+    {
+      "id": "send/TwoKeyMessages/bytes=1/delivery=default",
+      "status": "OK",
+      "observed": 5,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 5,
+        "upper": 5
+      }
+    },
+    {
+      "id": "send/TwoKeyMessages/bytes=1/delivery=past",
+      "status": "OK",
+      "observed": 5,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 5,
+        "upper": 5
+      }
+    },
+    {
+      "id": "send/TwoKeyMessages/bytes=1/delivery=future",
+      "status": "OK",
+      "observed": 5,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 5,
+        "upper": 5
+      }
+    },
+    {
+      "id": "send/TwoKeyMessages/bytes=8192/delivery=default",
+      "status": "OK",
+      "observed": 5,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 5,
+        "upper": 5
+      }
+    },
+    {
+      "id": "send/TwoKeyMessages/bytes=8192/delivery=past",
+      "status": "OK",
+      "observed": 5,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 5,
+        "upper": 5
+      }
+    },
+    {
+      "id": "send/TwoKeyMessages/bytes=8192/delivery=future",
+      "status": "OK",
+      "observed": 5,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 5,
+        "upper": 5
+      }
+    },
+    {
+      "id": "send/duplicate/TwoKeyMessages/same=true",
+      "status": "AlreadyExists",
+      "error": "Row [<internal>,<internal>,2,<internal>,1,m-0000090] in table _Queue_Index_TwoKeyMessages already exists",
+      "observed": null
+    },
+    {
+      "id": "send/duplicate/TwoKeyMessages/same=false",
+      "status": "AlreadyExists",
+      "error": "Row [<internal>,<internal>,2,<internal>,1,m-0000091] in table _Queue_Index_TwoKeyMessages already exists",
+      "observed": null
+    },
+    {
+      "id": "ack/TwoKeyMessages/present=false/ignore=false",
+      "status": "NotFound",
+      "error": "Message not found: TwoKeyMessages(1,m-0000092)",
+      "observed": null
+    },
+    {
+      "id": "ack/TwoKeyMessages/present=false/ignore=true",
+      "status": "OK",
+      "observed": 1,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 1,
+        "upper": 1
+      }
+    },
+    {
+      "id": "ack/TwoKeyMessages/present=true/ignore=false",
+      "status": "OK",
+      "observed": 2,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 2,
+        "upper": 2
+      }
+    },
+    {
+      "id": "ack/TwoKeyMessages/present=true/ignore=true",
+      "status": "OK",
+      "observed": 2,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 2,
+        "upper": 2
+      }
+    },
+    {
+      "id": "batch/send/TwoKeyMessages/n=2",
+      "status": "OK",
+      "observed": 10,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 10,
+        "upper": 10
+      }
+    },
+    {
+      "id": "batch/ack/TwoKeyMessages/n=2",
+      "status": "OK",
+      "observed": 4,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 4,
+        "upper": 4
+      }
+    },
+    {
+      "id": "batch/send/TwoKeyMessages/n=10",
+      "status": "OK",
+      "observed": 50,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 50,
+        "upper": 50
+      }
+    },
+    {
+      "id": "batch/ack/TwoKeyMessages/n=10",
+      "status": "OK",
+      "observed": 20,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 20,
+        "upper": 20
+      }
+    },
+    {
+      "id": "dml/insert/TwoKeyMessages/n=1/delivery=false",
+      "status": "OK",
+      "observed": 5,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 5,
+        "upper": 5
+      }
+    },
+    {
+      "id": "dml/insert/TwoKeyMessages/n=1/delivery=true",
+      "status": "OK",
+      "observed": 5,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 5,
+        "upper": 5
+      }
+    },
+    {
+      "id": "dml/insert/TwoKeyMessages/n=2/delivery=false",
+      "status": "OK",
+      "observed": 10,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 10,
+        "upper": 10
+      }
+    },
+    {
+      "id": "dml/insert/TwoKeyMessages/n=2/delivery=true",
+      "status": "OK",
+      "observed": 10,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 10,
+        "upper": 10
+      }
+    },
+    {
+      "id": "dml/insert/TwoKeyMessages/n=10/delivery=false",
+      "status": "OK",
+      "observed": 50,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 50,
+        "upper": 50
+      }
+    },
+    {
+      "id": "dml/insert/TwoKeyMessages/n=10/delivery=true",
+      "status": "OK",
+      "observed": 50,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 50,
+        "upper": 50
+      }
+    },
+    {
+      "id": "dml/delete/TwoKeyMessages/n=0",
+      "status": "OK",
+      "observed": 0,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 0,
+        "upper": 0
+      }
+    },
+    {
+      "id": "dml/delete/TwoKeyMessages/n=1",
+      "status": "OK",
+      "observed": 2,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 2,
+        "upper": 2
+      }
+    },
+    {
+      "id": "dml/delete/TwoKeyMessages/n=3",
+      "status": "OK",
+      "observed": 6,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 6,
+        "upper": 6
+      }
+    },
+    {
+      "id": "dml/delete/TwoKeyMessages/n=10",
+      "status": "OK",
+      "observed": 20,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 20,
+        "upper": 20
+      }
+    },
+    {
+      "id": "send/ThreeKeyMessages/bytes=0/delivery=default",
+      "status": "OK",
+      "observed": 5,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 5,
+        "upper": 5
+      }
+    },
+    {
+      "id": "send/ThreeKeyMessages/bytes=0/delivery=past",
+      "status": "OK",
+      "observed": 5,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 5,
+        "upper": 5
+      }
+    },
+    {
+      "id": "send/ThreeKeyMessages/bytes=0/delivery=future",
+      "status": "OK",
+      "observed": 5,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 5,
+        "upper": 5
+      }
+    },
+    {
+      "id": "send/ThreeKeyMessages/bytes=1/delivery=default",
+      "status": "OK",
+      "observed": 5,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 5,
+        "upper": 5
+      }
+    },
+    {
+      "id": "send/ThreeKeyMessages/bytes=1/delivery=past",
+      "status": "OK",
+      "observed": 5,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 5,
+        "upper": 5
+      }
+    },
+    {
+      "id": "send/ThreeKeyMessages/bytes=1/delivery=future",
+      "status": "OK",
+      "observed": 5,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 5,
+        "upper": 5
+      }
+    },
+    {
+      "id": "send/ThreeKeyMessages/bytes=8192/delivery=default",
+      "status": "OK",
+      "observed": 5,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 5,
+        "upper": 5
+      }
+    },
+    {
+      "id": "send/ThreeKeyMessages/bytes=8192/delivery=past",
+      "status": "OK",
+      "observed": 5,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 5,
+        "upper": 5
+      }
+    },
+    {
+      "id": "send/ThreeKeyMessages/bytes=8192/delivery=future",
+      "status": "OK",
+      "observed": 5,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 5,
+        "upper": 5
+      }
+    },
+    {
+      "id": "send/duplicate/ThreeKeyMessages/same=true",
+      "status": "AlreadyExists",
+      "error": "Row [<internal>,<internal>,2,<internal>,1,1,m-0000170] in table _Queue_Index_ThreeKeyMessages already exists",
+      "observed": null
+    },
+    {
+      "id": "send/duplicate/ThreeKeyMessages/same=false",
+      "status": "AlreadyExists",
+      "error": "Row [<internal>,<internal>,2,<internal>,1,1,m-0000171] in table _Queue_Index_ThreeKeyMessages already exists",
+      "observed": null
+    },
+    {
+      "id": "ack/ThreeKeyMessages/present=false/ignore=false",
+      "status": "NotFound",
+      "error": "Message not found: ThreeKeyMessages(1,1,m-0000172)",
+      "observed": null
+    },
+    {
+      "id": "ack/ThreeKeyMessages/present=false/ignore=true",
+      "status": "OK",
+      "observed": 1,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 1,
+        "upper": 1
+      }
+    },
+    {
+      "id": "ack/ThreeKeyMessages/present=true/ignore=false",
+      "status": "OK",
+      "observed": 2,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 2,
+        "upper": 2
+      }
+    },
+    {
+      "id": "ack/ThreeKeyMessages/present=true/ignore=true",
+      "status": "OK",
+      "observed": 2,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 2,
+        "upper": 2
+      }
+    },
+    {
+      "id": "batch/send/ThreeKeyMessages/n=2",
+      "status": "OK",
+      "observed": 10,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 10,
+        "upper": 10
+      }
+    },
+    {
+      "id": "batch/ack/ThreeKeyMessages/n=2",
+      "status": "OK",
+      "observed": 4,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 4,
+        "upper": 4
+      }
+    },
+    {
+      "id": "batch/send/ThreeKeyMessages/n=10",
+      "status": "OK",
+      "observed": 50,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 50,
+        "upper": 50
+      }
+    },
+    {
+      "id": "batch/ack/ThreeKeyMessages/n=10",
+      "status": "OK",
+      "observed": 20,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 20,
+        "upper": 20
+      }
+    },
+    {
+      "id": "dml/insert/ThreeKeyMessages/n=1/delivery=false",
+      "status": "OK",
+      "observed": 5,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 5,
+        "upper": 5
+      }
+    },
+    {
+      "id": "dml/insert/ThreeKeyMessages/n=1/delivery=true",
+      "status": "OK",
+      "observed": 5,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 5,
+        "upper": 5
+      }
+    },
+    {
+      "id": "dml/insert/ThreeKeyMessages/n=2/delivery=false",
+      "status": "OK",
+      "observed": 10,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 10,
+        "upper": 10
+      }
+    },
+    {
+      "id": "dml/insert/ThreeKeyMessages/n=2/delivery=true",
+      "status": "OK",
+      "observed": 10,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 10,
+        "upper": 10
+      }
+    },
+    {
+      "id": "dml/insert/ThreeKeyMessages/n=10/delivery=false",
+      "status": "OK",
+      "observed": 50,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 50,
+        "upper": 50
+      }
+    },
+    {
+      "id": "dml/insert/ThreeKeyMessages/n=10/delivery=true",
+      "status": "OK",
+      "observed": 50,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 50,
+        "upper": 50
+      }
+    },
+    {
+      "id": "dml/delete/ThreeKeyMessages/n=0",
+      "status": "OK",
+      "observed": 0,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 0,
+        "upper": 0
+      }
+    },
+    {
+      "id": "dml/delete/ThreeKeyMessages/n=1",
+      "status": "OK",
+      "observed": 2,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 2,
+        "upper": 2
+      }
+    },
+    {
+      "id": "dml/delete/ThreeKeyMessages/n=3",
+      "status": "OK",
+      "observed": 6,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 6,
+        "upper": 6
+      }
+    },
+    {
+      "id": "dml/delete/ThreeKeyMessages/n=10",
+      "status": "OK",
+      "observed": 20,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 20,
+        "upper": 20
+      }
+    },
+    {
+      "id": "send/TextMessages/bytes=0/delivery=default",
+      "status": "OK",
+      "observed": 5,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 5,
+        "upper": 5
+      }
+    },
+    {
+      "id": "send/TextMessages/bytes=0/delivery=past",
+      "status": "OK",
+      "observed": 5,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 5,
+        "upper": 5
+      }
+    },
+    {
+      "id": "send/TextMessages/bytes=0/delivery=future",
+      "status": "OK",
+      "observed": 5,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 5,
+        "upper": 5
+      }
+    },
+    {
+      "id": "send/TextMessages/bytes=1/delivery=default",
+      "status": "OK",
+      "observed": 5,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 5,
+        "upper": 5
+      }
+    },
+    {
+      "id": "send/TextMessages/bytes=1/delivery=past",
+      "status": "OK",
+      "observed": 5,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 5,
+        "upper": 5
+      }
+    },
+    {
+      "id": "send/TextMessages/bytes=1/delivery=future",
+      "status": "OK",
+      "observed": 5,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 5,
+        "upper": 5
+      }
+    },
+    {
+      "id": "send/TextMessages/bytes=8192/delivery=default",
+      "status": "OK",
+      "observed": 5,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 5,
+        "upper": 5
+      }
+    },
+    {
+      "id": "send/TextMessages/bytes=8192/delivery=past",
+      "status": "OK",
+      "observed": 5,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 5,
+        "upper": 5
+      }
+    },
+    {
+      "id": "send/TextMessages/bytes=8192/delivery=future",
+      "status": "OK",
+      "observed": 5,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 5,
+        "upper": 5
+      }
+    },
+    {
+      "id": "send/duplicate/TextMessages/same=true",
+      "status": "AlreadyExists",
+      "error": "Row [<internal>,<internal>,2,<internal>,m-0000250] in table _Queue_Index_TextMessages already exists",
+      "observed": null
+    },
+    {
+      "id": "send/duplicate/TextMessages/same=false",
+      "status": "AlreadyExists",
+      "error": "Row [<internal>,<internal>,2,<internal>,m-0000251] in table _Queue_Index_TextMessages already exists",
+      "observed": null
+    },
+    {
+      "id": "ack/TextMessages/present=false/ignore=false",
+      "status": "NotFound",
+      "error": "Message not found: TextMessages(m-0000252)",
+      "observed": null
+    },
+    {
+      "id": "ack/TextMessages/present=false/ignore=true",
+      "status": "OK",
+      "observed": 1,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 1,
+        "upper": 1
+      }
+    },
+    {
+      "id": "ack/TextMessages/present=true/ignore=false",
+      "status": "OK",
+      "observed": 2,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 2,
+        "upper": 2
+      }
+    },
+    {
+      "id": "ack/TextMessages/present=true/ignore=true",
+      "status": "OK",
+      "observed": 2,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 2,
+        "upper": 2
+      }
+    },
+    {
+      "id": "batch/send/TextMessages/n=2",
+      "status": "OK",
+      "observed": 10,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 10,
+        "upper": 10
+      }
+    },
+    {
+      "id": "batch/ack/TextMessages/n=2",
+      "status": "OK",
+      "observed": 4,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 4,
+        "upper": 4
+      }
+    },
+    {
+      "id": "batch/send/TextMessages/n=10",
+      "status": "OK",
+      "observed": 50,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 50,
+        "upper": 50
+      }
+    },
+    {
+      "id": "batch/ack/TextMessages/n=10",
+      "status": "OK",
+      "observed": 20,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 20,
+        "upper": 20
+      }
+    },
+    {
+      "id": "dml/insert/TextMessages/n=1/delivery=false",
+      "status": "OK",
+      "observed": 5,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 5,
+        "upper": 5
+      }
+    },
+    {
+      "id": "dml/insert/TextMessages/n=1/delivery=true",
+      "status": "OK",
+      "observed": 5,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 5,
+        "upper": 5
+      }
+    },
+    {
+      "id": "dml/insert/TextMessages/n=2/delivery=false",
+      "status": "OK",
+      "observed": 10,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 10,
+        "upper": 10
+      }
+    },
+    {
+      "id": "dml/insert/TextMessages/n=2/delivery=true",
+      "status": "OK",
+      "observed": 10,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 10,
+        "upper": 10
+      }
+    },
+    {
+      "id": "dml/insert/TextMessages/n=10/delivery=false",
+      "status": "OK",
+      "observed": 50,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 50,
+        "upper": 50
+      }
+    },
+    {
+      "id": "dml/insert/TextMessages/n=10/delivery=true",
+      "status": "OK",
+      "observed": 50,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 50,
+        "upper": 50
+      }
+    },
+    {
+      "id": "dml/delete/TextMessages/n=0",
+      "status": "OK",
+      "observed": 0,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 0,
+        "upper": 0
+      }
+    },
+    {
+      "id": "dml/delete/TextMessages/n=1",
+      "status": "OK",
+      "observed": 2,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 2,
+        "upper": 2
+      }
+    },
+    {
+      "id": "dml/delete/TextMessages/n=3",
+      "status": "OK",
+      "observed": 6,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 6,
+        "upper": 6
+      }
+    },
+    {
+      "id": "dml/delete/TextMessages/n=10",
+      "status": "OK",
+      "observed": 20,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 20,
+        "upper": 20
+      }
+    },
+    {
+      "id": "send/JsonMessages/bytes=0/delivery=default",
+      "status": "OK",
+      "observed": 5,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 5,
+        "upper": 5
+      }
+    },
+    {
+      "id": "send/JsonMessages/bytes=0/delivery=past",
+      "status": "OK",
+      "observed": 5,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 5,
+        "upper": 5
+      }
+    },
+    {
+      "id": "send/JsonMessages/bytes=0/delivery=future",
+      "status": "OK",
+      "observed": 5,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 5,
+        "upper": 5
+      }
+    },
+    {
+      "id": "send/JsonMessages/bytes=1/delivery=default",
+      "status": "OK",
+      "observed": 5,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 5,
+        "upper": 5
+      }
+    },
+    {
+      "id": "send/JsonMessages/bytes=1/delivery=past",
+      "status": "OK",
+      "observed": 5,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 5,
+        "upper": 5
+      }
+    },
+    {
+      "id": "send/JsonMessages/bytes=1/delivery=future",
+      "status": "OK",
+      "observed": 5,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 5,
+        "upper": 5
+      }
+    },
+    {
+      "id": "send/JsonMessages/bytes=8192/delivery=default",
+      "status": "OK",
+      "observed": 5,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 5,
+        "upper": 5
+      }
+    },
+    {
+      "id": "send/JsonMessages/bytes=8192/delivery=past",
+      "status": "OK",
+      "observed": 5,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 5,
+        "upper": 5
+      }
+    },
+    {
+      "id": "send/JsonMessages/bytes=8192/delivery=future",
+      "status": "OK",
+      "observed": 5,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 5,
+        "upper": 5
+      }
+    },
+    {
+      "id": "send/duplicate/JsonMessages/same=true",
+      "status": "AlreadyExists",
+      "error": "Row [<internal>,<internal>,2,<internal>,m-0000330] in table _Queue_Index_JsonMessages already exists",
+      "observed": null
+    },
+    {
+      "id": "send/duplicate/JsonMessages/same=false",
+      "status": "AlreadyExists",
+      "error": "Row [<internal>,<internal>,2,<internal>,m-0000331] in table _Queue_Index_JsonMessages already exists",
+      "observed": null
+    },
+    {
+      "id": "ack/JsonMessages/present=false/ignore=false",
+      "status": "NotFound",
+      "error": "Message not found: JsonMessages(m-0000332)",
+      "observed": null
+    },
+    {
+      "id": "ack/JsonMessages/present=false/ignore=true",
+      "status": "OK",
+      "observed": 1,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 1,
+        "upper": 1
+      }
+    },
+    {
+      "id": "ack/JsonMessages/present=true/ignore=false",
+      "status": "OK",
+      "observed": 2,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 2,
+        "upper": 2
+      }
+    },
+    {
+      "id": "ack/JsonMessages/present=true/ignore=true",
+      "status": "OK",
+      "observed": 2,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 2,
+        "upper": 2
+      }
+    },
+    {
+      "id": "batch/send/JsonMessages/n=2",
+      "status": "OK",
+      "observed": 10,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 10,
+        "upper": 10
+      }
+    },
+    {
+      "id": "batch/ack/JsonMessages/n=2",
+      "status": "OK",
+      "observed": 4,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 4,
+        "upper": 4
+      }
+    },
+    {
+      "id": "batch/send/JsonMessages/n=10",
+      "status": "OK",
+      "observed": 50,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 50,
+        "upper": 50
+      }
+    },
+    {
+      "id": "batch/ack/JsonMessages/n=10",
+      "status": "OK",
+      "observed": 20,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 20,
+        "upper": 20
+      }
+    },
+    {
+      "id": "dml/insert/JsonMessages/n=1/delivery=false",
+      "status": "OK",
+      "observed": 5,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 5,
+        "upper": 5
+      }
+    },
+    {
+      "id": "dml/insert/JsonMessages/n=1/delivery=true",
+      "status": "OK",
+      "observed": 5,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 5,
+        "upper": 5
+      }
+    },
+    {
+      "id": "dml/insert/JsonMessages/n=2/delivery=false",
+      "status": "OK",
+      "observed": 10,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 10,
+        "upper": 10
+      }
+    },
+    {
+      "id": "dml/insert/JsonMessages/n=2/delivery=true",
+      "status": "OK",
+      "observed": 10,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 10,
+        "upper": 10
+      }
+    },
+    {
+      "id": "dml/insert/JsonMessages/n=10/delivery=false",
+      "status": "OK",
+      "observed": 50,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 50,
+        "upper": 50
+      }
+    },
+    {
+      "id": "dml/insert/JsonMessages/n=10/delivery=true",
+      "status": "OK",
+      "observed": 50,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 50,
+        "upper": 50
+      }
+    },
+    {
+      "id": "dml/delete/JsonMessages/n=0",
+      "status": "OK",
+      "observed": 0,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 0,
+        "upper": 0
+      }
+    },
+    {
+      "id": "dml/delete/JsonMessages/n=1",
+      "status": "OK",
+      "observed": 2,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 2,
+        "upper": 2
+      }
+    },
+    {
+      "id": "dml/delete/JsonMessages/n=3",
+      "status": "OK",
+      "observed": 6,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 6,
+        "upper": 6
+      }
+    },
+    {
+      "id": "dml/delete/JsonMessages/n=10",
+      "status": "OK",
+      "observed": 20,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 20,
+        "upper": 20
+      }
+    },
+    {
+      "id": "send/ProtoMessages/bytes=0/delivery=default",
+      "status": "OK",
+      "observed": 5,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 5,
+        "upper": 5
+      }
+    },
+    {
+      "id": "send/ProtoMessages/bytes=0/delivery=past",
+      "status": "OK",
+      "observed": 5,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 5,
+        "upper": 5
+      }
+    },
+    {
+      "id": "send/ProtoMessages/bytes=0/delivery=future",
+      "status": "OK",
+      "observed": 5,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 5,
+        "upper": 5
+      }
+    },
+    {
+      "id": "send/ProtoMessages/bytes=1/delivery=default",
+      "status": "OK",
+      "observed": 5,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 5,
+        "upper": 5
+      }
+    },
+    {
+      "id": "send/ProtoMessages/bytes=1/delivery=past",
+      "status": "OK",
+      "observed": 5,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 5,
+        "upper": 5
+      }
+    },
+    {
+      "id": "send/ProtoMessages/bytes=1/delivery=future",
+      "status": "OK",
+      "observed": 5,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 5,
+        "upper": 5
+      }
+    },
+    {
+      "id": "send/ProtoMessages/bytes=8192/delivery=default",
+      "status": "OK",
+      "observed": 5,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 5,
+        "upper": 5
+      }
+    },
+    {
+      "id": "send/ProtoMessages/bytes=8192/delivery=past",
+      "status": "OK",
+      "observed": 5,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 5,
+        "upper": 5
+      }
+    },
+    {
+      "id": "send/ProtoMessages/bytes=8192/delivery=future",
+      "status": "OK",
+      "observed": 5,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 5,
+        "upper": 5
+      }
+    },
+    {
+      "id": "send/duplicate/ProtoMessages/same=true",
+      "status": "AlreadyExists",
+      "error": "Row [<internal>,<internal>,2,<internal>,m-0000410] in table _Queue_Index_ProtoMessages already exists",
+      "observed": null
+    },
+    {
+      "id": "send/duplicate/ProtoMessages/same=false",
+      "status": "AlreadyExists",
+      "error": "Row [<internal>,<internal>,2,<internal>,m-0000411] in table _Queue_Index_ProtoMessages already exists",
+      "observed": null
+    },
+    {
+      "id": "ack/ProtoMessages/present=false/ignore=false",
+      "status": "NotFound",
+      "error": "Message not found: ProtoMessages(m-0000412)",
+      "observed": null
+    },
+    {
+      "id": "ack/ProtoMessages/present=false/ignore=true",
+      "status": "OK",
+      "observed": 1,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 1,
+        "upper": 1
+      }
+    },
+    {
+      "id": "ack/ProtoMessages/present=true/ignore=false",
+      "status": "OK",
+      "observed": 2,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 2,
+        "upper": 2
+      }
+    },
+    {
+      "id": "ack/ProtoMessages/present=true/ignore=true",
+      "status": "OK",
+      "observed": 2,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 2,
+        "upper": 2
+      }
+    },
+    {
+      "id": "batch/send/ProtoMessages/n=2",
+      "status": "OK",
+      "observed": 10,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 10,
+        "upper": 10
+      }
+    },
+    {
+      "id": "batch/ack/ProtoMessages/n=2",
+      "status": "OK",
+      "observed": 4,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 4,
+        "upper": 4
+      }
+    },
+    {
+      "id": "batch/send/ProtoMessages/n=10",
+      "status": "OK",
+      "observed": 50,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 50,
+        "upper": 50
+      }
+    },
+    {
+      "id": "batch/ack/ProtoMessages/n=10",
+      "status": "OK",
+      "observed": 20,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 20,
+        "upper": 20
+      }
+    },
+    {
+      "id": "dml/insert/ProtoMessages/n=1/delivery=false",
+      "status": "OK",
+      "observed": 5,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 5,
+        "upper": 5
+      }
+    },
+    {
+      "id": "dml/insert/ProtoMessages/n=1/delivery=true",
+      "status": "OK",
+      "observed": 5,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 5,
+        "upper": 5
+      }
+    },
+    {
+      "id": "dml/insert/ProtoMessages/n=2/delivery=false",
+      "status": "OK",
+      "observed": 10,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 10,
+        "upper": 10
+      }
+    },
+    {
+      "id": "dml/insert/ProtoMessages/n=2/delivery=true",
+      "status": "OK",
+      "observed": 10,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 10,
+        "upper": 10
+      }
+    },
+    {
+      "id": "dml/insert/ProtoMessages/n=10/delivery=false",
+      "status": "OK",
+      "observed": 50,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 50,
+        "upper": 50
+      }
+    },
+    {
+      "id": "dml/insert/ProtoMessages/n=10/delivery=true",
+      "status": "OK",
+      "observed": 50,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 50,
+        "upper": 50
+      }
+    },
+    {
+      "id": "dml/delete/ProtoMessages/n=0",
+      "status": "OK",
+      "observed": 0,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 0,
+        "upper": 0
+      }
+    },
+    {
+      "id": "dml/delete/ProtoMessages/n=1",
+      "status": "OK",
+      "observed": 2,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 2,
+        "upper": 2
+      }
+    },
+    {
+      "id": "dml/delete/ProtoMessages/n=3",
+      "status": "OK",
+      "observed": 6,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 6,
+        "upper": 6
+      }
+    },
+    {
+      "id": "dml/delete/ProtoMessages/n=10",
+      "status": "OK",
+      "observed": 20,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 20,
+        "upper": 20
+      }
+    },
+    {
+      "id": "send/ChildMessages/bytes=0/delivery=default",
+      "status": "OK",
+      "observed": 5,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 5,
+        "upper": 5
+      }
+    },
+    {
+      "id": "send/ChildMessages/bytes=0/delivery=past",
+      "status": "OK",
+      "observed": 5,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 5,
+        "upper": 5
+      }
+    },
+    {
+      "id": "send/ChildMessages/bytes=0/delivery=future",
+      "status": "OK",
+      "observed": 5,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 5,
+        "upper": 5
+      }
+    },
+    {
+      "id": "send/ChildMessages/bytes=1/delivery=default",
+      "status": "OK",
+      "observed": 5,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 5,
+        "upper": 5
+      }
+    },
+    {
+      "id": "send/ChildMessages/bytes=1/delivery=past",
+      "status": "OK",
+      "observed": 5,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 5,
+        "upper": 5
+      }
+    },
+    {
+      "id": "send/ChildMessages/bytes=1/delivery=future",
+      "status": "OK",
+      "observed": 5,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 5,
+        "upper": 5
+      }
+    },
+    {
+      "id": "send/ChildMessages/bytes=8192/delivery=default",
+      "status": "OK",
+      "observed": 5,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 5,
+        "upper": 5
+      }
+    },
+    {
+      "id": "send/ChildMessages/bytes=8192/delivery=past",
+      "status": "OK",
+      "observed": 5,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 5,
+        "upper": 5
+      }
+    },
+    {
+      "id": "send/ChildMessages/bytes=8192/delivery=future",
+      "status": "OK",
+      "observed": 5,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 5,
+        "upper": 5
+      }
+    },
+    {
+      "id": "send/duplicate/ChildMessages/same=true",
+      "status": "AlreadyExists",
+      "error": "Row [<internal>,<internal>,2,<internal>,1,m-0000490] in table _Queue_Index_ChildMessages already exists",
+      "observed": null
+    },
+    {
+      "id": "send/duplicate/ChildMessages/same=false",
+      "status": "AlreadyExists",
+      "error": "Row [<internal>,<internal>,2,<internal>,1,m-0000491] in table _Queue_Index_ChildMessages already exists",
+      "observed": null
+    },
+    {
+      "id": "ack/ChildMessages/present=false/ignore=false",
+      "status": "NotFound",
+      "error": "Message not found: ChildMessages(1,m-0000492)",
+      "observed": null
+    },
+    {
+      "id": "ack/ChildMessages/present=false/ignore=true",
+      "status": "OK",
+      "observed": 1,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 1,
+        "upper": 1
+      }
+    },
+    {
+      "id": "ack/ChildMessages/present=true/ignore=false",
+      "status": "OK",
+      "observed": 2,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 2,
+        "upper": 2
+      }
+    },
+    {
+      "id": "ack/ChildMessages/present=true/ignore=true",
+      "status": "OK",
+      "observed": 2,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 2,
+        "upper": 2
+      }
+    },
+    {
+      "id": "batch/send/ChildMessages/n=2",
+      "status": "OK",
+      "observed": 10,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 10,
+        "upper": 10
+      }
+    },
+    {
+      "id": "batch/ack/ChildMessages/n=2",
+      "status": "OK",
+      "observed": 4,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 4,
+        "upper": 4
+      }
+    },
+    {
+      "id": "batch/send/ChildMessages/n=10",
+      "status": "OK",
+      "observed": 50,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 50,
+        "upper": 50
+      }
+    },
+    {
+      "id": "batch/ack/ChildMessages/n=10",
+      "status": "OK",
+      "observed": 20,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 20,
+        "upper": 20
+      }
+    },
+    {
+      "id": "dml/insert/ChildMessages/n=1/delivery=false",
+      "status": "OK",
+      "observed": 5,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 5,
+        "upper": 5
+      }
+    },
+    {
+      "id": "dml/insert/ChildMessages/n=1/delivery=true",
+      "status": "OK",
+      "observed": 5,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 5,
+        "upper": 5
+      }
+    },
+    {
+      "id": "dml/insert/ChildMessages/n=2/delivery=false",
+      "status": "OK",
+      "observed": 10,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 10,
+        "upper": 10
+      }
+    },
+    {
+      "id": "dml/insert/ChildMessages/n=2/delivery=true",
+      "status": "OK",
+      "observed": 10,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 10,
+        "upper": 10
+      }
+    },
+    {
+      "id": "dml/insert/ChildMessages/n=10/delivery=false",
+      "status": "OK",
+      "observed": 50,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 50,
+        "upper": 50
+      }
+    },
+    {
+      "id": "dml/insert/ChildMessages/n=10/delivery=true",
+      "status": "OK",
+      "observed": 50,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 50,
+        "upper": 50
+      }
+    },
+    {
+      "id": "dml/delete/ChildMessages/n=0",
+      "status": "OK",
+      "observed": 0,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 0,
+        "upper": 0
+      }
+    },
+    {
+      "id": "dml/delete/ChildMessages/n=1",
+      "status": "OK",
+      "observed": 2,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 2,
+        "upper": 2
+      }
+    },
+    {
+      "id": "dml/delete/ChildMessages/n=3",
+      "status": "OK",
+      "observed": 6,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 6,
+        "upper": 6
+      }
+    },
+    {
+      "id": "dml/delete/ChildMessages/n=10",
+      "status": "OK",
+      "observed": 20,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 20,
+        "upper": 20
+      }
+    },
+    {
+      "id": "send/DeepMessages/bytes=0/delivery=default",
+      "status": "OK",
+      "observed": 5,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 5,
+        "upper": 5
+      }
+    },
+    {
+      "id": "send/DeepMessages/bytes=0/delivery=past",
+      "status": "OK",
+      "observed": 5,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 5,
+        "upper": 5
+      }
+    },
+    {
+      "id": "send/DeepMessages/bytes=0/delivery=future",
+      "status": "OK",
+      "observed": 5,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 5,
+        "upper": 5
+      }
+    },
+    {
+      "id": "send/DeepMessages/bytes=1/delivery=default",
+      "status": "OK",
+      "observed": 5,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 5,
+        "upper": 5
+      }
+    },
+    {
+      "id": "send/DeepMessages/bytes=1/delivery=past",
+      "status": "OK",
+      "observed": 5,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 5,
+        "upper": 5
+      }
+    },
+    {
+      "id": "send/DeepMessages/bytes=1/delivery=future",
+      "status": "OK",
+      "observed": 5,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 5,
+        "upper": 5
+      }
+    },
+    {
+      "id": "send/DeepMessages/bytes=8192/delivery=default",
+      "status": "OK",
+      "observed": 5,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 5,
+        "upper": 5
+      }
+    },
+    {
+      "id": "send/DeepMessages/bytes=8192/delivery=past",
+      "status": "OK",
+      "observed": 5,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 5,
+        "upper": 5
+      }
+    },
+    {
+      "id": "send/DeepMessages/bytes=8192/delivery=future",
+      "status": "OK",
+      "observed": 5,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 5,
+        "upper": 5
+      }
+    },
+    {
+      "id": "send/duplicate/DeepMessages/same=true",
+      "status": "AlreadyExists",
+      "error": "Row [<internal>,<internal>,2,<internal>,1,1,m-0000570] in table _Queue_Index_DeepMessages already exists",
+      "observed": null
+    },
+    {
+      "id": "send/duplicate/DeepMessages/same=false",
+      "status": "AlreadyExists",
+      "error": "Row [<internal>,<internal>,2,<internal>,1,1,m-0000571] in table _Queue_Index_DeepMessages already exists",
+      "observed": null
+    },
+    {
+      "id": "ack/DeepMessages/present=false/ignore=false",
+      "status": "NotFound",
+      "error": "Message not found: DeepMessages(1,1,m-0000572)",
+      "observed": null
+    },
+    {
+      "id": "ack/DeepMessages/present=false/ignore=true",
+      "status": "OK",
+      "observed": 1,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 1,
+        "upper": 1
+      }
+    },
+    {
+      "id": "ack/DeepMessages/present=true/ignore=false",
+      "status": "OK",
+      "observed": 2,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 2,
+        "upper": 2
+      }
+    },
+    {
+      "id": "ack/DeepMessages/present=true/ignore=true",
+      "status": "OK",
+      "observed": 2,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 2,
+        "upper": 2
+      }
+    },
+    {
+      "id": "batch/send/DeepMessages/n=2",
+      "status": "OK",
+      "observed": 10,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 10,
+        "upper": 10
+      }
+    },
+    {
+      "id": "batch/ack/DeepMessages/n=2",
+      "status": "OK",
+      "observed": 4,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 4,
+        "upper": 4
+      }
+    },
+    {
+      "id": "batch/send/DeepMessages/n=10",
+      "status": "OK",
+      "observed": 50,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 50,
+        "upper": 50
+      }
+    },
+    {
+      "id": "batch/ack/DeepMessages/n=10",
+      "status": "OK",
+      "observed": 20,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 20,
+        "upper": 20
+      }
+    },
+    {
+      "id": "dml/insert/DeepMessages/n=1/delivery=false",
+      "status": "OK",
+      "observed": 5,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 5,
+        "upper": 5
+      }
+    },
+    {
+      "id": "dml/insert/DeepMessages/n=1/delivery=true",
+      "status": "OK",
+      "observed": 5,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 5,
+        "upper": 5
+      }
+    },
+    {
+      "id": "dml/insert/DeepMessages/n=2/delivery=false",
+      "status": "OK",
+      "observed": 10,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 10,
+        "upper": 10
+      }
+    },
+    {
+      "id": "dml/insert/DeepMessages/n=2/delivery=true",
+      "status": "OK",
+      "observed": 10,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 10,
+        "upper": 10
+      }
+    },
+    {
+      "id": "dml/insert/DeepMessages/n=10/delivery=false",
+      "status": "OK",
+      "observed": 50,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 50,
+        "upper": 50
+      }
+    },
+    {
+      "id": "dml/insert/DeepMessages/n=10/delivery=true",
+      "status": "OK",
+      "observed": 50,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 50,
+        "upper": 50
+      }
+    },
+    {
+      "id": "dml/delete/DeepMessages/n=0",
+      "status": "OK",
+      "observed": 0,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 0,
+        "upper": 0
+      }
+    },
+    {
+      "id": "dml/delete/DeepMessages/n=1",
+      "status": "OK",
+      "observed": 2,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 2,
+        "upper": 2
+      }
+    },
+    {
+      "id": "dml/delete/DeepMessages/n=3",
+      "status": "OK",
+      "observed": 6,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 6,
+        "upper": 6
+      }
+    },
+    {
+      "id": "dml/delete/DeepMessages/n=10",
+      "status": "OK",
+      "observed": 20,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 20,
+        "upper": 20
+      }
+    },
+    {
+      "id": "send/bytes-65536",
+      "status": "OK",
+      "observed": 5,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 5,
+        "upper": 5
+      }
+    },
+    {
+      "id": "send/key-1024-bytes",
+      "status": "OK",
+      "observed": 5,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 5,
+        "upper": 5
+      }
+    },
+    {
+      "id": "send/json-null",
+      "status": "OK",
+      "observed": 5,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 5,
+        "upper": 5
+      }
+    },
+    {
+      "id": "send/invalid-payload/<nil>",
+      "status": "FailedPrecondition",
+      "error": "Payload must not be NULL in table _Queue_Data_Messages.",
+      "observed": null
+    },
+    {
+      "id": "send/invalid-payload/int64",
+      "status": "InvalidArgument",
+      "error": "Failed to initialize transaction due to invalid mutation key.",
+      "observed": null
+    },
+    {
+      "id": "send/invalid-key/0",
+      "status": "InvalidArgument",
+      "error": "Failed to initialize transaction due to invalid mutation key.",
+      "observed": null
+    },
+    {
+      "id": "send/invalid-key/1",
+      "status": "FailedPrecondition",
+      "error": "Id must not be NULL in table _Queue_Index_Messages.",
+      "observed": null
+    },
+    {
+      "id": "send/invalid-key/2",
+      "status": "OK",
+      "observed": 5,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 5,
+        "upper": 5
+      }
+    },
+    {
+      "id": "composition/ack-already-acked/ignore=false",
+      "status": "NotFound",
+      "error": "Message not found: Messages(m-0000645)",
+      "observed": null
+    },
+    {
+      "id": "composition/ack-present-and-missing/ignore=false",
+      "status": "NotFound",
+      "error": "Message not found: Messages(m-0000647)",
+      "observed": null
+    },
+    {
+      "id": "composition/duplicate-ack/ignore=false",
+      "status": "InvalidArgument",
+      "error": "Message [m-0000648] in Messages was acked after being deleted.",
+      "observed": null
+    },
+    {
+      "id": "composition/ack-already-acked/ignore=true",
+      "status": "OK",
+      "observed": 1,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 1,
+        "upper": 1
+      }
+    },
+    {
+      "id": "composition/ack-present-and-missing/ignore=true",
+      "status": "OK",
+      "observed": 3,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 3,
+        "upper": 3
+      }
+    },
+    {
+      "id": "composition/duplicate-ack/ignore=true",
+      "status": "OK",
+      "observed": 3,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 3,
+        "upper": 3
+      }
+    },
+    {
+      "id": "composition/send-ack/present=false",
+      "status": "OK",
+      "observed": 3,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 3,
+        "upper": 3
+      }
+    },
+    {
+      "id": "composition/ack-send/present=false",
+      "status": "NotFound",
+      "error": "Message not found: Messages(m-0000654)",
+      "observed": null
+    },
+    {
+      "id": "composition/send-ack/present=true",
+      "status": "AlreadyExists",
+      "error": "Row [m-0000655] in table Messages already exists",
+      "observed": null
+    },
+    {
+      "id": "composition/ack-send/present=true",
+      "status": "OK",
+      "observed": 7,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 7,
+        "upper": 7
+      }
+    },
+    {
+      "id": "composition/duplicate-send",
+      "status": "InvalidArgument",
+      "error": "Request contains an invalid argument.",
+      "observed": null
+    },
+    {
+      "id": "composition/PlainRows-plus-send/n=1",
+      "status": "OK",
+      "observed": 7,
+      "baseline": {
+        "lower": 2,
+        "upper": null
+      },
+      "effective": {
+        "lower": 7,
+        "upper": 7
+      }
+    },
+    {
+      "id": "composition/PlainRows-plus-send/n=3",
+      "status": "OK",
+      "observed": 17,
+      "baseline": {
+        "lower": 2,
+        "upper": null
+      },
+      "effective": {
+        "lower": 17,
+        "upper": 17
+      }
+    },
+    {
+      "id": "composition/IndexedRows-plus-send/n=1",
+      "status": "OK",
+      "observed": 8,
+      "baseline": {
+        "lower": 3,
+        "upper": null
+      },
+      "effective": {
+        "lower": 8,
+        "upper": 8
+      }
+    },
+    {
+      "id": "composition/IndexedRows-plus-send/n=3",
+      "status": "OK",
+      "observed": 18,
+      "baseline": {
+        "lower": 3,
+        "upper": null
+      },
+      "effective": {
+        "lower": 18,
+        "upper": 18
+      }
+    },
+    {
+      "id": "composition/dml-insert-delete",
+      "status": "OK",
+      "observed": 7,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 7,
+        "upper": 7
+      }
+    },
+    {
+      "id": "composition/dml-delete-insert",
+      "status": "OK",
+      "observed": 7,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 7,
+        "upper": 7
+      }
+    },
+    {
+      "id": "composition/dml-insert-buffered-ack",
+      "status": "OK",
+      "observed": 7
+    },
+    {
+      "id": "composition/dml-table-buffered-send",
+      "status": "OK",
+      "observed": 7
+    },
+    {
+      "id": "unsupported/dml-insert-or-update",
+      "status": "InvalidArgument",
+      "error": "Insert mode OR UPDATE is not supported on queues.",
+      "observed": null
+    },
+    {
+      "id": "unsupported/dml-insert-or-ignore",
+      "status": "OK",
+      "observed": 5,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 5,
+        "upper": 5
+      }
+    },
+    {
+      "id": "unsupported/dml-insert-or-replace",
+      "status": "Unimplemented",
+      "error": "InsertMode not supported: OR REPLACE.",
+      "observed": null
+    },
+    {
+      "id": "unsupported/dml-update-Payload",
+      "status": "InvalidArgument",
+      "error": "DML not supported for queues.",
+      "observed": null
+    },
+    {
+      "id": "unsupported/dml-update-DeliverTime",
+      "status": "InvalidArgument",
+      "error": "DML not supported for queues.",
+      "observed": null
+    },
+    {
+      "id": "unsupported/wire-insert",
+      "status": "NotFound",
+      "error": "Table not found: Messages",
+      "observed": null
+    },
+    {
+      "id": "unsupported/wire-update",
+      "status": "NotFound",
+      "error": "Table not found: Messages",
+      "observed": null
+    },
+    {
+      "id": "unsupported/wire-upsert",
+      "status": "NotFound",
+      "error": "Table not found: Messages",
+      "observed": null
+    },
+    {
+      "id": "unsupported/wire-replace",
+      "status": "NotFound",
+      "error": "Table not found: Messages",
+      "observed": null
+    },
+    {
+      "id": "unsupported/wire-delete",
+      "status": "NotFound",
+      "error": "Table not found: Messages",
+      "observed": null
+    },
+    {
+      "id": "dml/delete-range/n=1",
+      "status": "OK",
+      "observed": 2,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 2,
+        "upper": 2
+      }
+    },
+    {
+      "id": "dml/delete-range/n=3",
+      "status": "OK",
+      "observed": 6,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 6,
+        "upper": 6
+      }
+    },
+    {
+      "id": "dml/delete-range/n=10",
+      "status": "OK",
+      "observed": 20,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 20,
+        "upper": 20
+      }
+    },
+    {
+      "id": "dml/delete-all/n=0",
+      "status": "OK",
+      "observed": 0,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 0,
+        "upper": 0
+      }
+    },
+    {
+      "id": "dml/delete-all/n=1",
+      "status": "OK",
+      "observed": 2,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 2,
+        "upper": 2
+      }
+    },
+    {
+      "id": "dml/delete-all/n=3",
+      "status": "OK",
+      "observed": 6,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 6,
+        "upper": 6
+      }
+    },
+    {
+      "id": "dml/delete-all/n=10",
+      "status": "OK",
+      "observed": 20,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 20,
+        "upper": 20
+      }
+    },
+    {
+      "id": "unsupported/dml-null-payload",
+      "status": "FailedPrecondition",
+      "error": "Payload must not be NULL in table _Queue_Data_Messages.",
+      "observed": null
+    },
+    {
+      "id": "unsupported/dml-null-delivery",
+      "status": "InvalidArgument",
+      "error": "Request contains an invalid argument.",
+      "observed": null
+    },
+    {
+      "id": "cascade/ChildMessages/mutation-delete/n=0",
+      "status": "OK",
+      "observed": 1,
+      "baseline": {
+        "lower": 1,
+        "upper": null
+      },
+      "effective": {
+        "lower": 1,
+        "upper": 1
+      }
+    },
+    {
+      "id": "cascade/ChildMessages/dml-delete/n=0",
+      "status": "OK",
+      "observed": 1,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 1,
+        "upper": 1
+      }
+    },
+    {
+      "id": "cascade/ChildMessages/replace/n=0",
+      "status": "OK",
+      "observed": 2,
+      "baseline": {
+        "lower": 2,
+        "upper": null
+      },
+      "effective": {
+        "lower": 2,
+        "upper": 2
+      }
+    },
+    {
+      "id": "cascade/ChildMessages/mutation-delete/n=1",
+      "status": "OK",
+      "observed": 2,
+      "baseline": {
+        "lower": 1,
+        "upper": null
+      },
+      "effective": {
+        "lower": 2,
+        "upper": 2
+      }
+    },
+    {
+      "id": "cascade/ChildMessages/dml-delete/n=1",
+      "status": "OK",
+      "observed": 2,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 2,
+        "upper": 2
+      }
+    },
+    {
+      "id": "cascade/ChildMessages/replace/n=1",
+      "status": "OK",
+      "observed": 3,
+      "baseline": {
+        "lower": 2,
+        "upper": null
+      },
+      "effective": {
+        "lower": 3,
+        "upper": 3
+      }
+    },
+    {
+      "id": "cascade/ChildMessages/mutation-delete/n=3",
+      "status": "OK",
+      "observed": 4,
+      "baseline": {
+        "lower": 1,
+        "upper": null
+      },
+      "effective": {
+        "lower": 4,
+        "upper": 4
+      }
+    },
+    {
+      "id": "cascade/ChildMessages/dml-delete/n=3",
+      "status": "OK",
+      "observed": 4,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 4,
+        "upper": 4
+      }
+    },
+    {
+      "id": "cascade/ChildMessages/replace/n=3",
+      "status": "OK",
+      "observed": 5,
+      "baseline": {
+        "lower": 2,
+        "upper": null
+      },
+      "effective": {
+        "lower": 5,
+        "upper": 5
+      }
+    },
+    {
+      "id": "cascade/ChildMessages/mutation-delete/n=10",
+      "status": "OK",
+      "observed": 11,
+      "baseline": {
+        "lower": 1,
+        "upper": null
+      },
+      "effective": {
+        "lower": 11,
+        "upper": 11
+      }
+    },
+    {
+      "id": "cascade/ChildMessages/dml-delete/n=10",
+      "status": "OK",
+      "observed": 11,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 11,
+        "upper": 11
+      }
+    },
+    {
+      "id": "cascade/ChildMessages/replace/n=10",
+      "status": "OK",
+      "observed": 12,
+      "baseline": {
+        "lower": 2,
+        "upper": null
+      },
+      "effective": {
+        "lower": 12,
+        "upper": 12
+      }
+    },
+    {
+      "id": "cascade/DeepMessages/mutation-delete/n=0",
+      "status": "OK",
+      "observed": 2,
+      "baseline": {
+        "lower": 1,
+        "upper": null
+      },
+      "effective": {
+        "lower": 2,
+        "upper": 2
+      }
+    },
+    {
+      "id": "cascade/DeepMessages/dml-delete/n=0",
+      "status": "OK",
+      "observed": 2,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 2,
+        "upper": 2
+      }
+    },
+    {
+      "id": "cascade/DeepMessages/replace/n=0",
+      "status": "OK",
+      "observed": 3,
+      "baseline": {
+        "lower": 2,
+        "upper": null
+      },
+      "effective": {
+        "lower": 3,
+        "upper": 3
+      }
+    },
+    {
+      "id": "cascade/DeepMessages/mutation-delete/n=1",
+      "status": "OK",
+      "observed": 3,
+      "baseline": {
+        "lower": 1,
+        "upper": null
+      },
+      "effective": {
+        "lower": 3,
+        "upper": 3
+      }
+    },
+    {
+      "id": "cascade/DeepMessages/dml-delete/n=1",
+      "status": "OK",
+      "observed": 3,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 3,
+        "upper": 3
+      }
+    },
+    {
+      "id": "cascade/DeepMessages/replace/n=1",
+      "status": "OK",
+      "observed": 4,
+      "baseline": {
+        "lower": 2,
+        "upper": null
+      },
+      "effective": {
+        "lower": 4,
+        "upper": 4
+      }
+    },
+    {
+      "id": "cascade/DeepMessages/mutation-delete/n=3",
+      "status": "OK",
+      "observed": 5,
+      "baseline": {
+        "lower": 1,
+        "upper": null
+      },
+      "effective": {
+        "lower": 5,
+        "upper": 5
+      }
+    },
+    {
+      "id": "cascade/DeepMessages/dml-delete/n=3",
+      "status": "OK",
+      "observed": 5,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 5,
+        "upper": 5
+      }
+    },
+    {
+      "id": "cascade/DeepMessages/replace/n=3",
+      "status": "OK",
+      "observed": 6,
+      "baseline": {
+        "lower": 2,
+        "upper": null
+      },
+      "effective": {
+        "lower": 6,
+        "upper": 6
+      }
+    },
+    {
+      "id": "cascade/DeepMessages/mutation-delete/n=10",
+      "status": "OK",
+      "observed": 12,
+      "baseline": {
+        "lower": 1,
+        "upper": null
+      },
+      "effective": {
+        "lower": 12,
+        "upper": 12
+      }
+    },
+    {
+      "id": "cascade/DeepMessages/dml-delete/n=10",
+      "status": "OK",
+      "observed": 12,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 12,
+        "upper": 12
+      }
+    },
+    {
+      "id": "cascade/DeepMessages/replace/n=10",
+      "status": "OK",
+      "observed": 13,
+      "baseline": {
+        "lower": 2,
+        "upper": null
+      },
+      "effective": {
+        "lower": 13,
+        "upper": 13
+      }
+    },
+    {
+      "id": "quota/send/n=16000",
+      "status": "OK",
+      "observed": 80000,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 80000,
+        "upper": 80000
+      }
+    },
+    {
+      "id": "quota/send/n=16001",
+      "status": "InvalidArgument",
+      "error": "The transaction contains too many mutations. Insert and update operations count with the multiplicity of the number of columns they affect. For example, inserting values into one key column and four non-key columns count as five mutations total for the insert. Delete and delete range operations count as one mutation regardless of the number of columns affected. The total mutation count includes any changes to indexes that the transaction generates. Please reduce the number of writes, or use fewer indexes. (Maximum number: 80000)",
+      "observed": null
+    },
+    {
+      "id": "quota/ack/n=40000",
+      "status": "OK",
+      "observed": 80000,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 80000,
+        "upper": 80000
+      }
+    },
+    {
+      "id": "quota/ack/n=40001",
+      "status": "InvalidArgument",
+      "error": "The transaction contains too many mutations. Insert and update operations count with the multiplicity of the number of columns they affect. For example, inserting values into one key column and four non-key columns count as five mutations total for the insert. Delete and delete range operations count as one mutation regardless of the number of columns affected. The total mutation count includes any changes to indexes that the transaction generates. Please reduce the number of writes, or use fewer indexes. (Maximum number: 80000)",
+      "observed": null
+    },
+    {
+      "id": "queue/lease/send/projected-scalar",
+      "status": "OK",
+      "observed": 5,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 5,
+        "upper": 5
+      }
+    },
+    {
+      "id": "queue/lease/ack/projected-scalar",
+      "status": "OK",
+      "observed": 2,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 2,
+        "upper": 2
+      }
+    },
+    {
+      "id": "queue/lease/send/star-scalar",
+      "status": "OK",
+      "observed": 5,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 5,
+        "upper": 5
+      }
+    },
+    {
+      "id": "queue/lease/ack/star-scalar",
+      "status": "OK",
+      "observed": 2,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 2,
+        "upper": 2
+      }
+    },
+    {
+      "id": "queue/lease/send/star-array",
+      "status": "OK",
+      "observed": 5,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 5,
+        "upper": 5
+      }
+    },
+    {
+      "id": "queue/lease/ack/star-array",
+      "status": "OK",
+      "observed": 2,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 2,
+        "upper": 2
+      }
+    },
+    {
+      "id": "lease/batch-ack/n=1",
+      "status": "OK",
+      "observed": 2,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 2,
+        "upper": 2
+      }
+    },
+    {
+      "id": "lease/batch-ack/n=3",
+      "status": "OK",
+      "observed": 6,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 6,
+        "upper": 6
+      }
+    },
+    {
+      "id": "lease/ack-after-expiry/redeliver=false",
+      "status": "OK",
+      "observed": 2,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 2,
+        "upper": 2
+      }
+    },
+    {
+      "id": "lease/ack-after-expiry/redeliver=true",
+      "status": "OK",
+      "observed": 2,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 2,
+        "upper": 2
+      }
+    },
+    {
+      "id": "lease/ack-before-renew",
+      "status": "OK",
+      "observed": 2,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 2,
+        "upper": 2
+      }
+    },
+    {
+      "id": "lease/receive-in-rw/normal-write=false",
+      "status": "InvalidArgument",
+      "error": "spanner: code = \"InvalidArgument\", desc = \"Queue receive queries must be single-use only.\", requestID = \"<redacted>\"",
+      "observed": null
+    },
+    {
+      "id": "lease/receive-in-rw/normal-write=true",
+      "status": "InvalidArgument",
+      "error": "spanner: code = \"InvalidArgument\", desc = \"Queue receive queries must be single-use only.\", requestID = \"<redacted>\"",
+      "observed": null
+    }
+  ]
+}

@@ -1,0 +1,97 @@
+{
+  "recorded_on_jst": "2026-11-10",
+  "source_base_commit": "f53e0a8d66d179c1c1cc4d9d798bb6f3e7f7d42a",
+  "source_branch": "feat/mutation-count-investigation-20261110",
+  "source_status": "local uncommitted preview investigation",
+  "runtime": "managed Spanner; backend build is not exposed",
+  "producer_platform": "darwin/arm64",
+  "go": "1.26.10",
+  "spanner_sdk": "v1.95.1",
+  "authorization": "The user requested comprehensive queue mutation-count verification and explicitly approved one additional temporary GoogleSQL DB create/verify/delete. The matrix used that single database.",
+  "owned_database_lifecycles_created": 1,
+  "existing_databases_or_instance_modified": false,
+  "started_at": "2026-11-09T23:32:39.167473Z",
+  "finished_at": "2026-11-09T23:36:43.502753Z",
+  "status": "complete",
+  "lifecycle": {
+    "absence": "NotFound",
+    "create_request": "OK",
+    "create_wait": "OK",
+    "drop": "OK"
+  },
+  "cleanup_errors": [],
+  "transaction_attempts": 319,
+  "successful_with_stats": 270,
+  "status_counts": {
+    "OK": 270,
+    "AlreadyExists": 17,
+    "NotFound": 16,
+    "FailedPrecondition": 3,
+    "InvalidArgument": 12,
+    "Unimplemented": 1
+  },
+  "queue_queries": 17,
+  "other_api_attempts": 3,
+  "schema_phases": 1,
+  "raw_capture": "testdata/mutation-count/managed-queues-20261110.json.gz",
+  "raw_capture_sha256": "6e235b73015ce2d86a6345c4e47d57a9eefc1b2073248bb3c92551958750ee1b",
+  "pre_execution_invocation_record": {
+    "authorization": "Current user explicitly approved one additional temporary GoogleSQL DB creation, verification and deletion, following the request for comprehensive queue mutation-count verification.",
+    "database_lifecycles_allowed": 1,
+    "database_lifecycles_started": 0,
+    "source_base_commit": "f53e0a8d66d179c1c1cc4d9d798bb6f3e7f7d42a",
+    "branch": "feat/mutation-count-investigation-20261110",
+    "binary_sha256": "a6a7ecf016459c9e96d7160b26352a7bb4df7bf10a70a6f8786b0edc37fb5955",
+    "source_sha256": {
+      "tools/mutation-count-lab/managed-probe/extended.go": "71fc1e71c1f2c31d7f3e6cb884b5c290deb347371a25a27d29641f3d24dba6fc",
+      "tools/mutation-count-lab/managed-probe/lease.go": "e2bfae2e2b70b0ee9f16a0357a4b4e2c560bd45f9c9a4c6561305d5254cbaf6e",
+      "tools/mutation-count-lab/managed-probe/lifecycle.go": "983990256f028dd24d9847250c956defa56d9cc5510cfe28f04b20effd46484a",
+      "tools/mutation-count-lab/managed-probe/lifecycle_test.go": "4ebfce8c03f22a298ab56328a4d33ce38cebaae513fe4b9c03f8f9259388f075",
+      "tools/mutation-count-lab/managed-probe/main.go": "1987c22f47abcee46b1bc54c2e882c353bae604222a9e4806cc1061f75464f74",
+      "tools/mutation-count-lab/managed-probe/queue_matrix.go": "c96946e45010a1989b4909aa0a1458b013e225e2e0e77d0109ac5d5e6e454ce7",
+      "tools/mutation-count-lab/managed-probe/queue_matrix_runtime.go": "0db2d805a1ac57b65be060ca4665bbb5c152c741fb831df9dd6aff1b1981edb1",
+      "tools/mutation-count-lab/managed-probe/queue_matrix_test.go": "cbe3613db1afcf6efbb629b138a6a2f5ec170e2caf03a8ee7c0ae5ec0dfd2deb",
+      "tools/mutation-count-lab/managed-probe/resume.go": "fa2b3564bc1b44af17d89321fbadb81d2488a0bc3503fa927464f9524eb90cf1",
+      "tools/mutation-count-lab/managed-probe/schema.go": "0127cff5edd1d36196fbeb77091d161c41b68b8a0be6bf332d01abd6686fd061"
+    },
+    "proto_descriptors_sha256": "54f19a45a01ee03a99845ef4662deb46f80571b5cdbab069bd063040e617fa37",
+    "prepared_write_cases": 306,
+    "prepared_schema_statements": 15,
+    "invocation": [
+      "queue-probe",
+      "-allow-create-test-drop-one-database",
+      "-queue-matrix",
+      "-queue-proto-descriptors",
+      "<repo>/testdata/protos/order_descriptors.pb",
+      "-out",
+      "<private-task-area>/managed/matrix.json"
+    ],
+    "recorded_at": "2026-11-09T23:32:34.563563+00:00",
+    "boundary": "existing dedicated instance only; exclusive private ownership journal; no existing DB modification or additional DB retry"
+  },
+  "retained_source_relationship": "The invocation hashes identify source and binary at execution. Retained producer adds the focused follow-up and corrects prospective labels/expectations for two discovered successful cases. Retained source and an agent-recorded digest are not independent execution attestation.",
+  "hypothesis_mismatches": [
+    "send/invalid-key/2: OK",
+    "unsupported/dml-insert-or-ignore: OK"
+  ],
+  "hypothesis_dispositions": {
+    "send/invalid-key/2": "SDK int64(1) became protobuf string scalar \"1\", a valid logical STRING key. It is not a service type-validation defect.",
+    "unsupported/dml-insert-or-ignore": "The absent-target INSERT OR IGNORE is supported; prospective producer naming/expectations and root DML normalization are corrected."
+  },
+  "raw_retention": "Synthetic DDL, mutations and SQL only. Project/instance/database IDs, sessions, credentials and lease tokens are not retained. Private owner journal excluded.",
+  "unverified": [
+    "PostgreSQL and other SDKs",
+    "concurrent races, TTL background deletion and placement differences",
+    "a public queue internal-cost formula",
+    "transaction bytes, lock costs and latency",
+    "INSERT OR IGNORE with existing targets and INSERT SELECT follow-up (prepared; requires separate one-DB approval)",
+    "RENEWLEASE in a read-write transaction (prepared in the follow-up)",
+    "combined DML and buffered-mutation input normalization in the core API"
+  ],
+  "metadata_origins": {
+    "schema_phases.ddl": "submitted fixture DDL whose initialization operation completed in the producer; not canonical GetDatabaseDdl output",
+    "schema_phases.indexes": "observed INFORMATION_SCHEMA index metadata",
+    "schema_phases.queue_columns": "observed INFORMATION_SCHEMA column metadata",
+    "measurement_association": "producer-scoped execution window and source/input capture; no independent execution attestation"
+  }
+}

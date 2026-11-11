@@ -17,6 +17,21 @@ are not a stable public contract.
 
 This repository was previously named `go-googlesql-spanner-poc`.
 
+The preview `MutationCountAnalyzer` also estimates write-impact intervals from
+DDL, wire mutations or DML. It preserves old-row assertions and qualified
+CommitStats separately, including unknown queue effects. See the package
+documentation and [write-analysis design](knowledge/research/write-analysis/mutation-count-alternatives-20261110.md).
+
+```sh
+go run ./cmd/spanner-analyzer --mode mutation_count \
+  --ddl testdata/mutation-count/schema.sql \
+  --mutations-file testdata/mutation-count/update.json --output json
+```
+
+Adding `--mutation-facts-file testdata/mutation-count/old-row.json` refines the
+example's `[3,6]` schema interval to 3 under the supplied old-image assertions.
+This does not verify commit-byte limits or establish a universal runtime price.
+
 The repository hosts five Go modules, split along dependency weight:
 
 - `github.com/apstndb/spanalyzer` — the analyzer framework: DDL catalog,

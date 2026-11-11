@@ -1,0 +1,483 @@
+{
+  "fixture_status": "complete",
+  "transaction_attempts": 43,
+  "successful_with_stats": 32,
+  "modeled_measurements": 30,
+  "baseline_contains_observation": 30,
+  "same_input_measured_refinements": 30,
+  "unknown_queue_query_reports": 2,
+  "unmodeled_scopes": [
+    "delete/assert-rows/present=false/assert=0: DELETE ASSERT_ROWS_MODIFIED is outside the pinned parser",
+    "delete/assert-rows/present=true/assert=1: DELETE ASSERT_ROWS_MODIFIED is outside the pinned parser"
+  ],
+  "analysis_errors": null,
+  "disagreements": null,
+  "cases": [
+    {
+      "id": "ignore/one/state=absent/delivery=false",
+      "status": "OK",
+      "observed": 5,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 5,
+        "upper": 5
+      }
+    },
+    {
+      "id": "ignore/one/state=absent/delivery=true",
+      "status": "OK",
+      "observed": 5,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 5,
+        "upper": 5
+      }
+    },
+    {
+      "id": "ignore/one/state=same/delivery=false",
+      "status": "OK",
+      "observed": 0,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 0,
+        "upper": 0
+      }
+    },
+    {
+      "id": "ignore/one/state=same/delivery=true",
+      "status": "OK",
+      "observed": 0,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 0,
+        "upper": 0
+      }
+    },
+    {
+      "id": "ignore/one/state=changed/delivery=false",
+      "status": "OK",
+      "observed": 0,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 0,
+        "upper": 0
+      }
+    },
+    {
+      "id": "ignore/one/state=changed/delivery=true",
+      "status": "OK",
+      "observed": 0,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 0,
+        "upper": 0
+      }
+    },
+    {
+      "id": "ignore/mixed3/present=0/delivery=false",
+      "status": "OK",
+      "observed": 15,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 15,
+        "upper": 15
+      }
+    },
+    {
+      "id": "ignore/mixed3/present=0/delivery=true",
+      "status": "OK",
+      "observed": 15,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 15,
+        "upper": 15
+      }
+    },
+    {
+      "id": "ignore/mixed3/present=1/delivery=false",
+      "status": "OK",
+      "observed": 10,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 10,
+        "upper": 10
+      }
+    },
+    {
+      "id": "ignore/mixed3/present=1/delivery=true",
+      "status": "OK",
+      "observed": 10,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 10,
+        "upper": 10
+      }
+    },
+    {
+      "id": "ignore/mixed3/present=2/delivery=false",
+      "status": "OK",
+      "observed": 5,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 5,
+        "upper": 5
+      }
+    },
+    {
+      "id": "ignore/mixed3/present=2/delivery=true",
+      "status": "OK",
+      "observed": 5,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 5,
+        "upper": 5
+      }
+    },
+    {
+      "id": "ignore/mixed3/present=3/delivery=false",
+      "status": "OK",
+      "observed": 0,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 0,
+        "upper": 0
+      }
+    },
+    {
+      "id": "ignore/mixed3/present=3/delivery=true",
+      "status": "OK",
+      "observed": 0,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 0,
+        "upper": 0
+      }
+    },
+    {
+      "id": "ignore/repeated-key/present=false/different=false",
+      "status": "OK",
+      "observed": 5,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 5,
+        "upper": 5
+      }
+    },
+    {
+      "id": "ignore/repeated-key/present=false/different=true",
+      "status": "OK",
+      "observed": 5,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 5,
+        "upper": 5
+      }
+    },
+    {
+      "id": "ignore/repeated-key/present=true/different=false",
+      "status": "OK",
+      "observed": 0,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 0,
+        "upper": 0
+      }
+    },
+    {
+      "id": "ignore/repeated-key/present=true/different=true",
+      "status": "OK",
+      "observed": 0,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 0,
+        "upper": 0
+      }
+    },
+    {
+      "id": "ignore/null-payload/present=false",
+      "status": "FailedPrecondition",
+      "error": "Payload must not be NULL in table _Queue_Data_Messages.",
+      "observed": null
+    },
+    {
+      "id": "ignore/null-payload/present=true",
+      "status": "OK",
+      "observed": 0,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 0,
+        "upper": 0
+      }
+    },
+    {
+      "id": "select/insert/n=0/present=0",
+      "status": "OK",
+      "observed": 0,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 0,
+        "upper": 0
+      }
+    },
+    {
+      "id": "select/insert/n=1/present=0",
+      "status": "OK",
+      "observed": 5,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 5,
+        "upper": 5
+      }
+    },
+    {
+      "id": "select/insert/n=3/present=0",
+      "status": "OK",
+      "observed": 15,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 15,
+        "upper": 15
+      }
+    },
+    {
+      "id": "select/ignore/n=0/present=0",
+      "status": "OK",
+      "observed": 0,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 0,
+        "upper": 0
+      }
+    },
+    {
+      "id": "select/ignore/n=1/present=0",
+      "status": "OK",
+      "observed": 5,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 5,
+        "upper": 5
+      }
+    },
+    {
+      "id": "select/ignore/n=3/present=0",
+      "status": "OK",
+      "observed": 15,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 15,
+        "upper": 15
+      }
+    },
+    {
+      "id": "select/ignore/n=3/present=1",
+      "status": "OK",
+      "observed": 10,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 10,
+        "upper": 10
+      }
+    },
+    {
+      "id": "select/ignore/n=3/present=3",
+      "status": "OK",
+      "observed": 0,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 0,
+        "upper": 0
+      }
+    },
+    {
+      "id": "ignore/then-delete/present=false",
+      "status": "OK",
+      "observed": 7,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 7,
+        "upper": 7
+      }
+    },
+    {
+      "id": "ignore/then-delete/present=true",
+      "status": "OK",
+      "observed": 2,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 2,
+        "upper": 2
+      }
+    },
+    {
+      "id": "ignore/two-statements",
+      "status": "OK",
+      "observed": 5,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 5,
+        "upper": 5
+      }
+    },
+    {
+      "id": "delete/assert-rows/present=false/assert=0",
+      "status": "OK",
+      "observed": 0
+    },
+    {
+      "id": "delete/assert-rows/present=false/assert=1",
+      "status": "OutOfRange",
+      "error": "DML statement modified an unexpected number of rows. Expected: 1, Actual: 0.",
+      "observed": null
+    },
+    {
+      "id": "delete/assert-rows/present=true/assert=0",
+      "status": "OutOfRange",
+      "error": "DML statement modified an unexpected number of rows. Expected: 0, Actual: 1.",
+      "observed": null
+    },
+    {
+      "id": "delete/assert-rows/present=true/assert=1",
+      "status": "OK",
+      "observed": 2
+    },
+    {
+      "id": "conflict/present=false/ON CONFLICT DO NOTHING",
+      "status": "InvalidArgument",
+      "error": "On conflict action NOTHING is not supported on queues.",
+      "observed": null
+    },
+    {
+      "id": "conflict/present=false/ON CONFLICT (Id) DO NOTHING",
+      "status": "InvalidArgument",
+      "error": "On conflict action NOTHING is not supported on queues.",
+      "observed": null
+    },
+    {
+      "id": "conflict/present=false/ON CONFLICT (Id) DO UPDATE SET Payload=excluded.Payload",
+      "status": "InvalidArgument",
+      "error": "On conflict action UPDATE is not supported on queues.",
+      "observed": null
+    },
+    {
+      "id": "conflict/present=true/ON CONFLICT DO NOTHING",
+      "status": "InvalidArgument",
+      "error": "On conflict action NOTHING is not supported on queues.",
+      "observed": null
+    },
+    {
+      "id": "conflict/present=true/ON CONFLICT (Id) DO NOTHING",
+      "status": "InvalidArgument",
+      "error": "On conflict action NOTHING is not supported on queues.",
+      "observed": null
+    },
+    {
+      "id": "conflict/present=true/ON CONFLICT (Id) DO UPDATE SET Payload=excluded.Payload",
+      "status": "InvalidArgument",
+      "error": "On conflict action UPDATE is not supported on queues.",
+      "observed": null
+    },
+    {
+      "id": "lease/renew-in-rw/ack=false",
+      "status": "InvalidArgument",
+      "error": "Queue renew lease queries must be single-use only.",
+      "observed": null
+    },
+    {
+      "id": "lease/renew-in-rw/ack=true",
+      "status": "InvalidArgument",
+      "error": "Queue renew lease queries must be single-use only.",
+      "observed": null
+    }
+  ]
+}
