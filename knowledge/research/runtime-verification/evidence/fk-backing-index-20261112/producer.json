@@ -1,0 +1,27 @@
+{
+  "source_commit": "c38773c0a6a696b2a8110f195b3124b8d974fd79",
+  "dependency_source_commit": "c38773c0a6a696b2a8110f195b3124b8d974fd79",
+  "working_module": "tools",
+  "go_version": "go version go1.26.11 darwin/arm64",
+  "producers": {
+    "local": {
+      "path": "knowledge/research/runtime-verification/evidence/cross-engine-recheck-20261112/probe-emulator-fixed.go.txt",
+      "source_sha256": "0b0f1dc5ed72533d32732d7bd1de1c93022a419bcab0717dad56f6e264111784",
+      "patch": "local-producer.patch",
+      "patch_sha256": "a0f5813ca96028e6c9be244807046867fbda38710d9d822bd450bd7ac5639fc2",
+      "prepared_sha256": "e75ab7d8871cad28747a419ba4437840c7a1f5385a54779d9f79e77d01f25b03"
+    },
+    "managed": {
+      "path": "knowledge/research/runtime-verification/evidence/managed-recheck-20261112/producer/managed.go.txt",
+      "source_sha256": "ced9af4cabdaa99a632d3a1e09d61a61e6e637a6a494034247b82422210710a5",
+      "patch": "managed-producer.patch",
+      "patch_sha256": "23c832ff340149c4b74f26e801f6334fb93e401fe1fdbdf5bc83130e89940e91",
+      "prepared_sha256": "7e0330cbf8b02ab65849fbbf3411d33711c25a9091c9972fe8328f26227ee74c"
+    }
+  },
+  "dependencies": {
+    "go.work": "b4a708a522cdaa9ca8776a360191c2bc8a355295ee6b48e5b0dc6ecdea0c815a",
+    "tools/go.mod": "2f36f06b98b5056d3c44aec6a2798d9a52f7af137e54cb48d604f361401d03be",
+    "tools/go.sum": "3f85babec06188a53ffa7786e8e8ea33b5a851be6d7ea1bf60b9dea03aabecb8"
+  }
+}

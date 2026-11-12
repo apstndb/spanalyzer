@@ -1,0 +1,42 @@
+--- a/local.go
++++ b/local.go
+@@ -131,7 +131,11 @@
+ 	if plan.Dialect == "pg" {
+ 		dialect = dbpb.DatabaseDialect_POSTGRESQL
+ 	}
+-	clients, err := spanemuboost.OpenClients(ctx, runtime, spanemuboost.EnableAutoConfig(), spanemuboost.WithRandomDatabaseID(), spanemuboost.WithDatabaseDialect(dialect), spanemuboost.SkipSchemaTeardown())
++	autoConfig := spanemuboost.EnableAutoConfig()
++	if backendName == "omni" {
++		autoConfig = spanemuboost.EnableDatabaseAutoConfigOnly()
++	}
++	clients, err := spanemuboost.OpenClients(ctx, runtime, autoConfig, spanemuboost.WithRandomDatabaseID(), spanemuboost.WithDatabaseDialect(dialect), spanemuboost.SkipSchemaTeardown())
+ 	if err != nil {
+ 		emit(map[string]any{"label": "fixture-open", "dialect": plan.Dialect, "code": status.Code(err).String(), "error": err.Error()})
+ 		return
+@@ -253,7 +257,8 @@
+ 			ro.Close()
+ 		case "dml":
+ 			var counts []int64
+-			_, e = client.ReadWriteTransaction(cx, func(ctx context.Context, tx *spanner.ReadWriteTransaction) error {
++			var commitResponse spanner.CommitResponse
++			commitResponse, e = client.ReadWriteTransactionWithOptions(cx, func(ctx context.Context, tx *spanner.ReadWriteTransaction) error {
+ 				counts = nil
+ 				for _, sql := range s.Statements {
+ 					n, err := tx.Update(ctx, spanner.Statement{SQL: sql})
+@@ -263,9 +268,15 @@
+ 					counts = append(counts, n)
+ 				}
+ 				return nil
+-			})
++			}, spanner.TransactionOptions{CommitOptions: spanner.CommitOptions{ReturnCommitStats: true}})
+ 			result["modified_counts"] = counts
+ 			result["transaction_committed"] = e == nil
++
++			result["stats_present"] = e == nil && commitResponse.CommitStats != nil
++			result["mutation_count"] = nil
++			if e == nil && commitResponse.CommitStats != nil {
++				result["mutation_count"] = commitResponse.CommitStats.MutationCount
++			}
+ 		case "mutation-delete":
+ 			key := make(spanner.Key, len(s.Key))
+ 			for i, value := range s.Key {

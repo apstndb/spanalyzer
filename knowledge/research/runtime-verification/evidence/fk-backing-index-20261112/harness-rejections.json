@@ -1,0 +1,31 @@
+{
+  "scope": "Initial Omni setup stopped before any SQL because instance auto-configuration is unsupported; corrected local producer selects database-only auto-configuration for Omni.",
+  "observations": [
+    {
+      "run": "omni-lts",
+      "code": "Unknown",
+      "dialect": "google",
+      "error": "spanemuboost: instance auto-configuration is unsupported for Spanner Omni single-server because the built-in default instance cannot be created, updated, or deleted; use the default behavior or EnableDatabaseAutoConfigOnly(), or DisableBackendGuardrails() to bypass this validation",
+      "label": "fixture-open"
+    },
+    {
+      "run": "omni-lts",
+      "code": "OK",
+      "error": "",
+      "label": "runtime-closed"
+    },
+    {
+      "run": "omni-r5",
+      "code": "Unknown",
+      "dialect": "google",
+      "error": "spanemuboost: instance auto-configuration is unsupported for Spanner Omni single-server because the built-in default instance cannot be created, updated, or deleted; use the default behavior or EnableDatabaseAutoConfigOnly(), or DisableBackendGuardrails() to bypass this validation",
+      "label": "fixture-open"
+    },
+    {
+      "run": "omni-r5",
+      "code": "OK",
+      "error": "",
+      "label": "runtime-closed"
+    }
+  ]
+}

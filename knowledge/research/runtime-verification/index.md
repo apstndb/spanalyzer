@@ -7,6 +7,7 @@ source evidence, results and unverified boundaries travel with each note.
 
 | Runtime and observation scope | Research Note |
 | --- | --- |
+| Managed, Omni r4 LTS.2 / r5.1 and Emulator 1.5.59, 2026-11-12 JST | [FK backing-index predictability](fk-backing-index-predictability-20261112.md): 504 controlled steps, schema/source/name boundaries, nullable PK and reordered-key count bounds, shared physical indexes, three-cycle FK failures and verified owned-DB cleanup |
 | Omni r4 LTS.2 / r5.1 and Emulator 1.5.59, 2026-11-12 JST | [Managed-control comparison](cross-engine-managed-recheck-20261112.md): 1,165 recorded steps, secure-context and privilege boundaries, distribution/compression, typed vectors, metadata tuples and current public releases |
 | Omni r4 LTS.2, 2026-11-12 JST | [Mutation-count feedback integration](mutation-count-feedback-20261112.md): shared observed FK indexes, explicit scenarios and count contracts; original 31 commits plus a separate 36-commit revalidation including the runnable CLI workflow |
 | Managed Spanner, 2026-11-12 JST | [Managed revalidation and parameterized views](managed-revalidation-20261112.md): four mirror commits, secure request context and FGAC, distribution aggregation, compression frames, scorer cohorts and explicit fixture corrections |
@@ -57,8 +58,8 @@ Read the [managed](managed/index.md), [Omni](omni/index.md) and
 changes, first coverage, rechecks and corrections. Same-day rows without exact
 times have no claimed internal order. [History conventions](organization.md)
 explain how to append observations without rewriting earlier conclusions.
-The November 12 managed revalidation and its cross-engine follow-up are the
-newest selected investigations. The mutation-count feedback fixture, November
+The November 12 FK investigation, managed revalidation and its cross-engine
+follow-up are the newest selected investigations. The mutation-count feedback fixture, November
 10 write-accounting notes and older comparisons retain their own observation
 dates and scopes.
 

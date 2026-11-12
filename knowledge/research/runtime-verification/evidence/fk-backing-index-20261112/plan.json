@@ -1,0 +1,1007 @@
+{
+  "dialect": "google",
+  "steps": [
+    {
+      "label": "parents",
+      "family": "foreign-key-backing-index",
+      "kind": "ddl",
+      "requires": [],
+      "timeout_seconds": 90,
+      "statements": [
+        "CREATE TABLE ParentSimple(Id INT64 NOT NULL) PRIMARY KEY(Id)",
+        "CREATE TABLE ParentTriple(A INT64 NOT NULL,B INT64 NOT NULL,C INT64 NOT NULL,U INT64,V INT64 NOT NULL) PRIMARY KEY(A,B,C)",
+        "CREATE TABLE ParentOrder(Id INT64 NOT NULL,C INT64 NOT NULL,A INT64 NOT NULL,B INT64 NOT NULL) PRIMARY KEY(Id)"
+      ]
+    },
+    {
+      "label": "not-null-non-pk/ddl",
+      "family": "foreign-key-backing-index",
+      "kind": "ddl",
+      "requires": [
+        "parents"
+      ],
+      "timeout_seconds": 90,
+      "statements": [
+        "CREATE TABLE NotNullSide(Id INT64 NOT NULL,Owner INT64 NOT NULL,CONSTRAINT NotNullFk FOREIGN KEY(Owner) REFERENCES ParentSimple(Id)) PRIMARY KEY(Id)"
+      ]
+    },
+    {
+      "label": "not-null-non-pk/indexes",
+      "family": "foreign-key-backing-index",
+      "kind": "query",
+      "requires": [
+        "not-null-non-pk/ddl"
+      ],
+      "timeout_seconds": 90,
+      "sql": "SELECT i.TABLE_SCHEMA,i.TABLE_NAME,i.INDEX_NAME,i.INDEX_TYPE,i.IS_UNIQUE,i.IS_NULL_FILTERED,i.INDEX_STATE,i.SPANNER_IS_MANAGED,c.COLUMN_NAME,c.ORDINAL_POSITION,c.COLUMN_ORDERING FROM INFORMATION_SCHEMA.INDEXES AS i JOIN INFORMATION_SCHEMA.INDEX_COLUMNS AS c USING(TABLE_CATALOG,TABLE_SCHEMA,TABLE_NAME,INDEX_NAME) WHERE i.INDEX_TYPE='INDEX' AND i.TABLE_NAME IN ('NotNullSide','ParentSimple') ORDER BY i.TABLE_SCHEMA,i.TABLE_NAME,i.INDEX_NAME,c.ORDINAL_POSITION,c.COLUMN_NAME"
+    },
+    {
+      "label": "not-null-non-pk/hint/NotNullFk/referencing",
+      "family": "foreign-key-backing-index",
+      "kind": "plan",
+      "requires": [
+        "not-null-non-pk/ddl"
+      ],
+      "timeout_seconds": 90,
+      "sql": "SELECT Owner FROM NotNullSide@{FORCE_INDEX=NotNullFk} WHERE Owner>=0"
+    },
+    {
+      "label": "not-null-non-pk/hint/NotNullFk/referenced",
+      "family": "foreign-key-backing-index",
+      "kind": "plan",
+      "requires": [
+        "not-null-non-pk/ddl"
+      ],
+      "timeout_seconds": 90,
+      "sql": "SELECT Id FROM ParentSimple@{FORCE_INDEX=NotNullFk} WHERE Id>=0"
+    },
+    {
+      "label": "nullable-non-pk/ddl",
+      "family": "foreign-key-backing-index",
+      "kind": "ddl",
+      "requires": [
+        "parents"
+      ],
+      "timeout_seconds": 90,
+      "statements": [
+        "CREATE TABLE NullableSide(Id INT64 NOT NULL,Owner INT64,CONSTRAINT NullableFk FOREIGN KEY(Owner) REFERENCES ParentSimple(Id)) PRIMARY KEY(Id)"
+      ]
+    },
+    {
+      "label": "nullable-non-pk/indexes",
+      "family": "foreign-key-backing-index",
+      "kind": "query",
+      "requires": [
+        "nullable-non-pk/ddl"
+      ],
+      "timeout_seconds": 90,
+      "sql": "SELECT i.TABLE_SCHEMA,i.TABLE_NAME,i.INDEX_NAME,i.INDEX_TYPE,i.IS_UNIQUE,i.IS_NULL_FILTERED,i.INDEX_STATE,i.SPANNER_IS_MANAGED,c.COLUMN_NAME,c.ORDINAL_POSITION,c.COLUMN_ORDERING FROM INFORMATION_SCHEMA.INDEXES AS i JOIN INFORMATION_SCHEMA.INDEX_COLUMNS AS c USING(TABLE_CATALOG,TABLE_SCHEMA,TABLE_NAME,INDEX_NAME) WHERE i.INDEX_TYPE='INDEX' AND i.TABLE_NAME IN ('NullableSide','ParentSimple') ORDER BY i.TABLE_SCHEMA,i.TABLE_NAME,i.INDEX_NAME,c.ORDINAL_POSITION,c.COLUMN_NAME"
+    },
+    {
+      "label": "nullable-non-pk/hint/NullableFk/referencing",
+      "family": "foreign-key-backing-index",
+      "kind": "plan",
+      "requires": [
+        "nullable-non-pk/ddl"
+      ],
+      "timeout_seconds": 90,
+      "sql": "SELECT Owner FROM NullableSide@{FORCE_INDEX=NullableFk} WHERE Owner>=0"
+    },
+    {
+      "label": "nullable-non-pk/hint/NullableFk/referenced",
+      "family": "foreign-key-backing-index",
+      "kind": "plan",
+      "requires": [
+        "nullable-non-pk/ddl"
+      ],
+      "timeout_seconds": 90,
+      "sql": "SELECT Id FROM ParentSimple@{FORCE_INDEX=NullableFk} WHERE Id>=0"
+    },
+    {
+      "label": "not-null-pk/ddl",
+      "family": "foreign-key-backing-index",
+      "kind": "ddl",
+      "requires": [
+        "parents"
+      ],
+      "timeout_seconds": 90,
+      "statements": [
+        "CREATE TABLE PkCovered(Id INT64 NOT NULL,V STRING(MAX),CONSTRAINT PkFk FOREIGN KEY(Id) REFERENCES ParentSimple(Id)) PRIMARY KEY(Id)"
+      ]
+    },
+    {
+      "label": "not-null-pk/indexes",
+      "family": "foreign-key-backing-index",
+      "kind": "query",
+      "requires": [
+        "not-null-pk/ddl"
+      ],
+      "timeout_seconds": 90,
+      "sql": "SELECT i.TABLE_SCHEMA,i.TABLE_NAME,i.INDEX_NAME,i.INDEX_TYPE,i.IS_UNIQUE,i.IS_NULL_FILTERED,i.INDEX_STATE,i.SPANNER_IS_MANAGED,c.COLUMN_NAME,c.ORDINAL_POSITION,c.COLUMN_ORDERING FROM INFORMATION_SCHEMA.INDEXES AS i JOIN INFORMATION_SCHEMA.INDEX_COLUMNS AS c USING(TABLE_CATALOG,TABLE_SCHEMA,TABLE_NAME,INDEX_NAME) WHERE i.INDEX_TYPE='INDEX' AND i.TABLE_NAME IN ('PkCovered','ParentSimple') ORDER BY i.TABLE_SCHEMA,i.TABLE_NAME,i.INDEX_NAME,c.ORDINAL_POSITION,c.COLUMN_NAME"
+    },
+    {
+      "label": "not-null-pk/hint/PkFk/referencing",
+      "family": "foreign-key-backing-index",
+      "kind": "plan",
+      "requires": [
+        "not-null-pk/ddl"
+      ],
+      "timeout_seconds": 90,
+      "sql": "SELECT Id FROM PkCovered@{FORCE_INDEX=PkFk} WHERE Id>=0"
+    },
+    {
+      "label": "not-null-pk/hint/PkFk/referenced",
+      "family": "foreign-key-backing-index",
+      "kind": "plan",
+      "requires": [
+        "not-null-pk/ddl"
+      ],
+      "timeout_seconds": 90,
+      "sql": "SELECT Id FROM ParentSimple@{FORCE_INDEX=PkFk} WHERE Id>=0"
+    },
+    {
+      "label": "nullable-pk/ddl",
+      "family": "foreign-key-backing-index",
+      "kind": "ddl",
+      "requires": [
+        "parents"
+      ],
+      "timeout_seconds": 90,
+      "statements": [
+        "CREATE TABLE NullablePk(Id INT64,V STRING(MAX),CONSTRAINT NullablePkFk FOREIGN KEY(Id) REFERENCES ParentSimple(Id)) PRIMARY KEY(Id)"
+      ]
+    },
+    {
+      "label": "nullable-pk/indexes",
+      "family": "foreign-key-backing-index",
+      "kind": "query",
+      "requires": [
+        "nullable-pk/ddl"
+      ],
+      "timeout_seconds": 90,
+      "sql": "SELECT i.TABLE_SCHEMA,i.TABLE_NAME,i.INDEX_NAME,i.INDEX_TYPE,i.IS_UNIQUE,i.IS_NULL_FILTERED,i.INDEX_STATE,i.SPANNER_IS_MANAGED,c.COLUMN_NAME,c.ORDINAL_POSITION,c.COLUMN_ORDERING FROM INFORMATION_SCHEMA.INDEXES AS i JOIN INFORMATION_SCHEMA.INDEX_COLUMNS AS c USING(TABLE_CATALOG,TABLE_SCHEMA,TABLE_NAME,INDEX_NAME) WHERE i.INDEX_TYPE='INDEX' AND i.TABLE_NAME IN ('NullablePk','ParentSimple') ORDER BY i.TABLE_SCHEMA,i.TABLE_NAME,i.INDEX_NAME,c.ORDINAL_POSITION,c.COLUMN_NAME"
+    },
+    {
+      "label": "nullable-pk/hint/NullablePkFk/referencing",
+      "family": "foreign-key-backing-index",
+      "kind": "plan",
+      "requires": [
+        "nullable-pk/ddl"
+      ],
+      "timeout_seconds": 90,
+      "sql": "SELECT Id FROM NullablePk@{FORCE_INDEX=NullablePkFk} WHERE Id>=0"
+    },
+    {
+      "label": "nullable-pk/hint/NullablePkFk/referenced",
+      "family": "foreign-key-backing-index",
+      "kind": "plan",
+      "requires": [
+        "nullable-pk/ddl"
+      ],
+      "timeout_seconds": 90,
+      "sql": "SELECT Id FROM ParentSimple@{FORCE_INDEX=NullablePkFk} WHERE Id>=0"
+    },
+    {
+      "label": "not-null-prefix/ddl",
+      "family": "foreign-key-backing-index",
+      "kind": "ddl",
+      "requires": [
+        "parents"
+      ],
+      "timeout_seconds": 90,
+      "statements": [
+        "CREATE TABLE PrefixCovered(Owner INT64 NOT NULL,Id INT64 NOT NULL,CONSTRAINT PrefixFk FOREIGN KEY(Owner) REFERENCES ParentSimple(Id)) PRIMARY KEY(Owner,Id)"
+      ]
+    },
+    {
+      "label": "not-null-prefix/indexes",
+      "family": "foreign-key-backing-index",
+      "kind": "query",
+      "requires": [
+        "not-null-prefix/ddl"
+      ],
+      "timeout_seconds": 90,
+      "sql": "SELECT i.TABLE_SCHEMA,i.TABLE_NAME,i.INDEX_NAME,i.INDEX_TYPE,i.IS_UNIQUE,i.IS_NULL_FILTERED,i.INDEX_STATE,i.SPANNER_IS_MANAGED,c.COLUMN_NAME,c.ORDINAL_POSITION,c.COLUMN_ORDERING FROM INFORMATION_SCHEMA.INDEXES AS i JOIN INFORMATION_SCHEMA.INDEX_COLUMNS AS c USING(TABLE_CATALOG,TABLE_SCHEMA,TABLE_NAME,INDEX_NAME) WHERE i.INDEX_TYPE='INDEX' AND i.TABLE_NAME IN ('PrefixCovered','ParentSimple') ORDER BY i.TABLE_SCHEMA,i.TABLE_NAME,i.INDEX_NAME,c.ORDINAL_POSITION,c.COLUMN_NAME"
+    },
+    {
+      "label": "not-null-prefix/hint/PrefixFk/referencing",
+      "family": "foreign-key-backing-index",
+      "kind": "plan",
+      "requires": [
+        "not-null-prefix/ddl"
+      ],
+      "timeout_seconds": 90,
+      "sql": "SELECT Owner FROM PrefixCovered@{FORCE_INDEX=PrefixFk} WHERE Owner>=0"
+    },
+    {
+      "label": "not-null-prefix/hint/PrefixFk/referenced",
+      "family": "foreign-key-backing-index",
+      "kind": "plan",
+      "requires": [
+        "not-null-prefix/ddl"
+      ],
+      "timeout_seconds": 90,
+      "sql": "SELECT Id FROM ParentSimple@{FORCE_INDEX=PrefixFk} WHERE Id>=0"
+    },
+    {
+      "label": "existing-user-index/ddl",
+      "family": "foreign-key-backing-index",
+      "kind": "ddl",
+      "requires": [
+        "parents"
+      ],
+      "timeout_seconds": 90,
+      "statements": [
+        "CREATE TABLE UserIndexed(Id INT64 NOT NULL,Owner INT64) PRIMARY KEY(Id)",
+        "CREATE INDEX UserByOwner ON UserIndexed(Owner)",
+        "ALTER TABLE UserIndexed ADD CONSTRAINT UserFk FOREIGN KEY(Owner) REFERENCES ParentSimple(Id)"
+      ]
+    },
+    {
+      "label": "existing-user-index/indexes",
+      "family": "foreign-key-backing-index",
+      "kind": "query",
+      "requires": [
+        "existing-user-index/ddl"
+      ],
+      "timeout_seconds": 90,
+      "sql": "SELECT i.TABLE_SCHEMA,i.TABLE_NAME,i.INDEX_NAME,i.INDEX_TYPE,i.IS_UNIQUE,i.IS_NULL_FILTERED,i.INDEX_STATE,i.SPANNER_IS_MANAGED,c.COLUMN_NAME,c.ORDINAL_POSITION,c.COLUMN_ORDERING FROM INFORMATION_SCHEMA.INDEXES AS i JOIN INFORMATION_SCHEMA.INDEX_COLUMNS AS c USING(TABLE_CATALOG,TABLE_SCHEMA,TABLE_NAME,INDEX_NAME) WHERE i.INDEX_TYPE='INDEX' AND i.TABLE_NAME IN ('UserIndexed','ParentSimple') ORDER BY i.TABLE_SCHEMA,i.TABLE_NAME,i.INDEX_NAME,c.ORDINAL_POSITION,c.COLUMN_NAME"
+    },
+    {
+      "label": "existing-user-index/hint/UserFk/referencing",
+      "family": "foreign-key-backing-index",
+      "kind": "plan",
+      "requires": [
+        "existing-user-index/ddl"
+      ],
+      "timeout_seconds": 90,
+      "sql": "SELECT Owner FROM UserIndexed@{FORCE_INDEX=UserFk} WHERE Owner>=0"
+    },
+    {
+      "label": "existing-user-index/hint/UserFk/referenced",
+      "family": "foreign-key-backing-index",
+      "kind": "plan",
+      "requires": [
+        "existing-user-index/ddl"
+      ],
+      "timeout_seconds": 90,
+      "sql": "SELECT Id FROM ParentSimple@{FORCE_INDEX=UserFk} WHERE Id>=0"
+    },
+    {
+      "label": "shared/ddl",
+      "family": "foreign-key-backing-index",
+      "kind": "ddl",
+      "requires": [
+        "parents"
+      ],
+      "timeout_seconds": 90,
+      "statements": [
+        "CREATE TABLE SharedSide(Id INT64 NOT NULL,Owner INT64,CONSTRAINT SharedA FOREIGN KEY(Owner) REFERENCES ParentSimple(Id),CONSTRAINT SharedB FOREIGN KEY(Owner) REFERENCES ParentSimple(Id)) PRIMARY KEY(Id)"
+      ]
+    },
+    {
+      "label": "shared/indexes",
+      "family": "foreign-key-backing-index",
+      "kind": "query",
+      "requires": [
+        "shared/ddl"
+      ],
+      "timeout_seconds": 90,
+      "sql": "SELECT i.TABLE_SCHEMA,i.TABLE_NAME,i.INDEX_NAME,i.INDEX_TYPE,i.IS_UNIQUE,i.IS_NULL_FILTERED,i.INDEX_STATE,i.SPANNER_IS_MANAGED,c.COLUMN_NAME,c.ORDINAL_POSITION,c.COLUMN_ORDERING FROM INFORMATION_SCHEMA.INDEXES AS i JOIN INFORMATION_SCHEMA.INDEX_COLUMNS AS c USING(TABLE_CATALOG,TABLE_SCHEMA,TABLE_NAME,INDEX_NAME) WHERE i.INDEX_TYPE='INDEX' AND i.TABLE_NAME IN ('SharedSide','ParentSimple') ORDER BY i.TABLE_SCHEMA,i.TABLE_NAME,i.INDEX_NAME,c.ORDINAL_POSITION,c.COLUMN_NAME"
+    },
+    {
+      "label": "shared/hint/SharedA/referencing",
+      "family": "foreign-key-backing-index",
+      "kind": "plan",
+      "requires": [
+        "shared/ddl"
+      ],
+      "timeout_seconds": 90,
+      "sql": "SELECT Owner FROM SharedSide@{FORCE_INDEX=SharedA} WHERE Owner>=0"
+    },
+    {
+      "label": "shared/hint/SharedA/referenced",
+      "family": "foreign-key-backing-index",
+      "kind": "plan",
+      "requires": [
+        "shared/ddl"
+      ],
+      "timeout_seconds": 90,
+      "sql": "SELECT Id FROM ParentSimple@{FORCE_INDEX=SharedA} WHERE Id>=0"
+    },
+    {
+      "label": "shared/hint/SharedB/referencing",
+      "family": "foreign-key-backing-index",
+      "kind": "plan",
+      "requires": [
+        "shared/ddl"
+      ],
+      "timeout_seconds": 90,
+      "sql": "SELECT Owner FROM SharedSide@{FORCE_INDEX=SharedB} WHERE Owner>=0"
+    },
+    {
+      "label": "shared/hint/SharedB/referenced",
+      "family": "foreign-key-backing-index",
+      "kind": "plan",
+      "requires": [
+        "shared/ddl"
+      ],
+      "timeout_seconds": 90,
+      "sql": "SELECT Id FROM ParentSimple@{FORCE_INDEX=SharedB} WHERE Id>=0"
+    },
+    {
+      "label": "informational/ddl",
+      "family": "foreign-key-backing-index",
+      "kind": "ddl",
+      "requires": [
+        "parents"
+      ],
+      "timeout_seconds": 90,
+      "statements": [
+        "CREATE TABLE InfoSide(Id INT64 NOT NULL,Owner INT64,CONSTRAINT InfoFk FOREIGN KEY(Owner) REFERENCES ParentSimple(Id) NOT ENFORCED) PRIMARY KEY(Id)"
+      ]
+    },
+    {
+      "label": "informational/indexes",
+      "family": "foreign-key-backing-index",
+      "kind": "query",
+      "requires": [
+        "informational/ddl"
+      ],
+      "timeout_seconds": 90,
+      "sql": "SELECT i.TABLE_SCHEMA,i.TABLE_NAME,i.INDEX_NAME,i.INDEX_TYPE,i.IS_UNIQUE,i.IS_NULL_FILTERED,i.INDEX_STATE,i.SPANNER_IS_MANAGED,c.COLUMN_NAME,c.ORDINAL_POSITION,c.COLUMN_ORDERING FROM INFORMATION_SCHEMA.INDEXES AS i JOIN INFORMATION_SCHEMA.INDEX_COLUMNS AS c USING(TABLE_CATALOG,TABLE_SCHEMA,TABLE_NAME,INDEX_NAME) WHERE i.INDEX_TYPE='INDEX' AND i.TABLE_NAME IN ('InfoSide','ParentSimple') ORDER BY i.TABLE_SCHEMA,i.TABLE_NAME,i.INDEX_NAME,c.ORDINAL_POSITION,c.COLUMN_NAME"
+    },
+    {
+      "label": "informational/hint/InfoFk/referencing",
+      "family": "foreign-key-backing-index",
+      "kind": "plan",
+      "requires": [
+        "informational/ddl"
+      ],
+      "timeout_seconds": 90,
+      "sql": "SELECT Owner FROM InfoSide@{FORCE_INDEX=InfoFk} WHERE Owner>=0"
+    },
+    {
+      "label": "informational/hint/InfoFk/referenced",
+      "family": "foreign-key-backing-index",
+      "kind": "plan",
+      "requires": [
+        "informational/ddl"
+      ],
+      "timeout_seconds": 90,
+      "sql": "SELECT Id FROM ParentSimple@{FORCE_INDEX=InfoFk} WHERE Id>=0"
+    },
+    {
+      "label": "nullable-referenced-alias/ddl",
+      "family": "foreign-key-backing-index",
+      "kind": "ddl",
+      "requires": [
+        "parents"
+      ],
+      "timeout_seconds": 90,
+      "statements": [
+        "CREATE TABLE AliasNullable(Id INT64 NOT NULL,Link INT64,CONSTRAINT AliasNullFk FOREIGN KEY(Link) REFERENCES ParentTriple(U)) PRIMARY KEY(Id)"
+      ]
+    },
+    {
+      "label": "nullable-referenced-alias/indexes",
+      "family": "foreign-key-backing-index",
+      "kind": "query",
+      "requires": [
+        "nullable-referenced-alias/ddl"
+      ],
+      "timeout_seconds": 90,
+      "sql": "SELECT i.TABLE_SCHEMA,i.TABLE_NAME,i.INDEX_NAME,i.INDEX_TYPE,i.IS_UNIQUE,i.IS_NULL_FILTERED,i.INDEX_STATE,i.SPANNER_IS_MANAGED,c.COLUMN_NAME,c.ORDINAL_POSITION,c.COLUMN_ORDERING FROM INFORMATION_SCHEMA.INDEXES AS i JOIN INFORMATION_SCHEMA.INDEX_COLUMNS AS c USING(TABLE_CATALOG,TABLE_SCHEMA,TABLE_NAME,INDEX_NAME) WHERE i.INDEX_TYPE='INDEX' AND i.TABLE_NAME IN ('AliasNullable','ParentTriple') ORDER BY i.TABLE_SCHEMA,i.TABLE_NAME,i.INDEX_NAME,c.ORDINAL_POSITION,c.COLUMN_NAME"
+    },
+    {
+      "label": "nullable-referenced-alias/hint/AliasNullFk/referencing",
+      "family": "foreign-key-backing-index",
+      "kind": "plan",
+      "requires": [
+        "nullable-referenced-alias/ddl"
+      ],
+      "timeout_seconds": 90,
+      "sql": "SELECT Link FROM AliasNullable@{FORCE_INDEX=AliasNullFk} WHERE Link>=0"
+    },
+    {
+      "label": "nullable-referenced-alias/hint/AliasNullFk/referenced",
+      "family": "foreign-key-backing-index",
+      "kind": "plan",
+      "requires": [
+        "nullable-referenced-alias/ddl"
+      ],
+      "timeout_seconds": 90,
+      "sql": "SELECT A FROM ParentTriple@{FORCE_INDEX=AliasNullFk} WHERE A>=0"
+    },
+    {
+      "label": "not-null-referenced-alias/ddl",
+      "family": "foreign-key-backing-index",
+      "kind": "ddl",
+      "requires": [
+        "parents"
+      ],
+      "timeout_seconds": 90,
+      "statements": [
+        "CREATE TABLE AliasRequired(Id INT64 NOT NULL,Link INT64 NOT NULL,CONSTRAINT AliasRequiredFk FOREIGN KEY(Link) REFERENCES ParentTriple(V)) PRIMARY KEY(Id)"
+      ]
+    },
+    {
+      "label": "not-null-referenced-alias/indexes",
+      "family": "foreign-key-backing-index",
+      "kind": "query",
+      "requires": [
+        "not-null-referenced-alias/ddl"
+      ],
+      "timeout_seconds": 90,
+      "sql": "SELECT i.TABLE_SCHEMA,i.TABLE_NAME,i.INDEX_NAME,i.INDEX_TYPE,i.IS_UNIQUE,i.IS_NULL_FILTERED,i.INDEX_STATE,i.SPANNER_IS_MANAGED,c.COLUMN_NAME,c.ORDINAL_POSITION,c.COLUMN_ORDERING FROM INFORMATION_SCHEMA.INDEXES AS i JOIN INFORMATION_SCHEMA.INDEX_COLUMNS AS c USING(TABLE_CATALOG,TABLE_SCHEMA,TABLE_NAME,INDEX_NAME) WHERE i.INDEX_TYPE='INDEX' AND i.TABLE_NAME IN ('AliasRequired','ParentTriple') ORDER BY i.TABLE_SCHEMA,i.TABLE_NAME,i.INDEX_NAME,c.ORDINAL_POSITION,c.COLUMN_NAME"
+    },
+    {
+      "label": "not-null-referenced-alias/hint/AliasRequiredFk/referencing",
+      "family": "foreign-key-backing-index",
+      "kind": "plan",
+      "requires": [
+        "not-null-referenced-alias/ddl"
+      ],
+      "timeout_seconds": 90,
+      "sql": "SELECT Link FROM AliasRequired@{FORCE_INDEX=AliasRequiredFk} WHERE Link>=0"
+    },
+    {
+      "label": "not-null-referenced-alias/hint/AliasRequiredFk/referenced",
+      "family": "foreign-key-backing-index",
+      "kind": "plan",
+      "requires": [
+        "not-null-referenced-alias/ddl"
+      ],
+      "timeout_seconds": 90,
+      "sql": "SELECT A FROM ParentTriple@{FORCE_INDEX=AliasRequiredFk} WHERE A>=0"
+    },
+    {
+      "label": "referenced-pk-subset/ddl",
+      "family": "foreign-key-backing-index",
+      "kind": "ddl",
+      "requires": [
+        "parents"
+      ],
+      "timeout_seconds": 90,
+      "statements": [
+        "CREATE TABLE SubsetSide(CA INT64 NOT NULL,CB INT64 NOT NULL,Id INT64 NOT NULL,CONSTRAINT SubsetFk FOREIGN KEY(CA,CB) REFERENCES ParentTriple(A,B)) PRIMARY KEY(CA,CB,Id)"
+      ]
+    },
+    {
+      "label": "referenced-pk-subset/indexes",
+      "family": "foreign-key-backing-index",
+      "kind": "query",
+      "requires": [
+        "referenced-pk-subset/ddl"
+      ],
+      "timeout_seconds": 90,
+      "sql": "SELECT i.TABLE_SCHEMA,i.TABLE_NAME,i.INDEX_NAME,i.INDEX_TYPE,i.IS_UNIQUE,i.IS_NULL_FILTERED,i.INDEX_STATE,i.SPANNER_IS_MANAGED,c.COLUMN_NAME,c.ORDINAL_POSITION,c.COLUMN_ORDERING FROM INFORMATION_SCHEMA.INDEXES AS i JOIN INFORMATION_SCHEMA.INDEX_COLUMNS AS c USING(TABLE_CATALOG,TABLE_SCHEMA,TABLE_NAME,INDEX_NAME) WHERE i.INDEX_TYPE='INDEX' AND i.TABLE_NAME IN ('SubsetSide','ParentTriple') ORDER BY i.TABLE_SCHEMA,i.TABLE_NAME,i.INDEX_NAME,c.ORDINAL_POSITION,c.COLUMN_NAME"
+    },
+    {
+      "label": "referenced-pk-subset/hint/SubsetFk/referencing",
+      "family": "foreign-key-backing-index",
+      "kind": "plan",
+      "requires": [
+        "referenced-pk-subset/ddl"
+      ],
+      "timeout_seconds": 90,
+      "sql": "SELECT CA FROM SubsetSide@{FORCE_INDEX=SubsetFk} WHERE CA>=0"
+    },
+    {
+      "label": "referenced-pk-subset/hint/SubsetFk/referenced",
+      "family": "foreign-key-backing-index",
+      "kind": "plan",
+      "requires": [
+        "referenced-pk-subset/ddl"
+      ],
+      "timeout_seconds": 90,
+      "sql": "SELECT A FROM ParentTriple@{FORCE_INDEX=SubsetFk} WHERE A>=0"
+    },
+    {
+      "label": "swapped-pk/ddl",
+      "family": "foreign-key-backing-index",
+      "kind": "ddl",
+      "requires": [
+        "parents"
+      ],
+      "timeout_seconds": 90,
+      "statements": [
+        "CREATE TABLE SwapSide(CA INT64 NOT NULL,CB INT64 NOT NULL,CC INT64 NOT NULL,CONSTRAINT SwapFk FOREIGN KEY(CA,CB,CC) REFERENCES ParentTriple(B,A,C)) PRIMARY KEY(CB,CA,CC)"
+      ]
+    },
+    {
+      "label": "swapped-pk/indexes",
+      "family": "foreign-key-backing-index",
+      "kind": "query",
+      "requires": [
+        "swapped-pk/ddl"
+      ],
+      "timeout_seconds": 90,
+      "sql": "SELECT i.TABLE_SCHEMA,i.TABLE_NAME,i.INDEX_NAME,i.INDEX_TYPE,i.IS_UNIQUE,i.IS_NULL_FILTERED,i.INDEX_STATE,i.SPANNER_IS_MANAGED,c.COLUMN_NAME,c.ORDINAL_POSITION,c.COLUMN_ORDERING FROM INFORMATION_SCHEMA.INDEXES AS i JOIN INFORMATION_SCHEMA.INDEX_COLUMNS AS c USING(TABLE_CATALOG,TABLE_SCHEMA,TABLE_NAME,INDEX_NAME) WHERE i.INDEX_TYPE='INDEX' AND i.TABLE_NAME IN ('SwapSide','ParentTriple') ORDER BY i.TABLE_SCHEMA,i.TABLE_NAME,i.INDEX_NAME,c.ORDINAL_POSITION,c.COLUMN_NAME"
+    },
+    {
+      "label": "swapped-pk/hint/SwapFk/referencing",
+      "family": "foreign-key-backing-index",
+      "kind": "plan",
+      "requires": [
+        "swapped-pk/ddl"
+      ],
+      "timeout_seconds": 90,
+      "sql": "SELECT CA FROM SwapSide@{FORCE_INDEX=SwapFk} WHERE CA>=0"
+    },
+    {
+      "label": "swapped-pk/hint/SwapFk/referenced",
+      "family": "foreign-key-backing-index",
+      "kind": "plan",
+      "requires": [
+        "swapped-pk/ddl"
+      ],
+      "timeout_seconds": 90,
+      "sql": "SELECT A FROM ParentTriple@{FORCE_INDEX=SwapFk} WHERE A>=0"
+    },
+    {
+      "label": "cyclic-covered-pk/ddl",
+      "family": "foreign-key-backing-index",
+      "kind": "ddl",
+      "requires": [
+        "parents"
+      ],
+      "timeout_seconds": 90,
+      "statements": [
+        "CREATE TABLE CycleCovered(CA INT64 NOT NULL,CB INT64 NOT NULL,CC INT64 NOT NULL,CONSTRAINT CycleCoveredFk FOREIGN KEY(CA,CB,CC) REFERENCES ParentTriple(B,C,A)) PRIMARY KEY(CC,CA,CB)"
+      ]
+    },
+    {
+      "label": "cyclic-covered-pk/indexes",
+      "family": "foreign-key-backing-index",
+      "kind": "query",
+      "requires": [
+        "cyclic-covered-pk/ddl"
+      ],
+      "timeout_seconds": 90,
+      "sql": "SELECT i.TABLE_SCHEMA,i.TABLE_NAME,i.INDEX_NAME,i.INDEX_TYPE,i.IS_UNIQUE,i.IS_NULL_FILTERED,i.INDEX_STATE,i.SPANNER_IS_MANAGED,c.COLUMN_NAME,c.ORDINAL_POSITION,c.COLUMN_ORDERING FROM INFORMATION_SCHEMA.INDEXES AS i JOIN INFORMATION_SCHEMA.INDEX_COLUMNS AS c USING(TABLE_CATALOG,TABLE_SCHEMA,TABLE_NAME,INDEX_NAME) WHERE i.INDEX_TYPE='INDEX' AND i.TABLE_NAME IN ('CycleCovered','ParentTriple') ORDER BY i.TABLE_SCHEMA,i.TABLE_NAME,i.INDEX_NAME,c.ORDINAL_POSITION,c.COLUMN_NAME"
+    },
+    {
+      "label": "cyclic-covered-pk/hint/CycleCoveredFk/referencing",
+      "family": "foreign-key-backing-index",
+      "kind": "plan",
+      "requires": [
+        "cyclic-covered-pk/ddl"
+      ],
+      "timeout_seconds": 90,
+      "sql": "SELECT CA FROM CycleCovered@{FORCE_INDEX=CycleCoveredFk} WHERE CA>=0"
+    },
+    {
+      "label": "cyclic-covered-pk/hint/CycleCoveredFk/referenced",
+      "family": "foreign-key-backing-index",
+      "kind": "plan",
+      "requires": [
+        "cyclic-covered-pk/ddl"
+      ],
+      "timeout_seconds": 90,
+      "sql": "SELECT A FROM ParentTriple@{FORCE_INDEX=CycleCoveredFk} WHERE A>=0"
+    },
+    {
+      "label": "cyclic-inverse-pk/ddl",
+      "family": "foreign-key-backing-index",
+      "kind": "ddl",
+      "requires": [
+        "parents"
+      ],
+      "timeout_seconds": 90,
+      "statements": [
+        "CREATE TABLE CycleInverse(CA INT64 NOT NULL,CB INT64 NOT NULL,CC INT64 NOT NULL,CONSTRAINT CycleInverseFk FOREIGN KEY(CA,CB,CC) REFERENCES ParentTriple(B,C,A)) PRIMARY KEY(CB,CC,CA)"
+      ]
+    },
+    {
+      "label": "cyclic-inverse-pk/indexes",
+      "family": "foreign-key-backing-index",
+      "kind": "query",
+      "requires": [
+        "cyclic-inverse-pk/ddl"
+      ],
+      "timeout_seconds": 90,
+      "sql": "SELECT i.TABLE_SCHEMA,i.TABLE_NAME,i.INDEX_NAME,i.INDEX_TYPE,i.IS_UNIQUE,i.IS_NULL_FILTERED,i.INDEX_STATE,i.SPANNER_IS_MANAGED,c.COLUMN_NAME,c.ORDINAL_POSITION,c.COLUMN_ORDERING FROM INFORMATION_SCHEMA.INDEXES AS i JOIN INFORMATION_SCHEMA.INDEX_COLUMNS AS c USING(TABLE_CATALOG,TABLE_SCHEMA,TABLE_NAME,INDEX_NAME) WHERE i.INDEX_TYPE='INDEX' AND i.TABLE_NAME IN ('CycleInverse','ParentTriple') ORDER BY i.TABLE_SCHEMA,i.TABLE_NAME,i.INDEX_NAME,c.ORDINAL_POSITION,c.COLUMN_NAME"
+    },
+    {
+      "label": "cyclic-inverse-pk/hint/CycleInverseFk/referencing",
+      "family": "foreign-key-backing-index",
+      "kind": "plan",
+      "requires": [
+        "cyclic-inverse-pk/ddl"
+      ],
+      "timeout_seconds": 90,
+      "sql": "SELECT CA FROM CycleInverse@{FORCE_INDEX=CycleInverseFk} WHERE CA>=0"
+    },
+    {
+      "label": "cyclic-inverse-pk/hint/CycleInverseFk/referenced",
+      "family": "foreign-key-backing-index",
+      "kind": "plan",
+      "requires": [
+        "cyclic-inverse-pk/ddl"
+      ],
+      "timeout_seconds": 90,
+      "sql": "SELECT A FROM ParentTriple@{FORCE_INDEX=CycleInverseFk} WHERE A>=0"
+    },
+    {
+      "label": "declaration-order/ddl",
+      "family": "foreign-key-backing-index",
+      "kind": "ddl",
+      "requires": [
+        "parents"
+      ],
+      "timeout_seconds": 90,
+      "statements": [
+        "CREATE TABLE OrderSide(Id INT64 NOT NULL,X INT64 NOT NULL,Y INT64 NOT NULL,Z INT64 NOT NULL,CONSTRAINT OrderFk FOREIGN KEY(X,Y,Z) REFERENCES ParentOrder(B,C,A)) PRIMARY KEY(Id)"
+      ]
+    },
+    {
+      "label": "declaration-order/indexes",
+      "family": "foreign-key-backing-index",
+      "kind": "query",
+      "requires": [
+        "declaration-order/ddl"
+      ],
+      "timeout_seconds": 90,
+      "sql": "SELECT i.TABLE_SCHEMA,i.TABLE_NAME,i.INDEX_NAME,i.INDEX_TYPE,i.IS_UNIQUE,i.IS_NULL_FILTERED,i.INDEX_STATE,i.SPANNER_IS_MANAGED,c.COLUMN_NAME,c.ORDINAL_POSITION,c.COLUMN_ORDERING FROM INFORMATION_SCHEMA.INDEXES AS i JOIN INFORMATION_SCHEMA.INDEX_COLUMNS AS c USING(TABLE_CATALOG,TABLE_SCHEMA,TABLE_NAME,INDEX_NAME) WHERE i.INDEX_TYPE='INDEX' AND i.TABLE_NAME IN ('OrderSide','ParentOrder') ORDER BY i.TABLE_SCHEMA,i.TABLE_NAME,i.INDEX_NAME,c.ORDINAL_POSITION,c.COLUMN_NAME"
+    },
+    {
+      "label": "declaration-order/hint/OrderFk/referencing",
+      "family": "foreign-key-backing-index",
+      "kind": "plan",
+      "requires": [
+        "declaration-order/ddl"
+      ],
+      "timeout_seconds": 90,
+      "sql": "SELECT X FROM OrderSide@{FORCE_INDEX=OrderFk} WHERE X>=0"
+    },
+    {
+      "label": "declaration-order/hint/OrderFk/referenced",
+      "family": "foreign-key-backing-index",
+      "kind": "plan",
+      "requires": [
+        "declaration-order/ddl"
+      ],
+      "timeout_seconds": 90,
+      "sql": "SELECT A FROM ParentOrder@{FORCE_INDEX=OrderFk} WHERE A>=0"
+    },
+    {
+      "label": "named-schema/ddl",
+      "family": "foreign-key-backing-index",
+      "kind": "ddl",
+      "requires": [
+        "parents"
+      ],
+      "timeout_seconds": 90,
+      "statements": [
+        "CREATE SCHEMA NS",
+        "CREATE TABLE NS.P(Id INT64 NOT NULL) PRIMARY KEY(Id)",
+        "CREATE TABLE NS.C(Id INT64 NOT NULL,Owner INT64,CONSTRAINT NamedFk FOREIGN KEY(Owner) REFERENCES NS.P(Id)) PRIMARY KEY(Id)"
+      ]
+    },
+    {
+      "label": "named-schema/indexes",
+      "family": "foreign-key-backing-index",
+      "kind": "query",
+      "requires": [
+        "named-schema/ddl"
+      ],
+      "timeout_seconds": 90,
+      "sql": "SELECT i.TABLE_SCHEMA,i.TABLE_NAME,i.INDEX_NAME,i.INDEX_TYPE,i.IS_UNIQUE,i.IS_NULL_FILTERED,i.INDEX_STATE,i.SPANNER_IS_MANAGED,c.COLUMN_NAME,c.ORDINAL_POSITION,c.COLUMN_ORDERING FROM INFORMATION_SCHEMA.INDEXES AS i JOIN INFORMATION_SCHEMA.INDEX_COLUMNS AS c USING(TABLE_CATALOG,TABLE_SCHEMA,TABLE_NAME,INDEX_NAME) WHERE i.INDEX_TYPE='INDEX' AND i.TABLE_NAME IN ('C','P') ORDER BY i.TABLE_SCHEMA,i.TABLE_NAME,i.INDEX_NAME,c.ORDINAL_POSITION,c.COLUMN_NAME"
+    },
+    {
+      "label": "named-schema/hint/NamedFk/referencing",
+      "family": "foreign-key-backing-index",
+      "kind": "plan",
+      "requires": [
+        "named-schema/ddl"
+      ],
+      "timeout_seconds": 90,
+      "sql": "SELECT Owner FROM NS.C@{FORCE_INDEX=NamedFk} WHERE Owner>=0"
+    },
+    {
+      "label": "named-schema/hint/NamedFk/referenced",
+      "family": "foreign-key-backing-index",
+      "kind": "plan",
+      "requires": [
+        "named-schema/ddl"
+      ],
+      "timeout_seconds": 90,
+      "sql": "SELECT Id FROM NS.P@{FORCE_INDEX=NamedFk} WHERE Id>=0"
+    },
+    {
+      "label": "long-name/ddl",
+      "family": "foreign-key-backing-index",
+      "kind": "ddl",
+      "requires": [
+        "parents"
+      ],
+      "timeout_seconds": 90,
+      "statements": [
+        "CREATE TABLE Longxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx(Id INT64 NOT NULL,OwnerReferenceyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy INT64,CONSTRAINT LongFk FOREIGN KEY(OwnerReferenceyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy) REFERENCES ParentSimple(Id)) PRIMARY KEY(Id)"
+      ]
+    },
+    {
+      "label": "long-name/indexes",
+      "family": "foreign-key-backing-index",
+      "kind": "query",
+      "requires": [
+        "long-name/ddl"
+      ],
+      "timeout_seconds": 90,
+      "sql": "SELECT i.TABLE_SCHEMA,i.TABLE_NAME,i.INDEX_NAME,i.INDEX_TYPE,i.IS_UNIQUE,i.IS_NULL_FILTERED,i.INDEX_STATE,i.SPANNER_IS_MANAGED,c.COLUMN_NAME,c.ORDINAL_POSITION,c.COLUMN_ORDERING FROM INFORMATION_SCHEMA.INDEXES AS i JOIN INFORMATION_SCHEMA.INDEX_COLUMNS AS c USING(TABLE_CATALOG,TABLE_SCHEMA,TABLE_NAME,INDEX_NAME) WHERE i.INDEX_TYPE='INDEX' AND i.TABLE_NAME IN ('Longxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx','ParentSimple') ORDER BY i.TABLE_SCHEMA,i.TABLE_NAME,i.INDEX_NAME,c.ORDINAL_POSITION,c.COLUMN_NAME"
+    },
+    {
+      "label": "long-name/hint/LongFk/referencing",
+      "family": "foreign-key-backing-index",
+      "kind": "plan",
+      "requires": [
+        "long-name/ddl"
+      ],
+      "timeout_seconds": 90,
+      "sql": "SELECT OwnerReferenceyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy FROM Longxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx@{FORCE_INDEX=LongFk} WHERE OwnerReferenceyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy>=0"
+    },
+    {
+      "label": "long-name/hint/LongFk/referenced",
+      "family": "foreign-key-backing-index",
+      "kind": "plan",
+      "requires": [
+        "long-name/ddl"
+      ],
+      "timeout_seconds": 90,
+      "sql": "SELECT Id FROM ParentSimple@{FORCE_INDEX=LongFk} WHERE Id>=0"
+    },
+    {
+      "label": "source-fixture/ddl",
+      "family": "foreign-key-backing-index",
+      "kind": "ddl",
+      "requires": [
+        "parents"
+      ],
+      "timeout_seconds": 90,
+      "statements": [
+        "CREATE TABLE T(X INT64,Y INT64) PRIMARY KEY(X)",
+        "CREATE TABLE U(A INT64,B INT64,CONSTRAINT C FOREIGN KEY(A,B) REFERENCES T(X,Y)) PRIMARY KEY(A)"
+      ]
+    },
+    {
+      "label": "source-fixture/indexes",
+      "family": "foreign-key-backing-index",
+      "kind": "query",
+      "requires": [
+        "source-fixture/ddl"
+      ],
+      "timeout_seconds": 90,
+      "sql": "SELECT i.TABLE_SCHEMA,i.TABLE_NAME,i.INDEX_NAME,i.INDEX_TYPE,i.IS_UNIQUE,i.IS_NULL_FILTERED,i.INDEX_STATE,i.SPANNER_IS_MANAGED,c.COLUMN_NAME,c.ORDINAL_POSITION,c.COLUMN_ORDERING FROM INFORMATION_SCHEMA.INDEXES AS i JOIN INFORMATION_SCHEMA.INDEX_COLUMNS AS c USING(TABLE_CATALOG,TABLE_SCHEMA,TABLE_NAME,INDEX_NAME) WHERE i.INDEX_TYPE='INDEX' AND i.TABLE_NAME IN ('U','T') ORDER BY i.TABLE_SCHEMA,i.TABLE_NAME,i.INDEX_NAME,c.ORDINAL_POSITION,c.COLUMN_NAME"
+    },
+    {
+      "label": "source-fixture/hint/C/referencing",
+      "family": "foreign-key-backing-index",
+      "kind": "plan",
+      "requires": [
+        "source-fixture/ddl"
+      ],
+      "timeout_seconds": 90,
+      "sql": "SELECT A FROM U@{FORCE_INDEX=C} WHERE A>=0"
+    },
+    {
+      "label": "source-fixture/hint/C/referenced",
+      "family": "foreign-key-backing-index",
+      "kind": "plan",
+      "requires": [
+        "source-fixture/ddl"
+      ],
+      "timeout_seconds": 90,
+      "sql": "SELECT X FROM T@{FORCE_INDEX=C} WHERE X>=0"
+    },
+    {
+      "label": "sharing/drop-first",
+      "family": "foreign-key-backing-index",
+      "kind": "ddl",
+      "requires": [
+        "shared/ddl"
+      ],
+      "timeout_seconds": 90,
+      "statements": [
+        "ALTER TABLE SharedSide DROP CONSTRAINT SharedA"
+      ]
+    },
+    {
+      "label": "sharing/drop-first/indexes",
+      "family": "foreign-key-backing-index",
+      "kind": "query",
+      "requires": [
+        "sharing/drop-first"
+      ],
+      "timeout_seconds": 90,
+      "sql": "SELECT i.TABLE_SCHEMA,i.TABLE_NAME,i.INDEX_NAME,i.INDEX_TYPE,i.IS_UNIQUE,i.IS_NULL_FILTERED,i.INDEX_STATE,i.SPANNER_IS_MANAGED,c.COLUMN_NAME,c.ORDINAL_POSITION,c.COLUMN_ORDERING FROM INFORMATION_SCHEMA.INDEXES AS i JOIN INFORMATION_SCHEMA.INDEX_COLUMNS AS c USING(TABLE_CATALOG,TABLE_SCHEMA,TABLE_NAME,INDEX_NAME) WHERE i.INDEX_TYPE='INDEX' AND i.TABLE_NAME IN ('SharedSide') ORDER BY i.TABLE_SCHEMA,i.TABLE_NAME,i.INDEX_NAME,c.ORDINAL_POSITION,c.COLUMN_NAME"
+    },
+    {
+      "label": "sharing/drop-last",
+      "family": "foreign-key-backing-index",
+      "kind": "ddl",
+      "requires": [
+        "sharing/drop-first"
+      ],
+      "timeout_seconds": 90,
+      "statements": [
+        "ALTER TABLE SharedSide DROP CONSTRAINT SharedB"
+      ]
+    },
+    {
+      "label": "sharing/drop-last/indexes",
+      "family": "foreign-key-backing-index",
+      "kind": "query",
+      "requires": [
+        "sharing/drop-last"
+      ],
+      "timeout_seconds": 90,
+      "sql": "SELECT i.TABLE_SCHEMA,i.TABLE_NAME,i.INDEX_NAME,i.INDEX_TYPE,i.IS_UNIQUE,i.IS_NULL_FILTERED,i.INDEX_STATE,i.SPANNER_IS_MANAGED,c.COLUMN_NAME,c.ORDINAL_POSITION,c.COLUMN_ORDERING FROM INFORMATION_SCHEMA.INDEXES AS i JOIN INFORMATION_SCHEMA.INDEX_COLUMNS AS c USING(TABLE_CATALOG,TABLE_SCHEMA,TABLE_NAME,INDEX_NAME) WHERE i.INDEX_TYPE='INDEX' AND i.TABLE_NAME IN ('SharedSide') ORDER BY i.TABLE_SCHEMA,i.TABLE_NAME,i.INDEX_NAME,c.ORDINAL_POSITION,c.COLUMN_NAME"
+    },
+    {
+      "label": "sharing/recreate",
+      "family": "foreign-key-backing-index",
+      "kind": "ddl",
+      "requires": [
+        "sharing/drop-last"
+      ],
+      "timeout_seconds": 90,
+      "statements": [
+        "ALTER TABLE SharedSide ADD CONSTRAINT SharedC FOREIGN KEY(Owner) REFERENCES ParentSimple(Id)"
+      ]
+    },
+    {
+      "label": "sharing/recreate/indexes",
+      "family": "foreign-key-backing-index",
+      "kind": "query",
+      "requires": [
+        "sharing/recreate"
+      ],
+      "timeout_seconds": 90,
+      "sql": "SELECT i.TABLE_SCHEMA,i.TABLE_NAME,i.INDEX_NAME,i.INDEX_TYPE,i.IS_UNIQUE,i.IS_NULL_FILTERED,i.INDEX_STATE,i.SPANNER_IS_MANAGED,c.COLUMN_NAME,c.ORDINAL_POSITION,c.COLUMN_ORDERING FROM INFORMATION_SCHEMA.INDEXES AS i JOIN INFORMATION_SCHEMA.INDEX_COLUMNS AS c USING(TABLE_CATALOG,TABLE_SCHEMA,TABLE_NAME,INDEX_NAME) WHERE i.INDEX_TYPE='INDEX' AND i.TABLE_NAME IN ('SharedSide') ORDER BY i.TABLE_SCHEMA,i.TABLE_NAME,i.INDEX_NAME,c.ORDINAL_POSITION,c.COLUMN_NAME"
+    },
+    {
+      "label": "repeat/first",
+      "family": "foreign-key-backing-index",
+      "kind": "ddl",
+      "requires": [
+        "parents"
+      ],
+      "timeout_seconds": 90,
+      "statements": [
+        "CREATE TABLE RepeatSide(Id INT64 NOT NULL,Owner INT64,CONSTRAINT RepeatFk FOREIGN KEY(Owner) REFERENCES ParentSimple(Id)) PRIMARY KEY(Id)"
+      ]
+    },
+    {
+      "label": "repeat/first/indexes",
+      "family": "foreign-key-backing-index",
+      "kind": "query",
+      "requires": [
+        "repeat/first"
+      ],
+      "timeout_seconds": 90,
+      "sql": "SELECT i.TABLE_SCHEMA,i.TABLE_NAME,i.INDEX_NAME,i.INDEX_TYPE,i.IS_UNIQUE,i.IS_NULL_FILTERED,i.INDEX_STATE,i.SPANNER_IS_MANAGED,c.COLUMN_NAME,c.ORDINAL_POSITION,c.COLUMN_ORDERING FROM INFORMATION_SCHEMA.INDEXES AS i JOIN INFORMATION_SCHEMA.INDEX_COLUMNS AS c USING(TABLE_CATALOG,TABLE_SCHEMA,TABLE_NAME,INDEX_NAME) WHERE i.INDEX_TYPE='INDEX' AND i.TABLE_NAME IN ('RepeatSide') ORDER BY i.TABLE_SCHEMA,i.TABLE_NAME,i.INDEX_NAME,c.ORDINAL_POSITION,c.COLUMN_NAME"
+    },
+    {
+      "label": "repeat/recreate",
+      "family": "foreign-key-backing-index",
+      "kind": "ddl",
+      "requires": [
+        "repeat/first"
+      ],
+      "timeout_seconds": 90,
+      "statements": [
+        "DROP TABLE RepeatSide",
+        "CREATE TABLE RepeatSide(Id INT64 NOT NULL,Owner INT64,CONSTRAINT RepeatFk FOREIGN KEY(Owner) REFERENCES ParentSimple(Id)) PRIMARY KEY(Id)"
+      ]
+    },
+    {
+      "label": "repeat/recreate/indexes",
+      "family": "foreign-key-backing-index",
+      "kind": "query",
+      "requires": [
+        "repeat/recreate"
+      ],
+      "timeout_seconds": 90,
+      "sql": "SELECT i.TABLE_SCHEMA,i.TABLE_NAME,i.INDEX_NAME,i.INDEX_TYPE,i.IS_UNIQUE,i.IS_NULL_FILTERED,i.INDEX_STATE,i.SPANNER_IS_MANAGED,c.COLUMN_NAME,c.ORDINAL_POSITION,c.COLUMN_ORDERING FROM INFORMATION_SCHEMA.INDEXES AS i JOIN INFORMATION_SCHEMA.INDEX_COLUMNS AS c USING(TABLE_CATALOG,TABLE_SCHEMA,TABLE_NAME,INDEX_NAME) WHERE i.INDEX_TYPE='INDEX' AND i.TABLE_NAME IN ('RepeatSide') ORDER BY i.TABLE_SCHEMA,i.TABLE_NAME,i.INDEX_NAME,c.ORDINAL_POSITION,c.COLUMN_NAME"
+    },
+    {
+      "label": "data/seed",
+      "family": "foreign-key-backing-index",
+      "kind": "dml",
+      "requires": [
+        "parents"
+      ],
+      "timeout_seconds": 90,
+      "statements": [
+        "INSERT INTO ParentSimple(Id) VALUES(1)",
+        "INSERT INTO ParentTriple(A,B,C,U,V) VALUES(1,2,3,101,201)"
+      ]
+    },
+    {
+      "label": "data/nullable-pk",
+      "family": "foreign-key-backing-index",
+      "kind": "dml",
+      "requires": [
+        "data/seed",
+        "nullable-pk/ddl"
+      ],
+      "timeout_seconds": 90,
+      "statements": [
+        "INSERT INTO NullablePk(Id,V) VALUES(1,'x')"
+      ]
+    },
+    {
+      "label": "data/not-null-pk",
+      "family": "foreign-key-backing-index",
+      "kind": "dml",
+      "requires": [
+        "data/seed",
+        "not-null-pk/ddl"
+      ],
+      "timeout_seconds": 90,
+      "statements": [
+        "INSERT INTO PkCovered(Id,V) VALUES(1,'x')"
+      ]
+    },
+    {
+      "label": "data/cycle-covered-valid",
+      "family": "foreign-key-backing-index",
+      "kind": "dml",
+      "requires": [
+        "data/seed",
+        "cyclic-covered-pk/ddl"
+      ],
+      "timeout_seconds": 90,
+      "statements": [
+        "INSERT INTO CycleCovered(CA,CB,CC) VALUES(2,3,1)"
+      ]
+    },
+    {
+      "label": "data/cycle-inverse-valid",
+      "family": "foreign-key-backing-index",
+      "kind": "dml",
+      "requires": [
+        "data/seed",
+        "cyclic-inverse-pk/ddl"
+      ],
+      "timeout_seconds": 90,
+      "statements": [
+        "INSERT INTO CycleInverse(CA,CB,CC) VALUES(2,3,1)"
+      ]
+    },
+    {
+      "label": "data/cycle-covered-invalid",
+      "family": "foreign-key-backing-index",
+      "kind": "dml",
+      "requires": [
+        "data/seed",
+        "cyclic-covered-pk/ddl"
+      ],
+      "timeout_seconds": 90,
+      "statements": [
+        "INSERT INTO CycleCovered(CA,CB,CC) VALUES(20,30,10)"
+      ]
+    },
+    {
+      "label": "data/cycle-inverse-invalid",
+      "family": "foreign-key-backing-index",
+      "kind": "dml",
+      "requires": [
+        "data/seed",
+        "cyclic-inverse-pk/ddl"
+      ],
+      "timeout_seconds": 90,
+      "statements": [
+        "INSERT INTO CycleInverse(CA,CB,CC) VALUES(20,30,10)"
+      ]
+    },
+    {
+      "label": "final/ddl-export",
+      "family": "foreign-key-backing-index",
+      "kind": "ddl-export",
+      "requires": [],
+      "timeout_seconds": 90
+    }
+  ]
+}

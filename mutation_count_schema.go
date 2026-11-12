@@ -276,7 +276,27 @@ func (s *mutationCountSchemaModel) potentialManaged(table string) int64 {
 	for _, fk := range s.ForeignKeys {
 		if fk.Enforced && strings.EqualFold(fk.Table, table) {
 			t := s.Tables[strings.ToLower(table)]
-			if t == nil || !mutationPrefixEqual(mutationPrimaryKeys(t.Table), fk.Columns) {
+			covered := t != nil && mutationPrefixEqual(mutationPrimaryKeys(t.Table), fk.Columns)
+			if covered {
+				for _, name := range fk.Columns {
+					col, _ := t.Table.Column(name)
+					if col == nil || !col.NotNull {
+						covered = false
+						break
+					}
+				}
+			}
+			// A nullable PK prefix still needs a NULL_FILTERED backing index.
+			// Composite referenced keys can also reorder the referencing keys;
+			// only rule that out for an unchanged referenced PK prefix. Other
+			// layouts retain the upper bound until an index snapshot is supplied.
+			// See knowledge/research/runtime-verification/
+			// fk-backing-index-predictability-20261112.md for the runtime evidence.
+			if covered && len(fk.Columns) > 1 {
+				referenced := s.Tables[strings.ToLower(fk.Referenced)]
+				covered = referenced != nil && mutationPrefixEqual(mutationPrimaryKeys(referenced.Table), fk.ReferenceColumns)
+			}
+			if !covered {
 				n++
 			}
 		}

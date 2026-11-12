@@ -32,6 +32,9 @@ sources:
   - id: mixed-transactions
     resource: ../research/write-analysis/mixed-transactions-and-evidence-20261112.md
     title: Mixed-transaction integration, remaining uncertainties and evidence retention
+  - id: fk-predictability
+    resource: ../research/runtime-verification/fk-backing-index-predictability-20261112.md
+    title: FK backing-index source and runtime investigation
 ---
 
 # Mutation-count analysis
@@ -85,6 +88,7 @@ It does not invent generated index names.
 | --- | --- |
 | Insert, update, insert-or-update, replace, delete; partial updates | [Managed ordinary writes](../research/runtime-verification/mutation-count-managed-20261110.md), plus [Omni/API integration](../research/runtime-verification/mutation-count-feedback-20261112.md); observations identify their schema, input and runtime |
 | Index keys, STORING, NULL_FILTERED, FK backing indexes, automatic columns and cascades | [Local comparison](../research/runtime-verification/mutation-count-20261110.md) and [reference audit](../research/write-analysis/mutation-count-reference-audit-20261110.md); unresolved values or fanout preserve intervals/unknown upper bounds |
+| FK nullability, referenced-column order and generated physical names | [November 12 source/runtime investigation](../research/runtime-verification/fk-backing-index-predictability-20261112.md): nullable PKs and reordered composite keys retain an extra-index upper bound; observed shared physical indexes are counted once |
 | Queue Send/Ack, missing messages, payload/key variants, same-key composition, DML and limit probes | [Managed queue matrix](../research/runtime-verification/queue-mutation-count-managed-20261110.md), with the completed 43-attempt follow-up retained separately |
 | Mixed DML and buffered Mutation commits | [Mixed-transaction integration](../research/write-analysis/mixed-transactions-and-evidence-20261112.md) replays both retained managed observations; related stages remain uncertain and a whole-commit measurement refines only the total |
 | Queue RECEIVE and RENEWLEASE | The queue API and CLI classify these separately; the [managed note](../research/runtime-verification/queue-mutation-count-managed-20261110.md) explains why their query responses do not provide caller CommitStats |

@@ -1,0 +1,120 @@
+{
+  "recorded_on": "2026-11-12",
+  "runs": [
+    {
+      "id": "emulator",
+      "variant": "schema-first",
+      "raw_sha256": "d954f1d40445a6979831c4db2c88eccf4719e9294df12cbaa86f420004af1fe0",
+      "retained_file": "emulator.jsonl",
+      "planned_steps": 93,
+      "scope": "Owned local container, including expected SQL rejections, actual failures and dependency-blocked steps. SQL error statuses do not change the producer process exit code.",
+      "producer_exit_code": 0,
+      "producer_variant": "before-omni-client-guard; reconstructed edit history, not an independently captured exact source hash",
+      "input_sha256": "53f371a83c3b1e21f4a17ce88cb0f0a116b64fbf4230107abb8c1f057c98da07"
+    },
+    {
+      "id": "emulator-parent-first",
+      "variant": "parent-first",
+      "raw_sha256": "475aca4d820da3f34bc310c2479ca98b790d659dcb51c10e43770222c72ed761",
+      "retained_file": "emulator-parent-first.jsonl",
+      "planned_steps": 93,
+      "scope": "Owned local container, including expected SQL rejections, actual failures and dependency-blocked steps. SQL error statuses do not change the producer process exit code.",
+      "producer_exit_code": 0,
+      "producer_variant": "local-producer.patch",
+      "input_sha256": "ddfdc090bb2cb38bb83a479c1c75b29c78e1e4ea17a726f2063b13da21144d22"
+    },
+    {
+      "id": "omni-lts-fixed",
+      "variant": "schema-first",
+      "raw_sha256": "75dd043d3c0a9924daaa26e566f80540d54d4c5ccede4ca357a6028a474036d9",
+      "retained_file": "omni-lts-fixed.jsonl",
+      "planned_steps": 93,
+      "scope": "Owned local container, including expected SQL rejections, actual failures and dependency-blocked steps. SQL error statuses do not change the producer process exit code.",
+      "producer_exit_code": 0,
+      "producer_variant": "local-producer.patch",
+      "input_sha256": "53f371a83c3b1e21f4a17ce88cb0f0a116b64fbf4230107abb8c1f057c98da07"
+    },
+    {
+      "id": "omni-r5-fixed",
+      "variant": "schema-first",
+      "raw_sha256": "8b12fe787a3c59ada708d719696b5035d156dda4d2be62c801d0fd0da3a7128d",
+      "retained_file": "omni-r5-fixed.jsonl",
+      "planned_steps": 93,
+      "scope": "Owned local container, including expected SQL rejections, actual failures and dependency-blocked steps. SQL error statuses do not change the producer process exit code.",
+      "producer_exit_code": 0,
+      "producer_variant": "local-producer.patch",
+      "input_sha256": "53f371a83c3b1e21f4a17ce88cb0f0a116b64fbf4230107abb8c1f057c98da07"
+    },
+    {
+      "id": "omni-lts-followup",
+      "variant": "controls",
+      "raw_sha256": "ac65f6caa687136ceaff0d40c3ad28125cf0bfeb6de6ba141f285b0acbf58d33",
+      "retained_file": "omni-lts-followup.jsonl",
+      "planned_steps": 17,
+      "scope": "Owned local container, including expected SQL rejections, actual failures and dependency-blocked steps. SQL error statuses do not change the producer process exit code.",
+      "producer_exit_code": 0,
+      "producer_variant": "local-producer.patch",
+      "input_sha256": "ba161664fdf71edad66b7720411f34839604d585585069a5cbdc0b0cc54f084a"
+    },
+    {
+      "id": "omni-r5-followup",
+      "variant": "controls",
+      "raw_sha256": "3d1c7e56a0ea589301d7e701dfd40bc18e753735de7dbc9c93358dc30bc9e8b9",
+      "retained_file": "omni-r5-followup.jsonl",
+      "planned_steps": 17,
+      "scope": "Owned local container, including expected SQL rejections, actual failures and dependency-blocked steps. SQL error statuses do not change the producer process exit code.",
+      "producer_exit_code": 0,
+      "producer_variant": "local-producer.patch",
+      "input_sha256": "ba161664fdf71edad66b7720411f34839604d585585069a5cbdc0b0cc54f084a"
+    },
+    {
+      "id": "omni-lts-ordering",
+      "variant": "ordering",
+      "raw_sha256": "37d86c7dd0238d590c7012ec1016cd0aadd7e4bc587a47a91c292105c8f5ddf5",
+      "retained_file": "omni-lts-ordering.jsonl",
+      "planned_steps": 5,
+      "scope": "Owned local container, including expected SQL rejections, actual failures and dependency-blocked steps. SQL error statuses do not change the producer process exit code.",
+      "producer_exit_code": 0,
+      "producer_variant": "local-producer.patch",
+      "input_sha256": "2a3cbf65288af934c9f9d0cf6bbe0a9429a1b08c9ee47bdf14a15d1dcfa9aca8"
+    },
+    {
+      "id": "managed",
+      "variant": "parent-first",
+      "raw_sha256": "97d2cc0602d89e8902f060a7ea3fbca0ec22e96288a71eb1594bacf1101f69cb",
+      "retained_file": "managed.jsonl",
+      "planned_steps": 93,
+      "input_sha256": "ddfdc090bb2cb38bb83a479c1c75b29c78e1e4ea17a726f2063b13da21144d22",
+      "scope": "One explicitly authorized newly created GoogleSQL database on the existing verification instance; 93 steps, owned database dropped and GetDatabase returned NotFound. Resource coordinates and request IDs omitted.",
+      "producer_exit_code": 0,
+      "producer_variant": "managed-producer.patch",
+      "service_build": "unavailable; rolling managed service",
+      "started_at": "2026-11-12T10:48:02.81758Z",
+      "finished_at": "2026-11-12T10:58:13.135272Z"
+    }
+  ],
+  "runtime_pins": "../../../../../runtime_targets.json",
+  "measurement_boundary": "Missing CommitStats is unknown, never zero. Schema-first Omni seeding returned Internal; six dependent DML controls were NOT_RUN. The separate parent-first controls are fresh observations, not corrections of those historical outcomes.",
+  "managed_status": "Completed one authorized DB, all 93 steps recorded; create/drop OK and post-drop GetDatabase NotFound. No additional managed DB created.",
+  "managed_lifecycle": {
+    "producer_exit_code": 0,
+    "recorded_steps": 93,
+    "create": "OK",
+    "drop": "OK",
+    "get_after_drop": "NotFound",
+    "cleanup_verified": true
+  },
+  "readonly_fingerprint_control": {
+    "scope": "One SELECT on the existing verification database, separate from the 93-step owned-DB run. No DDL, data writes or database creation. Resource coordinates omitted.",
+    "command": "Copy fingerprint-readonly.go.txt to a fresh scratch path with a .go suffix; build that file in the recorded tools module. Supply FK_READONLY_DATABASE externally and run the binary; it performs one SELECT only.",
+    "source": "fingerprint-readonly.go.txt",
+    "source_sha256": "b4d5aa3f10aabc5cf87b8d5d0735a5c9af48b3a86aa9b47f733ae7e203ca924c",
+    "results": "fingerprint-readonly.jsonl",
+    "exit_code": 0
+  },
+  "local_container_absence_check": {
+    "observed_task_container_count": 18,
+    "remaining_task_container_count": 0,
+    "method": "Intersect container IDs from the task producer stderr with docker ps -a after all producers exit; no unrelated container removed."
+  }
+}

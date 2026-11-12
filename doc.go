@@ -39,6 +39,9 @@
 // facts used by accounting, including physical managed names and explicitly
 // inferred constraint selectors, for plan collectors and other consumers.
 // It never synthesizes generated names or performs metadata RPCs.
+// DDL-only FK bounds retain potential backing indexes for nullable referencing
+// primary keys and composite keys whose referenced order can change. A complete
+// observed snapshot narrows those bounds and counts a shared physical index once.
 // Generated-column dependencies propagate to indexes, including virtual columns.
 // Expressions and automatic timestamp values are not evaluated, so old images
 // cannot establish their new values. Unsupported syntax fails explicitly.
