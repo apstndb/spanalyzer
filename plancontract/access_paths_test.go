@@ -146,3 +146,20 @@ func TestAccessPathSchemaTargetKindDisambiguatesObjectNames(t *testing.T) {
 		t.Fatalf("ambiguous target must retain unknown facts: %#v", path)
 	}
 }
+
+func TestObservedIndexAliasesRetainPhysicalIdentityAndAmbiguity(t *testing.T) {
+	plan := accessPathFixture(t)
+	plan.PlanNodes[2].Metadata = mustMetadata(t, map[string]interface{}{"scan_type": "IndexScan", "scan_target": "EventsOwner"})
+	managed := true
+	target := ScanTarget{Name: "physical_backend_name", Aliases: []string{"EventsOwner"}, Kind: "secondary_index", BaseTable: "Events", KeyColumns: []string{"Owner"}, Managed: &managed, IndexOrigin: "observed_snapshot", InferredConstraintSelectors: []string{"EventsOwner:referencing"}}
+	path := NormalizeAccessPaths(plan, []ScanTarget{target})[0]
+	if path.ScanTarget != "EventsOwner" || path.CatalogIndexName != target.Name || path.BaseTable != "Events" || path.Managed == nil || !*path.Managed || path.DeclaredKeyCount == nil || *path.DeclaredKeyCount != 1 || !slices.Equal(path.InferredConstraintSelectors, target.InferredConstraintSelectors) {
+		t.Fatalf("observed alias facts lost: %+v", path)
+	}
+	other := target
+	other.Name = "another_physical_name"
+	path = NormalizeAccessPaths(plan, []ScanTarget{target, other})[0]
+	if path.CatalogIndexName != "" || path.DeclaredKeyCount != nil || path.Managed != nil {
+		t.Fatalf("ambiguous aliases guessed: %+v", path)
+	}
+}

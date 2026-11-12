@@ -17,6 +17,13 @@ import (
 // An analyzer performs no database reads or writes and may be reused.
 type MutationCountAnalyzer struct{ schema *mutationCountSchemaModel }
 
+// MutationCountIndexSnapshot asserts a complete, fresh regular-index snapshot
+// for the exact DDL bytes identified by SchemaSHA256. It is not a live lookup.
+type MutationCountIndexSnapshot struct {
+	SchemaSHA256 string                          `json:"schema_sha256" yaml:"schema_sha256"`
+	Indexes      []MutationCountIndexObservation `json:"indexes" yaml:"indexes"`
+}
+
 // MutationCountOptions supplies conditional facts for one analyzed input.
 // Facts are parallel to normalized row operations, not original wire messages.
 // Repeated updates to one key use the first old image as the pre-commit image.
@@ -172,6 +179,9 @@ func (a *MutationCountAnalyzer) AnalyzeWriteShape(shape MutationWriteShape, opti
 	if t == nil {
 		return MutationCountReport{}, fmt.Errorf("unknown writable table %q", shape.Table)
 	}
+	if op.Kind == "delete" && len(shape.Columns) != 0 {
+		return MutationCountReport{}, fmt.Errorf("delete shape has key values, not written columns")
+	}
 	seen := map[string]bool{}
 	for _, name := range shape.Columns {
 		key := strings.ToLower(name)
@@ -185,6 +195,13 @@ func (a *MutationCountAnalyzer) AnalyzeWriteShape(shape MutationWriteShape, opti
 		}
 		if t.Generated[key] != "" || t.Virtual[key] {
 			return MutationCountReport{}, fmt.Errorf("generated column %q is not writable", name)
+		}
+	}
+	if op.Kind == "delete" {
+		// A delete has no written columns, but full-key scenario values can
+		// identify the row without pretending those keys are updated cells.
+		for _, key := range t.Table.PrimaryKey {
+			seen[strings.ToLower(key.Name)] = true
 		}
 	}
 	for name, value := range shape.Values {
@@ -301,6 +318,17 @@ func (a *MutationCountAnalyzer) analyze(ops []mutationCountOperation, inputSHA, 
 			}
 		}
 	}
+	r.Indexes = a.IndexCatalog()
+	return r, nil
+}
+
+// IndexCatalog returns independent copies of the reconciled regular-index
+// facts, ordered by table and index name. Generated names come only from an
+// observed snapshot; constraint selectors remain explicitly inferred from a
+// unique matching managed-index prefix, not from generated-name patterns.
+// The same facts can enrich query-plan scans without executing a write.
+func (a *MutationCountAnalyzer) IndexCatalog() []MutationCountIndex {
+	var indexes []MutationCountIndex
 	var names []string
 	for name := range a.schema.Indexes {
 		names = append(names, name)
@@ -315,10 +343,16 @@ func (a *MutationCountAnalyzer) analyze(ops []mutationCountOperation, inputSHA, 
 				v := *i.ObservedUnique
 				i.ObservedUnique = &v
 			}
-			r.Indexes = append(r.Indexes, i)
+			indexes = append(indexes, i)
 		}
 	}
-	return r, nil
+	slices.SortFunc(indexes, func(a, b MutationCountIndex) int {
+		if c := strings.Compare(a.Table, b.Table); c != 0 {
+			return c
+		}
+		return strings.Compare(a.Name, b.Name)
+	})
+	return indexes
 }
 
 func digestMutationInput(kind string, data []byte) string {

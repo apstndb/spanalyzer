@@ -11,17 +11,21 @@ import (
 
 // AccessPathNormalizationVersion identifies the mutable normalized access-path
 // contract. It does not imply that backend expression spellings are stable.
-const AccessPathNormalizationVersion = "v1alpha.1"
+const AccessPathNormalizationVersion = "v1alpha.2"
 
 // ScanTarget supplies schema facts without coupling this module to an analyzer
 // or DDL parser. Unknown targets retain empty schema facts rather than guessing.
 type ScanTarget struct {
-	Name          string
-	Kind          string
-	BaseTable     string
-	KeyColumns    []string
-	StoredColumns []string
-	NullFiltered  bool
+	Name                        string
+	Kind                        string
+	BaseTable                   string
+	KeyColumns                  []string
+	StoredColumns               []string
+	NullFiltered                bool
+	Aliases                     []string
+	IndexOrigin                 string
+	Managed                     *bool
+	InferredConstraintSelectors []string
 }
 
 // ScanCondition retains the immediate condition root and its backend expression.
@@ -42,30 +46,34 @@ type ScanCondition struct {
 // preserves declared key order. Test membership in SeekColumns when checking
 // key prefixes; slice equality does not express that relationship.
 type AccessPath struct {
-	ScanIndex             int32           `json:"scan_index" yaml:"scan_index"`
-	FilterIndex           *int32          `json:"filter_index" yaml:"filter_index"`
-	ScanTarget            string          `json:"scan_target" yaml:"scan_target"`
-	ScanType              string          `json:"scan_type" yaml:"scan_type"`
-	ScanTargetKind        string          `json:"scan_target_kind" yaml:"scan_target_kind"`
-	BaseTable             string          `json:"base_table" yaml:"base_table"`
-	FullScan              bool            `json:"full_scan" yaml:"full_scan"`
-	ConditionsComplete    bool            `json:"conditions_complete" yaml:"conditions_complete"`
-	HasSeekCondition      bool            `json:"has_seek_condition" yaml:"has_seek_condition"`
-	HasResidualCondition  bool            `json:"has_residual_condition" yaml:"has_residual_condition"`
-	HasTimestampCondition bool            `json:"has_timestamp_condition" yaml:"has_timestamp_condition"`
-	HasSearchCondition    bool            `json:"has_search_condition" yaml:"has_search_condition"`
-	SeekConditions        []ScanCondition `json:"seek_conditions" yaml:"seek_conditions"`
-	ResidualConditions    []ScanCondition `json:"residual_conditions" yaml:"residual_conditions"`
-	TimestampConditions   []ScanCondition `json:"timestamp_conditions" yaml:"timestamp_conditions"`
-	SearchConditions      []ScanCondition `json:"search_conditions" yaml:"search_conditions"`
-	SeekColumns           []string        `json:"seek_columns" yaml:"seek_columns"`
-	ResidualColumns       []string        `json:"residual_columns" yaml:"residual_columns"`
-	SeekableKeySize       string          `json:"seekable_key_size" yaml:"seekable_key_size"`
-	RangeSeekableKeySize  *int64          `json:"range_seekable_key_size" yaml:"range_seekable_key_size"`
-	DeclaredKeyCount      *int64          `json:"declared_key_count" yaml:"declared_key_count"`
-	KeyColumns            []string        `json:"key_columns" yaml:"key_columns"`
-	StoredColumns         []string        `json:"stored_columns" yaml:"stored_columns"`
-	NullFiltered          *bool           `json:"null_filtered" yaml:"null_filtered"`
+	CatalogIndexName            string          `json:"catalog_index_name,omitempty" yaml:"catalog_index_name,omitempty"`
+	IndexOrigin                 string          `json:"index_origin,omitempty" yaml:"index_origin,omitempty"`
+	Managed                     *bool           `json:"managed,omitempty" yaml:"managed,omitempty"`
+	InferredConstraintSelectors []string        `json:"inferred_constraint_selectors,omitempty" yaml:"inferred_constraint_selectors,omitempty"`
+	ScanIndex                   int32           `json:"scan_index" yaml:"scan_index"`
+	FilterIndex                 *int32          `json:"filter_index" yaml:"filter_index"`
+	ScanTarget                  string          `json:"scan_target" yaml:"scan_target"`
+	ScanType                    string          `json:"scan_type" yaml:"scan_type"`
+	ScanTargetKind              string          `json:"scan_target_kind" yaml:"scan_target_kind"`
+	BaseTable                   string          `json:"base_table" yaml:"base_table"`
+	FullScan                    bool            `json:"full_scan" yaml:"full_scan"`
+	ConditionsComplete          bool            `json:"conditions_complete" yaml:"conditions_complete"`
+	HasSeekCondition            bool            `json:"has_seek_condition" yaml:"has_seek_condition"`
+	HasResidualCondition        bool            `json:"has_residual_condition" yaml:"has_residual_condition"`
+	HasTimestampCondition       bool            `json:"has_timestamp_condition" yaml:"has_timestamp_condition"`
+	HasSearchCondition          bool            `json:"has_search_condition" yaml:"has_search_condition"`
+	SeekConditions              []ScanCondition `json:"seek_conditions" yaml:"seek_conditions"`
+	ResidualConditions          []ScanCondition `json:"residual_conditions" yaml:"residual_conditions"`
+	TimestampConditions         []ScanCondition `json:"timestamp_conditions" yaml:"timestamp_conditions"`
+	SearchConditions            []ScanCondition `json:"search_conditions" yaml:"search_conditions"`
+	SeekColumns                 []string        `json:"seek_columns" yaml:"seek_columns"`
+	ResidualColumns             []string        `json:"residual_columns" yaml:"residual_columns"`
+	SeekableKeySize             string          `json:"seekable_key_size" yaml:"seekable_key_size"`
+	RangeSeekableKeySize        *int64          `json:"range_seekable_key_size" yaml:"range_seekable_key_size"`
+	DeclaredKeyCount            *int64          `json:"declared_key_count" yaml:"declared_key_count"`
+	KeyColumns                  []string        `json:"key_columns" yaml:"key_columns"`
+	StoredColumns               []string        `json:"stored_columns" yaml:"stored_columns"`
+	NullFiltered                *bool           `json:"null_filtered" yaml:"null_filtered"`
 }
 
 // NormalizeAccessPaths retains condition evidence at its owning scan, without
@@ -148,7 +156,7 @@ func NormalizeAccessPaths(plan *spannerpb.QueryPlan, targets []ScanTarget) []Acc
 		var target *ScanTarget
 		for i := range targets {
 			candidate := &targets[i]
-			if candidate.Name != path.ScanTarget || (path.ScanTargetKind != "unknown" && path.ScanTargetKind != "batch" && candidate.Kind != "" && candidate.Kind != path.ScanTargetKind) {
+			if (candidate.Name != path.ScanTarget && !slices.Contains(candidate.Aliases, path.ScanTarget)) || (path.ScanTargetKind != "unknown" && path.ScanTargetKind != "batch" && candidate.Kind != "" && candidate.Kind != path.ScanTargetKind) {
 				continue
 			}
 			if target != nil {
@@ -171,6 +179,17 @@ func NormalizeAccessPaths(plan *spannerpb.QueryPlan, targets []ScanTarget) []Acc
 				path.DeclaredKeyCount = &count
 			}
 			if target.Kind == "secondary_index" {
+				// Existing callers need not opt into the supplemental index
+				// provenance projection merely by supplying declared keys.
+				if target.IndexOrigin != "" || target.Managed != nil || len(target.InferredConstraintSelectors) > 0 {
+					path.CatalogIndexName = target.Name
+					path.IndexOrigin = target.IndexOrigin
+					path.InferredConstraintSelectors = slices.Clone(target.InferredConstraintSelectors)
+					if target.Managed != nil {
+						managed := *target.Managed
+						path.Managed = &managed
+					}
+				}
 				value := target.NullFiltered
 				path.NullFiltered = &value
 			}

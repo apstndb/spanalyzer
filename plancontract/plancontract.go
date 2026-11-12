@@ -29,8 +29,10 @@ const (
 	EvaluatorVersionV1 = "v1"
 	// EvaluatorVersionV2 isolates runtime evaluation errors per contract.
 	// V1 identifies historical artifacts whose evaluator aborted the whole batch.
-	EvaluatorVersionV2      = "v2"
-	CurrentEvaluatorVersion = EvaluatorVersionV2
+	EvaluatorVersionV2 = "v2"
+	// V3 adds independent, conditional mutation-count inputs to CEL.
+	EvaluatorVersionV3      = "v3"
+	CurrentEvaluatorVersion = EvaluatorVersionV3
 
 	StabilityNormalized = "normalized_operator"
 	StabilityRawPlan    = "raw_query_plan"
@@ -132,6 +134,7 @@ type OptimizerEffective struct {
 
 // Query is the per-query contract evaluator input projection.
 type Query struct {
+	MutationCounts        map[string]MutationCountEvidence
 	TargetID              string
 	Name                  string
 	Catalog               string
@@ -403,7 +406,7 @@ func evaluateContract(report Report, contract compiledContract) (Evaluation, err
 		baseEvaluation.Reason = ReasonTargetNotFound
 		return baseEvaluation, nil
 	}
-	if query.Status != "" && query.Status != "ok" {
+	if query.Status != "" && query.Status != "ok" && (len(query.MutationCounts) == 0 || !mutationCountOnlyContract(contract)) {
 		baseEvaluation.Query = query.Name
 		baseEvaluation.TargetID = queryTargetID(query)
 		baseEvaluation.Scope = query.Scope
@@ -902,6 +905,7 @@ func newCELEnv() (*cel.Env, error) {
 		cel.Variable("operators", cel.ListType(cel.DynType)),
 		cel.Variable("operator_edges", cel.ListType(cel.DynType)),
 		cel.Variable("access_paths", cel.ListType(cel.DynType)),
+		cel.Variable("mutation_counts", cel.MapType(cel.StringType, cel.DynType)),
 		cel.Variable("operator_families", cel.ListType(cel.StringType)),
 		cel.Variable("operator_family_counts", cel.MapType(cel.StringType, cel.IntType)),
 		cel.Variable("optimizer", cel.DynType),
@@ -921,6 +925,7 @@ func celActivation(report Report, query Query) map[string]interface{} {
 		"operators":              celOperators(query.NormalizedOperators),
 		"operator_edges":         celOperatorEdges(query.OperatorEdges),
 		"access_paths":           celAccessPaths(query.AccessPaths),
+		"mutation_counts":        celMutationCounts(query.MutationCounts),
 		"operator_families":      query.OperatorFamilies,
 		"operator_family_counts": OperatorFamilyCountsOrEmpty(query.OperatorFamilyCounts),
 		"optimizer": map[string]interface{}{

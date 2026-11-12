@@ -1,37 +1,13 @@
 package querygen
 
 import (
-	"fmt"
 	"strings"
 
 	spanalyzer "github.com/apstndb/spanalyzer"
 )
 
 func writeMutationCounts(analyzer *spanalyzer.MutationCountAnalyzer, spec resolvedWriteSpec) (map[string]spanalyzer.MutationCountReport, error) {
-	result := map[string]spanalyzer.MutationCountReport{}
-	columns := columnNamesFromColumns(spec.InsertColumns)
-	if spec.Operation == "update" {
-		columns = append(columnNamesFromColumns(spec.Keys), columnNamesFromColumns(spec.UpdateColumns)...)
-	}
-	if spec.Operation == "delete" {
-		columns = nil
-	}
-	for _, method := range spec.Methods {
-		if method != "mutation" && method != "dml" {
-			continue
-		}
-		shape := spanalyzer.MutationWriteShape{Operation: spec.Operation, Table: spec.Table, Columns: columns, Channel: method}
-		if method == "dml" && (spec.Operation == "update" || spec.Operation == "delete") {
-			one := int64(1)
-			shape.RowBounds = &spanalyzer.MutationCountInterval{Lower: 0, Upper: &one}
-		}
-		r, err := analyzer.AnalyzeWriteShape(shape, spanalyzer.MutationCountOptions{})
-		if err != nil {
-			return nil, fmt.Errorf("write %s mutation accounting: %w", spec.Name, err)
-		}
-		result[method] = r
-	}
-	return result, nil
+	return AnalyzeWriteMutationCounts(analyzer, newMutationCountPlanWrite(spec, nil, ""), nil)
 }
 
 func mutationCountCatalog(schema QueryCodegenSchema, baseDir string) (*spanalyzer.MutationCountAnalyzer, error) {
@@ -43,4 +19,23 @@ func mutationCountCatalog(schema QueryCodegenSchema, baseDir string) (*spanalyze
 		return nil, err
 	}
 	return spanalyzer.NewMutationCountAnalyzer(ddl)
+}
+
+func newMutationCountPlanWrite(spec resolvedWriteSpec, counts map[string]spanalyzer.MutationCountReport, countError string) QueryCodegenPlanWrite {
+	return QueryCodegenPlanWrite{
+		MutationCounts:          counts,
+		MutationCountError:      countError,
+		Name:                    spec.Name,
+		Catalog:                 spec.Catalog,
+		Table:                   spec.Table,
+		Operation:               spec.Operation,
+		InputStruct:             spec.InputStruct,
+		Keys:                    columnNamesFromColumns(spec.Keys),
+		InsertColumns:           columnNamesFromColumns(spec.InsertColumns),
+		UpdateColumns:           columnNamesFromColumns(spec.UpdateColumns),
+		Methods:                 spec.Methods,
+		ColumnCapabilities:      planColumnCapabilities(spec.AllColumns),
+		ServerSideUpdateEffects: planServerSideUpdateEffects(spec),
+		VetSuppressions:         spec.VetSuppressions,
+	}
 }
