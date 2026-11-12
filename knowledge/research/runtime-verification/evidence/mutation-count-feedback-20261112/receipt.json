@@ -52,9 +52,14 @@
     "scope": "After the retained engine execution, a unit-tested collector guard makes an unattempted requested measurement fail explicitly. The measured write algorithm and the 31 target scenarios are unchanged. No additional engine-coverage claim follows.",
     "source": "cmd/spanner-query-gen/plan_report_mutation_measurement.go",
     "source_sha256": "a014afccfc0d50db12b1cddfcd2a31173f6f31ea031383dc7e0893cf4ae9104a",
-    "diff": "unattempted-measurement-guard.diff",
+    "diff": "unattempted-measurement-guard.diff.gz",
     "unit_test": "TestPlanReportCountOnlyTargetDoesNotWriteByDefault",
-    "test_log": "validation.json records the subsequent CLI module test"
+    "test_log": "validation.json records the subsequent CLI module test",
+    "diff_encoding": {
+      "encoding": "gzip with mtime=0; decoded unified-diff bytes unchanged",
+      "payload_sha256": "dc6489ea52fc5f437c1bf0b00c36646c193ae0dd0b0de8c5de8f0bacfa198132",
+      "archive_sha256": "df91a23b6ccb9ed7655558ae93175c905122fe1b29eb0b331d4883250ed1713d"
+    }
   },
   "report_archives": {
     "encoding": "gzip with mtime=0; decoded bytes match the captured JSON exactly",
