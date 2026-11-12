@@ -17,8 +17,15 @@ func celAccessPaths(paths []AccessPath) []map[string]interface{} {
 		if path.NullFiltered != nil {
 			nullFiltered = *path.NullFiltered
 		}
+		selectors := path.InferredConstraintSelectors
+		if selectors == nil {
+			selectors = []string{}
+		}
 		out = append(out, map[string]interface{}{
-			"scan_index": path.ScanIndex, "filter_index": filter,
+			"catalog_index_name": path.CatalogIndexName, "index_origin": path.IndexOrigin,
+			"inferred_constraint_selectors": selectors,
+			"managed":                       accessPathNullableBool(path.Managed),
+			"scan_index":                    path.ScanIndex, "filter_index": filter,
 			"scan_target": path.ScanTarget, "scan_type": path.ScanType,
 			"scan_target_kind": path.ScanTargetKind, "base_table": path.BaseTable,
 			"full_scan": path.FullScan, "conditions_complete": path.ConditionsComplete,
@@ -33,6 +40,13 @@ func celAccessPaths(paths []AccessPath) []map[string]interface{} {
 		})
 	}
 	return out
+}
+
+func accessPathNullableBool(value *bool) interface{} {
+	if value == nil {
+		return nil
+	}
+	return *value
 }
 
 func celScanConditions(conditions []ScanCondition) []map[string]interface{} {

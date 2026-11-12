@@ -1,6 +1,7 @@
 package querygen
 
 import (
+	spanalyzer "github.com/apstndb/spanalyzer"
 	"slices"
 )
 
@@ -63,6 +64,27 @@ func BuildQueryCodegenReportPlan(config QueryCodegenConfig, baseDir string) *Que
 			continue
 		}
 		spec := resolved.writeSpecs[0]
+		var schema QueryCodegenSchema
+		for _, candidate := range one.Schemas {
+			if candidate.Name == spec.Catalog {
+				schema = candidate
+				break
+			}
+		}
+		model, countErr := mutationCountCatalog(schema, baseDir)
+		var counts map[string]spanalyzer.MutationCountReport
+		if countErr == nil && model != nil {
+			counts, countErr = writeMutationCounts(model, spec)
+		}
+		countError := ""
+		if countErr != nil {
+			countError = countErr.Error()
+		}
+		plan.Writes = append(plan.Writes, newMutationCountPlanWrite(spec, counts, countError))
+		target.ReportWriteParamColumns = map[string]string{}
+		for _, column := range spec.InputColumns {
+			target.ReportWriteParamColumns[column.Name] = writeParamName(spec, column)
+		}
 		if !slices.Contains(spec.Methods, "dml") {
 			target.ReportSkipReason = "mutation-only write has no SQL PLAN target"
 			plan.Queries = append(plan.Queries, target)

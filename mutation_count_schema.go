@@ -55,11 +55,18 @@ type mutationCountForeignKey struct {
 	DeleteAction              string
 }
 
-// MutationCountIndexObservation is deliberately compatible with the retained local probe DTO.
+// MutationCountIndexObservation uses canonical snake_case JSON fields while
+// retaining compatibility with the earlier probe DTO's NullFiltered spelling.
 type MutationCountIndexObservation struct {
-	Table, Name, Type, State      string
-	Unique, NullFiltered, Managed bool
-	Columns, Stored               []string
+	Table        string   `json:"table" yaml:"table"`
+	Name         string   `json:"name" yaml:"name"`
+	Type         string   `json:"type" yaml:"type"`
+	State        string   `json:"state" yaml:"state"`
+	Unique       bool     `json:"unique" yaml:"unique"`
+	NullFiltered bool     `json:"null_filtered" yaml:"null_filtered"`
+	Managed      bool     `json:"managed" yaml:"managed"`
+	Columns      []string `json:"columns" yaml:"columns"`
+	Stored       []string `json:"stored" yaml:"stored"`
 }
 
 func newMutationCountSchema(ddl string) (*mutationCountSchemaModel, error) {

@@ -107,7 +107,7 @@ func TestEvaluateIsolatesRuntimeErrors(t *testing.T) {
 			if before.Status != StatusPass || after.Status != StatusPass || failed.Status != StatusNotEvaluated || failed.Reason != ReasonEvaluationError || failed.Error == "" || failed.Query != "Q" || failed.TargetID != "query/Q" {
 				t.Fatalf("evaluations = %+v", result.Evaluations)
 			}
-			if result.EvaluatorVersion != EvaluatorVersionV2 || result.Summary.Passed != 2 || result.Summary.NotEvaluated != 1 || result.Summary.Status != StatusFail || CheckFailureCount(result.Evaluations) != 1 {
+			if result.EvaluatorVersion != EvaluatorVersionV3 || result.Summary.Passed != 2 || result.Summary.NotEvaluated != 1 || result.Summary.Status != StatusFail || CheckFailureCount(result.Evaluations) != 1 {
 				t.Fatalf("result = %+v", result)
 			}
 		})

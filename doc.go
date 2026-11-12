@@ -30,6 +30,11 @@
 // their cumulative transaction statistic is not a per-statement measurement.
 // An observed execution never supplies a universal price for future writes.
 // Old images and index snapshots require caller-provided consistency/freshness.
+// MutationCountIndexSnapshot binds a complete regular-index snapshot to the
+// exact DDL digest. IndexCatalog exposes independent copies of the same index
+// facts used by accounting, including physical managed names and explicitly
+// inferred constraint selectors, for plan collectors and other consumers.
+// It never synthesizes generated names or performs metadata RPCs.
 // Generated-column dependencies propagate to indexes, including virtual columns.
 // Expressions and automatic timestamp values are not evaluated, so old images
 // cannot establish their new values. Unsupported syntax fails explicitly.

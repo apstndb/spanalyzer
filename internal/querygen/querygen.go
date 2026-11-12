@@ -205,8 +205,9 @@ type QueryCodegenPlanDigest struct {
 }
 
 type QueryCodegenPlanQuery struct {
-	ReportVariant          *QueryCodegenPlanQueryVariant `json:"report_variant,omitempty" yaml:"report_variant,omitempty"`
-	ReportVariantCanonical bool                          `json:"report_variant_canonical,omitempty" yaml:"report_variant_canonical,omitempty"`
+	ReportWriteParamColumns map[string]string             `json:"-" yaml:"-"`
+	ReportVariant           *QueryCodegenPlanQueryVariant `json:"report_variant,omitempty" yaml:"report_variant,omitempty"`
+	ReportVariantCanonical  bool                          `json:"report_variant_canonical,omitempty" yaml:"report_variant_canonical,omitempty"`
 	// Report-only failures preserve target identity without weakening generation.
 	PlanningError    string                           `json:"planning_error,omitempty" yaml:"planning_error,omitempty"`
 	ReportSkipReason string                           `json:"report_skip_reason,omitempty" yaml:"report_skip_reason,omitempty"`
@@ -904,22 +905,7 @@ func BuildQueryCodegenPlan(config QueryCodegenConfig, baseDir string) (*QueryCod
 				countError = err.Error()
 			}
 		}
-		plan.Writes = append(plan.Writes, QueryCodegenPlanWrite{
-			MutationCounts:          counts,
-			MutationCountError:      countError,
-			Name:                    spec.Name,
-			Catalog:                 spec.Catalog,
-			Table:                   spec.Table,
-			Operation:               spec.Operation,
-			InputStruct:             spec.InputStruct,
-			Keys:                    columnNamesFromColumns(spec.Keys),
-			InsertColumns:           columnNamesFromColumns(spec.InsertColumns),
-			UpdateColumns:           columnNamesFromColumns(spec.UpdateColumns),
-			Methods:                 spec.Methods,
-			ColumnCapabilities:      planColumnCapabilities(spec.AllColumns),
-			ServerSideUpdateEffects: planServerSideUpdateEffects(spec),
-			VetSuppressions:         spec.VetSuppressions,
-		})
+		plan.Writes = append(plan.Writes, newMutationCountPlanWrite(spec, counts, countError))
 	}
 	for name, fields := range structs {
 		plan.Structs = append(plan.Structs, QueryCodegenPlanStruct{Name: name, Fields: planFields(fields)})
