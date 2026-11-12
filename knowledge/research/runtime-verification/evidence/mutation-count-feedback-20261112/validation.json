@@ -1,0 +1,159 @@
+{
+  "at": "2026-11-12T04:53:23.379585+00:00",
+  "status": "local_checks_pass_consumer_publication_pending",
+  "commands": [
+    {
+      "command": "mise run verify-local",
+      "exit_code": 0,
+      "scope": "all five module tests plus generated evidence/OKF/language at the candidate; later CLI-only guard tested separately",
+      "log": "verify-local.log.gz"
+    },
+    {
+      "command": "go test -count=1 ./... (cmd/spanner-query-gen)",
+      "exit_code": 0,
+      "scope": "final unattempted-measurement guard and CLI regressions",
+      "log": "cli-final-tests.log.gz"
+    },
+    {
+      "command": "mise run lint",
+      "exit_code": 0,
+      "scope": "all five modules; final CLI-only change checked separately",
+      "log": "all-module-lint.log.gz"
+    },
+    {
+      "command": "golangci-lint run --timeout=5m (cmd/spanner-query-gen)",
+      "exit_code": 0,
+      "scope": "final CLI source",
+      "log": "cli-final-lint.log.gz"
+    },
+    {
+      "command": "mise run govulncheck",
+      "exit_code": 0,
+      "scope": "all five modules; no called vulnerability reported",
+      "log": "govulncheck.log.gz"
+    },
+    {
+      "command": "mise run verify-omni-integration",
+      "exit_code": 0,
+      "scope": "shared pinned LTS runtime: plan shapes, CLI integration and schema reconstruction; subsequent collector error-path guard tested locally",
+      "log": "omni-integration-final.log.gz"
+    },
+    {
+      "command": "mise run check-standalone-builds",
+      "exit_code": 1,
+      "scope": "candidate CLI requires new root/leaf APIs unavailable in its older published requirements",
+      "log": "standalone-pending.log.gz"
+    },
+    {
+      "command": "mise run pre-push",
+      "exit_code": 1,
+      "scope": "clean-diff tidy gate detects intentional uncommitted direct-dependency classification; not a passing publication gate",
+      "log": "pre-push-pending.log.gz"
+    },
+    {
+      "command": "mise run pre-push (foundation only)",
+      "exit_code": 0,
+      "scope": "all five modules without consumer CLI integration changes",
+      "log": "foundation-pre-push.log.gz"
+    },
+    {
+      "command": "mise run verify-local (foundation only)",
+      "exit_code": 0,
+      "scope": "root/leaf foundation with unchanged baseline CLI",
+      "log": "foundation-verify-local.log.gz"
+    }
+  ],
+  "tidy_stability": {
+    "status": "pass",
+    "before_sha256": {
+      "go.mod": "3ac602ccdac3d999cd172afd1d13a4894d903a105a42a93ac1281329c8aa7d43",
+      "go.sum": "0c280965ea1acf6e62b2c87d03b838e48ab4f0c5b753bbad650c67f4668bf0f9",
+      "plancontract/go.mod": "fe5b89262f29614bca7b40709a9343cf30601ebae83cae4d832e393eac6cacfd",
+      "plancontract/go.sum": "f2c267d22def69b002ab790e4e4648757bbc2cc1f31e01d3093cf15b90255c03",
+      "cmd/spanner-query-gen/go.mod": "19c826456bd3c0e84dc2420f633ab949573de67be1dd5e02146a8b0774d33d7a",
+      "cmd/spanner-query-gen/go.sum": "c9c620db7b0e1d6cf5218b8d409d7cfc65d138505a37cb0b6b68115e507e6d75",
+      "survey/go.mod": "76c582202d8355a27a377638a7179c5fad4eaa7777285bfcf475f72b1e133b83",
+      "survey/go.sum": "1099b96c6c2d6dc23da9874b6d952523f78cfa012e46f28865557bad4f309ba7",
+      "tools/go.mod": "2f36f06b98b5056d3c44aec6a2798d9a52f7af137e54cb48d604f361401d03be",
+      "tools/go.sum": "3f85babec06188a53ffa7786e8e8ea33b5a851be6d7ea1bf60b9dea03aabecb8"
+    },
+    "after_sha256": {
+      "go.mod": "3ac602ccdac3d999cd172afd1d13a4894d903a105a42a93ac1281329c8aa7d43",
+      "go.sum": "0c280965ea1acf6e62b2c87d03b838e48ab4f0c5b753bbad650c67f4668bf0f9",
+      "plancontract/go.mod": "fe5b89262f29614bca7b40709a9343cf30601ebae83cae4d832e393eac6cacfd",
+      "plancontract/go.sum": "f2c267d22def69b002ab790e4e4648757bbc2cc1f31e01d3093cf15b90255c03",
+      "cmd/spanner-query-gen/go.mod": "19c826456bd3c0e84dc2420f633ab949573de67be1dd5e02146a8b0774d33d7a",
+      "cmd/spanner-query-gen/go.sum": "c9c620db7b0e1d6cf5218b8d409d7cfc65d138505a37cb0b6b68115e507e6d75",
+      "survey/go.mod": "76c582202d8355a27a377638a7179c5fad4eaa7777285bfcf475f72b1e133b83",
+      "survey/go.sum": "1099b96c6c2d6dc23da9874b6d952523f78cfa012e46f28865557bad4f309ba7",
+      "tools/go.mod": "2f36f06b98b5056d3c44aec6a2798d9a52f7af137e54cb48d604f361401d03be",
+      "tools/go.sum": "3f85babec06188a53ffa7786e8e8ea33b5a851be6d7ea1bf60b9dea03aabecb8"
+    },
+    "results": [
+      {
+        "module": ".",
+        "command": "go mod tidy",
+        "exit_code": 0,
+        "output": ""
+      },
+      {
+        "module": "plancontract",
+        "command": "go mod tidy",
+        "exit_code": 0,
+        "output": ""
+      },
+      {
+        "module": "cmd/spanner-query-gen",
+        "command": "go mod tidy",
+        "exit_code": 0,
+        "output": ""
+      },
+      {
+        "module": "survey",
+        "command": "go mod tidy",
+        "exit_code": 0,
+        "output": ""
+      },
+      {
+        "module": "tools",
+        "command": "go mod tidy",
+        "exit_code": 0,
+        "output": ""
+      }
+    ],
+    "boundary": "Tidy stability of the uncommitted candidate. The repository clean-diff gate still detects its intentional CLI direct-dependency classification change."
+  },
+  "final_source_sha256": {
+    "cmd/spanner-query-gen/config_schema.go": "709fed59256a74e89a4d076c49ea22bcea7ba5f0b131a837d12acf98d4f8a1b2",
+    "cmd/spanner-query-gen/go.mod": "19c826456bd3c0e84dc2420f633ab949573de67be1dd5e02146a8b0774d33d7a",
+    "cmd/spanner-query-gen/main.go": "4f1372bc4a110b4ead50f6c98baddaa17b7c30096e9fa667c28e0b31c3ec99e4",
+    "cmd/spanner-query-gen/mutation_count_feedback_omni_test.go": "f392f000490608553a9cae28582b72ef2f5a70a3d639b0d47583294ee517aa86",
+    "cmd/spanner-query-gen/mutation_count_inputs.go": "d84f53bf2cca74bdf1ac4287817760e112eb5f3a6709f205609b88bdbdd022eb",
+    "cmd/spanner-query-gen/mutation_count_inputs_test.go": "30794efb3ab4a028f226c5293d8ce13cd34eab1d53f27cddbd26a414cff1af3e",
+    "cmd/spanner-query-gen/plan_access_path_schema.go": "2fa8798720f7c1fbf80ca00589650a097d9dd20d3396fb21209dfa9077cc3486",
+    "cmd/spanner-query-gen/plan_report.go": "15a3bc7711e82488000dfa1ba26ab09c8856dff3f248fe3348922a4aad93dec3",
+    "cmd/spanner-query-gen/plan_report_analyzer.go": "78a117257edce84695ae739b9b1af369d17311177f811dfb22a41cb1f9554f5d",
+    "cmd/spanner-query-gen/plan_report_indexes.go": "4990304a27be58eeda3831d6f04df30d4e32860fb28b132e4fd06b6500631da3",
+    "cmd/spanner-query-gen/plan_report_mutation_measurement.go": "a014afccfc0d50db12b1cddfcd2a31173f6f31ea031383dc7e0893cf4ae9104a",
+    "cmd/spanner-query-gen/plan_report_summary.go": "537c9428263112130fce5236a4f6cbe94842f00fab6db67fe1af35cd82a14caa",
+    "cmd/spanner-query-gen/plan_report_summary_schema.go": "882bc41053dffd37f4780c114f220e112ba617f744fbc8b65c26ca6cd4486a2f",
+    "doc.go": "378f9b4c7e831370c22ea40e114687d7415e5634978445898c3fd994cd3440b9",
+    "internal/querygen/mutation_count.go": "2c624bd3a0dd2a343fe615effad7737772076429a014a395d136976a12d4ee7c",
+    "internal/querygen/mutation_count_inputs.go": "a03f019df099267a7ef214930d3498825f939f42151143d644091a42ef15b787",
+    "internal/querygen/mutation_count_inputs_test.go": "31f57729805fdd0fdb50585626e2b1e0b0daca1b8cd1b8a2348d90bdc6136e36",
+    "internal/querygen/querygen.go": "a961d0cc8fdbf6309eb5e296a59a411f6ebd2f17aefc2465f87b34641e72bef6",
+    "internal/querygen/report_plan.go": "7dc684801bcb2c6965928bd4eb367a12e3f93e1511c79c54490ea23e4f766664",
+    "mutation_count.go": "0ed3bc0d66c461566083475b70a4f88f58e4d0e4459a3dafa8883f055ba0dc17",
+    "mutation_count_index_catalog_example_test.go": "c6ec5f2097bd90093308ebe0d855a4c5307359cd14e5c8d662fd32a23ee093da",
+    "mutation_count_index_catalog_test.go": "17cefef262b3a2f03707cd949de879b6ea902f539d55214f46565c8c211d02c6",
+    "plancontract/access_paths.go": "b2da9f6f5b25dc7af12571c6c841399b632c3c01f6ef5e432a4265392a94f76a",
+    "plancontract/access_paths_cel.go": "274589248a88a2d351a5a2d14172bdb84d4e90835fc29249eb53b3e9ed71c378",
+    "plancontract/access_paths_test.go": "c9cf7461a78ae8c9dbd1f3ee6b58db6acb90584eba336a0092aae2daf5935a37",
+    "plancontract/mutation_counts.go": "0479235c131a91407dbbf2d2886a1220b1c2d242eab9dfb9165a04638d324c4c",
+    "plancontract/mutation_counts_test.go": "4f7738c3ac511c909fc09b819465c18a490fa098237222cffa88642110a794e0",
+    "plancontract/plancontract.go": "1f67fb4e54980369cd6721e22cde84a39adf649d7743cd1d492ab2bfebb505fc",
+    "plancontract/validation_test.go": "ad0080ef731d2db3538ddd7eb30d5325b8487491180e6f59c33f6a678fd66a37"
+  },
+  "publication_boundary": "This local candidate precedes publication. Standalone CLI dependency closure requires foundation publication before pinning the consumer. No local filesystem replacement is used.",
+  "container_cleanup": "container-cleanup.json"
+}

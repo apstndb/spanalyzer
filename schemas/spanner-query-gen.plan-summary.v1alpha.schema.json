@@ -7,6 +7,11 @@
           "description": "Catalog-resolved base table, or empty when unknown.",
           "type": "string"
         },
+        "catalog_index_name": {
+          "description": "Resolved physical index name; scan_target retains the backend spelling.",
+          "minLength": 1,
+          "type": "string"
+        },
         "conditions_complete": {
           "description": "Observed scan signal; conditions_complete requires an unambiguous wrapper pairing.",
           "type": "boolean"
@@ -45,6 +50,22 @@
           "description": "Observed scan signal; conditions_complete requires an unambiguous wrapper pairing.",
           "type": "boolean"
         },
+        "index_origin": {
+          "description": "Source of regular-index catalog facts.",
+          "enum": [
+            "ddl",
+            "observed_snapshot"
+          ]
+        },
+        "inferred_constraint_selectors": {
+          "description": "Unique managed-index prefix associations, explicitly inferred rather than observed constraint bindings.",
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
         "key_columns": {
           "description": "Catalog key columns in declared key order; empty when schema facts are unavailable.",
           "items": {
@@ -53,6 +74,10 @@
           },
           "type": "array",
           "uniqueItems": true
+        },
+        "managed": {
+          "description": "Whether the observed regular index is managed by the backend.",
+          "type": "boolean"
         },
         "null_filtered": {
           "type": [
@@ -1488,6 +1513,18 @@
           "minLength": 1,
           "pattern": "^[a-f0-9]{64}$",
           "type": "string"
+        },
+        "mutation_facts_sha256": {
+          "description": "SHA-256 of the explicit mutation scenarios file.",
+          "minLength": 1,
+          "pattern": "^[a-f0-9]{64}$",
+          "type": "string"
+        },
+        "mutation_indexes_sha256": {
+          "description": "SHA-256 of the explicit regular-index snapshot file.",
+          "minLength": 1,
+          "pattern": "^[a-f0-9]{64}$",
+          "type": "string"
         }
       },
       "required": [
@@ -2375,6 +2412,109 @@
             "external_query",
             "write"
           ]
+        },
+        "mutation_count_error": {
+          "description": "Count-analysis or requested measurement failure, independent of SQL PLAN status.",
+          "minLength": 1,
+          "type": "string"
+        },
+        "mutation_counts": {
+          "additionalProperties": false,
+          "properties": {
+            "dml": {
+              "additionalProperties": true,
+              "properties": {
+                "effective": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "lower": {
+                      "description": "Conditional lower bound.",
+                      "minimum": 0,
+                      "type": "integer"
+                    },
+                    "overflow": {
+                      "description": "Whether interval arithmetic overflowed.",
+                      "type": "boolean"
+                    },
+                    "upper": {
+                      "description": "Conditional upper bound; null means unknown, never zero.",
+                      "minimum": 0,
+                      "type": [
+                        "integer",
+                        "null"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "lower",
+                    "upper"
+                  ],
+                  "type": "object"
+                },
+                "effective_basis": {
+                  "description": "Facts or same-execution observation on which this conditional interval depends.",
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "version": {
+                  "const": "spanalyzer.mutation-count/v0alpha1"
+                }
+              },
+              "required": [
+                "version",
+                "effective",
+                "effective_basis"
+              ],
+              "type": "object"
+            },
+            "mutation": {
+              "additionalProperties": true,
+              "properties": {
+                "effective": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "lower": {
+                      "description": "Conditional lower bound.",
+                      "minimum": 0,
+                      "type": "integer"
+                    },
+                    "overflow": {
+                      "description": "Whether interval arithmetic overflowed.",
+                      "type": "boolean"
+                    },
+                    "upper": {
+                      "description": "Conditional upper bound; null means unknown, never zero.",
+                      "minimum": 0,
+                      "type": [
+                        "integer",
+                        "null"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "lower",
+                    "upper"
+                  ],
+                  "type": "object"
+                },
+                "effective_basis": {
+                  "description": "Facts or same-execution observation on which this conditional interval depends.",
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "version": {
+                  "const": "spanalyzer.mutation-count/v0alpha1"
+                }
+              },
+              "required": [
+                "version",
+                "effective",
+                "effective_basis"
+              ],
+              "type": "object"
+            }
+          },
+          "type": "object"
         },
         "name": {
           "description": "Configured query name.",

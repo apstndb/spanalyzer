@@ -1,0 +1,59 @@
+{
+  "base_commit": "eaf2694b9e68281d087d8bee339d0c0acf76cb68",
+  "source_state": "uncommitted local implementation; source hashes identify the retained producer files",
+  "date_jst": "2026-11-12",
+  "target_commits": 31,
+  "successful_statistics": 31,
+  "within_conditional_interval": 31,
+  "seed_commits_included": false,
+  "runtime": "Omni 2026.r4-lts.2",
+  "image_provenance": {
+    "RequestedImage": "us-docker.pkg.dev/spanner-omni/images/spanner-omni:2026.r4-lts.2@sha256:b607b10bee3c1903f0a7f88f99bece67cb0dd9d9a028aee64226fc311bd78dae",
+    "ImageID": "sha256:b607b10bee3c1903f0a7f88f99bece67cb0dd9d9a028aee64226fc311bd78dae",
+    "IndexDigest": "",
+    "ManifestDigest": "sha256:b607b10bee3c1903f0a7f88f99bece67cb0dd9d9a028aee64226fc311bd78dae",
+    "Platform": "linux/arm64",
+    "ObservedAt": "2026-11-12T04:39:25.98134Z",
+    "Source": "container_inspect",
+    "ObservedByThisProcess": true
+  },
+  "sdk": "1.95.1",
+  "spanemuboost": "0.4.10",
+  "go": "1.26.11",
+  "feedback_base_commit": "8ba3f9539ed2cecc7820f92dde77bcaeb6c6a4e8",
+  "feedback_source_sha256": "bf83fb73d8c84323d1b400933be839a5978267a6ec45934f75d568c1780a892a",
+  "producer_sha256": {
+    "cmd/spanner-query-gen/mutation_count_feedback_omni_test.go": "f392f000490608553a9cae28582b72ef2f5a70a3d639b0d47583294ee517aa86",
+    "cmd/spanner-query-gen/plan_report_mutation_measurement.go": "667c9fc8b47cadedc86eaacb8198ca1926184fe4477c2c1fb2375d4fad0f32c4",
+    "cmd/spanner-query-gen/plan_report_indexes.go": "4990304a27be58eeda3831d6f04df30d4e32860fb28b132e4fd06b6500631da3",
+    "cmd/spanner-query-gen/mutation_count_inputs.go": "d84f53bf2cca74bdf1ac4287817760e112eb5f3a6709f205609b88bdbdd022eb",
+    "internal/querygen/mutation_count_inputs.go": "a03f019df099267a7ef214930d3498825f939f42151143d644091a42ef15b787",
+    "mutation_count.go": "0ed3bc0d66c461566083475b70a4f88f58e4d0e4459a3dafa8883f055ba0dc17",
+    "plancontract/mutation_counts.go": "0479235c131a91407dbbf2d2886a1220b1c2d242eab9dfb9165a04638d324c4c"
+  },
+  "first_attempt_correction": {
+    "failed_target": "DeleteEvent/mutation",
+    "reason": "GenericColumnValue is unsupported inside an SDK delete Key; native scalar decoding fixes the collector",
+    "failed_statistic": null
+  },
+  "provenance_boundary": "The report adapter was called without manual backend identity flags and retains not_recorded in observation runtime labels. The separate same-run provenance record and pinned command identify the actual owned container; no unverified report field is promoted to an observation.",
+  "foreign_key_mapping": {
+    "catalog_index_name": "IDX_ForeignEvents_Owner_N_3A62EB33EF2CFBD9",
+    "base_table": "ForeignEvents",
+    "declared_key_count": 1,
+    "inferred_constraint_selectors": [
+      "EventOwner:referencing"
+    ]
+  },
+  "managed_resources_created": 0,
+  "measurement_fixture_lifecycle": "command-created random database inside an owned local container; runtime cleanup PASS in retained test log",
+  "publication": "Initial local capture precedes publication; standalone CLI dependency closure requires foundation publication before pinning the consumer.",
+  "post_measurement_guard": {
+    "scope": "After the retained engine execution, a unit-tested collector guard makes an unattempted requested measurement fail explicitly. The measured write algorithm and the 31 target scenarios are unchanged. No additional engine-coverage claim follows.",
+    "source": "cmd/spanner-query-gen/plan_report_mutation_measurement.go",
+    "source_sha256": "a014afccfc0d50db12b1cddfcd2a31173f6f31ea031383dc7e0893cf4ae9104a",
+    "diff": "unattempted-measurement-guard.diff",
+    "unit_test": "TestPlanReportCountOnlyTargetDoesNotWriteByDefault",
+    "test_log": "validation.json records the subsequent CLI module test"
+  }
+}

@@ -1,0 +1,155 @@
+{
+  "base_commit": "eaf2694b9e68281d087d8bee339d0c0acf76cb68",
+  "date_jst": "2026-11-12",
+  "go": "1.26.11",
+  "sdk": "1.95.1",
+  "spanemuboost": "0.4.10",
+  "platform": "linux/arm64",
+  "managed_baseline": "../managed-recheck-20261112/receipt.json",
+  "runs": [
+    {
+      "name": "omni-lts",
+      "dialect": "google",
+      "planned_steps": 355,
+      "recorded_steps": 355,
+      "codes": {
+        "OK": 237,
+        "InvalidArgument": 65,
+        "Unimplemented": 19,
+        "OutOfRange": 5,
+        "NOT_RUN": 27,
+        "FailedPrecondition": 2
+      },
+      "started_at": "2026-11-12T03:25:47.373059Z",
+      "completed_at": "2026-11-12T03:33:46.26377Z",
+      "image": "us-docker.pkg.dev/spanner-omni/images/spanner-omni:2026.r4-lts.2@sha256:b607b10bee3c1903f0a7f88f99bece67cb0dd9d9a028aee64226fc311bd78dae",
+      "provenance": {
+        "RequestedImage": "us-docker.pkg.dev/spanner-omni/images/spanner-omni:2026.r4-lts.2@sha256:b607b10bee3c1903f0a7f88f99bece67cb0dd9d9a028aee64226fc311bd78dae",
+        "ImageID": "sha256:b607b10bee3c1903f0a7f88f99bece67cb0dd9d9a028aee64226fc311bd78dae",
+        "IndexDigest": "",
+        "ManifestDigest": "sha256:b607b10bee3c1903f0a7f88f99bece67cb0dd9d9a028aee64226fc311bd78dae",
+        "Platform": "linux/arm64",
+        "ObservedAt": "2026-11-12T03:25:47.372988Z",
+        "Source": "container_inspect",
+        "ObservedByThisProcess": true
+      },
+      "runtime_closed": "OK",
+      "source": "omni-lts.jsonl"
+    },
+    {
+      "name": "omni-r5",
+      "dialect": "google",
+      "planned_steps": 355,
+      "recorded_steps": 355,
+      "codes": {
+        "OK": 275,
+        "InvalidArgument": 68,
+        "Unimplemented": 2,
+        "OutOfRange": 5,
+        "PermissionDenied": 4,
+        "FailedPrecondition": 1
+      },
+      "started_at": "2026-11-12T03:33:52.96641Z",
+      "completed_at": "2026-11-12T03:41:32.189035Z",
+      "image": "us-docker.pkg.dev/spanner-omni/images/spanner-omni:2026.r5.1@sha256:b918acd3c785bd13733d7dca6e6c029ef4ab8d7b63a0cd28800210a9bf976516",
+      "provenance": {
+        "RequestedImage": "us-docker.pkg.dev/spanner-omni/images/spanner-omni:2026.r5.1@sha256:b918acd3c785bd13733d7dca6e6c029ef4ab8d7b63a0cd28800210a9bf976516",
+        "ImageID": "sha256:b918acd3c785bd13733d7dca6e6c029ef4ab8d7b63a0cd28800210a9bf976516",
+        "IndexDigest": "",
+        "ManifestDigest": "sha256:b918acd3c785bd13733d7dca6e6c029ef4ab8d7b63a0cd28800210a9bf976516",
+        "Platform": "linux/arm64",
+        "ObservedAt": "2026-11-12T03:33:52.966383Z",
+        "Source": "container_inspect",
+        "ObservedByThisProcess": true
+      },
+      "runtime_closed": "OK",
+      "source": "omni-r5.jsonl"
+    },
+    {
+      "name": "emulator-google",
+      "dialect": "google",
+      "planned_steps": 355,
+      "recorded_steps": 355,
+      "codes": {
+        "OK": 176,
+        "InvalidArgument": 158,
+        "Unimplemented": 18,
+        "NOT_RUN": 3
+      },
+      "started_at": "2026-11-12T03:46:47.696361Z",
+      "completed_at": "2026-11-12T03:47:03.572738Z",
+      "image": "gcr.io/cloud-spanner-emulator/emulator:1.5.59@sha256:969af6a9349948fbfb4a826c18e160e258a4005f7c759f8e7f2dcec369cccba8",
+      "provenance": {
+        "RequestedImage": "gcr.io/cloud-spanner-emulator/emulator:1.5.59@sha256:969af6a9349948fbfb4a826c18e160e258a4005f7c759f8e7f2dcec369cccba8",
+        "ImageID": "sha256:969af6a9349948fbfb4a826c18e160e258a4005f7c759f8e7f2dcec369cccba8",
+        "IndexDigest": "",
+        "ManifestDigest": "sha256:969af6a9349948fbfb4a826c18e160e258a4005f7c759f8e7f2dcec369cccba8",
+        "Platform": "linux/arm64",
+        "ObservedAt": "2026-11-12T03:46:47.696351Z",
+        "Source": "container_inspect",
+        "ObservedByThisProcess": true
+      },
+      "runtime_closed": "OK",
+      "source": "emulator-google.jsonl"
+    },
+    {
+      "name": "emulator-pg",
+      "dialect": "pg",
+      "planned_steps": 100,
+      "recorded_steps": 100,
+      "codes": {
+        "OK": 45,
+        "FailedPrecondition": 6,
+        "NOT_RUN": 11,
+        "Unimplemented": 7,
+        "OutOfRange": 3,
+        "InvalidArgument": 28
+      },
+      "started_at": "2026-11-12T03:48:38.046038Z",
+      "completed_at": "2026-11-12T03:48:53.584417Z",
+      "image": "gcr.io/cloud-spanner-emulator/emulator:1.5.59@sha256:969af6a9349948fbfb4a826c18e160e258a4005f7c759f8e7f2dcec369cccba8",
+      "provenance": {
+        "RequestedImage": "gcr.io/cloud-spanner-emulator/emulator:1.5.59@sha256:969af6a9349948fbfb4a826c18e160e258a4005f7c759f8e7f2dcec369cccba8",
+        "ImageID": "sha256:969af6a9349948fbfb4a826c18e160e258a4005f7c759f8e7f2dcec369cccba8",
+        "IndexDigest": "",
+        "ManifestDigest": "sha256:969af6a9349948fbfb4a826c18e160e258a4005f7c759f8e7f2dcec369cccba8",
+        "Platform": "linux/arm64",
+        "ObservedAt": "2026-11-12T03:48:38.046027Z",
+        "Source": "container_inspect",
+        "ObservedByThisProcess": true
+      },
+      "runtime_closed": "OK",
+      "source": "emulator-pg.jsonl"
+    }
+  ],
+  "planned_semantic_steps": 1165,
+  "recorded_semantic_steps": 1165,
+  "managed_new_measurements": false,
+  "harness_corrections": [
+    "Portable GoogleSQL uses qualified predicates, typed FLOAT32 literals, named-schema UDF prerequisites and an already-present annotated index, matching the managed correction context.",
+    "First Emulator runtime lacked instance auto-creation; it ran zero semantic cases. Enabling instance setup completed GoogleSQL; its attempted PostgreSQL setup then returned AlreadyExists for the shared instance. PostgreSQL completed in a separately owned fresh runtime.",
+    "Two failed Docker-provider starts are retained separately: rootless socket discovery, then a host-versus-VM reaper socket mismatch. The corrected Colima socket environment was scoped to the process."
+  ],
+  "source_scope": "Release notes, complete public registry tag responses and official download/limitations documents. Release announcement dates, image tags and engine observations are separate.",
+  "probe_builds": {
+    "host_os": "darwin",
+    "host_arch": "arm64",
+    "go_version": "go1.26.11",
+    "build_info": [
+      "probe-build-info.txt",
+      "probe-emulator-fixed-build-info.txt"
+    ],
+    "runtime_platform_is_container_platform": true
+  },
+  "producer_sha256": {
+    "probe.go": "d76c2a6f5f4875bfa5ce99bf401d1282d2bcf1c92f936e6d940f38028a0a0e60",
+    "probe-emulator-fixed.go": "0b0f1dc5ed72533d32732d7bd1de1c93022a419bcab0717dad56f6e264111784",
+    "google-plan.json": "7e0aeb23d5b3f781850fb5c1a7e9aa379eb5ce924dcdf9065de7ef815edc0016",
+    "pg-plan.json": "6c8cce0521cbd0a4d3b206f5ed510cc9aeff1fefa7d26972cf3905462bab38f5"
+  },
+  "probe_binary_sha256": {
+    "probe": "e0d7edf4a0e6d4b8489ddfe6d854dcc63f0cfabcfabdff63171ff560e8d60ab5",
+    "probe-emulator-fixed": "a9bbca16c1d4fd3ba0564ee6f93c9f35a9e17c7b6d936e320c01fc493494e041"
+  },
+  "binary_source_boundary": "Retained build information, source and binary hashes identify this capture; no bit-for-bit reproducible-build claim is made."
+}

@@ -1,0 +1,4275 @@
+[
+  {
+    "label": "readonly/readonly/connectivity",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT 1 AS connectivity",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "OK",
+      "managed": "OK"
+    },
+    "managed_source": "../managed-recheck-20261112/readonly.jsonl"
+  },
+  {
+    "label": "readonly/readonly/final-tables",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT COUNT(*) AS n FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA=''",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "OK",
+      "managed": "OK"
+    },
+    "managed_source": "../managed-recheck-20261112/readonly.jsonl"
+  },
+  {
+    "label": "readonly/readonly/final-views",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT COUNT(*) AS n FROM INFORMATION_SCHEMA.VIEWS WHERE TABLE_SCHEMA=''",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "OK",
+      "managed": "OK"
+    },
+    "managed_source": "../managed-recheck-20261112/readonly.jsonl"
+  },
+  {
+    "label": "readonly/readonly/final-graphs",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT COUNT(*) AS n FROM INFORMATION_SCHEMA.PROPERTY_GRAPHS",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "OK",
+      "managed": "OK"
+    },
+    "managed_source": "../managed-recheck-20261112/readonly.jsonl"
+  },
+  {
+    "label": "readonly/readonly/final-streams",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT COUNT(*) AS n FROM INFORMATION_SCHEMA.CHANGE_STREAMS",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "OK",
+      "managed": "OK"
+    },
+    "managed_source": "../managed-recheck-20261112/readonly.jsonl"
+  },
+  {
+    "label": "readonly/readonly/final-routines",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT COUNT(*) AS n FROM INFORMATION_SCHEMA.ROUTINES",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "InvalidArgument",
+      "managed": "OK"
+    },
+    "managed_source": "../managed-recheck-20261112/readonly.jsonl"
+  },
+  {
+    "label": "readonly/readonly/final-models",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT COUNT(*) AS n FROM INFORMATION_SCHEMA.MODELS",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "OK",
+      "managed": "OK"
+    },
+    "managed_source": "../managed-recheck-20261112/readonly.jsonl"
+  },
+  {
+    "label": "readonly/readonly/pipe-select",
+    "family": "managed-readonly-comparison",
+    "sql": "FROM (SELECT 1 AS a, 10 AS b UNION ALL SELECT 1, 20 UNION ALL SELECT 2, 30) |> SELECT a, b",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "InvalidArgument",
+      "managed": "OK"
+    },
+    "managed_source": "../managed-recheck-20261112/readonly.jsonl"
+  },
+  {
+    "label": "readonly/readonly/pipe-extend",
+    "family": "managed-readonly-comparison",
+    "sql": "FROM (SELECT 1 AS a, 10 AS b UNION ALL SELECT 1, 20 UNION ALL SELECT 2, 30) |> EXTEND a+b AS total",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "InvalidArgument",
+      "managed": "OK"
+    },
+    "managed_source": "../managed-recheck-20261112/readonly.jsonl"
+  },
+  {
+    "label": "readonly/readonly/pipe-set",
+    "family": "managed-readonly-comparison",
+    "sql": "FROM (SELECT 1 AS a, 10 AS b UNION ALL SELECT 1, 20 UNION ALL SELECT 2, 30) |> SET b=b+1",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "InvalidArgument",
+      "managed": "OK"
+    },
+    "managed_source": "../managed-recheck-20261112/readonly.jsonl"
+  },
+  {
+    "label": "readonly/readonly/pipe-drop",
+    "family": "managed-readonly-comparison",
+    "sql": "FROM (SELECT 1 AS a, 10 AS b UNION ALL SELECT 1, 20 UNION ALL SELECT 2, 30) |> DROP b",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "InvalidArgument",
+      "managed": "OK"
+    },
+    "managed_source": "../managed-recheck-20261112/readonly.jsonl"
+  },
+  {
+    "label": "readonly/readonly/pipe-rename",
+    "family": "managed-readonly-comparison",
+    "sql": "FROM (SELECT 1 AS a, 10 AS b UNION ALL SELECT 1, 20 UNION ALL SELECT 2, 30) |> RENAME b AS c",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "InvalidArgument",
+      "managed": "OK"
+    },
+    "managed_source": "../managed-recheck-20261112/readonly.jsonl"
+  },
+  {
+    "label": "readonly/readonly/pipe-as",
+    "family": "managed-readonly-comparison",
+    "sql": "FROM (SELECT 1 AS a, 10 AS b UNION ALL SELECT 1, 20 UNION ALL SELECT 2, 30) |> AS t |> SELECT t.a, t.b",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "InvalidArgument",
+      "managed": "OK"
+    },
+    "managed_source": "../managed-recheck-20261112/readonly.jsonl"
+  },
+  {
+    "label": "readonly/readonly/pipe-where",
+    "family": "managed-readonly-comparison",
+    "sql": "FROM (SELECT 1 AS a, 10 AS b UNION ALL SELECT 1, 20 UNION ALL SELECT 2, 30) |> WHERE a=1",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "InvalidArgument",
+      "managed": "OK"
+    },
+    "managed_source": "../managed-recheck-20261112/readonly.jsonl"
+  },
+  {
+    "label": "readonly/readonly/pipe-aggregate",
+    "family": "managed-readonly-comparison",
+    "sql": "FROM (SELECT 1 AS a, 10 AS b UNION ALL SELECT 1, 20 UNION ALL SELECT 2, 30) |> AGGREGATE SUM(b) AS total GROUP BY a",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "InvalidArgument",
+      "managed": "OK"
+    },
+    "managed_source": "../managed-recheck-20261112/readonly.jsonl"
+  },
+  {
+    "label": "readonly/readonly/pipe-join",
+    "family": "managed-readonly-comparison",
+    "sql": "FROM (SELECT 1 AS a, 10 AS b UNION ALL SELECT 1, 20 UNION ALL SELECT 2, 30) |> JOIN (SELECT 1 AS a, 'match' AS tag) AS r USING (a)",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "InvalidArgument",
+      "managed": "OK"
+    },
+    "managed_source": "../managed-recheck-20261112/readonly.jsonl"
+  },
+  {
+    "label": "readonly/readonly/pipe-order-by",
+    "family": "managed-readonly-comparison",
+    "sql": "FROM (SELECT 1 AS a, 10 AS b UNION ALL SELECT 1, 20 UNION ALL SELECT 2, 30) |> ORDER BY b DESC",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "InvalidArgument",
+      "managed": "OK"
+    },
+    "managed_source": "../managed-recheck-20261112/readonly.jsonl"
+  },
+  {
+    "label": "readonly/readonly/pipe-limit",
+    "family": "managed-readonly-comparison",
+    "sql": "FROM (SELECT 1 AS a, 10 AS b UNION ALL SELECT 1, 20 UNION ALL SELECT 2, 30) |> LIMIT 2",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "InvalidArgument",
+      "managed": "OK"
+    },
+    "managed_source": "../managed-recheck-20261112/readonly.jsonl"
+  },
+  {
+    "label": "readonly/readonly/pipe-union",
+    "family": "managed-readonly-comparison",
+    "sql": "FROM (SELECT 1 AS a, 10 AS b UNION ALL SELECT 1, 20 UNION ALL SELECT 2, 30) |> UNION ALL (SELECT 3 AS a, 40 AS b)",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "InvalidArgument",
+      "managed": "OK"
+    },
+    "managed_source": "../managed-recheck-20261112/readonly.jsonl"
+  },
+  {
+    "label": "readonly/readonly/pipe-intersect",
+    "family": "managed-readonly-comparison",
+    "sql": "FROM (SELECT 1 AS a, 10 AS b UNION ALL SELECT 1, 20 UNION ALL SELECT 2, 30) |> INTERSECT DISTINCT (SELECT 1 AS a, 10 AS b)",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "InvalidArgument",
+      "managed": "OK"
+    },
+    "managed_source": "../managed-recheck-20261112/readonly.jsonl"
+  },
+  {
+    "label": "readonly/readonly/pipe-except",
+    "family": "managed-readonly-comparison",
+    "sql": "FROM (SELECT 1 AS a, 10 AS b UNION ALL SELECT 1, 20 UNION ALL SELECT 2, 30) |> EXCEPT DISTINCT (SELECT 1 AS a, 10 AS b)",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "InvalidArgument",
+      "managed": "OK"
+    },
+    "managed_source": "../managed-recheck-20261112/readonly.jsonl"
+  },
+  {
+    "label": "readonly/readonly/pipe-tablesample",
+    "family": "managed-readonly-comparison",
+    "sql": "FROM (SELECT 1 AS a, 10 AS b UNION ALL SELECT 1, 20 UNION ALL SELECT 2, 30) |> TABLESAMPLE BERNOULLI (100 PERCENT)",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "InvalidArgument",
+      "managed": "OK"
+    },
+    "managed_source": "../managed-recheck-20261112/readonly.jsonl"
+  },
+  {
+    "label": "readonly/readonly/pipe-standard-ordinal",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT a AS k, SUM(b) AS total FROM (SELECT 1 AS a, 10 AS b UNION ALL SELECT 1,20 UNION ALL SELECT 2,30) GROUP BY 1",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "OK",
+      "managed": "OK"
+    },
+    "managed_source": "../managed-recheck-20261112/readonly.jsonl"
+  },
+  {
+    "label": "readonly/readonly/pipe-group-alias",
+    "family": "managed-readonly-comparison",
+    "sql": "FROM (SELECT 1 AS a, 10 AS b UNION ALL SELECT 1, 20 UNION ALL SELECT 2, 30) |> AGGREGATE SUM(b) AS total GROUP BY a AS k",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "InvalidArgument",
+      "managed": "OK"
+    },
+    "managed_source": "../managed-recheck-20261112/readonly.jsonl"
+  },
+  {
+    "label": "readonly/readonly/pipe-group-bare-alias",
+    "family": "managed-readonly-comparison",
+    "sql": "FROM (SELECT 1 AS a, 10 AS b UNION ALL SELECT 1, 20 UNION ALL SELECT 2, 30) |> AGGREGATE SUM(b) AS total GROUP BY a k",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "InvalidArgument",
+      "managed": "OK"
+    },
+    "managed_source": "../managed-recheck-20261112/readonly.jsonl"
+  },
+  {
+    "label": "readonly/readonly/pipe-group-two-aliases",
+    "family": "managed-readonly-comparison",
+    "sql": "FROM (SELECT 1 AS a, 10 AS b UNION ALL SELECT 1, 20 UNION ALL SELECT 2, 30) |> AGGREGATE COUNT(*) AS n GROUP BY a AS k, b AS v",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "InvalidArgument",
+      "managed": "OK"
+    },
+    "managed_source": "../managed-recheck-20261112/readonly.jsonl"
+  },
+  {
+    "label": "readonly/readonly/pipe-group-ordinal",
+    "family": "managed-readonly-comparison",
+    "sql": "FROM (SELECT 1 AS a, 10 AS b UNION ALL SELECT 1, 20 UNION ALL SELECT 2, 30) |> AGGREGATE SUM(b) AS total GROUP BY 1",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "InvalidArgument",
+      "omni-r5": "InvalidArgument",
+      "emulator-google": "InvalidArgument",
+      "managed": "InvalidArgument"
+    },
+    "managed_source": "../managed-recheck-20261112/readonly.jsonl"
+  },
+  {
+    "label": "readonly/readonly/pipe-group-output-alias",
+    "family": "managed-readonly-comparison",
+    "sql": "FROM (SELECT 1 AS a, 10 AS b UNION ALL SELECT 1, 20 UNION ALL SELECT 2, 30) |> AGGREGATE SUM(b) AS total GROUP BY total",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "InvalidArgument",
+      "omni-r5": "InvalidArgument",
+      "emulator-google": "InvalidArgument",
+      "managed": "InvalidArgument"
+    },
+    "managed_source": "../managed-recheck-20261112/readonly.jsonl"
+  },
+  {
+    "label": "readonly/readonly/pipe-group-input-alias",
+    "family": "managed-readonly-comparison",
+    "sql": "FROM (SELECT 1 AS a, 10 AS b UNION ALL SELECT 1, 20 UNION ALL SELECT 2, 30) |> EXTEND a+1 AS k |> AGGREGATE SUM(b) AS total GROUP BY k",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "InvalidArgument",
+      "managed": "OK"
+    },
+    "managed_source": "../managed-recheck-20261112/readonly.jsonl"
+  },
+  {
+    "label": "readonly/readonly/pipe-group-and-order",
+    "family": "managed-readonly-comparison",
+    "sql": "FROM (SELECT 1 AS a, 10 AS b UNION ALL SELECT 1, 20 UNION ALL SELECT 2, 30) |> AGGREGATE SUM(b) AS total GROUP AND ORDER BY a DESC",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "InvalidArgument",
+      "managed": "OK"
+    },
+    "managed_source": "../managed-recheck-20261112/readonly.jsonl"
+  },
+  {
+    "label": "readonly/readonly/select-led-select",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT 1 AS x |> SELECT x",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "InvalidArgument",
+      "managed": "OK"
+    },
+    "managed_source": "../managed-recheck-20261112/readonly.jsonl"
+  },
+  {
+    "label": "readonly/readonly/select-led-where",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT 1 AS x |> WHERE x=1",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "InvalidArgument",
+      "managed": "OK"
+    },
+    "managed_source": "../managed-recheck-20261112/readonly.jsonl"
+  },
+  {
+    "label": "readonly/readonly/select-led-aggregate",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT 1 AS x |> AGGREGATE SUM(x) AS n",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "InvalidArgument",
+      "managed": "OK"
+    },
+    "managed_source": "../managed-recheck-20261112/readonly.jsonl"
+  },
+  {
+    "label": "readonly/readonly/from-only",
+    "family": "managed-readonly-comparison",
+    "sql": "FROM (SELECT 1 AS x)",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "InvalidArgument",
+      "managed": "OK"
+    },
+    "managed_source": "../managed-recheck-20261112/readonly.jsonl"
+  },
+  {
+    "label": "readonly/readonly/json-equality",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT JSON '{\"a\":1}' = JSON '{\"a\":1}' AS same, JSON '1' < JSON '2' AS ordered, JSON '1' = 1 AS coerced, CAST(STRUCT(1 AS a) AS JSON) AS converted",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "OK",
+      "managed": "OK"
+    },
+    "managed_source": "../managed-recheck-20261112/readonly.jsonl"
+  },
+  {
+    "label": "readonly/readonly/json-group",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT j,COUNT(*) AS n FROM UNNEST([JSON '{\"a\":1}',JSON '{\"a\":1}',JSON '{\"a\":2}']) j GROUP BY j ORDER BY j",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "OK",
+      "managed": "OK"
+    },
+    "managed_source": "../managed-recheck-20261112/readonly.jsonl"
+  },
+  {
+    "label": "readonly/readonly/distinctness",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT NULL IS DISTINCT FROM NULL AS same_null, 1 IS DISTINCT FROM NULL AS distinct_null, JSON '1' IS NOT DISTINCT FROM 1 AS json_coerce",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "OK",
+      "managed": "OK"
+    },
+    "managed_source": "../managed-recheck-20261112/readonly.jsonl"
+  },
+  {
+    "label": "readonly/readonly/hll-count",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT HLL_COUNT.EXTRACT(HLL_COUNT.INIT(x)) AS estimate FROM UNNEST([1,1,2,3]) x",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "InvalidArgument",
+      "managed": "OK"
+    },
+    "managed_source": "../managed-recheck-20261112/readonly.jsonl"
+  },
+  {
+    "label": "readonly/readonly/approx-count",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT APPROX_COUNT_DISTINCT(x) AS estimate FROM UNNEST([1,1,2,3]) x",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "Unimplemented",
+      "managed": "OK"
+    },
+    "managed_source": "../managed-recheck-20261112/readonly.jsonl"
+  },
+  {
+    "label": "readonly/readonly/rand",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT RAND() AS r",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "Unimplemented",
+      "omni-r5": "Unimplemented",
+      "emulator-google": "Unimplemented",
+      "managed": "Unimplemented"
+    },
+    "managed_source": "../managed-recheck-20261112/readonly.jsonl"
+  },
+  {
+    "label": "readonly/readonly/infoschema-columns",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT TABLE_SCHEMA,TABLE_NAME,COLUMN_NAME,ORDINAL_POSITION,SPANNER_TYPE,IS_NULLABLE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA='INFORMATION_SCHEMA' ORDER BY TABLE_NAME,ORDINAL_POSITION",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "OK",
+      "managed": "OK"
+    },
+    "managed_source": "../managed-recheck-20261112/readonly.jsonl"
+  },
+  {
+    "label": "readonly/readonly/sys-columns-0",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT TABLE_NAME,COLUMN_NAME,ORDINAL_POSITION,SPANNER_TYPE,IS_NULLABLE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA='SPANNER_SYS' ORDER BY TABLE_NAME,ORDINAL_POSITION",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "OK",
+      "managed": "OK"
+    },
+    "managed_source": "../managed-recheck-20261112/readonly.jsonl"
+  },
+  {
+    "label": "readonly/readonly/sys-query-0-ACTIVE_BATCH_OPERATIONS",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT * FROM SPANNER_SYS.ACTIVE_BATCH_OPERATIONS LIMIT 0",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "InvalidArgument",
+      "managed": "OK"
+    },
+    "managed_source": "../managed-recheck-20261112/readonly.jsonl"
+  },
+  {
+    "label": "readonly/readonly/sys-query-0-BATCH_OPERATIONS",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT * FROM SPANNER_SYS.BATCH_OPERATIONS LIMIT 0",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "InvalidArgument",
+      "omni-r5": "InvalidArgument",
+      "emulator-google": "InvalidArgument",
+      "managed": "OK"
+    },
+    "managed_source": "../managed-recheck-20261112/readonly.jsonl"
+  },
+  {
+    "label": "readonly/readonly/sys-query-0-LOCK_STATS_TOTAL_10MINUTE",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT * FROM SPANNER_SYS.LOCK_STATS_TOTAL_10MINUTE LIMIT 0",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "InvalidArgument",
+      "managed": "Unimplemented"
+    },
+    "managed_source": "../managed-recheck-20261112/readonly.jsonl"
+  },
+  {
+    "label": "readonly/readonly/sys-query-0-SPLIT_STATS_TOP_10MINUTE",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT * FROM SPANNER_SYS.SPLIT_STATS_TOP_10MINUTE LIMIT 0",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "InvalidArgument",
+      "managed": "OK"
+    },
+    "managed_source": "../managed-recheck-20261112/readonly.jsonl"
+  },
+  {
+    "label": "readonly/readonly/sys-columns-1",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT TABLE_NAME,COLUMN_NAME,ORDINAL_POSITION,SPANNER_TYPE,IS_NULLABLE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA='SPANNER_SYS' ORDER BY TABLE_NAME,ORDINAL_POSITION",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "OK",
+      "managed": "OK"
+    },
+    "managed_source": "../managed-recheck-20261112/readonly.jsonl"
+  },
+  {
+    "label": "readonly/readonly/sys-query-1-ACTIVE_BATCH_OPERATIONS",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT * FROM SPANNER_SYS.ACTIVE_BATCH_OPERATIONS LIMIT 0",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "InvalidArgument",
+      "managed": "OK"
+    },
+    "managed_source": "../managed-recheck-20261112/readonly.jsonl"
+  },
+  {
+    "label": "readonly/readonly/sys-query-1-BATCH_OPERATIONS",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT * FROM SPANNER_SYS.BATCH_OPERATIONS LIMIT 0",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "InvalidArgument",
+      "omni-r5": "InvalidArgument",
+      "emulator-google": "InvalidArgument",
+      "managed": "OK"
+    },
+    "managed_source": "../managed-recheck-20261112/readonly.jsonl"
+  },
+  {
+    "label": "readonly/readonly/sys-query-1-LOCK_STATS_TOTAL_10MINUTE",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT * FROM SPANNER_SYS.LOCK_STATS_TOTAL_10MINUTE LIMIT 0",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "InvalidArgument",
+      "managed": "Unimplemented"
+    },
+    "managed_source": "../managed-recheck-20261112/readonly.jsonl"
+  },
+  {
+    "label": "readonly/readonly/sys-query-1-SPLIT_STATS_TOP_10MINUTE",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT * FROM SPANNER_SYS.SPLIT_STATS_TOP_10MINUTE LIMIT 0",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "InvalidArgument",
+      "managed": "OK"
+    },
+    "managed_source": "../managed-recheck-20261112/readonly.jsonl"
+  },
+  {
+    "label": "readonly/readonly/sys-columns-2",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT TABLE_NAME,COLUMN_NAME,ORDINAL_POSITION,SPANNER_TYPE,IS_NULLABLE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA='SPANNER_SYS' ORDER BY TABLE_NAME,ORDINAL_POSITION",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "OK",
+      "managed": "OK"
+    },
+    "managed_source": "../managed-recheck-20261112/readonly.jsonl"
+  },
+  {
+    "label": "readonly/readonly/sys-query-2-ACTIVE_BATCH_OPERATIONS",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT * FROM SPANNER_SYS.ACTIVE_BATCH_OPERATIONS LIMIT 0",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "InvalidArgument",
+      "managed": "OK"
+    },
+    "managed_source": "../managed-recheck-20261112/readonly.jsonl"
+  },
+  {
+    "label": "readonly/readonly/sys-query-2-BATCH_OPERATIONS",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT * FROM SPANNER_SYS.BATCH_OPERATIONS LIMIT 0",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "InvalidArgument",
+      "omni-r5": "InvalidArgument",
+      "emulator-google": "InvalidArgument",
+      "managed": "OK"
+    },
+    "managed_source": "../managed-recheck-20261112/readonly.jsonl"
+  },
+  {
+    "label": "readonly/readonly/sys-query-2-LOCK_STATS_TOTAL_10MINUTE",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT * FROM SPANNER_SYS.LOCK_STATS_TOTAL_10MINUTE LIMIT 0",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "InvalidArgument",
+      "managed": "Unimplemented"
+    },
+    "managed_source": "../managed-recheck-20261112/readonly.jsonl"
+  },
+  {
+    "label": "readonly/readonly/sys-query-2-SPLIT_STATS_TOP_10MINUTE",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT * FROM SPANNER_SYS.SPLIT_STATS_TOP_10MINUTE LIMIT 0",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "InvalidArgument",
+      "managed": "OK"
+    },
+    "managed_source": "../managed-recheck-20261112/readonly.jsonl"
+  },
+  {
+    "label": "readonly/supplemental/connectivity",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT 1 AS connectivity",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "OK",
+      "managed": "OK"
+    },
+    "managed_source": "../managed-recheck-20261112/supplemental.jsonl"
+  },
+  {
+    "label": "readonly/supplemental/ACTIVE_BATCH_OPERATIONS0",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT COUNT(*) AS n FROM SPANNER_SYS.ACTIVE_BATCH_OPERATIONS",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "InvalidArgument",
+      "managed": "OK"
+    },
+    "managed_source": "../managed-recheck-20261112/supplemental.jsonl"
+  },
+  {
+    "label": "readonly/supplemental/ACTIVE_BATCH_OPERATIONS1",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT NUM_PARTITIONS_TOTAL,STATUS FROM SPANNER_SYS.ACTIVE_BATCH_OPERATIONS LIMIT 1",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "InvalidArgument",
+      "managed": "OK"
+    },
+    "managed_source": "../managed-recheck-20261112/supplemental.jsonl"
+  },
+  {
+    "label": "readonly/supplemental/BATCH_OPERATIONS0",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT COUNT(*) AS n FROM SPANNER_SYS.BATCH_OPERATIONS",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "InvalidArgument",
+      "omni-r5": "InvalidArgument",
+      "emulator-google": "InvalidArgument",
+      "managed": "OK"
+    },
+    "managed_source": "../managed-recheck-20261112/supplemental.jsonl"
+  },
+  {
+    "label": "readonly/supplemental/BATCH_OPERATIONS1",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT NUM_PARTITIONS_TOTAL,STATUS FROM SPANNER_SYS.BATCH_OPERATIONS LIMIT 1",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "InvalidArgument",
+      "omni-r5": "InvalidArgument",
+      "emulator-google": "InvalidArgument",
+      "managed": "OK"
+    },
+    "managed_source": "../managed-recheck-20261112/supplemental.jsonl"
+  },
+  {
+    "label": "readonly/supplemental/LOCK_STATS_TOP_MINUTE-scalar",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT INTERVAL_END,LOCK_WAIT_SECONDS FROM SPANNER_SYS.LOCK_STATS_TOP_MINUTE LIMIT 1",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "InvalidArgument",
+      "managed": "OK"
+    },
+    "managed_source": "../managed-recheck-20261112/supplemental.jsonl"
+  },
+  {
+    "label": "readonly/supplemental/LOCK_STATS_TOP_MINUTE-dist",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT ARRAY_LENGTH(LOCK_WAIT_DISTRIBUTION) AS distribution_count FROM SPANNER_SYS.LOCK_STATS_TOP_MINUTE LIMIT 1",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "InvalidArgument",
+      "omni-r5": "InvalidArgument",
+      "emulator-google": "InvalidArgument",
+      "managed": "OK"
+    },
+    "managed_source": "../managed-recheck-20261112/supplemental.jsonl"
+  },
+  {
+    "label": "readonly/supplemental/LOCK_STATS_TOP_MINUTE-json",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT LOCK_WAIT_DISTRIBUTION_JSON_STRING FROM SPANNER_SYS.LOCK_STATS_TOP_MINUTE LIMIT 1",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "InvalidArgument",
+      "omni-r5": "InvalidArgument",
+      "emulator-google": "InvalidArgument",
+      "managed": "OK"
+    },
+    "managed_source": "../managed-recheck-20261112/supplemental.jsonl"
+  },
+  {
+    "label": "readonly/supplemental/LOCK_STATS_TOP_10MINUTE-scalar",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT INTERVAL_END,LOCK_WAIT_SECONDS FROM SPANNER_SYS.LOCK_STATS_TOP_10MINUTE LIMIT 1",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "InvalidArgument",
+      "managed": "OK"
+    },
+    "managed_source": "../managed-recheck-20261112/supplemental.jsonl"
+  },
+  {
+    "label": "readonly/supplemental/LOCK_STATS_TOP_10MINUTE-dist",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT ARRAY_LENGTH(LOCK_WAIT_DISTRIBUTION) AS distribution_count FROM SPANNER_SYS.LOCK_STATS_TOP_10MINUTE LIMIT 1",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "InvalidArgument",
+      "omni-r5": "InvalidArgument",
+      "emulator-google": "InvalidArgument",
+      "managed": "OK"
+    },
+    "managed_source": "../managed-recheck-20261112/supplemental.jsonl"
+  },
+  {
+    "label": "readonly/supplemental/LOCK_STATS_TOP_10MINUTE-json",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT LOCK_WAIT_DISTRIBUTION_JSON_STRING FROM SPANNER_SYS.LOCK_STATS_TOP_10MINUTE LIMIT 1",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "InvalidArgument",
+      "omni-r5": "InvalidArgument",
+      "emulator-google": "InvalidArgument",
+      "managed": "OK"
+    },
+    "managed_source": "../managed-recheck-20261112/supplemental.jsonl"
+  },
+  {
+    "label": "readonly/supplemental/LOCK_STATS_TOP_HOUR-scalar",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT INTERVAL_END,LOCK_WAIT_SECONDS FROM SPANNER_SYS.LOCK_STATS_TOP_HOUR LIMIT 1",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "InvalidArgument",
+      "managed": "OK"
+    },
+    "managed_source": "../managed-recheck-20261112/supplemental.jsonl"
+  },
+  {
+    "label": "readonly/supplemental/LOCK_STATS_TOP_HOUR-dist",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT ARRAY_LENGTH(LOCK_WAIT_DISTRIBUTION) AS distribution_count FROM SPANNER_SYS.LOCK_STATS_TOP_HOUR LIMIT 1",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "InvalidArgument",
+      "omni-r5": "InvalidArgument",
+      "emulator-google": "InvalidArgument",
+      "managed": "OK"
+    },
+    "managed_source": "../managed-recheck-20261112/supplemental.jsonl"
+  },
+  {
+    "label": "readonly/supplemental/LOCK_STATS_TOP_HOUR-json",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT LOCK_WAIT_DISTRIBUTION_JSON_STRING FROM SPANNER_SYS.LOCK_STATS_TOP_HOUR LIMIT 1",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "InvalidArgument",
+      "omni-r5": "InvalidArgument",
+      "emulator-google": "InvalidArgument",
+      "managed": "OK"
+    },
+    "managed_source": "../managed-recheck-20261112/supplemental.jsonl"
+  },
+  {
+    "label": "readonly/supplemental/LOCK_STATS_TOTAL_MINUTE-scalar",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT INTERVAL_END,TOTAL_LOCK_WAIT_SECONDS FROM SPANNER_SYS.LOCK_STATS_TOTAL_MINUTE LIMIT 1",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "InvalidArgument",
+      "managed": "OK"
+    },
+    "managed_source": "../managed-recheck-20261112/supplemental.jsonl"
+  },
+  {
+    "label": "readonly/supplemental/LOCK_STATS_TOTAL_MINUTE-dist",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT ARRAY_LENGTH(LOCK_WAIT_DISTRIBUTION) AS distribution_count FROM SPANNER_SYS.LOCK_STATS_TOTAL_MINUTE LIMIT 1",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "InvalidArgument",
+      "omni-r5": "InvalidArgument",
+      "emulator-google": "InvalidArgument",
+      "managed": "OK"
+    },
+    "managed_source": "../managed-recheck-20261112/supplemental.jsonl"
+  },
+  {
+    "label": "readonly/supplemental/LOCK_STATS_TOTAL_MINUTE-json",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT LOCK_WAIT_DISTRIBUTION_JSON_STRING FROM SPANNER_SYS.LOCK_STATS_TOTAL_MINUTE LIMIT 1",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "InvalidArgument",
+      "omni-r5": "InvalidArgument",
+      "emulator-google": "InvalidArgument",
+      "managed": "OK"
+    },
+    "managed_source": "../managed-recheck-20261112/supplemental.jsonl"
+  },
+  {
+    "label": "readonly/supplemental/LOCK_STATS_TOTAL_10MINUTE-scalar",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT INTERVAL_END,TOTAL_LOCK_WAIT_SECONDS FROM SPANNER_SYS.LOCK_STATS_TOTAL_10MINUTE LIMIT 1",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "InvalidArgument",
+      "managed": "OK"
+    },
+    "managed_source": "../managed-recheck-20261112/supplemental.jsonl"
+  },
+  {
+    "label": "readonly/supplemental/LOCK_STATS_TOTAL_10MINUTE-dist",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT ARRAY_LENGTH(LOCK_WAIT_DISTRIBUTION) AS distribution_count FROM SPANNER_SYS.LOCK_STATS_TOTAL_10MINUTE LIMIT 1",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "InvalidArgument",
+      "omni-r5": "InvalidArgument",
+      "emulator-google": "InvalidArgument",
+      "managed": "OK"
+    },
+    "managed_source": "../managed-recheck-20261112/supplemental.jsonl"
+  },
+  {
+    "label": "readonly/supplemental/LOCK_STATS_TOTAL_10MINUTE-json",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT LOCK_WAIT_DISTRIBUTION_JSON_STRING FROM SPANNER_SYS.LOCK_STATS_TOTAL_10MINUTE LIMIT 1",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "InvalidArgument",
+      "omni-r5": "InvalidArgument",
+      "emulator-google": "InvalidArgument",
+      "managed": "OK"
+    },
+    "managed_source": "../managed-recheck-20261112/supplemental.jsonl"
+  },
+  {
+    "label": "readonly/supplemental/LOCK_STATS_TOTAL_HOUR-scalar",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT INTERVAL_END,TOTAL_LOCK_WAIT_SECONDS FROM SPANNER_SYS.LOCK_STATS_TOTAL_HOUR LIMIT 1",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "InvalidArgument",
+      "managed": "OK"
+    },
+    "managed_source": "../managed-recheck-20261112/supplemental.jsonl"
+  },
+  {
+    "label": "readonly/supplemental/LOCK_STATS_TOTAL_HOUR-dist",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT ARRAY_LENGTH(LOCK_WAIT_DISTRIBUTION) AS distribution_count FROM SPANNER_SYS.LOCK_STATS_TOTAL_HOUR LIMIT 1",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "InvalidArgument",
+      "omni-r5": "InvalidArgument",
+      "emulator-google": "InvalidArgument",
+      "managed": "OK"
+    },
+    "managed_source": "../managed-recheck-20261112/supplemental.jsonl"
+  },
+  {
+    "label": "readonly/supplemental/LOCK_STATS_TOTAL_HOUR-json",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT LOCK_WAIT_DISTRIBUTION_JSON_STRING FROM SPANNER_SYS.LOCK_STATS_TOTAL_HOUR LIMIT 1",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "InvalidArgument",
+      "omni-r5": "InvalidArgument",
+      "emulator-google": "InvalidArgument",
+      "managed": "OK"
+    },
+    "managed_source": "../managed-recheck-20261112/supplemental.jsonl"
+  },
+  {
+    "label": "readonly/supplemental/SPLIT_STATS_TOP_MINUTE",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT LATENCY_IMPACT_CORRELATION_SCORE FROM SPANNER_SYS.SPLIT_STATS_TOP_MINUTE LIMIT 1",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "InvalidArgument",
+      "omni-r5": "InvalidArgument",
+      "emulator-google": "InvalidArgument",
+      "managed": "OK"
+    },
+    "managed_source": "../managed-recheck-20261112/supplemental.jsonl"
+  },
+  {
+    "label": "readonly/supplemental/SPLIT_STATS_TOP_10MINUTE",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT LATENCY_IMPACT_CORRELATION_SCORE FROM SPANNER_SYS.SPLIT_STATS_TOP_10MINUTE LIMIT 1",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "InvalidArgument",
+      "omni-r5": "InvalidArgument",
+      "emulator-google": "InvalidArgument",
+      "managed": "OK"
+    },
+    "managed_source": "../managed-recheck-20261112/supplemental.jsonl"
+  },
+  {
+    "label": "readonly/supplemental/SPLIT_STATS_TOP_HOUR",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT LATENCY_IMPACT_CORRELATION_SCORE FROM SPANNER_SYS.SPLIT_STATS_TOP_HOUR LIMIT 1",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "InvalidArgument",
+      "omni-r5": "InvalidArgument",
+      "emulator-google": "InvalidArgument",
+      "managed": "OK"
+    },
+    "managed_source": "../managed-recheck-20261112/supplemental.jsonl"
+  },
+  {
+    "label": "readonly/statistics/connectivity",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT 1 AS connectivity",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "OK",
+      "managed": "OK"
+    },
+    "managed_source": "../managed-recheck-20261112/statistics.jsonl"
+  },
+  {
+    "label": "readonly/statistics/stats-QUERY_STATS_TOP_MINUTE-scalar",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT AVG_COLUMNAR_READ_SHARE, ARRAY_LENGTH(CPU_SECONDS_DISTRIBUTION) AS cpu_distributions, ARRAY_LENGTH(ROW_SCANNED_DISTRIBUTION) AS row_distributions, CPU_SECONDS_DISTRIBUTION_JSON_STRING, ROW_SCANNED_DISTRIBUTION_JSON_STRING FROM SPANNER_SYS.QUERY_STATS_TOP_MINUTE LIMIT 1",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "InvalidArgument",
+      "managed": "OK"
+    },
+    "managed_source": "../managed-recheck-20261112/statistics.jsonl"
+  },
+  {
+    "label": "readonly/statistics/stats-QUERY_STATS_TOP_MINUTE-CPU_SECONDS_DISTRIBUTION-struct",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT SPANNER_SYS.DISTRIBUTION_PERCENTILE(CPU_SECONDS_DISTRIBUTION, 99.0) AS p99 FROM SPANNER_SYS.QUERY_STATS_TOP_MINUTE LIMIT 1",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "InvalidArgument",
+      "omni-r5": "InvalidArgument",
+      "emulator-google": "InvalidArgument",
+      "managed": "InvalidArgument"
+    },
+    "managed_source": "../managed-recheck-20261112/statistics.jsonl"
+  },
+  {
+    "label": "readonly/statistics/stats-QUERY_STATS_TOP_MINUTE-CPU_SECONDS_DISTRIBUTION-json",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT SPANNER_SYS.DISTRIBUTION_PERCENTILE(CPU_SECONDS_DISTRIBUTION_JSON_STRING, 99.0) AS p99 FROM SPANNER_SYS.QUERY_STATS_TOP_MINUTE LIMIT 1",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "InvalidArgument",
+      "managed": "OK"
+    },
+    "managed_source": "../managed-recheck-20261112/statistics.jsonl"
+  },
+  {
+    "label": "readonly/statistics/stats-QUERY_STATS_TOP_MINUTE-ROW_SCANNED_DISTRIBUTION-struct",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT SPANNER_SYS.DISTRIBUTION_PERCENTILE(ROW_SCANNED_DISTRIBUTION, 99.0) AS p99 FROM SPANNER_SYS.QUERY_STATS_TOP_MINUTE LIMIT 1",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "InvalidArgument",
+      "omni-r5": "InvalidArgument",
+      "emulator-google": "InvalidArgument",
+      "managed": "InvalidArgument"
+    },
+    "managed_source": "../managed-recheck-20261112/statistics.jsonl"
+  },
+  {
+    "label": "readonly/statistics/stats-QUERY_STATS_TOP_MINUTE-ROW_SCANNED_DISTRIBUTION-json",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT SPANNER_SYS.DISTRIBUTION_PERCENTILE(ROW_SCANNED_DISTRIBUTION_JSON_STRING, 99.0) AS p99 FROM SPANNER_SYS.QUERY_STATS_TOP_MINUTE LIMIT 1",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "InvalidArgument",
+      "managed": "OK"
+    },
+    "managed_source": "../managed-recheck-20261112/statistics.jsonl"
+  },
+  {
+    "label": "readonly/statistics/stats-QUERY_STATS_TOP_10MINUTE-scalar",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT AVG_COLUMNAR_READ_SHARE, ARRAY_LENGTH(CPU_SECONDS_DISTRIBUTION) AS cpu_distributions, ARRAY_LENGTH(ROW_SCANNED_DISTRIBUTION) AS row_distributions, CPU_SECONDS_DISTRIBUTION_JSON_STRING, ROW_SCANNED_DISTRIBUTION_JSON_STRING FROM SPANNER_SYS.QUERY_STATS_TOP_10MINUTE LIMIT 1",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "InvalidArgument",
+      "managed": "OK"
+    },
+    "managed_source": "../managed-recheck-20261112/statistics.jsonl"
+  },
+  {
+    "label": "readonly/statistics/stats-QUERY_STATS_TOP_10MINUTE-CPU_SECONDS_DISTRIBUTION-struct",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT SPANNER_SYS.DISTRIBUTION_PERCENTILE(CPU_SECONDS_DISTRIBUTION, 99.0) AS p99 FROM SPANNER_SYS.QUERY_STATS_TOP_10MINUTE LIMIT 1",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "InvalidArgument",
+      "omni-r5": "InvalidArgument",
+      "emulator-google": "InvalidArgument",
+      "managed": "InvalidArgument"
+    },
+    "managed_source": "../managed-recheck-20261112/statistics.jsonl"
+  },
+  {
+    "label": "readonly/statistics/stats-QUERY_STATS_TOP_10MINUTE-CPU_SECONDS_DISTRIBUTION-json",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT SPANNER_SYS.DISTRIBUTION_PERCENTILE(CPU_SECONDS_DISTRIBUTION_JSON_STRING, 99.0) AS p99 FROM SPANNER_SYS.QUERY_STATS_TOP_10MINUTE LIMIT 1",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "InvalidArgument",
+      "managed": "OK"
+    },
+    "managed_source": "../managed-recheck-20261112/statistics.jsonl"
+  },
+  {
+    "label": "readonly/statistics/stats-QUERY_STATS_TOP_10MINUTE-ROW_SCANNED_DISTRIBUTION-struct",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT SPANNER_SYS.DISTRIBUTION_PERCENTILE(ROW_SCANNED_DISTRIBUTION, 99.0) AS p99 FROM SPANNER_SYS.QUERY_STATS_TOP_10MINUTE LIMIT 1",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "InvalidArgument",
+      "omni-r5": "InvalidArgument",
+      "emulator-google": "InvalidArgument",
+      "managed": "InvalidArgument"
+    },
+    "managed_source": "../managed-recheck-20261112/statistics.jsonl"
+  },
+  {
+    "label": "readonly/statistics/stats-QUERY_STATS_TOP_10MINUTE-ROW_SCANNED_DISTRIBUTION-json",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT SPANNER_SYS.DISTRIBUTION_PERCENTILE(ROW_SCANNED_DISTRIBUTION_JSON_STRING, 99.0) AS p99 FROM SPANNER_SYS.QUERY_STATS_TOP_10MINUTE LIMIT 1",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "InvalidArgument",
+      "managed": "OK"
+    },
+    "managed_source": "../managed-recheck-20261112/statistics.jsonl"
+  },
+  {
+    "label": "readonly/statistics/stats-QUERY_STATS_TOP_HOUR-scalar",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT AVG_COLUMNAR_READ_SHARE, ARRAY_LENGTH(CPU_SECONDS_DISTRIBUTION) AS cpu_distributions, ARRAY_LENGTH(ROW_SCANNED_DISTRIBUTION) AS row_distributions, CPU_SECONDS_DISTRIBUTION_JSON_STRING, ROW_SCANNED_DISTRIBUTION_JSON_STRING FROM SPANNER_SYS.QUERY_STATS_TOP_HOUR LIMIT 1",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "InvalidArgument",
+      "managed": "OK"
+    },
+    "managed_source": "../managed-recheck-20261112/statistics.jsonl"
+  },
+  {
+    "label": "readonly/statistics/stats-QUERY_STATS_TOP_HOUR-CPU_SECONDS_DISTRIBUTION-struct",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT SPANNER_SYS.DISTRIBUTION_PERCENTILE(CPU_SECONDS_DISTRIBUTION, 99.0) AS p99 FROM SPANNER_SYS.QUERY_STATS_TOP_HOUR LIMIT 1",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "InvalidArgument",
+      "omni-r5": "InvalidArgument",
+      "emulator-google": "InvalidArgument",
+      "managed": "InvalidArgument"
+    },
+    "managed_source": "../managed-recheck-20261112/statistics.jsonl"
+  },
+  {
+    "label": "readonly/statistics/stats-QUERY_STATS_TOP_HOUR-CPU_SECONDS_DISTRIBUTION-json",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT SPANNER_SYS.DISTRIBUTION_PERCENTILE(CPU_SECONDS_DISTRIBUTION_JSON_STRING, 99.0) AS p99 FROM SPANNER_SYS.QUERY_STATS_TOP_HOUR LIMIT 1",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "InvalidArgument",
+      "managed": "OK"
+    },
+    "managed_source": "../managed-recheck-20261112/statistics.jsonl"
+  },
+  {
+    "label": "readonly/statistics/stats-QUERY_STATS_TOP_HOUR-ROW_SCANNED_DISTRIBUTION-struct",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT SPANNER_SYS.DISTRIBUTION_PERCENTILE(ROW_SCANNED_DISTRIBUTION, 99.0) AS p99 FROM SPANNER_SYS.QUERY_STATS_TOP_HOUR LIMIT 1",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "InvalidArgument",
+      "omni-r5": "InvalidArgument",
+      "emulator-google": "InvalidArgument",
+      "managed": "InvalidArgument"
+    },
+    "managed_source": "../managed-recheck-20261112/statistics.jsonl"
+  },
+  {
+    "label": "readonly/statistics/stats-QUERY_STATS_TOP_HOUR-ROW_SCANNED_DISTRIBUTION-json",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT SPANNER_SYS.DISTRIBUTION_PERCENTILE(ROW_SCANNED_DISTRIBUTION_JSON_STRING, 99.0) AS p99 FROM SPANNER_SYS.QUERY_STATS_TOP_HOUR LIMIT 1",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "InvalidArgument",
+      "managed": "OK"
+    },
+    "managed_source": "../managed-recheck-20261112/statistics.jsonl"
+  },
+  {
+    "label": "readonly/statistics/stats-QUERY_STATS_TOTAL_MINUTE-scalar",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT AVG_COLUMNAR_READ_SHARE, ARRAY_LENGTH(CPU_SECONDS_DISTRIBUTION) AS cpu_distributions, ARRAY_LENGTH(ROW_SCANNED_DISTRIBUTION) AS row_distributions, CPU_SECONDS_DISTRIBUTION_JSON_STRING, ROW_SCANNED_DISTRIBUTION_JSON_STRING FROM SPANNER_SYS.QUERY_STATS_TOTAL_MINUTE LIMIT 1",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "InvalidArgument",
+      "managed": "OK"
+    },
+    "managed_source": "../managed-recheck-20261112/statistics.jsonl"
+  },
+  {
+    "label": "readonly/statistics/stats-QUERY_STATS_TOTAL_MINUTE-CPU_SECONDS_DISTRIBUTION-struct",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT SPANNER_SYS.DISTRIBUTION_PERCENTILE(CPU_SECONDS_DISTRIBUTION, 99.0) AS p99 FROM SPANNER_SYS.QUERY_STATS_TOTAL_MINUTE LIMIT 1",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "InvalidArgument",
+      "omni-r5": "InvalidArgument",
+      "emulator-google": "InvalidArgument",
+      "managed": "InvalidArgument"
+    },
+    "managed_source": "../managed-recheck-20261112/statistics.jsonl"
+  },
+  {
+    "label": "readonly/statistics/stats-QUERY_STATS_TOTAL_MINUTE-CPU_SECONDS_DISTRIBUTION-json",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT SPANNER_SYS.DISTRIBUTION_PERCENTILE(CPU_SECONDS_DISTRIBUTION_JSON_STRING, 99.0) AS p99 FROM SPANNER_SYS.QUERY_STATS_TOTAL_MINUTE LIMIT 1",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "InvalidArgument",
+      "managed": "OK"
+    },
+    "managed_source": "../managed-recheck-20261112/statistics.jsonl"
+  },
+  {
+    "label": "readonly/statistics/stats-QUERY_STATS_TOTAL_MINUTE-ROW_SCANNED_DISTRIBUTION-struct",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT SPANNER_SYS.DISTRIBUTION_PERCENTILE(ROW_SCANNED_DISTRIBUTION, 99.0) AS p99 FROM SPANNER_SYS.QUERY_STATS_TOTAL_MINUTE LIMIT 1",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "InvalidArgument",
+      "omni-r5": "InvalidArgument",
+      "emulator-google": "InvalidArgument",
+      "managed": "InvalidArgument"
+    },
+    "managed_source": "../managed-recheck-20261112/statistics.jsonl"
+  },
+  {
+    "label": "readonly/statistics/stats-QUERY_STATS_TOTAL_MINUTE-ROW_SCANNED_DISTRIBUTION-json",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT SPANNER_SYS.DISTRIBUTION_PERCENTILE(ROW_SCANNED_DISTRIBUTION_JSON_STRING, 99.0) AS p99 FROM SPANNER_SYS.QUERY_STATS_TOTAL_MINUTE LIMIT 1",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "InvalidArgument",
+      "managed": "OK"
+    },
+    "managed_source": "../managed-recheck-20261112/statistics.jsonl"
+  },
+  {
+    "label": "readonly/statistics/stats-QUERY_STATS_TOTAL_10MINUTE-scalar",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT AVG_COLUMNAR_READ_SHARE, ARRAY_LENGTH(CPU_SECONDS_DISTRIBUTION) AS cpu_distributions, ARRAY_LENGTH(ROW_SCANNED_DISTRIBUTION) AS row_distributions, CPU_SECONDS_DISTRIBUTION_JSON_STRING, ROW_SCANNED_DISTRIBUTION_JSON_STRING FROM SPANNER_SYS.QUERY_STATS_TOTAL_10MINUTE LIMIT 1",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "InvalidArgument",
+      "managed": "OK"
+    },
+    "managed_source": "../managed-recheck-20261112/statistics.jsonl"
+  },
+  {
+    "label": "readonly/statistics/stats-QUERY_STATS_TOTAL_10MINUTE-CPU_SECONDS_DISTRIBUTION-struct",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT SPANNER_SYS.DISTRIBUTION_PERCENTILE(CPU_SECONDS_DISTRIBUTION, 99.0) AS p99 FROM SPANNER_SYS.QUERY_STATS_TOTAL_10MINUTE LIMIT 1",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "InvalidArgument",
+      "omni-r5": "InvalidArgument",
+      "emulator-google": "InvalidArgument",
+      "managed": "InvalidArgument"
+    },
+    "managed_source": "../managed-recheck-20261112/statistics.jsonl"
+  },
+  {
+    "label": "readonly/statistics/stats-QUERY_STATS_TOTAL_10MINUTE-CPU_SECONDS_DISTRIBUTION-json",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT SPANNER_SYS.DISTRIBUTION_PERCENTILE(CPU_SECONDS_DISTRIBUTION_JSON_STRING, 99.0) AS p99 FROM SPANNER_SYS.QUERY_STATS_TOTAL_10MINUTE LIMIT 1",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "InvalidArgument",
+      "managed": "OK"
+    },
+    "managed_source": "../managed-recheck-20261112/statistics.jsonl"
+  },
+  {
+    "label": "readonly/statistics/stats-QUERY_STATS_TOTAL_10MINUTE-ROW_SCANNED_DISTRIBUTION-struct",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT SPANNER_SYS.DISTRIBUTION_PERCENTILE(ROW_SCANNED_DISTRIBUTION, 99.0) AS p99 FROM SPANNER_SYS.QUERY_STATS_TOTAL_10MINUTE LIMIT 1",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "InvalidArgument",
+      "omni-r5": "InvalidArgument",
+      "emulator-google": "InvalidArgument",
+      "managed": "InvalidArgument"
+    },
+    "managed_source": "../managed-recheck-20261112/statistics.jsonl"
+  },
+  {
+    "label": "readonly/statistics/stats-QUERY_STATS_TOTAL_10MINUTE-ROW_SCANNED_DISTRIBUTION-json",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT SPANNER_SYS.DISTRIBUTION_PERCENTILE(ROW_SCANNED_DISTRIBUTION_JSON_STRING, 99.0) AS p99 FROM SPANNER_SYS.QUERY_STATS_TOTAL_10MINUTE LIMIT 1",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "InvalidArgument",
+      "managed": "OK"
+    },
+    "managed_source": "../managed-recheck-20261112/statistics.jsonl"
+  },
+  {
+    "label": "readonly/statistics/stats-QUERY_STATS_TOTAL_HOUR-scalar",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT AVG_COLUMNAR_READ_SHARE, ARRAY_LENGTH(CPU_SECONDS_DISTRIBUTION) AS cpu_distributions, ARRAY_LENGTH(ROW_SCANNED_DISTRIBUTION) AS row_distributions, CPU_SECONDS_DISTRIBUTION_JSON_STRING, ROW_SCANNED_DISTRIBUTION_JSON_STRING FROM SPANNER_SYS.QUERY_STATS_TOTAL_HOUR LIMIT 1",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "InvalidArgument",
+      "managed": "OK"
+    },
+    "managed_source": "../managed-recheck-20261112/statistics.jsonl"
+  },
+  {
+    "label": "readonly/statistics/stats-QUERY_STATS_TOTAL_HOUR-CPU_SECONDS_DISTRIBUTION-struct",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT SPANNER_SYS.DISTRIBUTION_PERCENTILE(CPU_SECONDS_DISTRIBUTION, 99.0) AS p99 FROM SPANNER_SYS.QUERY_STATS_TOTAL_HOUR LIMIT 1",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "InvalidArgument",
+      "omni-r5": "InvalidArgument",
+      "emulator-google": "InvalidArgument",
+      "managed": "InvalidArgument"
+    },
+    "managed_source": "../managed-recheck-20261112/statistics.jsonl"
+  },
+  {
+    "label": "readonly/statistics/stats-QUERY_STATS_TOTAL_HOUR-CPU_SECONDS_DISTRIBUTION-json",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT SPANNER_SYS.DISTRIBUTION_PERCENTILE(CPU_SECONDS_DISTRIBUTION_JSON_STRING, 99.0) AS p99 FROM SPANNER_SYS.QUERY_STATS_TOTAL_HOUR LIMIT 1",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "InvalidArgument",
+      "managed": "OK"
+    },
+    "managed_source": "../managed-recheck-20261112/statistics.jsonl"
+  },
+  {
+    "label": "readonly/statistics/stats-QUERY_STATS_TOTAL_HOUR-ROW_SCANNED_DISTRIBUTION-struct",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT SPANNER_SYS.DISTRIBUTION_PERCENTILE(ROW_SCANNED_DISTRIBUTION, 99.0) AS p99 FROM SPANNER_SYS.QUERY_STATS_TOTAL_HOUR LIMIT 1",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "InvalidArgument",
+      "omni-r5": "InvalidArgument",
+      "emulator-google": "InvalidArgument",
+      "managed": "InvalidArgument"
+    },
+    "managed_source": "../managed-recheck-20261112/statistics.jsonl"
+  },
+  {
+    "label": "readonly/statistics/stats-QUERY_STATS_TOTAL_HOUR-ROW_SCANNED_DISTRIBUTION-json",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT SPANNER_SYS.DISTRIBUTION_PERCENTILE(ROW_SCANNED_DISTRIBUTION_JSON_STRING, 99.0) AS p99 FROM SPANNER_SYS.QUERY_STATS_TOTAL_HOUR LIMIT 1",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "InvalidArgument",
+      "managed": "OK"
+    },
+    "managed_source": "../managed-recheck-20261112/statistics.jsonl"
+  },
+  {
+    "label": "readonly/statistics-controls/connectivity",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT 1 AS connectivity",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "OK",
+      "managed": "OK"
+    },
+    "managed_source": "../managed-recheck-20261112/statistics-controls.jsonl"
+  },
+  {
+    "label": "readonly/statistics-controls/QUERY_STATS_TOP_MINUTE-CPU_SECONDS_DISTRIBUTION-element",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT SPANNER_SYS.DISTRIBUTION_PERCENTILE(CPU_SECONDS_DISTRIBUTION[SAFE_OFFSET(0)],99.0) AS p99_struct, SPANNER_SYS.DISTRIBUTION_PERCENTILE(CPU_SECONDS_DISTRIBUTION_JSON_STRING,99.0) AS p99_json FROM SPANNER_SYS.QUERY_STATS_TOP_MINUTE LIMIT 1",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "InvalidArgument",
+      "managed": "OK"
+    },
+    "managed_source": "../managed-recheck-20261112/statistics-controls.jsonl"
+  },
+  {
+    "label": "readonly/statistics-controls/QUERY_STATS_TOP_MINUTE-ROW_SCANNED_DISTRIBUTION-element",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT SPANNER_SYS.DISTRIBUTION_PERCENTILE(ROW_SCANNED_DISTRIBUTION[SAFE_OFFSET(0)],99.0) AS p99_struct, SPANNER_SYS.DISTRIBUTION_PERCENTILE(ROW_SCANNED_DISTRIBUTION_JSON_STRING,99.0) AS p99_json FROM SPANNER_SYS.QUERY_STATS_TOP_MINUTE LIMIT 1",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "InvalidArgument",
+      "managed": "OK"
+    },
+    "managed_source": "../managed-recheck-20261112/statistics-controls.jsonl"
+  },
+  {
+    "label": "readonly/statistics-controls/QUERY_STATS_TOP_10MINUTE-CPU_SECONDS_DISTRIBUTION-element",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT SPANNER_SYS.DISTRIBUTION_PERCENTILE(CPU_SECONDS_DISTRIBUTION[SAFE_OFFSET(0)],99.0) AS p99_struct, SPANNER_SYS.DISTRIBUTION_PERCENTILE(CPU_SECONDS_DISTRIBUTION_JSON_STRING,99.0) AS p99_json FROM SPANNER_SYS.QUERY_STATS_TOP_10MINUTE LIMIT 1",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "InvalidArgument",
+      "managed": "OK"
+    },
+    "managed_source": "../managed-recheck-20261112/statistics-controls.jsonl"
+  },
+  {
+    "label": "readonly/statistics-controls/QUERY_STATS_TOP_10MINUTE-ROW_SCANNED_DISTRIBUTION-element",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT SPANNER_SYS.DISTRIBUTION_PERCENTILE(ROW_SCANNED_DISTRIBUTION[SAFE_OFFSET(0)],99.0) AS p99_struct, SPANNER_SYS.DISTRIBUTION_PERCENTILE(ROW_SCANNED_DISTRIBUTION_JSON_STRING,99.0) AS p99_json FROM SPANNER_SYS.QUERY_STATS_TOP_10MINUTE LIMIT 1",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "InvalidArgument",
+      "managed": "OK"
+    },
+    "managed_source": "../managed-recheck-20261112/statistics-controls.jsonl"
+  },
+  {
+    "label": "readonly/statistics-controls/QUERY_STATS_TOP_HOUR-CPU_SECONDS_DISTRIBUTION-element",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT SPANNER_SYS.DISTRIBUTION_PERCENTILE(CPU_SECONDS_DISTRIBUTION[SAFE_OFFSET(0)],99.0) AS p99_struct, SPANNER_SYS.DISTRIBUTION_PERCENTILE(CPU_SECONDS_DISTRIBUTION_JSON_STRING,99.0) AS p99_json FROM SPANNER_SYS.QUERY_STATS_TOP_HOUR LIMIT 1",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "InvalidArgument",
+      "managed": "OK"
+    },
+    "managed_source": "../managed-recheck-20261112/statistics-controls.jsonl"
+  },
+  {
+    "label": "readonly/statistics-controls/QUERY_STATS_TOP_HOUR-ROW_SCANNED_DISTRIBUTION-element",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT SPANNER_SYS.DISTRIBUTION_PERCENTILE(ROW_SCANNED_DISTRIBUTION[SAFE_OFFSET(0)],99.0) AS p99_struct, SPANNER_SYS.DISTRIBUTION_PERCENTILE(ROW_SCANNED_DISTRIBUTION_JSON_STRING,99.0) AS p99_json FROM SPANNER_SYS.QUERY_STATS_TOP_HOUR LIMIT 1",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "InvalidArgument",
+      "managed": "OK"
+    },
+    "managed_source": "../managed-recheck-20261112/statistics-controls.jsonl"
+  },
+  {
+    "label": "readonly/statistics-controls/QUERY_STATS_TOTAL_MINUTE-CPU_SECONDS_DISTRIBUTION-element",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT SPANNER_SYS.DISTRIBUTION_PERCENTILE(CPU_SECONDS_DISTRIBUTION[SAFE_OFFSET(0)],99.0) AS p99_struct, SPANNER_SYS.DISTRIBUTION_PERCENTILE(CPU_SECONDS_DISTRIBUTION_JSON_STRING,99.0) AS p99_json FROM SPANNER_SYS.QUERY_STATS_TOTAL_MINUTE LIMIT 1",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "InvalidArgument",
+      "managed": "OK"
+    },
+    "managed_source": "../managed-recheck-20261112/statistics-controls.jsonl"
+  },
+  {
+    "label": "readonly/statistics-controls/QUERY_STATS_TOTAL_MINUTE-ROW_SCANNED_DISTRIBUTION-element",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT SPANNER_SYS.DISTRIBUTION_PERCENTILE(ROW_SCANNED_DISTRIBUTION[SAFE_OFFSET(0)],99.0) AS p99_struct, SPANNER_SYS.DISTRIBUTION_PERCENTILE(ROW_SCANNED_DISTRIBUTION_JSON_STRING,99.0) AS p99_json FROM SPANNER_SYS.QUERY_STATS_TOTAL_MINUTE LIMIT 1",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "InvalidArgument",
+      "managed": "OK"
+    },
+    "managed_source": "../managed-recheck-20261112/statistics-controls.jsonl"
+  },
+  {
+    "label": "readonly/statistics-controls/QUERY_STATS_TOTAL_10MINUTE-CPU_SECONDS_DISTRIBUTION-element",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT SPANNER_SYS.DISTRIBUTION_PERCENTILE(CPU_SECONDS_DISTRIBUTION[SAFE_OFFSET(0)],99.0) AS p99_struct, SPANNER_SYS.DISTRIBUTION_PERCENTILE(CPU_SECONDS_DISTRIBUTION_JSON_STRING,99.0) AS p99_json FROM SPANNER_SYS.QUERY_STATS_TOTAL_10MINUTE LIMIT 1",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "InvalidArgument",
+      "managed": "OK"
+    },
+    "managed_source": "../managed-recheck-20261112/statistics-controls.jsonl"
+  },
+  {
+    "label": "readonly/statistics-controls/QUERY_STATS_TOTAL_10MINUTE-ROW_SCANNED_DISTRIBUTION-element",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT SPANNER_SYS.DISTRIBUTION_PERCENTILE(ROW_SCANNED_DISTRIBUTION[SAFE_OFFSET(0)],99.0) AS p99_struct, SPANNER_SYS.DISTRIBUTION_PERCENTILE(ROW_SCANNED_DISTRIBUTION_JSON_STRING,99.0) AS p99_json FROM SPANNER_SYS.QUERY_STATS_TOTAL_10MINUTE LIMIT 1",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "InvalidArgument",
+      "managed": "OK"
+    },
+    "managed_source": "../managed-recheck-20261112/statistics-controls.jsonl"
+  },
+  {
+    "label": "readonly/statistics-controls/QUERY_STATS_TOTAL_HOUR-CPU_SECONDS_DISTRIBUTION-element",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT SPANNER_SYS.DISTRIBUTION_PERCENTILE(CPU_SECONDS_DISTRIBUTION[SAFE_OFFSET(0)],99.0) AS p99_struct, SPANNER_SYS.DISTRIBUTION_PERCENTILE(CPU_SECONDS_DISTRIBUTION_JSON_STRING,99.0) AS p99_json FROM SPANNER_SYS.QUERY_STATS_TOTAL_HOUR LIMIT 1",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "InvalidArgument",
+      "managed": "OK"
+    },
+    "managed_source": "../managed-recheck-20261112/statistics-controls.jsonl"
+  },
+  {
+    "label": "readonly/statistics-controls/QUERY_STATS_TOTAL_HOUR-ROW_SCANNED_DISTRIBUTION-element",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT SPANNER_SYS.DISTRIBUTION_PERCENTILE(ROW_SCANNED_DISTRIBUTION[SAFE_OFFSET(0)],99.0) AS p99_struct, SPANNER_SYS.DISTRIBUTION_PERCENTILE(ROW_SCANNED_DISTRIBUTION_JSON_STRING,99.0) AS p99_json FROM SPANNER_SYS.QUERY_STATS_TOTAL_HOUR LIMIT 1",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "InvalidArgument",
+      "managed": "OK"
+    },
+    "managed_source": "../managed-recheck-20261112/statistics-controls.jsonl"
+  },
+  {
+    "label": "readonly/histogram-controls/connectivity",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT 1 AS connectivity",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "OK",
+      "managed": "OK"
+    },
+    "managed_source": "../managed-recheck-20261112/histogram-controls.jsonl"
+  },
+  {
+    "label": "readonly/histogram-controls/zero-run-controls",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT SPANNER_SYS.DISTRIBUTION_PERCENTILE('{\"COUNT\":1,\"MEAN\":1.5,\"SUM_OF_SQUARED_DEVIATION\":0,\"NUM_FINITE_BUCKETS\":8,\"GROWTH_FACTOR\":2.0,\"SCALE\":1.0,\"BUCKET_COUNTS\":[-1,1]}',50.0) AS compressed1, SPANNER_SYS.DISTRIBUTION_PERCENTILE('{\"COUNT\":1,\"MEAN\":1.5,\"SUM_OF_SQUARED_DEVIATION\":0,\"NUM_FINITE_BUCKETS\":8,\"GROWTH_FACTOR\":2.0,\"SCALE\":1.0,\"BUCKET_COUNTS\":[0,1]}',50.0) AS expanded1, SPANNER_SYS.DISTRIBUTION_PERCENTILE('{\"COUNT\":1,\"MEAN\":6.0,\"SUM_OF_SQUARED_DEVIATION\":0,\"NUM_FINITE_BUCKETS\":8,\"GROWTH_FACTOR\":2.0,\"SCALE\":1.0,\"BUCKET_COUNTS\":[-3,1]}',50.0) AS compressed3, SPANNER_SYS.DISTRIBUTION_PERCENTILE('{\"COUNT\":1,\"MEAN\":6.0,\"SUM_OF_SQUARED_DEVIATION\":0,\"NUM_FINITE_BUCKETS\":8,\"GROWTH_FACTOR\":2.0,\"SCALE\":1.0,\"BUCKET_COUNTS\":[0,0,0,1]}',50.0) AS expanded3, SPANNER_SYS.DISTRIBUTION_PERCENTILE('{\"COUNT\":1,\"MEAN\":24.0,\"SUM_OF_SQUARED_DEVIATION\":0,\"NUM_FINITE_BUCKETS\":8,\"GROWTH_FACTOR\":2.0,\"SCALE\":1.0,\"BUCKET_COUNTS\":[-5,1]}',50.0) AS compressed5, SPANNER_SYS.DISTRIBUTION_PERCENTILE('{\"COUNT\":1,\"MEAN\":24.0,\"SUM_OF_SQUARED_DEVIATION\":0,\"NUM_FINITE_BUCKETS\":8,\"GROWTH_FACTOR\":2.0,\"SCALE\":1.0,\"BUCKET_COUNTS\":[0,0,0,0,0,1]}',50.0) AS expanded5",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "InvalidArgument",
+      "omni-r5": "InvalidArgument",
+      "emulator-google": "InvalidArgument",
+      "managed": "InvalidArgument"
+    },
+    "managed_source": "../managed-recheck-20261112/histogram-controls.jsonl"
+  },
+  {
+    "label": "readonly/observed-histogram/connectivity",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT 1 AS connectivity",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "OK",
+      "managed": "OK"
+    },
+    "managed_source": "../managed-recheck-20261112/observed-histogram.jsonl"
+  },
+  {
+    "label": "readonly/observed-histogram/observed-json-original",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT SPANNER_SYS.DISTRIBUTION_PERCENTILE('{\"BUCKET_COUNTS\":[-14,1],\"COUNT\":1,\"GROWTH_FACTOR\":2.0,\"MEAN\":0.012682,\"NUM_FINITE_BUCKETS\":33,\"SCALE\":1e-06,\"SUM_OF_SQUARED_DEVIATION\":0.0}',99.0) AS p99",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "InvalidArgument",
+      "managed": "OK"
+    },
+    "managed_source": "../managed-recheck-20261112/observed-histogram.jsonl"
+  },
+  {
+    "label": "readonly/observed-histogram/observed-json-expanded",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT SPANNER_SYS.DISTRIBUTION_PERCENTILE('{\"BUCKET_COUNTS\":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],\"COUNT\":1,\"GROWTH_FACTOR\":2.0,\"MEAN\":0.012682,\"NUM_FINITE_BUCKETS\":33,\"SCALE\":1e-06,\"SUM_OF_SQUARED_DEVIATION\":0.0}',99.0) AS p99",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "InvalidArgument",
+      "omni-r5": "InvalidArgument",
+      "emulator-google": "InvalidArgument",
+      "managed": "InvalidArgument"
+    },
+    "managed_source": "../managed-recheck-20261112/observed-histogram.jsonl"
+  },
+  {
+    "label": "readonly/scalar-correction/connectivity",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT 1 AS connectivity",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "OK",
+      "managed": "OK"
+    },
+    "managed_source": "../managed-recheck-20261112/scalar-correction.jsonl"
+  },
+  {
+    "label": "readonly/scalar-correction/LOCK_STATS_TOP_MINUTE-corrected-scalar",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT INTERVAL_END,LOCK_WAIT_SECONDS FROM SPANNER_SYS.LOCK_STATS_TOP_MINUTE LIMIT 1",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "InvalidArgument",
+      "managed": "OK"
+    },
+    "managed_source": "../managed-recheck-20261112/scalar-correction.jsonl"
+  },
+  {
+    "label": "readonly/scalar-correction/LOCK_STATS_TOP_10MINUTE-corrected-scalar",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT INTERVAL_END,LOCK_WAIT_SECONDS FROM SPANNER_SYS.LOCK_STATS_TOP_10MINUTE LIMIT 1",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "InvalidArgument",
+      "managed": "OK"
+    },
+    "managed_source": "../managed-recheck-20261112/scalar-correction.jsonl"
+  },
+  {
+    "label": "readonly/scalar-correction/LOCK_STATS_TOP_HOUR-corrected-scalar",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT INTERVAL_END,LOCK_WAIT_SECONDS FROM SPANNER_SYS.LOCK_STATS_TOP_HOUR LIMIT 1",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "InvalidArgument",
+      "managed": "OK"
+    },
+    "managed_source": "../managed-recheck-20261112/scalar-correction.jsonl"
+  },
+  {
+    "label": "readonly/new-readonly/connectivity",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT 1 AS connectivity",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "OK",
+      "managed": "OK"
+    },
+    "managed_source": "../managed-recheck-20261112/new-readonly.jsonl"
+  },
+  {
+    "label": "readonly/new-readonly/server-time",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT CURRENT_TIMESTAMP() AS server_time",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "OK",
+      "managed": "OK"
+    },
+    "managed_source": "../managed-recheck-20261112/new-readonly.jsonl"
+  },
+  {
+    "label": "readonly/new-readonly/secure-context-absent",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT SECURE_CONTEXT('user_id') AS value",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "Unimplemented",
+      "omni-r5": "InvalidArgument",
+      "emulator-google": "InvalidArgument",
+      "managed": "InvalidArgument"
+    },
+    "managed_source": "../managed-recheck-20261112/new-readonly.jsonl"
+  },
+  {
+    "label": "readonly/new-readonly/secure-context-tenant-a",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT SECURE_CONTEXT('user_id') AS value",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "Unimplemented",
+      "omni-r5": "OK",
+      "emulator-google": "OK",
+      "managed": "OK"
+    },
+    "managed_source": "../managed-recheck-20261112/new-readonly.jsonl"
+  },
+  {
+    "label": "readonly/new-readonly/secure-context-tenant-b",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT SECURE_CONTEXT('user_id') AS value",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "Unimplemented",
+      "omni-r5": "OK",
+      "emulator-google": "OK",
+      "managed": "OK"
+    },
+    "managed_source": "../managed-recheck-20261112/new-readonly.jsonl"
+  },
+  {
+    "label": "readonly/new-readonly/secure-context-numeric",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT SECURE_CONTEXT('user_id') AS value",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "InvalidArgument",
+      "omni-r5": "InvalidArgument",
+      "emulator-google": "InvalidArgument",
+      "managed": "InvalidArgument"
+    },
+    "managed_source": "../managed-recheck-20261112/new-readonly.jsonl"
+  },
+  {
+    "label": "readonly/new-readonly/secure-context-null",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT SECURE_CONTEXT('user_id') AS value",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "Unimplemented",
+      "omni-r5": "OK",
+      "emulator-google": "OK",
+      "managed": "OK"
+    },
+    "managed_source": "../managed-recheck-20261112/new-readonly.jsonl"
+  },
+  {
+    "label": "readonly/new-readonly/secure-context-json-object",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT SECURE_CONTEXT('user_id') AS value",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "InvalidArgument",
+      "omni-r5": "InvalidArgument",
+      "emulator-google": "InvalidArgument",
+      "managed": "InvalidArgument"
+    },
+    "managed_source": "../managed-recheck-20261112/new-readonly.jsonl"
+  },
+  {
+    "label": "readonly/new-readonly/secure-context-nonliteral",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT SECURE_CONTEXT(@key) AS value",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "Unimplemented",
+      "omni-r5": "InvalidArgument",
+      "emulator-google": "OK",
+      "managed": "InvalidArgument"
+    },
+    "managed_source": "../managed-recheck-20261112/new-readonly.jsonl"
+  },
+  {
+    "label": "readonly/new-readonly/secure-context-null-key",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT SECURE_CONTEXT(CAST(NULL AS STRING)) AS value",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "Unimplemented",
+      "omni-r5": "InvalidArgument",
+      "emulator-google": "InvalidArgument",
+      "managed": "InvalidArgument"
+    },
+    "managed_source": "../managed-recheck-20261112/new-readonly.jsonl"
+  },
+  {
+    "label": "readonly/new-readonly/secure-context-wrong-key-type",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT SECURE_CONTEXT(1) AS value",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "Unimplemented",
+      "omni-r5": "InvalidArgument",
+      "emulator-google": "InvalidArgument",
+      "managed": "InvalidArgument"
+    },
+    "managed_source": "../managed-recheck-20261112/new-readonly.jsonl"
+  },
+  {
+    "label": "readonly/new-readonly/secure-context-cast-doc-syntax",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT CAST(SECURE_CONTEXT('user_id'), INT64) AS value",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "Unimplemented",
+      "omni-r5": "InvalidArgument",
+      "emulator-google": "InvalidArgument",
+      "managed": "InvalidArgument"
+    },
+    "managed_source": "../managed-recheck-20261112/new-readonly.jsonl"
+  },
+  {
+    "label": "readonly/new-readonly/secure-context-cast-corrected",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT CAST(SECURE_CONTEXT('user_id') AS INT64) AS value",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "Unimplemented",
+      "omni-r5": "OK",
+      "emulator-google": "OK",
+      "managed": "OK"
+    },
+    "managed_source": "../managed-recheck-20261112/new-readonly.jsonl"
+  },
+  {
+    "label": "readonly/new-readonly/secure-context-query-param-separate",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT SECURE_CONTEXT('user_id') AS value, @user_id AS ordinary_param",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "Unimplemented",
+      "omni-r5": "OK",
+      "emulator-google": "OK",
+      "managed": "OK"
+    },
+    "managed_source": "../managed-recheck-20261112/new-readonly.jsonl"
+  },
+  {
+    "label": "readonly/new-readonly/zstd-positional-level--6",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT ZSTD_DECOMPRESS_TO_STRING(ZSTD_COMPRESS('hello', -6)) AS result",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OutOfRange",
+      "omni-r5": "OutOfRange",
+      "emulator-google": "Unimplemented",
+      "managed": "OutOfRange"
+    },
+    "managed_source": "../managed-recheck-20261112/new-readonly.jsonl"
+  },
+  {
+    "label": "readonly/new-readonly/zstd-positional-level--5",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT ZSTD_DECOMPRESS_TO_STRING(ZSTD_COMPRESS('hello', -5)) AS result",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "Unimplemented",
+      "managed": "OK"
+    },
+    "managed_source": "../managed-recheck-20261112/new-readonly.jsonl"
+  },
+  {
+    "label": "readonly/new-readonly/zstd-positional-level-0",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT ZSTD_DECOMPRESS_TO_STRING(ZSTD_COMPRESS('hello', 0)) AS result",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "Unimplemented",
+      "managed": "OK"
+    },
+    "managed_source": "../managed-recheck-20261112/new-readonly.jsonl"
+  },
+  {
+    "label": "readonly/new-readonly/zstd-positional-level-3",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT ZSTD_DECOMPRESS_TO_STRING(ZSTD_COMPRESS('hello', 3)) AS result",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "Unimplemented",
+      "managed": "OK"
+    },
+    "managed_source": "../managed-recheck-20261112/new-readonly.jsonl"
+  },
+  {
+    "label": "readonly/new-readonly/zstd-positional-level-22",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT ZSTD_DECOMPRESS_TO_STRING(ZSTD_COMPRESS('hello', 22)) AS result",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "Unimplemented",
+      "managed": "OK"
+    },
+    "managed_source": "../managed-recheck-20261112/new-readonly.jsonl"
+  },
+  {
+    "label": "readonly/new-readonly/zstd-positional-level-23",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT ZSTD_DECOMPRESS_TO_STRING(ZSTD_COMPRESS('hello', 23)) AS result",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OutOfRange",
+      "omni-r5": "OutOfRange",
+      "emulator-google": "Unimplemented",
+      "managed": "OutOfRange"
+    },
+    "managed_source": "../managed-recheck-20261112/new-readonly.jsonl"
+  },
+  {
+    "label": "readonly/new-readonly/zstd-named-level",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT ZSTD_DECOMPRESS_TO_STRING(ZSTD_COMPRESS('hello', level=>3)) AS result",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "Unimplemented",
+      "managed": "OK"
+    },
+    "managed_source": "../managed-recheck-20261112/new-readonly.jsonl"
+  },
+  {
+    "label": "readonly/new-readonly/zstd-null-level",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT ZSTD_COMPRESS('hello', CAST(NULL AS INT64)) IS NULL AS is_null",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "Unimplemented",
+      "managed": "OK"
+    },
+    "managed_source": "../managed-recheck-20261112/new-readonly.jsonl"
+  },
+  {
+    "label": "readonly/new-readonly/zstd_decompress_to_bytes-null-limit",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT ZSTD_DECOMPRESS_TO_BYTES(ZSTD_COMPRESS('hello'), size_limit=>CAST(NULL AS INT64)) IS NULL AS is_null",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "Unimplemented",
+      "managed": "OK"
+    },
+    "managed_source": "../managed-recheck-20261112/new-readonly.jsonl"
+  },
+  {
+    "label": "readonly/new-readonly/zstd_decompress_to_bytes-size-limit",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT ZSTD_DECOMPRESS_TO_BYTES(ZSTD_COMPRESS('hello'), size_limit=>4) AS result",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OutOfRange",
+      "omni-r5": "OutOfRange",
+      "emulator-google": "Unimplemented",
+      "managed": "OutOfRange"
+    },
+    "managed_source": "../managed-recheck-20261112/new-readonly.jsonl"
+  },
+  {
+    "label": "readonly/new-readonly/zstd_decompress_to_bytes-positional-size-negative",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT ZSTD_DECOMPRESS_TO_BYTES(ZSTD_COMPRESS('hello'), 8) AS result",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "InvalidArgument",
+      "omni-r5": "InvalidArgument",
+      "emulator-google": "InvalidArgument",
+      "managed": "InvalidArgument"
+    },
+    "managed_source": "../managed-recheck-20261112/new-readonly.jsonl"
+  },
+  {
+    "label": "readonly/new-readonly/zstd_decompress_to_string-null-limit",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT ZSTD_DECOMPRESS_TO_STRING(ZSTD_COMPRESS('hello'), size_limit=>CAST(NULL AS INT64)) IS NULL AS is_null",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "Unimplemented",
+      "managed": "OK"
+    },
+    "managed_source": "../managed-recheck-20261112/new-readonly.jsonl"
+  },
+  {
+    "label": "readonly/new-readonly/zstd_decompress_to_string-size-limit",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT ZSTD_DECOMPRESS_TO_STRING(ZSTD_COMPRESS('hello'), size_limit=>4) AS result",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OutOfRange",
+      "omni-r5": "OutOfRange",
+      "emulator-google": "Unimplemented",
+      "managed": "OutOfRange"
+    },
+    "managed_source": "../managed-recheck-20261112/new-readonly.jsonl"
+  },
+  {
+    "label": "readonly/new-readonly/zstd_decompress_to_string-positional-size-negative",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT ZSTD_DECOMPRESS_TO_STRING(ZSTD_COMPRESS('hello'), 8) AS result",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "InvalidArgument",
+      "omni-r5": "InvalidArgument",
+      "emulator-google": "InvalidArgument",
+      "managed": "InvalidArgument"
+    },
+    "managed_source": "../managed-recheck-20261112/new-readonly.jsonl"
+  },
+  {
+    "label": "readonly/new-readonly/distribution-agg-empty-struct",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT SPANNER_SYS.DISTRIBUTION_AGG(LATENCY_DISTRIBUTION[SAFE_OFFSET(0)]) AS value FROM SPANNER_SYS.QUERY_STATS_TOP_MINUTE WHERE FALSE",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "Unimplemented",
+      "omni-r5": "Unimplemented",
+      "emulator-google": "InvalidArgument",
+      "managed": "Unimplemented"
+    },
+    "managed_source": "../managed-recheck-20261112/new-readonly.jsonl"
+  },
+  {
+    "label": "readonly/new-readonly/distribution-agg-empty-json",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT SPANNER_SYS.DISTRIBUTION_AGG(LATENCY_DISTRIBUTION_JSON_STRING) AS value FROM SPANNER_SYS.QUERY_STATS_TOP_MINUTE WHERE FALSE",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "InvalidArgument",
+      "managed": "OK"
+    },
+    "managed_source": "../managed-recheck-20261112/new-readonly.jsonl"
+  },
+  {
+    "label": "readonly/new-readonly/distribution-agg-documented-query-struct",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT IF(latency_dist IS NOT NULL, SPANNER_SYS.DISTRIBUTION_PERCENTILE(latency_dist, 99.0), NULL) AS p99 FROM (SELECT SPANNER_SYS.DISTRIBUTION_AGG(IF(T.LATENCY_DISTRIBUTION[SAFE_OFFSET(0)].COUNT > 0, T.LATENCY_DISTRIBUTION[SAFE_OFFSET(0)], NULL)) AS latency_dist FROM SPANNER_SYS.QUERY_STATS_TOP_MINUTE AS T WHERE T.INTERVAL_END > TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL 1 HOUR) AND T.INTERVAL_END <= CURRENT_TIMESTAMP())",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "InvalidArgument",
+      "managed": "OK"
+    },
+    "managed_source": "../managed-recheck-20261112/new-readonly.jsonl"
+  },
+  {
+    "label": "readonly/new-readonly/distribution-agg-documented-txn-struct",
+    "family": "managed-readonly-comparison",
+    "sql": "WITH aggregated_stats AS (SELECT T.FPRINT, SPANNER_SYS.DISTRIBUTION_AGG(IF(T.COMMIT_LATENCY_DISTRIBUTION[SAFE_OFFSET(0)].COUNT > 0, T.COMMIT_LATENCY_DISTRIBUTION[SAFE_OFFSET(0)], NULL)) AS commit_latency_dist FROM SPANNER_SYS.TXN_STATS_TOP_MINUTE AS T WHERE T.INTERVAL_END > TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL 1 HOUR) AND T.INTERVAL_END <= CURRENT_TIMESTAMP() GROUP BY T.FPRINT) SELECT FPRINT, IF(commit_latency_dist IS NOT NULL, SPANNER_SYS.DISTRIBUTION_PERCENTILE(commit_latency_dist, 99.0), NULL) AS p99 FROM aggregated_stats",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "InvalidArgument",
+      "managed": "OK"
+    },
+    "managed_source": "../managed-recheck-20261112/new-readonly.jsonl"
+  },
+  {
+    "label": "readonly/new-readonly/distribution-agg-query-json",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT SPANNER_SYS.DISTRIBUTION_PERCENTILE(SPANNER_SYS.DISTRIBUTION_AGG(LATENCY_DISTRIBUTION_JSON_STRING), 99.0) AS p99 FROM SPANNER_SYS.QUERY_STATS_TOP_MINUTE WHERE INTERVAL_END > TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL 1 HOUR)",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "InvalidArgument",
+      "omni-r5": "InvalidArgument",
+      "emulator-google": "InvalidArgument",
+      "managed": "InvalidArgument"
+    },
+    "managed_source": "../managed-recheck-20261112/new-readonly.jsonl"
+  },
+  {
+    "label": "readonly/new-readonly/distribution-agg-array-negative",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT SPANNER_SYS.DISTRIBUTION_AGG(LATENCY_DISTRIBUTION) AS value FROM SPANNER_SYS.QUERY_STATS_TOP_MINUTE WHERE FALSE",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "InvalidArgument",
+      "omni-r5": "InvalidArgument",
+      "emulator-google": "InvalidArgument",
+      "managed": "InvalidArgument"
+    },
+    "managed_source": "../managed-recheck-20261112/new-readonly.jsonl"
+  },
+  {
+    "label": "readonly/distribution-frames/connectivity",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT 1 AS connectivity",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "OK",
+      "managed": "OK"
+    },
+    "managed_source": "../managed-recheck-20261112/distribution-frames.jsonl"
+  },
+  {
+    "label": "readonly/distribution-frames/agg-two-equal-json-histograms",
+    "family": "managed-readonly-comparison",
+    "sql": "WITH h AS (SELECT @hist AS d UNION ALL SELECT @hist) SELECT JSON_VALUE(SPANNER_SYS.DISTRIBUTION_AGG(d),'$.COUNT') AS sample_count,SPANNER_SYS.DISTRIBUTION_PERCENTILE(SPANNER_SYS.DISTRIBUTION_AGG(d),99.0) AS p99 FROM h",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "InvalidArgument",
+      "managed": "OK"
+    },
+    "managed_source": "../managed-recheck-20261112/distribution-frames.jsonl"
+  },
+  {
+    "label": "readonly/distribution-frames/agg-null-is-ignored",
+    "family": "managed-readonly-comparison",
+    "sql": "WITH h AS (SELECT @hist AS d UNION ALL SELECT CAST(NULL AS STRING)) SELECT JSON_VALUE(SPANNER_SYS.DISTRIBUTION_AGG(d),'$.COUNT') AS sample_count,SPANNER_SYS.DISTRIBUTION_PERCENTILE(SPANNER_SYS.DISTRIBUTION_AGG(d),99.0) AS p99 FROM h",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "InvalidArgument",
+      "managed": "OK"
+    },
+    "managed_source": "../managed-recheck-20261112/distribution-frames.jsonl"
+  },
+  {
+    "label": "readonly/distribution-frames/agg-null-json-result",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT SPANNER_SYS.DISTRIBUTION_AGG(CAST(NULL AS STRING)) IS NULL AS is_null",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "InvalidArgument",
+      "omni-r5": "InvalidArgument",
+      "emulator-google": "InvalidArgument",
+      "managed": "InvalidArgument"
+    },
+    "managed_source": "../managed-recheck-20261112/distribution-frames.jsonl"
+  },
+  {
+    "label": "readonly/distribution-frames/agg-null-percentile-guard",
+    "family": "managed-readonly-comparison",
+    "sql": "WITH a AS (SELECT SPANNER_SYS.DISTRIBUTION_AGG(CAST(NULL AS STRING)) AS h) SELECT IF(h IS NULL,NULL,SPANNER_SYS.DISTRIBUTION_PERCENTILE(h,99.0)) AS p99 FROM a",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "InvalidArgument",
+      "omni-r5": "InvalidArgument",
+      "emulator-google": "InvalidArgument",
+      "managed": "InvalidArgument"
+    },
+    "managed_source": "../managed-recheck-20261112/distribution-frames.jsonl"
+  },
+  {
+    "label": "readonly/distribution-frames/agg-bad-json-negative",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT SPANNER_SYS.DISTRIBUTION_AGG('not-json') AS histogram",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "InvalidArgument",
+      "omni-r5": "InvalidArgument",
+      "emulator-google": "InvalidArgument",
+      "managed": "InvalidArgument"
+    },
+    "managed_source": "../managed-recheck-20261112/distribution-frames.jsonl"
+  },
+  {
+    "label": "readonly/distribution-frames/agg-flatten-struct-empty",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT (SPANNER_SYS.DISTRIBUTION_AGG(LATENCY_DISTRIBUTION[SAFE_OFFSET(0)])).COUNT AS sample_count FROM SPANNER_SYS.QUERY_STATS_TOP_MINUTE WHERE FALSE",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "InvalidArgument",
+      "managed": "OK"
+    },
+    "managed_source": "../managed-recheck-20261112/distribution-frames.jsonl"
+  },
+  {
+    "label": "readonly/distribution-frames/frame-streaming-zstd_decompress_to_bytes",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT ZSTD_DECOMPRESS_TO_BYTES(FROM_BASE64(@frame)) AS decoded",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "InvalidArgument",
+      "omni-r5": "InvalidArgument",
+      "emulator-google": "Unimplemented",
+      "managed": "InvalidArgument"
+    },
+    "managed_source": "../managed-recheck-20261112/distribution-frames.jsonl"
+  },
+  {
+    "label": "readonly/distribution-frames/frame-streaming-zstd_decompress_to_string",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT ZSTD_DECOMPRESS_TO_STRING(FROM_BASE64(@frame)) AS decoded",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "InvalidArgument",
+      "omni-r5": "InvalidArgument",
+      "emulator-google": "Unimplemented",
+      "managed": "InvalidArgument"
+    },
+    "managed_source": "../managed-recheck-20261112/distribution-frames.jsonl"
+  },
+  {
+    "label": "readonly/distribution-frames/frame-encode_all-zstd_decompress_to_bytes",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT ZSTD_DECOMPRESS_TO_BYTES(FROM_BASE64(@frame)) AS decoded",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "Unimplemented",
+      "managed": "OK"
+    },
+    "managed_source": "../managed-recheck-20261112/distribution-frames.jsonl"
+  },
+  {
+    "label": "readonly/distribution-frames/frame-encode_all-zstd_decompress_to_string",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT ZSTD_DECOMPRESS_TO_STRING(FROM_BASE64(@frame)) AS decoded",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "Unimplemented",
+      "managed": "OK"
+    },
+    "managed_source": "../managed-recheck-20261112/distribution-frames.jsonl"
+  },
+  {
+    "label": "readonly/distribution-null-controls/connectivity",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT 1 AS connectivity",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "OK",
+      "managed": "OK"
+    },
+    "managed_source": "../managed-recheck-20261112/distribution-null-controls.jsonl"
+  },
+  {
+    "label": "readonly/distribution-null-controls/agg-null-json-result-from",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT SPANNER_SYS.DISTRIBUTION_AGG(d) IS NULL AS is_null FROM (SELECT CAST(NULL AS STRING) AS d)",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "InvalidArgument",
+      "managed": "OK"
+    },
+    "managed_source": "../managed-recheck-20261112/distribution-null-controls.jsonl"
+  },
+  {
+    "label": "readonly/distribution-null-controls/agg-null-percentile-guard-from",
+    "family": "managed-readonly-comparison",
+    "sql": "WITH a AS (SELECT SPANNER_SYS.DISTRIBUTION_AGG(d) AS h FROM (SELECT CAST(NULL AS STRING) AS d)) SELECT IF(h IS NULL,NULL,SPANNER_SYS.DISTRIBUTION_PERCENTILE(h,99.0)) AS p99 FROM a",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "InvalidArgument",
+      "managed": "OK"
+    },
+    "managed_source": "../managed-recheck-20261112/distribution-null-controls.jsonl"
+  },
+  {
+    "label": "readonly/distribution-null-controls/agg-bad-json-negative-from",
+    "family": "managed-readonly-comparison",
+    "sql": "SELECT SPANNER_SYS.DISTRIBUTION_AGG(d) AS histogram FROM UNNEST(['not-json']) AS d",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OutOfRange",
+      "omni-r5": "OutOfRange",
+      "emulator-google": "InvalidArgument",
+      "managed": "OutOfRange"
+    },
+    "managed_source": "../managed-recheck-20261112/distribution-null-controls.jsonl"
+  },
+  {
+    "label": "fixture-connectivity",
+    "family": "extension",
+    "sql": "SELECT 1 AS connectivity",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "OK"
+    }
+  },
+  {
+    "label": "score-fixture",
+    "family": "score",
+    "sql": "CREATE TABLE ScoreDocs (Id INT64 NOT NULL, Body STRING(MAX), BodyTokens TOKENLIST AS (TOKENIZE_FULLTEXT(Body)) HIDDEN) PRIMARY KEY(Id)",
+    "kind": "ddl",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "OK"
+    }
+  },
+  {
+    "label": "score-search-index",
+    "family": "score",
+    "sql": "CREATE SEARCH INDEX ScoreIndex ON ScoreDocs(BodyTokens)",
+    "kind": "ddl",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "OK"
+    }
+  },
+  {
+    "label": "score-insert",
+    "family": "score",
+    "sql": "",
+    "kind": "dml",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "OK"
+    }
+  },
+  {
+    "label": "score-unpinned",
+    "family": "score",
+    "sql": "SELECT Id, SCORE(BodyTokens,'cat') AS default_score, SCORE(BodyTokens,'cat', options => JSON '{\"version\": 1}') AS version1_score, SCORE(BodyTokens,'cat', options => JSON '{\"version\": 2}') AS version2_score FROM ScoreDocs WHERE SEARCH(BodyTokens,'cat') ORDER BY Id",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "OK"
+    }
+  },
+  {
+    "label": "score-set-db-1",
+    "family": "score",
+    "sql": "ALTER DATABASE {{DATABASE}} SET OPTIONS (score_version = 1)",
+    "kind": "ddl",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "OK"
+    }
+  },
+  {
+    "label": "score-pinned-db-1",
+    "family": "score",
+    "sql": "SELECT Id, SCORE(BodyTokens,'cat') AS default_score, SCORE(BodyTokens,'cat', options => JSON '{\"version\": 1}') AS version1_score, SCORE(BodyTokens,'cat', options => JSON '{\"version\": 2}') AS version2_score FROM ScoreDocs WHERE SEARCH(BodyTokens,'cat') ORDER BY Id",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "OK"
+    }
+  },
+  {
+    "label": "score-set-db-2",
+    "family": "score",
+    "sql": "ALTER DATABASE {{DATABASE}} SET OPTIONS (score_version = 2)",
+    "kind": "ddl",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "OK"
+    }
+  },
+  {
+    "label": "score-pinned-db-2",
+    "family": "score",
+    "sql": "SELECT Id, SCORE(BodyTokens,'cat') AS default_score, SCORE(BodyTokens,'cat', options => JSON '{\"version\": 1}') AS version1_score, SCORE(BodyTokens,'cat', options => JSON '{\"version\": 2}') AS version2_score FROM ScoreDocs WHERE SEARCH(BodyTokens,'cat') ORDER BY Id",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "OK"
+    }
+  },
+  {
+    "label": "score-explicit-independent",
+    "family": "score",
+    "sql": "SELECT Id, SCORE(BodyTokens,'cat', options => JSON '{\"version\": 1}') AS version1_score, SCORE(BodyTokens,'cat', options => JSON '{\"version\": 2}') AS version2_score FROM ScoreDocs WHERE SEARCH(BodyTokens,'cat') ORDER BY Id",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "OK"
+    }
+  },
+  {
+    "label": "bucket-fixture",
+    "family": "bucket",
+    "sql": "CREATE TABLE BucketFixed (Id INT64 NOT NULL, Body STRING(MAX), UpdatedAt TIMESTAMP NOT NULL, UpdatedSeconds INT64 NOT NULL AS (UNIX_SECONDS(UpdatedAt)) STORED, HourBucket INT64 NOT NULL AS (UNIX_SECONDS(TIMESTAMP_TRUNC(UpdatedAt,HOUR))) STORED, BodyTokens TOKENLIST AS (TOKENIZE_FULLTEXT(Body)) HIDDEN) PRIMARY KEY(Id)",
+    "kind": "ddl",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "OK"
+    }
+  },
+  {
+    "label": "bucket-index-seconds",
+    "family": "bucket",
+    "sql": "CREATE SEARCH INDEX FixedIndexseconds ON BucketFixed(BodyTokens) ORDER BY UpdatedSeconds DESC",
+    "kind": "ddl",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "OK"
+    }
+  },
+  {
+    "label": "bucket-index-hour",
+    "family": "bucket",
+    "sql": "CREATE SEARCH INDEX FixedIndexhour ON BucketFixed(BodyTokens) ORDER BY HourBucket DESC",
+    "kind": "ddl",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "OK"
+    }
+  },
+  {
+    "label": "bucket-index-none",
+    "family": "bucket",
+    "sql": "CREATE SEARCH INDEX FixedIndexnone ON BucketFixed(BodyTokens)",
+    "kind": "ddl",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "OK"
+    }
+  },
+  {
+    "label": "bucket-insert",
+    "family": "bucket",
+    "sql": "",
+    "kind": "dml",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "OK"
+    }
+  },
+  {
+    "label": "bucket-values-start",
+    "family": "bucket",
+    "sql": "SELECT Id,UpdatedSeconds,HourBucket FROM BucketFixed",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "OK"
+    }
+  },
+  {
+    "label": "bucket-update-same-hour",
+    "family": "bucket",
+    "sql": "",
+    "kind": "dml",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "OK"
+    }
+  },
+  {
+    "label": "bucket-values-same-hour",
+    "family": "bucket",
+    "sql": "SELECT Id,UpdatedSeconds,HourBucket FROM BucketFixed",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "OK"
+    }
+  },
+  {
+    "label": "bucket-update-next-hour",
+    "family": "bucket",
+    "sql": "",
+    "kind": "dml",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "OK"
+    }
+  },
+  {
+    "label": "bucket-values-next-hour",
+    "family": "bucket",
+    "sql": "SELECT Id,UpdatedSeconds,HourBucket FROM BucketFixed",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "OK"
+    }
+  },
+  {
+    "label": "queue-fixture",
+    "family": "queue",
+    "sql": "CREATE QUEUE AliasQueue (Id STRING(36) NOT NULL, Payload BYTES(MAX) NOT NULL) PRIMARY KEY(Id)",
+    "kind": "ddl",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "OK"
+    }
+  },
+  {
+    "label": "tvf-star-plain",
+    "family": "tvf",
+    "sql": "SELECT * FROM RENEWLEASE_AliasQueue(lease_tokens=>ARRAY<STRING>[])",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "OK"
+    }
+  },
+  {
+    "label": "tvf-star-as",
+    "family": "tvf",
+    "sql": "SELECT * FROM RENEWLEASE_AliasQueue(lease_tokens=>ARRAY<STRING>[]) AS r",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "OK"
+    }
+  },
+  {
+    "label": "tvf-star-bare",
+    "family": "tvf",
+    "sql": "SELECT * FROM RENEWLEASE_AliasQueue(lease_tokens=>ARRAY<STRING>[]) r",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "OK"
+    }
+  },
+  {
+    "label": "graph-node-table",
+    "family": "graph",
+    "sql": "CREATE TABLE PropNodes (Id INT64 NOT NULL) PRIMARY KEY(Id)",
+    "kind": "ddl",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "OK"
+    }
+  },
+  {
+    "label": "graph-create",
+    "family": "graph",
+    "sql": "CREATE PROPERTY GRAPH ProbeGraph NODE TABLES (PropNodes)",
+    "kind": "ddl",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "OK"
+    }
+  },
+  {
+    "label": "gql-left-common",
+    "family": "gql",
+    "sql": "GRAPH ProbeGraph RETURN 1 AS a, 9 AS left_only LEFT OUTER UNION ALL RETURN 2 AS a, 8 AS right_only",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "InvalidArgument"
+    }
+  },
+  {
+    "label": "schema-readback",
+    "family": "schema",
+    "sql": "",
+    "kind": "ddl-export",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "OK"
+    }
+  },
+  {
+    "label": "select-led-select",
+    "family": "pipe-isolation",
+    "sql": "SELECT 1 AS x |> SELECT x",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "InvalidArgument"
+    }
+  },
+  {
+    "label": "select-led-where",
+    "family": "pipe-isolation",
+    "sql": "SELECT 1 AS x |> WHERE x=1",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "InvalidArgument"
+    }
+  },
+  {
+    "label": "select-led-aggregate",
+    "family": "pipe-isolation",
+    "sql": "SELECT 1 AS x |> AGGREGATE SUM(x) AS n",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "InvalidArgument"
+    }
+  },
+  {
+    "label": "from-only",
+    "family": "pipe-isolation",
+    "sql": "FROM (SELECT 1 AS x)",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "InvalidArgument"
+    }
+  },
+  {
+    "label": "gql-mode-full",
+    "family": "gql-propagation",
+    "sql": "GRAPH ProbeGraph RETURN 1 AS a, 9 AS left_only FULL UNION ALL RETURN 2 AS a, 8 AS right_only",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "InvalidArgument"
+    }
+  },
+  {
+    "label": "gql-mode-full-outer",
+    "family": "gql-propagation",
+    "sql": "GRAPH ProbeGraph RETURN 1 AS a, 9 AS left_only FULL OUTER UNION ALL RETURN 2 AS a, 8 AS right_only",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "InvalidArgument"
+    }
+  },
+  {
+    "label": "gql-mode-outer",
+    "family": "gql-propagation",
+    "sql": "GRAPH ProbeGraph RETURN 1 AS a, 9 AS left_only OUTER UNION ALL RETURN 2 AS a, 8 AS right_only",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "InvalidArgument"
+    }
+  },
+  {
+    "label": "gql-mode-left",
+    "family": "gql-propagation",
+    "sql": "GRAPH ProbeGraph RETURN 1 AS a, 9 AS left_only LEFT UNION ALL RETURN 2 AS a, 8 AS right_only",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "InvalidArgument"
+    }
+  },
+  {
+    "label": "gql-mode-left-outer",
+    "family": "gql-propagation",
+    "sql": "GRAPH ProbeGraph RETURN 1 AS a, 9 AS left_only LEFT OUTER UNION ALL RETURN 2 AS a, 8 AS right_only",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "InvalidArgument"
+    }
+  },
+  {
+    "label": "gql-mode-inner",
+    "family": "gql-propagation",
+    "sql": "GRAPH ProbeGraph RETURN 1 AS a, 9 AS left_only INNER UNION ALL RETURN 2 AS a, 8 AS right_only",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "InvalidArgument"
+    }
+  },
+  {
+    "label": "graph-insert",
+    "family": "extension",
+    "sql": "",
+    "kind": "dml",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "OK"
+    }
+  },
+  {
+    "label": "gql-return-order",
+    "family": "gql-order",
+    "sql": "GRAPH ProbeGraph MATCH (n) RETURN n.Id AS id ORDER BY id",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "OK"
+    }
+  },
+  {
+    "label": "gql-return-order-limit",
+    "family": "gql-order",
+    "sql": "GRAPH ProbeGraph MATCH (n) RETURN n.Id AS id ORDER BY id LIMIT 2",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "OK"
+    }
+  },
+  {
+    "label": "gql-standalone-order-limit",
+    "family": "gql-order",
+    "sql": "GRAPH ProbeGraph MATCH (n) RETURN n.Id AS id NEXT ORDER BY id LIMIT 2",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "InvalidArgument",
+      "omni-r5": "InvalidArgument",
+      "emulator-google": "InvalidArgument"
+    }
+  },
+  {
+    "label": "gql-cross-next-order-limit",
+    "family": "gql-order",
+    "sql": "GRAPH ProbeGraph MATCH (n) RETURN n.Id AS id ORDER BY id NEXT LIMIT 2",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "InvalidArgument",
+      "omni-r5": "InvalidArgument",
+      "emulator-google": "InvalidArgument"
+    }
+  },
+  {
+    "label": "queue-case-Payload",
+    "family": "queue-case",
+    "sql": "CREATE QUEUE CaseQueue0 (Id STRING(36) NOT NULL, Payload BYTES(MAX) NOT NULL) PRIMARY KEY(Id)",
+    "kind": "ddl",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "OK"
+    }
+  },
+  {
+    "label": "queue-case-payload",
+    "family": "queue-case",
+    "sql": "CREATE QUEUE CaseQueue1 (Id STRING(36) NOT NULL, payload BYTES(MAX) NOT NULL) PRIMARY KEY(Id)",
+    "kind": "ddl",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "OK"
+    }
+  },
+  {
+    "label": "queue-case-PAYLOAD",
+    "family": "queue-case",
+    "sql": "CREATE QUEUE CaseQueue2 (Id STRING(36) NOT NULL, PAYLOAD BYTES(MAX) NOT NULL) PRIMARY KEY(Id)",
+    "kind": "ddl",
+    "codes": {
+      "omni-lts": "InvalidArgument",
+      "omni-r5": "InvalidArgument",
+      "emulator-google": "OK"
+    }
+  },
+  {
+    "label": "queue-case-PaYlOaD",
+    "family": "queue-case",
+    "sql": "CREATE QUEUE CaseQueue3 (Id STRING(36) NOT NULL, PaYlOaD BYTES(MAX) NOT NULL) PRIMARY KEY(Id)",
+    "kind": "ddl",
+    "codes": {
+      "omni-lts": "InvalidArgument",
+      "omni-r5": "InvalidArgument",
+      "emulator-google": "OK"
+    }
+  },
+  {
+    "label": "search-enhanced",
+    "family": "differences",
+    "sql": "SELECT Id FROM ScoreDocs WHERE SEARCH(BodyTokens,'cat',enhance_query=>true) ORDER BY Id",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "OK"
+    }
+  },
+  {
+    "label": "search-enhanced-required",
+    "family": "differences",
+    "sql": "@{require_enhance_query=true} SELECT Id FROM ScoreDocs WHERE SEARCH(BodyTokens,'cat',enhance_query=>true) ORDER BY Id",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "OK"
+    }
+  },
+  {
+    "label": "json-table",
+    "family": "json-search",
+    "sql": "CREATE TABLE JsonDocs (Id INT64 NOT NULL, Doc JSON, Tokens TOKENLIST AS (TOKENIZE_JSON(Doc)) HIDDEN) PRIMARY KEY(Id)",
+    "kind": "ddl",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "OK"
+    }
+  },
+  {
+    "label": "json-index",
+    "family": "json-search",
+    "sql": "CREATE SEARCH INDEX JsonSearch ON JsonDocs(Tokens)",
+    "kind": "ddl",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "OK"
+    }
+  },
+  {
+    "label": "json-insert",
+    "family": "json-search",
+    "sql": "",
+    "kind": "dml",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "OK"
+    }
+  },
+  {
+    "label": "json-search-equal-auto",
+    "family": "json-search",
+    "sql": "SELECT Id FROM JsonDocs WHERE Doc.kind=JSON '\"active\"' ORDER BY Id",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "OK"
+    }
+  },
+  {
+    "label": "json-search-equal-search",
+    "family": "json-search",
+    "sql": "SELECT Id FROM JsonDocs@{FORCE_INDEX=JsonSearch} WHERE Doc.kind=JSON '\"active\"' ORDER BY Id",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "OK"
+    }
+  },
+  {
+    "label": "json-search-equal-base",
+    "family": "json-search",
+    "sql": "SELECT Id FROM JsonDocs@{FORCE_INDEX=_BASE_TABLE} WHERE Doc.kind=JSON '\"active\"' ORDER BY Id",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "OK"
+    }
+  },
+  {
+    "label": "json-search-in-auto",
+    "family": "json-search",
+    "sql": "SELECT Id FROM JsonDocs WHERE Doc.kind IN (JSON '\"active\"',JSON '\"pending\"') ORDER BY Id",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "OK"
+    }
+  },
+  {
+    "label": "json-search-in-search",
+    "family": "json-search",
+    "sql": "SELECT Id FROM JsonDocs@{FORCE_INDEX=JsonSearch} WHERE Doc.kind IN (JSON '\"active\"',JSON '\"pending\"') ORDER BY Id",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "OK"
+    }
+  },
+  {
+    "label": "json-search-in-base",
+    "family": "json-search",
+    "sql": "SELECT Id FROM JsonDocs@{FORCE_INDEX=_BASE_TABLE} WHERE Doc.kind IN (JSON '\"active\"',JSON '\"pending\"') ORDER BY Id",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "OK"
+    }
+  },
+  {
+    "label": "json-search-whole-auto",
+    "family": "json-search",
+    "sql": "SELECT Id FROM JsonDocs WHERE Doc=JSON '{\"n\":1,\"kind\":\"active\"}' ORDER BY Id",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "OK"
+    }
+  },
+  {
+    "label": "json-search-whole-search",
+    "family": "json-search",
+    "sql": "SELECT Id FROM JsonDocs@{FORCE_INDEX=JsonSearch} WHERE Doc=JSON '{\"n\":1,\"kind\":\"active\"}' ORDER BY Id",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "OK"
+    }
+  },
+  {
+    "label": "json-search-whole-base",
+    "family": "json-search",
+    "sql": "SELECT Id FROM JsonDocs@{FORCE_INDEX=_BASE_TABLE} WHERE Doc=JSON '{\"n\":1,\"kind\":\"active\"}' ORDER BY Id",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "OK"
+    }
+  },
+  {
+    "label": "gql-standalone-corrected",
+    "family": "gql-order",
+    "sql": "GRAPH ProbeGraph MATCH(n) ORDER BY n.Id LIMIT 2 RETURN n.Id AS id",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "OK"
+    }
+  },
+  {
+    "label": "gql-next-corrected",
+    "family": "gql-order",
+    "sql": "GRAPH ProbeGraph MATCH(n) RETURN n.Id AS id ORDER BY id NEXT LIMIT 2 RETURN id",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "OK"
+    }
+  },
+  {
+    "label": "volatile-view",
+    "family": "volatile-view",
+    "sql": "CREATE VIEW VolatileView SQL SECURITY INVOKER AS SELECT n.Id, GENERATE_UUID() AS V FROM PropNodes AS n",
+    "kind": "ddl",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "OK"
+    }
+  },
+  {
+    "label": "volatile-graph-default",
+    "family": "volatile-view",
+    "sql": "CREATE PROPERTY GRAPH Volatiledefault NODE TABLES(VolatileView KEY(Id))",
+    "kind": "ddl",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "OK"
+    }
+  },
+  {
+    "label": "volatile-read-default-1",
+    "family": "volatile-view",
+    "sql": "GRAPH Volatiledefault MATCH(n) RETURN n.Id AS id,n.V AS v ORDER BY id",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "OK"
+    }
+  },
+  {
+    "label": "volatile-read-default-2",
+    "family": "volatile-view",
+    "sql": "GRAPH Volatiledefault MATCH(n) RETURN n.Id AS id,n.V AS v ORDER BY id",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "OK"
+    }
+  },
+  {
+    "label": "volatile-graph-false",
+    "family": "volatile-view",
+    "sql": "CREATE PROPERTY GRAPH Volatilefalse NODE TABLES(VolatileView KEY(Id)) OPTIONS(allow_view_with_volatile_column=false)",
+    "kind": "ddl",
+    "codes": {
+      "omni-lts": "Unimplemented",
+      "omni-r5": "OK",
+      "emulator-google": "OK"
+    }
+  },
+  {
+    "label": "volatile-read-false-1",
+    "family": "volatile-view",
+    "sql": "GRAPH Volatilefalse MATCH(n) RETURN n.Id AS id,n.V AS v ORDER BY id",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "NOT_RUN",
+      "omni-r5": "OK",
+      "emulator-google": "OK"
+    }
+  },
+  {
+    "label": "volatile-read-false-2",
+    "family": "volatile-view",
+    "sql": "GRAPH Volatilefalse MATCH(n) RETURN n.Id AS id,n.V AS v ORDER BY id",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "NOT_RUN",
+      "omni-r5": "OK",
+      "emulator-google": "OK"
+    }
+  },
+  {
+    "label": "volatile-graph-true",
+    "family": "volatile-view",
+    "sql": "CREATE PROPERTY GRAPH Volatiletrue NODE TABLES(VolatileView KEY(Id)) OPTIONS(allow_view_with_volatile_column=true)",
+    "kind": "ddl",
+    "codes": {
+      "omni-lts": "Unimplemented",
+      "omni-r5": "OK",
+      "emulator-google": "OK"
+    }
+  },
+  {
+    "label": "volatile-read-true-1",
+    "family": "volatile-view",
+    "sql": "GRAPH Volatiletrue MATCH(n) RETURN n.Id AS id,n.V AS v ORDER BY id",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "NOT_RUN",
+      "omni-r5": "OK",
+      "emulator-google": "OK"
+    }
+  },
+  {
+    "label": "volatile-read-true-2",
+    "family": "volatile-view",
+    "sql": "GRAPH Volatiletrue MATCH(n) RETURN n.Id AS id,n.V AS v ORDER BY id",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "NOT_RUN",
+      "omni-r5": "OK",
+      "emulator-google": "OK"
+    }
+  },
+  {
+    "label": "set-null-schema",
+    "family": "set-null",
+    "sql": "",
+    "kind": "ddl",
+    "codes": {
+      "omni-lts": "InvalidArgument",
+      "omni-r5": "OK",
+      "emulator-google": "InvalidArgument"
+    }
+  },
+  {
+    "label": "set-null-insert",
+    "family": "set-null",
+    "sql": "",
+    "kind": "dml",
+    "codes": {
+      "omni-lts": "NOT_RUN",
+      "omni-r5": "OK",
+      "emulator-google": "NOT_RUN"
+    }
+  },
+  {
+    "label": "set-null-delete",
+    "family": "set-null",
+    "sql": "",
+    "kind": "dml",
+    "codes": {
+      "omni-lts": "NOT_RUN",
+      "omni-r5": "OK",
+      "emulator-google": "NOT_RUN"
+    }
+  },
+  {
+    "label": "set-null-result",
+    "family": "set-null",
+    "sql": "SELECT Id,ParentId FROM NullChild",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "NOT_RUN",
+      "omni-r5": "OK",
+      "emulator-google": "NOT_RUN"
+    }
+  },
+  {
+    "label": "score-pagination-insert",
+    "family": "mirror-20261108",
+    "sql": "",
+    "kind": "dml",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "OK"
+    }
+  },
+  {
+    "label": "pagination-v1-full",
+    "family": "ranked-pagination",
+    "sql": "SELECT Id, SCORE(BodyTokens,@p, options=>JSON_OBJECT('version', @score_version)) AS score FROM ScoreDocs WHERE SEARCH(BodyTokens,@p) ORDER BY score DESC,Id",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "OK"
+    }
+  },
+  {
+    "label": "pagination-v1-offset-0",
+    "family": "ranked-pagination",
+    "sql": "SELECT Id, SCORE(BodyTokens,@p, options=>JSON_OBJECT('version', @score_version)) AS score FROM ScoreDocs WHERE SEARCH(BodyTokens,@p) ORDER BY score DESC,Id LIMIT @page_size OFFSET @offset",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "OK"
+    }
+  },
+  {
+    "label": "pagination-v1-offset-2",
+    "family": "ranked-pagination",
+    "sql": "SELECT Id, SCORE(BodyTokens,@p, options=>JSON_OBJECT('version', @score_version)) AS score FROM ScoreDocs WHERE SEARCH(BodyTokens,@p) ORDER BY score DESC,Id LIMIT @page_size OFFSET @offset",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "OK"
+    }
+  },
+  {
+    "label": "pagination-v1-offset-4",
+    "family": "ranked-pagination",
+    "sql": "SELECT Id, SCORE(BodyTokens,@p, options=>JSON_OBJECT('version', @score_version)) AS score FROM ScoreDocs WHERE SEARCH(BodyTokens,@p) ORDER BY score DESC,Id LIMIT @page_size OFFSET @offset",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "OK"
+    }
+  },
+  {
+    "label": "pagination-v2-full",
+    "family": "ranked-pagination",
+    "sql": "SELECT Id, SCORE(BodyTokens,@p, options=>JSON_OBJECT('version', @score_version)) AS score FROM ScoreDocs WHERE SEARCH(BodyTokens,@p) ORDER BY score DESC,Id",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "OK"
+    }
+  },
+  {
+    "label": "pagination-v2-offset-0",
+    "family": "ranked-pagination",
+    "sql": "SELECT Id, SCORE(BodyTokens,@p, options=>JSON_OBJECT('version', @score_version)) AS score FROM ScoreDocs WHERE SEARCH(BodyTokens,@p) ORDER BY score DESC,Id LIMIT @page_size OFFSET @offset",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "OK"
+    }
+  },
+  {
+    "label": "pagination-v2-offset-2",
+    "family": "ranked-pagination",
+    "sql": "SELECT Id, SCORE(BodyTokens,@p, options=>JSON_OBJECT('version', @score_version)) AS score FROM ScoreDocs WHERE SEARCH(BodyTokens,@p) ORDER BY score DESC,Id LIMIT @page_size OFFSET @offset",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "OK"
+    }
+  },
+  {
+    "label": "pagination-v2-offset-4",
+    "family": "ranked-pagination",
+    "sql": "SELECT Id, SCORE(BodyTokens,@p, options=>JSON_OBJECT('version', @score_version)) AS score FROM ScoreDocs WHERE SEARCH(BodyTokens,@p) ORDER BY score DESC,Id LIMIT @page_size OFFSET @offset",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "OK"
+    }
+  },
+  {
+    "label": "batch-omitted-create",
+    "family": "queue-batches",
+    "sql": "CREATE QUEUE BatchOmitted(Id STRING(36) NOT NULL, Payload BYTES(MAX) NOT NULL) PRIMARY KEY(Id)",
+    "kind": "ddl",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "OK"
+    }
+  },
+  {
+    "label": "batch-omitted-insert",
+    "family": "queue-batches",
+    "sql": "",
+    "kind": "dml",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "OK"
+    }
+  },
+  {
+    "label": "batch-omitted-receive",
+    "family": "queue-batches",
+    "sql": "SELECT Id,SpannerLastBatchMessage AS batch_end FROM RECEIVE_BatchOmitted(max_duration=>'5s')",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "OK"
+    }
+  },
+  {
+    "label": "batch-null-create",
+    "family": "queue-batches",
+    "sql": "CREATE QUEUE BatchNull(Id STRING(36) NOT NULL, Payload BYTES(MAX) NOT NULL) PRIMARY KEY(Id)",
+    "kind": "ddl",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "OK"
+    }
+  },
+  {
+    "label": "batch-null-insert",
+    "family": "queue-batches",
+    "sql": "",
+    "kind": "dml",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "OK"
+    }
+  },
+  {
+    "label": "batch-null-receive",
+    "family": "queue-batches",
+    "sql": "SELECT Id,SpannerLastBatchMessage AS batch_end FROM RECEIVE_BatchNull(max_duration=>'5s',max_batch_size=>NULL)",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "OK"
+    }
+  },
+  {
+    "label": "batch-twenty-create",
+    "family": "queue-batches",
+    "sql": "CREATE QUEUE BatchTwenty(Id STRING(36) NOT NULL, Payload BYTES(MAX) NOT NULL) PRIMARY KEY(Id)",
+    "kind": "ddl",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "OK"
+    }
+  },
+  {
+    "label": "batch-twenty-insert",
+    "family": "queue-batches",
+    "sql": "",
+    "kind": "dml",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "OK"
+    }
+  },
+  {
+    "label": "batch-twenty-receive",
+    "family": "queue-batches",
+    "sql": "SELECT Id,SpannerLastBatchMessage AS batch_end FROM RECEIVE_BatchTwenty(max_duration=>'5s',max_batch_size=>20)",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "OK"
+    }
+  },
+  {
+    "label": "dynamic-table",
+    "family": "dynamic-properties",
+    "sql": "CREATE TABLE DynamicNodes(Id INT64 NOT NULL, Label STRING(MAX), Props JSON) PRIMARY KEY(Id)",
+    "kind": "ddl",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "OK"
+    }
+  },
+  {
+    "label": "dynamic-insert",
+    "family": "dynamic-properties",
+    "sql": "",
+    "kind": "dml",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "OK"
+    }
+  },
+  {
+    "label": "dynamic-graph",
+    "family": "dynamic-properties",
+    "sql": "CREATE PROPERTY GRAPH DynamicGraph NODE TABLES(DynamicNodes DYNAMIC LABEL(Label) DYNAMIC PROPERTIES(Props))",
+    "kind": "ddl",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "OK"
+    }
+  },
+  {
+    "label": "dynamic-filter-number",
+    "family": "dynamic-properties",
+    "sql": "GRAPH DynamicGraph MATCH(n:person) WHERE n.age=43 RETURN n.Id AS id ORDER BY id",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "OK"
+    }
+  },
+  {
+    "label": "dynamic-filter-pattern",
+    "family": "dynamic-properties",
+    "sql": "GRAPH DynamicGraph MATCH(n:person {age:43}) RETURN n.Id AS id ORDER BY id",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "OK"
+    }
+  },
+  {
+    "label": "dynamic-filter-string-negative",
+    "family": "dynamic-properties",
+    "sql": "GRAPH DynamicGraph MATCH(n:person {age:'43'}) RETURN n.Id AS id ORDER BY id",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "OK"
+    }
+  },
+  {
+    "label": "dynamic-group",
+    "family": "dynamic-properties",
+    "sql": "GRAPH DynamicGraph MATCH(n:person) RETURN n.age AS age,COUNT(*) AS n ORDER BY age",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "OK"
+    }
+  },
+  {
+    "label": "dynamic-order",
+    "family": "dynamic-properties",
+    "sql": "GRAPH DynamicGraph MATCH(n:person) RETURN n.Id AS id,n.age AS age ORDER BY age,id",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "OK"
+    }
+  },
+  {
+    "label": "dynamic-distinct",
+    "family": "dynamic-properties",
+    "sql": "GRAPH DynamicGraph MATCH(n:person) RETURN DISTINCT n.age AS age ORDER BY age",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "OK"
+    }
+  },
+  {
+    "label": "dynamic-compare-properties",
+    "family": "dynamic-properties",
+    "sql": "GRAPH DynamicGraph MATCH(a:person),(b:person) WHERE a.Id<b.Id AND a.age=b.age RETURN a.Id AS a,b.Id AS b ORDER BY a,b",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "OK"
+    }
+  },
+  {
+    "label": "dynamic-filter-bool",
+    "family": "dynamic-properties",
+    "sql": "GRAPH DynamicGraph MATCH(n:person) WHERE n.active=true RETURN n.Id AS id ORDER BY id",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "OK"
+    }
+  },
+  {
+    "label": "dynamic-bare-bool-negative",
+    "family": "dynamic-properties",
+    "sql": "GRAPH DynamicGraph MATCH(n:person) WHERE n.active RETURN n.Id AS id",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "InvalidArgument",
+      "omni-r5": "InvalidArgument",
+      "emulator-google": "InvalidArgument"
+    }
+  },
+  {
+    "label": "pv-table",
+    "family": "new-docs-20261112",
+    "sql": "CREATE TABLE PVRows(Id INT64 NOT NULL,Tenant STRING(10),Payload STRING(MAX)) PRIMARY KEY(Id)",
+    "kind": "ddl",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "OK"
+    }
+  },
+  {
+    "label": "pv-seed",
+    "family": "new-docs-20261112",
+    "sql": null,
+    "kind": "dml",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "OK"
+    }
+  },
+  {
+    "label": "pv-roles",
+    "family": "new-docs-20261112",
+    "sql": "CREATE ROLE pv_user",
+    "kind": "ddl",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "OK"
+    }
+  },
+  {
+    "label": "pv-ordinary-view",
+    "family": "new-docs-20261112",
+    "sql": "CREATE VIEW PVPublic SQL SECURITY DEFINER AS SELECT 42 AS Answer",
+    "kind": "ddl",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "OK"
+    }
+  },
+  {
+    "label": "pv-filter-view",
+    "family": "new-docs-20261112",
+    "sql": "CREATE VIEW PVFilter SQL SECURITY DEFINER AS SELECT r.Id,r.Tenant,r.Payload FROM PVRows AS r WHERE r.Tenant=SECURE_CONTEXT('tenant')",
+    "kind": "ddl",
+    "codes": {
+      "omni-lts": "InvalidArgument",
+      "omni-r5": "OK",
+      "emulator-google": "OK"
+    }
+  },
+  {
+    "label": "pv-project-view",
+    "family": "new-docs-20261112",
+    "sql": "CREATE VIEW PVProject SQL SECURITY DEFINER AS SELECT SECURE_CONTEXT('tenant') AS Tenant",
+    "kind": "ddl",
+    "codes": {
+      "omni-lts": "InvalidArgument",
+      "omni-r5": "OK",
+      "emulator-google": "OK"
+    }
+  },
+  {
+    "label": "pv-json-view",
+    "family": "new-docs-20261112",
+    "sql": "CREATE VIEW PVJson SQL SECURITY DEFINER AS SELECT r.Id,r.Tenant,r.Payload FROM PVRows AS r WHERE r.Tenant=JSON_VALUE(PARSE_JSON(SECURE_CONTEXT('auth')),'$.tenant')",
+    "kind": "ddl",
+    "codes": {
+      "omni-lts": "InvalidArgument",
+      "omni-r5": "OK",
+      "emulator-google": "OK"
+    }
+  },
+  {
+    "label": "pv-grant-public",
+    "family": "new-docs-20261112",
+    "sql": "GRANT SELECT ON VIEW PVPublic TO ROLE pv_user",
+    "kind": "ddl",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "OK"
+    }
+  },
+  {
+    "label": "pv-role-connectivity",
+    "family": "new-docs-20261112",
+    "sql": "SELECT Answer FROM PVPublic",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "OK"
+    }
+  },
+  {
+    "label": "pv-grant-filter",
+    "family": "new-docs-20261112",
+    "sql": "GRANT SELECT ON VIEW PVFilter TO ROLE pv_user",
+    "kind": "ddl",
+    "codes": {
+      "omni-lts": "NOT_RUN",
+      "omni-r5": "OK",
+      "emulator-google": "OK"
+    }
+  },
+  {
+    "label": "pv-grant-project",
+    "family": "new-docs-20261112",
+    "sql": "GRANT SELECT ON VIEW PVProject TO ROLE pv_user",
+    "kind": "ddl",
+    "codes": {
+      "omni-lts": "NOT_RUN",
+      "omni-r5": "OK",
+      "emulator-google": "OK"
+    }
+  },
+  {
+    "label": "pv-grant-json",
+    "family": "new-docs-20261112",
+    "sql": "GRANT SELECT ON VIEW PVJson TO ROLE pv_user",
+    "kind": "ddl",
+    "codes": {
+      "omni-lts": "NOT_RUN",
+      "omni-r5": "OK",
+      "emulator-google": "OK"
+    }
+  },
+  {
+    "label": "pv-role-tenant-a",
+    "family": "new-docs-20261112",
+    "sql": "SELECT Id,Tenant,Payload FROM PVFilter ORDER BY Id",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "NOT_RUN",
+      "omni-r5": "OK",
+      "emulator-google": "OK"
+    }
+  },
+  {
+    "label": "pv-role-tenant-b",
+    "family": "new-docs-20261112",
+    "sql": "SELECT Id,Tenant,Payload FROM PVFilter ORDER BY Id",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "NOT_RUN",
+      "omni-r5": "OK",
+      "emulator-google": "OK"
+    }
+  },
+  {
+    "label": "pv-role-unknown",
+    "family": "new-docs-20261112",
+    "sql": "SELECT Id,Tenant,Payload FROM PVFilter ORDER BY Id",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "NOT_RUN",
+      "omni-r5": "OK",
+      "emulator-google": "OK"
+    }
+  },
+  {
+    "label": "pv-role-null",
+    "family": "new-docs-20261112",
+    "sql": "SELECT Id,Tenant,Payload FROM PVFilter ORDER BY Id",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "NOT_RUN",
+      "omni-r5": "OK",
+      "emulator-google": "OK"
+    }
+  },
+  {
+    "label": "pv-role-missing",
+    "family": "new-docs-20261112",
+    "sql": "SELECT Id,Tenant,Payload FROM PVFilter ORDER BY Id",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "NOT_RUN",
+      "omni-r5": "InvalidArgument",
+      "emulator-google": "InvalidArgument"
+    }
+  },
+  {
+    "label": "pv-role-wrong-type",
+    "family": "new-docs-20261112",
+    "sql": "SELECT Id,Tenant,Payload FROM PVFilter ORDER BY Id",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "NOT_RUN",
+      "omni-r5": "InvalidArgument",
+      "emulator-google": "InvalidArgument"
+    }
+  },
+  {
+    "label": "pv-role-ordinary-param-cannot-override",
+    "family": "new-docs-20261112",
+    "sql": "SELECT Id,Tenant,Payload FROM PVFilter WHERE Tenant=@tenant OR TRUE ORDER BY Id",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "NOT_RUN",
+      "omni-r5": "OK",
+      "emulator-google": "OK"
+    }
+  },
+  {
+    "label": "pv-role-base-denied",
+    "family": "new-docs-20261112",
+    "sql": "SELECT Id FROM PVRows ORDER BY Id",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "Unimplemented",
+      "omni-r5": "PermissionDenied",
+      "emulator-google": "OK"
+    }
+  },
+  {
+    "label": "pv-role-direct-context-denied",
+    "family": "new-docs-20261112",
+    "sql": "SELECT SECURE_CONTEXT('tenant') AS value",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "Unimplemented",
+      "omni-r5": "PermissionDenied",
+      "emulator-google": "OK"
+    }
+  },
+  {
+    "label": "pv-role-explicit-projection",
+    "family": "new-docs-20261112",
+    "sql": "SELECT Tenant FROM PVProject",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "NOT_RUN",
+      "omni-r5": "OK",
+      "emulator-google": "OK"
+    }
+  },
+  {
+    "label": "pv-role-json-context",
+    "family": "new-docs-20261112",
+    "sql": "SELECT Id,Tenant,Payload FROM PVJson ORDER BY Id",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "NOT_RUN",
+      "omni-r5": "OK",
+      "emulator-google": "OK"
+    }
+  },
+  {
+    "label": "pv-grant-debug-system-role",
+    "family": "new-docs-20261112",
+    "sql": "GRANT ROLE spanner_secure_context_reader TO ROLE pv_debug",
+    "kind": "ddl",
+    "codes": {
+      "omni-lts": "FailedPrecondition",
+      "omni-r5": "OK",
+      "emulator-google": "OK"
+    }
+  },
+  {
+    "label": "pv-debug-direct-context",
+    "family": "new-docs-20261112",
+    "sql": "SELECT SECURE_CONTEXT('tenant') AS value",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "NOT_RUN",
+      "omni-r5": "OK",
+      "emulator-google": "OK"
+    }
+  },
+  {
+    "label": "pv-debug-base-still-denied",
+    "family": "new-docs-20261112",
+    "sql": "SELECT Id FROM PVRows",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "NOT_RUN",
+      "omni-r5": "PermissionDenied",
+      "emulator-google": "OK"
+    }
+  },
+  {
+    "label": "pv-invoker-negative",
+    "family": "same-owned-fixture-correction",
+    "sql": "CREATE VIEW PVInvoker SQL SECURITY INVOKER AS SELECT r.Id,r.Tenant FROM PVRows AS r WHERE r.Tenant=SECURE_CONTEXT('tenant')",
+    "kind": "ddl",
+    "codes": {
+      "omni-lts": "InvalidArgument",
+      "omni-r5": "OK",
+      "emulator-google": "OK"
+    }
+  },
+  {
+    "label": "pv-udf-schema-control",
+    "family": "same-owned-fixture-correction",
+    "sql": "CREATE SCHEMA PVFunctions",
+    "kind": "ddl",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "OK"
+    }
+  },
+  {
+    "label": "pv-udf-positive-control",
+    "family": "same-owned-fixture-correction",
+    "sql": "CREATE FUNCTION PVFunctions.Echo(x STRING) RETURNS STRING SQL SECURITY INVOKER AS (x)",
+    "kind": "ddl",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "OK"
+    }
+  },
+  {
+    "label": "pv-udf-negative",
+    "family": "same-owned-fixture-correction",
+    "sql": "CREATE FUNCTION PVFunctions.PVUdf() RETURNS STRING SQL SECURITY INVOKER AS (SECURE_CONTEXT('tenant'))",
+    "kind": "ddl",
+    "codes": {
+      "omni-lts": "InvalidArgument",
+      "omni-r5": "OK",
+      "emulator-google": "OK"
+    }
+  },
+  {
+    "label": "pv-default-negative",
+    "family": "new-docs-20261112",
+    "sql": "CREATE TABLE PVDefault(Id INT64 NOT NULL,Tenant STRING(MAX) DEFAULT (SECURE_CONTEXT('tenant'))) PRIMARY KEY(Id)",
+    "kind": "ddl",
+    "codes": {
+      "omni-lts": "InvalidArgument",
+      "omni-r5": "InvalidArgument",
+      "emulator-google": "OK"
+    }
+  },
+  {
+    "label": "pv-generated-negative",
+    "family": "new-docs-20261112",
+    "sql": "CREATE TABLE PVGenerated(Id INT64 NOT NULL,Tenant STRING(MAX) AS (SECURE_CONTEXT('tenant')) STORED) PRIMARY KEY(Id)",
+    "kind": "ddl",
+    "codes": {
+      "omni-lts": "InvalidArgument",
+      "omni-r5": "InvalidArgument",
+      "emulator-google": "OK"
+    }
+  },
+  {
+    "label": "pv-cast-doc-negative",
+    "family": "new-docs-20261112",
+    "sql": "CREATE VIEW PVCastDoc SQL SECURITY DEFINER AS SELECT CAST(SECURE_CONTEXT('user_id'), INT64) AS UserId",
+    "kind": "ddl",
+    "codes": {
+      "omni-lts": "InvalidArgument",
+      "omni-r5": "InvalidArgument",
+      "emulator-google": "InvalidArgument"
+    }
+  },
+  {
+    "label": "pv-cast-corrected",
+    "family": "new-docs-20261112",
+    "sql": "CREATE VIEW PVCastCorrected SQL SECURITY DEFINER AS SELECT CAST(SECURE_CONTEXT('user_id') AS INT64) AS UserId",
+    "kind": "ddl",
+    "codes": {
+      "omni-lts": "InvalidArgument",
+      "omni-r5": "OK",
+      "emulator-google": "OK"
+    }
+  },
+  {
+    "label": "pv-cast-corrected-query",
+    "family": "new-docs-20261112",
+    "sql": "SELECT UserId FROM PVCastCorrected",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "NOT_RUN",
+      "omni-r5": "OK",
+      "emulator-google": "OK"
+    }
+  },
+  {
+    "label": "pv-info-schema",
+    "family": "new-docs-20261112",
+    "sql": "SELECT TABLE_NAME,VIEW_DEFINITION,SECURITY_TYPE FROM INFORMATION_SCHEMA.VIEWS WHERE STARTS_WITH(TABLE_NAME,'PV') ORDER BY TABLE_NAME",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "OK"
+    }
+  },
+  {
+    "label": "vector-annotated",
+    "family": "new-docs-20261112",
+    "sql": "CREATE TABLE VectorsAnnotated(Id INT64 NOT NULL,E ARRAY<FLOAT32>(vector_length=>3)) PRIMARY KEY(Id)",
+    "kind": "ddl",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "OK"
+    }
+  },
+  {
+    "label": "vector-unannotated",
+    "family": "new-docs-20261112",
+    "sql": "CREATE TABLE VectorsFlexible(Id INT64 NOT NULL,E ARRAY<FLOAT32>) PRIMARY KEY(Id)",
+    "kind": "ddl",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "OK"
+    }
+  },
+  {
+    "label": "vector-index-annotated",
+    "family": "new-docs-20261112",
+    "sql": "CREATE VECTOR INDEX AnnotatedVectorIndex ON VectorsAnnotated(E) WHERE E IS NOT NULL OPTIONS(distance_type='EUCLIDEAN')",
+    "kind": "ddl",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "OK"
+    }
+  },
+  {
+    "label": "vector-annotated-length-3",
+    "family": "same-owned-fixture-correction",
+    "sql": null,
+    "kind": "dml",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "OK"
+    }
+  },
+  {
+    "label": "vector-annotated-length-2",
+    "family": "same-owned-fixture-correction",
+    "sql": null,
+    "kind": "dml",
+    "codes": {
+      "omni-lts": "InvalidArgument",
+      "omni-r5": "InvalidArgument",
+      "emulator-google": "InvalidArgument"
+    }
+  },
+  {
+    "label": "vector-annotated-knn",
+    "family": "same-owned-fixture-correction",
+    "sql": "SELECT Id,EUCLIDEAN_DISTANCE(E,ARRAY<FLOAT32>[1.0,2.0,3.0]) AS Distance FROM VectorsAnnotated WHERE ARRAY_LENGTH(E)=3 ORDER BY Distance",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "OK"
+    }
+  },
+  {
+    "label": "vector-flexible-length-3",
+    "family": "same-owned-fixture-correction",
+    "sql": null,
+    "kind": "dml",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "OK"
+    }
+  },
+  {
+    "label": "vector-flexible-length-2",
+    "family": "same-owned-fixture-correction",
+    "sql": null,
+    "kind": "dml",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "OK"
+    }
+  },
+  {
+    "label": "vector-flexible-knn",
+    "family": "same-owned-fixture-correction",
+    "sql": "SELECT Id,EUCLIDEAN_DISTANCE(E,ARRAY<FLOAT32>[1.0,2.0,3.0]) AS Distance FROM VectorsFlexible WHERE ARRAY_LENGTH(E)=3 ORDER BY Distance",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "OK"
+    }
+  },
+  {
+    "label": "vector-index-unannotated-negative",
+    "family": "new-docs-20261112",
+    "sql": "CREATE VECTOR INDEX FlexibleVectorIndex ON VectorsFlexible(E) WHERE E IS NOT NULL OPTIONS(distance_type='EUCLIDEAN')",
+    "kind": "ddl",
+    "codes": {
+      "omni-lts": "FailedPrecondition",
+      "omni-r5": "FailedPrecondition",
+      "emulator-google": "InvalidArgument"
+    }
+  },
+  {
+    "label": "pv-ddl-export",
+    "family": "new-docs-20261112",
+    "sql": null,
+    "kind": "ddl-export",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "OK"
+    }
+  },
+  {
+    "label": "pv-invoker-grant",
+    "family": "same-owned-fixture-correction",
+    "sql": "GRANT SELECT ON VIEW PVInvoker TO ROLE pv_user",
+    "kind": "ddl",
+    "codes": {
+      "omni-lts": "NOT_RUN",
+      "omni-r5": "OK",
+      "emulator-google": "OK"
+    }
+  },
+  {
+    "label": "pv-invoker-role-query",
+    "family": "same-owned-fixture-correction",
+    "sql": "SELECT Id,Tenant FROM PVInvoker ORDER BY Id",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "NOT_RUN",
+      "omni-r5": "PermissionDenied",
+      "emulator-google": "OK"
+    }
+  },
+  {
+    "label": "udf-execution/pv-udf-execute-a",
+    "family": "secure-context-named-udf-controls",
+    "sql": "SELECT PVFunctions.PVUdf() AS value",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "Unimplemented",
+      "omni-r5": "InvalidArgument",
+      "emulator-google": "OK"
+    }
+  },
+  {
+    "label": "udf-execution/pv-udf-execute-b",
+    "family": "secure-context-named-udf-controls",
+    "sql": "SELECT PVFunctions.PVUdf() AS value",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "Unimplemented",
+      "omni-r5": "InvalidArgument",
+      "emulator-google": "OK"
+    }
+  },
+  {
+    "label": "udf-execution/pv-udf-execute-missing",
+    "family": "secure-context-named-udf-controls",
+    "sql": "SELECT PVFunctions.PVUdf() AS value",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "InvalidArgument",
+      "omni-r5": "InvalidArgument",
+      "emulator-google": "InvalidArgument"
+    }
+  },
+  {
+    "label": "udf-execution/pv-udf-argument-forwarding",
+    "family": "secure-context-named-udf-controls",
+    "sql": "SELECT PVFunctions.Echo(SECURE_CONTEXT('tenant')) AS value",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "Unimplemented",
+      "omni-r5": "OK",
+      "emulator-google": "OK"
+    }
+  },
+  {
+    "label": "udf-execution/pv-udf-view",
+    "family": "secure-context-named-udf-controls",
+    "sql": "CREATE VIEW PVViaUdf SQL SECURITY DEFINER AS SELECT r.Id,r.Tenant,r.Payload FROM PVRows AS r WHERE r.Tenant=PVFunctions.PVUdf()",
+    "kind": "ddl",
+    "codes": {
+      "omni-lts": "InvalidArgument",
+      "omni-r5": "OK",
+      "emulator-google": "OK"
+    }
+  },
+  {
+    "label": "udf-execution/pv-udf-view-grant",
+    "family": "secure-context-named-udf-controls",
+    "sql": "GRANT SELECT ON VIEW PVViaUdf TO ROLE pv_user",
+    "kind": "ddl",
+    "codes": {
+      "omni-lts": "NOT_RUN",
+      "omni-r5": "OK",
+      "emulator-google": "OK"
+    }
+  },
+  {
+    "label": "udf-execution/pv-udf-view-role-a",
+    "family": "secure-context-named-udf-controls",
+    "sql": "SELECT Id,Tenant,Payload FROM PVViaUdf ORDER BY Id",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "NOT_RUN",
+      "omni-r5": "InvalidArgument",
+      "emulator-google": "OK"
+    }
+  },
+  {
+    "label": "udf-execution/pv-udf-view-role-b",
+    "family": "secure-context-named-udf-controls",
+    "sql": "SELECT Id,Tenant,Payload FROM PVViaUdf ORDER BY Id",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "NOT_RUN",
+      "omni-r5": "InvalidArgument",
+      "emulator-google": "OK"
+    }
+  },
+  {
+    "label": "udf-execution/pv-ddl-export",
+    "family": "secure-context-named-udf-controls",
+    "sql": null,
+    "kind": "ddl-export",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "OK"
+    }
+  },
+  {
+    "label": "fk-schema",
+    "family": null,
+    "sql": null,
+    "kind": "ddl",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "OK"
+    }
+  },
+  {
+    "label": "fk-index-observation",
+    "family": null,
+    "sql": "SELECT i.TABLE_NAME,i.INDEX_NAME,i.INDEX_TYPE,i.IS_UNIQUE,i.IS_NULL_FILTERED,i.INDEX_STATE,i.SPANNER_IS_MANAGED,c.COLUMN_NAME,c.ORDINAL_POSITION,c.COLUMN_ORDERING FROM INFORMATION_SCHEMA.INDEXES AS i JOIN INFORMATION_SCHEMA.INDEX_COLUMNS AS c USING(TABLE_CATALOG,TABLE_SCHEMA,TABLE_NAME,INDEX_NAME) WHERE i.TABLE_NAME IN ('Owners','Events') ORDER BY i.TABLE_NAME,i.INDEX_NAME,c.ORDINAL_POSITION,c.COLUMN_NAME",
+    "kind": "query",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "OK"
+    }
+  },
+  {
+    "label": "fk-insert-parent",
+    "family": null,
+    "sql": null,
+    "kind": "dml",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "OK"
+    }
+  },
+  {
+    "label": "fk-insert-event",
+    "family": null,
+    "sql": null,
+    "kind": "dml",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "OK"
+    }
+  },
+  {
+    "label": "fk-seek-plan",
+    "family": null,
+    "sql": "SELECT Shard,Id FROM Events WHERE Owner=1",
+    "kind": "plan",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "OK"
+    }
+  },
+  {
+    "label": "fk-constraint-hint-plan",
+    "family": null,
+    "sql": "SELECT Shard,Id FROM Events@{FORCE_INDEX=EventsOwner} WHERE Owner=1",
+    "kind": "plan",
+    "codes": {
+      "omni-lts": "OK",
+      "omni-r5": "OK",
+      "emulator-google": "InvalidArgument"
+    }
+  }
+]

@@ -1,0 +1,287 @@
+package main
+
+import (
+	"context"
+	"fmt"
+	"strings"
+	"time"
+
+	"cloud.google.com/go/spanner"
+	"cloud.google.com/go/spanner/apiv1/spannerpb"
+	spanalyzer "github.com/apstndb/spanalyzer"
+	"github.com/apstndb/spanalyzer/internal/querygen"
+	"github.com/cloudspannerecosystem/memefish/ast"
+	"google.golang.org/api/iterator"
+	"google.golang.org/protobuf/types/known/structpb"
+)
+
+type planReportWriteMeasurer interface {
+	MeasureWrite(context.Context, querygen.QueryCodegenPlanWrite, querygen.MutationCountWriteInput, spanalyzer.MutationWriteShape, string, map[string]string) (*int64, []spanalyzer.MutationCountRowFacts, error)
+}
+
+// MeasureWrite is deliberately separate from AnalyzePlan. Only the explicit
+// measurement path calls it, and only the constructor's random owned fixture
+// can execute it. Seeds and the measured target are separate transactions.
+func (a *spannerPlanReportAnalyzer) MeasureWrite(ctx context.Context, write querygen.QueryCodegenPlanWrite, input querygen.MutationCountWriteInput, shape spanalyzer.MutationWriteShape, sql string, paramColumns map[string]string) (*int64, []spanalyzer.MutationCountRowFacts, error) {
+	if !a.ownedFixture || a.catalog == nil {
+		return nil, nil, fmt.Errorf("measurement requires a command-created fixture")
+	}
+	ctx, cancel := context.WithTimeout(ctx, 45*time.Second)
+	defer cancel()
+	table := a.catalog.Tables[write.Table]
+	if table == nil {
+		return nil, nil, fmt.Errorf("unknown measurement table %s", write.Table)
+	}
+	values := map[string]interface{}{}
+	for name, value := range input.Values {
+		values[strings.ToLower(name)] = value
+	}
+	encoded := map[string]interface{}{}
+	columns := shape.Columns
+	if write.Operation == "delete" {
+		columns = write.Keys
+	}
+	for _, name := range columns {
+		value, ok := values[strings.ToLower(name)]
+		if !ok {
+			return nil, nil, fmt.Errorf("measurement of %s requires explicit value for %s", write.Name, name)
+		}
+		column, _ := table.Column(name)
+		if column == nil {
+			return nil, nil, fmt.Errorf("unknown measurement column %s", name)
+		}
+		typ, err := column.Type.SpannerPB()
+		if err != nil {
+			return nil, nil, err
+		}
+		wire, err := structpb.NewValue(value)
+		if err != nil {
+			return nil, nil, err
+		}
+		encoded[strings.ToLower(name)] = spanner.GenericColumnValue{Type: typ, Value: wire}
+	}
+	var key spanner.Key
+	var predicates []string
+	keyParams := map[string]interface{}{}
+	for n, name := range write.Keys {
+		value, ok := encoded[strings.ToLower(name)]
+		if !ok {
+			return nil, nil, fmt.Errorf("measurement requires full key %s", name)
+		}
+		keyPart := value
+		if shape.Channel == "mutation" && write.Operation == "delete" {
+			var err error
+			keyPart, err = planReportMeasurementKeyPart(value.(spanner.GenericColumnValue))
+			if err != nil {
+				return nil, nil, fmt.Errorf("key %s: %w", name, err)
+			}
+		}
+		key = append(key, keyPart)
+		param := fmt.Sprintf("k%d", n)
+		predicates = append(predicates, (&ast.Ident{Name: name}).SQL()+" IS NOT DISTINCT FROM @"+param)
+		keyParams[param] = value
+	}
+	if len(key) == 0 {
+		return nil, nil, fmt.Errorf("measurement requires an explicit primary key")
+	}
+	// Seeds are caller-authored fixture DML. They run only after the complete
+	// measured input has been validated and must reset state for each scenario.
+	if len(input.SeedDML) > 0 {
+		_, err := a.clients.Client.ReadWriteTransaction(ctx, func(ctx context.Context, tx *spanner.ReadWriteTransaction) error {
+			for _, sql := range input.SeedDML {
+				if _, err := tx.Update(ctx, spanner.NewStatement(sql)); err != nil {
+					return err
+				}
+			}
+			return nil
+		})
+		if err != nil {
+			return nil, nil, fmt.Errorf("fixture seed: %w", err)
+		}
+	}
+	var facts []spanalyzer.MutationCountRowFacts
+	response, err := a.clients.Client.ReadWriteTransactionWithOptions(ctx, func(ctx context.Context, tx *spanner.ReadWriteTransaction) error {
+		// Retry callbacks replace the old-row evidence; they never append data
+		// from aborted attempts to the final successful commit's observation.
+		facts = nil
+		stmt := spanner.Statement{SQL: "SELECT * FROM " + measurementPathSQL(write.Table) + " WHERE " + strings.Join(predicates, " AND "), Params: keyParams}
+		it := tx.Query(ctx, stmt)
+		row, readErr := it.Next()
+		exists := readErr != iterator.Done
+		if readErr != nil && readErr != iterator.Done {
+			it.Stop()
+			return readErr
+		}
+		old := map[string]interface{}{}
+		if exists {
+			for n, name := range row.ColumnNames() {
+				var value spanner.GenericColumnValue
+				if err := row.Column(n, &value); err != nil {
+					it.Stop()
+					return err
+				}
+				old[name] = value.Value.AsInterface()
+			}
+			if _, err := it.Next(); err != iterator.Done {
+				it.Stop()
+				if err == nil {
+					return fmt.Errorf("measurement key selected more than one row")
+				}
+				return err
+			}
+		}
+		it.Stop()
+		rows := int64(1)
+		if write.Operation == "delete" && !exists {
+			rows = 0
+		}
+		facts = []spanalyzer.MutationCountRowFacts{{Exists: &exists, Old: old, Rows: &rows}}
+		if shape.Channel == "dml" {
+			if sql == "" {
+				return fmt.Errorf("DML measurement has no generated statement")
+			}
+			params := map[string]interface{}{}
+			for column, param := range paramColumns {
+				value, ok := encoded[strings.ToLower(column)]
+				if !ok {
+					return fmt.Errorf("missing parameter value for %s", column)
+				}
+				params[param] = value
+			}
+			n, err := tx.Update(ctx, spanner.Statement{SQL: sql, Params: params})
+			if err != nil {
+				return err
+			}
+			if n > 1 {
+				return fmt.Errorf("measured generated DML affected %d rows; expected at most one", n)
+			}
+			facts[0].Rows = &n
+			return nil
+		}
+		var mutation *spanner.Mutation
+		var vals []interface{}
+		for _, name := range columns {
+			vals = append(vals, encoded[strings.ToLower(name)])
+		}
+		switch write.Operation {
+		case "insert":
+			mutation = spanner.Insert(write.Table, columns, vals)
+		case "update":
+			mutation = spanner.Update(write.Table, columns, vals)
+		case "insert_or_update":
+			mutation = spanner.InsertOrUpdate(write.Table, columns, vals)
+		case "replace":
+			mutation = spanner.Replace(write.Table, columns, vals)
+		case "delete":
+			mutation = spanner.Delete(write.Table, key)
+		default:
+			return fmt.Errorf("unsupported measured operation %s", write.Operation)
+		}
+		return tx.BufferWrite([]*spanner.Mutation{mutation})
+	}, spanner.TransactionOptions{CommitOptions: spanner.CommitOptions{ReturnCommitStats: true}})
+	if err != nil {
+		return nil, nil, err
+	}
+	if response.CommitStats == nil {
+		return nil, facts, nil
+	}
+	count := response.CommitStats.GetMutationCount()
+	return &count, facts, nil
+}
+
+// SDK query parameters and write values accept GenericColumnValue, but Key
+// explicitly does not. Decode supported key scalars before any seed executes.
+// Nullable wrappers preserve SQL NULL separately from a scalar's zero value.
+func planReportMeasurementKeyPart(value spanner.GenericColumnValue) (interface{}, error) {
+	switch value.Type.GetCode() {
+	case spannerpb.TypeCode_INT64:
+		var v spanner.NullInt64
+		err := value.Decode(&v)
+		return v, err
+	case spannerpb.TypeCode_STRING:
+		var v spanner.NullString
+		err := value.Decode(&v)
+		return v, err
+	case spannerpb.TypeCode_BOOL:
+		var v spanner.NullBool
+		err := value.Decode(&v)
+		return v, err
+	case spannerpb.TypeCode_BYTES:
+		var v []byte
+		err := value.Decode(&v)
+		return v, err
+	case spannerpb.TypeCode_DATE:
+		var v spanner.NullDate
+		err := value.Decode(&v)
+		return v, err
+	case spannerpb.TypeCode_TIMESTAMP:
+		var v spanner.NullTime
+		err := value.Decode(&v)
+		return v, err
+	case spannerpb.TypeCode_FLOAT64:
+		var v spanner.NullFloat64
+		err := value.Decode(&v)
+		return v, err
+	default:
+		return nil, fmt.Errorf("measurement does not support SDK delete key type %s", value.Type.GetCode())
+	}
+}
+
+func measurementPathSQL(name string) string {
+	parts := strings.Split(name, ".")
+	for i, part := range parts {
+		parts[i] = (&ast.Ident{Name: part}).SQL()
+	}
+	return strings.Join(parts, ".")
+}
+
+func measurePlanReportWrite(ctx context.Context, clients planReportAnalyzer, model *spanalyzer.MutationCountAnalyzer, write querygen.QueryCodegenPlanWrite, inputs map[string]querygen.MutationCountWriteInput, query querygen.QueryCodegenPlanQuery, runtime string, counts map[string]spanalyzer.MutationCountReport) (map[string]spanalyzer.MutationCountReport, string) {
+	measurer, ok := clients.(planReportWriteMeasurer)
+	if !ok {
+		return counts, "runtime analyzer does not support owned-fixture measurement"
+	}
+	var errors []string
+	// Configured method order is deterministic; each scenario's seeds must
+	// re-establish its own starting state rather than depending on that order.
+	for _, method := range write.Methods {
+		input, supplied := inputs[method]
+		if !supplied {
+			continue
+		}
+		if input.Observation != nil {
+			errors = append(errors, method+": supplied observation cannot describe a new measured execution")
+			continue
+		}
+		shape, err := querygen.MutationCountWriteShape(write, method, input.Values)
+		if err != nil {
+			errors = append(errors, err.Error())
+			continue
+		}
+		before, exists := counts[method]
+		if !exists {
+			errors = append(errors, method+": no valid conditional model")
+			continue
+		}
+		count, facts, measureErr := measurer.MeasureWrite(ctx, write, input, shape, query.SQL, query.ReportWriteParamColumns)
+		observation := &spanalyzer.MutationCountObservation{Runtime: runtime, ObservedAt: time.Now().UTC().Format(time.RFC3339Nano), SchemaSHA256: before.SchemaSHA256, InputSHA256: before.InputSHA256, Scope: before.Scope, Successful: measureErr == nil, StatsPresent: count != nil, Count: count}
+		options := spanalyzer.MutationCountOptions{Facts: input.Facts, Calibration: input.Calibration, Observation: observation}
+		if len(options.Facts) == 0 && measureErr == nil {
+			options.Facts = facts
+		}
+		refined, err := model.AnalyzeWriteShape(shape, options)
+		if err != nil {
+			errors = append(errors, method+": "+err.Error())
+			continue
+		}
+		counts[method] = refined
+		switch {
+		case measureErr != nil:
+			errors = append(errors, method+": "+measureErr.Error())
+		case count == nil:
+			errors = append(errors, method+": successful commit returned no CommitStats; count is unknown")
+		case len(refined.Disagreements) > 0:
+			errors = append(errors, method+": "+strings.Join(refined.Disagreements, "; "))
+		}
+	}
+	return counts, strings.Join(errors, "; ")
+}

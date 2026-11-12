@@ -123,6 +123,8 @@ func runExplainPlan(args []string, stdout, stderr io.Writer) error {
 	output := fs.String("output", "yaml", "plan output format: yaml, json, or summary")
 	stable := fs.Bool("stable", false, "omit volatile evidence fields from machine-readable plan output")
 	audit := fs.Bool("audit", false, "include audit-only projection matrix details in machine-readable plan output")
+	mutationFacts := fs.String("mutation-facts-file", "", "JSON one-row scenarios keyed by write name and API")
+	mutationIndexes := fs.String("mutation-indexes-file", "", "JSON complete regular-index snapshots keyed by catalog")
 	if err := fs.Parse(args); err != nil {
 		if errors.Is(err, flag.ErrHelp) {
 			return nil
@@ -139,6 +141,14 @@ func runExplainPlan(args []string, stdout, stderr io.Writer) error {
 	}
 	inspection := buildInspectionPlan(config, filepath.Dir(*configPath))
 	plan := inspection.Plan
+	mutationInputs, _, err := readQuerygenMutationInputs(filepath.Dir(*configPath), *mutationFacts, *mutationIndexes)
+	if err != nil {
+		return err
+	}
+	if err := querygen.RefinePlanMutationCounts(plan, config, filepath.Dir(*configPath), mutationInputs); err != nil {
+		return err
+	}
+
 	if !*audit {
 		makePlanConcise(plan)
 	}

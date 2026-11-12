@@ -1,0 +1,702 @@
+[
+  {
+    "label": "fixture-connectivity",
+    "sql": "SELECT 1 AS connectivity",
+    "kind": "query",
+    "managed": "OK",
+    "emulator": "OK"
+  },
+  {
+    "label": "score-fixture",
+    "sql": "CREATE TABLE ScoreDocs (id bigint NOT NULL PRIMARY KEY, body text, bodytokens spanner.tokenlist GENERATED ALWAYS AS (spanner.tokenize_fulltext(body)) VIRTUAL HIDDEN)",
+    "kind": "ddl",
+    "managed": "OK",
+    "emulator": "OK"
+  },
+  {
+    "label": "score-search-index",
+    "sql": "CREATE SEARCH INDEX ScoreIndex ON ScoreDocs(BodyTokens)",
+    "kind": "ddl",
+    "managed": "OK",
+    "emulator": "OK"
+  },
+  {
+    "label": "score-insert",
+    "sql": "",
+    "kind": "dml",
+    "managed": "OK",
+    "emulator": "OK"
+  },
+  {
+    "label": "score-unpinned",
+    "sql": "SELECT Id, spanner.score(BodyTokens,'cat') AS default_score, spanner.score(BodyTokens,'cat', options => '{\"version\": 1}'::jsonb) AS version1_score, spanner.score(BodyTokens,'cat', options => '{\"version\": 2}'::jsonb) AS version2_score FROM ScoreDocs WHERE spanner.search(BodyTokens,'cat') ORDER BY Id",
+    "kind": "query",
+    "managed": "OK",
+    "emulator": "OK"
+  },
+  {
+    "label": "score-set-db-1",
+    "sql": "ALTER DATABASE {{DATABASE}} SET \"spanner.score_version\" = 1",
+    "kind": "ddl",
+    "managed": "InvalidArgument",
+    "emulator": "FailedPrecondition"
+  },
+  {
+    "label": "score-pinned-db-1",
+    "sql": "SELECT Id, spanner.score(BodyTokens,'cat') AS default_score, spanner.score(BodyTokens,'cat', options => '{\"version\": 1}'::jsonb) AS version1_score, spanner.score(BodyTokens,'cat', options => '{\"version\": 2}'::jsonb) AS version2_score FROM ScoreDocs WHERE spanner.search(BodyTokens,'cat') ORDER BY Id",
+    "kind": "query",
+    "managed": "NOT_RUN",
+    "emulator": "NOT_RUN"
+  },
+  {
+    "label": "score-set-db-2",
+    "sql": "ALTER DATABASE {{DATABASE}} SET \"spanner.score_version\" = 2",
+    "kind": "ddl",
+    "managed": "InvalidArgument",
+    "emulator": "FailedPrecondition"
+  },
+  {
+    "label": "score-pinned-db-2",
+    "sql": "SELECT Id, spanner.score(BodyTokens,'cat') AS default_score, spanner.score(BodyTokens,'cat', options => '{\"version\": 1}'::jsonb) AS version1_score, spanner.score(BodyTokens,'cat', options => '{\"version\": 2}'::jsonb) AS version2_score FROM ScoreDocs WHERE spanner.search(BodyTokens,'cat') ORDER BY Id",
+    "kind": "query",
+    "managed": "NOT_RUN",
+    "emulator": "NOT_RUN"
+  },
+  {
+    "label": "score-explicit-independent",
+    "sql": "SELECT Id, spanner.score(BodyTokens,'cat', options => '{\"version\": 1}'::jsonb) AS version1_score, spanner.score(BodyTokens,'cat', options => '{\"version\": 2}'::jsonb) AS version2_score FROM ScoreDocs WHERE spanner.search(BodyTokens,'cat') ORDER BY Id",
+    "kind": "query",
+    "managed": "OK",
+    "emulator": "OK"
+  },
+  {
+    "label": "bucket-pg-query",
+    "sql": "SELECT EXTRACT(EPOCH FROM '2026-10-31 00:59:59.9Z'::timestamptz - '1970-01-01Z'::timestamptz)::bigint / 3600 AS near_hour, EXTRACT(EPOCH FROM '2026-10-31 01:00:00Z'::timestamptz - '1970-01-01Z'::timestamptz)::bigint / 3600 AS on_hour",
+    "kind": "query",
+    "managed": "OK",
+    "emulator": "OK"
+  },
+  {
+    "label": "bucket-pg-boundaries",
+    "sql": "SELECT t, EXTRACT(EPOCH FROM t - '1970-01-01Z'::timestamptz)::bigint / 3600 AS documented_hour, FLOOR(EXTRACT(EPOCH FROM t - '1970-01-01Z'::timestamptz) / 3600)::bigint AS floored_hour FROM (SELECT '1969-12-31 23:59:59Z'::timestamptz AS t UNION ALL SELECT '2026-10-31 00:00:00Z'::timestamptz UNION ALL SELECT '2026-10-31 00:59:59.4Z'::timestamptz UNION ALL SELECT '2026-10-31 00:59:59.9Z'::timestamptz UNION ALL SELECT '2026-10-31 01:00:00Z'::timestamptz) q ORDER BY t",
+    "kind": "query",
+    "managed": "OK",
+    "emulator": "OK"
+  },
+  {
+    "label": "pg-jsonb-sort",
+    "sql": "SELECT x FROM (SELECT '2'::jsonb x UNION ALL SELECT '1'::jsonb UNION ALL SELECT 'null'::jsonb) q ORDER BY x",
+    "kind": "query",
+    "managed": "OK",
+    "emulator": "Unimplemented"
+  },
+  {
+    "label": "pg-jsonb-count",
+    "sql": "SELECT COUNT(x) AS n FROM (SELECT '1'::jsonb x) q",
+    "kind": "query",
+    "managed": "Unimplemented",
+    "emulator": "OK"
+  },
+  {
+    "label": "json-table",
+    "sql": "CREATE TABLE JsonDocs (Id bigint PRIMARY KEY, Doc jsonb, Tokens spanner.tokenlist GENERATED ALWAYS AS (spanner.tokenize_jsonb(Doc)) VIRTUAL HIDDEN)",
+    "kind": "ddl",
+    "managed": "OK",
+    "emulator": "OK"
+  },
+  {
+    "label": "json-index",
+    "sql": "CREATE SEARCH INDEX JsonSearch ON JsonDocs(Tokens)",
+    "kind": "ddl",
+    "managed": "OK",
+    "emulator": "OK"
+  },
+  {
+    "label": "json-insert",
+    "sql": "",
+    "kind": "dml",
+    "managed": "OK",
+    "emulator": "OK"
+  },
+  {
+    "label": "json-search-equal-auto",
+    "sql": "SELECT Id FROM JsonDocs WHERE Doc->'kind'='\"active\"'::jsonb ORDER BY Id",
+    "kind": "query",
+    "managed": "OK",
+    "emulator": "Unimplemented"
+  },
+  {
+    "label": "json-search-equal-search",
+    "sql": "SELECT Id FROM JsonDocs/*@ FORCE_INDEX=JsonSearch */ WHERE Doc->'kind'='\"active\"'::jsonb ORDER BY Id",
+    "kind": "query",
+    "managed": "OK",
+    "emulator": "Unimplemented"
+  },
+  {
+    "label": "json-search-equal-base",
+    "sql": "SELECT Id FROM JsonDocs/*@ FORCE_INDEX=_BASE_TABLE */ WHERE Doc->'kind'='\"active\"'::jsonb ORDER BY Id",
+    "kind": "query",
+    "managed": "OK",
+    "emulator": "Unimplemented"
+  },
+  {
+    "label": "json-search-in-auto",
+    "sql": "SELECT Id FROM JsonDocs WHERE Doc->'kind' IN ('\"active\"'::jsonb,'\"pending\"'::jsonb) ORDER BY Id",
+    "kind": "query",
+    "managed": "OK",
+    "emulator": "OutOfRange"
+  },
+  {
+    "label": "json-search-in-search",
+    "sql": "SELECT Id FROM JsonDocs/*@ FORCE_INDEX=JsonSearch */ WHERE Doc->'kind' IN ('\"active\"'::jsonb,'\"pending\"'::jsonb) ORDER BY Id",
+    "kind": "query",
+    "managed": "OK",
+    "emulator": "OutOfRange"
+  },
+  {
+    "label": "json-search-in-base",
+    "sql": "SELECT Id FROM JsonDocs/*@ FORCE_INDEX=_BASE_TABLE */ WHERE Doc->'kind' IN ('\"active\"'::jsonb,'\"pending\"'::jsonb) ORDER BY Id",
+    "kind": "query",
+    "managed": "OK",
+    "emulator": "OutOfRange"
+  },
+  {
+    "label": "json-search-whole-auto",
+    "sql": "SELECT Id FROM JsonDocs WHERE Doc='{\"n\":1,\"kind\":\"active\"}'::jsonb ORDER BY Id",
+    "kind": "query",
+    "managed": "OK",
+    "emulator": "Unimplemented"
+  },
+  {
+    "label": "json-search-whole-search",
+    "sql": "SELECT Id FROM JsonDocs/*@ FORCE_INDEX=JsonSearch */ WHERE Doc='{\"n\":1,\"kind\":\"active\"}'::jsonb ORDER BY Id",
+    "kind": "query",
+    "managed": "OK",
+    "emulator": "Unimplemented"
+  },
+  {
+    "label": "json-search-whole-base",
+    "sql": "SELECT Id FROM JsonDocs/*@ FORCE_INDEX=_BASE_TABLE */ WHERE Doc='{\"n\":1,\"kind\":\"active\"}'::jsonb ORDER BY Id",
+    "kind": "query",
+    "managed": "OK",
+    "emulator": "Unimplemented"
+  },
+  {
+    "label": "pg-stats-metadata",
+    "sql": "SELECT table_name,column_name,data_type FROM information_schema.columns WHERE table_schema='spanner_sys' AND column_name IN ('avg_columnar_read_share','cpu_seconds_distribution','cpu_seconds_distribution_json_string','row_scanned_distribution','row_scanned_distribution_json_string') ORDER BY table_name,column_name",
+    "kind": "query",
+    "managed": "OK",
+    "emulator": "OK"
+  },
+  {
+    "label": "pg-stats-query_stats_top_minute",
+    "sql": "SELECT avg_columnar_read_share,cpu_seconds_distribution_json_string,row_scanned_distribution_json_string FROM spanner_sys.query_stats_top_minute LIMIT 1",
+    "kind": "query",
+    "managed": "OK",
+    "emulator": "InvalidArgument"
+  },
+  {
+    "label": "pg-stats-query_stats_top_minute-cpu_seconds_distribution",
+    "sql": "SELECT spanner_sys.distribution_percentile(cpu_seconds_distribution_json_string,99.0) AS p99 FROM spanner_sys.query_stats_top_minute LIMIT 1",
+    "kind": "query",
+    "managed": "OK",
+    "emulator": "InvalidArgument"
+  },
+  {
+    "label": "pg-stats-query_stats_top_minute-row_scanned_distribution",
+    "sql": "SELECT spanner_sys.distribution_percentile(row_scanned_distribution_json_string,99.0) AS p99 FROM spanner_sys.query_stats_top_minute LIMIT 1",
+    "kind": "query",
+    "managed": "OK",
+    "emulator": "InvalidArgument"
+  },
+  {
+    "label": "pg-stats-query_stats_top_10minute",
+    "sql": "SELECT avg_columnar_read_share,cpu_seconds_distribution_json_string,row_scanned_distribution_json_string FROM spanner_sys.query_stats_top_10minute LIMIT 1",
+    "kind": "query",
+    "managed": "OK",
+    "emulator": "InvalidArgument"
+  },
+  {
+    "label": "pg-stats-query_stats_top_10minute-cpu_seconds_distribution",
+    "sql": "SELECT spanner_sys.distribution_percentile(cpu_seconds_distribution_json_string,99.0) AS p99 FROM spanner_sys.query_stats_top_10minute LIMIT 1",
+    "kind": "query",
+    "managed": "OK",
+    "emulator": "InvalidArgument"
+  },
+  {
+    "label": "pg-stats-query_stats_top_10minute-row_scanned_distribution",
+    "sql": "SELECT spanner_sys.distribution_percentile(row_scanned_distribution_json_string,99.0) AS p99 FROM spanner_sys.query_stats_top_10minute LIMIT 1",
+    "kind": "query",
+    "managed": "OK",
+    "emulator": "InvalidArgument"
+  },
+  {
+    "label": "pg-stats-query_stats_top_hour",
+    "sql": "SELECT avg_columnar_read_share,cpu_seconds_distribution_json_string,row_scanned_distribution_json_string FROM spanner_sys.query_stats_top_hour LIMIT 1",
+    "kind": "query",
+    "managed": "OK",
+    "emulator": "InvalidArgument"
+  },
+  {
+    "label": "pg-stats-query_stats_top_hour-cpu_seconds_distribution",
+    "sql": "SELECT spanner_sys.distribution_percentile(cpu_seconds_distribution_json_string,99.0) AS p99 FROM spanner_sys.query_stats_top_hour LIMIT 1",
+    "kind": "query",
+    "managed": "OK",
+    "emulator": "InvalidArgument"
+  },
+  {
+    "label": "pg-stats-query_stats_top_hour-row_scanned_distribution",
+    "sql": "SELECT spanner_sys.distribution_percentile(row_scanned_distribution_json_string,99.0) AS p99 FROM spanner_sys.query_stats_top_hour LIMIT 1",
+    "kind": "query",
+    "managed": "OK",
+    "emulator": "InvalidArgument"
+  },
+  {
+    "label": "pg-stats-query_stats_total_minute",
+    "sql": "SELECT avg_columnar_read_share,cpu_seconds_distribution_json_string,row_scanned_distribution_json_string FROM spanner_sys.query_stats_total_minute LIMIT 1",
+    "kind": "query",
+    "managed": "OK",
+    "emulator": "InvalidArgument"
+  },
+  {
+    "label": "pg-stats-query_stats_total_minute-cpu_seconds_distribution",
+    "sql": "SELECT spanner_sys.distribution_percentile(cpu_seconds_distribution_json_string,99.0) AS p99 FROM spanner_sys.query_stats_total_minute LIMIT 1",
+    "kind": "query",
+    "managed": "OK",
+    "emulator": "InvalidArgument"
+  },
+  {
+    "label": "pg-stats-query_stats_total_minute-row_scanned_distribution",
+    "sql": "SELECT spanner_sys.distribution_percentile(row_scanned_distribution_json_string,99.0) AS p99 FROM spanner_sys.query_stats_total_minute LIMIT 1",
+    "kind": "query",
+    "managed": "OK",
+    "emulator": "InvalidArgument"
+  },
+  {
+    "label": "pg-stats-query_stats_total_10minute",
+    "sql": "SELECT avg_columnar_read_share,cpu_seconds_distribution_json_string,row_scanned_distribution_json_string FROM spanner_sys.query_stats_total_10minute LIMIT 1",
+    "kind": "query",
+    "managed": "OK",
+    "emulator": "InvalidArgument"
+  },
+  {
+    "label": "pg-stats-query_stats_total_10minute-cpu_seconds_distribution",
+    "sql": "SELECT spanner_sys.distribution_percentile(cpu_seconds_distribution_json_string,99.0) AS p99 FROM spanner_sys.query_stats_total_10minute LIMIT 1",
+    "kind": "query",
+    "managed": "OK",
+    "emulator": "InvalidArgument"
+  },
+  {
+    "label": "pg-stats-query_stats_total_10minute-row_scanned_distribution",
+    "sql": "SELECT spanner_sys.distribution_percentile(row_scanned_distribution_json_string,99.0) AS p99 FROM spanner_sys.query_stats_total_10minute LIMIT 1",
+    "kind": "query",
+    "managed": "OK",
+    "emulator": "InvalidArgument"
+  },
+  {
+    "label": "pg-stats-query_stats_total_hour",
+    "sql": "SELECT avg_columnar_read_share,cpu_seconds_distribution_json_string,row_scanned_distribution_json_string FROM spanner_sys.query_stats_total_hour LIMIT 1",
+    "kind": "query",
+    "managed": "OK",
+    "emulator": "InvalidArgument"
+  },
+  {
+    "label": "pg-stats-query_stats_total_hour-cpu_seconds_distribution",
+    "sql": "SELECT spanner_sys.distribution_percentile(cpu_seconds_distribution_json_string,99.0) AS p99 FROM spanner_sys.query_stats_total_hour LIMIT 1",
+    "kind": "query",
+    "managed": "OK",
+    "emulator": "InvalidArgument"
+  },
+  {
+    "label": "pg-stats-query_stats_total_hour-row_scanned_distribution",
+    "sql": "SELECT spanner_sys.distribution_percentile(row_scanned_distribution_json_string,99.0) AS p99 FROM spanner_sys.query_stats_total_hour LIMIT 1",
+    "kind": "query",
+    "managed": "OK",
+    "emulator": "InvalidArgument"
+  },
+  {
+    "label": "pg-stats-struct-negative",
+    "sql": "SELECT cpu_seconds_distribution FROM spanner_sys.query_stats_total_minute LIMIT 0",
+    "kind": "query",
+    "managed": "InvalidArgument",
+    "emulator": "InvalidArgument"
+  },
+  {
+    "label": "set-null-schema",
+    "sql": "",
+    "kind": "ddl",
+    "managed": "OK",
+    "emulator": "FailedPrecondition"
+  },
+  {
+    "label": "set-null-insert",
+    "sql": "",
+    "kind": "dml",
+    "managed": "OK",
+    "emulator": "NOT_RUN"
+  },
+  {
+    "label": "set-null-delete",
+    "sql": "",
+    "kind": "dml",
+    "managed": "OK",
+    "emulator": "NOT_RUN"
+  },
+  {
+    "label": "set-null-result",
+    "sql": "SELECT Id,ParentId FROM NullChild",
+    "kind": "query",
+    "managed": "OK",
+    "emulator": "NOT_RUN"
+  },
+  {
+    "label": "score-pagination-insert",
+    "sql": "",
+    "kind": "dml",
+    "managed": "OK",
+    "emulator": "OK"
+  },
+  {
+    "label": "pagination-v1-full",
+    "sql": "SELECT Id, spanner.score(BodyTokens,$1, options=>$2) AS score FROM ScoreDocs WHERE spanner.search(BodyTokens,$1) ORDER BY score DESC,Id",
+    "kind": "query",
+    "managed": "OK",
+    "emulator": "OK"
+  },
+  {
+    "label": "pagination-v1-offset-0",
+    "sql": "SELECT Id, spanner.score(BodyTokens,$1, options=>$2) AS score FROM ScoreDocs WHERE spanner.search(BodyTokens,$1) ORDER BY score DESC,Id LIMIT $3 OFFSET $4",
+    "kind": "query",
+    "managed": "OK",
+    "emulator": "OK"
+  },
+  {
+    "label": "pagination-v1-offset-2",
+    "sql": "SELECT Id, spanner.score(BodyTokens,$1, options=>$2) AS score FROM ScoreDocs WHERE spanner.search(BodyTokens,$1) ORDER BY score DESC,Id LIMIT $3 OFFSET $4",
+    "kind": "query",
+    "managed": "OK",
+    "emulator": "OK"
+  },
+  {
+    "label": "pagination-v1-offset-4",
+    "sql": "SELECT Id, spanner.score(BodyTokens,$1, options=>$2) AS score FROM ScoreDocs WHERE spanner.search(BodyTokens,$1) ORDER BY score DESC,Id LIMIT $3 OFFSET $4",
+    "kind": "query",
+    "managed": "OK",
+    "emulator": "OK"
+  },
+  {
+    "label": "pagination-v2-full",
+    "sql": "SELECT Id, spanner.score(BodyTokens,$1, options=>$2) AS score FROM ScoreDocs WHERE spanner.search(BodyTokens,$1) ORDER BY score DESC,Id",
+    "kind": "query",
+    "managed": "OK",
+    "emulator": "OK"
+  },
+  {
+    "label": "pagination-v2-offset-0",
+    "sql": "SELECT Id, spanner.score(BodyTokens,$1, options=>$2) AS score FROM ScoreDocs WHERE spanner.search(BodyTokens,$1) ORDER BY score DESC,Id LIMIT $3 OFFSET $4",
+    "kind": "query",
+    "managed": "OK",
+    "emulator": "OK"
+  },
+  {
+    "label": "pagination-v2-offset-2",
+    "sql": "SELECT Id, spanner.score(BodyTokens,$1, options=>$2) AS score FROM ScoreDocs WHERE spanner.search(BodyTokens,$1) ORDER BY score DESC,Id LIMIT $3 OFFSET $4",
+    "kind": "query",
+    "managed": "OK",
+    "emulator": "OK"
+  },
+  {
+    "label": "pagination-v2-offset-4",
+    "sql": "SELECT Id, spanner.score(BodyTokens,$1, options=>$2) AS score FROM ScoreDocs WHERE spanner.search(BodyTokens,$1) ORDER BY score DESC,Id LIMIT $3 OFFSET $4",
+    "kind": "query",
+    "managed": "OK",
+    "emulator": "OK"
+  },
+  {
+    "label": "batch-omitted-create",
+    "sql": "CREATE QUEUE batchomitted(id varchar(36) NOT NULL,payload bytea NOT NULL,PRIMARY KEY(id))",
+    "kind": "ddl",
+    "managed": "OK",
+    "emulator": "OK"
+  },
+  {
+    "label": "batch-omitted-insert",
+    "sql": "",
+    "kind": "dml",
+    "managed": "OK",
+    "emulator": "OK"
+  },
+  {
+    "label": "batch-omitted-receive",
+    "sql": "SELECT Id,spanner_last_batch_message AS batch_end FROM spanner.receive_batchomitted(max_duration=>'5s',priority=>NULL)",
+    "kind": "query",
+    "managed": "InvalidArgument",
+    "emulator": "OK"
+  },
+  {
+    "label": "batch-null-create",
+    "sql": "CREATE QUEUE batchnull(id varchar(36) NOT NULL,payload bytea NOT NULL,PRIMARY KEY(id))",
+    "kind": "ddl",
+    "managed": "OK",
+    "emulator": "OK"
+  },
+  {
+    "label": "batch-null-insert",
+    "sql": "",
+    "kind": "dml",
+    "managed": "OK",
+    "emulator": "OK"
+  },
+  {
+    "label": "batch-null-receive",
+    "sql": "SELECT Id,spanner_last_batch_message AS batch_end FROM spanner.receive_batchnull(max_duration=>'5s',priority=>NULL,max_batch_size=>NULL)",
+    "kind": "query",
+    "managed": "OK",
+    "emulator": "OK"
+  },
+  {
+    "label": "batch-twenty-create",
+    "sql": "CREATE QUEUE batchtwenty(id varchar(36) NOT NULL,payload bytea NOT NULL,PRIMARY KEY(id))",
+    "kind": "ddl",
+    "managed": "OK",
+    "emulator": "OK"
+  },
+  {
+    "label": "batch-twenty-insert",
+    "sql": "",
+    "kind": "dml",
+    "managed": "OK",
+    "emulator": "OK"
+  },
+  {
+    "label": "batch-twenty-receive",
+    "sql": "SELECT Id,spanner_last_batch_message AS batch_end FROM spanner.receive_batchtwenty(max_duration=>'5s',priority=>NULL,max_batch_size=>20)",
+    "kind": "query",
+    "managed": "OK",
+    "emulator": "OK"
+  },
+  {
+    "label": "pv-context-qualified",
+    "sql": "SELECT spanner.secure_context('tenant') AS value",
+    "kind": "query",
+    "managed": "OK",
+    "emulator": "InvalidArgument"
+  },
+  {
+    "label": "pv-context-unqualified",
+    "sql": "SELECT secure_context('tenant') AS value",
+    "kind": "query",
+    "managed": "InvalidArgument",
+    "emulator": "InvalidArgument"
+  },
+  {
+    "label": "distribution-query-example",
+    "sql": "SELECT CASE WHEN latency_dist IS NOT NULL THEN SPANNER_SYS.DISTRIBUTION_PERCENTILE(latency_dist,99.0) ELSE NULL END AS p99 FROM (SELECT SPANNER_SYS.DISTRIBUTION_AGG(CASE WHEN T.LATENCY_DISTRIBUTION_JSON_STRING::jsonb ->> 'COUNT' != '0' THEN T.LATENCY_DISTRIBUTION_JSON_STRING ELSE NULL END) AS latency_dist FROM SPANNER_SYS.QUERY_STATS_TOP_MINUTE AS T WHERE T.INTERVAL_END > spanner.timestamptz_subtract(now(),'1 HOUR') AND T.INTERVAL_END <= now()) AS agg",
+    "kind": "query",
+    "managed": "OK",
+    "emulator": "InvalidArgument"
+  },
+  {
+    "label": "distribution-txn-example",
+    "sql": "WITH aggregated_stats AS (SELECT T.FPRINT,SPANNER_SYS.DISTRIBUTION_AGG(CASE WHEN T.COMMIT_LATENCY_DISTRIBUTION_JSON_STRING::jsonb ->> 'COUNT' != '0' THEN T.COMMIT_LATENCY_DISTRIBUTION_JSON_STRING ELSE NULL END) AS commit_latency_dist_str FROM SPANNER_SYS.TXN_STATS_TOP_MINUTE AS T WHERE T.INTERVAL_END > spanner.timestamptz_subtract(now(),'1 HOUR') AND T.INTERVAL_END <= now() GROUP BY T.FPRINT) SELECT FPRINT,CASE WHEN commit_latency_dist_str IS NOT NULL THEN SPANNER_SYS.DISTRIBUTION_PERCENTILE(commit_latency_dist_str,99.0) ELSE NULL END AS p99 FROM aggregated_stats",
+    "kind": "query",
+    "managed": "OK",
+    "emulator": "InvalidArgument"
+  },
+  {
+    "label": "vector-annotated",
+    "sql": "CREATE TABLE VectorsAnnotated(Id bigint PRIMARY KEY,E real[] VECTOR LENGTH 3)",
+    "kind": "ddl",
+    "managed": "OK",
+    "emulator": "OK"
+  },
+  {
+    "label": "vector-unannotated",
+    "sql": "CREATE TABLE VectorsFlexible(Id bigint PRIMARY KEY,E real[])",
+    "kind": "ddl",
+    "managed": "OK",
+    "emulator": "OK"
+  },
+  {
+    "label": "vector-annotated-length-3",
+    "sql": null,
+    "kind": "dml",
+    "managed": "OK",
+    "emulator": "OK"
+  },
+  {
+    "label": "vector-annotated-length-2",
+    "sql": null,
+    "kind": "dml",
+    "managed": "InvalidArgument",
+    "emulator": "InvalidArgument"
+  },
+  {
+    "label": "vector-annotated-knn",
+    "sql": "SELECT Id,spanner.euclidean_distance(E,ARRAY[1.0,2.0,3.0]::real[]) AS Distance FROM VectorsAnnotated WHERE array_length(E,1)=3 ORDER BY Distance",
+    "kind": "query",
+    "managed": "OK",
+    "emulator": "OK"
+  },
+  {
+    "label": "vector-flexible-length-3",
+    "sql": null,
+    "kind": "dml",
+    "managed": "OK",
+    "emulator": "OK"
+  },
+  {
+    "label": "vector-flexible-length-2",
+    "sql": null,
+    "kind": "dml",
+    "managed": "OK",
+    "emulator": "OK"
+  },
+  {
+    "label": "vector-flexible-knn",
+    "sql": "SELECT Id,spanner.euclidean_distance(E,ARRAY[1.0,2.0,3.0]::real[]) AS Distance FROM VectorsFlexible WHERE array_length(E,1)=3 ORDER BY Distance",
+    "kind": "query",
+    "managed": "OK",
+    "emulator": "OK"
+  },
+  {
+    "label": "vector-index-annotated",
+    "sql": "CREATE VECTOR INDEX AnnotatedVectorIndex ON VectorsAnnotated(E) WHERE E IS NOT NULL OPTIONS(distance_type='EUCLIDEAN')",
+    "kind": "ddl",
+    "managed": "InvalidArgument",
+    "emulator": "InvalidArgument"
+  },
+  {
+    "label": "vector-index-unannotated-negative",
+    "sql": "CREATE VECTOR INDEX FlexibleVectorIndex ON VectorsFlexible(E) WHERE E IS NOT NULL OPTIONS(distance_type='EUCLIDEAN')",
+    "kind": "ddl",
+    "managed": "InvalidArgument",
+    "emulator": "InvalidArgument"
+  },
+  {
+    "label": "current-ddl-export",
+    "sql": null,
+    "kind": "ddl-export",
+    "managed": "OK",
+    "emulator": "OK"
+  },
+  {
+    "label": "pg-final/fixture-connectivity",
+    "sql": "SELECT 1 AS connectivity",
+    "kind": "query",
+    "managed": "OK",
+    "emulator": "OK"
+  },
+  {
+    "label": "pg-final/pg-final-vector-tables",
+    "sql": null,
+    "kind": "ddl",
+    "managed": "OK",
+    "emulator": "OK"
+  },
+  {
+    "label": "pg-final/pg-final-vector-seed",
+    "sql": null,
+    "kind": "dml",
+    "managed": "OK",
+    "emulator": "OK"
+  },
+  {
+    "label": "pg-final/pg-final-index-annotated",
+    "sql": "CREATE INDEX FinalAnnotatedIndex ON FinalAnnotated USING scann(e) WITH (distance_type='EUCLIDEAN') WHERE e IS NOT NULL",
+    "kind": "ddl",
+    "managed": "OK",
+    "emulator": "FailedPrecondition"
+  },
+  {
+    "label": "pg-final/pg-final-index-unannotated-negative",
+    "sql": "CREATE INDEX FinalFlexibleIndex ON FinalFlexible USING scann(e) WITH (distance_type='EUCLIDEAN') WHERE e IS NOT NULL",
+    "kind": "ddl",
+    "managed": "FailedPrecondition",
+    "emulator": "FailedPrecondition"
+  },
+  {
+    "label": "pg-final/pg-final-role",
+    "sql": "CREATE ROLE pv_final_user",
+    "kind": "ddl",
+    "managed": "OK",
+    "emulator": "FailedPrecondition"
+  },
+  {
+    "label": "pg-final/pg-final-tenant-table",
+    "sql": "CREATE TABLE FinalTenants(id bigint PRIMARY KEY,tenant text,payload text)",
+    "kind": "ddl",
+    "managed": "OK",
+    "emulator": "OK"
+  },
+  {
+    "label": "pg-final/pg-final-tenant-seed",
+    "sql": null,
+    "kind": "dml",
+    "managed": "OK",
+    "emulator": "OK"
+  },
+  {
+    "label": "pg-final/pg-final-definer-view",
+    "sql": "CREATE VIEW FinalTenantView SQL SECURITY DEFINER AS SELECT r.id,r.tenant,r.payload FROM FinalTenants AS r WHERE r.tenant=spanner.secure_context('tenant')",
+    "kind": "ddl",
+    "managed": "OK",
+    "emulator": "InvalidArgument"
+  },
+  {
+    "label": "pg-final/pg-final-view-grant",
+    "sql": "GRANT SELECT ON FinalTenantView TO pv_final_user",
+    "kind": "ddl",
+    "managed": "OK",
+    "emulator": "NOT_RUN"
+  },
+  {
+    "label": "pg-final/pg-final-view-role-a",
+    "sql": "SELECT id,tenant,payload FROM FinalTenantView ORDER BY id",
+    "kind": "query",
+    "managed": "OK",
+    "emulator": "NOT_RUN"
+  },
+  {
+    "label": "pg-final/pg-final-view-role-b",
+    "sql": "SELECT id,tenant,payload FROM FinalTenantView ORDER BY id",
+    "kind": "query",
+    "managed": "OK",
+    "emulator": "NOT_RUN"
+  },
+  {
+    "label": "pg-final/pg-final-view-missing-context",
+    "sql": "SELECT id,tenant,payload FROM FinalTenantView ORDER BY id",
+    "kind": "query",
+    "managed": "InvalidArgument",
+    "emulator": "NOT_RUN"
+  },
+  {
+    "label": "pg-final/pg-final-base-denied",
+    "sql": "SELECT id FROM FinalTenants",
+    "kind": "query",
+    "managed": "PermissionDenied",
+    "emulator": "NOT_RUN"
+  },
+  {
+    "label": "pg-final/pg-final-context-denied",
+    "sql": "SELECT spanner.secure_context('tenant') AS value",
+    "kind": "query",
+    "managed": "PermissionDenied",
+    "emulator": "NOT_RUN"
+  },
+  {
+    "label": "pg-final/pg-final-context-owner",
+    "sql": "SELECT spanner.secure_context('tenant') AS value",
+    "kind": "query",
+    "managed": "OK",
+    "emulator": "InvalidArgument"
+  },
+  {
+    "label": "pg-final/pg-final-ddl-export",
+    "sql": null,
+    "kind": "ddl-export",
+    "managed": "OK",
+    "emulator": "OK"
+  }
+]

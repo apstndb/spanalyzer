@@ -25,7 +25,7 @@ func planReportSummaryJSONSchema() map[string]interface{} {
 	})
 	fullQueryProperties := planReportQueryJSONSchema()["properties"].(map[string]interface{})
 	queryProperties := map[string]interface{}{}
-	for _, field := range []string{"target_id", "name", "catalog", "scope", "kind", "status", "sql_sha256", "ddl_sha256", "proto_descriptor_sha256", "operator_tree_sha256", "access_paths", "variant", "error", "optimizer_not_pinned", "plan_environment_notes", "classification_warnings"} {
+	for _, field := range []string{"target_id", "name", "catalog", "scope", "kind", "status", "sql_sha256", "ddl_sha256", "proto_descriptor_sha256", "operator_tree_sha256", "access_paths", "variant", "error", "optimizer_not_pinned", "plan_environment_notes", "classification_warnings", "mutation_counts", "mutation_count_error"} {
 		queryProperties[field] = fullQueryProperties[field]
 	}
 	query := objectSchema([]interface{}{"target_id", "name", "catalog", "kind", "status"}, queryProperties)

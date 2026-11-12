@@ -1,0 +1,2861 @@
+{
+  "dialect": "google",
+  "steps": [
+    {
+      "label": "readonly/readonly/connectivity",
+      "sql": "SELECT 1 AS connectivity",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/readonly/final-tables",
+      "sql": "SELECT COUNT(*) AS n FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA=''",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/readonly/final-views",
+      "sql": "SELECT COUNT(*) AS n FROM INFORMATION_SCHEMA.VIEWS WHERE TABLE_SCHEMA=''",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/readonly/final-graphs",
+      "sql": "SELECT COUNT(*) AS n FROM INFORMATION_SCHEMA.PROPERTY_GRAPHS",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/readonly/final-streams",
+      "sql": "SELECT COUNT(*) AS n FROM INFORMATION_SCHEMA.CHANGE_STREAMS",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/readonly/final-routines",
+      "sql": "SELECT COUNT(*) AS n FROM INFORMATION_SCHEMA.ROUTINES",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/readonly/final-models",
+      "sql": "SELECT COUNT(*) AS n FROM INFORMATION_SCHEMA.MODELS",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/readonly/pipe-select",
+      "sql": "FROM (SELECT 1 AS a, 10 AS b UNION ALL SELECT 1, 20 UNION ALL SELECT 2, 30) |> SELECT a, b",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/readonly/pipe-extend",
+      "sql": "FROM (SELECT 1 AS a, 10 AS b UNION ALL SELECT 1, 20 UNION ALL SELECT 2, 30) |> EXTEND a+b AS total",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/readonly/pipe-set",
+      "sql": "FROM (SELECT 1 AS a, 10 AS b UNION ALL SELECT 1, 20 UNION ALL SELECT 2, 30) |> SET b=b+1",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/readonly/pipe-drop",
+      "sql": "FROM (SELECT 1 AS a, 10 AS b UNION ALL SELECT 1, 20 UNION ALL SELECT 2, 30) |> DROP b",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/readonly/pipe-rename",
+      "sql": "FROM (SELECT 1 AS a, 10 AS b UNION ALL SELECT 1, 20 UNION ALL SELECT 2, 30) |> RENAME b AS c",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/readonly/pipe-as",
+      "sql": "FROM (SELECT 1 AS a, 10 AS b UNION ALL SELECT 1, 20 UNION ALL SELECT 2, 30) |> AS t |> SELECT t.a, t.b",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/readonly/pipe-where",
+      "sql": "FROM (SELECT 1 AS a, 10 AS b UNION ALL SELECT 1, 20 UNION ALL SELECT 2, 30) |> WHERE a=1",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/readonly/pipe-aggregate",
+      "sql": "FROM (SELECT 1 AS a, 10 AS b UNION ALL SELECT 1, 20 UNION ALL SELECT 2, 30) |> AGGREGATE SUM(b) AS total GROUP BY a",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/readonly/pipe-join",
+      "sql": "FROM (SELECT 1 AS a, 10 AS b UNION ALL SELECT 1, 20 UNION ALL SELECT 2, 30) |> JOIN (SELECT 1 AS a, 'match' AS tag) AS r USING (a)",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/readonly/pipe-order-by",
+      "sql": "FROM (SELECT 1 AS a, 10 AS b UNION ALL SELECT 1, 20 UNION ALL SELECT 2, 30) |> ORDER BY b DESC",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/readonly/pipe-limit",
+      "sql": "FROM (SELECT 1 AS a, 10 AS b UNION ALL SELECT 1, 20 UNION ALL SELECT 2, 30) |> LIMIT 2",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/readonly/pipe-union",
+      "sql": "FROM (SELECT 1 AS a, 10 AS b UNION ALL SELECT 1, 20 UNION ALL SELECT 2, 30) |> UNION ALL (SELECT 3 AS a, 40 AS b)",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/readonly/pipe-intersect",
+      "sql": "FROM (SELECT 1 AS a, 10 AS b UNION ALL SELECT 1, 20 UNION ALL SELECT 2, 30) |> INTERSECT DISTINCT (SELECT 1 AS a, 10 AS b)",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/readonly/pipe-except",
+      "sql": "FROM (SELECT 1 AS a, 10 AS b UNION ALL SELECT 1, 20 UNION ALL SELECT 2, 30) |> EXCEPT DISTINCT (SELECT 1 AS a, 10 AS b)",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/readonly/pipe-tablesample",
+      "sql": "FROM (SELECT 1 AS a, 10 AS b UNION ALL SELECT 1, 20 UNION ALL SELECT 2, 30) |> TABLESAMPLE BERNOULLI (100 PERCENT)",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/readonly/pipe-standard-ordinal",
+      "sql": "SELECT a AS k, SUM(b) AS total FROM (SELECT 1 AS a, 10 AS b UNION ALL SELECT 1,20 UNION ALL SELECT 2,30) GROUP BY 1",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/readonly/pipe-group-alias",
+      "sql": "FROM (SELECT 1 AS a, 10 AS b UNION ALL SELECT 1, 20 UNION ALL SELECT 2, 30) |> AGGREGATE SUM(b) AS total GROUP BY a AS k",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/readonly/pipe-group-bare-alias",
+      "sql": "FROM (SELECT 1 AS a, 10 AS b UNION ALL SELECT 1, 20 UNION ALL SELECT 2, 30) |> AGGREGATE SUM(b) AS total GROUP BY a k",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/readonly/pipe-group-two-aliases",
+      "sql": "FROM (SELECT 1 AS a, 10 AS b UNION ALL SELECT 1, 20 UNION ALL SELECT 2, 30) |> AGGREGATE COUNT(*) AS n GROUP BY a AS k, b AS v",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/readonly/pipe-group-ordinal",
+      "sql": "FROM (SELECT 1 AS a, 10 AS b UNION ALL SELECT 1, 20 UNION ALL SELECT 2, 30) |> AGGREGATE SUM(b) AS total GROUP BY 1",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/readonly/pipe-group-output-alias",
+      "sql": "FROM (SELECT 1 AS a, 10 AS b UNION ALL SELECT 1, 20 UNION ALL SELECT 2, 30) |> AGGREGATE SUM(b) AS total GROUP BY total",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/readonly/pipe-group-input-alias",
+      "sql": "FROM (SELECT 1 AS a, 10 AS b UNION ALL SELECT 1, 20 UNION ALL SELECT 2, 30) |> EXTEND a+1 AS k |> AGGREGATE SUM(b) AS total GROUP BY k",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/readonly/pipe-group-and-order",
+      "sql": "FROM (SELECT 1 AS a, 10 AS b UNION ALL SELECT 1, 20 UNION ALL SELECT 2, 30) |> AGGREGATE SUM(b) AS total GROUP AND ORDER BY a DESC",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/readonly/select-led-select",
+      "sql": "SELECT 1 AS x |> SELECT x",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/readonly/select-led-where",
+      "sql": "SELECT 1 AS x |> WHERE x=1",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/readonly/select-led-aggregate",
+      "sql": "SELECT 1 AS x |> AGGREGATE SUM(x) AS n",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/readonly/from-only",
+      "sql": "FROM (SELECT 1 AS x)",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/readonly/json-equality",
+      "sql": "SELECT JSON '{\"a\":1}' = JSON '{\"a\":1}' AS same, JSON '1' < JSON '2' AS ordered, JSON '1' = 1 AS coerced, CAST(STRUCT(1 AS a) AS JSON) AS converted",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/readonly/json-group",
+      "sql": "SELECT j,COUNT(*) AS n FROM UNNEST([JSON '{\"a\":1}',JSON '{\"a\":1}',JSON '{\"a\":2}']) j GROUP BY j ORDER BY j",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/readonly/distinctness",
+      "sql": "SELECT NULL IS DISTINCT FROM NULL AS same_null, 1 IS DISTINCT FROM NULL AS distinct_null, JSON '1' IS NOT DISTINCT FROM 1 AS json_coerce",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/readonly/hll-count",
+      "sql": "SELECT HLL_COUNT.EXTRACT(HLL_COUNT.INIT(x)) AS estimate FROM UNNEST([1,1,2,3]) x",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/readonly/approx-count",
+      "sql": "SELECT APPROX_COUNT_DISTINCT(x) AS estimate FROM UNNEST([1,1,2,3]) x",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/readonly/rand",
+      "sql": "SELECT RAND() AS r",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/readonly/infoschema-columns",
+      "sql": "SELECT TABLE_SCHEMA,TABLE_NAME,COLUMN_NAME,ORDINAL_POSITION,SPANNER_TYPE,IS_NULLABLE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA='INFORMATION_SCHEMA' ORDER BY TABLE_NAME,ORDINAL_POSITION",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/readonly/sys-columns-0",
+      "sql": "SELECT TABLE_NAME,COLUMN_NAME,ORDINAL_POSITION,SPANNER_TYPE,IS_NULLABLE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA='SPANNER_SYS' ORDER BY TABLE_NAME,ORDINAL_POSITION",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/readonly/sys-query-0-ACTIVE_BATCH_OPERATIONS",
+      "sql": "SELECT * FROM SPANNER_SYS.ACTIVE_BATCH_OPERATIONS LIMIT 0",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/readonly/sys-query-0-BATCH_OPERATIONS",
+      "sql": "SELECT * FROM SPANNER_SYS.BATCH_OPERATIONS LIMIT 0",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/readonly/sys-query-0-LOCK_STATS_TOTAL_10MINUTE",
+      "sql": "SELECT * FROM SPANNER_SYS.LOCK_STATS_TOTAL_10MINUTE LIMIT 0",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/readonly/sys-query-0-SPLIT_STATS_TOP_10MINUTE",
+      "sql": "SELECT * FROM SPANNER_SYS.SPLIT_STATS_TOP_10MINUTE LIMIT 0",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/readonly/sys-columns-1",
+      "sql": "SELECT TABLE_NAME,COLUMN_NAME,ORDINAL_POSITION,SPANNER_TYPE,IS_NULLABLE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA='SPANNER_SYS' ORDER BY TABLE_NAME,ORDINAL_POSITION",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/readonly/sys-query-1-ACTIVE_BATCH_OPERATIONS",
+      "sql": "SELECT * FROM SPANNER_SYS.ACTIVE_BATCH_OPERATIONS LIMIT 0",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/readonly/sys-query-1-BATCH_OPERATIONS",
+      "sql": "SELECT * FROM SPANNER_SYS.BATCH_OPERATIONS LIMIT 0",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/readonly/sys-query-1-LOCK_STATS_TOTAL_10MINUTE",
+      "sql": "SELECT * FROM SPANNER_SYS.LOCK_STATS_TOTAL_10MINUTE LIMIT 0",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/readonly/sys-query-1-SPLIT_STATS_TOP_10MINUTE",
+      "sql": "SELECT * FROM SPANNER_SYS.SPLIT_STATS_TOP_10MINUTE LIMIT 0",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/readonly/sys-columns-2",
+      "sql": "SELECT TABLE_NAME,COLUMN_NAME,ORDINAL_POSITION,SPANNER_TYPE,IS_NULLABLE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA='SPANNER_SYS' ORDER BY TABLE_NAME,ORDINAL_POSITION",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/readonly/sys-query-2-ACTIVE_BATCH_OPERATIONS",
+      "sql": "SELECT * FROM SPANNER_SYS.ACTIVE_BATCH_OPERATIONS LIMIT 0",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/readonly/sys-query-2-BATCH_OPERATIONS",
+      "sql": "SELECT * FROM SPANNER_SYS.BATCH_OPERATIONS LIMIT 0",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/readonly/sys-query-2-LOCK_STATS_TOTAL_10MINUTE",
+      "sql": "SELECT * FROM SPANNER_SYS.LOCK_STATS_TOTAL_10MINUTE LIMIT 0",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/readonly/sys-query-2-SPLIT_STATS_TOP_10MINUTE",
+      "sql": "SELECT * FROM SPANNER_SYS.SPLIT_STATS_TOP_10MINUTE LIMIT 0",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/supplemental/connectivity",
+      "sql": "SELECT 1 AS connectivity",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/supplemental/ACTIVE_BATCH_OPERATIONS0",
+      "sql": "SELECT COUNT(*) AS n FROM SPANNER_SYS.ACTIVE_BATCH_OPERATIONS",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/supplemental/ACTIVE_BATCH_OPERATIONS1",
+      "sql": "SELECT NUM_PARTITIONS_TOTAL,STATUS FROM SPANNER_SYS.ACTIVE_BATCH_OPERATIONS LIMIT 1",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/supplemental/BATCH_OPERATIONS0",
+      "sql": "SELECT COUNT(*) AS n FROM SPANNER_SYS.BATCH_OPERATIONS",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/supplemental/BATCH_OPERATIONS1",
+      "sql": "SELECT NUM_PARTITIONS_TOTAL,STATUS FROM SPANNER_SYS.BATCH_OPERATIONS LIMIT 1",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/supplemental/LOCK_STATS_TOP_MINUTE-scalar",
+      "sql": "SELECT INTERVAL_END,LOCK_WAIT_SECONDS FROM SPANNER_SYS.LOCK_STATS_TOP_MINUTE LIMIT 1",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/supplemental/LOCK_STATS_TOP_MINUTE-dist",
+      "sql": "SELECT ARRAY_LENGTH(LOCK_WAIT_DISTRIBUTION) AS distribution_count FROM SPANNER_SYS.LOCK_STATS_TOP_MINUTE LIMIT 1",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/supplemental/LOCK_STATS_TOP_MINUTE-json",
+      "sql": "SELECT LOCK_WAIT_DISTRIBUTION_JSON_STRING FROM SPANNER_SYS.LOCK_STATS_TOP_MINUTE LIMIT 1",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/supplemental/LOCK_STATS_TOP_10MINUTE-scalar",
+      "sql": "SELECT INTERVAL_END,LOCK_WAIT_SECONDS FROM SPANNER_SYS.LOCK_STATS_TOP_10MINUTE LIMIT 1",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/supplemental/LOCK_STATS_TOP_10MINUTE-dist",
+      "sql": "SELECT ARRAY_LENGTH(LOCK_WAIT_DISTRIBUTION) AS distribution_count FROM SPANNER_SYS.LOCK_STATS_TOP_10MINUTE LIMIT 1",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/supplemental/LOCK_STATS_TOP_10MINUTE-json",
+      "sql": "SELECT LOCK_WAIT_DISTRIBUTION_JSON_STRING FROM SPANNER_SYS.LOCK_STATS_TOP_10MINUTE LIMIT 1",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/supplemental/LOCK_STATS_TOP_HOUR-scalar",
+      "sql": "SELECT INTERVAL_END,LOCK_WAIT_SECONDS FROM SPANNER_SYS.LOCK_STATS_TOP_HOUR LIMIT 1",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/supplemental/LOCK_STATS_TOP_HOUR-dist",
+      "sql": "SELECT ARRAY_LENGTH(LOCK_WAIT_DISTRIBUTION) AS distribution_count FROM SPANNER_SYS.LOCK_STATS_TOP_HOUR LIMIT 1",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/supplemental/LOCK_STATS_TOP_HOUR-json",
+      "sql": "SELECT LOCK_WAIT_DISTRIBUTION_JSON_STRING FROM SPANNER_SYS.LOCK_STATS_TOP_HOUR LIMIT 1",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/supplemental/LOCK_STATS_TOTAL_MINUTE-scalar",
+      "sql": "SELECT INTERVAL_END,TOTAL_LOCK_WAIT_SECONDS FROM SPANNER_SYS.LOCK_STATS_TOTAL_MINUTE LIMIT 1",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/supplemental/LOCK_STATS_TOTAL_MINUTE-dist",
+      "sql": "SELECT ARRAY_LENGTH(LOCK_WAIT_DISTRIBUTION) AS distribution_count FROM SPANNER_SYS.LOCK_STATS_TOTAL_MINUTE LIMIT 1",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/supplemental/LOCK_STATS_TOTAL_MINUTE-json",
+      "sql": "SELECT LOCK_WAIT_DISTRIBUTION_JSON_STRING FROM SPANNER_SYS.LOCK_STATS_TOTAL_MINUTE LIMIT 1",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/supplemental/LOCK_STATS_TOTAL_10MINUTE-scalar",
+      "sql": "SELECT INTERVAL_END,TOTAL_LOCK_WAIT_SECONDS FROM SPANNER_SYS.LOCK_STATS_TOTAL_10MINUTE LIMIT 1",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/supplemental/LOCK_STATS_TOTAL_10MINUTE-dist",
+      "sql": "SELECT ARRAY_LENGTH(LOCK_WAIT_DISTRIBUTION) AS distribution_count FROM SPANNER_SYS.LOCK_STATS_TOTAL_10MINUTE LIMIT 1",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/supplemental/LOCK_STATS_TOTAL_10MINUTE-json",
+      "sql": "SELECT LOCK_WAIT_DISTRIBUTION_JSON_STRING FROM SPANNER_SYS.LOCK_STATS_TOTAL_10MINUTE LIMIT 1",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/supplemental/LOCK_STATS_TOTAL_HOUR-scalar",
+      "sql": "SELECT INTERVAL_END,TOTAL_LOCK_WAIT_SECONDS FROM SPANNER_SYS.LOCK_STATS_TOTAL_HOUR LIMIT 1",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/supplemental/LOCK_STATS_TOTAL_HOUR-dist",
+      "sql": "SELECT ARRAY_LENGTH(LOCK_WAIT_DISTRIBUTION) AS distribution_count FROM SPANNER_SYS.LOCK_STATS_TOTAL_HOUR LIMIT 1",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/supplemental/LOCK_STATS_TOTAL_HOUR-json",
+      "sql": "SELECT LOCK_WAIT_DISTRIBUTION_JSON_STRING FROM SPANNER_SYS.LOCK_STATS_TOTAL_HOUR LIMIT 1",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/supplemental/SPLIT_STATS_TOP_MINUTE",
+      "sql": "SELECT LATENCY_IMPACT_CORRELATION_SCORE FROM SPANNER_SYS.SPLIT_STATS_TOP_MINUTE LIMIT 1",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/supplemental/SPLIT_STATS_TOP_10MINUTE",
+      "sql": "SELECT LATENCY_IMPACT_CORRELATION_SCORE FROM SPANNER_SYS.SPLIT_STATS_TOP_10MINUTE LIMIT 1",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/supplemental/SPLIT_STATS_TOP_HOUR",
+      "sql": "SELECT LATENCY_IMPACT_CORRELATION_SCORE FROM SPANNER_SYS.SPLIT_STATS_TOP_HOUR LIMIT 1",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/statistics/connectivity",
+      "sql": "SELECT 1 AS connectivity",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/statistics/stats-QUERY_STATS_TOP_MINUTE-scalar",
+      "sql": "SELECT AVG_COLUMNAR_READ_SHARE, ARRAY_LENGTH(CPU_SECONDS_DISTRIBUTION) AS cpu_distributions, ARRAY_LENGTH(ROW_SCANNED_DISTRIBUTION) AS row_distributions, CPU_SECONDS_DISTRIBUTION_JSON_STRING, ROW_SCANNED_DISTRIBUTION_JSON_STRING FROM SPANNER_SYS.QUERY_STATS_TOP_MINUTE LIMIT 1",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/statistics/stats-QUERY_STATS_TOP_MINUTE-CPU_SECONDS_DISTRIBUTION-struct",
+      "sql": "SELECT SPANNER_SYS.DISTRIBUTION_PERCENTILE(CPU_SECONDS_DISTRIBUTION, 99.0) AS p99 FROM SPANNER_SYS.QUERY_STATS_TOP_MINUTE LIMIT 1",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/statistics/stats-QUERY_STATS_TOP_MINUTE-CPU_SECONDS_DISTRIBUTION-json",
+      "sql": "SELECT SPANNER_SYS.DISTRIBUTION_PERCENTILE(CPU_SECONDS_DISTRIBUTION_JSON_STRING, 99.0) AS p99 FROM SPANNER_SYS.QUERY_STATS_TOP_MINUTE LIMIT 1",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/statistics/stats-QUERY_STATS_TOP_MINUTE-ROW_SCANNED_DISTRIBUTION-struct",
+      "sql": "SELECT SPANNER_SYS.DISTRIBUTION_PERCENTILE(ROW_SCANNED_DISTRIBUTION, 99.0) AS p99 FROM SPANNER_SYS.QUERY_STATS_TOP_MINUTE LIMIT 1",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/statistics/stats-QUERY_STATS_TOP_MINUTE-ROW_SCANNED_DISTRIBUTION-json",
+      "sql": "SELECT SPANNER_SYS.DISTRIBUTION_PERCENTILE(ROW_SCANNED_DISTRIBUTION_JSON_STRING, 99.0) AS p99 FROM SPANNER_SYS.QUERY_STATS_TOP_MINUTE LIMIT 1",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/statistics/stats-QUERY_STATS_TOP_10MINUTE-scalar",
+      "sql": "SELECT AVG_COLUMNAR_READ_SHARE, ARRAY_LENGTH(CPU_SECONDS_DISTRIBUTION) AS cpu_distributions, ARRAY_LENGTH(ROW_SCANNED_DISTRIBUTION) AS row_distributions, CPU_SECONDS_DISTRIBUTION_JSON_STRING, ROW_SCANNED_DISTRIBUTION_JSON_STRING FROM SPANNER_SYS.QUERY_STATS_TOP_10MINUTE LIMIT 1",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/statistics/stats-QUERY_STATS_TOP_10MINUTE-CPU_SECONDS_DISTRIBUTION-struct",
+      "sql": "SELECT SPANNER_SYS.DISTRIBUTION_PERCENTILE(CPU_SECONDS_DISTRIBUTION, 99.0) AS p99 FROM SPANNER_SYS.QUERY_STATS_TOP_10MINUTE LIMIT 1",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/statistics/stats-QUERY_STATS_TOP_10MINUTE-CPU_SECONDS_DISTRIBUTION-json",
+      "sql": "SELECT SPANNER_SYS.DISTRIBUTION_PERCENTILE(CPU_SECONDS_DISTRIBUTION_JSON_STRING, 99.0) AS p99 FROM SPANNER_SYS.QUERY_STATS_TOP_10MINUTE LIMIT 1",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/statistics/stats-QUERY_STATS_TOP_10MINUTE-ROW_SCANNED_DISTRIBUTION-struct",
+      "sql": "SELECT SPANNER_SYS.DISTRIBUTION_PERCENTILE(ROW_SCANNED_DISTRIBUTION, 99.0) AS p99 FROM SPANNER_SYS.QUERY_STATS_TOP_10MINUTE LIMIT 1",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/statistics/stats-QUERY_STATS_TOP_10MINUTE-ROW_SCANNED_DISTRIBUTION-json",
+      "sql": "SELECT SPANNER_SYS.DISTRIBUTION_PERCENTILE(ROW_SCANNED_DISTRIBUTION_JSON_STRING, 99.0) AS p99 FROM SPANNER_SYS.QUERY_STATS_TOP_10MINUTE LIMIT 1",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/statistics/stats-QUERY_STATS_TOP_HOUR-scalar",
+      "sql": "SELECT AVG_COLUMNAR_READ_SHARE, ARRAY_LENGTH(CPU_SECONDS_DISTRIBUTION) AS cpu_distributions, ARRAY_LENGTH(ROW_SCANNED_DISTRIBUTION) AS row_distributions, CPU_SECONDS_DISTRIBUTION_JSON_STRING, ROW_SCANNED_DISTRIBUTION_JSON_STRING FROM SPANNER_SYS.QUERY_STATS_TOP_HOUR LIMIT 1",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/statistics/stats-QUERY_STATS_TOP_HOUR-CPU_SECONDS_DISTRIBUTION-struct",
+      "sql": "SELECT SPANNER_SYS.DISTRIBUTION_PERCENTILE(CPU_SECONDS_DISTRIBUTION, 99.0) AS p99 FROM SPANNER_SYS.QUERY_STATS_TOP_HOUR LIMIT 1",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/statistics/stats-QUERY_STATS_TOP_HOUR-CPU_SECONDS_DISTRIBUTION-json",
+      "sql": "SELECT SPANNER_SYS.DISTRIBUTION_PERCENTILE(CPU_SECONDS_DISTRIBUTION_JSON_STRING, 99.0) AS p99 FROM SPANNER_SYS.QUERY_STATS_TOP_HOUR LIMIT 1",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/statistics/stats-QUERY_STATS_TOP_HOUR-ROW_SCANNED_DISTRIBUTION-struct",
+      "sql": "SELECT SPANNER_SYS.DISTRIBUTION_PERCENTILE(ROW_SCANNED_DISTRIBUTION, 99.0) AS p99 FROM SPANNER_SYS.QUERY_STATS_TOP_HOUR LIMIT 1",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/statistics/stats-QUERY_STATS_TOP_HOUR-ROW_SCANNED_DISTRIBUTION-json",
+      "sql": "SELECT SPANNER_SYS.DISTRIBUTION_PERCENTILE(ROW_SCANNED_DISTRIBUTION_JSON_STRING, 99.0) AS p99 FROM SPANNER_SYS.QUERY_STATS_TOP_HOUR LIMIT 1",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/statistics/stats-QUERY_STATS_TOTAL_MINUTE-scalar",
+      "sql": "SELECT AVG_COLUMNAR_READ_SHARE, ARRAY_LENGTH(CPU_SECONDS_DISTRIBUTION) AS cpu_distributions, ARRAY_LENGTH(ROW_SCANNED_DISTRIBUTION) AS row_distributions, CPU_SECONDS_DISTRIBUTION_JSON_STRING, ROW_SCANNED_DISTRIBUTION_JSON_STRING FROM SPANNER_SYS.QUERY_STATS_TOTAL_MINUTE LIMIT 1",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/statistics/stats-QUERY_STATS_TOTAL_MINUTE-CPU_SECONDS_DISTRIBUTION-struct",
+      "sql": "SELECT SPANNER_SYS.DISTRIBUTION_PERCENTILE(CPU_SECONDS_DISTRIBUTION, 99.0) AS p99 FROM SPANNER_SYS.QUERY_STATS_TOTAL_MINUTE LIMIT 1",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/statistics/stats-QUERY_STATS_TOTAL_MINUTE-CPU_SECONDS_DISTRIBUTION-json",
+      "sql": "SELECT SPANNER_SYS.DISTRIBUTION_PERCENTILE(CPU_SECONDS_DISTRIBUTION_JSON_STRING, 99.0) AS p99 FROM SPANNER_SYS.QUERY_STATS_TOTAL_MINUTE LIMIT 1",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/statistics/stats-QUERY_STATS_TOTAL_MINUTE-ROW_SCANNED_DISTRIBUTION-struct",
+      "sql": "SELECT SPANNER_SYS.DISTRIBUTION_PERCENTILE(ROW_SCANNED_DISTRIBUTION, 99.0) AS p99 FROM SPANNER_SYS.QUERY_STATS_TOTAL_MINUTE LIMIT 1",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/statistics/stats-QUERY_STATS_TOTAL_MINUTE-ROW_SCANNED_DISTRIBUTION-json",
+      "sql": "SELECT SPANNER_SYS.DISTRIBUTION_PERCENTILE(ROW_SCANNED_DISTRIBUTION_JSON_STRING, 99.0) AS p99 FROM SPANNER_SYS.QUERY_STATS_TOTAL_MINUTE LIMIT 1",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/statistics/stats-QUERY_STATS_TOTAL_10MINUTE-scalar",
+      "sql": "SELECT AVG_COLUMNAR_READ_SHARE, ARRAY_LENGTH(CPU_SECONDS_DISTRIBUTION) AS cpu_distributions, ARRAY_LENGTH(ROW_SCANNED_DISTRIBUTION) AS row_distributions, CPU_SECONDS_DISTRIBUTION_JSON_STRING, ROW_SCANNED_DISTRIBUTION_JSON_STRING FROM SPANNER_SYS.QUERY_STATS_TOTAL_10MINUTE LIMIT 1",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/statistics/stats-QUERY_STATS_TOTAL_10MINUTE-CPU_SECONDS_DISTRIBUTION-struct",
+      "sql": "SELECT SPANNER_SYS.DISTRIBUTION_PERCENTILE(CPU_SECONDS_DISTRIBUTION, 99.0) AS p99 FROM SPANNER_SYS.QUERY_STATS_TOTAL_10MINUTE LIMIT 1",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/statistics/stats-QUERY_STATS_TOTAL_10MINUTE-CPU_SECONDS_DISTRIBUTION-json",
+      "sql": "SELECT SPANNER_SYS.DISTRIBUTION_PERCENTILE(CPU_SECONDS_DISTRIBUTION_JSON_STRING, 99.0) AS p99 FROM SPANNER_SYS.QUERY_STATS_TOTAL_10MINUTE LIMIT 1",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/statistics/stats-QUERY_STATS_TOTAL_10MINUTE-ROW_SCANNED_DISTRIBUTION-struct",
+      "sql": "SELECT SPANNER_SYS.DISTRIBUTION_PERCENTILE(ROW_SCANNED_DISTRIBUTION, 99.0) AS p99 FROM SPANNER_SYS.QUERY_STATS_TOTAL_10MINUTE LIMIT 1",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/statistics/stats-QUERY_STATS_TOTAL_10MINUTE-ROW_SCANNED_DISTRIBUTION-json",
+      "sql": "SELECT SPANNER_SYS.DISTRIBUTION_PERCENTILE(ROW_SCANNED_DISTRIBUTION_JSON_STRING, 99.0) AS p99 FROM SPANNER_SYS.QUERY_STATS_TOTAL_10MINUTE LIMIT 1",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/statistics/stats-QUERY_STATS_TOTAL_HOUR-scalar",
+      "sql": "SELECT AVG_COLUMNAR_READ_SHARE, ARRAY_LENGTH(CPU_SECONDS_DISTRIBUTION) AS cpu_distributions, ARRAY_LENGTH(ROW_SCANNED_DISTRIBUTION) AS row_distributions, CPU_SECONDS_DISTRIBUTION_JSON_STRING, ROW_SCANNED_DISTRIBUTION_JSON_STRING FROM SPANNER_SYS.QUERY_STATS_TOTAL_HOUR LIMIT 1",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/statistics/stats-QUERY_STATS_TOTAL_HOUR-CPU_SECONDS_DISTRIBUTION-struct",
+      "sql": "SELECT SPANNER_SYS.DISTRIBUTION_PERCENTILE(CPU_SECONDS_DISTRIBUTION, 99.0) AS p99 FROM SPANNER_SYS.QUERY_STATS_TOTAL_HOUR LIMIT 1",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/statistics/stats-QUERY_STATS_TOTAL_HOUR-CPU_SECONDS_DISTRIBUTION-json",
+      "sql": "SELECT SPANNER_SYS.DISTRIBUTION_PERCENTILE(CPU_SECONDS_DISTRIBUTION_JSON_STRING, 99.0) AS p99 FROM SPANNER_SYS.QUERY_STATS_TOTAL_HOUR LIMIT 1",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/statistics/stats-QUERY_STATS_TOTAL_HOUR-ROW_SCANNED_DISTRIBUTION-struct",
+      "sql": "SELECT SPANNER_SYS.DISTRIBUTION_PERCENTILE(ROW_SCANNED_DISTRIBUTION, 99.0) AS p99 FROM SPANNER_SYS.QUERY_STATS_TOTAL_HOUR LIMIT 1",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/statistics/stats-QUERY_STATS_TOTAL_HOUR-ROW_SCANNED_DISTRIBUTION-json",
+      "sql": "SELECT SPANNER_SYS.DISTRIBUTION_PERCENTILE(ROW_SCANNED_DISTRIBUTION_JSON_STRING, 99.0) AS p99 FROM SPANNER_SYS.QUERY_STATS_TOTAL_HOUR LIMIT 1",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/statistics-controls/connectivity",
+      "sql": "SELECT 1 AS connectivity",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/statistics-controls/QUERY_STATS_TOP_MINUTE-CPU_SECONDS_DISTRIBUTION-element",
+      "sql": "SELECT SPANNER_SYS.DISTRIBUTION_PERCENTILE(CPU_SECONDS_DISTRIBUTION[SAFE_OFFSET(0)],99.0) AS p99_struct, SPANNER_SYS.DISTRIBUTION_PERCENTILE(CPU_SECONDS_DISTRIBUTION_JSON_STRING,99.0) AS p99_json FROM SPANNER_SYS.QUERY_STATS_TOP_MINUTE LIMIT 1",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/statistics-controls/QUERY_STATS_TOP_MINUTE-ROW_SCANNED_DISTRIBUTION-element",
+      "sql": "SELECT SPANNER_SYS.DISTRIBUTION_PERCENTILE(ROW_SCANNED_DISTRIBUTION[SAFE_OFFSET(0)],99.0) AS p99_struct, SPANNER_SYS.DISTRIBUTION_PERCENTILE(ROW_SCANNED_DISTRIBUTION_JSON_STRING,99.0) AS p99_json FROM SPANNER_SYS.QUERY_STATS_TOP_MINUTE LIMIT 1",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/statistics-controls/QUERY_STATS_TOP_10MINUTE-CPU_SECONDS_DISTRIBUTION-element",
+      "sql": "SELECT SPANNER_SYS.DISTRIBUTION_PERCENTILE(CPU_SECONDS_DISTRIBUTION[SAFE_OFFSET(0)],99.0) AS p99_struct, SPANNER_SYS.DISTRIBUTION_PERCENTILE(CPU_SECONDS_DISTRIBUTION_JSON_STRING,99.0) AS p99_json FROM SPANNER_SYS.QUERY_STATS_TOP_10MINUTE LIMIT 1",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/statistics-controls/QUERY_STATS_TOP_10MINUTE-ROW_SCANNED_DISTRIBUTION-element",
+      "sql": "SELECT SPANNER_SYS.DISTRIBUTION_PERCENTILE(ROW_SCANNED_DISTRIBUTION[SAFE_OFFSET(0)],99.0) AS p99_struct, SPANNER_SYS.DISTRIBUTION_PERCENTILE(ROW_SCANNED_DISTRIBUTION_JSON_STRING,99.0) AS p99_json FROM SPANNER_SYS.QUERY_STATS_TOP_10MINUTE LIMIT 1",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/statistics-controls/QUERY_STATS_TOP_HOUR-CPU_SECONDS_DISTRIBUTION-element",
+      "sql": "SELECT SPANNER_SYS.DISTRIBUTION_PERCENTILE(CPU_SECONDS_DISTRIBUTION[SAFE_OFFSET(0)],99.0) AS p99_struct, SPANNER_SYS.DISTRIBUTION_PERCENTILE(CPU_SECONDS_DISTRIBUTION_JSON_STRING,99.0) AS p99_json FROM SPANNER_SYS.QUERY_STATS_TOP_HOUR LIMIT 1",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/statistics-controls/QUERY_STATS_TOP_HOUR-ROW_SCANNED_DISTRIBUTION-element",
+      "sql": "SELECT SPANNER_SYS.DISTRIBUTION_PERCENTILE(ROW_SCANNED_DISTRIBUTION[SAFE_OFFSET(0)],99.0) AS p99_struct, SPANNER_SYS.DISTRIBUTION_PERCENTILE(ROW_SCANNED_DISTRIBUTION_JSON_STRING,99.0) AS p99_json FROM SPANNER_SYS.QUERY_STATS_TOP_HOUR LIMIT 1",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/statistics-controls/QUERY_STATS_TOTAL_MINUTE-CPU_SECONDS_DISTRIBUTION-element",
+      "sql": "SELECT SPANNER_SYS.DISTRIBUTION_PERCENTILE(CPU_SECONDS_DISTRIBUTION[SAFE_OFFSET(0)],99.0) AS p99_struct, SPANNER_SYS.DISTRIBUTION_PERCENTILE(CPU_SECONDS_DISTRIBUTION_JSON_STRING,99.0) AS p99_json FROM SPANNER_SYS.QUERY_STATS_TOTAL_MINUTE LIMIT 1",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/statistics-controls/QUERY_STATS_TOTAL_MINUTE-ROW_SCANNED_DISTRIBUTION-element",
+      "sql": "SELECT SPANNER_SYS.DISTRIBUTION_PERCENTILE(ROW_SCANNED_DISTRIBUTION[SAFE_OFFSET(0)],99.0) AS p99_struct, SPANNER_SYS.DISTRIBUTION_PERCENTILE(ROW_SCANNED_DISTRIBUTION_JSON_STRING,99.0) AS p99_json FROM SPANNER_SYS.QUERY_STATS_TOTAL_MINUTE LIMIT 1",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/statistics-controls/QUERY_STATS_TOTAL_10MINUTE-CPU_SECONDS_DISTRIBUTION-element",
+      "sql": "SELECT SPANNER_SYS.DISTRIBUTION_PERCENTILE(CPU_SECONDS_DISTRIBUTION[SAFE_OFFSET(0)],99.0) AS p99_struct, SPANNER_SYS.DISTRIBUTION_PERCENTILE(CPU_SECONDS_DISTRIBUTION_JSON_STRING,99.0) AS p99_json FROM SPANNER_SYS.QUERY_STATS_TOTAL_10MINUTE LIMIT 1",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/statistics-controls/QUERY_STATS_TOTAL_10MINUTE-ROW_SCANNED_DISTRIBUTION-element",
+      "sql": "SELECT SPANNER_SYS.DISTRIBUTION_PERCENTILE(ROW_SCANNED_DISTRIBUTION[SAFE_OFFSET(0)],99.0) AS p99_struct, SPANNER_SYS.DISTRIBUTION_PERCENTILE(ROW_SCANNED_DISTRIBUTION_JSON_STRING,99.0) AS p99_json FROM SPANNER_SYS.QUERY_STATS_TOTAL_10MINUTE LIMIT 1",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/statistics-controls/QUERY_STATS_TOTAL_HOUR-CPU_SECONDS_DISTRIBUTION-element",
+      "sql": "SELECT SPANNER_SYS.DISTRIBUTION_PERCENTILE(CPU_SECONDS_DISTRIBUTION[SAFE_OFFSET(0)],99.0) AS p99_struct, SPANNER_SYS.DISTRIBUTION_PERCENTILE(CPU_SECONDS_DISTRIBUTION_JSON_STRING,99.0) AS p99_json FROM SPANNER_SYS.QUERY_STATS_TOTAL_HOUR LIMIT 1",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/statistics-controls/QUERY_STATS_TOTAL_HOUR-ROW_SCANNED_DISTRIBUTION-element",
+      "sql": "SELECT SPANNER_SYS.DISTRIBUTION_PERCENTILE(ROW_SCANNED_DISTRIBUTION[SAFE_OFFSET(0)],99.0) AS p99_struct, SPANNER_SYS.DISTRIBUTION_PERCENTILE(ROW_SCANNED_DISTRIBUTION_JSON_STRING,99.0) AS p99_json FROM SPANNER_SYS.QUERY_STATS_TOTAL_HOUR LIMIT 1",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/histogram-controls/connectivity",
+      "sql": "SELECT 1 AS connectivity",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/histogram-controls/zero-run-controls",
+      "sql": "SELECT SPANNER_SYS.DISTRIBUTION_PERCENTILE('{\"COUNT\":1,\"MEAN\":1.5,\"SUM_OF_SQUARED_DEVIATION\":0,\"NUM_FINITE_BUCKETS\":8,\"GROWTH_FACTOR\":2.0,\"SCALE\":1.0,\"BUCKET_COUNTS\":[-1,1]}',50.0) AS compressed1, SPANNER_SYS.DISTRIBUTION_PERCENTILE('{\"COUNT\":1,\"MEAN\":1.5,\"SUM_OF_SQUARED_DEVIATION\":0,\"NUM_FINITE_BUCKETS\":8,\"GROWTH_FACTOR\":2.0,\"SCALE\":1.0,\"BUCKET_COUNTS\":[0,1]}',50.0) AS expanded1, SPANNER_SYS.DISTRIBUTION_PERCENTILE('{\"COUNT\":1,\"MEAN\":6.0,\"SUM_OF_SQUARED_DEVIATION\":0,\"NUM_FINITE_BUCKETS\":8,\"GROWTH_FACTOR\":2.0,\"SCALE\":1.0,\"BUCKET_COUNTS\":[-3,1]}',50.0) AS compressed3, SPANNER_SYS.DISTRIBUTION_PERCENTILE('{\"COUNT\":1,\"MEAN\":6.0,\"SUM_OF_SQUARED_DEVIATION\":0,\"NUM_FINITE_BUCKETS\":8,\"GROWTH_FACTOR\":2.0,\"SCALE\":1.0,\"BUCKET_COUNTS\":[0,0,0,1]}',50.0) AS expanded3, SPANNER_SYS.DISTRIBUTION_PERCENTILE('{\"COUNT\":1,\"MEAN\":24.0,\"SUM_OF_SQUARED_DEVIATION\":0,\"NUM_FINITE_BUCKETS\":8,\"GROWTH_FACTOR\":2.0,\"SCALE\":1.0,\"BUCKET_COUNTS\":[-5,1]}',50.0) AS compressed5, SPANNER_SYS.DISTRIBUTION_PERCENTILE('{\"COUNT\":1,\"MEAN\":24.0,\"SUM_OF_SQUARED_DEVIATION\":0,\"NUM_FINITE_BUCKETS\":8,\"GROWTH_FACTOR\":2.0,\"SCALE\":1.0,\"BUCKET_COUNTS\":[0,0,0,0,0,1]}',50.0) AS expanded5",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/observed-histogram/connectivity",
+      "sql": "SELECT 1 AS connectivity",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/observed-histogram/observed-json-original",
+      "sql": "SELECT SPANNER_SYS.DISTRIBUTION_PERCENTILE('{\"BUCKET_COUNTS\":[-14,1],\"COUNT\":1,\"GROWTH_FACTOR\":2.0,\"MEAN\":0.012682,\"NUM_FINITE_BUCKETS\":33,\"SCALE\":1e-06,\"SUM_OF_SQUARED_DEVIATION\":0.0}',99.0) AS p99",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/observed-histogram/observed-json-expanded",
+      "sql": "SELECT SPANNER_SYS.DISTRIBUTION_PERCENTILE('{\"BUCKET_COUNTS\":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],\"COUNT\":1,\"GROWTH_FACTOR\":2.0,\"MEAN\":0.012682,\"NUM_FINITE_BUCKETS\":33,\"SCALE\":1e-06,\"SUM_OF_SQUARED_DEVIATION\":0.0}',99.0) AS p99",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/scalar-correction/connectivity",
+      "sql": "SELECT 1 AS connectivity",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/scalar-correction/LOCK_STATS_TOP_MINUTE-corrected-scalar",
+      "sql": "SELECT INTERVAL_END,LOCK_WAIT_SECONDS FROM SPANNER_SYS.LOCK_STATS_TOP_MINUTE LIMIT 1",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/scalar-correction/LOCK_STATS_TOP_10MINUTE-corrected-scalar",
+      "sql": "SELECT INTERVAL_END,LOCK_WAIT_SECONDS FROM SPANNER_SYS.LOCK_STATS_TOP_10MINUTE LIMIT 1",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/scalar-correction/LOCK_STATS_TOP_HOUR-corrected-scalar",
+      "sql": "SELECT INTERVAL_END,LOCK_WAIT_SECONDS FROM SPANNER_SYS.LOCK_STATS_TOP_HOUR LIMIT 1",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/new-readonly/connectivity",
+      "sql": "SELECT 1 AS connectivity",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/new-readonly/server-time",
+      "sql": "SELECT CURRENT_TIMESTAMP() AS server_time",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/new-readonly/secure-context-absent",
+      "sql": "SELECT SECURE_CONTEXT('user_id') AS value",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/new-readonly/secure-context-tenant-a",
+      "sql": "SELECT SECURE_CONTEXT('user_id') AS value",
+      "secure_context": {
+        "user_id": "123"
+      },
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/new-readonly/secure-context-tenant-b",
+      "sql": "SELECT SECURE_CONTEXT('user_id') AS value",
+      "secure_context": {
+        "user_id": "456"
+      },
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/new-readonly/secure-context-numeric",
+      "sql": "SELECT SECURE_CONTEXT('user_id') AS value",
+      "secure_context": {
+        "user_id": 123
+      },
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/new-readonly/secure-context-null",
+      "sql": "SELECT SECURE_CONTEXT('user_id') AS value",
+      "secure_context": {
+        "user_id": null
+      },
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/new-readonly/secure-context-json-object",
+      "sql": "SELECT SECURE_CONTEXT('user_id') AS value",
+      "secure_context": {
+        "user_id": {
+          "id": "123"
+        }
+      },
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/new-readonly/secure-context-nonliteral",
+      "sql": "SELECT SECURE_CONTEXT(@key) AS value",
+      "params": {
+        "key": "user_id"
+      },
+      "secure_context": {
+        "user_id": "123"
+      },
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/new-readonly/secure-context-null-key",
+      "sql": "SELECT SECURE_CONTEXT(CAST(NULL AS STRING)) AS value",
+      "secure_context": {
+        "user_id": "123"
+      },
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/new-readonly/secure-context-wrong-key-type",
+      "sql": "SELECT SECURE_CONTEXT(1) AS value",
+      "secure_context": {
+        "user_id": "123"
+      },
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/new-readonly/secure-context-cast-doc-syntax",
+      "sql": "SELECT CAST(SECURE_CONTEXT('user_id'), INT64) AS value",
+      "secure_context": {
+        "user_id": "123"
+      },
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/new-readonly/secure-context-cast-corrected",
+      "sql": "SELECT CAST(SECURE_CONTEXT('user_id') AS INT64) AS value",
+      "secure_context": {
+        "user_id": "123"
+      },
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/new-readonly/secure-context-query-param-separate",
+      "sql": "SELECT SECURE_CONTEXT('user_id') AS value, @user_id AS ordinary_param",
+      "params": {
+        "user_id": "456"
+      },
+      "secure_context": {
+        "user_id": "123"
+      },
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/new-readonly/zstd-positional-level--6",
+      "sql": "SELECT ZSTD_DECOMPRESS_TO_STRING(ZSTD_COMPRESS('hello', -6)) AS result",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/new-readonly/zstd-positional-level--5",
+      "sql": "SELECT ZSTD_DECOMPRESS_TO_STRING(ZSTD_COMPRESS('hello', -5)) AS result",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/new-readonly/zstd-positional-level-0",
+      "sql": "SELECT ZSTD_DECOMPRESS_TO_STRING(ZSTD_COMPRESS('hello', 0)) AS result",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/new-readonly/zstd-positional-level-3",
+      "sql": "SELECT ZSTD_DECOMPRESS_TO_STRING(ZSTD_COMPRESS('hello', 3)) AS result",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/new-readonly/zstd-positional-level-22",
+      "sql": "SELECT ZSTD_DECOMPRESS_TO_STRING(ZSTD_COMPRESS('hello', 22)) AS result",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/new-readonly/zstd-positional-level-23",
+      "sql": "SELECT ZSTD_DECOMPRESS_TO_STRING(ZSTD_COMPRESS('hello', 23)) AS result",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/new-readonly/zstd-named-level",
+      "sql": "SELECT ZSTD_DECOMPRESS_TO_STRING(ZSTD_COMPRESS('hello', level=>3)) AS result",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/new-readonly/zstd-null-level",
+      "sql": "SELECT ZSTD_COMPRESS('hello', CAST(NULL AS INT64)) IS NULL AS is_null",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/new-readonly/zstd_decompress_to_bytes-null-limit",
+      "sql": "SELECT ZSTD_DECOMPRESS_TO_BYTES(ZSTD_COMPRESS('hello'), size_limit=>CAST(NULL AS INT64)) IS NULL AS is_null",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/new-readonly/zstd_decompress_to_bytes-size-limit",
+      "sql": "SELECT ZSTD_DECOMPRESS_TO_BYTES(ZSTD_COMPRESS('hello'), size_limit=>4) AS result",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/new-readonly/zstd_decompress_to_bytes-positional-size-negative",
+      "sql": "SELECT ZSTD_DECOMPRESS_TO_BYTES(ZSTD_COMPRESS('hello'), 8) AS result",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/new-readonly/zstd_decompress_to_string-null-limit",
+      "sql": "SELECT ZSTD_DECOMPRESS_TO_STRING(ZSTD_COMPRESS('hello'), size_limit=>CAST(NULL AS INT64)) IS NULL AS is_null",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/new-readonly/zstd_decompress_to_string-size-limit",
+      "sql": "SELECT ZSTD_DECOMPRESS_TO_STRING(ZSTD_COMPRESS('hello'), size_limit=>4) AS result",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/new-readonly/zstd_decompress_to_string-positional-size-negative",
+      "sql": "SELECT ZSTD_DECOMPRESS_TO_STRING(ZSTD_COMPRESS('hello'), 8) AS result",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/new-readonly/distribution-agg-empty-struct",
+      "sql": "SELECT SPANNER_SYS.DISTRIBUTION_AGG(LATENCY_DISTRIBUTION[SAFE_OFFSET(0)]) AS value FROM SPANNER_SYS.QUERY_STATS_TOP_MINUTE WHERE FALSE",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/new-readonly/distribution-agg-empty-json",
+      "sql": "SELECT SPANNER_SYS.DISTRIBUTION_AGG(LATENCY_DISTRIBUTION_JSON_STRING) AS value FROM SPANNER_SYS.QUERY_STATS_TOP_MINUTE WHERE FALSE",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/new-readonly/distribution-agg-documented-query-struct",
+      "sql": "SELECT IF(latency_dist IS NOT NULL, SPANNER_SYS.DISTRIBUTION_PERCENTILE(latency_dist, 99.0), NULL) AS p99 FROM (SELECT SPANNER_SYS.DISTRIBUTION_AGG(IF(T.LATENCY_DISTRIBUTION[SAFE_OFFSET(0)].COUNT > 0, T.LATENCY_DISTRIBUTION[SAFE_OFFSET(0)], NULL)) AS latency_dist FROM SPANNER_SYS.QUERY_STATS_TOP_MINUTE AS T WHERE T.INTERVAL_END > TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL 1 HOUR) AND T.INTERVAL_END <= CURRENT_TIMESTAMP())",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/new-readonly/distribution-agg-documented-txn-struct",
+      "sql": "WITH aggregated_stats AS (SELECT T.FPRINT, SPANNER_SYS.DISTRIBUTION_AGG(IF(T.COMMIT_LATENCY_DISTRIBUTION[SAFE_OFFSET(0)].COUNT > 0, T.COMMIT_LATENCY_DISTRIBUTION[SAFE_OFFSET(0)], NULL)) AS commit_latency_dist FROM SPANNER_SYS.TXN_STATS_TOP_MINUTE AS T WHERE T.INTERVAL_END > TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL 1 HOUR) AND T.INTERVAL_END <= CURRENT_TIMESTAMP() GROUP BY T.FPRINT) SELECT FPRINT, IF(commit_latency_dist IS NOT NULL, SPANNER_SYS.DISTRIBUTION_PERCENTILE(commit_latency_dist, 99.0), NULL) AS p99 FROM aggregated_stats",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/new-readonly/distribution-agg-query-json",
+      "sql": "SELECT SPANNER_SYS.DISTRIBUTION_PERCENTILE(SPANNER_SYS.DISTRIBUTION_AGG(LATENCY_DISTRIBUTION_JSON_STRING), 99.0) AS p99 FROM SPANNER_SYS.QUERY_STATS_TOP_MINUTE WHERE INTERVAL_END > TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL 1 HOUR)",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/new-readonly/distribution-agg-array-negative",
+      "sql": "SELECT SPANNER_SYS.DISTRIBUTION_AGG(LATENCY_DISTRIBUTION) AS value FROM SPANNER_SYS.QUERY_STATS_TOP_MINUTE WHERE FALSE",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/distribution-frames/connectivity",
+      "sql": "SELECT 1 AS connectivity",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/distribution-frames/agg-two-equal-json-histograms",
+      "sql": "WITH h AS (SELECT @hist AS d UNION ALL SELECT @hist) SELECT JSON_VALUE(SPANNER_SYS.DISTRIBUTION_AGG(d),'$.COUNT') AS sample_count,SPANNER_SYS.DISTRIBUTION_PERCENTILE(SPANNER_SYS.DISTRIBUTION_AGG(d),99.0) AS p99 FROM h",
+      "params": {
+        "hist": "{\"BUCKET_COUNTS\":[-14,1],\"COUNT\":1,\"GROWTH_FACTOR\":2.0,\"MEAN\":0.012682,\"NUM_FINITE_BUCKETS\":33,\"SCALE\":1e-06,\"SUM_OF_SQUARED_DEVIATION\":0.0}"
+      },
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/distribution-frames/agg-null-is-ignored",
+      "sql": "WITH h AS (SELECT @hist AS d UNION ALL SELECT CAST(NULL AS STRING)) SELECT JSON_VALUE(SPANNER_SYS.DISTRIBUTION_AGG(d),'$.COUNT') AS sample_count,SPANNER_SYS.DISTRIBUTION_PERCENTILE(SPANNER_SYS.DISTRIBUTION_AGG(d),99.0) AS p99 FROM h",
+      "params": {
+        "hist": "{\"BUCKET_COUNTS\":[-14,1],\"COUNT\":1,\"GROWTH_FACTOR\":2.0,\"MEAN\":0.012682,\"NUM_FINITE_BUCKETS\":33,\"SCALE\":1e-06,\"SUM_OF_SQUARED_DEVIATION\":0.0}"
+      },
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/distribution-frames/agg-null-json-result",
+      "sql": "SELECT SPANNER_SYS.DISTRIBUTION_AGG(CAST(NULL AS STRING)) IS NULL AS is_null",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/distribution-frames/agg-null-percentile-guard",
+      "sql": "WITH a AS (SELECT SPANNER_SYS.DISTRIBUTION_AGG(CAST(NULL AS STRING)) AS h) SELECT IF(h IS NULL,NULL,SPANNER_SYS.DISTRIBUTION_PERCENTILE(h,99.0)) AS p99 FROM a",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/distribution-frames/agg-bad-json-negative",
+      "sql": "SELECT SPANNER_SYS.DISTRIBUTION_AGG('not-json') AS histogram",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/distribution-frames/agg-flatten-struct-empty",
+      "sql": "SELECT (SPANNER_SYS.DISTRIBUTION_AGG(LATENCY_DISTRIBUTION[SAFE_OFFSET(0)])).COUNT AS sample_count FROM SPANNER_SYS.QUERY_STATS_TOP_MINUTE WHERE FALSE",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/distribution-frames/frame-streaming-zstd_decompress_to_bytes",
+      "sql": "SELECT ZSTD_DECOMPRESS_TO_BYTES(FROM_BASE64(@frame)) AS decoded",
+      "params": {
+        "frame": "KLUv/QQAKQAAaGVsbG+jbZ+I"
+      },
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/distribution-frames/frame-streaming-zstd_decompress_to_string",
+      "sql": "SELECT ZSTD_DECOMPRESS_TO_STRING(FROM_BASE64(@frame)) AS decoded",
+      "params": {
+        "frame": "KLUv/QQAKQAAaGVsbG+jbZ+I"
+      },
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/distribution-frames/frame-encode_all-zstd_decompress_to_bytes",
+      "sql": "SELECT ZSTD_DECOMPRESS_TO_BYTES(FROM_BASE64(@frame)) AS decoded",
+      "params": {
+        "frame": "KLUv/SQFKQAAaGVsbG+jbZ+I"
+      },
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/distribution-frames/frame-encode_all-zstd_decompress_to_string",
+      "sql": "SELECT ZSTD_DECOMPRESS_TO_STRING(FROM_BASE64(@frame)) AS decoded",
+      "params": {
+        "frame": "KLUv/SQFKQAAaGVsbG+jbZ+I"
+      },
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/distribution-null-controls/connectivity",
+      "sql": "SELECT 1 AS connectivity",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/distribution-null-controls/agg-null-json-result-from",
+      "sql": "SELECT SPANNER_SYS.DISTRIBUTION_AGG(d) IS NULL AS is_null FROM (SELECT CAST(NULL AS STRING) AS d)",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/distribution-null-controls/agg-null-percentile-guard-from",
+      "sql": "WITH a AS (SELECT SPANNER_SYS.DISTRIBUTION_AGG(d) AS h FROM (SELECT CAST(NULL AS STRING) AS d)) SELECT IF(h IS NULL,NULL,SPANNER_SYS.DISTRIBUTION_PERCENTILE(h,99.0)) AS p99 FROM a",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "readonly/distribution-null-controls/agg-bad-json-negative-from",
+      "sql": "SELECT SPANNER_SYS.DISTRIBUTION_AGG(d) AS histogram FROM UNNEST(['not-json']) AS d",
+      "kind": "query",
+      "family": "managed-readonly-comparison"
+    },
+    {
+      "label": "fixture-connectivity",
+      "kind": "query",
+      "sql": "SELECT 1 AS connectivity",
+      "family": "extension"
+    },
+    {
+      "label": "score-fixture",
+      "family": "score",
+      "kind": "ddl",
+      "sql": "CREATE TABLE ScoreDocs (Id INT64 NOT NULL, Body STRING(MAX), BodyTokens TOKENLIST AS (TOKENIZE_FULLTEXT(Body)) HIDDEN) PRIMARY KEY(Id)"
+    },
+    {
+      "label": "score-search-index",
+      "family": "score",
+      "kind": "ddl",
+      "sql": "CREATE SEARCH INDEX ScoreIndex ON ScoreDocs(BodyTokens)",
+      "requires": [
+        "score-fixture"
+      ]
+    },
+    {
+      "label": "score-insert",
+      "family": "score",
+      "kind": "dml",
+      "sql": "",
+      "statements": [
+        "INSERT INTO ScoreDocs(Id,Body) VALUES (1,'cat cat dog'),(2,'cat dog'),(3,'dog')"
+      ],
+      "requires": [
+        "score-fixture"
+      ]
+    },
+    {
+      "label": "score-unpinned",
+      "family": "score",
+      "kind": "query",
+      "sql": "SELECT Id, SCORE(BodyTokens,'cat') AS default_score, SCORE(BodyTokens,'cat', options => JSON '{\"version\": 1}') AS version1_score, SCORE(BodyTokens,'cat', options => JSON '{\"version\": 2}') AS version2_score FROM ScoreDocs WHERE SEARCH(BodyTokens,'cat') ORDER BY Id",
+      "requires": [
+        "score-insert",
+        "score-search-index"
+      ]
+    },
+    {
+      "label": "score-set-db-1",
+      "family": "score",
+      "kind": "ddl",
+      "sql": "ALTER DATABASE {{DATABASE}} SET OPTIONS (score_version = 1)"
+    },
+    {
+      "label": "score-pinned-db-1",
+      "family": "score",
+      "kind": "query",
+      "sql": "SELECT Id, SCORE(BodyTokens,'cat') AS default_score, SCORE(BodyTokens,'cat', options => JSON '{\"version\": 1}') AS version1_score, SCORE(BodyTokens,'cat', options => JSON '{\"version\": 2}') AS version2_score FROM ScoreDocs WHERE SEARCH(BodyTokens,'cat') ORDER BY Id",
+      "requires": [
+        "score-insert",
+        "score-search-index",
+        "score-set-db-1"
+      ]
+    },
+    {
+      "label": "score-set-db-2",
+      "family": "score",
+      "kind": "ddl",
+      "sql": "ALTER DATABASE {{DATABASE}} SET OPTIONS (score_version = 2)"
+    },
+    {
+      "label": "score-pinned-db-2",
+      "family": "score",
+      "kind": "query",
+      "sql": "SELECT Id, SCORE(BodyTokens,'cat') AS default_score, SCORE(BodyTokens,'cat', options => JSON '{\"version\": 1}') AS version1_score, SCORE(BodyTokens,'cat', options => JSON '{\"version\": 2}') AS version2_score FROM ScoreDocs WHERE SEARCH(BodyTokens,'cat') ORDER BY Id",
+      "requires": [
+        "score-insert",
+        "score-search-index",
+        "score-set-db-2"
+      ]
+    },
+    {
+      "label": "score-explicit-independent",
+      "family": "score",
+      "kind": "query",
+      "sql": "SELECT Id, SCORE(BodyTokens,'cat', options => JSON '{\"version\": 1}') AS version1_score, SCORE(BodyTokens,'cat', options => JSON '{\"version\": 2}') AS version2_score FROM ScoreDocs WHERE SEARCH(BodyTokens,'cat') ORDER BY Id",
+      "requires": [
+        "score-insert",
+        "score-search-index"
+      ]
+    },
+    {
+      "label": "bucket-fixture",
+      "family": "bucket",
+      "kind": "ddl",
+      "sql": "CREATE TABLE BucketFixed (Id INT64 NOT NULL, Body STRING(MAX), UpdatedAt TIMESTAMP NOT NULL, UpdatedSeconds INT64 NOT NULL AS (UNIX_SECONDS(UpdatedAt)) STORED, HourBucket INT64 NOT NULL AS (UNIX_SECONDS(TIMESTAMP_TRUNC(UpdatedAt,HOUR))) STORED, BodyTokens TOKENLIST AS (TOKENIZE_FULLTEXT(Body)) HIDDEN) PRIMARY KEY(Id)"
+    },
+    {
+      "label": "bucket-index-seconds",
+      "family": "bucket",
+      "kind": "ddl",
+      "sql": "CREATE SEARCH INDEX FixedIndexseconds ON BucketFixed(BodyTokens) ORDER BY UpdatedSeconds DESC",
+      "requires": [
+        "bucket-fixture"
+      ]
+    },
+    {
+      "label": "bucket-index-hour",
+      "family": "bucket",
+      "kind": "ddl",
+      "sql": "CREATE SEARCH INDEX FixedIndexhour ON BucketFixed(BodyTokens) ORDER BY HourBucket DESC",
+      "requires": [
+        "bucket-fixture"
+      ]
+    },
+    {
+      "label": "bucket-index-none",
+      "family": "bucket",
+      "kind": "ddl",
+      "sql": "CREATE SEARCH INDEX FixedIndexnone ON BucketFixed(BodyTokens)",
+      "requires": [
+        "bucket-fixture"
+      ]
+    },
+    {
+      "label": "bucket-insert",
+      "family": "bucket",
+      "kind": "dml",
+      "sql": "",
+      "statements": [
+        "INSERT INTO BucketFixed(Id,Body,UpdatedAt) VALUES (1,'cat cat dog',TIMESTAMP '2026-10-31 00:01:00Z')"
+      ],
+      "requires": [
+        "bucket-fixture"
+      ]
+    },
+    {
+      "label": "bucket-values-start",
+      "family": "bucket",
+      "kind": "query",
+      "sql": "SELECT Id,UpdatedSeconds,HourBucket FROM BucketFixed",
+      "requires": [
+        "bucket-insert"
+      ]
+    },
+    {
+      "label": "bucket-update-same-hour",
+      "family": "bucket",
+      "kind": "dml",
+      "sql": "",
+      "statements": [
+        "UPDATE BucketFixed SET UpdatedAt=TIMESTAMP '2026-10-31 00:59:00Z' WHERE Id=1"
+      ],
+      "requires": [
+        "bucket-insert"
+      ]
+    },
+    {
+      "label": "bucket-values-same-hour",
+      "family": "bucket",
+      "kind": "query",
+      "sql": "SELECT Id,UpdatedSeconds,HourBucket FROM BucketFixed",
+      "requires": [
+        "bucket-update-same-hour"
+      ]
+    },
+    {
+      "label": "bucket-update-next-hour",
+      "family": "bucket",
+      "kind": "dml",
+      "sql": "",
+      "statements": [
+        "UPDATE BucketFixed SET UpdatedAt=TIMESTAMP '2026-10-31 01:00:00Z' WHERE Id=1"
+      ],
+      "requires": [
+        "bucket-insert"
+      ]
+    },
+    {
+      "label": "bucket-values-next-hour",
+      "family": "bucket",
+      "kind": "query",
+      "sql": "SELECT Id,UpdatedSeconds,HourBucket FROM BucketFixed",
+      "requires": [
+        "bucket-update-next-hour"
+      ]
+    },
+    {
+      "label": "queue-fixture",
+      "family": "queue",
+      "kind": "ddl",
+      "sql": "CREATE QUEUE AliasQueue (Id STRING(36) NOT NULL, Payload BYTES(MAX) NOT NULL) PRIMARY KEY(Id)"
+    },
+    {
+      "label": "tvf-star-plain",
+      "family": "tvf",
+      "kind": "query",
+      "sql": "SELECT * FROM RENEWLEASE_AliasQueue(lease_tokens=>ARRAY<STRING>[])",
+      "requires": [
+        "queue-fixture"
+      ]
+    },
+    {
+      "label": "tvf-star-as",
+      "family": "tvf",
+      "kind": "query",
+      "sql": "SELECT * FROM RENEWLEASE_AliasQueue(lease_tokens=>ARRAY<STRING>[]) AS r",
+      "requires": [
+        "queue-fixture"
+      ]
+    },
+    {
+      "label": "tvf-star-bare",
+      "family": "tvf",
+      "kind": "query",
+      "sql": "SELECT * FROM RENEWLEASE_AliasQueue(lease_tokens=>ARRAY<STRING>[]) r",
+      "requires": [
+        "queue-fixture"
+      ]
+    },
+    {
+      "label": "graph-node-table",
+      "family": "graph",
+      "kind": "ddl",
+      "sql": "CREATE TABLE PropNodes (Id INT64 NOT NULL) PRIMARY KEY(Id)"
+    },
+    {
+      "label": "graph-create",
+      "family": "graph",
+      "kind": "ddl",
+      "sql": "CREATE PROPERTY GRAPH ProbeGraph NODE TABLES (PropNodes)",
+      "requires": [
+        "graph-node-table"
+      ]
+    },
+    {
+      "label": "gql-left-common",
+      "family": "gql",
+      "kind": "query",
+      "sql": "GRAPH ProbeGraph RETURN 1 AS a, 9 AS left_only LEFT OUTER UNION ALL RETURN 2 AS a, 8 AS right_only",
+      "requires": [
+        "graph-create"
+      ]
+    },
+    {
+      "label": "schema-readback",
+      "family": "schema",
+      "kind": "ddl-export",
+      "sql": ""
+    },
+    {
+      "label": "select-led-select",
+      "family": "pipe-isolation",
+      "kind": "query",
+      "sql": "SELECT 1 AS x |> SELECT x"
+    },
+    {
+      "label": "select-led-where",
+      "family": "pipe-isolation",
+      "kind": "query",
+      "sql": "SELECT 1 AS x |> WHERE x=1"
+    },
+    {
+      "label": "select-led-aggregate",
+      "family": "pipe-isolation",
+      "kind": "query",
+      "sql": "SELECT 1 AS x |> AGGREGATE SUM(x) AS n"
+    },
+    {
+      "label": "from-only",
+      "family": "pipe-isolation",
+      "kind": "query",
+      "sql": "FROM (SELECT 1 AS x)"
+    },
+    {
+      "label": "gql-mode-full",
+      "kind": "query",
+      "sql": "GRAPH ProbeGraph RETURN 1 AS a, 9 AS left_only FULL UNION ALL RETURN 2 AS a, 8 AS right_only",
+      "family": "gql-propagation",
+      "requires": [
+        "graph-create"
+      ]
+    },
+    {
+      "label": "gql-mode-full-outer",
+      "kind": "query",
+      "sql": "GRAPH ProbeGraph RETURN 1 AS a, 9 AS left_only FULL OUTER UNION ALL RETURN 2 AS a, 8 AS right_only",
+      "family": "gql-propagation",
+      "requires": [
+        "graph-create"
+      ]
+    },
+    {
+      "label": "gql-mode-outer",
+      "kind": "query",
+      "sql": "GRAPH ProbeGraph RETURN 1 AS a, 9 AS left_only OUTER UNION ALL RETURN 2 AS a, 8 AS right_only",
+      "family": "gql-propagation",
+      "requires": [
+        "graph-create"
+      ]
+    },
+    {
+      "label": "gql-mode-left",
+      "kind": "query",
+      "sql": "GRAPH ProbeGraph RETURN 1 AS a, 9 AS left_only LEFT UNION ALL RETURN 2 AS a, 8 AS right_only",
+      "family": "gql-propagation",
+      "requires": [
+        "graph-create"
+      ]
+    },
+    {
+      "label": "gql-mode-left-outer",
+      "kind": "query",
+      "sql": "GRAPH ProbeGraph RETURN 1 AS a, 9 AS left_only LEFT OUTER UNION ALL RETURN 2 AS a, 8 AS right_only",
+      "family": "gql-propagation",
+      "requires": [
+        "graph-create"
+      ]
+    },
+    {
+      "label": "gql-mode-inner",
+      "kind": "query",
+      "sql": "GRAPH ProbeGraph RETURN 1 AS a, 9 AS left_only INNER UNION ALL RETURN 2 AS a, 8 AS right_only",
+      "family": "gql-propagation",
+      "requires": [
+        "graph-create"
+      ]
+    },
+    {
+      "label": "graph-insert",
+      "kind": "dml",
+      "sql": "",
+      "family": "extension",
+      "statements": [
+        "INSERT INTO PropNodes(Id) VALUES (3),(1),(2)"
+      ],
+      "requires": [
+        "graph-create"
+      ]
+    },
+    {
+      "label": "gql-return-order",
+      "kind": "query",
+      "sql": "GRAPH ProbeGraph MATCH (n) RETURN n.Id AS id ORDER BY id",
+      "family": "gql-order",
+      "requires": [
+        "graph-insert"
+      ]
+    },
+    {
+      "label": "gql-return-order-limit",
+      "kind": "query",
+      "sql": "GRAPH ProbeGraph MATCH (n) RETURN n.Id AS id ORDER BY id LIMIT 2",
+      "family": "gql-order",
+      "requires": [
+        "graph-insert"
+      ]
+    },
+    {
+      "label": "gql-standalone-order-limit",
+      "kind": "query",
+      "sql": "GRAPH ProbeGraph MATCH (n) RETURN n.Id AS id NEXT ORDER BY id LIMIT 2",
+      "family": "gql-order",
+      "requires": [
+        "graph-insert"
+      ]
+    },
+    {
+      "label": "gql-cross-next-order-limit",
+      "kind": "query",
+      "sql": "GRAPH ProbeGraph MATCH (n) RETURN n.Id AS id ORDER BY id NEXT LIMIT 2",
+      "family": "gql-order",
+      "requires": [
+        "graph-insert"
+      ]
+    },
+    {
+      "label": "queue-case-Payload",
+      "kind": "ddl",
+      "sql": "CREATE QUEUE CaseQueue0 (Id STRING(36) NOT NULL, Payload BYTES(MAX) NOT NULL) PRIMARY KEY(Id)",
+      "family": "queue-case"
+    },
+    {
+      "label": "queue-case-payload",
+      "kind": "ddl",
+      "sql": "CREATE QUEUE CaseQueue1 (Id STRING(36) NOT NULL, payload BYTES(MAX) NOT NULL) PRIMARY KEY(Id)",
+      "family": "queue-case"
+    },
+    {
+      "label": "queue-case-PAYLOAD",
+      "kind": "ddl",
+      "sql": "CREATE QUEUE CaseQueue2 (Id STRING(36) NOT NULL, PAYLOAD BYTES(MAX) NOT NULL) PRIMARY KEY(Id)",
+      "family": "queue-case"
+    },
+    {
+      "label": "queue-case-PaYlOaD",
+      "kind": "ddl",
+      "sql": "CREATE QUEUE CaseQueue3 (Id STRING(36) NOT NULL, PaYlOaD BYTES(MAX) NOT NULL) PRIMARY KEY(Id)",
+      "family": "queue-case"
+    },
+    {
+      "label": "search-enhanced",
+      "kind": "query",
+      "sql": "SELECT Id FROM ScoreDocs WHERE SEARCH(BodyTokens,'cat',enhance_query=>true) ORDER BY Id",
+      "family": "differences",
+      "requires": [
+        "score-insert",
+        "score-search-index"
+      ]
+    },
+    {
+      "label": "search-enhanced-required",
+      "kind": "query",
+      "sql": "@{require_enhance_query=true} SELECT Id FROM ScoreDocs WHERE SEARCH(BodyTokens,'cat',enhance_query=>true) ORDER BY Id",
+      "family": "differences",
+      "requires": [
+        "score-insert",
+        "score-search-index"
+      ]
+    },
+    {
+      "label": "json-table",
+      "kind": "ddl",
+      "sql": "CREATE TABLE JsonDocs (Id INT64 NOT NULL, Doc JSON, Tokens TOKENLIST AS (TOKENIZE_JSON(Doc)) HIDDEN) PRIMARY KEY(Id)",
+      "family": "json-search"
+    },
+    {
+      "label": "json-index",
+      "kind": "ddl",
+      "sql": "CREATE SEARCH INDEX JsonSearch ON JsonDocs(Tokens)",
+      "family": "json-search",
+      "requires": [
+        "json-table"
+      ]
+    },
+    {
+      "label": "json-insert",
+      "kind": "dml",
+      "sql": "",
+      "family": "json-search",
+      "statements": [
+        "INSERT INTO JsonDocs(Id,Doc) VALUES (1,JSON '{\"kind\":\"active\",\"n\":1}'),(2,JSON '{\"kind\":\"pending\",\"n\":2}'),(3,JSON '{\"kind\":\"active\",\"n\":3}')"
+      ],
+      "requires": [
+        "json-index"
+      ]
+    },
+    {
+      "label": "json-search-equal-auto",
+      "kind": "query",
+      "sql": "SELECT Id FROM JsonDocs WHERE Doc.kind=JSON '\"active\"' ORDER BY Id",
+      "family": "json-search",
+      "profile": true,
+      "requires": [
+        "json-insert"
+      ]
+    },
+    {
+      "label": "json-search-equal-search",
+      "kind": "query",
+      "sql": "SELECT Id FROM JsonDocs@{FORCE_INDEX=JsonSearch} WHERE Doc.kind=JSON '\"active\"' ORDER BY Id",
+      "family": "json-search",
+      "profile": true,
+      "requires": [
+        "json-insert"
+      ]
+    },
+    {
+      "label": "json-search-equal-base",
+      "kind": "query",
+      "sql": "SELECT Id FROM JsonDocs@{FORCE_INDEX=_BASE_TABLE} WHERE Doc.kind=JSON '\"active\"' ORDER BY Id",
+      "family": "json-search",
+      "profile": true,
+      "requires": [
+        "json-insert"
+      ]
+    },
+    {
+      "label": "json-search-in-auto",
+      "kind": "query",
+      "sql": "SELECT Id FROM JsonDocs WHERE Doc.kind IN (JSON '\"active\"',JSON '\"pending\"') ORDER BY Id",
+      "family": "json-search",
+      "profile": true,
+      "requires": [
+        "json-insert"
+      ]
+    },
+    {
+      "label": "json-search-in-search",
+      "kind": "query",
+      "sql": "SELECT Id FROM JsonDocs@{FORCE_INDEX=JsonSearch} WHERE Doc.kind IN (JSON '\"active\"',JSON '\"pending\"') ORDER BY Id",
+      "family": "json-search",
+      "profile": true,
+      "requires": [
+        "json-insert"
+      ]
+    },
+    {
+      "label": "json-search-in-base",
+      "kind": "query",
+      "sql": "SELECT Id FROM JsonDocs@{FORCE_INDEX=_BASE_TABLE} WHERE Doc.kind IN (JSON '\"active\"',JSON '\"pending\"') ORDER BY Id",
+      "family": "json-search",
+      "profile": true,
+      "requires": [
+        "json-insert"
+      ]
+    },
+    {
+      "label": "json-search-whole-auto",
+      "kind": "query",
+      "sql": "SELECT Id FROM JsonDocs WHERE Doc=JSON '{\"n\":1,\"kind\":\"active\"}' ORDER BY Id",
+      "family": "json-search",
+      "profile": true,
+      "requires": [
+        "json-insert"
+      ]
+    },
+    {
+      "label": "json-search-whole-search",
+      "kind": "query",
+      "sql": "SELECT Id FROM JsonDocs@{FORCE_INDEX=JsonSearch} WHERE Doc=JSON '{\"n\":1,\"kind\":\"active\"}' ORDER BY Id",
+      "family": "json-search",
+      "profile": true,
+      "requires": [
+        "json-insert"
+      ]
+    },
+    {
+      "label": "json-search-whole-base",
+      "kind": "query",
+      "sql": "SELECT Id FROM JsonDocs@{FORCE_INDEX=_BASE_TABLE} WHERE Doc=JSON '{\"n\":1,\"kind\":\"active\"}' ORDER BY Id",
+      "family": "json-search",
+      "profile": true,
+      "requires": [
+        "json-insert"
+      ]
+    },
+    {
+      "label": "gql-standalone-corrected",
+      "kind": "query",
+      "sql": "GRAPH ProbeGraph MATCH(n) ORDER BY n.Id LIMIT 2 RETURN n.Id AS id",
+      "family": "gql-order",
+      "requires": [
+        "graph-insert"
+      ]
+    },
+    {
+      "label": "gql-next-corrected",
+      "kind": "query",
+      "sql": "GRAPH ProbeGraph MATCH(n) RETURN n.Id AS id ORDER BY id NEXT LIMIT 2 RETURN id",
+      "family": "gql-order",
+      "requires": [
+        "graph-insert"
+      ]
+    },
+    {
+      "label": "volatile-view",
+      "kind": "ddl",
+      "sql": "CREATE VIEW VolatileView SQL SECURITY INVOKER AS SELECT n.Id, GENERATE_UUID() AS V FROM PropNodes AS n",
+      "family": "volatile-view",
+      "requires": [
+        "graph-insert"
+      ]
+    },
+    {
+      "label": "volatile-graph-default",
+      "kind": "ddl",
+      "sql": "CREATE PROPERTY GRAPH Volatiledefault NODE TABLES(VolatileView KEY(Id))",
+      "family": "volatile-view",
+      "requires": [
+        "volatile-view"
+      ]
+    },
+    {
+      "label": "volatile-read-default-1",
+      "kind": "query",
+      "sql": "GRAPH Volatiledefault MATCH(n) RETURN n.Id AS id,n.V AS v ORDER BY id",
+      "family": "volatile-view",
+      "requires": [
+        "volatile-graph-default"
+      ]
+    },
+    {
+      "label": "volatile-read-default-2",
+      "kind": "query",
+      "sql": "GRAPH Volatiledefault MATCH(n) RETURN n.Id AS id,n.V AS v ORDER BY id",
+      "family": "volatile-view",
+      "requires": [
+        "volatile-graph-default"
+      ]
+    },
+    {
+      "label": "volatile-graph-false",
+      "kind": "ddl",
+      "sql": "CREATE PROPERTY GRAPH Volatilefalse NODE TABLES(VolatileView KEY(Id)) OPTIONS(allow_view_with_volatile_column=false)",
+      "family": "volatile-view",
+      "requires": [
+        "volatile-view"
+      ]
+    },
+    {
+      "label": "volatile-read-false-1",
+      "kind": "query",
+      "sql": "GRAPH Volatilefalse MATCH(n) RETURN n.Id AS id,n.V AS v ORDER BY id",
+      "family": "volatile-view",
+      "requires": [
+        "volatile-graph-false"
+      ]
+    },
+    {
+      "label": "volatile-read-false-2",
+      "kind": "query",
+      "sql": "GRAPH Volatilefalse MATCH(n) RETURN n.Id AS id,n.V AS v ORDER BY id",
+      "family": "volatile-view",
+      "requires": [
+        "volatile-graph-false"
+      ]
+    },
+    {
+      "label": "volatile-graph-true",
+      "kind": "ddl",
+      "sql": "CREATE PROPERTY GRAPH Volatiletrue NODE TABLES(VolatileView KEY(Id)) OPTIONS(allow_view_with_volatile_column=true)",
+      "family": "volatile-view",
+      "requires": [
+        "volatile-view"
+      ]
+    },
+    {
+      "label": "volatile-read-true-1",
+      "kind": "query",
+      "sql": "GRAPH Volatiletrue MATCH(n) RETURN n.Id AS id,n.V AS v ORDER BY id",
+      "family": "volatile-view",
+      "requires": [
+        "volatile-graph-true"
+      ]
+    },
+    {
+      "label": "volatile-read-true-2",
+      "kind": "query",
+      "sql": "GRAPH Volatiletrue MATCH(n) RETURN n.Id AS id,n.V AS v ORDER BY id",
+      "family": "volatile-view",
+      "requires": [
+        "volatile-graph-true"
+      ]
+    },
+    {
+      "label": "set-null-schema",
+      "kind": "ddl",
+      "sql": "",
+      "family": "set-null",
+      "statements": [
+        "CREATE TABLE NullParent (Id INT64 NOT NULL) PRIMARY KEY(Id)",
+        "CREATE TABLE NullChild (Id INT64 NOT NULL, ParentId INT64, CONSTRAINT ParentFk FOREIGN KEY(ParentId) REFERENCES NullParent(Id) ON DELETE SET NULL) PRIMARY KEY(Id)"
+      ]
+    },
+    {
+      "label": "set-null-insert",
+      "kind": "dml",
+      "sql": "",
+      "family": "set-null",
+      "statements": [
+        "INSERT INTO NullParent(Id) VALUES(1)",
+        "INSERT INTO NullChild(Id,ParentId) VALUES(1,1)"
+      ],
+      "requires": [
+        "set-null-schema"
+      ]
+    },
+    {
+      "label": "set-null-delete",
+      "kind": "dml",
+      "sql": "",
+      "family": "set-null",
+      "statements": [
+        "DELETE FROM NullParent WHERE Id=1"
+      ],
+      "requires": [
+        "set-null-insert"
+      ]
+    },
+    {
+      "label": "set-null-result",
+      "kind": "query",
+      "sql": "SELECT Id,ParentId FROM NullChild",
+      "family": "set-null",
+      "requires": [
+        "set-null-delete"
+      ]
+    },
+    {
+      "label": "score-pagination-insert",
+      "kind": "dml",
+      "sql": "",
+      "family": "mirror-20261108",
+      "statements": [
+        "INSERT INTO ScoreDocs(Id,Body) VALUES (4,'cat cat cat banana'),(5,'cat banana'),(6,'cat dog dog dog'),(7,'cat')"
+      ],
+      "requires": [
+        "score-insert"
+      ]
+    },
+    {
+      "label": "pagination-v1-full",
+      "kind": "query",
+      "sql": "SELECT Id, SCORE(BodyTokens,@p, options=>JSON_OBJECT('version', @score_version)) AS score FROM ScoreDocs WHERE SEARCH(BodyTokens,@p) ORDER BY score DESC,Id",
+      "family": "ranked-pagination",
+      "params": {
+        "p": "cat",
+        "page_size": 2,
+        "offset": 0,
+        "score_version": 1
+      },
+      "param_types": {
+        "page_size": "INT64",
+        "offset": "INT64",
+        "score_version": "INT64"
+      },
+      "requires": [
+        "score-pagination-insert",
+        "score-search-index"
+      ]
+    },
+    {
+      "label": "pagination-v1-offset-0",
+      "kind": "query",
+      "sql": "SELECT Id, SCORE(BodyTokens,@p, options=>JSON_OBJECT('version', @score_version)) AS score FROM ScoreDocs WHERE SEARCH(BodyTokens,@p) ORDER BY score DESC,Id LIMIT @page_size OFFSET @offset",
+      "family": "ranked-pagination",
+      "params": {
+        "p": "cat",
+        "page_size": 2,
+        "offset": 0,
+        "score_version": 1
+      },
+      "param_types": {
+        "page_size": "INT64",
+        "offset": "INT64",
+        "score_version": "INT64"
+      },
+      "requires": [
+        "score-pagination-insert",
+        "score-search-index"
+      ]
+    },
+    {
+      "label": "pagination-v1-offset-2",
+      "kind": "query",
+      "sql": "SELECT Id, SCORE(BodyTokens,@p, options=>JSON_OBJECT('version', @score_version)) AS score FROM ScoreDocs WHERE SEARCH(BodyTokens,@p) ORDER BY score DESC,Id LIMIT @page_size OFFSET @offset",
+      "family": "ranked-pagination",
+      "params": {
+        "p": "cat",
+        "page_size": 2,
+        "offset": 2,
+        "score_version": 1
+      },
+      "param_types": {
+        "page_size": "INT64",
+        "offset": "INT64",
+        "score_version": "INT64"
+      },
+      "requires": [
+        "score-pagination-insert",
+        "score-search-index"
+      ]
+    },
+    {
+      "label": "pagination-v1-offset-4",
+      "kind": "query",
+      "sql": "SELECT Id, SCORE(BodyTokens,@p, options=>JSON_OBJECT('version', @score_version)) AS score FROM ScoreDocs WHERE SEARCH(BodyTokens,@p) ORDER BY score DESC,Id LIMIT @page_size OFFSET @offset",
+      "family": "ranked-pagination",
+      "params": {
+        "p": "cat",
+        "page_size": 2,
+        "offset": 4,
+        "score_version": 1
+      },
+      "param_types": {
+        "page_size": "INT64",
+        "offset": "INT64",
+        "score_version": "INT64"
+      },
+      "requires": [
+        "score-pagination-insert",
+        "score-search-index"
+      ]
+    },
+    {
+      "label": "pagination-v2-full",
+      "kind": "query",
+      "sql": "SELECT Id, SCORE(BodyTokens,@p, options=>JSON_OBJECT('version', @score_version)) AS score FROM ScoreDocs WHERE SEARCH(BodyTokens,@p) ORDER BY score DESC,Id",
+      "family": "ranked-pagination",
+      "params": {
+        "p": "cat",
+        "page_size": 2,
+        "offset": 0,
+        "score_version": 2
+      },
+      "param_types": {
+        "page_size": "INT64",
+        "offset": "INT64",
+        "score_version": "INT64"
+      },
+      "requires": [
+        "score-pagination-insert",
+        "score-search-index"
+      ]
+    },
+    {
+      "label": "pagination-v2-offset-0",
+      "kind": "query",
+      "sql": "SELECT Id, SCORE(BodyTokens,@p, options=>JSON_OBJECT('version', @score_version)) AS score FROM ScoreDocs WHERE SEARCH(BodyTokens,@p) ORDER BY score DESC,Id LIMIT @page_size OFFSET @offset",
+      "family": "ranked-pagination",
+      "params": {
+        "p": "cat",
+        "page_size": 2,
+        "offset": 0,
+        "score_version": 2
+      },
+      "param_types": {
+        "page_size": "INT64",
+        "offset": "INT64",
+        "score_version": "INT64"
+      },
+      "requires": [
+        "score-pagination-insert",
+        "score-search-index"
+      ]
+    },
+    {
+      "label": "pagination-v2-offset-2",
+      "kind": "query",
+      "sql": "SELECT Id, SCORE(BodyTokens,@p, options=>JSON_OBJECT('version', @score_version)) AS score FROM ScoreDocs WHERE SEARCH(BodyTokens,@p) ORDER BY score DESC,Id LIMIT @page_size OFFSET @offset",
+      "family": "ranked-pagination",
+      "params": {
+        "p": "cat",
+        "page_size": 2,
+        "offset": 2,
+        "score_version": 2
+      },
+      "param_types": {
+        "page_size": "INT64",
+        "offset": "INT64",
+        "score_version": "INT64"
+      },
+      "requires": [
+        "score-pagination-insert",
+        "score-search-index"
+      ]
+    },
+    {
+      "label": "pagination-v2-offset-4",
+      "kind": "query",
+      "sql": "SELECT Id, SCORE(BodyTokens,@p, options=>JSON_OBJECT('version', @score_version)) AS score FROM ScoreDocs WHERE SEARCH(BodyTokens,@p) ORDER BY score DESC,Id LIMIT @page_size OFFSET @offset",
+      "family": "ranked-pagination",
+      "params": {
+        "p": "cat",
+        "page_size": 2,
+        "offset": 4,
+        "score_version": 2
+      },
+      "param_types": {
+        "page_size": "INT64",
+        "offset": "INT64",
+        "score_version": "INT64"
+      },
+      "requires": [
+        "score-pagination-insert",
+        "score-search-index"
+      ]
+    },
+    {
+      "label": "batch-omitted-create",
+      "kind": "ddl",
+      "sql": "CREATE QUEUE BatchOmitted(Id STRING(36) NOT NULL, Payload BYTES(MAX) NOT NULL) PRIMARY KEY(Id)",
+      "family": "queue-batches"
+    },
+    {
+      "label": "batch-omitted-insert",
+      "kind": "dml",
+      "sql": "",
+      "family": "queue-batches",
+      "statements": [
+        "INSERT INTO BatchOmitted(Id,Payload,DeliverTime) VALUES ('000',b'x',CURRENT_TIMESTAMP()),('001',b'x',CURRENT_TIMESTAMP()),('002',b'x',CURRENT_TIMESTAMP()),('003',b'x',CURRENT_TIMESTAMP()),('004',b'x',CURRENT_TIMESTAMP()),('005',b'x',CURRENT_TIMESTAMP()),('006',b'x',CURRENT_TIMESTAMP()),('007',b'x',CURRENT_TIMESTAMP()),('008',b'x',CURRENT_TIMESTAMP()),('009',b'x',CURRENT_TIMESTAMP()),('010',b'x',CURRENT_TIMESTAMP()),('011',b'x',CURRENT_TIMESTAMP()),('012',b'x',CURRENT_TIMESTAMP()),('013',b'x',CURRENT_TIMESTAMP()),('014',b'x',CURRENT_TIMESTAMP()),('015',b'x',CURRENT_TIMESTAMP()),('016',b'x',CURRENT_TIMESTAMP()),('017',b'x',CURRENT_TIMESTAMP()),('018',b'x',CURRENT_TIMESTAMP()),('019',b'x',CURRENT_TIMESTAMP()),('020',b'x',CURRENT_TIMESTAMP()),('021',b'x',CURRENT_TIMESTAMP()),('022',b'x',CURRENT_TIMESTAMP()),('023',b'x',CURRENT_TIMESTAMP()),('024',b'x',CURRENT_TIMESTAMP()),('025',b'x',CURRENT_TIMESTAMP()),('026',b'x',CURRENT_TIMESTAMP()),('027',b'x',CURRENT_TIMESTAMP()),('028',b'x',CURRENT_TIMESTAMP()),('029',b'x',CURRENT_TIMESTAMP()),('030',b'x',CURRENT_TIMESTAMP()),('031',b'x',CURRENT_TIMESTAMP()),('032',b'x',CURRENT_TIMESTAMP()),('033',b'x',CURRENT_TIMESTAMP()),('034',b'x',CURRENT_TIMESTAMP()),('035',b'x',CURRENT_TIMESTAMP()),('036',b'x',CURRENT_TIMESTAMP()),('037',b'x',CURRENT_TIMESTAMP()),('038',b'x',CURRENT_TIMESTAMP()),('039',b'x',CURRENT_TIMESTAMP())"
+      ],
+      "requires": [
+        "batch-omitted-create"
+      ]
+    },
+    {
+      "label": "batch-omitted-receive",
+      "kind": "query",
+      "sql": "SELECT Id,SpannerLastBatchMessage AS batch_end FROM RECEIVE_BatchOmitted(max_duration=>'5s')",
+      "family": "queue-batches",
+      "timeout_seconds": 20,
+      "requires": [
+        "batch-omitted-insert"
+      ]
+    },
+    {
+      "label": "batch-null-create",
+      "kind": "ddl",
+      "sql": "CREATE QUEUE BatchNull(Id STRING(36) NOT NULL, Payload BYTES(MAX) NOT NULL) PRIMARY KEY(Id)",
+      "family": "queue-batches"
+    },
+    {
+      "label": "batch-null-insert",
+      "kind": "dml",
+      "sql": "",
+      "family": "queue-batches",
+      "statements": [
+        "INSERT INTO BatchNull(Id,Payload,DeliverTime) VALUES ('000',b'x',CURRENT_TIMESTAMP()),('001',b'x',CURRENT_TIMESTAMP()),('002',b'x',CURRENT_TIMESTAMP()),('003',b'x',CURRENT_TIMESTAMP()),('004',b'x',CURRENT_TIMESTAMP()),('005',b'x',CURRENT_TIMESTAMP()),('006',b'x',CURRENT_TIMESTAMP()),('007',b'x',CURRENT_TIMESTAMP()),('008',b'x',CURRENT_TIMESTAMP()),('009',b'x',CURRENT_TIMESTAMP()),('010',b'x',CURRENT_TIMESTAMP()),('011',b'x',CURRENT_TIMESTAMP()),('012',b'x',CURRENT_TIMESTAMP()),('013',b'x',CURRENT_TIMESTAMP()),('014',b'x',CURRENT_TIMESTAMP()),('015',b'x',CURRENT_TIMESTAMP()),('016',b'x',CURRENT_TIMESTAMP()),('017',b'x',CURRENT_TIMESTAMP()),('018',b'x',CURRENT_TIMESTAMP()),('019',b'x',CURRENT_TIMESTAMP()),('020',b'x',CURRENT_TIMESTAMP()),('021',b'x',CURRENT_TIMESTAMP()),('022',b'x',CURRENT_TIMESTAMP()),('023',b'x',CURRENT_TIMESTAMP()),('024',b'x',CURRENT_TIMESTAMP()),('025',b'x',CURRENT_TIMESTAMP()),('026',b'x',CURRENT_TIMESTAMP()),('027',b'x',CURRENT_TIMESTAMP()),('028',b'x',CURRENT_TIMESTAMP()),('029',b'x',CURRENT_TIMESTAMP()),('030',b'x',CURRENT_TIMESTAMP()),('031',b'x',CURRENT_TIMESTAMP()),('032',b'x',CURRENT_TIMESTAMP()),('033',b'x',CURRENT_TIMESTAMP()),('034',b'x',CURRENT_TIMESTAMP()),('035',b'x',CURRENT_TIMESTAMP()),('036',b'x',CURRENT_TIMESTAMP()),('037',b'x',CURRENT_TIMESTAMP()),('038',b'x',CURRENT_TIMESTAMP()),('039',b'x',CURRENT_TIMESTAMP())"
+      ],
+      "requires": [
+        "batch-null-create"
+      ]
+    },
+    {
+      "label": "batch-null-receive",
+      "kind": "query",
+      "sql": "SELECT Id,SpannerLastBatchMessage AS batch_end FROM RECEIVE_BatchNull(max_duration=>'5s',max_batch_size=>NULL)",
+      "family": "queue-batches",
+      "timeout_seconds": 20,
+      "requires": [
+        "batch-null-insert"
+      ]
+    },
+    {
+      "label": "batch-twenty-create",
+      "kind": "ddl",
+      "sql": "CREATE QUEUE BatchTwenty(Id STRING(36) NOT NULL, Payload BYTES(MAX) NOT NULL) PRIMARY KEY(Id)",
+      "family": "queue-batches"
+    },
+    {
+      "label": "batch-twenty-insert",
+      "kind": "dml",
+      "sql": "",
+      "family": "queue-batches",
+      "statements": [
+        "INSERT INTO BatchTwenty(Id,Payload,DeliverTime) VALUES ('000',b'x',CURRENT_TIMESTAMP()),('001',b'x',CURRENT_TIMESTAMP()),('002',b'x',CURRENT_TIMESTAMP()),('003',b'x',CURRENT_TIMESTAMP()),('004',b'x',CURRENT_TIMESTAMP()),('005',b'x',CURRENT_TIMESTAMP()),('006',b'x',CURRENT_TIMESTAMP()),('007',b'x',CURRENT_TIMESTAMP()),('008',b'x',CURRENT_TIMESTAMP()),('009',b'x',CURRENT_TIMESTAMP()),('010',b'x',CURRENT_TIMESTAMP()),('011',b'x',CURRENT_TIMESTAMP()),('012',b'x',CURRENT_TIMESTAMP()),('013',b'x',CURRENT_TIMESTAMP()),('014',b'x',CURRENT_TIMESTAMP()),('015',b'x',CURRENT_TIMESTAMP()),('016',b'x',CURRENT_TIMESTAMP()),('017',b'x',CURRENT_TIMESTAMP()),('018',b'x',CURRENT_TIMESTAMP()),('019',b'x',CURRENT_TIMESTAMP()),('020',b'x',CURRENT_TIMESTAMP()),('021',b'x',CURRENT_TIMESTAMP()),('022',b'x',CURRENT_TIMESTAMP()),('023',b'x',CURRENT_TIMESTAMP()),('024',b'x',CURRENT_TIMESTAMP()),('025',b'x',CURRENT_TIMESTAMP()),('026',b'x',CURRENT_TIMESTAMP()),('027',b'x',CURRENT_TIMESTAMP()),('028',b'x',CURRENT_TIMESTAMP()),('029',b'x',CURRENT_TIMESTAMP()),('030',b'x',CURRENT_TIMESTAMP()),('031',b'x',CURRENT_TIMESTAMP()),('032',b'x',CURRENT_TIMESTAMP()),('033',b'x',CURRENT_TIMESTAMP()),('034',b'x',CURRENT_TIMESTAMP()),('035',b'x',CURRENT_TIMESTAMP()),('036',b'x',CURRENT_TIMESTAMP()),('037',b'x',CURRENT_TIMESTAMP()),('038',b'x',CURRENT_TIMESTAMP()),('039',b'x',CURRENT_TIMESTAMP())"
+      ],
+      "requires": [
+        "batch-twenty-create"
+      ]
+    },
+    {
+      "label": "batch-twenty-receive",
+      "kind": "query",
+      "sql": "SELECT Id,SpannerLastBatchMessage AS batch_end FROM RECEIVE_BatchTwenty(max_duration=>'5s',max_batch_size=>20)",
+      "family": "queue-batches",
+      "timeout_seconds": 20,
+      "requires": [
+        "batch-twenty-insert"
+      ]
+    },
+    {
+      "label": "dynamic-table",
+      "kind": "ddl",
+      "sql": "CREATE TABLE DynamicNodes(Id INT64 NOT NULL, Label STRING(MAX), Props JSON) PRIMARY KEY(Id)",
+      "family": "dynamic-properties"
+    },
+    {
+      "label": "dynamic-insert",
+      "kind": "dml",
+      "sql": "",
+      "family": "dynamic-properties",
+      "statements": [
+        "INSERT INTO DynamicNodes(Id,Label,Props) VALUES(1,'person',JSON '{\"age\":43,\"name\":\"Alice\",\"active\":true}'),(2,'person',JSON '{\"age\":27,\"name\":\"Bob\",\"active\":false}'),(3,'person',JSON '{\"age\":43,\"name\":\"Carol\",\"active\":true}')"
+      ],
+      "requires": [
+        "dynamic-table"
+      ]
+    },
+    {
+      "label": "dynamic-graph",
+      "kind": "ddl",
+      "sql": "CREATE PROPERTY GRAPH DynamicGraph NODE TABLES(DynamicNodes DYNAMIC LABEL(Label) DYNAMIC PROPERTIES(Props))",
+      "family": "dynamic-properties",
+      "requires": [
+        "dynamic-table"
+      ]
+    },
+    {
+      "label": "dynamic-filter-number",
+      "kind": "query",
+      "sql": "GRAPH DynamicGraph MATCH(n:person) WHERE n.age=43 RETURN n.Id AS id ORDER BY id",
+      "family": "dynamic-properties",
+      "requires": [
+        "dynamic-graph",
+        "dynamic-insert"
+      ]
+    },
+    {
+      "label": "dynamic-filter-pattern",
+      "kind": "query",
+      "sql": "GRAPH DynamicGraph MATCH(n:person {age:43}) RETURN n.Id AS id ORDER BY id",
+      "family": "dynamic-properties",
+      "requires": [
+        "dynamic-graph",
+        "dynamic-insert"
+      ]
+    },
+    {
+      "label": "dynamic-filter-string-negative",
+      "kind": "query",
+      "sql": "GRAPH DynamicGraph MATCH(n:person {age:'43'}) RETURN n.Id AS id ORDER BY id",
+      "family": "dynamic-properties",
+      "requires": [
+        "dynamic-graph",
+        "dynamic-insert"
+      ]
+    },
+    {
+      "label": "dynamic-group",
+      "kind": "query",
+      "sql": "GRAPH DynamicGraph MATCH(n:person) RETURN n.age AS age,COUNT(*) AS n ORDER BY age",
+      "family": "dynamic-properties",
+      "requires": [
+        "dynamic-graph",
+        "dynamic-insert"
+      ]
+    },
+    {
+      "label": "dynamic-order",
+      "kind": "query",
+      "sql": "GRAPH DynamicGraph MATCH(n:person) RETURN n.Id AS id,n.age AS age ORDER BY age,id",
+      "family": "dynamic-properties",
+      "requires": [
+        "dynamic-graph",
+        "dynamic-insert"
+      ]
+    },
+    {
+      "label": "dynamic-distinct",
+      "kind": "query",
+      "sql": "GRAPH DynamicGraph MATCH(n:person) RETURN DISTINCT n.age AS age ORDER BY age",
+      "family": "dynamic-properties",
+      "requires": [
+        "dynamic-graph",
+        "dynamic-insert"
+      ]
+    },
+    {
+      "label": "dynamic-compare-properties",
+      "kind": "query",
+      "sql": "GRAPH DynamicGraph MATCH(a:person),(b:person) WHERE a.Id<b.Id AND a.age=b.age RETURN a.Id AS a,b.Id AS b ORDER BY a,b",
+      "family": "dynamic-properties",
+      "requires": [
+        "dynamic-graph",
+        "dynamic-insert"
+      ]
+    },
+    {
+      "label": "dynamic-filter-bool",
+      "kind": "query",
+      "sql": "GRAPH DynamicGraph MATCH(n:person) WHERE n.active=true RETURN n.Id AS id ORDER BY id",
+      "family": "dynamic-properties",
+      "requires": [
+        "dynamic-graph",
+        "dynamic-insert"
+      ]
+    },
+    {
+      "label": "dynamic-bare-bool-negative",
+      "kind": "query",
+      "sql": "GRAPH DynamicGraph MATCH(n:person) WHERE n.active RETURN n.Id AS id",
+      "family": "dynamic-properties",
+      "requires": [
+        "dynamic-graph",
+        "dynamic-insert"
+      ]
+    },
+    {
+      "label": "pv-table",
+      "family": "new-docs-20261112",
+      "kind": "ddl",
+      "requires": [],
+      "sql": "CREATE TABLE PVRows(Id INT64 NOT NULL,Tenant STRING(10),Payload STRING(MAX)) PRIMARY KEY(Id)"
+    },
+    {
+      "label": "pv-seed",
+      "family": "new-docs-20261112",
+      "kind": "dml",
+      "requires": [
+        "pv-table"
+      ],
+      "statements": [
+        "INSERT INTO PVRows(Id,Tenant,Payload) VALUES (1,'a','a1'),(2,'b','b1'),(3,'a','a2')"
+      ]
+    },
+    {
+      "label": "pv-roles",
+      "family": "new-docs-20261112",
+      "kind": "ddl",
+      "requires": [],
+      "statements": [
+        "CREATE ROLE pv_user",
+        "CREATE ROLE pv_debug"
+      ],
+      "sql": "CREATE ROLE pv_user"
+    },
+    {
+      "label": "pv-ordinary-view",
+      "family": "new-docs-20261112",
+      "kind": "ddl",
+      "requires": [],
+      "sql": "CREATE VIEW PVPublic SQL SECURITY DEFINER AS SELECT 42 AS Answer"
+    },
+    {
+      "label": "pv-filter-view",
+      "family": "new-docs-20261112",
+      "kind": "ddl",
+      "requires": [
+        "pv-table"
+      ],
+      "sql": "CREATE VIEW PVFilter SQL SECURITY DEFINER AS SELECT r.Id,r.Tenant,r.Payload FROM PVRows AS r WHERE r.Tenant=SECURE_CONTEXT('tenant')"
+    },
+    {
+      "label": "pv-project-view",
+      "family": "new-docs-20261112",
+      "kind": "ddl",
+      "requires": [],
+      "sql": "CREATE VIEW PVProject SQL SECURITY DEFINER AS SELECT SECURE_CONTEXT('tenant') AS Tenant"
+    },
+    {
+      "label": "pv-json-view",
+      "family": "new-docs-20261112",
+      "kind": "ddl",
+      "requires": [
+        "pv-table"
+      ],
+      "sql": "CREATE VIEW PVJson SQL SECURITY DEFINER AS SELECT r.Id,r.Tenant,r.Payload FROM PVRows AS r WHERE r.Tenant=JSON_VALUE(PARSE_JSON(SECURE_CONTEXT('auth')),'$.tenant')"
+    },
+    {
+      "label": "pv-grant-public",
+      "family": "new-docs-20261112",
+      "kind": "ddl",
+      "requires": [
+        "pv-roles",
+        "pv-ordinary-view"
+      ],
+      "sql": "GRANT SELECT ON VIEW PVPublic TO ROLE pv_user"
+    },
+    {
+      "label": "pv-role-connectivity",
+      "family": "new-docs-20261112",
+      "kind": "query",
+      "requires": [
+        "pv-grant-public"
+      ],
+      "database_role": "pv_user",
+      "sql": "SELECT Answer FROM PVPublic"
+    },
+    {
+      "label": "pv-grant-filter",
+      "family": "new-docs-20261112",
+      "kind": "ddl",
+      "requires": [
+        "pv-roles",
+        "pv-filter-view"
+      ],
+      "sql": "GRANT SELECT ON VIEW PVFilter TO ROLE pv_user"
+    },
+    {
+      "label": "pv-grant-project",
+      "family": "new-docs-20261112",
+      "kind": "ddl",
+      "requires": [
+        "pv-roles",
+        "pv-project-view"
+      ],
+      "sql": "GRANT SELECT ON VIEW PVProject TO ROLE pv_user"
+    },
+    {
+      "label": "pv-grant-json",
+      "family": "new-docs-20261112",
+      "kind": "ddl",
+      "requires": [
+        "pv-roles",
+        "pv-json-view"
+      ],
+      "sql": "GRANT SELECT ON VIEW PVJson TO ROLE pv_user"
+    },
+    {
+      "label": "pv-role-tenant-a",
+      "family": "new-docs-20261112",
+      "kind": "query",
+      "requires": [
+        "pv-grant-filter",
+        "pv-seed"
+      ],
+      "secure_context": {
+        "tenant": "a"
+      },
+      "database_role": "pv_user",
+      "sql": "SELECT Id,Tenant,Payload FROM PVFilter ORDER BY Id"
+    },
+    {
+      "label": "pv-role-tenant-b",
+      "family": "new-docs-20261112",
+      "kind": "query",
+      "requires": [
+        "pv-grant-filter",
+        "pv-seed"
+      ],
+      "secure_context": {
+        "tenant": "b"
+      },
+      "database_role": "pv_user",
+      "sql": "SELECT Id,Tenant,Payload FROM PVFilter ORDER BY Id"
+    },
+    {
+      "label": "pv-role-unknown",
+      "family": "new-docs-20261112",
+      "kind": "query",
+      "requires": [
+        "pv-grant-filter",
+        "pv-seed"
+      ],
+      "secure_context": {
+        "tenant": "c"
+      },
+      "database_role": "pv_user",
+      "sql": "SELECT Id,Tenant,Payload FROM PVFilter ORDER BY Id"
+    },
+    {
+      "label": "pv-role-null",
+      "family": "new-docs-20261112",
+      "kind": "query",
+      "requires": [
+        "pv-grant-filter",
+        "pv-seed"
+      ],
+      "secure_context": {
+        "tenant": null
+      },
+      "database_role": "pv_user",
+      "sql": "SELECT Id,Tenant,Payload FROM PVFilter ORDER BY Id"
+    },
+    {
+      "label": "pv-role-missing",
+      "family": "new-docs-20261112",
+      "kind": "query",
+      "requires": [
+        "pv-grant-filter",
+        "pv-seed"
+      ],
+      "secure_context": {},
+      "database_role": "pv_user",
+      "sql": "SELECT Id,Tenant,Payload FROM PVFilter ORDER BY Id"
+    },
+    {
+      "label": "pv-role-wrong-type",
+      "family": "new-docs-20261112",
+      "kind": "query",
+      "requires": [
+        "pv-grant-filter",
+        "pv-seed"
+      ],
+      "secure_context": {
+        "tenant": 42
+      },
+      "database_role": "pv_user",
+      "sql": "SELECT Id,Tenant,Payload FROM PVFilter ORDER BY Id"
+    },
+    {
+      "label": "pv-role-ordinary-param-cannot-override",
+      "family": "new-docs-20261112",
+      "kind": "query",
+      "requires": [
+        "pv-grant-filter",
+        "pv-seed"
+      ],
+      "params": {
+        "tenant": "b"
+      },
+      "secure_context": {
+        "tenant": "a"
+      },
+      "database_role": "pv_user",
+      "sql": "SELECT Id,Tenant,Payload FROM PVFilter WHERE Tenant=@tenant OR TRUE ORDER BY Id"
+    },
+    {
+      "label": "pv-role-base-denied",
+      "family": "new-docs-20261112",
+      "kind": "query",
+      "requires": [
+        "pv-role-connectivity",
+        "pv-seed"
+      ],
+      "database_role": "pv_user",
+      "secure_context": {
+        "tenant": "a"
+      },
+      "sql": "SELECT Id FROM PVRows ORDER BY Id"
+    },
+    {
+      "label": "pv-role-direct-context-denied",
+      "family": "new-docs-20261112",
+      "kind": "query",
+      "requires": [
+        "pv-role-connectivity"
+      ],
+      "secure_context": {
+        "tenant": "a"
+      },
+      "database_role": "pv_user",
+      "sql": "SELECT SECURE_CONTEXT('tenant') AS value"
+    },
+    {
+      "label": "pv-role-explicit-projection",
+      "family": "new-docs-20261112",
+      "kind": "query",
+      "requires": [
+        "pv-grant-project"
+      ],
+      "secure_context": {
+        "tenant": "a"
+      },
+      "database_role": "pv_user",
+      "sql": "SELECT Tenant FROM PVProject"
+    },
+    {
+      "label": "pv-role-json-context",
+      "family": "new-docs-20261112",
+      "kind": "query",
+      "requires": [
+        "pv-grant-json",
+        "pv-seed"
+      ],
+      "secure_context": {
+        "auth": "{\"tenant\":\"b\"}"
+      },
+      "database_role": "pv_user",
+      "sql": "SELECT Id,Tenant,Payload FROM PVJson ORDER BY Id"
+    },
+    {
+      "label": "pv-grant-debug-system-role",
+      "family": "new-docs-20261112",
+      "kind": "ddl",
+      "requires": [
+        "pv-roles"
+      ],
+      "sql": "GRANT ROLE spanner_secure_context_reader TO ROLE pv_debug"
+    },
+    {
+      "label": "pv-debug-direct-context",
+      "family": "new-docs-20261112",
+      "kind": "query",
+      "requires": [
+        "pv-grant-debug-system-role"
+      ],
+      "secure_context": {
+        "tenant": "a"
+      },
+      "database_role": "pv_debug",
+      "sql": "SELECT SECURE_CONTEXT('tenant') AS value"
+    },
+    {
+      "label": "pv-debug-base-still-denied",
+      "family": "new-docs-20261112",
+      "kind": "query",
+      "requires": [
+        "pv-grant-debug-system-role",
+        "pv-seed"
+      ],
+      "secure_context": {
+        "tenant": "a"
+      },
+      "database_role": "pv_debug",
+      "sql": "SELECT Id FROM PVRows"
+    },
+    {
+      "label": "pv-invoker-negative",
+      "family": "same-owned-fixture-correction",
+      "kind": "ddl",
+      "requires": [],
+      "sql": "CREATE VIEW PVInvoker SQL SECURITY INVOKER AS SELECT r.Id,r.Tenant FROM PVRows AS r WHERE r.Tenant=SECURE_CONTEXT('tenant')"
+    },
+    {
+      "label": "pv-udf-schema-control",
+      "kind": "ddl",
+      "family": "same-owned-fixture-correction",
+      "requires": [],
+      "sql": "CREATE SCHEMA PVFunctions"
+    },
+    {
+      "label": "pv-udf-positive-control",
+      "kind": "ddl",
+      "family": "same-owned-fixture-correction",
+      "requires": [
+        "pv-udf-schema-control"
+      ],
+      "sql": "CREATE FUNCTION PVFunctions.Echo(x STRING) RETURNS STRING SQL SECURITY INVOKER AS (x)"
+    },
+    {
+      "label": "pv-udf-negative",
+      "family": "same-owned-fixture-correction",
+      "kind": "ddl",
+      "requires": [
+        "pv-udf-positive-control"
+      ],
+      "sql": "CREATE FUNCTION PVFunctions.PVUdf() RETURNS STRING SQL SECURITY INVOKER AS (SECURE_CONTEXT('tenant'))"
+    },
+    {
+      "label": "pv-default-negative",
+      "family": "new-docs-20261112",
+      "kind": "ddl",
+      "requires": [],
+      "sql": "CREATE TABLE PVDefault(Id INT64 NOT NULL,Tenant STRING(MAX) DEFAULT (SECURE_CONTEXT('tenant'))) PRIMARY KEY(Id)"
+    },
+    {
+      "label": "pv-generated-negative",
+      "family": "new-docs-20261112",
+      "kind": "ddl",
+      "requires": [],
+      "sql": "CREATE TABLE PVGenerated(Id INT64 NOT NULL,Tenant STRING(MAX) AS (SECURE_CONTEXT('tenant')) STORED) PRIMARY KEY(Id)"
+    },
+    {
+      "label": "pv-cast-doc-negative",
+      "family": "new-docs-20261112",
+      "kind": "ddl",
+      "requires": [],
+      "sql": "CREATE VIEW PVCastDoc SQL SECURITY DEFINER AS SELECT CAST(SECURE_CONTEXT('user_id'), INT64) AS UserId"
+    },
+    {
+      "label": "pv-cast-corrected",
+      "family": "new-docs-20261112",
+      "kind": "ddl",
+      "requires": [],
+      "sql": "CREATE VIEW PVCastCorrected SQL SECURITY DEFINER AS SELECT CAST(SECURE_CONTEXT('user_id') AS INT64) AS UserId"
+    },
+    {
+      "label": "pv-cast-corrected-query",
+      "family": "new-docs-20261112",
+      "kind": "query",
+      "requires": [
+        "pv-cast-corrected"
+      ],
+      "secure_context": {
+        "user_id": "123"
+      },
+      "sql": "SELECT UserId FROM PVCastCorrected"
+    },
+    {
+      "label": "pv-info-schema",
+      "family": "new-docs-20261112",
+      "kind": "query",
+      "requires": [],
+      "sql": "SELECT TABLE_NAME,VIEW_DEFINITION,SECURITY_TYPE FROM INFORMATION_SCHEMA.VIEWS WHERE STARTS_WITH(TABLE_NAME,'PV') ORDER BY TABLE_NAME"
+    },
+    {
+      "label": "vector-annotated",
+      "family": "new-docs-20261112",
+      "kind": "ddl",
+      "requires": [],
+      "sql": "CREATE TABLE VectorsAnnotated(Id INT64 NOT NULL,E ARRAY<FLOAT32>(vector_length=>3)) PRIMARY KEY(Id)"
+    },
+    {
+      "label": "vector-unannotated",
+      "family": "new-docs-20261112",
+      "kind": "ddl",
+      "requires": [],
+      "sql": "CREATE TABLE VectorsFlexible(Id INT64 NOT NULL,E ARRAY<FLOAT32>) PRIMARY KEY(Id)"
+    },
+    {
+      "label": "vector-index-annotated",
+      "family": "new-docs-20261112",
+      "kind": "ddl",
+      "requires": [
+        "vector-annotated"
+      ],
+      "sql": "CREATE VECTOR INDEX AnnotatedVectorIndex ON VectorsAnnotated(E) WHERE E IS NOT NULL OPTIONS(distance_type='EUCLIDEAN')"
+    },
+    {
+      "label": "vector-annotated-length-3",
+      "family": "same-owned-fixture-correction",
+      "kind": "dml",
+      "requires": [],
+      "statements": [
+        "INSERT INTO VectorsAnnotated(Id,E) VALUES (3,ARRAY<FLOAT32>[1.0,2.0,3.0])"
+      ]
+    },
+    {
+      "label": "vector-annotated-length-2",
+      "family": "same-owned-fixture-correction",
+      "kind": "dml",
+      "requires": [],
+      "statements": [
+        "INSERT INTO VectorsAnnotated(Id,E) VALUES (2,ARRAY<FLOAT32>[1.0,2.0])"
+      ]
+    },
+    {
+      "label": "vector-annotated-knn",
+      "family": "same-owned-fixture-correction",
+      "kind": "query",
+      "requires": [],
+      "sql": "SELECT Id,EUCLIDEAN_DISTANCE(E,ARRAY<FLOAT32>[1.0,2.0,3.0]) AS Distance FROM VectorsAnnotated WHERE ARRAY_LENGTH(E)=3 ORDER BY Distance"
+    },
+    {
+      "label": "vector-flexible-length-3",
+      "family": "same-owned-fixture-correction",
+      "kind": "dml",
+      "requires": [],
+      "statements": [
+        "INSERT INTO VectorsFlexible(Id,E) VALUES (3,ARRAY<FLOAT32>[1.0,2.0,3.0])"
+      ]
+    },
+    {
+      "label": "vector-flexible-length-2",
+      "family": "same-owned-fixture-correction",
+      "kind": "dml",
+      "requires": [],
+      "statements": [
+        "INSERT INTO VectorsFlexible(Id,E) VALUES (2,ARRAY<FLOAT32>[1.0,2.0])"
+      ]
+    },
+    {
+      "label": "vector-flexible-knn",
+      "family": "same-owned-fixture-correction",
+      "kind": "query",
+      "requires": [],
+      "sql": "SELECT Id,EUCLIDEAN_DISTANCE(E,ARRAY<FLOAT32>[1.0,2.0,3.0]) AS Distance FROM VectorsFlexible WHERE ARRAY_LENGTH(E)=3 ORDER BY Distance"
+    },
+    {
+      "label": "vector-index-unannotated-negative",
+      "family": "new-docs-20261112",
+      "kind": "ddl",
+      "requires": [
+        "vector-unannotated"
+      ],
+      "sql": "CREATE VECTOR INDEX FlexibleVectorIndex ON VectorsFlexible(E) WHERE E IS NOT NULL OPTIONS(distance_type='EUCLIDEAN')"
+    },
+    {
+      "label": "pv-ddl-export",
+      "family": "new-docs-20261112",
+      "kind": "ddl-export",
+      "requires": []
+    },
+    {
+      "label": "pv-invoker-grant",
+      "kind": "ddl",
+      "family": "same-owned-fixture-correction",
+      "requires": [
+        "pv-invoker-negative"
+      ],
+      "sql": "GRANT SELECT ON VIEW PVInvoker TO ROLE pv_user"
+    },
+    {
+      "label": "pv-invoker-role-query",
+      "kind": "query",
+      "family": "same-owned-fixture-correction",
+      "requires": [
+        "pv-invoker-grant"
+      ],
+      "database_role": "pv_user",
+      "secure_context": {
+        "tenant": "a"
+      },
+      "sql": "SELECT Id,Tenant FROM PVInvoker ORDER BY Id"
+    },
+    {
+      "label": "udf-execution/pv-udf-execute-a",
+      "family": "secure-context-named-udf-controls",
+      "kind": "query",
+      "requires": [],
+      "secure_context": {
+        "tenant": "a"
+      },
+      "sql": "SELECT PVFunctions.PVUdf() AS value"
+    },
+    {
+      "label": "udf-execution/pv-udf-execute-b",
+      "family": "secure-context-named-udf-controls",
+      "kind": "query",
+      "requires": [],
+      "secure_context": {
+        "tenant": "b"
+      },
+      "sql": "SELECT PVFunctions.PVUdf() AS value"
+    },
+    {
+      "label": "udf-execution/pv-udf-execute-missing",
+      "family": "secure-context-named-udf-controls",
+      "kind": "query",
+      "requires": [],
+      "secure_context": {},
+      "sql": "SELECT PVFunctions.PVUdf() AS value"
+    },
+    {
+      "label": "udf-execution/pv-udf-argument-forwarding",
+      "family": "secure-context-named-udf-controls",
+      "kind": "query",
+      "requires": [],
+      "secure_context": {
+        "tenant": "a"
+      },
+      "sql": "SELECT PVFunctions.Echo(SECURE_CONTEXT('tenant')) AS value"
+    },
+    {
+      "label": "udf-execution/pv-udf-view",
+      "family": "secure-context-named-udf-controls",
+      "kind": "ddl",
+      "requires": [],
+      "sql": "CREATE VIEW PVViaUdf SQL SECURITY DEFINER AS SELECT r.Id,r.Tenant,r.Payload FROM PVRows AS r WHERE r.Tenant=PVFunctions.PVUdf()"
+    },
+    {
+      "label": "udf-execution/pv-udf-view-grant",
+      "family": "secure-context-named-udf-controls",
+      "kind": "ddl",
+      "requires": [
+        "udf-execution/pv-udf-view"
+      ],
+      "sql": "GRANT SELECT ON VIEW PVViaUdf TO ROLE pv_user"
+    },
+    {
+      "label": "udf-execution/pv-udf-view-role-a",
+      "family": "secure-context-named-udf-controls",
+      "kind": "query",
+      "requires": [
+        "udf-execution/pv-udf-view-grant"
+      ],
+      "database_role": "pv_user",
+      "secure_context": {
+        "tenant": "a"
+      },
+      "sql": "SELECT Id,Tenant,Payload FROM PVViaUdf ORDER BY Id"
+    },
+    {
+      "label": "udf-execution/pv-udf-view-role-b",
+      "family": "secure-context-named-udf-controls",
+      "kind": "query",
+      "requires": [
+        "udf-execution/pv-udf-view-grant"
+      ],
+      "database_role": "pv_user",
+      "secure_context": {
+        "tenant": "b"
+      },
+      "sql": "SELECT Id,Tenant,Payload FROM PVViaUdf ORDER BY Id"
+    },
+    {
+      "label": "udf-execution/pv-ddl-export",
+      "family": "secure-context-named-udf-controls",
+      "kind": "ddl-export",
+      "requires": []
+    },
+    {
+      "label": "fk-schema",
+      "kind": "ddl",
+      "statements": [
+        "CREATE TABLE Owners(Id INT64 NOT NULL) PRIMARY KEY(Id)",
+        "CREATE TABLE Events(Shard INT64 NOT NULL,Id INT64 NOT NULL,Owner INT64,Active BOOL,Note STRING(MAX),CONSTRAINT EventsOwner FOREIGN KEY(Owner) REFERENCES Owners(Id)) PRIMARY KEY(Shard,Id)"
+      ]
+    },
+    {
+      "label": "fk-index-observation",
+      "kind": "query",
+      "requires": [
+        "fk-schema"
+      ],
+      "sql": "SELECT i.TABLE_NAME,i.INDEX_NAME,i.INDEX_TYPE,i.IS_UNIQUE,i.IS_NULL_FILTERED,i.INDEX_STATE,i.SPANNER_IS_MANAGED,c.COLUMN_NAME,c.ORDINAL_POSITION,c.COLUMN_ORDERING FROM INFORMATION_SCHEMA.INDEXES AS i JOIN INFORMATION_SCHEMA.INDEX_COLUMNS AS c USING(TABLE_CATALOG,TABLE_SCHEMA,TABLE_NAME,INDEX_NAME) WHERE i.TABLE_NAME IN ('Owners','Events') ORDER BY i.TABLE_NAME,i.INDEX_NAME,c.ORDINAL_POSITION,c.COLUMN_NAME"
+    },
+    {
+      "label": "fk-insert-parent",
+      "kind": "dml",
+      "requires": [
+        "fk-schema"
+      ],
+      "statements": [
+        "INSERT INTO Owners(Id) VALUES(1)"
+      ]
+    },
+    {
+      "label": "fk-insert-event",
+      "kind": "dml",
+      "requires": [
+        "fk-insert-parent"
+      ],
+      "statements": [
+        "INSERT INTO Events(Shard,Id,Owner,Active,Note) VALUES(1,1,1,TRUE,'old')"
+      ]
+    },
+    {
+      "label": "fk-seek-plan",
+      "kind": "plan",
+      "requires": [
+        "fk-insert-event"
+      ],
+      "sql": "SELECT Shard,Id FROM Events WHERE Owner=1"
+    },
+    {
+      "label": "fk-constraint-hint-plan",
+      "kind": "plan",
+      "requires": [
+        "fk-insert-event"
+      ],
+      "sql": "SELECT Shard,Id FROM Events@{FORCE_INDEX=EventsOwner} WHERE Owner=1"
+    }
+  ]
+}

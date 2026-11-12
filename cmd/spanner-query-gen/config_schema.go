@@ -257,9 +257,11 @@ func planReportJSONSchema() map[string]interface{} {
 			"operator_family":          enumSchema(interfaceSlice(planReportKnownOperatorFamilies()), "Normalized operator family, including derived umbrella families usable in counts and contracts."),
 			"concrete_operator_family": enumSchema(interfaceSlice(planReportConcreteOperatorFamilies()), "Concrete normalized operator family that can appear in normalized_operators[].family."),
 			"input": objectSchema([]interface{}{"config_sha256"}, map[string]interface{}{
-				"config_sha256":        sha256Schema("SHA-256 of the resolved spanner-query-gen config file bytes."),
-				"contract_file_sha256": sha256Schema("SHA-256 of the resolved plan contract file bytes."),
-				"contract_file_path":   stringSchema("Relative plan contract file path when stable output does not omit it."),
+				"mutation_facts_sha256":   sha256Schema("SHA-256 of the explicit mutation scenarios file."),
+				"mutation_indexes_sha256": sha256Schema("SHA-256 of the explicit regular-index snapshot file."),
+				"config_sha256":           sha256Schema("SHA-256 of the resolved spanner-query-gen config file bytes."),
+				"contract_file_sha256":    sha256Schema("SHA-256 of the resolved plan contract file bytes."),
+				"contract_file_path":      stringSchema("Relative plan contract file path when stable output does not omit it."),
 			}),
 			"plan_source": objectSchema([]interface{}{"backend", "api", "render_tool"}, map[string]interface{}{
 				"backend":     enumSchema([]interface{}{"omni"}, "Runtime backend used to obtain query plans."),
@@ -423,6 +425,8 @@ func planReportBackendIdentityJSONSchema() map[string]interface{} {
 
 func planReportQueryJSONSchema() map[string]interface{} {
 	schema := objectSchema([]interface{}{"target_id", "name", "catalog", "kind", "status"}, map[string]interface{}{
+		"mutation_counts":         mutationCountsJSONSchema(),
+		"mutation_count_error":    stringSchema("Count-analysis or requested measurement failure, independent of SQL PLAN status."),
 		"target_id":               targetIDSchema("Canonical target ID, for example query/ListSingers or query/ExternalQuery#inner."),
 		"name":                    identifierSchema("Configured query name."),
 		"catalog":                 stringSchema("Spanner catalog used for analysis."),

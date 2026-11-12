@@ -1,0 +1,41 @@
+[
+  {
+    "at": "2026-11-12T03:41:33.424687Z",
+    "backend": "emulator",
+    "image": "gcr.io/cloud-spanner-emulator/emulator:1.5.59@sha256:969af6a9349948fbfb4a826c18e160e258a4005f7c759f8e7f2dcec369cccba8",
+    "label": "runtime-started",
+    "provenance": {
+      "RequestedImage": "gcr.io/cloud-spanner-emulator/emulator:1.5.59@sha256:969af6a9349948fbfb4a826c18e160e258a4005f7c759f8e7f2dcec369cccba8",
+      "ImageID": "sha256:969af6a9349948fbfb4a826c18e160e258a4005f7c759f8e7f2dcec369cccba8",
+      "IndexDigest": "",
+      "ManifestDigest": "sha256:969af6a9349948fbfb4a826c18e160e258a4005f7c759f8e7f2dcec369cccba8",
+      "Platform": "linux/arm64",
+      "ObservedAt": "2026-11-12T03:41:33.424678Z",
+      "Source": "container_inspect",
+      "ObservedByThisProcess": true
+    }
+  },
+  {
+    "at": "2026-11-12T03:41:33.438248Z",
+    "backend": "emulator",
+    "code": "NotFound",
+    "dialect": "google",
+    "error": "rpc error: code = NotFound desc = Instance not found: projects/emulator-project/instances/emulator-instance\nerror details: name = ResourceInfo type = type.googleapis.com/google.spanner.admin.instance.v1.Instance resourcename = projects/emulator-project/instances/emulator-instance owner =  desc = Instance does not exist.",
+    "label": "fixture-open"
+  },
+  {
+    "at": "2026-11-12T03:41:33.441952Z",
+    "backend": "emulator",
+    "code": "NotFound",
+    "dialect": "pg",
+    "error": "rpc error: code = NotFound desc = Instance not found: projects/emulator-project/instances/emulator-instance\nerror details: name = ResourceInfo type = type.googleapis.com/google.spanner.admin.instance.v1.Instance resourcename = projects/emulator-project/instances/emulator-instance owner =  desc = Instance does not exist.",
+    "label": "fixture-open"
+  },
+  {
+    "at": "2026-11-12T03:41:33.556864Z",
+    "backend": "emulator",
+    "code": "OK",
+    "error": "",
+    "label": "runtime-closed"
+  }
+]
