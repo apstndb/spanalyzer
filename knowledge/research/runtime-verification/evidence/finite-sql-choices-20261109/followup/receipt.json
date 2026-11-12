@@ -99,10 +99,12 @@
   ],
   "runtime_log": {
     "original_sha256": "41c0dd466bc57bfd6e443273a269fdb3347b10f4619901a8ef0cb6c0b368f4b2",
-    "retained_sha256": "f9597c9a4ceae36b35c9c4803adb7bc5828f33eaf1d1abda40b07712edb5c5a6",
+    "retained_sha256": "bb1a636d16e1dc84049db453dd2a92c8b927acae9807aa793959d25824602033",
     "transformations": [
-      "Mask local Docker socket, home prefixes and loopback endpoints."
-    ]
+      "Mask local Docker socket, home prefixes and loopback endpoints.",
+      "2026-11-12: retain every observation output and every test event; omit only duplicate Go test framework and successful package-summary output. See research-retention-20261112/disposition.json under the evidence root."
+    ],
+    "pre_compaction_retained_sha256": "f9597c9a4ceae36b35c9c4803adb7bc5828f33eaf1d1abda40b07712edb5c5a6"
   },
   "unit_checks": [
     {
@@ -133,6 +135,6 @@
     "cli-unit-tests.log": "a702de59c0bea98434ee8f744b000ab7d73082600f6578735469edec2816229f",
     "producer.patch": "217bdd95cebeed0aa4cdb2a654a061aed3a3cccb291db3debd06935e0c6d1cfa",
     "root-unit-tests.log": "155142c2d62e2965258e295f32111f7c691c28f8c18c44778e27840dc895efcd",
-    "runtime.jsonl": "f9597c9a4ceae36b35c9c4803adb7bc5828f33eaf1d1abda40b07712edb5c5a6"
+    "runtime.jsonl": "bb1a636d16e1dc84049db453dd2a92c8b927acae9807aa793959d25824602033"
   }
 }

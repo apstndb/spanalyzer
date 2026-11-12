@@ -105,10 +105,12 @@
   ],
   "runtime_log": {
     "original_sha256": "3ea39856556f5265992cabee104429d92adfe494ff24f4737040b720756d2397",
-    "retained_sha256": "fdb3f54cf38a0b5d669d5ab5903c141e8d2bc1ca76289d5563497334d6260007",
+    "retained_sha256": "dea5d9166c7ada13fc4f5310b3c6ab1796459f6395f4bb7c22f6350c4fbc7d30",
     "transformations": [
-      "Mask local Docker socket, home prefixes and loopback endpoints. Preserve primary event contents otherwise."
-    ]
+      "Mask local Docker socket, home prefixes and loopback endpoints. Preserve primary event contents otherwise.",
+      "2026-11-12: retain every observation output and every test event; omit only duplicate Go test framework and successful package-summary output. See research-retention-20261112/disposition.json under the evidence root."
+    ],
+    "pre_compaction_retained_sha256": "fdb3f54cf38a0b5d669d5ab5903c141e8d2bc1ca76289d5563497334d6260007"
   },
   "cleanup": {
     "task_container_ids": [
@@ -127,7 +129,7 @@
   "retained_source_scope": "Apply producer.patch to the stated base and add the three retained untracked test sources. Root implementation resolves to the immutable dependency stated in producer; source hashes are identities, not independent execution attestations.",
   "files": {
     "producer.patch": "252f70d2ee12a3990616f0b64a6ff9417ba91917500af969fb88b7a18286135f",
-    "runtime.jsonl": "fdb3f54cf38a0b5d669d5ab5903c141e8d2bc1ca76289d5563497334d6260007",
+    "runtime.jsonl": "dea5d9166c7ada13fc4f5310b3c6ab1796459f6395f4bb7c22f6350c4fbc7d30",
     "sql_choice_integration_test.go.txt": "3169b272aca1b1e6238a3a59c43239777bb2ca5327f38721df2549219f3557ef",
     "sql_choice_omni_test.go.txt": "9ba6e8b769a9c1fd85ff5e50024d603667eaecbb666bf1e2f5807ef8a6671fc2",
     "sql_choice_test.go.txt": "a5064a90b54a3ff8894a638bace7b8c3e81233bb11a6e27ff51becf4e2509d7d"

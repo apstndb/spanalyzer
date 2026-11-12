@@ -1,11 +1,17 @@
 {
-  "scope": "Full primary source bytes; live HTML originals remain in the retained durable task directory. Mirror/source publication and runtime dates are separate.",
+  "scope": "Full primary source bytes; live HTML originals remain in the retained durable task directory. Mirror/source publication and runtime dates are separate. November 12 retention preserves acquisition hashes; retained_projection identifies compact current bytes when the full response is retired.",
   "files": [
     {
       "file": "emulator-github-releases.json",
       "bytes": 172331,
       "sha256": "8b28053ce797c6662be836f8821f312ff33129e04d02f00e1529413c86f35181",
-      "retained_in_repository": true
+      "retained_in_repository": false,
+      "retained_projection": {
+        "sha256": "f6d1a3d4b211ebf1d08a0aacf3ca5474eeedc38c918fe1ba8a86c710dfe5a587",
+        "bytes": 82363,
+        "date": "2026-11-12",
+        "disposition": "../../research-retention-20261112/disposition.json"
+      }
     },
     {
       "file": "emulator-latest-refresh.json",

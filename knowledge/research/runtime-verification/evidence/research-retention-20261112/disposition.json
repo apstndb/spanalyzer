@@ -1,0 +1,469 @@
+{
+  "date": "2026-11-12",
+  "source_commit": "c38773c0a6a696b2a8110f195b3124b8d974fd79",
+  "scope": "Loss-checked historical GitHub metadata and Go test transcripts, exact duplicate stdout, and release-page copies with identical normalized article text. Runtime SQL measurements, consumed PLAN reports, producer snapshots and survey captures are unchanged.",
+  "original_recovery": "git show source_commit:path; no history rewrite",
+  "changes": [
+    {
+      "path": "knowledge/research/runtime-verification/evidence/cross-engine-doc-delta-20261029/sources/emulator-github-releases.json",
+      "kind": "github_metadata_projection",
+      "original_sha256": "8b28053ce797c6662be836f8821f312ff33129e04d02f00e1529413c86f35181",
+      "original_bytes": 172331,
+      "retained_sha256": "f6d1a3d4b211ebf1d08a0aacf3ca5474eeedc38c918fe1ba8a86c710dfe5a587",
+      "retained_bytes": 82363,
+      "rule": "Retain array/page order, all issue/PR bodies and state, source SHA/ref/paths, labels and non-duplicated metadata; omit repeated account/repository DTOs, derived API links, and per-file commit patch bodies recoverable from immutable commits.",
+      "retained_fields_are_equal_subsets": true
+    },
+    {
+      "path": "knowledge/research/runtime-verification/evidence/docs-delta-20261031/sources/since-baseline.json",
+      "kind": "github_metadata_projection",
+      "original_sha256": "c679b96fca11f446da8f9c07ddd2cfd8743a8e9a6c81d8f16de4ea823afcf080",
+      "original_bytes": 145053,
+      "retained_sha256": "1fc55b30b68d66b454329cd07e7d8ad68bcda20276856e5f6feae829d51ea3ee",
+      "retained_bytes": 31121,
+      "rule": "Retain array/page order, all issue/PR bodies and state, source SHA/ref/paths, labels and non-duplicated metadata; omit repeated account/repository DTOs, derived API links, and per-file commit patch bodies recoverable from immutable commits.",
+      "retained_fields_are_equal_subsets": true
+    },
+    {
+      "path": "knowledge/research/runtime-verification/evidence/docs-delta-runtime-20261031/sources/googlesql-commit.json",
+      "kind": "github_metadata_projection",
+      "original_sha256": "8033806305ce70d4755f1d419f158b365dab9d007b80dbdf6b31786dbe7dfdfc",
+      "original_bytes": 1037227,
+      "retained_sha256": "80b385f1cf60904c4318bf435823728248e8024abf53bdcde77e44aa1a960a64",
+      "retained_bytes": 114705,
+      "rule": "Retain array/page order, all issue/PR bodies and state, source SHA/ref/paths, labels and non-duplicated metadata; omit repeated account/repository DTOs, derived API links, and per-file commit patch bodies recoverable from immutable commits.",
+      "retained_fields_are_equal_subsets": true
+    },
+    {
+      "path": "knowledge/research/runtime-verification/evidence/docs-delta-runtime-20261031/sources/memefish-all-prs-final.json",
+      "kind": "github_metadata_projection",
+      "original_sha256": "9807d737bd2596238c0fccbda1ff70a5d29a8c7c854031ce7b9c026716c38029",
+      "original_bytes": 5348963,
+      "retained_sha256": "eb313df3ff5bcb7157b44d66c83adcd26c5eebcff3f8ed6d26c2074c2ecbd89d",
+      "retained_bytes": 811449,
+      "rule": "Retain array/page order, all issue/PR bodies and state, source SHA/ref/paths, labels and non-duplicated metadata; omit repeated account/repository DTOs, derived API links, and per-file commit patch bodies recoverable from immutable commits.",
+      "retained_fields_are_equal_subsets": true
+    },
+    {
+      "path": "knowledge/research/runtime-verification/evidence/docs-delta-runtime-20261031/sources/memefish-all-prs.json",
+      "kind": "github_metadata_projection",
+      "original_sha256": "99e77b5da6358ff60abbab82f957cddef9133da27313308eecace936c9e09181",
+      "original_bytes": 5332254,
+      "retained_sha256": "a748f73f6b3b8c37076a61a48a01da9a9bef998f604239d13370a8a66d825663",
+      "retained_bytes": 809436,
+      "rule": "Retain array/page order, all issue/PR bodies and state, source SHA/ref/paths, labels and non-duplicated metadata; omit repeated account/repository DTOs, derived API links, and per-file commit patch bodies recoverable from immutable commits.",
+      "retained_fields_are_equal_subsets": true
+    },
+    {
+      "path": "knowledge/research/runtime-verification/evidence/docs-delta-runtime-20261031/sources/memefish-open-issues-final.json",
+      "kind": "github_metadata_projection",
+      "original_sha256": "8ef1127c5f3b16535d0f1db61c1654ad3126707819dfa302c5c8d682e0ec1cd3",
+      "original_bytes": 155392,
+      "retained_sha256": "0f813e0b8247d94258d3b138ee91153768af0d8b5a2096dfa52df198f80096c2",
+      "retained_bytes": 103109,
+      "rule": "Retain array/page order, all issue/PR bodies and state, source SHA/ref/paths, labels and non-duplicated metadata; omit repeated account/repository DTOs, derived API links, and per-file commit patch bodies recoverable from immutable commits.",
+      "retained_fields_are_equal_subsets": true
+    },
+    {
+      "path": "knowledge/research/runtime-verification/evidence/docs-delta-runtime-20261031/sources/memefish-open-issues.json",
+      "kind": "github_metadata_projection",
+      "original_sha256": "b61797044fb7202a02e64477346732f6821dcc42573a12aef35938ea37df0e03",
+      "original_bytes": 149948,
+      "retained_sha256": "3fff706d97426e5890fb7162540e3214d90b3c4614f46f4fae36ec10895773d9",
+      "retained_bytes": 100261,
+      "rule": "Retain array/page order, all issue/PR bodies and state, source SHA/ref/paths, labels and non-duplicated metadata; omit repeated account/repository DTOs, derived API links, and per-file commit patch bodies recoverable from immutable commits.",
+      "retained_fields_are_equal_subsets": true
+    },
+    {
+      "path": "knowledge/research/runtime-verification/evidence/docs-delta-runtime-20261031/sources/memefish-open-prs-final.json",
+      "kind": "github_metadata_projection",
+      "original_sha256": "d2f8bdf867e48dadb0b668ff6dc98fea36bc3065c3124412d2e396735b5d41a7",
+      "original_bytes": 118697,
+      "retained_sha256": "8f8acdbeaf40f53022f0057712e7bea38a2e046cc2a87e89c39a34ff57510a16",
+      "retained_bytes": 26434,
+      "rule": "Retain array/page order, all issue/PR bodies and state, source SHA/ref/paths, labels and non-duplicated metadata; omit repeated account/repository DTOs, derived API links, and per-file commit patch bodies recoverable from immutable commits.",
+      "retained_fields_are_equal_subsets": true
+    },
+    {
+      "path": "knowledge/research/runtime-verification/evidence/docs-delta-runtime-20261031/sources/memefish-open-prs.json",
+      "kind": "github_metadata_projection",
+      "original_sha256": "ddaf767f1d1269cd35c9e44e815cbda0a7dd80aa05e51a0b4b344c3e79aa7415",
+      "original_bytes": 101988,
+      "retained_sha256": "774dbd67d2fe99780bd24c213ef38a7694458c63beef2d4a5d8215d20f1d52ab",
+      "retained_bytes": 24421,
+      "rule": "Retain array/page order, all issue/PR bodies and state, source SHA/ref/paths, labels and non-duplicated metadata; omit repeated account/repository DTOs, derived API links, and per-file commit patch bodies recoverable from immutable commits.",
+      "retained_fields_are_equal_subsets": true
+    },
+    {
+      "path": "knowledge/research/runtime-verification/evidence/emulator-issue-candidates-20261031/sources/current-master.json",
+      "kind": "github_metadata_projection",
+      "original_sha256": "3f787f6f63b003fff457dae7efbe0eed00d007926100fbde6bbb9a6cac263b5e",
+      "original_bytes": 826865,
+      "retained_sha256": "2cc05ab2cc9b43618011a19f59edb060d6249d495325e048856d69ecbc53cc67",
+      "retained_bytes": 91499,
+      "rule": "Retain array/page order, all issue/PR bodies and state, source SHA/ref/paths, labels and non-duplicated metadata; omit repeated account/repository DTOs, derived API links, and per-file commit patch bodies recoverable from immutable commits.",
+      "retained_fields_are_equal_subsets": true
+    },
+    {
+      "path": "knowledge/research/runtime-verification/evidence/emulator-issue-candidates-20261031/sources/emulator-tree.json",
+      "kind": "github_metadata_projection",
+      "original_sha256": "8229d726a82a0b41a7dd76e7f6ac6084236dbc665f29f4f0722059a17aeb72db",
+      "original_bytes": 2096541,
+      "retained_sha256": "3d4efa5cb1fb078b3c3f6a6d68671ae24a215c5ab0157d5cec71375e5c89dc3b",
+      "retained_bytes": 1146792,
+      "rule": "Retain array/page order, all issue/PR bodies and state, source SHA/ref/paths, labels and non-duplicated metadata; omit repeated account/repository DTOs, derived API links, and per-file commit patch bodies recoverable from immutable commits.",
+      "retained_fields_are_equal_subsets": true
+    },
+    {
+      "path": "knowledge/research/runtime-verification/evidence/emulator-issue-candidates-20261031/sources/issues-all.json",
+      "kind": "github_metadata_projection",
+      "original_sha256": "8e903495d9b461712a1c2adec3bb187673c9426fa33159f3103778c79ba34e5d",
+      "original_bytes": 1974232,
+      "retained_sha256": "53729464f75a8a8e583aceb9fe8a4efab64868daefe95a550df6caee843d71f4",
+      "retained_bytes": 1074316,
+      "rule": "Retain array/page order, all issue/PR bodies and state, source SHA/ref/paths, labels and non-duplicated metadata; omit repeated account/repository DTOs, derived API links, and per-file commit patch bodies recoverable from immutable commits.",
+      "retained_fields_are_equal_subsets": true
+    },
+    {
+      "path": "knowledge/research/runtime-verification/evidence/gql-order-bisect-20261031/sources/commit-1.5.29.json",
+      "kind": "github_metadata_projection",
+      "original_sha256": "c1fd648aaeef14d1dcb889c879782ebf95910a3c9acbb1be72a6a37d50d86976",
+      "original_bytes": 847019,
+      "retained_sha256": "222b14be69847e67dfe4b8d4f358857bac404689ab3a99523155835bcbcbeb60",
+      "retained_bytes": 162830,
+      "rule": "Retain array/page order, all issue/PR bodies and state, source SHA/ref/paths, labels and non-duplicated metadata; omit repeated account/repository DTOs, derived API links, and per-file commit patch bodies recoverable from immutable commits.",
+      "retained_fields_are_equal_subsets": true
+    },
+    {
+      "path": "knowledge/research/runtime-verification/evidence/gql-order-bisect-20261031/sources/commit-1.5.30.json",
+      "kind": "github_metadata_projection",
+      "original_sha256": "8d5bc09d40fbaaa5cb6ee96cd9bef045c57d5d45c89eb6586508fce653c51df2",
+      "original_bytes": 580731,
+      "retained_sha256": "b6dbbfcfdc39db0f4cce22ac4dd128c430b7c3df246869d2e8b05b6a5b8f4ad9",
+      "retained_bytes": 70158,
+      "rule": "Retain array/page order, all issue/PR bodies and state, source SHA/ref/paths, labels and non-duplicated metadata; omit repeated account/repository DTOs, derived API links, and per-file commit patch bodies recoverable from immutable commits.",
+      "retained_fields_are_equal_subsets": true
+    },
+    {
+      "path": "knowledge/research/runtime-verification/evidence/gql-order-bisect-20261031/sources/releases.json",
+      "kind": "github_metadata_projection",
+      "original_sha256": "8b28053ce797c6662be836f8821f312ff33129e04d02f00e1529413c86f35181",
+      "original_bytes": 172331,
+      "retained_sha256": "f6d1a3d4b211ebf1d08a0aacf3ca5474eeedc38c918fe1ba8a86c710dfe5a587",
+      "retained_bytes": 82363,
+      "rule": "Retain array/page order, all issue/PR bodies and state, source SHA/ref/paths, labels and non-duplicated metadata; omit repeated account/repository DTOs, derived API links, and per-file commit patch bodies recoverable from immutable commits.",
+      "retained_fields_are_equal_subsets": true
+    },
+    {
+      "path": "knowledge/research/runtime-verification/evidence/gql-order-root-cause-20261030/sources/googlesql-current-head.json",
+      "kind": "github_metadata_projection",
+      "original_sha256": "8033806305ce70d4755f1d419f158b365dab9d007b80dbdf6b31786dbe7dfdfc",
+      "original_bytes": 1037227,
+      "retained_sha256": "80b385f1cf60904c4318bf435823728248e8024abf53bdcde77e44aa1a960a64",
+      "retained_bytes": 114705,
+      "rule": "Retain array/page order, all issue/PR bodies and state, source SHA/ref/paths, labels and non-duplicated metadata; omit repeated account/repository DTOs, derived API links, and per-file commit patch bodies recoverable from immutable commits.",
+      "retained_fields_are_equal_subsets": true
+    },
+    {
+      "path": "knowledge/research/runtime-verification/evidence/json-parser-impact-20261010/open-issues-and-prs.json",
+      "kind": "github_metadata_projection",
+      "original_sha256": "d8fcdfae4d972f633f530b83665cc00e8716bcf7b9c8567e41f7278e85126af8",
+      "original_bytes": 171586,
+      "retained_sha256": "72f586386f313ddcfad832abca68fb83374e2ac5759bab36c171b183ebf0da5b",
+      "retained_bytes": 115357,
+      "rule": "Retain array/page order, all issue/PR bodies and state, source SHA/ref/paths, labels and non-duplicated metadata; omit repeated account/repository DTOs, derived API links, and per-file commit patch bodies recoverable from immutable commits.",
+      "retained_fields_are_equal_subsets": true
+    },
+    {
+      "path": "knowledge/research/runtime-verification/evidence/managed-recheck-20261021/mirror-compare.json",
+      "kind": "github_metadata_projection",
+      "original_sha256": "0eab2dcbaf0ef3dedffa2c000f8c051c5de9405e4b4979222b053cc3efde158b",
+      "original_bytes": 327913,
+      "retained_sha256": "5928f48583f791a040c3bd63732c2f35a507a379b6291c97d417d1d9eabf3d89",
+      "retained_bytes": 48068,
+      "rule": "Retain array/page order, all issue/PR bodies and state, source SHA/ref/paths, labels and non-duplicated metadata; omit repeated account/repository DTOs, derived API links, and per-file commit patch bodies recoverable from immutable commits.",
+      "retained_fields_are_equal_subsets": true
+    },
+    {
+      "path": "knowledge/research/runtime-verification/evidence/managed-recheck-20261023/documentation-mirror-compare.json",
+      "kind": "github_metadata_projection",
+      "original_sha256": "5fed95cf83a74502c613b5a85a208f1d7c7c970e5be66bfa5a472886879f0f4d",
+      "original_bytes": 138805,
+      "retained_sha256": "c9dfed17d6b0dbc9f0b72964ba5b8a363dbb4085e4e4f6f05197d160c60077c4",
+      "retained_bytes": 17370,
+      "rule": "Retain array/page order, all issue/PR bodies and state, source SHA/ref/paths, labels and non-duplicated metadata; omit repeated account/repository DTOs, derived API links, and per-file commit patch bodies recoverable from immutable commits.",
+      "retained_fields_are_equal_subsets": true
+    },
+    {
+      "path": "knowledge/research/runtime-verification/evidence/managed-recheck-20261029/sources/mirror-compare.json",
+      "kind": "github_metadata_projection",
+      "original_sha256": "087930eeaae55ccab65711df5cfeff193a052c2bd8fa1184f826b65cf370aaeb",
+      "original_bytes": 465238,
+      "retained_sha256": "873b54b8402a1f898d4578be7f40eb8df76770bfdce03b88324dedc912c046bd",
+      "retained_bytes": 39489,
+      "rule": "Retain array/page order, all issue/PR bodies and state, source SHA/ref/paths, labels and non-duplicated metadata; omit repeated account/repository DTOs, derived API links, and per-file commit patch bodies recoverable from immutable commits.",
+      "retained_fields_are_equal_subsets": true
+    },
+    {
+      "path": "knowledge/research/runtime-verification/evidence/managed-recheck-20261029/sources/mirror-head-refresh.json",
+      "kind": "github_metadata_projection",
+      "original_sha256": "585d0ef00dcfd3cbe0172e563a5c29ac0d688c4151a9a1d946989f73bd65df09",
+      "original_bytes": 114363,
+      "retained_sha256": "48e7099a72951a3d175ab7b05e1a9e31c37bb7343d448b69d4e71ed930e9f099",
+      "retained_bytes": 9866,
+      "rule": "Retain array/page order, all issue/PR bodies and state, source SHA/ref/paths, labels and non-duplicated metadata; omit repeated account/repository DTOs, derived API links, and per-file commit patch bodies recoverable from immutable commits.",
+      "retained_fields_are_equal_subsets": true
+    },
+    {
+      "path": "knowledge/research/runtime-verification/evidence/emulator-1.5.57-release/release-probes-final.jsonl",
+      "kind": "go_test_event_projection",
+      "original_sha256": "70ea5b01d4d89937d52c88595912db46e26daa968cc3b9a6c04164271ed2c78c",
+      "original_bytes": 22292,
+      "retained_sha256": "ceecacdfb8fe6b58bbf1fe4d04b5d5f6615e8bfe18ad235a489a6df4d468683e",
+      "retained_bytes": 10669,
+      "rule": "Retain every non-output event and every non-framework output, including observation-only passing tests, all failure output, full logged plans/results and provenance. Omit only duplicate Go test RUN/PAUSE/CONT/NAME/PASS and successful package-summary lines.",
+      "original_records": 116,
+      "failed_tests": 0
+    },
+    {
+      "path": "knowledge/research/runtime-verification/evidence/emulator-1.5.57-release/survey-tests-r2.jsonl",
+      "kind": "go_test_event_projection",
+      "original_sha256": "08d6a5d1ced6ee07bef96b53997927ca550abf245a5aa57ee27fcaeb0dee6418",
+      "original_bytes": 335894,
+      "retained_sha256": "2a3a9799f4244414bd8228509d28135e7cacd7d092cb5752170988b73e6dc9ad",
+      "retained_bytes": 142799,
+      "rule": "Retain every non-output event and every non-framework output, including observation-only passing tests, all failure output, full logged plans/results and provenance. Omit only duplicate Go test RUN/PAUSE/CONT/NAME/PASS and successful package-summary lines.",
+      "original_records": 1587,
+      "failed_tests": 0
+    },
+    {
+      "path": "knowledge/research/runtime-verification/evidence/finite-sql-choices-20261109/followup/runtime.jsonl",
+      "kind": "go_test_event_projection",
+      "original_sha256": "f9597c9a4ceae36b35c9c4803adb7bc5828f33eaf1d1abda40b07712edb5c5a6",
+      "original_bytes": 24903,
+      "retained_sha256": "bb1a636d16e1dc84049db453dd2a92c8b927acae9807aa793959d25824602033",
+      "retained_bytes": 16238,
+      "rule": "Retain every non-output event and every non-framework output, including observation-only passing tests, all failure output, full logged plans/results and provenance. Omit only duplicate Go test RUN/PAUSE/CONT/NAME/PASS and successful package-summary lines.",
+      "original_records": 106,
+      "failed_tests": 0
+    },
+    {
+      "path": "knowledge/research/runtime-verification/evidence/finite-sql-choices-20261109/runtime.jsonl",
+      "kind": "go_test_event_projection",
+      "original_sha256": "fdb3f54cf38a0b5d669d5ab5903c141e8d2bc1ca76289d5563497334d6260007",
+      "original_bytes": 86458,
+      "retained_sha256": "dea5d9166c7ada13fc4f5310b3c6ab1796459f6395f4bb7c22f6350c4fbc7d30",
+      "retained_bytes": 53079,
+      "rule": "Retain every non-output event and every non-framework output, including observation-only passing tests, all failure output, full logged plans/results and provenance. Omit only duplicate Go test RUN/PAUSE/CONT/NAME/PASS and successful package-summary lines.",
+      "original_records": 325,
+      "failed_tests": 0
+    },
+    {
+      "path": "knowledge/research/runtime-verification/evidence/omni-r3-20260926/integration-tests.jsonl",
+      "kind": "go_test_event_projection",
+      "original_sha256": "5924f1d42eae8414015c4787bbfad3519fbea39a8bd17f5f4b97da78a8dc9fa5",
+      "original_bytes": 346416,
+      "retained_sha256": "d1dc6b8466b7454f4408cb1e931a05978da5c214e0f8ddccb3181c9ccd7d77d0",
+      "retained_bytes": 215956,
+      "rule": "Retain every non-output event and every non-framework output, including observation-only passing tests, all failure output, full logged plans/results and provenance. Omit only duplicate Go test RUN/PAUSE/CONT/NAME/PASS and successful package-summary lines.",
+      "original_records": 1128,
+      "failed_tests": 20
+    },
+    {
+      "path": "knowledge/research/runtime-verification/evidence/omni-r3-20260926/query-generator.jsonl",
+      "kind": "go_test_event_projection",
+      "original_sha256": "af177c3c5042ad5097ce8e5a6a65324248fa9c14d3c42940d322aec18f5b7657",
+      "original_bytes": 31608,
+      "retained_sha256": "1400e29ff717fa966dfffd9952daa0ad799432df6c94a95263a6d9dd28faddd4",
+      "retained_bytes": 13039,
+      "rule": "Retain every non-output event and every non-framework output, including observation-only passing tests, all failure output, full logged plans/results and provenance. Omit only duplicate Go test RUN/PAUSE/CONT/NAME/PASS and successful package-summary lines.",
+      "original_records": 125,
+      "failed_tests": 0
+    },
+    {
+      "path": "knowledge/research/runtime-verification/evidence/omni-r4-20261004/integration-tests.jsonl",
+      "kind": "go_test_event_projection",
+      "original_sha256": "ee24c311fdbfebf4c7c6cecc3405256d67e0952291d6637779f2fe82f9b3341f",
+      "original_bytes": 346511,
+      "retained_sha256": "82968f634b821894edead62166b9f8cf1c84fb5c3c161de04ed98abef8a3ffbf",
+      "retained_bytes": 216028,
+      "rule": "Retain every non-output event and every non-framework output, including observation-only passing tests, all failure output, full logged plans/results and provenance. Omit only duplicate Go test RUN/PAUSE/CONT/NAME/PASS and successful package-summary lines.",
+      "original_records": 1128,
+      "failed_tests": 20
+    },
+    {
+      "path": "knowledge/research/runtime-verification/evidence/omni-r4-20261004/query-generator.jsonl",
+      "kind": "go_test_event_projection",
+      "original_sha256": "a12e9147a99def94c3551d4ebe1a035cb7cf3970b399be55a9f65dfa4f31c470",
+      "original_bytes": 31605,
+      "retained_sha256": "e6ef3aa41910d593541e2a111f5ff98b4d4afcd2c88f9199fd21cced63bcc5b0",
+      "retained_bytes": 13039,
+      "rule": "Retain every non-output event and every non-framework output, including observation-only passing tests, all failure output, full logged plans/results and provenance. Omit only duplicate Go test RUN/PAUSE/CONT/NAME/PASS and successful package-summary lines.",
+      "original_records": 125,
+      "failed_tests": 0
+    },
+    {
+      "path": "knowledge/research/runtime-verification/evidence/managed-recheck-20261007/cleanup.stdout",
+      "kind": "exact_duplicate",
+      "original_sha256": "30fad5f253db7e489691b89ffb16b7c3368ff050d0a126fa1e0cb172787b32fd",
+      "original_bytes": 1399,
+      "retained_sha256": null,
+      "retained_bytes": 0,
+      "canonical": "knowledge/research/runtime-verification/evidence/managed-recheck-20261007/cleanup.jsonl"
+    },
+    {
+      "path": "knowledge/research/runtime-verification/evidence/managed-recheck-20261007/google-features.stdout",
+      "kind": "exact_duplicate",
+      "original_sha256": "803b294b4ea57c7fc8435e99de5f3f4e5dcac006f9a03abe2f826c7e521b09e5",
+      "original_bytes": 61528,
+      "retained_sha256": null,
+      "retained_bytes": 0,
+      "canonical": "knowledge/research/runtime-verification/evidence/managed-recheck-20261007/google-features.jsonl"
+    },
+    {
+      "path": "knowledge/research/runtime-verification/evidence/managed-recheck-20261007/pg-features.stdout",
+      "kind": "exact_duplicate",
+      "original_sha256": "a66f2d430c30a45da61b5207d70665552c503f441f57cc4abb085a89a25d6019",
+      "original_bytes": 55064,
+      "retained_sha256": null,
+      "retained_bytes": 0,
+      "canonical": "knowledge/research/runtime-verification/evidence/managed-recheck-20261007/pg-features.jsonl"
+    },
+    {
+      "path": "knowledge/research/runtime-verification/evidence/managed-recheck-20261007/queue.stdout",
+      "kind": "exact_duplicate",
+      "original_sha256": "5022b68712a0b8a520f71730ef74269dd7fc7ff28b3297c54bebddc79445830b",
+      "original_bytes": 17892,
+      "retained_sha256": null,
+      "retained_bytes": 0,
+      "canonical": "knowledge/research/runtime-verification/evidence/managed-recheck-20261007/queue.jsonl"
+    },
+    {
+      "path": "knowledge/research/runtime-verification/evidence/managed-recheck-20261007/readonly.stdout",
+      "kind": "exact_duplicate",
+      "original_sha256": "5d9da7559ed9375dcc5a7daaa097edeba0afd29aa0d19374a67e94adcf1489df",
+      "original_bytes": 39774,
+      "retained_sha256": null,
+      "retained_bytes": 0,
+      "canonical": "knowledge/research/runtime-verification/evidence/managed-recheck-20261007/readonly.jsonl"
+    },
+    {
+      "path": "knowledge/research/runtime-verification/evidence/managed-recheck-20261009/active-batch.stdout",
+      "kind": "exact_duplicate",
+      "original_sha256": "92393a61614cca5bdafdd00d029892c2388768de45cead0893a26716c1930267",
+      "original_bytes": 5843,
+      "retained_sha256": null,
+      "retained_bytes": 0,
+      "canonical": "knowledge/research/runtime-verification/evidence/managed-recheck-20261009/active-batch.jsonl"
+    },
+    {
+      "path": "knowledge/research/runtime-verification/evidence/managed-recheck-20261009/cleanup.stdout",
+      "kind": "exact_duplicate",
+      "original_sha256": "089ccbfc0ea990a27e7bbd731b8d424d3d9dadb7682de58a716fb7b55d0eea97",
+      "original_bytes": 1398,
+      "retained_sha256": null,
+      "retained_bytes": 0,
+      "canonical": "knowledge/research/runtime-verification/evidence/managed-recheck-20261009/cleanup.jsonl"
+    },
+    {
+      "path": "knowledge/research/runtime-verification/evidence/managed-recheck-20261009/google-features.stdout",
+      "kind": "exact_duplicate",
+      "original_sha256": "684c444054cff2578f8f3deefdb84112cdcab916dce84d6e2789f26561e524af",
+      "original_bytes": 61543,
+      "retained_sha256": null,
+      "retained_bytes": 0,
+      "canonical": "knowledge/research/runtime-verification/evidence/managed-recheck-20261009/google-features.jsonl"
+    },
+    {
+      "path": "knowledge/research/runtime-verification/evidence/managed-recheck-20261009/pg-features.stdout",
+      "kind": "exact_duplicate",
+      "original_sha256": "ff97b223b8b246dff4b6ca7b75bd3ae5f826a2f224579dd92808e43c2a49c2c0",
+      "original_bytes": 55090,
+      "retained_sha256": null,
+      "retained_bytes": 0,
+      "canonical": "knowledge/research/runtime-verification/evidence/managed-recheck-20261009/pg-features.jsonl"
+    },
+    {
+      "path": "knowledge/research/runtime-verification/evidence/managed-recheck-20261009/queue.stdout",
+      "kind": "exact_duplicate",
+      "original_sha256": "fcc3281e1cd2ea35736f64c90eafcd5f73fa52d2eaadb10012afc5dec67a32ac",
+      "original_bytes": 17891,
+      "retained_sha256": null,
+      "retained_bytes": 0,
+      "canonical": "knowledge/research/runtime-verification/evidence/managed-recheck-20261009/queue.jsonl"
+    },
+    {
+      "path": "knowledge/research/runtime-verification/evidence/managed-recheck-20261009/readonly.stdout",
+      "kind": "exact_duplicate",
+      "original_sha256": "5b838b94f7b8a163c448e898c92c463a0ab8fadf8ab269f061fe89a10fc4873b",
+      "original_bytes": 40035,
+      "retained_sha256": null,
+      "retained_bytes": 0,
+      "canonical": "knowledge/research/runtime-verification/evidence/managed-recheck-20261009/readonly.jsonl"
+    },
+    {
+      "path": "knowledge/research/runtime-verification/evidence/managed-recheck-20261112/release-notes-final.html.gz",
+      "kind": "article_text_duplicate",
+      "original_sha256": "c177327838fe402cc14aaad7bbc0bccdd29edae9216f5731c8124d671ca7c804",
+      "original_bytes": 150841,
+      "retained_sha256": null,
+      "retained_bytes": 0,
+      "canonical": "knowledge/research/runtime-verification/evidence/managed-recheck-20261112/release-notes.html.gz",
+      "normalized_article_sha256": "37a643fd874f85c330009d319d5510741ac4abb1e8b2cc3fd671ba9d87ca5b05",
+      "rule": "HTMLParser article text excluding script/style, whitespace-normalized. Raw response bytes differ; no exact-byte identity is claimed."
+    },
+    {
+      "path": "knowledge/research/runtime-verification/evidence/managed-recheck-20261112/release-notes-after-pg.html.gz",
+      "kind": "article_text_duplicate",
+      "original_sha256": "601a190bed594c001db60d0aab08521ef2a8627240d82809a7584d724129bca6",
+      "original_bytes": 150830,
+      "retained_sha256": null,
+      "retained_bytes": 0,
+      "canonical": "knowledge/research/runtime-verification/evidence/managed-recheck-20261112/release-notes.html.gz",
+      "normalized_article_sha256": "37a643fd874f85c330009d319d5510741ac4abb1e8b2cc3fd671ba9d87ca5b05",
+      "rule": "HTMLParser article text excluding script/style, whitespace-normalized. Raw response bytes differ; no exact-byte identity is claimed."
+    },
+    {
+      "path": "knowledge/research/runtime-verification/evidence/emulator-open-issues-20261030/open-issues.json",
+      "kind": "github_metadata_projection",
+      "original_sha256": "8171e1ee5369a1c20b85656ee1071371d1372c77fe85274fcc0e31e57edf99ef",
+      "original_bytes": 740498,
+      "retained_sha256": "7e3e3e9c2731b940f13a8b7043dd3f31970a1c5e197bef953cd3c8db4c493c55",
+      "retained_bytes": 399170,
+      "rule": "Retain the wrapper, all bodies/comments, lifecycle state and source identities; omit repeated DTOs, derived API links and immutable-commit patch copies.",
+      "retained_fields_are_equal_subsets": true
+    },
+    {
+      "path": "knowledge/research/runtime-verification/evidence/managed-recheck-20261029/sources/commit-details.json",
+      "kind": "github_metadata_projection",
+      "original_sha256": "deec5ee30ebf3ada9aaa497407fd9212a75b2b71189fd3045d9e5caa249506ca",
+      "original_bytes": 526166,
+      "retained_sha256": "06b8da070d761902198a355c0c096eab6c3b50942964d038ff49d1d2a0318fb0",
+      "retained_bytes": 33634,
+      "rule": "Retain the wrapper, all bodies/comments, lifecycle state and source identities; omit repeated DTOs, derived API links and immutable-commit patch copies.",
+      "retained_fields_are_equal_subsets": true
+    }
+  ],
+  "totals": {
+    "files": 44,
+    "original_bytes": 24466183,
+    "retained_bytes": 6189763,
+    "saved_bytes": 18276420
+  },
+  "schema_version": "research-retention/v0alpha1",
+  "acquisition_hash_boundary": "Original acquisition/import hashes continue to identify the event and revision recorded by their receipt. This disposition maps the source_commit bytes to current retained projections; artifact-sha256.json verifies current evidence.",
+  "retained_large_artifacts": [
+    {
+      "path": "knowledge/research/runtime-verification/evidence/cross-engine-doc-delta-20261029/comparison.json",
+      "reason": "The historical offline verifier consumes per-case pairs and PLAN observations, including HLL/propagation coverage and cross-engine value differences."
+    },
+    {
+      "path": "knowledge/research/runtime-verification/evidence/plan-summary-lts-20261108",
+      "reason": "The full and summary JSON/YAML reports are fixtures consumed by schema/parity validation; they are not ordinary passing-test stdout."
+    },
+    {
+      "path": "survey/",
+      "reason": "Producer-owned primary metadata captures and projection selectors are outside this retention change."
+    }
+  ]
+}

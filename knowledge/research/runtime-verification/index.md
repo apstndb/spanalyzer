@@ -38,6 +38,10 @@ these notes in [evidence](evidence/). The [migration provenance](evidence/migrat
 records original and retained hashes, transformations and historical sources.
 The [artifact hash manifest](evidence/artifact-sha256.json) covers the retained
 research evidence, including that provenance record.
+The [November 12 retention review](research-evidence-retention-20261112.md)
+maps compact historical API/test outputs and retired duplicate captures to
+their pinned originals. Original acquisition/import hashes and current
+retained-file hashes describe different events; the disposition records both.
 
 Raw JSON is observation evidence. Probe source is a reproducer, and an
 assertion summary is a derived check; neither is an execution attestation.
