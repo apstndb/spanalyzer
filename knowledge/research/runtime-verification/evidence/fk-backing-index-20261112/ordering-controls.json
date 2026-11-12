@@ -1,0 +1,60 @@
+{
+  "dialect": "google",
+  "steps": [
+    {
+      "label": "ordered/parent",
+      "kind": "ddl",
+      "statements": [
+        "CREATE TABLE OrderedParent(A INT64 NOT NULL,B INT64 NOT NULL) PRIMARY KEY(A,B)"
+      ],
+      "family": "foreign-key-backing-index",
+      "timeout_seconds": 90
+    },
+    {
+      "label": "ordered/seed",
+      "kind": "dml",
+      "requires": [
+        "ordered/parent"
+      ],
+      "statements": [
+        "INSERT INTO OrderedParent(A,B) VALUES(1,2)"
+      ],
+      "family": "foreign-key-backing-index",
+      "timeout_seconds": 90
+    },
+    {
+      "label": "ordered/child",
+      "kind": "ddl",
+      "requires": [
+        "ordered/seed"
+      ],
+      "statements": [
+        "CREATE TABLE OrderedChild(X INT64 NOT NULL,Y INT64 NOT NULL,V STRING(MAX),CONSTRAINT OrderedFk FOREIGN KEY(X,Y) REFERENCES OrderedParent(B,A)) PRIMARY KEY(X,Y)"
+      ],
+      "family": "foreign-key-backing-index",
+      "timeout_seconds": 90
+    },
+    {
+      "label": "ordered/indexes",
+      "kind": "query",
+      "requires": [
+        "ordered/child"
+      ],
+      "sql": "SELECT i.TABLE_SCHEMA,i.TABLE_NAME,i.INDEX_NAME,i.INDEX_TYPE,i.IS_UNIQUE,i.IS_NULL_FILTERED,i.INDEX_STATE,i.SPANNER_IS_MANAGED,c.COLUMN_NAME,c.ORDINAL_POSITION,c.COLUMN_ORDERING FROM INFORMATION_SCHEMA.INDEXES AS i JOIN INFORMATION_SCHEMA.INDEX_COLUMNS AS c USING(TABLE_CATALOG,TABLE_SCHEMA,TABLE_NAME,INDEX_NAME) WHERE i.INDEX_TYPE='INDEX' AND i.TABLE_NAME IN ('OrderedChild','OrderedParent') ORDER BY i.TABLE_SCHEMA,i.TABLE_NAME,i.INDEX_NAME,c.ORDINAL_POSITION,c.COLUMN_NAME",
+      "family": "foreign-key-backing-index",
+      "timeout_seconds": 90
+    },
+    {
+      "label": "ordered/insert",
+      "kind": "dml",
+      "requires": [
+        "ordered/child"
+      ],
+      "statements": [
+        "INSERT INTO OrderedChild(X,Y,V) VALUES(2,1,'x')"
+      ],
+      "family": "foreign-key-backing-index",
+      "timeout_seconds": 90
+    }
+  ]
+}

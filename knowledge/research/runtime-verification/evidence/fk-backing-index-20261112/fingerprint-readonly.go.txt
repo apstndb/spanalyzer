@@ -1,0 +1,47 @@
+package main
+
+import (
+	"context"
+	"encoding/json"
+	"fmt"
+	"os"
+	"time"
+
+	"cloud.google.com/go/spanner"
+	"google.golang.org/api/iterator"
+)
+
+func main() {
+	if os.Getenv("SPANNER_EMULATOR_HOST") != "" {
+		panic("emulator override")
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
+	defer cancel()
+	client, err := spanner.NewClient(ctx, os.Getenv("FK_READONLY_DATABASE"))
+	if err != nil {
+		panic(err)
+	}
+	defer client.Close()
+	texts := []string{"2695C62E33338E4B_IDX_NotNullSide_Owner", "IDX_NotNullSide_Owner", "2695C62E33338E4B_IDX_NullableSide_Owner_N", "IDX_NullableSide_Owner_N"}
+	ro := client.Single()
+	defer ro.Close()
+	it := ro.Query(ctx, spanner.Statement{SQL: "SELECT text,FARM_FINGERPRINT(text) AS fingerprint FROM UNNEST(@texts) AS text ORDER BY text", Params: map[string]interface{}{"texts": texts}})
+	defer it.Stop()
+	for {
+		row, err := it.Next()
+		if err == iterator.Done {
+			break
+		}
+		if err != nil {
+			panic(err)
+		}
+		var text string
+		var value int64
+		if err = row.Columns(&text, &value); err != nil {
+			panic(err)
+		}
+		if err = json.NewEncoder(os.Stdout).Encode(map[string]interface{}{"text": text, "fingerprint_hex": fmt.Sprintf("%016X", uint64(value)), "observed_at": time.Now().UTC().Format(time.RFC3339Nano)}); err != nil {
+			panic(err)
+		}
+	}
+}

@@ -1,0 +1,64 @@
+--- a/managed.go
++++ b/managed.go
+@@ -88,7 +88,7 @@
+ 	if err = json.Unmarshal(bytes, &plan); err != nil {
+ 		panic(err)
+ 	}
+-	if os.Getenv("SPANALYZER_OWNED_FIXTURE_APPROVAL") != "managed-revalidation-20261112" {
++	if os.Getenv("SPANALYZER_OWNED_FIXTURE_APPROVAL") != "fk-backing-index-20261112" {
+ 		panic("current run approval is required before database creation")
+ 	}
+ 	ctx := context.Background()
+@@ -98,7 +98,7 @@
+ 	}
+ 	defer admin.Close()
+ 	parent := fmt.Sprintf("projects/%s/instances/%s", os.Getenv("SPANNER_PROJECT_ID"), os.Getenv("SPANNER_INSTANCE_ID"))
+-	name := fmt.Sprintf("recheck1112g-%x", time.Now().UnixNano())
++	name := fmt.Sprintf("fk1112g-%x", time.Now().UnixNano())
+ 	dialect := dbpb.DatabaseDialect_GOOGLE_STANDARD_SQL
+ 	statement := "CREATE DATABASE `" + name + "`"
+ 	if plan.Dialect == "pg" {
+@@ -107,6 +107,16 @@
+ 		statement = "CREATE DATABASE \"" + name + "\""
+ 	}
+ 	db := parent + "/databases/" + name
++	journal, err := os.OpenFile(os.Getenv("SPANALYZER_FIXTURE_JOURNAL"), os.O_WRONLY|os.O_CREATE|os.O_EXCL, 0600)
++	if err != nil {
++		panic(err)
++	}
++	if err = json.NewEncoder(journal).Encode(map[string]string{"database": db, "purpose": "one authorized FK backing-index lifecycle"}); err != nil {
++		panic(err)
++	}
++	if err = journal.Close(); err != nil {
++		panic(err)
++	}
+ 	cx, cancel := context.WithTimeout(ctx, 3*time.Minute)
+ 	op, err := admin.CreateDatabase(cx, &dbpb.CreateDatabaseRequest{Parent: parent, CreateStatement: statement, DatabaseDialect: dialect})
+ 	if err != nil {
+@@ -254,7 +264,8 @@
+ 			ro.Close()
+ 		case "dml":
+ 			var counts []int64
+-			_, e = client.ReadWriteTransaction(cx, func(ctx context.Context, tx *spanner.ReadWriteTransaction) error {
++			var commitResponse spanner.CommitResponse
++			commitResponse, e = client.ReadWriteTransactionWithOptions(cx, func(ctx context.Context, tx *spanner.ReadWriteTransaction) error {
+ 				counts = nil
+ 				for _, sql := range s.Statements {
+ 					n, err := tx.Update(ctx, spanner.Statement{SQL: sql})
+@@ -264,9 +275,15 @@
+ 					counts = append(counts, n)
+ 				}
+ 				return nil
+-			})
++			}, spanner.TransactionOptions{CommitOptions: spanner.CommitOptions{ReturnCommitStats: true}})
+ 			result["modified_counts"] = counts
+ 			result["transaction_committed"] = e == nil
++
++			result["stats_present"] = e == nil && commitResponse.CommitStats != nil
++			result["mutation_count"] = nil
++			if e == nil && commitResponse.CommitStats != nil {
++				result["mutation_count"] = commitResponse.CommitStats.MutationCount
++			}
+ 		case "mutation-delete":
+ 			key := make(spanner.Key, len(s.Key))
+ 			for i, value := range s.Key {
