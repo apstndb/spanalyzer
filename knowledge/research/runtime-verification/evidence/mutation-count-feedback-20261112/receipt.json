@@ -61,25 +61,10 @@
       "archive_sha256": "df91a23b6ccb9ed7655558ae93175c905122fe1b29eb0b331d4883250ed1713d"
     }
   },
-  "report_archives": {
-    "encoding": "gzip with mtime=0; decoded bytes match the captured JSON exactly",
-    "files": [
-      {
-        "original": "report.json",
-        "archive": "report.json.gz",
-        "payload_sha256": "01e76a361f6f67bc56e0c3622a4703523f6ea04807a7bc216bc6e2769a805b07",
-        "archive_sha256": "452277be11ba96d454c087363eb9f309b950723d813c1742d47a200b4ea7b124",
-        "payload_bytes": 1167746,
-        "archive_bytes": 49942
-      },
-      {
-        "original": "first-attempt-report.json",
-        "archive": "first-attempt-report.json.gz",
-        "payload_sha256": "28c7b05ec0f151446969bb49f2ce6e3fabd98dd805d51b38df68237bcc3e6396",
-        "archive_sha256": "b15c337593fddf5f8eeccb7c2229ea544b7f14ca269b0915d1fea69e841cceff",
-        "payload_bytes": 1166370,
-        "archive_bytes": 50187
-      }
-    ]
+  "evidence_retention": {
+    "changed_on": "2026-11-12",
+    "source_commit": "6a99aad7bee9502f59ac1148c813fd3dd9924f07",
+    "retirement_manifest": "../mutation-integration-20261112/evidence-retirement.json",
+    "policy": "Retain reproduction inputs, compact dated observations, failures and check statuses; omit redundant full reports and ordinary test logs."
   }
 }

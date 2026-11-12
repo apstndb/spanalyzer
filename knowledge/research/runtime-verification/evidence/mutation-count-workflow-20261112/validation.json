@@ -9,19 +9,19 @@
       "command": "mise run pre-push",
       "exit_code": 0,
       "scope": "all five modules: tidy, standalone builds, lint and govulncheck",
-      "log": "pre-push.log.gz"
+      "log_retention": "Not retained; command, exit status and scope preserve the original check. See evidence_retention."
     },
     {
       "command": "mise run verify-local",
       "exit_code": 0,
       "scope": "all five module tests, generated catalogs, OKF and Markdown policy",
-      "log": "verify-local.log.gz"
+      "log_retention": "Not retained; command, exit status and scope preserve the original check. See evidence_retention."
     },
     {
       "command": "env -u SPANEMUBOOST_ENDPOINT_FILE -u SPANEMUBOOST_OMNI_URI -u SPANALYZER_OMNI_IMAGE SPANEMUBOOST_ENABLE_OMNI_TESTS=1 mise x --no-deps -- go test -count=1 -timeout=20m -tags=integration,omni -run ^TestIntegrationMutationCountFeedbackOnOmni$ -v .",
       "exit_code": 0,
       "scope": "owned LTS container, 31 matrix + 5 documented workflow target commits, 3 count contracts",
-      "log": "omni-workflow.log.gz"
+      "log_retention": "Not retained; command, exit status and scope preserve the original check. See evidence_retention."
     },
     {
       "command": "Compiled analyzer/query-generator CLI validation",
@@ -31,5 +31,11 @@
     }
   ],
   "cleanup": "container-cleanup.json",
-  "external_writes": "Only the owned local Omni fixture container; no managed-service database created."
+  "external_writes": "Only the owned local Omni fixture container; no managed-service database created.",
+  "evidence_retention": {
+    "changed_on": "2026-11-12",
+    "source_commit": "6a99aad7bee9502f59ac1148c813fd3dd9924f07",
+    "retirement_manifest": "../mutation-integration-20261112/evidence-retirement.json",
+    "policy": "Retain reproduction inputs, compact dated observations, failures and check statuses; omit redundant full reports and ordinary test logs."
+  }
 }

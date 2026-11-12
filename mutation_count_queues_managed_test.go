@@ -64,19 +64,19 @@ func replayManagedQueueCounts(f managedMutationFixture) managedQueueReplaySummar
 			continue
 		}
 		s.Measured++
-		if len(o.Statements) > 0 && len(o.Mutations) > 0 {
-			// Cumulative stats cannot be attached to only the DML or buffered
-			// mutation subset. The current API deliberately has separate scopes.
-			s.ScopeGaps = append(s.ScopeGaps, o.ID+": combined DML and buffered mutations need a combined scope")
-			s.Cases = append(s.Cases, item)
-			continue
-		}
 		if o.Phase < 0 || o.Phase >= len(models) || models[o.Phase] == nil {
 			s.Errors = append(s.Errors, o.ID+": missing preceding schema phase")
 			continue
 		}
 		a := models[o.Phase]
 		analyze := func(opts MutationCountOptions) (MutationCountReport, error) {
+			if len(o.Statements) > 0 && len(o.Mutations) > 0 {
+				b, err := json.Marshal(o.Mutations)
+				if err != nil {
+					return MutationCountReport{}, err
+				}
+				return a.AnalyzeTransaction(MutationCountTransaction{Statements: o.Statements, Mutations: b}, opts)
+			}
 			if len(o.Statements) > 0 {
 				return a.AnalyzeDML(o.Statements, opts)
 			}
@@ -157,7 +157,7 @@ func TestMutationCountManagedQueueMatrix(t *testing.T) {
 			t.Fatal(err)
 		}
 	}
-	if s.Records != 319 || s.Measured != 270 || s.Modeled != 268 || len(s.ScopeGaps) != 2 || s.Contains != s.Modeled || s.Refined != s.Modeled {
+	if s.Records != 319 || s.Measured != 270 || s.Modeled != 270 || len(s.ScopeGaps) != 0 || s.Contains != s.Modeled || s.Refined != s.Modeled {
 		t.Errorf("incomplete accounting coverage: records=%d measured=%d modeled=%d contains=%d refined=%d gaps=%v", s.Records, s.Measured, s.Modeled, s.Contains, s.Refined, s.ScopeGaps)
 	}
 	if len(s.Errors) > 0 || len(s.Disagreements) > 0 {

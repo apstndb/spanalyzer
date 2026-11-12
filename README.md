@@ -35,6 +35,11 @@ This does not verify commit-byte limits or establish a universal runtime price.
 Refinement files reject unknown fields rather than silently discarding a
 misspelled old-row or observation assertion.
 
+For a transaction containing both DML and buffered mutations, use
+`--mutation-transaction-file testdata/mutation-count/transaction.json` with
+`--ddl testdata/mutation-count/transaction.sql`. The [package documentation](https://pkg.go.dev/github.com/apstndb/spanalyzer#MutationCountAnalyzer.AnalyzeTransaction)
+explains execution order, separate quota boundaries and unresolved interactions.
+
 The repository hosts five Go modules, split along dependency weight:
 
 - `github.com/apstndb/spanalyzer` — the analyzer framework: DDL catalog,

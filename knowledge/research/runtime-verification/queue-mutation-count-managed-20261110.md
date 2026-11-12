@@ -222,6 +222,13 @@ not evidence of a precise static predictor. The two combined DML/buffered
 mutation cases remain explicit scope gaps. Their cumulative total is not
 attached to a partial input. Query effects remain in their own unknown scope.
 
+The subsequent [November 12 integration](../write-analysis/mixed-transactions-and-evidence-20261112.md)
+adds an explicit combined input and replays both retained mixed commits. Its
+current core matrix covers all 270 measurements. The earlier 268-case summary
+above and its retained JSON describe the pre-integration checkpoint. The new
+combined observation refines only the transaction total; it does not assign
+the count of 7 to either subset or establish a static queue price.
+
 The captured case labeled `send/invalid-key/2` succeeds because SDK int64(1)
 encodes as a protobuf string scalar, which is the valid logical STRING key
 "1". The label describes a rejected producer hypothesis, not a server type

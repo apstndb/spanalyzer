@@ -22,6 +22,7 @@ func main() {
 	dialect := flag.String("dialect", "spanner", "SQL dialect/catalog mode: spanner or bigquery")
 	mode := flag.String("mode", "", "comma-separated modes: spanner_type, bigquery_type, go_struct, parse, analyze, unparse; or standalone mutation_count")
 	mutationsFile := flag.String("mutations-file", "", "JSON array of google.spanner.v1.Mutation for --mode=mutation_count")
+	mutationTransaction := flag.String("mutation-transaction-file", "", "JSON object with ordered statements and buffered mutations for --mode=mutation_count")
 	mutationFacts := flag.String("mutation-facts-file", "", "old-row/cardinality assertions for --mode=mutation_count")
 	mutationIndexes := flag.String("mutation-indexes-file", "", "complete schema-digest-qualified index snapshot for --mode=mutation_count")
 	mutationObservation := flag.String("mutation-observation-file", "", "same-execution CommitStats observation for --mode=mutation_count")
@@ -49,7 +50,7 @@ func main() {
 	flag.Var(&positionalParams, "positional-param", "positional query parameter TYPE; repeatable")
 	flag.Parse()
 
-	if *sql == "" && *mutationsFile == "" {
+	if *sql == "" && *mutationsFile == "" && *mutationTransaction == "" {
 		flag.Usage()
 		os.Exit(2)
 	}
@@ -65,14 +66,14 @@ func main() {
 		if len(params)+len(positionalParams)+len(protoDescriptorFiles)+len(externalDDLs)+len(externalProtoDescriptorFiles) > 0 {
 			exitErr(fmt.Errorf("mutation_count does not use query parameters, descriptor flags or external schemas"))
 		}
-		result, err := runMutationCountCLI(ddl, *sql, *output, *mutationsFile, *mutationFacts, *mutationIndexes, *mutationObservation, *mutationCalibration)
+		result, err := runMutationCountCLI(ddl, *sql, *output, *mutationsFile, *mutationTransaction, *mutationFacts, *mutationIndexes, *mutationObservation, *mutationCalibration)
 		if err != nil {
 			exitErr(err)
 		}
 		fmt.Print(result)
 		return
 	}
-	if *mutationsFile != "" || *mutationFacts != "" || *mutationIndexes != "" || *mutationObservation != "" || *mutationCalibration != "" {
+	if *mutationsFile != "" || *mutationTransaction != "" || *mutationFacts != "" || *mutationIndexes != "" || *mutationObservation != "" || *mutationCalibration != "" {
 		exitErr(fmt.Errorf("mutation flags require --mode=mutation_count as the only mode"))
 	}
 	externalSchemas, err := readExternalSchemas(externalDDLs, externalProtoDescriptorFiles)

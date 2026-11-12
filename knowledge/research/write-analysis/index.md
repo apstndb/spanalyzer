@@ -6,6 +6,9 @@ are separate measurements.
 
 - [Implemented mutation-count analysis](../../concepts/mutation-count-analysis.md):
   current API/CLI entry points and a consolidated verification map.
+- [Mixed transactions and evidence retention, November 12](mixed-transactions-and-evidence-20261112.md):
+  official-source review, integrated transaction input, replayed managed cases,
+  remaining uncertainties and removal of redundant report/log archives.
 - [Scenario integration and latest feedback](../runtime-verification/mutation-count-feedback-20261112.md):
   observed FK indexes, explicit old-row and cardinality inputs, measured counts
   and count contracts, including a reproducible command workflow.

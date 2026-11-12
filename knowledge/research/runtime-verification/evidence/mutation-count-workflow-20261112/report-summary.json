@@ -1,0 +1,806 @@
+{
+  "kind": "historical_report_projection",
+  "derived_on": "2026-11-12",
+  "source_commit": "6a99aad7bee9502f59ac1148c813fd3dd9924f07",
+  "boundary": "Projection of the original observations, not a new runtime execution. Access-path node numbers refer to the original report; no full operator graph is retained here.",
+  "count_projection": "counts.json",
+  "reports": [
+    {
+      "report_version": "v1alpha-plan-report-v1",
+      "status": "ok",
+      "backend": "omni",
+      "created_database_cleanup": "retain",
+      "backend_identity": {
+        "kind": "omni",
+        "version": "not_recorded",
+        "image_digest": "not_recorded",
+        "source": "external_unverified"
+      },
+      "plan_source": {
+        "backend": "omni",
+        "api": "analyze_query",
+        "render_tool": "spannerplan"
+      },
+      "target_summary": {
+        "included_count": 17,
+        "planned": 16,
+        "errors": 0,
+        "skipped": 1,
+        "excluded": []
+      },
+      "optimizer": {
+        "requested": {
+          "version": "not_pinned",
+          "statistics_package": "not_pinned"
+        },
+        "effective": {
+          "version": "not_recorded",
+          "statistics_package": "not_recorded"
+        }
+      },
+      "contract_evaluation_mode": "none",
+      "warnings": [],
+      "source_artifact": "matrix-report.json.gz",
+      "queries": [
+        {
+          "target_id": "query/ForeignSeek",
+          "name": "ForeignSeek",
+          "kind": "sql",
+          "status": "ok",
+          "sql": "SELECT Shard,Id FROM ForeignEvents@{FORCE_INDEX=EventOwner} WHERE Owner=@owner",
+          "sql_sha256": "2cce5e08a16609dbf48b5ccbc5f86a5d31bae5bc2f2638661fc72331563c01fd",
+          "ddl_sha256": "d0caac5bdcb6996476e0ee5a42b000d70ca0290c7dcea5ba87a6c0d34db072ff",
+          "operator_tree_sha256": "8e56ca6169899983bfe4e396398ee13eefd85983568c63d88f7ea7efc311158d",
+          "access_paths": [
+            {
+              "catalog_index_name": "IDX_ForeignEvents_Owner_N_3A62EB33EF2CFBD9",
+              "index_origin": "observed_snapshot",
+              "managed": true,
+              "inferred_constraint_selectors": [
+                "EventOwner:referencing"
+              ],
+              "scan_index": 4,
+              "filter_index": 3,
+              "scan_target": "IDX_ForeignEvents_Owner_N_3A62EB33EF2CFBD9",
+              "scan_type": "index_scan",
+              "scan_target_kind": "secondary_index",
+              "base_table": "ForeignEvents",
+              "full_scan": false,
+              "conditions_complete": true,
+              "has_seek_condition": true,
+              "has_residual_condition": false,
+              "has_timestamp_condition": false,
+              "has_search_condition": false,
+              "seek_conditions": [
+                {
+                  "index": 11,
+                  "expression": "($Owner = @owner)",
+                  "columns": [
+                    "Owner"
+                  ]
+                }
+              ],
+              "residual_conditions": [],
+              "timestamp_conditions": [],
+              "search_conditions": [],
+              "seek_columns": [
+                "Owner"
+              ],
+              "residual_columns": [],
+              "seekable_key_size": "0",
+              "range_seekable_key_size": null,
+              "declared_key_count": 1,
+              "key_columns": [
+                "Owner"
+              ],
+              "stored_columns": [],
+              "null_filtered": true
+            }
+          ],
+          "plan_environment_notes": [
+            "requested optimizer version is not pinned to a fixed value",
+            "requested optimizer statistics package is not pinned to a fixed value"
+          ]
+        },
+        {
+          "target_id": "write/InsertBare",
+          "name": "InsertBare",
+          "kind": "write",
+          "status": "ok",
+          "sql": "INSERT INTO `Bare` (`Shard`, `Id`, `Active`, `Note`) VALUES (@Shard, @Id, @Active, @Note)",
+          "sql_sha256": "0ca1425598fa6050009f38b73ed857b48a21d37cee16a3a73834f67b6d9dfce2",
+          "ddl_sha256": "d0caac5bdcb6996476e0ee5a42b000d70ca0290c7dcea5ba87a6c0d34db072ff",
+          "operator_tree_sha256": "d78ce7a045905dc77d2b1226e9df860204df41d6352d8e75dd1d67ef978bc868",
+          "access_paths": [],
+          "plan_environment_notes": [
+            "requested optimizer version is not pinned to a fixed value",
+            "requested optimizer statistics package is not pinned to a fixed value"
+          ]
+        },
+        {
+          "target_id": "write/InsertOne",
+          "name": "InsertOne",
+          "kind": "write",
+          "status": "ok",
+          "sql": "INSERT INTO `OneIndex` (`Shard`, `Id`, `Active`, `Note`) VALUES (@Shard, @Id, @Active, @Note)",
+          "sql_sha256": "05debcf1e16a2fad5f5186db1f99a76832e1ef10617dbca9c7ebf36934928829",
+          "ddl_sha256": "d0caac5bdcb6996476e0ee5a42b000d70ca0290c7dcea5ba87a6c0d34db072ff",
+          "operator_tree_sha256": "d78ce7a045905dc77d2b1226e9df860204df41d6352d8e75dd1d67ef978bc868",
+          "access_paths": [],
+          "plan_environment_notes": [
+            "requested optimizer version is not pinned to a fixed value",
+            "requested optimizer statistics package is not pinned to a fixed value"
+          ]
+        },
+        {
+          "target_id": "write/InsertTwo",
+          "name": "InsertTwo",
+          "kind": "write",
+          "status": "ok",
+          "sql": "INSERT INTO `TwoIndexes` (`Shard`, `Id`, `Active`, `Note`) VALUES (@Shard, @Id, @Active, @Note)",
+          "sql_sha256": "e6e3e58b2879429e99895c6a4fcfbaa4136d56e0ca9ac922d2ea378d0157641e",
+          "ddl_sha256": "d0caac5bdcb6996476e0ee5a42b000d70ca0290c7dcea5ba87a6c0d34db072ff",
+          "operator_tree_sha256": "d78ce7a045905dc77d2b1226e9df860204df41d6352d8e75dd1d67ef978bc868",
+          "access_paths": [],
+          "plan_environment_notes": [
+            "requested optimizer version is not pinned to a fixed value",
+            "requested optimizer statistics package is not pinned to a fixed value"
+          ]
+        },
+        {
+          "target_id": "write/InsertKeys",
+          "name": "InsertKeys",
+          "kind": "write",
+          "status": "ok",
+          "sql": "INSERT INTO `TwoIndexes` (`Shard`, `Id`) VALUES (@Shard, @Id)",
+          "sql_sha256": "8e035927f2e36a5eb0621fde8bdec0838cbc14475f63615085b35d1050c65f25",
+          "ddl_sha256": "d0caac5bdcb6996476e0ee5a42b000d70ca0290c7dcea5ba87a6c0d34db072ff",
+          "operator_tree_sha256": "ba8f6185b64967ffd751b4335a7e2a42e76821e4409259adc924f34160797d03",
+          "access_paths": [],
+          "plan_environment_notes": [
+            "requested optimizer version is not pinned to a fixed value",
+            "requested optimizer statistics package is not pinned to a fixed value"
+          ]
+        },
+        {
+          "target_id": "write/InsertNullKeys",
+          "name": "InsertNullKeys",
+          "kind": "write",
+          "status": "ok",
+          "sql": "INSERT INTO `NullIndex` (`Shard`, `Id`) VALUES (@Shard, @Id)",
+          "sql_sha256": "0973df01f246f75abdf8b3e8352e69f9e5016172998ea64ecdb2163fb37979ef",
+          "ddl_sha256": "d0caac5bdcb6996476e0ee5a42b000d70ca0290c7dcea5ba87a6c0d34db072ff",
+          "operator_tree_sha256": "ba8f6185b64967ffd751b4335a7e2a42e76821e4409259adc924f34160797d03",
+          "access_paths": [],
+          "plan_environment_notes": [
+            "requested optimizer version is not pinned to a fixed value",
+            "requested optimizer statistics package is not pinned to a fixed value"
+          ]
+        },
+        {
+          "target_id": "write/InsertStored",
+          "name": "InsertStored",
+          "kind": "write",
+          "status": "ok",
+          "sql": "INSERT INTO `StoredIndex` (`Shard`, `Id`, `Active`, `Note`) VALUES (@Shard, @Id, @Active, @Note)",
+          "sql_sha256": "303f48bc56778d73946f104e217507aa7b53840b27fc96cb12e10499866284b8",
+          "ddl_sha256": "d0caac5bdcb6996476e0ee5a42b000d70ca0290c7dcea5ba87a6c0d34db072ff",
+          "operator_tree_sha256": "d78ce7a045905dc77d2b1226e9df860204df41d6352d8e75dd1d67ef978bc868",
+          "access_paths": [],
+          "plan_environment_notes": [
+            "requested optimizer version is not pinned to a fixed value",
+            "requested optimizer statistics package is not pinned to a fixed value"
+          ]
+        },
+        {
+          "target_id": "write/UpdateNote",
+          "name": "UpdateNote",
+          "kind": "write",
+          "status": "ok",
+          "sql": "UPDATE `OneIndex` SET `Note` = @Note WHERE `Shard` = @Shard AND `Id` = @Id",
+          "sql_sha256": "5afe0b0a15c441b9613c67094f2dfae352161ba4cf2262f111acc8712ce7a638",
+          "ddl_sha256": "d0caac5bdcb6996476e0ee5a42b000d70ca0290c7dcea5ba87a6c0d34db072ff",
+          "operator_tree_sha256": "1cff03294e308d1f92e926405bc788dd8bb7491a8a49fe2cf519d3b9ca4c424e",
+          "access_paths": [
+            {
+              "scan_index": 5,
+              "filter_index": 4,
+              "scan_target": "OneIndex",
+              "scan_type": "table_scan",
+              "scan_target_kind": "table",
+              "base_table": "OneIndex",
+              "full_scan": false,
+              "conditions_complete": true,
+              "has_seek_condition": true,
+              "has_residual_condition": false,
+              "has_timestamp_condition": false,
+              "has_search_condition": false,
+              "seek_conditions": [
+                {
+                  "index": 15,
+                  "expression": "(($Shard = @shard) AND ($Id = @id))",
+                  "columns": [
+                    "Id",
+                    "Shard"
+                  ]
+                }
+              ],
+              "residual_conditions": [],
+              "timestamp_conditions": [],
+              "search_conditions": [],
+              "seek_columns": [
+                "Id",
+                "Shard"
+              ],
+              "residual_columns": [],
+              "seekable_key_size": "0",
+              "range_seekable_key_size": null,
+              "declared_key_count": 2,
+              "key_columns": [
+                "Shard",
+                "Id"
+              ],
+              "stored_columns": [],
+              "null_filtered": null
+            }
+          ],
+          "plan_environment_notes": [
+            "requested optimizer version is not pinned to a fixed value",
+            "requested optimizer statistics package is not pinned to a fixed value"
+          ]
+        },
+        {
+          "target_id": "write/UpdateStoredNote",
+          "name": "UpdateStoredNote",
+          "kind": "write",
+          "status": "ok",
+          "sql": "UPDATE `StoredIndex` SET `Note` = @Note WHERE `Shard` = @Shard AND `Id` = @Id",
+          "sql_sha256": "9b8082d7daaeabdc25e13f0dfe74391ee2629cc7af96ee2a81f49c343cfc9290",
+          "ddl_sha256": "d0caac5bdcb6996476e0ee5a42b000d70ca0290c7dcea5ba87a6c0d34db072ff",
+          "operator_tree_sha256": "2f9299b888c94ad6783055f35b120a7b646f0029b0e67e656dec1324d6fe2dfc",
+          "access_paths": [
+            {
+              "scan_index": 5,
+              "filter_index": 4,
+              "scan_target": "StoredIndex",
+              "scan_type": "table_scan",
+              "scan_target_kind": "table",
+              "base_table": "StoredIndex",
+              "full_scan": false,
+              "conditions_complete": true,
+              "has_seek_condition": true,
+              "has_residual_condition": false,
+              "has_timestamp_condition": false,
+              "has_search_condition": false,
+              "seek_conditions": [
+                {
+                  "index": 15,
+                  "expression": "(($Shard = @shard) AND ($Id = @id))",
+                  "columns": [
+                    "Id",
+                    "Shard"
+                  ]
+                }
+              ],
+              "residual_conditions": [],
+              "timestamp_conditions": [],
+              "search_conditions": [],
+              "seek_columns": [
+                "Id",
+                "Shard"
+              ],
+              "residual_columns": [],
+              "seekable_key_size": "0",
+              "range_seekable_key_size": null,
+              "declared_key_count": 2,
+              "key_columns": [
+                "Shard",
+                "Id"
+              ],
+              "stored_columns": [],
+              "null_filtered": null
+            }
+          ],
+          "plan_environment_notes": [
+            "requested optimizer version is not pinned to a fixed value",
+            "requested optimizer statistics package is not pinned to a fixed value"
+          ]
+        },
+        {
+          "target_id": "write/UpdateActive",
+          "name": "UpdateActive",
+          "kind": "write",
+          "status": "ok",
+          "sql": "UPDATE `OneIndex` SET `Active` = @Active WHERE `Shard` = @Shard AND `Id` = @Id",
+          "sql_sha256": "d772ca7a76b42dc1c9f0e53cc7c377508a3b30ff9329e7745cbf45dcc213cb9b",
+          "ddl_sha256": "d0caac5bdcb6996476e0ee5a42b000d70ca0290c7dcea5ba87a6c0d34db072ff",
+          "operator_tree_sha256": "087c2a72e2817e51452238ccaca103ac8172dd5b6872f87c8ab0f011f76a55af",
+          "access_paths": [
+            {
+              "scan_index": 5,
+              "filter_index": 4,
+              "scan_target": "OneIndex",
+              "scan_type": "table_scan",
+              "scan_target_kind": "table",
+              "base_table": "OneIndex",
+              "full_scan": false,
+              "conditions_complete": true,
+              "has_seek_condition": true,
+              "has_residual_condition": false,
+              "has_timestamp_condition": false,
+              "has_search_condition": false,
+              "seek_conditions": [
+                {
+                  "index": 15,
+                  "expression": "(($Shard = @shard) AND ($Id = @id))",
+                  "columns": [
+                    "Id",
+                    "Shard"
+                  ]
+                }
+              ],
+              "residual_conditions": [],
+              "timestamp_conditions": [],
+              "search_conditions": [],
+              "seek_columns": [
+                "Id",
+                "Shard"
+              ],
+              "residual_columns": [],
+              "seekable_key_size": "0",
+              "range_seekable_key_size": null,
+              "declared_key_count": 2,
+              "key_columns": [
+                "Shard",
+                "Id"
+              ],
+              "stored_columns": [],
+              "null_filtered": null
+            }
+          ],
+          "plan_environment_notes": [
+            "requested optimizer version is not pinned to a fixed value",
+            "requested optimizer statistics package is not pinned to a fixed value"
+          ]
+        },
+        {
+          "target_id": "write/UpdateStoredActive",
+          "name": "UpdateStoredActive",
+          "kind": "write",
+          "status": "ok",
+          "sql": "UPDATE `StoredIndex` SET `Active` = @Active WHERE `Shard` = @Shard AND `Id` = @Id",
+          "sql_sha256": "087e40afb215cc00cad02620c0e7f408eb9f3e7069953b89a33cb1b7c3b3a926",
+          "ddl_sha256": "d0caac5bdcb6996476e0ee5a42b000d70ca0290c7dcea5ba87a6c0d34db072ff",
+          "operator_tree_sha256": "0004c0c0600df028342d7d34da49333a52b3b982c3b8efe05cf376d190cdf8d0",
+          "access_paths": [
+            {
+              "scan_index": 5,
+              "filter_index": 4,
+              "scan_target": "StoredIndex",
+              "scan_type": "table_scan",
+              "scan_target_kind": "table",
+              "base_table": "StoredIndex",
+              "full_scan": false,
+              "conditions_complete": true,
+              "has_seek_condition": true,
+              "has_residual_condition": false,
+              "has_timestamp_condition": false,
+              "has_search_condition": false,
+              "seek_conditions": [
+                {
+                  "index": 15,
+                  "expression": "(($Shard = @shard) AND ($Id = @id))",
+                  "columns": [
+                    "Id",
+                    "Shard"
+                  ]
+                }
+              ],
+              "residual_conditions": [],
+              "timestamp_conditions": [],
+              "search_conditions": [],
+              "seek_columns": [
+                "Id",
+                "Shard"
+              ],
+              "residual_columns": [],
+              "seekable_key_size": "0",
+              "range_seekable_key_size": null,
+              "declared_key_count": 2,
+              "key_columns": [
+                "Shard",
+                "Id"
+              ],
+              "stored_columns": [],
+              "null_filtered": null
+            }
+          ],
+          "plan_environment_notes": [
+            "requested optimizer version is not pinned to a fixed value",
+            "requested optimizer statistics package is not pinned to a fixed value"
+          ]
+        },
+        {
+          "target_id": "write/UpsertExisting",
+          "name": "UpsertExisting",
+          "kind": "write",
+          "status": "ok",
+          "sql": "INSERT OR UPDATE INTO `OneIndex` (`Shard`, `Id`, `Active`) VALUES (@Shard, @Id, @Active)",
+          "sql_sha256": "25e9cd9b5573fe7d4ca7fbdddb668f6bf53866bbbd71845f5dd2f0677ee20120",
+          "ddl_sha256": "d0caac5bdcb6996476e0ee5a42b000d70ca0290c7dcea5ba87a6c0d34db072ff",
+          "operator_tree_sha256": "54a00244934c6cfb9c8da32b6ad50f181d5d0233c362b97e010e8540d73ea74e",
+          "access_paths": [],
+          "plan_environment_notes": [
+            "requested optimizer version is not pinned to a fixed value",
+            "requested optimizer statistics package is not pinned to a fixed value"
+          ]
+        },
+        {
+          "target_id": "write/UpsertMissing",
+          "name": "UpsertMissing",
+          "kind": "write",
+          "status": "ok",
+          "sql": "INSERT OR UPDATE INTO `OneIndex` (`Shard`, `Id`, `Active`) VALUES (@Shard, @Id, @Active)",
+          "sql_sha256": "25e9cd9b5573fe7d4ca7fbdddb668f6bf53866bbbd71845f5dd2f0677ee20120",
+          "ddl_sha256": "d0caac5bdcb6996476e0ee5a42b000d70ca0290c7dcea5ba87a6c0d34db072ff",
+          "operator_tree_sha256": "54a00244934c6cfb9c8da32b6ad50f181d5d0233c362b97e010e8540d73ea74e",
+          "access_paths": [],
+          "plan_environment_notes": [
+            "requested optimizer version is not pinned to a fixed value",
+            "requested optimizer statistics package is not pinned to a fixed value"
+          ]
+        },
+        {
+          "target_id": "write/ReplacePartial",
+          "name": "ReplacePartial",
+          "kind": "write",
+          "status": "skipped",
+          "sql_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "ddl_sha256": "d0caac5bdcb6996476e0ee5a42b000d70ca0290c7dcea5ba87a6c0d34db072ff",
+          "error": "mutation-only write has no SQL PLAN target",
+          "plan_environment_notes": [
+            "requested optimizer version is not pinned to a fixed value",
+            "requested optimizer statistics package is not pinned to a fixed value"
+          ]
+        },
+        {
+          "target_id": "write/DeleteEvent",
+          "name": "DeleteEvent",
+          "kind": "write",
+          "status": "ok",
+          "sql": "DELETE FROM `OneIndex` WHERE `Shard` = @Shard AND `Id` = @Id",
+          "sql_sha256": "633e518d5aa05aa603e4ce33619050b5367eebbb5091607fb0afbbdce4ed88f3",
+          "ddl_sha256": "d0caac5bdcb6996476e0ee5a42b000d70ca0290c7dcea5ba87a6c0d34db072ff",
+          "operator_tree_sha256": "89ed02747eb5af1d63855d49432604449107392ce9ad50d0fb45190ba2e2c0ce",
+          "access_paths": [
+            {
+              "scan_index": 5,
+              "filter_index": 4,
+              "scan_target": "OneIndex",
+              "scan_type": "table_scan",
+              "scan_target_kind": "table",
+              "base_table": "OneIndex",
+              "full_scan": false,
+              "conditions_complete": true,
+              "has_seek_condition": true,
+              "has_residual_condition": false,
+              "has_timestamp_condition": false,
+              "has_search_condition": false,
+              "seek_conditions": [
+                {
+                  "index": 15,
+                  "expression": "(($Shard = @shard) AND ($Id = @id))",
+                  "columns": [
+                    "Id",
+                    "Shard"
+                  ]
+                }
+              ],
+              "residual_conditions": [],
+              "timestamp_conditions": [],
+              "search_conditions": [],
+              "seek_columns": [
+                "Id",
+                "Shard"
+              ],
+              "residual_columns": [],
+              "seekable_key_size": "0",
+              "range_seekable_key_size": null,
+              "declared_key_count": 2,
+              "key_columns": [
+                "Shard",
+                "Id"
+              ],
+              "stored_columns": [],
+              "null_filtered": null
+            }
+          ],
+          "plan_environment_notes": [
+            "requested optimizer version is not pinned to a fixed value",
+            "requested optimizer statistics package is not pinned to a fixed value"
+          ]
+        },
+        {
+          "target_id": "write/InsertForeign",
+          "name": "InsertForeign",
+          "kind": "write",
+          "status": "ok",
+          "sql": "INSERT INTO `ForeignEvents` (`Shard`, `Id`, `Owner`, `Note`) VALUES (@Shard, @Id, @Owner, @Note)",
+          "sql_sha256": "e91442223359e81023d5c0fc5441660a10afa41e09f3f298469bc51e0c9d04da",
+          "ddl_sha256": "d0caac5bdcb6996476e0ee5a42b000d70ca0290c7dcea5ba87a6c0d34db072ff",
+          "operator_tree_sha256": "3fea3462edbcc93fa8b4bc5dcbad6947c46bcfe013eb32d6c396d929c2a05d61",
+          "access_paths": [],
+          "plan_environment_notes": [
+            "requested optimizer version is not pinned to a fixed value",
+            "requested optimizer statistics package is not pinned to a fixed value"
+          ]
+        },
+        {
+          "target_id": "write/InsertAutomatic",
+          "name": "InsertAutomatic",
+          "kind": "write",
+          "status": "ok",
+          "sql": "INSERT INTO `AutomaticEvents` (`Shard`, `Id`) VALUES (@Shard, @Id)",
+          "sql_sha256": "62f6579cfaef1cdab0c4406fafac00e2830e0d1a747d6c733605eb1adb009b06",
+          "ddl_sha256": "d0caac5bdcb6996476e0ee5a42b000d70ca0290c7dcea5ba87a6c0d34db072ff",
+          "operator_tree_sha256": "a95769c277bafc26d437b186a968af9a4986b74b255ac82cbbbd1627e75ca5ee",
+          "access_paths": [],
+          "plan_environment_notes": [
+            "requested optimizer version is not pinned to a fixed value",
+            "requested optimizer statistics package is not pinned to a fixed value"
+          ]
+        }
+      ]
+    },
+    {
+      "report_version": "v1alpha-plan-summary-v1",
+      "status": "ok",
+      "backend": "omni",
+      "created_database_cleanup": "drop_created",
+      "backend_identity": {
+        "kind": "omni",
+        "version": "not_recorded",
+        "image_digest": "not_recorded",
+        "source": "external_unverified"
+      },
+      "plan_source": {
+        "backend": "omni",
+        "api": "analyze_query"
+      },
+      "target_summary": {
+        "included_count": 3,
+        "planned": 2,
+        "errors": 0,
+        "skipped": 1,
+        "excluded": []
+      },
+      "optimizer": {
+        "requested": {
+          "version": "not_pinned",
+          "statistics_package": "not_pinned"
+        },
+        "effective": {
+          "version": "not_recorded",
+          "statistics_package": "not_recorded"
+        }
+      },
+      "contract_evaluation_mode": "check",
+      "contract_summary": {
+        "status": "pass",
+        "contracts": 3,
+        "passed": 3,
+        "failed": 0,
+        "not_evaluated": 0,
+        "environment_warnings": [
+          "optimizer_not_pinned",
+          "statistics_package_not_pinned",
+          "backend_identity_not_recorded",
+          "query_optimizer_not_pinned"
+        ]
+      },
+      "contract_evaluations": [
+        {
+          "name": "IndexedUpdateWithinSix",
+          "query": "UpdateActive",
+          "target_id": "write/UpdateActive",
+          "scope": "write",
+          "status": "pass",
+          "stability": {
+            "tier": "normalized_operator",
+            "reasons": [
+              "contract uses the normalized plan-report view",
+              "summary_projection_omits_full_plan_evidence"
+            ],
+            "check_recommended": true,
+            "replayable_from_report": false
+          },
+          "results": [
+            {
+              "rule": "cel",
+              "source": "cel",
+              "expression": "mutation_counts.mutation.effective.upper != null && mutation_counts.mutation.effective.upper <= 6 && mutation_counts.mutation.disagreements.size() == 0 && mutation_counts.dml.effective.upper != null && mutation_counts.dml.effective.upper <= 6 && mutation_counts.dml.disagreements.size() == 0",
+              "status": "pass"
+            }
+          ]
+        },
+        {
+          "name": "UnrelatedUpdateWithinThree",
+          "query": "UpdateExtra",
+          "target_id": "write/UpdateExtra",
+          "scope": "write",
+          "status": "pass",
+          "stability": {
+            "tier": "normalized_operator",
+            "reasons": [
+              "contract uses the normalized plan-report view",
+              "summary_projection_omits_full_plan_evidence"
+            ],
+            "check_recommended": true,
+            "replayable_from_report": false
+          },
+          "results": [
+            {
+              "rule": "cel",
+              "source": "cel",
+              "expression": "mutation_counts.mutation.effective.upper != null && mutation_counts.mutation.effective.upper <= 3 && mutation_counts.mutation.disagreements.size() == 0 && mutation_counts.dml.effective.upper != null && mutation_counts.dml.effective.upper <= 3 && mutation_counts.dml.disagreements.size() == 0",
+              "status": "pass"
+            }
+          ]
+        },
+        {
+          "name": "MutationOnlyReplaceWithinSix",
+          "query": "ReplaceEvent",
+          "target_id": "write/ReplaceEvent",
+          "scope": "write",
+          "status": "pass",
+          "stability": {
+            "tier": "normalized_operator",
+            "reasons": [
+              "contract uses the normalized plan-report view",
+              "summary_projection_omits_full_plan_evidence"
+            ],
+            "check_recommended": true,
+            "replayable_from_report": false
+          },
+          "results": [
+            {
+              "rule": "cel",
+              "source": "cel",
+              "expression": "mutation_counts.mutation.effective.upper != null && mutation_counts.mutation.effective.upper <= 6 && mutation_counts.mutation.disagreements.size() == 0",
+              "status": "pass"
+            }
+          ]
+        }
+      ],
+      "warnings": [],
+      "source_artifact": "workflow-report.json.gz",
+      "queries": [
+        {
+          "target_id": "write/UpdateActive",
+          "name": "UpdateActive",
+          "kind": "write",
+          "status": "ok",
+          "sql_sha256": "66259ab2664dc1e619c13eb3f778e7da868cba59db32a48a187c95ec0fa35888",
+          "ddl_sha256": "be6190248fd54383e0765edd8b616d4b437cced6b982c7d9e92a22f368cafbb2",
+          "operator_tree_sha256": "c2b7fd9c6ea54f21f3102889d0659449cdddf3ce016a42c334f6050523fdf618",
+          "access_paths": [
+            {
+              "scan_index": 5,
+              "filter_index": 4,
+              "scan_target": "Events",
+              "scan_type": "table_scan",
+              "scan_target_kind": "table",
+              "base_table": "Events",
+              "full_scan": false,
+              "conditions_complete": true,
+              "has_seek_condition": true,
+              "has_residual_condition": false,
+              "has_timestamp_condition": false,
+              "has_search_condition": false,
+              "seek_conditions": [
+                {
+                  "index": 15,
+                  "expression": "(($Shard = @shard) AND ($Id = @id))",
+                  "columns": [
+                    "Id",
+                    "Shard"
+                  ]
+                }
+              ],
+              "residual_conditions": [],
+              "timestamp_conditions": [],
+              "search_conditions": [],
+              "seek_columns": [
+                "Id",
+                "Shard"
+              ],
+              "residual_columns": [],
+              "seekable_key_size": "0",
+              "range_seekable_key_size": null,
+              "declared_key_count": 2,
+              "key_columns": [
+                "Shard",
+                "Id"
+              ],
+              "stored_columns": [],
+              "null_filtered": null
+            }
+          ],
+          "plan_environment_notes": [
+            "requested optimizer version is not pinned to a fixed value",
+            "requested optimizer statistics package is not pinned to a fixed value"
+          ]
+        },
+        {
+          "target_id": "write/UpdateExtra",
+          "name": "UpdateExtra",
+          "kind": "write",
+          "status": "ok",
+          "sql_sha256": "bebd15ef694669994c845beadf12591720385be8e22ad51604feef042a3d2392",
+          "ddl_sha256": "be6190248fd54383e0765edd8b616d4b437cced6b982c7d9e92a22f368cafbb2",
+          "operator_tree_sha256": "3d6886ceb941852ce979c9d7ed1d14a77805966bef459ddbfcfb13d123c594b3",
+          "access_paths": [
+            {
+              "scan_index": 5,
+              "filter_index": 4,
+              "scan_target": "Events",
+              "scan_type": "table_scan",
+              "scan_target_kind": "table",
+              "base_table": "Events",
+              "full_scan": false,
+              "conditions_complete": true,
+              "has_seek_condition": true,
+              "has_residual_condition": false,
+              "has_timestamp_condition": false,
+              "has_search_condition": false,
+              "seek_conditions": [
+                {
+                  "index": 15,
+                  "expression": "(($Shard = @shard) AND ($Id = @id))",
+                  "columns": [
+                    "Id",
+                    "Shard"
+                  ]
+                }
+              ],
+              "residual_conditions": [],
+              "timestamp_conditions": [],
+              "search_conditions": [],
+              "seek_columns": [
+                "Id",
+                "Shard"
+              ],
+              "residual_columns": [],
+              "seekable_key_size": "0",
+              "range_seekable_key_size": null,
+              "declared_key_count": 2,
+              "key_columns": [
+                "Shard",
+                "Id"
+              ],
+              "stored_columns": [],
+              "null_filtered": null
+            }
+          ],
+          "plan_environment_notes": [
+            "requested optimizer version is not pinned to a fixed value",
+            "requested optimizer statistics package is not pinned to a fixed value"
+          ]
+        },
+        {
+          "target_id": "write/ReplaceEvent",
+          "name": "ReplaceEvent",
+          "kind": "write",
+          "status": "skipped",
+          "sql_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "ddl_sha256": "be6190248fd54383e0765edd8b616d4b437cced6b982c7d9e92a22f368cafbb2",
+          "error": "mutation-only write has no SQL PLAN target",
+          "plan_environment_notes": [
+            "requested optimizer version is not pinned to a fixed value",
+            "requested optimizer statistics package is not pinned to a fixed value"
+          ]
+        }
+      ]
+    }
+  ]
+}

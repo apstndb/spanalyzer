@@ -1,0 +1,41 @@
+{
+  "fixture_status": "complete",
+  "transaction_attempts": 319,
+  "successful_with_stats": 270,
+  "modeled_measurements": 270,
+  "baseline_contains_observation": 270,
+  "same_input_measured_refinements": 270,
+  "unknown_queue_query_reports": 17,
+  "unmodeled_scopes": null,
+  "analysis_errors": null,
+  "disagreements": null,
+  "boundary": "Offline replay of retained November 10 managed observations, not a new service run. The original 268-case summary remains a historical checkpoint.",
+  "mixed_cases": [
+    {
+      "id": "composition/dml-insert-buffered-ack",
+      "status": "OK",
+      "observed": 7,
+      "baseline": {
+        "lower": 0,
+        "upper": null
+      },
+      "effective": {
+        "lower": 7,
+        "upper": 7
+      }
+    },
+    {
+      "id": "composition/dml-table-buffered-send",
+      "status": "OK",
+      "observed": 7,
+      "baseline": {
+        "lower": 2,
+        "upper": null
+      },
+      "effective": {
+        "lower": 7,
+        "upper": 7
+      }
+    }
+  ]
+}

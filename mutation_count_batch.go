@@ -10,15 +10,16 @@ import (
 // MutationCountAnalysis retains model totals and per-operation explanations.
 // DML Statements retain their separate limit boundaries; Count is cumulative.
 type MutationCountAnalysis struct {
-	Strategy       string                   `json:"strategy" yaml:"strategy"`
-	Count          MutationCountInterval    `json:"total_under_model" yaml:"total_under_model"`
-	LimitScope     string                   `json:"limit_scope" yaml:"limit_scope"`
-	LimitVerdict   string                   `json:"limit_verdict" yaml:"limit_verdict"`
-	Results        []MutationCountEstimate  `json:"operations" yaml:"operations"`
-	OperationCount int                      `json:"normalized_operation_count" yaml:"normalized_operation_count"`
-	Reasons        []string                 `json:"batch_uncertainties,omitempty" yaml:"batch_uncertainties,omitempty"`
-	GateEligible   bool                     `json:"gate_eligible" yaml:"gate_eligible"`
-	Statements     []MutationCountStatement `json:"dml_statements,omitempty" yaml:"dml_statements,omitempty"`
+	Strategy       string                       `json:"strategy" yaml:"strategy"`
+	Count          MutationCountInterval        `json:"total_under_model" yaml:"total_under_model"`
+	LimitScope     string                       `json:"limit_scope" yaml:"limit_scope"`
+	LimitVerdict   string                       `json:"limit_verdict" yaml:"limit_verdict"`
+	Results        []MutationCountEstimate      `json:"operations" yaml:"operations"`
+	OperationCount int                          `json:"normalized_operation_count" yaml:"normalized_operation_count"`
+	Reasons        []string                     `json:"batch_uncertainties,omitempty" yaml:"batch_uncertainties,omitempty"`
+	GateEligible   bool                         `json:"gate_eligible" yaml:"gate_eligible"`
+	Statements     []MutationCountStatement     `json:"dml_statements,omitempty" yaml:"dml_statements,omitempty"`
+	BufferedCommit *MutationCountBufferedCommit `json:"buffered_commit,omitempty" yaml:"buffered_commit,omitempty"`
 }
 
 // MutationCountStatement aggregates normalized rows from one DML statement.
@@ -31,6 +32,25 @@ type MutationCountStatement struct {
 func analyzeMutationCount(s *mutationCountSchemaModel, ops []mutationCountOperation, strategy string) (MutationCountAnalysis, error) {
 	if strategy != "shape" && strategy != "bounds" && strategy != "row-image" {
 		return MutationCountAnalysis{}, fmt.Errorf("unknown strategy %q", strategy)
+	}
+	hasDML, hasBuffered := false, false
+	for _, op := range ops {
+		if op.Channel == "dml" {
+			hasDML = true
+		} else {
+			hasBuffered = true
+		}
+	}
+	if hasDML && hasBuffered {
+		var dml, buffered []mutationCountOperation
+		for _, op := range ops {
+			if op.Channel == "dml" {
+				dml = append(dml, op)
+			} else {
+				buffered = append(buffered, op)
+			}
+		}
+		return analyzeMixedMutationCount(s, dml, buffered, strategy)
 	}
 	a := MutationCountAnalysis{Strategy: strategy, Count: mutationFixed(0), LimitScope: "mutation_api_commit", OperationCount: len(ops)}
 	groups := map[string][]int{}
@@ -140,9 +160,6 @@ func analyzeMutationCount(s *mutationCountSchemaModel, ops []mutationCountOperat
 	if a.LimitScope == "dml_statements_separately" {
 		statements := map[int]MutationCountInterval{}
 		for n, op := range ops {
-			if op.Channel != "dml" {
-				return a, fmt.Errorf("mixed DML and Mutation API commits need separate accounting")
-			}
 			q, ok := statements[op.Statement]
 			if !ok {
 				q = mutationFixed(0)

@@ -29,6 +29,9 @@ type MutationCountIndexSnapshot struct {
 // Repeated updates to one key use the first old image as the pre-commit image.
 // INSERT SELECT normalizes to one group accepting cardinality facts, not a
 // singular Exists/Old image. Its source query is never analyzed or executed.
+// In a mixed transaction, facts follow all DML operations, then buffered
+// mutations. Old images describe the state before the respective statement or
+// buffered commit, not necessarily the initial transaction snapshot.
 type MutationCountOptions struct {
 	Facts       []MutationCountRowFacts
 	Observation *MutationCountObservation
@@ -136,25 +139,33 @@ func (a *MutationCountAnalyzer) AnalyzeMutationsJSON(data []byte, options Mutati
 // and DELETE cardinality stays unknown unless supplied in Facts. No SELECT is
 // executed and SQL expression semantics remain a service/analyzer check.
 func (a *MutationCountAnalyzer) AnalyzeDML(statements []string, options MutationCountOptions) (MutationCountReport, error) {
-	if len(statements) == 0 {
-		return MutationCountReport{}, fmt.Errorf("DML statements are required")
-	}
-	var ops []mutationCountOperation
-	for i, sql := range statements {
-		part, err := mutationDMLOperations(a.schema, sql)
-		if err != nil {
-			return MutationCountReport{}, fmt.Errorf("statement %d: %w", i, err)
-		}
-		for n := range part {
-			part[n].Statement = i
-		}
-		ops = append(ops, part...)
+	ops, err := a.dmlOperations(statements)
+	if err != nil {
+		return MutationCountReport{}, err
 	}
 	b, err := json.Marshal(statements)
 	if err != nil {
 		return MutationCountReport{}, err
 	}
 	return a.analyze(ops, digestMutationInput("dml", b), "dml_transaction", options)
+}
+
+func (a *MutationCountAnalyzer) dmlOperations(statements []string) ([]mutationCountOperation, error) {
+	if len(statements) == 0 {
+		return nil, fmt.Errorf("DML statements are required")
+	}
+	var ops []mutationCountOperation
+	for i, sql := range statements {
+		part, err := mutationDMLOperations(a.schema, sql)
+		if err != nil {
+			return nil, fmt.Errorf("statement %d: %w", i, err)
+		}
+		for n := range part {
+			part[n].Statement = i
+		}
+		ops = append(ops, part...)
+	}
+	return ops, nil
 }
 
 // AnalyzeWriteShape estimates a configured write without runtime values. This

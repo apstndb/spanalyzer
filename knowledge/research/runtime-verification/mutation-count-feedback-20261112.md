@@ -15,8 +15,8 @@ sources:
     resource: evidence/mutation-count-feedback-20261112/receipt.json
     title: Fixture scope, source identities, image provenance and retained correction
   - id: report
-    resource: evidence/mutation-count-feedback-20261112/report.json.gz
-    title: Full collector report and the 31 measured one-row scenarios
+    resource: evidence/mutation-count-feedback-20261112/report-summary.json
+    title: Compact historical report projection; per-scenario measurements remain in counts.json
   - id: counts
     resource: evidence/mutation-count-feedback-20261112/counts.json
     title: Bounds, old-row refinement and same-execution measurements per API
@@ -202,8 +202,8 @@ The core CLI had a separate input-integrity gap: `old_row` was silently ignored
 instead of rejecting a misspelling of `old`. The successful wider report was
 reproduced before the fix. Facts and observation files now reject unknown
 fields, with a file-qualified diagnostic; index-file strictness remains covered
-too. Exactly-one-JSON-document validation is retained. The before/fix regression
-logs and producer snapshot are part of the new evidence directory.
+too. Exactly-one-JSON-document validation is retained. The command receipts and
+producer snapshot preserve the before/fix regression conditions.
 
 ### Alternatives for this follow-up
 
@@ -238,8 +238,9 @@ also parses the offline scenario file. These are concrete command paths in
 addition to library tests; count availability is not inferred from exit zero.
 
 The [count projection](evidence/mutation-count-workflow-20261112/counts.json)
-retains baseline, old-row and observation results per API. Compressed full
-reports and logs retain their hashes in the receipt. The first new test attempt
+retains baseline, old-row and observation results per API. A compact report
+projection retains plan statuses, selected access paths and contract outcomes.
+The first new test attempt
 failed compilation because `EndpointFromRuntime` requires a started Runtime;
 it created no container. After retrieving that value through `LazyRuntime.Get`,
 the live run passed. Its owned container was stopped and terminated, and a
@@ -249,7 +250,7 @@ The latest working snapshot passed `mise run pre-push` (all five modules' tidy,
 standalone builds, lint and vulnerability checks) and `mise run verify-local`
 (all five module test suites, generated catalogs, OKF and Markdown policy).
 The [validation record](evidence/mutation-count-workflow-20261112/validation.json)
-and retained logs identify their scope. Compiled CLI checks independently cover
+identifies their scope and exit statuses. Compiled CLI checks independently cover
 the `[3,6]` schema interval, `[3,3]` old-row refinement, an explicit error for
 `old_row`, queue TVF analysis with an unknown upper bound and the five configured
 API scenarios. These are local checks of the hashed dirty source, not hosted CI
@@ -260,3 +261,13 @@ Emulator's missing-statistic boundary is unchanged. The one-row measurement
 path still does not execute arbitrary multirow/source-discovered application
 commits or queue internal TVFs. The earlier managed ordinary-write and queue
 notes remain the authority for those independently recorded experiments.
+
+### Subsequent evidence-retention correction
+
+The [mixed-transaction follow-up](../write-analysis/mixed-transactions-and-evidence-20261112.md)
+removes redundant full reports and ordinary gzipped logs from both November 12
+mutation-count evidence directories. Counts, runtime identities, cleanup,
+source hashes, meaningful failures and validation exit statuses remain. The
+[retirement manifest](evidence/mutation-integration-20261112/evidence-retirement.json)
+identifies the original commit/path and replacement for each artifact. This is
+a storage correction, not a new execution or a change to the observations above.

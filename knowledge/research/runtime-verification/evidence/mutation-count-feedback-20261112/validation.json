@@ -6,61 +6,61 @@
       "command": "mise run verify-local",
       "exit_code": 0,
       "scope": "all five module tests plus generated evidence/OKF/language at the candidate; later CLI-only guard tested separately",
-      "log": "verify-local.log.gz"
+      "log_retention": "Not retained; command, exit status and scope preserve the original check. See evidence_retention."
     },
     {
       "command": "go test -count=1 ./... (cmd/spanner-query-gen)",
       "exit_code": 0,
       "scope": "final unattempted-measurement guard and CLI regressions",
-      "log": "cli-final-tests.log.gz"
+      "log_retention": "Not retained; command, exit status and scope preserve the original check. See evidence_retention."
     },
     {
       "command": "mise run lint",
       "exit_code": 0,
       "scope": "all five modules; final CLI-only change checked separately",
-      "log": "all-module-lint.log.gz"
+      "log_retention": "Not retained; command, exit status and scope preserve the original check. See evidence_retention."
     },
     {
       "command": "golangci-lint run --timeout=5m (cmd/spanner-query-gen)",
       "exit_code": 0,
       "scope": "final CLI source",
-      "log": "cli-final-lint.log.gz"
+      "log_retention": "Not retained; command, exit status and scope preserve the original check. See evidence_retention."
     },
     {
       "command": "mise run govulncheck",
       "exit_code": 0,
       "scope": "all five modules; no called vulnerability reported",
-      "log": "govulncheck.log.gz"
+      "log_retention": "Not retained; command, exit status and scope preserve the original check. See evidence_retention."
     },
     {
       "command": "mise run verify-omni-integration",
       "exit_code": 0,
       "scope": "shared pinned LTS runtime: plan shapes, CLI integration and schema reconstruction; subsequent collector error-path guard tested locally",
-      "log": "omni-integration-final.log.gz"
+      "log_retention": "Not retained; command, exit status and scope preserve the original check. See evidence_retention."
     },
     {
       "command": "mise run check-standalone-builds",
       "exit_code": 1,
       "scope": "candidate CLI requires new root/leaf APIs unavailable in its older published requirements",
-      "log": "standalone-pending.log.gz"
+      "log_retention": "Not retained; command, exit status and scope preserve the original check. See evidence_retention."
     },
     {
       "command": "mise run pre-push",
       "exit_code": 1,
       "scope": "clean-diff tidy gate detects intentional uncommitted direct-dependency classification; not a passing publication gate",
-      "log": "pre-push-pending.log.gz"
+      "log_retention": "Not retained; command, exit status and scope preserve the original check. See evidence_retention."
     },
     {
       "command": "mise run pre-push (foundation only)",
       "exit_code": 0,
       "scope": "all five modules without consumer CLI integration changes",
-      "log": "foundation-pre-push.log.gz"
+      "log_retention": "Not retained; command, exit status and scope preserve the original check. See evidence_retention."
     },
     {
       "command": "mise run verify-local (foundation only)",
       "exit_code": 0,
       "scope": "root/leaf foundation with unchanged baseline CLI",
-      "log": "foundation-verify-local.log.gz"
+      "log_retention": "Not retained; command, exit status and scope preserve the original check. See evidence_retention."
     }
   ],
   "tidy_stability": {
@@ -155,5 +155,11 @@
     "plancontract/validation_test.go": "ad0080ef731d2db3538ddd7eb30d5325b8487491180e6f59c33f6a678fd66a37"
   },
   "publication_boundary": "This local candidate precedes publication. Standalone CLI dependency closure requires foundation publication before pinning the consumer. No local filesystem replacement is used.",
-  "container_cleanup": "container-cleanup.json"
+  "container_cleanup": "container-cleanup.json",
+  "evidence_retention": {
+    "changed_on": "2026-11-12",
+    "source_commit": "6a99aad7bee9502f59ac1148c813fd3dd9924f07",
+    "retirement_manifest": "../mutation-integration-20261112/evidence-retirement.json",
+    "policy": "Retain reproduction inputs, compact dated observations, failures and check statuses; omit redundant full reports and ordinary test logs."
+  }
 }
