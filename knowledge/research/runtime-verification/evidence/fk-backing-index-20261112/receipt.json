@@ -106,7 +106,7 @@
   },
   "readonly_fingerprint_control": {
     "scope": "One SELECT on the existing verification database, separate from the 93-step owned-DB run. No DDL, data writes or database creation. Resource coordinates omitted.",
-    "command": "Build fingerprint-readonly.go.txt in the recorded tools module; set FK_READONLY_DATABASE externally and run the binary.",
+    "command": "Copy fingerprint-readonly.go.txt to a fresh scratch path with a .go suffix; build that file in the recorded tools module. Supply FK_READONLY_DATABASE externally and run the binary; it performs one SELECT only.",
     "source": "fingerprint-readonly.go.txt",
     "source_sha256": "b4d5aa3f10aabc5cf87b8d5d0735a5c9af48b3a86aa9b47f733ae7e203ca924c",
     "results": "fingerprint-readonly.jsonl",

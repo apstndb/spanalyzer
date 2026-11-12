@@ -147,6 +147,10 @@ DB was dropped successfully and a subsequent GetDatabase returned NotFound.
 The rolling service build is unavailable; this is one dated observation, not
 fleet-wide or future naming evidence.
 
+PostgreSQL identifier normalization, descending/NULLS key order and deliberate
+collisions with pre-created generated names are outside the runtime matrix.
+Source-level direction handling above is not an additional runtime claim.
+
 ## Write controls and unexpected failures
 
 The first two Omni attempts stopped before SQL because the harness enabled
@@ -205,6 +209,13 @@ FK constraint success or claim that every successful count is service-verified.
 Existing snapshot alias linkage remains partial when physical canonical key
 order differs from the declared FK order; physical index costing does not
 depend on that alias being available.
+
+The standalone CLI and tools modules pin published root commit
+`7c70c0d080540df41f82acd231e36959c50ba441`. Both pass their tests with
+`GOWORK=off`. An independent consumer without replacement directives resolves
+that same module version and confirms nullable-PK `[2,3]`, NOT NULL `[2,2]`
+and reordered-reference `[3,4]` bounds; this is a local consumer check, not
+another service measurement.
 
 ## Reproduction and retained evidence
 
