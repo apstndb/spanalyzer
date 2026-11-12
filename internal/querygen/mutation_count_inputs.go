@@ -78,6 +78,9 @@ func AnalyzeWriteMutationCounts(a *spanalyzer.MutationCountAnalyzer, write Query
 // names, incompatible snapshots and malformed facts fail instead of silently
 // returning the original wider interval.
 func RefinePlanMutationCounts(plan *QueryCodegenPlan, config QueryCodegenConfig, baseDir string, inputs MutationCountInputs) error {
+	if plan == nil {
+		return fmt.Errorf("mutation refinement requires a plan")
+	}
 	schemas := map[string]QueryCodegenSchema{}
 	for _, schema := range config.Schemas {
 		schemas[schema.Name] = schema
@@ -102,6 +105,7 @@ func RefinePlanMutationCounts(plan *QueryCodegenPlan, config QueryCodegenConfig,
 		models[name] = a
 	}
 	seen := map[string]bool{}
+	updates := map[int]map[string]spanalyzer.MutationCountReport{}
 	for i := range plan.Writes {
 		write := &plan.Writes[i]
 		seen[write.Name] = true
@@ -121,16 +125,60 @@ func RefinePlanMutationCounts(plan *QueryCodegenPlan, config QueryCodegenConfig,
 			}
 			models[write.Catalog] = a
 		}
+		if err := validateMutationPlanSchema(plan, write.Catalog, a.SchemaSHA256()); err != nil {
+			return err
+		}
 		counts, err := AnalyzeWriteMutationCounts(a, *write, facts)
 		if err != nil {
 			return err
 		}
-		write.MutationCounts, write.MutationCountError = counts, ""
+		updates[i] = counts
 	}
 	for name := range inputs.Writes {
 		if !seen[name] {
 			return fmt.Errorf("mutation facts name unknown or invalid write %q", name)
 		}
+	}
+	// Commit refinements only after every supplied target and scenario validates.
+	// An error must not leave a caller's plan partly updated under its old digest.
+	for i, counts := range updates {
+		plan.Writes[i].MutationCounts, plan.Writes[i].MutationCountError = counts, ""
+	}
+	return nil
+}
+
+func validateMutationPlanSchema(plan *QueryCodegenPlan, catalog, currentSHA string) error {
+	expected := ""
+	accept := func(sha string) error {
+		if sha == "" {
+			return nil
+		}
+		if expected != "" && expected != sha {
+			return fmt.Errorf("catalog %s has conflicting schema digests in the input plan", catalog)
+		}
+		expected = sha
+		return nil
+	}
+	for _, digest := range plan.SchemaDigests {
+		if digest.Catalog == catalog && digest.Kind == "ddl" {
+			if err := accept(digest.SHA256); err != nil {
+				return err
+			}
+		}
+	}
+	// Partial report plans retain the identity in their original count reports,
+	// even when generation's full SchemaDigests projection is unavailable.
+	for _, write := range plan.Writes {
+		if write.Catalog == catalog {
+			for _, count := range write.MutationCounts {
+				if err := accept(count.SchemaSHA256); err != nil {
+					return err
+				}
+			}
+		}
+	}
+	if expected == "" || expected != currentSHA {
+		return fmt.Errorf("catalog %s DDL differs from or lacks the input plan's schema identity; rebuild the plan before refinement", catalog)
 	}
 	return nil
 }
