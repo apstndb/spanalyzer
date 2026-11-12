@@ -117,3 +117,22 @@ func TestMutationCountTransactionCLI(t *testing.T) {
 		t.Fatal("misspelled transaction field was not rejected", err)
 	}
 }
+
+func TestMutationCountDisjointTransactionCLI(t *testing.T) {
+	fixture := filepath.Join("..", "..", "testdata", "mutation-count")
+	ddl, err := os.ReadFile(filepath.Join(fixture, "transaction-disjoint.sql"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	out, err := runMutationCountCLI(string(ddl), "", "json", "", filepath.Join(fixture, "transaction-disjoint.json"), filepath.Join(fixture, "transaction-disjoint-facts.json"), "", "", "")
+	if err != nil {
+		t.Fatal(err)
+	}
+	var report spanalyzer.MutationCountReport
+	if err := json.Unmarshal([]byte(out), &report); err != nil {
+		t.Fatal(err)
+	}
+	if report.Effective.Lower != 0 || report.Effective.Upper == nil || *report.Effective.Upper != 5 || report.OldRows == nil || report.Bounds.BufferedCommit.Count.Upper == nil || *report.Bounds.BufferedCommit.Count.Upper != 2 {
+		t.Fatal(report)
+	}
+}

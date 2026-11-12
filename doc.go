@@ -17,8 +17,11 @@
 // GoogleSQL writes. AnalyzeWriteShape reports configured writes without values.
 // AnalyzeTransaction accepts ordered DML and buffered mutations together. Its
 // whole-transaction observation refines only the total, while per-statement
-// and buffered-commit quota boundaries stay separate. Related writes retain
-// unknown combined bounds rather than assuming cross-stage additivity.
+// and buffered-commit quota boundaries stay separate. Disjoint complete primary
+// keys on ordinary tables without FK/interleave relationships retain the sum
+// of component upper bounds, with a zero combined lower bound. Other related
+// writes retain unknown combined bounds. This does not assume exact additivity
+// or infer UPDATE/DELETE cardinality from a predicate.
 // INSERT OR IGNORE retains affected-row uncertainty; INSERT SELECT accepts
 // cardinality facts without executing or semantically analyzing its source.
 // Zero affected-row facts can narrow successful DML to zero, including queues;

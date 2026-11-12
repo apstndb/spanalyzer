@@ -81,7 +81,12 @@ transaction. Accepting an existing mixed input for analysis does not recommend
 that application pattern. Commit-byte limits, constraint success, locks and
 latency remain independent of the mutation-count model.
 
-## Alternatives and chosen model
+## Alternatives and initial chosen model
+
+This section records the first integration. The same-day
+[disjoint-key follow-up](../runtime-verification/mixed-disjoint-key-bounds-20261112.md)
+later narrowed the same-table guard for isolated ordinary tables; its model
+and runtime evidence are retained separately.
 
 | Choice | Alternatives considered | Result |
 | --- | --- | --- |
@@ -93,8 +98,9 @@ latency remain independent of the mutation-count model.
 
 Relationship closure treats foreign keys and interleaving as undirected edges,
 including transitive shared families. This intentionally over-approximates
-possible interactions. Even distinct keys in the same table remain uncertain;
-the analyzer does not solve predicates or child fanout. Per-operation estimates
+possible interactions. Initially, even distinct keys in the same table remained
+uncertain; the follow-up adds a limited mandatory-equality key proof, without
+solving arbitrary predicates or child fanout. Per-operation estimates
 remain diagnostic standalone estimates when the combined interval is unknown.
 None of these preview reports is eligible as a verified quota gate.
 

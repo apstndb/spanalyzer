@@ -90,6 +90,7 @@ type mutationCountOperation struct {
 	Table         string
 	Columns       []string
 	Values        map[string]interface{}
+	PredicateKey  map[string]interface{} // Mandatory DML equalities, never written columns or old-row facts.
 	Rows          MutationCountInterval
 	DeleteUnits   MutationCountInterval
 	Facts         MutationCountRowFacts
