@@ -1,0 +1,29 @@
+[
+  {
+    "label": "connectivity",
+    "sql": "SELECT 1 AS connectivity",
+    "started_at": "2026-11-11T19:56:20.344869+00:00",
+    "completed_at": "2026-11-11T19:56:21.632355+00:00",
+    "exit_code": 0,
+    "stdout": "+--------------+\n| connectivity |\n+--------------+\n| 1            |\n+--------------+\n",
+    "stderr": ""
+  },
+  {
+    "label": "cast-comma",
+    "sql": "SELECT CAST(SECURE_CONTEXT('user_id'), INT64) AS value",
+    "started_at": "2026-11-11T19:56:21.632979+00:00",
+    "completed_at": "2026-11-11T19:56:22.240448+00:00",
+    "exit_code": 1,
+    "stdout": "",
+    "stderr": "ERROR: spanner: code=\"InvalidArgument\", desc: Syntax error: Expected keyword AS but got \",\" [at 1:38]\nSELECT CAST(SECURE_CONTEXT('user_id'), INT64) AS value\n                                     ^\n"
+  },
+  {
+    "label": "cast-as",
+    "sql": "SELECT CAST(SECURE_CONTEXT('user_id') AS INT64) AS value",
+    "started_at": "2026-11-11T19:56:22.240554+00:00",
+    "completed_at": "2026-11-11T19:56:22.762171+00:00",
+    "exit_code": 1,
+    "stdout": "",
+    "stderr": "ERROR: spanner: code=\"InvalidArgument\", desc: Missing secure parameter: user_id\n"
+  }
+]

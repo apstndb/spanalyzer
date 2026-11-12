@@ -1,0 +1,226 @@
+[
+  {
+    "label": "connectivity",
+    "sql": "SELECT 1 AS connectivity"
+  },
+  {
+    "label": "final-tables",
+    "sql": "SELECT COUNT(*) AS n FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA=''"
+  },
+  {
+    "label": "final-views",
+    "sql": "SELECT COUNT(*) AS n FROM INFORMATION_SCHEMA.VIEWS WHERE TABLE_SCHEMA=''"
+  },
+  {
+    "label": "final-graphs",
+    "sql": "SELECT COUNT(*) AS n FROM INFORMATION_SCHEMA.PROPERTY_GRAPHS"
+  },
+  {
+    "label": "final-streams",
+    "sql": "SELECT COUNT(*) AS n FROM INFORMATION_SCHEMA.CHANGE_STREAMS"
+  },
+  {
+    "label": "final-routines",
+    "sql": "SELECT COUNT(*) AS n FROM INFORMATION_SCHEMA.ROUTINES"
+  },
+  {
+    "label": "final-models",
+    "sql": "SELECT COUNT(*) AS n FROM INFORMATION_SCHEMA.MODELS"
+  },
+  {
+    "label": "pipe-select",
+    "sql": "FROM (SELECT 1 AS a, 10 AS b UNION ALL SELECT 1, 20 UNION ALL SELECT 2, 30) |> SELECT a, b"
+  },
+  {
+    "label": "pipe-extend",
+    "sql": "FROM (SELECT 1 AS a, 10 AS b UNION ALL SELECT 1, 20 UNION ALL SELECT 2, 30) |> EXTEND a+b AS total"
+  },
+  {
+    "label": "pipe-set",
+    "sql": "FROM (SELECT 1 AS a, 10 AS b UNION ALL SELECT 1, 20 UNION ALL SELECT 2, 30) |> SET b=b+1"
+  },
+  {
+    "label": "pipe-drop",
+    "sql": "FROM (SELECT 1 AS a, 10 AS b UNION ALL SELECT 1, 20 UNION ALL SELECT 2, 30) |> DROP b"
+  },
+  {
+    "label": "pipe-rename",
+    "sql": "FROM (SELECT 1 AS a, 10 AS b UNION ALL SELECT 1, 20 UNION ALL SELECT 2, 30) |> RENAME b AS c"
+  },
+  {
+    "label": "pipe-as",
+    "sql": "FROM (SELECT 1 AS a, 10 AS b UNION ALL SELECT 1, 20 UNION ALL SELECT 2, 30) |> AS t |> SELECT t.a, t.b"
+  },
+  {
+    "label": "pipe-where",
+    "sql": "FROM (SELECT 1 AS a, 10 AS b UNION ALL SELECT 1, 20 UNION ALL SELECT 2, 30) |> WHERE a=1"
+  },
+  {
+    "label": "pipe-aggregate",
+    "sql": "FROM (SELECT 1 AS a, 10 AS b UNION ALL SELECT 1, 20 UNION ALL SELECT 2, 30) |> AGGREGATE SUM(b) AS total GROUP BY a"
+  },
+  {
+    "label": "pipe-join",
+    "sql": "FROM (SELECT 1 AS a, 10 AS b UNION ALL SELECT 1, 20 UNION ALL SELECT 2, 30) |> JOIN (SELECT 1 AS a, 'match' AS tag) AS r USING (a)"
+  },
+  {
+    "label": "pipe-order-by",
+    "sql": "FROM (SELECT 1 AS a, 10 AS b UNION ALL SELECT 1, 20 UNION ALL SELECT 2, 30) |> ORDER BY b DESC"
+  },
+  {
+    "label": "pipe-limit",
+    "sql": "FROM (SELECT 1 AS a, 10 AS b UNION ALL SELECT 1, 20 UNION ALL SELECT 2, 30) |> LIMIT 2"
+  },
+  {
+    "label": "pipe-union",
+    "sql": "FROM (SELECT 1 AS a, 10 AS b UNION ALL SELECT 1, 20 UNION ALL SELECT 2, 30) |> UNION ALL (SELECT 3 AS a, 40 AS b)"
+  },
+  {
+    "label": "pipe-intersect",
+    "sql": "FROM (SELECT 1 AS a, 10 AS b UNION ALL SELECT 1, 20 UNION ALL SELECT 2, 30) |> INTERSECT DISTINCT (SELECT 1 AS a, 10 AS b)"
+  },
+  {
+    "label": "pipe-except",
+    "sql": "FROM (SELECT 1 AS a, 10 AS b UNION ALL SELECT 1, 20 UNION ALL SELECT 2, 30) |> EXCEPT DISTINCT (SELECT 1 AS a, 10 AS b)"
+  },
+  {
+    "label": "pipe-tablesample",
+    "sql": "FROM (SELECT 1 AS a, 10 AS b UNION ALL SELECT 1, 20 UNION ALL SELECT 2, 30) |> TABLESAMPLE BERNOULLI (100 PERCENT)"
+  },
+  {
+    "label": "pipe-standard-ordinal",
+    "sql": "SELECT a AS k, SUM(b) AS total FROM (SELECT 1 AS a, 10 AS b UNION ALL SELECT 1,20 UNION ALL SELECT 2,30) GROUP BY 1"
+  },
+  {
+    "label": "pipe-group-alias",
+    "sql": "FROM (SELECT 1 AS a, 10 AS b UNION ALL SELECT 1, 20 UNION ALL SELECT 2, 30) |> AGGREGATE SUM(b) AS total GROUP BY a AS k"
+  },
+  {
+    "label": "pipe-group-bare-alias",
+    "sql": "FROM (SELECT 1 AS a, 10 AS b UNION ALL SELECT 1, 20 UNION ALL SELECT 2, 30) |> AGGREGATE SUM(b) AS total GROUP BY a k"
+  },
+  {
+    "label": "pipe-group-two-aliases",
+    "sql": "FROM (SELECT 1 AS a, 10 AS b UNION ALL SELECT 1, 20 UNION ALL SELECT 2, 30) |> AGGREGATE COUNT(*) AS n GROUP BY a AS k, b AS v"
+  },
+  {
+    "label": "pipe-group-ordinal",
+    "sql": "FROM (SELECT 1 AS a, 10 AS b UNION ALL SELECT 1, 20 UNION ALL SELECT 2, 30) |> AGGREGATE SUM(b) AS total GROUP BY 1"
+  },
+  {
+    "label": "pipe-group-output-alias",
+    "sql": "FROM (SELECT 1 AS a, 10 AS b UNION ALL SELECT 1, 20 UNION ALL SELECT 2, 30) |> AGGREGATE SUM(b) AS total GROUP BY total"
+  },
+  {
+    "label": "pipe-group-input-alias",
+    "sql": "FROM (SELECT 1 AS a, 10 AS b UNION ALL SELECT 1, 20 UNION ALL SELECT 2, 30) |> EXTEND a+1 AS k |> AGGREGATE SUM(b) AS total GROUP BY k"
+  },
+  {
+    "label": "pipe-group-and-order",
+    "sql": "FROM (SELECT 1 AS a, 10 AS b UNION ALL SELECT 1, 20 UNION ALL SELECT 2, 30) |> AGGREGATE SUM(b) AS total GROUP AND ORDER BY a DESC"
+  },
+  {
+    "label": "select-led-select",
+    "sql": "SELECT 1 AS x |> SELECT x"
+  },
+  {
+    "label": "select-led-where",
+    "sql": "SELECT 1 AS x |> WHERE x=1"
+  },
+  {
+    "label": "select-led-aggregate",
+    "sql": "SELECT 1 AS x |> AGGREGATE SUM(x) AS n"
+  },
+  {
+    "label": "from-only",
+    "sql": "FROM (SELECT 1 AS x)"
+  },
+  {
+    "label": "json-equality",
+    "sql": "SELECT JSON '{\"a\":1}' = JSON '{\"a\":1}' AS same, JSON '1' < JSON '2' AS ordered, JSON '1' = 1 AS coerced, CAST(STRUCT(1 AS a) AS JSON) AS converted"
+  },
+  {
+    "label": "json-group",
+    "sql": "SELECT j,COUNT(*) AS n FROM UNNEST([JSON '{\"a\":1}',JSON '{\"a\":1}',JSON '{\"a\":2}']) j GROUP BY j ORDER BY j"
+  },
+  {
+    "label": "distinctness",
+    "sql": "SELECT NULL IS DISTINCT FROM NULL AS same_null, 1 IS DISTINCT FROM NULL AS distinct_null, JSON '1' IS NOT DISTINCT FROM 1 AS json_coerce"
+  },
+  {
+    "label": "hll-count",
+    "sql": "SELECT HLL_COUNT.EXTRACT(HLL_COUNT.INIT(x)) AS estimate FROM UNNEST([1,1,2,3]) x"
+  },
+  {
+    "label": "approx-count",
+    "sql": "SELECT APPROX_COUNT_DISTINCT(x) AS estimate FROM UNNEST([1,1,2,3]) x"
+  },
+  {
+    "label": "rand",
+    "sql": "SELECT RAND() AS r"
+  },
+  {
+    "label": "infoschema-columns",
+    "sql": "SELECT TABLE_SCHEMA,TABLE_NAME,COLUMN_NAME,ORDINAL_POSITION,SPANNER_TYPE,IS_NULLABLE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA='INFORMATION_SCHEMA' ORDER BY TABLE_NAME,ORDINAL_POSITION"
+  },
+  {
+    "label": "sys-columns-0",
+    "sql": "SELECT TABLE_NAME,COLUMN_NAME,ORDINAL_POSITION,SPANNER_TYPE,IS_NULLABLE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA='SPANNER_SYS' ORDER BY TABLE_NAME,ORDINAL_POSITION"
+  },
+  {
+    "label": "sys-query-0-ACTIVE_BATCH_OPERATIONS",
+    "sql": "SELECT * FROM SPANNER_SYS.ACTIVE_BATCH_OPERATIONS LIMIT 0"
+  },
+  {
+    "label": "sys-query-0-BATCH_OPERATIONS",
+    "sql": "SELECT * FROM SPANNER_SYS.BATCH_OPERATIONS LIMIT 0"
+  },
+  {
+    "label": "sys-query-0-LOCK_STATS_TOTAL_10MINUTE",
+    "sql": "SELECT * FROM SPANNER_SYS.LOCK_STATS_TOTAL_10MINUTE LIMIT 0"
+  },
+  {
+    "label": "sys-query-0-SPLIT_STATS_TOP_10MINUTE",
+    "sql": "SELECT * FROM SPANNER_SYS.SPLIT_STATS_TOP_10MINUTE LIMIT 0"
+  },
+  {
+    "label": "sys-columns-1",
+    "sql": "SELECT TABLE_NAME,COLUMN_NAME,ORDINAL_POSITION,SPANNER_TYPE,IS_NULLABLE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA='SPANNER_SYS' ORDER BY TABLE_NAME,ORDINAL_POSITION"
+  },
+  {
+    "label": "sys-query-1-ACTIVE_BATCH_OPERATIONS",
+    "sql": "SELECT * FROM SPANNER_SYS.ACTIVE_BATCH_OPERATIONS LIMIT 0"
+  },
+  {
+    "label": "sys-query-1-BATCH_OPERATIONS",
+    "sql": "SELECT * FROM SPANNER_SYS.BATCH_OPERATIONS LIMIT 0"
+  },
+  {
+    "label": "sys-query-1-LOCK_STATS_TOTAL_10MINUTE",
+    "sql": "SELECT * FROM SPANNER_SYS.LOCK_STATS_TOTAL_10MINUTE LIMIT 0"
+  },
+  {
+    "label": "sys-query-1-SPLIT_STATS_TOP_10MINUTE",
+    "sql": "SELECT * FROM SPANNER_SYS.SPLIT_STATS_TOP_10MINUTE LIMIT 0"
+  },
+  {
+    "label": "sys-columns-2",
+    "sql": "SELECT TABLE_NAME,COLUMN_NAME,ORDINAL_POSITION,SPANNER_TYPE,IS_NULLABLE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA='SPANNER_SYS' ORDER BY TABLE_NAME,ORDINAL_POSITION"
+  },
+  {
+    "label": "sys-query-2-ACTIVE_BATCH_OPERATIONS",
+    "sql": "SELECT * FROM SPANNER_SYS.ACTIVE_BATCH_OPERATIONS LIMIT 0"
+  },
+  {
+    "label": "sys-query-2-BATCH_OPERATIONS",
+    "sql": "SELECT * FROM SPANNER_SYS.BATCH_OPERATIONS LIMIT 0"
+  },
+  {
+    "label": "sys-query-2-LOCK_STATS_TOTAL_10MINUTE",
+    "sql": "SELECT * FROM SPANNER_SYS.LOCK_STATS_TOTAL_10MINUTE LIMIT 0"
+  },
+  {
+    "label": "sys-query-2-SPLIT_STATS_TOP_10MINUTE",
+    "sql": "SELECT * FROM SPANNER_SYS.SPLIT_STATS_TOP_10MINUTE LIMIT 0"
+  }
+]

@@ -1,0 +1,18 @@
+[
+  {
+    "label": "connectivity",
+    "sql": "SELECT 1 AS connectivity"
+  },
+  {
+    "label": "agg-null-json-result-from",
+    "sql": "SELECT SPANNER_SYS.DISTRIBUTION_AGG(d) IS NULL AS is_null FROM (SELECT CAST(NULL AS STRING) AS d)"
+  },
+  {
+    "label": "agg-null-percentile-guard-from",
+    "sql": "WITH a AS (SELECT SPANNER_SYS.DISTRIBUTION_AGG(d) AS h FROM (SELECT CAST(NULL AS STRING) AS d)) SELECT IF(h IS NULL,NULL,SPANNER_SYS.DISTRIBUTION_PERCENTILE(h,99.0)) AS p99 FROM a"
+  },
+  {
+    "label": "agg-bad-json-negative-from",
+    "sql": "SELECT SPANNER_SYS.DISTRIBUTION_AGG(d) AS histogram FROM UNNEST(['not-json']) AS d"
+  }
+]

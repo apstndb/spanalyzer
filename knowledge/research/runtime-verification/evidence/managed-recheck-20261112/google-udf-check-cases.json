@@ -1,0 +1,91 @@
+{
+  "dialect": "google",
+  "steps": [
+    {
+      "label": "pv-udf-execute-a",
+      "family": "secure-context-named-udf-controls",
+      "kind": "query",
+      "requires": [],
+      "secure_context": {
+        "tenant": "a"
+      },
+      "sql": "SELECT PVFunctions.PVUdf() AS value"
+    },
+    {
+      "label": "pv-udf-execute-b",
+      "family": "secure-context-named-udf-controls",
+      "kind": "query",
+      "requires": [],
+      "secure_context": {
+        "tenant": "b"
+      },
+      "sql": "SELECT PVFunctions.PVUdf() AS value"
+    },
+    {
+      "label": "pv-udf-execute-missing",
+      "family": "secure-context-named-udf-controls",
+      "kind": "query",
+      "requires": [],
+      "secure_context": {},
+      "sql": "SELECT PVFunctions.PVUdf() AS value"
+    },
+    {
+      "label": "pv-udf-argument-forwarding",
+      "family": "secure-context-named-udf-controls",
+      "kind": "query",
+      "requires": [],
+      "secure_context": {
+        "tenant": "a"
+      },
+      "sql": "SELECT PVFunctions.Echo(SECURE_CONTEXT('tenant')) AS value"
+    },
+    {
+      "label": "pv-udf-view",
+      "family": "secure-context-named-udf-controls",
+      "kind": "ddl",
+      "requires": [],
+      "sql": "CREATE VIEW PVViaUdf SQL SECURITY DEFINER AS SELECT r.Id,r.Tenant,r.Payload FROM PVRows AS r WHERE r.Tenant=PVFunctions.PVUdf()"
+    },
+    {
+      "label": "pv-udf-view-grant",
+      "family": "secure-context-named-udf-controls",
+      "kind": "ddl",
+      "requires": [
+        "pv-udf-view"
+      ],
+      "sql": "GRANT SELECT ON VIEW PVViaUdf TO ROLE pv_user"
+    },
+    {
+      "label": "pv-udf-view-role-a",
+      "family": "secure-context-named-udf-controls",
+      "kind": "query",
+      "requires": [
+        "pv-udf-view-grant"
+      ],
+      "database_role": "pv_user",
+      "secure_context": {
+        "tenant": "a"
+      },
+      "sql": "SELECT Id,Tenant,Payload FROM PVViaUdf ORDER BY Id"
+    },
+    {
+      "label": "pv-udf-view-role-b",
+      "family": "secure-context-named-udf-controls",
+      "kind": "query",
+      "requires": [
+        "pv-udf-view-grant"
+      ],
+      "database_role": "pv_user",
+      "secure_context": {
+        "tenant": "b"
+      },
+      "sql": "SELECT Id,Tenant,Payload FROM PVViaUdf ORDER BY Id"
+    },
+    {
+      "label": "pv-ddl-export",
+      "family": "secure-context-named-udf-controls",
+      "kind": "ddl-export",
+      "requires": []
+    }
+  ]
+}

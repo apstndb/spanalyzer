@@ -1,0 +1,84 @@
+from pathlib import Path
+import copy,json
+out=Path('/Users/apstndb/tmp/apstndb/spanalyzer/managed-revalidation-20261112/evidence')
+prior=Path('/Users/apstndb/tmp/apstndb/spanalyzer/managed-and-main-20261108/evidence')
+plans={}
+for dialect in ['google','pg']:
+ old=json.loads((prior/(dialect+'-cases.json')).read_text())
+ keep=[]
+ for item in old['steps']:
+  s=copy.deepcopy(item)
+  if s['family']in ['geo-sequence','mirror-20261108'] and s['label']!='score-pagination-insert':continue
+  if s['family']=='ranked-pagination'and s['label'].startswith(('pagination-set-db-','pagination-db-')):continue
+  if dialect=='pg'and s['family']=='queue-batches'and s['kind']=='query':
+   s['sql']=s['sql'].replace("max_duration=>'5s'", "max_duration=>'5s',priority=>NULL")
+  keep.append(s)
+ plans[dialect]={'dialect':dialect,'steps':keep}
+def add(dialect,label,kind,sql='',family='new-docs-20261112',requires=(),**extra):
+ s=dict(label=label,family=family,kind=kind,requires=list(requires),**extra)
+ if sql:s['sql']=sql
+ plans[dialect]['steps'].append(s)
+def ddl(dialect,label,sql,**kw):add(dialect,label,'ddl',sql,**kw)
+def query(dialect,label,sql,**kw):add(dialect,label,'query',sql,**kw)
+g='google'
+ddl(g,'pv-table','CREATE TABLE PVRows(Id INT64 NOT NULL,Tenant STRING(10),Payload STRING(MAX)) PRIMARY KEY(Id)')
+add(g,'pv-seed','dml',requires=['pv-table'],statements=["INSERT INTO PVRows(Id,Tenant,Payload) VALUES (1,'a','a1'),(2,'b','b1'),(3,'a','a2')"])
+ddl(g,'pv-roles','CREATE ROLE pv_user',statements=['CREATE ROLE pv_user','CREATE ROLE pv_debug'])
+ddl(g,'pv-ordinary-view','CREATE VIEW PVPublic SQL SECURITY DEFINER AS SELECT 42 AS Answer')
+ddl(g,'pv-filter-view',"CREATE VIEW PVFilter SQL SECURITY DEFINER AS SELECT Id,Tenant,Payload FROM PVRows WHERE Tenant=SECURE_CONTEXT('tenant')",requires=['pv-table'])
+ddl(g,'pv-project-view',"CREATE VIEW PVProject SQL SECURITY DEFINER AS SELECT SECURE_CONTEXT('tenant') AS Tenant")
+ddl(g,'pv-json-view',"CREATE VIEW PVJson SQL SECURITY DEFINER AS SELECT Id,Tenant,Payload FROM PVRows WHERE Tenant=JSON_VALUE(PARSE_JSON(SECURE_CONTEXT('auth')),'$.tenant')",requires=['pv-table'])
+ddl(g,'pv-grant-public','GRANT SELECT ON VIEW PVPublic TO ROLE pv_user',requires=['pv-roles','pv-ordinary-view'])
+query(g,'pv-role-connectivity','SELECT Answer FROM PVPublic',database_role='pv_user',requires=['pv-grant-public'])
+for label,view in [('filter','PVFilter'),('project','PVProject'),('json','PVJson')]:
+ ddl(g,'pv-grant-'+label,'GRANT SELECT ON VIEW '+view+' TO ROLE pv_user',requires=['pv-roles','pv-'+label+'-view'])
+for label,context in [('tenant-a',{'tenant':'a'}),('tenant-b',{'tenant':'b'}),('unknown',{'tenant':'c'}),('null',{'tenant':None}),('missing',{}),('wrong-type',{'tenant':42})]:
+ query(g,'pv-role-'+label,'SELECT Id,Tenant,Payload FROM PVFilter ORDER BY Id',secure_context=context,database_role='pv_user',requires=['pv-grant-filter','pv-seed'])
+query(g,'pv-role-ordinary-param-cannot-override','SELECT Id,Tenant,Payload FROM PVFilter WHERE Tenant=@tenant OR TRUE ORDER BY Id',params={'tenant':'b'},secure_context={'tenant':'a'},database_role='pv_user',requires=['pv-grant-filter','pv-seed'])
+query(g,'pv-role-base-denied','SELECT Id FROM PVRows ORDER BY Id',database_role='pv_user',secure_context={'tenant':'a'},requires=['pv-role-connectivity','pv-seed'])
+query(g,'pv-role-direct-context-denied',"SELECT SECURE_CONTEXT('tenant') AS value",secure_context={'tenant':'a'},database_role='pv_user',requires=['pv-role-connectivity'])
+query(g,'pv-role-explicit-projection','SELECT Tenant FROM PVProject',secure_context={'tenant':'a'},database_role='pv_user',requires=['pv-grant-project'])
+query(g,'pv-role-json-context','SELECT Id,Tenant,Payload FROM PVJson ORDER BY Id',secure_context={'auth':'{"tenant":"b"}'},database_role='pv_user',requires=['pv-grant-json','pv-seed'])
+ddl(g,'pv-grant-debug-system-role','GRANT ROLE spanner_secure_context_reader TO ROLE pv_debug',requires=['pv-roles'])
+query(g,'pv-debug-direct-context',"SELECT SECURE_CONTEXT('tenant') AS value",secure_context={'tenant':'a'},database_role='pv_debug',requires=['pv-grant-debug-system-role'])
+query(g,'pv-debug-base-still-denied','SELECT Id FROM PVRows',secure_context={'tenant':'a'},database_role='pv_debug',requires=['pv-grant-debug-system-role','pv-seed'])
+ddl(g,'pv-invoker-negative',"CREATE VIEW PVInvoker SQL SECURITY INVOKER AS SELECT Id FROM PVRows WHERE Tenant=SECURE_CONTEXT('tenant')",requires=['pv-table'])
+ddl(g,'pv-udf-negative',"CREATE FUNCTION PVUdf() RETURNS STRING SQL SECURITY INVOKER AS (SECURE_CONTEXT('tenant'))")
+ddl(g,'pv-default-negative',"CREATE TABLE PVDefault(Id INT64 NOT NULL,Tenant STRING(MAX) DEFAULT (SECURE_CONTEXT('tenant'))) PRIMARY KEY(Id)")
+ddl(g,'pv-generated-negative',"CREATE TABLE PVGenerated(Id INT64 NOT NULL,Tenant STRING(MAX) AS (SECURE_CONTEXT('tenant')) STORED) PRIMARY KEY(Id)")
+ddl(g,'pv-cast-doc-negative',"CREATE VIEW PVCastDoc SQL SECURITY DEFINER AS SELECT CAST(SECURE_CONTEXT('user_id'), INT64) AS UserId")
+ddl(g,'pv-cast-corrected',"CREATE VIEW PVCastCorrected SQL SECURITY DEFINER AS SELECT CAST(SECURE_CONTEXT('user_id') AS INT64) AS UserId")
+query(g,'pv-cast-corrected-query','SELECT UserId FROM PVCastCorrected',secure_context={'user_id':'123'},requires=['pv-cast-corrected'])
+query(g,'pv-info-schema','SELECT TABLE_NAME,VIEW_DEFINITION,SECURITY_TYPE FROM INFORMATION_SCHEMA.VIEWS WHERE STARTS_WITH(TABLE_NAME,\'PV\') ORDER BY TABLE_NAME')
+ddl(g,'vector-annotated','CREATE TABLE VectorsAnnotated(Id INT64 NOT NULL,E ARRAY<FLOAT32>(vector_length=>3)) PRIMARY KEY(Id)')
+ddl(g,'vector-unannotated','CREATE TABLE VectorsFlexible(Id INT64 NOT NULL,E ARRAY<FLOAT32>) PRIMARY KEY(Id)')
+for table,label,requires in [('VectorsAnnotated','annotated','vector-annotated'),('VectorsFlexible','flexible','vector-unannotated')]:
+ for n,vector in [(3,'[1.0,2.0,3.0]'),(2,'[1.0,2.0]')]:
+  add(g,'vector-'+label+'-length-'+str(n),'dml',requires=[requires],statements=[f'INSERT INTO {table}(Id,E) VALUES ({n},{vector})'])
+ query(g,'vector-'+label+'-knn',f'SELECT Id,EUCLIDEAN_DISTANCE(E,CAST([1.0,2.0,3.0] AS ARRAY<FLOAT32>)) AS Distance FROM {table} WHERE ARRAY_LENGTH(E)=3 ORDER BY Distance',requires=[requires])
+ddl(g,'vector-index-annotated',"CREATE VECTOR INDEX AnnotatedVectorIndex ON VectorsAnnotated(E) WHERE E IS NOT NULL OPTIONS(distance_type='EUCLIDEAN')",requires=['vector-annotated'])
+ddl(g,'vector-index-unannotated-negative',"CREATE VECTOR INDEX FlexibleVectorIndex ON VectorsFlexible(E) WHERE E IS NOT NULL OPTIONS(distance_type='EUCLIDEAN')",requires=['vector-unannotated'])
+add(g,'pv-ddl-export','ddl-export')
+p='pg'
+for fn,label in [('spanner.secure_context','qualified'),('secure_context','unqualified')]:
+ query(p,'pv-context-'+label,f"SELECT {fn}('tenant') AS value",secure_context={'tenant':'a'})
+query(p,'distribution-query-example',"SELECT CASE WHEN latency_dist IS NOT NULL THEN SPANNER_SYS.DISTRIBUTION_PERCENTILE(latency_dist,99.0) ELSE NULL END AS p99 FROM (SELECT SPANNER_SYS.DISTRIBUTION_AGG(CASE WHEN T.LATENCY_DISTRIBUTION_JSON_STRING::jsonb ->> 'COUNT' != '0' THEN T.LATENCY_DISTRIBUTION_JSON_STRING ELSE NULL END) AS latency_dist FROM SPANNER_SYS.QUERY_STATS_TOP_MINUTE AS T WHERE T.INTERVAL_END > spanner.timestamptz_subtract(now(),'1 HOUR') AND T.INTERVAL_END <= now()) AS agg")
+query(p,'distribution-txn-example',"WITH aggregated_stats AS (SELECT T.FPRINT,SPANNER_SYS.DISTRIBUTION_AGG(CASE WHEN T.COMMIT_LATENCY_DISTRIBUTION_JSON_STRING::jsonb ->> 'COUNT' != '0' THEN T.COMMIT_LATENCY_DISTRIBUTION_JSON_STRING ELSE NULL END) AS commit_latency_dist_str FROM SPANNER_SYS.TXN_STATS_TOP_MINUTE AS T WHERE T.INTERVAL_END > spanner.timestamptz_subtract(now(),'1 HOUR') AND T.INTERVAL_END <= now() GROUP BY T.FPRINT) SELECT FPRINT,CASE WHEN commit_latency_dist_str IS NOT NULL THEN SPANNER_SYS.DISTRIBUTION_PERCENTILE(commit_latency_dist_str,99.0) ELSE NULL END AS p99 FROM aggregated_stats")
+ddl(p,'vector-annotated','CREATE TABLE VectorsAnnotated(Id bigint PRIMARY KEY,E real[] VECTOR LENGTH 3)')
+ddl(p,'vector-unannotated','CREATE TABLE VectorsFlexible(Id bigint PRIMARY KEY,E real[])')
+for table,label,requires in [('VectorsAnnotated','annotated','vector-annotated'),('VectorsFlexible','flexible','vector-unannotated')]:
+ for n,vector in [(3,'ARRAY[1.0,2.0,3.0]::real[]'),(2,'ARRAY[1.0,2.0]::real[]')]:
+  add(p,'vector-'+label+'-length-'+str(n),'dml',requires=[requires],statements=[f'INSERT INTO {table}(Id,E) VALUES ({n},{vector})'])
+ query(p,'vector-'+label+'-knn',f'SELECT Id,spanner.euclidean_distance(E,ARRAY[1.0,2.0,3.0]::real[]) AS Distance FROM {table} WHERE array_length(E,1)=3 ORDER BY Distance',requires=[requires])
+ddl(p,'vector-index-annotated',"CREATE VECTOR INDEX AnnotatedVectorIndex ON VectorsAnnotated(E) WHERE E IS NOT NULL OPTIONS(distance_type='EUCLIDEAN')",requires=['vector-annotated'])
+ddl(p,'vector-index-unannotated-negative',"CREATE VECTOR INDEX FlexibleVectorIndex ON VectorsFlexible(E) WHERE E IS NOT NULL OPTIONS(distance_type='EUCLIDEAN')",requires=['vector-unannotated'])
+add(p,'current-ddl-export','ddl-export')
+for dialect,plan in plans.items():
+ labels=set()
+ for step in plan['steps']:
+  assert step['label']not in labels,step['label']
+  assert all(r in labels for r in step.get('requires',[])),(step['label'],step.get('requires'))
+  labels.add(step['label'])
+ (out/(dialect+'-cases.json')).write_text(json.dumps(plan,indent=2)+'\n')
+ print(dialect,len(plan['steps']))
+print('total',sum(len(p['steps'])for p in plans.values()))

@@ -1,0 +1,32 @@
+[
+  {
+    "url": "https://docs.cloud.google.com/spanner/docs/fgac-system-roles",
+    "retrieved_at_utc": "2026-11-11T20:50:32.359337+00:00",
+    "html_sha256": "84e21e0eaa866ca0d3d6cccba9130ffb8b325ffd8c3b7006ff858bf72e054a20",
+    "role_occurrences": 0,
+    "role_contexts": [],
+    "cast_contexts": []
+  },
+  {
+    "url": "https://docs.cloud.google.com/spanner/docs/create-manage-views",
+    "retrieved_at_utc": "2026-11-11T20:50:32.355449+00:00",
+    "html_sha256": "02cd08188fb4f842cf8d1bb13c835655775de36958f81ea7afcb2fe82f4b33a0",
+    "role_occurrences": 0,
+    "role_contexts": [],
+    "cast_contexts": [
+      "ame AS Name FROM Singers WHERE UserID = CAST ( SECURE_CONTEXT ( 'app_end_userid' ), INT64 ); To use the parameterized view, you must have the SELECT privilege on a view. For more information, see Grant and revo"
+    ]
+  },
+  {
+    "url": "https://docs.cloud.google.com/spanner/docs/use-parameterized-views",
+    "retrieved_at_utc": "2026-11-11T20:50:32.442271+00:00",
+    "html_sha256": "5e534e370372562d51195a1438a71e450db0339641f36a1488be7080d8d4a848",
+    "role_occurrences": 1,
+    "role_contexts": [
+      "f. However, if you need to call SECURE_CONTEXT() directly to debug your queries, grant yourself the spanner_secure_context_reader role. You must not grant this role to untrusted agents. Query data using the parameterized view Your application queries a parameterized view by first"
+    ],
+    "cast_contexts": [
+      "ROM checked_items t WHERE customer_id = CAST ( SECURE_CONTEXT ( 'app_end_userid' ), INT64 )); Click Run . Set up access privileges To ensure that users can only access data through the parameterized view, creat"
+    ]
+  }
+]

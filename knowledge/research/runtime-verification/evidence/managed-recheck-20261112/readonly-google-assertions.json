@@ -1,0 +1,1189 @@
+{
+  "status": "pass",
+  "checks": 236,
+  "failures": [],
+  "read_only_sdk_records": 184,
+  "scope": "Completed read-only and GoogleSQL corrected controls only; PostgreSQL and final combined fixture coverage are checked separately. Expected errors and harness interruptions are not counted as universal SQL successes.",
+  "assertions": [
+    {
+      "name": "readonly-complete",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "readonly-connectivity",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "readonly-no-inconclusive-transport",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "readonly/connectivity-prior-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "readonly/final-tables-prior-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "readonly/final-views-prior-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "readonly/final-graphs-prior-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "readonly/final-streams-prior-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "readonly/final-routines-prior-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "readonly/final-models-prior-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "readonly/pipe-select-prior-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "readonly/pipe-extend-prior-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "readonly/pipe-set-prior-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "readonly/pipe-drop-prior-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "readonly/pipe-rename-prior-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "readonly/pipe-as-prior-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "readonly/pipe-where-prior-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "readonly/pipe-aggregate-prior-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "readonly/pipe-join-prior-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "readonly/pipe-order-by-prior-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "readonly/pipe-limit-prior-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "readonly/pipe-union-prior-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "readonly/pipe-intersect-prior-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "readonly/pipe-except-prior-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "readonly/pipe-tablesample-prior-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "readonly/pipe-standard-ordinal-prior-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "readonly/pipe-group-alias-prior-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "readonly/pipe-group-bare-alias-prior-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "readonly/pipe-group-two-aliases-prior-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "readonly/pipe-group-ordinal-prior-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "readonly/pipe-group-output-alias-prior-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "readonly/pipe-group-input-alias-prior-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "readonly/pipe-group-and-order-prior-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "readonly/select-led-select-prior-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "readonly/select-led-where-prior-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "readonly/select-led-aggregate-prior-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "readonly/from-only-prior-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "readonly/json-equality-prior-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "readonly/json-group-prior-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "readonly/distinctness-prior-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "readonly/hll-count-prior-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "readonly/approx-count-prior-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "readonly/rand-prior-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "readonly/infoschema-columns-prior-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "infoschema-columns-unchanged-tuples",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "readonly/sys-columns-0-prior-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "sys-columns-0-unchanged-tuples",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "readonly/sys-query-0-ACTIVE_BATCH_OPERATIONS-prior-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "readonly/sys-query-0-BATCH_OPERATIONS-prior-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "readonly/sys-query-0-LOCK_STATS_TOTAL_10MINUTE-prior-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "readonly/sys-query-0-SPLIT_STATS_TOP_10MINUTE-prior-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "readonly/sys-columns-1-prior-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "sys-columns-1-unchanged-tuples",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "readonly/sys-query-1-ACTIVE_BATCH_OPERATIONS-prior-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "readonly/sys-query-1-BATCH_OPERATIONS-prior-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "readonly/sys-query-1-LOCK_STATS_TOTAL_10MINUTE-prior-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "readonly/sys-query-1-SPLIT_STATS_TOP_10MINUTE-prior-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "readonly/sys-columns-2-prior-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "sys-columns-2-unchanged-tuples",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "readonly/sys-query-2-ACTIVE_BATCH_OPERATIONS-prior-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "readonly/sys-query-2-BATCH_OPERATIONS-prior-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "readonly/sys-query-2-LOCK_STATS_TOTAL_10MINUTE-prior-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "readonly/sys-query-2-SPLIT_STATS_TOP_10MINUTE-prior-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "supplemental-complete",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "supplemental-connectivity",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "supplemental-no-inconclusive-transport",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "supplemental/connectivity-prior-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "supplemental/ACTIVE_BATCH_OPERATIONS0-prior-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "supplemental/ACTIVE_BATCH_OPERATIONS1-prior-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "supplemental/BATCH_OPERATIONS0-prior-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "supplemental/BATCH_OPERATIONS1-prior-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "supplemental/LOCK_STATS_TOP_MINUTE-scalar-prior-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "supplemental/LOCK_STATS_TOP_MINUTE-dist-prior-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "supplemental/LOCK_STATS_TOP_MINUTE-json-prior-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "supplemental/LOCK_STATS_TOP_10MINUTE-scalar-prior-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "supplemental/LOCK_STATS_TOP_10MINUTE-dist-prior-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "supplemental/LOCK_STATS_TOP_10MINUTE-json-prior-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "supplemental/LOCK_STATS_TOP_HOUR-scalar-prior-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "supplemental/LOCK_STATS_TOP_HOUR-dist-prior-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "supplemental/LOCK_STATS_TOP_HOUR-json-prior-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "supplemental/LOCK_STATS_TOTAL_MINUTE-scalar-prior-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "supplemental/LOCK_STATS_TOTAL_MINUTE-dist-prior-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "supplemental/LOCK_STATS_TOTAL_MINUTE-json-prior-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "supplemental/LOCK_STATS_TOTAL_10MINUTE-scalar-prior-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "supplemental/LOCK_STATS_TOTAL_10MINUTE-dist-prior-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "supplemental/LOCK_STATS_TOTAL_10MINUTE-json-prior-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "supplemental/LOCK_STATS_TOTAL_HOUR-scalar-prior-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "supplemental/LOCK_STATS_TOTAL_HOUR-dist-prior-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "supplemental/LOCK_STATS_TOTAL_HOUR-json-prior-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "supplemental/SPLIT_STATS_TOP_MINUTE-prior-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "supplemental/SPLIT_STATS_TOP_10MINUTE-prior-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "supplemental/SPLIT_STATS_TOP_HOUR-prior-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "statistics-complete",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "statistics-connectivity",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "statistics-no-inconclusive-transport",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "statistics/connectivity-prior-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "statistics/stats-QUERY_STATS_TOP_MINUTE-scalar-prior-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "statistics/stats-QUERY_STATS_TOP_MINUTE-CPU_SECONDS_DISTRIBUTION-struct-prior-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "statistics/stats-QUERY_STATS_TOP_MINUTE-CPU_SECONDS_DISTRIBUTION-json-prior-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "statistics/stats-QUERY_STATS_TOP_MINUTE-ROW_SCANNED_DISTRIBUTION-struct-prior-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "statistics/stats-QUERY_STATS_TOP_MINUTE-ROW_SCANNED_DISTRIBUTION-json-prior-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "statistics/stats-QUERY_STATS_TOP_10MINUTE-scalar-prior-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "statistics/stats-QUERY_STATS_TOP_10MINUTE-CPU_SECONDS_DISTRIBUTION-struct-prior-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "statistics/stats-QUERY_STATS_TOP_10MINUTE-CPU_SECONDS_DISTRIBUTION-json-prior-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "statistics/stats-QUERY_STATS_TOP_10MINUTE-ROW_SCANNED_DISTRIBUTION-struct-prior-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "statistics/stats-QUERY_STATS_TOP_10MINUTE-ROW_SCANNED_DISTRIBUTION-json-prior-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "statistics/stats-QUERY_STATS_TOP_HOUR-scalar-prior-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "statistics/stats-QUERY_STATS_TOP_HOUR-CPU_SECONDS_DISTRIBUTION-struct-prior-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "statistics/stats-QUERY_STATS_TOP_HOUR-CPU_SECONDS_DISTRIBUTION-json-prior-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "statistics/stats-QUERY_STATS_TOP_HOUR-ROW_SCANNED_DISTRIBUTION-struct-prior-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "statistics/stats-QUERY_STATS_TOP_HOUR-ROW_SCANNED_DISTRIBUTION-json-prior-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "statistics/stats-QUERY_STATS_TOTAL_MINUTE-scalar-prior-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "statistics/stats-QUERY_STATS_TOTAL_MINUTE-CPU_SECONDS_DISTRIBUTION-struct-prior-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "statistics/stats-QUERY_STATS_TOTAL_MINUTE-CPU_SECONDS_DISTRIBUTION-json-prior-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "statistics/stats-QUERY_STATS_TOTAL_MINUTE-ROW_SCANNED_DISTRIBUTION-struct-prior-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "statistics/stats-QUERY_STATS_TOTAL_MINUTE-ROW_SCANNED_DISTRIBUTION-json-prior-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "statistics/stats-QUERY_STATS_TOTAL_10MINUTE-scalar-prior-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "statistics/stats-QUERY_STATS_TOTAL_10MINUTE-CPU_SECONDS_DISTRIBUTION-struct-prior-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "statistics/stats-QUERY_STATS_TOTAL_10MINUTE-CPU_SECONDS_DISTRIBUTION-json-prior-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "statistics/stats-QUERY_STATS_TOTAL_10MINUTE-ROW_SCANNED_DISTRIBUTION-struct-prior-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "statistics/stats-QUERY_STATS_TOTAL_10MINUTE-ROW_SCANNED_DISTRIBUTION-json-prior-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "statistics/stats-QUERY_STATS_TOTAL_HOUR-scalar-prior-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "statistics/stats-QUERY_STATS_TOTAL_HOUR-CPU_SECONDS_DISTRIBUTION-struct-prior-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "statistics/stats-QUERY_STATS_TOTAL_HOUR-CPU_SECONDS_DISTRIBUTION-json-prior-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "statistics/stats-QUERY_STATS_TOTAL_HOUR-ROW_SCANNED_DISTRIBUTION-struct-prior-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "statistics/stats-QUERY_STATS_TOTAL_HOUR-ROW_SCANNED_DISTRIBUTION-json-prior-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "statistics-controls-complete",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "statistics-controls-connectivity",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "statistics-controls-no-inconclusive-transport",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "statistics-controls/connectivity-prior-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "statistics-controls/QUERY_STATS_TOP_MINUTE-CPU_SECONDS_DISTRIBUTION-element-prior-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "statistics-controls/QUERY_STATS_TOP_MINUTE-ROW_SCANNED_DISTRIBUTION-element-prior-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "statistics-controls/QUERY_STATS_TOP_10MINUTE-CPU_SECONDS_DISTRIBUTION-element-prior-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "statistics-controls/QUERY_STATS_TOP_10MINUTE-ROW_SCANNED_DISTRIBUTION-element-prior-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "statistics-controls/QUERY_STATS_TOP_HOUR-CPU_SECONDS_DISTRIBUTION-element-prior-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "statistics-controls/QUERY_STATS_TOP_HOUR-ROW_SCANNED_DISTRIBUTION-element-prior-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "statistics-controls/QUERY_STATS_TOTAL_MINUTE-CPU_SECONDS_DISTRIBUTION-element-prior-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "statistics-controls/QUERY_STATS_TOTAL_MINUTE-ROW_SCANNED_DISTRIBUTION-element-prior-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "statistics-controls/QUERY_STATS_TOTAL_10MINUTE-CPU_SECONDS_DISTRIBUTION-element-prior-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "statistics-controls/QUERY_STATS_TOTAL_10MINUTE-ROW_SCANNED_DISTRIBUTION-element-prior-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "statistics-controls/QUERY_STATS_TOTAL_HOUR-CPU_SECONDS_DISTRIBUTION-element-prior-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "statistics-controls/QUERY_STATS_TOTAL_HOUR-ROW_SCANNED_DISTRIBUTION-element-prior-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "histogram-controls-complete",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "histogram-controls-connectivity",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "histogram-controls-no-inconclusive-transport",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "histogram-controls/connectivity-prior-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "histogram-controls/zero-run-controls-prior-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "observed-histogram-complete",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "observed-histogram-connectivity",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "observed-histogram-no-inconclusive-transport",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "observed-histogram/connectivity-prior-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "observed-histogram/observed-json-original-prior-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "observed-histogram/observed-json-expanded-prior-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "scalar-correction-complete",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "scalar-correction-connectivity",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "scalar-correction-no-inconclusive-transport",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "scalar-correction/connectivity-prior-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "scalar-correction/LOCK_STATS_TOP_MINUTE-corrected-scalar-prior-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "scalar-correction/LOCK_STATS_TOP_10MINUTE-corrected-scalar-prior-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "scalar-correction/LOCK_STATS_TOP_HOUR-corrected-scalar-prior-code",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "new-readonly-complete",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "new-readonly-connectivity",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "new-readonly-no-inconclusive-transport",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "distribution-frames-complete",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "distribution-frames-connectivity",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "distribution-frames-no-inconclusive-transport",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "distribution-null-controls-complete",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "distribution-null-controls-connectivity",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "distribution-null-controls-no-inconclusive-transport",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "secure-context-tenant-a-value",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "secure-context-tenant-b-value",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "secure-context-null-value",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "secure-context-cast-corrected-value",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "secure-context-absent-rejection",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "secure-context-numeric-rejection",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "secure-context-json-object-rejection",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "secure-context-nonliteral-rejection",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "secure-context-null-key-rejection",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "secure-context-wrong-key-type-rejection",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "cast-comma-parser-rejection",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "secure-and-ordinary-parameters-independent",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "zstd-level--5",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "zstd-level-0",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "zstd-level-3",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "zstd-level-22",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "zstd-level-reject--6",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "zstd-level-reject-23",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "zstd-null-level",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "zstd_decompress_to_bytes-null-limit",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "zstd_decompress_to_bytes-size-limit",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "zstd_decompress_to_bytes-named-only",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "zstd_decompress_to_string-null-limit",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "zstd_decompress_to_string-size-limit",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "zstd_decompress_to_string-named-only",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "aggregate-two-count",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "aggregate-ignore-null-count",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "aggregate-duplicate-percentile",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "frame-fixtures-locally-valid",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "zstd_decompress_to_bytes-known-content-size",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "zstd_decompress_to_bytes-unknown-content-size-reject",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "zstd_decompress_to_string-known-content-size",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "zstd_decompress_to_string-unknown-content-size-reject",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "aggregate-all-null",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "aggregate-null-guard",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "aggregate-invalid-json",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "pv-role-tenant-a-rows",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "pv-role-tenant-b-rows",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "pv-role-ordinary-param-cannot-override-rows",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "pv-role-json-context-rows",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "pv-role-unknown-rows",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "pv-role-null-rows",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "pv-role-missing-invalid-context",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "pv-role-wrong-type-invalid-context",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "pv-role-base-denied-privilege-control",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "pv-role-direct-context-denied-privilege-control",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "pv-debug-base-still-denied-privilege-control",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "context-reader-explicit-grant",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "invoker-context-denied",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "named-udf-prerequisite-positive",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "named-udf-definition-accepted",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "annotated-vector-positive",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "annotated-vector-wrong-dimension",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "flexible-vectors-both-lengths",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "both-knn-positive",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "annotated-index-ready",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "unannotated-index-negative",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "pv-udf-execute-a-execution-rejected",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "pv-udf-execute-b-execution-rejected",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "pv-udf-execute-missing-execution-rejected",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "pv-udf-view-role-a-execution-rejected",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "pv-udf-view-role-b-execution-rejected",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "context-argument-forwarding",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "same-google-owned-database",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "google-owned-cleanup",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "infoschema-check-unchanged",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "spanner-sys-check-unchanged",
+      "pass": true,
+      "detail": null
+    }
+  ]
+}

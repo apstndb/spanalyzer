@@ -1,0 +1,14 @@
+[
+  {
+    "label": "connectivity",
+    "sql": "SELECT 1 AS connectivity"
+  },
+  {
+    "label": "observed-json-original",
+    "sql": "SELECT SPANNER_SYS.DISTRIBUTION_PERCENTILE('{\"BUCKET_COUNTS\":[-14,1],\"COUNT\":1,\"GROWTH_FACTOR\":2.0,\"MEAN\":0.012682,\"NUM_FINITE_BUCKETS\":33,\"SCALE\":1e-06,\"SUM_OF_SQUARED_DEVIATION\":0.0}',99.0) AS p99"
+  },
+  {
+    "label": "observed-json-expanded",
+    "sql": "SELECT SPANNER_SYS.DISTRIBUTION_PERCENTILE('{\"BUCKET_COUNTS\":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],\"COUNT\":1,\"GROWTH_FACTOR\":2.0,\"MEAN\":0.012682,\"NUM_FINITE_BUCKETS\":33,\"SCALE\":1e-06,\"SUM_OF_SQUARED_DEVIATION\":0.0}',99.0) AS p99"
+  }
+]

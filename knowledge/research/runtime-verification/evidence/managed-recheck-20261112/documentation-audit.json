@@ -1,0 +1,806 @@
+{
+  "observed_at_utc": "2026-11-11T20:24:28.549564+00:00",
+  "base": "fa8645afd32f27de73bd1fca7c29e89fbc027245",
+  "head": "103e2193ab35b06695c2b518a9ae6a4c7d90116c",
+  "coverage": "Every intervening commit and all changed documentation paths, including the removed/restored schema-design page; logs and synchronization metadata are classified separately. No generated search answers are evidence.",
+  "commits": [
+    {
+      "sha": "a17f48f39452170f51ab9b8d3cf7b9282f214485",
+      "parent": "fa8645afd32f27de73bd1fca7c29e89fbc027245",
+      "date_and_subject": "2026-11-08T18:01:32Z docs: auto-update 2026-11-08 [skip ci]",
+      "paths": [
+        "metadata.yaml"
+      ],
+      "patch_sha256": "9c908e0f1ced85a4deb7d8aadf4889ef56dd7e15a8eac6012eb07a32c6aa79b7",
+      "body_hashes": [
+        {
+          "revision": "fa8645afd32f27de73bd1fca7c29e89fbc027245",
+          "path": "metadata.yaml",
+          "bytes": 48,
+          "sha256": "0bd36404093c664f0f1e3af41e429908faddb06bbac41cc34209ea748927426d"
+        },
+        {
+          "revision": "a17f48f39452170f51ab9b8d3cf7b9282f214485",
+          "path": "metadata.yaml",
+          "bytes": 48,
+          "sha256": "030ebad75b09113b44b375908a7456014d34516a342b017b6dd149866077646d"
+        }
+      ]
+    },
+    {
+      "sha": "09d56518462a14ac31db4f4af1f244b83b7b122c",
+      "parent": "a17f48f39452170f51ab9b8d3cf7b9282f214485",
+      "date_and_subject": "2026-11-09T18:02:03Z docs: auto-update 2026-11-09 [skip ci]",
+      "paths": [
+        "docs/docs.cloud.google.com/spanner/docs/schema-design.md",
+        "docs/docs.cloud.google.com/spanner/docs/ttl/working-with-ttl.md",
+        "logs/failed.txt",
+        "logs/urls.txt",
+        "metadata.yaml"
+      ],
+      "patch_sha256": "46cff02359aadf18f029981eb27d5c4b258e02c6c2f4f14709bb2d2688adfd77",
+      "body_hashes": [
+        {
+          "revision": "a17f48f39452170f51ab9b8d3cf7b9282f214485",
+          "path": "docs/docs.cloud.google.com/spanner/docs/schema-design.md",
+          "bytes": 19247,
+          "sha256": "5abb5b14ff01308370e37e1913c1be7ba269201b0de1b942989ea35fa32c70db"
+        },
+        {
+          "revision": "a17f48f39452170f51ab9b8d3cf7b9282f214485",
+          "path": "docs/docs.cloud.google.com/spanner/docs/ttl/working-with-ttl.md",
+          "bytes": 17484,
+          "sha256": "fd97e73a123b7d6b7e623311a67903864a026494a11bde56dd1003e2001e653f"
+        },
+        {
+          "revision": "a17f48f39452170f51ab9b8d3cf7b9282f214485",
+          "path": "logs/failed.txt",
+          "bytes": 1,
+          "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+        },
+        {
+          "revision": "a17f48f39452170f51ab9b8d3cf7b9282f214485",
+          "path": "logs/urls.txt",
+          "bytes": 90565,
+          "sha256": "33331828e63e517beb3eec6f8fbeb1a4c09d1fb68301a4f61b3d4631205abed2"
+        },
+        {
+          "revision": "a17f48f39452170f51ab9b8d3cf7b9282f214485",
+          "path": "metadata.yaml",
+          "bytes": 48,
+          "sha256": "030ebad75b09113b44b375908a7456014d34516a342b017b6dd149866077646d"
+        },
+        {
+          "revision": "09d56518462a14ac31db4f4af1f244b83b7b122c",
+          "path": "docs/docs.cloud.google.com/spanner/docs/schema-design.md",
+          "absent": true
+        },
+        {
+          "revision": "09d56518462a14ac31db4f4af1f244b83b7b122c",
+          "path": "docs/docs.cloud.google.com/spanner/docs/ttl/working-with-ttl.md",
+          "bytes": 17481,
+          "sha256": "6f54ee4184911f0f694bba17135b4f9052a2c851062d0eaf31967fd6be452499"
+        },
+        {
+          "revision": "09d56518462a14ac31db4f4af1f244b83b7b122c",
+          "path": "logs/failed.txt",
+          "bytes": 61,
+          "sha256": "0e00452dc081d2ed4843e4bca1d6c4724df0ee6100c16178ac878ff5ce64032e"
+        },
+        {
+          "revision": "09d56518462a14ac31db4f4af1f244b83b7b122c",
+          "path": "logs/urls.txt",
+          "bytes": 90487,
+          "sha256": "89008f3d24679d29ab05871cfbfce774176dc9ce04585f069770d2df07e06854"
+        },
+        {
+          "revision": "09d56518462a14ac31db4f4af1f244b83b7b122c",
+          "path": "metadata.yaml",
+          "bytes": 48,
+          "sha256": "05e77608c6235b3b764e987a5324f3c50eb084d843566046604f82a04794ecad"
+        }
+      ]
+    },
+    {
+      "sha": "e8560663f58b619f3d8f7defc1340ee7586e4d73",
+      "parent": "09d56518462a14ac31db4f4af1f244b83b7b122c",
+      "date_and_subject": "2026-11-10T18:01:43Z docs: auto-update 2026-11-10 [skip ci]",
+      "paths": [
+        "docs/docs.cloud.google.com/spanner/docs/backfill-embeddings.md",
+        "docs/docs.cloud.google.com/spanner/docs/find-approximate-nearest-neighbors.md",
+        "docs/docs.cloud.google.com/spanner/docs/find-k-nearest-neighbors.md",
+        "docs/docs.cloud.google.com/spanner/docs/getting-started/java.md",
+        "docs/docs.cloud.google.com/spanner/docs/graph/opencypher-reference.md",
+        "docs/docs.cloud.google.com/spanner/docs/introspection/query-statistics.md",
+        "docs/docs.cloud.google.com/spanner/docs/introspection/transaction-statistics.md",
+        "docs/docs.cloud.google.com/spanner/docs/migrating-postgres-spanner.md",
+        "docs/docs.cloud.google.com/spanner/docs/ml-tutorial-embeddings.md",
+        "docs/docs.cloud.google.com/spanner/docs/reference/libraries.md",
+        "docs/docs.cloud.google.com/spanner/docs/reference/standard-sql/compression-functions.md",
+        "docs/docs.cloud.google.com/spanner/docs/schema-design.md",
+        "docs/docs.cloud.google.com/spanner/docs/spanner-custom-constraints.md",
+        "logs/failed.txt",
+        "logs/urls.txt",
+        "metadata.yaml"
+      ],
+      "patch_sha256": "db052a96b200705a6e5c509359cb4d9031c791c1246a54999da919407017ca8b",
+      "body_hashes": [
+        {
+          "revision": "09d56518462a14ac31db4f4af1f244b83b7b122c",
+          "path": "docs/docs.cloud.google.com/spanner/docs/backfill-embeddings.md",
+          "bytes": 14184,
+          "sha256": "eeb34551c7142337c1a76f7424f72776b965ebbca0e4c4b3ceda84e0af32cf7e"
+        },
+        {
+          "revision": "09d56518462a14ac31db4f4af1f244b83b7b122c",
+          "path": "docs/docs.cloud.google.com/spanner/docs/find-approximate-nearest-neighbors.md",
+          "bytes": 9848,
+          "sha256": "cf412301806ab8ee4de3da3df8a83448d51b31f8cb84bf748be910bc1e5f5474"
+        },
+        {
+          "revision": "09d56518462a14ac31db4f4af1f244b83b7b122c",
+          "path": "docs/docs.cloud.google.com/spanner/docs/find-k-nearest-neighbors.md",
+          "bytes": 9184,
+          "sha256": "184ce74b0f5c09bd2c8ef7bea22d1406005e9ce74d50ff3668d53e62a49c92c0"
+        },
+        {
+          "revision": "09d56518462a14ac31db4f4af1f244b83b7b122c",
+          "path": "docs/docs.cloud.google.com/spanner/docs/getting-started/java.md",
+          "bytes": 49251,
+          "sha256": "4fc0d0b809a5b6b1c7771f8f7adab08cbdc145d051b7903b2fef9ddf78068ae1"
+        },
+        {
+          "revision": "09d56518462a14ac31db4f4af1f244b83b7b122c",
+          "path": "docs/docs.cloud.google.com/spanner/docs/graph/opencypher-reference.md",
+          "bytes": 40286,
+          "sha256": "65196fcc998f625d974d3acfdc092bf0911108fc284fa24eec389be1b83e202f"
+        },
+        {
+          "revision": "09d56518462a14ac31db4f4af1f244b83b7b122c",
+          "path": "docs/docs.cloud.google.com/spanner/docs/introspection/query-statistics.md",
+          "bytes": 58682,
+          "sha256": "7cb6a78a84967fcdaaba3bcc0d2e114141a0b0cff8d6c4cbcff4b86c07c8d3c7"
+        },
+        {
+          "revision": "09d56518462a14ac31db4f4af1f244b83b7b122c",
+          "path": "docs/docs.cloud.google.com/spanner/docs/introspection/transaction-statistics.md",
+          "bytes": 69015,
+          "sha256": "bdfe31ec25831a0eda9a383d548f10e84b1436d099c4042eafd98fdf58197bd3"
+        },
+        {
+          "revision": "09d56518462a14ac31db4f4af1f244b83b7b122c",
+          "path": "docs/docs.cloud.google.com/spanner/docs/migrating-postgres-spanner.md",
+          "bytes": 22098,
+          "sha256": "2e178b73c8bb1ab33fd1eeb5be26fbaabe5146eb8ae2607b07efd5dc54d90a03"
+        },
+        {
+          "revision": "09d56518462a14ac31db4f4af1f244b83b7b122c",
+          "path": "docs/docs.cloud.google.com/spanner/docs/ml-tutorial-embeddings.md",
+          "bytes": 12815,
+          "sha256": "5de949c9e241288f0d1023ef3c57e1801eb5d872fb86c9c01167830dd85bbae2"
+        },
+        {
+          "revision": "09d56518462a14ac31db4f4af1f244b83b7b122c",
+          "path": "docs/docs.cloud.google.com/spanner/docs/reference/libraries.md",
+          "bytes": 22628,
+          "sha256": "f0122de943950bd94b63910b61d5289a002033e1b22a7bc042b8d9abb172165a"
+        },
+        {
+          "revision": "09d56518462a14ac31db4f4af1f244b83b7b122c",
+          "path": "docs/docs.cloud.google.com/spanner/docs/reference/standard-sql/compression-functions.md",
+          "bytes": 5711,
+          "sha256": "93179d8525e9fa0d2513b058ecbe91cd194c3d32ae2044818b9cc364dd68e636"
+        },
+        {
+          "revision": "09d56518462a14ac31db4f4af1f244b83b7b122c",
+          "path": "docs/docs.cloud.google.com/spanner/docs/schema-design.md",
+          "absent": true
+        },
+        {
+          "revision": "09d56518462a14ac31db4f4af1f244b83b7b122c",
+          "path": "docs/docs.cloud.google.com/spanner/docs/spanner-custom-constraints.md",
+          "bytes": 24875,
+          "sha256": "c1377b18b1282ecd2ac5341b959804ce09c950474f81aac016b0f2eb78b1a6c9"
+        },
+        {
+          "revision": "09d56518462a14ac31db4f4af1f244b83b7b122c",
+          "path": "logs/failed.txt",
+          "bytes": 61,
+          "sha256": "0e00452dc081d2ed4843e4bca1d6c4724df0ee6100c16178ac878ff5ce64032e"
+        },
+        {
+          "revision": "09d56518462a14ac31db4f4af1f244b83b7b122c",
+          "path": "logs/urls.txt",
+          "bytes": 90487,
+          "sha256": "89008f3d24679d29ab05871cfbfce774176dc9ce04585f069770d2df07e06854"
+        },
+        {
+          "revision": "09d56518462a14ac31db4f4af1f244b83b7b122c",
+          "path": "metadata.yaml",
+          "bytes": 48,
+          "sha256": "05e77608c6235b3b764e987a5324f3c50eb084d843566046604f82a04794ecad"
+        },
+        {
+          "revision": "e8560663f58b619f3d8f7defc1340ee7586e4d73",
+          "path": "docs/docs.cloud.google.com/spanner/docs/backfill-embeddings.md",
+          "bytes": 14762,
+          "sha256": "38a8af2a1c10d28a0d73a2133474d5fe73a9c4354551db4aa8cc1c4c2029f1b0"
+        },
+        {
+          "revision": "e8560663f58b619f3d8f7defc1340ee7586e4d73",
+          "path": "docs/docs.cloud.google.com/spanner/docs/find-approximate-nearest-neighbors.md",
+          "bytes": 10112,
+          "sha256": "1131a539637a706e144dfcbe0075fb86bd8f3838f49fbc706120f7c10f47e6d7"
+        },
+        {
+          "revision": "e8560663f58b619f3d8f7defc1340ee7586e4d73",
+          "path": "docs/docs.cloud.google.com/spanner/docs/find-k-nearest-neighbors.md",
+          "bytes": 9625,
+          "sha256": "6b06e16371808cbd172e0ec7c27c8db1b93889aea1a55fafed24edde96702c1c"
+        },
+        {
+          "revision": "e8560663f58b619f3d8f7defc1340ee7586e4d73",
+          "path": "docs/docs.cloud.google.com/spanner/docs/getting-started/java.md",
+          "bytes": 49251,
+          "sha256": "b1c4afee84f87836e4694cc02e5eaeeab4245982545fcc7bee9684dc70edfce6"
+        },
+        {
+          "revision": "e8560663f58b619f3d8f7defc1340ee7586e4d73",
+          "path": "docs/docs.cloud.google.com/spanner/docs/graph/opencypher-reference.md",
+          "bytes": 40249,
+          "sha256": "ebbac2025c3912860858ead9e75edd1c8affc631dd493dd04000bef8d97d3b63"
+        },
+        {
+          "revision": "e8560663f58b619f3d8f7defc1340ee7586e4d73",
+          "path": "docs/docs.cloud.google.com/spanner/docs/introspection/query-statistics.md",
+          "bytes": 60604,
+          "sha256": "4945f9d59bb772a376d3453463b459ca3c3e5afb7ff1a6d620dc5e452e33af1e"
+        },
+        {
+          "revision": "e8560663f58b619f3d8f7defc1340ee7586e4d73",
+          "path": "docs/docs.cloud.google.com/spanner/docs/introspection/transaction-statistics.md",
+          "bytes": 71408,
+          "sha256": "ebd777529240e06aaf7ed2c42ce184a5d8fb6d2b84ed02d24dabaa47515cd0ca"
+        },
+        {
+          "revision": "e8560663f58b619f3d8f7defc1340ee7586e4d73",
+          "path": "docs/docs.cloud.google.com/spanner/docs/migrating-postgres-spanner.md",
+          "bytes": 22210,
+          "sha256": "23595041ab8b242a36ff28bbc18e3730dce111234acc13951aa560eb40e6eeae"
+        },
+        {
+          "revision": "e8560663f58b619f3d8f7defc1340ee7586e4d73",
+          "path": "docs/docs.cloud.google.com/spanner/docs/ml-tutorial-embeddings.md",
+          "bytes": 13773,
+          "sha256": "c78307bd8dd9f1c4eae7e08a753aaa486c7240970d3cf2479af91d4be67fe7f5"
+        },
+        {
+          "revision": "e8560663f58b619f3d8f7defc1340ee7586e4d73",
+          "path": "docs/docs.cloud.google.com/spanner/docs/reference/libraries.md",
+          "bytes": 22628,
+          "sha256": "e37e677fd6a8a57d52aef35482a4cf2334c0dcf039f8d62f2469d0c098df229e"
+        },
+        {
+          "revision": "e8560663f58b619f3d8f7defc1340ee7586e4d73",
+          "path": "docs/docs.cloud.google.com/spanner/docs/reference/standard-sql/compression-functions.md",
+          "bytes": 6102,
+          "sha256": "9b24f665e130a6e2d459055b805cb89f7331073d798183449ba8ba34b0204468"
+        },
+        {
+          "revision": "e8560663f58b619f3d8f7defc1340ee7586e4d73",
+          "path": "docs/docs.cloud.google.com/spanner/docs/schema-design.md",
+          "bytes": 19247,
+          "sha256": "5abb5b14ff01308370e37e1913c1be7ba269201b0de1b942989ea35fa32c70db"
+        },
+        {
+          "revision": "e8560663f58b619f3d8f7defc1340ee7586e4d73",
+          "path": "docs/docs.cloud.google.com/spanner/docs/spanner-custom-constraints.md",
+          "bytes": 24872,
+          "sha256": "4b20d8056796db8c35c6cafea7bf7b1efe40354a6747d661aef32688b96c27cb"
+        },
+        {
+          "revision": "e8560663f58b619f3d8f7defc1340ee7586e4d73",
+          "path": "logs/failed.txt",
+          "bytes": 1,
+          "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+        },
+        {
+          "revision": "e8560663f58b619f3d8f7defc1340ee7586e4d73",
+          "path": "logs/urls.txt",
+          "bytes": 90565,
+          "sha256": "c124e8115cd5113bf0358864d728aa571a5aa6198e3a3559f307a6f65d203750"
+        },
+        {
+          "revision": "e8560663f58b619f3d8f7defc1340ee7586e4d73",
+          "path": "metadata.yaml",
+          "bytes": 48,
+          "sha256": "466fcdcccc848834c1a9a1461c1616b5e93284f7cb2fcb1d5e4926d6fa6d57f7"
+        }
+      ]
+    },
+    {
+      "sha": "103e2193ab35b06695c2b518a9ae6a4c7d90116c",
+      "parent": "e8560663f58b619f3d8f7defc1340ee7586e4d73",
+      "date_and_subject": "2026-11-11T18:01:37Z docs: auto-update 2026-11-11 [skip ci]",
+      "paths": [
+        "docs/docs.cloud.google.com/sdk/gcloud/reference/spanner/databases/update.md",
+        "docs/docs.cloud.google.com/spanner/docs/create-manage-views.md",
+        "docs/docs.cloud.google.com/spanner/docs/create-query-database-console.md",
+        "docs/docs.cloud.google.com/spanner/docs/full-text-search/ranked-search.md",
+        "docs/docs.cloud.google.com/spanner/docs/parameterized-views.md",
+        "docs/docs.cloud.google.com/spanner/docs/querydata.md",
+        "docs/docs.cloud.google.com/spanner/docs/reference/standard-sql/search_functions.md",
+        "docs/docs.cloud.google.com/spanner/docs/release-notes.md",
+        "docs/docs.cloud.google.com/spanner/docs/use-parameterized-views.md",
+        "docs/docs.cloud.google.com/spanner/docs/views.md",
+        "logs/urls.txt",
+        "metadata.yaml"
+      ],
+      "patch_sha256": "8d907433a11a68b06a33fe95ef66f8075758f007f3af43397d8f693b53d6fc0d",
+      "body_hashes": [
+        {
+          "revision": "e8560663f58b619f3d8f7defc1340ee7586e4d73",
+          "path": "docs/docs.cloud.google.com/sdk/gcloud/reference/spanner/databases/update.md",
+          "bytes": 5378,
+          "sha256": "63c35ad92d7d2d29d0d5c33000286b407581f8d9c434c95e76415750e6f16988"
+        },
+        {
+          "revision": "e8560663f58b619f3d8f7defc1340ee7586e4d73",
+          "path": "docs/docs.cloud.google.com/spanner/docs/create-manage-views.md",
+          "bytes": 8582,
+          "sha256": "46bd80ba31d4ab68828758120b787b65f20545162ed6290ad38d6e31fbe7ef89"
+        },
+        {
+          "revision": "e8560663f58b619f3d8f7defc1340ee7586e4d73",
+          "path": "docs/docs.cloud.google.com/spanner/docs/create-query-database-console.md",
+          "bytes": 19640,
+          "sha256": "c0053fc9cf07c3d0889169e65a20fe6d7ffd7c37c982efff896966b221ff62c6"
+        },
+        {
+          "revision": "e8560663f58b619f3d8f7defc1340ee7586e4d73",
+          "path": "docs/docs.cloud.google.com/spanner/docs/full-text-search/ranked-search.md",
+          "bytes": 12999,
+          "sha256": "fdbf1a085f9599d4e1185458a736990e74ff52e7c0eda65a8ebf800b48885811"
+        },
+        {
+          "revision": "e8560663f58b619f3d8f7defc1340ee7586e4d73",
+          "path": "docs/docs.cloud.google.com/spanner/docs/parameterized-views.md",
+          "absent": true
+        },
+        {
+          "revision": "e8560663f58b619f3d8f7defc1340ee7586e4d73",
+          "path": "docs/docs.cloud.google.com/spanner/docs/querydata.md",
+          "bytes": 2035,
+          "sha256": "25a85afa0ae79b2e5e5a3a6b26a19b2fff2e0a1a52151e3b5cd2223e954cb6fc"
+        },
+        {
+          "revision": "e8560663f58b619f3d8f7defc1340ee7586e4d73",
+          "path": "docs/docs.cloud.google.com/spanner/docs/reference/standard-sql/search_functions.md",
+          "bytes": 90028,
+          "sha256": "9f6ae41f6db1b6d2f3f76687d9319b85c986c873c3f678d02b9cd20e548b9bc4"
+        },
+        {
+          "revision": "e8560663f58b619f3d8f7defc1340ee7586e4d73",
+          "path": "docs/docs.cloud.google.com/spanner/docs/release-notes.md",
+          "bytes": 524445,
+          "sha256": "938c6cf99365697ec39a87550d783e31d5c157f1f3078535c653118fb952ca1e"
+        },
+        {
+          "revision": "e8560663f58b619f3d8f7defc1340ee7586e4d73",
+          "path": "docs/docs.cloud.google.com/spanner/docs/use-parameterized-views.md",
+          "absent": true
+        },
+        {
+          "revision": "e8560663f58b619f3d8f7defc1340ee7586e4d73",
+          "path": "docs/docs.cloud.google.com/spanner/docs/views.md",
+          "bytes": 12665,
+          "sha256": "34ed936cc5169bad2b30f7c5cd610c9fb5de6beca20b1d4f7d60c1f30e237b35"
+        },
+        {
+          "revision": "e8560663f58b619f3d8f7defc1340ee7586e4d73",
+          "path": "logs/urls.txt",
+          "bytes": 90565,
+          "sha256": "c124e8115cd5113bf0358864d728aa571a5aa6198e3a3559f307a6f65d203750"
+        },
+        {
+          "revision": "e8560663f58b619f3d8f7defc1340ee7586e4d73",
+          "path": "metadata.yaml",
+          "bytes": 48,
+          "sha256": "466fcdcccc848834c1a9a1461c1616b5e93284f7cb2fcb1d5e4926d6fa6d57f7"
+        },
+        {
+          "revision": "103e2193ab35b06695c2b518a9ae6a4c7d90116c",
+          "path": "docs/docs.cloud.google.com/sdk/gcloud/reference/spanner/databases/update.md",
+          "bytes": 6530,
+          "sha256": "0dabdbea38fdd29e429a3a04e8e531542f114400351628ddec400b7419bd4506"
+        },
+        {
+          "revision": "103e2193ab35b06695c2b518a9ae6a4c7d90116c",
+          "path": "docs/docs.cloud.google.com/spanner/docs/create-manage-views.md",
+          "bytes": 9815,
+          "sha256": "99e13de601749bd33408e926cdef5a934ab5acffaebf6201ef674c7f1912145d"
+        },
+        {
+          "revision": "103e2193ab35b06695c2b518a9ae6a4c7d90116c",
+          "path": "docs/docs.cloud.google.com/spanner/docs/create-query-database-console.md",
+          "bytes": 14469,
+          "sha256": "babf8604f80d8e5f5c4dfb320058dbfad69d92f92152f577fa2c9f2623ae02d6"
+        },
+        {
+          "revision": "103e2193ab35b06695c2b518a9ae6a4c7d90116c",
+          "path": "docs/docs.cloud.google.com/spanner/docs/full-text-search/ranked-search.md",
+          "bytes": 13268,
+          "sha256": "d0b0f3f90d4d461f23d261246bcb238ff6f48ac149618c505386041f8ec3d9eb"
+        },
+        {
+          "revision": "103e2193ab35b06695c2b518a9ae6a4c7d90116c",
+          "path": "docs/docs.cloud.google.com/spanner/docs/parameterized-views.md",
+          "bytes": 8775,
+          "sha256": "80d682731f416d3e95d1345e1d58cc9285cc7e6c856b06c16036b280d26d100e"
+        },
+        {
+          "revision": "103e2193ab35b06695c2b518a9ae6a4c7d90116c",
+          "path": "docs/docs.cloud.google.com/spanner/docs/querydata.md",
+          "bytes": 2167,
+          "sha256": "b3418c0b196488c873fd5cde5265dc8ee6e33aba1a651cb4ebdd1ffd8b727942"
+        },
+        {
+          "revision": "103e2193ab35b06695c2b518a9ae6a4c7d90116c",
+          "path": "docs/docs.cloud.google.com/spanner/docs/reference/standard-sql/search_functions.md",
+          "bytes": 90432,
+          "sha256": "69fe930b08fe58feb0cb9307e4b3753f0d74330be558afe94ce64080d927f2c5"
+        },
+        {
+          "revision": "103e2193ab35b06695c2b518a9ae6a4c7d90116c",
+          "path": "docs/docs.cloud.google.com/spanner/docs/release-notes.md",
+          "bytes": 525118,
+          "sha256": "34b0eab7ad0d72cf72212e019ecdff840bd28627712e76ba9550c8804a8d0186"
+        },
+        {
+          "revision": "103e2193ab35b06695c2b518a9ae6a4c7d90116c",
+          "path": "docs/docs.cloud.google.com/spanner/docs/use-parameterized-views.md",
+          "bytes": 9282,
+          "sha256": "675e3df3fa435ae2ab47318547754144620200e4c24d5dab791d8eeb0e6341eb"
+        },
+        {
+          "revision": "103e2193ab35b06695c2b518a9ae6a4c7d90116c",
+          "path": "docs/docs.cloud.google.com/spanner/docs/views.md",
+          "bytes": 13304,
+          "sha256": "60ab40a5afc619a8c6ab8ecb5ff79b9bbf3052468c5a05c7c8bd373108fef6b5"
+        },
+        {
+          "revision": "103e2193ab35b06695c2b518a9ae6a4c7d90116c",
+          "path": "logs/urls.txt",
+          "bytes": 90737,
+          "sha256": "c564a0695c6aff4ec7212ed74d4699e3ae30f13dcbd12b1e12162db28c87860d"
+        },
+        {
+          "revision": "103e2193ab35b06695c2b518a9ae6a4c7d90116c",
+          "path": "metadata.yaml",
+          "bytes": 48,
+          "sha256": "3a7d2c5c86622de79a3617628fc22cdb5dfdd3ea157f34c58d2c431ac145db78"
+        }
+      ]
+    }
+  ],
+  "documents": [
+    {
+      "url": "https://docs.cloud.google.com/sdk/gcloud/reference/spanner/databases/update",
+      "name": "documents/docs.cloud.google.com/sdk/gcloud/reference/spanner/databases/update",
+      "title": "gcloud spanner databases update",
+      "update_time": "2026-11-10T17:26:21Z",
+      "official_content_bytes": 6175,
+      "official_content_sha256": "c56d2179c0a1f6d63bcc12707212283e5da4940050bc794ba37ff6316e711902",
+      "mirror_content_sha256": "c56d2179c0a1f6d63bcc12707212283e5da4940050bc794ba37ff6316e711902",
+      "same_body_ignoring_trailing_whitespace": true,
+      "category": "administration",
+      "change": "CMEK update completion, background re-encryption, retained backup keys, and wait/inspection guidance.",
+      "verification": "Documentation only; no encryption or key operations."
+    },
+    {
+      "url": "https://docs.cloud.google.com/spanner/docs/backfill-embeddings",
+      "name": "documents/docs.cloud.google.com/spanner/docs/backfill-embeddings",
+      "title": "Generate vector embeddings for textual data in bulk using partitioned DML",
+      "update_time": "2026-11-09T21:09:31Z",
+      "official_content_bytes": 14382,
+      "official_content_sha256": "3145ac1b867cbefb9572ed1207f2f00fd23a2b6a1e246aa72bc24d5f1d3f5d3b",
+      "mirror_content_sha256": "3145ac1b867cbefb9572ed1207f2f00fd23a2b6a1e246aa72bc24d5f1d3f5d3b",
+      "same_body_ignoring_trailing_whitespace": true,
+      "category": "vector-length",
+      "change": "Annotate embedding dimensions; storage and KNN remain optional, ANN indexes require a vector length.",
+      "verification": "Both-dialect owned vector controls."
+    },
+    {
+      "url": "https://docs.cloud.google.com/spanner/docs/create-manage-views",
+      "name": "documents/docs.cloud.google.com/spanner/docs/create-manage-views",
+      "title": "Create and manage views",
+      "update_time": "2026-11-10T22:00:52Z",
+      "official_content_bytes": 9481,
+      "official_content_sha256": "ef4b55a02f3d939bafb0fb007be02b6d46d0d886a2294f23c17babf260bb04a3",
+      "mirror_content_sha256": "ef4b55a02f3d939bafb0fb007be02b6d46d0d886a2294f23c17babf260bb04a3",
+      "same_body_ignoring_trailing_whitespace": true,
+      "category": "parameterized-views",
+      "change": "SECURE_CONTEXT in a definer view; the new example uses comma-style CAST.",
+      "verification": "Managed role/filter controls and paired CAST rejection/correction."
+    },
+    {
+      "url": "https://docs.cloud.google.com/spanner/docs/create-query-database-console",
+      "name": "documents/docs.cloud.google.com/spanner/docs/create-query-database-console",
+      "title": "Create and query a database in the Google Cloud console",
+      "update_time": "2026-11-10T18:05:54Z",
+      "official_content_bytes": 14028,
+      "official_content_sha256": "bd4b8e64563bf031cc714a76d52d2faeeec250cbd265c389cda094363a806900",
+      "mirror_content_sha256": "bd4b8e64563bf031cc714a76d52d2faeeec250cbd265c389cda094363a806900",
+      "same_body_ignoring_trailing_whitespace": true,
+      "category": "console-and-dml",
+      "change": "Current instance/Studio workflow, simplified columns, THEN RETURN versus PostgreSQL RETURNING.",
+      "verification": "Workflow text reviewed; no console provisioning. No new DML syntax claim."
+    },
+    {
+      "url": "https://docs.cloud.google.com/spanner/docs/find-approximate-nearest-neighbors",
+      "name": "documents/docs.cloud.google.com/spanner/docs/find-approximate-nearest-neighbors",
+      "title": "Find approximate nearest neighbors (ANN) and query vector embeddings",
+      "update_time": "2026-11-09T21:09:31Z",
+      "official_content_bytes": 9708,
+      "official_content_sha256": "c912f25ed5cd2f49ff5a570395f7644ae8c984aa0cd938867457f9a4cedf4d69",
+      "mirror_content_sha256": "c912f25ed5cd2f49ff5a570395f7644ae8c984aa0cd938867457f9a4cedf4d69",
+      "same_body_ignoring_trailing_whitespace": true,
+      "category": "vector-length",
+      "change": "Add the required fixed vector dimensions to ANN examples.",
+      "verification": "Both-dialect owned vector controls."
+    },
+    {
+      "url": "https://docs.cloud.google.com/spanner/docs/find-k-nearest-neighbors",
+      "name": "documents/docs.cloud.google.com/spanner/docs/find-k-nearest-neighbors",
+      "title": "Perform vector similarity search in Spanner by finding the K-nearest neighbors",
+      "update_time": "2026-11-09T21:09:31Z",
+      "official_content_bytes": 9188,
+      "official_content_sha256": "588d0af88839325cc684b58434c47eb4ad2f2eac49616a319530e7c49c939ddd",
+      "mirror_content_sha256": "588d0af88839325cc684b58434c47eb4ad2f2eac49616a319530e7c49c939ddd",
+      "same_body_ignoring_trailing_whitespace": true,
+      "category": "vector-length",
+      "change": "KNN annotation is recommended, not required; varying dimensions may remain unannotated.",
+      "verification": "Both-dialect storage and KNN controls."
+    },
+    {
+      "url": "https://docs.cloud.google.com/spanner/docs/full-text-search/ranked-search",
+      "name": "documents/docs.cloud.google.com/spanner/docs/full-text-search/ranked-search",
+      "title": "Rank search results",
+      "update_time": "2026-11-10T22:10:16Z",
+      "official_content_bytes": 12912,
+      "official_content_sha256": "376c7add98dc1324b8d5a079e4a38bb2e25a827c79152cdbc761ef63b051ac8e",
+      "mirror_content_sha256": "376c7add98dc1324b8d5a079e4a38bb2e25a827c79152cdbc761ef63b051ac8e",
+      "same_body_ignoring_trailing_whitespace": true,
+      "category": "scorer-cohorts",
+      "change": "Post-April-2026 databases default to v2; pre-April remains v1 until migration, April may vary.",
+      "verification": "New current databases compared with explicit v1/v2; no old-cohort migration experiment."
+    },
+    {
+      "url": "https://docs.cloud.google.com/spanner/docs/getting-started/java",
+      "name": "documents/docs.cloud.google.com/spanner/docs/getting-started/java",
+      "title": "Getting started with Spanner in Java",
+      "update_time": "2026-11-10T03:54:30Z",
+      "official_content_bytes": 48893,
+      "official_content_sha256": "78a263211c2553e65d7bdbbc0d716a2a06169c4ba5a61cf91af31a73d350e179",
+      "mirror_content_sha256": "78a263211c2553e65d7bdbbc0d716a2a06169c4ba5a61cf91af31a73d350e179",
+      "same_body_ignoring_trailing_whitespace": true,
+      "category": "client-example",
+      "change": "Java example version 6.126.0 to 6.127.0.",
+      "verification": "Documentation only; no Java dependency upgrade or client execution."
+    },
+    {
+      "url": "https://docs.cloud.google.com/spanner/docs/graph/opencypher-reference",
+      "name": "documents/docs.cloud.google.com/spanner/docs/graph/opencypher-reference",
+      "title": "Spanner Graph reference for openCypher users",
+      "update_time": "2026-11-09T04:31:17Z",
+      "official_content_bytes": 39896,
+      "official_content_sha256": "8bd1b4491a59ba6bcb8bb42fc145f8d470094d13c972b08c15e0f094b86c7cd2",
+      "mirror_content_sha256": "8bd1b4491a59ba6bcb8bb42fc145f8d470094d13c972b08c15e0f094b86c7cd2",
+      "same_body_ignoring_trailing_whitespace": true,
+      "category": "formatting",
+      "change": "Property-reference layout and stray less-than character corrected.",
+      "verification": "No added mapping or new graph syntax claim; existing graph controls repeated."
+    },
+    {
+      "url": "https://docs.cloud.google.com/spanner/docs/introspection/query-statistics",
+      "name": "documents/docs.cloud.google.com/spanner/docs/introspection/query-statistics",
+      "title": "Query statistics",
+      "update_time": "2026-11-09T23:28:26Z",
+      "official_content_bytes": 60235,
+      "official_content_sha256": "f160d2e963aec8cf4fa4917f7df972184847ee8186a61fb37d1f4ba4b8c3633f",
+      "mirror_content_sha256": "f160d2e963aec8cf4fa4917f7df972184847ee8186a61fb37d1f4ba4b8c3633f",
+      "same_body_ignoring_trailing_whitespace": true,
+      "category": "distribution-aggregate",
+      "change": "New DISTRIBUTION_AGG examples for custom-span percentiles in both dialects.",
+      "verification": "Managed typed/string, nonempty, empty, NULL and invalid-input controls."
+    },
+    {
+      "url": "https://docs.cloud.google.com/spanner/docs/introspection/transaction-statistics",
+      "name": "documents/docs.cloud.google.com/spanner/docs/introspection/transaction-statistics",
+      "title": "Transaction statistics",
+      "update_time": "2026-11-09T23:28:26Z",
+      "official_content_bytes": 71012,
+      "official_content_sha256": "dace23d795675bffac5fa9069bc24c2b678776603852190c09977858fd10f3e6",
+      "mirror_content_sha256": "dace23d795675bffac5fa9069bc24c2b678776603852190c09977858fd10f3e6",
+      "same_body_ignoring_trailing_whitespace": true,
+      "category": "distribution-aggregate",
+      "change": "New transaction-distribution aggregation and percentile examples.",
+      "verification": "Both-dialect documented-shape probes; controlled nonempty string histograms tested independently."
+    },
+    {
+      "url": "https://docs.cloud.google.com/spanner/docs/migrating-postgres-spanner",
+      "name": "documents/docs.cloud.google.com/spanner/docs/migrating-postgres-spanner",
+      "title": "Migrate from PostgreSQL to Spanner (GoogleSQL dialect)",
+      "update_time": "2026-11-09T04:32:16Z",
+      "official_content_bytes": 21799,
+      "official_content_sha256": "f9594a539188a04ceecdf64360ea6f6082fb0c24ed1545decfb4ae62c34300ea",
+      "mirror_content_sha256": "f9594a539188a04ceecdf64360ea6f6082fb0c24ed1545decfb4ae62c34300ea",
+      "same_body_ignoring_trailing_whitespace": true,
+      "category": "formatting",
+      "change": "HTML paragraph wrappers in type aliases; type mapping text remains unchanged.",
+      "verification": "Documentation comparison only."
+    },
+    {
+      "url": "https://docs.cloud.google.com/spanner/docs/ml-tutorial-embeddings",
+      "name": "documents/docs.cloud.google.com/spanner/docs/ml-tutorial-embeddings",
+      "title": "Get Agent Platform text embeddings",
+      "update_time": "2026-11-09T21:09:31Z",
+      "official_content_bytes": 13401,
+      "official_content_sha256": "e1e7ff7242f66e7e2c2cd569fec3e49e7d1006ab1041ff03cd3c67de84a64987",
+      "mirror_content_sha256": "e1e7ff7242f66e7e2c2cd569fec3e49e7d1006ab1041ff03cd3c67de84a64987",
+      "same_body_ignoring_trailing_whitespace": true,
+      "category": "vector-length",
+      "change": "Fixed dimensions in GoogleSQL and PostgreSQL embedding examples.",
+      "verification": "Both-dialect owned vector controls; no model/remote embedding invocation."
+    },
+    {
+      "url": "https://docs.cloud.google.com/spanner/docs/parameterized-views",
+      "name": "documents/docs.cloud.google.com/spanner/docs/parameterized-views",
+      "title": "Parameterized views overview",
+      "update_time": "2026-11-10T22:00:52Z",
+      "official_content_bytes": 8392,
+      "official_content_sha256": "55a13ec7a304a4dafa84f6ad5cc3e2907d86d24b79ff842484f7bf5022c101ef",
+      "mirror_content_sha256": "55a13ec7a304a4dafa84f6ad5cc3e2907d86d24b79ff842484f7bf5022c101ef",
+      "same_body_ignoring_trailing_whitespace": true,
+      "category": "parameterized-views",
+      "change": "New overview, request context, privileges, supported argument/result types and limitations.",
+      "verification": "Request-value, FGAC view, invoker, generated/default and named-UDF controls."
+    },
+    {
+      "url": "https://docs.cloud.google.com/spanner/docs/querydata",
+      "name": "documents/docs.cloud.google.com/spanner/docs/querydata",
+      "title": "Query database in natural language with QueryData",
+      "update_time": "2026-11-10T12:58:08Z",
+      "official_content_bytes": 1869,
+      "official_content_sha256": "e6039e34e2cedb7026dc320fef2b2728cb882d2dfcc001d3aae4649f30740943",
+      "mirror_content_sha256": "e6039e34e2cedb7026dc320fef2b2728cb882d2dfcc001d3aae4649f30740943",
+      "same_body_ignoring_trailing_whitespace": true,
+      "category": "description",
+      "change": "Clarify that context sets contain templates, facets and value searches.",
+      "verification": "Documentation only; no QueryData agent call."
+    },
+    {
+      "url": "https://docs.cloud.google.com/spanner/docs/reference/libraries",
+      "name": "documents/docs.cloud.google.com/spanner/docs/reference/libraries",
+      "title": "Spanner client libraries",
+      "update_time": "2026-11-10T03:55:15Z",
+      "official_content_bytes": 22319,
+      "official_content_sha256": "262ebacfef8b26090163b80b2468860422b61032779384fa2ee8e0955449e64d",
+      "mirror_content_sha256": "262ebacfef8b26090163b80b2468860422b61032779384fa2ee8e0955449e64d",
+      "same_body_ignoring_trailing_whitespace": true,
+      "category": "client-example",
+      "change": "Java sbt example version 6.126.0 to 6.127.0.",
+      "verification": "Documentation only; no Java client execution."
+    },
+    {
+      "url": "https://docs.cloud.google.com/spanner/docs/reference/standard-sql/compression-functions",
+      "name": "documents/docs.cloud.google.com/spanner/docs/reference/standard-sql/compression-functions",
+      "title": "Compression functions in GoogleSQL",
+      "update_time": "2026-11-09T18:15:22Z",
+      "official_content_bytes": 5723,
+      "official_content_sha256": "3b78e93391bc396dc1c36949e92c687ccec1428d0c2de029e5ba11f8e1a6f1fe",
+      "mirror_content_sha256": "3b78e93391bc396dc1c36949e92c687ccec1428d0c2de029e5ba11f8e1a6f1fe",
+      "same_body_ignoring_trailing_whitespace": true,
+      "category": "compression",
+      "change": "Optional/positional compression level, NULL options, named decompression size limit and frame content-size requirement.",
+      "verification": "Managed boundary/NULL/named-argument controls and locally decoded known/unknown-size Zstd frames."
+    },
+    {
+      "url": "https://docs.cloud.google.com/spanner/docs/reference/standard-sql/search_functions",
+      "name": "documents/docs.cloud.google.com/spanner/docs/reference/standard-sql/search_functions",
+      "title": "Search functions in GoogleSQL",
+      "update_time": "2026-11-10T22:10:16Z",
+      "official_content_bytes": 90068,
+      "official_content_sha256": "c86e0c18a37bdcc6c337ad5c5e1e682b89ed3e26a3943b999a756c8e202c1149",
+      "mirror_content_sha256": "c86e0c18a37bdcc6c337ad5c5e1e682b89ed3e26a3943b999a756c8e202c1149",
+      "same_body_ignoring_trailing_whitespace": true,
+      "category": "scorer-cohorts",
+      "change": "Remove unconditional default-v1 wording and explain creation cohorts.",
+      "verification": "Current owned databases and explicit scorer controls; historical cohorts remain unverified."
+    },
+    {
+      "url": "https://docs.cloud.google.com/spanner/docs/release-notes",
+      "name": "documents/docs.cloud.google.com/spanner/docs/release-notes",
+      "title": "Spanner release notes",
+      "update_time": "2026-11-10T22:01:48Z",
+      "official_content_bytes": 524814,
+      "official_content_sha256": "143b274116188377c2d48478ec23056e823c059464eee8611429f322aaedd2c8",
+      "mirror_content_sha256": "143b274116188377c2d48478ec23056e823c059464eee8611429f322aaedd2c8",
+      "same_body_ignoring_trailing_whitespace": true,
+      "category": "release-announcement",
+      "change": "November 10 parameterized-views GA entry.",
+      "verification": "Official current HTML and dkcli agree; managed implementation checked separately."
+    },
+    {
+      "url": "https://docs.cloud.google.com/spanner/docs/schema-design",
+      "name": "documents/docs.cloud.google.com/spanner/docs/schema-design",
+      "title": "Schema design best practices",
+      "update_time": "2026-11-09T04:33:02Z",
+      "official_content_bytes": 18918,
+      "official_content_sha256": "fd29c09bd2131a671794203b81743692bc5c0d8575cc803a6bbde3ec96d9a4fb",
+      "mirror_content_sha256": "fd29c09bd2131a671794203b81743692bc5c0d8575cc803a6bbde3ec96d9a4fb",
+      "same_body_ignoring_trailing_whitespace": true,
+      "category": "temporary-mirror-omission",
+      "change": "Removed in the November 9 mirror capture and restored byte-identically November 10.",
+      "verification": "Current official body matches; no engine change inferred."
+    },
+    {
+      "url": "https://docs.cloud.google.com/spanner/docs/spanner-custom-constraints",
+      "name": "documents/docs.cloud.google.com/spanner/docs/spanner-custom-constraints",
+      "title": "Add a custom organization policy",
+      "update_time": "2026-11-10T04:06:55Z",
+      "official_content_bytes": 24494,
+      "official_content_sha256": "6f957947dfb75f4d46f44b933efdbe2767ce4904366f429a1b1e16bd4f04907b",
+      "mirror_content_sha256": "6f957947dfb75f4d46f44b933efdbe2767ce4904366f429a1b1e16bd4f04907b",
+      "same_body_ignoring_trailing_whitespace": true,
+      "category": "organization-policy",
+      "change": "Condition limit changes from 1000 to 1500 characters and the generic console example changes.",
+      "verification": "Documentation only; no organization policy mutation or CEL runtime claim."
+    },
+    {
+      "url": "https://docs.cloud.google.com/spanner/docs/ttl/working-with-ttl",
+      "name": "documents/docs.cloud.google.com/spanner/docs/ttl/working-with-ttl",
+      "title": "Manage data retention with TTL",
+      "update_time": "2026-11-09T04:32:15Z",
+      "official_content_bytes": 17122,
+      "official_content_sha256": "ed7a7ad97b3141caf064d8a0a68523fe0a62ed565a62073d00d8280d062bddec",
+      "mirror_content_sha256": "ed7a7ad97b3141caf064d8a0a68523fe0a62ed565a62073d00d8280d062bddec",
+      "same_body_ignoring_trailing_whitespace": true,
+      "category": "link-fix",
+      "change": "Remove .md from the DEFAULT-clause URL.",
+      "verification": "No TTL behavior change claim."
+    },
+    {
+      "url": "https://docs.cloud.google.com/spanner/docs/use-parameterized-views",
+      "name": "documents/docs.cloud.google.com/spanner/docs/use-parameterized-views",
+      "title": "Use parameterized views",
+      "update_time": "2026-11-10T22:00:52Z",
+      "official_content_bytes": 8927,
+      "official_content_sha256": "303ca278fe6a8030e44d1d29b24361c76c10cfdf2ab59b3f0b88445ac1b1a477",
+      "mirror_content_sha256": "303ca278fe6a8030e44d1d29b24361c76c10cfdf2ab59b3f0b88445ac1b1a477",
+      "same_body_ignoring_trailing_whitespace": true,
+      "category": "parameterized-views",
+      "change": "New tutorial and client snippets; comma-style CAST and mixed tutorial/example table names.",
+      "verification": "Managed API/FGAC controls, strict parser and service syntax comparison. Client languages are not all executed."
+    },
+    {
+      "url": "https://docs.cloud.google.com/spanner/docs/views",
+      "name": "documents/docs.cloud.google.com/spanner/docs/views",
+      "title": "Views overview",
+      "update_time": "2026-11-10T22:00:52Z",
+      "official_content_bytes": 13013,
+      "official_content_sha256": "40758f18c274dd6e7df2e951d800ab8bf6de2c8006077ed8787e4a9ee738f27e",
+      "mirror_content_sha256": "40758f18c274dd6e7df2e951d800ab8bf6de2c8006077ed8787e4a9ee738f27e",
+      "same_body_ignoring_trailing_whitespace": true,
+      "category": "parameterized-views",
+      "change": "Add definer-rights parameterized-view overview.",
+      "verification": "Managed view-only role, denied direct table/function access and invoker comparison."
+    }
+  ],
+  "non_document_paths": [
+    "logs/failed.txt",
+    "logs/urls.txt",
+    "metadata.yaml"
+  ],
+  "current_official_body_matches": 24
+}

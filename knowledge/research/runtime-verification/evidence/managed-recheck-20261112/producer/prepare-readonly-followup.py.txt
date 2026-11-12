@@ -1,0 +1,20 @@
+from pathlib import Path
+import json,re
+out=Path('/Users/apstndb/tmp/apstndb/spanalyzer/managed-revalidation-20261112/evidence')
+old=Path('/Users/apstndb/tmp/apstndb/spanalyzer/managed-and-main-20261108/evidence/observed-histogram-cases.json')
+encoded=re.search(r"DISTRIBUTION_PERCENTILE\('([^']+)'",json.loads(old.read_text())[1]['sql']).group(1)
+cases=[{'label':'connectivity','sql':'SELECT 1 AS connectivity'}]
+def add(label,sql,**kw):cases.append(dict(label=label,sql=sql,**kw))
+add('agg-two-equal-json-histograms',"WITH h AS (SELECT @hist AS d UNION ALL SELECT @hist) SELECT JSON_VALUE(SPANNER_SYS.DISTRIBUTION_AGG(d),'$.COUNT') AS sample_count,SPANNER_SYS.DISTRIBUTION_PERCENTILE(SPANNER_SYS.DISTRIBUTION_AGG(d),99.0) AS p99 FROM h",params={'hist':encoded})
+add('agg-null-is-ignored',"WITH h AS (SELECT @hist AS d UNION ALL SELECT CAST(NULL AS STRING)) SELECT JSON_VALUE(SPANNER_SYS.DISTRIBUTION_AGG(d),'$.COUNT') AS sample_count,SPANNER_SYS.DISTRIBUTION_PERCENTILE(SPANNER_SYS.DISTRIBUTION_AGG(d),99.0) AS p99 FROM h",params={'hist':encoded})
+add('agg-null-json-result',"SELECT SPANNER_SYS.DISTRIBUTION_AGG(CAST(NULL AS STRING)) IS NULL AS is_null")
+add('agg-null-percentile-guard',"WITH a AS (SELECT SPANNER_SYS.DISTRIBUTION_AGG(CAST(NULL AS STRING)) AS h) SELECT IF(h IS NULL,NULL,SPANNER_SYS.DISTRIBUTION_PERCENTILE(h,99.0)) AS p99 FROM a")
+add('agg-bad-json-negative',"SELECT SPANNER_SYS.DISTRIBUTION_AGG('not-json') AS histogram")
+add('agg-flatten-struct-empty',"SELECT (SPANNER_SYS.DISTRIBUTION_AGG(LATENCY_DISTRIBUTION[SAFE_OFFSET(0)])).COUNT AS sample_count FROM SPANNER_SYS.QUERY_STATS_TOP_MINUTE WHERE FALSE")
+frames=[json.loads(x)for x in (out/'zstd-frames.jsonl').read_text().splitlines()]
+assert {x['has_content_size']for x in frames}=={False,True}
+for frame in frames:
+ for fn in ['ZSTD_DECOMPRESS_TO_BYTES','ZSTD_DECOMPRESS_TO_STRING']:
+  add('frame-'+frame['name']+'-'+fn.lower(),f"SELECT {fn}(FROM_BASE64(@frame)) AS decoded",params={'frame':frame['base64']})
+(out/'distribution-frames-cases.json').write_text(json.dumps(cases,indent=2)+'\n')
+print('Prepared',len(cases),'read-only controls; frames',[(x['name'],x['has_content_size'],x['local_decoded'])for x in frames])

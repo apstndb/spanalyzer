@@ -1,0 +1,64 @@
+[
+  {
+    "label": "connectivity",
+    "sql": "SELECT 1 AS connectivity"
+  },
+  {
+    "label": "agg-two-equal-json-histograms",
+    "sql": "WITH h AS (SELECT @hist AS d UNION ALL SELECT @hist) SELECT JSON_VALUE(SPANNER_SYS.DISTRIBUTION_AGG(d),'$.COUNT') AS sample_count,SPANNER_SYS.DISTRIBUTION_PERCENTILE(SPANNER_SYS.DISTRIBUTION_AGG(d),99.0) AS p99 FROM h",
+    "params": {
+      "hist": "{\"BUCKET_COUNTS\":[-14,1],\"COUNT\":1,\"GROWTH_FACTOR\":2.0,\"MEAN\":0.012682,\"NUM_FINITE_BUCKETS\":33,\"SCALE\":1e-06,\"SUM_OF_SQUARED_DEVIATION\":0.0}"
+    }
+  },
+  {
+    "label": "agg-null-is-ignored",
+    "sql": "WITH h AS (SELECT @hist AS d UNION ALL SELECT CAST(NULL AS STRING)) SELECT JSON_VALUE(SPANNER_SYS.DISTRIBUTION_AGG(d),'$.COUNT') AS sample_count,SPANNER_SYS.DISTRIBUTION_PERCENTILE(SPANNER_SYS.DISTRIBUTION_AGG(d),99.0) AS p99 FROM h",
+    "params": {
+      "hist": "{\"BUCKET_COUNTS\":[-14,1],\"COUNT\":1,\"GROWTH_FACTOR\":2.0,\"MEAN\":0.012682,\"NUM_FINITE_BUCKETS\":33,\"SCALE\":1e-06,\"SUM_OF_SQUARED_DEVIATION\":0.0}"
+    }
+  },
+  {
+    "label": "agg-null-json-result",
+    "sql": "SELECT SPANNER_SYS.DISTRIBUTION_AGG(CAST(NULL AS STRING)) IS NULL AS is_null"
+  },
+  {
+    "label": "agg-null-percentile-guard",
+    "sql": "WITH a AS (SELECT SPANNER_SYS.DISTRIBUTION_AGG(CAST(NULL AS STRING)) AS h) SELECT IF(h IS NULL,NULL,SPANNER_SYS.DISTRIBUTION_PERCENTILE(h,99.0)) AS p99 FROM a"
+  },
+  {
+    "label": "agg-bad-json-negative",
+    "sql": "SELECT SPANNER_SYS.DISTRIBUTION_AGG('not-json') AS histogram"
+  },
+  {
+    "label": "agg-flatten-struct-empty",
+    "sql": "SELECT (SPANNER_SYS.DISTRIBUTION_AGG(LATENCY_DISTRIBUTION[SAFE_OFFSET(0)])).COUNT AS sample_count FROM SPANNER_SYS.QUERY_STATS_TOP_MINUTE WHERE FALSE"
+  },
+  {
+    "label": "frame-streaming-zstd_decompress_to_bytes",
+    "sql": "SELECT ZSTD_DECOMPRESS_TO_BYTES(FROM_BASE64(@frame)) AS decoded",
+    "params": {
+      "frame": "KLUv/QQAKQAAaGVsbG+jbZ+I"
+    }
+  },
+  {
+    "label": "frame-streaming-zstd_decompress_to_string",
+    "sql": "SELECT ZSTD_DECOMPRESS_TO_STRING(FROM_BASE64(@frame)) AS decoded",
+    "params": {
+      "frame": "KLUv/QQAKQAAaGVsbG+jbZ+I"
+    }
+  },
+  {
+    "label": "frame-encode_all-zstd_decompress_to_bytes",
+    "sql": "SELECT ZSTD_DECOMPRESS_TO_BYTES(FROM_BASE64(@frame)) AS decoded",
+    "params": {
+      "frame": "KLUv/SQFKQAAaGVsbG+jbZ+I"
+    }
+  },
+  {
+    "label": "frame-encode_all-zstd_decompress_to_string",
+    "sql": "SELECT ZSTD_DECOMPRESS_TO_STRING(FROM_BASE64(@frame)) AS decoded",
+    "params": {
+      "frame": "KLUv/SQFKQAAaGVsbG+jbZ+I"
+    }
+  }
+]

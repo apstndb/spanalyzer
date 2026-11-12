@@ -1,0 +1,129 @@
+{
+  "dialect": "google",
+  "steps": [
+    {
+      "label": "pv-invoker-negative",
+      "kind": "ddl",
+      "family": "same-owned-fixture-correction",
+      "requires": [],
+      "sql": "CREATE VIEW PVInvoker SQL SECURITY INVOKER AS SELECT r.Id,r.Tenant FROM PVRows AS r WHERE r.Tenant=SECURE_CONTEXT('tenant')"
+    },
+    {
+      "label": "pv-invoker-grant",
+      "kind": "ddl",
+      "family": "same-owned-fixture-correction",
+      "requires": [
+        "pv-invoker-negative"
+      ],
+      "sql": "GRANT SELECT ON VIEW PVInvoker TO ROLE pv_user"
+    },
+    {
+      "label": "pv-invoker-role-query",
+      "kind": "query",
+      "family": "same-owned-fixture-correction",
+      "requires": [
+        "pv-invoker-grant"
+      ],
+      "database_role": "pv_user",
+      "secure_context": {
+        "tenant": "a"
+      },
+      "sql": "SELECT Id,Tenant FROM PVInvoker ORDER BY Id"
+    },
+    {
+      "label": "pv-udf-schema-control",
+      "kind": "ddl",
+      "family": "same-owned-fixture-correction",
+      "requires": [],
+      "sql": "CREATE SCHEMA PVFunctions"
+    },
+    {
+      "label": "pv-udf-positive-control",
+      "kind": "ddl",
+      "family": "same-owned-fixture-correction",
+      "requires": [
+        "pv-udf-schema-control"
+      ],
+      "sql": "CREATE FUNCTION PVFunctions.Echo(x STRING) RETURNS STRING SQL SECURITY INVOKER AS (x)"
+    },
+    {
+      "label": "pv-udf-negative",
+      "kind": "ddl",
+      "family": "same-owned-fixture-correction",
+      "requires": [
+        "pv-udf-positive-control"
+      ],
+      "sql": "CREATE FUNCTION PVFunctions.PVUdf() RETURNS STRING SQL SECURITY INVOKER AS (SECURE_CONTEXT('tenant'))"
+    },
+    {
+      "label": "vector-annotated-length-3",
+      "family": "same-owned-fixture-correction",
+      "kind": "dml",
+      "requires": [],
+      "statements": [
+        "INSERT INTO VectorsAnnotated(Id,E) VALUES (3,ARRAY<FLOAT32>[1.0,2.0,3.0])"
+      ]
+    },
+    {
+      "label": "vector-annotated-length-2",
+      "family": "same-owned-fixture-correction",
+      "kind": "dml",
+      "requires": [],
+      "statements": [
+        "INSERT INTO VectorsAnnotated(Id,E) VALUES (2,ARRAY<FLOAT32>[1.0,2.0])"
+      ]
+    },
+    {
+      "label": "vector-annotated-knn",
+      "family": "same-owned-fixture-correction",
+      "kind": "query",
+      "requires": [],
+      "sql": "SELECT Id,EUCLIDEAN_DISTANCE(E,ARRAY<FLOAT32>[1.0,2.0,3.0]) AS Distance FROM VectorsAnnotated WHERE ARRAY_LENGTH(E)=3 ORDER BY Distance"
+    },
+    {
+      "label": "vector-flexible-length-3",
+      "family": "same-owned-fixture-correction",
+      "kind": "dml",
+      "requires": [],
+      "statements": [
+        "INSERT INTO VectorsFlexible(Id,E) VALUES (3,ARRAY<FLOAT32>[1.0,2.0,3.0])"
+      ]
+    },
+    {
+      "label": "vector-flexible-length-2",
+      "family": "same-owned-fixture-correction",
+      "kind": "dml",
+      "requires": [],
+      "statements": [
+        "INSERT INTO VectorsFlexible(Id,E) VALUES (2,ARRAY<FLOAT32>[1.0,2.0])"
+      ]
+    },
+    {
+      "label": "vector-flexible-knn",
+      "family": "same-owned-fixture-correction",
+      "kind": "query",
+      "requires": [],
+      "sql": "SELECT Id,EUCLIDEAN_DISTANCE(E,ARRAY<FLOAT32>[1.0,2.0,3.0]) AS Distance FROM VectorsFlexible WHERE ARRAY_LENGTH(E)=3 ORDER BY Distance"
+    },
+    {
+      "label": "vector-index-annotated-observed",
+      "kind": "query",
+      "family": "same-owned-fixture-correction",
+      "requires": [],
+      "sql": "SELECT INDEX_NAME,INDEX_STATE FROM INFORMATION_SCHEMA.INDEXES WHERE INDEX_NAME='AnnotatedVectorIndex'"
+    },
+    {
+      "label": "vector-index-unannotated-negative",
+      "family": "new-docs-20261112",
+      "kind": "ddl",
+      "requires": [],
+      "sql": "CREATE VECTOR INDEX FlexibleVectorIndex ON VectorsFlexible(E) WHERE E IS NOT NULL OPTIONS(distance_type='EUCLIDEAN')"
+    },
+    {
+      "label": "pv-ddl-export",
+      "kind": "ddl-export",
+      "family": "same-owned-fixture-correction",
+      "requires": []
+    }
+  ]
+}

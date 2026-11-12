@@ -1,0 +1,39 @@
+from pathlib import Path
+import datetime,hashlib,json,os,re,subprocess,sys
+root=Path('/Users/apstndb/work/spanner-analyzer/.worktrees/cross-engine-docs-20261005')
+scratch=root/'.tmp/managed-revalidation-20261112'
+out=Path('/Users/apstndb/tmp/apstndb/spanalyzer/managed-revalidation-20261112/evidence')
+keys=['SPANNER_PROJECT_ID','SPANNER_INSTANCE_ID','SPANNER_DATABASE_ID']
+env=os.environ.copy()
+assert all(env.get(k)for k in keys)
+assert not env.get('SPANNER_EMULATOR_HOST')
+env['TEST_REAL_SPANNER_DATABASE']='projects/{SPANNER_PROJECT_ID}/instances/{SPANNER_INSTANCE_ID}/databases/{SPANNER_DATABASE_ID}'.format(**env)
+identifiers=sorted([env['TEST_REAL_SPANNER_DATABASE']]+[env[k]for k in keys],key=len,reverse=True)
+def clean(value):
+ if isinstance(value,dict):return {k:clean(v)for k,v in value.items()}
+ if isinstance(value,list):return [clean(v)for v in value]
+ if not isinstance(value,str):return value
+ for identifier in identifiers:value=value.replace(identifier,'<redacted>')
+ value=re.sub(r'projects/[^/\s"\']+/instances/[^/\s"\']+/databases/[^/\s"\']+','<database>',value)
+ return re.sub(r'requestID\s*=\s*"[^"]*"','requestID = "<redacted>"',value)
+phases=sys.argv[1:] or ['readonly','supplemental','statistics','statistics-controls','histogram-controls','observed-histogram','scalar-correction','new-readonly']
+receipts=[]
+for phase in phases:
+ plan=out/(phase+'-cases.json');cases=json.loads(plan.read_text())
+ assert cases[0]['sql']=='SELECT 1 AS connectivity'
+ assert all(re.match(r'^\s*(SELECT|WITH|FROM|GRAPH)\b',p['sql'],re.I)and not re.search(r'\b(RECEIVE_|GET_NEXT_SEQUENCE_VALUE)',p['sql'],re.I)for p in cases)
+ destination=out/(phase+'.jsonl')
+ assert not destination.exists(),'Use a distinct observation path rather than replace retained results'
+ started=datetime.datetime.now(datetime.timezone.utc).isoformat()
+ result=subprocess.run([str(scratch/'query'),str(plan)],env=env,capture_output=True,text=True,timeout=1800)
+ rows=[clean(json.loads(line))for line in result.stdout.splitlines()]
+ with destination.open('x')as f:
+  for row in rows:f.write(json.dumps(row)+'\n')
+ (out/(phase+'.stderr')).write_text(clean(result.stderr))
+ receipt={'phase':phase,'started_at':started,'completed_at':datetime.datetime.now(datetime.timezone.utc).isoformat(),'exit_code':result.returncode,'planned_cases':len(cases),'recorded_cases':len(rows),'producer_sha256':hashlib.sha256((scratch/'module/query.go').read_bytes()).hexdigest(),'binary_sha256':hashlib.sha256((scratch/'query').read_bytes()).hexdigest(),'plan_sha256':hashlib.sha256(plan.read_bytes()).hexdigest(),'scope':'Existing dedicated managed GoogleSQL database, single-use read-only transactions only; no DDL, DML, queue receive, sequence allocation or database lifecycle.'}
+ receipts.append(receipt);(out/('readonly-commands-'+('-'.join(sys.argv[1:]) or 'initial')+'.json')).write_text(json.dumps(receipts,indent=2)+'\n')
+ print(phase,'exit',result.returncode,'records',len(rows),'codes',{c:sum(x['code']==c for x in rows)for c in sorted({x['code']for x in rows})},flush=True)
+ assert result.returncode==0 and [r['label']for r in rows]==[p['label']for p in cases]
+ assert rows[0]['code']=='OK'and rows[0]['rows']==[{'connectivity':'1'}]
+ assert not any(r['code']in ['Unavailable','Unauthenticated','DeadlineExceeded','Unknown']for r in rows),'Transport/authentication result is inconclusive'
+print('Completed',sum(r['recorded_cases']for r in receipts),'read-only cases',flush=True)

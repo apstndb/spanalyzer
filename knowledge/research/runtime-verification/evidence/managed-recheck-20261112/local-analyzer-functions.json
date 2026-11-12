@@ -1,0 +1,27 @@
+{
+  "code_baseline": "8ba3f9539ed2cecc7820f92dde77bcaeb6c6a4e8",
+  "binary_sha256": "6882d70372d31dbbb78a8a142b9c35b7119a903973df09a56e049993e293c197",
+  "cases": [
+    {
+      "label": "secure-context",
+      "sql": "SELECT SECURE_CONTEXT('tenant') AS context",
+      "exit_code": 1,
+      "stdout": "",
+      "stderr": "{\"error\":\"Function not found: SECURE_CONTEXT [at 1:8]\"}\n"
+    },
+    {
+      "label": "distribution-aggregate",
+      "sql": "SELECT SPANNER_SYS.DISTRIBUTION_AGG(d) AS histogram FROM UNNEST(['{}']) AS d",
+      "exit_code": 1,
+      "stdout": "",
+      "stderr": "{\"error\":\"Function not found: SPANNER_SYS.DISTRIBUTION_AGG [at 1:8]\"}\n"
+    },
+    {
+      "label": "compression",
+      "sql": "SELECT ZSTD_DECOMPRESS_TO_STRING(ZSTD_COMPRESS('hello',3)) AS text",
+      "exit_code": 0,
+      "stdout": "fields:\n- name: text\n  type:\n    code: STRING\n\n",
+      "stderr": ""
+    }
+  ]
+}

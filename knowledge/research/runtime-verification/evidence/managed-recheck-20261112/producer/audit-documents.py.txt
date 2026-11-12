@@ -1,0 +1,39 @@
+from pathlib import Path
+import json,datetime
+root=Path('.tmp/managed-revalidation-20261112/sources')
+inv=json.loads((root/'commit-inventory.json').read_text());official=json.loads((root/'official-source-comparison.json').read_text())
+items={
+'sdk/gcloud/reference/spanner/databases/update':('administration','CMEK update completion, background re-encryption, retained backup keys, and wait/inspection guidance.','Documentation only; no encryption or key operations.'),
+'spanner/docs/backfill-embeddings':('vector-length','Annotate embedding dimensions; storage and KNN remain optional, ANN indexes require a vector length.','Both-dialect owned vector controls.'),
+'spanner/docs/create-manage-views':('parameterized-views','SECURE_CONTEXT in a definer view; the new example uses comma-style CAST.','Managed role/filter controls and paired CAST rejection/correction.'),
+'spanner/docs/create-query-database-console':('console-and-dml','Current instance/Studio workflow, simplified columns, THEN RETURN versus PostgreSQL RETURNING.','Workflow text reviewed; no console provisioning. No new DML syntax claim.'),
+'spanner/docs/find-approximate-nearest-neighbors':('vector-length','Add the required fixed vector dimensions to ANN examples.','Both-dialect owned vector controls.'),
+'spanner/docs/find-k-nearest-neighbors':('vector-length','KNN annotation is recommended, not required; varying dimensions may remain unannotated.','Both-dialect storage and KNN controls.'),
+'spanner/docs/full-text-search/ranked-search':('scorer-cohorts','Post-April-2026 databases default to v2; pre-April remains v1 until migration, April may vary.','New current databases compared with explicit v1/v2; no old-cohort migration experiment.'),
+'spanner/docs/getting-started/java':('client-example','Java example version 6.126.0 to 6.127.0.','Documentation only; no Java dependency upgrade or client execution.'),
+'spanner/docs/graph/opencypher-reference':('formatting','Property-reference layout and stray less-than character corrected.','No added mapping or new graph syntax claim; existing graph controls repeated.'),
+'spanner/docs/introspection/query-statistics':('distribution-aggregate','New DISTRIBUTION_AGG examples for custom-span percentiles in both dialects.','Managed typed/string, nonempty, empty, NULL and invalid-input controls.'),
+'spanner/docs/introspection/transaction-statistics':('distribution-aggregate','New transaction-distribution aggregation and percentile examples.','Both-dialect documented-shape probes; controlled nonempty string histograms tested independently.'),
+'spanner/docs/migrating-postgres-spanner':('formatting','HTML paragraph wrappers in type aliases; type mapping text remains unchanged.','Documentation comparison only.'),
+'spanner/docs/ml-tutorial-embeddings':('vector-length','Fixed dimensions in GoogleSQL and PostgreSQL embedding examples.','Both-dialect owned vector controls; no model/remote embedding invocation.'),
+'spanner/docs/parameterized-views':('parameterized-views','New overview, request context, privileges, supported argument/result types and limitations.','Request-value, FGAC view, invoker, generated/default and named-UDF controls.'),
+'spanner/docs/querydata':('description','Clarify that context sets contain templates, facets and value searches.','Documentation only; no QueryData agent call.'),
+'spanner/docs/reference/libraries':('client-example','Java sbt example version 6.126.0 to 6.127.0.','Documentation only; no Java client execution.'),
+'spanner/docs/reference/standard-sql/compression-functions':('compression','Optional/positional compression level, NULL options, named decompression size limit and frame content-size requirement.','Managed boundary/NULL/named-argument controls and locally decoded known/unknown-size Zstd frames.'),
+'spanner/docs/reference/standard-sql/search_functions':('scorer-cohorts','Remove unconditional default-v1 wording and explain creation cohorts.','Current owned databases and explicit scorer controls; historical cohorts remain unverified.'),
+'spanner/docs/release-notes':('release-announcement','November 10 parameterized-views GA entry.','Official current HTML and dkcli agree; managed implementation checked separately.'),
+'spanner/docs/schema-design':('temporary-mirror-omission','Removed in the November 9 mirror capture and restored byte-identically November 10.','Current official body matches; no engine change inferred.'),
+'spanner/docs/spanner-custom-constraints':('organization-policy','Condition limit changes from 1000 to 1500 characters and the generic console example changes.','Documentation only; no organization policy mutation or CEL runtime claim.'),
+'spanner/docs/ttl/working-with-ttl':('link-fix','Remove .md from the DEFAULT-clause URL.','No TTL behavior change claim.'),
+'spanner/docs/use-parameterized-views':('parameterized-views','New tutorial and client snippets; comma-style CAST and mixed tutorial/example table names.','Managed API/FGAC controls, strict parser and service syntax comparison. Client languages are not all executed.'),
+'spanner/docs/views':('parameterized-views','Add definer-rights parameterized-view overview.','Managed view-only role, denied direct table/function access and invoker comparison.'),
+}
+rows=[]
+for d in official['documents']:
+ key=d['name'].removeprefix('documents/docs.cloud.google.com/')
+ category,change,verification=items.pop(key)
+ rows.append({**d,'category':category,'change':change,'verification':verification})
+assert not items and len(rows)==24 and all(r['same_body_ignoring_trailing_whitespace']for r in rows)
+record={'observed_at_utc':datetime.datetime.now(datetime.timezone.utc).isoformat(),'base':inv['base'],'head':inv['head'],'coverage':'Every intervening commit and all changed documentation paths, including the removed/restored schema-design page; logs and synchronization metadata are classified separately. No generated search answers are evidence.','commits':[{'sha':c['sha'],'parent':c['parent'],'date_and_subject':c['metadata'],'paths':c['paths'],'patch_sha256':c['patch_sha256'],'body_hashes':c['bodies']}for c in inv['commits']],'documents':rows,'non_document_paths':['logs/failed.txt','logs/urls.txt','metadata.yaml'],'current_official_body_matches':24}
+(root/'documentation-audit.json').write_text(json.dumps(record,indent=2)+'\n')
+print('Audited four commits and all',len(rows),'documentation paths.')
