@@ -18,6 +18,24 @@ type planReportIndexObserver interface {
 	ObserveIndexes(context.Context) ([]spanalyzer.MutationCountIndexObservation, error)
 }
 
+func applyPlanReportMutationModel(query *planReportQuery, write querygen.QueryCodegenPlanWrite, model *spanalyzer.MutationCountAnalyzer, modelErr error, inputs querygen.MutationCountInputs) error {
+	if model == nil {
+		if modelErr != nil {
+			query.MutationCountError = modelErr.Error()
+			if _, supplied := inputs.Catalogs[query.Catalog]; supplied {
+				query.MutationCounts = nil
+			}
+		}
+		return modelErr
+	}
+	counts, err := querygen.AnalyzeWriteMutationCounts(model, write, inputs.Writes[write.Name])
+	query.MutationCounts, query.MutationCountError = counts, ""
+	if err != nil {
+		query.MutationCountError = err.Error()
+	}
+	return err
+}
+
 // ObserveIndexes reads one consistent snapshot of all regular indexes in the
 // command-created database. Search/vector accounting remains explicitly unknown
 // in the analyzer; this never invents a backing name from its hexadecimal suffix.

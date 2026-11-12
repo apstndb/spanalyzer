@@ -183,6 +183,10 @@ and leaves the original plan unchanged if any supplied input is invalid.
 new database's regular-index metadata and shares the reconciled physical names
 and inferred FK selectors with `access_paths`. A supplied snapshot with different
 physical names is rejected rather than used for that new database.
+Mutation-only reporting without measurement or an eligible SQL target creates
+no database; its supplied snapshot remains a caller freshness assertion, as in
+`explain-plan`. If another target opens that catalog, the live reconciliation
+also applies to skipped writes, and a rejected snapshot removes their counts.
 
 `seed_dml` is inert during ordinary analysis. Explicit
 `plan-report --measure-mutation-counts --mutation-facts-file scenarios.json`

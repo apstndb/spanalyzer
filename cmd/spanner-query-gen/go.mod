@@ -4,7 +4,7 @@ go 1.26.2
 
 require (
 	cloud.google.com/go v0.123.0
-	github.com/apstndb/spanalyzer v0.2.2-0.20261108152247-dfcf679fab54
+	github.com/apstndb/spanalyzer v0.2.2-0.20261112055308-0c08dadcc78d
 	github.com/apstndb/spanemuboost v0.4.10
 	github.com/cloudspannerecosystem/memefish v0.8.1
 	github.com/moby/moby/api v1.56.0
@@ -111,7 +111,7 @@ require (
 
 require (
 	cloud.google.com/go/spanner v1.95.1
-	github.com/apstndb/spanalyzer/plancontract v0.1.1-0.20261108075420-ec5bb1879b1b
+	github.com/apstndb/spanalyzer/plancontract v0.1.1-0.20261112055308-0c08dadcc78d
 	github.com/apstndb/spannerplan v0.3.2
 	github.com/goccy/go-yaml v1.19.2
 	github.com/samber/lo v1.53.0 // indirect

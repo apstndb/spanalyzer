@@ -15,7 +15,7 @@ sources:
     resource: evidence/mutation-count-feedback-20261112/receipt.json
     title: Fixture scope, source identities, image provenance and retained correction
   - id: report
-    resource: evidence/mutation-count-feedback-20261112/report.json
+    resource: evidence/mutation-count-feedback-20261112/report.json.gz
     title: Full collector report and the 31 measured one-row scenarios
   - id: counts
     resource: evidence/mutation-count-feedback-20261112/counts.json
@@ -29,6 +29,12 @@ sources:
   - id: model
     resource: ../../../mutation_count.go
     title: Shared index catalog and bounds-first accounting implementation
+  - id: foundation
+    resource: https://github.com/apstndb/spanalyzer/pull/77
+    title: Merged root and contract foundation with input-integrity corrections
+  - id: publication-validation
+    resource: evidence/mutation-count-feedback-20261112/publication-validation.json
+    title: Subsequent standalone consumer closure and local publication checks
 ---
 
 # Mutation-count feedback follow-up on November 12, 2026
@@ -65,6 +71,10 @@ snapshots are keyed by catalog and exact DDL digest. Unknown names, invalid
 values, extra JSON fields, trailing JSON documents and mismatched snapshots
 fail explicitly. Missing values stay unknown. INT64 uses decimal wire strings,
 so values beyond JavaScript's exact-number range retain their identity.
+Default Mutation-only reports with no eligible SQL target open no database;
+their index snapshots remain caller freshness assertions. When another target
+opens the same catalog, its live reconciliation also governs skipped writes.
+A rejected snapshot removes those counts before any contract evaluation.
 
 Each measured scenario must supply every written value and the complete primary
 key. Caller-authored `seed_dml` resets its starting state in a separate
@@ -147,9 +157,16 @@ remain mutable previews. The leaf `plancontract` module retains its lightweight
 dependency boundary and receives only count DTOs, not the analyzer or container
 dependencies.
 
-Root, leaf and CLI workspace tests, all-module lint, vulnerability checks and
-the shared LTS integration runner pass. Publication is not complete: standalone
-CLI builds still select older root/leaf module revisions that lack the new APIs.
-The dependency-safe publication order is to merge the root/leaf foundation first,
-then pin the CLI to that immutable revision and rerun the entire gate. A local
-filesystem replacement would hide this consumer boundary and is not used.
+The initial candidate passed workspace tests, lint, vulnerability checks and
+the shared LTS integration runner. Its first standalone build selected older
+root/leaf revisions and failed; those staging logs retain their original status.
+The foundation subsequently merged through PR #77 as
+`0c08dadcc78ddf0ff14f1072da610ce4112e23f7`. The CLI now pins root
+`v0.2.2-0.20261112055308-0c08dadcc78d` and plancontract
+`v0.1.1-0.20261112055308-0c08dadcc78d` to that same immutable commit.
+The separate publication-validation record tracks consumer closure and later
+checks without changing the initial engine observations or producer identities.
+
+The two large report JSON payloads are retained as deterministic gzip archives.
+Their decoded bytes match the captured originals; the receipt records both
+payload and archive hashes. The compact count table remains ordinary JSON.

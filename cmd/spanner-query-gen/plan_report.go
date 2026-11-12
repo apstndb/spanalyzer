@@ -715,27 +715,15 @@ func buildPlanReportWithAnalyzer(ctx context.Context, config querygen.QueryCodeg
 		}
 		if scope == "write" {
 			write := writesByName[query.Name]
+			countErr := applyPlanReportMutationModel(&reportQuery, write, countModels[catalog], countModelErrors[catalog], opts.MutationInputs)
 			if model := countModels[catalog]; model != nil {
-				counts, countErr := querygen.AnalyzeWriteMutationCounts(model, write, opts.MutationInputs.Writes[write.Name])
-				if countErr != nil {
-					reportQuery.MutationCounts = nil
-					reportQuery.MutationCountError = countErr.Error()
-				} else {
-					reportQuery.MutationCounts = counts
-					reportQuery.MutationCountError = ""
-				}
 				if opts.MeasureMutationCounts && len(opts.MutationInputs.Writes[write.Name]) > 0 && countErr == nil {
 					measurementAttempted[write.Name] = true
 					runtimeIdentity := report.Backend + "/" + report.BackendIdentity.Version + "@" + report.BackendIdentity.ImageDigest
-					reportQuery.MutationCounts, reportQuery.MutationCountError = measurePlanReportWrite(ctx, clients, model, write, opts.MutationInputs.Writes[write.Name], query, runtimeIdentity, counts)
+					reportQuery.MutationCounts, reportQuery.MutationCountError = measurePlanReportWrite(ctx, clients, model, write, opts.MutationInputs.Writes[write.Name], query, runtimeIdentity, reportQuery.MutationCounts)
 					if reportQuery.MutationCountError != "" {
 						report.Warnings = append(report.Warnings, planReportDiagnostic{ID: "mutation-count-measurement-failed", Message: write.Name + ": " + reportQuery.MutationCountError})
 					}
-				}
-			} else if observeErr := countModelErrors[catalog]; observeErr != nil {
-				reportQuery.MutationCountError = observeErr.Error()
-				if _, supplied := opts.MutationInputs.Catalogs[catalog]; supplied {
-					reportQuery.MutationCounts = nil
 				}
 			}
 		}
@@ -801,6 +789,17 @@ func buildPlanReportWithAnalyzer(ctx context.Context, config querygen.QueryCodeg
 			ID:      "plan-report-no-targets",
 			Message: "no Spanner query targets were available for plan-report",
 		})
+	}
+	// A skipped/error target may precede the first live target for its catalog.
+	// Apply the catalog's final metadata result to all unmeasured writes so a
+	// rejected snapshot cannot survive on a count-only target or CEL input.
+	for i := range report.Queries {
+		query := &report.Queries[i]
+		if query.Scope != "write" || measurementAttempted[query.Name] || !countModelLoaded[query.Catalog] {
+			continue
+		}
+		// Failures are stored on the target; retain the partial report here.
+		_ = applyPlanReportMutationModel(query, writesByName[query.Name], countModels[query.Catalog], countModelErrors[query.Catalog], opts.MutationInputs)
 	}
 	if opts.MeasureMutationCounts {
 		recordUnattemptedPlanReportMeasurements(&report, opts.MutationInputs, measurementAttempted)

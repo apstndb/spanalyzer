@@ -55,5 +55,26 @@
     "diff": "unattempted-measurement-guard.diff",
     "unit_test": "TestPlanReportCountOnlyTargetDoesNotWriteByDefault",
     "test_log": "validation.json records the subsequent CLI module test"
+  },
+  "report_archives": {
+    "encoding": "gzip with mtime=0; decoded bytes match the captured JSON exactly",
+    "files": [
+      {
+        "original": "report.json",
+        "archive": "report.json.gz",
+        "payload_sha256": "01e76a361f6f67bc56e0c3622a4703523f6ea04807a7bc216bc6e2769a805b07",
+        "archive_sha256": "452277be11ba96d454c087363eb9f309b950723d813c1742d47a200b4ea7b124",
+        "payload_bytes": 1167746,
+        "archive_bytes": 49942
+      },
+      {
+        "original": "first-attempt-report.json",
+        "archive": "first-attempt-report.json.gz",
+        "payload_sha256": "28c7b05ec0f151446969bb49f2ce6e3fabd98dd805d51b38df68237bcc3e6396",
+        "archive_sha256": "b15c337593fddf5f8eeccb7c2229ea544b7f14ca269b0915d1fea69e841cceff",
+        "payload_bytes": 1166370,
+        "archive_bytes": 50187
+      }
+    ]
   }
 }
