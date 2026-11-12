@@ -526,6 +526,7 @@ func mutationDMLOperations(s *mutationCountSchemaModel, sql string) ([]mutationC
 	case *ast.Update:
 		base.Kind = "update"
 		base.Table = mutationPathName(n.TableName)
+		base.PredicateKey = mutationDMLPredicateKey(n.Where)
 		for _, item := range n.Updates {
 			u, ok := item.(*ast.UpdateItemSetValue)
 			if !ok || len(u.Path) != 1 {
@@ -546,6 +547,7 @@ func mutationDMLOperations(s *mutationCountSchemaModel, sql string) ([]mutationC
 	case *ast.Delete:
 		base.Kind = "delete"
 		base.Table = mutationPathName(n.TableName)
+		base.PredicateKey = mutationDMLPredicateKey(n.Where)
 		base.DeleteUnits = mutationUncertain(0, nil)
 	default:
 		return nil, fmt.Errorf("DML kind is outside this prototype")

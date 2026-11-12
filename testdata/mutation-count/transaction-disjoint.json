@@ -1,0 +1,6 @@
+{
+  "statements": ["UPDATE Events SET Note = 'n' WHERE Shard = 1 AND Id = 2"],
+  "mutations": [
+    {"insert": {"table": "Events", "columns": ["Shard", "Id"], "values": [["1", "3"]]}}
+  ]
+}

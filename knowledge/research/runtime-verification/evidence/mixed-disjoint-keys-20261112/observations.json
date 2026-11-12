@@ -1,0 +1,379 @@
+{
+  "schema_version": "spanalyzer.mixed-key-observations/v0alpha1",
+  "source": {
+    "base_commit": "439bddbb9fa99b0df1d4f2c39e62c6c5e2175f17",
+    "files": {
+      "mutation_count_keys.go": "2f7a821d8ca71ec5d42eb8719bde166ec35251f7a7520cb0f83a6aac5b49b219",
+      "mutation_count_transaction.go": "bd87b475063e2ef67b58fecb14c0d33c82eb7fc5fcd962701c006fdae06cbbe6",
+      "mutation_count_input.go": "0dc1d8654b1feacb40fe94494da9812d0b01c131fd8582930f32679a59a8459d",
+      "mutation_count_model.go": "2eefe3f8afb7d10421ee21059ba0d2c95d3ff579ab34d729d4ef6e04feac6225",
+      "tools/mutation-count-lab/mixed_transaction_integration_test.go": "b9653c6f9517df9802609ee738922b45a9307a83f4494dbf3650404399e1df95",
+      "runtime_targets.json": "8628282a73afcaa7e8e7a3883f2f3efaf621c141e3696c6c2cf0f4297b124119",
+      "go.mod": "3ac602ccdac3d999cd172afd1d13a4894d903a105a42a93ac1281329c8aa7d43",
+      "tools/go.mod": "87d86dc1a47861d90577b611b1c5b0975171889c399a004d68c064068e8f13b8"
+    }
+  },
+  "scope": "Owned synthetic local runtimes only; no fresh managed measurement. A finite model upper is conditional, not a service guarantee.",
+  "documents": [
+    {
+      "uri": "https://docs.cloud.google.com/spanner/docs/dml-versus-mutations",
+      "title": "Compare DML and Mutations",
+      "reported_update_time": "2026-10-07T09:39:47Z",
+      "content_sha256": "2723793662f37d6b222b77e7410f22a4a9172c179036008fb5562d21ec6a5773"
+    },
+    {
+      "uri": "https://docs.cloud.google.com/spanner/docs/commit-statistics",
+      "title": "Retrieve commit statistics for a transaction",
+      "reported_update_time": "2026-10-07T09:40:22Z",
+      "content_sha256": "0da3a2dc6c9477209d108bed8bdc7122959b2078bcfa352464fa86e43a598ec4"
+    },
+    {
+      "uri": "https://docs.cloud.google.com/spanner/docs/dml-best-practices",
+      "title": "Data Manipulation Language best practices",
+      "reported_update_time": "2026-10-23T19:40:06Z",
+      "content_sha256": "8e2765587dece3f04c9f3b9ae0677588fff3a6cb84cbb389b6740a80cf5eb270"
+    },
+    {
+      "uri": "https://docs.cloud.google.com/spanner/docs/secondary-indexes",
+      "title": "Secondary indexes",
+      "reported_update_time": "2026-10-24T22:46:36Z",
+      "content_sha256": "00e4ba6b3858802f98c625354b68ad1d1783f0c34617ee9df7530154114422cb"
+    },
+    {
+      "uri": "https://docs.cloud.google.com/spanner/docs/reference/standard-sql/data-types",
+      "title": "Data types in GoogleSQL",
+      "reported_update_time": "2026-10-08T19:54:18Z",
+      "content_sha256": "5d5dd8314c7bc7efa267410527e3238f257729dd6fcd2690db951b9434493392"
+    },
+    {
+      "uri": "https://docs.cloud.google.com/spanner/docs/reference/standard-sql/operators",
+      "title": "Operators in GoogleSQL",
+      "reported_update_time": "2026-10-08T19:54:18Z",
+      "content_sha256": "4dc4bdb1a7c3d43a072f1df9c84bc703cffba7738d4e54bf17f1b328e42613ce"
+    }
+  ],
+  "initial_probe_failure": {
+    "backend": "emulator",
+    "category": "probe_bootstrap_before_measured_cases",
+    "status": "AlreadyExists",
+    "message": "Instance already exists: projects/emulator-project/instances/emulator-instance",
+    "measured_cases": 0,
+    "resolution": "Use EnableDatabaseAutoConfigOnly when reopening the instance already bootstrapped by Run.",
+    "owned_container_id_prefix": "e5ea7bce10b3",
+    "owned_container_removed": true,
+    "configured_image": "gcr.io/cloud-spanner-emulator/emulator:1.5.59@sha256:969af6a9349948fbfb4a826c18e160e258a4005f7c759f8e7f2dcec369cccba8",
+    "started_at": "2026-11-12T12:26:11Z"
+  },
+  "runs": [
+    {
+      "backend": "omni",
+      "configured_image": "us-docker.pkg.dev/spanner-omni/images/spanner-omni:2026.r4-lts.2@sha256:b607b10bee3c1903f0a7f88f99bece67cb0dd9d9a028aee64226fc311bd78dae",
+      "platform": "linux/arm64",
+      "started_at": "2026-11-12T12:32:22Z",
+      "command": "SPANALYZER_MIXED_MUTATION_BACKEND=omni go -C tools test -tags=integration -count=1 -timeout=7m -v -run ^TestIntegrationMixedMutationPrimaryKeys$ ./mutation-count-lab",
+      "exit_code": 0,
+      "owned_container_id_prefix": "c1f029f9b026",
+      "owned_container_removed": true,
+      "cases": [
+        {
+          "case": "feedback",
+          "dml_rows": 1,
+          "mutation_count": 5,
+          "effective": {
+            "lower": 0,
+            "upper": 5
+          },
+          "final_ids": [
+            2,
+            3
+          ]
+        },
+        {
+          "case": "update",
+          "dml_rows": 1,
+          "mutation_count": 6,
+          "effective": {
+            "lower": 0,
+            "upper": 6
+          },
+          "final_ids": [
+            2,
+            3
+          ]
+        },
+        {
+          "case": "upsert",
+          "dml_rows": 1,
+          "mutation_count": 6,
+          "effective": {
+            "lower": 0,
+            "upper": 6
+          },
+          "final_ids": [
+            2,
+            3
+          ]
+        },
+        {
+          "case": "replace",
+          "dml_rows": 1,
+          "mutation_count": 6,
+          "effective": {
+            "lower": 0,
+            "upper": 6
+          },
+          "final_ids": [
+            2,
+            3
+          ]
+        },
+        {
+          "case": "delete",
+          "dml_rows": 1,
+          "mutation_count": 4,
+          "effective": {
+            "lower": 0,
+            "upper": 4
+          },
+          "final_ids": [
+            2
+          ]
+        },
+        {
+          "case": "dml-insert",
+          "dml_rows": 1,
+          "mutation_count": 4,
+          "effective": {
+            "lower": 0,
+            "upper": 4
+          },
+          "final_ids": [
+            2,
+            3
+          ]
+        },
+        {
+          "case": "dml-delete",
+          "dml_rows": 1,
+          "mutation_count": 3,
+          "effective": {
+            "lower": 0,
+            "upper": 3
+          },
+          "final_ids": [
+            3
+          ]
+        },
+        {
+          "case": "same-key",
+          "dml_rows": 1,
+          "mutation_count": 6,
+          "effective": {
+            "lower": 0,
+            "upper": null
+          },
+          "final_ids": [
+            2
+          ]
+        },
+        {
+          "case": "parameter",
+          "dml_rows": 1,
+          "mutation_count": 5,
+          "effective": {
+            "lower": 0,
+            "upper": null
+          },
+          "final_ids": [
+            2,
+            3
+          ]
+        },
+        {
+          "case": "partial-key",
+          "dml_rows": 1,
+          "mutation_count": 5,
+          "effective": {
+            "lower": 0,
+            "upper": null
+          },
+          "final_ids": [
+            2,
+            3
+          ]
+        },
+        {
+          "case": "unique-key-reuse",
+          "dml_rows": 1,
+          "mutation_count": 9,
+          "effective": {
+            "lower": 0,
+            "upper": 9
+          },
+          "final_ids": [
+            2,
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "backend": "emulator",
+      "configured_image": "gcr.io/cloud-spanner-emulator/emulator:1.5.59@sha256:969af6a9349948fbfb4a826c18e160e258a4005f7c759f8e7f2dcec369cccba8",
+      "platform": "linux/arm64",
+      "started_at": "2026-11-12T12:32:37Z",
+      "command": "SPANALYZER_MIXED_MUTATION_BACKEND=emulator go -C tools test -tags=integration -count=1 -timeout=7m -v -run ^TestIntegrationMixedMutationPrimaryKeys$ ./mutation-count-lab",
+      "exit_code": 0,
+      "owned_container_id_prefix": "cae90ea06424",
+      "owned_container_removed": true,
+      "cases": [
+        {
+          "case": "feedback",
+          "dml_rows": 1,
+          "mutation_count": null,
+          "effective": {
+            "lower": 0,
+            "upper": 5
+          },
+          "final_ids": [
+            2,
+            3
+          ]
+        },
+        {
+          "case": "update",
+          "dml_rows": 1,
+          "mutation_count": null,
+          "effective": {
+            "lower": 0,
+            "upper": 6
+          },
+          "final_ids": [
+            2,
+            3
+          ]
+        },
+        {
+          "case": "upsert",
+          "dml_rows": 1,
+          "mutation_count": null,
+          "effective": {
+            "lower": 0,
+            "upper": 6
+          },
+          "final_ids": [
+            2,
+            3
+          ]
+        },
+        {
+          "case": "replace",
+          "dml_rows": 1,
+          "mutation_count": null,
+          "effective": {
+            "lower": 0,
+            "upper": 6
+          },
+          "final_ids": [
+            2,
+            3
+          ]
+        },
+        {
+          "case": "delete",
+          "dml_rows": 1,
+          "mutation_count": null,
+          "effective": {
+            "lower": 0,
+            "upper": 4
+          },
+          "final_ids": [
+            2
+          ]
+        },
+        {
+          "case": "dml-insert",
+          "dml_rows": 1,
+          "mutation_count": null,
+          "effective": {
+            "lower": 0,
+            "upper": 4
+          },
+          "final_ids": [
+            2,
+            3
+          ]
+        },
+        {
+          "case": "dml-delete",
+          "dml_rows": 1,
+          "mutation_count": null,
+          "effective": {
+            "lower": 0,
+            "upper": 3
+          },
+          "final_ids": [
+            3
+          ]
+        },
+        {
+          "case": "same-key",
+          "dml_rows": 1,
+          "mutation_count": null,
+          "effective": {
+            "lower": 0,
+            "upper": null
+          },
+          "final_ids": [
+            2
+          ]
+        },
+        {
+          "case": "parameter",
+          "dml_rows": 1,
+          "mutation_count": null,
+          "effective": {
+            "lower": 0,
+            "upper": null
+          },
+          "final_ids": [
+            2,
+            3
+          ]
+        },
+        {
+          "case": "partial-key",
+          "dml_rows": 1,
+          "mutation_count": null,
+          "effective": {
+            "lower": 0,
+            "upper": null
+          },
+          "final_ids": [
+            2,
+            3
+          ]
+        },
+        {
+          "case": "unique-key-reuse",
+          "dml_rows": 1,
+          "mutation_count": null,
+          "effective": {
+            "lower": 0,
+            "upper": 9
+          },
+          "final_ids": [
+            2,
+            3
+          ]
+        }
+      ]
+    }
+  ],
+  "cleanup": {
+    "owned_container_removal_verified": true,
+    "post_run_running_containers": [],
+    "reaper_note": "Immediate post-process enumeration contained two testcontainers reapers; subsequent verification was empty."
+  },
+  "retention": "Reproduction is the checked-in probe and fixtures. Full downloads and routine logs remain local task scratch."
+}

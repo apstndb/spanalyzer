@@ -42,6 +42,8 @@ observation date. Same-day rows without exact times have no claimed order.
 | 2026-11-12 JST; r4 LTS.2 arm64, separate fixture | First focused coverage | The report collector measures 31 explicit one-row Mutation/DML commits, retains conditional bounds and real CommitStats, and shares observed FK physical names with PLAN access paths. Generated/default insertion is 6 for Mutation and 4 for DML. No future price or managed quota-enforcement claim follows. | [Feedback implementation](../mutation-count-feedback-20261112.md) |
 | 2026-11-12 JST; LTS.2 / r5.1 arm64, separate FK fixtures | First focused coverage | FK physical metadata/names match each other and fresh managed observations. Sharing and name reuse hold in the bounded matrix. Nullable-PK count 3 versus NOT NULL 2; an ordered-key control costs 4 rather than 3. Three-cycle inverse PK inserts return Internal. Initial client-setup failures and schema-first seed failures remain distinct from successful parent-first controls; owned runtimes close. | [FK predictability and source boundaries](../fk-backing-index-predictability-20261112.md), [receipt](../evidence/fk-backing-index-20261112/receipt.json) |
 
+| 2026-11-12T12:32:22Z; r4 LTS.2 arm64 | First focused coverage | All 11 mixed DML/Mutation controls commit and return CommitStats. Eight proven disjoint-key cases fit the new component-upper sum; overlap and unresolved-key controls retain unknown uppers. This is model coverage, not an engine transition or managed measurement. | [Disjoint-key bounds](../mixed-disjoint-key-bounds-20261112.md), [compact observations](../evidence/mixed-disjoint-keys-20261112/observations.json) |
+
 ## Publication and source context
 
 - **September 5 consolidation:** the r2.1 report recovered August observations

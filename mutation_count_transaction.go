@@ -19,9 +19,11 @@ type MutationCountTransaction struct {
 // AnalyzeTransaction estimates one mixed DML and Mutation API transaction.
 // Each DML statement and the buffered commit retain separate quota boundaries;
 // the cumulative total is not compared to a single 80,000-mutation limit.
-// Same-table or transitively related writes keep an unknown combined interval
-// instead of assuming independent index or cascade effects. A matching whole-
-// transaction observation can refine the total, never its individual parts.
+// Provably disjoint complete primary keys on ordinary tables without FK or
+// interleave relationships retain the sum of component upper bounds, with a
+// zero combined lower bound. Other related writes keep an unknown combined
+// interval. A matching whole-transaction observation can refine the total,
+// never its individual parts. UPDATE/DELETE cardinality remains caller-supplied.
 func (a *MutationCountAnalyzer) AnalyzeTransaction(input MutationCountTransaction, options MutationCountOptions) (MutationCountReport, error) {
 	ops, err := a.dmlOperations(input.Statements)
 	if err != nil {
@@ -75,15 +77,25 @@ func analyzeMixedMutationCount(s *mutationCountSchemaModel, dml, buffered []muta
 		BufferedCommit: &MutationCountBufferedCommit{Count: commit.Count, Verdict: commit.LimitVerdict},
 		Reasons:        append(statements.Reasons, commit.Reasons...),
 	}
-	// The documented execution order is not an additivity guarantee. In
-	// particular DML can create the row later Ack'ed by the buffered commit.
-	// Do not reuse an initial old image or infer cross-stage coalescing. See
-	// knowledge/research/write-analysis/mixed-transactions-and-evidence-20261112.md.
-	if mutationStagesRelated(s, dml, buffered) {
-		a.Count = mutationUncertain(0, nil)
-		a.BufferedCommit.Count = mutationUncertain(0, nil)
-		a.BufferedCommit.Verdict = "indeterminate"
-		a.Reasons = append(a.Reasons, "mixed_stage_related_writes_not_calibrated")
+	// Execution order alone is not an additivity guarantee. Only a complete
+	// key proof on isolated ordinary tables permits a finite combined upper;
+	// it does not establish an exact total or cross-stage index coalescing.
+	// See knowledge/research/write-analysis/mixed-transactions-and-evidence-20261112.md.
+	related := mutationRelatedTables(s, dml)
+	for _, op := range buffered {
+		if !related[strings.ToLower(op.Table)] {
+			continue
+		}
+		if mutationStageKeysDisjoint(s, dml, buffered, related) {
+			a.Count.Lower = 0
+			a.Reasons = append(a.Reasons, "mixed_stage_disjoint_primary_keys_upper_bound")
+		} else {
+			a.Count = mutationUncertain(0, nil)
+			a.BufferedCommit.Count = mutationUncertain(0, nil)
+			a.BufferedCommit.Verdict = "indeterminate"
+			a.Reasons = append(a.Reasons, "mixed_stage_related_writes_not_calibrated")
+		}
+		break
 	}
 	verdicts := []string{statements.LimitVerdict, a.BufferedCommit.Verdict}
 	for _, v := range verdicts {
@@ -103,7 +115,7 @@ func analyzeMixedMutationCount(s *mutationCountSchemaModel, dml, buffered []muta
 	return a, nil
 }
 
-func mutationStagesRelated(s *mutationCountSchemaModel, dml, buffered []mutationCountOperation) bool {
+func mutationRelatedTables(s *mutationCountSchemaModel, dml []mutationCountOperation) map[string]bool {
 	// An undirected closure is deliberately conservative: shared ancestors or
 	// FK targets can connect indirect effects even when target names differ.
 	related := map[string]bool{}
@@ -127,10 +139,5 @@ func mutationStagesRelated(s *mutationCountSchemaModel, dml, buffered []mutation
 			changed = connect(fk.Table, fk.Referenced) || changed
 		}
 	}
-	for _, op := range buffered {
-		if related[strings.ToLower(op.Table)] {
-			return true
-		}
-	}
-	return false
+	return related
 }

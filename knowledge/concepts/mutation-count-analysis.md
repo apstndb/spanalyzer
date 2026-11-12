@@ -35,6 +35,9 @@ sources:
   - id: fk-predictability
     resource: ../research/runtime-verification/fk-backing-index-predictability-20261112.md
     title: FK backing-index source and runtime investigation
+  - id: disjoint-keys
+    resource: ../research/runtime-verification/mixed-disjoint-key-bounds-20261112.md
+    title: Disjoint primary-key upper bounds and local mixed-commit controls
 ---
 
 # Mutation-count analysis
@@ -90,7 +93,7 @@ It does not invent generated index names.
 | Index keys, STORING, NULL_FILTERED, FK backing indexes, automatic columns and cascades | [Local comparison](../research/runtime-verification/mutation-count-20261110.md) and [reference audit](../research/write-analysis/mutation-count-reference-audit-20261110.md); unresolved values or fanout preserve intervals/unknown upper bounds |
 | FK nullability, referenced-column order and generated physical names | [November 12 source/runtime investigation](../research/runtime-verification/fk-backing-index-predictability-20261112.md): nullable PKs and reordered composite keys retain an extra-index upper bound; observed shared physical indexes are counted once |
 | Queue Send/Ack, missing messages, payload/key variants, same-key composition, DML and limit probes | [Managed queue matrix](../research/runtime-verification/queue-mutation-count-managed-20261110.md), with the completed 43-attempt follow-up retained separately |
-| Mixed DML and buffered Mutation commits | [Mixed-transaction integration](../research/write-analysis/mixed-transactions-and-evidence-20261112.md) replays both retained managed observations; related stages remain uncertain and a whole-commit measurement refines only the total |
+| Mixed DML and buffered Mutation commits | [Initial integration](../research/write-analysis/mixed-transactions-and-evidence-20261112.md) replays both retained managed observations; the [disjoint-key follow-up](../research/runtime-verification/mixed-disjoint-key-bounds-20261112.md) retains component upper sums for provably disjoint keys on isolated ordinary tables. Other related stages remain uncertain; a whole-commit measurement refines only the total |
 | Queue RECEIVE and RENEWLEASE | The queue API and CLI classify these separately; the [managed note](../research/runtime-verification/queue-mutation-count-managed-20261110.md) explains why their query responses do not provide caller CommitStats |
 | Emulator | [Local controls](../research/runtime-verification/mutation-count-20261110.md) execute writes and inspect metadata; unavailable CommitStats do not provide numerical agreement or zero counts |
 | Latest feedback and command integration | [November 12 follow-up](../research/runtime-verification/mutation-count-feedback-20261112.md#latest-feedback-and-cli-revalidation): foundation-versus-main disposition, strict input correction, runnable workflow, fresh runtime and contract results |
