@@ -4,11 +4,12 @@ go 1.26.2
 
 require (
 	cloud.google.com/go v0.123.0
-	github.com/apstndb/spanalyzer v0.2.2-0.20261108152247-dfcf679fab54
+	github.com/apstndb/spanalyzer v0.2.2-0.20261112055308-0c08dadcc78d
 	github.com/apstndb/spanemuboost v0.4.10
 	github.com/cloudspannerecosystem/memefish v0.8.1
 	github.com/moby/moby/api v1.56.0
 	github.com/testcontainers/testcontainers-go v0.44.0
+	google.golang.org/api v0.287.1
 )
 
 require (
@@ -104,14 +105,13 @@ require (
 	golang.org/x/oauth2 v0.36.0 // indirect
 	golang.org/x/sync v0.23.0 // indirect
 	golang.org/x/time v0.15.0 // indirect
-	google.golang.org/api v0.287.1 // indirect
 	google.golang.org/genproto v0.0.0-20260319201613-d00831a3d3e7 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
 
 require (
 	cloud.google.com/go/spanner v1.95.1
-	github.com/apstndb/spanalyzer/plancontract v0.1.1-0.20261108075420-ec5bb1879b1b
+	github.com/apstndb/spanalyzer/plancontract v0.1.1-0.20261112055308-0c08dadcc78d
 	github.com/apstndb/spannerplan v0.3.2
 	github.com/goccy/go-yaml v1.19.2
 	github.com/samber/lo v1.53.0 // indirect

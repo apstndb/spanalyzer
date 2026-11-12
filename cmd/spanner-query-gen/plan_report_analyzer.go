@@ -21,7 +21,9 @@ type planReportAnalyzer interface {
 type planReportOpenAnalyzer func(context.Context, spanemuboost.RuntimeHandle, querygen.QueryCodegenSchema, string, *spanalyzer.ProtoDescriptorSet, planReportOptimizer) (planReportAnalyzer, error)
 
 type spannerPlanReportAnalyzer struct {
-	clients *spanemuboost.Clients
+	clients      *spanemuboost.Clients
+	catalog      *spanalyzer.Catalog
+	ownedFixture bool
 }
 
 func openPlanReportAnalyzer(ctx context.Context, runtime spanemuboost.RuntimeHandle, schema querygen.QueryCodegenSchema, baseDir string, descriptors *spanalyzer.ProtoDescriptorSet, optimizer planReportOptimizer, dropCreatedDatabases bool) (planReportAnalyzer, error) {
@@ -29,7 +31,17 @@ func openPlanReportAnalyzer(ctx context.Context, runtime spanemuboost.RuntimeHan
 	if err != nil {
 		return nil, err
 	}
-	return &spannerPlanReportAnalyzer{clients: clients}, nil
+	ddls, err := planReportDDLs(schema, baseDir)
+	if err != nil {
+		return nil, errors.Join(err, clients.Close())
+	}
+	catalog, err := spanalyzer.BuildSchemaCatalog(schema.Name, strings.Join(ddls, ";\n"))
+	if err != nil {
+		return nil, errors.Join(err, clients.Close())
+	}
+	// openPlanReportClients always requests a random, newly bootstrapped DB;
+	// the attached runtime's pre-existing database is never a write fixture.
+	return &spannerPlanReportAnalyzer{clients: clients, catalog: catalog, ownedFixture: true}, nil
 }
 
 func (a *spannerPlanReportAnalyzer) Close() error { return a.clients.Close() }

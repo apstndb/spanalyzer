@@ -1,0 +1,51 @@
+from pathlib import Path
+import json,gzip,re,hashlib,datetime,collections,shutil
+p=Path('.tmp/cross-engine-revalidation-20261112');out=Path('knowledge/research/runtime-verification/evidence/cross-engine-recheck-20261112');out.mkdir(parents=True,exist_ok=True)
+def clean(x):
+ if isinstance(x,str):return re.sub(r'requestID = "[^"]+"','requestID = "<redacted>"',x).replace(str(Path.cwd()),'<checkout>')
+ if isinstance(x,list):return [clean(v) for v in x]
+ if isinstance(x,dict):return {k:clean(v) for k,v in x.items()}
+ return x
+def save(name,obj): (out/name).write_text(json.dumps(clean(obj),indent=2,ensure_ascii=True)+'\n')
+def rows(name):return [json.loads(x) for x in (p/(name+'.jsonl')).read_text().splitlines()]
+plans={n:json.loads((p/(n+'-plan.json')).read_text()) for n in ['google','pg']}
+for n,d in plans.items():save(n+'-plan.json',d)
+runs=[('omni-lts','google','omni-lts'),('omni-r5','google','omni-r5'),('emulator-google','google','emulator-complete'),('emulator-pg','pg','emulator-pg-complete')]
+checks=[];runinfo=[]
+for dest,dialect,source in runs:
+ data=rows(source);expected={x['label'] for x in plans[dialect]['steps']};actual=[x for x in data if x['label'] in expected]
+ assert len(actual)==len(expected) and {x['label'] for x in actual}==expected,(dest,len(actual),len(expected))
+ assert not any(x.get('code') in ['DeadlineExceeded','Unavailable','Unknown','Internal','DataLoss'] for x in actual),dest
+ assert data[-1]['label']=='runtime-closed' and data[-1]['code']=='OK'
+ with (out/(dest+'.jsonl')).open('w') as f:
+  for r in data:f.write(json.dumps(clean(r),ensure_ascii=True)+'\n')
+ started=data[0]
+ runinfo.append({'name':dest,'dialect':dialect,'planned_steps':len(expected),'recorded_steps':len(actual),'codes':dict(collections.Counter(x['code'] for x in actual)),'started_at':data[0]['at'],'completed_at':data[-1]['at'],'image':started['image'],'provenance':started['provenance'],'runtime_closed':'OK','source':dest+'.jsonl'})
+ checks += [{'name':dest+'/all-planned-recorded','pass':True},{'name':dest+'/no-inconclusive-transport','pass':True},{'name':dest+'/runtime-closed','pass':True}]
+# Compare portable readonly inputs to the exact retained managed originals.
+managed=Path('knowledge/research/runtime-verification/evidence/managed-recheck-20261112')
+baseline={}
+for n in ['readonly','supplemental','statistics','statistics-controls','histogram-controls','observed-histogram','scalar-correction','new-readonly','distribution-frames','distribution-null-controls']:
+ for r in [json.loads(x) for x in (managed/(n+'.jsonl')).read_text().splitlines()]:baseline['readonly/'+n+'/'+r['label']]=r
+matrix=[]
+by={name:{x['label']:x for x in rows(source)} for name,_,source in runs}
+for s in plans['google']['steps']:
+ entry={'label':s['label'],'family':s.get('family'),'sql':s.get('sql'),'kind':s['kind'],'codes':{n:d[s['label']]['code'] for n,d in by.items() if n!='emulator-pg'}}
+ if s['label'] in baseline:entry['codes']['managed']=baseline[s['label']]['code'];entry['managed_source']='../managed-recheck-20261112/'+s['label'].split('/')[1]+'.jsonl'
+ matrix.append(entry)
+save('comparison-matrix.json',matrix)
+# Retain raw source responses, never generated search answers.
+for n in ['emulator-releases.json','omni-documents.json','omni-release-notes.json','omni-registry-tags.json','emulator-registry-tags.json','runtime-documents.json']:
+ d=json.loads((p/n).read_text());raw=json.dumps(d,ensure_ascii=True,indent=2).encode()+b'\n'
+ (out/(n+'.gz')).write_bytes(gzip.compress(raw,mtime=0))
+for dest,source in [('probe.go.txt','probe.go'),('probe-emulator-fixed.go.txt','probe-emulator-fixed.go'),('prepare-probe.py.txt','prepare-probe.py'),('run-probes.py.txt','run-probes.py')]:shutil.copy2(p/source,out/dest)
+# The initial empty-instance failure and the later same-instance collision are
+# setup failures, not evidence of PostgreSQL dialect rejection.
+save('initial-emulator-bootstrap.json',rows('emulator'))
+for n in ['omni-lts','omni-r5','emulator','emulator-fixed','emulator-fixed-retry','emulator-complete','emulator-pg-complete']:
+ f=p/(n+'.stderr')
+ if f.exists():(out/(n+'.stderr.gz')).write_bytes(gzip.compress(clean(f.read_text()).encode(),mtime=0))
+save('assertions.json',{'checks':len(checks),'status':'pass','assertions':checks,'boundary':'Completeness, transport and owned-runtime closure only. Expected rejections and dependency-blocked cases retain their status; this is not a universal SQL success claim.'})
+save('receipt.json',{'base_commit':'eaf2694b9e68281d087d8bee339d0c0acf76cb68','date_jst':'2026-11-12','go':'1.26.11','sdk':'1.95.1','spanemuboost':'0.4.10','platform':'linux/arm64','managed_baseline':'../managed-recheck-20261112/receipt.json','runs':runinfo,'planned_semantic_steps':1165,'recorded_semantic_steps':1165,'managed_new_measurements':False,'harness_corrections':['Portable GoogleSQL uses qualified predicates, typed FLOAT32 literals, named-schema UDF prerequisites and an already-present annotated index, matching the managed correction context.','First Emulator runtime lacked instance auto-creation; it ran zero semantic cases. Enabling instance setup completed GoogleSQL; its attempted PostgreSQL setup then returned AlreadyExists for the shared instance. PostgreSQL completed in a separately owned fresh runtime.','Two failed Docker-provider starts are retained separately: rootless socket discovery, then a host-versus-VM reaper socket mismatch. The corrected Colima socket environment was scoped to the process.'],'source_scope':'Release notes, complete public registry tag responses and official download/limitations documents. Release announcement dates, image tags and engine observations are separate.'})
+assert sum(x['recorded_steps'] for x in runinfo)==1165
+print('Retained',len(list(out.iterdir())),'files; 1165 semantic steps across four runs, plus explicit setup failures.')

@@ -40,6 +40,10 @@ func planAccessPathJSONSchema() map[string]interface{} {
 	for _, key := range keys {
 		required = append(required, key)
 	}
+	properties["catalog_index_name"] = stringSchema("Resolved physical index name; scan_target retains the backend spelling.")
+	properties["index_origin"] = enumSchema([]interface{}{"ddl", "observed_snapshot"}, "Source of regular-index catalog facts.")
+	properties["managed"] = boolSchema("Whether the observed regular index is managed by the backend.")
+	properties["inferred_constraint_selectors"] = stringListSchema("Unique managed-index prefix associations, explicitly inferred rather than observed constraint bindings.")
 	return objectSchema(required, properties)
 }
 

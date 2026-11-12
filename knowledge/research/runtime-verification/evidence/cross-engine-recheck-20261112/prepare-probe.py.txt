@@ -1,0 +1,77 @@
+from pathlib import Path
+import json,copy
+p=Path('.tmp/cross-engine-revalidation-20261112');src=Path('knowledge/research/runtime-verification/evidence/managed-recheck-20261112')
+g=json.loads((src/'google-cases.json').read_text());complete=json.loads((src/'google-completion-cases.json').read_text())['steps'];by={s['label']:s for s in complete}
+for s in g['steps']:
+ if s['label']=='pv-filter-view':s['sql']="CREATE VIEW PVFilter SQL SECURITY DEFINER AS SELECT r.Id,r.Tenant,r.Payload FROM PVRows AS r WHERE r.Tenant=SECURE_CONTEXT('tenant')"
+ if s['label']=='pv-json-view':s['sql']="CREATE VIEW PVJson SQL SECURITY DEFINER AS SELECT r.Id,r.Tenant,r.Payload FROM PVRows AS r WHERE r.Tenant=JSON_VALUE(PARSE_JSON(SECURE_CONTEXT('auth')),'$.tenant')"
+ if s['label'].startswith('vector-') and s['label'] in by and s['kind'] in ['query','dml']:s.update(copy.deepcopy(by[s['label']]))
+ if s['label']=='pv-udf-negative':s.update(copy.deepcopy(by['pv-udf-negative']))
+ if s['label'].startswith('pv-invoker-') and s['label'] in by:s.update(copy.deepcopy(by[s['label']]))
+idx=next(x for x in g['steps'] if x['label']=='vector-index-annotated');g['steps'].remove(idx)
+n=next(i for i,x in enumerate(g['steps']) if x['label']=='vector-unannotated');g['steps'].insert(n+1,idx)
+n=next(i for i,x in enumerate(g['steps']) if x['label']=='pv-udf-negative');g['steps'][n:n]=[by['pv-udf-schema-control'],by['pv-udf-positive-control']]
+for label in ['pv-invoker-negative','pv-invoker-grant','pv-invoker-role-query']:
+ if label not in {s['label'] for s in g['steps']}:g['steps'].append(by[label])
+udf=json.loads((src/'google-udf-check-cases.json').read_text())['steps'];own={s['label'] for s in udf}
+for s in udf:
+ s['requires']=['udf-execution/'+n if n in own else n for n in s.get('requires',[])];s['label']='udf-execution/'+s['label']
+g['steps']+=udf
+readonly=[]
+for name in ['readonly','supplemental','statistics','statistics-controls','histogram-controls','observed-histogram','scalar-correction','new-readonly','distribution-frames','distribution-null-controls']:
+ for row in json.loads((src/(name+'-cases.json')).read_text()):
+  row['label']='readonly/'+name+'/'+row['label'];row['kind']='query';row['family']='managed-readonly-comparison';readonly.append(row)
+assert len(readonly)==184
+fk=[{'label':'fk-schema','kind':'ddl','statements':['CREATE TABLE Owners(Id INT64 NOT NULL) PRIMARY KEY(Id)','CREATE TABLE Events(Shard INT64 NOT NULL,Id INT64 NOT NULL,Owner INT64,Active BOOL,Note STRING(MAX),CONSTRAINT EventsOwner FOREIGN KEY(Owner) REFERENCES Owners(Id)) PRIMARY KEY(Shard,Id)']}, {'label':'fk-index-observation','kind':'query','requires':['fk-schema'],'sql':"SELECT i.TABLE_NAME,i.INDEX_NAME,i.INDEX_TYPE,i.IS_UNIQUE,i.IS_NULL_FILTERED,i.INDEX_STATE,i.SPANNER_IS_MANAGED,c.COLUMN_NAME,c.ORDINAL_POSITION,c.COLUMN_ORDERING FROM INFORMATION_SCHEMA.INDEXES AS i JOIN INFORMATION_SCHEMA.INDEX_COLUMNS AS c USING(TABLE_CATALOG,TABLE_SCHEMA,TABLE_NAME,INDEX_NAME) WHERE i.TABLE_NAME IN ('Owners','Events') ORDER BY i.TABLE_NAME,i.INDEX_NAME,c.ORDINAL_POSITION,c.COLUMN_NAME"},{'label':'fk-insert-parent','kind':'dml','requires':['fk-schema'],'statements':['INSERT INTO Owners(Id) VALUES(1)']},{'label':'fk-insert-event','kind':'dml','requires':['fk-insert-parent'],'statements':["INSERT INTO Events(Shard,Id,Owner,Active,Note) VALUES(1,1,1,TRUE,'old')"]},{'label':'fk-seek-plan','kind':'plan','requires':['fk-insert-event'],'sql':'SELECT Shard,Id FROM Events WHERE Owner=1'},{'label':'fk-constraint-hint-plan','kind':'plan','requires':['fk-insert-event'],'sql':'SELECT Shard,Id FROM Events@{FORCE_INDEX=EventsOwner} WHERE Owner=1'}]
+g['steps']=readonly+g['steps']+fk
+for name,data in [('google-plan.json',g),('pg-plan.json',json.loads((src/'pg-cases.json').read_text()))]:
+ if name=='pg-plan.json':
+  extra=json.loads((src/'pg-final-cases.json').read_text())['steps'];names={s['label'] for s in extra}
+  for s in extra:
+   s['requires']=['pg-final/'+n if n in names else n for n in s.get('requires',[])];s['label']='pg-final/'+s['label']
+  data['steps']+=extra
+ labels=[x['label'] for x in data['steps']];assert len(labels)==len(set(labels)),[n for n in labels if labels.count(n)>1]
+ (p/name).write_text(json.dumps(data,indent=2)+'\n');print(name,len(labels))
+old=(src/'producer/managed.go.txt').read_text()
+imports=old[old.index('import ('):old.index('type step')]
+imports=imports.replace('"fmt"','')
+imports=imports.replace('database "cloud.google.com/go/spanner/admin/database/apiv1"','').replace('dbpb "cloud.google.com/go/spanner/admin/database/apiv1/databasepb"','dbpb "cloud.google.com/go/spanner/admin/database/apiv1/databasepb"\n"github.com/apstndb/spanemuboost"')
+types=old[old.index('type step'):old.index('func main()')].replace('row["backend"] = "managed"','row["backend"] = backendName')
+loop=old[old.index('\tcodes := map[string]string{}'):]
+loop=loop.replace('spanner.ClientConfig{DatabaseRole: s.DatabaseRole})','spanner.ClientConfig{DatabaseRole: s.DatabaseRole}, runtime.ClientOptions()...)')
+header='package main\n'+imports+'var backendName string\n'+types+r'''
+func main() {
+ if len(os.Args)<4 { panic("usage: probe backend pinned-image plan.json...") }
+ backendName=os.Args[1]
+ backend:=spanemuboost.Backend(backendName)
+ if backend!=spanemuboost.BackendOmni && backend!=spanemuboost.BackendEmulator { panic("owned local container backend required") }
+ if !strings.Contains(os.Args[2],"@sha256:") { panic("pinned image required") }
+ ctx:=context.Background()
+ runtime,err:=spanemuboost.Run(ctx,backend,spanemuboost.WithContainerImage(os.Args[2]),spanemuboost.DisableAutoConfig())
+ if err!=nil { panic(err) }
+ closed:=false
+ defer func(){ if !closed { _=runtime.Close() } }()
+ provenance,err:=spanemuboost.RuntimeImageProvenance(ctx,runtime)
+ if err!=nil { panic(err) }
+ emit(map[string]any{"label":"runtime-started","image":os.Args[2],"provenance":provenance})
+ for _,path:=range os.Args[3:] { runPlan(ctx,runtime,path) }
+ err=runtime.Close();closed=true
+ outcome("runtime-closed",err)
+ if err!=nil { panic(err) }
+}
+func runPlan(ctx context.Context,runtime spanemuboost.Runtime,path string) {
+ bytes,err:=os.ReadFile(path);if err!=nil { panic(err) }
+ var plan input;if err=json.Unmarshal(bytes,&plan);err!=nil { panic(err) }
+ dialect:=dbpb.DatabaseDialect_GOOGLE_STANDARD_SQL
+ if plan.Dialect=="pg" { dialect=dbpb.DatabaseDialect_POSTGRESQL }
+ clients,err:=spanemuboost.OpenClients(ctx,runtime,spanemuboost.WithRandomDatabaseID(),spanemuboost.WithDatabaseDialect(dialect),spanemuboost.SkipSchemaTeardown())
+ if err!=nil { emit(map[string]any{"label":"fixture-open","dialect":plan.Dialect,"code":status.Code(err).String(),"error":err.Error()});return }
+ defer func(){ outcome("fixture-client-closed",clients.Close()) }()
+ admin,client,db,name:=clients.DatabaseClient,clients.Client,clients.DatabasePath(),clients.DatabaseID
+ emit(map[string]any{"label":"fixture-open","dialect":plan.Dialect,"code":"OK","database":name,"plan_file":path})
+ roleClients:=map[string]*spanner.Client{}
+ defer func(){for _,c:=range roleClients { c.Close() }}()
+ quotedDB:="`"+name+"`"
+ if plan.Dialect=="pg" { quotedDB="\""+name+"\"" }
+'''
+(p/'probe.go').write_text(header+loop)

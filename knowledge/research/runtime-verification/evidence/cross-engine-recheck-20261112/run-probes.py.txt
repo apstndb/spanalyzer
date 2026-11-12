@@ -1,0 +1,16 @@
+import json,pathlib,subprocess,datetime,hashlib
+p=pathlib.Path('.tmp/cross-engine-revalidation-20261112').resolve()
+r=json.loads(pathlib.Path('runtime_targets.json').read_text());by={x['kind']:x for x in r['targets']}
+receipts=[]
+for name,kind,tag in [('omni-lts','omni',by['omni']['tag']),('omni-r5','omni',by['omni']['alternatives'][0]['tag']),('emulator','emulator',by['emulator']['tag'])]:
+ target=by[kind] if by[kind]['tag']==tag else by[kind]['alternatives'][0]
+ digest=next(x['digest'] for x in target['platforms'] if x['platform']=='linux/arm64')
+ image=by[kind]['image_family']+':'+tag+'@'+digest
+ plans=[p/'google-plan.json']+([p/'pg-plan.json'] if kind=='emulator' else [])
+ start=datetime.datetime.now(datetime.timezone.utc).isoformat()
+ with (p/(name+'.jsonl')).open('wb') as out,(p/(name+'.stderr')).open('wb') as err:
+  result=subprocess.run([str(p/'probe'),kind,image,*map(str,plans)],stdout=out,stderr=err)
+ rec={'name':name,'backend':kind,'tag':tag,'image':image,'platform':'linux/arm64','started_at':start,'completed_at':datetime.datetime.now(datetime.timezone.utc).isoformat(),'process_exit_code':result.returncode,'plan_sha256':{x.name:hashlib.sha256(x.read_bytes()).hexdigest() for x in plans},'producer_sha256':hashlib.sha256((p/'probe.go').read_bytes()).hexdigest()}
+ receipts.append(rec);(p/'probe-receipts.json').write_text(json.dumps(receipts,indent=2)+'\n')
+ print(json.dumps(rec),flush=True)
+ if result.returncode!=0:raise SystemExit(result.returncode)

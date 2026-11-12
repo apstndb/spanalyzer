@@ -85,8 +85,9 @@ summary status is `fail`.
 - `query/ScanSingerIDsFast`: a regular configured query target.
 - `query/ExternalQuerySingerIDs#inner`: the Spanner inner SQL of a configured
   `kind: external_query` target.
-- `write/RemoveSinger`: the SQL DML helper of a configured write. Mutation-only
-  writes are skipped because they have no SQL PLAN.
+- `write/RemoveSinger`: a configured write. Its DML helper can have a SQL PLAN.
+  Mutation-only writes retain skipped PLAN status and independently expose
+  conditional mutation-count analysis.
 - `query/ListSingers/variant/<label>`: a noncanonical optional SQL shape. The
   suffix is the unpadded base64url encoding of the reported variant label. Copy
   the reported ID rather than deriving it from enumeration order.
@@ -102,9 +103,11 @@ the canonical ID does not automatically cover every other shape.
 
 DML queries use `result.cardinality: row_count` or `row_set`; only row_count
 can omit `result.struct`. `row_set` describes DML THEN RETURN output. Both use
-read-write `AnalyzeQuery` in PLAN mode and explicitly roll back. Reporting never
-executes their mutations. The operator family `row_count` is a separate backend
-operator concept, not the config's DML result mode.
+read-write `AnalyzeQuery` in PLAN mode and explicitly roll back. This collection
+path does not execute mutations. The separate, explicit `--measure-mutation-counts`
+path commits supplied one-row scenarios in command-created fixture databases;
+its result is a CommitStats observation, not PLAN or PROFILE data. The operator
+family `row_count` is separate from the config's DML result mode.
 
 Contract names must be unique within one contract file. Runtime validation
 rejects duplicate names because report consumers may use
@@ -893,10 +896,15 @@ an absence claim about residual conditions.
 
 Each path includes scan/filter indexes, the case-preserving `scan_target`,
 `scan_type`, `scan_target_kind`, `base_table`, and `full_scan`. The catalog adds
-declared `key_columns`, `declared_key_count`, stored columns and null-filtered
-index facts for tables and regular secondary indexes. Missing schema facts are
-empty or null; they are not inferred from a synthetic target name. Index key
-counts exclude implicit base-table primary-key suffixes.
+`key_columns`, `declared_key_count`, stored columns and null-filtered facts for
+tables and regular secondary indexes. The legacy key-count field also accepts
+observed regular-index keys. Supplemental fields `catalog_index_name`,
+`index_origin`, `managed` and `inferred_constraint_selectors` distinguish physical
+metadata from DDL declarations and inferred FK associations. The same reconciled
+index catalog feeds mutation accounting. Generated index names come from metadata;
+constraint selectors require a unique managed-key prefix and retain their inferred
+status. Ambiguous target aliases keep unknown facts. Missing facts are empty or
+null. Counts exclude implicit base-table primary-key suffixes.
 
 `has_seek_condition`, `has_residual_condition`, `has_timestamp_condition` and
 `has_search_condition` come from typed child links. Their corresponding
@@ -954,7 +962,7 @@ separate Filter operator. A whole-query `no_full_scan` contract is unsuitable
 when a different, intentionally small table is fully scanned.
 
 The access-path compatibility marker is
-`normalization.access_paths_version: v1alpha.1`. Operator and child-edge
+`normalization.access_paths_version: v1alpha.2`. Operator and child-edge
 `expression` fields also preserve the backend short descriptions. Expressions
 participate in `operator_tree_sha256`, whose input revision is now `v1alpha.4`.
 ANN root/leaf components retain their backend scan kinds; logical ANN coalescing
@@ -976,11 +984,14 @@ that batch, so dependent targets do not repeatedly create databases. Error and
 skipped targets have no successful normalization payload. Malformed config or
 contracts and invalid global runtime selection still fail before collection.
 
-Generation and `explain-plan` keep their strict whole-config validation.
-`plan-report` uses the same resolver per target with the required catalog
+Generation remains strict. `explain-plan` retains partial inspection results,
+and `plan-report` uses the same resolver per target with the required catalog
 dependency closure, so an unrelated missing DDL file cannot discard a valid
 query. Reporting errors does not make a target satisfy its contracts: `--check`
-continues to fail for an unavailable contracted target.
+continues to fail for an unavailable contracted PLAN target. A CEL expression
+using only `mutation_counts` can evaluate the independently available conditional
+accounting of a skipped Mutation-only target; mixing operator inputs into that
+expression keeps the missing-PLAN failure.
 
 ## CEL Inputs
 
@@ -996,11 +1007,30 @@ Current CEL variables:
 - `operators`
 - `operator_edges`
 - `access_paths`
+- `mutation_counts`
 - `operator_families`
 - `operator_family_counts`
 - `optimizer`
 - `raw_plan`
 - `raw_nodes`
+
+Evaluator revision `v3` adds `mutation_counts`, keyed by `mutation` and `dml`.
+Each entry exposes `effective.lower`, nullable `effective.upper`,
+`effective.overflow`, `effective_basis` and `disagreements`. Integer bounds retain
+INT64 precision. Unknown upper bounds are null; an observed zero is a distinct
+point. For example, a bounded conditional check is:
+
+```cel
+mutation_counts.mutation.effective.upper != null &&
+mutation_counts.mutation.effective.upper <= 80000 &&
+mutation_counts.mutation.disagreements.size() == 0
+```
+
+This checks the described successful scenario and supplied facts. It does not
+prove future affected-row counts, commit-byte limits, or server quota enforcement.
+A same-execution observation narrows only that execution. Failed or unavailable
+measurements cannot become zero, and out-of-interval observations remain visible
+without replacing the model. The report's SQL PLAN status remains independent.
 
 `raw_plan` is the in-memory `spannerpb.QueryPlan` supplied to the evaluator;
 `raw_nodes` is `raw_plan.plan_nodes`. These are evaluator inputs, not

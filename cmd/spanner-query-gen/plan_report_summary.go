@@ -1,6 +1,9 @@
 package main
 
-import "github.com/apstndb/spanalyzer/plancontract"
+import (
+	spanalyzer "github.com/apstndb/spanalyzer"
+	"github.com/apstndb/spanalyzer/plancontract"
+)
 
 const planReportSummaryVersionV1Alpha = "v1alpha-plan-summary-v1"
 
@@ -34,22 +37,24 @@ type planReportSummarySource struct {
 }
 
 type planReportSummaryQuery struct {
-	TargetID              string                    `json:"target_id"`
-	Name                  string                    `json:"name"`
-	Catalog               string                    `json:"catalog"`
-	Scope                 string                    `json:"scope,omitempty"`
-	Kind                  string                    `json:"kind"`
-	Status                string                    `json:"status"`
-	SQLSHA256             string                    `json:"sql_sha256,omitempty"`
-	DDLSHA256             string                    `json:"ddl_sha256,omitempty"`
-	ProtoDescriptorSHA256 string                    `json:"proto_descriptor_sha256,omitempty"`
-	OperatorTreeSHA256    string                    `json:"operator_tree_sha256,omitempty"`
-	AccessPaths           interface{}               `json:"access_paths,omitempty"`
-	Variant               *planReportSummaryVariant `json:"variant,omitempty"`
-	Error                 string                    `json:"error,omitempty"`
-	OptimizerNotPinned    bool                      `json:"optimizer_not_pinned,omitempty"`
-	PlanEnvironmentNotes  []string                  `json:"plan_environment_notes,omitempty"`
-	ClassificationNotes   []planReportDiagnostic    `json:"classification_warnings,omitempty"`
+	MutationCounts        map[string]spanalyzer.MutationCountReport `json:"mutation_counts,omitempty"`
+	MutationCountError    string                                    `json:"mutation_count_error,omitempty"`
+	TargetID              string                                    `json:"target_id"`
+	Name                  string                                    `json:"name"`
+	Catalog               string                                    `json:"catalog"`
+	Scope                 string                                    `json:"scope,omitempty"`
+	Kind                  string                                    `json:"kind"`
+	Status                string                                    `json:"status"`
+	SQLSHA256             string                                    `json:"sql_sha256,omitempty"`
+	DDLSHA256             string                                    `json:"ddl_sha256,omitempty"`
+	ProtoDescriptorSHA256 string                                    `json:"proto_descriptor_sha256,omitempty"`
+	OperatorTreeSHA256    string                                    `json:"operator_tree_sha256,omitempty"`
+	AccessPaths           interface{}                               `json:"access_paths,omitempty"`
+	Variant               *planReportSummaryVariant                 `json:"variant,omitempty"`
+	Error                 string                                    `json:"error,omitempty"`
+	OptimizerNotPinned    bool                                      `json:"optimizer_not_pinned,omitempty"`
+	PlanEnvironmentNotes  []string                                  `json:"plan_environment_notes,omitempty"`
+	ClassificationNotes   []planReportDiagnostic                    `json:"classification_warnings,omitempty"`
 }
 
 type planReportSummaryVariant struct {
@@ -81,6 +86,8 @@ func summarizePlanReport(report planReport) planReportSummary {
 	}
 	for _, query := range report.Queries {
 		q := planReportSummaryQuery{
+			MutationCounts:        query.MutationCounts,
+			MutationCountError:    query.MutationCountError,
 			TargetID:              query.TargetID,
 			Name:                  query.Name,
 			Catalog:               query.Catalog,

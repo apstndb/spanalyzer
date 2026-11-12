@@ -68,6 +68,10 @@ Spanner Go SDK v1.95.1. Connection and request identifiers are redacted.
 The service does not expose a backend build identity through these probes:
 timestamps identify this observation, not a product version or rollout date.
 
+The subsequent [Omni and Emulator comparison](cross-engine-managed-recheck-20261112.md)
+reuses these managed observations and runs matched local controls. It creates
+no new managed resource and does not change this investigation's event times.
+
 ## Release notes and complete mirror comparison
 
 Both the current official HTML and the full Developer Knowledge document list

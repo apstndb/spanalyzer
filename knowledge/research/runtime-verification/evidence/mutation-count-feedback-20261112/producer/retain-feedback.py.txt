@@ -1,0 +1,75 @@
+from pathlib import Path
+import argparse
+import gzip
+import hashlib
+import json
+import re
+import shutil
+
+parser = argparse.ArgumentParser()
+parser.add_argument('--feedback-source', type=Path, required=True)
+args = parser.parse_args()
+
+root = Path.cwd()
+scratch = root / '.tmp/cross-engine-revalidation-20261112'
+out = root / 'knowledge/research/runtime-verification/evidence/mutation-count-feedback-20261112'
+out.mkdir(parents=True, exist_ok=True)
+
+def clean(value):
+    if isinstance(value, str):
+        return re.sub(r'requestID = "[^"]+"', 'requestID = "<redacted>"', value).replace(str(root), '<checkout>')
+    if isinstance(value, list):
+        return [clean(v) for v in value]
+    if isinstance(value, dict):
+        return {k: clean(v) for k, v in value.items()}
+    return value
+
+def write(name, value):
+    (out / name).write_text(json.dumps(clean(value), indent=2) + '\n')
+
+def marked(log, marker):
+    return json.loads(next(line.split(marker, 1)[1] for line in log.splitlines() if marker in line))
+
+log = (scratch / 'feedback-omni-lts-retained.log').read_text()
+report = marked(log, 'mutation_feedback_report=')
+provenance = marked(log, 'mutation_feedback_provenance=')
+first = marked((scratch / 'feedback-omni-lts.log').read_text(), 'mutation_feedback_report=')
+write('report.json', report)
+write('first-attempt-report.json', first)
+write('image-provenance.json', provenance)
+counts = []
+for query in report['queries']:
+    for method, value in query.get('mutation_counts', {}).items():
+        observation = value['observation']
+        measured = observation['mutation_count']
+        assert observation['successful'] and observation['stats_present']
+        assert measured is not None and not value.get('disagreements')
+        interval = (value.get('old_rows') or value['bounds'])['total_under_model']
+        assert interval['lower'] <= measured and (interval['upper'] is None or measured <= interval['upper'])
+        counts.append({'write': query['name'], 'method': method, 'schema_sha256': value['schema_sha256'], 'input_sha256': value['input_sha256'], 'bounds': value['bounds']['total_under_model'], 'old_rows': value.get('old_rows', {}).get('total_under_model'), 'observed': measured, 'effective': value['effective'], 'effective_basis': value['effective_basis'], 'observed_at': observation['observed_at']})
+assert len(counts) == 31
+write('counts.json', counts)
+failed = [(q['name'], method) for q in first['queries'] for method, count in q.get('mutation_counts', {}).items() if not count.get('observation', {}).get('successful')]
+assert failed == [('DeleteEvent', 'mutation')], failed
+paths = next(q for q in report['queries'] if q['name'] == 'ForeignSeek')['access_paths']
+fk = next(p for p in paths if 'EventOwner:referencing' in p.get('inferred_constraint_selectors', []))
+assert fk['base_table'] == 'ForeignEvents' and fk['declared_key_count'] == 1 and fk['managed']
+for query in report['queries']:
+    if query['name'] != 'InsertForeign':
+        continue
+    for value in query['mutation_counts'].values():
+        assert any(i['name'] == fk['catalog_index_name'] and 'EventOwner:referencing' in i.get('inferred_constraint_selectors', []) for i in value['indexes'])
+
+for source in ['feedback-omni-lts.log', 'feedback-omni-lts-final.log', 'feedback-omni-lts-retained.log', 'omni-integration-final.log']:
+    (out / (source + '.gz')).write_bytes(gzip.compress(clean((scratch / source).read_text()).encode(), mtime=0))
+producer = out / 'producer'
+producer.mkdir(exist_ok=True)
+source_files = ['cmd/spanner-query-gen/mutation_count_feedback_omni_test.go', 'cmd/spanner-query-gen/plan_report_mutation_measurement.go', 'cmd/spanner-query-gen/plan_report_indexes.go', 'cmd/spanner-query-gen/mutation_count_inputs.go', 'internal/querygen/mutation_count_inputs.go', 'mutation_count.go', 'plancontract/mutation_counts.go']
+source_hashes = {}
+for name in source_files:
+    data = (root / name).read_bytes()
+    source_hashes[name] = hashlib.sha256(data).hexdigest()
+    (producer / (name.replace('/', '__') + '.txt')).write_bytes(data)
+shutil.copyfile(Path(__file__), producer / 'retain-feedback.py.txt')
+write('receipt.json', {'base_commit': 'eaf2694b9e68281d087d8bee339d0c0acf76cb68', 'source_state': 'uncommitted local implementation; source hashes identify the retained producer files', 'date_jst': '2026-11-12', 'target_commits': 31, 'successful_statistics': 31, 'within_conditional_interval': 31, 'seed_commits_included': False, 'runtime': 'Omni 2026.r4-lts.2', 'image_provenance': provenance, 'sdk': '1.95.1', 'spanemuboost': '0.4.10', 'go': '1.26.11', 'feedback_base_commit': '8ba3f9539ed2cecc7820f92dde77bcaeb6c6a4e8', 'feedback_source_sha256': hashlib.sha256(args.feedback_source.read_bytes()).hexdigest(), 'producer_sha256': source_hashes, 'first_attempt_correction': {'failed_target': 'DeleteEvent/mutation', 'reason': 'GenericColumnValue is unsupported inside an SDK delete Key; native scalar decoding fixes the collector', 'failed_statistic': None}, 'provenance_boundary': 'The report adapter was called without manual backend identity flags and retains not_recorded in observation runtime labels. The separate same-run provenance record and pinned command identify the actual owned container; no unverified report field is promoted to an observation.', 'foreign_key_mapping': {'catalog_index_name': fk['catalog_index_name'], 'base_table': fk['base_table'], 'declared_key_count': fk['declared_key_count'], 'inferred_constraint_selectors': fk['inferred_constraint_selectors']}, 'managed_resources_created': 0, 'measurement_fixture_lifecycle': 'command-created random database inside an owned local container; runtime cleanup PASS in retained test log', 'publication': 'not authorized in this task; standalone CLI dependency closure requires foundation publication before pinning the consumer'})
+print('Retained 31 matching measurements, shared FK identity, provenance and the earlier failed delete separately.')

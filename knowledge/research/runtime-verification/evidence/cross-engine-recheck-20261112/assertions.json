@@ -1,0 +1,55 @@
+{
+  "checks": 12,
+  "status": "pass",
+  "assertions": [
+    {
+      "name": "omni-lts/all-planned-recorded",
+      "pass": true
+    },
+    {
+      "name": "omni-lts/no-inconclusive-transport",
+      "pass": true
+    },
+    {
+      "name": "omni-lts/runtime-closed",
+      "pass": true
+    },
+    {
+      "name": "omni-r5/all-planned-recorded",
+      "pass": true
+    },
+    {
+      "name": "omni-r5/no-inconclusive-transport",
+      "pass": true
+    },
+    {
+      "name": "omni-r5/runtime-closed",
+      "pass": true
+    },
+    {
+      "name": "emulator-google/all-planned-recorded",
+      "pass": true
+    },
+    {
+      "name": "emulator-google/no-inconclusive-transport",
+      "pass": true
+    },
+    {
+      "name": "emulator-google/runtime-closed",
+      "pass": true
+    },
+    {
+      "name": "emulator-pg/all-planned-recorded",
+      "pass": true
+    },
+    {
+      "name": "emulator-pg/no-inconclusive-transport",
+      "pass": true
+    },
+    {
+      "name": "emulator-pg/runtime-closed",
+      "pass": true
+    }
+  ],
+  "boundary": "Completeness, transport and owned-runtime closure only. Expected rejections and dependency-blocked cases retain their status; this is not a universal SQL success claim."
+}

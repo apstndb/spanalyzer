@@ -53,6 +53,9 @@ func runPlanReport(args []string, stdout, stderr io.Writer) error {
 	requireOptimizerPinning := fs.Bool("require-optimizer-pinning", false, "fail when optimizer version or statistics package is not pinned")
 	contractsPath := fs.String("contracts", "", "experimental plan contracts YAML file")
 	checkContracts := fs.Bool("check", false, "evaluate --contracts and fail when a contract is violated")
+	mutationFacts := fs.String("mutation-facts-file", "", "JSON one-row scenarios keyed by write name and API")
+	mutationIndexes := fs.String("mutation-indexes-file", "", "JSON complete regular-index snapshots keyed by catalog")
+	measureMutationCounts := fs.Bool("measure-mutation-counts", false, "commit explicit one-row scenarios only in command-created fixture databases and check CommitStats against intervals")
 	if err := fs.Parse(args); err != nil {
 		if errors.Is(err, flag.ErrHelp) {
 			return nil
@@ -108,17 +111,37 @@ func runPlanReport(args []string, stdout, stderr io.Writer) error {
 	}
 
 	plan := querygen.BuildQueryCodegenReportPlan(config, baseDir)
+	mutationInputs, mutationInputDigests, err := readQuerygenMutationInputs(baseDir, *mutationFacts, *mutationIndexes)
+	if err != nil {
+		return err
+	}
+	if *measureMutationCounts {
+		if len(mutationInputs.Writes) == 0 {
+			return fmt.Errorf("--measure-mutation-counts requires explicit scenarios in --mutation-facts-file")
+		}
+		for name, methods := range mutationInputs.Writes {
+			if len(methods) == 0 {
+				return fmt.Errorf("write %s has no measurement scenarios", name)
+			}
+		}
+	}
+	if err := querygen.RefinePlanMutationCounts(plan, config, baseDir, mutationInputs); err != nil {
+		return err
+	}
+
 	report, err := buildPlanReport(context.Background(), config, plan, baseDir, planReportOptions{
-		Backend:              strings.ToLower(strings.TrimSpace(*backend)),
-		Format:               format,
-		RenderMode:           reference.RenderModePlan,
-		WrapWidth:            *wrapWidth,
-		AnnotateSeekability:  strings.TrimSpace(*annotate) == "seekability",
-		Stable:               *stable,
-		Summary:              *summary,
-		DropCreatedDatabases: *dropCreatedDatabases,
-		RuntimeTargets:       *runtimeTargets,
-		Identity:             identity,
+		MutationInputs:        mutationInputs,
+		MeasureMutationCounts: *measureMutationCounts,
+		Backend:               strings.ToLower(strings.TrimSpace(*backend)),
+		Format:                format,
+		RenderMode:            reference.RenderModePlan,
+		WrapWidth:             *wrapWidth,
+		AnnotateSeekability:   strings.TrimSpace(*annotate) == "seekability",
+		Stable:                *stable,
+		Summary:               *summary,
+		DropCreatedDatabases:  *dropCreatedDatabases,
+		RuntimeTargets:        *runtimeTargets,
+		Identity:              identity,
 		Optimizer: planReportOptimizerEnvironment{
 			Version:           strings.TrimSpace(*optimizerVersion),
 			StatisticsPackage: strings.TrimSpace(*optimizerStatisticsPackage),
@@ -128,6 +151,8 @@ func runPlanReport(args []string, stdout, stderr io.Writer) error {
 		return err
 	}
 	report.Input.ConfigSHA256 = configDigest
+	report.Input.MutationFactsSHA256 = mutationInputDigests["facts"]
+	report.Input.MutationIndexesSHA256 = mutationInputDigests["indexes"]
 	if strings.TrimSpace(*contractsPath) != "" {
 		if err := applyPlanContracts(&report, contracts); err != nil {
 			return err
@@ -144,10 +169,20 @@ func runPlanReport(args []string, stdout, stderr io.Writer) error {
 	if err := writePlanReport(stdout, *output, report); err != nil {
 		return err
 	}
+	var operationErrors []error
 	for _, warning := range report.Warnings {
-		if warning.ID == "plan-report-cleanup-error" {
-			return fmt.Errorf("plan-report cleanup failed: %s", warning.Message)
+		if warning.ID == "mutation-count-measurement-failed" {
+			operationErrors = append(operationErrors, fmt.Errorf("mutation count measurement failed: %s", warning.Message))
 		}
+		if warning.ID == "mutation-index-snapshot-rejected" {
+			operationErrors = append(operationErrors, fmt.Errorf("mutation index snapshot rejected: %s", warning.Message))
+		}
+		if warning.ID == "plan-report-cleanup-error" {
+			operationErrors = append(operationErrors, fmt.Errorf("plan-report cleanup failed: %s", warning.Message))
+		}
+	}
+	if len(operationErrors) > 0 {
+		return errors.Join(operationErrors...)
 	}
 	if *requireTargets && report.Status == planReportStatusNoTargets {
 		return fmt.Errorf("plan-report found no Spanner query targets")
@@ -166,17 +201,19 @@ func runPlanReport(args []string, stdout, stderr io.Writer) error {
 }
 
 type planReportOptions struct {
-	AnnotateSeekability  bool
-	Backend              string
-	Format               reference.Format
-	RenderMode           reference.RenderMode
-	WrapWidth            int
-	Stable               bool
-	Summary              bool
-	DropCreatedDatabases bool
-	RuntimeTargets       string
-	Identity             planReportBackendIdentity
-	Optimizer            planReportOptimizerEnvironment
+	MutationInputs        querygen.MutationCountInputs
+	MeasureMutationCounts bool
+	AnnotateSeekability   bool
+	Backend               string
+	Format                reference.Format
+	RenderMode            reference.RenderMode
+	WrapWidth             int
+	Stable                bool
+	Summary               bool
+	DropCreatedDatabases  bool
+	RuntimeTargets        string
+	Identity              planReportBackendIdentity
+	Optimizer             planReportOptimizerEnvironment
 }
 
 const (
@@ -240,9 +277,11 @@ type planReport struct {
 }
 
 type planReportInput struct {
-	ConfigSHA256       string `json:"config_sha256,omitempty" yaml:"config_sha256,omitempty"`
-	ContractFileSHA256 string `json:"contract_file_sha256,omitempty" yaml:"contract_file_sha256,omitempty"`
-	ContractFilePath   string `json:"contract_file_path,omitempty" yaml:"contract_file_path,omitempty"`
+	MutationFactsSHA256   string `json:"mutation_facts_sha256,omitempty" yaml:"mutation_facts_sha256,omitempty"`
+	MutationIndexesSHA256 string `json:"mutation_indexes_sha256,omitempty" yaml:"mutation_indexes_sha256,omitempty"`
+	ConfigSHA256          string `json:"config_sha256,omitempty" yaml:"config_sha256,omitempty"`
+	ContractFileSHA256    string `json:"contract_file_sha256,omitempty" yaml:"contract_file_sha256,omitempty"`
+	ContractFilePath      string `json:"contract_file_path,omitempty" yaml:"contract_file_path,omitempty"`
 }
 
 type planReportPlanSource struct {
@@ -288,54 +327,58 @@ type planReportExcludedTarget struct {
 }
 
 type planReportQuery struct {
-	Variant               *querygen.QueryCodegenPlanQueryVariant `json:"variant,omitempty" yaml:"variant,omitempty"`
-	TargetID              string                                 `json:"target_id" yaml:"target_id"`
-	Name                  string                                 `json:"name" yaml:"name"`
-	Catalog               string                                 `json:"catalog" yaml:"catalog"`
-	Scope                 string                                 `json:"scope,omitempty" yaml:"scope,omitempty"`
-	Kind                  string                                 `json:"kind" yaml:"kind"`
-	Status                string                                 `json:"status" yaml:"status"`
-	SQL                   string                                 `json:"sql,omitempty" yaml:"sql,omitempty"`
-	SQLSHA256             string                                 `json:"sql_sha256,omitempty" yaml:"sql_sha256,omitempty"`
-	DDLSHA256             string                                 `json:"ddl_sha256,omitempty" yaml:"ddl_sha256,omitempty"`
-	ProtoDescriptorSHA256 string                                 `json:"proto_descriptor_sha256,omitempty" yaml:"proto_descriptor_sha256,omitempty"`
-	OperatorTreeSHA256    string                                 `json:"operator_tree_sha256,omitempty" yaml:"operator_tree_sha256,omitempty"`
-	OperatorFamilies      []string                               `json:"operator_families,omitempty" yaml:"operator_families,omitempty"`
-	OperatorFamilyCounts  map[string]int                         `json:"operator_family_counts,omitempty" yaml:"operator_family_counts,omitempty"`
-	NormalizedOperators   []planReportOperator                   `json:"normalized_operators,omitempty" yaml:"normalized_operators,omitempty"`
-	OperatorEdges         []planReportOperatorEdge               `json:"operator_edges,omitempty" yaml:"operator_edges,omitempty"`
-	AccessPaths           []plancontract.AccessPath              `json:"access_paths,omitempty" yaml:"access_paths,omitempty"`
-	Plan                  string                                 `json:"plan,omitempty" yaml:"plan,omitempty"`
-	Error                 string                                 `json:"error,omitempty" yaml:"error,omitempty"`
-	OptimizerNotPinned    bool                                   `json:"optimizer_not_pinned,omitempty" yaml:"optimizer_not_pinned,omitempty"`
-	PlanEnvironmentNotes  []string                               `json:"plan_environment_notes,omitempty" yaml:"plan_environment_notes,omitempty"`
-	ClassificationNotes   []planReportDiagnostic                 `json:"classification_warnings,omitempty" yaml:"classification_warnings,omitempty"`
-	RawPlan               *spannerpb.QueryPlan                   `json:"-" yaml:"-"`
+	MutationCounts        map[string]spanalyzer.MutationCountReport `json:"mutation_counts,omitempty" yaml:"mutation_counts,omitempty"`
+	MutationCountError    string                                    `json:"mutation_count_error,omitempty" yaml:"mutation_count_error,omitempty"`
+	Variant               *querygen.QueryCodegenPlanQueryVariant    `json:"variant,omitempty" yaml:"variant,omitempty"`
+	TargetID              string                                    `json:"target_id" yaml:"target_id"`
+	Name                  string                                    `json:"name" yaml:"name"`
+	Catalog               string                                    `json:"catalog" yaml:"catalog"`
+	Scope                 string                                    `json:"scope,omitempty" yaml:"scope,omitempty"`
+	Kind                  string                                    `json:"kind" yaml:"kind"`
+	Status                string                                    `json:"status" yaml:"status"`
+	SQL                   string                                    `json:"sql,omitempty" yaml:"sql,omitempty"`
+	SQLSHA256             string                                    `json:"sql_sha256,omitempty" yaml:"sql_sha256,omitempty"`
+	DDLSHA256             string                                    `json:"ddl_sha256,omitempty" yaml:"ddl_sha256,omitempty"`
+	ProtoDescriptorSHA256 string                                    `json:"proto_descriptor_sha256,omitempty" yaml:"proto_descriptor_sha256,omitempty"`
+	OperatorTreeSHA256    string                                    `json:"operator_tree_sha256,omitempty" yaml:"operator_tree_sha256,omitempty"`
+	OperatorFamilies      []string                                  `json:"operator_families,omitempty" yaml:"operator_families,omitempty"`
+	OperatorFamilyCounts  map[string]int                            `json:"operator_family_counts,omitempty" yaml:"operator_family_counts,omitempty"`
+	NormalizedOperators   []planReportOperator                      `json:"normalized_operators,omitempty" yaml:"normalized_operators,omitempty"`
+	OperatorEdges         []planReportOperatorEdge                  `json:"operator_edges,omitempty" yaml:"operator_edges,omitempty"`
+	AccessPaths           []plancontract.AccessPath                 `json:"access_paths,omitempty" yaml:"access_paths,omitempty"`
+	Plan                  string                                    `json:"plan,omitempty" yaml:"plan,omitempty"`
+	Error                 string                                    `json:"error,omitempty" yaml:"error,omitempty"`
+	OptimizerNotPinned    bool                                      `json:"optimizer_not_pinned,omitempty" yaml:"optimizer_not_pinned,omitempty"`
+	PlanEnvironmentNotes  []string                                  `json:"plan_environment_notes,omitempty" yaml:"plan_environment_notes,omitempty"`
+	ClassificationNotes   []planReportDiagnostic                    `json:"classification_warnings,omitempty" yaml:"classification_warnings,omitempty"`
+	RawPlan               *spannerpb.QueryPlan                      `json:"-" yaml:"-"`
 }
 
 type serializedPlanReportQuery struct {
-	Variant               *querygen.QueryCodegenPlanQueryVariant `json:"variant,omitempty" yaml:"variant,omitempty"`
-	TargetID              string                                 `json:"target_id" yaml:"target_id"`
-	Name                  string                                 `json:"name" yaml:"name"`
-	Catalog               string                                 `json:"catalog" yaml:"catalog"`
-	Scope                 string                                 `json:"scope,omitempty" yaml:"scope,omitempty"`
-	Kind                  string                                 `json:"kind" yaml:"kind"`
-	Status                string                                 `json:"status" yaml:"status"`
-	SQL                   string                                 `json:"sql,omitempty" yaml:"sql,omitempty"`
-	SQLSHA256             string                                 `json:"sql_sha256,omitempty" yaml:"sql_sha256,omitempty"`
-	DDLSHA256             string                                 `json:"ddl_sha256,omitempty" yaml:"ddl_sha256,omitempty"`
-	ProtoDescriptorSHA256 string                                 `json:"proto_descriptor_sha256,omitempty" yaml:"proto_descriptor_sha256,omitempty"`
-	OperatorTreeSHA256    string                                 `json:"operator_tree_sha256,omitempty" yaml:"operator_tree_sha256,omitempty"`
-	OperatorFamilies      []string                               `json:"operator_families,omitempty" yaml:"operator_families,omitempty"`
-	OperatorFamilyCounts  map[string]int                         `json:"operator_family_counts,omitempty" yaml:"operator_family_counts,omitempty"`
-	NormalizedOperators   []planReportOperator                   `json:"normalized_operators,omitempty" yaml:"normalized_operators,omitempty"`
-	OperatorEdges         interface{}                            `json:"operator_edges,omitempty" yaml:"operator_edges,omitempty"`
-	AccessPaths           interface{}                            `json:"access_paths,omitempty" yaml:"access_paths,omitempty"`
-	Plan                  string                                 `json:"plan,omitempty" yaml:"plan,omitempty"`
-	Error                 string                                 `json:"error,omitempty" yaml:"error,omitempty"`
-	OptimizerNotPinned    bool                                   `json:"optimizer_not_pinned,omitempty" yaml:"optimizer_not_pinned,omitempty"`
-	PlanEnvironmentNotes  []string                               `json:"plan_environment_notes,omitempty" yaml:"plan_environment_notes,omitempty"`
-	ClassificationNotes   []planReportDiagnostic                 `json:"classification_warnings,omitempty" yaml:"classification_warnings,omitempty"`
+	MutationCounts        map[string]spanalyzer.MutationCountReport `json:"mutation_counts,omitempty" yaml:"mutation_counts,omitempty"`
+	MutationCountError    string                                    `json:"mutation_count_error,omitempty" yaml:"mutation_count_error,omitempty"`
+	Variant               *querygen.QueryCodegenPlanQueryVariant    `json:"variant,omitempty" yaml:"variant,omitempty"`
+	TargetID              string                                    `json:"target_id" yaml:"target_id"`
+	Name                  string                                    `json:"name" yaml:"name"`
+	Catalog               string                                    `json:"catalog" yaml:"catalog"`
+	Scope                 string                                    `json:"scope,omitempty" yaml:"scope,omitempty"`
+	Kind                  string                                    `json:"kind" yaml:"kind"`
+	Status                string                                    `json:"status" yaml:"status"`
+	SQL                   string                                    `json:"sql,omitempty" yaml:"sql,omitempty"`
+	SQLSHA256             string                                    `json:"sql_sha256,omitempty" yaml:"sql_sha256,omitempty"`
+	DDLSHA256             string                                    `json:"ddl_sha256,omitempty" yaml:"ddl_sha256,omitempty"`
+	ProtoDescriptorSHA256 string                                    `json:"proto_descriptor_sha256,omitempty" yaml:"proto_descriptor_sha256,omitempty"`
+	OperatorTreeSHA256    string                                    `json:"operator_tree_sha256,omitempty" yaml:"operator_tree_sha256,omitempty"`
+	OperatorFamilies      []string                                  `json:"operator_families,omitempty" yaml:"operator_families,omitempty"`
+	OperatorFamilyCounts  map[string]int                            `json:"operator_family_counts,omitempty" yaml:"operator_family_counts,omitempty"`
+	NormalizedOperators   []planReportOperator                      `json:"normalized_operators,omitempty" yaml:"normalized_operators,omitempty"`
+	OperatorEdges         interface{}                               `json:"operator_edges,omitempty" yaml:"operator_edges,omitempty"`
+	AccessPaths           interface{}                               `json:"access_paths,omitempty" yaml:"access_paths,omitempty"`
+	Plan                  string                                    `json:"plan,omitempty" yaml:"plan,omitempty"`
+	Error                 string                                    `json:"error,omitempty" yaml:"error,omitempty"`
+	OptimizerNotPinned    bool                                      `json:"optimizer_not_pinned,omitempty" yaml:"optimizer_not_pinned,omitempty"`
+	PlanEnvironmentNotes  []string                                  `json:"plan_environment_notes,omitempty" yaml:"plan_environment_notes,omitempty"`
+	ClassificationNotes   []planReportDiagnostic                    `json:"classification_warnings,omitempty" yaml:"classification_warnings,omitempty"`
 }
 
 func (q planReportQuery) MarshalJSON() ([]byte, error) {
@@ -361,6 +404,8 @@ func (q planReportQuery) serialized() serializedPlanReportQuery {
 		accessPaths = paths
 	}
 	return serializedPlanReportQuery{
+		MutationCounts:        q.MutationCounts,
+		MutationCountError:    q.MutationCountError,
 		Variant:               q.Variant,
 		TargetID:              q.TargetID,
 		Name:                  q.Name,
@@ -394,7 +439,7 @@ type planReportOptimizerEnvironment = plancontract.OptimizerEnvironment
 type planReportOptimizerEffective = plancontract.OptimizerEffective
 
 func buildPlanReport(ctx context.Context, config querygen.QueryCodegenConfig, plan *querygen.QueryCodegenPlan, baseDir string, opts planReportOptions) (report planReport, err error) {
-	if !planReportNeedsRuntime(config, plan) {
+	if !planReportNeedsRuntime(config, plan) && !opts.MeasureMutationCounts {
 		opts.Identity = attachedPlanReportIdentity(emptyDefault(opts.Backend, "omni"), opts.Identity)
 		return buildPlanReportWithRuntime(ctx, config, plan, baseDir, opts, nil)
 	}
@@ -480,9 +525,18 @@ func buildPlanReportWithAnalyzer(ctx context.Context, config querygen.QueryCodeg
 	}
 	schemas := queryCodegenSchemasByName(config.Schemas)
 	configQueries := queryCodegenQueriesByName(config.Queries)
+	writesByName := map[string]querygen.QueryCodegenPlanWrite{}
+	for _, write := range plan.Writes {
+		writesByName[write.Name] = write
+	}
+	countModels := map[string]*spanalyzer.MutationCountAnalyzer{}
+	countModelLoaded := map[string]bool{}
+	countModelErrors := map[string]error{}
+	measurementAttempted := map[string]bool{}
 	clientsBySource := map[string]planReportAnalyzer{}
 	openErrorsBySource := map[string]error{}
 	scanTargetsBySource := map[string][]plancontract.ScanTarget{}
+	scanTargetErrorsBySource := map[string]error{}
 	protoDescriptorsBySource := map[string]*spanalyzer.ProtoDescriptorSet{}
 	protoDescriptorDigestsBySource := map[string]string{}
 	defer func() {
@@ -525,6 +579,10 @@ func buildPlanReportWithAnalyzer(ctx context.Context, config querygen.QueryCodeg
 			SQL:       sql,
 			SQLSHA256: planReportDigest(sql),
 		}
+		if scope == "write" {
+			write := writesByName[query.Name]
+			reportQuery.MutationCounts, reportQuery.MutationCountError = write.MutationCounts, write.MutationCountError
+		}
 		report.TargetSummary.IncludedCount++
 		schema, ok := schemas[catalog]
 		if !ok {
@@ -542,7 +600,7 @@ func buildPlanReportWithAnalyzer(ctx context.Context, config querygen.QueryCodeg
 			continue
 		}
 		targets++
-		if query.PlanningError != "" || query.ReportSkipReason != "" {
+		if query.PlanningError != "" || (query.ReportSkipReason != "" && !opts.MeasureMutationCounts) {
 			if query.PlanningError != "" {
 				reportQuery.Status = "error"
 				reportQuery.Error = query.PlanningError
@@ -618,6 +676,64 @@ func buildPlanReportWithAnalyzer(ctx context.Context, config querygen.QueryCodeg
 			clients = started
 			clientsBySource[catalog] = clients
 		}
+		if !countModelLoaded[catalog] {
+			countModelLoaded[catalog] = true
+			var supplied *spanalyzer.MutationCountIndexSnapshot
+			if snapshot, ok := opts.MutationInputs.Catalogs[catalog]; ok {
+				supplied = &snapshot
+			}
+			model, observeErr := planReportObservedIndexModel(ctx, clients, schema, baseDir, supplied)
+			countModels[catalog], countModelErrors[catalog] = model, observeErr
+			if observeErr != nil {
+				warningID := "plan-report-index-observation-error"
+				if supplied != nil {
+					warningID = "mutation-index-snapshot-rejected"
+				}
+				report.Warnings = append(report.Warnings, planReportDiagnostic{ID: warningID, Message: fmt.Sprintf("catalog %s: %v", catalog, observeErr)})
+			}
+			targets, targetErr := planReportSchemaScanTargets(schema, baseDir)
+			if targetErr != nil {
+				scanTargetErrorsBySource[catalog] = targetErr
+			}
+			if model != nil {
+				kept := targets[:0]
+				for _, target := range targets {
+					if target.Kind != "secondary_index" {
+						kept = append(kept, target)
+					}
+				}
+				targets = append(kept, planReportIndexScanTargets(model.IndexCatalog())...)
+			}
+			scanTargetsBySource[catalog] = targets
+		}
+		if targetErr := scanTargetErrorsBySource[catalog]; targetErr != nil {
+			reportQuery.Status = "error"
+			reportQuery.Error = targetErr.Error()
+			report.TargetSummary.Errors++
+			report.Queries = append(report.Queries, reportQuery)
+			continue
+		}
+		if scope == "write" {
+			write := writesByName[query.Name]
+			countErr := applyPlanReportMutationModel(&reportQuery, write, countModels[catalog], countModelErrors[catalog], opts.MutationInputs)
+			if model := countModels[catalog]; model != nil {
+				if opts.MeasureMutationCounts && len(opts.MutationInputs.Writes[write.Name]) > 0 && countErr == nil {
+					measurementAttempted[write.Name] = true
+					runtimeIdentity := report.Backend + "/" + report.BackendIdentity.Version + "@" + report.BackendIdentity.ImageDigest
+					reportQuery.MutationCounts, reportQuery.MutationCountError = measurePlanReportWrite(ctx, clients, model, write, opts.MutationInputs.Writes[write.Name], query, runtimeIdentity, reportQuery.MutationCounts)
+					if reportQuery.MutationCountError != "" {
+						report.Warnings = append(report.Warnings, planReportDiagnostic{ID: "mutation-count-measurement-failed", Message: write.Name + ": " + reportQuery.MutationCountError})
+					}
+				}
+			}
+		}
+		if query.ReportSkipReason != "" {
+			reportQuery.Status = "skipped"
+			reportQuery.Error = query.ReportSkipReason
+			report.TargetSummary.Skipped++
+			report.Queries = append(report.Queries, reportQuery)
+			continue
+		}
 		stmt := spanner.NewStatement(sql)
 		values, err := planReportParamValues(params)
 		if err != nil {
@@ -641,20 +757,7 @@ func buildPlanReportWithAnalyzer(ctx context.Context, config querygen.QueryCodeg
 		}
 		normalizedOperators := planReportOperators(queryPlan)
 		operatorEdges := planReportOperatorEdges(queryPlan)
-		targetsForSchema, loaded := scanTargetsBySource[catalog]
-		if !loaded {
-			var err error
-			targetsForSchema, err = planReportSchemaScanTargets(schema, baseDir)
-			if err != nil {
-				reportQuery.Status = "error"
-				reportQuery.Error = err.Error()
-				report.TargetSummary.Errors++
-				report.Queries = append(report.Queries, reportQuery)
-				continue
-			}
-			scanTargetsBySource[catalog] = targetsForSchema
-		}
-		accessPaths := plancontract.NormalizeAccessPaths(queryPlan, targetsForSchema)
+		accessPaths := plancontract.NormalizeAccessPaths(queryPlan, scanTargetsBySource[catalog])
 		var rendered string
 		if !opts.Summary {
 			rendered, err = renderPlanReportTree(queryPlan, accessPaths, opts)
@@ -686,6 +789,20 @@ func buildPlanReportWithAnalyzer(ctx context.Context, config querygen.QueryCodeg
 			ID:      "plan-report-no-targets",
 			Message: "no Spanner query targets were available for plan-report",
 		})
+	}
+	// A skipped/error target may precede the first live target for its catalog.
+	// Apply the catalog's final metadata result to all unmeasured writes so a
+	// rejected snapshot cannot survive on a count-only target or CEL input.
+	for i := range report.Queries {
+		query := &report.Queries[i]
+		if query.Scope != "write" || measurementAttempted[query.Name] || !countModelLoaded[query.Catalog] {
+			continue
+		}
+		// Failures are stored on the target; retain the partial report here.
+		_ = applyPlanReportMutationModel(query, writesByName[query.Name], countModels[query.Catalog], countModelErrors[query.Catalog], opts.MutationInputs)
+	}
+	if opts.MeasureMutationCounts {
+		recordUnattemptedPlanReportMeasurements(&report, opts.MutationInputs, measurementAttempted)
 	}
 	return report, nil
 }
@@ -1128,6 +1245,7 @@ func planContractReport(report planReport) plancontract.Report {
 			OptimizerNotPinned:    query.OptimizerNotPinned,
 			PlanEnvironmentNotes:  query.PlanEnvironmentNotes,
 			ClassificationNotes:   query.ClassificationNotes,
+			MutationCounts:        planContractMutationCounts(query.MutationCounts),
 			RawPlan:               query.RawPlan,
 		})
 	}
@@ -1483,6 +1601,7 @@ func writePlanReportMarkdown(w io.Writer, report planReport) error {
 			}
 		}
 		b.WriteByte('\n')
+		writePlanReportMutationCountsMarkdown(&b, query)
 		fmt.Fprintf(&b, "```sql\n%s\n```\n\n", strings.TrimSpace(query.SQL))
 		if query.Error != "" {
 			fmt.Fprintf(&b, "```text\n%s\n```\n\n", query.Error)

@@ -1,0 +1,855 @@
+{
+  "scope": "new standalone GOWORK=off publication smoke; distinct execution from original counts.json",
+  "image_provenance": {
+    "RequestedImage": "us-docker.pkg.dev/spanner-omni/images/spanner-omni:2026.r4-lts.2@sha256:b607b10bee3c1903f0a7f88f99bece67cb0dd9d9a028aee64226fc311bd78dae",
+    "ImageID": "sha256:b607b10bee3c1903f0a7f88f99bece67cb0dd9d9a028aee64226fc311bd78dae",
+    "IndexDigest": "",
+    "ManifestDigest": "sha256:b607b10bee3c1903f0a7f88f99bece67cb0dd9d9a028aee64226fc311bd78dae",
+    "Platform": "linux/arm64",
+    "ObservedAt": "2026-11-12T06:06:52.881544Z",
+    "Source": "container_inspect",
+    "ObservedByThisProcess": true
+  },
+  "target_commits": 31,
+  "successful_statistics": 31,
+  "seed_commits_included": false,
+  "observations": [
+    {
+      "write": "InsertBare",
+      "method": "dml",
+      "bounds": {
+        "lower": 4,
+        "upper": 4
+      },
+      "old_rows": {
+        "lower": 4,
+        "upper": 4
+      },
+      "observation": {
+        "runtime": "omni/not_recorded@not_recorded",
+        "observed_at": "2026-11-12T06:06:55.510622Z",
+        "schema_sha256": "d0caac5bdcb6996476e0ee5a42b000d70ca0290c7dcea5ba87a6c0d34db072ff",
+        "input_sha256": "e2a8db02673b801e729e02a21d2c275509968c5490304ea9998bd147d69fe694",
+        "scope": "dml_transaction",
+        "successful": true,
+        "stats_present": true,
+        "mutation_count": 4
+      },
+      "effective": {
+        "lower": 4,
+        "upper": 4
+      },
+      "effective_basis": "same_execution_observation"
+    },
+    {
+      "write": "InsertBare",
+      "method": "mutation",
+      "bounds": {
+        "lower": 4,
+        "upper": 4
+      },
+      "old_rows": {
+        "lower": 4,
+        "upper": 4
+      },
+      "observation": {
+        "runtime": "omni/not_recorded@not_recorded",
+        "observed_at": "2026-11-12T06:06:55.500052Z",
+        "schema_sha256": "d0caac5bdcb6996476e0ee5a42b000d70ca0290c7dcea5ba87a6c0d34db072ff",
+        "input_sha256": "ed2603977cee51209690ac33ab9c3386da74f461f1deac9402b2b70b73e0d92f",
+        "scope": "mutation_api_commit",
+        "successful": true,
+        "stats_present": true,
+        "mutation_count": 4
+      },
+      "effective": {
+        "lower": 4,
+        "upper": 4
+      },
+      "effective_basis": "same_execution_observation"
+    },
+    {
+      "write": "InsertOne",
+      "method": "dml",
+      "bounds": {
+        "lower": 5,
+        "upper": 5
+      },
+      "old_rows": {
+        "lower": 5,
+        "upper": 5
+      },
+      "observation": {
+        "runtime": "omni/not_recorded@not_recorded",
+        "observed_at": "2026-11-12T06:06:55.536477Z",
+        "schema_sha256": "d0caac5bdcb6996476e0ee5a42b000d70ca0290c7dcea5ba87a6c0d34db072ff",
+        "input_sha256": "d4f766d3ba3ed4c2df72a16c1870e65e3cfa4808772401c210faa5e5c8ec8989",
+        "scope": "dml_transaction",
+        "successful": true,
+        "stats_present": true,
+        "mutation_count": 5
+      },
+      "effective": {
+        "lower": 5,
+        "upper": 5
+      },
+      "effective_basis": "same_execution_observation"
+    },
+    {
+      "write": "InsertOne",
+      "method": "mutation",
+      "bounds": {
+        "lower": 5,
+        "upper": 5
+      },
+      "old_rows": {
+        "lower": 5,
+        "upper": 5
+      },
+      "observation": {
+        "runtime": "omni/not_recorded@not_recorded",
+        "observed_at": "2026-11-12T06:06:55.525218Z",
+        "schema_sha256": "d0caac5bdcb6996476e0ee5a42b000d70ca0290c7dcea5ba87a6c0d34db072ff",
+        "input_sha256": "cb730d27f6594d370c3d80e2e6c1186236cf27bd6aa5092c9968e302611c11fc",
+        "scope": "mutation_api_commit",
+        "successful": true,
+        "stats_present": true,
+        "mutation_count": 5
+      },
+      "effective": {
+        "lower": 5,
+        "upper": 5
+      },
+      "effective_basis": "same_execution_observation"
+    },
+    {
+      "write": "InsertTwo",
+      "method": "dml",
+      "bounds": {
+        "lower": 6,
+        "upper": 6
+      },
+      "old_rows": {
+        "lower": 6,
+        "upper": 6
+      },
+      "observation": {
+        "runtime": "omni/not_recorded@not_recorded",
+        "observed_at": "2026-11-12T06:06:55.562781Z",
+        "schema_sha256": "d0caac5bdcb6996476e0ee5a42b000d70ca0290c7dcea5ba87a6c0d34db072ff",
+        "input_sha256": "68d6342324a6476c3ccf8ce8168e54d7add4c6c3d3eaf0d7756ba0025fce539e",
+        "scope": "dml_transaction",
+        "successful": true,
+        "stats_present": true,
+        "mutation_count": 6
+      },
+      "effective": {
+        "lower": 6,
+        "upper": 6
+      },
+      "effective_basis": "same_execution_observation"
+    },
+    {
+      "write": "InsertTwo",
+      "method": "mutation",
+      "bounds": {
+        "lower": 6,
+        "upper": 6
+      },
+      "old_rows": {
+        "lower": 6,
+        "upper": 6
+      },
+      "observation": {
+        "runtime": "omni/not_recorded@not_recorded",
+        "observed_at": "2026-11-12T06:06:55.551158Z",
+        "schema_sha256": "d0caac5bdcb6996476e0ee5a42b000d70ca0290c7dcea5ba87a6c0d34db072ff",
+        "input_sha256": "f2c6afee56a5111a87333c5124d0315f5462150026d89ea6adeb11805414df6f",
+        "scope": "mutation_api_commit",
+        "successful": true,
+        "stats_present": true,
+        "mutation_count": 6
+      },
+      "effective": {
+        "lower": 6,
+        "upper": 6
+      },
+      "effective_basis": "same_execution_observation"
+    },
+    {
+      "write": "InsertKeys",
+      "method": "dml",
+      "bounds": {
+        "lower": 4,
+        "upper": 4
+      },
+      "old_rows": {
+        "lower": 4,
+        "upper": 4
+      },
+      "observation": {
+        "runtime": "omni/not_recorded@not_recorded",
+        "observed_at": "2026-11-12T06:06:55.586076Z",
+        "schema_sha256": "d0caac5bdcb6996476e0ee5a42b000d70ca0290c7dcea5ba87a6c0d34db072ff",
+        "input_sha256": "2c38cc2c6bfd8e2bbde9ad7b4469b4570757e54ee8ca8f8ca080d04c995734ee",
+        "scope": "dml_transaction",
+        "successful": true,
+        "stats_present": true,
+        "mutation_count": 4
+      },
+      "effective": {
+        "lower": 4,
+        "upper": 4
+      },
+      "effective_basis": "same_execution_observation"
+    },
+    {
+      "write": "InsertKeys",
+      "method": "mutation",
+      "bounds": {
+        "lower": 4,
+        "upper": 4
+      },
+      "old_rows": {
+        "lower": 4,
+        "upper": 4
+      },
+      "observation": {
+        "runtime": "omni/not_recorded@not_recorded",
+        "observed_at": "2026-11-12T06:06:55.575346Z",
+        "schema_sha256": "d0caac5bdcb6996476e0ee5a42b000d70ca0290c7dcea5ba87a6c0d34db072ff",
+        "input_sha256": "c329713b4febd40fe467ad096a1392ad506c2c609e0dc3f4e9469eaecc5f03f2",
+        "scope": "mutation_api_commit",
+        "successful": true,
+        "stats_present": true,
+        "mutation_count": 4
+      },
+      "effective": {
+        "lower": 4,
+        "upper": 4
+      },
+      "effective_basis": "same_execution_observation"
+    },
+    {
+      "write": "InsertNullKeys",
+      "method": "dml",
+      "bounds": {
+        "lower": 2,
+        "upper": 2
+      },
+      "old_rows": {
+        "lower": 2,
+        "upper": 2
+      },
+      "observation": {
+        "runtime": "omni/not_recorded@not_recorded",
+        "observed_at": "2026-11-12T06:06:55.609568Z",
+        "schema_sha256": "d0caac5bdcb6996476e0ee5a42b000d70ca0290c7dcea5ba87a6c0d34db072ff",
+        "input_sha256": "33cd81dcb439780aacb5539fb06e1ce8f60d2e54183e6581e658698077b828ba",
+        "scope": "dml_transaction",
+        "successful": true,
+        "stats_present": true,
+        "mutation_count": 2
+      },
+      "effective": {
+        "lower": 2,
+        "upper": 2
+      },
+      "effective_basis": "same_execution_observation"
+    },
+    {
+      "write": "InsertNullKeys",
+      "method": "mutation",
+      "bounds": {
+        "lower": 2,
+        "upper": 2
+      },
+      "old_rows": {
+        "lower": 2,
+        "upper": 2
+      },
+      "observation": {
+        "runtime": "omni/not_recorded@not_recorded",
+        "observed_at": "2026-11-12T06:06:55.599557Z",
+        "schema_sha256": "d0caac5bdcb6996476e0ee5a42b000d70ca0290c7dcea5ba87a6c0d34db072ff",
+        "input_sha256": "34e5dd95202657699f295a7287f083a7939bebb3e51af41fa1aa630f59c2328a",
+        "scope": "mutation_api_commit",
+        "successful": true,
+        "stats_present": true,
+        "mutation_count": 2
+      },
+      "effective": {
+        "lower": 2,
+        "upper": 2
+      },
+      "effective_basis": "same_execution_observation"
+    },
+    {
+      "write": "InsertStored",
+      "method": "dml",
+      "bounds": {
+        "lower": 6,
+        "upper": 6
+      },
+      "old_rows": {
+        "lower": 6,
+        "upper": 6
+      },
+      "observation": {
+        "runtime": "omni/not_recorded@not_recorded",
+        "observed_at": "2026-11-12T06:06:55.633042Z",
+        "schema_sha256": "d0caac5bdcb6996476e0ee5a42b000d70ca0290c7dcea5ba87a6c0d34db072ff",
+        "input_sha256": "a2c67c150555d7000449f176072baba250bed1cd99c71dfb465fd909746cf31a",
+        "scope": "dml_transaction",
+        "successful": true,
+        "stats_present": true,
+        "mutation_count": 6
+      },
+      "effective": {
+        "lower": 6,
+        "upper": 6
+      },
+      "effective_basis": "same_execution_observation"
+    },
+    {
+      "write": "InsertStored",
+      "method": "mutation",
+      "bounds": {
+        "lower": 6,
+        "upper": 6
+      },
+      "old_rows": {
+        "lower": 6,
+        "upper": 6
+      },
+      "observation": {
+        "runtime": "omni/not_recorded@not_recorded",
+        "observed_at": "2026-11-12T06:06:55.622483Z",
+        "schema_sha256": "d0caac5bdcb6996476e0ee5a42b000d70ca0290c7dcea5ba87a6c0d34db072ff",
+        "input_sha256": "a614fde856b4e96b7da3821c95f42e45142c1e154bf33d92793ffc9f54334753",
+        "scope": "mutation_api_commit",
+        "successful": true,
+        "stats_present": true,
+        "mutation_count": 6
+      },
+      "effective": {
+        "lower": 6,
+        "upper": 6
+      },
+      "effective_basis": "same_execution_observation"
+    },
+    {
+      "write": "UpdateNote",
+      "method": "dml",
+      "bounds": {
+        "lower": 3,
+        "upper": 3
+      },
+      "old_rows": {
+        "lower": 3,
+        "upper": 3
+      },
+      "observation": {
+        "runtime": "omni/not_recorded@not_recorded",
+        "observed_at": "2026-11-12T06:06:55.660478Z",
+        "schema_sha256": "d0caac5bdcb6996476e0ee5a42b000d70ca0290c7dcea5ba87a6c0d34db072ff",
+        "input_sha256": "05fee0ef45e1c933b111adef8ee25d6e1f0fa2f138060edab126e847f0b2570f",
+        "scope": "dml_transaction",
+        "successful": true,
+        "stats_present": true,
+        "mutation_count": 3
+      },
+      "effective": {
+        "lower": 3,
+        "upper": 3
+      },
+      "effective_basis": "same_execution_observation"
+    },
+    {
+      "write": "UpdateNote",
+      "method": "mutation",
+      "bounds": {
+        "lower": 3,
+        "upper": 3
+      },
+      "old_rows": {
+        "lower": 3,
+        "upper": 3
+      },
+      "observation": {
+        "runtime": "omni/not_recorded@not_recorded",
+        "observed_at": "2026-11-12T06:06:55.648533Z",
+        "schema_sha256": "d0caac5bdcb6996476e0ee5a42b000d70ca0290c7dcea5ba87a6c0d34db072ff",
+        "input_sha256": "7f769b840c70f5d8d4d11801c22ef134e1e3a3d421deeb2e73d80e51f8aaff45",
+        "scope": "mutation_api_commit",
+        "successful": true,
+        "stats_present": true,
+        "mutation_count": 3
+      },
+      "effective": {
+        "lower": 3,
+        "upper": 3
+      },
+      "effective_basis": "same_execution_observation"
+    },
+    {
+      "write": "UpdateStoredNote",
+      "method": "dml",
+      "bounds": {
+        "lower": 5,
+        "upper": 5
+      },
+      "old_rows": {
+        "lower": 5,
+        "upper": 5
+      },
+      "observation": {
+        "runtime": "omni/not_recorded@not_recorded",
+        "observed_at": "2026-11-12T06:06:55.690408Z",
+        "schema_sha256": "d0caac5bdcb6996476e0ee5a42b000d70ca0290c7dcea5ba87a6c0d34db072ff",
+        "input_sha256": "6a35cef299eb794bf17828703a9831c2a549dd9685779a7871bc202b0dbe4484",
+        "scope": "dml_transaction",
+        "successful": true,
+        "stats_present": true,
+        "mutation_count": 5
+      },
+      "effective": {
+        "lower": 5,
+        "upper": 5
+      },
+      "effective_basis": "same_execution_observation"
+    },
+    {
+      "write": "UpdateStoredNote",
+      "method": "mutation",
+      "bounds": {
+        "lower": 5,
+        "upper": 5
+      },
+      "old_rows": {
+        "lower": 5,
+        "upper": 5
+      },
+      "observation": {
+        "runtime": "omni/not_recorded@not_recorded",
+        "observed_at": "2026-11-12T06:06:55.677285Z",
+        "schema_sha256": "d0caac5bdcb6996476e0ee5a42b000d70ca0290c7dcea5ba87a6c0d34db072ff",
+        "input_sha256": "2d0fa6257e6556f87fcd1800361e151e11c3225227bbcc938bb6dbd5eb8a487d",
+        "scope": "mutation_api_commit",
+        "successful": true,
+        "stats_present": true,
+        "mutation_count": 5
+      },
+      "effective": {
+        "lower": 5,
+        "upper": 5
+      },
+      "effective_basis": "same_execution_observation"
+    },
+    {
+      "write": "UpdateActive",
+      "method": "dml",
+      "bounds": {
+        "lower": 3,
+        "upper": 5
+      },
+      "old_rows": {
+        "lower": 5,
+        "upper": 5
+      },
+      "observation": {
+        "runtime": "omni/not_recorded@not_recorded",
+        "observed_at": "2026-11-12T06:06:55.719699Z",
+        "schema_sha256": "d0caac5bdcb6996476e0ee5a42b000d70ca0290c7dcea5ba87a6c0d34db072ff",
+        "input_sha256": "13ab353cac24715b9c649d7db70ce3da5d4c6350cf19933e691c0a29d913053e",
+        "scope": "dml_transaction",
+        "successful": true,
+        "stats_present": true,
+        "mutation_count": 5
+      },
+      "effective": {
+        "lower": 5,
+        "upper": 5
+      },
+      "effective_basis": "same_execution_observation"
+    },
+    {
+      "write": "UpdateActive",
+      "method": "mutation",
+      "bounds": {
+        "lower": 3,
+        "upper": 5
+      },
+      "old_rows": {
+        "lower": 5,
+        "upper": 5
+      },
+      "observation": {
+        "runtime": "omni/not_recorded@not_recorded",
+        "observed_at": "2026-11-12T06:06:55.707089Z",
+        "schema_sha256": "d0caac5bdcb6996476e0ee5a42b000d70ca0290c7dcea5ba87a6c0d34db072ff",
+        "input_sha256": "499a9bb2f2b91deb7953fa2b485449ecc560d4eebfe494b367e19c42e2b7f7b3",
+        "scope": "mutation_api_commit",
+        "successful": true,
+        "stats_present": true,
+        "mutation_count": 5
+      },
+      "effective": {
+        "lower": 5,
+        "upper": 5
+      },
+      "effective_basis": "same_execution_observation"
+    },
+    {
+      "write": "UpdateStoredActive",
+      "method": "dml",
+      "bounds": {
+        "lower": 3,
+        "upper": 6
+      },
+      "old_rows": {
+        "lower": 6,
+        "upper": 6
+      },
+      "observation": {
+        "runtime": "omni/not_recorded@not_recorded",
+        "observed_at": "2026-11-12T06:06:55.750525Z",
+        "schema_sha256": "d0caac5bdcb6996476e0ee5a42b000d70ca0290c7dcea5ba87a6c0d34db072ff",
+        "input_sha256": "cfbb526f94b22948afb0f3389062d85641bf3e779ea60a90094424c7fe681bde",
+        "scope": "dml_transaction",
+        "successful": true,
+        "stats_present": true,
+        "mutation_count": 6
+      },
+      "effective": {
+        "lower": 6,
+        "upper": 6
+      },
+      "effective_basis": "same_execution_observation"
+    },
+    {
+      "write": "UpdateStoredActive",
+      "method": "mutation",
+      "bounds": {
+        "lower": 3,
+        "upper": 6
+      },
+      "old_rows": {
+        "lower": 6,
+        "upper": 6
+      },
+      "observation": {
+        "runtime": "omni/not_recorded@not_recorded",
+        "observed_at": "2026-11-12T06:06:55.737437Z",
+        "schema_sha256": "d0caac5bdcb6996476e0ee5a42b000d70ca0290c7dcea5ba87a6c0d34db072ff",
+        "input_sha256": "5e2ea6153bce715a59bdce1def478bc0dab76257d69094f53e58769f1323d97e",
+        "scope": "mutation_api_commit",
+        "successful": true,
+        "stats_present": true,
+        "mutation_count": 6
+      },
+      "effective": {
+        "lower": 6,
+        "upper": 6
+      },
+      "effective_basis": "same_execution_observation"
+    },
+    {
+      "write": "UpsertExisting",
+      "method": "dml",
+      "bounds": {
+        "lower": 3,
+        "upper": 5
+      },
+      "old_rows": {
+        "lower": 5,
+        "upper": 5
+      },
+      "observation": {
+        "runtime": "omni/not_recorded@not_recorded",
+        "observed_at": "2026-11-12T06:06:55.780511Z",
+        "schema_sha256": "d0caac5bdcb6996476e0ee5a42b000d70ca0290c7dcea5ba87a6c0d34db072ff",
+        "input_sha256": "981025b5a1e60fd2f2d8999d446ffd3fab8568f294a2c4057e25ed4d1d48e321",
+        "scope": "dml_transaction",
+        "successful": true,
+        "stats_present": true,
+        "mutation_count": 5
+      },
+      "effective": {
+        "lower": 5,
+        "upper": 5
+      },
+      "effective_basis": "same_execution_observation"
+    },
+    {
+      "write": "UpsertExisting",
+      "method": "mutation",
+      "bounds": {
+        "lower": 3,
+        "upper": 5
+      },
+      "old_rows": {
+        "lower": 5,
+        "upper": 5
+      },
+      "observation": {
+        "runtime": "omni/not_recorded@not_recorded",
+        "observed_at": "2026-11-12T06:06:55.76791Z",
+        "schema_sha256": "d0caac5bdcb6996476e0ee5a42b000d70ca0290c7dcea5ba87a6c0d34db072ff",
+        "input_sha256": "02682e30c20852135f812068be7b2d2501c8bd2a429b81d481bd133600dd884b",
+        "scope": "mutation_api_commit",
+        "successful": true,
+        "stats_present": true,
+        "mutation_count": 5
+      },
+      "effective": {
+        "lower": 5,
+        "upper": 5
+      },
+      "effective_basis": "same_execution_observation"
+    },
+    {
+      "write": "UpsertMissing",
+      "method": "dml",
+      "bounds": {
+        "lower": 3,
+        "upper": 5
+      },
+      "old_rows": {
+        "lower": 4,
+        "upper": 4
+      },
+      "observation": {
+        "runtime": "omni/not_recorded@not_recorded",
+        "observed_at": "2026-11-12T06:06:55.802767Z",
+        "schema_sha256": "d0caac5bdcb6996476e0ee5a42b000d70ca0290c7dcea5ba87a6c0d34db072ff",
+        "input_sha256": "20332055e4e47fe1f94f7e955c76b4e2bc7ebc580f58cb7f85de1e39c900c8a9",
+        "scope": "dml_transaction",
+        "successful": true,
+        "stats_present": true,
+        "mutation_count": 4
+      },
+      "effective": {
+        "lower": 4,
+        "upper": 4
+      },
+      "effective_basis": "same_execution_observation"
+    },
+    {
+      "write": "UpsertMissing",
+      "method": "mutation",
+      "bounds": {
+        "lower": 3,
+        "upper": 5
+      },
+      "old_rows": {
+        "lower": 4,
+        "upper": 4
+      },
+      "observation": {
+        "runtime": "omni/not_recorded@not_recorded",
+        "observed_at": "2026-11-12T06:06:55.793089Z",
+        "schema_sha256": "d0caac5bdcb6996476e0ee5a42b000d70ca0290c7dcea5ba87a6c0d34db072ff",
+        "input_sha256": "ba529eebdb90f818461f3a8865702213fef712287c92fe4be5e6e6bb2d270a0e",
+        "scope": "mutation_api_commit",
+        "successful": true,
+        "stats_present": true,
+        "mutation_count": 4
+      },
+      "effective": {
+        "lower": 4,
+        "upper": 4
+      },
+      "effective_basis": "same_execution_observation"
+    },
+    {
+      "write": "ReplacePartial",
+      "method": "mutation",
+      "bounds": {
+        "lower": 3,
+        "upper": 5
+      },
+      "old_rows": {
+        "lower": 5,
+        "upper": 5
+      },
+      "observation": {
+        "runtime": "omni/not_recorded@not_recorded",
+        "observed_at": "2026-11-12T06:06:55.817605Z",
+        "schema_sha256": "d0caac5bdcb6996476e0ee5a42b000d70ca0290c7dcea5ba87a6c0d34db072ff",
+        "input_sha256": "bbee3f8f55da6bd31d193f17b12c80104845600f32a5744c3b7e5ce2ebe290a4",
+        "scope": "mutation_api_commit",
+        "successful": true,
+        "stats_present": true,
+        "mutation_count": 5
+      },
+      "effective": {
+        "lower": 5,
+        "upper": 5
+      },
+      "effective_basis": "same_execution_observation"
+    },
+    {
+      "write": "DeleteEvent",
+      "method": "dml",
+      "bounds": {
+        "lower": 1,
+        "upper": 2
+      },
+      "old_rows": {
+        "lower": 1,
+        "upper": 2
+      },
+      "observation": {
+        "runtime": "omni/not_recorded@not_recorded",
+        "observed_at": "2026-11-12T06:06:55.842936Z",
+        "schema_sha256": "d0caac5bdcb6996476e0ee5a42b000d70ca0290c7dcea5ba87a6c0d34db072ff",
+        "input_sha256": "fc59e08c3f7363d7e5a2052caf91085684fc3645e08a4bf50fa1d64cb3b92d0d",
+        "scope": "dml_transaction",
+        "successful": true,
+        "stats_present": true,
+        "mutation_count": 2
+      },
+      "effective": {
+        "lower": 2,
+        "upper": 2
+      },
+      "effective_basis": "same_execution_observation"
+    },
+    {
+      "write": "DeleteEvent",
+      "method": "mutation",
+      "bounds": {
+        "lower": 2,
+        "upper": 2
+      },
+      "old_rows": {
+        "lower": 2,
+        "upper": 2
+      },
+      "observation": {
+        "runtime": "omni/not_recorded@not_recorded",
+        "observed_at": "2026-11-12T06:06:55.8304Z",
+        "schema_sha256": "d0caac5bdcb6996476e0ee5a42b000d70ca0290c7dcea5ba87a6c0d34db072ff",
+        "input_sha256": "b994011a553fd05ed2be42fa253afb949f07f63c926ad6d28758a8c4314f1a79",
+        "scope": "mutation_api_commit",
+        "successful": true,
+        "stats_present": true,
+        "mutation_count": 2
+      },
+      "effective": {
+        "lower": 2,
+        "upper": 2
+      },
+      "effective_basis": "same_execution_observation"
+    },
+    {
+      "write": "InsertForeign",
+      "method": "dml",
+      "bounds": {
+        "lower": 5,
+        "upper": 5
+      },
+      "old_rows": {
+        "lower": 5,
+        "upper": 5
+      },
+      "observation": {
+        "runtime": "omni/not_recorded@not_recorded",
+        "observed_at": "2026-11-12T06:06:55.877667Z",
+        "schema_sha256": "d0caac5bdcb6996476e0ee5a42b000d70ca0290c7dcea5ba87a6c0d34db072ff",
+        "input_sha256": "1376abc93f9ac3a9b906def803360ddf416c405831c2642cb0f10210d93af808",
+        "scope": "dml_transaction",
+        "successful": true,
+        "stats_present": true,
+        "mutation_count": 5
+      },
+      "effective": {
+        "lower": 5,
+        "upper": 5
+      },
+      "effective_basis": "same_execution_observation"
+    },
+    {
+      "write": "InsertForeign",
+      "method": "mutation",
+      "bounds": {
+        "lower": 5,
+        "upper": 5
+      },
+      "old_rows": {
+        "lower": 5,
+        "upper": 5
+      },
+      "observation": {
+        "runtime": "omni/not_recorded@not_recorded",
+        "observed_at": "2026-11-12T06:06:55.863923Z",
+        "schema_sha256": "d0caac5bdcb6996476e0ee5a42b000d70ca0290c7dcea5ba87a6c0d34db072ff",
+        "input_sha256": "d88c2e6132c49436cb89df5b487aa6f82e9d135a1c3e912f5cb5f351f3d174a8",
+        "scope": "mutation_api_commit",
+        "successful": true,
+        "stats_present": true,
+        "mutation_count": 5
+      },
+      "effective": {
+        "lower": 5,
+        "upper": 5
+      },
+      "effective_basis": "same_execution_observation"
+    },
+    {
+      "write": "InsertAutomatic",
+      "method": "dml",
+      "bounds": {
+        "lower": 2,
+        "upper": 6
+      },
+      "old_rows": {
+        "lower": 2,
+        "upper": 6
+      },
+      "observation": {
+        "runtime": "omni/not_recorded@not_recorded",
+        "observed_at": "2026-11-12T06:06:55.907833Z",
+        "schema_sha256": "d0caac5bdcb6996476e0ee5a42b000d70ca0290c7dcea5ba87a6c0d34db072ff",
+        "input_sha256": "67db4f826d8e278af0573265523cc83b3dd124e658d131ab9a3732c74666df8e",
+        "scope": "dml_transaction",
+        "successful": true,
+        "stats_present": true,
+        "mutation_count": 4
+      },
+      "effective": {
+        "lower": 4,
+        "upper": 4
+      },
+      "effective_basis": "same_execution_observation"
+    },
+    {
+      "write": "InsertAutomatic",
+      "method": "mutation",
+      "bounds": {
+        "lower": 2,
+        "upper": 6
+      },
+      "old_rows": {
+        "lower": 2,
+        "upper": 6
+      },
+      "observation": {
+        "runtime": "omni/not_recorded@not_recorded",
+        "observed_at": "2026-11-12T06:06:55.897042Z",
+        "schema_sha256": "d0caac5bdcb6996476e0ee5a42b000d70ca0290c7dcea5ba87a6c0d34db072ff",
+        "input_sha256": "7656ca25f7dd5db6ab5dc0da2fca422046acb3c263446a158a0bd52754b91c28",
+        "scope": "mutation_api_commit",
+        "successful": true,
+        "stats_present": true,
+        "mutation_count": 6
+      },
+      "effective": {
+        "lower": 6,
+        "upper": 6
+      },
+      "effective_basis": "same_execution_observation"
+    }
+  ]
+}

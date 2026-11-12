@@ -129,8 +129,79 @@ updates/deletes include the possibility of matching zero rows. Missing runtime
 values stay unknown, rather than being interpreted as SQL NULL. Unsupported
 accounting metadata is retained in `mutation_count_error` without losing an
 otherwise valid write plan. This projection performs no database reads or
-writes; the core analyzer CLI accepts explicit old-row and measurement files
-for more specific scenarios. Mutation units do not measure bytes or latency.
+writes. Both `explain-plan` and `plan-report` accept `--mutation-facts-file`
+(one-row scenarios keyed by write name and API) and `--mutation-indexes-file`
+(complete regular-index snapshots keyed by catalog). Relative input paths use
+the config directory. Unknown names, malformed facts and mismatched DDL digests
+fail explicitly. Mutation units do not measure bytes or latency.
+
+A facts file has the following preview shape. Values use Spanner wire encodings,
+including decimal strings for INT64. Each method has its own starting state:
+
+```json
+{
+  "writes": {
+    "UpdateEvent": {
+      "mutation": {
+        "values": {"Shard": "1", "Id": "2", "Active": true},
+        "facts": [{"exists": true, "old": {"Shard": "1", "Id": "2", "Active": false}}],
+        "seed_dml": [
+          "DELETE FROM Events WHERE Shard=1 AND Id=2",
+          "INSERT INTO Events(Shard,Id,Active) VALUES(1,2,FALSE)"
+        ]
+      }
+    }
+  }
+}
+```
+
+An index file has this preview shape; include every actual regular secondary
+index with its observed physical name, flags and declared key/stored columns:
+
+```json
+{
+  "catalogs": {
+    "app": {
+      "schema_sha256": "<DDL SHA-256>",
+      "indexes": [{
+        "table": "Events", "name": "EventsByActive",
+        "type": "INDEX", "state": "READ_WRITE",
+        "unique": false, "null_filtered": false, "managed": false,
+        "columns": ["Active"], "stored": ["Note"]
+      }]
+    }
+  }
+}
+```
+
+This is a completeness/freshness assertion for the exact DDL bytes. The core
+analyzer's `schema_sha256` identifies those bytes. Canonical JSON fields use
+snake_case; the older `NullFiltered` spelling remains an input alias, and
+contradictory aliases fail. Refinement rejects a plan built from different DDL
+and leaves the original plan unchanged if any supplied input is invalid.
+`plan-report` also reads its
+new database's regular-index metadata and shares the reconciled physical names
+and inferred FK selectors with `access_paths`. A supplied snapshot with different
+physical names is rejected rather than used for that new database.
+Mutation-only reporting without measurement or an eligible SQL target creates
+no database; its supplied snapshot remains a caller freshness assertion, as in
+`explain-plan`. If another target opens that catalog, the live reconciliation
+also applies to skipped writes, and a rejected snapshot removes their counts.
+
+`seed_dml` is inert during ordinary analysis. Explicit
+`plan-report --measure-mutation-counts --mutation-facts-file scenarios.json`
+commits the selected one-row Mutation/DML scenarios in command-created random
+fixture databases. It validates target values before seeding, reads the old row
+inside the measured transaction, requests CommitStats and preserves bounds,
+old-row refinement and same-execution observations separately. Seeds must reset
+the starting state for each API; they are separate commits and are excluded from
+the target's statistic. Existing databases on an attached endpoint are never the
+measurement target. Missing statistics remain unknown. Measurement errors and
+counts outside the conditional interval produce diagnostics and a nonzero exit
+after writing the artifact. A measured point describes that execution only.
+Observation timestamps remain present with `--stable` to preserve event identity.
+Mutation-only targets retain their skipped SQL PLAN status while exposing their
+independent count analysis. Both full and summary structured output include it.
 
 The default machine-readable plan omits heavy audit-only projection
 matrix rows. Use `--audit` to include those rows, and `--stable` to omit
@@ -331,6 +402,12 @@ Usage of spanner-query-gen plan-report:
         drop databases created by this command when closing clients; default retains random databases on attached endpoints
   -format string
         spannerplan tree format: current, traditional, or compact (default "current")
+  -measure-mutation-counts
+        commit explicit one-row scenarios only in command-created fixture databases and check CommitStats against intervals
+  -mutation-facts-file string
+        JSON one-row scenarios keyed by write name and API
+  -mutation-indexes-file string
+        JSON complete regular-index snapshots keyed by catalog
   -optimizer-statistics-package string
         Spanner optimizer statistics package to pass to AnalyzeQuery
   -optimizer-version string
