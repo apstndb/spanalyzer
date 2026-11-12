@@ -107,13 +107,16 @@ rule out two concrete recipes; they do not prove that managed names are random
 or impossible to predict. A different deterministic seed/algorithm remains
 unverified. No additional managed DB or data write was used for this control.
 
-In this matrix managed/Omni accept the FK constraint name as a referencing-side
-`FORCE_INDEX` selector when its backing index exists. The same constraint name
-is not an accepted selector on the referenced parent, even when a parent
-backing index exists. Emulator rejects the constraint-name selector on both
-sides. A referencing hint can also fail the NULL-filter safety check when the
-query does not exclude every nullable key. These are separate rejection
-reasons; use the physical discovered name for a portable catalog identity.
+Each managed/Omni matrix run records 11 successful default-schema FK-name
+`FORCE_INDEX` plans on the referencing side. On named-schema `NS.C`, however,
+the unqualified `NamedFk` selector is rejected despite an existing backing
+index; a schema-qualified constraint selector was not tested. The same FK
+constraint name is not accepted on the referenced parent, even when a parent
+backing index exists. Emulator rejects every tested constraint-name selector
+on both sides. A referencing hint can also fail the NULL-filter safety check
+when the query does not exclude every nullable key. These are separate
+rejection reasons; use the physical discovered name for a portable catalog
+identity.
 
 ## Runtime matrix
 

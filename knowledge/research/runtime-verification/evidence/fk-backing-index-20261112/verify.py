@@ -74,6 +74,12 @@ for run in matrix:
 
 assert names('emulator', 'source-fixture/indexes', 'T') == {'IDX_T_X_Y_U_5AD6E41B495C5BB9'}
 assert names('emulator', 'source-fixture/indexes', 'U') == {'IDX_U_A_B_N_8C11B65ACA7F01B9'}
+for run in ['managed', 'omni-lts-fixed', 'omni-r5-fixed']:
+    assert sum(r.get('kind') == 'plan' and r['code'] == 'OK' for r in runs[run].values()) == 11
+    assert runs[run]['named-schema/hint/NamedFk/referencing']['code'] == 'InvalidArgument'
+    assert runs[run]['named-schema/hint/NamedFk/referenced']['code'] == 'InvalidArgument'
+for run in ['emulator', 'emulator-parent-first']:
+    assert all(r['code'] == 'InvalidArgument' for r in runs[run].values() if r.get('kind') == 'plan')
 for label in [k for k, v in runs['omni-lts-fixed'].items() if v.get('kind') == 'query']:
     assert runs['omni-lts-fixed'][label]['rows'] == runs['omni-r5-fixed'][label]['rows'], label
     assert runs['managed'][label]['rows'] == runs['omni-lts-fixed'][label]['rows'], label
