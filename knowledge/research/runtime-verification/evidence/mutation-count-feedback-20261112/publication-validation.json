@@ -1,9 +1,79 @@
 {
-  "status": "consumer_dependencies_pinned_final_gate_pending",
+  "status": "local_publication_checks_passed",
+  "at": "2026-11-12T06:13:13.993356+00:00",
+  "tested_source_commit": "289d47f174b900279d589bfb4a9c0eb1ff8abd7d",
+  "source_boundary": "Production code and dependencies are identified by this committed source snapshot and hashes. A subsequent evidence-only commit records these results; hosted CI and the merge outcome are tracked by the PR.",
   "foundation_commit": "0c08dadcc78ddf0ff14f1072da610ce4112e23f7",
   "foundation_pr": "https://github.com/apstndb/spanalyzer/pull/77",
-  "root_version": "v0.2.2-0.20261112055308-0c08dadcc78d",
-  "plancontract_version": "v0.1.1-0.20261112055308-0c08dadcc78d",
+  "published_modules": [
+    {
+      "Path": "github.com/apstndb/spanalyzer",
+      "Version": "v0.2.2-0.20261112055308-0c08dadcc78d",
+      "Origin": {
+        "VCS": "git",
+        "URL": "https://github.com/apstndb/spanalyzer",
+        "Hash": "0c08dadcc78ddf0ff14f1072da610ce4112e23f7",
+        "TagSum": "t1:Kg1VeZ6SniyGvWFJPwSvxHrX8EEmdP+Qryl6cBt3xME="
+      }
+    },
+    {
+      "Path": "github.com/apstndb/spanalyzer/plancontract",
+      "Version": "v0.1.1-0.20261112055308-0c08dadcc78d",
+      "Origin": {
+        "VCS": "git",
+        "URL": "https://github.com/apstndb/spanalyzer",
+        "Subdir": "plancontract",
+        "Hash": "0c08dadcc78ddf0ff14f1072da610ce4112e23f7",
+        "TagPrefix": "plancontract/",
+        "TagSum": "t1:NRKyA9n69CdSQWqFtR4thY7oGJl6NOJXBgGFwGpdeaQ="
+      }
+    }
+  ],
+  "module_replacements": false,
+  "commands": [
+    {
+      "command": "mise run pre-push",
+      "exit_code": 0,
+      "log": "publication-pre-push.log.gz",
+      "scope": "all five modules: tidy, standalone builds, lint and govulncheck"
+    },
+    {
+      "command": "mise run verify-local",
+      "exit_code": 0,
+      "log": "publication-verify-local.log.gz",
+      "scope": "all five module tests, generated catalogs, OKF and Markdown policy"
+    },
+    {
+      "command": "GOWORK=off go test -count=1 ./... (CLI module)",
+      "exit_code": 0,
+      "log": "standalone-cli-tests.log.gz",
+      "scope": "published root/leaf dependencies, no workspace replacement"
+    },
+    {
+      "command": "GOWORK=off go test -count=1 -tags=integration,omni -run ^TestIntegrationMutationCountFeedbackOnOmni$ -v .",
+      "exit_code": 0,
+      "log": "standalone-omni-smoke.log.gz",
+      "scope": "one owned LTS container; 31 target CommitStats agree with conditional intervals"
+    }
+  ],
+  "production_and_test_source_sha256": {
+    "cmd/spanner-query-gen/config_schema.go": "709fed59256a74e89a4d076c49ea22bcea7ba5f0b131a837d12acf98d4f8a1b2",
+    "cmd/spanner-query-gen/go.mod": "65bc924bfa9910d7fff33ec20073b92394990568806b8a02f3573d629caac147",
+    "cmd/spanner-query-gen/go.sum": "15a0561f0ddbe3cc8742530c8f61ab842b0a8dfe6fac1c2213155697ac52701d",
+    "cmd/spanner-query-gen/main.go": "4f1372bc4a110b4ead50f6c98baddaa17b7c30096e9fa667c28e0b31c3ec99e4",
+    "cmd/spanner-query-gen/mutation_count_feedback_omni_test.go": "f392f000490608553a9cae28582b72ef2f5a70a3d639b0d47583294ee517aa86",
+    "cmd/spanner-query-gen/mutation_count_inputs.go": "d84f53bf2cca74bdf1ac4287817760e112eb5f3a6709f205609b88bdbdd022eb",
+    "cmd/spanner-query-gen/mutation_count_inputs_test.go": "0d1adf9f06b0e8c19afcf91b765cea53265259064a37a3ed6f02e07c06a38a0d",
+    "cmd/spanner-query-gen/plan_access_path_schema.go": "2fa8798720f7c1fbf80ca00589650a097d9dd20d3396fb21209dfa9077cc3486",
+    "cmd/spanner-query-gen/plan_report.go": "801b6fe0a9654d8eee5cd8fe4536ef47c3db24e5594cc4a69d5fa55cf5b5e0a4",
+    "cmd/spanner-query-gen/plan_report_analyzer.go": "78a117257edce84695ae739b9b1af369d17311177f811dfb22a41cb1f9554f5d",
+    "cmd/spanner-query-gen/plan_report_indexes.go": "287dc9beee9e15c3c939a3086538b5cc1b8ef2bdbaf46958552142ee1102af85",
+    "cmd/spanner-query-gen/plan_report_mutation_measurement.go": "a014afccfc0d50db12b1cddfcd2a31173f6f31ea031383dc7e0893cf4ae9104a",
+    "cmd/spanner-query-gen/plan_report_summary.go": "537c9428263112130fce5236a4f6cbe94842f00fab6db67fe1af35cd82a14caa",
+    "cmd/spanner-query-gen/plan_report_summary_schema.go": "882bc41053dffd37f4780c114f220e112ba617f744fbc8b65c26ca6cd4486a2f"
+  },
+  "runtime_smoke": "publication-smoke-counts.json",
+  "owned_container_cleanup": "publication-container-cleanup.json",
   "prior_validation": "validation.json",
-  "boundary": "The earlier record describes the initial local candidate and retains its failed standalone gate. This later record tracks immutable published dependencies and subsequent validation, without re-dating engine observations."
+  "historical_boundary": "The earlier record retains the initial standalone failure and its original producer identities. These follow-up checks do not re-date the 1165 cross-engine observations."
 }
