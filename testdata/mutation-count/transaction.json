@@ -1,0 +1,6 @@
+{
+  "statements": ["UPDATE Events SET Extra='changed' WHERE Shard=1 AND Id=2"],
+  "mutations": [
+    {"send": {"queue": "Tasks", "key": ["task-1"], "payload": "eA=="}}
+  ]
+}

@@ -180,6 +180,12 @@ examples of the integrated CLI feature. Unit and optional Omni integration
 checks exercise them; their [usage](../../cmd/spanner-query-gen/README.md#runnable-mutation-count-workflow)
 separates offline refinement from explicit fixture commits.
 
+The [mixed-transaction input](../../testdata/mutation-count/transaction.json),
+[schema](../../testdata/mutation-count/transaction.sql) and
+[cardinality facts](../../testdata/mutation-count/transaction-facts.json) exercise
+the non-executing core CLI's combined DML/buffered-Mutation scope. Their queue
+upper bound remains unknown; they do not assert a universal Send coefficient.
+
 The experimental [mutation-count lab](../../tools/mutation-count-lab/) retains
 compressed primary local-runtime receipts alongside small wire-input and DDL
 examples. The [runtime note](../research/runtime-verification/mutation-count-20261110.md)
@@ -191,6 +197,9 @@ retain a separate source, partial-completion boundary and verified cleanup.
 The [expanded queue corpus](../../testdata/mutation-count/managed-queues-20261110.json.gz)
 is separately scoped in its [matrix note](../research/runtime-verification/queue-mutation-count-managed-20261110.md),
 including large successful boundary commits and unavailable query/API statistics.
+These compressed replay inputs are consumed by tests. Redundant full reports
+and ordinary logs follow the [minimum-evidence policy](../concepts/evidence-lifecycle.md#minimum-retained-evidence)
+instead of being retained merely because they compress well.
 
 ## Analyzer fixtures
 

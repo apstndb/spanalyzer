@@ -1,0 +1,68 @@
+{
+  "status": "passed",
+  "recorded_at": "2026-11-12T09:12:25.858503+00:00",
+  "base_commit": "6a99aad7bee9502f59ac1148c813fd3dd9924f07",
+  "source_dirty": true,
+  "source_boundary": "Local working source identified by hashes; this record is not an execution attestation or hosted CI result. No new engine/database lifecycle was run.",
+  "source_sha256": {
+    "mutation_count.go": "a19fbefc6851ac533b6228c9e020cd179e6fae389478ccde05d1fd3e7535826e",
+    "mutation_count_batch.go": "5629fdb530f33706cbb683f000fc8108e1f2975d3dc3c34833742213be030dee",
+    "mutation_count_transaction.go": "6faae3d0589ef0f2d50ab4cc351750a3c6aa2ce571c4289ff09f9c2ccaa3a83b",
+    "mutation_count_transaction_test.go": "9b6f6aa25af115d9c5f9e494589ded4a3290cbbfd40c5a2d8cda85af5de02b62",
+    "mutation_count_transaction_example_test.go": "b021a5c541a7a7bcf4506d910c91d6574416993fe859bbff64dbf8a9130fe2a1",
+    "mutation_count_queues_managed_test.go": "c26921066ae8c707ad8c14a762318c937a528c008b73310fea25ccc590ddb837",
+    "cmd/spanner-analyzer/main.go": "84e47099170a0b2aeb3e9dad4565857cf11c69ba4e8dc69dd5fed3d11f749836",
+    "cmd/spanner-analyzer/mutation_count.go": "583522ab3d8704c7b9c1124a20653a70d0680d9f068f4dd1a7ad784487b3f6f3",
+    "cmd/spanner-analyzer/mutation_count_test.go": "0eb71674577aec98318e9d78a9b7f1f6b04e60cec80d21cafded175d8881b610",
+    "doc.go": "2abc2aa7a7ab45f9032b27420b38a5115ff1314f46db4e20bcddfad30c9ab438",
+    "testdata/mutation-count/transaction.sql": "2b8054b396206e90d3a6d20e2da34665f5fe202c968f776e5a36e11c2cd76984",
+    "testdata/mutation-count/transaction.json": "c51eb8b7ad738b341893addb4266321a6926eb6a13ec0a5cfbb553286a439a00",
+    "testdata/mutation-count/transaction-facts.json": "f2020dfea506b62d7550aad08c0aac51a35e3780b6d76665839979efca3cdba7",
+    "knowledge/research/write-analysis/mixed-transactions-and-evidence-20261112.md": "3e68dfe3b71347bd49e4d88a4bd717ee7f3a0093e3b6441cf0d98433a4ef4f0a",
+    "knowledge/concepts/evidence-lifecycle.md": "6f345add86eb9df22f28482c1c7382722724331e3cf34c99ea3dbfdd1d410677"
+  },
+  "commands": [
+    {
+      "command": "go test -count=1 -run 'TestMutationCountMixed|TestMutationCountManagedQueue|ExampleMutationCountAnalyzer_AnalyzeTransaction' .",
+      "exit_code": 0,
+      "scope": "Mixed transaction regression, main matrix and 43-attempt follow-up replay, runnable example"
+    },
+    {
+      "command": "go test -count=1 -run 'TestRunMutationCountCLI|TestMutationCount.*CLI' ./cmd/spanner-analyzer",
+      "exit_code": 0,
+      "scope": "Existing and mixed CLI inputs, strict fields and exclusivity"
+    },
+    {
+      "command": "go build ./cmd/spanner-analyzer; invoke built binary with transaction.sql, transaction.json and transaction-facts.json",
+      "exit_code": 0,
+      "scope": "Compiled flag dispatch, mixed scope, one DML boundary and unknown queue upper bound"
+    },
+    {
+      "command": "mise run verify-local",
+      "exit_code": 0,
+      "scope": "All five module tests; survey independently with GOWORK=off and -short; generated catalogs; OKF all; Markdown policy"
+    },
+    {
+      "command": "mise run pre-push",
+      "exit_code": 0,
+      "scope": "All five modules: tidy, standalone builds, lint and govulncheck"
+    },
+    {
+      "command": "Retirement identity, original Git blob, retained receipt checksums and compact projection comparison",
+      "exit_code": 0,
+      "scope": "All 31 removed artifacts and replacement numerical/plan observations"
+    }
+  ],
+  "retention": "Full command output is task scratch, not a tracked log archive. The command/source/status and claim-specific result records are retained.",
+  "managed_replay_inputs": {
+    "testdata/mutation-count/managed-queues-20261110.json.gz": "6e235b73015ce2d86a6345c4e47d57a9eefc1b2073248bb3c92551958750ee1b",
+    "testdata/mutation-count/managed-queues-ignore-20261110.json.gz": "f82162ffec45e31e4f941dfb4d566e1299bab6f694df72d305e57876eb0a8a96"
+  },
+  "boundaries": [
+    "No new managed observation",
+    "No new Omni or Emulator execution",
+    "No finite specialized-index or internal-lease count inferred",
+    "No numeric measurement from absent CommitStats",
+    "No commit, push or merge in this task"
+  ]
+}

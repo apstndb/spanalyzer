@@ -23,7 +23,7 @@ func TestRunMutationCountCLI(t *testing.T) {
 	}
 	ddl := `CREATE TABLE Events(Id INT64 NOT NULL,V STRING(MAX)) PRIMARY KEY(Id); CREATE INDEX ByV ON Events(V);`
 	for _, format := range []string{"json", "yaml"} {
-		out, err := runMutationCountCLI(ddl, "", format, mut, facts, "", "", "")
+		out, err := runMutationCountCLI(ddl, "", format, mut, "", facts, "", "", "")
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -42,10 +42,10 @@ func TestRunMutationCountCLI(t *testing.T) {
 			t.Fatal(r)
 		}
 	}
-	if _, err := runMutationCountCLI(ddl, "SELECT 1", "json", "", "", "", "", ""); err == nil {
+	if _, err := runMutationCountCLI(ddl, "SELECT 1", "json", "", "", "", "", "", ""); err == nil {
 		t.Fatal("ordinary SELECT is not a write estimate")
 	}
-	if _, err := runMutationCountCLI(`CREATE QUEUE Tasks(Id STRING(36) NOT NULL,Payload BYTES(MAX) NOT NULL) PRIMARY KEY(Id)`, "SELECT * FROM RECEIVE_Tasks(max_duration=>'1s')", "json", "", "", "", "", ""); err != nil {
+	if _, err := runMutationCountCLI(`CREATE QUEUE Tasks(Id STRING(36) NOT NULL,Payload BYTES(MAX) NOT NULL) PRIMARY KEY(Id)`, "SELECT * FROM RECEIVE_Tasks(max_duration=>'1s')", "json", "", "", "", "", "", ""); err != nil {
 		t.Fatal(err)
 	}
 }
@@ -78,10 +78,42 @@ func TestMutationCountCLIRejectsUnknownRefinementFields(t *testing.T) {
 			case "observation":
 				observation = path
 			}
-			_, err := runMutationCountCLI(ddl, "", "json", mutations, facts, indexes, observation, "")
+			_, err := runMutationCountCLI(ddl, "", "json", mutations, "", facts, indexes, observation, "")
 			if err == nil || !strings.Contains(err.Error(), "unknown field") || !strings.Contains(err.Error(), path) {
 				t.Fatalf("expected a file-specific unknown-field error, got %v", err)
 			}
 		})
+	}
+}
+
+func TestMutationCountTransactionCLI(t *testing.T) {
+	fixture := filepath.Join("..", "..", "testdata", "mutation-count")
+	ddl, err := os.ReadFile(filepath.Join(fixture, "transaction.sql"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	transaction := filepath.Join(fixture, "transaction.json")
+	out, err := runMutationCountCLI(string(ddl), "", "json", "", transaction, filepath.Join(fixture, "transaction-facts.json"), "", "", "")
+	if err != nil {
+		t.Fatal(err)
+	}
+	var report spanalyzer.MutationCountReport
+	if err := json.Unmarshal([]byte(out), &report); err != nil {
+		t.Fatal(err)
+	}
+	if report.Scope != "mixed_dml_mutation_transaction" || report.Effective.Upper != nil || len(report.Bounds.Statements) != 1 || report.Bounds.BufferedCommit == nil {
+		t.Fatal(report)
+	}
+	for _, tc := range []struct{ sql, mutations string }{{"SELECT 1", ""}, {"", transaction}} {
+		if _, err := runMutationCountCLI(string(ddl), tc.sql, "json", tc.mutations, transaction, "", "", "", ""); err == nil {
+			t.Fatal("mixed input sources must be rejected", tc)
+		}
+	}
+	bad := filepath.Join(t.TempDir(), "transaction.json")
+	if err := os.WriteFile(bad, []byte(`{"statements":["DELETE FROM Tasks"],"mutation":[]}`), 0600); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := runMutationCountCLI(string(ddl), "", "json", "", bad, "", "", "", ""); err == nil || !strings.Contains(err.Error(), "unknown field") {
+		t.Fatal("misspelled transaction field was not rejected", err)
 	}
 }

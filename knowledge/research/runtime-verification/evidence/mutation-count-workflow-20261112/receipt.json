@@ -54,26 +54,6 @@
       "sha256": "43852634550734196110510ad362a77462546bdd87c82e6171c75ab8487bf386",
       "bytes": 12724
     },
-    "matrix-report.json.gz": {
-      "sha256": "3dca38facbec8fd5b84610ddfff98d142b9ac39f2fa4abe94b4526e792c515ce",
-      "bytes": 35043
-    },
-    "mutation-targeted.log.gz": {
-      "sha256": "bee525b947cb6b291cdfc25d5a844d4ad6a16412b78b1b206a52026677da9bc6",
-      "bytes": 193
-    },
-    "new-root-regressions.log.gz": {
-      "sha256": "7e8571331f9aaaf5d17e7b230e383b118fa95f3ca91b1f61fccdbe87489be3f5",
-      "bytes": 85
-    },
-    "omni-workflow-build-failed.log.gz": {
-      "sha256": "2b1196caae0ea33c501b6bc61eb740f2aaf9acd5d28269b5a2ecb9a1c3bfc1e2",
-      "bytes": 263
-    },
-    "omni-workflow.log.gz": {
-      "sha256": "000f9cea91cd85e93ece6d4a7e4abc28cc3af3225c3e8e762aaf02889776a1ce",
-      "bytes": 39587
-    },
     "producer/cmd__spanner-analyzer__mutation_count.go.txt": {
       "sha256": "b51af1550b84941cbd0124258c6b9a2b6676c83905b1d3f247d300ce20cead4a",
       "bytes": 2739
@@ -94,26 +74,6 @@
       "sha256": "0cb6e12bcc151751ddbeec3469c2e9c52cbe34fcfe5e2f9fd1f322697b4da83f",
       "bytes": 1592
     },
-    "strict-input-before.log.gz": {
-      "sha256": "b3eafe562d392753b2d66fdbf789484ebdf74118c1ea401840e0aa2b35e83ef2",
-      "bytes": 263
-    },
-    "workflow-report.json.gz": {
-      "sha256": "c99aed875c656f8d127b4cb94ba0ce81d9d7d46c31067b4012b3009c6299de76",
-      "bytes": 3524
-    },
-    "workflow-unit.log.gz": {
-      "sha256": "23ec423fb42b1212947f86493ef43ddc3112a9ea4435cc748b78547edbec4bcd",
-      "bytes": 80
-    },
-    "pre-push.log.gz": {
-      "sha256": "b3a96cf7b7f80c568f779ef9ce935bd777d6b6ae6c1c9e76888c07ee31f393b9",
-      "bytes": 450
-    },
-    "verify-local.log.gz": {
-      "sha256": "6c5680ac776d3247959b2dca9e2ec8961f9d54ee6965b5efa06d60af9c1f05c8",
-      "bytes": 842
-    },
     "compiled-cli-checks.json": {
       "sha256": "fc536b7c33c08e3b22a02179f4455760ea9876a0d6eab7c0e9c703b44d191005",
       "bytes": 886
@@ -130,25 +90,13 @@
       "sha256": "08c75a8ba08766469659201188770c463b4964d041637dc7e678e7cfe8dcfd89",
       "bytes": 1427
     },
-    "workflow-explain.json.gz": {
-      "sha256": "1925070658e40c42f636eb8b5173f6a235d5361461c92fe13941a4b6162d1e9a",
-      "bytes": 1951
-    },
-    "misspelled-cli.stderr.gz": {
-      "sha256": "c675098e7851f19cd0a90a2a49882922d6447670fd5b9ce68df79a88716569bf",
-      "bytes": 163
-    },
     "validation.json": {
-      "sha256": "5e38fd0de20a50caf0eef88f223e94aa7e3a1497cdb684ce8ab64fadd0c46a9c",
-      "bytes": 1620
-    }
-  },
-  "reports": {
-    "matrix-report.json.gz": {
-      "decoded_sha256": "4013fcd8df36db8fec7f3b37c389383be7b74bc41a7fdfb8687d43946e9a4fc6"
+      "sha256": "7a8c3d49d8fda3ae4308ea328b428832447ff7d532096ca0a02874370fc86375",
+      "bytes": 2256
     },
-    "workflow-report.json.gz": {
-      "decoded_sha256": "885031231a660aeba5711ecfd05ac66e8d6e165cbd841d7fa8f0323863d403bd"
+    "report-summary.json": {
+      "sha256": "8be00bdb160bbb4bdba667003096e25cf9bd525c7dc43beab492824738ce134e",
+      "bytes": 31886
     }
   },
   "boundaries": [
@@ -156,5 +104,11 @@
     "No new numeric Emulator CommitStats",
     "Scenario-specific counts, not universal coefficients or latency measurements",
     "No source discovery, open SQL fragment rewriting or application commit assembly"
-  ]
+  ],
+  "evidence_retention": {
+    "changed_on": "2026-11-12",
+    "source_commit": "6a99aad7bee9502f59ac1148c813fd3dd9924f07",
+    "retirement_manifest": "../mutation-integration-20261112/evidence-retirement.json",
+    "policy": "Retain reproduction inputs, compact dated observations, failures and check statuses; omit redundant full reports and ordinary test logs."
+  }
 }

@@ -29,6 +29,9 @@ sources:
   - id: integration
     resource: ../research/runtime-verification/mutation-count-feedback-20261112.md
     title: Shared observed indexes, scenario measurement and latest CLI revalidation
+  - id: mixed-transactions
+    resource: ../research/write-analysis/mixed-transactions-and-evidence-20261112.md
+    title: Mixed-transaction integration, remaining uncertainties and evidence retention
 ---
 
 # Mutation-count analysis
@@ -43,8 +46,8 @@ surfaces to the verification record without duplicating their instructions.
 
 | Surface | Supported input and behavior | Execution boundary |
 | --- | --- | --- |
-| `MutationCountAnalyzer` | DDL, wire Mutation arrays, ordinary DML, configured write shapes, explicit old rows/cardinality, complete observed-index snapshots and input-qualified observations | No database reads or writes |
-| `spanner-analyzer --mode mutation_count` | Mutation arrays or `--sql`, optional facts/index/observation files, JSON or YAML reports; unknown refinement fields fail explicitly | No database connection |
+| `MutationCountAnalyzer` | DDL, wire Mutation arrays, ordinary DML, mixed transactions, configured write shapes, explicit old rows/cardinality, complete observed-index snapshots and input-qualified observations | No database reads or writes |
+| `spanner-analyzer --mode mutation_count` | Mutation arrays, `--sql` or `--mutation-transaction-file`, optional facts/index/observation files, JSON or YAML reports; unknown fields fail explicitly | No database connection |
 | `spanner-query-gen explain-plan` | API-specific configured-write intervals and explicit scenario files | No database connection; `seed_dml` is inert |
 | `spanner-query-gen plan-report` | Live regular-index metadata shared with access paths and write accounting | Ordinary SQL PLAN collection retains its rollback behavior |
 | Explicit `--measure-mutation-counts` | Selected one-row Mutation/DML commits, separate fixture seeds, transactional old-row reads and CommitStats | Writes only to command-created fixture databases on Omni |
@@ -83,14 +86,16 @@ It does not invent generated index names.
 | Insert, update, insert-or-update, replace, delete; partial updates | [Managed ordinary writes](../research/runtime-verification/mutation-count-managed-20261110.md), plus [Omni/API integration](../research/runtime-verification/mutation-count-feedback-20261112.md); observations identify their schema, input and runtime |
 | Index keys, STORING, NULL_FILTERED, FK backing indexes, automatic columns and cascades | [Local comparison](../research/runtime-verification/mutation-count-20261110.md) and [reference audit](../research/write-analysis/mutation-count-reference-audit-20261110.md); unresolved values or fanout preserve intervals/unknown upper bounds |
 | Queue Send/Ack, missing messages, payload/key variants, same-key composition, DML and limit probes | [Managed queue matrix](../research/runtime-verification/queue-mutation-count-managed-20261110.md), with the completed 43-attempt follow-up retained separately |
+| Mixed DML and buffered Mutation commits | [Mixed-transaction integration](../research/write-analysis/mixed-transactions-and-evidence-20261112.md) replays both retained managed observations; related stages remain uncertain and a whole-commit measurement refines only the total |
 | Queue RECEIVE and RENEWLEASE | The queue API and CLI classify these separately; the [managed note](../research/runtime-verification/queue-mutation-count-managed-20261110.md) explains why their query responses do not provide caller CommitStats |
 | Emulator | [Local controls](../research/runtime-verification/mutation-count-20261110.md) execute writes and inspect metadata; unavailable CommitStats do not provide numerical agreement or zero counts |
 | Latest feedback and command integration | [November 12 follow-up](../research/runtime-verification/mutation-count-feedback-20261112.md#latest-feedback-and-cli-revalidation): foundation-versus-main disposition, strict input correction, runnable workflow, fresh runtime and contract results |
 
 Same-key operations are not generally additive. Arbitrary application commit
-assembly, source-code write discovery, queue internal bookkeeping and mixed
-API execution need their own evidence; the one-row measurement command does
-not infer them. Mutation counts also do not measure transaction bytes, latency,
+assembly, source-code write discovery and queue internal bookkeeping need their
+own evidence; the one-row measurement command does not infer mixed execution.
+The offline mixed API accepts an explicit complete input instead. Mutation
+counts also do not measure transaction bytes, latency,
 contention, DDL backfill cost or future commit success.
 
 See the [implemented strategy comparison](../research/write-analysis/mutation-count-alternatives-20261110.md)

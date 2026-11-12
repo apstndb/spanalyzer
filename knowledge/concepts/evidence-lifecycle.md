@@ -80,10 +80,38 @@ managed-primary surface.
 Canonical Emulator and Spanner Omni verification findings live in
 [Runtime verification](../research/runtime-verification/index.md). Notes bind
 claims to exact runtime identities, cases and retained results. Existing
-producer captures stay under `survey/`; selected release logs and probe source
+producer captures stay under `survey/`; compact observations and probe source
 may be retained beside a Research Note with artifact hashes and documented
 redactions. Coordination handoffs link to the notes. Recovered historical
 reports remain distinct from direct captures and fresh execution receipts.
+
+## Minimum retained evidence
+
+Keep reproduction conditions and the smallest observation needed to assess the
+claim. Compression alone is not a reason to retain an output.
+
+| Artifact | Default retention |
+| --- | --- |
+| Reproducer, synthetic inputs, schema, source revision, runtime manifest and command | Keep the canonical implementation or a source-pinned input; avoid duplicate writable producers |
+| Ordinary build, lint, test and successful command output | Keep the command, source identity, scope and exit status; store full logs in task scratch or CI artifacts |
+| Large derived report | Keep a claim-specific projection and reproduction command; retain the full graph only when a test or unresolved investigation consumes it |
+| Managed result or unexpected runtime failure | Keep minimal redacted input/result pairs, observation time and runtime identity; an input alone does not preserve what an earlier service returned |
+| Rolling official page | Prefer a canonical URL, retrieval metadata and reviewed source revision; retain a minimal historical excerpt or snapshot only when a dated content difference is part of the claim |
+| Regression fixture | Keep the data actually consumed by tests, including compressed wire inputs when useful; it is not an ordinary test log |
+
+A pinned Omni or Emulator image makes another execution possible, but does not
+recreate every historical SDK, optimizer, timing or generated-name observation.
+Conversely, a prior managed observation cannot be recreated merely by keeping
+the SQL: the service rolls forward. This justifies compact observations rather
+than complete execution transcripts for every successful run.
+
+When retiring tracked artifacts, first check consumers and hashed provenance.
+Preserve the dated conclusion and failure status, update live links and hash
+manifests, and record the original commit/path with the compact replacement.
+Do not rewrite Git history or retain a dangling path as current evidence. The
+[November 12 integration](../research/write-analysis/mixed-transactions-and-evidence-20261112.md)
+applies this policy to redundant mutation-count reports and logs. Other
+historical captures retain their existing scope until separately reviewed.
 
 ## Legacy repository disposition
 

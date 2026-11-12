@@ -1,0 +1,238 @@
+{
+  "recorded_at": "2026-11-12T09:08:27.085288+00:00",
+  "retrieval_date": "2026-11-12",
+  "method": "dkcli batch-get -f json; full content retrieved, relevant sections read directly",
+  "scope": "Mixed transactions and the previously listed known-unknowns; not an exhaustive new audit of every Spanner product page",
+  "retention": "Full downloads stay in task scratch. These metadata and reviewed conclusions do not claim a new service observation.",
+  "documents": [
+    {
+      "name": "documents/docs.cloud.google.com/spanner-omni/differences",
+      "uri": "https://docs.cloud.google.com/spanner-omni/differences",
+      "title": "Differences between Spanner and Spanner Omni",
+      "update_time": "2026-10-01T16:55:26Z",
+      "content_sha256": "7afd94f5f5f590c1bb80a63a6e0d02b41155062ecbe86865d1cfed849c266e9c",
+      "content_bytes": 15666,
+      "reviewed_sections": [
+        "Unsupported capabilities",
+        "Spanner Omni versus managed Spanner"
+      ]
+    },
+    {
+      "name": "documents/docs.cloud.google.com/spanner/docs/cloud-run-remote-function",
+      "uri": "https://docs.cloud.google.com/spanner/docs/cloud-run-remote-function",
+      "title": "Spanner remote functions",
+      "update_time": "2026-10-01T01:24:09Z",
+      "content_sha256": "f88e0b2cc3c80e05b1733828ec90f8887fee17b5a945dc751db844c57a64eb7d",
+      "content_bytes": 13979,
+      "reviewed_sections": [
+        "Limitations",
+        "Create a remote function"
+      ]
+    },
+    {
+      "name": "documents/docs.cloud.google.com/spanner/docs/commit-statistics",
+      "uri": "https://docs.cloud.google.com/spanner/docs/commit-statistics",
+      "title": "Retrieve commit statistics for a transaction",
+      "update_time": "2026-10-07T09:40:22Z",
+      "content_sha256": "0da3a2dc6c9477209d108bed8bdc7122959b2078bcfa352464fa86e43a598ec4",
+      "content_bytes": 16116,
+      "reviewed_sections": [
+        "Optimize for round trips",
+        "How to access commit statistics"
+      ]
+    },
+    {
+      "name": "documents/docs.cloud.google.com/spanner/docs/dml-best-practices",
+      "uri": "https://docs.cloud.google.com/spanner/docs/dml-best-practices",
+      "title": "Data Manipulation Language best practices",
+      "update_time": "2026-10-23T19:40:06Z",
+      "content_sha256": "8e2765587dece3f04c9f3b9ae0677588fff3a6cb84cbb389b6740a80cf5eb270",
+      "content_bytes": 16419,
+      "reviewed_sections": [
+        "Use batch DML",
+        "Use the last_statement option to reduce DML latency"
+      ]
+    },
+    {
+      "name": "documents/docs.cloud.google.com/spanner/docs/dml-versus-mutations",
+      "uri": "https://docs.cloud.google.com/spanner/docs/dml-versus-mutations",
+      "title": "Compare DML and Mutations",
+      "update_time": "2026-10-07T09:39:47Z",
+      "content_sha256": "2723793662f37d6b222b77e7410f22a4a9172c179036008fb5562d21ec6a5773",
+      "content_bytes": 9335,
+      "reviewed_sections": [
+        "Feature comparison",
+        "Best practice - avoid mixing DML and mutation in the same transaction"
+      ]
+    },
+    {
+      "name": "documents/docs.cloud.google.com/spanner/docs/foreign-keys/overview",
+      "uri": "https://docs.cloud.google.com/spanner/docs/foreign-keys/overview",
+      "title": "Foreign keys",
+      "update_time": "2026-10-27T05:00:12Z",
+      "content_sha256": "cb6e7b7b2d4c9aeba00aac45258751e1660c398785405825c7b917d5d464d137",
+      "content_bytes": 48240,
+      "reviewed_sections": [
+        "Foreign key actions",
+        "Resource usage for foreign key delete actions"
+      ]
+    },
+    {
+      "name": "documents/docs.cloud.google.com/spanner/docs/full-text-search/ranked-search",
+      "uri": "https://docs.cloud.google.com/spanner/docs/full-text-search/ranked-search",
+      "title": "Rank search results",
+      "update_time": "2026-11-10T22:10:16Z",
+      "content_sha256": "376c7add98dc1324b8d5a079e4a38bb2e25a827c79152cdbc761ef63b051ac8e",
+      "content_bytes": 12912,
+      "reviewed_sections": [
+        "Scorer versions"
+      ]
+    },
+    {
+      "name": "documents/docs.cloud.google.com/spanner/docs/full-text-search/search-indexes",
+      "uri": "https://docs.cloud.google.com/spanner/docs/full-text-search/search-indexes",
+      "title": "Search indexes",
+      "update_time": "2026-10-29T16:16:06Z",
+      "content_sha256": "0009b0d5b5c12076f1e97084dd21b38dbb71485e515f878b1c4e710526f6f931",
+      "content_bytes": 23294,
+      "reviewed_sections": [
+        "How to use search indexes",
+        "Search index options"
+      ]
+    },
+    {
+      "name": "documents/docs.cloud.google.com/spanner/docs/generated-column/how-to",
+      "uri": "https://docs.cloud.google.com/spanner/docs/generated-column/how-to",
+      "title": "Create and manage generated columns",
+      "update_time": "2026-10-07T09:41:07Z",
+      "content_sha256": "57d5c4cb6614115397aa7e1dea4b97252c02292240d8d4c2bc8361cecebba6f8",
+      "content_bytes": 15819,
+      "reviewed_sections": [
+        "Stored and non-stored generated columns",
+        "Generated primary keys"
+      ]
+    },
+    {
+      "name": "documents/docs.cloud.google.com/spanner/docs/queues/queues-examples",
+      "uri": "https://docs.cloud.google.com/spanner/docs/queues/queues-examples",
+      "title": "Spanner queues scenarios and examples",
+      "update_time": "2026-10-07T09:40:30Z",
+      "content_sha256": "ad117685e0eb95b7794d68b86eba3aeed9cb7e7122e123187a9abde4b52bbc36",
+      "content_bytes": 24948,
+      "reviewed_sections": [
+        "Sending and processing messages",
+        "Lease and transactional examples"
+      ]
+    },
+    {
+      "name": "documents/docs.cloud.google.com/spanner/docs/queues/queues-overview",
+      "uri": "https://docs.cloud.google.com/spanner/docs/queues/queues-overview",
+      "title": "Spanner queues overview",
+      "update_time": "2026-10-21T23:12:09Z",
+      "content_sha256": "c236d851ebbad3938708fbf0fe91d93722f09be396c1e69f6f7aabdc79880b25",
+      "content_bytes": 8872,
+      "reviewed_sections": [
+        "Queue semantics",
+        "Message delivery and leasing"
+      ]
+    },
+    {
+      "name": "documents/docs.cloud.google.com/spanner/docs/queues/queues-using",
+      "uri": "https://docs.cloud.google.com/spanner/docs/queues/queues-using",
+      "title": "Use Spanner queues",
+      "update_time": "2026-11-05T22:57:26Z",
+      "content_sha256": "fcf7158b784df3b88e968ac25e6014f8c5aa9836c8511ee2b04fd2683faa478c",
+      "content_bytes": 18722,
+      "reviewed_sections": [
+        "Send a message",
+        "Extend a message lease",
+        "Acknowledge a message"
+      ]
+    },
+    {
+      "name": "documents/docs.cloud.google.com/spanner/docs/reference/standard-sql/data-definition-language",
+      "uri": "https://docs.cloud.google.com/spanner/docs/reference/standard-sql/data-definition-language",
+      "title": "GoogleSQL data definition language",
+      "update_time": "2026-10-28T17:49:56Z",
+      "content_sha256": "e6048b4725138b57cffb8c0d488410a3e28c56477fc54b44f2d533b848d909b9",
+      "content_bytes": 140277,
+      "reviewed_sections": [
+        "vector_length",
+        "ON UPDATE",
+        "Index statements"
+      ]
+    },
+    {
+      "name": "documents/docs.cloud.google.com/spanner/docs/reference/standard-sql/dml-syntax",
+      "uri": "https://docs.cloud.google.com/spanner/docs/reference/standard-sql/dml-syntax",
+      "title": "GoogleSQL data manipulation language",
+      "update_time": "2026-10-01T01:23:56Z",
+      "content_sha256": "07a531c5a8f4c24fd4f2063ea7481e47b38810c0c28a0f6410cd463f4f79f948",
+      "content_bytes": 55190,
+      "reviewed_sections": [
+        "INSERT",
+        "DELETE",
+        "UPDATE"
+      ]
+    },
+    {
+      "name": "documents/docs.cloud.google.com/spanner/docs/reference/standard-sql/search_functions",
+      "uri": "https://docs.cloud.google.com/spanner/docs/reference/standard-sql/search_functions",
+      "title": "Search functions in GoogleSQL",
+      "update_time": "2026-11-10T22:10:16Z",
+      "content_sha256": "c86e0c18a37bdcc6c337ad5c5e1e682b89ed3e26a3943b999a756c8e202c1149",
+      "content_bytes": 90068,
+      "reviewed_sections": [
+        "SCORE versions and options"
+      ]
+    },
+    {
+      "name": "documents/docs.cloud.google.com/spanner/docs/transactions",
+      "uri": "https://docs.cloud.google.com/spanner/docs/transactions",
+      "title": "Transactions overview",
+      "update_time": "2026-10-07T09:43:42Z",
+      "content_sha256": "8fe652fd4cb0a56fb815e4d8698362776db1bf1716c5f7bff25b4a41ab14da52",
+      "content_bytes": 78960,
+      "reviewed_sections": [
+        "Read-write transactions",
+        "Interface",
+        "Read-write transaction semantics and failure"
+      ]
+    },
+    {
+      "name": "documents/docs.cloud.google.com/spanner/docs/vector-indexes",
+      "uri": "https://docs.cloud.google.com/spanner/docs/vector-indexes",
+      "title": "Create and manage vector indexes",
+      "update_time": "2026-10-07T09:43:42Z",
+      "content_sha256": "1b6a7595d8729303f1ea89504d2b8475660e0ff59957574a6b62df8fca19fe2c",
+      "content_bytes": 11132,
+      "reviewed_sections": [
+        "Vector length annotation",
+        "Index definition"
+      ]
+    },
+    {
+      "name": "documents/docs.cloud.google.com/spanner/quotas",
+      "uri": "https://docs.cloud.google.com/spanner/quotas",
+      "title": "Quotas & limits",
+      "update_time": "2026-10-10T21:28:22Z",
+      "content_sha256": "1016f89f24edb38eeac94f6324b7a78b2585faae64a9c38d1ec7e2470d8b6c1d",
+      "content_bytes": 32771,
+      "reviewed_sections": [
+        "Limits for creating, reading, updating, and deleting data",
+        "Notes 3 and 10"
+      ]
+    }
+  ],
+  "sdk_lookup": {
+    "module": "cloud.google.com/go/spanner",
+    "version": "v1.95.1",
+    "symbols": [
+      "ReadWriteTransaction.BufferWrite",
+      "Client.ReadWriteTransactionWithOptions",
+      "CommitResponse"
+    ],
+    "tool": "godoc.sh",
+    "sha256": "0ffc7b85b16d13250c286dc6dfdb9b39f4c9414acfd5eadc28503543e55f3f13"
+  }
+}

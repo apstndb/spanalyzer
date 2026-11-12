@@ -126,6 +126,11 @@ there. Save Emulator and Spanner Omni verification findings under
 [`knowledge/research/runtime-verification/`](knowledge/research/runtime-verification/index.md),
 with runtime identity and retained evidence. Use `.cursor/handoffs` for
 coordination and links to those notes, not as the canonical result store.
+Retain reproduction inputs and compact dated observations, rather than routine
+build/test logs or redundant full reports; gzip does not change this policy.
+Keep full command logs in task scratch or CI artifacts. Preserve meaningful
+failure details and source/runtime identities, and check consumers and hashes
+before retiring evidence. See [Evidence lifecycle](knowledge/concepts/evidence-lifecycle.md#minimum-retained-evidence).
 When adding or removing tracked Markdown outside the bundle, update
 [`knowledge/references/repository-documents.md`](knowledge/references/repository-documents.md).
 Every non-`index.md` concept inside the bundle must have parseable YAML

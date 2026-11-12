@@ -11,12 +11,18 @@ import (
 	spanalyzer "github.com/apstndb/spanalyzer"
 )
 
-func runMutationCountCLI(ddl, sql, output, mutations, facts, indexes, observation, calibration string) (string, error) {
+func runMutationCountCLI(ddl, sql, output, mutations, transaction, facts, indexes, observation, calibration string) (string, error) {
 	if !strings.EqualFold(output, "json") && !strings.EqualFold(output, "yaml") {
 		return "", fmt.Errorf("mutation_count output must be json or yaml")
 	}
-	if (mutations == "") == (sql == "") {
-		return "", fmt.Errorf("mutation_count requires exactly one of --mutations-file or --sql DML")
+	inputs := 0
+	for _, value := range []string{mutations, transaction, sql} {
+		if value != "" {
+			inputs++
+		}
+	}
+	if inputs != 1 {
+		return "", fmt.Errorf("mutation_count requires exactly one of --mutations-file, --mutation-transaction-file or --sql DML")
 	}
 	a, err := spanalyzer.NewMutationCountAnalyzer(ddl)
 	if err != nil {
@@ -48,7 +54,16 @@ func runMutationCountCLI(ddl, sql, output, mutations, facts, indexes, observatio
 		}
 	}
 	var report spanalyzer.MutationCountReport
-	if mutations != "" {
+	if transaction != "" {
+		var input spanalyzer.MutationCountTransaction
+		if err := readMutationJSON(transaction, &input); err != nil {
+			return "", err
+		}
+		report, err = a.AnalyzeTransaction(input, options)
+		if err != nil {
+			return "", err
+		}
+	} else if mutations != "" {
 		b, err := os.ReadFile(mutations)
 		if err != nil {
 			return "", err

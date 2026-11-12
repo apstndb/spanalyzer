@@ -34,26 +34,26 @@
     {
       "command": "mise run pre-push",
       "exit_code": 0,
-      "log": "publication-pre-push.log.gz",
-      "scope": "all five modules: tidy, standalone builds, lint and govulncheck"
+      "scope": "all five modules: tidy, standalone builds, lint and govulncheck",
+      "log_retention": "Not retained; command, exit status and scope preserve the original check. See evidence_retention."
     },
     {
       "command": "mise run verify-local",
       "exit_code": 0,
-      "log": "publication-verify-local.log.gz",
-      "scope": "all five module tests, generated catalogs, OKF and Markdown policy"
+      "scope": "all five module tests, generated catalogs, OKF and Markdown policy",
+      "log_retention": "Not retained; command, exit status and scope preserve the original check. See evidence_retention."
     },
     {
       "command": "GOWORK=off go test -count=1 ./... (CLI module)",
       "exit_code": 0,
-      "log": "standalone-cli-tests.log.gz",
-      "scope": "published root/leaf dependencies, no workspace replacement"
+      "scope": "published root/leaf dependencies, no workspace replacement",
+      "log_retention": "Not retained; command, exit status and scope preserve the original check. See evidence_retention."
     },
     {
       "command": "GOWORK=off go test -count=1 -tags=integration,omni -run ^TestIntegrationMutationCountFeedbackOnOmni$ -v .",
       "exit_code": 0,
-      "log": "standalone-omni-smoke.log.gz",
-      "scope": "one owned LTS container; 31 target CommitStats agree with conditional intervals"
+      "scope": "one owned LTS container; 31 target CommitStats agree with conditional intervals",
+      "log_retention": "Not retained; command, exit status and scope preserve the original check. See evidence_retention."
     }
   ],
   "production_and_test_source_sha256": {
@@ -75,5 +75,11 @@
   "runtime_smoke": "publication-smoke-counts.json",
   "owned_container_cleanup": "publication-container-cleanup.json",
   "prior_validation": "validation.json",
-  "historical_boundary": "The earlier record retains the initial standalone failure and its original producer identities. These follow-up checks do not re-date the 1165 cross-engine observations."
+  "historical_boundary": "The earlier record retains the initial standalone failure and its original producer identities. These follow-up checks do not re-date the 1165 cross-engine observations.",
+  "evidence_retention": {
+    "changed_on": "2026-11-12",
+    "source_commit": "6a99aad7bee9502f59ac1148c813fd3dd9924f07",
+    "retirement_manifest": "../mutation-integration-20261112/evidence-retirement.json",
+    "policy": "Retain reproduction inputs, compact dated observations, failures and check statuses; omit redundant full reports and ordinary test logs."
+  }
 }
