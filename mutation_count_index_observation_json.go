@@ -25,9 +25,9 @@ func (o *MutationCountIndexObservation) UnmarshalJSON(data []byte) error {
 		return fmt.Errorf("conflicting null_filtered and NullFiltered index attributes")
 	}
 	if input.CanonicalNullFiltered != nil {
-		input.observation.NullFiltered = *input.CanonicalNullFiltered
+		input.NullFiltered = *input.CanonicalNullFiltered
 	} else if input.LegacyNullFiltered != nil {
-		input.observation.NullFiltered = *input.LegacyNullFiltered
+		input.NullFiltered = *input.LegacyNullFiltered
 	}
 	*o = MutationCountIndexObservation(input.observation)
 	return nil
