@@ -3,6 +3,7 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"os"
@@ -150,4 +151,52 @@ func TestIntegrationMutationCountFeedbackOnOmni(t *testing.T) {
 	if physical == "" {
 		t.Error("foreign-key backing-index scan was not catalogued")
 	}
+	t.Run("DocumentedCLIWorkflow", func(t *testing.T) {
+		started, err := runtime.Get(t.Context())
+		if err != nil {
+			t.Fatal(err)
+		}
+		endpoint, err := spanemuboost.EndpointFromRuntime(started)
+		if err != nil {
+			t.Fatal(err)
+		}
+		endpointPath := filepath.Join(t.TempDir(), "endpoint.json")
+		if err := spanemuboost.SaveEndpoint(endpointPath, endpoint); err != nil {
+			t.Fatal(err)
+		}
+		t.Setenv("SPANEMUBOOST_ENDPOINT_FILE", endpointPath)
+		var stdout, stderr bytes.Buffer
+		err = run([]string{
+			"plan-report", "--config", filepath.Join("..", "..", "testdata", "mutation-count", "querygen.yaml"),
+			"--mutation-facts-file", "scenarios.json", "--measure-mutation-counts",
+			"--contracts", "contracts.yaml", "--check", "--summary", "--output", "json",
+			"--drop-created-databases", "--stable",
+		}, &stdout, &stderr)
+		if err != nil {
+			t.Fatalf("documented measured CLI workflow: %v\n%s\n%s", err, &stderr, &stdout)
+		}
+		var summary planReportSummary
+		if err := json.Unmarshal(stdout.Bytes(), &summary); err != nil {
+			t.Fatal(err)
+		}
+		if summary.ContractSummary == nil || summary.ContractSummary.Passed != 3 || len(summary.Queries) != 3 {
+			t.Fatalf("expected three count contracts, including mutation-only replace: %s", &stdout)
+		}
+		commits := 0
+		for _, query := range summary.Queries {
+			if query.Name == "ReplaceEvent" && query.Status != "skipped" {
+				t.Fatalf("mutation-only write acquired a SQL PLAN status: %s", query.Status)
+			}
+			for method, count := range query.MutationCounts {
+				if count.Observation == nil || !count.Observation.Successful || !count.Observation.StatsPresent || count.Observation.Count == nil || count.Effective.Upper == nil || count.Effective.Lower != *count.Observation.Count || *count.Effective.Upper != *count.Observation.Count || len(count.Disagreements) != 0 {
+					t.Fatalf("%s/%s: missing matching CommitStats: %+v", query.Name, method, count)
+				}
+				commits++
+			}
+		}
+		if commits != 5 {
+			t.Fatalf("expected five API-specific target commits, got %d", commits)
+		}
+		t.Logf("mutation_workflow_cli_report=%s", stdout.Bytes())
+	})
 }

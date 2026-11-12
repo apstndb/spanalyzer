@@ -57,6 +57,7 @@ asset_families:
       - testdata/mutation-count/*.json
       - testdata/mutation-count/*.json.gz
       - testdata/mutation-count/*.sql
+      - testdata/mutation-count/*.yaml
       - tools/mutation-count-lab/testdata/*.json.gz
       - tools/mutation-count-lab/testdata/*.json
       - tools/mutation-count-lab/testdata/*.sql
@@ -171,6 +172,13 @@ plan-report and classification tests, plus the repository's
 [`querygen.yaml`](../../testdata/querygen.yaml) example configuration.
 
 ## Write-accounting fixtures
+
+The [workflow configuration](../../testdata/mutation-count/querygen.yaml),
+[scenario facts](../../testdata/mutation-count/scenarios.json) and
+[count contracts](../../testdata/mutation-count/contracts.yaml) are executable
+examples of the integrated CLI feature. Unit and optional Omni integration
+checks exercise them; their [usage](../../cmd/spanner-query-gen/README.md#runnable-mutation-count-workflow)
+separates offline refinement from explicit fixture commits.
 
 The experimental [mutation-count lab](../../tools/mutation-count-lab/) retains
 compressed primary local-runtime receipts alongside small wire-input and DDL

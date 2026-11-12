@@ -8,7 +8,7 @@ source evidence, results and unverified boundaries travel with each note.
 | Runtime and observation scope | Research Note |
 | --- | --- |
 | Omni r4 LTS.2 / r5.1 and Emulator 1.5.59, 2026-11-12 JST | [Managed-control comparison](cross-engine-managed-recheck-20261112.md): 1,165 recorded steps, secure-context and privilege boundaries, distribution/compression, typed vectors, metadata tuples and current public releases |
-| Omni r4 LTS.2, 2026-11-12 JST | [Mutation-count feedback integration](mutation-count-feedback-20261112.md): shared observed FK indexes, explicit old-row scenarios, opt-in 31-commit measurement and independent CEL count contracts |
+| Omni r4 LTS.2, 2026-11-12 JST | [Mutation-count feedback integration](mutation-count-feedback-20261112.md): shared observed FK indexes, explicit scenarios and count contracts; original 31 commits plus a separate 36-commit revalidation including the runnable CLI workflow |
 | Managed Spanner, 2026-11-12 JST | [Managed revalidation and parameterized views](managed-revalidation-20261112.md): four mirror commits, secure request context and FGAC, distribution aggregation, compression frames, scorer cohorts and explicit fixture corrections |
 | Managed Spanner, 2026-11-10 JST, later runs | [Queue mutation-count matrix and follow-up](queue-mutation-count-managed-20261110.md): 319 + 43 attempts, 270 + 32 CommitStats, OR IGNORE/source inserts, RW renewal rejection, cascades, quota boundaries and explicit parser/API gaps |
 | Managed Spanner, 2026-11-10 JST | [Mutation-count integration](mutation-count-managed-20261110.md): 197 CommitStats observations, index-sensitive partial writes, queue restrictions, lease failure and verified owned-DB cleanup |

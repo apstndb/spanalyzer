@@ -1,0 +1,38 @@
+version: v1alpha
+
+go:
+  package: mutationdemo
+  out: mutationdemo.sql.go
+
+emit:
+  spanner:
+    mutations: true
+    dml: true
+
+catalogs:
+- name: app
+  kind: spanner
+  ddl: schema.sql
+
+writes:
+- name: UpdateActive
+  catalog: app
+  table: Events
+  operation: update
+  input: UpdateActiveInput
+  update:
+    columns: [Active]
+- name: UpdateExtra
+  catalog: app
+  table: Events
+  operation: update
+  input: UpdateExtraInput
+  update:
+    columns: [Extra]
+- name: ReplaceEvent
+  catalog: app
+  table: Events
+  operation: replace
+  input: ReplaceEventInput
+  insert:
+    columns: [Shard, Id, Active]

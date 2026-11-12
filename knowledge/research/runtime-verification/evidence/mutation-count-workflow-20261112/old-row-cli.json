@@ -1,0 +1,119 @@
+{
+  "version": "spanalyzer.mutation-count/v0alpha1",
+  "schema_sha256": "be6190248fd54383e0765edd8b616d4b437cced6b982c7d9e92a22f368cafbb2",
+  "input_sha256": "b18e70515d685997d768ac0a40728c80fbb9a0fd65cc279020971ecae397569c",
+  "scope": "mutation_api_commit",
+  "bounds": {
+    "strategy": "bounds",
+    "total_under_model": {
+      "lower": 3,
+      "upper": 6
+    },
+    "limit_scope": "mutation_api_commit",
+    "limit_verdict": "within_model_mutation_limit_only",
+    "operations": [
+      {
+        "index_effects": [
+          {
+            "index": "ByActive",
+            "table": "Events",
+            "count": {
+              "lower": 0,
+              "upper": 3
+            }
+          }
+        ],
+        "strategy": "bounds",
+        "table": "Events",
+        "operation": "update",
+        "channel": "mutation",
+        "count": {
+          "lower": 3,
+          "upper": 6
+        },
+        "expression": "rows * (written_primary_and_value_cells + automatic_cells + index_effects)",
+        "classification": "bounded",
+        "uncertainties": [
+          "row_existence_or_old_index_values"
+        ],
+        "assumptions": [
+          "successful operation; schema and snapshot match the transaction; mutation quota only; experimental model, not a service guarantee"
+        ],
+        "index_source": "ddl_declared_only",
+        "limit_scope": "mutation_api_commit",
+        "limit_verdict": "within_model_mutation_limit_only",
+        "mutation_limited_batch_rows": 13333,
+        "gate_eligible": false,
+        "commit_size_limit_checked": false
+      }
+    ],
+    "normalized_operation_count": 1,
+    "gate_eligible": false
+  },
+  "old_rows": {
+    "strategy": "row-image",
+    "total_under_model": {
+      "lower": 3,
+      "upper": 3
+    },
+    "limit_scope": "mutation_api_commit",
+    "limit_verdict": "within_model_mutation_limit_only",
+    "operations": [
+      {
+        "index_effects": [
+          {
+            "index": "ByActive",
+            "table": "Events",
+            "count": {
+              "lower": 0,
+              "upper": 0
+            }
+          }
+        ],
+        "strategy": "row-image",
+        "table": "Events",
+        "operation": "update",
+        "channel": "mutation",
+        "count": {
+          "lower": 3,
+          "upper": 3
+        },
+        "expression": "rows * (written_primary_and_value_cells + automatic_cells + index_effects)",
+        "classification": "exact_under_model",
+        "assumptions": [
+          "successful operation; schema and snapshot match the transaction; mutation quota only; experimental model, not a service guarantee",
+          "supplied old-row assertions; experimental index-delta model, not a database read"
+        ],
+        "index_source": "ddl_declared_only",
+        "limit_scope": "mutation_api_commit",
+        "limit_verdict": "within_model_mutation_limit_only",
+        "gate_eligible": false,
+        "commit_size_limit_checked": false
+      }
+    ],
+    "normalized_operation_count": 1,
+    "gate_eligible": false
+  },
+  "effective": {
+    "lower": 3,
+    "upper": 3
+  },
+  "effective_basis": "schema_and_old_row_assertions",
+  "indexes": [
+    {
+      "name": "ByActive",
+      "table": "Events",
+      "keys": [
+        "Active"
+      ],
+      "stored": [
+        "Note"
+      ],
+      "null_filtered": false,
+      "managed": false,
+      "origin": "ddl"
+    }
+  ],
+  "commit_size_limit_checked": false,
+  "quota_enforcement_verified": false
+}

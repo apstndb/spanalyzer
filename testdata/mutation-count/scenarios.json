@@ -1,0 +1,50 @@
+{
+  "writes": {
+    "UpdateActive": {
+      "mutation": {
+        "values": {"Shard": "1", "Id": "2", "Active": "b"},
+        "facts": [{"rows": 1, "exists": true, "old": {"Shard": "1", "Id": "2", "Active": "a", "Note": "n", "Extra": "x"}}],
+        "seed_dml": [
+          "DELETE FROM Events WHERE Shard=1 AND Id=2",
+          "INSERT INTO Events(Shard,Id,Active,Note,Extra) VALUES(1,2,'a','n','x')"
+        ]
+      },
+      "dml": {
+        "values": {"Shard": "1", "Id": "2", "Active": "b"},
+        "facts": [{"rows": 1, "exists": true, "old": {"Shard": "1", "Id": "2", "Active": "a", "Note": "n", "Extra": "x"}}],
+        "seed_dml": [
+          "DELETE FROM Events WHERE Shard=1 AND Id=2",
+          "INSERT INTO Events(Shard,Id,Active,Note,Extra) VALUES(1,2,'a','n','x')"
+        ]
+      }
+    },
+    "UpdateExtra": {
+      "mutation": {
+        "values": {"Shard": "1", "Id": "3", "Extra": "y"},
+        "facts": [{"rows": 1, "exists": true, "old": {"Shard": "1", "Id": "3", "Active": "a", "Note": "n", "Extra": "x"}}],
+        "seed_dml": [
+          "DELETE FROM Events WHERE Shard=1 AND Id=3",
+          "INSERT INTO Events(Shard,Id,Active,Note,Extra) VALUES(1,3,'a','n','x')"
+        ]
+      },
+      "dml": {
+        "values": {"Shard": "1", "Id": "3", "Extra": "y"},
+        "facts": [{"rows": 1, "exists": true, "old": {"Shard": "1", "Id": "3", "Active": "a", "Note": "n", "Extra": "x"}}],
+        "seed_dml": [
+          "DELETE FROM Events WHERE Shard=1 AND Id=3",
+          "INSERT INTO Events(Shard,Id,Active,Note,Extra) VALUES(1,3,'a','n','x')"
+        ]
+      }
+    },
+    "ReplaceEvent": {
+      "mutation": {
+        "values": {"Shard": "1", "Id": "4", "Active": "b"},
+        "facts": [{"rows": 1, "exists": true, "old": {"Shard": "1", "Id": "4", "Active": "a", "Note": "n", "Extra": "x"}}],
+        "seed_dml": [
+          "DELETE FROM Events WHERE Shard=1 AND Id=4",
+          "INSERT INTO Events(Shard,Id,Active,Note,Extra) VALUES(1,4,'a','n','x')"
+        ]
+      }
+    }
+  }
+}

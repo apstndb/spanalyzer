@@ -10,6 +10,8 @@
 - [Knowledge Catalog publication boundary](knowledge-catalog-publication.md) -
   the repository-to-catalog authority, identity, provenance, and deletion
   gates for a future governed publication.
+- [Mutation-count analysis](mutation-count-analysis.md) - implemented API/CLI
+  surfaces, conditional refinements, measurement and the verification map.
 - [Query generation](query-generation.md) - the `spanner-query-gen` product
   boundary and its canonical documentation surfaces.
 - [Query-plan inspection](query-plan-inspection.md) - how probes, normalized

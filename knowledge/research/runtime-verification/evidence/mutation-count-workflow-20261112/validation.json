@@ -1,0 +1,35 @@
+{
+  "status": "passed",
+  "recorded_at": "2026-11-12T08:09:47.744848+00:00",
+  "source_head": "638b0261bb4da996647764729b4c9e6b488bbbf7",
+  "source_dirty": true,
+  "source_boundary": "Implementation and producer hashes are recorded in receipt.json. These checks cover the dirty local source; no hosted CI or merge is claimed.",
+  "commands": [
+    {
+      "command": "mise run pre-push",
+      "exit_code": 0,
+      "scope": "all five modules: tidy, standalone builds, lint and govulncheck",
+      "log": "pre-push.log.gz"
+    },
+    {
+      "command": "mise run verify-local",
+      "exit_code": 0,
+      "scope": "all five module tests, generated catalogs, OKF and Markdown policy",
+      "log": "verify-local.log.gz"
+    },
+    {
+      "command": "env -u SPANEMUBOOST_ENDPOINT_FILE -u SPANEMUBOOST_OMNI_URI -u SPANALYZER_OMNI_IMAGE SPANEMUBOOST_ENABLE_OMNI_TESTS=1 mise x --no-deps -- go test -count=1 -timeout=20m -tags=integration,omni -run ^TestIntegrationMutationCountFeedbackOnOmni$ -v .",
+      "exit_code": 0,
+      "scope": "owned LTS container, 31 matrix + 5 documented workflow target commits, 3 count contracts",
+      "log": "omni-workflow.log.gz"
+    },
+    {
+      "command": "Compiled analyzer/query-generator CLI validation",
+      "exit_code": 0,
+      "scope": "schema interval, old-row refinement, unknown-field rejection, non-executing queue query classification, explicit configured scenarios",
+      "receipt": "compiled-cli-checks.json"
+    }
+  ],
+  "cleanup": "container-cleanup.json",
+  "external_writes": "Only the owned local Omni fixture container; no managed-service database created."
+}

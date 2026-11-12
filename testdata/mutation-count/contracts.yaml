@@ -1,0 +1,27 @@
+version: v1alpha-plan-contracts
+
+contracts:
+- name: IndexedUpdateWithinSix
+  target: write/UpdateActive
+  cel: >-
+    mutation_counts.mutation.effective.upper != null &&
+    mutation_counts.mutation.effective.upper <= 6 &&
+    mutation_counts.mutation.disagreements.size() == 0 &&
+    mutation_counts.dml.effective.upper != null &&
+    mutation_counts.dml.effective.upper <= 6 &&
+    mutation_counts.dml.disagreements.size() == 0
+- name: UnrelatedUpdateWithinThree
+  target: write/UpdateExtra
+  cel: >-
+    mutation_counts.mutation.effective.upper != null &&
+    mutation_counts.mutation.effective.upper <= 3 &&
+    mutation_counts.mutation.disagreements.size() == 0 &&
+    mutation_counts.dml.effective.upper != null &&
+    mutation_counts.dml.effective.upper <= 3 &&
+    mutation_counts.dml.disagreements.size() == 0
+- name: MutationOnlyReplaceWithinSix
+  target: write/ReplaceEvent
+  cel: >-
+    mutation_counts.mutation.effective.upper != null &&
+    mutation_counts.mutation.effective.upper <= 6 &&
+    mutation_counts.mutation.disagreements.size() == 0

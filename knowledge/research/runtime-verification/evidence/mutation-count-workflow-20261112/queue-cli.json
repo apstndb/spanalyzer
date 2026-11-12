@@ -1,0 +1,46 @@
+{
+  "version": "spanalyzer.mutation-count/v0alpha1",
+  "schema_sha256": "4600a4d6250b8c2851482ebfe59846f2c49b5b03f6566410bc9069f99c2a10e2",
+  "input_sha256": "bf75555c89a67cad0704bbe5ed42cd0511231e79c3f9ae3a5dd082fef00fe34f",
+  "scope": "queue_internal_queries",
+  "bounds": {
+    "strategy": "bounds",
+    "total_under_model": {
+      "lower": 0,
+      "upper": null
+    },
+    "limit_scope": "not_caller_mutation_commit",
+    "limit_verdict": "indeterminate",
+    "operations": [
+      {
+        "strategy": "bounds",
+        "table": "Tasks",
+        "operation": "receive",
+        "channel": "queue_tvf",
+        "count": {
+          "lower": 0,
+          "upper": null
+        },
+        "expression": "internal queue delivery/lease effects are not exposed through caller CommitStats",
+        "classification": "unknown_upper",
+        "uncertainties": [
+          "queue_tvf_has_no_caller_commit_stats"
+        ],
+        "index_source": "ddl_declared_only",
+        "limit_scope": "not_caller_mutation_commit",
+        "limit_verdict": "indeterminate",
+        "gate_eligible": false,
+        "commit_size_limit_checked": false
+      }
+    ],
+    "normalized_operation_count": 1,
+    "gate_eligible": false
+  },
+  "effective": {
+    "lower": 0,
+    "upper": null
+  },
+  "effective_basis": "queue_query_effects_not_exposed_by_commit_stats",
+  "commit_size_limit_checked": false,
+  "quota_enforcement_verified": false
+}

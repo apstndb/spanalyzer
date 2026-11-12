@@ -1,8 +1,10 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
+	"io"
 	"os"
 	"strings"
 
@@ -79,8 +81,15 @@ func readMutationJSON(path string, v interface{}) error {
 	if err != nil {
 		return err
 	}
-	if err := json.Unmarshal(b, v); err != nil {
+	decoder := json.NewDecoder(bytes.NewReader(b))
+	// Refinements are caller assertions. A misspelled field must not silently
+	// drop old-row or measurement evidence and leave a wider-looking success.
+	decoder.DisallowUnknownFields()
+	if err := decoder.Decode(v); err != nil {
 		return fmt.Errorf("%s: %w", path, err)
+	}
+	if err := decoder.Decode(new(interface{})); err != io.EOF {
+		return fmt.Errorf("%s: expected exactly one JSON document", path)
 	}
 	return nil
 }
