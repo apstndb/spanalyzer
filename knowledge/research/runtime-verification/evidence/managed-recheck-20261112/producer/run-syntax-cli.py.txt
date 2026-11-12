@@ -1,0 +1,18 @@
+from pathlib import Path
+import datetime,json,os,re,subprocess
+out=Path('/Users/apstndb/tmp/apstndb/spanalyzer/managed-revalidation-20261112/evidence')
+runner='/Users/apstndb/.agents/skills/apstndb-spanner-syntax-verify/scripts/run-managed-spanner.sh'
+secrets=sorted([os.getenv(k,'')for k in ['SPANNER_PROJECT_ID','SPANNER_INSTANCE_ID','SPANNER_DATABASE_ID']],key=len,reverse=True)
+def clean(s):
+ for k in secrets:
+  if k:s=s.replace(k,'<redacted>')
+ s=re.sub(r'projects/[^/\s"\']+/instances/[^/\s"\']+/databases/[^/\s"\']+','<database>',s)
+ return re.sub(r'requestID\s*=\s*"[^"]*"','requestID = "<redacted>"',s)
+rows=[]
+for label,sql in [('connectivity','SELECT 1 AS connectivity'),('cast-comma',"SELECT CAST(SECURE_CONTEXT('user_id'), INT64) AS value"),('cast-as',"SELECT CAST(SECURE_CONTEXT('user_id') AS INT64) AS value")]:
+ start=datetime.datetime.now(datetime.timezone.utc).isoformat()
+ r=subprocess.run([runner,'--execute',sql],capture_output=True,text=True,timeout=180)
+ rows.append({'label':label,'sql':sql,'started_at':start,'completed_at':datetime.datetime.now(datetime.timezone.utc).isoformat(),'exit_code':r.returncode,'stdout':clean(r.stdout),'stderr':clean(r.stderr)})
+ print(label,'exit',r.returncode,flush=True)
+ if label=='connectivity'and r.returncode!=0:break
+(out/'managed-cli-syntax.json').write_text(json.dumps(rows,indent=2)+'\n')

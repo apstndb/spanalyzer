@@ -1,0 +1,22 @@
+from pathlib import Path
+import subprocess,json,os,re,hashlib,datetime
+base=Path('/Users/apstndb/work/spanner-analyzer/.worktrees/cross-engine-docs-20261005/.tmp/managed-revalidation-20261112');task=Path('/Users/apstndb/tmp/apstndb/spanalyzer/managed-revalidation-20261112');out=task/'evidence'
+env=os.environ.copy();env['SPANALYZER_OWNED_FIXTURE_APPROVAL']='managed-revalidation-20261112'
+secrets=sorted([env[k]for k in ['SPANNER_PROJECT_ID','SPANNER_INSTANCE_ID','SPANNER_DATABASE_ID']],key=len,reverse=True)
+def clean(value):
+ if isinstance(value,dict):return{k:clean(v)for k,v in value.items()}
+ if isinstance(value,list):return[clean(v)for v in value]
+ if not isinstance(value,str):return value
+ for s in secrets:value=value.replace(s,'<redacted>')
+ value=re.sub(r'projects/[^/\s"\']+/instances/[^/\s"\']+/databases/[^/\s"\']+','<database>',value);value=re.sub(r'recheck1112[gp]-[a-f0-9]+','<owned-database>',value)
+ return re.sub(r'requestID\s*=\s*"[^"]*"','requestID = "<redacted>"',value)
+started=datetime.datetime.now(datetime.timezone.utc).isoformat();rows=[]
+with (out/'google-view-repair.jsonl').open('x')as log:
+ p=subprocess.Popen([str(base/'repair'),str(out/'google-lifecycle-started.json'),str(out/'google-cases.json')],env=env,stdout=subprocess.PIPE,stderr=subprocess.PIPE,text=True)
+ for line in p.stdout:
+  row=clean(json.loads(line));rows.append(row);log.write(json.dumps(row)+'\n');log.flush();print(row['label'],row['code'],flush=True)
+ code=p.wait();stderr=clean(p.stderr.read())
+(out/'google-view-repair.stderr').write_text(stderr)
+(out/'google-view-repair-command.json').write_text(json.dumps({'exit_code':code,'started_at':started,'completed_at':datetime.datetime.now(datetime.timezone.utc).isoformat(),'source_sha256':hashlib.sha256((base/'module/repair.go').read_bytes()).hexdigest(),'binary_sha256':hashlib.sha256((base/'repair').read_bytes()).hexdigest(),'scope':'Correct two unqualified view predicates and retry the original eight blocked role queries inside the same current-run GoogleSQL owned database. This producer has no create/drop API calls.'},indent=2)+'\n')
+assert code==0,stderr
+assert next(r for r in rows if r['label']=='repair-view-definitions-and-grants')['code']=='OK'

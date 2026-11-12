@@ -1,0 +1,53 @@
+from pathlib import Path
+import datetime,hashlib,json,os,re,subprocess,sys
+root=Path('/Users/apstndb/work/spanner-analyzer/.worktrees/cross-engine-docs-20261005')
+scratch=root/'.tmp/managed-revalidation-20261112';task=Path('/Users/apstndb/tmp/apstndb/spanalyzer/managed-revalidation-20261112');out=task/'evidence'
+authorization=json.loads((task/'fixture-authorization.json').read_text())
+assert authorization['approved'] is True and authorization['database_count']==2 and authorization['prepared_step_count']==235
+assert not os.getenv('SPANNER_EMULATOR_HOST')
+keys=['SPANNER_PROJECT_ID','SPANNER_INSTANCE_ID','SPANNER_DATABASE_ID']
+assert all(os.getenv(k)for k in keys)
+assert sum(len(json.loads((out/(d+'-cases.json')).read_text())['steps'])for d in ['google','pg'])==235
+secrets=sorted([os.getenv(k)for k in keys],key=len,reverse=True)
+def clean(value):
+ if isinstance(value,dict):return{k:clean(v)for k,v in value.items()}
+ if isinstance(value,list):return[clean(v)for v in value]
+ if not isinstance(value,str):return value
+ for secret in secrets:value=value.replace(secret,'<redacted>')
+ value=re.sub(r'projects/[^/\s"\']+/instances/[^/\s"\']+/databases/[^/\s"\']+','<database>',value)
+ value=re.sub(r'recheck1112[gp]-[a-f0-9]+','<owned-database>',value)
+ return re.sub(r'requestID\s*=\s*"[^"]*"','requestID = "<redacted>"',value)
+dialects=sys.argv[1:] or ['google','pg']
+assert dialects in [['google','pg'],['pg']]
+receipts_path=out/'fixture-commands.json'
+receipts=json.loads(receipts_path.read_text()) if receipts_path.exists() else []
+if dialects==['pg']:
+ prior=[json.loads(s)for s in (out/'google.jsonl').read_text().splitlines()]
+ prior_codes={r['label']:r['code']for r in prior}
+ assert prior_codes.get('drop-database')=='OK'and prior_codes.get('database-absent')=='NotFound'
+ assert json.loads((out/'google-view-repair-command.json').read_text())['exit_code']==0
+ assert json.loads((out/'google-completion-command.json').read_text())['exit_code']==0
+ assert json.loads((out/'google-udf-check-command.json').read_text())['exit_code']==0
+ assert not (out/'pg-lifecycle-started.json').exists(), 'The approved PostgreSQL lifecycle must still be unused'
+for dialect in dialects:
+ plan=out/(dialect+'-cases.json')
+ digest=hashlib.sha256(plan.read_bytes()).hexdigest()
+ assert authorization['plan_sha256'][dialect]==digest,'Reconcile the approved fixture scope before execution'
+ with (out/(dialect+'-lifecycle-started.json')).open('x')as f:
+  json.dump({'authorization':'Explicit user approval for this November 12 two-database run only.','started_at':datetime.datetime.now(datetime.timezone.utc).isoformat(),'plan_sha256':digest},f)
+ env=os.environ.copy();env['SPANALYZER_OWNED_FIXTURE_APPROVAL']='managed-revalidation-20261112'
+ started=datetime.datetime.now(datetime.timezone.utc).isoformat();rows=[]
+ with (out/(dialect+'.jsonl')).open('x')as log,(scratch/(dialect+'-raw.stderr')).open('w+')as err:
+  p=subprocess.Popen([str(scratch/'managed'),str(plan)],env=env,stdout=subprocess.PIPE,stderr=err,text=True)
+  for line in p.stdout:
+   row=clean(json.loads(line));rows.append(row);log.write(json.dumps(row)+'\n');log.flush()
+   print(dialect,row['label'],row['code'],flush=True)
+  code=p.wait();err.seek(0);(out/(dialect+'.stderr')).write_text(clean(err.read()))
+ (scratch/(dialect+'-raw.stderr')).unlink()
+ receipts.append({'dialect':dialect,'exit_code':code,'started_at':started,'completed_at':datetime.datetime.now(datetime.timezone.utc).isoformat(),'binary_sha256':hashlib.sha256((scratch/'managed').read_bytes()).hexdigest(),'source_sha256':hashlib.sha256((scratch/'module/managed.go').read_bytes()).hexdigest(),'plan_sha256':digest,'authorization':'November 12 explicit approval; one owned database per dialect. Cleanup is limited to successfully created databases from this producer.'})
+ (out/'fixture-commands.json').write_text(json.dumps(receipts,indent=2)+'\n')
+ codes={r['label']:r['code']for r in rows}
+ assert code==0 and codes.get('create-database')=='OK'and codes.get('drop-database')=='OK'and codes.get('database-absent')=='NotFound','Stop and inspect lifecycle state; do not create another database'
+ assert not any(r['code']in ['DeadlineExceeded','Unavailable','Unauthenticated']for r in rows),'Transport result is inconclusive; inspect before further creation'
+ assert len(rows)==len(json.loads(plan.read_text())['steps'])+3,'Keep incomplete cases explicit'
+print('Completed the two approved lifecycles; both databases confirmed absent.',flush=True)

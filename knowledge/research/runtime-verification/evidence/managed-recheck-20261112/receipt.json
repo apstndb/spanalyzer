@@ -1,0 +1,53 @@
+{
+  "status": "complete",
+  "observation_date_jst": "2026-11-12",
+  "code_baseline": "8ba3f9539ed2cecc7820f92dde77bcaeb6c6a4e8",
+  "go_version": "go1.26.11 darwin/arm64",
+  "spanner_sdk": "v1.95.1",
+  "managed_backend_build": "Not exposed by these probes; use exact retained timestamps.",
+  "connection": "Existing dedicated user-level mise profile; resource and request IDs redacted.",
+  "prepared_primary_steps": {
+    "google": 152,
+    "pg": 83
+  },
+  "primary_records": {
+    "google": 153,
+    "pg": 86
+  },
+  "supplemental_same_google_db_records": {
+    "view_repair": 10,
+    "completion": 16,
+    "udf_execution": 10
+  },
+  "same_owned_google_binding_sha256": "9fa6828d5963fe76d73a262e9295f69370d0f1b59dc5c78d941ac66912bb13d0",
+  "original_google_wrapper_exit": 1,
+  "original_google_wrapper_reason": "Deliberate process pause retained the owned DB for in-place corrections; its owner wait expired. Cleanup still succeeded; the explicit transport guard stopped the initial two-dialect orchestrator. The still-unused approved PostgreSQL lifecycle was then run separately.",
+  "cleanup": {
+    "google": {
+      "drop": "OK",
+      "absence": "NotFound"
+    },
+    "pg": {
+      "drop": "OK",
+      "absence": "NotFound"
+    },
+    "pg_final": {
+      "drop": "OK",
+      "absence": "NotFound"
+    }
+  },
+  "new_dbs_created": 3,
+  "additional_pg_permission": "Explicit user approval for one additional PostgreSQL DB and 17 prepared controls; exactly one successful lifecycle consumed.",
+  "producer_role": "Primary SDK/CLI outputs are observation evidence. Source files reproduce producers. Derived assertions do not replace primary outcomes.",
+  "retained_at_utc": "2026-11-11T23:39:35.166992+00:00",
+  "additional_pg_controls": {
+    "planned_steps": 17,
+    "recorded_steps": 17,
+    "records_including_lifecycle": 20,
+    "process_exit_code": 0,
+    "source": "pg-final.jsonl",
+    "assertions": "pg-final-assertions.json"
+  },
+  "current_owned_databases": 0,
+  "bounded_assertions_passed": 482
+}

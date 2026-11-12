@@ -1,0 +1,3 @@
+{"accepted":false,"sql":"SELECT CAST(SECURE_CONTEXT('user_id'), INT64)","strict_parse_error":"syntax error: :1:38: expected token: AS, but: ,"}
+{"accepted":true,"sql":"SELECT CAST(SECURE_CONTEXT('user_id') AS INT64)","strict_parse_error":""}
+{"accepted":true,"sql":"SELECT SECURE_CONTEXT(@key)","strict_parse_error":""}

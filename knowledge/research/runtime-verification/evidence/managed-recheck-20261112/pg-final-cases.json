@@ -1,0 +1,178 @@
+{
+  "dialect": "pg",
+  "steps": [
+    {
+      "label": "fixture-connectivity",
+      "family": "postgresql-corrected-ddl-and-view-controls",
+      "kind": "query",
+      "requires": [],
+      "sql": "SELECT 1 AS connectivity"
+    },
+    {
+      "label": "pg-final-vector-tables",
+      "family": "postgresql-corrected-ddl-and-view-controls",
+      "kind": "ddl",
+      "requires": [],
+      "statements": [
+        "CREATE TABLE FinalAnnotated(id bigint PRIMARY KEY,e real[] VECTOR LENGTH 3)",
+        "CREATE TABLE FinalFlexible(id bigint PRIMARY KEY,e real[])"
+      ]
+    },
+    {
+      "label": "pg-final-vector-seed",
+      "family": "postgresql-corrected-ddl-and-view-controls",
+      "kind": "dml",
+      "requires": [
+        "pg-final-vector-tables"
+      ],
+      "statements": [
+        "INSERT INTO FinalAnnotated(id,e) VALUES (1,ARRAY[1.0,2.0,3.0]::real[])"
+      ]
+    },
+    {
+      "label": "pg-final-index-annotated",
+      "family": "postgresql-corrected-ddl-and-view-controls",
+      "kind": "ddl",
+      "requires": [
+        "pg-final-vector-seed"
+      ],
+      "sql": "CREATE INDEX FinalAnnotatedIndex ON FinalAnnotated USING scann(e) WITH (distance_type='EUCLIDEAN') WHERE e IS NOT NULL"
+    },
+    {
+      "label": "pg-final-index-unannotated-negative",
+      "family": "postgresql-corrected-ddl-and-view-controls",
+      "kind": "ddl",
+      "requires": [
+        "pg-final-vector-tables"
+      ],
+      "sql": "CREATE INDEX FinalFlexibleIndex ON FinalFlexible USING scann(e) WITH (distance_type='EUCLIDEAN') WHERE e IS NOT NULL"
+    },
+    {
+      "label": "pg-final-role",
+      "family": "postgresql-corrected-ddl-and-view-controls",
+      "kind": "ddl",
+      "requires": [],
+      "sql": "CREATE ROLE pv_final_user"
+    },
+    {
+      "label": "pg-final-tenant-table",
+      "family": "postgresql-corrected-ddl-and-view-controls",
+      "kind": "ddl",
+      "requires": [],
+      "sql": "CREATE TABLE FinalTenants(id bigint PRIMARY KEY,tenant text,payload text)"
+    },
+    {
+      "label": "pg-final-tenant-seed",
+      "family": "postgresql-corrected-ddl-and-view-controls",
+      "kind": "dml",
+      "requires": [
+        "pg-final-tenant-table"
+      ],
+      "statements": [
+        "INSERT INTO FinalTenants(id,tenant,payload) VALUES(1,'a','a1'),(2,'b','b1')"
+      ]
+    },
+    {
+      "label": "pg-final-definer-view",
+      "family": "postgresql-corrected-ddl-and-view-controls",
+      "kind": "ddl",
+      "requires": [
+        "pg-final-tenant-table"
+      ],
+      "sql": "CREATE VIEW FinalTenantView SQL SECURITY DEFINER AS SELECT r.id,r.tenant,r.payload FROM FinalTenants AS r WHERE r.tenant=spanner.secure_context('tenant')"
+    },
+    {
+      "label": "pg-final-view-grant",
+      "family": "postgresql-corrected-ddl-and-view-controls",
+      "kind": "ddl",
+      "requires": [
+        "pg-final-role",
+        "pg-final-definer-view"
+      ],
+      "sql": "GRANT SELECT ON FinalTenantView TO pv_final_user"
+    },
+    {
+      "label": "pg-final-view-role-a",
+      "family": "postgresql-corrected-ddl-and-view-controls",
+      "kind": "query",
+      "requires": [
+        "pg-final-view-grant",
+        "pg-final-tenant-seed"
+      ],
+      "database_role": "pv_final_user",
+      "secure_context": {
+        "tenant": "a"
+      },
+      "sql": "SELECT id,tenant,payload FROM FinalTenantView ORDER BY id"
+    },
+    {
+      "label": "pg-final-view-role-b",
+      "family": "postgresql-corrected-ddl-and-view-controls",
+      "kind": "query",
+      "requires": [
+        "pg-final-view-grant",
+        "pg-final-tenant-seed"
+      ],
+      "database_role": "pv_final_user",
+      "secure_context": {
+        "tenant": "b"
+      },
+      "sql": "SELECT id,tenant,payload FROM FinalTenantView ORDER BY id"
+    },
+    {
+      "label": "pg-final-view-missing-context",
+      "family": "postgresql-corrected-ddl-and-view-controls",
+      "kind": "query",
+      "requires": [
+        "pg-final-view-grant",
+        "pg-final-tenant-seed"
+      ],
+      "database_role": "pv_final_user",
+      "secure_context": {},
+      "sql": "SELECT id,tenant,payload FROM FinalTenantView ORDER BY id"
+    },
+    {
+      "label": "pg-final-base-denied",
+      "family": "postgresql-corrected-ddl-and-view-controls",
+      "kind": "query",
+      "requires": [
+        "pg-final-role",
+        "pg-final-tenant-seed"
+      ],
+      "database_role": "pv_final_user",
+      "secure_context": {
+        "tenant": "a"
+      },
+      "sql": "SELECT id FROM FinalTenants"
+    },
+    {
+      "label": "pg-final-context-denied",
+      "family": "postgresql-corrected-ddl-and-view-controls",
+      "kind": "query",
+      "requires": [
+        "pg-final-role"
+      ],
+      "database_role": "pv_final_user",
+      "secure_context": {
+        "tenant": "a"
+      },
+      "sql": "SELECT spanner.secure_context('tenant') AS value"
+    },
+    {
+      "label": "pg-final-context-owner",
+      "family": "postgresql-corrected-ddl-and-view-controls",
+      "kind": "query",
+      "requires": [],
+      "secure_context": {
+        "tenant": "a"
+      },
+      "sql": "SELECT spanner.secure_context('tenant') AS value"
+    },
+    {
+      "label": "pg-final-ddl-export",
+      "family": "postgresql-corrected-ddl-and-view-controls",
+      "kind": "ddl-export",
+      "requires": []
+    }
+  ]
+}

@@ -1,0 +1,36 @@
+from pathlib import Path
+import hashlib,json
+root=Path('/Users/apstndb/tmp/apstndb/spanalyzer/managed-revalidation-20261112/evidence')
+plan=json.loads((root/'pg-final-cases.json').read_text())
+rows=[json.loads(x)for x in (root/'pg-final.jsonl').read_text().splitlines()]
+by={r['label']:r for r in rows};checks=[]
+def check(name,ok,detail=None):checks.append({'name':name,'pass':bool(ok),'detail':detail})
+check('all-planned-steps-recorded',[r['label']for r in rows]==['create-database']+[s['label']for s in plan['steps']]+['drop-database','database-absent'])
+check('exactly-one-extra-lifecycle',sum(r['label']=='create-database'for r in rows)==1)
+check('no-blocked-cases',all(r['code']!='NOT_RUN'for r in rows))
+check('no-inconclusive-transport',all(r['code']not in ['Unavailable','Unauthenticated','DeadlineExceeded','Unknown']for r in rows))
+negative={'pg-final-index-unannotated-negative':'FailedPrecondition','pg-final-view-missing-context':'InvalidArgument','pg-final-base-denied':'PermissionDenied','pg-final-context-denied':'PermissionDenied'}
+for step in plan['steps']:
+ expected=negative.get(step['label'],'OK');r=by[step['label']]
+ check(step['label']+'-classification',r['code']==expected,{'expected':expected,'observed':r['code']})
+for tenant,identifier in [('a','1'),('b','2')]:check('tenant-'+tenant+'-only',by['pg-final-view-role-'+tenant]['rows']==[{'id':identifier,'payload':tenant+'1','tenant':tenant}])
+check('secure-context-owner-value',by['pg-final-context-owner']['rows']==[{'value':'a'}])
+check('missing-context-is-rejected', 'Missing secure parameter: tenant'in by['pg-final-view-missing-context']['error'])
+check('native-index-needs-vector-length','vector_length'in by['pg-final-index-unannotated-negative']['error'])
+check('base-access-rejection-identifies-table','finaltenants'in by['pg-final-base-denied']['error'])
+check('direct-context-rejection-identifies-function','SECURE_CONTEXT()'in by['pg-final-context-denied']['error'])
+check('vector-seed-committed',by['pg-final-vector-seed']['transaction_committed']is True and by['pg-final-vector-seed']['modified_counts']==[1])
+check('tenant-seed-committed',by['pg-final-tenant-seed']['transaction_committed']is True and by['pg-final-tenant-seed']['modified_counts']==[2])
+ddl='\n'.join(by['pg-final-ddl-export']['ddl']).casefold()
+check('native-scann-index-exported','create index finalannotatedindex'in ddl and 'using scann (e)'in ddl)
+check('rejected-unannotated-index-absent','create index finalflexibleindex'not in ddl)
+check('view-and-privilege-exported','create view finaltenantview'in ddl and 'spanner.secure_context'in ddl and 'grant select on table finaltenantview to pv_final_user'in ddl)
+check('owned-create-succeeded',by['create-database']['code']=='OK')
+check('owned-drop-succeeded',by['drop-database']['code']=='OK')
+check('owned-database-confirmed-absent',by['database-absent']['code']=='NotFound')
+command=json.loads((root/'pg-final-command.json').read_text())
+check('producer-completed',command['exit_code']==0)
+check('approved-input-hash',command['plan_sha256']==hashlib.sha256((root/'pg-final-cases.json').read_bytes()).hexdigest())
+report={'status':'pass'if all(c['pass']for c in checks)else'fail','checks':len(checks),'failures':[c for c in checks if not c['pass']],'planned_steps':17,'recorded_steps':17,'lifecycle_records':3,'assertions':checks,'boundary':'One separately approved PostgreSQL DB. Positive and expected-negative results are checked separately; no claim that every SQL statement succeeds. Security behavior is verified by restricted-role queries, not inferred from normalized GetDatabaseDdl text.'}
+(root/'pg-final-assertions.json').write_text(json.dumps(report,indent=2)+'\n')
+print(report['status'],report['checks'],'checks',report['failures']);assert report['status']=='pass'

@@ -1,0 +1,31 @@
+from pathlib import Path
+import datetime,hashlib,json,os,re,subprocess
+base=Path('/Users/apstndb/work/spanner-analyzer/.worktrees/cross-engine-docs-20261005/.tmp/managed-revalidation-20261112');task=Path('/Users/apstndb/tmp/apstndb/spanalyzer/managed-revalidation-20261112');out=task/'evidence'
+auth=json.loads((task/'pg-final-authorization.json').read_text());plan=out/'pg-final-cases.json';digest=hashlib.sha256(plan.read_bytes()).hexdigest()
+assert auth['approved']is True and auth['database_count']==1 and auth['step_count']==17 and auth['plan_sha256']==digest
+assert len(json.loads(plan.read_text())['steps'])==17 and not os.getenv('SPANNER_EMULATOR_HOST')
+for dialect in ['google','pg']:
+ rows=[json.loads(s)for s in (out/(dialect+'.jsonl')).read_text().splitlines()];codes={r['label']:r['code']for r in rows}
+ assert codes['drop-database']=='OK'and codes['database-absent']=='NotFound'
+env=os.environ.copy();env['SPANALYZER_OWNED_FIXTURE_APPROVAL']='managed-revalidation-20261112';keys=['SPANNER_PROJECT_ID','SPANNER_INSTANCE_ID','SPANNER_DATABASE_ID'];assert all(env.get(k)for k in keys)
+parent_digest=hashlib.sha256((env['SPANNER_PROJECT_ID']+'\n'+env['SPANNER_INSTANCE_ID']).encode()).hexdigest()
+assert parent_digest==json.loads((task/'parent-identity.json').read_text())['sha256'], 'The dedicated instance differs from the prepared authorization scope'
+with (out/'pg-final-lifecycle-started.json').open('x')as f:json.dump({'authorization':'Separate explicit approval for exactly one additional PostgreSQL lifecycle and 17 controls.','started_at':datetime.datetime.now(datetime.timezone.utc).isoformat(),'plan_sha256':digest},f)
+def clean(v):
+ if isinstance(v,dict):return{k:clean(x)for k,x in v.items()}
+ if isinstance(v,list):return[clean(x)for x in v]
+ if not isinstance(v,str):return v
+ for s in sorted([env[k]for k in keys],key=len,reverse=True):v=v.replace(s,'<redacted>')
+ v=re.sub(r'projects/[^/\s"\']+/instances/[^/\s"\']+/databases/[^/\s"\']+','<database>',v);v=re.sub(r'recheck1112[gp]-[a-f0-9]+','<owned-database>',v)
+ return re.sub(r'requestID\s*=\s*"[^"]*"','requestID = "<redacted>"',v)
+started=datetime.datetime.now(datetime.timezone.utc).isoformat();rows=[]
+with (out/'pg-final.jsonl').open('x')as log,(base/'pg-final-raw.stderr').open('w+')as err:
+ p=subprocess.Popen([str(base/'managed'),str(plan)],env=env,stdout=subprocess.PIPE,stderr=err,text=True)
+ for line in p.stdout:
+  row=clean(json.loads(line));rows.append(row);log.write(json.dumps(row)+'\n');log.flush();print(row['label'],row['code'],flush=True)
+ code=p.wait();err.seek(0);(out/'pg-final.stderr').write_text(clean(err.read()))
+(base/'pg-final-raw.stderr').unlink()
+(out/'pg-final-command.json').write_text(json.dumps({'exit_code':code,'started_at':started,'completed_at':datetime.datetime.now(datetime.timezone.utc).isoformat(),'plan_sha256':digest,'source_sha256':hashlib.sha256((base/'module/managed.go').read_bytes()).hexdigest(),'binary_sha256':hashlib.sha256((base/'managed').read_bytes()).hexdigest(),'scope':'Separately authorized additional PostgreSQL database, 17 minimal corrected controls, delete only after successful creation, verify NotFound.'},indent=2)+'\n')
+codes={r['label']:r['code']for r in rows};assert code==0 and len(rows)==20
+assert codes['create-database']=='OK'and codes['drop-database']=='OK'and codes['database-absent']=='NotFound'
+assert not any(r['code']in ['Unavailable','Unauthenticated','DeadlineExceeded']for r in rows)

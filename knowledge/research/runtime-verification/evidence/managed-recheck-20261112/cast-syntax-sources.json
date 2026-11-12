@@ -1,0 +1,40 @@
+{
+  "source": "Pinned GoogleSQL upstream checkout; source design evidence, not a current managed build identity.",
+  "revision": "c3f174111ccfbd6b5b0b112925ef962a3a5c8d47",
+  "files": [
+    {
+      "path": "docs/conversion_functions.md",
+      "sha256": "005ef0dd829af6d5ed320e2afae1b19acfce59e1dc49387cf4080157cd547eee",
+      "start_line": 849,
+      "end_line": 865,
+      "excerpt": "## `CAST` \n<a id=\"cast\"></a>\n\n```zetasql\nCAST(expression AS typename [format_clause])\n```\n\n**Description**\n\nCast syntax is used in a query to indicate that the result type of an\nexpression should be converted to some other type.\n\nWhen using `CAST`, a query can fail if ZetaSQL is unable to perform\nthe cast. If you want to protect your queries from these types of errors, you\ncan use [SAFE_CAST][con-func-safecast].\n\nCasts between supported types that don't successfully map from the original"
+    },
+    {
+      "path": "zetasql/parser/zetasql.tm",
+      "sha256": "11dab70ebc663673a8ea5f08c283954d5d49f3afc9a984faf8a9911bb44c5362",
+      "start_line": 10644,
+      "end_line": 10652,
+      "excerpt": "cast_expression {ASTExpression*}:\n    (\"CAST\" | \"SAFE_CAST\"[safe]) \"(\" expression \"AS\" type format? \")\"\n    {\n      auto* cast = MakeNode<ASTCastExpression>(@$, $expression, $type, $format);\n      cast->set_is_safe_cast(@safe.has_value());\n      $$ = cast;\n    }\n  | \"CAST\" \"(\" \"SELECT\"\n    {"
+    },
+    {
+      "path": "zetasql/parser/gen_parse_tree.py",
+      "sha256": "51048c6fe7ff044bf455ae69b78e0d506f6491acac3f5c922115ce711174351b",
+      "start_line": 2819,
+      "end_line": 2843,
+      "excerpt": "  gen.AddNode(\n      name='ASTCastExpression',\n      tag_id=42,\n      parent='ASTExpression',\n      use_custom_debug_string=True,\n      fields=[\n          Field(\n              'expr',\n              'ASTExpression',\n              tag_id=2,\n              field_loader=FieldLoaderMethod.REQUIRED,\n          ),\n          Field(\n              'type',\n              'ASTType',\n              tag_id=3,\n              field_loader=FieldLoaderMethod.REQUIRED,\n          ),\n          Field('format', 'ASTFormatClause', tag_id=4),\n          Field('is_safe_cast', SCALAR_BOOL, tag_id=5),\n      ],\n  )\n\n  gen.AddNode(\n      name='ASTSelectAs',"
+    },
+    {
+      "path": "zetasql/parser/unparser.cc",
+      "sha256": "ed135777f7a09bab4c860c2f081f19266c29435a6f7c743291061154d8f15c45",
+      "start_line": 2721,
+      "end_line": 2737,
+      "excerpt": "void Unparser::visitASTCastExpression(const ASTCastExpression* node,\n                                      void* data) {\n  if (!ThreadHasEnoughStack()) {\n    println(\"<Complex nested expression truncated>\");\n    return;\n  }\n  print(node->is_safe_cast() ? \"SAFE_CAST(\" : \"CAST(\");\n  node->expr()->Accept(this, data);\n  print(\"AS\");\n  node->type()->Accept(this, data);\n  if (node->format()) {\n    node->format()->Accept(this, data);\n  }\n  print(\")\");\n}\n\nvoid Unparser::visitASTExtractExpression(const ASTExtractExpression* node,"
+    }
+  ],
+  "local_parser": {
+    "module": "github.com/cloudspannerecosystem/memefish",
+    "version": "v0.8.1",
+    "result": "memefish-syntax.jsonl"
+  },
+  "managed_sql_parser_bypass": "Dedicated managed runner injects CLI_PARSE_MODE=NO_MEMEFISH; managed-cli-syntax.json retains service errors. Corrected AS form has separate successful SDK execution with synthetic secure context in new-readonly.jsonl."
+}

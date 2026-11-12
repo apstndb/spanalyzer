@@ -1,0 +1,169 @@
+package main
+
+import (
+	"context"
+	"crypto/sha256"
+	"encoding/hex"
+	"encoding/json"
+	"fmt"
+	"os"
+	"path"
+	"strings"
+	"time"
+
+	"cloud.google.com/go/spanner"
+	database "cloud.google.com/go/spanner/admin/database/apiv1"
+	dbpb "cloud.google.com/go/spanner/admin/database/apiv1/databasepb"
+	sppb "cloud.google.com/go/spanner/apiv1/spannerpb"
+	"google.golang.org/api/iterator"
+	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/types/known/structpb"
+)
+
+type repairStep struct {
+	Label         string         `json:"label"`
+	SQL           string         `json:"sql"`
+	Params        map[string]any `json:"params"`
+	SecureContext map[string]any `json:"secure_context"`
+}
+
+func output(label string, err error, extra map[string]any) {
+	if extra == nil {
+		extra = map[string]any{}
+	}
+	extra["label"] = label
+	extra["code"] = status.Code(err).String()
+	extra["error"] = ""
+	if err != nil {
+		extra["error"] = err.Error()
+	}
+	extra["at"] = time.Now().UTC().Format(time.RFC3339Nano)
+	if err = json.NewEncoder(os.Stdout).Encode(extra); err != nil {
+		panic(err)
+	}
+}
+func main() {
+	if os.Getenv("SPANNER_EMULATOR_HOST") != "" || os.Getenv("SPANALYZER_OWNED_FIXTURE_APPROVAL") != "managed-revalidation-20261112" {
+		panic("owned current-run approval required")
+	}
+	var marker struct {
+		Started string `json:"started_at"`
+	}
+	data, err := os.ReadFile(os.Args[1])
+	if err != nil {
+		panic(err)
+	}
+	if err = json.Unmarshal(data, &marker); err != nil {
+		panic(err)
+	}
+	since, err := time.Parse(time.RFC3339Nano, marker.Started)
+	if err != nil {
+		panic(err)
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
+	defer cancel()
+	admin, err := database.NewDatabaseAdminClient(ctx)
+	if err != nil {
+		panic(err)
+	}
+	defer admin.Close()
+	parent := fmt.Sprintf("projects/%s/instances/%s", os.Getenv("SPANNER_PROJECT_ID"), os.Getenv("SPANNER_INSTANCE_ID"))
+	it := admin.ListDatabases(ctx, &dbpb.ListDatabasesRequest{Parent: parent})
+	candidates := []*dbpb.Database{}
+	for {
+		d, e := it.Next()
+		if e == iterator.Done {
+			break
+		}
+		if e != nil {
+			panic(e)
+		}
+		if strings.HasPrefix(path.Base(d.Name), "recheck1112g-") && d.CreateTime.AsTime().After(since) && d.DatabaseDialect == dbpb.DatabaseDialect_GOOGLE_STANDARD_SQL {
+			candidates = append(candidates, d)
+		}
+	}
+	if len(candidates) != 1 {
+		panic("ambiguous owned fixture; no DDL executed")
+	}
+	db := candidates[0]
+	ddl, err := admin.GetDatabaseDdl(ctx, &dbpb.GetDatabaseDdlRequest{Database: db.Name})
+	if err != nil {
+		panic(err)
+	}
+	joined := strings.Join(ddl.Statements, "\n")
+	for _, required := range []string{"PVRows", "PVProject", "PVPublic", "ScoreDocs"} {
+		if !strings.Contains(joined, required) {
+			panic("owned fixture schema does not match")
+		}
+	}
+	sum := sha256.Sum256([]byte(db.Name))
+	output("repair-owned-binding", nil, map[string]any{"database_identity_sha256": hex.EncodeToString(sum[:]), "created_at": db.CreateTime.AsTime().Format(time.RFC3339Nano), "selection": "Exactly one GoogleSQL database matching current producer prefix, creation after exclusive lifecycle marker, and expected fixture DDL. No resource name is retained."})
+	statements := []string{
+		"CREATE OR REPLACE VIEW PVFilter SQL SECURITY DEFINER AS SELECT r.Id,r.Tenant,r.Payload FROM PVRows AS r WHERE r.Tenant=SECURE_CONTEXT('tenant')",
+		"CREATE OR REPLACE VIEW PVJson SQL SECURITY DEFINER AS SELECT r.Id,r.Tenant,r.Payload FROM PVRows AS r WHERE r.Tenant=JSON_VALUE(PARSE_JSON(SECURE_CONTEXT('auth')),'$.tenant')",
+		"GRANT SELECT ON VIEW PVFilter TO ROLE pv_user",
+		"GRANT SELECT ON VIEW PVJson TO ROLE pv_user",
+	}
+	op, err := admin.UpdateDatabaseDdl(ctx, &dbpb.UpdateDatabaseDdlRequest{Database: db.Name, Statements: statements})
+	if err == nil {
+		err = op.Wait(ctx)
+	}
+	output("repair-view-definitions-and-grants", err, map[string]any{"statements": statements})
+	if err != nil {
+		return
+	}
+	raw, err := os.ReadFile(os.Args[2])
+	if err != nil {
+		panic(err)
+	}
+	var plan struct {
+		Steps []repairStep `json:"steps"`
+	}
+	if err = json.Unmarshal(raw, &plan); err != nil {
+		panic(err)
+	}
+	wanted := map[string]bool{"pv-role-tenant-a": true, "pv-role-tenant-b": true, "pv-role-unknown": true, "pv-role-null": true, "pv-role-missing": true, "pv-role-wrong-type": true, "pv-role-ordinary-param-cannot-override": true, "pv-role-json-context": true}
+	client, err := spanner.NewClientWithConfig(ctx, db.Name, spanner.ClientConfig{DatabaseRole: "pv_user"})
+	if err != nil {
+		panic(err)
+	}
+	defer client.Close()
+	for _, s := range plan.Steps {
+		if !wanted[s.Label] {
+			continue
+		}
+		values := map[string]*structpb.Value{}
+		for k, v := range s.SecureContext {
+			values[k], err = structpb.NewValue(v)
+			if err != nil {
+				panic(err)
+			}
+		}
+		ro := client.Single()
+		rows := []map[string]any{}
+		iter := ro.QueryWithOptions(ctx, spanner.Statement{SQL: s.SQL, Params: s.Params}, spanner.QueryOptions{ClientContext: &sppb.RequestOptions_ClientContext{SecureContext: values}})
+		for {
+			row, e := iter.Next()
+			if e == iterator.Done {
+				err = nil
+				break
+			}
+			if e != nil {
+				err = e
+				break
+			}
+			r := map[string]any{}
+			for i, name := range row.ColumnNames() {
+				var v spanner.GenericColumnValue
+				if e = row.Column(i, &v); e != nil {
+					panic(e)
+				}
+				r[name] = v.Value.AsInterface()
+			}
+			rows = append(rows, r)
+		}
+		iter.Stop()
+		ro.Close()
+		output(s.Label, err, map[string]any{"sql": s.SQL, "rows": rows, "secure_context": s.SecureContext, "database_role": "pv_user", "correction": "Qualified r.Tenant in the view WHERE clause; same owned database and original probe intent."})
+	}
+}

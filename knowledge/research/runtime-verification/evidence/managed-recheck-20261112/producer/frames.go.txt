@@ -1,0 +1,52 @@
+package main
+
+import (
+	"bytes"
+	"encoding/base64"
+	"encoding/json"
+	"os"
+
+	"github.com/klauspost/compress/zstd"
+)
+
+func main() {
+	payload := []byte("hello")
+	var buffer bytes.Buffer
+	stream, err := zstd.NewWriter(&buffer)
+	if err != nil {
+		panic(err)
+	}
+	if _, err = stream.Write(payload); err != nil {
+		panic(err)
+	}
+	if err = stream.Close(); err != nil {
+		panic(err)
+	}
+	block, err := zstd.NewWriter(nil, zstd.WithSingleSegment(true))
+	if err != nil {
+		panic(err)
+	}
+	defer block.Close()
+	decoder, err := zstd.NewReader(nil)
+	if err != nil {
+		panic(err)
+	}
+	defer decoder.Close()
+	frames := map[string][]byte{"streaming": buffer.Bytes(), "encode_all": block.EncodeAll(payload, nil)}
+	for name, frame := range frames {
+		var header zstd.Header
+		if err = header.Decode(frame); err != nil {
+			panic(err)
+		}
+		decoded, err := decoder.DecodeAll(frame, nil)
+		if err != nil {
+			panic(err)
+		}
+		if !bytes.Equal(payload, decoded) {
+			panic("invalid fixture")
+		}
+		if err = json.NewEncoder(os.Stdout).Encode(map[string]any{"name": name, "base64": base64.StdEncoding.EncodeToString(frame), "has_content_size": header.HasFCS, "content_size": header.FrameContentSize, "local_decoded": string(decoded)}); err != nil {
+			panic(err)
+		}
+	}
+}

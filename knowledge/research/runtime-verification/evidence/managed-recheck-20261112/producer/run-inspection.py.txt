@@ -1,0 +1,24 @@
+from pathlib import Path
+import datetime,json,os,re,subprocess
+root=Path('/Users/apstndb/work/spanner-analyzer/.worktrees/cross-engine-docs-20261005')
+out=Path('/Users/apstndb/tmp/apstndb/spanalyzer/managed-revalidation-20261112/evidence')
+env=os.environ.copy();keys=['SPANNER_PROJECT_ID','SPANNER_INSTANCE_ID','SPANNER_DATABASE_ID']
+assert all(env.get(k)for k in keys)and not env.get('SPANNER_EMULATOR_HOST')
+env['TEST_REAL_SPANNER_DATABASE']='projects/{SPANNER_PROJECT_ID}/instances/{SPANNER_INSTANCE_ID}/databases/{SPANNER_DATABASE_ID}'.format(**env)
+go_root='/Users/apstndb/.local/share/mise/installs/go/1.26.11'
+env.update(GOROOT=go_root,GOTOOLCHAIN='local',GOWORK='off',GOFLAGS='-mod=readonly',GOCACHE='/Users/apstndb/work/spanner-analyzer/.tmp/managed-recheck-20260925/go-cache',REQUIRE_REAL_SPANNER_DRIFT='1',REQUIRE_REAL_SPANNER_CANONICAL='1')
+env['PATH']=go_root+'/bin:'+env['PATH']
+def clean(s):
+ for k in sorted([env['TEST_REAL_SPANNER_DATABASE']]+[env[k]for k in keys],key=len,reverse=True):s=s.replace(k,'<redacted>')
+ s=re.sub(r'projects/[^/\s"\']+/instances/[^/\s"\']+/databases/[^/\s"\']+','<database>',s)
+ return re.sub(r'requestID\s*=\s*"[^"]*"','requestID = "<redacted>"',s)
+tasks=[('drift-canonical',['go','test','-count=1','-v','-run','^Test(Drift_RealTableMetas|CanonicalDDL_RealSpanner)$','./infoschem']),('infoschema-check',['go','run','./cmd/infoschema-capture','check','--target','managed','--observations=3','--repo-root','..']),('spanner-sys-check',['go','run','./cmd/spanner-sys-capture','check','--target','managed','--repo-root','..'])]
+receipts=[]
+for label,args in tasks:
+ started=datetime.datetime.now(datetime.timezone.utc).isoformat()
+ r=subprocess.run(args,cwd=root/'survey',env=env,capture_output=True,text=True,timeout=1800)
+ (out/(label+'.log')).write_text(clean(r.stdout));(out/(label+'.stderr')).write_text(clean(r.stderr))
+ receipts.append(dict(label=label,argv=args,exit_code=r.returncode,started_at=started,completed_at=datetime.datetime.now(datetime.timezone.utc).isoformat(),scope='Existing dedicated managed database; read-only inspection; no capture write flag or resource lifecycle.'))
+ (out/'inspection-commands.json').write_text(json.dumps(receipts,indent=2)+'\n')
+ print(label,'exit',r.returncode,'stdout_bytes',len(r.stdout),flush=True)
+ assert r.returncode==0,clean(r.stderr[-1200:])

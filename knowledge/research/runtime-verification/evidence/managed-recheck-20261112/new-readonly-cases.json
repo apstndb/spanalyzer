@@ -1,0 +1,179 @@
+[
+  {
+    "label": "connectivity",
+    "sql": "SELECT 1 AS connectivity"
+  },
+  {
+    "label": "server-time",
+    "sql": "SELECT CURRENT_TIMESTAMP() AS server_time"
+  },
+  {
+    "label": "secure-context-absent",
+    "sql": "SELECT SECURE_CONTEXT('user_id') AS value"
+  },
+  {
+    "label": "secure-context-tenant-a",
+    "sql": "SELECT SECURE_CONTEXT('user_id') AS value",
+    "secure_context": {
+      "user_id": "123"
+    }
+  },
+  {
+    "label": "secure-context-tenant-b",
+    "sql": "SELECT SECURE_CONTEXT('user_id') AS value",
+    "secure_context": {
+      "user_id": "456"
+    }
+  },
+  {
+    "label": "secure-context-numeric",
+    "sql": "SELECT SECURE_CONTEXT('user_id') AS value",
+    "secure_context": {
+      "user_id": 123
+    }
+  },
+  {
+    "label": "secure-context-null",
+    "sql": "SELECT SECURE_CONTEXT('user_id') AS value",
+    "secure_context": {
+      "user_id": null
+    }
+  },
+  {
+    "label": "secure-context-json-object",
+    "sql": "SELECT SECURE_CONTEXT('user_id') AS value",
+    "secure_context": {
+      "user_id": {
+        "id": "123"
+      }
+    }
+  },
+  {
+    "label": "secure-context-nonliteral",
+    "sql": "SELECT SECURE_CONTEXT(@key) AS value",
+    "params": {
+      "key": "user_id"
+    },
+    "secure_context": {
+      "user_id": "123"
+    }
+  },
+  {
+    "label": "secure-context-null-key",
+    "sql": "SELECT SECURE_CONTEXT(CAST(NULL AS STRING)) AS value",
+    "secure_context": {
+      "user_id": "123"
+    }
+  },
+  {
+    "label": "secure-context-wrong-key-type",
+    "sql": "SELECT SECURE_CONTEXT(1) AS value",
+    "secure_context": {
+      "user_id": "123"
+    }
+  },
+  {
+    "label": "secure-context-cast-doc-syntax",
+    "sql": "SELECT CAST(SECURE_CONTEXT('user_id'), INT64) AS value",
+    "secure_context": {
+      "user_id": "123"
+    }
+  },
+  {
+    "label": "secure-context-cast-corrected",
+    "sql": "SELECT CAST(SECURE_CONTEXT('user_id') AS INT64) AS value",
+    "secure_context": {
+      "user_id": "123"
+    }
+  },
+  {
+    "label": "secure-context-query-param-separate",
+    "sql": "SELECT SECURE_CONTEXT('user_id') AS value, @user_id AS ordinary_param",
+    "params": {
+      "user_id": "456"
+    },
+    "secure_context": {
+      "user_id": "123"
+    }
+  },
+  {
+    "label": "zstd-positional-level--6",
+    "sql": "SELECT ZSTD_DECOMPRESS_TO_STRING(ZSTD_COMPRESS('hello', -6)) AS result"
+  },
+  {
+    "label": "zstd-positional-level--5",
+    "sql": "SELECT ZSTD_DECOMPRESS_TO_STRING(ZSTD_COMPRESS('hello', -5)) AS result"
+  },
+  {
+    "label": "zstd-positional-level-0",
+    "sql": "SELECT ZSTD_DECOMPRESS_TO_STRING(ZSTD_COMPRESS('hello', 0)) AS result"
+  },
+  {
+    "label": "zstd-positional-level-3",
+    "sql": "SELECT ZSTD_DECOMPRESS_TO_STRING(ZSTD_COMPRESS('hello', 3)) AS result"
+  },
+  {
+    "label": "zstd-positional-level-22",
+    "sql": "SELECT ZSTD_DECOMPRESS_TO_STRING(ZSTD_COMPRESS('hello', 22)) AS result"
+  },
+  {
+    "label": "zstd-positional-level-23",
+    "sql": "SELECT ZSTD_DECOMPRESS_TO_STRING(ZSTD_COMPRESS('hello', 23)) AS result"
+  },
+  {
+    "label": "zstd-named-level",
+    "sql": "SELECT ZSTD_DECOMPRESS_TO_STRING(ZSTD_COMPRESS('hello', level=>3)) AS result"
+  },
+  {
+    "label": "zstd-null-level",
+    "sql": "SELECT ZSTD_COMPRESS('hello', CAST(NULL AS INT64)) IS NULL AS is_null"
+  },
+  {
+    "label": "zstd_decompress_to_bytes-null-limit",
+    "sql": "SELECT ZSTD_DECOMPRESS_TO_BYTES(ZSTD_COMPRESS('hello'), size_limit=>CAST(NULL AS INT64)) IS NULL AS is_null"
+  },
+  {
+    "label": "zstd_decompress_to_bytes-size-limit",
+    "sql": "SELECT ZSTD_DECOMPRESS_TO_BYTES(ZSTD_COMPRESS('hello'), size_limit=>4) AS result"
+  },
+  {
+    "label": "zstd_decompress_to_bytes-positional-size-negative",
+    "sql": "SELECT ZSTD_DECOMPRESS_TO_BYTES(ZSTD_COMPRESS('hello'), 8) AS result"
+  },
+  {
+    "label": "zstd_decompress_to_string-null-limit",
+    "sql": "SELECT ZSTD_DECOMPRESS_TO_STRING(ZSTD_COMPRESS('hello'), size_limit=>CAST(NULL AS INT64)) IS NULL AS is_null"
+  },
+  {
+    "label": "zstd_decompress_to_string-size-limit",
+    "sql": "SELECT ZSTD_DECOMPRESS_TO_STRING(ZSTD_COMPRESS('hello'), size_limit=>4) AS result"
+  },
+  {
+    "label": "zstd_decompress_to_string-positional-size-negative",
+    "sql": "SELECT ZSTD_DECOMPRESS_TO_STRING(ZSTD_COMPRESS('hello'), 8) AS result"
+  },
+  {
+    "label": "distribution-agg-empty-struct",
+    "sql": "SELECT SPANNER_SYS.DISTRIBUTION_AGG(LATENCY_DISTRIBUTION[SAFE_OFFSET(0)]) AS value FROM SPANNER_SYS.QUERY_STATS_TOP_MINUTE WHERE FALSE"
+  },
+  {
+    "label": "distribution-agg-empty-json",
+    "sql": "SELECT SPANNER_SYS.DISTRIBUTION_AGG(LATENCY_DISTRIBUTION_JSON_STRING) AS value FROM SPANNER_SYS.QUERY_STATS_TOP_MINUTE WHERE FALSE"
+  },
+  {
+    "label": "distribution-agg-documented-query-struct",
+    "sql": "SELECT IF(latency_dist IS NOT NULL, SPANNER_SYS.DISTRIBUTION_PERCENTILE(latency_dist, 99.0), NULL) AS p99 FROM (SELECT SPANNER_SYS.DISTRIBUTION_AGG(IF(T.LATENCY_DISTRIBUTION[SAFE_OFFSET(0)].COUNT > 0, T.LATENCY_DISTRIBUTION[SAFE_OFFSET(0)], NULL)) AS latency_dist FROM SPANNER_SYS.QUERY_STATS_TOP_MINUTE AS T WHERE T.INTERVAL_END > TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL 1 HOUR) AND T.INTERVAL_END <= CURRENT_TIMESTAMP())"
+  },
+  {
+    "label": "distribution-agg-documented-txn-struct",
+    "sql": "WITH aggregated_stats AS (SELECT T.FPRINT, SPANNER_SYS.DISTRIBUTION_AGG(IF(T.COMMIT_LATENCY_DISTRIBUTION[SAFE_OFFSET(0)].COUNT > 0, T.COMMIT_LATENCY_DISTRIBUTION[SAFE_OFFSET(0)], NULL)) AS commit_latency_dist FROM SPANNER_SYS.TXN_STATS_TOP_MINUTE AS T WHERE T.INTERVAL_END > TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL 1 HOUR) AND T.INTERVAL_END <= CURRENT_TIMESTAMP() GROUP BY T.FPRINT) SELECT FPRINT, IF(commit_latency_dist IS NOT NULL, SPANNER_SYS.DISTRIBUTION_PERCENTILE(commit_latency_dist, 99.0), NULL) AS p99 FROM aggregated_stats"
+  },
+  {
+    "label": "distribution-agg-query-json",
+    "sql": "SELECT SPANNER_SYS.DISTRIBUTION_PERCENTILE(SPANNER_SYS.DISTRIBUTION_AGG(LATENCY_DISTRIBUTION_JSON_STRING), 99.0) AS p99 FROM SPANNER_SYS.QUERY_STATS_TOP_MINUTE WHERE INTERVAL_END > TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL 1 HOUR)"
+  },
+  {
+    "label": "distribution-agg-array-negative",
+    "sql": "SELECT SPANNER_SYS.DISTRIBUTION_AGG(LATENCY_DISTRIBUTION) AS value FROM SPANNER_SYS.QUERY_STATS_TOP_MINUTE WHERE FALSE"
+  }
+]

@@ -1,0 +1,20 @@
+package main
+
+import (
+	"encoding/json"
+	"github.com/cloudspannerecosystem/memefish"
+	"os"
+)
+
+func main() {
+	for _, sql := range []string{"SELECT CAST(SECURE_CONTEXT('user_id'), INT64)", "SELECT CAST(SECURE_CONTEXT('user_id') AS INT64)", "SELECT SECURE_CONTEXT(@key)"} {
+		_, err := memefish.ParseQuery("", sql)
+		text := ""
+		if err != nil {
+			text = err.Error()
+		}
+		if err = json.NewEncoder(os.Stdout).Encode(map[string]any{"sql": sql, "strict_parse_error": text, "accepted": err == nil}); err != nil {
+			panic(err)
+		}
+	}
+}

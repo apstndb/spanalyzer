@@ -1,0 +1,53 @@
+[
+  {
+    "label": "drift-canonical",
+    "argv": [
+      "go",
+      "test",
+      "-count=1",
+      "-v",
+      "-run",
+      "^Test(Drift_RealTableMetas|CanonicalDDL_RealSpanner)$",
+      "./infoschem"
+    ],
+    "exit_code": 0,
+    "started_at": "2026-11-11T19:54:51.614418+00:00",
+    "completed_at": "2026-11-11T19:55:08.206568+00:00",
+    "scope": "Existing dedicated managed database; read-only inspection; no capture write flag or resource lifecycle."
+  },
+  {
+    "label": "infoschema-check",
+    "argv": [
+      "go",
+      "run",
+      "./cmd/infoschema-capture",
+      "check",
+      "--target",
+      "managed",
+      "--observations=3",
+      "--repo-root",
+      ".."
+    ],
+    "exit_code": 0,
+    "started_at": "2026-11-11T19:55:08.206685+00:00",
+    "completed_at": "2026-11-11T19:55:11.058929+00:00",
+    "scope": "Existing dedicated managed database; read-only inspection; no capture write flag or resource lifecycle."
+  },
+  {
+    "label": "spanner-sys-check",
+    "argv": [
+      "go",
+      "run",
+      "./cmd/spanner-sys-capture",
+      "check",
+      "--target",
+      "managed",
+      "--repo-root",
+      ".."
+    ],
+    "exit_code": 0,
+    "started_at": "2026-11-11T19:55:11.059156+00:00",
+    "completed_at": "2026-11-11T19:55:13.328371+00:00",
+    "scope": "Existing dedicated managed database; read-only inspection; no capture write flag or resource lifecycle."
+  }
+]

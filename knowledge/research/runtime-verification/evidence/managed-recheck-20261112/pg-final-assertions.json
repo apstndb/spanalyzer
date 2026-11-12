@@ -1,0 +1,252 @@
+{
+  "status": "pass",
+  "checks": 38,
+  "failures": [],
+  "planned_steps": 17,
+  "recorded_steps": 17,
+  "lifecycle_records": 3,
+  "assertions": [
+    {
+      "name": "all-planned-steps-recorded",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "exactly-one-extra-lifecycle",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "no-blocked-cases",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "no-inconclusive-transport",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "fixture-connectivity-classification",
+      "pass": true,
+      "detail": {
+        "expected": "OK",
+        "observed": "OK"
+      }
+    },
+    {
+      "name": "pg-final-vector-tables-classification",
+      "pass": true,
+      "detail": {
+        "expected": "OK",
+        "observed": "OK"
+      }
+    },
+    {
+      "name": "pg-final-vector-seed-classification",
+      "pass": true,
+      "detail": {
+        "expected": "OK",
+        "observed": "OK"
+      }
+    },
+    {
+      "name": "pg-final-index-annotated-classification",
+      "pass": true,
+      "detail": {
+        "expected": "OK",
+        "observed": "OK"
+      }
+    },
+    {
+      "name": "pg-final-index-unannotated-negative-classification",
+      "pass": true,
+      "detail": {
+        "expected": "FailedPrecondition",
+        "observed": "FailedPrecondition"
+      }
+    },
+    {
+      "name": "pg-final-role-classification",
+      "pass": true,
+      "detail": {
+        "expected": "OK",
+        "observed": "OK"
+      }
+    },
+    {
+      "name": "pg-final-tenant-table-classification",
+      "pass": true,
+      "detail": {
+        "expected": "OK",
+        "observed": "OK"
+      }
+    },
+    {
+      "name": "pg-final-tenant-seed-classification",
+      "pass": true,
+      "detail": {
+        "expected": "OK",
+        "observed": "OK"
+      }
+    },
+    {
+      "name": "pg-final-definer-view-classification",
+      "pass": true,
+      "detail": {
+        "expected": "OK",
+        "observed": "OK"
+      }
+    },
+    {
+      "name": "pg-final-view-grant-classification",
+      "pass": true,
+      "detail": {
+        "expected": "OK",
+        "observed": "OK"
+      }
+    },
+    {
+      "name": "pg-final-view-role-a-classification",
+      "pass": true,
+      "detail": {
+        "expected": "OK",
+        "observed": "OK"
+      }
+    },
+    {
+      "name": "pg-final-view-role-b-classification",
+      "pass": true,
+      "detail": {
+        "expected": "OK",
+        "observed": "OK"
+      }
+    },
+    {
+      "name": "pg-final-view-missing-context-classification",
+      "pass": true,
+      "detail": {
+        "expected": "InvalidArgument",
+        "observed": "InvalidArgument"
+      }
+    },
+    {
+      "name": "pg-final-base-denied-classification",
+      "pass": true,
+      "detail": {
+        "expected": "PermissionDenied",
+        "observed": "PermissionDenied"
+      }
+    },
+    {
+      "name": "pg-final-context-denied-classification",
+      "pass": true,
+      "detail": {
+        "expected": "PermissionDenied",
+        "observed": "PermissionDenied"
+      }
+    },
+    {
+      "name": "pg-final-context-owner-classification",
+      "pass": true,
+      "detail": {
+        "expected": "OK",
+        "observed": "OK"
+      }
+    },
+    {
+      "name": "pg-final-ddl-export-classification",
+      "pass": true,
+      "detail": {
+        "expected": "OK",
+        "observed": "OK"
+      }
+    },
+    {
+      "name": "tenant-a-only",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "tenant-b-only",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "secure-context-owner-value",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "missing-context-is-rejected",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "native-index-needs-vector-length",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "base-access-rejection-identifies-table",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "direct-context-rejection-identifies-function",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "vector-seed-committed",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "tenant-seed-committed",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "native-scann-index-exported",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "rejected-unannotated-index-absent",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "view-and-privilege-exported",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "owned-create-succeeded",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "owned-drop-succeeded",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "owned-database-confirmed-absent",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "producer-completed",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "approved-input-hash",
+      "pass": true,
+      "detail": null
+    }
+  ],
+  "boundary": "One separately approved PostgreSQL DB. Positive and expected-negative results are checked separately; no claim that every SQL statement succeeds. Security behavior is verified by restricted-role queries, not inferred from normalized GetDatabaseDdl text."
+}

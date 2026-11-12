@@ -1,0 +1,1608 @@
+{
+  "status": "pass",
+  "checks": 208,
+  "failures": [],
+  "assertions": [
+    {
+      "name": "google-owned-create",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "google-owned-drop",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "google-owned-absent",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "google/create-database-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "google/fixture-connectivity-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "google/score-fixture-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "google/score-search-index-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "google/score-insert-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "google/score-unpinned-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "google/score-set-db-1-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "google/score-pinned-db-1-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "google/score-set-db-2-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "google/score-pinned-db-2-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "google/score-explicit-independent-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "google/bucket-fixture-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "google/bucket-index-seconds-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "google/bucket-index-hour-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "google/bucket-index-none-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "google/bucket-insert-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "google/bucket-values-start-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "google/bucket-update-same-hour-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "google/bucket-values-same-hour-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "google/bucket-update-next-hour-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "google/bucket-values-next-hour-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "google/queue-fixture-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "google/tvf-star-plain-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "google/tvf-star-as-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "google/tvf-star-bare-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "google/graph-node-table-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "google/graph-create-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "google/gql-left-common-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "google/schema-readback-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "google/select-led-select-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "google/select-led-where-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "google/select-led-aggregate-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "google/from-only-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "google/gql-mode-full-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "google/gql-mode-full-outer-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "google/gql-mode-outer-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "google/gql-mode-left-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "google/gql-mode-left-outer-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "google/gql-mode-inner-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "google/graph-insert-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "google/gql-return-order-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "google/gql-return-order-limit-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "google/gql-standalone-order-limit-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "InvalidArgument",
+        "current": "InvalidArgument"
+      }
+    },
+    {
+      "name": "google/gql-cross-next-order-limit-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "InvalidArgument",
+        "current": "InvalidArgument"
+      }
+    },
+    {
+      "name": "google/queue-case-Payload-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "google/queue-case-payload-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "google/queue-case-PAYLOAD-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "InvalidArgument",
+        "current": "InvalidArgument"
+      }
+    },
+    {
+      "name": "google/queue-case-PaYlOaD-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "InvalidArgument",
+        "current": "InvalidArgument"
+      }
+    },
+    {
+      "name": "google/search-enhanced-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "google/search-enhanced-required-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "google/json-table-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "google/json-index-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "google/json-insert-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "google/json-search-equal-auto-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "google/json-search-equal-search-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "google/json-search-equal-base-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "google/json-search-in-auto-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "google/json-search-in-search-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "google/json-search-in-base-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "google/json-search-whole-auto-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "google/json-search-whole-search-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "google/json-search-whole-base-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "google/gql-standalone-corrected-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "google/gql-next-corrected-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "google/volatile-view-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "google/volatile-graph-default-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "google/volatile-read-default-1-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "google/volatile-read-default-2-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "google/volatile-graph-false-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "google/volatile-read-false-1-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "google/volatile-read-false-2-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "google/volatile-graph-true-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "google/volatile-read-true-1-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "google/volatile-read-true-2-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "google/set-null-schema-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "google/set-null-insert-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "google/set-null-delete-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "google/set-null-result-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "google/score-pagination-insert-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "google/pagination-v1-full-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "google/pagination-v1-offset-0-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "google/pagination-v1-offset-2-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "google/pagination-v1-offset-4-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "google/pagination-v2-full-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "google/pagination-v2-offset-0-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "google/pagination-v2-offset-2-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "google/pagination-v2-offset-4-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "google/batch-omitted-create-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "google/batch-omitted-insert-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "google/batch-omitted-receive-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "google/batch-null-create-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "google/batch-null-insert-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "google/batch-null-receive-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "google/batch-twenty-create-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "google/batch-twenty-insert-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "google/batch-twenty-receive-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "google/dynamic-table-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "google/dynamic-insert-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "google/dynamic-graph-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "google/dynamic-filter-number-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "google/dynamic-filter-pattern-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "google/dynamic-filter-string-negative-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "google/dynamic-group-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "google/dynamic-order-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "google/dynamic-distinct-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "google/dynamic-compare-properties-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "google/dynamic-filter-bool-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "google/dynamic-bare-bool-negative-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "InvalidArgument",
+        "current": "InvalidArgument"
+      }
+    },
+    {
+      "name": "google/drop-database-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "google/database-absent-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "NotFound",
+        "current": "NotFound"
+      }
+    },
+    {
+      "name": "google-new-cohort-v2",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "google-cohort-differs-from-v1",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "google-v1-stable-pages",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "google-v2-stable-pages",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "pg-owned-create",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "pg-owned-drop",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "pg-owned-absent",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "pg/create-database-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "pg/fixture-connectivity-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "pg/score-fixture-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "pg/score-search-index-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "pg/score-insert-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "pg/score-unpinned-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "pg/score-set-db-1-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "InvalidArgument",
+        "current": "InvalidArgument"
+      }
+    },
+    {
+      "name": "pg/score-pinned-db-1-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "NOT_RUN",
+        "current": "NOT_RUN"
+      }
+    },
+    {
+      "name": "pg/score-set-db-2-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "InvalidArgument",
+        "current": "InvalidArgument"
+      }
+    },
+    {
+      "name": "pg/score-pinned-db-2-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "NOT_RUN",
+        "current": "NOT_RUN"
+      }
+    },
+    {
+      "name": "pg/score-explicit-independent-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "pg/bucket-pg-query-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "pg/bucket-pg-boundaries-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "pg/pg-jsonb-sort-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "pg/pg-jsonb-count-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "Unimplemented",
+        "current": "Unimplemented"
+      }
+    },
+    {
+      "name": "pg/json-table-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "pg/json-index-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "pg/json-insert-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "pg/json-search-equal-auto-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "pg/json-search-equal-search-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "pg/json-search-equal-base-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "pg/json-search-in-auto-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "pg/json-search-in-search-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "pg/json-search-in-base-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "pg/json-search-whole-auto-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "pg/json-search-whole-search-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "pg/json-search-whole-base-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "pg/pg-stats-metadata-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "pg/pg-stats-query_stats_top_minute-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "pg/pg-stats-query_stats_top_minute-cpu_seconds_distribution-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "pg/pg-stats-query_stats_top_minute-row_scanned_distribution-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "pg/pg-stats-query_stats_top_10minute-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "pg/pg-stats-query_stats_top_10minute-cpu_seconds_distribution-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "pg/pg-stats-query_stats_top_10minute-row_scanned_distribution-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "pg/pg-stats-query_stats_top_hour-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "pg/pg-stats-query_stats_top_hour-cpu_seconds_distribution-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "pg/pg-stats-query_stats_top_hour-row_scanned_distribution-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "pg/pg-stats-query_stats_total_minute-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "pg/pg-stats-query_stats_total_minute-cpu_seconds_distribution-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "pg/pg-stats-query_stats_total_minute-row_scanned_distribution-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "pg/pg-stats-query_stats_total_10minute-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "pg/pg-stats-query_stats_total_10minute-cpu_seconds_distribution-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "pg/pg-stats-query_stats_total_10minute-row_scanned_distribution-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "pg/pg-stats-query_stats_total_hour-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "pg/pg-stats-query_stats_total_hour-cpu_seconds_distribution-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "pg/pg-stats-query_stats_total_hour-row_scanned_distribution-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "pg/pg-stats-struct-negative-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "InvalidArgument",
+        "current": "InvalidArgument"
+      }
+    },
+    {
+      "name": "pg/set-null-schema-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "pg/set-null-insert-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "pg/set-null-delete-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "pg/set-null-result-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "pg/score-pagination-insert-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "pg/pagination-v1-full-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "pg/pagination-v1-offset-0-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "pg/pagination-v1-offset-2-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "pg/pagination-v1-offset-4-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "pg/pagination-v2-full-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "pg/pagination-v2-offset-0-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "pg/pagination-v2-offset-2-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "pg/pagination-v2-offset-4-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "pg/batch-omitted-create-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "pg/batch-omitted-insert-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "pg/batch-omitted-receive-corrected-signature-control",
+      "pass": true,
+      "detail": {
+        "expected": "InvalidArgument",
+        "current": "InvalidArgument",
+        "comparison": "The new probe supplies priority explicitly; the November 8 initial input did not. Use the separately retained November 8 full-signature repair as the behavioral baseline, not this changed initial input."
+      }
+    },
+    {
+      "name": "pg/batch-null-create-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "pg/batch-null-insert-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "pg/batch-null-receive-corrected-signature-control",
+      "pass": true,
+      "detail": {
+        "expected": "OK",
+        "current": "OK",
+        "comparison": "The new probe supplies priority explicitly; the November 8 initial input did not. Use the separately retained November 8 full-signature repair as the behavioral baseline, not this changed initial input."
+      }
+    },
+    {
+      "name": "pg/batch-twenty-create-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "pg/batch-twenty-insert-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "pg/batch-twenty-receive-corrected-signature-control",
+      "pass": true,
+      "detail": {
+        "expected": "OK",
+        "current": "OK",
+        "comparison": "The new probe supplies priority explicitly; the November 8 initial input did not. Use the separately retained November 8 full-signature repair as the behavioral baseline, not this changed initial input."
+      }
+    },
+    {
+      "name": "pg/drop-database-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "OK",
+        "current": "OK"
+      }
+    },
+    {
+      "name": "pg/database-absent-prior-code",
+      "pass": true,
+      "detail": {
+        "old": "NotFound",
+        "current": "NotFound"
+      }
+    },
+    {
+      "name": "pg-new-cohort-v2",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "pg-cohort-differs-from-v1",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "pg-v1-stable-pages",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "pg-v2-stable-pages",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "pg-qualified-secure-context",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "pg-unqualified-context-negative",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "pg-distribution-query-example-executes",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "pg-distribution-txn-example-executes",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "pg-vector-annotated-valid-length",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "pg-vector-annotated-knn",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "pg-vector-flexible-valid-length",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "pg-vector-flexible-knn",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "pg-vector-dimension-negative",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "pg-flexible-shorter-vector",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "pg-initial-index-probes-have-wrong-dialect-syntax",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "pg/batch-null-receive-batch-boundary",
+      "pass": true,
+      "detail": {
+        "sizes": [
+          30,
+          10
+        ],
+        "maximum": 30,
+        "row_count": 40
+      }
+    },
+    {
+      "name": "pg/batch-twenty-receive-batch-boundary",
+      "pass": true,
+      "detail": {
+        "sizes": [
+          20,
+          20
+        ],
+        "maximum": 20,
+        "row_count": 40
+      }
+    }
+  ],
+  "boundary": "Initial two DB lifecycles are complete. Initial PostgreSQL vector-index syntax is a harness gap, not a lack-of-support result. A separate additional lifecycle requires new permission."
+}
