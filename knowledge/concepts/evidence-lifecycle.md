@@ -110,8 +110,13 @@ Preserve the dated conclusion and failure status, update live links and hash
 manifests, and record the original commit/path with the compact replacement.
 Do not rewrite Git history or retain a dangling path as current evidence. The
 [November 12 integration](../research/write-analysis/mixed-transactions-and-evidence-20261112.md)
-applies this policy to redundant mutation-count reports and logs. Other
-historical captures retain their existing scope until separately reviewed.
+applies this policy to redundant mutation-count reports and logs. The
+[historical retention review](../research/runtime-verification/research-evidence-retention-20261112.md)
+also covers API metadata, Go test output and duplicate captures. Preserve the
+original acquisition/import hash as historical provenance; record a distinct
+current retained hash and transformation instead of silently replacing the
+meaning of the old receipt. Other captures retain their scope until separately
+reviewed.
 
 ## Legacy repository disposition
 
