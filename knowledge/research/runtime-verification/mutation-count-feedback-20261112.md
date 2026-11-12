@@ -1,7 +1,7 @@
 ---
 type: Research Note
 title: Observed indexes and explicit mutation-count scenarios in plan reports
-description: Design alternatives, shared foreign-key index facts, explicit one-row measurement, integer-safe CEL bounds and 31 LTS CommitStats observations.
+description: Design alternatives, observed indexes, explicit scenarios and count contracts, with original 31-commit evidence and a separate 36-commit CLI revalidation.
 tags: [runtime-verification, spanner-omni, mutation-count, foreign-keys, plan-contracts]
 status: draft
 sources:
@@ -35,6 +35,15 @@ sources:
   - id: publication-validation
     resource: evidence/mutation-count-feedback-20261112/publication-validation.json
     title: Subsequent standalone consumer closure and local publication checks
+  - id: latest-revalidation
+    resource: evidence/mutation-count-workflow-20261112/receipt.json
+    title: Latest-feedback disposition, source hashes, 36 fresh CommitStats and cleanup
+  - id: workflow
+    resource: ../../../testdata/mutation-count/querygen.yaml
+    title: Executable CLI configuration with explicit scenario and contract companions
+  - id: latest-validation
+    resource: evidence/mutation-count-workflow-20261112/validation.json
+    title: Five-module gates and compiled CLI validation for the latest working snapshot
 ---
 
 # Mutation-count feedback follow-up on November 12, 2026
@@ -170,3 +179,84 @@ checks without changing the initial engine observations or producer identities.
 The two large report JSON payloads are retained as deterministic gzip archives.
 Their decoded bytes match the captured originals; the receipt records both
 payload and archive hashes. The compact count table remains ordinary JSON.
+
+## Latest feedback and CLI revalidation
+
+The latest supplied feedback inspected `0c08dad`, the foundation merged through
+PR #77. Main subsequently included the CLI integration through PR #78 as
+`638b0261bb4da996647764729b4c9e6b488bbbf7`. The following disposition was checked
+against that main snapshot and the explicitly hashed working-tree changes in
+the [new execution receipt](evidence/mutation-count-workflow-20261112/receipt.json).
+It does not change the earlier producer identities or re-date managed evidence.
+
+| Feedback item | Current implementation and verification |
+| --- | --- |
+| Read the created DB's index list for scans and write counts | `ObserveIndexes` uses a consistent regular-index snapshot; the existing 31-commit integration control again verifies that the forced FK scan and count report share the physical name, managed flag, key and inferred selector |
+| Accept old-row scenarios in both inspection commands | Both commands accept facts and index files; the checked-in scenario additionally states one-row cardinality explicitly for each API |
+| Execute fixture seeds and capture CommitStats | Only explicit measurement runs seeds and target commits; the new dispatcher-level command test uses the documented flags and compares five successful target counts |
+| Supply write counts to the contract evaluator | Three count contracts pass, including a Mutation-only replace whose SQL PLAN status remains `skipped` |
+| DDL-only intervals retain automatic/index/cascade uncertainty | Original bounds remain in every report. This change does not hard-code the feedback's LTS points or invent child fanout |
+| Source extraction and open SQL fragments | Remain outside this write-accounting feature; no source-discovery or `ORDER BY` rewriting was added |
+
+The core CLI had a separate input-integrity gap: `old_row` was silently ignored
+instead of rejecting a misspelling of `old`. The successful wider report was
+reproduced before the fix. Facts and observation files now reject unknown
+fields, with a file-qualified diagnostic; index-file strictness remains covered
+too. Exactly-one-JSON-document validation is retained. The before/fix regression
+logs and producer snapshot are part of the new evidence directory.
+
+### Alternatives for this follow-up
+
+| Choice | Considered alternatives | Applied result |
+| --- | --- | --- |
+| Functional integration | Duplicate accounting in a new tool; extend only the historical lab; exercise the existing library and CLIs | Keep the integrated implementation and add checked-in CLI scenarios/contracts that unit and live tests execute |
+| Refinement JSON | Ignore unknown fields; warn and continue; reject them; introduce a new shared parsing package | Reject unknown fields using the existing command-local decoder pattern, preserving explicit schema and observation validation |
+| DML cardinality | Infer one row from an old image; require a separate assertion | State `rows: 1` explicitly in the example; old rows and affected-row assertions remain separate inputs |
+| Knowledge organization | Copy all historical findings into another mutable note; move or discard old runs; add a navigable feature concept | Add the [implemented-surface and verification map](../../concepts/mutation-count-analysis.md), retain the dated notes and append this source-scoped revalidation |
+
+### New execution scope
+
+The dedicated LTS container used the same platform manifest
+`sha256:b607b10bee3c1903f0a7f88f99bece67cb0dd9d9a028aee64226fc311bd78dae`
+for Omni `2026.r4-lts.2`, observed through container inspection on
+`2026-11-12T07:56:12.063185Z`. The existing matrix completed 31 target commits;
+the documented CLI workflow completed five more. All 36 counts agree with their
+conditional intervals. The new workflow separately resets each API's initial
+state; seed commits are excluded from target statistics.
+
+| New scenario | Mutation API | DML |
+| --- | --- | --- |
+| Change the indexed key, with a stored column | 6 | 6 |
+| Update an unrelated column | 3 | 3 |
+| Partial replace of an existing row | 6 | No generated DML method |
+
+The exact [scenarios](../../../testdata/mutation-count/scenarios.json) and
+[contracts](../../../testdata/mutation-count/contracts.yaml) are linked from
+the command documentation. The three contracts pass through the CLI dispatcher,
+including the skipped-SQL-plan replace. An independent compiled CLI invocation
+also parses the offline scenario file. These are concrete command paths in
+addition to library tests; count availability is not inferred from exit zero.
+
+The [count projection](evidence/mutation-count-workflow-20261112/counts.json)
+retains baseline, old-row and observation results per API. Compressed full
+reports and logs retain their hashes in the receipt. The first new test attempt
+failed compilation because `EndpointFromRuntime` requires a started Runtime;
+it created no container. After retrieving that value through `LazyRuntime.Get`,
+the live run passed. Its owned container was stopped and terminated, and a
+post-run inspection confirmed that it was absent.
+
+The latest working snapshot passed `mise run pre-push` (all five modules' tidy,
+standalone builds, lint and vulnerability checks) and `mise run verify-local`
+(all five module test suites, generated catalogs, OKF and Markdown policy).
+The [validation record](evidence/mutation-count-workflow-20261112/validation.json)
+and retained logs identify their scope. Compiled CLI checks independently cover
+the `[3,6]` schema interval, `[3,3]` old-row refinement, an explicit error for
+`old_row`, queue TVF analysis with an unknown upper bound and the five configured
+API scenarios. These are local checks of the hashed dirty source, not hosted CI
+or a claim that these new changes have merged.
+
+No new managed database was created, no new managed count was observed, and
+Emulator's missing-statistic boundary is unchanged. The one-row measurement
+path still does not execute arbitrary multirow/source-discovered application
+commits or queue internal TVFs. The earlier managed ordinary-write and queue
+notes remain the authority for those independently recorded experiments.

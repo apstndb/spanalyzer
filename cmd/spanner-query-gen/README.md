@@ -203,6 +203,44 @@ Observation timestamps remain present with `--stable` to preserve event identity
 Mutation-only targets retain their skipped SQL PLAN status while exposing their
 independent count analysis. Both full and summary structured output include it.
 
+### Runnable mutation-count workflow
+
+The checked-in [configuration](../../testdata/mutation-count/querygen.yaml),
+[scenarios](../../testdata/mutation-count/scenarios.json) and
+[contracts](../../testdata/mutation-count/contracts.yaml) compare an indexed-key
+update, an unrelated-column update and a Mutation-only replace. From the
+repository root, first inspect schema-only intervals, then supply explicit
+old images, values and one-row cardinality assertions:
+
+```sh
+go run ./cmd/spanner-query-gen explain-plan \
+  --config testdata/mutation-count/querygen.yaml --output json --stable
+go run ./cmd/spanner-query-gen explain-plan \
+  --config testdata/mutation-count/querygen.yaml \
+  --mutation-facts-file scenarios.json --output json --stable
+```
+
+Both commands are offline. The scenario's `rows: 1` is a caller assertion for
+each API, not inferred from the presence of an old image. Each API's fixture
+seeds reset its own starting row. Explicitly measure the five target commits
+and evaluate the three count contracts on the pinned Omni runtime with:
+
+```sh
+go run ./cmd/spanner-query-gen plan-report \
+  --config testdata/mutation-count/querygen.yaml \
+  --mutation-facts-file scenarios.json --measure-mutation-counts \
+  --contracts contracts.yaml --check --summary --output json \
+  --drop-created-databases
+```
+
+This last command commits the selected fixture writes. The counts are 6 for
+the indexed-key update, 3 for the unrelated-column update and 6 for the partial
+replace on the [recorded LTS execution](../../knowledge/research/runtime-verification/mutation-count-feedback-20261112.md#latest-feedback-and-cli-revalidation).
+The replace target keeps SQL PLAN status `skipped`; its count contract still
+evaluates. These values describe these exact scenarios, not every update or
+replace. Managed, Omni and Emulator evidence remains separately identified in
+the [verification map](../../knowledge/concepts/mutation-count-analysis.md).
+
 The default machine-readable plan omits heavy audit-only projection
 matrix rows. Use `--audit` to include those rows, and `--stable` to omit
 volatile audit fields such as verification timestamps from snapshot-oriented

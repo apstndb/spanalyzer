@@ -27,7 +27,7 @@ func querygenOmniIntegrationRequireRuntime(tb testing.TB) {
 // SPANEMUBOOST_ENDPOINT_FILE or SPANEMUBOOST_OMNI_URI is set, it attaches to the
 // long-lived runtime started by `spanemuboost serve` instead of booting a new
 // testcontainers instance.
-func querygenOmniRuntime(tb testing.TB) spanemuboost.RuntimeHandle {
+func querygenOmniRuntime(tb testing.TB) *spanemuboost.LazyRuntime {
 	tb.Helper()
 	var options []spanemuboost.Option
 	image := strings.TrimSpace(os.Getenv(querygenOmniImageEnv))

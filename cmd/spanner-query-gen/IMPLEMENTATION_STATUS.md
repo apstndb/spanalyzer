@@ -30,6 +30,10 @@ deliberate deferrals.
   `order_by: key` by default and opt-out `order_by: none`.
 - Spanner write helper generation for mutation and DML surfaces, including
   update column masks.
+- Preview mutation-count intervals in `explain-plan` and `plan-report`, explicit
+  per-API facts/cardinality and index snapshots, shared live regular-index facts,
+  and opt-in one-row fixture measurement with CommitStats. Count-only CEL
+  contracts can evaluate Mutation-only writes independently of SQL PLAN status.
 - External BigQuery bindings for `EXTERNAL_QUERY` and Spanner external dataset
   modeling as reviewable analyzer inputs.
 - Analyzer parameter type declarations via `queries[].params`, including
@@ -46,7 +50,8 @@ deliberate deferrals.
 - Experimental external plan contract files with canonical `target` IDs,
   exactly one rule mode per entry (`use`, `forbid`, or `cel`), normalized
   operator-family checks, normalized topology fields, raw QueryPlan CEL for
-  advanced cases, and PLAN-only scope.
+  advanced cases, and PLAN-only structural scope. Explicit mutation-count
+  measurement is a separate opt-in execution path.
 - Plan normalization (operator family classification, operator topology,
   plan digests) and contract evaluation live in the
   `github.com/apstndb/spanalyzer/plancontract` nested Go module, which

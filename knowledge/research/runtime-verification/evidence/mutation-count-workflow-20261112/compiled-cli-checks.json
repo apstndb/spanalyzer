@@ -1,0 +1,42 @@
+{
+  "status": "passed",
+  "cases": [
+    {
+      "case": "schema",
+      "exit_code": 0,
+      "effective": {
+        "lower": 3,
+        "upper": 6
+      }
+    },
+    {
+      "case": "old-row",
+      "exit_code": 0,
+      "effective": {
+        "lower": 3,
+        "upper": 3
+      }
+    },
+    {
+      "case": "misspelled-old-row",
+      "exit_code": 1,
+      "rejected": true
+    },
+    {
+      "case": "queue-query-non-executing-analysis",
+      "exit_code": 0,
+      "scope": "queue_internal_queries",
+      "upper_bound": null
+    },
+    {
+      "case": "compiled-querygen-offline-workflow",
+      "exit_code": 0,
+      "writes": 3,
+      "api_scenarios": 5
+    }
+  ],
+  "binary_sha256": {
+    "spanner-analyzer": "110ca321db3ba92a1bfeab34f8d97150cae51981dbbf18926c060cd41b7ffecf",
+    "spanner-query-gen": "fa163c4535eb65c2a8572e64597916e7c4b93c2356d30508155c5e30e020dfd7"
+  }
+}

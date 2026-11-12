@@ -1,0 +1,160 @@
+{
+  "schema_version": "spanalyzer.mutation-workflow-verification/v0alpha1",
+  "recorded_at": "2026-11-12T08:01:57.475072+00:00",
+  "source_head": "638b0261bb4da996647764729b4c9e6b488bbbf7",
+  "source_dirty": true,
+  "source_boundary": "Source hashes identify the uncommitted implementation and producer snapshot. This record does not identify a later commit or a new managed-service run.",
+  "feedback_base": "0c08dadcc78ddf0ff14f1072da610ce4112e23f7",
+  "feedback_sha256": "714921c0a423b208654eb9b1ed0bcf98f7332f603a91bd31123f581cbf0454e0",
+  "runtime": {
+    "RequestedImage": "us-docker.pkg.dev/spanner-omni/images/spanner-omni:2026.r4-lts.2@sha256:b607b10bee3c1903f0a7f88f99bece67cb0dd9d9a028aee64226fc311bd78dae",
+    "ImageID": "sha256:b607b10bee3c1903f0a7f88f99bece67cb0dd9d9a028aee64226fc311bd78dae",
+    "IndexDigest": "",
+    "ManifestDigest": "sha256:b607b10bee3c1903f0a7f88f99bece67cb0dd9d9a028aee64226fc311bd78dae",
+    "Platform": "linux/arm64",
+    "ObservedAt": "2026-11-12T07:56:12.063185Z",
+    "Source": "container_inspect",
+    "ObservedByThisProcess": true
+  },
+  "matrix_target_commits": 31,
+  "documented_cli_target_commits": 5,
+  "seed_commits": "Separate, excluded from every target statistic",
+  "count_contracts_passed": 3,
+  "command": "env -u SPANEMUBOOST_ENDPOINT_FILE -u SPANEMUBOOST_OMNI_URI -u SPANALYZER_OMNI_IMAGE SPANEMUBOOST_ENABLE_OMNI_TESTS=1 mise x --no-deps -- go test -count=1 -timeout=20m -tags=integration,omni -run ^TestIntegrationMutationCountFeedbackOnOmni$ -v .",
+  "command_workdir": "cmd/spanner-query-gen",
+  "exit_code": 0,
+  "initial_failure": "A producer type mismatch failed compilation before container startup; retained separately, corrected through LazyRuntime.Get.",
+  "source_sha256": {
+    "cmd/spanner-analyzer/mutation_count.go": "b51af1550b84941cbd0124258c6b9a2b6676c83905b1d3f247d300ce20cead4a",
+    "cmd/spanner-analyzer/mutation_count_test.go": "46568f63814b9ac083b126733fbe18b5b7f23e21c824627ed03bfbdfb411d250",
+    "cmd/spanner-query-gen/mutation_count_workflow_test.go": "569b026ec93830539f679257e99761b1c7b9d8c32e7d274ac307bc2f06e5f452",
+    "cmd/spanner-query-gen/mutation_count_feedback_omni_test.go": "22e2976141e76a88e676e40f3acfb035cc95a032f21ff1fbd7e5acc14d1c801a",
+    "cmd/spanner-query-gen/omni_runtime.go": "0cb6e12bcc151751ddbeec3469c2e9c52cbe34fcfe5e2f9fd1f322697b4da83f",
+    "cmd/spanner-query-gen/plan_report_indexes.go": "287dc9beee9e15c3c939a3086538b5cc1b8ef2bdbaf46958552142ee1102af85",
+    "cmd/spanner-query-gen/plan_report_mutation_measurement.go": "a014afccfc0d50db12b1cddfcd2a31173f6f31ea031383dc7e0893cf4ae9104a",
+    "internal/querygen/mutation_count_inputs.go": "d35fc533acf32db09298e1f97012fa7c9532953e45b0c8ac07bf691452130ad7",
+    "mutation_count.go": "0ed3bc0d66c461566083475b70a4f88f58e4d0e4459a3dafa8883f055ba0dc17",
+    "mutation_count_schema.go": "beeec61924252152e48009542d199179d443ca73daaa2af5bd713fdc6fc42e5d",
+    "mutation_count_model.go": "32e1789dab6f42a52543073de9d25a60d0db15260044ea691b5c8de7ab6505f3",
+    "mutation_count_input.go": "77cc0c739db919653421003dfe32e7e0009541edb44f6b71c60b8a1cfbc1a6d9",
+    "mutation_count_queue.go": "ca9f947417c07752d1b75352f428214db97abcb437d629fb9defd424b159b3a7",
+    "mutation_count_queue_example_test.go": "d4a7cd36cc06e6f6951b98c777b42c7ba2cfce7ade89b59f742bd6b32c42ac2e",
+    "plancontract/mutation_counts.go": "0479235c131a91407dbbf2d2886a1220b1c2d242eab9dfb9165a04638d324c4c",
+    "testdata/mutation-count/schema.sql": "be6190248fd54383e0765edd8b616d4b437cced6b982c7d9e92a22f368cafbb2",
+    "testdata/mutation-count/querygen.yaml": "bd3740b38d92f9781f437c731dc4f967c98af9162e4650c2b8a4b23dd6cde625",
+    "testdata/mutation-count/scenarios.json": "74bd387d8b1ae3a9a452dcda5238b9b31767b6c778fdeb877f5631f18db7c9ed",
+    "testdata/mutation-count/contracts.yaml": "496430227d8a8a09c5f15d140b4e011744f462e0a8e99856f88cbc325fffdb88"
+  },
+  "files": {
+    "container-cleanup.json": {
+      "sha256": "75cbee2926e9688ea7479c70faeac4a50e4c64b7698e9ce2e77f25a469d307c5",
+      "bytes": 235
+    },
+    "counts.json": {
+      "sha256": "43852634550734196110510ad362a77462546bdd87c82e6171c75ab8487bf386",
+      "bytes": 12724
+    },
+    "matrix-report.json.gz": {
+      "sha256": "3dca38facbec8fd5b84610ddfff98d142b9ac39f2fa4abe94b4526e792c515ce",
+      "bytes": 35043
+    },
+    "mutation-targeted.log.gz": {
+      "sha256": "bee525b947cb6b291cdfc25d5a844d4ad6a16412b78b1b206a52026677da9bc6",
+      "bytes": 193
+    },
+    "new-root-regressions.log.gz": {
+      "sha256": "7e8571331f9aaaf5d17e7b230e383b118fa95f3ca91b1f61fccdbe87489be3f5",
+      "bytes": 85
+    },
+    "omni-workflow-build-failed.log.gz": {
+      "sha256": "2b1196caae0ea33c501b6bc61eb740f2aaf9acd5d28269b5a2ecb9a1c3bfc1e2",
+      "bytes": 263
+    },
+    "omni-workflow.log.gz": {
+      "sha256": "000f9cea91cd85e93ece6d4a7e4abc28cc3af3225c3e8e762aaf02889776a1ce",
+      "bytes": 39587
+    },
+    "producer/cmd__spanner-analyzer__mutation_count.go.txt": {
+      "sha256": "b51af1550b84941cbd0124258c6b9a2b6676c83905b1d3f247d300ce20cead4a",
+      "bytes": 2739
+    },
+    "producer/cmd__spanner-analyzer__mutation_count_test.go.txt": {
+      "sha256": "46568f63814b9ac083b126733fbe18b5b7f23e21c824627ed03bfbdfb411d250",
+      "bytes": 2991
+    },
+    "producer/cmd__spanner-query-gen__mutation_count_feedback_omni_test.go.txt": {
+      "sha256": "22e2976141e76a88e676e40f3acfb035cc95a032f21ff1fbd7e5acc14d1c801a",
+      "bytes": 9933
+    },
+    "producer/cmd__spanner-query-gen__mutation_count_workflow_test.go.txt": {
+      "sha256": "569b026ec93830539f679257e99761b1c7b9d8c32e7d274ac307bc2f06e5f452",
+      "bytes": 1543
+    },
+    "producer/cmd__spanner-query-gen__omni_runtime.go.txt": {
+      "sha256": "0cb6e12bcc151751ddbeec3469c2e9c52cbe34fcfe5e2f9fd1f322697b4da83f",
+      "bytes": 1592
+    },
+    "strict-input-before.log.gz": {
+      "sha256": "b3eafe562d392753b2d66fdbf789484ebdf74118c1ea401840e0aa2b35e83ef2",
+      "bytes": 263
+    },
+    "workflow-report.json.gz": {
+      "sha256": "c99aed875c656f8d127b4cb94ba0ce81d9d7d46c31067b4012b3009c6299de76",
+      "bytes": 3524
+    },
+    "workflow-unit.log.gz": {
+      "sha256": "23ec423fb42b1212947f86493ef43ddc3112a9ea4435cc748b78547edbec4bcd",
+      "bytes": 80
+    },
+    "pre-push.log.gz": {
+      "sha256": "b3a96cf7b7f80c568f779ef9ce935bd777d6b6ae6c1c9e76888c07ee31f393b9",
+      "bytes": 450
+    },
+    "verify-local.log.gz": {
+      "sha256": "6c5680ac776d3247959b2dca9e2ec8961f9d54ee6965b5efa06d60af9c1f05c8",
+      "bytes": 842
+    },
+    "compiled-cli-checks.json": {
+      "sha256": "fc536b7c33c08e3b22a02179f4455760ea9876a0d6eab7c0e9c703b44d191005",
+      "bytes": 886
+    },
+    "schema-cli.json": {
+      "sha256": "92079f0f762b5d8cd64b7fed673021f9f545714b48a052b14454019b3bd594a3",
+      "bytes": 2088
+    },
+    "old-row-cli.json": {
+      "sha256": "40e14885c07ac2dc41c20e20dc950275e877245178ce9e54a558e5371103487c",
+      "bytes": 3466
+    },
+    "queue-cli.json": {
+      "sha256": "08c75a8ba08766469659201188770c463b4964d041637dc7e678e7cfe8dcfd89",
+      "bytes": 1427
+    },
+    "workflow-explain.json.gz": {
+      "sha256": "1925070658e40c42f636eb8b5173f6a235d5361461c92fe13941a4b6162d1e9a",
+      "bytes": 1951
+    },
+    "misspelled-cli.stderr.gz": {
+      "sha256": "c675098e7851f19cd0a90a2a49882922d6447670fd5b9ce68df79a88716569bf",
+      "bytes": 163
+    },
+    "validation.json": {
+      "sha256": "5e38fd0de20a50caf0eef88f223e94aa7e3a1497cdb684ce8ab64fadd0c46a9c",
+      "bytes": 1620
+    }
+  },
+  "reports": {
+    "matrix-report.json.gz": {
+      "decoded_sha256": "4013fcd8df36db8fec7f3b37c389383be7b74bc41a7fdfb8687d43946e9a4fc6"
+    },
+    "workflow-report.json.gz": {
+      "decoded_sha256": "885031231a660aeba5711ecfd05ac66e8d6e165cbd841d7fa8f0323863d403bd"
+    }
+  },
+  "boundaries": [
+    "No new managed Spanner database or service observation",
+    "No new numeric Emulator CommitStats",
+    "Scenario-specific counts, not universal coefficients or latency measurements",
+    "No source discovery, open SQL fragment rewriting or application commit assembly"
+  ]
+}

@@ -4,6 +4,11 @@ Experimental analysis of Spanner Mutation API and DML effects, using DDL as
 schema input. Mutation counts, transaction bytes, lock costs and query plans
 are separate measurements.
 
+- [Implemented mutation-count analysis](../../concepts/mutation-count-analysis.md):
+  current API/CLI entry points and a consolidated verification map.
+- [Scenario integration and latest feedback](../runtime-verification/mutation-count-feedback-20261112.md):
+  observed FK indexes, explicit old-row and cardinality inputs, measured counts
+  and count contracts, including a reproducible command workflow.
 - [DDL/DML reference audit, November 10](mutation-count-reference-audit-20261110.md):
   every GoogleSQL reference family, source-backed dependency corrections,
   implementation alternatives and prioritized adapter/accounting gaps.
