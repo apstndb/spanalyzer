@@ -24,8 +24,12 @@ the groups below relate when their contents appear to disagree.
 
 ## Repository entry points and maintenance
 
-- [README](../../README.md) - project positioning, module map, analyzer usage,
-  public components, and limitations.
+- [README](../../README.md) - project orientation, quick starts, module map,
+  and routes to canonical guides.
+- [Development guide](../../DEVELOPMENT.md) - module checks, push gate, pinned
+  runtime selection, and documentation/evidence maintenance.
+- [Analyzer command guide](../../cmd/spanner-analyzer/README.md) - detailed
+  analyzer CLI examples, formats, dialects, and mutation-count inputs.
 - [AGENTS](../../AGENTS.md) - repository rules for coding agents, including
   module boundaries and validation commands.
 - [TODO](../../TODO.md) - unresolved work only; not a current behavior spec.

@@ -17,6 +17,13 @@ repository; do not use that copy as the current authority.
 Each concept has one writable body. Repository indexes may link to a concept,
 but must not maintain a second copy of its findings.
 
+For day-to-day use, start with the [library documentation](../doc.go),
+[analyzer command guide](../cmd/spanner-analyzer/README.md),
+[query-generator guide](../cmd/spanner-query-gen/README.md), or
+[development guide](../DEVELOPMENT.md). For measured engine behavior, use the
+[runtime histories](research/runtime-verification/index.md). These remain
+separate from the current implementation contract.
+
 ## Browse by purpose
 
 - [Concepts](concepts/index.md) - cross-cutting explanations of the repository's

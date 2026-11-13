@@ -24,6 +24,20 @@ sources:
 Repository documents serve different purposes. A nearby or newer-looking file
 does not automatically override a canonical behavior surface.
 
+## Choose a starting point
+
+| Need | Canonical body |
+| --- | --- |
+| Project orientation and a quick start | [Repository README](../../README.md) |
+| Reusable library APIs and analysis boundaries | [Package documentation](../../doc.go), with runnable Go Example tests |
+| Analyzer CLI usage and formats | [Analyzer command guide](../../cmd/spanner-analyzer/README.md) |
+| Generator CLI/configuration | [Query-generator guide](../../cmd/spanner-query-gen/README.md) |
+| Repository checks and runtime selection | [Development guide](../../DEVELOPMENT.md) |
+| Dated engine behavior and changes | [Runtime verification and engine histories](../research/runtime-verification/index.md) |
+
+The README routes readers to these bodies. It does not reproduce their full
+examples or serve as an alternate API reference.
+
 ## Evidence order
 
 1. **Implemented behavior:** code, checked-in schemas, tests, package

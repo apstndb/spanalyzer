@@ -9,6 +9,9 @@ sources:
   - id: repository-readme
     resource: ../../README.md
     title: spanalyzer README
+  - id: package-documentation
+    resource: ../../doc.go
+    title: spanalyzer package documentation
   - id: agent-guide
     resource: ../../AGENTS.md
     title: spanalyzer repository guidance
@@ -39,10 +42,12 @@ plan-contract libraries.[^go-workspace]
 - [`tools`](../../tools/spanner-query-plan-shape/README.md) contains
   developer-only probes and may depend on container tooling.
 
-The exact public and experimental surfaces remain documented in the
-[repository README](../../README.md). Dependency-weight rules and validation
-commands are maintained in [AGENTS.md](../../AGENTS.md); this concept does not
-duplicate them.
+Reusable APIs and analysis boundaries are documented in [godoc](../../doc.go)
+and runnable Go Example tests. The [analyzer command guide](../../cmd/spanner-analyzer/README.md)
+owns CLI examples; the [development guide](../../DEVELOPMENT.md) owns repository
+verification and runtime selection. [AGENTS.md](../../AGENTS.md) maintains agent
+rules and dependency boundaries. This concept links those bodies without
+duplicating their manuals.
 
 ## Related concepts
 

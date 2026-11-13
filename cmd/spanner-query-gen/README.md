@@ -50,6 +50,22 @@ five-module layout.
   is a developer-only Spanner Omni probe for inspecting raw query plan shapes
   before changing operator normalization or plan contracts.
 
+## Find a workflow
+
+| Task | Section |
+| --- | --- |
+| Generate, check, or explain queries | [Usage](#usage) |
+| Configure catalogs and emitted Go | [Minimal Config](#minimal-config) |
+| Analyze and explicitly measure mutation counts | [Runnable mutation-count workflow](#runnable-mutation-count-workflow) |
+| Choose among finite SQL variants | [Closed SQL choices](#closed-sql-choices) |
+| Evaluate plan-report contracts | [Plan-report contracts](#plan-report-contracts) |
+| Analyze federated queries | [EXTERNAL_QUERY](#external_query) and [Spanner External Datasets](#spanner-external-datasets) |
+| Generate Mutation API or DML writes | [Writes](#writes) |
+
+For the lightweight analyzer command, use the
+[analyzer guide](../spanner-analyzer/README.md). Repository-wide build, test, and
+runtime selection instructions live in the [development guide](../../DEVELOPMENT.md).
+
 ## Usage
 
 Run these examples from the repository root. The generation and check commands
@@ -636,6 +652,32 @@ go run ./cmd/spanner-query-gen plan-report \
 - Contract evaluation mode: `none`
 - Included targets: `1`
 
+## GetLiteral
+
+- Target ID: `query/GetLiteral`
+- Catalog: `app`
+- Scope: `query`
+- Kind: `sql`
+- Status: `ok`
+- SQL SHA-256: `b8ccac726e885e4bae2a0596e87cc88c5113c16e87c3bdec2ffb0e09e49cb29e`
+- DDL SHA-256: `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`
+- Operator tree SHA-256: `...`
+- Operator families: `serialize_result`, `unit_relation`
+
+```sql
+SELECT 1 AS value
+```
+
+```text
++----+------------------------+
+| ID | Operator               |
++----+------------------------+
+|  0 | Serialize Result <Row> |
+|  1 | +- Unit Relation <Row> |
++----+------------------------+
+```
+````
+
 ## Closed SQL choices
 
 For `kind: sql` Spanner queries, `optional: sql_choice` selects exactly one
@@ -687,31 +729,7 @@ projection lists and INSERT columns need an explicit finite allowlist before
 they can be verified this way. Use separate named queries when row types
 differ. Row-count DML and BigQuery optional variants remain unsupported.
 
-## GetLiteral
-
-- Target ID: `query/GetLiteral`
-- Catalog: `app`
-- Scope: `query`
-- Kind: `sql`
-- Status: `ok`
-- SQL SHA-256: `b8ccac726e885e4bae2a0596e87cc88c5113c16e87c3bdec2ffb0e09e49cb29e`
-- DDL SHA-256: `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`
-- Operator tree SHA-256: `...`
-- Operator families: `serialize_result`, `unit_relation`
-
-```sql
-SELECT 1 AS value
-```
-
-```text
-+----+------------------------+
-| ID | Operator               |
-+----+------------------------+
-|  0 | Serialize Result <Row> |
-|  1 | +- Unit Relation <Row> |
-+----+------------------------+
-```
-````
+## Plan-report contracts
 
 `plan-report` also has an experimental contract check mode. Plan contracts live
 in a separate `v1alpha-plan-contracts` YAML file so the main

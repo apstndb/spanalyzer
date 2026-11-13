@@ -5,6 +5,21 @@ here as canonical Research Notes. Coordination handoffs may link here, but do
 not own the verification findings. Runtime identity, date, SQL or case scope,
 source evidence, results and unverified boundaries travel with each note.
 
+## Engine histories
+
+Read the [managed](managed/index.md), [Omni](omni/index.md) and
+[Emulator](emulator/index.md) timelines oldest to newest. Their rows distinguish
+changes, first coverage, rechecks and corrections. Same-day rows without exact
+times have no claimed internal order. [History conventions](organization.md)
+explain how to append observations without rewriting earlier conclusions.
+Each selected investigation retains its own observation dates and engine
+scopes. A later report does not refresh unrelated cases or engines.
+
+## Selected investigations
+
+These are selected dated observations, not a claim about every deployment or
+the latest public release. Use the engine histories for a chronological view.
+
 | Runtime and observation scope | Research Note |
 | --- | --- |
 | Omni r4 LTS.2 and Emulator 1.5.59, 2026-11-12 UTC/JST | [Disjoint mixed-transaction keys](mixed-disjoint-key-bounds-20261112.md): 11 cases per engine, finite component-upper sums for isolated ordinary tables, conservative overlap guards, and absent Emulator CommitStats |
@@ -51,18 +66,6 @@ Historical reports recovered without full logs are identified as such. Each
 source/image pair is independently pinned unless binary reproducibility was
 actually established. Repeated runs without new findings update evidence
 rather than create duplicate research bodies.
-
-## Engine histories
-
-Read the [managed](managed/index.md), [Omni](omni/index.md) and
-[Emulator](emulator/index.md) timelines oldest to newest. Their rows distinguish
-changes, first coverage, rechecks and corrections. Same-day rows without exact
-times have no claimed internal order. [History conventions](organization.md)
-explain how to append observations without rewriting earlier conclusions.
-The November 12 FK investigation, managed revalidation and its cross-engine
-follow-up are the newest selected investigations. The mutation-count feedback fixture, November
-10 write-accounting notes and older comparisons retain their own observation
-dates and scopes.
 
 ## Retained historical research
 
