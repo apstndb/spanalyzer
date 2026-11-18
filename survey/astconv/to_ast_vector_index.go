@@ -9,6 +9,11 @@ import (
 	"github.com/cloudspannerecosystem/memefish/ast"
 )
 
+// Live GoogleSQL catalogs use VECTOR. FromDDLStatements uses VECTOR_INDEX.
+func isVectorIndexType(indexType string) bool {
+	return indexType == "VECTOR" || indexType == "VECTOR_INDEX"
+}
+
 func (s *Schema) toVectorIndexesDDL() ([]ast.DDL, error) {
 	idxCols := groupBy(s.IndexColumns, func(ic *infoschem.IndexColumn) string {
 		return qualifiedIndexKey(ic.TableSchema, ic.TableName, ic.IndexName)
@@ -19,7 +24,7 @@ func (s *Schema) toVectorIndexesDDL() ([]ast.DDL, error) {
 
 	var ddls []ast.DDL
 	for _, idx := range s.Indexes {
-		if idx.IndexType != "VECTOR_INDEX" {
+		if !isVectorIndexType(idx.IndexType) {
 			continue
 		}
 		if idx.SpannerIsManaged {
@@ -77,14 +82,17 @@ func (s *Schema) toVectorIndexesDDL() ([]ast.DDL, error) {
 			cvi.Where = &ast.Where{Expr: expr}
 		}
 
-		// Options
-		if opts := idxOpts[key]; len(opts) > 0 {
-			var defs []*ast.OptionsDef
-			for _, o := range opts {
-				defs = append(defs, optionsDef(o.OptionName, parseOptionValue(o.OptionType, o.OptionValue)))
+		var defs []*ast.OptionsDef
+		for _, o := range idxOpts[key] {
+			// INDEX_OPTIONS also reports the effective tree shape chosen by Spanner.
+			// Only the corresponding unprefixed options can be set in DDL.
+			switch o.OptionName {
+			case "system_optimized_tree_depth", "system_optimized_num_branches", "system_optimized_num_leaves":
+				continue
 			}
-			cvi.Options = mkOptions(defs...)
+			defs = append(defs, optionsDef(o.OptionName, parseOptionValue(o.OptionType, o.OptionValue)))
 		}
+		cvi.Options = mkOptions(defs...)
 
 		ddls = append(ddls, cvi)
 	}

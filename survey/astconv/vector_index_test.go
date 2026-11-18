@@ -40,6 +40,45 @@ func TestRoundtripVectorIndexFilter(t *testing.T) {
 	}
 }
 
+func TestVectorIndexDDLFiltersSystemOptimizedOptions(t *testing.T) {
+	for _, tc := range []struct{ name, options string }{
+		{"automatic", "distance_type = 'COSINE'"},
+		{"explicit", "distance_type = 'EUCLIDEAN', tree_depth = 3, num_branches = 2, num_leaves = 4"},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			stmt, err := memefish.ParseDDL("", "CREATE VECTOR INDEX Vec ON Docs(Embedding) WHERE Embedding IS NOT NULL OPTIONS ("+tc.options+")")
+			if err != nil {
+				t.Fatal(err)
+			}
+			schema, err := FromDDLStatements([]ast.DDL{stmt})
+			if err != nil {
+				t.Fatal(err)
+			}
+			// Live GoogleSQL catalogs identify vector indexes as VECTOR.
+			schema.Indexes[0].IndexType = "VECTOR"
+			schema.IndexColumns[0].IndexType = "VECTOR"
+			for _, o := range schema.IndexOptions {
+				o.IndexType = "VECTOR"
+			}
+			for _, name := range []string{"system_optimized_tree_depth", "system_optimized_num_branches", "system_optimized_num_leaves"} {
+				schema.IndexOptions = append(schema.IndexOptions, &infoschem.IndexOption{
+					TableName: "Docs", IndexName: "Vec", IndexType: "VECTOR", OptionName: name, OptionType: "INT64", OptionValue: "2",
+				})
+			}
+			ddls, err := schema.ToDDLStatements()
+			if err != nil {
+				t.Fatal(err)
+			}
+			if len(ddls) != 1 {
+				t.Fatalf("got %d DDL statements, want 1", len(ddls))
+			}
+			if got, want := ddls[0].SQL(), stmt.SQL(); got != want {
+				t.Errorf("reconstructed DDL = %s; want %s", got, want)
+			}
+		})
+	}
+}
+
 func TestToVectorIndexesDDLRejectsMultipleKeyColumns(t *testing.T) {
 	ordinal := func(value int64) *int64 { return &value }
 	schema := &Schema{
