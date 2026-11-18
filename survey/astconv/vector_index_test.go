@@ -44,6 +44,7 @@ func TestVectorIndexDDLFiltersSystemOptimizedOptions(t *testing.T) {
 	for _, tc := range []struct{ name, options string }{
 		{"automatic", "distance_type = 'COSINE'"},
 		{"explicit", "distance_type = 'EUCLIDEAN', tree_depth = 3, num_branches = 2, num_leaves = 4"},
+		{"uppercase_option", "DISTANCE_TYPE = 'DOT_PRODUCT'"},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
 			stmt, err := memefish.ParseDDL("", "CREATE VECTOR INDEX Vec ON Docs(Embedding) WHERE Embedding IS NOT NULL OPTIONS ("+tc.options+")")
@@ -95,6 +96,32 @@ func TestToVectorIndexesDDLRejectsMultipleKeyColumns(t *testing.T) {
 	_, err := schema.ToDDLStatements()
 	if err == nil || !strings.Contains(err.Error(), "has 3 key columns") {
 		t.Fatalf("ToDDLStatements() error = %v, want multi-key fail-closed error", err)
+	}
+}
+
+func TestVectorIndexDDLRequiresDistanceType(t *testing.T) {
+	for _, tc := range []struct{ name, option string }{
+		{"no_options", ""},
+		{"effective_setting_only", "system_optimized_tree_depth"},
+		{"explicit_tree_depth_only", "tree_depth"},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			schema := &Schema{
+				Indexes: []*infoschem.Index{{TableName: "Docs", IndexName: "Vec", IndexType: "VECTOR"}},
+				IndexColumns: []*infoschem.IndexColumn{{
+					TableName: "Docs", IndexName: "Vec", ColumnName: "Embedding", OrdinalPosition: new(int64(1)),
+				}},
+			}
+			if tc.option != "" {
+				schema.IndexOptions = []*infoschem.IndexOption{{
+					TableName: "Docs", IndexName: "Vec", OptionName: tc.option, OptionType: "INT64", OptionValue: "2",
+				}}
+			}
+			_, err := schema.ToDDLStatements()
+			if err == nil || !strings.Contains(err.Error(), `vector index "Vec" has no distance_type`) {
+				t.Fatalf("ToDDLStatements() error = %v, want missing distance_type for Vec", err)
+			}
+		})
 	}
 }
 

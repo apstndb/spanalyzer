@@ -3,6 +3,7 @@ package astconv
 import (
 	"fmt"
 	"sort"
+	"strings"
 
 	"github.com/apstndb/spanalyzer/survey/infoschem"
 	"github.com/cloudspannerecosystem/memefish"
@@ -83,14 +84,20 @@ func (s *Schema) toVectorIndexesDDL() ([]ast.DDL, error) {
 		}
 
 		var defs []*ast.OptionsDef
+		hasDistanceType := false
 		for _, o := range idxOpts[key] {
 			// INDEX_OPTIONS also reports the effective tree shape chosen by Spanner.
 			// Only the corresponding unprefixed options can be set in DDL.
-			switch o.OptionName {
+			switch strings.ToLower(o.OptionName) {
 			case "system_optimized_tree_depth", "system_optimized_num_branches", "system_optimized_num_leaves":
 				continue
+			case "distance_type":
+				hasDistanceType = true
 			}
 			defs = append(defs, optionsDef(o.OptionName, parseOptionValue(o.OptionType, o.OptionValue)))
+		}
+		if !hasDistanceType {
+			return nil, fmt.Errorf("vector index %q has no distance_type in INDEX_OPTIONS", idx.IndexName)
 		}
 		cvi.Options = mkOptions(defs...)
 
