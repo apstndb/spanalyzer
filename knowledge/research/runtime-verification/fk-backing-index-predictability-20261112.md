@@ -52,6 +52,8 @@ not multiply the number of FK constraints by one universal coefficient: some
 constraints need no index, several can share one, and a referenced index can
 also affect writes to the parent table.
 
+The [November 13 naming study](fk-full-name-analysis-20261113.md) compares complete names, qualification and underscore collisions across engines. The [November 18 plan study](fk-backing-index-resolution-20261118.md) tests how to resolve an individual constraint to a physical index.
+
 ## Documented behavior
 
 Full FK overview, how-to, INFORMATION_SCHEMA, GoogleSQL DDL and Omni differences

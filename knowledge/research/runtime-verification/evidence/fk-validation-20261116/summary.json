@@ -1,0 +1,73 @@
+{
+  "observed_on_jst": "2026-11-16",
+  "dialect": "GoogleSQL",
+  "scope": "Sixteen schema, data and consistency checks per engine for a three-column foreign key. A separate indexed control ran in the same fixture. These results describe the tested builds and service observation.",
+  "input_sha256": "b1ec77b412f495007c3c516b4b1aa59f2029925757c9c36c2e358f728a8a2807",
+  "source_capture_sha256": {
+    "emulator": "a04b69fe120e5ffacf64c0701e0c5bce7916a6714912d7e9acaede4cef7df166",
+    "managed_and_omni": "a49e71c4786fa2c124395eefd070649a055fb7351f83aee4881306c02e2e71c0"
+  },
+  "runs": [
+    {
+      "engine": "emulator",
+      "steps": 16,
+      "outcomes": {
+        "FailedPrecondition": 6,
+        "OK": 10
+      },
+      "stored_rows": 1,
+      "orphan_rows": 1,
+      "indexed_control_stored_rows": 1,
+      "runtime": "Cloud Spanner Emulator 1.5.59",
+      "platform": "linux/arm64",
+      "manifest_digest": "sha256:969af6a9349948fbfb4a826c18e160e258a4005f7c759f8e7f2dcec369cccba8",
+      "owned_containers_confirmed_absent": true
+    },
+    {
+      "engine": "omni-lts",
+      "steps": 16,
+      "outcomes": {
+        "FailedPrecondition": 1,
+        "Internal": 6,
+        "OK": 9
+      },
+      "stored_rows": 0,
+      "orphan_rows": 0,
+      "indexed_control_stored_rows": 1,
+      "runtime": "2026.r4-lts.2",
+      "platform": "linux/arm64",
+      "manifest_digest": "sha256:b607b10bee3c1903f0a7f88f99bece67cb0dd9d9a028aee64226fc311bd78dae",
+      "owned_containers_confirmed_absent": true
+    },
+    {
+      "engine": "omni-r5",
+      "steps": 16,
+      "outcomes": {
+        "FailedPrecondition": 1,
+        "Internal": 6,
+        "OK": 9
+      },
+      "stored_rows": 0,
+      "orphan_rows": 0,
+      "indexed_control_stored_rows": 1,
+      "runtime": "2026.r5.1",
+      "platform": "linux/arm64",
+      "manifest_digest": "sha256:b918acd3c785bd13733d7dca6e6c029ef4ab8d7b63a0cd28800210a9bf976516",
+      "owned_containers_confirmed_absent": true
+    },
+    {
+      "engine": "managed",
+      "steps": 16,
+      "outcomes": {
+        "FailedPrecondition": 1,
+        "Internal": 6,
+        "OK": 9
+      },
+      "stored_rows": 0,
+      "orphan_rows": 0,
+      "indexed_control_stored_rows": 1,
+      "service_build": "not exposed",
+      "database_after_cleanup": "NotFound"
+    }
+  ]
+}

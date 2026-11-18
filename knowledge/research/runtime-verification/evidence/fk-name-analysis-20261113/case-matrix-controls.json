@@ -1,0 +1,367 @@
+{
+  "dialect": "google",
+  "steps": [
+    {
+      "family": "underscore-case-matrix/upper",
+      "timeout_seconds": 180,
+      "label": "upper/parent",
+      "kind": "ddl",
+      "requires": [],
+      "statements": [
+        "CREATE TABLE ADDRESS(ADDRESS_ID INT64 NOT NULL) PRIMARY KEY(ADDRESS_ID)"
+      ]
+    },
+    {
+      "family": "underscore-case-matrix/upper",
+      "timeout_seconds": 180,
+      "label": "upper/shipping-first",
+      "kind": "ddl",
+      "requires": [
+        "upper/parent"
+      ],
+      "statements": [
+        "CREATE TABLE SALES_ORDER_SHIPPING(SHIPMENT_ID INT64 NOT NULL,ADDRESS_ID INT64 NOT NULL,CONSTRAINT SHIPPING_ADDRESS_FK FOREIGN KEY(ADDRESS_ID) REFERENCES ADDRESS(ADDRESS_ID)) PRIMARY KEY(SHIPMENT_ID)"
+      ]
+    },
+    {
+      "family": "underscore-case-matrix/upper",
+      "timeout_seconds": 180,
+      "label": "upper/indexes-shipping",
+      "kind": "query",
+      "requires": [
+        "upper/shipping-first"
+      ],
+      "sql": "SELECT i.TABLE_SCHEMA,i.TABLE_NAME,i.INDEX_NAME,i.IS_UNIQUE,i.IS_NULL_FILTERED,i.SPANNER_IS_MANAGED,c.COLUMN_NAME,c.COLUMN_ORDERING FROM INFORMATION_SCHEMA.INDEXES i JOIN INFORMATION_SCHEMA.INDEX_COLUMNS c USING(TABLE_CATALOG,TABLE_SCHEMA,TABLE_NAME,INDEX_NAME) WHERE i.INDEX_TYPE='INDEX' ORDER BY i.TABLE_NAME,i.INDEX_NAME,c.ORDINAL_POSITION"
+    },
+    {
+      "family": "underscore-case-matrix/upper",
+      "timeout_seconds": 180,
+      "label": "upper/order-second",
+      "kind": "ddl",
+      "requires": [
+        "upper/shipping-first"
+      ],
+      "statements": [
+        "CREATE TABLE SALES_ORDER(ORDER_ID INT64 NOT NULL,SHIPPING_ADDRESS_ID INT64 NOT NULL,CONSTRAINT ORDER_ADDRESS_FK FOREIGN KEY(SHIPPING_ADDRESS_ID) REFERENCES ADDRESS(ADDRESS_ID)) PRIMARY KEY(ORDER_ID)"
+      ]
+    },
+    {
+      "family": "underscore-case-matrix/upper",
+      "timeout_seconds": 180,
+      "label": "upper/indexes-forward",
+      "kind": "query",
+      "requires": [
+        "upper/shipping-first"
+      ],
+      "sql": "SELECT i.TABLE_SCHEMA,i.TABLE_NAME,i.INDEX_NAME,i.IS_UNIQUE,i.IS_NULL_FILTERED,i.SPANNER_IS_MANAGED,c.COLUMN_NAME,c.COLUMN_ORDERING FROM INFORMATION_SCHEMA.INDEXES i JOIN INFORMATION_SCHEMA.INDEX_COLUMNS c USING(TABLE_CATALOG,TABLE_SCHEMA,TABLE_NAME,INDEX_NAME) WHERE i.INDEX_TYPE='INDEX' ORDER BY i.TABLE_NAME,i.INDEX_NAME,c.ORDINAL_POSITION"
+    },
+    {
+      "family": "underscore-case-matrix/upper",
+      "timeout_seconds": 180,
+      "label": "upper/drop-forward-order",
+      "kind": "ddl",
+      "requires": [
+        "upper/order-second"
+      ],
+      "statements": [
+        "DROP TABLE SALES_ORDER"
+      ]
+    },
+    {
+      "family": "underscore-case-matrix/upper",
+      "timeout_seconds": 180,
+      "label": "upper/drop-forward-shipping",
+      "kind": "ddl",
+      "requires": [
+        "upper/shipping-first"
+      ],
+      "statements": [
+        "DROP TABLE SALES_ORDER_SHIPPING"
+      ]
+    },
+    {
+      "family": "underscore-case-matrix/upper",
+      "timeout_seconds": 180,
+      "label": "upper/order-first",
+      "kind": "ddl",
+      "requires": [
+        "upper/parent",
+        "upper/drop-forward-shipping"
+      ],
+      "statements": [
+        "CREATE TABLE SALES_ORDER(ORDER_ID INT64 NOT NULL,SHIPPING_ADDRESS_ID INT64 NOT NULL,CONSTRAINT ORDER_ADDRESS_FK FOREIGN KEY(SHIPPING_ADDRESS_ID) REFERENCES ADDRESS(ADDRESS_ID)) PRIMARY KEY(ORDER_ID)"
+      ]
+    },
+    {
+      "family": "underscore-case-matrix/upper",
+      "timeout_seconds": 180,
+      "label": "upper/indexes-order",
+      "kind": "query",
+      "requires": [
+        "upper/order-first"
+      ],
+      "sql": "SELECT i.TABLE_SCHEMA,i.TABLE_NAME,i.INDEX_NAME,i.IS_UNIQUE,i.IS_NULL_FILTERED,i.SPANNER_IS_MANAGED,c.COLUMN_NAME,c.COLUMN_ORDERING FROM INFORMATION_SCHEMA.INDEXES i JOIN INFORMATION_SCHEMA.INDEX_COLUMNS c USING(TABLE_CATALOG,TABLE_SCHEMA,TABLE_NAME,INDEX_NAME) WHERE i.INDEX_TYPE='INDEX' ORDER BY i.TABLE_NAME,i.INDEX_NAME,c.ORDINAL_POSITION"
+    },
+    {
+      "family": "underscore-case-matrix/upper",
+      "timeout_seconds": 180,
+      "label": "upper/shipping-second",
+      "kind": "ddl",
+      "requires": [
+        "upper/order-first"
+      ],
+      "statements": [
+        "CREATE TABLE SALES_ORDER_SHIPPING(SHIPMENT_ID INT64 NOT NULL,ADDRESS_ID INT64 NOT NULL,CONSTRAINT SHIPPING_ADDRESS_FK FOREIGN KEY(ADDRESS_ID) REFERENCES ADDRESS(ADDRESS_ID)) PRIMARY KEY(SHIPMENT_ID)"
+      ]
+    },
+    {
+      "family": "underscore-case-matrix/upper",
+      "timeout_seconds": 180,
+      "label": "upper/indexes-reverse",
+      "kind": "query",
+      "requires": [
+        "upper/order-first"
+      ],
+      "sql": "SELECT i.TABLE_SCHEMA,i.TABLE_NAME,i.INDEX_NAME,i.IS_UNIQUE,i.IS_NULL_FILTERED,i.SPANNER_IS_MANAGED,c.COLUMN_NAME,c.COLUMN_ORDERING FROM INFORMATION_SCHEMA.INDEXES i JOIN INFORMATION_SCHEMA.INDEX_COLUMNS c USING(TABLE_CATALOG,TABLE_SCHEMA,TABLE_NAME,INDEX_NAME) WHERE i.INDEX_TYPE='INDEX' ORDER BY i.TABLE_NAME,i.INDEX_NAME,c.ORDINAL_POSITION"
+    },
+    {
+      "family": "underscore-case-matrix/upper",
+      "timeout_seconds": 180,
+      "label": "upper/drop-reverse-shipping",
+      "kind": "ddl",
+      "requires": [
+        "upper/shipping-second"
+      ],
+      "statements": [
+        "DROP TABLE SALES_ORDER_SHIPPING"
+      ]
+    },
+    {
+      "family": "underscore-case-matrix/upper",
+      "timeout_seconds": 180,
+      "label": "upper/drop-reverse-order",
+      "kind": "ddl",
+      "requires": [
+        "upper/order-first"
+      ],
+      "statements": [
+        "DROP TABLE SALES_ORDER"
+      ]
+    },
+    {
+      "family": "underscore-case-matrix/upper",
+      "timeout_seconds": 180,
+      "label": "upper/drop-parent",
+      "kind": "ddl",
+      "requires": [
+        "upper/parent",
+        "upper/drop-reverse-order"
+      ],
+      "statements": [
+        "DROP TABLE ADDRESS"
+      ]
+    },
+    {
+      "family": "underscore-case-matrix/upper",
+      "timeout_seconds": 180,
+      "label": "upper/tables-empty",
+      "kind": "query",
+      "requires": [
+        "upper/drop-parent"
+      ],
+      "sql": "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA='' ORDER BY TABLE_NAME"
+    },
+    {
+      "family": "underscore-case-matrix/upper",
+      "timeout_seconds": 180,
+      "label": "upper/indexes-empty",
+      "kind": "query",
+      "requires": [
+        "upper/drop-parent"
+      ],
+      "sql": "SELECT i.TABLE_SCHEMA,i.TABLE_NAME,i.INDEX_NAME,i.IS_UNIQUE,i.IS_NULL_FILTERED,i.SPANNER_IS_MANAGED,c.COLUMN_NAME,c.COLUMN_ORDERING FROM INFORMATION_SCHEMA.INDEXES i JOIN INFORMATION_SCHEMA.INDEX_COLUMNS c USING(TABLE_CATALOG,TABLE_SCHEMA,TABLE_NAME,INDEX_NAME) WHERE i.INDEX_TYPE='INDEX' ORDER BY i.TABLE_NAME,i.INDEX_NAME,c.ORDINAL_POSITION"
+    },
+    {
+      "family": "underscore-case-matrix/lower",
+      "timeout_seconds": 180,
+      "label": "lower/parent",
+      "kind": "ddl",
+      "requires": [
+        "upper/drop-parent"
+      ],
+      "statements": [
+        "create table address(address_id int64 not null) primary key(address_id)"
+      ]
+    },
+    {
+      "family": "underscore-case-matrix/lower",
+      "timeout_seconds": 180,
+      "label": "lower/shipping-first",
+      "kind": "ddl",
+      "requires": [
+        "lower/parent"
+      ],
+      "statements": [
+        "create table sales_order_shipping(shipment_id int64 not null,address_id int64 not null,constraint shipping_address_fk foreign key(address_id) references address(address_id)) primary key(shipment_id)"
+      ]
+    },
+    {
+      "family": "underscore-case-matrix/lower",
+      "timeout_seconds": 180,
+      "label": "lower/indexes-shipping",
+      "kind": "query",
+      "requires": [
+        "lower/shipping-first"
+      ],
+      "sql": "SELECT i.TABLE_SCHEMA,i.TABLE_NAME,i.INDEX_NAME,i.IS_UNIQUE,i.IS_NULL_FILTERED,i.SPANNER_IS_MANAGED,c.COLUMN_NAME,c.COLUMN_ORDERING FROM INFORMATION_SCHEMA.INDEXES i JOIN INFORMATION_SCHEMA.INDEX_COLUMNS c USING(TABLE_CATALOG,TABLE_SCHEMA,TABLE_NAME,INDEX_NAME) WHERE i.INDEX_TYPE='INDEX' ORDER BY i.TABLE_NAME,i.INDEX_NAME,c.ORDINAL_POSITION"
+    },
+    {
+      "family": "underscore-case-matrix/lower",
+      "timeout_seconds": 180,
+      "label": "lower/order-second",
+      "kind": "ddl",
+      "requires": [
+        "lower/shipping-first"
+      ],
+      "statements": [
+        "create table sales_order(order_id int64 not null,shipping_address_id int64 not null,constraint order_address_fk foreign key(shipping_address_id) references address(address_id)) primary key(order_id)"
+      ]
+    },
+    {
+      "family": "underscore-case-matrix/lower",
+      "timeout_seconds": 180,
+      "label": "lower/indexes-forward",
+      "kind": "query",
+      "requires": [
+        "lower/shipping-first"
+      ],
+      "sql": "SELECT i.TABLE_SCHEMA,i.TABLE_NAME,i.INDEX_NAME,i.IS_UNIQUE,i.IS_NULL_FILTERED,i.SPANNER_IS_MANAGED,c.COLUMN_NAME,c.COLUMN_ORDERING FROM INFORMATION_SCHEMA.INDEXES i JOIN INFORMATION_SCHEMA.INDEX_COLUMNS c USING(TABLE_CATALOG,TABLE_SCHEMA,TABLE_NAME,INDEX_NAME) WHERE i.INDEX_TYPE='INDEX' ORDER BY i.TABLE_NAME,i.INDEX_NAME,c.ORDINAL_POSITION"
+    },
+    {
+      "family": "underscore-case-matrix/lower",
+      "timeout_seconds": 180,
+      "label": "lower/drop-forward-order",
+      "kind": "ddl",
+      "requires": [
+        "lower/order-second"
+      ],
+      "statements": [
+        "DROP TABLE sales_order"
+      ]
+    },
+    {
+      "family": "underscore-case-matrix/lower",
+      "timeout_seconds": 180,
+      "label": "lower/drop-forward-shipping",
+      "kind": "ddl",
+      "requires": [
+        "lower/shipping-first"
+      ],
+      "statements": [
+        "DROP TABLE sales_order_shipping"
+      ]
+    },
+    {
+      "family": "underscore-case-matrix/lower",
+      "timeout_seconds": 180,
+      "label": "lower/order-first",
+      "kind": "ddl",
+      "requires": [
+        "lower/parent",
+        "lower/drop-forward-shipping"
+      ],
+      "statements": [
+        "create table sales_order(order_id int64 not null,shipping_address_id int64 not null,constraint order_address_fk foreign key(shipping_address_id) references address(address_id)) primary key(order_id)"
+      ]
+    },
+    {
+      "family": "underscore-case-matrix/lower",
+      "timeout_seconds": 180,
+      "label": "lower/indexes-order",
+      "kind": "query",
+      "requires": [
+        "lower/order-first"
+      ],
+      "sql": "SELECT i.TABLE_SCHEMA,i.TABLE_NAME,i.INDEX_NAME,i.IS_UNIQUE,i.IS_NULL_FILTERED,i.SPANNER_IS_MANAGED,c.COLUMN_NAME,c.COLUMN_ORDERING FROM INFORMATION_SCHEMA.INDEXES i JOIN INFORMATION_SCHEMA.INDEX_COLUMNS c USING(TABLE_CATALOG,TABLE_SCHEMA,TABLE_NAME,INDEX_NAME) WHERE i.INDEX_TYPE='INDEX' ORDER BY i.TABLE_NAME,i.INDEX_NAME,c.ORDINAL_POSITION"
+    },
+    {
+      "family": "underscore-case-matrix/lower",
+      "timeout_seconds": 180,
+      "label": "lower/shipping-second",
+      "kind": "ddl",
+      "requires": [
+        "lower/order-first"
+      ],
+      "statements": [
+        "create table sales_order_shipping(shipment_id int64 not null,address_id int64 not null,constraint shipping_address_fk foreign key(address_id) references address(address_id)) primary key(shipment_id)"
+      ]
+    },
+    {
+      "family": "underscore-case-matrix/lower",
+      "timeout_seconds": 180,
+      "label": "lower/indexes-reverse",
+      "kind": "query",
+      "requires": [
+        "lower/order-first"
+      ],
+      "sql": "SELECT i.TABLE_SCHEMA,i.TABLE_NAME,i.INDEX_NAME,i.IS_UNIQUE,i.IS_NULL_FILTERED,i.SPANNER_IS_MANAGED,c.COLUMN_NAME,c.COLUMN_ORDERING FROM INFORMATION_SCHEMA.INDEXES i JOIN INFORMATION_SCHEMA.INDEX_COLUMNS c USING(TABLE_CATALOG,TABLE_SCHEMA,TABLE_NAME,INDEX_NAME) WHERE i.INDEX_TYPE='INDEX' ORDER BY i.TABLE_NAME,i.INDEX_NAME,c.ORDINAL_POSITION"
+    },
+    {
+      "family": "underscore-case-matrix/lower",
+      "timeout_seconds": 180,
+      "label": "lower/drop-reverse-shipping",
+      "kind": "ddl",
+      "requires": [
+        "lower/shipping-second"
+      ],
+      "statements": [
+        "DROP TABLE sales_order_shipping"
+      ]
+    },
+    {
+      "family": "underscore-case-matrix/lower",
+      "timeout_seconds": 180,
+      "label": "lower/drop-reverse-order",
+      "kind": "ddl",
+      "requires": [
+        "lower/order-first"
+      ],
+      "statements": [
+        "DROP TABLE sales_order"
+      ]
+    },
+    {
+      "family": "underscore-case-matrix/lower",
+      "timeout_seconds": 180,
+      "label": "lower/drop-parent",
+      "kind": "ddl",
+      "requires": [
+        "lower/parent",
+        "lower/drop-reverse-order"
+      ],
+      "statements": [
+        "DROP TABLE address"
+      ]
+    },
+    {
+      "family": "underscore-case-matrix/lower",
+      "timeout_seconds": 180,
+      "label": "lower/tables-empty",
+      "kind": "query",
+      "requires": [
+        "lower/drop-parent"
+      ],
+      "sql": "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA='' ORDER BY TABLE_NAME"
+    },
+    {
+      "family": "underscore-case-matrix/lower",
+      "timeout_seconds": 180,
+      "label": "lower/indexes-empty",
+      "kind": "query",
+      "requires": [
+        "lower/drop-parent"
+      ],
+      "sql": "SELECT i.TABLE_SCHEMA,i.TABLE_NAME,i.INDEX_NAME,i.IS_UNIQUE,i.IS_NULL_FILTERED,i.SPANNER_IS_MANAGED,c.COLUMN_NAME,c.COLUMN_ORDERING FROM INFORMATION_SCHEMA.INDEXES i JOIN INFORMATION_SCHEMA.INDEX_COLUMNS c USING(TABLE_CATALOG,TABLE_SCHEMA,TABLE_NAME,INDEX_NAME) WHERE i.INDEX_TYPE='INDEX' ORDER BY i.TABLE_NAME,i.INDEX_NAME,c.ORDINAL_POSITION"
+    }
+  ]
+}

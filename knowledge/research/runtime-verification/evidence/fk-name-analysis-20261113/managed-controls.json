@@ -1,0 +1,125 @@
+{
+  "dialect": "google",
+  "steps": [
+    {
+      "label": "address",
+      "family": "managed-lowercase-fk-collision",
+      "kind": "ddl",
+      "requires": [],
+      "timeout_seconds": 180,
+      "statements": [
+        "create table address(address_id int64 not null) primary key(address_id)"
+      ]
+    },
+    {
+      "label": "shipping-first",
+      "family": "managed-lowercase-fk-collision",
+      "kind": "ddl",
+      "requires": [
+        "address"
+      ],
+      "timeout_seconds": 180,
+      "statements": [
+        "create table sales_order_shipping(shipment_id int64 not null,address_id int64 not null,constraint shipping_address_fk foreign key(address_id) references address(address_id)) primary key(shipment_id)"
+      ]
+    },
+    {
+      "label": "indexes-shipping",
+      "family": "managed-lowercase-fk-collision",
+      "kind": "query",
+      "requires": [
+        "shipping-first"
+      ],
+      "timeout_seconds": 180,
+      "sql": "SELECT i.TABLE_SCHEMA,i.TABLE_NAME,i.INDEX_NAME,i.IS_UNIQUE,i.IS_NULL_FILTERED,i.SPANNER_IS_MANAGED,c.COLUMN_NAME,c.COLUMN_ORDERING FROM INFORMATION_SCHEMA.INDEXES i JOIN INFORMATION_SCHEMA.INDEX_COLUMNS c USING(TABLE_CATALOG,TABLE_SCHEMA,TABLE_NAME,INDEX_NAME) WHERE i.INDEX_TYPE='INDEX' ORDER BY i.TABLE_NAME,i.INDEX_NAME,c.ORDINAL_POSITION"
+    },
+    {
+      "label": "order-collision",
+      "family": "managed-lowercase-fk-collision",
+      "kind": "ddl",
+      "requires": [
+        "shipping-first"
+      ],
+      "timeout_seconds": 180,
+      "statements": [
+        "create table sales_order(order_id int64 not null,shipping_address_id int64 not null,constraint order_address_fk foreign key(shipping_address_id) references address(address_id)) primary key(order_id)"
+      ]
+    },
+    {
+      "label": "indexes-first-collision",
+      "family": "managed-lowercase-fk-collision",
+      "kind": "query",
+      "requires": [
+        "shipping-first"
+      ],
+      "timeout_seconds": 180,
+      "sql": "SELECT i.TABLE_SCHEMA,i.TABLE_NAME,i.INDEX_NAME,i.IS_UNIQUE,i.IS_NULL_FILTERED,i.SPANNER_IS_MANAGED,c.COLUMN_NAME,c.COLUMN_ORDERING FROM INFORMATION_SCHEMA.INDEXES i JOIN INFORMATION_SCHEMA.INDEX_COLUMNS c USING(TABLE_CATALOG,TABLE_SCHEMA,TABLE_NAME,INDEX_NAME) WHERE i.INDEX_TYPE='INDEX' ORDER BY i.TABLE_NAME,i.INDEX_NAME,c.ORDINAL_POSITION"
+    },
+    {
+      "label": "drop-shipping",
+      "family": "managed-lowercase-fk-collision",
+      "kind": "ddl",
+      "requires": [
+        "shipping-first"
+      ],
+      "timeout_seconds": 180,
+      "statements": [
+        "DROP TABLE sales_order_shipping"
+      ]
+    },
+    {
+      "label": "order-alone",
+      "family": "managed-lowercase-fk-collision",
+      "kind": "ddl",
+      "requires": [
+        "drop-shipping"
+      ],
+      "timeout_seconds": 180,
+      "statements": [
+        "create table sales_order(order_id int64 not null,shipping_address_id int64 not null,constraint order_address_fk foreign key(shipping_address_id) references address(address_id)) primary key(order_id)"
+      ]
+    },
+    {
+      "label": "indexes-order",
+      "family": "managed-lowercase-fk-collision",
+      "kind": "query",
+      "requires": [
+        "order-alone"
+      ],
+      "timeout_seconds": 180,
+      "sql": "SELECT i.TABLE_SCHEMA,i.TABLE_NAME,i.INDEX_NAME,i.IS_UNIQUE,i.IS_NULL_FILTERED,i.SPANNER_IS_MANAGED,c.COLUMN_NAME,c.COLUMN_ORDERING FROM INFORMATION_SCHEMA.INDEXES i JOIN INFORMATION_SCHEMA.INDEX_COLUMNS c USING(TABLE_CATALOG,TABLE_SCHEMA,TABLE_NAME,INDEX_NAME) WHERE i.INDEX_TYPE='INDEX' ORDER BY i.TABLE_NAME,i.INDEX_NAME,c.ORDINAL_POSITION"
+    },
+    {
+      "label": "shipping-collision",
+      "family": "managed-lowercase-fk-collision",
+      "kind": "ddl",
+      "requires": [
+        "order-alone"
+      ],
+      "timeout_seconds": 180,
+      "statements": [
+        "create table sales_order_shipping(shipment_id int64 not null,address_id int64 not null,constraint shipping_address_fk foreign key(address_id) references address(address_id)) primary key(shipment_id)"
+      ]
+    },
+    {
+      "label": "indexes-second-collision",
+      "family": "managed-lowercase-fk-collision",
+      "kind": "query",
+      "requires": [
+        "order-alone"
+      ],
+      "timeout_seconds": 180,
+      "sql": "SELECT i.TABLE_SCHEMA,i.TABLE_NAME,i.INDEX_NAME,i.IS_UNIQUE,i.IS_NULL_FILTERED,i.SPANNER_IS_MANAGED,c.COLUMN_NAME,c.COLUMN_ORDERING FROM INFORMATION_SCHEMA.INDEXES i JOIN INFORMATION_SCHEMA.INDEX_COLUMNS c USING(TABLE_CATALOG,TABLE_SCHEMA,TABLE_NAME,INDEX_NAME) WHERE i.INDEX_TYPE='INDEX' ORDER BY i.TABLE_NAME,i.INDEX_NAME,c.ORDINAL_POSITION"
+    },
+    {
+      "label": "tables-final",
+      "family": "managed-lowercase-fk-collision",
+      "kind": "query",
+      "requires": [
+        "address"
+      ],
+      "timeout_seconds": 180,
+      "sql": "SELECT TABLE_NAME,TABLE_TYPE,TABLE_STATE FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA='' ORDER BY TABLE_NAME"
+    }
+  ]
+}

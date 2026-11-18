@@ -1,0 +1,546 @@
+{
+  "dialect": "google",
+  "steps": [
+    {
+      "label": "parents",
+      "family": "fk-name-inputs",
+      "kind": "ddl",
+      "requires": [],
+      "timeout_seconds": 90,
+      "statements": [
+        "CREATE TABLE P(K INT64 NOT NULL) PRIMARY KEY(K)",
+        "CREATE TABLE Q(K INT64 NOT NULL) PRIMARY KEY(K)",
+        "CREATE TABLE PStr(K STRING(32) NOT NULL) PRIMARY KEY(K)",
+        "CREATE SCHEMA S",
+        "CREATE SCHEMA T"
+      ]
+    },
+    {
+      "label": "ambiguous/a_b",
+      "family": "fk-name-inputs",
+      "kind": "ddl",
+      "requires": [
+        "parents"
+      ],
+      "timeout_seconds": 90,
+      "statements": [
+        "CREATE TABLE A_B(Id INT64 NOT NULL,C INT64,FOREIGN KEY(C) REFERENCES P(K)) PRIMARY KEY(Id)"
+      ]
+    },
+    {
+      "label": "ambiguous/a_b/indexes",
+      "family": "fk-name-inputs",
+      "kind": "query",
+      "requires": [
+        "ambiguous/a_b"
+      ],
+      "timeout_seconds": 90,
+      "sql": "SELECT i.TABLE_SCHEMA,i.TABLE_NAME,i.INDEX_NAME,i.IS_UNIQUE,i.IS_NULL_FILTERED,i.SPANNER_IS_MANAGED,c.COLUMN_NAME,c.ORDINAL_POSITION,c.COLUMN_ORDERING FROM INFORMATION_SCHEMA.INDEXES i JOIN INFORMATION_SCHEMA.INDEX_COLUMNS c USING(TABLE_CATALOG,TABLE_SCHEMA,TABLE_NAME,INDEX_NAME) WHERE i.INDEX_TYPE='INDEX' AND UPPER(i.TABLE_NAME) IN ('A_B') ORDER BY i.TABLE_SCHEMA,i.TABLE_NAME,i.INDEX_NAME,c.ORDINAL_POSITION"
+    },
+    {
+      "label": "ambiguous/a_b/constraints",
+      "family": "fk-name-inputs",
+      "kind": "query",
+      "requires": [
+        "ambiguous/a_b"
+      ],
+      "timeout_seconds": 90,
+      "sql": "SELECT CONSTRAINT_SCHEMA,CONSTRAINT_NAME,TABLE_SCHEMA,TABLE_NAME FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS WHERE CONSTRAINT_TYPE='FOREIGN KEY' AND UPPER(TABLE_NAME) IN ('A_B') ORDER BY CONSTRAINT_SCHEMA,CONSTRAINT_NAME"
+    },
+    {
+      "label": "ambiguous/a",
+      "family": "fk-name-inputs",
+      "kind": "ddl",
+      "requires": [
+        "parents",
+        "ambiguous/a_b"
+      ],
+      "timeout_seconds": 90,
+      "statements": [
+        "CREATE TABLE A(Id INT64 NOT NULL,B_C INT64,FOREIGN KEY(B_C) REFERENCES P(K)) PRIMARY KEY(Id)"
+      ]
+    },
+    {
+      "label": "ambiguous/both/indexes",
+      "family": "fk-name-inputs",
+      "kind": "query",
+      "requires": [
+        "ambiguous/a_b"
+      ],
+      "timeout_seconds": 90,
+      "sql": "SELECT i.TABLE_SCHEMA,i.TABLE_NAME,i.INDEX_NAME,i.IS_UNIQUE,i.IS_NULL_FILTERED,i.SPANNER_IS_MANAGED,c.COLUMN_NAME,c.ORDINAL_POSITION,c.COLUMN_ORDERING FROM INFORMATION_SCHEMA.INDEXES i JOIN INFORMATION_SCHEMA.INDEX_COLUMNS c USING(TABLE_CATALOG,TABLE_SCHEMA,TABLE_NAME,INDEX_NAME) WHERE i.INDEX_TYPE='INDEX' AND UPPER(i.TABLE_NAME) IN ('A_B','A') ORDER BY i.TABLE_SCHEMA,i.TABLE_NAME,i.INDEX_NAME,c.ORDINAL_POSITION"
+    },
+    {
+      "label": "ambiguous/both/constraints",
+      "family": "fk-name-inputs",
+      "kind": "query",
+      "requires": [
+        "ambiguous/a_b"
+      ],
+      "timeout_seconds": 90,
+      "sql": "SELECT CONSTRAINT_SCHEMA,CONSTRAINT_NAME,TABLE_SCHEMA,TABLE_NAME FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS WHERE CONSTRAINT_TYPE='FOREIGN KEY' AND UPPER(TABLE_NAME) IN ('A_B','A') ORDER BY CONSTRAINT_SCHEMA,CONSTRAINT_NAME"
+    },
+    {
+      "label": "schema/create",
+      "family": "fk-name-inputs",
+      "kind": "ddl",
+      "requires": [
+        "parents"
+      ],
+      "timeout_seconds": 90,
+      "statements": [
+        "CREATE TABLE S.Same(Id INT64 NOT NULL,Owner INT64,CONSTRAINT SameFk FOREIGN KEY(Owner) REFERENCES P(K)) PRIMARY KEY(Id)",
+        "CREATE TABLE T.Same(Id INT64 NOT NULL,Owner INT64,CONSTRAINT SameFk FOREIGN KEY(Owner) REFERENCES P(K)) PRIMARY KEY(Id)"
+      ]
+    },
+    {
+      "label": "schema/both/indexes",
+      "family": "fk-name-inputs",
+      "kind": "query",
+      "requires": [
+        "schema/create"
+      ],
+      "timeout_seconds": 90,
+      "sql": "SELECT i.TABLE_SCHEMA,i.TABLE_NAME,i.INDEX_NAME,i.IS_UNIQUE,i.IS_NULL_FILTERED,i.SPANNER_IS_MANAGED,c.COLUMN_NAME,c.ORDINAL_POSITION,c.COLUMN_ORDERING FROM INFORMATION_SCHEMA.INDEXES i JOIN INFORMATION_SCHEMA.INDEX_COLUMNS c USING(TABLE_CATALOG,TABLE_SCHEMA,TABLE_NAME,INDEX_NAME) WHERE i.INDEX_TYPE='INDEX' AND UPPER(i.TABLE_NAME) IN ('SAME') ORDER BY i.TABLE_SCHEMA,i.TABLE_NAME,i.INDEX_NAME,c.ORDINAL_POSITION"
+    },
+    {
+      "label": "schema/both/constraints",
+      "family": "fk-name-inputs",
+      "kind": "query",
+      "requires": [
+        "schema/create"
+      ],
+      "timeout_seconds": 90,
+      "sql": "SELECT CONSTRAINT_SCHEMA,CONSTRAINT_NAME,TABLE_SCHEMA,TABLE_NAME FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS WHERE CONSTRAINT_TYPE='FOREIGN KEY' AND UPPER(TABLE_NAME) IN ('SAME') ORDER BY CONSTRAINT_SCHEMA,CONSTRAINT_NAME"
+    },
+    {
+      "label": "schema/hint/unqualified",
+      "family": "fk-name-inputs",
+      "kind": "plan",
+      "requires": [
+        "schema/create"
+      ],
+      "timeout_seconds": 90,
+      "sql": "SELECT Owner FROM S.Same@{FORCE_INDEX=SameFk} WHERE Owner=1"
+    },
+    {
+      "label": "schema/hint/path",
+      "family": "fk-name-inputs",
+      "kind": "plan",
+      "requires": [
+        "schema/create"
+      ],
+      "timeout_seconds": 90,
+      "sql": "SELECT Owner FROM S.Same@{FORCE_INDEX=S.SameFk} WHERE Owner=1"
+    },
+    {
+      "label": "schema/hint/quoted",
+      "family": "fk-name-inputs",
+      "kind": "plan",
+      "requires": [
+        "schema/create"
+      ],
+      "timeout_seconds": 90,
+      "sql": "SELECT Owner FROM S.Same@{FORCE_INDEX=`S.SameFk`} WHERE Owner=1"
+    },
+    {
+      "label": "schema/hint/physical-qualified",
+      "family": "fk-name-inputs",
+      "kind": "plan",
+      "requires": [
+        "schema/create"
+      ],
+      "timeout_seconds": 90,
+      "sql": "SELECT Owner FROM S.Same@{FORCE_INDEX=`S.IDX_Same_Owner_N_FA7F931463D537A2`} WHERE Owner=1"
+    },
+    {
+      "label": "schema/hint/physical-unqualified",
+      "family": "fk-name-inputs",
+      "kind": "plan",
+      "requires": [
+        "schema/create"
+      ],
+      "timeout_seconds": 90,
+      "sql": "SELECT Owner FROM S.Same@{FORCE_INDEX=IDX_Same_Owner_N_FA7F931463D537A2} WHERE Owner=1"
+    },
+    {
+      "label": "relation/first",
+      "family": "fk-name-inputs",
+      "kind": "ddl",
+      "requires": [
+        "parents"
+      ],
+      "timeout_seconds": 90,
+      "statements": [
+        "CREATE TABLE RelationCase(Id INT64 NOT NULL,Owner INT64,CONSTRAINT FirstFk FOREIGN KEY(Owner) REFERENCES P(K)) PRIMARY KEY(Id)"
+      ]
+    },
+    {
+      "label": "relation/first/indexes",
+      "family": "fk-name-inputs",
+      "kind": "query",
+      "requires": [
+        "relation/first"
+      ],
+      "timeout_seconds": 90,
+      "sql": "SELECT i.TABLE_SCHEMA,i.TABLE_NAME,i.INDEX_NAME,i.IS_UNIQUE,i.IS_NULL_FILTERED,i.SPANNER_IS_MANAGED,c.COLUMN_NAME,c.ORDINAL_POSITION,c.COLUMN_ORDERING FROM INFORMATION_SCHEMA.INDEXES i JOIN INFORMATION_SCHEMA.INDEX_COLUMNS c USING(TABLE_CATALOG,TABLE_SCHEMA,TABLE_NAME,INDEX_NAME) WHERE i.INDEX_TYPE='INDEX' AND UPPER(i.TABLE_NAME) IN ('RELATIONCASE') ORDER BY i.TABLE_SCHEMA,i.TABLE_NAME,i.INDEX_NAME,c.ORDINAL_POSITION"
+    },
+    {
+      "label": "relation/first/constraints",
+      "family": "fk-name-inputs",
+      "kind": "query",
+      "requires": [
+        "relation/first"
+      ],
+      "timeout_seconds": 90,
+      "sql": "SELECT CONSTRAINT_SCHEMA,CONSTRAINT_NAME,TABLE_SCHEMA,TABLE_NAME FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS WHERE CONSTRAINT_TYPE='FOREIGN KEY' AND UPPER(TABLE_NAME) IN ('RELATIONCASE') ORDER BY CONSTRAINT_SCHEMA,CONSTRAINT_NAME"
+    },
+    {
+      "label": "relation/recreate",
+      "family": "fk-name-inputs",
+      "kind": "ddl",
+      "requires": [
+        "relation/first"
+      ],
+      "timeout_seconds": 90,
+      "statements": [
+        "DROP TABLE RelationCase",
+        "CREATE TABLE RelationCase(Id INT64 NOT NULL,Owner INT64,CONSTRAINT SecondFk FOREIGN KEY(Owner) REFERENCES Q(K)) PRIMARY KEY(Id)"
+      ]
+    },
+    {
+      "label": "relation/recreate/indexes",
+      "family": "fk-name-inputs",
+      "kind": "query",
+      "requires": [
+        "relation/recreate"
+      ],
+      "timeout_seconds": 90,
+      "sql": "SELECT i.TABLE_SCHEMA,i.TABLE_NAME,i.INDEX_NAME,i.IS_UNIQUE,i.IS_NULL_FILTERED,i.SPANNER_IS_MANAGED,c.COLUMN_NAME,c.ORDINAL_POSITION,c.COLUMN_ORDERING FROM INFORMATION_SCHEMA.INDEXES i JOIN INFORMATION_SCHEMA.INDEX_COLUMNS c USING(TABLE_CATALOG,TABLE_SCHEMA,TABLE_NAME,INDEX_NAME) WHERE i.INDEX_TYPE='INDEX' AND UPPER(i.TABLE_NAME) IN ('RELATIONCASE') ORDER BY i.TABLE_SCHEMA,i.TABLE_NAME,i.INDEX_NAME,c.ORDINAL_POSITION"
+    },
+    {
+      "label": "relation/recreate/constraints",
+      "family": "fk-name-inputs",
+      "kind": "query",
+      "requires": [
+        "relation/recreate"
+      ],
+      "timeout_seconds": 90,
+      "sql": "SELECT CONSTRAINT_SCHEMA,CONSTRAINT_NAME,TABLE_SCHEMA,TABLE_NAME FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS WHERE CONSTRAINT_TYPE='FOREIGN KEY' AND UPPER(TABLE_NAME) IN ('RELATIONCASE') ORDER BY CONSTRAINT_SCHEMA,CONSTRAINT_NAME"
+    },
+    {
+      "label": "type/int",
+      "family": "fk-name-inputs",
+      "kind": "ddl",
+      "requires": [
+        "parents"
+      ],
+      "timeout_seconds": 90,
+      "statements": [
+        "CREATE TABLE TypeCase(Id INT64 NOT NULL,Owner INT64,FOREIGN KEY(Owner) REFERENCES P(K)) PRIMARY KEY(Id)"
+      ]
+    },
+    {
+      "label": "type/int/indexes",
+      "family": "fk-name-inputs",
+      "kind": "query",
+      "requires": [
+        "type/int"
+      ],
+      "timeout_seconds": 90,
+      "sql": "SELECT i.TABLE_SCHEMA,i.TABLE_NAME,i.INDEX_NAME,i.IS_UNIQUE,i.IS_NULL_FILTERED,i.SPANNER_IS_MANAGED,c.COLUMN_NAME,c.ORDINAL_POSITION,c.COLUMN_ORDERING FROM INFORMATION_SCHEMA.INDEXES i JOIN INFORMATION_SCHEMA.INDEX_COLUMNS c USING(TABLE_CATALOG,TABLE_SCHEMA,TABLE_NAME,INDEX_NAME) WHERE i.INDEX_TYPE='INDEX' AND UPPER(i.TABLE_NAME) IN ('TYPECASE') ORDER BY i.TABLE_SCHEMA,i.TABLE_NAME,i.INDEX_NAME,c.ORDINAL_POSITION"
+    },
+    {
+      "label": "type/int/constraints",
+      "family": "fk-name-inputs",
+      "kind": "query",
+      "requires": [
+        "type/int"
+      ],
+      "timeout_seconds": 90,
+      "sql": "SELECT CONSTRAINT_SCHEMA,CONSTRAINT_NAME,TABLE_SCHEMA,TABLE_NAME FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS WHERE CONSTRAINT_TYPE='FOREIGN KEY' AND UPPER(TABLE_NAME) IN ('TYPECASE') ORDER BY CONSTRAINT_SCHEMA,CONSTRAINT_NAME"
+    },
+    {
+      "label": "type/string",
+      "family": "fk-name-inputs",
+      "kind": "ddl",
+      "requires": [
+        "type/int"
+      ],
+      "timeout_seconds": 90,
+      "statements": [
+        "DROP TABLE TypeCase",
+        "CREATE TABLE TypeCase(Id INT64 NOT NULL,Owner STRING(32),FOREIGN KEY(Owner) REFERENCES PStr(K)) PRIMARY KEY(Id)"
+      ]
+    },
+    {
+      "label": "type/string/indexes",
+      "family": "fk-name-inputs",
+      "kind": "query",
+      "requires": [
+        "type/string"
+      ],
+      "timeout_seconds": 90,
+      "sql": "SELECT i.TABLE_SCHEMA,i.TABLE_NAME,i.INDEX_NAME,i.IS_UNIQUE,i.IS_NULL_FILTERED,i.SPANNER_IS_MANAGED,c.COLUMN_NAME,c.ORDINAL_POSITION,c.COLUMN_ORDERING FROM INFORMATION_SCHEMA.INDEXES i JOIN INFORMATION_SCHEMA.INDEX_COLUMNS c USING(TABLE_CATALOG,TABLE_SCHEMA,TABLE_NAME,INDEX_NAME) WHERE i.INDEX_TYPE='INDEX' AND UPPER(i.TABLE_NAME) IN ('TYPECASE') ORDER BY i.TABLE_SCHEMA,i.TABLE_NAME,i.INDEX_NAME,c.ORDINAL_POSITION"
+    },
+    {
+      "label": "type/string/constraints",
+      "family": "fk-name-inputs",
+      "kind": "query",
+      "requires": [
+        "type/string"
+      ],
+      "timeout_seconds": 90,
+      "sql": "SELECT CONSTRAINT_SCHEMA,CONSTRAINT_NAME,TABLE_SCHEMA,TABLE_NAME FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS WHERE CONSTRAINT_TYPE='FOREIGN KEY' AND UPPER(TABLE_NAME) IN ('TYPECASE') ORDER BY CONSTRAINT_SCHEMA,CONSTRAINT_NAME"
+    },
+    {
+      "label": "case/mixed",
+      "family": "fk-name-inputs",
+      "kind": "ddl",
+      "requires": [
+        "parents"
+      ],
+      "timeout_seconds": 90,
+      "statements": [
+        "CREATE TABLE CaseDemo(Id INT64 NOT NULL,Owner INT64,FOREIGN KEY(Owner) REFERENCES P(K)) PRIMARY KEY(Id)"
+      ]
+    },
+    {
+      "label": "case/mixed/indexes",
+      "family": "fk-name-inputs",
+      "kind": "query",
+      "requires": [
+        "case/mixed"
+      ],
+      "timeout_seconds": 90,
+      "sql": "SELECT i.TABLE_SCHEMA,i.TABLE_NAME,i.INDEX_NAME,i.IS_UNIQUE,i.IS_NULL_FILTERED,i.SPANNER_IS_MANAGED,c.COLUMN_NAME,c.ORDINAL_POSITION,c.COLUMN_ORDERING FROM INFORMATION_SCHEMA.INDEXES i JOIN INFORMATION_SCHEMA.INDEX_COLUMNS c USING(TABLE_CATALOG,TABLE_SCHEMA,TABLE_NAME,INDEX_NAME) WHERE i.INDEX_TYPE='INDEX' AND UPPER(i.TABLE_NAME) IN ('CASEDEMO') ORDER BY i.TABLE_SCHEMA,i.TABLE_NAME,i.INDEX_NAME,c.ORDINAL_POSITION"
+    },
+    {
+      "label": "case/mixed/constraints",
+      "family": "fk-name-inputs",
+      "kind": "query",
+      "requires": [
+        "case/mixed"
+      ],
+      "timeout_seconds": 90,
+      "sql": "SELECT CONSTRAINT_SCHEMA,CONSTRAINT_NAME,TABLE_SCHEMA,TABLE_NAME FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS WHERE CONSTRAINT_TYPE='FOREIGN KEY' AND UPPER(TABLE_NAME) IN ('CASEDEMO') ORDER BY CONSTRAINT_SCHEMA,CONSTRAINT_NAME"
+    },
+    {
+      "label": "case/lower",
+      "family": "fk-name-inputs",
+      "kind": "ddl",
+      "requires": [
+        "case/mixed"
+      ],
+      "timeout_seconds": 90,
+      "statements": [
+        "DROP TABLE CaseDemo",
+        "CREATE TABLE casedemo(id INT64 NOT NULL,owner INT64,FOREIGN KEY(owner) REFERENCES P(K)) PRIMARY KEY(id)"
+      ]
+    },
+    {
+      "label": "case/lower/indexes",
+      "family": "fk-name-inputs",
+      "kind": "query",
+      "requires": [
+        "case/lower"
+      ],
+      "timeout_seconds": 90,
+      "sql": "SELECT i.TABLE_SCHEMA,i.TABLE_NAME,i.INDEX_NAME,i.IS_UNIQUE,i.IS_NULL_FILTERED,i.SPANNER_IS_MANAGED,c.COLUMN_NAME,c.ORDINAL_POSITION,c.COLUMN_ORDERING FROM INFORMATION_SCHEMA.INDEXES i JOIN INFORMATION_SCHEMA.INDEX_COLUMNS c USING(TABLE_CATALOG,TABLE_SCHEMA,TABLE_NAME,INDEX_NAME) WHERE i.INDEX_TYPE='INDEX' AND UPPER(i.TABLE_NAME) IN ('CASEDEMO') ORDER BY i.TABLE_SCHEMA,i.TABLE_NAME,i.INDEX_NAME,c.ORDINAL_POSITION"
+    },
+    {
+      "label": "case/lower/constraints",
+      "family": "fk-name-inputs",
+      "kind": "query",
+      "requires": [
+        "case/lower"
+      ],
+      "timeout_seconds": 90,
+      "sql": "SELECT CONSTRAINT_SCHEMA,CONSTRAINT_NAME,TABLE_SCHEMA,TABLE_NAME FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS WHERE CONSTRAINT_TYPE='FOREIGN KEY' AND UPPER(TABLE_NAME) IN ('CASEDEMO') ORDER BY CONSTRAINT_SCHEMA,CONSTRAINT_NAME"
+    },
+    {
+      "label": "direction/asc",
+      "family": "fk-name-inputs",
+      "kind": "ddl",
+      "requires": [
+        "parents"
+      ],
+      "timeout_seconds": 90,
+      "statements": [
+        "CREATE TABLE DirectionCase(Id INT64,FOREIGN KEY(Id) REFERENCES P(K)) PRIMARY KEY(Id ASC)"
+      ]
+    },
+    {
+      "label": "direction/asc/indexes",
+      "family": "fk-name-inputs",
+      "kind": "query",
+      "requires": [
+        "direction/asc"
+      ],
+      "timeout_seconds": 90,
+      "sql": "SELECT i.TABLE_SCHEMA,i.TABLE_NAME,i.INDEX_NAME,i.IS_UNIQUE,i.IS_NULL_FILTERED,i.SPANNER_IS_MANAGED,c.COLUMN_NAME,c.ORDINAL_POSITION,c.COLUMN_ORDERING FROM INFORMATION_SCHEMA.INDEXES i JOIN INFORMATION_SCHEMA.INDEX_COLUMNS c USING(TABLE_CATALOG,TABLE_SCHEMA,TABLE_NAME,INDEX_NAME) WHERE i.INDEX_TYPE='INDEX' AND UPPER(i.TABLE_NAME) IN ('DIRECTIONCASE') ORDER BY i.TABLE_SCHEMA,i.TABLE_NAME,i.INDEX_NAME,c.ORDINAL_POSITION"
+    },
+    {
+      "label": "direction/asc/constraints",
+      "family": "fk-name-inputs",
+      "kind": "query",
+      "requires": [
+        "direction/asc"
+      ],
+      "timeout_seconds": 90,
+      "sql": "SELECT CONSTRAINT_SCHEMA,CONSTRAINT_NAME,TABLE_SCHEMA,TABLE_NAME FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS WHERE CONSTRAINT_TYPE='FOREIGN KEY' AND UPPER(TABLE_NAME) IN ('DIRECTIONCASE') ORDER BY CONSTRAINT_SCHEMA,CONSTRAINT_NAME"
+    },
+    {
+      "label": "direction/desc",
+      "family": "fk-name-inputs",
+      "kind": "ddl",
+      "requires": [
+        "direction/asc"
+      ],
+      "timeout_seconds": 90,
+      "statements": [
+        "DROP TABLE DirectionCase",
+        "CREATE TABLE DirectionCase(Id INT64,FOREIGN KEY(Id) REFERENCES P(K)) PRIMARY KEY(Id DESC)"
+      ]
+    },
+    {
+      "label": "direction/desc/indexes",
+      "family": "fk-name-inputs",
+      "kind": "query",
+      "requires": [
+        "direction/desc"
+      ],
+      "timeout_seconds": 90,
+      "sql": "SELECT i.TABLE_SCHEMA,i.TABLE_NAME,i.INDEX_NAME,i.IS_UNIQUE,i.IS_NULL_FILTERED,i.SPANNER_IS_MANAGED,c.COLUMN_NAME,c.ORDINAL_POSITION,c.COLUMN_ORDERING FROM INFORMATION_SCHEMA.INDEXES i JOIN INFORMATION_SCHEMA.INDEX_COLUMNS c USING(TABLE_CATALOG,TABLE_SCHEMA,TABLE_NAME,INDEX_NAME) WHERE i.INDEX_TYPE='INDEX' AND UPPER(i.TABLE_NAME) IN ('DIRECTIONCASE') ORDER BY i.TABLE_SCHEMA,i.TABLE_NAME,i.INDEX_NAME,c.ORDINAL_POSITION"
+    },
+    {
+      "label": "direction/desc/constraints",
+      "family": "fk-name-inputs",
+      "kind": "query",
+      "requires": [
+        "direction/desc"
+      ],
+      "timeout_seconds": 90,
+      "sql": "SELECT CONSTRAINT_SCHEMA,CONSTRAINT_NAME,TABLE_SCHEMA,TABLE_NAME FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS WHERE CONSTRAINT_TYPE='FOREIGN KEY' AND UPPER(TABLE_NAME) IN ('DIRECTIONCASE') ORDER BY CONSTRAINT_SCHEMA,CONSTRAINT_NAME"
+    },
+    {
+      "label": "unique/nullable",
+      "family": "fk-name-inputs",
+      "kind": "ddl",
+      "requires": [
+        "parents"
+      ],
+      "timeout_seconds": 90,
+      "statements": [
+        "CREATE TABLE UniqueParent(Id INT64 NOT NULL,Alt INT64) PRIMARY KEY(Id)",
+        "CREATE TABLE UniqueChild(Id INT64 NOT NULL,Owner INT64,FOREIGN KEY(Owner) REFERENCES UniqueParent(Alt)) PRIMARY KEY(Id)"
+      ]
+    },
+    {
+      "label": "unique/nullable/indexes",
+      "family": "fk-name-inputs",
+      "kind": "query",
+      "requires": [
+        "unique/nullable"
+      ],
+      "timeout_seconds": 90,
+      "sql": "SELECT i.TABLE_SCHEMA,i.TABLE_NAME,i.INDEX_NAME,i.IS_UNIQUE,i.IS_NULL_FILTERED,i.SPANNER_IS_MANAGED,c.COLUMN_NAME,c.ORDINAL_POSITION,c.COLUMN_ORDERING FROM INFORMATION_SCHEMA.INDEXES i JOIN INFORMATION_SCHEMA.INDEX_COLUMNS c USING(TABLE_CATALOG,TABLE_SCHEMA,TABLE_NAME,INDEX_NAME) WHERE i.INDEX_TYPE='INDEX' AND UPPER(i.TABLE_NAME) IN ('UNIQUEPARENT','UNIQUECHILD') ORDER BY i.TABLE_SCHEMA,i.TABLE_NAME,i.INDEX_NAME,c.ORDINAL_POSITION"
+    },
+    {
+      "label": "unique/nullable/constraints",
+      "family": "fk-name-inputs",
+      "kind": "query",
+      "requires": [
+        "unique/nullable"
+      ],
+      "timeout_seconds": 90,
+      "sql": "SELECT CONSTRAINT_SCHEMA,CONSTRAINT_NAME,TABLE_SCHEMA,TABLE_NAME FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS WHERE CONSTRAINT_TYPE='FOREIGN KEY' AND UPPER(TABLE_NAME) IN ('UNIQUEPARENT','UNIQUECHILD') ORDER BY CONSTRAINT_SCHEMA,CONSTRAINT_NAME"
+    },
+    {
+      "label": "unique/not-null",
+      "family": "fk-name-inputs",
+      "kind": "ddl",
+      "requires": [
+        "unique/nullable"
+      ],
+      "timeout_seconds": 90,
+      "statements": [
+        "DROP TABLE UniqueChild",
+        "DROP TABLE UniqueParent",
+        "CREATE TABLE UniqueParent(Id INT64 NOT NULL,Alt INT64 NOT NULL) PRIMARY KEY(Id)",
+        "CREATE TABLE UniqueChild(Id INT64 NOT NULL,Owner INT64,FOREIGN KEY(Owner) REFERENCES UniqueParent(Alt)) PRIMARY KEY(Id)"
+      ]
+    },
+    {
+      "label": "unique/not-null/indexes",
+      "family": "fk-name-inputs",
+      "kind": "query",
+      "requires": [
+        "unique/not-null"
+      ],
+      "timeout_seconds": 90,
+      "sql": "SELECT i.TABLE_SCHEMA,i.TABLE_NAME,i.INDEX_NAME,i.IS_UNIQUE,i.IS_NULL_FILTERED,i.SPANNER_IS_MANAGED,c.COLUMN_NAME,c.ORDINAL_POSITION,c.COLUMN_ORDERING FROM INFORMATION_SCHEMA.INDEXES i JOIN INFORMATION_SCHEMA.INDEX_COLUMNS c USING(TABLE_CATALOG,TABLE_SCHEMA,TABLE_NAME,INDEX_NAME) WHERE i.INDEX_TYPE='INDEX' AND UPPER(i.TABLE_NAME) IN ('UNIQUEPARENT','UNIQUECHILD') ORDER BY i.TABLE_SCHEMA,i.TABLE_NAME,i.INDEX_NAME,c.ORDINAL_POSITION"
+    },
+    {
+      "label": "unique/not-null/constraints",
+      "family": "fk-name-inputs",
+      "kind": "query",
+      "requires": [
+        "unique/not-null"
+      ],
+      "timeout_seconds": 90,
+      "sql": "SELECT CONSTRAINT_SCHEMA,CONSTRAINT_NAME,TABLE_SCHEMA,TABLE_NAME FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS WHERE CONSTRAINT_TYPE='FOREIGN KEY' AND UPPER(TABLE_NAME) IN ('UNIQUEPARENT','UNIQUECHILD') ORDER BY CONSTRAINT_SCHEMA,CONSTRAINT_NAME"
+    },
+    {
+      "label": "long/create",
+      "family": "fk-name-inputs",
+      "kind": "ddl",
+      "requires": [
+        "parents"
+      ],
+      "timeout_seconds": 90,
+      "statements": [
+        "CREATE TABLE Longxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx(Id INT64 NOT NULL,RefyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyA INT64,RefyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyB INT64,FOREIGN KEY(RefyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyA) REFERENCES P(K),FOREIGN KEY(RefyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyB) REFERENCES P(K)) PRIMARY KEY(Id)"
+      ]
+    },
+    {
+      "label": "long/two-columns/indexes",
+      "family": "fk-name-inputs",
+      "kind": "query",
+      "requires": [
+        "long/create"
+      ],
+      "timeout_seconds": 90,
+      "sql": "SELECT i.TABLE_SCHEMA,i.TABLE_NAME,i.INDEX_NAME,i.IS_UNIQUE,i.IS_NULL_FILTERED,i.SPANNER_IS_MANAGED,c.COLUMN_NAME,c.ORDINAL_POSITION,c.COLUMN_ORDERING FROM INFORMATION_SCHEMA.INDEXES i JOIN INFORMATION_SCHEMA.INDEX_COLUMNS c USING(TABLE_CATALOG,TABLE_SCHEMA,TABLE_NAME,INDEX_NAME) WHERE i.INDEX_TYPE='INDEX' AND UPPER(i.TABLE_NAME) IN ('LONGXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX') ORDER BY i.TABLE_SCHEMA,i.TABLE_NAME,i.INDEX_NAME,c.ORDINAL_POSITION"
+    },
+    {
+      "label": "long/two-columns/constraints",
+      "family": "fk-name-inputs",
+      "kind": "query",
+      "requires": [
+        "long/create"
+      ],
+      "timeout_seconds": 90,
+      "sql": "SELECT CONSTRAINT_SCHEMA,CONSTRAINT_NAME,TABLE_SCHEMA,TABLE_NAME FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS WHERE CONSTRAINT_TYPE='FOREIGN KEY' AND UPPER(TABLE_NAME) IN ('LONGXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX') ORDER BY CONSTRAINT_SCHEMA,CONSTRAINT_NAME"
+    },
+    {
+      "label": "final/referential",
+      "family": "fk-name-inputs",
+      "kind": "query",
+      "requires": [
+        "parents"
+      ],
+      "timeout_seconds": 90,
+      "sql": "SELECT CONSTRAINT_SCHEMA,CONSTRAINT_NAME,UNIQUE_CONSTRAINT_SCHEMA,UNIQUE_CONSTRAINT_NAME FROM INFORMATION_SCHEMA.REFERENTIAL_CONSTRAINTS ORDER BY CONSTRAINT_SCHEMA,CONSTRAINT_NAME"
+    },
+    {
+      "label": "final/ddl",
+      "family": "fk-name-inputs",
+      "kind": "ddl-export",
+      "requires": [
+        "parents"
+      ],
+      "timeout_seconds": 90
+    }
+  ]
+}

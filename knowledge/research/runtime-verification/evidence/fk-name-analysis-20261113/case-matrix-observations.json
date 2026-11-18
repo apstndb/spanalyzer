@@ -1,0 +1,433 @@
+{
+  "schema_version": "spanalyzer.fk-underscore-case-matrix/v0alpha1",
+  "scope": "Same uppercase/lowercase fixture and both creation orders on managed, Omni LTS.2 and Emulator1.5.59; schema-only comparison, no DML enforcement claim.",
+  "plan_sha256": "ab1cf7b88f430119912ae07095150014d39b792add478006759f74c281bffe8b",
+  "planned_steps_per_backend": 32,
+  "runs": [
+    {
+      "backend": "managed",
+      "started_at": "2026-11-13T02:45:52.570773+00:00",
+      "completed_at": "2026-11-13T02:49:06.062883+00:00",
+      "producer_source_sha256": "7c59d381100b86e21e6b729d9c7f7b1f0e5ce969accb5d54190dd17bf119abad",
+      "producer_binary_sha256": "5c41a8649227b109481e20a8b364a755245c0872e8547a947465b4ac0595bf47",
+      "planned_steps": 32,
+      "executed_steps": 28,
+      "process_exit_code": 0,
+      "cleanup": {
+        "create-database": "OK",
+        "drop-database": "OK",
+        "database-absent": "NotFound"
+      },
+      "cleanup_verified": true,
+      "cases": {
+        "upper": {
+          "started_at": "2026-11-13T02:45:58.442491Z",
+          "completed_at": "2026-11-13T02:48:08.266977Z",
+          "step_codes": {
+            "parent": "OK",
+            "shipping-first": "OK",
+            "indexes-shipping": "OK",
+            "order-second": "FailedPrecondition",
+            "indexes-forward": "OK",
+            "drop-forward-order": "NOT_RUN",
+            "drop-forward-shipping": "OK",
+            "order-first": "OK",
+            "indexes-order": "OK",
+            "shipping-second": "FailedPrecondition",
+            "indexes-reverse": "OK",
+            "drop-reverse-shipping": "NOT_RUN",
+            "drop-reverse-order": "OK",
+            "drop-parent": "OK",
+            "tables-empty": "OK",
+            "indexes-empty": "OK"
+          },
+          "ddl_errors": {
+            "order-second": "rpc error: code = FailedPrecondition desc =",
+            "shipping-second": "rpc error: code = FailedPrecondition desc ="
+          },
+          "index_snapshots": {
+            "indexes-shipping": [
+              {
+                "COLUMN_NAME": "ADDRESS_ID",
+                "COLUMN_ORDERING": "ASC",
+                "INDEX_NAME": "IDX_SALES_ORDER_SHIPPING_ADDRESS_ID_C53AEFD47826CE09",
+                "IS_NULL_FILTERED": false,
+                "IS_UNIQUE": false,
+                "SPANNER_IS_MANAGED": true,
+                "TABLE_NAME": "SALES_ORDER_SHIPPING",
+                "TABLE_SCHEMA": ""
+              }
+            ],
+            "indexes-order": [
+              {
+                "COLUMN_NAME": "SHIPPING_ADDRESS_ID",
+                "COLUMN_ORDERING": "ASC",
+                "INDEX_NAME": "IDX_SALES_ORDER_SHIPPING_ADDRESS_ID_C53AEFD47826CE09",
+                "IS_NULL_FILTERED": false,
+                "IS_UNIQUE": false,
+                "SPANNER_IS_MANAGED": true,
+                "TABLE_NAME": "SALES_ORDER",
+                "TABLE_SCHEMA": ""
+              }
+            ]
+          },
+          "after_second_create_index_rows_unchanged": {
+            "forward": true,
+            "reverse": true
+          },
+          "after_case_tables_empty": true,
+          "after_case_indexes_empty": true
+        },
+        "lower": {
+          "started_at": "2026-11-13T02:48:08.267146Z",
+          "completed_at": "2026-11-13T02:48:58.149281Z",
+          "step_codes": {
+            "parent": "OK",
+            "shipping-first": "OK",
+            "indexes-shipping": "OK",
+            "order-second": "FailedPrecondition",
+            "indexes-forward": "OK",
+            "drop-forward-order": "NOT_RUN",
+            "drop-forward-shipping": "OK",
+            "order-first": "OK",
+            "indexes-order": "OK",
+            "shipping-second": "FailedPrecondition",
+            "indexes-reverse": "OK",
+            "drop-reverse-shipping": "NOT_RUN",
+            "drop-reverse-order": "OK",
+            "drop-parent": "OK",
+            "tables-empty": "OK",
+            "indexes-empty": "OK"
+          },
+          "ddl_errors": {
+            "order-second": "rpc error: code = FailedPrecondition desc =",
+            "shipping-second": "rpc error: code = FailedPrecondition desc ="
+          },
+          "index_snapshots": {
+            "indexes-shipping": [
+              {
+                "COLUMN_NAME": "address_id",
+                "COLUMN_ORDERING": "ASC",
+                "INDEX_NAME": "IDX_sales_order_shipping_address_id_90E532EDA843ECD5",
+                "IS_NULL_FILTERED": false,
+                "IS_UNIQUE": false,
+                "SPANNER_IS_MANAGED": true,
+                "TABLE_NAME": "sales_order_shipping",
+                "TABLE_SCHEMA": ""
+              }
+            ],
+            "indexes-order": [
+              {
+                "COLUMN_NAME": "shipping_address_id",
+                "COLUMN_ORDERING": "ASC",
+                "INDEX_NAME": "IDX_sales_order_shipping_address_id_90E532EDA843ECD5",
+                "IS_NULL_FILTERED": false,
+                "IS_UNIQUE": false,
+                "SPANNER_IS_MANAGED": true,
+                "TABLE_NAME": "sales_order",
+                "TABLE_SCHEMA": ""
+              }
+            ]
+          },
+          "after_second_create_index_rows_unchanged": {
+            "forward": true,
+            "reverse": true
+          },
+          "after_case_tables_empty": true,
+          "after_case_indexes_empty": true
+        }
+      },
+      "runtime": {
+        "build_identity": "not exposed",
+        "instance_state_preflight": "READY",
+        "instance_type_preflight": "FREE_INSTANCE",
+        "owned_database_resource_sha256": "47ec81a60dd79362ccfd5582f0450fe0685ed9dd7821a6758b6047bf388caad6"
+      }
+    },
+    {
+      "backend": "omni",
+      "started_at": "2026-11-13T02:45:52.560984+00:00",
+      "completed_at": "2026-11-13T02:48:09.433739+00:00",
+      "producer_source_sha256": "e75ab7d8871cad28747a419ba4437840c7a1f5385a54779d9f79e77d01f25b03",
+      "producer_binary_sha256": "c75d890d5667f89c9b8d0a6134be8101f5f0e6bc5fde9f0e5ec1e66f2149574e",
+      "planned_steps": 32,
+      "executed_steps": 28,
+      "process_exit_code": 0,
+      "cleanup": {
+        "fixture-open": "OK",
+        "fixture-client-closed": "OK",
+        "runtime-closed": "OK",
+        "owned_container_absent": true,
+        "owned_container_id_prefix": "8cbab676289e"
+      },
+      "cleanup_verified": true,
+      "cases": {
+        "upper": {
+          "started_at": "2026-11-13T02:46:03.90815Z",
+          "completed_at": "2026-11-13T02:47:32.822507Z",
+          "step_codes": {
+            "parent": "OK",
+            "shipping-first": "OK",
+            "indexes-shipping": "OK",
+            "order-second": "FailedPrecondition",
+            "indexes-forward": "OK",
+            "drop-forward-order": "NOT_RUN",
+            "drop-forward-shipping": "OK",
+            "order-first": "OK",
+            "indexes-order": "OK",
+            "shipping-second": "FailedPrecondition",
+            "indexes-reverse": "OK",
+            "drop-reverse-shipping": "NOT_RUN",
+            "drop-reverse-order": "OK",
+            "drop-parent": "OK",
+            "tables-empty": "OK",
+            "indexes-empty": "OK"
+          },
+          "ddl_errors": {
+            "order-second": "rpc error: code = FailedPrecondition desc =",
+            "shipping-second": "rpc error: code = FailedPrecondition desc ="
+          },
+          "index_snapshots": {
+            "indexes-shipping": [
+              {
+                "COLUMN_NAME": "ADDRESS_ID",
+                "COLUMN_ORDERING": "ASC",
+                "INDEX_NAME": "IDX_SALES_ORDER_SHIPPING_ADDRESS_ID_C53AEFD47826CE09",
+                "IS_NULL_FILTERED": false,
+                "IS_UNIQUE": false,
+                "SPANNER_IS_MANAGED": true,
+                "TABLE_NAME": "SALES_ORDER_SHIPPING",
+                "TABLE_SCHEMA": ""
+              }
+            ],
+            "indexes-order": [
+              {
+                "COLUMN_NAME": "SHIPPING_ADDRESS_ID",
+                "COLUMN_ORDERING": "ASC",
+                "INDEX_NAME": "IDX_SALES_ORDER_SHIPPING_ADDRESS_ID_C53AEFD47826CE09",
+                "IS_NULL_FILTERED": false,
+                "IS_UNIQUE": false,
+                "SPANNER_IS_MANAGED": true,
+                "TABLE_NAME": "SALES_ORDER",
+                "TABLE_SCHEMA": ""
+              }
+            ]
+          },
+          "after_second_create_index_rows_unchanged": {
+            "forward": true,
+            "reverse": true
+          },
+          "after_case_tables_empty": true,
+          "after_case_indexes_empty": true
+        },
+        "lower": {
+          "started_at": "2026-11-13T02:47:32.822549Z",
+          "completed_at": "2026-11-13T02:47:59.284788Z",
+          "step_codes": {
+            "parent": "OK",
+            "shipping-first": "OK",
+            "indexes-shipping": "OK",
+            "order-second": "FailedPrecondition",
+            "indexes-forward": "OK",
+            "drop-forward-order": "NOT_RUN",
+            "drop-forward-shipping": "OK",
+            "order-first": "OK",
+            "indexes-order": "OK",
+            "shipping-second": "FailedPrecondition",
+            "indexes-reverse": "OK",
+            "drop-reverse-shipping": "NOT_RUN",
+            "drop-reverse-order": "OK",
+            "drop-parent": "OK",
+            "tables-empty": "OK",
+            "indexes-empty": "OK"
+          },
+          "ddl_errors": {
+            "order-second": "rpc error: code = FailedPrecondition desc =",
+            "shipping-second": "rpc error: code = FailedPrecondition desc ="
+          },
+          "index_snapshots": {
+            "indexes-shipping": [
+              {
+                "COLUMN_NAME": "address_id",
+                "COLUMN_ORDERING": "ASC",
+                "INDEX_NAME": "IDX_sales_order_shipping_address_id_90E532EDA843ECD5",
+                "IS_NULL_FILTERED": false,
+                "IS_UNIQUE": false,
+                "SPANNER_IS_MANAGED": true,
+                "TABLE_NAME": "sales_order_shipping",
+                "TABLE_SCHEMA": ""
+              }
+            ],
+            "indexes-order": [
+              {
+                "COLUMN_NAME": "shipping_address_id",
+                "COLUMN_ORDERING": "ASC",
+                "INDEX_NAME": "IDX_sales_order_shipping_address_id_90E532EDA843ECD5",
+                "IS_NULL_FILTERED": false,
+                "IS_UNIQUE": false,
+                "SPANNER_IS_MANAGED": true,
+                "TABLE_NAME": "sales_order",
+                "TABLE_SCHEMA": ""
+              }
+            ]
+          },
+          "after_second_create_index_rows_unchanged": {
+            "forward": true,
+            "reverse": true
+          },
+          "after_case_tables_empty": true,
+          "after_case_indexes_empty": true
+        }
+      },
+      "runtime": {
+        "RequestedImage": "us-docker.pkg.dev/spanner-omni/images/spanner-omni:2026.r4-lts.2@sha256:b607b10bee3c1903f0a7f88f99bece67cb0dd9d9a028aee64226fc311bd78dae",
+        "ManifestDigest": "sha256:b607b10bee3c1903f0a7f88f99bece67cb0dd9d9a028aee64226fc311bd78dae",
+        "Platform": "linux/arm64",
+        "ObservedAt": "2026-11-13T02:45:59.181022Z",
+        "Source": "container_inspect",
+        "ObservedByThisProcess": true
+      }
+    },
+    {
+      "backend": "emulator",
+      "started_at": "2026-11-13T02:45:51.700729+00:00",
+      "completed_at": "2026-11-13T02:45:54.081396+00:00",
+      "producer_source_sha256": "e75ab7d8871cad28747a419ba4437840c7a1f5385a54779d9f79e77d01f25b03",
+      "producer_binary_sha256": "c75d890d5667f89c9b8d0a6134be8101f5f0e6bc5fde9f0e5ec1e66f2149574e",
+      "planned_steps": 32,
+      "executed_steps": 32,
+      "process_exit_code": 0,
+      "cleanup": {
+        "fixture-open": "OK",
+        "fixture-client-closed": "OK",
+        "runtime-closed": "OK",
+        "owned_container_absent": true,
+        "owned_container_id_prefix": "b40adb85eea9"
+      },
+      "cleanup_verified": true,
+      "cases": {
+        "upper": {
+          "started_at": "2026-11-13T02:45:53.879549Z",
+          "completed_at": "2026-11-13T02:45:53.926493Z",
+          "step_codes": {
+            "parent": "OK",
+            "shipping-first": "OK",
+            "indexes-shipping": "OK",
+            "order-second": "OK",
+            "indexes-forward": "OK",
+            "drop-forward-order": "OK",
+            "drop-forward-shipping": "OK",
+            "order-first": "OK",
+            "indexes-order": "OK",
+            "shipping-second": "OK",
+            "indexes-reverse": "OK",
+            "drop-reverse-shipping": "OK",
+            "drop-reverse-order": "OK",
+            "drop-parent": "OK",
+            "tables-empty": "OK",
+            "indexes-empty": "OK"
+          },
+          "ddl_errors": {},
+          "index_snapshots": {
+            "indexes-shipping": [
+              {
+                "COLUMN_NAME": "ADDRESS_ID",
+                "COLUMN_ORDERING": "ASC",
+                "INDEX_NAME": "IDX_SALES_ORDER_SHIPPING_ADDRESS_ID_1AFAA9CDAD6073AC",
+                "IS_NULL_FILTERED": false,
+                "IS_UNIQUE": false,
+                "SPANNER_IS_MANAGED": true,
+                "TABLE_NAME": "SALES_ORDER_SHIPPING",
+                "TABLE_SCHEMA": ""
+              }
+            ],
+            "indexes-order": [
+              {
+                "COLUMN_NAME": "SHIPPING_ADDRESS_ID",
+                "COLUMN_ORDERING": "ASC",
+                "INDEX_NAME": "IDX_SALES_ORDER_SHIPPING_ADDRESS_ID_1AFAA9CDAD6073AC",
+                "IS_NULL_FILTERED": false,
+                "IS_UNIQUE": false,
+                "SPANNER_IS_MANAGED": true,
+                "TABLE_NAME": "SALES_ORDER",
+                "TABLE_SCHEMA": ""
+              }
+            ]
+          },
+          "after_second_create_index_rows_unchanged": {
+            "forward": true,
+            "reverse": true
+          },
+          "after_case_tables_empty": true,
+          "after_case_indexes_empty": true
+        },
+        "lower": {
+          "started_at": "2026-11-13T02:45:53.926531Z",
+          "completed_at": "2026-11-13T02:45:53.964872Z",
+          "step_codes": {
+            "parent": "OK",
+            "shipping-first": "OK",
+            "indexes-shipping": "OK",
+            "order-second": "OK",
+            "indexes-forward": "OK",
+            "drop-forward-order": "OK",
+            "drop-forward-shipping": "OK",
+            "order-first": "OK",
+            "indexes-order": "OK",
+            "shipping-second": "OK",
+            "indexes-reverse": "OK",
+            "drop-reverse-shipping": "OK",
+            "drop-reverse-order": "OK",
+            "drop-parent": "OK",
+            "tables-empty": "OK",
+            "indexes-empty": "OK"
+          },
+          "ddl_errors": {},
+          "index_snapshots": {
+            "indexes-shipping": [
+              {
+                "COLUMN_NAME": "address_id",
+                "COLUMN_ORDERING": "ASC",
+                "INDEX_NAME": "IDX_sales_order_shipping_address_id_BF3CF24FB4130FD9",
+                "IS_NULL_FILTERED": false,
+                "IS_UNIQUE": false,
+                "SPANNER_IS_MANAGED": true,
+                "TABLE_NAME": "sales_order_shipping",
+                "TABLE_SCHEMA": ""
+              }
+            ],
+            "indexes-order": [
+              {
+                "COLUMN_NAME": "shipping_address_id",
+                "COLUMN_ORDERING": "ASC",
+                "INDEX_NAME": "IDX_sales_order_shipping_address_id_BF3CF24FB4130FD9",
+                "IS_NULL_FILTERED": false,
+                "IS_UNIQUE": false,
+                "SPANNER_IS_MANAGED": true,
+                "TABLE_NAME": "sales_order",
+                "TABLE_SCHEMA": ""
+              }
+            ]
+          },
+          "after_second_create_index_rows_unchanged": {
+            "forward": true,
+            "reverse": true
+          },
+          "after_case_tables_empty": true,
+          "after_case_indexes_empty": true
+        }
+      },
+      "runtime": {
+        "RequestedImage": "gcr.io/cloud-spanner-emulator/emulator:1.5.59@sha256:969af6a9349948fbfb4a826c18e160e258a4005f7c759f8e7f2dcec369cccba8",
+        "ManifestDigest": "sha256:969af6a9349948fbfb4a826c18e160e258a4005f7c759f8e7f2dcec369cccba8",
+        "Platform": "linux/arm64",
+        "ObservedAt": "2026-11-13T02:45:53.859853Z",
+        "Source": "container_inspect",
+        "ObservedByThisProcess": true
+      }
+    }
+  ],
+  "retention": "Reproduction input, producer identities, critical metadata and outcomes retained; full routine logs stay task-local.",
+  "planned_steps_total": 96,
+  "executed_steps_total": 88
+}

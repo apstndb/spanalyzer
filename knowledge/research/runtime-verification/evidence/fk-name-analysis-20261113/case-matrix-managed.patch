@@ -1,0 +1,20 @@
+--- a/managed.go
++++ b/managed.go
+@@ -88,7 +88,7 @@
+ 	if err = json.Unmarshal(bytes, &plan); err != nil {
+ 		panic(err)
+ 	}
+-	if os.Getenv("SPANALYZER_OWNED_FIXTURE_APPROVAL") != "fk-name-managed-20261113" {
++	if os.Getenv("SPANALYZER_OWNED_FIXTURE_APPROVAL") != "fk-case-matrix-20261113" {
+ 		panic("current run approval is required before database creation")
+ 	}
+ 	ctx := context.Background()
+@@ -98,7 +98,7 @@
+ 	}
+ 	defer admin.Close()
+ 	parent := fmt.Sprintf("projects/%s/instances/%s", os.Getenv("SPANNER_PROJECT_ID"), os.Getenv("SPANNER_INSTANCE_ID"))
+-	name := fmt.Sprintf("fk1113g-%x", time.Now().UnixNano())
++	name := fmt.Sprintf("fkcase-%x", time.Now().UnixNano())
+ 	dialect := dbpb.DatabaseDialect_GOOGLE_STANDARD_SQL
+ 	statement := "CREATE DATABASE `" + name + "`"
+ 	if plan.Dialect == "pg" {
