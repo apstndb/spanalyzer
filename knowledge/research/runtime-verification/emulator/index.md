@@ -44,6 +44,7 @@ without exact times have no claimed internal order.
 
 | 2026-11-12T12:32:37Z; 1.5.59 arm64 | First focused coverage | After a probe-only instance-bootstrap correction, all 11 mixed DML/Mutation controls commit and preserve expected final keys. CommitStats remain absent, so numerical count agreement is unverified. Owned containers close after the failed bootstrap and corrected run. | [Disjoint-key bounds](../mixed-disjoint-key-bounds-20261112.md), [compact observations](../evidence/mixed-disjoint-keys-20261112/observations.json) |
 | 2026-11-13 02:45 UTC, 1.5.59 arm64 | Backing-index naming | Both children were created in either order for uppercase and lowercase identifiers. After both definitions, the catalog returned a backing-index row for only the first child. | [Names and case matrix](../fk-full-name-analysis-20261113.md) |
+| 2026-11-16 JST, 1.5.59 arm64 | Composite FK validation | The consistency read found one child without a matching parent in the three-column fixture. The separate indexed control retained one valid row. | [Results by engine](../evidence/fk-validation-20261116/summary.json) |
 | 2026-11-18 UTC, 1.5.59 arm64 | FK catalog correction and hint comparison | Both dialects rejected the FK name as a hint and accepted the managed-generated physical name. The catalog paired reordered references incorrectly and repeated parent key rows when two FKs shared a parent unique index. DDL export preserved the declared pairs. | [FK backing-index resolution](../fk-backing-index-resolution-20261118.md) |
 
 ## Publication and source context
