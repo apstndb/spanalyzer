@@ -498,7 +498,10 @@
     ],
     "emulator_github_release": {
       "url": "https://github.com/GoogleCloudPlatform/cloud-spanner-emulator/releases/tag/v1.5.59",
-      "published_at": "2026-10-14T04:17:58Z"
+      "published_at": "2026-10-14T04:17:58Z",
+      "latest_endpoint": "https://api.github.com/repos/GoogleCloudPlatform/cloud-spanner-emulator/releases/latest",
+      "latest_checked_at_utc": "2026-11-18T17:26:38Z",
+      "tag_returned": "v1.5.59"
     },
     "version_check_utc": "2026-11-18T07:21:34.187205+00:00",
     "pins_at": "de53ff8bfd9977bdfee84523fa4af48a7e268a13",
@@ -527,7 +530,32 @@
           "linux/amd64": "sha256:f9212d99a52ee9bf39b6e4b397eab09b90d87327dca7a985110801456b40dc9d"
         }
       }
-    ]
+    ],
+    "registry_tag_observations": {
+      "emulator": {
+        "response_sha256": "ff2018b1f4e9207ab42f24e7b851a1dde534da0d5ae05e4b7cc8aa7b8c9afa56",
+        "total_tags": 540,
+        "numeric_version_tags": 81,
+        "highest_numeric_version": "1.5.59",
+        "image_index_by_tag": {
+          "latest": "sha256:5f71fecd6330211789b75065ade9587d67b3a6b4678e7e5408e42c22f778c63e",
+          "1.5.59": "sha256:5f71fecd6330211789b75065ade9587d67b3a6b4678e7e5408e42c22f778c63e"
+        }
+      },
+      "omni": {
+        "response_sha256": "81f98384e266df17cf567d6782205ad5b854c685239d257a2784fd346a0f426e",
+        "total_tags": 71,
+        "non_beta_version_tags": [
+          "2026.r4-lts",
+          "2026.r4-lts.1",
+          "2026.r4-lts.2",
+          "2026.r5",
+          "2026.r5.1"
+        ],
+        "highest_lts_version": "2026.r4-lts.2",
+        "highest_regular_version": "2026.r5.1"
+      }
+    }
   },
   "limits": [
     "No managed service build or fleet rollout date is inferred. The hint probes establish acceptance and type validation, not coordinator selection.",

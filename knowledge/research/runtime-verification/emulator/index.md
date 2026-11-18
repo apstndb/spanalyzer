@@ -81,7 +81,8 @@ in the [receipt](../evidence/cross-engine-20261005/receipt.json). Preparation
 failure is not engine syntax rejection. Emulator query execution and empty PLAN
 results cannot establish managed/Omni optimizer behavior.
 
-On November 18 the newest GitHub release was still `v1.5.59`. The registry's
-`latest` and `1.5.59` tags selected the same image index; its amd64 and arm64
-digests matched the repository pins. This [release check](../evidence/managed-recheck-20261118/receipt.json)
-did not run Emulator queries.
+On November 18 UTC, `1.5.59` was the highest numeric version in the Emulator
+registry. It and `latest` resolved to the same image index. The amd64 and
+arm64 digests matched the repository pins. A separate check that day returned
+`v1.5.59` from GitHub's latest-release endpoint.
+[Dated registry and GitHub observations](../evidence/managed-recheck-20261118/receipt.json)

@@ -81,11 +81,11 @@ observation date. Same-day rows without exact times have no claimed order.
 Full image identities stay in the linked evidence. Repository runtime pin and
 catalog-selection changes are separate from adding an observation to this index.
 
-On November 18 the public `spanner-omni` registry still listed `2026.r4-lts.2`
-and `2026.r5.1` as the newest LTS and regular tags. Both platform digests per
-tag matched the repository pins. The latest release-note heading was still
-October 29; this was a [release check](../evidence/managed-recheck-20261118/receipt.json),
-with no new Omni execution.
+On November 18 UTC, the public `spanner-omni` registry listed five non-beta
+version tags. The highest LTS and regular versions were `2026.r4-lts.2` and
+`2026.r5.1`, respectively. Both platform digests per tag matched the
+repository pins. The latest release-note heading was October 29.
+[Dated registry and release-note observations](../evidence/managed-recheck-20261118/receipt.json)
 
 The November 12 VM and Kubernetes TLS guides require separate CAs for internal
 server traffic and for API and client certificates. On November 18 the official
