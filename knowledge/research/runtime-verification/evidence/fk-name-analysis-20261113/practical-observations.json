@@ -1,0 +1,172 @@
+{
+  "schema_version": "spanalyzer.practical-fk-name-collision/v0alpha1",
+  "scope": "Additional15 local Omni LTS.2 steps following the original160. No fresh managed or r5 run for these concrete business identifiers.",
+  "runtime": {
+    "requested_image": "us-docker.pkg.dev/spanner-omni/images/spanner-omni:2026.r4-lts.2@sha256:b607b10bee3c1903f0a7f88f99bece67cb0dd9d9a028aee64226fc311bd78dae",
+    "manifest": "sha256:b607b10bee3c1903f0a7f88f99bece67cb0dd9d9a028aee64226fc311bd78dae",
+    "platform": "linux/arm64",
+    "started_at": "2026-11-13T01:12:49.9195Z",
+    "completed_at": "2026-11-13T01:15:54.700709Z"
+  },
+  "fixtures": [
+    {
+      "variant": "practical-forward",
+      "started_at": "2026-11-13T01:12:50.922492Z",
+      "plan_semantic_sha256": "cd441742bb918796f32581a26471801a06983fbe047baaa563989c06ee37665b",
+      "results": {
+        "address": {
+          "code": "OK"
+        },
+        "child-1": {
+          "code": "OK"
+        },
+        "indexes-after-1": {
+          "code": "OK",
+          "rows": [
+            {
+              "COLUMN_NAME": "ADDRESS_ID",
+              "COLUMN_ORDERING": "ASC",
+              "INDEX_NAME": "IDX_SALES_ORDER_SHIPPING_ADDRESS_ID_C53AEFD47826CE09",
+              "IS_NULL_FILTERED": false,
+              "IS_UNIQUE": false,
+              "SPANNER_IS_MANAGED": true,
+              "TABLE_NAME": "SALES_ORDER_SHIPPING",
+              "TABLE_SCHEMA": ""
+            }
+          ]
+        },
+        "child-2": {
+          "code": "FailedPrecondition",
+          "error": "rpc error: code = FailedPrecondition desc ="
+        },
+        "indexes-after-2": {
+          "code": "OK",
+          "rows": [
+            {
+              "COLUMN_NAME": "ADDRESS_ID",
+              "COLUMN_ORDERING": "ASC",
+              "INDEX_NAME": "IDX_SALES_ORDER_SHIPPING_ADDRESS_ID_C53AEFD47826CE09",
+              "IS_NULL_FILTERED": false,
+              "IS_UNIQUE": false,
+              "SPANNER_IS_MANAGED": true,
+              "TABLE_NAME": "SALES_ORDER_SHIPPING",
+              "TABLE_SCHEMA": ""
+            }
+          ]
+        }
+      },
+      "completed_at": "2026-11-13T01:13:36.242491Z"
+    },
+    {
+      "variant": "practical-reverse",
+      "started_at": "2026-11-13T01:13:36.412615Z",
+      "plan_semantic_sha256": "1da582f29b0b78c8573ee3bfc4484663b8510370bdc27cd972e1d3318000d74f",
+      "results": {
+        "address": {
+          "code": "OK"
+        },
+        "child-1": {
+          "code": "OK"
+        },
+        "indexes-after-1": {
+          "code": "OK",
+          "rows": [
+            {
+              "COLUMN_NAME": "SHIPPING_ADDRESS_ID",
+              "COLUMN_ORDERING": "ASC",
+              "INDEX_NAME": "IDX_SALES_ORDER_SHIPPING_ADDRESS_ID_C53AEFD47826CE09",
+              "IS_NULL_FILTERED": false,
+              "IS_UNIQUE": false,
+              "SPANNER_IS_MANAGED": true,
+              "TABLE_NAME": "SALES_ORDER",
+              "TABLE_SCHEMA": ""
+            }
+          ]
+        },
+        "child-2": {
+          "code": "FailedPrecondition",
+          "error": "rpc error: code = FailedPrecondition desc ="
+        },
+        "indexes-after-2": {
+          "code": "OK",
+          "rows": [
+            {
+              "COLUMN_NAME": "SHIPPING_ADDRESS_ID",
+              "COLUMN_ORDERING": "ASC",
+              "INDEX_NAME": "IDX_SALES_ORDER_SHIPPING_ADDRESS_ID_C53AEFD47826CE09",
+              "IS_NULL_FILTERED": false,
+              "IS_UNIQUE": false,
+              "SPANNER_IS_MANAGED": true,
+              "TABLE_NAME": "SALES_ORDER",
+              "TABLE_SCHEMA": ""
+            }
+          ]
+        }
+      },
+      "completed_at": "2026-11-13T01:14:23.184347Z"
+    },
+    {
+      "variant": "practical-different-nullability",
+      "started_at": "2026-11-13T01:14:29.565425Z",
+      "plan_semantic_sha256": "89e80d7cfd3dafbba5105a49ba62ee2d1ad625642c8362c9366334d90081dff1",
+      "results": {
+        "address": {
+          "code": "OK"
+        },
+        "child-1": {
+          "code": "OK"
+        },
+        "indexes-after-1": {
+          "code": "OK",
+          "rows": [
+            {
+              "COLUMN_NAME": "ADDRESS_ID",
+              "COLUMN_ORDERING": "ASC",
+              "INDEX_NAME": "IDX_SALES_ORDER_SHIPPING_ADDRESS_ID_C53AEFD47826CE09",
+              "IS_NULL_FILTERED": false,
+              "IS_UNIQUE": false,
+              "SPANNER_IS_MANAGED": true,
+              "TABLE_NAME": "SALES_ORDER_SHIPPING",
+              "TABLE_SCHEMA": ""
+            }
+          ]
+        },
+        "child-2": {
+          "code": "OK"
+        },
+        "indexes-after-2": {
+          "code": "OK",
+          "rows": [
+            {
+              "COLUMN_NAME": "SHIPPING_ADDRESS_ID",
+              "COLUMN_ORDERING": "ASC",
+              "INDEX_NAME": "IDX_SALES_ORDER_SHIPPING_ADDRESS_ID_N_A414555C5DC900A2",
+              "IS_NULL_FILTERED": true,
+              "IS_UNIQUE": false,
+              "SPANNER_IS_MANAGED": true,
+              "TABLE_NAME": "SALES_ORDER",
+              "TABLE_SCHEMA": ""
+            },
+            {
+              "COLUMN_NAME": "ADDRESS_ID",
+              "COLUMN_ORDERING": "ASC",
+              "INDEX_NAME": "IDX_SALES_ORDER_SHIPPING_ADDRESS_ID_C53AEFD47826CE09",
+              "IS_NULL_FILTERED": false,
+              "IS_UNIQUE": false,
+              "SPANNER_IS_MANAGED": true,
+              "TABLE_NAME": "SALES_ORDER_SHIPPING",
+              "TABLE_SCHEMA": ""
+            }
+          ]
+        }
+      },
+      "completed_at": "2026-11-13T01:15:44.640991Z"
+    }
+  ],
+  "process_exit_code": 0,
+  "cleanup": {
+    "runtime_closed": true,
+    "owned_container_id_prefix": "dda490fc8966",
+    "owned_container_absent": true
+  }
+}

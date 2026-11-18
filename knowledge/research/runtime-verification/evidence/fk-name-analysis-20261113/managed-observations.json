@@ -1,0 +1,168 @@
+{
+  "schema_version": 1,
+  "scope": "Natural lower_snake_case referencing-index name collision, both orders in one owned GoogleSQL database; schema DDL and metadata only.",
+  "runtime": {
+    "backend": "managed",
+    "dialect": "GOOGLE_STANDARD_SQL",
+    "build_identity": "not exposed",
+    "instance_state_preflight": "READY",
+    "instance_type_preflight": "FREE_INSTANCE"
+  },
+  "started_at": "2026-11-13T01:41:38.372039+00:00",
+  "completed_at": "2026-11-13T01:44:06.302453+00:00",
+  "database_count": 1,
+  "plan_steps": 11,
+  "plan_sha256": "f4f9e2e42e1cb995cb799e6c0c33b59f814686d6cbfa47c61ebad8800d000492",
+  "producer_source_sha256": "721995b9afac317b12f662622fbe2accaa2d581869724562d32d25d19727de43",
+  "producer_binary_sha256": "ebe543ee7f16e2a86e914bfbcd1afc2c40da3c2aaed8b4093bdc975007baa9c4",
+  "owned_database_resource_sha256": "865c624e5776421d89b1a7b621589cfd0c2c80b0a4c0948ec27546cf495d1f98",
+  "results": {
+    "address": {
+      "kind": "ddl",
+      "started_at": "2026-11-13T01:41:43.313162Z",
+      "completed_at": "2026-11-13T01:43:21.786613Z",
+      "at": "2026-11-13T01:43:21.786617Z",
+      "code": "OK"
+    },
+    "shipping-first": {
+      "kind": "ddl",
+      "started_at": "2026-11-13T01:43:21.786714Z",
+      "completed_at": "2026-11-13T01:43:28.754708Z",
+      "at": "2026-11-13T01:43:28.754713Z",
+      "code": "OK"
+    },
+    "indexes-shipping": {
+      "kind": "query",
+      "started_at": "2026-11-13T01:43:28.75478Z",
+      "completed_at": "2026-11-13T01:43:29.138458Z",
+      "at": "2026-11-13T01:43:29.138459Z",
+      "code": "OK",
+      "rows": [
+        {
+          "COLUMN_NAME": "address_id",
+          "COLUMN_ORDERING": "ASC",
+          "INDEX_NAME": "IDX_sales_order_shipping_address_id_90E532EDA843ECD5",
+          "IS_NULL_FILTERED": false,
+          "IS_UNIQUE": false,
+          "SPANNER_IS_MANAGED": true,
+          "TABLE_NAME": "sales_order_shipping",
+          "TABLE_SCHEMA": ""
+        }
+      ]
+    },
+    "order-collision": {
+      "kind": "ddl",
+      "started_at": "2026-11-13T01:43:29.138539Z",
+      "completed_at": "2026-11-13T01:43:34.55793Z",
+      "at": "2026-11-13T01:43:34.557932Z",
+      "code": "FailedPrecondition",
+      "error": "rpc error: code = FailedPrecondition desc ="
+    },
+    "indexes-first-collision": {
+      "kind": "query",
+      "started_at": "2026-11-13T01:43:34.558019Z",
+      "completed_at": "2026-11-13T01:43:34.772356Z",
+      "at": "2026-11-13T01:43:34.772358Z",
+      "code": "OK",
+      "rows": [
+        {
+          "COLUMN_NAME": "address_id",
+          "COLUMN_ORDERING": "ASC",
+          "INDEX_NAME": "IDX_sales_order_shipping_address_id_90E532EDA843ECD5",
+          "IS_NULL_FILTERED": false,
+          "IS_UNIQUE": false,
+          "SPANNER_IS_MANAGED": true,
+          "TABLE_NAME": "sales_order_shipping",
+          "TABLE_SCHEMA": ""
+        }
+      ]
+    },
+    "drop-shipping": {
+      "kind": "ddl",
+      "started_at": "2026-11-13T01:43:34.77247Z",
+      "completed_at": "2026-11-13T01:43:41.848704Z",
+      "at": "2026-11-13T01:43:41.848705Z",
+      "code": "OK"
+    },
+    "order-alone": {
+      "kind": "ddl",
+      "started_at": "2026-11-13T01:43:41.848743Z",
+      "completed_at": "2026-11-13T01:43:49.240816Z",
+      "at": "2026-11-13T01:43:49.240819Z",
+      "code": "OK"
+    },
+    "indexes-order": {
+      "kind": "query",
+      "started_at": "2026-11-13T01:43:49.240875Z",
+      "completed_at": "2026-11-13T01:43:49.46046Z",
+      "at": "2026-11-13T01:43:49.460461Z",
+      "code": "OK",
+      "rows": [
+        {
+          "COLUMN_NAME": "shipping_address_id",
+          "COLUMN_ORDERING": "ASC",
+          "INDEX_NAME": "IDX_sales_order_shipping_address_id_90E532EDA843ECD5",
+          "IS_NULL_FILTERED": false,
+          "IS_UNIQUE": false,
+          "SPANNER_IS_MANAGED": true,
+          "TABLE_NAME": "sales_order",
+          "TABLE_SCHEMA": ""
+        }
+      ]
+    },
+    "shipping-collision": {
+      "kind": "ddl",
+      "started_at": "2026-11-13T01:43:49.460533Z",
+      "completed_at": "2026-11-13T01:43:55.004268Z",
+      "at": "2026-11-13T01:43:55.00427Z",
+      "code": "FailedPrecondition",
+      "error": "rpc error: code = FailedPrecondition desc ="
+    },
+    "indexes-second-collision": {
+      "kind": "query",
+      "started_at": "2026-11-13T01:43:55.004326Z",
+      "completed_at": "2026-11-13T01:43:55.090442Z",
+      "at": "2026-11-13T01:43:55.090444Z",
+      "code": "OK",
+      "rows": [
+        {
+          "COLUMN_NAME": "shipping_address_id",
+          "COLUMN_ORDERING": "ASC",
+          "INDEX_NAME": "IDX_sales_order_shipping_address_id_90E532EDA843ECD5",
+          "IS_NULL_FILTERED": false,
+          "IS_UNIQUE": false,
+          "SPANNER_IS_MANAGED": true,
+          "TABLE_NAME": "sales_order",
+          "TABLE_SCHEMA": ""
+        }
+      ]
+    },
+    "tables-final": {
+      "kind": "query",
+      "started_at": "2026-11-13T01:43:55.090559Z",
+      "completed_at": "2026-11-13T01:43:55.142774Z",
+      "at": "2026-11-13T01:43:55.142775Z",
+      "code": "InvalidArgument",
+      "rows": [],
+      "error": "spanner: code = \"InvalidArgument\", desc = \"Unrecognized name: TABLE_STATE; Did you mean TABLE_NAME? [at 1:30]\\\\nSELECT TABLE_NAME,TABLE_TYPE,TABLE_STATE FROM INFORMATION_SCHEMA.TABLES WHERE...\\\\n                             ^\""
+    }
+  },
+  "process_exit_code": 0,
+  "lifecycle": {
+    "create-database": {
+      "at": "2026-11-13T01:41:43.310846Z",
+      "code": "OK"
+    },
+    "drop-database": {
+      "at": "2026-11-13T01:44:06.089746Z",
+      "code": "OK"
+    },
+    "database-absent": {
+      "at": "2026-11-13T01:44:06.297469Z",
+      "code": "NotFound",
+      "error": "rpc error: code = NotFound desc = Database not found: <owned-database>\nerror details: name = ResourceInfo type = type.googleapis.com/google.spanner.admin.database.v1.Database resourcename = <owned-database> owner =  desc = Database does not exist."
+    }
+  },
+  "cleanup_verified": true,
+  "retention": "Inputs and compact dated outcomes retained; routine raw RPC output and private resource journal remain task-local."
+}
