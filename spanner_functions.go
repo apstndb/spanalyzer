@@ -278,15 +278,7 @@ func (c *GoogleSQLCatalog) addSpannerFunctions() error {
 	); err != nil {
 		return err
 	}
-	if err := c.addScalarFunction("TOKENLIST_CONCAT", tokenlistType,
-		functionArgs(tokenlistArrayType),
-		functionArgs(tokenlistType),
-		functionArgs(tokenlistType, tokenlistType),
-		functionArgs(tokenlistType, tokenlistType, tokenlistType),
-	); err != nil {
-		return err
-	}
-	return nil
+	return c.addScalarFunction("TOKENLIST_CONCAT", tokenlistType, functionArgs(tokenlistArrayType))
 }
 
 type functionArgSpec struct {
