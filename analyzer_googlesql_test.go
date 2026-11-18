@@ -802,6 +802,45 @@ SELECT
 	assertField(t, rowType.Fields[3], "concat_hit", spannerpb.TypeCode_BOOL)
 }
 
+func TestAnalyzerTokenlistConcatSignature(t *testing.T) {
+	analyzer, err := NewAnalyzerFromDDL("schema.sql", "")
+	if err != nil {
+		t.Fatalf("NewAnalyzerFromDDL() error = %v", err)
+	}
+	const tokens = ` FROM (SELECT TOKENIZE_FULLTEXT('alpha') AS a,
+		TOKENIZE_FULLTEXT('beta') AS b, TOKENIZE_FULLTEXT('gamma') AS c)`
+	for _, tc := range []struct {
+		name    string
+		args    string
+		wantErr bool
+	}{
+		{"array_one_element", "[a]", false},
+		{"array_two_elements", "[a, b]", false},
+		{"array_three_elements", "[a, b, c]", false},
+		{"one_scalar", "a", true},
+		{"two_scalars", "a, b", true},
+		{"three_scalars", "a, b, c", true},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			query := "SELECT DEBUG_TOKENLIST(TOKENLIST_CONCAT(" + tc.args + ")) AS tokens" + tokens
+			rowType, err := analyzer.RowTypeForStatement(query)
+			if tc.wantErr {
+				if err == nil || !strings.Contains(err.Error(), "TOKENLIST_CONCAT(ARRAY<TOKENLIST>)") {
+					t.Fatalf("RowTypeForStatement() error = %v, want TOKENLIST_CONCAT signature mismatch", err)
+				}
+				return
+			}
+			if err != nil {
+				t.Fatalf("RowTypeForStatement() error = %v", err)
+			}
+			if got := len(rowType.Fields); got != 1 {
+				t.Fatalf("len(rowType.Fields) = %d, want 1", got)
+			}
+			assertField(t, rowType.Fields[0], "tokens", spannerpb.TypeCode_STRING)
+		})
+	}
+}
+
 func TestAnalyzerRowTypeForSpannerFunctionNamedArgs(t *testing.T) {
 	analyzer, err := NewAnalyzerFromDDL("schema.sql", "")
 	if err != nil {
