@@ -1,0 +1,323 @@
+{
+  "scope": "Documentation changes and additional managed GoogleSQL read-only observations on November 18, 2026. Commit dates identify mirror captures.",
+  "mirror": {
+    "repository": "https://github.com/apstndb/spanner-docs-mirror",
+    "from": "103e2193ab35b06695c2b518a9ae6a4c7d90116c",
+    "to": "844901e61a5a0613216dd197d96ff4f6567bd6b8",
+    "unique_document_paths_across_commits": 66,
+    "net_document_paths": 65,
+    "net_paths_including_metadata": 68,
+    "commits": [
+      {
+        "sha": "3539e3ab91202b43340421e2d82953513eb71c0e",
+        "date_utc": "2026-11-12",
+        "document_paths": 5,
+        "changes": "Omni two-CA instructions on VMs and Kubernetes, medium or low request priority with USE_ADDITIONAL_PARALLELISM in both dialect references, and a QueryData link."
+      },
+      {
+        "sha": "35d5e0331e5a7d5399c304ce4991f18647023977",
+        "date_utc": "2026-11-13",
+        "document_paths": 26,
+        "changes": "TABLE_OPTIONS reference and example in both dialects, corrected PostgreSQL tokenlist_concat description, Rust client and feature documentation, and a transient mysql-fallback removal."
+      },
+      {
+        "sha": "e7ec1e425f08cee8f50e9d30bb21d436d157ace9",
+        "date_utc": "2026-11-14",
+        "document_paths": 1,
+        "changes": "mysql-fallback returned with the original Git blob 84f3a0141071815bdcea61769ff69edc882f87b4."
+      },
+      {
+        "sha": "6d18f5f7f3d82533c8682c3e9008a19f33f9629b",
+        "date_utc": "2026-11-15",
+        "document_paths": 0
+      },
+      {
+        "sha": "d5950779f34db54cf5945c989b7dae8b9b0fd7a2",
+        "date_utc": "2026-11-16",
+        "document_paths": 0
+      },
+      {
+        "sha": "844901e61a5a0613216dd197d96ff4f6567bd6b8",
+        "date_utc": "2026-11-17",
+        "document_paths": 40,
+        "changes": "Index and inheritance metadata in both dialects, tiered storage, GoogleSQL RANDOMIZE_QUERY_ROOT, the absent Omni TrueTime page, and removal of rendered icon text across guides."
+      }
+    ],
+    "release_notes": "Neither product's release notes changed in this range."
+  },
+  "managed": {
+    "dialect": "GOOGLE_STANDARD_SQL",
+    "scope": "Existing empty verification schema. SQL statements in single-use reads, plus two read-only gcloud priority controls. No DDL, DML or database lifecycle.",
+    "observed_utc": [
+      "2026-11-18T08:15:40.206439+00:00",
+      "2026-11-18T08:21:12.105078+00:00"
+    ],
+    "producer": {
+      "source": "../managed-recheck-20261112/producer/query.go.txt",
+      "binary_sha256": "de5fb34945fcea1d15b5dff5bf15177afaab8c206ff82e34ae3826c70b8a9575"
+    },
+    "requests": {
+      "sdk_controls": 20,
+      "gcloud_priority": 2,
+      "sdk_arity": 6,
+      "total": 28,
+      "ok": 20,
+      "invalid_argument": 8
+    },
+    "controls": [
+      {
+        "id": "connectivity",
+        "sql": "SELECT 1 AS connectivity",
+        "status": "OK"
+      },
+      {
+        "id": "producer-full-a",
+        "sql": "SELECT DEBUG_TOKENLIST(TOKENIZE_FULLTEXT('alpha')) AS tokens",
+        "status": "OK"
+      },
+      {
+        "id": "producer-full-b",
+        "sql": "SELECT DEBUG_TOKENLIST(TOKENIZE_FULLTEXT('bravo')) AS tokens",
+        "status": "OK"
+      },
+      {
+        "id": "producer-sub-a",
+        "sql": "SELECT DEBUG_TOKENLIST(TOKENIZE_SUBSTRING('alpha')) AS tokens",
+        "status": "OK"
+      },
+      {
+        "id": "producer-sub-b",
+        "sql": "SELECT DEBUG_TOKENLIST(TOKENIZE_SUBSTRING('bravo')) AS tokens",
+        "status": "OK"
+      },
+      {
+        "id": "producer-ngram",
+        "sql": "SELECT DEBUG_TOKENLIST(TOKENIZE_NGRAMS('alpha')) AS tokens",
+        "status": "OK"
+      },
+      {
+        "id": "producer-exact",
+        "sql": "SELECT DEBUG_TOKENLIST(TOKEN('alpha')) AS tokens",
+        "status": "OK"
+      },
+      {
+        "id": "producer-bool",
+        "sql": "SELECT DEBUG_TOKENLIST(TOKENIZE_BOOL(TRUE)) AS tokens",
+        "status": "OK"
+      },
+      {
+        "id": "concat-full",
+        "sql": "SELECT DEBUG_TOKENLIST(TOKENLIST_CONCAT([TOKENIZE_FULLTEXT('alpha'), TOKENIZE_FULLTEXT('bravo')])) AS tokens",
+        "status": "OK",
+        "contains_both_inputs": true
+      },
+      {
+        "id": "concat-substring",
+        "sql": "SELECT DEBUG_TOKENLIST(TOKENLIST_CONCAT([TOKENIZE_SUBSTRING('alpha'), TOKENIZE_SUBSTRING('bravo')])) AS tokens",
+        "status": "OK",
+        "contains_both_input_fragments": true
+      },
+      {
+        "id": "concat-full-substring",
+        "sql": "SELECT DEBUG_TOKENLIST(TOKENLIST_CONCAT([TOKENIZE_FULLTEXT('alpha'), TOKENIZE_SUBSTRING('bravo')])) AS tokens",
+        "status": "InvalidArgument",
+        "error_condition": "Mixed tokenizer kinds"
+      },
+      {
+        "id": "concat-ngram",
+        "sql": "SELECT DEBUG_TOKENLIST(TOKENLIST_CONCAT([TOKENIZE_NGRAMS('alpha'), TOKENIZE_NGRAMS('alpha')])) AS tokens",
+        "status": "InvalidArgument",
+        "error_condition": "Only FULLTEXT and SUBSTRING producers allowed"
+      },
+      {
+        "id": "concat-exact",
+        "sql": "SELECT DEBUG_TOKENLIST(TOKENLIST_CONCAT([TOKEN('alpha'), TOKEN('alpha')])) AS tokens",
+        "status": "InvalidArgument",
+        "error_condition": "Only FULLTEXT and SUBSTRING producers allowed"
+      },
+      {
+        "id": "concat-bool",
+        "sql": "SELECT DEBUG_TOKENLIST(TOKENLIST_CONCAT([TOKENIZE_BOOL(TRUE), TOKENIZE_BOOL(TRUE)])) AS tokens",
+        "status": "InvalidArgument",
+        "error_condition": "Only FULLTEXT and SUBSTRING producers allowed"
+      },
+      {
+        "id": "concat-separate-arguments",
+        "sql": "SELECT DEBUG_TOKENLIST(TOKENLIST_CONCAT(TOKENIZE_FULLTEXT('alpha'), TOKENIZE_FULLTEXT('bravo'))) AS tokens",
+        "status": "InvalidArgument",
+        "reported_signature": "TOKENLIST_CONCAT(ARRAY<TOKENLIST>)"
+      },
+      {
+        "id": "concat-null-array",
+        "sql": "SELECT DEBUG_TOKENLIST(TOKENLIST_CONCAT(CAST(NULL AS ARRAY<TOKENLIST>))) AS tokens",
+        "status": "OK",
+        "debug_result": null
+      },
+      {
+        "id": "concat-empty-array",
+        "sql": "SELECT DEBUG_TOKENLIST(TOKENLIST_CONCAT(ARRAY<TOKENLIST>[])) AS tokens",
+        "status": "OK",
+        "debug_result": null
+      },
+      {
+        "id": "concat-null-element",
+        "sql": "SELECT DEBUG_TOKENLIST(TOKENLIST_CONCAT([CAST(NULL AS TOKENLIST), TOKENIZE_FULLTEXT('alpha')])) AS tokens",
+        "status": "OK",
+        "contains_non_null_input": true
+      },
+      {
+        "id": "table-options-example",
+        "sql": "SELECT t.table_schema, t.table_name, t.option_name, t.option_type, t.option_value FROM INFORMATION_SCHEMA.TABLE_OPTIONS AS t ORDER BY t.table_schema, t.table_name, t.option_name",
+        "status": "OK",
+        "row_count": 0
+      },
+      {
+        "id": "placement-default",
+        "sql": "SELECT PLACEMENT_NAME = 'default' AS is_default, OPTION_NAME, OPTION_TYPE FROM INFORMATION_SCHEMA.PLACEMENT_OPTIONS ORDER BY 1,2",
+        "status": "OK",
+        "rows": [
+          {
+            "OPTION_NAME": "instance_partition",
+            "OPTION_TYPE": "STRING(MAX)",
+            "is_default": true
+          }
+        ]
+      }
+    ],
+    "priority_controls": {
+      "sql": "@{USE_ADDITIONAL_PARALLELISM=TRUE} SELECT COUNT(*) AS n FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA='INFORMATION_SCHEMA'",
+      "transport_option": "gcloud spanner databases execute-sql --priority=MEDIUM or --priority=LOW",
+      "results": [
+        {
+          "priority": "MEDIUM",
+          "exit": 0,
+          "count": "310"
+        },
+        {
+          "priority": "LOW",
+          "exit": 0,
+          "count": "310"
+        }
+      ],
+      "scope": "Execution and row value only. Coordinator selection, CPU and latency impact were not measured."
+    }
+  },
+  "spanalyzer_comparison": {
+    "main_commit": "de53ff8bfd9977bdfee84523fa4af48a7e268a13",
+    "source_tree": "3d53280cd6ce968a0fbe9fd50e0bb78ade0fe481",
+    "entry_point": "spanner-analyzer --mode=spanner_type --sql <query>",
+    "source": "spanner_functions.go, TOKENLIST_CONCAT registration",
+    "paired_cases": [
+      {
+        "label": "array-1",
+        "sql": "SELECT DEBUG_TOKENLIST(TOKENLIST_CONCAT([TOKENIZE_FULLTEXT('alpha')])) AS tokens",
+        "managed": "OK",
+        "service_reported_array_signature": false,
+        "local_exit": 0,
+        "local_type": "STRING"
+      },
+      {
+        "label": "scalar-1",
+        "sql": "SELECT DEBUG_TOKENLIST(TOKENLIST_CONCAT(TOKENIZE_FULLTEXT('alpha'))) AS tokens",
+        "managed": "InvalidArgument",
+        "service_reported_array_signature": true,
+        "local_exit": 0,
+        "local_type": "STRING"
+      },
+      {
+        "label": "array-2",
+        "sql": "SELECT DEBUG_TOKENLIST(TOKENLIST_CONCAT([TOKENIZE_FULLTEXT('alpha'), TOKENIZE_FULLTEXT('bravo')])) AS tokens",
+        "managed": "OK",
+        "service_reported_array_signature": false,
+        "local_exit": 0,
+        "local_type": "STRING"
+      },
+      {
+        "label": "scalar-2",
+        "sql": "SELECT DEBUG_TOKENLIST(TOKENLIST_CONCAT(TOKENIZE_FULLTEXT('alpha'), TOKENIZE_FULLTEXT('bravo'))) AS tokens",
+        "managed": "InvalidArgument",
+        "service_reported_array_signature": true,
+        "local_exit": 0,
+        "local_type": "STRING"
+      },
+      {
+        "label": "array-3",
+        "sql": "SELECT DEBUG_TOKENLIST(TOKENLIST_CONCAT([TOKENIZE_FULLTEXT('alpha'), TOKENIZE_FULLTEXT('bravo'), TOKENIZE_FULLTEXT('charlie')])) AS tokens",
+        "managed": "OK",
+        "service_reported_array_signature": false,
+        "local_exit": 0,
+        "local_type": "STRING"
+      },
+      {
+        "label": "scalar-3",
+        "sql": "SELECT DEBUG_TOKENLIST(TOKENLIST_CONCAT(TOKENIZE_FULLTEXT('alpha'), TOKENIZE_FULLTEXT('bravo'), TOKENIZE_FULLTEXT('charlie'))) AS tokens",
+        "managed": "InvalidArgument",
+        "service_reported_array_signature": true,
+        "local_exit": 0,
+        "local_type": "STRING"
+      }
+    ],
+    "interpretation": "The array overload agrees with managed. The one-, two-, and three-scalar overloads produce false positives during row-type analysis. Rejecting mixed tokenizer kinds is a separate semantic question.",
+    "google_reference": "Its pre-existing synopsis shows a variable number of values. Its example passes one array. All three managed scalar diagnostics advertise TOKENLIST_CONCAT(ARRAY<TOKENLIST>).",
+    "postgresql_reference": "The November 13 correction describes concatenation instead of token debugging. The argument was already documented as spanner.tokenlist[] and the return as spanner.tokenlist. PostgreSQL runtime was not sampled."
+  },
+  "schema_followup": {
+    "table_options": "Test explicit table options for non-default locality, columnar policy, custom dictionaries and role-specific visibility. Documented behavior omits default locality even if set explicitly. The published query returned zero rows against this empty schema.",
+    "column_and_locality_options": "Compare explicit and inherited locality_group values. GoogleSQL documents BOOL and PostgreSQL documents character varying YES/NO; unrelated options have a NULL inheritance flag. For LOCALITY_GROUP_OPTIONS compare explicit and inherited storage with the NULL flag on ssd_to_hdd_spill_timespan. Only the GoogleSQL default group was sampled in the preceding receipt.",
+    "example": "Both references describe a query as returning columns with non-default options, but the query filters only catalog or schema. A September 16 managed GoogleSQL sample documented 1,651 inherited default column rows across 206 tables.",
+    "historical_observation": "../../managed-information-schema-is-inherited-rollout-20260916.md",
+    "index_options": "Check explicit search options and system_optimized_tree_depth, system_optimized_num_leaves, system_optimized_num_branches for vectors. Compare INDEX_OPTIONS.index_type (documented VECTOR vs ScaNN) separately from INDEXES.index_type. Collect GetDatabaseDdl on the same populated schema in each dialect.",
+    "local_vector_projection": {
+      "source": "survey/astconv/to_ast_vector_index.go, vector index option loop",
+      "input_ddl": "CREATE VECTOR INDEX VecIdx ON Items(Embedding) WHERE Embedding IS NOT NULL OPTIONS (distance_type = 'COSINE')",
+      "reproduction": "Parse the DDL with memefish. Pass it to astconv.FromDDLStatements. Append three synthetic infoschem.IndexOption rows using TableName Items, IndexName VecIdx, IndexType VECTOR, OptionType INT64, OptionValue 2 and the three system_optimized option names above. Render with ToDDLStatements.",
+      "result": "The reconstructed CREATE VECTOR INDEX contained all three system_optimized options with value 2, alongside distance_type. The documented GoogleSQL input options omit these system_optimized names.",
+      "scope": "Synthetic local projection only. No live index metadata or managed DDL replay was tested."
+    },
+    "postgresql_headings": "placement_options and locality_group_options are corrected headings for existing sections. The changes do not establish new views."
+  },
+  "source_checks": {
+    "omni_tls": "Both VM and Kubernetes guides now prescribe separate CAs. The internal server CA is ca.crt; ca-api.crt signs API server and client certificates. The Kubernetes example includes spanner.NAMESPACE.svc. Deployment and handshakes were not tested.",
+    "omni_truetime": {
+      "official_http": 200,
+      "developer_knowledge": "Full body matched the pre-removal mirror text after removing frontmatter and trimming outer whitespace.",
+      "normalized_sha256": "f171e32159b50d1418110feb98bc7bdc0dce7cdcbe5473525bfd8346af7c81fd",
+      "mirror_failed_log_status": 200
+    },
+    "mysql_fallback": {
+      "official_http": 200,
+      "normalized_sha256": "5b340c11a80ca1563aa8a8799c5c2458655818b0b2e8b008a9e0c93903b18152"
+    },
+    "rust": "Client guide adds google-cloud-spanner and code. The documentation lists rust_decimal::Decimal and multiplexed sessions; the rendered API matrix marks all 16 displayed Rust feature rows with compare-yes. The Spanner-specific getting-started/rust link returned HTTP 404 and Developer Knowledge NOT_FOUND.",
+    "rust_compile": {
+      "observed_date_utc": "2026-11-18",
+      "sample_source": "Spanner client libraries, Rust sample that constructs DatabaseClient and DatabaseAdmin",
+      "sample_sha256_utf8_with_trailing_newline": "3381e8c9e46d844edde5a1397efa4a87f8f184f370036fb12ac0f08786c0c5f1",
+      "toolchain": "Rust 1.99.1, aarch64-apple-darwin, edition 2024",
+      "reproduce": "Use the published Rust sample unchanged as src/lib.rs. Add the two dependencies in the installation section and run cargo check. Then add the two referenced crates as direct dependencies and rerun cargo check on the same source.",
+      "published_direct_dependencies": ["google-cloud-spanner 0.35.0", "tokio 1.54.1 with full features"],
+      "as_published": {"cargo_check_exit": 101, "errors": ["E0433 at line 2: google_cloud_spanner_admin_database_v1", "E0433 at line 4: anyhow"]},
+      "additional_direct_dependencies": ["google-cloud-spanner-admin-database-v1 1.15.0", "anyhow 1.0.104"],
+      "with_both_dependencies": {"cargo_check_exit": 0, "source_unchanged": true},
+      "scope": "Compiled locally. There was no client connection to Spanner."
+    },
+    "documentation_sources": [
+      "https://docs.cloud.google.com/spanner/docs/reference/postgresql/functions",
+      "https://docs.cloud.google.com/spanner/docs/reference/standard-sql/search_functions#tokenlist_concat",
+      "https://docs.cloud.google.com/spanner/docs/full-text-search/combine-tokenlists",
+      "https://docs.cloud.google.com/spanner/docs/information-schema",
+      "https://docs.cloud.google.com/spanner/docs/information-schema-pg",
+      "https://docs.cloud.google.com/spanner/docs/tiered-storage",
+      "https://docs.cloud.google.com/spanner/docs/reference/standard-sql/data-definition-language#create_vector_index",
+      "https://docs.cloud.google.com/spanner/docs/vector-index-best-practices",
+      "https://docs.cloud.google.com/spanner/docs/query-tuning",
+      "https://docs.cloud.google.com/spanner-omni/deploy-encryption-vms",
+      "https://docs.cloud.google.com/spanner-omni/deploy-encryption-kubernetes",
+      "https://docs.cloud.google.com/spanner-omni/true-time-external-consistency",
+      "https://docs.cloud.google.com/spanner/docs/mysql-fallback",
+      "https://docs.cloud.google.com/spanner/docs/api-libraries-overview",
+      "https://docs.cloud.google.com/spanner/docs/reference/libraries",
+      "https://docs.cloud.google.com/spanner/docs/getting-started/rust"
+    ]
+  }
+}

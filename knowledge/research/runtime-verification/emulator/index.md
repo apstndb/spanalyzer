@@ -43,6 +43,7 @@ without exact times have no claimed internal order.
 | 2026-11-12 JST; 1.5.59 arm64, pinned v1.5.59 source | First focused coverage / source-backed discrepancy | FK physical shapes match managed/Omni; deterministic name suffixes differ and match the pinned source fixture. A three-cycle inverse child PK incorrectly omits its backing index and rejects a valid reference with the wrong tuple. CommitStats remain absent. Both 93-step orders run and owned runtimes close; no version-introduction or patched-intervention claim. | [FK source/runtime investigation](../fk-backing-index-predictability-20261112.md), [source identities](../evidence/fk-backing-index-20261112/source-audit.json) |
 
 | 2026-11-12T12:32:37Z; 1.5.59 arm64 | First focused coverage | After a probe-only instance-bootstrap correction, all 11 mixed DML/Mutation controls commit and preserve expected final keys. CommitStats remain absent, so numerical count agreement is unverified. Owned containers close after the failed bootstrap and corrected run. | [Disjoint-key bounds](../mixed-disjoint-key-bounds-20261112.md), [compact observations](../evidence/mixed-disjoint-keys-20261112/observations.json) |
+| 2026-11-18 UTC, 1.5.59 arm64 | FK catalog correction and hint comparison | Both dialects rejected the FK name as a hint and accepted the managed-generated physical name. The catalog paired reordered references incorrectly and repeated parent key rows when two FKs shared a parent unique index. DDL export preserved the declared pairs. | [FK backing-index resolution](../fk-backing-index-resolution-20261118.md) |
 
 ## Publication and source context
 
@@ -77,3 +78,8 @@ Emulator-specific instance/database setup and successful cleanup are retained
 in the [receipt](../evidence/cross-engine-20261005/receipt.json). Preparation
 failure is not engine syntax rejection. Emulator query execution and empty PLAN
 results cannot establish managed/Omni optimizer behavior.
+
+On November 18 the newest GitHub release was still `v1.5.59`. The registry's
+`latest` and `1.5.59` tags selected the same image index; its amd64 and arm64
+digests matched the repository pins. This [release check](../evidence/managed-recheck-20261118/receipt.json)
+did not run Emulator queries.

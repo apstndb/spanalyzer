@@ -22,6 +22,7 @@ the latest public release. Use the engine histories for a chronological view.
 
 | Runtime and observation scope | Research Note |
 | --- | --- |
+| Managed, Omni r4 LTS.2 / r5.1 and Emulator 1.5.59, 2026-11-18 UTC | [Resolving an individual FK to its backing index](fk-backing-index-resolution-20261118.md). Constraint-name hints, an Omni forecast for seven physical names and a composite-key catalog correction in both SQL dialects. |
 | Omni r4 LTS.2 and Emulator 1.5.59, 2026-11-12 UTC/JST | [Disjoint mixed-transaction keys](mixed-disjoint-key-bounds-20261112.md): 11 cases per engine, finite component-upper sums for isolated ordinary tables, conservative overlap guards, and absent Emulator CommitStats |
 | Managed, Omni r4 LTS.2 / r5.1 and Emulator 1.5.59, 2026-11-12 JST | [FK backing-index predictability](fk-backing-index-predictability-20261112.md): 504 controlled steps, schema/source/name boundaries, nullable PK and reordered-key count bounds, shared physical indexes, three-cycle FK failures and verified owned-DB cleanup |
 | Omni r4 LTS.2 / r5.1 and Emulator 1.5.59, 2026-11-12 JST | [Managed-control comparison](cross-engine-managed-recheck-20261112.md): 1,165 recorded steps, secure-context and privilege boundaries, distribution/compression, typed vectors, metadata tuples and current public releases |

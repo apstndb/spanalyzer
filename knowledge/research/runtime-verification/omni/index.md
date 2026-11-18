@@ -43,6 +43,7 @@ observation date. Same-day rows without exact times have no claimed order.
 | 2026-11-12 JST; LTS.2 / r5.1 arm64, separate FK fixtures | First focused coverage | FK physical metadata/names match each other and fresh managed observations. Sharing and name reuse hold in the bounded matrix. Nullable-PK count 3 versus NOT NULL 2; an ordered-key control costs 4 rather than 3. Three-cycle inverse PK inserts return Internal. Initial client-setup failures and schema-first seed failures remain distinct from successful parent-first controls; owned runtimes close. | [FK predictability and source boundaries](../fk-backing-index-predictability-20261112.md), [receipt](../evidence/fk-backing-index-20261112/receipt.json) |
 
 | 2026-11-12T12:32:22Z; r4 LTS.2 arm64 | First focused coverage | All 11 mixed DML/Mutation controls commit and return CommitStats. Eight proven disjoint-key cases fit the new component-upper sum; overlap and unresolved-key controls retain unknown uppers. This is model coverage, not an engine transition or managed measurement. | [Disjoint-key bounds](../mixed-disjoint-key-bounds-20261112.md), [compact observations](../evidence/mixed-disjoint-keys-20261112/observations.json) |
+| 2026-11-18 UTC, r4 LTS.2 and r5.1 arm64 | Two-dialect comparison | Both releases returned the physical child index through the FK-name hint. All seven names recorded on LTS matched managed. Reordered FK column pairs agreed with the declared DDL. The LTS shared-parent control returned one catalog row per key column. | [FK backing-index resolution](../fk-backing-index-resolution-20261118.md) |
 
 ## Publication and source context
 
@@ -77,3 +78,14 @@ observation date. Same-day rows without exact times have no claimed order.
 
 Full image identities stay in the linked evidence. Repository runtime pin and
 catalog-selection changes are separate from adding an observation to this index.
+
+On November 18 the public `spanner-omni` registry still listed `2026.r4-lts.2`
+and `2026.r5.1` as the newest LTS and regular tags. Both platform digests per
+tag matched the repository pins. The latest release-note heading was still
+October 29; this was a [release check](../evidence/managed-recheck-20261118/receipt.json),
+with no new Omni execution.
+
+The November 12 VM and Kubernetes TLS guides require separate CAs for internal
+server traffic and for API and client certificates. On November 18 the official
+TrueTime page returned HTTP 200 and its body matched the copy preceding its
+November 17 removal from the mirror. See the [documentation checks](../evidence/managed-recheck-20261118/mirror-followup.json).

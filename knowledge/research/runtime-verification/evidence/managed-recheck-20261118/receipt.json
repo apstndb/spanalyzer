@@ -1,0 +1,536 @@
+{
+  "scope": "Existing dedicated GoogleSQL DB, single-use read-only transactions",
+  "observed_at_utc": [
+    "2026-11-18T07:12:01.610236+00:00",
+    "2026-11-18T07:12:11.244412+00:00"
+  ],
+  "reproduce": {
+    "producer": "../managed-recheck-20261112/producer/query.go.txt",
+    "producer_source_sha256": "13dc8b3ebf9044d4fe48072b79ac02c47d645aec2d84be2298262f5bf4b3b22c",
+    "binary_sha256": "de5fb34945fcea1d15b5dff5bf15177afaab8c206ff82e34ae3826c70b8a9575",
+    "plans": "../managed-recheck-20261112/<phase>-cases.json; run each with the read-only producer. Then run the SQL in focused_cases on an empty dedicated GoogleSQL DB with the default locality group.",
+    "plan_sha256_by_phase": {
+      "readonly": "9698734091e7e6c85e728ec8aa9994b959567e4eac13ceb1abb59d352c6af273",
+      "supplemental": "a9f3595ca73d6450ca61da7d6e69bd93086dde6a05f779698bcfe1671505ee9f",
+      "statistics": "5e16b629c5ab06281dea9a90fa72054610cf7779431d54d9acb7c6e8596c3e0d",
+      "statistics-controls": "3b8c1e1230dc12b236fa73e0d5b045235880d4c4dcacd2a192cde87ae912d65b",
+      "histogram-controls": "df3baa433e113a7c93df5923eaa45bcb84ad420ae1d59dde2516f0b545558687",
+      "observed-histogram": "459a9fdf1da51faabac08606d7eed89a5d0d03e370216c0a3d1e9dd4cf8249ca",
+      "scalar-correction": "6d1094b723f0544b1220e76deabc3364f6ddf33c4e509a7b05f69bbf8a60a7f1",
+      "new-readonly": "ee44a45b1e520a86d796a2de27d52be7d9c1a59c3dc2cae0fbd1b40c8c6f4268",
+      "distribution-frames": "12d8a354ffb528dd20dcc891bef048b7b77b15ff965a08f948f37d9b3cad1944",
+      "distribution-null-controls": "89cef3100c7866ee373610b69b34a664accfc43bf011adf29e04b1f46d09fcf5"
+    }
+  },
+  "replay": {
+    "queries": 184,
+    "status_differences": 0,
+    "row_type_field_differences": 0,
+    "row_value_differences": 26,
+    "changed_row_categories": [
+      "lock statistics",
+      "query statistics",
+      "server time"
+    ],
+    "information_schema_columns": 310,
+    "spanner_sys_column_samples": [
+      624,
+      624,
+      624
+    ]
+  },
+  "focused_cases": [
+    {
+      "label": "nov18/connectivity",
+      "code": "OK",
+      "sql": "SELECT 1 AS connectivity",
+      "sample": [
+        {
+          "connectivity": "1"
+        }
+      ]
+    },
+    {
+      "label": "nov18/shape-TABLE_OPTIONS",
+      "code": "OK",
+      "sql": "SELECT * FROM INFORMATION_SCHEMA.TABLE_OPTIONS LIMIT 0",
+      "sample": [],
+      "fields": [
+        {
+          "name": "TABLE_CATALOG",
+          "type": {
+            "code": "STRING"
+          }
+        },
+        {
+          "name": "TABLE_SCHEMA",
+          "type": {
+            "code": "STRING"
+          }
+        },
+        {
+          "name": "TABLE_NAME",
+          "type": {
+            "code": "STRING"
+          }
+        },
+        {
+          "name": "OPTION_NAME",
+          "type": {
+            "code": "STRING"
+          }
+        },
+        {
+          "name": "OPTION_TYPE",
+          "type": {
+            "code": "STRING"
+          }
+        },
+        {
+          "name": "OPTION_VALUE",
+          "type": {
+            "code": "STRING"
+          }
+        }
+      ]
+    },
+    {
+      "label": "nov18/count-TABLE_OPTIONS",
+      "code": "OK",
+      "sql": "SELECT COUNT(*) AS n FROM INFORMATION_SCHEMA.TABLE_OPTIONS",
+      "sample": [
+        {
+          "n": "0"
+        }
+      ]
+    },
+    {
+      "label": "nov18/shape-COLUMN_OPTIONS",
+      "code": "OK",
+      "sql": "SELECT * FROM INFORMATION_SCHEMA.COLUMN_OPTIONS LIMIT 0",
+      "sample": [],
+      "fields": [
+        {
+          "name": "TABLE_CATALOG",
+          "type": {
+            "code": "STRING"
+          }
+        },
+        {
+          "name": "TABLE_SCHEMA",
+          "type": {
+            "code": "STRING"
+          }
+        },
+        {
+          "name": "TABLE_NAME",
+          "type": {
+            "code": "STRING"
+          }
+        },
+        {
+          "name": "COLUMN_NAME",
+          "type": {
+            "code": "STRING"
+          }
+        },
+        {
+          "name": "OPTION_NAME",
+          "type": {
+            "code": "STRING"
+          }
+        },
+        {
+          "name": "OPTION_TYPE",
+          "type": {
+            "code": "STRING"
+          }
+        },
+        {
+          "name": "OPTION_VALUE",
+          "type": {
+            "code": "STRING"
+          }
+        },
+        {
+          "name": "IS_INHERITED",
+          "type": {
+            "code": "BOOL"
+          }
+        }
+      ]
+    },
+    {
+      "label": "nov18/count-COLUMN_OPTIONS",
+      "code": "OK",
+      "sql": "SELECT COUNT(*) AS n FROM INFORMATION_SCHEMA.COLUMN_OPTIONS",
+      "sample": [
+        {
+          "n": "0"
+        }
+      ]
+    },
+    {
+      "label": "nov18/shape-INDEX_OPTIONS",
+      "code": "OK",
+      "sql": "SELECT * FROM INFORMATION_SCHEMA.INDEX_OPTIONS LIMIT 0",
+      "sample": [],
+      "fields": [
+        {
+          "name": "TABLE_CATALOG",
+          "type": {
+            "code": "STRING"
+          }
+        },
+        {
+          "name": "TABLE_SCHEMA",
+          "type": {
+            "code": "STRING"
+          }
+        },
+        {
+          "name": "TABLE_NAME",
+          "type": {
+            "code": "STRING"
+          }
+        },
+        {
+          "name": "INDEX_NAME",
+          "type": {
+            "code": "STRING"
+          }
+        },
+        {
+          "name": "INDEX_TYPE",
+          "type": {
+            "code": "STRING"
+          }
+        },
+        {
+          "name": "OPTION_NAME",
+          "type": {
+            "code": "STRING"
+          }
+        },
+        {
+          "name": "OPTION_TYPE",
+          "type": {
+            "code": "STRING"
+          }
+        },
+        {
+          "name": "OPTION_VALUE",
+          "type": {
+            "code": "STRING"
+          }
+        }
+      ]
+    },
+    {
+      "label": "nov18/count-INDEX_OPTIONS",
+      "code": "OK",
+      "sql": "SELECT COUNT(*) AS n FROM INFORMATION_SCHEMA.INDEX_OPTIONS",
+      "sample": [
+        {
+          "n": "0"
+        }
+      ]
+    },
+    {
+      "label": "nov18/shape-LOCALITY_GROUP_OPTIONS",
+      "code": "OK",
+      "sql": "SELECT * FROM INFORMATION_SCHEMA.LOCALITY_GROUP_OPTIONS LIMIT 0",
+      "sample": [],
+      "fields": [
+        {
+          "name": "LOCALITY_GROUP_NAME",
+          "type": {
+            "code": "STRING"
+          }
+        },
+        {
+          "name": "OPTION_NAME",
+          "type": {
+            "code": "STRING"
+          }
+        },
+        {
+          "name": "OPTION_VALUE",
+          "type": {
+            "code": "STRING"
+          }
+        },
+        {
+          "name": "IS_INHERITED",
+          "type": {
+            "code": "BOOL"
+          }
+        }
+      ]
+    },
+    {
+      "label": "nov18/count-LOCALITY_GROUP_OPTIONS",
+      "code": "OK",
+      "sql": "SELECT COUNT(*) AS n FROM INFORMATION_SCHEMA.LOCALITY_GROUP_OPTIONS",
+      "sample": [
+        {
+          "n": "2"
+        }
+      ]
+    },
+    {
+      "label": "nov18/shape-PLACEMENT_OPTIONS",
+      "code": "OK",
+      "sql": "SELECT * FROM INFORMATION_SCHEMA.PLACEMENT_OPTIONS LIMIT 0",
+      "sample": [],
+      "fields": [
+        {
+          "name": "PLACEMENT_NAME",
+          "type": {
+            "code": "STRING"
+          }
+        },
+        {
+          "name": "OPTION_NAME",
+          "type": {
+            "code": "STRING"
+          }
+        },
+        {
+          "name": "OPTION_TYPE",
+          "type": {
+            "code": "STRING"
+          }
+        },
+        {
+          "name": "OPTION_VALUE",
+          "type": {
+            "code": "STRING"
+          }
+        }
+      ]
+    },
+    {
+      "label": "nov18/count-PLACEMENT_OPTIONS",
+      "code": "OK",
+      "sql": "SELECT COUNT(*) AS n FROM INFORMATION_SCHEMA.PLACEMENT_OPTIONS",
+      "sample": [
+        {
+          "n": "1"
+        }
+      ]
+    },
+    {
+      "label": "nov18/locality-options",
+      "code": "OK",
+      "sql": "SELECT LOCALITY_GROUP_NAME, OPTION_NAME, OPTION_VALUE, IS_INHERITED FROM INFORMATION_SCHEMA.LOCALITY_GROUP_OPTIONS ORDER BY 1,2",
+      "sample": [
+        {
+          "IS_INHERITED": null,
+          "LOCALITY_GROUP_NAME": "default",
+          "OPTION_NAME": "ssd_to_hdd_spill_timespan",
+          "OPTION_VALUE": null
+        },
+        {
+          "IS_INHERITED": true,
+          "LOCALITY_GROUP_NAME": "default",
+          "OPTION_NAME": "storage",
+          "OPTION_VALUE": "ssd"
+        }
+      ]
+    },
+    {
+      "label": "nov18/column-options",
+      "code": "OK",
+      "sql": "SELECT OPTION_NAME, IS_INHERITED, COUNT(*) AS n FROM INFORMATION_SCHEMA.COLUMN_OPTIONS GROUP BY 1,2 ORDER BY 1,2",
+      "sample": []
+    },
+    {
+      "label": "nov18/index-options",
+      "code": "OK",
+      "sql": "SELECT INDEX_TYPE, OPTION_NAME, COUNT(*) AS n FROM INFORMATION_SCHEMA.INDEX_OPTIONS GROUP BY 1,2 ORDER BY 1,2",
+      "sample": []
+    },
+    {
+      "label": "nov18/hint-none",
+      "code": "OK",
+      "sql": "SELECT COUNT(*) AS n FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA='INFORMATION_SCHEMA'",
+      "sample": [
+        {
+          "n": "310"
+        }
+      ]
+    },
+    {
+      "label": "nov18/hint-RANDOMIZE_QUERY_ROOT=TRUE",
+      "code": "OK",
+      "sql": "@{RANDOMIZE_QUERY_ROOT=TRUE} SELECT COUNT(*) AS n FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA='INFORMATION_SCHEMA'",
+      "sample": [
+        {
+          "n": "310"
+        }
+      ]
+    },
+    {
+      "label": "nov18/hint-RANDOMIZE_QUERY_ROOT=FALSE",
+      "code": "OK",
+      "sql": "@{RANDOMIZE_QUERY_ROOT=FALSE} SELECT COUNT(*) AS n FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA='INFORMATION_SCHEMA'",
+      "sample": [
+        {
+          "n": "310"
+        }
+      ]
+    },
+    {
+      "label": "nov18/hint-RANDOMIZE_QUERY_ROOT=1",
+      "code": "InvalidArgument",
+      "sql": "@{RANDOMIZE_QUERY_ROOT=1} SELECT COUNT(*) AS n FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA='INFORMATION_SCHEMA'",
+      "sample": [],
+      "error": "spanner: code = \"InvalidArgument\", desc = \"Invalid hint value for: randomize_query_root.\", requestID = \"<redacted>\""
+    },
+    {
+      "label": "nov18/hint-RANDOMIZE_QUERY_ROOT=\"bad\"",
+      "code": "InvalidArgument",
+      "sql": "@{RANDOMIZE_QUERY_ROOT=\"bad\"} SELECT COUNT(*) AS n FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA='INFORMATION_SCHEMA'",
+      "sample": [],
+      "error": "spanner: code = \"InvalidArgument\", desc = \"Invalid hint value for: randomize_query_root.\", requestID = \"<redacted>\""
+    },
+    {
+      "label": "nov18/hint-RANDOMIZE_QUERY_ROOT_UNKNOWN=TRUE",
+      "code": "InvalidArgument",
+      "sql": "@{RANDOMIZE_QUERY_ROOT_UNKNOWN=TRUE} SELECT COUNT(*) AS n FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA='INFORMATION_SCHEMA'",
+      "sample": [],
+      "error": "spanner: code = \"InvalidArgument\", desc = \"Unsupported hint: RANDOMIZE_QUERY_ROOT_UNKNOWN.\", requestID = \"<redacted>\""
+    },
+    {
+      "label": "nov18/hint-USE_ADDITIONAL_PARALLELISM=TRUE",
+      "code": "OK",
+      "sql": "@{USE_ADDITIONAL_PARALLELISM=TRUE} SELECT COUNT(*) AS n FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA='INFORMATION_SCHEMA'",
+      "sample": [
+        {
+          "n": "310"
+        }
+      ]
+    },
+    {
+      "label": "nov18/hint-RANDOMIZE_QUERY_ROOT=TRUE,USE_ADDITIONAL_PARALLELISM=TRUE",
+      "code": "OK",
+      "sql": "@{RANDOMIZE_QUERY_ROOT=TRUE,USE_ADDITIONAL_PARALLELISM=TRUE} SELECT COUNT(*) AS n FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA='INFORMATION_SCHEMA'",
+      "sample": [
+        {
+          "n": "310"
+        }
+      ]
+    }
+  ],
+  "inspection": {
+    "drift-canonical": {
+      "exit": 0,
+      "args": [
+        "test",
+        "-count=1",
+        "-v",
+        "-run",
+        "^Test(Drift_RealTableMetas|CanonicalDDL_RealSpanner)$",
+        "./infoschem"
+      ],
+      "ended": "2026-11-18T07:17:20.228799+00:00",
+      "canonical_statements": 0,
+      "generated_statements": 0
+    },
+    "information-schema": {
+      "exit": 0,
+      "args": [
+        "run",
+        "./cmd/infoschema-capture",
+        "check",
+        "--target",
+        "managed",
+        "--observations=3",
+        "--repo-root",
+        ".."
+      ],
+      "ended": "2026-11-18T07:17:23.086437+00:00",
+      "status": "producer_changed_only",
+      "surface_sha256": "89b4ab9e231d7d61bf417669b6f5d29d1715c3999058b905f60698bc1047c6b0",
+      "material_change": false
+    },
+    "spanner-sys": {
+      "exit": 0,
+      "args": [
+        "run",
+        "./cmd/spanner-sys-capture",
+        "check",
+        "--target",
+        "managed",
+        "--repo-root",
+        ".."
+      ],
+      "ended": "2026-11-18T07:17:25.407953+00:00",
+      "status": "producer_changed_only",
+      "surface_sha256": "016061fbe58ebf687727bab9f31154ba29205d8e45e25fd65fc55b9b14cae8f0",
+      "material_change": false
+    }
+  },
+  "sources": {
+    "mirror_base": "103e2193ab35b06695c2b518a9ae6a4c7d90116c",
+    "mirror_head": "844901e61a5a0613216dd197d96ff4f6567bd6b8",
+    "intervening_commits": [
+      "3539e3ab91202b43340421e2d82953513eb71c0e",
+      "35d5e0331e5a7d5399c304ce4991f18647023977",
+      "e7ec1e425f08cee8f50e9d30bb21d436d157ace9",
+      "6d18f5f7f3d82533c8682c3e9008a19f33f9629b",
+      "d5950779f34db54cf5945c989b7dae8b9b0fd7a2",
+      "844901e61a5a0613216dd197d96ff4f6567bd6b8"
+    ],
+    "net_changed_paths": 68,
+    "managed_release_notes": {
+      "url": "https://docs.cloud.google.com/spanner/docs/release-notes",
+      "latest_heading": "2026-11-10"
+    },
+    "omni_release_notes": {
+      "url": "https://docs.cloud.google.com/spanner-omni/release-notes",
+      "latest_heading": "2026-10-29"
+    },
+    "tags": [
+      "https://us-docker.pkg.dev/v2/spanner-omni/images/spanner-omni/tags/list",
+      "https://gcr.io/v2/cloud-spanner-emulator/emulator/tags/list"
+    ],
+    "emulator_github_release": {
+      "url": "https://github.com/GoogleCloudPlatform/cloud-spanner-emulator/releases/tag/v1.5.59",
+      "published_at": "2026-10-14T04:17:58Z"
+    },
+    "version_check_utc": "2026-11-18T07:21:34.187205+00:00",
+    "pins_at": "de53ff8bfd9977bdfee84523fa4af48a7e268a13",
+    "images": [
+      {
+        "tag": "2026.r4-lts.2",
+        "image_index": "sha256:4a9a23c1f24c0c73c2d0b5891f71966faf72b172cf9cbf341559f4a3f2db186f",
+        "platforms": {
+          "linux/amd64": "sha256:5c585b2e7d0a25730abf7db86dab75e47070de01d0de074e8d653ecbf84a50ef",
+          "linux/arm64": "sha256:b607b10bee3c1903f0a7f88f99bece67cb0dd9d9a028aee64226fc311bd78dae"
+        }
+      },
+      {
+        "tag": "2026.r5.1",
+        "image_index": "sha256:75330f6b09e6fce401d3245a14819650cf9f9db05ba514a6ca099ddcb4018a8b",
+        "platforms": {
+          "linux/amd64": "sha256:9a811aa0230d43a8dcf20fa053699a1c08f15b24c39a1e7db6966e59d516d9bd",
+          "linux/arm64": "sha256:b918acd3c785bd13733d7dca6e6c029ef4ab8d7b63a0cd28800210a9bf976516"
+        }
+      },
+      {
+        "tag": "1.5.59",
+        "image_index": "sha256:5f71fecd6330211789b75065ade9587d67b3a6b4678e7e5408e42c22f778c63e",
+        "platforms": {
+          "linux/arm64": "sha256:969af6a9349948fbfb4a826c18e160e258a4005f7c759f8e7f2dcec369cccba8",
+          "linux/amd64": "sha256:f9212d99a52ee9bf39b6e4b397eab09b90d87327dca7a985110801456b40dc9d"
+        }
+      }
+    ]
+  },
+  "limits": [
+    "No managed service build or fleet rollout date is inferred. The hint probes establish acceptance and type validation, not coordinator selection.",
+    "No fixture, DDL/DML, PostgreSQL database, or Omni/Emulator runtime was exercised. Table/index/column option views had no user-object rows. Registry checks are publication evidence only."
+  ]
+}

@@ -1,0 +1,967 @@
+{
+  "scope": "Independent disposable databases, empty rows, default schema, ascending scalar keys. PLAN uses ExecuteSqlRequest.PLAN.",
+  "documents": [
+    {
+      "url": "https://docs.cloud.google.com/spanner/docs/foreign-keys/overview",
+      "content_sha256": "cb6e7b7b2d4c9aeba00aac45258751e1660c398785405825c7b917d5d464d137"
+    },
+    {
+      "url": "https://docs.cloud.google.com/spanner/docs/foreign-keys/how-to",
+      "content_sha256": "067daa48cb97d14dba2359a11a66e08f7d6701a3fa9d404b989f1455b00939d4"
+    },
+    {
+      "url": "https://docs.cloud.google.com/spanner/docs/information-schema",
+      "content_sha256": "b8511d2f46abe80209b1cf67b055d739aad0ec909c463c6f05ecfc9ce2ada5e4"
+    },
+    {
+      "url": "https://docs.cloud.google.com/spanner/docs/information-schema-pg",
+      "content_sha256": "c45b7b3ac5c025a57911dd881d32f73a053d3d9e1cabdc79128380072088c828"
+    },
+    {
+      "url": "https://docs.cloud.google.com/spanner/docs/reference/standard-sql/query-syntax",
+      "content_sha256": "ca957a5e77f5ffd19917f092f0a23a22e6aaef9e97f3e13b364be3f8f584bc10"
+    },
+    {
+      "url": "https://docs.cloud.google.com/spanner/docs/reference/postgresql/pg-system-catalog-tables",
+      "content_sha256": "b1dbc1a44bd9ae37e3c7ff6571a56e5c3ff353195e071d46360d1a6ca6e7d28f"
+    },
+    {
+      "url": "https://docs.cloud.google.com/spanner/docs/reference/postgresql/query-syntax",
+      "content_sha256": "a5a599f18475c5da9672550f765c81ad5290842bce29f7494438d49fcd3ba350"
+    },
+    {
+      "url": "https://docs.cloud.google.com/spanner/docs/secondary-indexes",
+      "content_sha256": "00e4ba6b3858802f98c625354b68ad1d1783f0c34617ee9df7530154114422cb"
+    }
+  ],
+  "input_sha256": {
+    "google": "8b162845d02b690d193a696621e8163cfaa9cfc5c6bc5c77b7e829e4188c0e61",
+    "control-google": "7a1af79ad700cf779d4900088d720a7400e0d6e22b1ea847161691cc69cbc86e",
+    "hints-google": "7e747288b7cbb782b1fd08a09b2ae480a114bbefe8e3ffd09c5b2fa7424462df",
+    "pg": "90281277f259481ceb5efd2e62192abb37f38ce31a7f841216dc2a301bc21eb5",
+    "control-pg": "ed0809475c1186f851e58a7eb894747970cab1cd4fbad964924ed59593ed7c9e",
+    "hints-pg": "b6d39b3ad2f578323ceae229d8bcdc0e56af4e61d33fc6ec213e5e090ae2bafa"
+  },
+  "local_images": {
+    "emulator": "gcr.io/cloud-spanner-emulator/emulator:1.5.59@sha256:969af6a9349948fbfb4a826c18e160e258a4005f7c759f8e7f2dcec369cccba8",
+    "omni-lts": "us-docker.pkg.dev/spanner-omni/images/spanner-omni:2026.r4-lts.2@sha256:b607b10bee3c1903f0a7f88f99bece67cb0dd9d9a028aee64226fc311bd78dae",
+    "omni-r5": "us-docker.pkg.dev/spanner-omni/images/spanner-omni:2026.r5.1@sha256:b918acd3c785bd13733d7dca6e6c029ef4ab8d7b63a0cd28800210a9bf976516"
+  },
+  "local_producer_source_sha256": "e75ab7d8871cad28747a419ba4437840c7a1f5385a54779d9f79e77d01f25b03",
+  "managed_producer_source_sha256": "69769c4400cdd3a3dc4b621556d9f3df85acacfe3991f51a0691d81fdf7b41cb",
+  "forecast": {
+    "source": "Omni 2026.r4-lts.2, GoogleSQL, before fresh managed fixture",
+    "observed_utc": "2026-11-18T14:48:57.636515+00:00",
+    "ordered_names": [
+      "IDX_c_code_N_E985B7CD5F04A313",
+      "IDX_cc_x_y_N_E25E6B8EDD63FF7F",
+      "IDX_cc_y_x_N_4ED5E199599716A1",
+      "IDX_p_code_U_43F4D4B2D4523DE8",
+      "IDX_pa_a_b_U_C7B7753AEF81FC01",
+      "IDX_pb_a_b_U_26F35C40252AA9AD",
+      "IDX_q_code_U_22DAB7E7066E760A"
+    ],
+    "case_targets": {
+      "child-p": "IDX_c_code_N_E985B7CD5F04A313",
+      "child-q": "IDX_c_code_N_E985B7CD5F04A313",
+      "reverse": "IDX_cc_y_x_N_4ED5E199599716A1",
+      "forward": "IDX_cc_x_y_N_E25E6B8EDD63FF7F",
+      "survivor": "IDX_c_code_N_E985B7CD5F04A313"
+    }
+  },
+  "forecast_sha256": "baa6baa4756746309be335319cf44f1438b80406fd12de45bee49e7a7d2a2c4b",
+  "catalog_value_fields": [
+    "table",
+    "key_columns_in_order",
+    "is_unique",
+    "is_null_filtered"
+  ],
+  "catalogs": {
+    "emulator": {
+      "IDX_c_code_N_D99AE4F461677C4A": [
+        "c",
+        [
+          "code"
+        ],
+        false,
+        true
+      ],
+      "IDX_cc_x_y_N_BDDE6238CE336FFB": [
+        "cc",
+        [
+          "x",
+          "y"
+        ],
+        false,
+        true
+      ],
+      "IDX_cc_y_x_N_C0D2FCC07DC20A4A": [
+        "cc",
+        [
+          "y",
+          "x"
+        ],
+        false,
+        true
+      ],
+      "IDX_p_code_U_01E1F8F9B918D93F": [
+        "p",
+        [
+          "code"
+        ],
+        true,
+        true
+      ],
+      "IDX_pa_a_b_U_A7033170978F0A12": [
+        "pa",
+        [
+          "a",
+          "b"
+        ],
+        true,
+        true
+      ],
+      "IDX_pb_a_b_U_CCCED6FD492A3ABA": [
+        "pb",
+        [
+          "a",
+          "b"
+        ],
+        true,
+        true
+      ],
+      "IDX_q_code_U_FD5FDFED06610F92": [
+        "q",
+        [
+          "code"
+        ],
+        true,
+        true
+      ]
+    },
+    "managed-omni": {
+      "IDX_c_code_N_E985B7CD5F04A313": [
+        "c",
+        [
+          "code"
+        ],
+        false,
+        true
+      ],
+      "IDX_cc_x_y_N_E25E6B8EDD63FF7F": [
+        "cc",
+        [
+          "x",
+          "y"
+        ],
+        false,
+        true
+      ],
+      "IDX_cc_y_x_N_4ED5E199599716A1": [
+        "cc",
+        [
+          "y",
+          "x"
+        ],
+        false,
+        true
+      ],
+      "IDX_p_code_U_43F4D4B2D4523DE8": [
+        "p",
+        [
+          "code"
+        ],
+        true,
+        true
+      ],
+      "IDX_pa_a_b_U_C7B7753AEF81FC01": [
+        "pa",
+        [
+          "a",
+          "b"
+        ],
+        true,
+        true
+      ],
+      "IDX_pb_a_b_U_26F35C40252AA9AD": [
+        "pb",
+        [
+          "a",
+          "b"
+        ],
+        true,
+        true
+      ],
+      "IDX_q_code_U_22DAB7E7066E760A": [
+        "q",
+        [
+          "code"
+        ],
+        true,
+        true
+      ]
+    }
+  },
+  "primary_profiles": {
+    "emulator-google": {
+      "non_ok": {
+        "InvalidArgument": [
+          "child-p",
+          "child-q",
+          "parent-p",
+          "wrong-table",
+          "unknown",
+          "nullable-without-filter",
+          "covered-child",
+          "covered-parent",
+          "reverse",
+          "forward",
+          "normal-child",
+          "normal-unknown",
+          "dropped-alias",
+          "survivor",
+          "informational-child",
+          "informational-parent"
+        ]
+      },
+      "plan_scans": {
+        "explicit-user-index": [],
+        "base": []
+      },
+      "fk_rev_pairs": [
+        [
+          "x",
+          "a",
+          1
+        ],
+        [
+          "y",
+          "b",
+          2
+        ]
+      ],
+      "parent_constraint": {
+        "fk_covered": "PK_p",
+        "fk_fwd": "IDX_pb_a_b_U_CCCED6FD492A3ABA",
+        "fk_p": "IDX_p_code_U_01E1F8F9B918D93F",
+        "fk_q": "IDX_q_code_U_FD5FDFED06610F92",
+        "fk_rev": "IDX_pa_a_b_U_A7033170978F0A12"
+      },
+      "tables_with_managed_indexes_among_c_p_q": {
+        "after-p": [
+          "c",
+          "p"
+        ],
+        "after-q": [
+          "c",
+          "p",
+          "q"
+        ],
+        "after-drop-p": [
+          "c",
+          "q"
+        ],
+        "after-drop-q": [],
+        "informational-layout": [
+          "p"
+        ]
+      }
+    },
+    "emulator-pg": {
+      "non_ok": {
+        "InvalidArgument": [
+          "child-p",
+          "child-q",
+          "parent-p",
+          "wrong-table",
+          "unknown",
+          "nullable-without-filter",
+          "covered-child",
+          "covered-parent",
+          "reverse",
+          "forward",
+          "normal-child",
+          "normal-unknown",
+          "dropped-alias",
+          "survivor",
+          "fk_info"
+        ],
+        "NOT_RUN": [
+          "informational-layout",
+          "informational-reference",
+          "informational-child",
+          "informational-parent"
+        ]
+      },
+      "plan_scans": {
+        "explicit-user-index": [],
+        "base": []
+      },
+      "fk_rev_pairs": [
+        [
+          "x",
+          "a",
+          1
+        ],
+        [
+          "y",
+          "b",
+          2
+        ]
+      ],
+      "parent_constraint": {
+        "fk_covered": "PK_p",
+        "fk_fwd": "IDX_pb_a_b_U_CCCED6FD492A3ABA",
+        "fk_p": "IDX_p_code_U_01E1F8F9B918D93F",
+        "fk_q": "IDX_q_code_U_FD5FDFED06610F92",
+        "fk_rev": "IDX_pa_a_b_U_A7033170978F0A12"
+      },
+      "pg_conindid_null_rows": 5,
+      "tables_with_managed_indexes_among_c_p_q": {
+        "after-p": [
+          "c",
+          "p"
+        ],
+        "after-q": [
+          "c",
+          "p",
+          "q"
+        ],
+        "after-drop-p": [
+          "c",
+          "q"
+        ],
+        "after-drop-q": []
+      }
+    },
+    "service-google": {
+      "non_ok": {
+        "InvalidArgument": [
+          "parent-p",
+          "wrong-table",
+          "unknown",
+          "nullable-without-filter",
+          "covered-child",
+          "covered-parent",
+          "normal-unknown",
+          "dropped-alias",
+          "informational-child",
+          "informational-parent"
+        ]
+      },
+      "plan_scans": {
+        "child-p": [
+          [
+            "IndexScan",
+            "IDX_c_code_N_E985B7CD5F04A313"
+          ]
+        ],
+        "child-q": [
+          [
+            "IndexScan",
+            "IDX_c_code_N_E985B7CD5F04A313"
+          ]
+        ],
+        "explicit-user-index": [
+          [
+            "IndexScan",
+            "ix_c_code"
+          ]
+        ],
+        "base": [
+          [
+            "TableScan",
+            "c"
+          ]
+        ],
+        "reverse": [
+          [
+            "IndexScan",
+            "IDX_cc_y_x_N_4ED5E199599716A1"
+          ]
+        ],
+        "forward": [
+          [
+            "IndexScan",
+            "IDX_cc_x_y_N_E25E6B8EDD63FF7F"
+          ]
+        ],
+        "survivor": [
+          [
+            "IndexScan",
+            "IDX_c_code_N_E985B7CD5F04A313"
+          ]
+        ]
+      },
+      "fk_rev_pairs": [
+        [
+          "x",
+          "b",
+          2
+        ],
+        [
+          "y",
+          "a",
+          1
+        ]
+      ],
+      "parent_constraint": {
+        "fk_covered": "PK_p",
+        "fk_fwd": "IDX_pb_a_b_U_26F35C40252AA9AD",
+        "fk_p": "IDX_p_code_U_43F4D4B2D4523DE8",
+        "fk_q": "IDX_q_code_U_22DAB7E7066E760A",
+        "fk_rev": "IDX_pa_a_b_U_C7B7753AEF81FC01"
+      },
+      "tables_with_managed_indexes_among_c_p_q": {
+        "after-p": [
+          "c",
+          "p"
+        ],
+        "after-q": [
+          "c",
+          "p",
+          "q"
+        ],
+        "after-drop-p": [
+          "c",
+          "q"
+        ],
+        "after-drop-q": [],
+        "informational-layout": [
+          "p"
+        ]
+      }
+    },
+    "service-pg": {
+      "non_ok": {
+        "InvalidArgument": [
+          "parent-p",
+          "wrong-table",
+          "unknown",
+          "nullable-without-filter",
+          "covered-child",
+          "covered-parent",
+          "normal-unknown",
+          "dropped-alias",
+          "fk_info"
+        ],
+        "NOT_RUN": [
+          "informational-layout",
+          "informational-reference",
+          "informational-child",
+          "informational-parent"
+        ]
+      },
+      "plan_scans": {
+        "child-p": [
+          [
+            "IndexScan",
+            "IDX_c_code_N_E985B7CD5F04A313"
+          ]
+        ],
+        "child-q": [
+          [
+            "IndexScan",
+            "IDX_c_code_N_E985B7CD5F04A313"
+          ]
+        ],
+        "explicit-user-index": [
+          [
+            "IndexScan",
+            "ix_c_code"
+          ]
+        ],
+        "base": [
+          [
+            "TableScan",
+            "c"
+          ]
+        ],
+        "reverse": [
+          [
+            "IndexScan",
+            "IDX_cc_y_x_N_4ED5E199599716A1"
+          ]
+        ],
+        "forward": [
+          [
+            "IndexScan",
+            "IDX_cc_x_y_N_E25E6B8EDD63FF7F"
+          ]
+        ],
+        "survivor": [
+          [
+            "IndexScan",
+            "IDX_c_code_N_E985B7CD5F04A313"
+          ]
+        ]
+      },
+      "fk_rev_pairs": [
+        [
+          "x",
+          "b",
+          2
+        ],
+        [
+          "y",
+          "a",
+          1
+        ]
+      ],
+      "parent_constraint": {
+        "fk_covered": "PK_p",
+        "fk_fwd": "IDX_pb_a_b_U_26F35C40252AA9AD",
+        "fk_p": "IDX_p_code_U_43F4D4B2D4523DE8",
+        "fk_q": "IDX_q_code_U_22DAB7E7066E760A",
+        "fk_rev": "IDX_pa_a_b_U_C7B7753AEF81FC01"
+      },
+      "pg_conindid_null_rows": 5,
+      "tables_with_managed_indexes_among_c_p_q": {
+        "after-p": [
+          "c",
+          "p"
+        ],
+        "after-q": [
+          "c",
+          "p",
+          "q"
+        ],
+        "after-drop-p": [
+          "c",
+          "q"
+        ],
+        "after-drop-q": []
+      }
+    }
+  },
+  "local_composite_controls": {
+    "emulator": {
+      "exported_fk_rev": "(x, y) REFERENCES pa(b, a)",
+      "fk_rev": [
+        [
+          "x",
+          "a",
+          1
+        ],
+        [
+          "x",
+          "a",
+          1
+        ],
+        [
+          "y",
+          "b",
+          2
+        ],
+        [
+          "y",
+          "b",
+          2
+        ]
+      ],
+      "fk_pk": [
+        [
+          "v",
+          "a",
+          1
+        ],
+        [
+          "w",
+          "b",
+          2
+        ]
+      ],
+      "shared_parent_kcu_rows_per_key": {
+        "a": 2,
+        "b": 2
+      },
+      "cc_keys": {
+        "all-indexes": [
+          [
+            "x",
+            "y"
+          ],
+          [
+            "y",
+            "x"
+          ]
+        ],
+        "one-remaining": [
+          [
+            "x",
+            "y"
+          ]
+        ],
+        "none-remaining": []
+      }
+    },
+    "omni": {
+      "exported_fk_rev": "(x, y) REFERENCES pa(b, a)",
+      "fk_rev": [
+        [
+          "x",
+          "b",
+          2
+        ],
+        [
+          "y",
+          "a",
+          1
+        ]
+      ],
+      "fk_pk": [
+        [
+          "v",
+          "b",
+          2
+        ],
+        [
+          "w",
+          "a",
+          1
+        ]
+      ],
+      "shared_parent_kcu_rows_per_key": {
+        "a": 1,
+        "b": 1
+      },
+      "cc_keys": {
+        "all-indexes": [
+          [
+            "x",
+            "y"
+          ],
+          [
+            "y",
+            "x"
+          ]
+        ],
+        "one-remaining": [
+          [
+            "x",
+            "y"
+          ]
+        ],
+        "none-remaining": []
+      }
+    }
+  },
+  "local_physical_name_controls": {
+    "emulator": {
+      "constraint-name": "InvalidArgument",
+      "managed-index-name": "OK",
+      "emulator-index-name": "InvalidArgument",
+      "user-index-name": "OK"
+    },
+    "omni-lts": {
+      "constraint-name": "OK",
+      "managed-index-name": "OK",
+      "emulator-index-name": "InvalidArgument",
+      "user-index-name": "OK"
+    }
+  },
+  "emulator_readme_sha256": "678304f5050de359846e89cfc8edaca7377ec8b8d2a5b81c07c43a83ec53e447",
+  "runs": [
+    {
+      "engine": "emulator",
+      "dialect": "google",
+      "suite": "primary",
+      "observed_utc": [
+        "2026-11-18T14:44:18.160146Z",
+        "2026-11-18T14:44:18.278927Z"
+      ],
+      "planned": 36,
+      "outcomes": {
+        "InvalidArgument": 16,
+        "OK": 20
+      },
+      "reported_managed_key_order": [
+        "ASC"
+      ],
+      "catalog": "emulator",
+      "emulator_recipe_name_matches": 7,
+      "results": "emulator-google"
+    },
+    {
+      "engine": "emulator",
+      "dialect": "pg",
+      "suite": "primary",
+      "observed_utc": [
+        "2026-11-18T14:45:11.38231Z",
+        "2026-11-18T14:45:11.691287Z"
+      ],
+      "planned": 37,
+      "outcomes": {
+        "InvalidArgument": 15,
+        "NOT_RUN": 4,
+        "OK": 18
+      },
+      "reported_managed_key_order": [
+        "ASC NULLS FIRST"
+      ],
+      "catalog": "emulator",
+      "emulator_recipe_name_matches": 7,
+      "results": "emulator-pg"
+    },
+    {
+      "engine": "omni-lts",
+      "dialect": "google",
+      "suite": "primary",
+      "observed_utc": [
+        "2026-11-18T14:44:31.378538Z",
+        "2026-11-18T14:48:16.295385Z"
+      ],
+      "planned": 36,
+      "outcomes": {
+        "InvalidArgument": 10,
+        "OK": 26
+      },
+      "reported_managed_key_order": [
+        "ASC"
+      ],
+      "catalog": "managed-omni",
+      "emulator_recipe_name_matches": 0,
+      "results": "service-google"
+    },
+    {
+      "engine": "omni-lts",
+      "dialect": "pg",
+      "suite": "primary",
+      "observed_utc": [
+        "2026-11-18T14:48:16.47716Z",
+        "2026-11-18T14:52:25.276299Z"
+      ],
+      "planned": 37,
+      "outcomes": {
+        "InvalidArgument": 9,
+        "NOT_RUN": 4,
+        "OK": 24
+      },
+      "reported_managed_key_order": [
+        "ASC NULLS FIRST"
+      ],
+      "catalog": "managed-omni",
+      "emulator_recipe_name_matches": 0,
+      "results": "service-pg"
+    },
+    {
+      "engine": "omni-r5",
+      "dialect": "google",
+      "suite": "primary",
+      "observed_utc": [
+        "2026-11-18T14:48:07.224426Z",
+        "2026-11-18T14:52:23.83085Z"
+      ],
+      "planned": 36,
+      "outcomes": {
+        "InvalidArgument": 10,
+        "OK": 26
+      },
+      "reported_managed_key_order": [
+        "ASC"
+      ],
+      "catalog": "managed-omni",
+      "emulator_recipe_name_matches": 0,
+      "results": "service-google"
+    },
+    {
+      "engine": "omni-r5",
+      "dialect": "pg",
+      "suite": "primary",
+      "observed_utc": [
+        "2026-11-18T14:52:24.329257Z",
+        "2026-11-18T14:57:21.752836Z"
+      ],
+      "planned": 37,
+      "outcomes": {
+        "InvalidArgument": 9,
+        "NOT_RUN": 4,
+        "OK": 24
+      },
+      "reported_managed_key_order": [
+        "ASC NULLS FIRST"
+      ],
+      "catalog": "managed-omni",
+      "emulator_recipe_name_matches": 0,
+      "results": "service-pg"
+    },
+    {
+      "engine": "emulator",
+      "dialect": "google",
+      "suite": "controls",
+      "observed_utc": [
+        "2026-11-18T14:52:32.019632Z",
+        "2026-11-18T14:52:32.057712Z"
+      ],
+      "planned": 13,
+      "outcomes": {
+        "OK": 13
+      },
+      "results": "emulator"
+    },
+    {
+      "engine": "emulator",
+      "dialect": "pg",
+      "suite": "controls",
+      "observed_utc": [
+        "2026-11-18T14:52:31.544239Z",
+        "2026-11-18T14:52:31.810729Z"
+      ],
+      "planned": 13,
+      "outcomes": {
+        "OK": 13
+      },
+      "results": "emulator"
+    },
+    {
+      "engine": "omni-lts",
+      "dialect": "google",
+      "suite": "controls",
+      "observed_utc": [
+        "2026-11-18T14:53:43.61332Z",
+        "2026-11-18T14:56:05.842494Z"
+      ],
+      "planned": 13,
+      "outcomes": {
+        "OK": 13
+      },
+      "results": "omni"
+    },
+    {
+      "engine": "omni-lts",
+      "dialect": "pg",
+      "suite": "controls",
+      "observed_utc": [
+        "2026-11-18T14:56:06.046723Z",
+        "2026-11-18T14:58:56.785549Z"
+      ],
+      "planned": 13,
+      "outcomes": {
+        "OK": 13
+      },
+      "results": "omni"
+    },
+    {
+      "engine": "managed",
+      "dialect": "google",
+      "suite": "primary",
+      "observed_utc": [
+        "2026-11-18T15:00:34.042526Z",
+        "2026-11-18T15:08:56.909308Z"
+      ],
+      "planned": 36,
+      "outcomes": {
+        "InvalidArgument": 10,
+        "OK": 26
+      },
+      "reported_managed_key_order": [
+        "ASC"
+      ],
+      "catalog": "managed-omni",
+      "emulator_recipe_name_matches": 0,
+      "results": "service-google",
+      "lifecycle": {
+        "create-database": "OK",
+        "drop-database": "OK",
+        "database-absent": "NotFound"
+      },
+      "lifecycle_utc": {
+        "create-database": "2026-11-18T15:00:34.038526Z",
+        "drop-database": "2026-11-18T15:09:06.112892Z",
+        "database-absent": "2026-11-18T15:09:06.294043Z"
+      }
+    },
+    {
+      "engine": "managed",
+      "dialect": "pg",
+      "suite": "primary",
+      "observed_utc": [
+        "2026-11-18T15:00:35.227357Z",
+        "2026-11-18T15:09:22.096296Z"
+      ],
+      "planned": 37,
+      "outcomes": {
+        "InvalidArgument": 9,
+        "NOT_RUN": 4,
+        "OK": 24
+      },
+      "reported_managed_key_order": [
+        "ASC NULLS FIRST"
+      ],
+      "catalog": "managed-omni",
+      "emulator_recipe_name_matches": 0,
+      "results": "service-pg",
+      "lifecycle": {
+        "create-database": "OK",
+        "drop-database": "OK",
+        "database-absent": "NotFound"
+      },
+      "lifecycle_utc": {
+        "create-database": "2026-11-18T15:00:35.223564Z",
+        "drop-database": "2026-11-18T15:09:31.503053Z",
+        "database-absent": "2026-11-18T15:09:31.541411Z"
+      }
+    },
+    {
+      "engine": "emulator",
+      "dialect": "google",
+      "suite": "physical-hints",
+      "planned": 8,
+      "observed_utc": [
+        "2026-11-18T15:10:55.767113Z",
+        "2026-11-18T15:10:55.795291Z"
+      ],
+      "outcomes": {
+        "InvalidArgument": 2,
+        "OK": 6
+      },
+      "results": "emulator"
+    },
+    {
+      "engine": "emulator",
+      "dialect": "pg",
+      "suite": "physical-hints",
+      "planned": 8,
+      "observed_utc": [
+        "2026-11-18T15:10:56.602962Z",
+        "2026-11-18T15:10:56.832444Z"
+      ],
+      "outcomes": {
+        "InvalidArgument": 2,
+        "OK": 6
+      },
+      "results": "emulator"
+    },
+    {
+      "engine": "omni-lts",
+      "dialect": "google",
+      "suite": "physical-hints",
+      "planned": 8,
+      "observed_utc": [
+        "2026-11-18T15:11:02.664886Z",
+        "2026-11-18T15:12:51.44856Z"
+      ],
+      "outcomes": {
+        "InvalidArgument": 1,
+        "OK": 7
+      },
+      "results": "omni-lts"
+    },
+    {
+      "engine": "omni-lts",
+      "dialect": "pg",
+      "suite": "physical-hints",
+      "planned": 8,
+      "observed_utc": [
+        "2026-11-18T15:12:53.731184Z",
+        "2026-11-18T15:15:01.638768Z"
+      ],
+      "outcomes": {
+        "InvalidArgument": 1,
+        "OK": 7
+      },
+      "results": "omni-lts"
+    }
+  ],
+  "setup_note": "An extra PostgreSQL Emulator database bootstrap returned AlreadyExists before SQL. The separate PostgreSQL run completed its own fixture. Every local container reported closure."
+}
