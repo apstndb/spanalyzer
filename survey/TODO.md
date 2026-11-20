@@ -5,7 +5,7 @@
 - [x] Recognize the live `VECTOR` index type and preserve round trips for `VECTOR_INDEX` snapshots produced by `FromDDLStatements`.
 - [x] Preserve user-specified vector index options when generating GoogleSQL DDL and omit the three system-optimized tree parameters.
 - [x] Report missing `distance_type` when incomplete catalog rows cannot supply a valid index definition.
-- [ ] Compare populated GoogleSQL and PostgreSQL `INDEX_OPTIONS` rows with `GetDatabaseDdl` and reapply the index definitions.
+- [x] Compared populated GoogleSQL and PostgreSQL `INDEX_OPTIONS` rows with `GetDatabaseDdl` and reapplied three index definitions per dialect. [Managed measurements](../knowledge/research/runtime-verification/evidence/managed-vector-options-20261120/receipt.json).
 
 ## Catalog observation resilience (2026-11-08)
 
