@@ -31,7 +31,7 @@ func (s *Schema) toIndexesDDL() ([]ast.DDL, error) {
 		if idx.SpannerIsManaged {
 			continue
 		}
-		if idx.IndexType == "VECTOR_INDEX" {
+		if isVectorIndexType(idx.IndexType) {
 			continue
 		}
 		if idx.IndexType != "INDEX" && idx.IndexType != "SEARCH" && idx.IndexType != "SEARCH_INDEX" {

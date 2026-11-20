@@ -1,0 +1,111 @@
+{
+  "observed_on_utc": "2026-11-20",
+  "fixture": {
+    "rows_per_table": 9,
+    "non_null_vectors": 8,
+    "rows": "For each table, insert (id, [id, 1, 2]) for id 1 through 8 and (9, NULL) before creating its index.",
+    "GoogleSQL": "CREATE TABLE items_auto (id INT64 NOT NULL, emb ARRAY<FLOAT32>(vector_length=>3)) PRIMARY KEY(id)",
+    "PostgreSQL": "CREATE TABLE items_auto (id bigint PRIMARY KEY, emb real[] VECTOR LENGTH 3)",
+    "other_tables": [
+      "items_explicit",
+      "items_branched"
+    ]
+  },
+  "read_options": "SELECT table_schema, table_name, index_name, index_type, option_name, option_type, option_value FROM information_schema.index_options WHERE table_name IN ('items_auto','items_explicit','items_branched') AND index_name IN ('vec_auto','vec_explicit','vec_branched') ORDER BY index_name, option_name",
+  "reference": "GetDatabaseDdl on the same populated database immediately before and after recreating all three indexes.",
+  "baseline_google_renderer": "ToDDLStatements: indexes: unsupported index type \"VECTOR\" for index \"vec_auto\"",
+  "dialects": {
+    "GoogleSQL": {
+      "index_type": "VECTOR",
+      "explicit_option_values_match_admin_ddl": true,
+      "option_rows": 15,
+      "canonical_statements_unchanged_after_replay": 3,
+      "identical_option_rows_after_replay": 15,
+      "replay_source": "survey/astconv.LoadSchema and Schema.ToDDLStatements",
+      "explicit_system_option_negative_controls": {
+        "system_optimized_tree_depth": "INVALID_ARGUMENT",
+        "system_optimized_num_leaves": "INVALID_ARGUMENT",
+        "system_optimized_num_branches": "INVALID_ARGUMENT"
+      },
+      "cases": {
+        "vec_auto": {
+          "admin_ddl": "CREATE VECTOR INDEX vec_auto ON items_auto(emb) WHERE emb IS NOT NULL OPTIONS (\n  distance_type = 'COSINE'\n)",
+          "system_options": {
+            "system_optimized_num_leaves": "1",
+            "system_optimized_tree_depth": "2"
+          },
+          "reapplied_ddl": "CREATE VECTOR INDEX vec_auto ON items_auto (emb) WHERE emb IS NOT NULL OPTIONS (distance_type = \"COSINE\")"
+        },
+        "vec_explicit": {
+          "admin_ddl": "CREATE VECTOR INDEX vec_explicit ON items_explicit(emb) WHERE emb IS NOT NULL OPTIONS (\n  tree_depth = 2,\n  num_leaves = 2,\n  distance_type = 'EUCLIDEAN'\n)",
+          "system_options": {
+            "system_optimized_num_leaves": "2",
+            "system_optimized_tree_depth": "2"
+          },
+          "reapplied_ddl": "CREATE VECTOR INDEX vec_explicit ON items_explicit (emb) WHERE emb IS NOT NULL OPTIONS (tree_depth = 2, num_leaves = 2, distance_type = \"EUCLIDEAN\")"
+        },
+        "vec_branched": {
+          "admin_ddl": "CREATE VECTOR INDEX vec_branched ON items_branched(emb) WHERE emb IS NOT NULL OPTIONS (\n  tree_depth = 3,\n  num_leaves = 4,\n  num_branches = 2,\n  distance_type = 'EUCLIDEAN'\n)",
+          "system_options": {
+            "system_optimized_num_branches": "2",
+            "system_optimized_num_leaves": "4",
+            "system_optimized_tree_depth": "3"
+          },
+          "reapplied_ddl": "CREATE VECTOR INDEX vec_branched ON items_branched (emb) WHERE emb IS NOT NULL OPTIONS (tree_depth = 3, num_leaves = 4, num_branches = 2, distance_type = \"EUCLIDEAN\")"
+        }
+      }
+    },
+    "PostgreSQL": {
+      "index_type": "ScaNN",
+      "explicit_option_values_match_admin_ddl": true,
+      "option_rows": 15,
+      "canonical_statements_unchanged_after_replay": 3,
+      "identical_option_rows_after_replay": 15,
+      "replay_source": "GetDatabaseDdl",
+      "explicit_system_option_negative_controls": {
+        "system_optimized_tree_depth": "INVALID_ARGUMENT",
+        "system_optimized_num_leaves": "INVALID_ARGUMENT",
+        "system_optimized_num_branches": "INVALID_ARGUMENT"
+      },
+      "cases": {
+        "vec_auto": {
+          "admin_ddl": "CREATE INDEX vec_auto ON items_auto USING ScaNN (emb) WITH (distance_type = 'COSINE') WHERE (emb IS NOT NULL)",
+          "system_options": {
+            "system_optimized_num_leaves": "1",
+            "system_optimized_tree_depth": "2"
+          }
+        },
+        "vec_explicit": {
+          "admin_ddl": "CREATE INDEX vec_explicit ON items_explicit USING ScaNN (emb) WITH (tree_depth = 2, num_leaves = 2, distance_type = 'EUCLIDEAN') WHERE (emb IS NOT NULL)",
+          "system_options": {
+            "system_optimized_num_leaves": "2",
+            "system_optimized_tree_depth": "2"
+          }
+        },
+        "vec_branched": {
+          "admin_ddl": "CREATE INDEX vec_branched ON items_branched USING ScaNN (emb) WITH (tree_depth = 3, num_leaves = 4, num_branches = 2, distance_type = 'EUCLIDEAN') WHERE (emb IS NOT NULL)",
+          "system_options": {
+            "system_optimized_num_branches": "2",
+            "system_optimized_num_leaves": "4",
+            "system_optimized_tree_depth": "3"
+          }
+        }
+      }
+    }
+  },
+  "cleanup": "Both owned databases returned NOT_FOUND after deletion.",
+  "renderer_rebuild": {
+    "toolchain": "go1.26.11 darwin/arm64",
+    "build": "GOWORK=off go build of the same render.go program from each survey module",
+    "byte_identical_to_executed_binaries": {
+      "baseline": {
+        "source_commit": "7bd98585b27f08a3070e4e158fc4730faa6a2f6c",
+        "binary_sha256": "68320d07f213fb71644c7cc861c7ae10d64aaf3646cb0d0be812fd15affd4edb"
+      },
+      "fixed": {
+        "source_commit": "c5692fa264937fc30db4ecf41c97418b37272f11",
+        "binary_sha256": "b2060c022ad1ce4c583ec478b1b403a3f2e0d4daa98240cd268321611c4cdc64"
+      }
+    }
+  }
+}

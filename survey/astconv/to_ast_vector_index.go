@@ -3,11 +3,17 @@ package astconv
 import (
 	"fmt"
 	"sort"
+	"strings"
 
 	"github.com/apstndb/spanalyzer/survey/infoschem"
 	"github.com/cloudspannerecosystem/memefish"
 	"github.com/cloudspannerecosystem/memefish/ast"
 )
+
+// Live GoogleSQL catalogs use VECTOR. FromDDLStatements uses VECTOR_INDEX.
+func isVectorIndexType(indexType string) bool {
+	return indexType == "VECTOR" || indexType == "VECTOR_INDEX"
+}
 
 func (s *Schema) toVectorIndexesDDL() ([]ast.DDL, error) {
 	idxCols := groupBy(s.IndexColumns, func(ic *infoschem.IndexColumn) string {
@@ -19,7 +25,7 @@ func (s *Schema) toVectorIndexesDDL() ([]ast.DDL, error) {
 
 	var ddls []ast.DDL
 	for _, idx := range s.Indexes {
-		if idx.IndexType != "VECTOR_INDEX" {
+		if !isVectorIndexType(idx.IndexType) {
 			continue
 		}
 		if idx.SpannerIsManaged {
@@ -77,14 +83,23 @@ func (s *Schema) toVectorIndexesDDL() ([]ast.DDL, error) {
 			cvi.Where = &ast.Where{Expr: expr}
 		}
 
-		// Options
-		if opts := idxOpts[key]; len(opts) > 0 {
-			var defs []*ast.OptionsDef
-			for _, o := range opts {
-				defs = append(defs, optionsDef(o.OptionName, parseOptionValue(o.OptionType, o.OptionValue)))
+		var defs []*ast.OptionsDef
+		hasDistanceType := false
+		for _, o := range idxOpts[key] {
+			// INDEX_OPTIONS also reports the effective tree shape chosen by Spanner.
+			// Only the corresponding unprefixed options can be set in DDL.
+			switch strings.ToLower(o.OptionName) {
+			case "system_optimized_tree_depth", "system_optimized_num_branches", "system_optimized_num_leaves":
+				continue
+			case "distance_type":
+				hasDistanceType = true
 			}
-			cvi.Options = mkOptions(defs...)
+			defs = append(defs, optionsDef(o.OptionName, parseOptionValue(o.OptionType, o.OptionValue)))
 		}
+		if !hasDistanceType {
+			return nil, fmt.Errorf("vector index %q has no distance_type in INDEX_OPTIONS", idx.IndexName)
+		}
+		cvi.Options = mkOptions(defs...)
 
 		ddls = append(ddls, cvi)
 	}
