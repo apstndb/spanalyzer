@@ -46,7 +46,7 @@ without exact times have no claimed internal order.
 | 2026-11-13 02:45 UTC, 1.5.59 arm64 | Backing-index naming | Both children were created in either order for uppercase and lowercase identifiers. After both definitions, the catalog returned a backing-index row for only the first child. | [Names and case matrix](../fk-full-name-analysis-20261113.md) |
 | 2026-11-16 JST, 1.5.59 arm64 | Composite FK validation | The consistency read found one child without a matching parent in the three-column fixture. The separate indexed control retained one valid row. | [Results by engine](../evidence/fk-validation-20261116/summary.json) |
 | 2026-11-18 UTC, 1.5.59 arm64 | FK catalog correction and hint comparison | Both dialects rejected the FK name as a hint and accepted the managed-generated physical name. The catalog paired reordered references incorrectly and repeated parent key rows when two FKs shared a parent unique index. DDL export preserved the declared pairs. | [FK backing-index resolution](../fk-backing-index-resolution-20261118.md) |
-| 2026-11-24 UTC, 1.5.59 arm64 | Bulk and scalar function privileges | All 24 bulk statements failed at DDL parsing. A role on a split setup returned 42 before grant, after grant and after revoke. | [SQL and engine comparison](../managed-placements-and-omni-privileges-20261124.md) |
+| 2026-11-24 UTC, 1.5.59 arm64 | First coverage | All 24 bulk privilege statements failed during DDL parsing. With the setup statements executed separately, the role returned 42 before the grant, after it and after the revoke. | [November 24](../managed-placements-and-omni-privileges-20261124.md) |
 
 ## Publication and source context
 

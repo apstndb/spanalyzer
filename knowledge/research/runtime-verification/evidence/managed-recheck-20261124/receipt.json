@@ -259,7 +259,11 @@
         ]
       }
     },
-    "canonical_ddl": "PASS",
+    "canonical_ddl": {
+      "outcome": "PASS",
+      "canonical_definitions": 0,
+      "generated_definitions": 0
+    },
     "drift_test": "FAIL on the six known SPANNER_SYS columns"
   },
   "local": {
@@ -374,6 +378,10 @@
           "sql": "REVOKE EXECUTE ON FUNCTION inventory.missing FROM ROLE role1",
           "code": "NotFound"
         }
+      ],
+      "comparison_observed_span_utc": [
+        "2026-11-21T16:15:39.338279Z",
+        "2026-11-21T16:20:56.19698Z"
       ]
     },
     "bulk_privileges": {

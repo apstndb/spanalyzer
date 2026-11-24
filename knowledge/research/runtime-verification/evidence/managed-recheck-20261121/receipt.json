@@ -298,7 +298,9 @@
         "ALTER TABLE num32 ADD COLUMN teq TOKENLIST AS (tokenize_number(x,comparison_type=>'equality')) HIDDEN",
         "CREATE SEARCH INDEX num32eq ON num32(gt,teq)",
         "ALTER TABLE num32 ADD COLUMN tall TOKENLIST AS (tokenize_number(x,comparison_type=>'all')) HIDDEN",
-        "CREATE SEARCH INDEX num32all ON num32(gt,tall)"
+        "CREATE SEARCH INDEX num32all ON num32(gt,tall)",
+        "CREATE SEARCH INDEX num32onlyeq ON num32(teq)",
+        "CREATE SEARCH INDEX num32onlyall ON num32(tall)"
       ],
       "seven_rows_sql": "INSERT INTO num32(id,x,gateval) VALUES (1,CAST('NaN' AS FLOAT32),1),(2,CAST(41 AS FLOAT32),1),(3,CAST(42 AS FLOAT32),1),(4,CAST(43 AS FLOAT32),1),(5,NULL,1),(6,CAST('NaN' AS FLOAT32),0),(7,CAST(41 AS FLOAT32),0)",
       "float64_substitution": "Use num64 and FLOAT64 instead of num32 and FLOAT32.",
@@ -351,6 +353,7 @@
         "f64/all": "Unimplemented"
       },
       "unavailable_float_index_routes": 48,
+      "float32_fixture_ddl_grpc": ["OK", "OK", "InvalidArgument", "FailedPrecondition", "InvalidArgument", "FailedPrecondition"],
       "index_ddl_errors": {
         "num32-eq-token": "Postgres function tokenize_number(real, text, text, double precision, double precision, double precision, bigint, bigint) is not supported",
         "num32-all-token": "Postgres function tokenize_number(real, text, text, double precision, double precision, double precision, bigint, bigint) is not supported",

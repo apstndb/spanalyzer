@@ -40,7 +40,7 @@ FROM SPANNER_SYS.QUERY_STATS_TOP_MINUTE
 WHERE FALSE
 ```
 
-`INFORMATION_SCHEMA` exposed 310 columns and canonical DDL reconstruction passed. `SPANNER_SYS` exposed 630 columns. Both catalog hashes matched November 21. The repository drift check still flags the six columns first observed on November 20, the lock latency distribution and its JSON form on the minute, ten-minute and hour `TXN_STATS_TOP` tables.
+`INFORMATION_SCHEMA` exposed 310 columns. The empty-schema canonical DDL check passed with zero definitions in both the administrative DDL and the reconstruction. `SPANNER_SYS` exposed 630 columns. Both catalog hashes matched November 21. The repository drift check still flags the six columns first observed on November 20, the lock latency distribution and its JSON form on the minute, ten-minute and hour `TXN_STATS_TOP` tables.
 
 ## What the documentation change covers
 
