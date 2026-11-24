@@ -1,0 +1,596 @@
+{
+  "date_utc": "2026-11-24",
+  "environment": "One regional managed Enterprise trial instance, existing GoogleSQL database, read-only. Local container platforms are recorded below.",
+  "managed": {
+    "baseline_date": "2026-11-21",
+    "baseline_database_scope": {
+      "existing-google": "same persistent database",
+      "google-stats": "same input SQL, previously run on a disposable GoogleSQL database"
+    },
+    "queries": {
+      "routine": 272,
+      "placement": 6,
+      "distribution_followup": 5
+    },
+    "first_pass_utc": [
+      "2026-11-24T00:35:11.249435Z",
+      "2026-11-24T00:35:21.416083Z"
+    ],
+    "replay": {
+      "existing-google": {
+        "n": 236,
+        "grpc": {
+          "OK": 176,
+          "InvalidArgument": 44,
+          "Unimplemented": 11,
+          "OutOfRange": 5
+        },
+        "code_or_type_changes": [
+          "new-readonly/distribution-agg-query-json"
+        ],
+        "row_multiset_changes": 32
+      },
+      "google-stats": {
+        "n": 36,
+        "grpc": {
+          "OK": 26,
+          "InvalidArgument": 10
+        },
+        "code_or_type_changes": [],
+        "row_multiset_changes": 3
+      }
+    },
+    "changed_query": {
+      "sql": "SELECT SPANNER_SYS.DISTRIBUTION_PERCENTILE(SPANNER_SYS.DISTRIBUTION_AGG(LATENCY_DISTRIBUTION_JSON_STRING), 99.0) AS p99 FROM SPANNER_SYS.QUERY_STATS_TOP_MINUTE WHERE INTERVAL_END > TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL 1 HOUR)",
+      "previous": {
+        "code": "OK",
+        "rows": [
+          {
+            "p99": 0.0647168
+          }
+        ]
+      },
+      "initial": {
+        "code": "InvalidArgument",
+        "rows": []
+      },
+      "service_detail": "Distribution-json-string input to SPANNER_SYS.DISTRIBUTION_PERCENTILE function cannot be NULL or EMPTY."
+    },
+    "distribution_controls": [
+      {
+        "label": "rolling-original",
+        "sql": "SELECT SPANNER_SYS.DISTRIBUTION_PERCENTILE(SPANNER_SYS.DISTRIBUTION_AGG(LATENCY_DISTRIBUTION_JSON_STRING), 99.0) AS p99 FROM SPANNER_SYS.QUERY_STATS_TOP_MINUTE WHERE INTERVAL_END > TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL 1 HOUR)",
+        "code": "OK",
+        "rows": [
+          {
+            "p99": 0.5751439360000015
+          }
+        ]
+      },
+      {
+        "label": "rolling-count-and-guard",
+        "sql": "WITH a AS (SELECT COUNT(*) AS n, COUNT(LATENCY_DISTRIBUTION_JSON_STRING) AS nonnull, SPANNER_SYS.DISTRIBUTION_AGG(LATENCY_DISTRIBUTION_JSON_STRING) AS h FROM SPANNER_SYS.QUERY_STATS_TOP_MINUTE WHERE INTERVAL_END > TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL 1 HOUR)) SELECT n, nonnull, h IS NULL AS null_hist, IF(h IS NULL,NULL,SPANNER_SYS.DISTRIBUTION_PERCENTILE(h,99.0)) AS p99 FROM a",
+        "code": "OK",
+        "rows": [
+          {
+            "n": "294",
+            "nonnull": "294",
+            "null_hist": false,
+            "p99": 0.5751439360000015
+          }
+        ]
+      },
+      {
+        "label": "empty",
+        "sql": "SELECT SPANNER_SYS.DISTRIBUTION_PERCENTILE(SPANNER_SYS.DISTRIBUTION_AGG(LATENCY_DISTRIBUTION_JSON_STRING), 99.0) AS p99 FROM SPANNER_SYS.QUERY_STATS_TOP_MINUTE WHERE FALSE",
+        "code": "InvalidArgument",
+        "rows": []
+      },
+      {
+        "label": "empty-count-and-guard",
+        "sql": "WITH a AS (SELECT COUNT(*) AS n, SPANNER_SYS.DISTRIBUTION_AGG(LATENCY_DISTRIBUTION_JSON_STRING) AS h FROM SPANNER_SYS.QUERY_STATS_TOP_MINUTE WHERE FALSE) SELECT n,h IS NULL AS null_hist,IF(h IS NULL,NULL,SPANNER_SYS.DISTRIBUTION_PERCENTILE(h,99.0)) AS p99 FROM a",
+        "code": "OK",
+        "rows": [
+          {
+            "n": "0",
+            "null_hist": true,
+            "p99": null
+          }
+        ]
+      },
+      {
+        "label": "fixed-sample",
+        "sql": "SELECT SPANNER_SYS.DISTRIBUTION_PERCENTILE(SPANNER_SYS.DISTRIBUTION_AGG(hist),99.0) AS p99 FROM UNNEST(['{\"BUCKET_COUNTS\":[-10,1],\"COUNT\":1,\"GROWTH_FACTOR\":2.0,\"MEAN\":647.0,\"NUM_FINITE_BUCKETS\":33,\"SCALE\":1.0,\"SUM_OF_SQUARED_DEVIATION\":0.0}']) AS hist",
+        "code": "OK",
+        "rows": [
+          {
+            "p99": 1018.88
+          }
+        ]
+      }
+    ],
+    "placements": {
+      "administrative_instance_partitions": [
+        {
+          "id": "default",
+          "state": "READY"
+        }
+      ],
+      "queries": [
+        {
+          "label": "placement/catalog-tables",
+          "sql": "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA='INFORMATION_SCHEMA' AND STRPOS(TABLE_NAME,'PLACEMENT')>0 ORDER BY TABLE_NAME",
+          "code": "OK",
+          "rows": [
+            {
+              "TABLE_NAME": "PLACEMENTS"
+            },
+            {
+              "TABLE_NAME": "PLACEMENT_OPTIONS"
+            }
+          ]
+        },
+        {
+          "label": "placement/catalog-columns",
+          "sql": "SELECT TABLE_NAME,COLUMN_NAME,ORDINAL_POSITION FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA='INFORMATION_SCHEMA' AND STRPOS(TABLE_NAME,'PLACEMENT')>0 ORDER BY TABLE_NAME,ORDINAL_POSITION",
+          "code": "OK",
+          "rows": [
+            {
+              "COLUMN_NAME": "PLACEMENT_NAME",
+              "ORDINAL_POSITION": "1",
+              "TABLE_NAME": "PLACEMENTS"
+            },
+            {
+              "COLUMN_NAME": "IS_DEFAULT",
+              "ORDINAL_POSITION": "2",
+              "TABLE_NAME": "PLACEMENTS"
+            },
+            {
+              "COLUMN_NAME": "PLACEMENT_NAME",
+              "ORDINAL_POSITION": "1",
+              "TABLE_NAME": "PLACEMENT_OPTIONS"
+            },
+            {
+              "COLUMN_NAME": "OPTION_NAME",
+              "ORDINAL_POSITION": "2",
+              "TABLE_NAME": "PLACEMENT_OPTIONS"
+            },
+            {
+              "COLUMN_NAME": "OPTION_TYPE",
+              "ORDINAL_POSITION": "3",
+              "TABLE_NAME": "PLACEMENT_OPTIONS"
+            },
+            {
+              "COLUMN_NAME": "OPTION_VALUE",
+              "ORDINAL_POSITION": "4",
+              "TABLE_NAME": "PLACEMENT_OPTIONS"
+            }
+          ]
+        },
+        {
+          "label": "placement/placements",
+          "sql": "SELECT * FROM INFORMATION_SCHEMA.PLACEMENTS",
+          "code": "OK",
+          "rows": [
+            {
+              "IS_DEFAULT": true,
+              "PLACEMENT_NAME": "default"
+            }
+          ]
+        },
+        {
+          "label": "placement/routing-option",
+          "sql": "SELECT OPTION_NAME,OPTION_TYPE,OPTION_VALUE FROM INFORMATION_SCHEMA.DATABASE_OPTIONS WHERE LOWER(OPTION_NAME)='per_placement_routing_metadata'",
+          "code": "OK",
+          "rows": []
+        },
+        {
+          "label": "placement/option-positive-control",
+          "sql": "SELECT OPTION_NAME,OPTION_TYPE,OPTION_VALUE FROM INFORMATION_SCHEMA.DATABASE_OPTIONS WHERE LOWER(OPTION_NAME)='database_dialect'",
+          "code": "OK",
+          "rows": [
+            {
+              "OPTION_NAME": "database_dialect",
+              "OPTION_TYPE": "STRING",
+              "OPTION_VALUE": "GOOGLE_STANDARD_SQL"
+            }
+          ]
+        },
+        {
+          "label": "placement-options",
+          "sql": "SELECT PLACEMENT_NAME,OPTION_NAME,OPTION_TYPE,OPTION_VALUE FROM INFORMATION_SCHEMA.PLACEMENT_OPTIONS ORDER BY 1,2",
+          "code": "OK",
+          "rows": [
+            {
+              "OPTION_NAME": "instance_partition",
+              "OPTION_TYPE": "STRING(MAX)",
+              "OPTION_VALUE": "default",
+              "PLACEMENT_NAME": "default"
+            }
+          ]
+        }
+      ]
+    },
+    "catalog": {
+      "ischema": {
+        "capture_exit": 0,
+        "against_checked_in_capture": "producer_changed_only",
+        "column_count": 310,
+        "surface_sha256": "89b4ab9e231d7d61bf417669b6f5d29d1715c3999058b905f60698bc1047c6b0",
+        "matches_nov21_surface": true
+      },
+      "sys": {
+        "capture_exit": 1,
+        "against_checked_in_capture": "surface_changed",
+        "column_count": 630,
+        "surface_sha256": "8576197c6f20f69c15f4beeaa37c5b1739a0fbe6c71d3cea994fac33043790a8",
+        "matches_nov21_surface": true,
+        "columns_above_repository_baseline": [
+          {
+            "table_name": "TXN_STATS_TOP_10MINUTE",
+            "column_name": "LOCK_LATENCY_DISTRIBUTION",
+            "ordinal_position": 28
+          },
+          {
+            "table_name": "TXN_STATS_TOP_10MINUTE",
+            "column_name": "LOCK_LATENCY_DISTRIBUTION_JSON_STRING",
+            "ordinal_position": 29
+          },
+          {
+            "table_name": "TXN_STATS_TOP_HOUR",
+            "column_name": "LOCK_LATENCY_DISTRIBUTION",
+            "ordinal_position": 28
+          },
+          {
+            "table_name": "TXN_STATS_TOP_HOUR",
+            "column_name": "LOCK_LATENCY_DISTRIBUTION_JSON_STRING",
+            "ordinal_position": 29
+          },
+          {
+            "table_name": "TXN_STATS_TOP_MINUTE",
+            "column_name": "LOCK_LATENCY_DISTRIBUTION",
+            "ordinal_position": 28
+          },
+          {
+            "table_name": "TXN_STATS_TOP_MINUTE",
+            "column_name": "LOCK_LATENCY_DISTRIBUTION_JSON_STRING",
+            "ordinal_position": 29
+          }
+        ]
+      }
+    },
+    "canonical_ddl": {
+      "outcome": "PASS",
+      "canonical_definitions": 0,
+      "generated_definitions": 0
+    },
+    "drift_test": "FAIL on the six known SPANNER_SYS columns"
+  },
+  "local": {
+    "engines": {
+      "omni": {
+        "tag": "2026.r5.2",
+        "index_digest": "sha256:09fbca681b5185bb223cae2b0d87276b47b7541f2a4901c4f28522f7ff27ce05",
+        "platform": "linux/arm64",
+        "observed_image_id": "sha256:7b8bcc80c16693536016fb75ea5d9a344119f3709364e06161ecbdd6f255bf21"
+      },
+      "emulator": {
+        "tag": "1.5.59",
+        "index_digest": "sha256:5f71fecd6330211789b75065ade9587d67b3a6b4678e7e5408e42c22f778c63e",
+        "platform": "linux/arm64",
+        "observed_image_id": "sha256:969af6a9349948fbfb4a826c18e160e258a4005f7c759f8e7f2dcec369cccba8"
+      }
+    },
+    "omni_replay": {
+      "steps": 49,
+      "november_21_comparison_tag": "2026.r5.1",
+      "changed_sql_status_or_rows": 0,
+      "comparison_linux_arm64_image": "us-docker.pkg.dev/spanner-omni/images/spanner-omni:2026.r5.1@sha256:b918acd3c785bd13733d7dca6e6c029ef4ab8d7b63a0cd28800210a9bf976516",
+      "fixture_order": [
+        "In a fresh GoogleSQL database, run bulk_setup, the 16 bulk_privileges.forms for tables, views, change streams and sequences, default_schema_usage, the remaining eight bulk forms for functions, and bulk_final_controls. These first 41 steps use an administrator connection.",
+        "Open a second fresh GoogleSQL database. Submit individual_function.setup as one DDL batch. Run the seven controls under individual_function.omni in the listed order, using udf_reader for the before, after-grant and after-revoke queries."
+      ],
+      "bulk_setup": [
+        {
+          "sql": "CREATE ROLE role1",
+          "code": "OK"
+        },
+        {
+          "sql": "CREATE SCHEMA inventory",
+          "code": "OK"
+        },
+        {
+          "sql": "CREATE TABLE T (Id INT64) PRIMARY KEY (Id)",
+          "code": "OK"
+        },
+        {
+          "sql": "CREATE VIEW V SQL SECURITY INVOKER AS SELECT 1 AS Id",
+          "code": "OK"
+        },
+        {
+          "sql": "CREATE CHANGE STREAM Changes FOR T",
+          "code": "OK"
+        },
+        {
+          "sql": "CREATE SEQUENCE S OPTIONS (sequence_kind = 'bit_reversed_positive')",
+          "code": "OK"
+        },
+        {
+          "sql": "CREATE FUNCTION inventory.f(x INT64) RETURNS INT64 SQL SECURITY INVOKER AS (x + 1)",
+          "code": "OK"
+        }
+      ],
+      "default_schema_usage": [
+        {
+          "sql": "GRANT USAGE ON SCHEMA DEFAULT TO ROLE role1",
+          "code": "OK"
+        },
+        {
+          "sql": "REVOKE USAGE ON SCHEMA DEFAULT FROM ROLE role1",
+          "code": "OK"
+        }
+      ],
+      "bulk_final_controls": [
+        {
+          "sql": "GRANT USAGE ON SCHEMA inventory TO ROLE role1",
+          "code": "OK"
+        },
+        {
+          "sql": "SELECT inventory.f(41) AS answer",
+          "code": "OK",
+          "rows": [
+            {
+              "answer": "42"
+            }
+          ]
+        },
+        {
+          "sql": "GRANT EXECUTE ON FUNCTION inventory.f TO ROLE role1",
+          "code": "OK"
+        },
+        {
+          "sql": "SELECT inventory.f(41) AS answer",
+          "code": "OK",
+          "rows": [
+            {
+              "answer": "42"
+            }
+          ]
+        },
+        {
+          "sql": "REVOKE EXECUTE ON FUNCTION inventory.f FROM ROLE role1",
+          "code": "OK"
+        },
+        {
+          "sql": "SELECT inventory.f(41) AS answer",
+          "code": "OK",
+          "rows": [
+            {
+              "answer": "42"
+            }
+          ]
+        },
+        {
+          "sql": "GRANT EXECUTE ON FUNCTION inventory.missing TO ROLE role1",
+          "code": "NotFound"
+        },
+        {
+          "sql": "REVOKE EXECUTE ON FUNCTION inventory.missing FROM ROLE role1",
+          "code": "NotFound"
+        }
+      ],
+      "comparison_observed_span_utc": [
+        "2026-11-21T16:15:39.338279Z",
+        "2026-11-21T16:20:56.19698Z"
+      ]
+    },
+    "bulk_privileges": {
+      "forms": [
+        "GRANT SELECT ON ALL TABLES IN SCHEMA DEFAULT TO ROLE role1",
+        "GRANT SELECT ON ALL TABLES IN SCHEMA inventory TO ROLE role1",
+        "GRANT SELECT ON ALL VIEWS IN SCHEMA DEFAULT TO ROLE role1",
+        "GRANT SELECT ON ALL VIEWS IN SCHEMA inventory TO ROLE role1",
+        "GRANT SELECT ON ALL CHANGE STREAMS IN SCHEMA DEFAULT TO ROLE role1",
+        "GRANT SELECT ON ALL CHANGE STREAMS IN SCHEMA inventory TO ROLE role1",
+        "GRANT SELECT ON ALL SEQUENCES IN SCHEMA DEFAULT TO ROLE role1",
+        "GRANT SELECT ON ALL SEQUENCES IN SCHEMA inventory TO ROLE role1",
+        "REVOKE SELECT ON ALL TABLES IN SCHEMA DEFAULT FROM ROLE role1",
+        "REVOKE SELECT ON ALL TABLES IN SCHEMA inventory FROM ROLE role1",
+        "REVOKE SELECT ON ALL VIEWS IN SCHEMA DEFAULT FROM ROLE role1",
+        "REVOKE SELECT ON ALL VIEWS IN SCHEMA inventory FROM ROLE role1",
+        "REVOKE SELECT ON ALL CHANGE STREAMS IN SCHEMA DEFAULT FROM ROLE role1",
+        "REVOKE SELECT ON ALL CHANGE STREAMS IN SCHEMA inventory FROM ROLE role1",
+        "REVOKE SELECT ON ALL SEQUENCES IN SCHEMA DEFAULT FROM ROLE role1",
+        "REVOKE SELECT ON ALL SEQUENCES IN SCHEMA inventory FROM ROLE role1",
+        "GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA DEFAULT TO ROLE role1",
+        "REVOKE EXECUTE ON ALL FUNCTIONS IN SCHEMA DEFAULT FROM ROLE role1",
+        "GRANT EXECUTE ON ALL TABLE FUNCTIONS IN SCHEMA DEFAULT TO ROLE role1",
+        "REVOKE EXECUTE ON ALL TABLE FUNCTIONS IN SCHEMA DEFAULT FROM ROLE role1",
+        "GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA inventory TO ROLE role1",
+        "REVOKE EXECUTE ON ALL FUNCTIONS IN SCHEMA inventory FROM ROLE role1",
+        "GRANT EXECUTE ON ALL TABLE FUNCTIONS IN SCHEMA inventory TO ROLE role1",
+        "REVOKE EXECUTE ON ALL TABLE FUNCTIONS IN SCHEMA inventory FROM ROLE role1"
+      ],
+      "omni_grpc": "OK",
+      "emulator_grpc": "InvalidArgument",
+      "emulator_stage": "DDL syntax analysis"
+    },
+    "individual_function": {
+      "setup": [
+        "CREATE SCHEMA udfscope",
+        "CREATE ROLE udf_reader",
+        "CREATE FUNCTION udfscope.f(x INT64) RETURNS INT64 SQL SECURITY INVOKER AS (x + 1)",
+        "GRANT USAGE ON SCHEMA udfscope TO ROLE udf_reader"
+      ],
+      "omni": {
+        "admin-control": {
+          "sql": "SELECT udfscope.f(41) AS answer",
+          "database_role": "",
+          "code": "OK",
+          "rows": [
+            {
+              "answer": "42"
+            }
+          ]
+        },
+        "before": {
+          "sql": "SELECT udfscope.f(41) AS answer",
+          "database_role": "udf_reader",
+          "code": "PermissionDenied",
+          "rows": []
+        },
+        "individual-grant": {
+          "sql": "GRANT EXECUTE ON FUNCTION udfscope.f TO ROLE udf_reader",
+          "code": "OK"
+        },
+        "after-grant": {
+          "sql": "SELECT udfscope.f(41) AS answer",
+          "database_role": "udf_reader",
+          "code": "OK",
+          "rows": [
+            {
+              "answer": "42"
+            }
+          ]
+        },
+        "individual-revoke": {
+          "sql": "REVOKE EXECUTE ON FUNCTION udfscope.f FROM ROLE udf_reader",
+          "code": "OK"
+        },
+        "after-revoke": {
+          "sql": "SELECT udfscope.f(41) AS answer",
+          "database_role": "udf_reader",
+          "code": "PermissionDenied",
+          "rows": []
+        },
+        "missing-control": {
+          "sql": "GRANT EXECUTE ON FUNCTION udfscope.missing TO ROLE udf_reader",
+          "code": "NotFound"
+        }
+      },
+      "emulator": {
+        "admin-control": {
+          "sql": "SELECT udfscope.f(41) AS answer",
+          "database_role": "",
+          "code": "OK",
+          "rows": [
+            {
+              "answer": "42"
+            }
+          ]
+        },
+        "before": {
+          "sql": "SELECT udfscope.f(41) AS answer",
+          "database_role": "udf_reader",
+          "code": "OK",
+          "rows": [
+            {
+              "answer": "42"
+            }
+          ]
+        },
+        "individual-grant": {
+          "sql": "GRANT EXECUTE ON FUNCTION udfscope.f TO ROLE udf_reader",
+          "code": "OK"
+        },
+        "after-grant": {
+          "sql": "SELECT udfscope.f(41) AS answer",
+          "database_role": "udf_reader",
+          "code": "OK",
+          "rows": [
+            {
+              "answer": "42"
+            }
+          ]
+        },
+        "individual-revoke": {
+          "sql": "REVOKE EXECUTE ON FUNCTION udfscope.f FROM ROLE udf_reader",
+          "code": "OK"
+        },
+        "after-revoke": {
+          "sql": "SELECT udfscope.f(41) AS answer",
+          "database_role": "udf_reader",
+          "code": "OK",
+          "rows": [
+            {
+              "answer": "42"
+            }
+          ]
+        },
+        "missing-control": {
+          "sql": "GRANT EXECUTE ON FUNCTION udfscope.missing TO ROLE udf_reader",
+          "code": "OK"
+        }
+      },
+      "emulator_setup": "A batch containing GRANT USAGE ON SCHEMA failed. Running the four setup statements separately created the schema, role and function. Only GRANT USAGE ON SCHEMA failed. The admin returned 42 before the restricted-role controls."
+    }
+  },
+  "publication": {
+    "mirror_base": "8ff17fc9c5e93332c20a5ce54f15cf7c8cb3ebaf",
+    "mirror_commits": [
+      {
+        "sha": "4c3ac4f2ddcab0993670c321447de6c081cf4bde",
+        "date": "2026-11-21T18:02:06Z",
+        "files": [
+          "docs/docs.cloud.google.com/sdk/gcloud/reference/spanner/backups/delete.md",
+          "docs/docs.cloud.google.com/spanner/docs/create-manage-data-placements.md",
+          "docs/docs.cloud.google.com/spanner/docs/replication.md",
+          "logs/failed.txt",
+          "logs/urls.txt",
+          "metadata.yaml"
+        ]
+      },
+      {
+        "sha": "176fb7fa7f94800892151a705e52857ccd155b7f",
+        "date": "2026-11-22T18:01:42Z",
+        "files": [
+          "metadata.yaml"
+        ]
+      },
+      {
+        "sha": "5f1eee77499cc8cffa5759c87ce72d575b3de319",
+        "date": "2026-11-23T18:02:00Z",
+        "files": [
+          "metadata.yaml"
+        ]
+      }
+    ],
+    "atom_latest": "November 18, 2026",
+    "bigquery_spanner_product_rows": [
+      {
+        "latest": "2026-11-18",
+        "product_name": "Spanner",
+        "row_count": "533"
+      }
+    ],
+    "managed_html_heading": "November_10_2026",
+    "managed_developer_knowledge_heading": "November 10, 2026",
+    "omni_lts": "2026.r4-lts.3",
+    "omni_r5_2_index_uploaded_utc": "2026-11-22T09:47:53.167000+00:00",
+    "omni_notes_heading": "October 29, 2026",
+    "spanemuboost_latest_release": "v0.4.11"
+  },
+  "placement_ddl_parser": {
+    "version": "memefish v0.9.0",
+    "results": [
+      {
+        "SQL": "ALTER DATABASE `testdb` SET OPTIONS (per_placement_routing_metadata = TRUE)",
+        "Error": "",
+        "StatementError": "",
+        "Stable": true
+      },
+      {
+        "SQL": "ALTER DATABASE `testdb` SET OPTIONS (per_placement_routing_metadata = FALSE)",
+        "Error": "",
+        "StatementError": "",
+        "Stable": true
+      },
+      {
+        "SQL": "ALTER DATABASE `testdb` SET OPTIONS (per_placement_routing_metadata = )",
+        "Error": "syntax error: :1:71: unexpected token: )",
+        "StatementError": "syntax error: :1:71: unexpected token: )",
+        "Stable": false
+      }
+    ]
+  }
+}

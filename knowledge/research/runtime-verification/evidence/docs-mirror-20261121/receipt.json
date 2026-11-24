@@ -1,0 +1,80 @@
+{
+  "checked_at_utc": "2026-11-21T13:55:12+00:00",
+  "kind": "Documentation mirror comparison",
+  "runtime_calls_this_check": 0,
+  "base": "f77f592f639a4b42fe3654c3bcb9b18fd89d22f3",
+  "head": "8ff17fc9c5e93332c20a5ce54f15cf7c8cb3ebaf",
+  "remote_compare": "https://github.com/apstndb/spanner-docs-mirror/compare/f77f592f639a4b42fe3654c3bcb9b18fd89d22f3...8ff17fc9c5e93332c20a5ce54f15cf7c8cb3ebaf",
+  "committed_at_utc": "2026-11-20T18:02:16Z",
+  "commits": 1,
+  "modified_documents": 13,
+  "removed_documents": 1,
+  "sync_files": 3,
+  "developer_knowledge": {
+    "method": "Compare the UTF-8 content of dkcli batch-get to the Git blobs after removing YAML frontmatter and its following blank line. The remaining bytes, including line endings, matched for all 13 updated pages.",
+    "document_body_sha256": {
+      "https://docs.cloud.google.com/spanner/docs/create-manage-locality-groups": "078fe2bff72ee626c208f74445252a1e6e2719b29207ceafa835b879e5827dc3",
+      "https://docs.cloud.google.com/spanner/docs/fgac-queues": "6162aec99dfc6606c6f53b047157a50039380e12d5e30cd65e5501f62bc673bd",
+      "https://docs.cloud.google.com/spanner/docs/full-text-search/numeric-indexes": "ae9d77834ae733e20e329b891bab651b2c06dc52adb4ca4e709b9bf8aad63e94",
+      "https://docs.cloud.google.com/spanner/docs/getting-started/pgadapter": "aa87b3963b9abe0e5eb8ef9e2471d33f6ae61379461a0116979bda6ab7e6707a",
+      "https://docs.cloud.google.com/spanner/docs/metrics": "11b6e9690ce5af818c056f13429fedfecafa4936f1179002c31485dffa10f727",
+      "https://docs.cloud.google.com/spanner/docs/ml-tutorial-embeddings": "af5883c3e4fb9cbb6c23062f96d530ff0d9de423625910eea2d4ed8f931bca66",
+      "https://docs.cloud.google.com/spanner/docs/pgadapter": "0bc52a126900c0105cdbdd34a088d2e458c84f3491f523b18cf3a011cd12f60b",
+      "https://docs.cloud.google.com/spanner/docs/pgadapter-get": "3ed9569977ed3cd9d32d5736cf6818ea47691e09d6fce47bb24fe163ee1f417c",
+      "https://docs.cloud.google.com/spanner/docs/pgadapter-start": "74adea3c276bf67e74a396c57ad21ca186644a521010ae7786f209bd3c0beb58",
+      "https://docs.cloud.google.com/spanner/docs/psql-commands": "2967d5e264e5bcd7272b9f16420bd5da93a3bca2592ea20bd6e1e27e049ac187",
+      "https://docs.cloud.google.com/spanner/docs/psql-connect": "f5f27ddbdc64e7cb06d7adcda60fd940040b71e30771d47bbac4dec5e6b3a243",
+      "https://docs.cloud.google.com/spanner/docs/reference/standard-sql/search_functions": "711e93c59750cd646a3511f6ed811e1fb0227bd2db05fcb4488eb7f623a656f8",
+      "https://docs.cloud.google.com/spanner/docs/tiered-storage": "4704304115bfbf1ba8c9b735ee78303b0adb9a49be10af8df3c8e32a7f9d2e2e"
+    }
+  },
+  "removed_from_mirror": {
+    "url": "https://docs.cloud.google.com/sdk/gcloud/reference/spanner/backups/delete",
+    "old_document_body_sha256": "f50f9203e1fb19161127534be419df06003d3b23e065d2d6a716ec8544a5d016",
+    "failed_txt_status": 200,
+    "live_http_status": 200,
+    "live_page_title": "gcloud spanner backups delete | Google Cloud SDK | Google Cloud Documentation",
+    "developer_knowledge_matches_parent": true,
+    "installed_gcloud": "593.0.0",
+    "cli_help": "The command help rendered the backup deletion synopsis."
+  },
+  "source_changes": {
+    "queue_privileges": "In GoogleSQL, ALL TABLE FUNCTIONS IN SCHEMA DEFAULT covers existing queue TVFs. ALL FUNCTIONS does not include them. GRANT and REVOKE require uppercase RECEIVE_ or RENEWLEASE_ and the exact queue-name case. PostgreSQL calls and individual grants use the spanner. prefix. Bulk privileges on existing TVFs use ALL FUNCTIONS or ALL ROUTINES IN SCHEMA public. A bulk grant in either dialect excludes queues created later.",
+    "numeric_search": "Equality mode supports positive equality and IN. With all mode, INT64 not-equal and negated predicates can use ranges. For FLOAT32 and FLOAT64, NaN satisfies not-equal and a negated range but produces no search token. Positive predicates can still drive an index scan with a residual filter.",
+    "tiered_storage": "The table locality group holds row-existence metadata. A secondary index has one group for keys, row metadata, and stored columns. The guide distinguishes existence reads on INSERT and partial or conditional upserts from full-row primary-key upserts. For ON CONFLICT DO UPDATE the documented exception assigns every column, including the key, to its EXCLUDED value without a WHERE clause. Secondary indexes, foreign keys, change streams, returning clauses and interleaved parent checks can still cause reads. The column example now names LastName, and the guide points to manual major compaction.",
+    "pgadapter": "Six documents describe spgc, which bundles PGAdapter and a Java runtime and starts a temporary local proxy for a PostgreSQL client command. The client executable is separately installed. The Maven example moved from 0.56.2 to 0.56.4.",
+    "embedding_tutorial": "The tutorial specifies regional predict endpoints and response shapes. Examples include gemini-embedding-001. gemini-embedding-2 uses embedContent and cannot be called through these Spanner functions. GoogleSQL reads embeddings.values from the declared STRUCT. PostgreSQL reads predictions[0].embeddings.values from JSONB.",
+    "monitoring": "Only the generated timestamp changed in metrics.md.",
+    "unchanged_in_range": [
+      "managed release notes",
+      "Spanner Omni documentation",
+      "transaction statistics documentation"
+    ],
+    "transaction_lock_columns": "No exact LOCK_LATENCY_DISTRIBUTION or LOCK_LATENCY_DISTRIBUTION_JSON_STRING identifier occurs in the managed Spanner documentation at this mirror head."
+  },
+  "earlier_measurements": [
+    {
+      "source": "../managed-recheck-20261029/weekly-google.jsonl",
+      "cases": [
+        "numeric-not-eq-auto",
+        "numeric-not-eq-base",
+        "numeric-not-eq-prefix",
+        "numeric-not-eq-log"
+      ],
+      "observation": "INT64 N <> 2 returned the same eight rows under all four routes. Each forced numeric index exposed a SearchIndexScan with a Search Predicate. This comparison did not measure speed."
+    },
+    {
+      "source": "../managed-recheck-20261118/receipt.json",
+      "case": "nov18/locality-options",
+      "default_locality_group": {
+        "ssd_to_hdd_spill_timespan": null,
+        "storage": "ssd"
+      }
+    }
+  ],
+  "focused_runtime_followups": [
+    "Compare bulk GRANT and REVOKE before and after creating a second queue using a database role. Cover GoogleSQL TVF name case and ALL FUNCTIONS versus ALL TABLE FUNCTIONS. Cover PostgreSQL individual prefixes and bulk public versus spanner schema names.",
+    "Compare profile scan targets, search predicates, residual filters, and result sets with a base scan for INT64, FLOAT32 and FLOAT64. Include NaN, NULL, equality and all tokenization modes, and standalone and combined negation.",
+    "Assess physical tiered reads separately from CommitStats.mutation_count. A latency comparison requires aged data and comparable cache conditions."
+  ]
+}

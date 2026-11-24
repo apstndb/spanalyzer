@@ -1,0 +1,464 @@
+{
+  "observed_at_utc": [
+    "2026-11-20T14:47:50.063437Z",
+    "2026-11-20T14:57:09.377966Z"
+  ],
+  "scope": "One dedicated Enterprise trial instance. Existing GoogleSQL database for longitudinal comparisons. One isolated database per SQL dialect for fixture checks.",
+  "sources": {
+    "mirror_previous": "844901e61a5a0613216dd197d96ff4f6567bd6b8",
+    "mirror_head": "f77f592f639a4b42fe3654c3bcb9b18fd89d22f3",
+    "mirror_commits": [
+      "529693da4a42ac7c17b3d7aae025c2151229088a",
+      "f77f592f639a4b42fe3654c3bcb9b18fd89d22f3"
+    ],
+    "net_paths": 31,
+    "changed_documents": [
+      "spanner-omni/true-time-external-consistency.md",
+      "spanner/docs/client-side-metrics-descriptions.md",
+      "spanner/docs/cmek.md",
+      "spanner/docs/create-query-database-console.md",
+      "spanner/docs/custom-timeout-and-retry.md",
+      "spanner/docs/deadline-exceeded.md",
+      "spanner/docs/full-text-search/numeric-indexes.md",
+      "spanner/docs/iam.md",
+      "spanner/docs/identify-latency-point.md",
+      "spanner/docs/import-export-csv.md",
+      "spanner/docs/index-geo-partitioning.md",
+      "spanner/docs/information-schema-pg.md",
+      "spanner/docs/introspection/lock-statistics.md",
+      "spanner/docs/introspection/transaction-statistics.md",
+      "spanner/docs/latency-points.md",
+      "spanner/docs/query-execution-plans.md",
+      "spanner/docs/query-plan-visualizer-overview.md",
+      "spanner/docs/querydata.md",
+      "spanner/docs/reference/standard-sql/arrays.md",
+      "spanner/docs/reference/standard-sql/query-syntax.md",
+      "spanner/docs/replication.md",
+      "spanner/docs/rest-endpoints.md",
+      "spanner/docs/transaction-timeout.md",
+      "spanner/docs/transactions.md",
+      "spanner/docs/use-cmek.md",
+      "spanner/docs/use-lock-and-transaction-insights.md",
+      "spanner/docs/use-select-for-update-repeatable-read.md",
+      "spanner/docs/use-select-for-update-serializable.md"
+    ],
+    "release_notes": {
+      "html_headings": {
+        "managed-live": "November_10_2026",
+        "managed-en": "November_10_2026",
+        "omni-live": "October_29_2026"
+      },
+      "dkcli_managed_first_date": "November 10, 2026",
+      "feed_first_entries": [
+        {
+          "title": "November 18, 2026",
+          "link": "https://docs.cloud.google.com/spanner/docs/release-notes#November_18_2026"
+        },
+        {
+          "title": "November 16, 2026",
+          "link": "https://docs.cloud.google.com/spanner/docs/release-notes#November_16_2026"
+        },
+        {
+          "title": "November 10, 2026",
+          "link": "https://docs.cloud.google.com/spanner/docs/release-notes#November_10_2026"
+        }
+      ],
+      "bigquery_table": "bigquery-public-data.google_cloud_release_notes.release_notes",
+      "bigquery_spanner_named_products": [
+        {
+          "latest": "2026-11-16",
+          "product_name": "Spanner",
+          "row_count": "532"
+        }
+      ],
+      "querydata": "November 18 Preview. Specify graph_ids for GQL. The required geminidataanalytics.googleapis.com service was absent from enabled services in the verification project. The native graph fixture ran directly on Spanner.",
+      "feed_url": "https://docs.cloud.google.com/feeds/spanner-release-notes.xml",
+      "html_url": "https://docs.cloud.google.com/spanner/docs/release-notes",
+      "bigquery_querydata_graph_cross_product": {
+        "from_date": "2026-11-16",
+        "match": "description contains both querydata and graph, case-insensitive",
+        "results": []
+      }
+    },
+    "published_releases": {
+      "spanemuboost": "v0.4.11",
+      "emulator": "v1.5.59"
+    },
+    "spanemuboost_selected_in_survey": "v0.4.10",
+    "pinned_linux_images": {
+      "2026.r4-lts.2": "sha256:4a9a23c1f24c0c73c2d0b5891f71966faf72b172cf9cbf341559f4a3f2db186f",
+      "2026.r5.1": "sha256:75330f6b09e6fce401d3245a14819650cf9f9db05ba514a6ca099ddcb4018a8b",
+      "1.5.59": "sha256:5f71fecd6330211789b75065ade9587d67b3a6b4678e7e5408e42c22f778c63e"
+    },
+    "emulator_latest_equals_numeric_tag": true,
+    "omni_release_note_first_date": "October 29, 2026",
+    "omni_emulator_execution": "Registry checks only in this run.",
+    "transaction_column_documentation": {
+      "url": "https://docs.cloud.google.com/spanner/docs/introspection/transaction-statistics",
+      "exact_column_name_matches": {
+        "Developer Knowledge copy": 0,
+        "public HTML": 0,
+        "Spanner documents at mirror head": 0
+      },
+      "note": "This check looks for the exact transaction-column names. The lock-statistics document describes a different family, LOCK_WAIT_DISTRIBUTION."
+    },
+    "omni_differences": {
+      "url": "https://docs.cloud.google.com/spanner-omni/differences",
+      "changed_in_mirror_range": false,
+      "new_omni_document": "https://docs.cloud.google.com/spanner-omni/true-time-external-consistency"
+    }
+  },
+  "queries": {
+    "longitudinal_and_focused_google": 236,
+    "nov18_replay": 206,
+    "status_changes": 0,
+    "metadata_changes": 0,
+    "changed_value_queries": 22,
+    "changed_value_groups": {
+      "catalog_column_list": 3,
+      "time_and_runtime_statistics": 19
+    },
+    "additional_queries_by_batch": {
+      "google-stats": 36,
+      "pg-stats": 42,
+      "google-guards": 7,
+      "pg-guards": 4,
+      "google-fixture": 9,
+      "google-contention": 3
+    },
+    "code_counts_initial": {
+      "InvalidArgument": 44,
+      "OK": 176,
+      "OutOfRange": 5,
+      "Unimplemented": 11
+    },
+    "previous_plan": "Rebuild the 206 November 18 cases from the November 12 producer and the November 18 retained receipt. The other six token cases use spanalyzer_comparison.paired_cases in the November 18 mirror-followup.json.",
+    "producer": {
+      "source": "../managed-recheck-20261112/producer/query.go.txt",
+      "source_sha256": "13dc8b3ebf9044d4fe48072b79ac02c47d645aec2d84be2298262f5bf4b3b22c",
+      "executed_binary_sha256": "de5fb34945fcea1d15b5dff5bf15177afaab8c206ff82e34ae3826c70b8a9575",
+      "initial_236_plan_sha256": "094a3c81b48bfa4a7662a7cd2938109141d37bcf6444e5fdcd9ea7abdbc2efbb",
+      "previous_206_plan_sha256": "c430f368dca18d80da1663df050c3eb8b84b582f3b7b332f03be6955f8c22664",
+      "previous_receipt": "../managed-recheck-20261118/receipt.json",
+      "token_cases": "../managed-recheck-20261118/mirror-followup.json"
+    }
+  },
+  "catalog": {
+    "information_schema": {
+      "columns": 310,
+      "material_change": false,
+      "samples": 3
+    },
+    "spanner_sys": {
+      "tables": 52,
+      "previous_columns": 624,
+      "observed_columns": 630,
+      "samples": 3,
+      "surface_sha256": "8576197c6f20f69c15f4beeaa37c5b1739a0fbe6c71d3cea994fac33043790a8",
+      "added": [
+        {
+          "table_name": "TXN_STATS_TOP_10MINUTE",
+          "column_name": "LOCK_LATENCY_DISTRIBUTION",
+          "spanner_type": "ARRAY<STRUCT<COUNT INT64, MEAN FLOAT64, SUM_OF_SQUARED_DEVIATION FLOAT64, NUM_FINITE_BUCKETS INT64, GROWTH_FACTOR FLOAT64, SCALE FLOAT64, BUCKET_COUNTS ARRAY<INT64>>>",
+          "ordinal_position": 28
+        },
+        {
+          "table_name": "TXN_STATS_TOP_10MINUTE",
+          "column_name": "LOCK_LATENCY_DISTRIBUTION_JSON_STRING",
+          "spanner_type": "STRING(MAX)",
+          "ordinal_position": 29
+        },
+        {
+          "table_name": "TXN_STATS_TOP_HOUR",
+          "column_name": "LOCK_LATENCY_DISTRIBUTION",
+          "spanner_type": "ARRAY<STRUCT<COUNT INT64, MEAN FLOAT64, SUM_OF_SQUARED_DEVIATION FLOAT64, NUM_FINITE_BUCKETS INT64, GROWTH_FACTOR FLOAT64, SCALE FLOAT64, BUCKET_COUNTS ARRAY<INT64>>>",
+          "ordinal_position": 28
+        },
+        {
+          "table_name": "TXN_STATS_TOP_HOUR",
+          "column_name": "LOCK_LATENCY_DISTRIBUTION_JSON_STRING",
+          "spanner_type": "STRING(MAX)",
+          "ordinal_position": 29
+        },
+        {
+          "table_name": "TXN_STATS_TOP_MINUTE",
+          "column_name": "LOCK_LATENCY_DISTRIBUTION",
+          "spanner_type": "ARRAY<STRUCT<COUNT INT64, MEAN FLOAT64, SUM_OF_SQUARED_DEVIATION FLOAT64, NUM_FINITE_BUCKETS INT64, GROWTH_FACTOR FLOAT64, SCALE FLOAT64, BUCKET_COUNTS ARRAY<INT64>>>",
+          "ordinal_position": 28
+        },
+        {
+          "table_name": "TXN_STATS_TOP_MINUTE",
+          "column_name": "LOCK_LATENCY_DISTRIBUTION_JSON_STRING",
+          "spanner_type": "STRING(MAX)",
+          "ordinal_position": 29
+        }
+      ],
+      "postgresql_advertised": [
+        {
+          "column_name": "lock_latency_distribution_json_string",
+          "ordinal_position": "24",
+          "table_name": "txn_stats_top_10minute"
+        },
+        {
+          "column_name": "lock_latency_distribution_json_string",
+          "ordinal_position": "24",
+          "table_name": "txn_stats_top_hour"
+        },
+        {
+          "column_name": "lock_latency_distribution_json_string",
+          "ordinal_position": "24",
+          "table_name": "txn_stats_top_minute"
+        }
+      ],
+      "type_or_ordinal_changes": 0,
+      "canonical_ddl_empty_database": "passed",
+      "drift_and_spanner_sys_capture": "detected unregistered managed columns"
+    }
+  },
+  "stats": {
+    "transaction_columns": {
+      "top_windows": [
+        "MINUTE",
+        "10MINUTE",
+        "HOUR"
+      ],
+      "total_controls": "Unknown column in both dialects for every TXN_STATS_TOTAL window. PostgreSQL also rejected the native ARRAY name on all three TOP windows.",
+      "google_element_sql": "SELECT ARRAY_LENGTH(lock_latency_distribution) AS cardinality,lock_latency_distribution[SAFE_OFFSET(0)].count AS event_count,lock_latency_distribution[SAFE_OFFSET(0)].mean AS mean,lock_latency_distribution[SAFE_OFFSET(0)].sum_of_squared_deviation AS ssd,lock_latency_distribution[SAFE_OFFSET(0)].num_finite_buckets AS finite,lock_latency_distribution[SAFE_OFFSET(0)].growth_factor AS growth,lock_latency_distribution[SAFE_OFFSET(0)].scale AS scale,ARRAY_LENGTH(lock_latency_distribution[SAFE_OFFSET(0)].bucket_counts) AS bins FROM spanner_sys.txn_stats_top_minute LIMIT 1",
+      "postgresql_sql": "SELECT lock_latency_distribution_json_string AS hist FROM spanner_sys.txn_stats_top_minute LIMIT 1",
+      "postgresql_nonempty_guard_sql": "SELECT spanner_sys.distribution_percentile(lock_latency_distribution_json_string,50.0) AS p50 FROM spanner_sys.txn_stats_top_minute WHERE CAST((lock_latency_distribution_json_string::jsonb->>'COUNT') AS bigint)>0 AND jsonb_typeof(lock_latency_distribution_json_string::jsonb->'BUCKET_COUNTS')='array' LIMIT 1",
+      "tagged_transactions": {
+        "activity": {
+          "commits": 2,
+          "completed_at": "2026-11-20T14:56:37Z",
+          "holder_ms": 1200,
+          "waiter_end_to_end_ms": 222
+        },
+        "minute_rows": [
+          {
+            "tag": "nov20_hist_holder",
+            "count": null,
+            "mean": null,
+            "encoded": {
+              "BUCKET_COUNTS": null,
+              "COUNT": null,
+              "GROWTH_FACTOR": null,
+              "MEAN": null,
+              "NUM_FINITE_BUCKETS": null,
+              "SCALE": null,
+              "SUM_OF_SQUARED_DEVIATION": null
+            }
+          },
+          {
+            "tag": "nov20_hist_waiter",
+            "count": null,
+            "mean": null,
+            "encoded": {
+              "BUCKET_COUNTS": null,
+              "COUNT": null,
+              "GROWTH_FACTOR": null,
+              "MEAN": null,
+              "NUM_FINITE_BUCKETS": null,
+              "SCALE": null,
+              "SUM_OF_SQUARED_DEVIATION": null
+            }
+          }
+        ],
+        "interpretation": "Both tags appeared in the minute window with empty histograms. The lock latency of those transactions cannot be derived."
+      }
+    },
+    "lock_stats": {
+      "observed_total_windows": {
+        "MINUTE": {
+          "struct_p50": 1536,
+          "json_p50": 1536,
+          "same_row_units": {
+            "histogram_s": 0.001373,
+            "mean_us": 1373,
+            "n": "1",
+            "total_s": 0.001373
+          }
+        },
+        "10MINUTE": {
+          "struct_p50": 12288,
+          "json_p50": 12288,
+          "same_row_units": {
+            "histogram_s": 0.013649,
+            "mean_us": 13649,
+            "n": "1",
+            "total_s": 0.013649
+          }
+        },
+        "HOUR": {
+          "struct_p50": 6144,
+          "json_p50": 6144,
+          "same_row_units": {
+            "histogram_s": 0.004326,
+            "mean_us": 4326,
+            "n": "1",
+            "total_s": 0.004326
+          }
+        }
+      },
+      "units_sql": "SELECT lock_wait_distribution[SAFE_OFFSET(0)].count AS n, lock_wait_distribution[SAFE_OFFSET(0)].mean AS mean_us, total_lock_wait_seconds AS total_s, lock_wait_distribution[SAFE_OFFSET(0)].count * lock_wait_distribution[SAFE_OFFSET(0)].mean / 1e6 AS histogram_s FROM spanner_sys.lock_stats_total_minute WHERE ARRAY_LENGTH(lock_wait_distribution)>0 AND total_lock_wait_seconds>0 LIMIT 1",
+      "percentile_sql": "SELECT LOCK_WAIT_DISTRIBUTION[SAFE_OFFSET(0)].count AS n, SPANNER_SYS.DISTRIBUTION_PERCENTILE(LOCK_WAIT_DISTRIBUTION[SAFE_OFFSET(0)],50.0) AS struct_p50, SPANNER_SYS.DISTRIBUTION_PERCENTILE(LOCK_WAIT_DISTRIBUTION_JSON_STRING,50.0) AS json_p50 FROM SPANNER_SYS.LOCK_STATS_TOTAL_MINUTE WHERE ARRAY_LENGTH(LOCK_WAIT_DISTRIBUTION)>0 LIMIT 1",
+      "whole_array_percentile": "InvalidArgument in six windows. Using a STRUCT element or JSON was accepted.",
+      "direct_array_limit_0": "The tested GoogleSQL projection returned Unimplemented across the six LOCK_STATS windows. Scalar field projections compiled."
+    },
+    "transaction_counters": "Both requested transaction concurrency counters compiled on TOP and TOTAL for all three windows in both dialects."
+  },
+  "runtime_examples": {
+    "tokenlist_concat": {
+      "array-1": "OK",
+      "scalar-1": "InvalidArgument",
+      "array-2": "OK",
+      "scalar-2": "InvalidArgument",
+      "array-3": "OK",
+      "scalar-3": "InvalidArgument"
+    },
+    "repeated_proto": {
+      "scalar": [
+        {
+          "song_title": "Aria",
+          "title": "The Goldberg Variations"
+        },
+        {
+          "song_title": "Var. 1",
+          "title": "The Goldberg Variations"
+        },
+        {
+          "song_title": "Var. 2",
+          "title": "The Goldberg Variations"
+        }
+      ],
+      "nested": [
+        {
+          "city": "Eugene",
+          "country": "USA",
+          "title": "The Goldberg Variations"
+        },
+        {
+          "city": "Seattle",
+          "country": "USA",
+          "title": "The Goldberg Variations"
+        }
+      ],
+      "left-scalar": [
+        {
+          "song_title": null,
+          "title": "Mass in B Minor"
+        },
+        {
+          "song_title": "Aria",
+          "title": "The Goldberg Variations"
+        },
+        {
+          "song_title": "Var. 1",
+          "title": "The Goldberg Variations"
+        },
+        {
+          "song_title": "Var. 2",
+          "title": "The Goldberg Variations"
+        }
+      ],
+      "left-nested": [
+        {
+          "city": null,
+          "title": "Mass in B Minor"
+        },
+        {
+          "city": "Eugene",
+          "title": "The Goldberg Variations"
+        },
+        {
+          "city": "Seattle",
+          "title": "The Goldberg Variations"
+        }
+      ],
+      "offset": [
+        {
+          "offset": "0",
+          "song_title": "Aria",
+          "title": "The Goldberg Variations"
+        },
+        {
+          "offset": "1",
+          "song_title": "Var. 1",
+          "title": "The Goldberg Variations"
+        },
+        {
+          "offset": "2",
+          "song_title": "Var. 2",
+          "title": "The Goldberg Variations"
+        }
+      ]
+    },
+    "profile": {
+      "native-graph": {
+        "rows": 3,
+        "scan_targets": [
+          "items_auto"
+        ],
+        "predicate_edges": [],
+        "statistics_since_last_restart": "omitted"
+      },
+      "profile/covering": {
+        "rows": 2,
+        "scan_targets": [
+          "verify_by_kind"
+        ],
+        "predicate_edges": [
+          "Seek Condition"
+        ],
+        "statistics_since_last_restart": "omitted"
+      },
+      "profile/back-join": {
+        "rows": 2,
+        "scan_targets": [
+          "verify_by_kind",
+          "$v2",
+          "verify_plan"
+        ],
+        "predicate_edges": [
+          "Seek Condition"
+        ],
+        "statistics_since_last_restart": "omitted"
+      },
+      "profile/residual": {
+        "rows": 0,
+        "scan_targets": [
+          "verify_by_kind"
+        ],
+        "predicate_edges": [
+          "Residual Condition",
+          "Seek Condition"
+        ],
+        "statistics_since_last_restart": "omitted"
+      }
+    },
+    "for_update": {
+      "query": "SELECT id FROM items_auto WHERE id=1 FOR UPDATE",
+      "matrix": {
+        "dialects": [
+          "GoogleSQL",
+          "PostgreSQL"
+        ],
+        "isolation": [
+          "REPEATABLE_READ",
+          "SERIALIZABLE"
+        ],
+        "mode": [
+          "PESSIMISTIC",
+          "OPTIMISTIC"
+        ]
+      },
+      "read_one_then_rolled_back": 8
+    },
+    "cleanup": "Both owned databases returned NOT_FOUND after deletion."
+  },
+  "other_updated_surfaces": {
+    "cmek_guide": "https://docs.cloud.google.com/spanner/docs/use-cmek",
+    "rest_discovery_update_mask": "Required. The list of fields to update. Currently, only `enable_drop_protection` field can be updated.",
+    "rest_discovery_source": "https://spanner.googleapis.com/$discovery/rest?version=v1",
+    "scope": "The guide gives PATCH with updateMask=encryption_config. No encryption or IAM changes were made. TrueTime hardware, console and Dataflow workflows, client telemetry and retry policy, and geo-partitioning topology are documentation-only coverage."
+  }
+}

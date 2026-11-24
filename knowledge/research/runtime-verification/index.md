@@ -22,6 +22,8 @@ the latest public release. Use the engine histories for a chronological view.
 
 | Runtime and observation scope | Research Note |
 | --- | --- |
+| Managed, Omni r5.2 and Emulator 1.5.59, 2026-11-24 UTC | [Managed placement metadata and function privileges](managed-placements-and-omni-privileges-20261124.md). A 272-query managed replay and a restricted-role comparison on both local engines. |
+| Managed Spanner, 2026-11-21 UTC | [Queue privileges, indexed NaN predicates and ordinary-table upserts](managed-queue-search-upsert-20261121.md). Two dialects, restricted-role execution before and after bulk grants, 144 comparisons with base scans, and a 337-query compatibility replay. |
 | Managed, Omni r4 LTS.2 / r5.1 and Emulator 1.5.59, 2026-11-18 UTC | [Resolving an individual FK to its backing index](fk-backing-index-resolution-20261118.md). Constraint-name hints, an Omni forecast for seven physical names and a composite-key catalog correction in both SQL dialects. |
 | Managed, Omni r4 LTS.2 / r5.1 and Emulator 1.5.59, 2026-11-13 JST | [FK backing-index names](fk-full-name-analysis-20261113.md) covers qualification, underscore-separated identifiers, and a 96-step comparison of both identifier cases and creation orders on managed, Omni LTS and Emulator. |
 | Omni r4 LTS.2 and Emulator 1.5.59, 2026-11-12 UTC/JST | [Disjoint mixed-transaction keys](mixed-disjoint-key-bounds-20261112.md): 11 cases per engine, finite component-upper sums for isolated ordinary tables, conservative overlap guards, and absent Emulator CommitStats |

@@ -71,6 +71,15 @@ observation date.
 | 2026-11-18 08:15–08:21 UTC / 17:15–17:21 JST, GoogleSQL | Token list signatures and request priority | Across 28 additional reads, one array containing 1, 2 or 3 full-text token lists succeeded. Passing the same inputs as separate arguments failed for all three counts. The local analyzer accepted both forms. Matching full-text or substring arrays succeeded and mixed tokenizer kinds failed. The parallelism hint ran at MEDIUM and LOW priority. The table-options example returned zero rows. | [Reproduction, six-commit audit and populated-schema follow-ups](../evidence/managed-recheck-20261118/mirror-followup.json) |
 | 2026-11-18 15:00–15:09 UTC / November 19 JST | Prospective name comparison and plan recheck | Both dialects matched all seven names recorded first on Omni. Two constraint-name hints selected the same child index. Reordered references selected distinct child indexes. Both owned database lookups returned NotFound after deletion. | [FK backing-index resolution](../fk-backing-index-resolution-20261118.md) |
 | 2026-11-20 UTC, GoogleSQL and PostgreSQL | Vector index reconstruction | Each dialect reported 15 options across three indexes. All explicit settings matched the admin DDL. Both dialects rejected the three system-optimized settings as DDL input. Replaying the survey output on GoogleSQL and the admin output on PostgreSQL preserved all six definitions. | [DDL, option values and replay controls](../evidence/managed-vector-options-20261120/receipt.json) |
+| 2026-11-20 14:47–14:57 UTC, GoogleSQL and PostgreSQL | Change | GoogleSQL SYS grew from 624 to 630 columns. The three TXN_STATS_TOP windows added the lock latency distribution and its JSON form. PostgreSQL exposed the JSON column in each window. | [November 18](../evidence/managed-recheck-20261118/receipt.json), [November 20](../evidence/managed-recheck-20261120/receipt.json) |
+| 2026-11-20 14:47–14:57 UTC, GoogleSQL and PostgreSQL | Recheck | All 206 GoogleSQL probes from November 18 retained their gRPC status and result fields. | [November 18](../evidence/managed-recheck-20261118/receipt.json), [November 20](../evidence/managed-recheck-20261120/receipt.json) |
+| 2026-11-20 14:47–14:57 UTC, GoogleSQL and PostgreSQL | First coverage | The documented repeated-proto UNNEST examples, PROFILE scan targets and eight FOR UPDATE cases produced the recorded results. | [November 20](../evidence/managed-recheck-20261120/receipt.json) |
+| 2026-11-21 14:12–14:35 UTC, GoogleSQL and PostgreSQL | First coverage | Bulk queue grants covered existing queues. All 144 alternate query routes matched their dialect’s base scan. PostgreSQL accepted conditional and expression upserts with the primary key omitted from SET. | [November 21](../managed-queue-search-upsert-20261121.md) |
+| 2026-11-21 14:12–14:35 UTC, GoogleSQL and PostgreSQL | Recheck | Both catalog hashes matched November 20. Of 337 inputs, 335 kept their gRPC status and all common successes kept their result fields. | [November 20](../evidence/managed-recheck-20261120/receipt.json), [November 21](../managed-queue-search-upsert-20261121.md) |
+| 2026-11-21 14:12–14:35 UTC, GoogleSQL and PostgreSQL | Change | Two reads changed from InvalidArgument to OK with the sampled data. GoogleSQL returned a p99 with a populated distribution. PostgreSQL returned zero rows for an empty transaction-statistics window. | [November 20](../evidence/managed-recheck-20261120/receipt.json), [November 21](../managed-queue-search-upsert-20261121.md) |
+| 2026-11-24 UTC, GoogleSQL | Recheck | Both catalog hashes matched November 21. Of 272 repeated inputs, 271 kept their gRPC status and result fields. | [November 21](../managed-queue-search-upsert-20261121.md), [November 24](../managed-placements-and-omni-privileges-20261124.md) |
+| 2026-11-24 UTC, GoogleSQL | Change | The rolling latency percentile changed from OK on November 21 to InvalidArgument, then succeeded as histograms became available. Empty and populated controls reproduced the two outcomes. | [November 21](../managed-queue-search-upsert-20261121.md), [November 24](../managed-placements-and-omni-privileges-20261124.md) |
+| 2026-11-24 UTC, GoogleSQL | First coverage | The database had only the default placement on the default instance partition. Its database options listed no routing metadata setting. | [November 24](../managed-placements-and-omni-privileges-20261124.md) |
 
 ## Publication and source context
 
@@ -93,6 +102,13 @@ These dates do not supply missing runtime transition dates:
   leader-operation descriptions are corrected. The SET NULL announcement catches
   up to existing runtime coverage. See the [source audit](../documentation-delta-review-20261031.md);
   no managed request is executed.
+
+- **November 21 documentation review.** One mirror commit clarifies bulk queue
+  privileges, numeric search predicates, and tiered-storage existence checks.
+  All 13 revised pages matched Developer Knowledge. The removed backup CLI
+  reference remained available. The [source comparison and earlier managed
+  controls](../evidence/docs-mirror-20261121/receipt.json) identified the cases for the
+  [subsequent managed service test](../managed-queue-search-upsert-20261121.md).
 
 The [IS selector](../../../observations/information-schema-managed-primary-catalog.md)
 and [SYS selector](../../../observations/spanner-sys-live-primary-catalog.md)

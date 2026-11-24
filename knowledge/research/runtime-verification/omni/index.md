@@ -46,6 +46,8 @@ observation date. Same-day rows without exact times have no claimed order.
 | 2026-11-13 JST, r4 LTS.2 and r5.1 arm64 | Backing-index naming | The structural controls matched across the two releases. The separate LTS case matrix matched the managed names and DDL failures for both identifier cases and both creation orders. | [Names and case matrix](../fk-full-name-analysis-20261113.md) |
 | 2026-11-16 JST, r4 LTS.2 and r5.1 arm64 | Composite FK validation | On each image, six writes to the three-column fixture returned Internal. The consistency read found no stored child rows. The separate indexed control retained one valid row. | [Results by engine](../evidence/fk-validation-20261116/summary.json) |
 | 2026-11-18 UTC, r4 LTS.2 and r5.1 arm64 | Two-dialect comparison | Both releases returned the physical child index through the FK-name hint. All seven names recorded on LTS matched managed. Reordered FK column pairs agreed with the declared DDL. The LTS shared-parent control returned one catalog row per key column. | [FK backing-index resolution](../fk-backing-index-resolution-20261118.md) |
+| 2026-11-21 UTC, r5.1 arm64 | Baseline | Two GoogleSQL fixtures recorded 49 privilege steps. The restricted role could call the scalar function only between grant and revoke. | [Paired image evidence](../evidence/managed-recheck-20261124/receipt.json) |
+| 2026-11-24 UTC, r5.2 arm64 | Recheck | All 49 steps matched the November 21 r5.1 sample in SQL, status and returned rows. | [Paired image evidence](../evidence/managed-recheck-20261124/receipt.json), [November 24](../managed-placements-and-omni-privileges-20261124.md) |
 
 ## Publication and source context
 
@@ -91,3 +93,5 @@ The November 12 VM and Kubernetes TLS guides require separate CAs for internal
 server traffic and for API and client certificates. On November 18 the official
 TrueTime page returned HTTP 200 and its body matched the copy preceding its
 November 17 removal from the mirror. See the [documentation checks](../evidence/managed-recheck-20261118/mirror-followup.json).
+
+On November 24 UTC, the registry reported that the r5.2 image index had been uploaded on November 22 UTC. [Registry evidence](../evidence/managed-recheck-20261124/receipt.json)

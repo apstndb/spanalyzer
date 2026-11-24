@@ -1,0 +1,476 @@
+{
+  "observed_date_utc": "2026-11-21",
+  "runtime": "Managed Cloud Spanner, GoogleSQL and PostgreSQL, one verification instance. No public engine build ID.",
+  "lifecycle": {
+    "google": {
+      "created_utc": "2026-11-21T14:12:45.177093+00:00",
+      "deletion_verified_utc": "2026-11-21T14:35:22.017726+00:00",
+      "post_delete_get": "NotFound"
+    },
+    "pg": {
+      "created_utc": "2026-11-21T14:12:53.698575+00:00",
+      "deletion_verified_utc": "2026-11-21T14:34:22.115942+00:00",
+      "post_delete_get": "NotFound"
+    }
+  },
+  "routine": {
+    "prior_reference": "../managed-recheck-20261120/receipt.json",
+    "baseline_span_utc": ["2026-11-21T14:12:28.507033Z", "2026-11-21T14:12:43.959868Z"],
+    "batches": {
+      "existing-google": {"queries": 236, "codes": {"InvalidArgument": 43, "OK": 177, "OutOfRange": 5, "Unimplemented": 11}},
+      "google-stats": {"queries": 36, "codes": {"InvalidArgument": 10, "OK": 26}},
+      "google-guards": {"queries": 7, "codes": {"OK": 7}},
+      "pg-stats": {"queries": 42, "codes": {"InvalidArgument": 18, "OK": 24}},
+      "pg-guards": {"queries": 4, "codes": {"OK": 4}},
+      "google-fixture": {"queries": 9, "codes": {"OK": 9}},
+      "google-contention": {"queries": 3, "codes": {"OK": 3}}
+    },
+    "queries": 337,
+    "same_status": 335,
+    "field_changes_among_cases_successful_on_both_dates": 0,
+    "status_changes": [
+      {
+        "batch": "existing-google",
+        "label": "new-readonly/distribution-agg-query-json",
+        "previous_code": "InvalidArgument",
+        "current_code": "OK",
+        "previous_diagnostic": "spanner: code = \"InvalidArgument\", desc = \"Distribution-json-string input to SPANNER_SYS.DISTRIBUTION_PERCENTILE function cannot be NULL or EMPTY.\"",
+        "current_rows": [{"p99": 0.0647168}]
+      },
+      {
+        "batch": "pg-stats",
+        "label": "percentile/TXN_STATS_TOP_MINUTE",
+        "previous_code": "InvalidArgument",
+        "current_code": "OK",
+        "previous_diagnostic": "spanner: code = \"InvalidArgument\", desc = \"The field BUCKET_COUNTS of the distribution-json-string input to SPANNER_SYS.DISTRIBUTION_PERCENTILE function is of wrong type.\"",
+        "current_rows": []
+      }
+    ],
+    "google_controls": {
+      "explicit-empty": {
+        "code": "InvalidArgument",
+        "rows": [],
+        "diagnostic": "spanner: code = \"InvalidArgument\", desc = \"Distribution-json-string input to SPANNER_SYS.DISTRIBUTION_PERCENTILE function cannot be NULL or EMPTY.\""
+      },
+      "positive-count": {"code": "OK", "rows": [{"p99": 0.5460787199999988}]},
+      "sample-count": {"code": "OK", "rows": [{"nonempty": "2450", "visible": "2450"}]},
+      "txn-histogram": {"code": "OK", "rows": [{"populated_json": "0", "populated_struct": "0", "visible": "22"}]}
+    },
+    "pg_after_workload": {
+      "after-workload/sample-count": {"code": "OK", "rows": [{"encoded": "17", "visible": "17"}]},
+      "after-workload/unguarded": {
+        "code": "InvalidArgument",
+        "rows": [],
+        "diagnostic": "The field BUCKET_COUNTS of the distribution-json-string input to SPANNER_SYS.DISTRIBUTION_PERCENTILE function is of wrong type."
+      },
+      "after-workload/guarded": {"code": "OK", "rows": []},
+      "explicit-empty": {"code": "OK", "rows": []},
+      "unique-key-catalog": {"code": "OK", "rows": [{"column_name": "code", "is_nullable": "NO"}]}
+    },
+    "lock_modes": {"read_and_rolled_back": 8, "isolation": ["SERIALIZABLE", "REPEATABLE_READ"], "read_lock_mode": ["OPTIMISTIC", "PESSIMISTIC"]},
+    "tagged_transactions": {"commits": 2, "observed_minute_tags": 2, "non_null_histogram_counts": 0},
+    "catalog": {
+      "ischema": {
+        "status_against_repo": "producer_changed_only",
+        "observed_columns": 310,
+        "surface_sha256": "89b4ab9e231d7d61bf417669b6f5d29d1715c3999058b905f60698bc1047c6b0",
+        "matches_nov20": true,
+        "added_columns_against_repo": []
+      },
+      "sys": {
+        "status_against_repo": "surface_changed",
+        "observed_columns": 630,
+        "surface_sha256": "8576197c6f20f69c15f4beeaa37c5b1739a0fbe6c71d3cea994fac33043790a8",
+        "matches_nov20": true,
+        "added_columns_against_repo": [
+          ["TXN_STATS_TOP_10MINUTE", "LOCK_LATENCY_DISTRIBUTION"],
+          ["TXN_STATS_TOP_10MINUTE", "LOCK_LATENCY_DISTRIBUTION_JSON_STRING"],
+          ["TXN_STATS_TOP_HOUR", "LOCK_LATENCY_DISTRIBUTION"],
+          ["TXN_STATS_TOP_HOUR", "LOCK_LATENCY_DISTRIBUTION_JSON_STRING"],
+          ["TXN_STATS_TOP_MINUTE", "LOCK_LATENCY_DISTRIBUTION"],
+          ["TXN_STATS_TOP_MINUTE", "LOCK_LATENCY_DISTRIBUTION_JSON_STRING"]
+        ]
+      }
+    },
+    "survey_results": {
+      "canonical_empty_db": "PASS",
+      "TestDrift_RealTableMetas": "FAIL: six previously observed TXN_STATS_TOP columns absent from the checked-in baseline",
+      "infoschema_capture_exit": 0,
+      "spanner_sys_capture_exit": 1
+    },
+    "producer": "../managed-recheck-20261112/producer/query.go.txt",
+    "baseline_236_inputs_sha256": "094a3c81b48bfa4a7662a7cd2938109141d37bcf6444e5fdcd9ea7abdbc2efbb"
+  },
+  "public_sources": {
+    "spanner_docs_mirror_head": "8ff17fc9c5e93332c20a5ce54f15cf7c8cb3ebaf",
+    "release_notes": {
+      "atom_first_entry": "November 18, 2026",
+      "bigquery": [{"latest": "2026-11-18", "product_name": "Spanner", "row_count": "533"}],
+      "latest_bigquery_feature": "QueryData for Spanner Graph",
+      "html_first_date": "November_10_2026",
+      "developer_knowledge_first_date": "November 10, 2026"
+    },
+    "registry_tags_and_checked_in_digests": [
+      {
+        "family": "gcr.io/cloud-spanner-emulator/emulator",
+        "latest": "1.5.59",
+        "manifests": {
+          "1.5.59": {"index": "sha256:5f71fecd6330211789b75065ade9587d67b3a6b4678e7e5408e42c22f778c63e", "matches_pinned_platforms": true}
+        }
+      },
+      {
+        "family": "us-docker.pkg.dev/spanner-omni/images/spanner-omni",
+        "latest": {"lts": "2026.r4-lts.3", "regular": "2026.r5.1"},
+        "manifests": {
+          "2026.r4-lts.2": {"index": "sha256:4a9a23c1f24c0c73c2d0b5891f71966faf72b172cf9cbf341559f4a3f2db186f", "matches_pinned_platforms": true},
+          "2026.r5.1": {"index": "sha256:75330f6b09e6fce401d3245a14819650cf9f9db05ba514a6ca099ddcb4018a8b", "matches_pinned_platforms": true}
+        }
+      }
+    ],
+    "new_lts": {
+      "tag": "2026.r4-lts.3",
+      "index": "sha256:952455576a4c52aeafbb3136d43de8778dc35e3e38fa86b58297d3f4a8e2468a",
+      "platforms": {
+        "linux/amd64": "sha256:d067a88c1ffa8dc5271d02fcf8e2ef7e2508804f32be6c0db8c0027d3401beab",
+        "linux/arm64": "sha256:e1ee15b1b1f9e2f32ce9b9935998ce96f584ef60d3abe550d67dbc2a5eca521b"
+      },
+      "registry_url": "https://us-docker.pkg.dev/v2/spanner-omni/images/spanner-omni/manifests/2026.r4-lts.3",
+      "omni_developer_knowledge_first_date": "October 29, 2026",
+      "exact_tag_mentioned": false
+    },
+    "spanemuboost_latest_release": "v0.4.11",
+    "scope": "Publication checks only for Omni and Emulator."
+  },
+  "queues": {
+    "outcome_order": ["receive", "renew", "direct_select_if_tested"],
+    "renew_test": "Admin acquired a real lease on a separate single-use stream and kept it open. The restricted role used a bound string array. A successful renew returned a non-NULL replacement token.",
+    "role_phases": {
+      "admin-first": ["OK", "OK", "OK"],
+      "ungranted-first": ["PermissionDenied", "PermissionDenied", "PermissionDenied"],
+      "select-only": ["PermissionDenied", "PermissionDenied", "OK"],
+      "bulk-existing": ["OK", "OK", "PermissionDenied"],
+      "bulk-later": ["PermissionDenied", "PermissionDenied", "PermissionDenied"],
+      "other-existing": {"google": ["PermissionDenied", "PermissionDenied", "PermissionDenied"], "pg": ["OK", "OK", "PermissionDenied"]},
+      "other-later": ["PermissionDenied", "PermissionDenied", "PermissionDenied"],
+      "regrant-later": ["OK", "OK"],
+      "revoke-later": ["PermissionDenied", "PermissionDenied"]
+    },
+    "individual_role_phases": {
+      "ung": ["PermissionDenied", "PermissionDenied"],
+      "receive-only": ["OK", "PermissionDenied"],
+      "both-individual": ["OK", "OK"],
+      "unaffected": ["OK", "OK"],
+      "bulk-revoked": ["PermissionDenied", "PermissionDenied"],
+      "renew-only": ["PermissionDenied", "OK"],
+      "revoked-individual": ["PermissionDenied", "PermissionDenied"]
+    },
+    "sql": {
+      "google": {
+        "first_queue": "CREATE QUEUE OrdersQueue(id STRING(MAX) NOT NULL, payload STRING(MAX) NOT NULL) PRIMARY KEY(id)",
+        "bulk_grant_and_revoke": [
+          "GRANT EXECUTE ON ALL TABLE FUNCTIONS IN SCHEMA DEFAULT TO ROLE queue_member",
+          "GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA DEFAULT TO ROLE queue_other",
+          "REVOKE EXECUTE ON ALL TABLE FUNCTIONS IN SCHEMA DEFAULT FROM ROLE queue_member",
+          "REVOKE EXECUTE ON ALL FUNCTIONS IN SCHEMA DEFAULT FROM ROLE queue_other"
+        ],
+        "receive": "SELECT id FROM RECEIVE_OrdersQueue(max_duration=>'20m',max_batch_size=>1)",
+        "renew": "SELECT SpannerNewLeaseToken AS new_token FROM RENEWLEASE_OrdersQueue(lease_tokens=>@tokens)",
+        "individual_receive_grant": "GRANT EXECUTE ON TABLE FUNCTION RECEIVE_OrdersQueue TO ROLE queue_specific",
+        "individual_renew_grant": "GRANT EXECUTE ON TABLE FUNCTION RENEWLEASE_OrdersQueue TO ROLE queue_specific",
+        "individual_receive_revoke": "REVOKE EXECUTE ON TABLE FUNCTION RECEIVE_OrdersQueue FROM ROLE queue_specific"
+      },
+      "pg": {
+        "first_queue": "CREATE QUEUE ordersqueue(id varchar(36) NOT NULL, payload bytea NOT NULL, PRIMARY KEY(id))",
+        "bulk_grant_and_revoke": [
+          "GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA public TO queue_member",
+          "GRANT EXECUTE ON ALL ROUTINES IN SCHEMA public TO queue_other",
+          "REVOKE EXECUTE ON ALL FUNCTIONS IN SCHEMA public FROM queue_member",
+          "REVOKE EXECUTE ON ALL ROUTINES IN SCHEMA public FROM queue_other"
+        ],
+        "receive": "SELECT id FROM spanner.receive_ordersqueue(max_batch_size=>1,priority=>NULL,max_duration=>'20m')",
+        "renew": "SELECT spanner_new_lease_token AS new_token FROM spanner.renewlease_ordersqueue(lease_tokens=>$1)",
+        "individual_receive_grant": "GRANT EXECUTE ON FUNCTION spanner.receive_ordersqueue TO queue_specific",
+        "individual_renew_grant": "GRANT EXECUTE ON FUNCTION spanner.renewlease_ordersqueue TO queue_specific",
+        "individual_receive_revoke": "REVOKE EXECUTE ON FUNCTION spanner.receive_ordersqueue FROM queue_specific"
+      }
+    },
+    "spelling": {
+      "google": {
+        "GRANT EXECUTE ON TABLE FUNCTION receive_OrdersQueue TO ROLE queue_specific": {"code": "NotFound", "error": "TABLE_FUNCTION not found: receive_OrdersQueue"},
+        "REVOKE EXECUTE ON TABLE FUNCTION receive_OrdersQueue FROM ROLE queue_specific": {"code": "NotFound", "error": "TABLE_FUNCTION not found: receive_OrdersQueue"},
+        "GRANT EXECUTE ON TABLE FUNCTION RECEIVE_ordersqueue TO ROLE queue_specific": {"code": "NotFound", "error": "TABLE_FUNCTION not found: RECEIVE_ordersqueue"},
+        "REVOKE EXECUTE ON TABLE FUNCTION RECEIVE_ordersqueue FROM ROLE queue_specific": {"code": "NotFound", "error": "TABLE_FUNCTION not found: RECEIVE_ordersqueue"},
+        "GRANT EXECUTE ON TABLE FUNCTION renewlease_OrdersQueue TO ROLE queue_specific": {"code": "NotFound", "error": "TABLE_FUNCTION not found: renewlease_OrdersQueue"},
+        "REVOKE EXECUTE ON TABLE FUNCTION renewlease_OrdersQueue FROM ROLE queue_specific": {"code": "NotFound", "error": "TABLE_FUNCTION not found: renewlease_OrdersQueue"},
+        "GRANT EXECUTE ON TABLE FUNCTION RENEWLEASE_ordersqueue TO ROLE queue_specific": {"code": "NotFound", "error": "TABLE_FUNCTION not found: RENEWLEASE_ordersqueue"},
+        "REVOKE EXECUTE ON TABLE FUNCTION RENEWLEASE_ordersqueue FROM ROLE queue_specific": {"code": "NotFound", "error": "TABLE_FUNCTION not found: RENEWLEASE_ordersqueue"}
+      },
+      "pg": {
+        "GRANT EXECUTE ON FUNCTION public.receive_ordersqueue TO queue_specific": {"code": "InvalidArgument", "error": "Namespace 'spanner' must be specified in <GRANT> statement on functions."},
+        "REVOKE EXECUTE ON FUNCTION public.receive_ordersqueue FROM queue_specific": {"code": "InvalidArgument", "error": "Namespace 'spanner' must be specified in <REVOKE> statement on functions."},
+        "GRANT EXECUTE ON FUNCTION public.renewlease_ordersqueue TO queue_specific": {"code": "InvalidArgument", "error": "Namespace 'spanner' must be specified in <GRANT> statement on functions."},
+        "REVOKE EXECUTE ON FUNCTION public.renewlease_ordersqueue FROM queue_specific": {"code": "InvalidArgument", "error": "Namespace 'spanner' must be specified in <REVOKE> statement on functions."},
+        "GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA spanner TO queue_specific": {"code": "NotFound", "error": "Schema `spanner` not found."},
+        "REVOKE EXECUTE ON ALL FUNCTIONS IN SCHEMA spanner FROM queue_specific": {"code": "NotFound", "error": "Schema `spanner` not found."}
+      }
+    },
+    "initial_deadlines_retested": {
+      "google": [
+        "individual-after-renewlease/renew",
+        "folded-call",
+        "revoked-bulk/renew",
+        "unaffected-individual/receive",
+        "unaffected-individual/renew",
+        "revoked-individual/renew"
+      ],
+      "pg": [
+        "individual-after-renewlease/receive",
+        "individual-after-renewlease/renew",
+        "unaffected-individual/receive",
+        "unaffected-individual/renew",
+        "revoked-individual/renew"
+      ]
+    },
+    "folded_google_call": "OK",
+    "google_default_schema_udf": {
+      "code": "Unimplemented",
+      "error": "Cannot create function queue_marker because user-defined functions are not supported in the default schema. Please create the function in a named schema as <schema>.queue_marker"
+    },
+    "named_scalar_function": {
+      "admin": "OK",
+      "before": "PermissionDenied",
+      "outside-default": "PermissionDenied",
+      "named-effective": "OK",
+      "named-revoked": "PermissionDenied"
+    },
+    "named_scalar_grant_result": [{"answer": "42"}],
+    "queue_message_fixture": {
+      "initial_rows_per_queue": 45,
+      "fresh_rows_inserted_before_each_stream_control": 8,
+      "client_deadline_seconds": 12,
+      "single_use_max_batch_size": 1,
+      "server_max_duration": "20m"
+    }
+  },
+  "numeric_search": {
+    "fixture_rows_id_x_gate": [[1, "NaN", 1], [2, 41, 1], [3, 42, 1], [4, 43, 1], [5, null, 1], [6, "NaN", 0], [7, 41, 0]],
+    "conditions": {
+      "ne": "x != 42",
+      "not-gt": "NOT(x > 42)",
+      "two-ranges": "x < 42 OR x > 42",
+      "le": "x <= 42",
+      "eq": "x = 42",
+      "in": "x IN (42,41)"
+    },
+    "guard": "gateval=1",
+    "google": {
+      "profile_queries_including_float_only": 132,
+      "base_controls": 24,
+      "comparisons_with_base": 108,
+      "mismatches": 0,
+      "nan_truth": {"le": false, "ne": true, "not_gt": true, "two_ranges": false},
+      "ids_for_float32_and_float64": {
+        "ne/alone": [1, 2, 4, 6, 7],
+        "ne/guarded": [1, 2, 4],
+        "not-gt/alone": [1, 2, 3, 6, 7],
+        "not-gt/guarded": [1, 2, 3],
+        "two-ranges/alone": [2, 4, 7],
+        "two-ranges/guarded": [2, 4],
+        "le/alone": [2, 3, 7],
+        "le/guarded": [2, 3],
+        "eq/alone": [3],
+        "eq/guarded": [3],
+        "in/alone": [2, 3, 7],
+        "in/guarded": [2, 3]
+      },
+      "guarded_ne_plan": {"search_scans": ["num32all"], "search_token_columns": ["gt"], "residuals": ["($x != 42)"]},
+      "guarded_not_gt_plan": {"search_scans": ["num32all"], "search_token_columns": ["gt"], "residuals": ["NOT(($x > 42))"]},
+      "float_only_negative_example": {"search_scans": ["num32onlyall"], "search_token_columns": [], "residuals": ["($x != 42)"]},
+      "positive_token_control": {"search_scans": ["num32eq"], "search_token_columns": ["gt", "teq"], "residuals": []},
+      "debug_nan_eq_and_all": {
+        "all_tokens": "<warning(printed values for DOUBLE tokens are approximate)>",
+        "eq_tokens": "<warning(printed values for DOUBLE tokens are approximate)>",
+        "id": "1"
+      },
+      "float32_fixture_ddl": [
+        "CREATE TABLE num32 (id INT64 NOT NULL, x FLOAT32, gateval INT64 NOT NULL, gt TOKENLIST AS (tokenize_number(gateval,comparison_type=>'equality')) HIDDEN) PRIMARY KEY(id)",
+        "CREATE SEARCH INDEX num32gate ON num32(gt)",
+        "ALTER TABLE num32 ADD COLUMN teq TOKENLIST AS (tokenize_number(x,comparison_type=>'equality')) HIDDEN",
+        "CREATE SEARCH INDEX num32eq ON num32(gt,teq)",
+        "ALTER TABLE num32 ADD COLUMN tall TOKENLIST AS (tokenize_number(x,comparison_type=>'all')) HIDDEN",
+        "CREATE SEARCH INDEX num32all ON num32(gt,tall)",
+        "CREATE SEARCH INDEX num32onlyeq ON num32(teq)",
+        "CREATE SEARCH INDEX num32onlyall ON num32(tall)"
+      ],
+      "seven_rows_sql": "INSERT INTO num32(id,x,gateval) VALUES (1,CAST('NaN' AS FLOAT32),1),(2,CAST(41 AS FLOAT32),1),(3,CAST(42 AS FLOAT32),1),(4,CAST(43 AS FLOAT32),1),(5,NULL,1),(6,CAST('NaN' AS FLOAT32),0),(7,CAST(41 AS FLOAT32),0)",
+      "float64_substitution": "Use num64 and FLOAT64 instead of num32 and FLOAT32.",
+      "profile_sql_examples": {
+        "num32/ne/guarded/base": "SELECT id FROM num32@{FORCE_INDEX=_BASE_TABLE} WHERE gateval=1 AND x != CAST(42 AS FLOAT32) ORDER BY id",
+        "num32/ne/guarded/gate": "SELECT id FROM num32@{FORCE_INDEX=num32gate} WHERE gateval=1 AND x != CAST(42 AS FLOAT32) ORDER BY id",
+        "num32/not-gt/guarded/gate": "SELECT id FROM num32@{FORCE_INDEX=num32gate} WHERE gateval=1 AND NOT (x > CAST(42 AS FLOAT32)) ORDER BY id"
+      },
+      "float_only_profile_sql": "SELECT id FROM num32@{FORCE_INDEX=num32onlyall} WHERE x != CAST(42 AS FLOAT32) ORDER BY id"
+    },
+    "pg": {
+      "profile_queries_including_float_only": 60,
+      "base_controls": 24,
+      "comparisons_with_base": 36,
+      "mismatches": 0,
+      "nan_truth": {"le": false, "ne": true, "not_gt": false, "two_ranges": true},
+      "ids_for_float32_and_float64": {
+        "ne/alone": [1, 2, 4, 6, 7],
+        "ne/guarded": [1, 2, 4],
+        "not-gt/alone": [2, 3, 7],
+        "not-gt/guarded": [2, 3],
+        "two-ranges/alone": [1, 2, 4, 6, 7],
+        "two-ranges/guarded": [1, 2, 4],
+        "le/alone": [2, 3, 7],
+        "le/guarded": [2, 3],
+        "eq/alone": [3],
+        "eq/guarded": [3],
+        "in/alone": [2, 3, 7],
+        "in/guarded": [2, 3]
+      },
+      "guarded_ne_plan": {
+        "search_scans": ["num32gate"],
+        "search_token_columns": ["gt"],
+        "residuals": ["(PG_MAP_FLOAT_TO_INT($x) != 4631107791820423168)"]
+      },
+      "guarded_not_gt_plan": {
+        "search_scans": ["num32gate"],
+        "search_token_columns": ["gt"],
+        "residuals": ["(PG_MAP_FLOAT_TO_INT($x) <= 4631107791820423168)"]
+      },
+      "direct_tokenization": {
+        "int/default": "OK",
+        "int/equality": "OK",
+        "int/all": "OK",
+        "f32/default": "Unimplemented",
+        "f32/equality": "Unimplemented",
+        "f32/all": "Unimplemented",
+        "f64/default": "Unimplemented",
+        "f64/equality": "Unimplemented",
+        "f64/all": "Unimplemented"
+      },
+      "unavailable_float_index_routes": 48,
+      "float32_fixture_ddl_grpc": ["OK", "OK", "InvalidArgument", "FailedPrecondition", "InvalidArgument", "FailedPrecondition"],
+      "index_ddl_errors": {
+        "num32-eq-token": "Postgres function tokenize_number(real, text, text, double precision, double precision, double precision, bigint, bigint) is not supported",
+        "num32-all-token": "Postgres function tokenize_number(real, text, text, double precision, double precision, double precision, bigint, bigint) is not supported",
+        "num64-eq-token": "Postgres function tokenize_number(double precision, text, text, double precision, double precision, double precision, bigint, bigint) is not supported",
+        "num64-all-token": "Postgres function tokenize_number(double precision, text, text, double precision, double precision, double precision, bigint, bigint) is not supported"
+      },
+      "float32_fixture_ddl": [
+        "CREATE TABLE num32 (id bigint NOT NULL, x real, gateval bigint NOT NULL, gt spanner.tokenlist GENERATED ALWAYS AS (spanner.tokenize_number(gateval,comparison_type=>'equality')) VIRTUAL HIDDEN, PRIMARY KEY(id))",
+        "CREATE SEARCH INDEX num32gate ON num32(gt)",
+        "ALTER TABLE num32 ADD COLUMN teq spanner.tokenlist GENERATED ALWAYS AS (spanner.tokenize_number(x,comparison_type=>'equality')) VIRTUAL HIDDEN",
+        "CREATE SEARCH INDEX num32eq ON num32(gt,teq)",
+        "ALTER TABLE num32 ADD COLUMN tall spanner.tokenlist GENERATED ALWAYS AS (spanner.tokenize_number(x,comparison_type=>'all')) VIRTUAL HIDDEN",
+        "CREATE SEARCH INDEX num32all ON num32(gt,tall)"
+      ],
+      "seven_rows_sql": "INSERT INTO num32(id,x,gateval) VALUES (1,CAST('NaN' AS real),1),(2,CAST(41 AS real),1),(3,CAST(42 AS real),1),(4,CAST(43 AS real),1),(5,NULL,1),(6,CAST('NaN' AS real),0),(7,CAST(41 AS real),0)",
+      "float64_substitution": "Use num64 and double precision instead of num32 and real.",
+      "profile_sql_examples": {
+        "num32/ne/guarded/base": "SELECT id FROM num32 /*@ FORCE_INDEX=_BASE_TABLE */ WHERE gateval=1 AND x != CAST(42 AS real) ORDER BY id",
+        "num32/ne/guarded/gate": "SELECT id FROM num32 /*@ FORCE_INDEX=num32gate */ WHERE gateval=1 AND x != CAST(42 AS real) ORDER BY id",
+        "num32/not-gt/guarded/gate": "SELECT id FROM num32 /*@ FORCE_INDEX=num32gate */ WHERE gateval=1 AND NOT (x > CAST(42 AS real)) ORDER BY id"
+      }
+    }
+  },
+  "upserts": {
+    "common_column_order": ["new_or_existing_key", "code", "affected_rows", "commit_mutations", "final_val", "final_spare"],
+    "shared_primary_key_cases": {
+      "pk-full": [["absent", "OK", 1, 3, 11, "sent"], ["present", "OK", 1, 3, 11, "sent"]],
+      "pk-partial": [["absent", "OK", 1, 3, 11, "default-tag"], ["present", "OK", 1, 3, 11, "kept"]],
+      "no-pk-assignment/no-key-set": [["absent", "OK", 1, 3, 11, "sent"], ["present", "OK", 1, 3, 11, "sent"]],
+      "no-pk-assignment/expression": [["absent", "OK", 1, 3, 11, "sent"], ["present", "OK", 1, 3, 12, "sent"]],
+      "no-pk-assignment/where-true": [["absent", "OK", 1, 3, 11, "sent"], ["present", "OK", 1, 3, 11, "sent"]],
+      "no-pk-assignment/where-false": [["absent", "OK", 1, 3, 11, "sent"], ["present", "OK", 0, 0, 7, "kept"]],
+      "no-pk-assignment/set-omits-spare": [["absent", "OK", 1, 3, 11, "sent"], ["present", "OK", 1, 2, 11, "kept"]]
+    },
+    "sql": {
+      "plain_table": {
+        "google": "CREATE TABLE plain_up (id INT64 NOT NULL,val INT64,spare STRING(60) DEFAULT ('default-tag')) PRIMARY KEY(id)",
+        "pg": "CREATE TABLE plain_up (id bigint NOT NULL,val bigint,spare varchar(60) DEFAULT 'default-tag', PRIMARY KEY(id))"
+      },
+      "pk_full": "INSERT INTO plain_up (id,val,spare) VALUES (11,11,'sent') ON CONFLICT (id) DO UPDATE SET id=excluded.id,val=excluded.val,spare=excluded.spare",
+      "pk_partial": "INSERT INTO plain_up (id,val) VALUES (21,11) ON CONFLICT (id) DO UPDATE SET id=excluded.id,val=excluded.val",
+      "with_pk_expression": "INSERT INTO plain_up (id,val,spare) VALUES (41,11,'sent') ON CONFLICT (id) DO UPDATE SET id=excluded.id,val=excluded.val+1,spare=excluded.spare",
+      "without_pk_expression": "INSERT INTO plain_up(id,val,spare) VALUES(1021,11,'sent') ON CONFLICT(id) DO UPDATE SET val=excluded.val+1,spare=excluded.spare",
+      "with_false_condition": "INSERT INTO plain_up(id,val,spare) VALUES(1041,11,'sent') ON CONFLICT(id) DO UPDATE SET val=excluded.val,spare=excluded.spare WHERE plain_up.val > 10",
+      "unique_target": "INSERT INTO unique_up(id,code,val) VALUES(901,901,11) ON CONFLICT(code) DO UPDATE SET val=excluded.val"
+    },
+    "insert_or_update_google": {
+      "insert-or-update-full/absent": {"code": "OK", "affected": 1, "mutation_count": 3, "final_rows": [{"id": "70", "spare": "sent", "val": "11"}]},
+      "insert-or-update-full/present": {"code": "OK", "affected": 1, "mutation_count": 3, "final_rows": [{"id": "71", "spare": "sent", "val": "11"}]},
+      "insert-or-update-partial/absent": {"code": "OK", "affected": 1, "mutation_count": 3, "final_rows": [{"id": "80", "spare": "default-tag", "val": "11"}]},
+      "insert-or-update-partial/present": {"code": "OK", "affected": 1, "mutation_count": 3, "final_rows": [{"id": "81", "spare": "kept", "val": "11"}]}
+    },
+    "google": {
+      "unique_table_ddl": "CREATE TABLE unique_up (id INT64 NOT NULL, code INT64 NOT NULL,val INT64) PRIMARY KEY(id)",
+      "unique_index_ddl": "CREATE UNIQUE INDEX unique_up_code ON unique_up(code)",
+      "unique_index_catalog": {"index_name": "unique_up_code", "is_null_filtered": false, "is_unique": true},
+      "unique_target_cases": {
+        "unique-target/absent": {"code": "OK", "affected": 1, "mutation_count": 4, "final_rows": [{"code": "900", "id": "900", "val": "11"}]},
+        "unique-target/present": {"code": "OK", "affected": 1, "mutation_count": 2, "final_rows": [{"code": "901", "id": "899", "val": "11"}]},
+        "same-primary-key/present": {
+          "code": "InvalidArgument",
+          "error": "Key column id cannot be updated.",
+          "final_rows": [{"code": "981", "id": "971", "val": "7"}]
+        }
+      },
+      "nonmatching_set_with_pk_error": "Key column id cannot be updated."
+    },
+    "pg": {
+      "unique_table_ddl": "CREATE TABLE unique_up (id bigint NOT NULL, code bigint NOT NULL,val bigint, PRIMARY KEY(id))",
+      "unique_index_ddl": "CREATE UNIQUE INDEX unique_up_code ON unique_up(code)",
+      "unique_index_catalog": {"index_name": "unique_up_code", "is_null_filtered": "NO", "is_unique": "YES"},
+      "unique_target_cases": {
+        "unique-target/absent": {
+          "code": "Unimplemented",
+          "error": "ON CONFLICT clause with null filtering index as conflict target is not supported. Index: unique_up_code",
+          "final_rows": []
+        },
+        "unique-target/present": {
+          "code": "Unimplemented",
+          "error": "ON CONFLICT clause with null filtering index as conflict target is not supported. Index: unique_up_code",
+          "final_rows": [{"code": "901", "id": "899", "val": "7"}]
+        },
+        "same-primary-key/present": {
+          "code": "InvalidArgument",
+          "error": "Key column id cannot be updated.",
+          "final_rows": [{"code": "981", "id": "971", "val": "7"}]
+        }
+      },
+      "nonmatching_set_with_pk_error": "Key column id cannot be updated."
+    }
+  },
+  "strict_google_ddl_parser": {
+    "revisions": {"v0.8.1": "4842adc19d09225adef475e9672e64e9322a0729", "upstream_main": "da2ddfdd6277527f9dc2a54b87221579a9b18abe"},
+    "source_scope": "Prior same-day strict memefish.ParseDDL run; both revisions returned identical results.",
+    "cases": [
+      {"sql": "GRANT EXECUTE ON TABLE FUNCTION RECEIVE_OrdersQueue TO ROLE consumer", "accepted": true},
+      {"sql": "REVOKE EXECUTE ON TABLE FUNCTION RECEIVE_OrdersQueue FROM ROLE consumer", "accepted": true},
+      {
+        "sql": "GRANT EXECUTE ON ALL TABLE FUNCTIONS IN SCHEMA DEFAULT TO ROLE consumer",
+        "accepted": false,
+        "error": "syntax error: :1:18: expected token: <ident>, but: ALL"
+      },
+      {
+        "sql": "REVOKE EXECUTE ON ALL TABLE FUNCTIONS IN SCHEMA DEFAULT FROM ROLE consumer",
+        "accepted": false,
+        "error": "syntax error: :1:19: expected token: <ident>, but: ALL"
+      },
+      {
+        "sql": "GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA DEFAULT TO ROLE consumer",
+        "accepted": false,
+        "error": "syntax error: :1:18: expected token: <ident>, but: ALL"
+      },
+      {
+        "sql": "REVOKE EXECUTE ON ALL FUNCTIONS IN SCHEMA DEFAULT FROM ROLE consumer",
+        "accepted": false,
+        "error": "syntax error: :1:19: expected token: <ident>, but: ALL"
+      }
+    ]
+  }
+}
