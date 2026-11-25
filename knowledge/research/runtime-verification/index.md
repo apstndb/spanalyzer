@@ -22,7 +22,7 @@ the latest public release. Use the engine histories for a chronological view.
 
 | Runtime and observation scope | Research Note |
 | --- | --- |
-| Managed GoogleSQL, 2026-11-25 22:56–23:02 JST | [GoogleSQL frontend release comparisons](googlesql-release-deltas-20261125.md). Seven upstream release pairs and 71 managed probes, including nested JSON casts and secure context. |
+| Managed GoogleSQL, 2026-11-25 22:56–23:13 JST | [GoogleSQL frontend release comparisons](googlesql-release-deltas-20261125.md). Seven upstream release pairs and 72 managed probes, including nested JSON casts and secure context. |
 | Managed, Omni r4 LTS.3 / r5.2 and Emulator 1.5.59, 2026-11-25 JST | [GoogleSQL catalog comparison](managed-omni-emulator-catalogs-20261125.md). Measured system columns and optimizer-version reads on four targets, with two managed replays. |
 | Managed, Omni r5.2 and Emulator 1.5.59, 2026-11-24 UTC | [Managed placement metadata and function privileges](managed-placements-and-omni-privileges-20261124.md). A 272-query managed replay and a restricted-role comparison on both local engines. |
 | Managed Spanner, 2026-11-21 UTC | [Queue privileges, indexed NaN predicates and ordinary-table upserts](managed-queue-search-upsert-20261121.md). Two dialects, restricted-role execution before and after bulk grants, 144 comparisons with base scans, and a 337-query compatibility replay. |

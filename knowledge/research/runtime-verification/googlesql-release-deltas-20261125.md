@@ -1,13 +1,13 @@
 ---
 type: Research Note
 title: GoogleSQL frontend releases and managed Spanner behavior
-description: Seven upstream release comparisons from July to November 2026, paired with 71 read-only managed Spanner probes and controls.
+description: Seven upstream release comparisons from July to November 2026, paired with 72 read-only managed Spanner probes and controls.
 tags: [managed-spanner, googlesql, runtime-verification, json, gql]
 status: draft
 sources:
   - id: managed
     resource: evidence/managed-recheck-20261125/googlesql-release-probes.json
-    title: SQL, query options, result types, rows and diagnostics for all 71 probes
+    title: SQL, query options, result types, rows and diagnostics for all 72 probes
   - id: upstream
     resource: https://github.com/google/googlesql/releases/tag/2026.11.3
     title: Latest GoogleSQL frontend release at the time of observation
@@ -25,7 +25,7 @@ On November 25, 2026, a managed GoogleSQL database accepted conversion of indivi
 
 ## Managed results
 
-The 71 queries ran from 22:56 to 23:02 JST on one existing regional Enterprise trial database. Each ran in a single-use read-only transaction. Thirty succeeded, 33 returned `InvalidArgument`, six returned `Unimplemented` and two returned `OutOfRange`. The set includes positive controls, intentional errors and a graph inventory. [Inputs, results and types](evidence/managed-recheck-20261125/googlesql-release-probes.json)
+The 72 queries ran from 22:56 to 23:13 JST on one existing regional Enterprise trial database. Each ran in a single-use read-only transaction. Thirty-one succeeded, 33 returned `InvalidArgument`, six returned `Unimplemented` and two returned `OutOfRange`. The set includes positive controls, intentional errors and a graph inventory. [Inputs, results and types](evidence/managed-recheck-20261125/googlesql-release-probes.json)
 
 | Candidate | Result on managed GoogleSQL |
 | --- | --- |
@@ -33,9 +33,9 @@ The 71 queries ran from 22:56 to 23:02 JST on one existing regional Enterprise t
 | Secure context | With a synthetic `user_id` in the request, `SECURE_CONTEXT('user_id')` returned the supplied string. Omitting the key raised a missing-parameter error. The routine suite had already exercised this function. |
 | SQL cast shorthand and quantified comparisons | Both postfix cast operators, `::` and `?::`, and the tested `= ANY` and `!= ALL` forms were rejected. `CAST` and `SAFE_CAST` returned 123 and SQL NULL. The equivalent `IN` and `NOT IN` controls returned TRUE, NULL and TRUE. |
 | Aggregate filters and window frames | `SUM(1 / x WHERE x != 0)` rejected the in-call modifier. Moving the predicate to the query returned 1.5, and removing it raised division by zero. A computed frame bound required a literal or parameter. Literal and type-matched parameter controls reached an unimplemented analytic aggregate, leaving the upstream RANGE arithmetic unmeasured. |
-| JSON presence and wildcard paths | `JSON_EXISTS` was unavailable, including for a plain path to a JSON null. `JSON_QUERY` preserved that null. `JSON_QUERY_ARRAY` returned the two elements at `$.a` and rejected the wildcard in `$.a[*]` with `OutOfRange`. |
+| JSON presence and wildcard paths | `JSON_EXISTS` was unavailable, including for a plain path to a JSON null. On the present path, `JSON_QUERY(...) IS NULL` returned FALSE. On a missing path it returned TRUE. Serializing the two nulls to text alone cannot distinguish them. `JSON_QUERY_ARRAY` returned the two elements at `$.a` and rejected the wildcard in `$.a[*]` with `OutOfRange`. |
 | Additional functions and types | `ARRAY_REDUCE`, `JAROWINKLER_SIMILARITY`, the tested bit-cast function names and the `VARIANT` type were unavailable. `NULLIF` rejected a lambda argument and accepted the ordinary two-value call. `EDIT_DISTANCE` reached an unimplemented built-in. |
-| Name resolution and table expressions | A select-list alias was invisible to a later expression in the same list, including the grouped positive control. A subquery made the alias visible. Top-level `TABLE` and a string literal table reference were rejected. Ordinary table references worked. |
+| Name resolution and table expressions | A select-list alias was invisible to a later expression in the same list, including the grouped control. A subquery made the alias visible. Top-level `TABLE` and a string literal table reference were rejected. Ordinary table references worked. |
 | Column lists | Standalone `**COLUMNS` reported a disabled feature. In a predicate it produced an expression-resolution error. Both the explicit and unpacked `UNION ALL BY NAME ON` lists rejected the surrounding set-operation syntax. Positional `UNION ALL` succeeded. |
 
 To replay the evening cases, extract `[.cases[].input]` with jq and pass the resulting JSON array to the managed producer described in the [catalog note](managed-omni-emulator-catalogs-20261125.md#reproduction). Returned field types distinguish a single JSON array from an SQL array of JSON values.
@@ -50,13 +50,13 @@ The Emulator 1.5.59 source pins the July tag and applies a Spanner-specific patc
 | [2026.9.1 → 2026.9.2](https://github.com/google/googlesql/compare/2026.9.1...2026.9.2) | 178 | Top-level TABLE and Jaro-Winkler leave development status. GQL label resolution changes. |
 | [2026.9.2 → 2026.10.1](https://github.com/google/googlesql/compare/2026.9.2...2026.10.1) | 285 | JSON existence functions gain reference evaluation. JSONPath wildcards gain a feature flag. General quantified comparisons gain documentation. Index stored-column changes gain grammar and AST support. |
 | [2026.10.1 → 2026.10.3](https://github.com/google/googlesql/compare/2026.10.1...2026.10.3) | 231 | SQL-standard JSONPath wildcards reach reference evaluation. GQL endpoint predicates on NULL operands return NULL in reference tests. Graph-element JSON casts and stored-column index resolution gain coverage. |
-| [2026.10.3 → 2026.11.1](https://github.com/google/googlesql/compare/2026.10.3...2026.11.1) | 337 | SECURE_CONTEXT leaves development status. NUMERIC frame bounds and GQL analytic WITH followed by ANY k MATCH gain coverage. |
+| [2026.10.3 → 2026.11.1](https://github.com/google/googlesql/compare/2026.10.3...2026.11.1) | 337 | SECURE_CONTEXT leaves development status. NUMERIC frame bounds and GQL analytic WITH followed by MATCH ANY k gain coverage. |
 | [2026.11.1 → 2026.11.2](https://github.com/google/googlesql/compare/2026.11.1...2026.11.2) | 225 | Filtered aggregates evaluate arguments after filtering in reference cases. GQL checks duplicate WITH aliases earlier. Experimental ARRAY_REDUCE and catalog-backed string literal table references appear. |
 | [2026.11.2 → 2026.11.3](https://github.com/google/googlesql/compare/2026.11.2...2026.11.3) | 39 | Experimental VARIANT casts expand. New nested JSON cast tests exercise an existing gate. Diagnostics change for misplaced column unpacking, and system-time resolution checks its feature gate. |
 
 ## Remaining candidates
 
-The managed test database exposed zero property graphs. The following tests require a graph with a node, a directed edge and scalar IDs. Past measurements and the upstream release dates establish independent reference points.
+The managed test database exposed zero property graphs. The first three candidates require a graph with a node, a directed edge and scalar IDs. Past measurements and the upstream release dates establish independent reference points.
 
 - **NULL graph endpoints.** Force an unmatched OPTIONAL MATCH, verify that its edge is NULL, then apply `IS SOURCE OF` and `IS DESTINATION OF`. Compare with a matched edge. Upstream changed from an error to NULL, and Spanner documents three-valued results. [Reference cases](https://github.com/google/googlesql/blob/a09b0bd95dd55dba9478eb8f20a3971bc9e30b70/googlesql/compliance/testdata/graph_table.test#L1175-L1218) · [Spanner graph predicates](https://docs.cloud.google.com/spanner/docs/reference/standard-sql/operators#is_source_predicate)
 - **Graph JSON casts.** Reuse the October fixture to compare `CAST` and `TO_JSON` on the same node, edge and path. Managed returned `Unimplemented` for the graph casts in October. November's scalar and nested casts measured different input types. [October observations](managed-json-comparison-and-change-streams-20261010.md#cast-as-json) · [Spanner casts](https://docs.cloud.google.com/spanner/docs/reference/standard-sql/conversion_functions#cast_as_json)

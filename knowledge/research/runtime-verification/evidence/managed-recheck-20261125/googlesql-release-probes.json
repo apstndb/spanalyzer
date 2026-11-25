@@ -1,7 +1,7 @@
 {
   "scope": "One existing managed Spanner GoogleSQL database in a regional Enterprise trial in asia-northeast1. Single-use read-only queries in NORMAL mode.",
   "started_utc": "2026-11-25T13:56:39.079832Z",
-  "finished_utc": "2026-11-25T14:02:50.118514Z",
+  "finished_utc": "2026-11-25T14:13:24.819549Z",
   "producer_source": "../managed-recheck-20261112/producer/query.go.txt",
   "producer_binary_sha256": "797e550de8fc200bfad2fd2e36b641f765204fbe7118deab7d50bb578ae4f094",
   "client_build": {
@@ -9,11 +9,11 @@
     "cloud.google.com/go/spanner": "v1.95.1",
     "google.golang.org/grpc": "v1.84.0"
   },
-  "replay": "Extract the input objects in order with jq ' [.cases[].input] ' and pass the array to the linked managed producer. JSON numeric parameters decode as FLOAT64 in this producer.",
+  "replay": "Extract the input objects in order with jq '[.cases[].input]' and pass the array to the linked managed producer. JSON numeric parameters decode as FLOAT64 in this producer.",
   "result_format": "Successful rows use the Spanner protobuf JSON wire representation. The fields retain the SQL result types. Error diagnostics retain their first line with source positions removed.",
   "counts": {
     "InvalidArgument": 33,
-    "OK": 30,
+    "OK": 31,
     "OutOfRange": 2,
     "Unimplemented": 6
   },
@@ -1027,6 +1027,54 @@
           "name": "v",
           "type": {
             "code": "JSON"
+          }
+        }
+      ]
+    },
+    {
+      "input": {
+        "label": "json_null_vs_missing",
+        "sql": "WITH sample AS (SELECT JSON_QUERY(JSON '{\"a\":null}', '$.a') AS present, JSON_QUERY(JSON '{\"a\":null}', '$.missing') AS missing) SELECT present, present IS NULL AS present_is_sql_null, missing, missing IS NULL AS missing_is_sql_null, TO_JSON_STRING(CAST(NULL AS JSON)) AS sql_null_text FROM sample"
+      },
+      "code": "OK",
+      "rows": [
+        {
+          "missing": null,
+          "missing_is_sql_null": true,
+          "present": "null",
+          "present_is_sql_null": false,
+          "sql_null_text": "null"
+        }
+      ],
+      "fields": [
+        {
+          "name": "present",
+          "type": {
+            "code": "JSON"
+          }
+        },
+        {
+          "name": "present_is_sql_null",
+          "type": {
+            "code": "BOOL"
+          }
+        },
+        {
+          "name": "missing",
+          "type": {
+            "code": "JSON"
+          }
+        },
+        {
+          "name": "missing_is_sql_null",
+          "type": {
+            "code": "BOOL"
+          }
+        },
+        {
+          "name": "sql_null_text",
+          "type": {
+            "code": "STRING"
           }
         }
       ]
