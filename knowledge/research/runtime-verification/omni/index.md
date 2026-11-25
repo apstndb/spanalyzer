@@ -48,6 +48,7 @@ observation date. Same-day rows without exact times have no claimed order.
 | 2026-11-18 UTC, r4 LTS.2 and r5.1 arm64 | Two-dialect comparison | Both releases returned the physical child index through the FK-name hint. All seven names recorded on LTS matched managed. Reordered FK column pairs agreed with the declared DDL. The LTS shared-parent control returned one catalog row per key column. | [FK backing-index resolution](../fk-backing-index-resolution-20261118.md) |
 | 2026-11-21 UTC, r5.1 arm64 | Baseline | Two GoogleSQL fixtures recorded 49 privilege steps. The restricted role could call the scalar function only between grant and revoke. | [Paired image evidence](../evidence/managed-recheck-20261124/receipt.json) |
 | 2026-11-24 UTC, r5.2 arm64 | Recheck | All 49 steps matched the November 21 r5.1 sample in SQL, status and returned rows. | [Paired image evidence](../evidence/managed-recheck-20261124/receipt.json), [November 24](../managed-placements-and-omni-privileges-20261124.md) |
+| 2026-11-24 17:21–17:24 UTC (November 25 JST), r4 LTS.3 and r5.2 arm64 | First coverage | The paired patch images exposed identical column tuples in IS (310) and SYS (598). Both returned optimizer versions 1 through 9 with default 9. | [Catalog comparison](../managed-omni-emulator-catalogs-20261125.md), [per-image evidence](../evidence/managed-recheck-20261125/receipt.json) |
 
 ## Publication and source context
 
