@@ -40,6 +40,28 @@
         "label": "optimizer-direct",
         "sql": "SELECT VERSION, IS_DEFAULT FROM SPANNER_SYS.SUPPORTED_OPTIMIZER_VERSIONS ORDER BY VERSION"
       }
+    ],
+    "local_discovery": "Open a GoogleSQL database on each tagged local service with a Spanner-compatible SQL client, then execute each discovery_queries SQL string there. Use infoschema-capture for all three target types and spanner-sys-capture for managed or omni. The managed read-only producer requires the production endpoint.",
+    "local_discovery_runner": "../docs-delta-runtime-20261031/producers/module/local.go.txt",
+    "local_discovery_replay": [
+      {
+        "tag": "1.5.59",
+        "completed_utc": "2026-11-25T14:10:38.559973Z",
+        "matching_discovery_results": 4,
+        "database_after_drop": "NotFound"
+      },
+      {
+        "tag": "2026.r4-lts.3",
+        "completed_utc": "2026-11-25T14:10:57.685685Z",
+        "matching_discovery_results": 4,
+        "database_after_drop": "NotFound"
+      },
+      {
+        "tag": "2026.r5.2",
+        "completed_utc": "2026-11-25T14:11:20.770249Z",
+        "matching_discovery_results": 4,
+        "database_after_drop": "NotFound"
+      }
     ]
   },
   "managed_replay": {
@@ -197,7 +219,12 @@
               }
             ]
           }
-        ]
+        ],
+        "client_build": {
+          "go": "go1.26.11",
+          "cloud.google.com/go/spanner": "v1.95.1",
+          "google.golang.org/grpc": "v1.83.2"
+        }
       }
     ],
     "first_pass_row_variations": {

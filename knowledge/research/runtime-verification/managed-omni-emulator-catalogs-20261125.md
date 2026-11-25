@@ -45,3 +45,18 @@ At 02:31 JST the mirror remained at `5f1eee7`. By the evening recheck it had adv
 ## Reproduction
 
 Use Python 3 to run `replay_inputs.py primary` and `replay_inputs.py controls`, then save each emitted JSON array to a file. The receipt identifies the two measured binaries by SHA-256. To build an independent replay executable, compile the linked Go source as a `.go` file from the `survey` module with `GOWORK=off GOFLAGS=-mod=readonly`, set `TEST_REAL_SPANNER_DATABASE` to the GoogleSQL database resource, and pass one input file per invocation. The receipt records both file hashes, the four common catalog queries, and the image digests for repeating the local measurements. [Input generator](evidence/managed-recheck-20261125/replay_inputs.py) · [Go producer](evidence/managed-recheck-20261112/producer/query.go.txt) · [Measured results](evidence/managed-recheck-20261125/receipt.json)
+
+For local catalog captures, run `infoschema-capture` with `--target omni` or `--target emulator` and the image pinned in the receipt. Use `spanner-sys-capture --target omni` for the full Omni system surface. To reproduce the discovery counts and optimizer rows on either local engine, connect a Spanner SQL client to a GoogleSQL database on that pinned container and execute the four statements in `reproduction.discovery_queries`. The managed replay producer requires a managed connection.
+
+To run all four queries on a pinned local image, start in the repository root with Docker available. Use the [local runner](evidence/docs-delta-runtime-20261031/producers/module/local.go.txt). Set `BACKEND` to `emulator` or `omni` and `PINNED_IMAGE` to the matching image repository and tag followed by `@` and the Linux arm64 `manifest_digest` in the receipt. The runner opens and removes its own local database. Its output includes the status of each query and cleanup.
+
+```sh
+evidence=knowledge/research/runtime-verification/evidence
+scratch="$PWD/.tmp/nov25-catalog-replay"
+mkdir -p "$scratch"
+cp "$evidence/docs-delta-runtime-20261031/producers/module/local.go.txt" "$scratch/local.go"
+jq '{dialect:"google", steps:[.reproduction.discovery_queries[] + {kind:"query"}]}' \
+  "$evidence/managed-recheck-20261125/receipt.json" > "$scratch/queries.json"
+(cd survey && GOWORK=off GOFLAGS=-mod=readonly go build -o "$scratch/local" "$scratch/local.go")
+"$scratch/local" "$BACKEND" "$PINNED_IMAGE" "$scratch/queries.json"
+```
