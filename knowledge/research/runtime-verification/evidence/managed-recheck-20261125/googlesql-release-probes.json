@@ -1,0 +1,1083 @@
+{
+  "scope": "One existing managed Spanner GoogleSQL database in a regional Enterprise trial in asia-northeast1. Single-use read-only queries in NORMAL mode.",
+  "started_utc": "2026-11-25T13:56:39.079832Z",
+  "finished_utc": "2026-11-25T14:13:24.819549Z",
+  "producer_source": "../managed-recheck-20261112/producer/query.go.txt",
+  "producer_binary_sha256": "797e550de8fc200bfad2fd2e36b641f765204fbe7118deab7d50bb578ae4f094",
+  "client_build": {
+    "go": "go1.26.11",
+    "cloud.google.com/go/spanner": "v1.95.1",
+    "google.golang.org/grpc": "v1.84.0"
+  },
+  "replay": "Extract the input objects in order with jq '[.cases[].input]' and pass the array to the linked managed producer. JSON numeric parameters decode as FLOAT64 in this producer.",
+  "result_format": "Successful rows use the Spanner protobuf JSON wire representation. The fields retain the SQL result types. Error diagnostics retain their first line with source positions removed.",
+  "counts": {
+    "InvalidArgument": 33,
+    "OK": 31,
+    "OutOfRange": 2,
+    "Unimplemented": 6
+  },
+  "cases": [
+    {
+      "input": {
+        "label": "aggregate_inline_filter",
+        "sql": "SELECT SUM(1 / x WHERE x != 0) AS s FROM UNNEST([0,1,2]) AS x"
+      },
+      "code": "InvalidArgument",
+      "diagnostic": "WHERE modifier is not supported in function calls"
+    },
+    {
+      "input": {
+        "label": "aggregate_outer_filter",
+        "sql": "SELECT SUM(1 / x) AS s FROM UNNEST([0,1,2]) AS x WHERE x != 0"
+      },
+      "code": "OK",
+      "rows": [
+        {
+          "s": 1.5
+        }
+      ],
+      "fields": [
+        {
+          "name": "s",
+          "type": {
+            "code": "FLOAT64"
+          }
+        }
+      ]
+    },
+    {
+      "input": {
+        "label": "aggregate_zero_control",
+        "sql": "SELECT SUM(1 / x) AS s FROM UNNEST([0,1,2]) AS x"
+      },
+      "code": "OutOfRange",
+      "diagnostic": "division by zero: 1 / 0"
+    },
+    {
+      "input": {
+        "label": "double_colon",
+        "sql": "SELECT '123'::INT64 AS i"
+      },
+      "code": "InvalidArgument",
+      "diagnostic": "CAST operators are not supported"
+    },
+    {
+      "input": {
+        "label": "safe_double_colon",
+        "sql": "SELECT 'bad'?::INT64 AS i"
+      },
+      "code": "InvalidArgument",
+      "diagnostic": "CAST operators are not supported"
+    },
+    {
+      "input": {
+        "label": "cast_control",
+        "sql": "SELECT CAST('123' AS INT64) AS i, SAFE_CAST('bad' AS INT64) AS safe_i"
+      },
+      "code": "OK",
+      "rows": [
+        {
+          "i": "123",
+          "safe_i": null
+        }
+      ],
+      "fields": [
+        {
+          "name": "i",
+          "type": {
+            "code": "INT64"
+          }
+        },
+        {
+          "name": "safe_i",
+          "type": {
+            "code": "INT64"
+          }
+        }
+      ]
+    },
+    {
+      "input": {
+        "label": "equals_any_hit",
+        "sql": "SELECT 5 = ANY (1,NULL,5) AS present"
+      },
+      "code": "InvalidArgument",
+      "diagnostic": "Quantified comparisons (= ANY) are not supported"
+    },
+    {
+      "input": {
+        "label": "equals_any_unknown",
+        "sql": "SELECT 5 = ANY (1,NULL,2) AS unknown_value"
+      },
+      "code": "InvalidArgument",
+      "diagnostic": "Quantified comparisons (= ANY) are not supported"
+    },
+    {
+      "input": {
+        "label": "ne_all_array",
+        "sql": "SELECT 5 != ALL UNNEST([1,2,3]) AS absent"
+      },
+      "code": "InvalidArgument",
+      "diagnostic": "Quantified comparisons (!= ALL) are not supported"
+    },
+    {
+      "input": {
+        "label": "in_control",
+        "sql": "SELECT 5 IN (1,NULL,5) AS present, 5 IN (1,NULL,2) AS unknown_value, 5 NOT IN UNNEST([1,2,3]) AS absent"
+      },
+      "code": "OK",
+      "rows": [
+        {
+          "absent": true,
+          "present": true,
+          "unknown_value": null
+        }
+      ],
+      "fields": [
+        {
+          "name": "present",
+          "type": {
+            "code": "BOOL"
+          }
+        },
+        {
+          "name": "unknown_value",
+          "type": {
+            "code": "BOOL"
+          }
+        },
+        {
+          "name": "absent",
+          "type": {
+            "code": "BOOL"
+          }
+        }
+      ]
+    },
+    {
+      "input": {
+        "label": "json_exists_null",
+        "sql": "SELECT JSON_EXISTS(JSON '{\"a\":null}', '$.a') AS present"
+      },
+      "code": "InvalidArgument",
+      "diagnostic": "Function not found: JSON_EXISTS"
+    },
+    {
+      "input": {
+        "label": "json_exists_wildcard",
+        "sql": "SELECT JSON_EXISTS(JSON '{\"a\":[{\"k\":null}]}', '$.a[*].k') AS present"
+      },
+      "code": "InvalidArgument",
+      "diagnostic": "Function not found: JSON_EXISTS"
+    },
+    {
+      "input": {
+        "label": "json_exists_subscript",
+        "sql": "SELECT JSON_EXISTS(JSON '{\"a\":[{\"k\":null}]}', '$.a[0].k') AS present"
+      },
+      "code": "InvalidArgument",
+      "diagnostic": "Function not found: JSON_EXISTS"
+    },
+    {
+      "input": {
+        "label": "json_query_null_control",
+        "sql": "SELECT TO_JSON_STRING(JSON_QUERY(JSON '{\"a\":null}', '$.a')) AS json_value"
+      },
+      "code": "OK",
+      "rows": [
+        {
+          "json_value": "null"
+        }
+      ],
+      "fields": [
+        {
+          "name": "json_value",
+          "type": {
+            "code": "STRING"
+          }
+        }
+      ]
+    },
+    {
+      "input": {
+        "label": "json_query_array_wildcard",
+        "sql": "SELECT JSON_QUERY_ARRAY(JSON '{\"a\":[1,2]}', '$.a[*]') AS elements"
+      },
+      "code": "OutOfRange",
+      "diagnostic": "Unsupported operator in JSONPath: *"
+    },
+    {
+      "input": {
+        "label": "json_query_array_control",
+        "sql": "SELECT JSON_QUERY_ARRAY(JSON '{\"a\":[1,2]}', '$.a') AS elements"
+      },
+      "code": "OK",
+      "rows": [
+        {
+          "elements": [
+            "1",
+            "2"
+          ]
+        }
+      ],
+      "fields": [
+        {
+          "name": "elements",
+          "type": {
+            "code": "ARRAY",
+            "arrayElementType": {
+              "code": "JSON"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "input": {
+        "label": "array_reduce",
+        "sql": "SELECT ARRAY_REDUCE([1,2,3],0,(acc,e)->acc+e) AS total"
+      },
+      "code": "InvalidArgument",
+      "diagnostic": "Function not found: ARRAY_REDUCE"
+    },
+    {
+      "input": {
+        "label": "unnest_sum_control",
+        "sql": "SELECT SUM(e) AS total FROM UNNEST([1,2,3]) AS e"
+      },
+      "code": "OK",
+      "rows": [
+        {
+          "total": "6"
+        }
+      ],
+      "fields": [
+        {
+          "name": "total",
+          "type": {
+            "code": "INT64"
+          }
+        }
+      ]
+    },
+    {
+      "input": {
+        "label": "range_expression",
+        "sql": "SELECT x, SUM(x) OVER (ORDER BY x RANGE BETWEEN (1+1) PRECEDING AND CURRENT ROW) AS rolling FROM UNNEST([1,2,4,5]) AS x ORDER BY x"
+      },
+      "code": "InvalidArgument",
+      "diagnostic": "Window framing expression must be a literal or parameter"
+    },
+    {
+      "input": {
+        "label": "range_literal",
+        "sql": "SELECT x, SUM(x) OVER (ORDER BY x RANGE BETWEEN 2 PRECEDING AND CURRENT ROW) AS rolling FROM UNNEST([1,2,4,5]) AS x ORDER BY x"
+      },
+      "code": "Unimplemented",
+      "diagnostic": "Unsupported built-in function: SUM."
+    },
+    {
+      "input": {
+        "label": "range_numeric_fraction",
+        "sql": "SELECT x, COUNT(*) OVER (ORDER BY x RANGE BETWEEN NUMERIC '0.000000001' PRECEDING AND CURRENT ROW) AS n FROM UNNEST([NUMERIC '0', NUMERIC '0.000000001']) AS x ORDER BY x"
+      },
+      "code": "Unimplemented",
+      "diagnostic": "Unsupported built-in function: $COUNT_STAR."
+    },
+    {
+      "input": {
+        "label": "range_numeric_zero",
+        "sql": "SELECT x, COUNT(*) OVER (ORDER BY x RANGE BETWEEN NUMERIC '0' PRECEDING AND CURRENT ROW) AS n FROM UNNEST([NUMERIC '0', NUMERIC '0.000000001']) AS x ORDER BY x"
+      },
+      "code": "Unimplemented",
+      "diagnostic": "Unsupported built-in function: $COUNT_STAR."
+    },
+    {
+      "input": {
+        "label": "lateral_alias",
+        "sql": "WITH t AS (SELECT 1 AS x) SELECT x+1 AS a,a+1 AS b FROM t"
+      },
+      "code": "InvalidArgument",
+      "diagnostic": "Unrecognized name: a"
+    },
+    {
+      "input": {
+        "label": "lateral_ungrouped",
+        "sql": "WITH t AS (SELECT 1 AS x,2 AS y,3 AS z) SELECT SUM(x)+z AS a,a+1 AS b FROM t GROUP BY y"
+      },
+      "code": "InvalidArgument",
+      "diagnostic": "Unrecognized name: a"
+    },
+    {
+      "input": {
+        "label": "lateral_grouped",
+        "sql": "WITH t AS (SELECT 1 AS x,2 AS y,3 AS z) SELECT SUM(x)+z AS a,a+1 AS b FROM t GROUP BY y,z"
+      },
+      "code": "InvalidArgument",
+      "diagnostic": "Unrecognized name: a"
+    },
+    {
+      "input": {
+        "label": "literal_table_path",
+        "sql": "SELECT * FROM 'INFORMATION_SCHEMA.SCHEMATA' LIMIT 0"
+      },
+      "code": "InvalidArgument",
+      "diagnostic": "Syntax error: Unexpected string literal \\'INFORMATION_SCHEMA.SCHEMATA\\'"
+    },
+    {
+      "input": {
+        "label": "table_path_control",
+        "sql": "SELECT * FROM INFORMATION_SCHEMA.SCHEMATA LIMIT 0"
+      },
+      "code": "OK",
+      "rows": [],
+      "fields": [
+        {
+          "name": "CATALOG_NAME",
+          "type": {
+            "code": "STRING"
+          }
+        },
+        {
+          "name": "SCHEMA_NAME",
+          "type": {
+            "code": "STRING"
+          }
+        },
+        {
+          "name": "EFFECTIVE_TIMESTAMP",
+          "type": {
+            "code": "INT64"
+          }
+        },
+        {
+          "name": "PROTO_BUNDLE",
+          "type": {
+            "code": "PROTO",
+            "protoTypeFqn": "proto2.FileDescriptorSet"
+          }
+        },
+        {
+          "name": "SCHEMA_OWNER",
+          "type": {
+            "code": "STRING"
+          }
+        }
+      ]
+    },
+    {
+      "input": {
+        "label": "columns_select",
+        "sql": "SELECT **COLUMNS(['x']) FROM (SELECT 1 AS x)"
+      },
+      "code": "InvalidArgument",
+      "diagnostic": "COLUMN_LIST_SPEC feature is not enabled"
+    },
+    {
+      "input": {
+        "label": "columns_where",
+        "sql": "SELECT x FROM (SELECT 1 AS x) WHERE **COLUMNS(['x'])=1"
+      },
+      "code": "InvalidArgument",
+      "diagnostic": "Unhandled expression for node kind UnpackExpression:"
+    },
+    {
+      "input": {
+        "label": "columns_control",
+        "sql": "SELECT x FROM (SELECT 1 AS x)"
+      },
+      "code": "OK",
+      "rows": [
+        {
+          "x": "1"
+        }
+      ],
+      "fields": [
+        {
+          "name": "x",
+          "type": {
+            "code": "INT64"
+          }
+        }
+      ]
+    },
+    {
+      "input": {
+        "label": "cast_array_json",
+        "sql": "SELECT CAST([x] AS ARRAY<JSON>) AS arr FROM UNNEST([1]) AS x"
+      },
+      "code": "InvalidArgument",
+      "diagnostic": "Casting between arrays with incompatible element types is not supported: Invalid cast from ARRAY<INT64> to ARRAY<JSON>"
+    },
+    {
+      "input": {
+        "label": "array_json_control",
+        "sql": "SELECT [TO_JSON(x)] AS arr FROM UNNEST([1]) AS x"
+      },
+      "code": "OK",
+      "rows": [
+        {
+          "arr": [
+            "1"
+          ]
+        }
+      ],
+      "fields": [
+        {
+          "name": "arr",
+          "type": {
+            "code": "ARRAY",
+            "arrayElementType": {
+              "code": "JSON"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "input": {
+        "label": "cast_struct_json",
+        "sql": "SELECT (CAST(STRUCT(1 AS a) AS STRUCT<a JSON>)).a AS elem"
+      },
+      "code": "OK",
+      "rows": [
+        {
+          "elem": "1"
+        }
+      ],
+      "fields": [
+        {
+          "name": "elem",
+          "type": {
+            "code": "JSON"
+          }
+        }
+      ]
+    },
+    {
+      "input": {
+        "label": "struct_json_control",
+        "sql": "SELECT TO_JSON(1) AS elem"
+      },
+      "code": "OK",
+      "rows": [
+        {
+          "elem": "1"
+        }
+      ],
+      "fields": [
+        {
+          "name": "elem",
+          "type": {
+            "code": "JSON"
+          }
+        }
+      ]
+    },
+    {
+      "input": {
+        "label": "graph_inventory",
+        "sql": "SELECT PROPERTY_GRAPH_NAME FROM INFORMATION_SCHEMA.PROPERTY_GRAPHS ORDER BY PROPERTY_GRAPH_NAME"
+      },
+      "code": "OK",
+      "rows": [],
+      "fields": [
+        {
+          "name": "PROPERTY_GRAPH_NAME",
+          "type": {
+            "code": "STRING"
+          }
+        }
+      ]
+    },
+    {
+      "input": {
+        "label": "jaro_example",
+        "sql": "SELECT JAROWINKLER_SIMILARITY('martha','marhta') AS score"
+      },
+      "code": "InvalidArgument",
+      "diagnostic": "Function not found: JAROWINKLER_SIMILARITY"
+    },
+    {
+      "input": {
+        "label": "jaro_identical",
+        "sql": "SELECT JAROWINKLER_SIMILARITY('martha','martha') AS score"
+      },
+      "code": "InvalidArgument",
+      "diagnostic": "Function not found: JAROWINKLER_SIMILARITY"
+    },
+    {
+      "input": {
+        "label": "edit_distance_control",
+        "sql": "SELECT EDIT_DISTANCE('martha','marhta') AS distance"
+      },
+      "code": "Unimplemented",
+      "diagnostic": "Unsupported built-in function: edit_distance."
+    },
+    {
+      "input": {
+        "label": "cast_scalar_json",
+        "sql": "SELECT CAST(1 AS JSON) AS elem"
+      },
+      "code": "OK",
+      "rows": [
+        {
+          "elem": "1"
+        }
+      ],
+      "fields": [
+        {
+          "name": "elem",
+          "type": {
+            "code": "JSON"
+          }
+        }
+      ]
+    },
+    {
+      "input": {
+        "label": "cast_array_json_literal",
+        "sql": "SELECT CAST([1] AS ARRAY<JSON>) AS arr"
+      },
+      "code": "InvalidArgument",
+      "diagnostic": "Casting between arrays with incompatible element types is not supported: Invalid cast from ARRAY<INT64> to ARRAY<JSON>"
+    },
+    {
+      "input": {
+        "label": "cast_struct_json_column",
+        "sql": "SELECT (CAST(STRUCT(x AS a) AS STRUCT<a JSON>)).a AS elem FROM UNNEST([1,2]) AS x ORDER BY x"
+      },
+      "code": "OK",
+      "rows": [
+        {
+          "elem": "1"
+        },
+        {
+          "elem": "2"
+        }
+      ],
+      "fields": [
+        {
+          "name": "elem",
+          "type": {
+            "code": "JSON"
+          }
+        }
+      ]
+    },
+    {
+      "input": {
+        "label": "cast_struct_json_bound_field",
+        "sql": "WITH t AS (SELECT STRUCT(x AS a) AS pair FROM UNNEST([1,2]) AS x) SELECT (CAST(pair AS STRUCT<a JSON>)).a AS elem FROM t ORDER BY pair.a"
+      },
+      "code": "OK",
+      "rows": [
+        {
+          "elem": "1"
+        },
+        {
+          "elem": "2"
+        }
+      ],
+      "fields": [
+        {
+          "name": "elem",
+          "type": {
+            "code": "JSON"
+          }
+        }
+      ]
+    },
+    {
+      "input": {
+        "label": "cast_array_json_bound_field",
+        "sql": "WITH t AS (SELECT [x] AS a FROM UNNEST([1,2]) AS x) SELECT CAST(a AS ARRAY<JSON>) AS arr FROM t ORDER BY a[OFFSET(0)]"
+      },
+      "code": "InvalidArgument",
+      "diagnostic": "Casting between arrays with incompatible element types is not supported: Invalid cast from ARRAY<INT64> to ARRAY<JSON>"
+    },
+    {
+      "input": {
+        "label": "cast_struct_json_text",
+        "sql": "SELECT (CAST(STRUCT('foo' AS a) AS STRUCT<a JSON>)).a AS elem"
+      },
+      "code": "OK",
+      "rows": [
+        {
+          "elem": "\"foo\""
+        }
+      ],
+      "fields": [
+        {
+          "name": "elem",
+          "type": {
+            "code": "JSON"
+          }
+        }
+      ]
+    },
+    {
+      "input": {
+        "label": "cast_nested_json_null_control",
+        "sql": "SELECT CAST(NULL AS JSON) IS NULL AS sql_null"
+      },
+      "code": "OK",
+      "rows": [
+        {
+          "sql_null": true
+        }
+      ],
+      "fields": [
+        {
+          "name": "sql_null",
+          "type": {
+            "code": "BOOL"
+          }
+        }
+      ]
+    },
+    {
+      "input": {
+        "label": "range_parameter",
+        "sql": "SELECT x, SUM(x) OVER (ORDER BY x RANGE BETWEEN @width PRECEDING AND CURRENT ROW) AS rolling FROM UNNEST([1,2,4,5]) AS x ORDER BY x",
+        "params": {
+          "width": 2
+        }
+      },
+      "code": "InvalidArgument",
+      "diagnostic": "Window framing expression has type FLOAT64 that cannot coerce to the type of the ORDER BY expression, which is INT64"
+    },
+    {
+      "input": {
+        "label": "aggregate_plain_control",
+        "sql": "SELECT SUM(x) AS total FROM UNNEST([1,2,4,5]) AS x"
+      },
+      "code": "OK",
+      "rows": [
+        {
+          "total": "12"
+        }
+      ],
+      "fields": [
+        {
+          "name": "total",
+          "type": {
+            "code": "INT64"
+          }
+        }
+      ]
+    },
+    {
+      "input": {
+        "label": "lateral_subquery_control",
+        "sql": "WITH t AS (SELECT 1 AS x) SELECT a,a+1 AS b FROM (SELECT x+1 AS a FROM t)"
+      },
+      "code": "OK",
+      "rows": [
+        {
+          "a": "2",
+          "b": "3"
+        }
+      ],
+      "fields": [
+        {
+          "name": "a",
+          "type": {
+            "code": "INT64"
+          }
+        },
+        {
+          "name": "b",
+          "type": {
+            "code": "INT64"
+          }
+        }
+      ]
+    },
+    {
+      "input": {
+        "label": "columns_struct_control",
+        "sql": "SELECT x FROM (SELECT 1 AS x) WHERE x=1"
+      },
+      "code": "OK",
+      "rows": [
+        {
+          "x": "1"
+        }
+      ],
+      "fields": [
+        {
+          "name": "x",
+          "type": {
+            "code": "INT64"
+          }
+        }
+      ]
+    },
+    {
+      "input": {
+        "label": "table_cte",
+        "sql": "WITH t AS (SELECT 1 AS x) TABLE t"
+      },
+      "code": "InvalidArgument",
+      "diagnostic": "TABLE statements are not supported"
+    },
+    {
+      "input": {
+        "label": "table_cte_control",
+        "sql": "WITH t AS (SELECT 1 AS x) SELECT * FROM t"
+      },
+      "code": "OK",
+      "rows": [
+        {
+          "x": "1"
+        }
+      ],
+      "fields": [
+        {
+          "name": "x",
+          "type": {
+            "code": "INT64"
+          }
+        }
+      ]
+    },
+    {
+      "input": {
+        "label": "table_top",
+        "sql": "TABLE INFORMATION_SCHEMA.SCHEMATA"
+      },
+      "code": "InvalidArgument",
+      "diagnostic": "TABLE statements are not supported"
+    },
+    {
+      "input": {
+        "label": "table_identifier_count",
+        "sql": "SELECT COUNT(*) AS n FROM INFORMATION_SCHEMA.SCHEMATA"
+      },
+      "code": "OK",
+      "rows": [
+        {
+          "n": "3"
+        }
+      ],
+      "fields": [
+        {
+          "name": "n",
+          "type": {
+            "code": "INT64"
+          }
+        }
+      ]
+    },
+    {
+      "input": {
+        "label": "nullif_lambda",
+        "sql": "SELECT NULLIF(1, x -> x > 0) AS v"
+      },
+      "code": "InvalidArgument",
+      "diagnostic": "No matching signature for function NULLIF"
+    },
+    {
+      "input": {
+        "label": "nullif_control",
+        "sql": "SELECT NULLIF(1,1) AS v"
+      },
+      "code": "OK",
+      "rows": [
+        {
+          "v": null
+        }
+      ],
+      "fields": [
+        {
+          "name": "v",
+          "type": {
+            "code": "INT64"
+          }
+        }
+      ]
+    },
+    {
+      "input": {
+        "label": "bit_cast_bytes",
+        "sql": "SELECT BIT_CAST_TO_INT64(BIT_CAST_TO_BYTES(1)) AS v"
+      },
+      "code": "InvalidArgument",
+      "diagnostic": "Function not found: BIT_CAST_TO_INT64"
+    },
+    {
+      "input": {
+        "label": "bit_cast_inner",
+        "sql": "SELECT BIT_CAST_TO_BYTES(1) AS v"
+      },
+      "code": "InvalidArgument",
+      "diagnostic": "Function not found: BIT_CAST_TO_BYTES"
+    },
+    {
+      "input": {
+        "label": "bit_cast_control",
+        "sql": "SELECT CAST(1 AS INT64) AS v"
+      },
+      "code": "OK",
+      "rows": [
+        {
+          "v": "1"
+        }
+      ],
+      "fields": [
+        {
+          "name": "v",
+          "type": {
+            "code": "INT64"
+          }
+        }
+      ]
+    },
+    {
+      "input": {
+        "label": "variant_to_json",
+        "sql": "SELECT CAST(CAST(1 AS VARIANT) AS JSON) AS v"
+      },
+      "code": "InvalidArgument",
+      "diagnostic": "Type not found: VARIANT"
+    },
+    {
+      "input": {
+        "label": "variant_type_control",
+        "sql": "SELECT CAST(1 AS VARIANT) AS v"
+      },
+      "code": "InvalidArgument",
+      "diagnostic": "Type not found: VARIANT"
+    },
+    {
+      "input": {
+        "label": "range_parameter_double_key",
+        "sql": "SELECT x, SUM(x) OVER (ORDER BY x RANGE BETWEEN @width PRECEDING AND CURRENT ROW) AS rolling FROM UNNEST([1.0,2.0,4.0,5.0]) AS x ORDER BY x",
+        "params": {
+          "width": 2
+        }
+      },
+      "code": "Unimplemented",
+      "diagnostic": "Unsupported built-in function: SUM."
+    },
+    {
+      "input": {
+        "label": "range_double_literal",
+        "sql": "SELECT x, SUM(x) OVER (ORDER BY x RANGE BETWEEN 2.0 PRECEDING AND CURRENT ROW) AS rolling FROM UNNEST([1.0,2.0,4.0,5.0]) AS x ORDER BY x"
+      },
+      "code": "Unimplemented",
+      "diagnostic": "Unsupported built-in function: SUM."
+    },
+    {
+      "input": {
+        "label": "secure_context_empty",
+        "sql": "SELECT SECURE_CONTEXT('user_id') AS value"
+      },
+      "code": "InvalidArgument",
+      "diagnostic": "Missing secure parameter: user_id"
+    },
+    {
+      "input": {
+        "label": "secure_context_set",
+        "sql": "SELECT SECURE_CONTEXT('user_id') AS value",
+        "secure_context": {
+          "user_id": "release-probe"
+        }
+      },
+      "code": "OK",
+      "rows": [
+        {
+          "value": "release-probe"
+        }
+      ],
+      "fields": [
+        {
+          "name": "value",
+          "type": {
+            "code": "STRING"
+          }
+        }
+      ]
+    },
+    {
+      "input": {
+        "label": "union_columns_unpack",
+        "sql": "SELECT 1 AS x UNION ALL BY NAME ON (**COLUMNS(['x'])) SELECT 2 AS x"
+      },
+      "code": "InvalidArgument",
+      "diagnostic": "BY NAME ON for set operations is not supported"
+    },
+    {
+      "input": {
+        "label": "union_columns_explicit",
+        "sql": "SELECT 1 AS x UNION ALL BY NAME ON (x) SELECT 2 AS x"
+      },
+      "code": "InvalidArgument",
+      "diagnostic": "BY NAME ON for set operations is not supported"
+    },
+    {
+      "input": {
+        "label": "union_columns_positional",
+        "sql": "SELECT 1 AS x UNION ALL SELECT 2 AS x ORDER BY x"
+      },
+      "code": "OK",
+      "rows": [
+        {
+          "x": "1"
+        },
+        {
+          "x": "2"
+        }
+      ],
+      "fields": [
+        {
+          "name": "x",
+          "type": {
+            "code": "INT64"
+          }
+        }
+      ]
+    },
+    {
+      "input": {
+        "label": "cast_array_to_one_json",
+        "sql": "SELECT CAST([x, x+1] AS JSON) AS j FROM UNNEST([1]) AS x"
+      },
+      "code": "OK",
+      "rows": [
+        {
+          "j": "[1,2]"
+        }
+      ],
+      "fields": [
+        {
+          "name": "j",
+          "type": {
+            "code": "JSON"
+          }
+        }
+      ]
+    },
+    {
+      "input": {
+        "label": "cast_identical_array",
+        "sql": "SELECT CAST([x] AS ARRAY<INT64>) AS arr FROM UNNEST([1]) AS x"
+      },
+      "code": "OK",
+      "rows": [
+        {
+          "arr": [
+            "1"
+          ]
+        }
+      ],
+      "fields": [
+        {
+          "name": "arr",
+          "type": {
+            "code": "ARRAY",
+            "arrayElementType": {
+              "code": "INT64"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "input": {
+        "label": "to_json_array_mapping",
+        "sql": "SELECT ARRAY(SELECT TO_JSON(x) FROM UNNEST([1,2]) AS x ORDER BY x) AS arr"
+      },
+      "code": "OK",
+      "rows": [
+        {
+          "arr": [
+            "1",
+            "2"
+          ]
+        }
+      ],
+      "fields": [
+        {
+          "name": "arr",
+          "type": {
+            "code": "ARRAY",
+            "arrayElementType": {
+              "code": "JSON"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "input": {
+        "label": "cast_field_name",
+        "sql": "SELECT (CAST(STRUCT(7 AS original_name) AS STRUCT<new_name JSON>)).new_name AS v"
+      },
+      "code": "OK",
+      "rows": [
+        {
+          "v": "7"
+        }
+      ],
+      "fields": [
+        {
+          "name": "v",
+          "type": {
+            "code": "JSON"
+          }
+        }
+      ]
+    },
+    {
+      "input": {
+        "label": "json_null_vs_missing",
+        "sql": "WITH sample AS (SELECT JSON_QUERY(JSON '{\"a\":null}', '$.a') AS present, JSON_QUERY(JSON '{\"a\":null}', '$.missing') AS missing) SELECT present, present IS NULL AS present_is_sql_null, missing, missing IS NULL AS missing_is_sql_null, TO_JSON_STRING(CAST(NULL AS JSON)) AS sql_null_text FROM sample"
+      },
+      "code": "OK",
+      "rows": [
+        {
+          "missing": null,
+          "missing_is_sql_null": true,
+          "present": "null",
+          "present_is_sql_null": false,
+          "sql_null_text": "null"
+        }
+      ],
+      "fields": [
+        {
+          "name": "present",
+          "type": {
+            "code": "JSON"
+          }
+        },
+        {
+          "name": "present_is_sql_null",
+          "type": {
+            "code": "BOOL"
+          }
+        },
+        {
+          "name": "missing",
+          "type": {
+            "code": "JSON"
+          }
+        },
+        {
+          "name": "missing_is_sql_null",
+          "type": {
+            "code": "BOOL"
+          }
+        },
+        {
+          "name": "sql_null_text",
+          "type": {
+            "code": "STRING"
+          }
+        }
+      ]
+    }
+  ]
+}

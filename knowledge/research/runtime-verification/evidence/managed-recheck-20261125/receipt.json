@@ -1,0 +1,607 @@
+{
+  "observation_date_jst": "2026-11-25",
+  "spanalyzer_revision": "d0580d39991aea898962bb5c51e18e2e7245c64f",
+  "scope": "Existing regional managed Enterprise trial GoogleSQL database and isolated Linux arm64 GoogleSQL containers. All managed SQL used a read-only transaction.",
+  "reproduction": {
+    "previous_receipt": "../managed-recheck-20261124/receipt.json",
+    "input_generator": "replay_inputs.py",
+    "primary": {
+      "cases": 277,
+      "sha256": "f9030cf816bd556f6fe7d51ce5429a603d3ed094f2acab3060043b7ce9229c28",
+      "order": "236 routine inputs, 36 routine statistics inputs, five placement inputs"
+    },
+    "controls": {
+      "cases": 6,
+      "sha256": "b4c94ab90ffe43cf6359c819fb4d6b645e388390060ac070d4207196a8f1eaa0",
+      "order": "five distribution controls followed by one placement input"
+    },
+    "input_format": "Run python3 replay_inputs.py primary or python3 replay_inputs.py controls. Pass the JSON output file to the read-only producer. Parameters and secure context are preserved.",
+    "producer_source": "../managed-recheck-20261112/producer/query.go.txt",
+    "producer_source_sha256": "13dc8b3ebf9044d4fe48072b79ac02c47d645aec2d84be2298262f5bf4b3b22c",
+    "catalog_producers": [
+      "survey/cmd/infoschema-capture",
+      "survey/cmd/spanner-sys-capture"
+    ],
+    "catalog_settings": "GOWORK=off GOFLAGS=-mod=readonly. Use --target managed with the existing database. For local captures, specify the tagged image pinned to the recorded Linux arm64 manifest digest.",
+    "discovery_queries": [
+      {
+        "label": "information-schema-size",
+        "sql": "SELECT COUNT(DISTINCT TABLE_NAME) AS table_count, COUNT(*) AS column_count FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = 'INFORMATION_SCHEMA'"
+      },
+      {
+        "label": "system-schema-size",
+        "sql": "SELECT COUNT(DISTINCT TABLE_NAME) AS table_count, COUNT(*) AS column_count FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = 'SPANNER_SYS'"
+      },
+      {
+        "label": "optimizer-advertised",
+        "sql": "SELECT COUNT(*) AS advertised_columns FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = 'SPANNER_SYS' AND TABLE_NAME = 'SUPPORTED_OPTIMIZER_VERSIONS'"
+      },
+      {
+        "label": "optimizer-direct",
+        "sql": "SELECT VERSION, IS_DEFAULT FROM SPANNER_SYS.SUPPORTED_OPTIMIZER_VERSIONS ORDER BY VERSION"
+      }
+    ],
+    "local_discovery": "Open a GoogleSQL database on each tagged local service with a Spanner-compatible SQL client, then execute each discovery_queries SQL string there. Use infoschema-capture for all three target types and spanner-sys-capture for managed or omni. The managed read-only producer requires the production endpoint.",
+    "local_discovery_runner": "../docs-delta-runtime-20261031/producers/module/local.go.txt",
+    "local_discovery_replay": [
+      {
+        "tag": "1.5.59",
+        "completed_utc": "2026-11-25T14:10:38.559973Z",
+        "matching_discovery_results": 4,
+        "database_after_drop": "NotFound"
+      },
+      {
+        "tag": "2026.r4-lts.3",
+        "completed_utc": "2026-11-25T14:10:57.685685Z",
+        "matching_discovery_results": 4,
+        "database_after_drop": "NotFound"
+      },
+      {
+        "tag": "2026.r5.2",
+        "completed_utc": "2026-11-25T14:11:20.770249Z",
+        "matching_discovery_results": 4,
+        "database_after_drop": "NotFound"
+      }
+    ]
+  },
+  "managed_replay": {
+    "result_comparison": "gRPC code and ordered result field metadata, excluding transaction metadata. Row multisets include duplicate rows and ignore row order.",
+    "passes": [
+      {
+        "pass": "first",
+        "producer_binary_sha256": "797e550de8fc200bfad2fd2e36b641f765204fbe7118deab7d50bb578ae4f094",
+        "started_utc": "2026-11-24T17:16:59.982281Z",
+        "finished_utc": "2026-11-24T17:17:12.74852Z",
+        "routine_vs_nov24_first_pass": {
+          "cases": 272,
+          "codes": {
+            "InvalidArgument": 54,
+            "OK": 202,
+            "OutOfRange": 5,
+            "Unimplemented": 11
+          },
+          "changed_status_or_fields": [],
+          "changed_row_multisets": 20
+        },
+        "placement_vs_nov24": {
+          "cases": 6,
+          "codes": {
+            "OK": 6
+          },
+          "changed_status_or_fields": [],
+          "changed_row_multisets": 0
+        },
+        "distribution_controls": [
+          {
+            "label": "rolling-original",
+            "code": "InvalidArgument",
+            "rows": []
+          },
+          {
+            "label": "rolling-count-and-guard",
+            "code": "OK",
+            "rows": [
+              {
+                "n": "0",
+                "nonnull": "0",
+                "null_hist": true,
+                "p99": null
+              }
+            ]
+          },
+          {
+            "label": "empty",
+            "code": "InvalidArgument",
+            "rows": []
+          },
+          {
+            "label": "empty-count-and-guard",
+            "code": "OK",
+            "rows": [
+              {
+                "n": "0",
+                "null_hist": true,
+                "p99": null
+              }
+            ]
+          },
+          {
+            "label": "fixed-sample",
+            "code": "OK",
+            "rows": [
+              {
+                "p99": 1018.88
+              }
+            ]
+          }
+        ],
+        "client_build": {
+          "go": "go1.26.11",
+          "cloud.google.com/go/spanner": "v1.95.1",
+          "google.golang.org/grpc": "v1.84.0"
+        }
+      },
+      {
+        "pass": "repeat",
+        "producer_binary_sha256": "de5fb34945fcea1d15b5dff5bf15177afaab8c206ff82e34ae3826c70b8a9575",
+        "started_utc": "2026-11-24T17:19:21.100225Z",
+        "finished_utc": "2026-11-24T17:19:31.232344Z",
+        "routine_vs_nov24_first_pass": {
+          "cases": 272,
+          "codes": {
+            "InvalidArgument": 53,
+            "OK": 203,
+            "OutOfRange": 5,
+            "Unimplemented": 11
+          },
+          "changed_status_or_fields": [
+            {
+              "label": "new-readonly/distribution-agg-query-json",
+              "before": "InvalidArgument",
+              "after": "OK",
+              "result_fields_equal": false
+            }
+          ],
+          "changed_row_multisets": 32
+        },
+        "placement_vs_nov24": {
+          "cases": 6,
+          "codes": {
+            "OK": 6
+          },
+          "changed_status_or_fields": [],
+          "changed_row_multisets": 0
+        },
+        "distribution_controls": [
+          {
+            "label": "rolling-original",
+            "code": "OK",
+            "rows": [
+              {
+                "p99": 0.4540334080000043
+              }
+            ]
+          },
+          {
+            "label": "rolling-count-and-guard",
+            "code": "OK",
+            "rows": [
+              {
+                "n": "299",
+                "nonnull": "299",
+                "null_hist": false,
+                "p99": 0.4540334080000043
+              }
+            ]
+          },
+          {
+            "label": "empty",
+            "code": "InvalidArgument",
+            "rows": []
+          },
+          {
+            "label": "empty-count-and-guard",
+            "code": "OK",
+            "rows": [
+              {
+                "n": "0",
+                "null_hist": true,
+                "p99": null
+              }
+            ]
+          },
+          {
+            "label": "fixed-sample",
+            "code": "OK",
+            "rows": [
+              {
+                "p99": 1018.88
+              }
+            ]
+          }
+        ],
+        "client_build": {
+          "go": "go1.26.11",
+          "cloud.google.com/go/spanner": "v1.95.1",
+          "google.golang.org/grpc": "v1.83.2"
+        }
+      }
+    ],
+    "first_pass_row_variations": {
+      "clock": 1,
+      "lock_or_query_statistics": 19
+    },
+    "placements": {
+      "administrative_partitions": [
+        {
+          "id": "default",
+          "state": "READY"
+        }
+      ],
+      "explicit_routing_option_rows": 0
+    }
+  },
+  "managed_catalog_checks": {
+    "information_schema": {
+      "observations": 3,
+      "tool_exit": 0,
+      "baseline_status": "producer_changed_only",
+      "rolling_queryability": [
+        {
+          "table_name": "INDEXES",
+          "column_name": "SEARCH_UNNEST",
+          "status": "queryable"
+        },
+        {
+          "table_name": "INDEX_COLUMNS",
+          "column_name": "EXPRESSION",
+          "status": "queryable"
+        }
+      ],
+      "observed_at": "2026-11-24T17:20:50.854816Z"
+    },
+    "spanner_sys": {
+      "tool_exit": 1,
+      "baseline_status": "surface_changed",
+      "repository_baseline_columns": 624,
+      "added_since_repository_baseline": [
+        {
+          "table": "TXN_STATS_TOP_10MINUTE",
+          "column": "LOCK_LATENCY_DISTRIBUTION",
+          "ordinal": 28
+        },
+        {
+          "table": "TXN_STATS_TOP_10MINUTE",
+          "column": "LOCK_LATENCY_DISTRIBUTION_JSON_STRING",
+          "ordinal": 29
+        },
+        {
+          "table": "TXN_STATS_TOP_HOUR",
+          "column": "LOCK_LATENCY_DISTRIBUTION",
+          "ordinal": 28
+        },
+        {
+          "table": "TXN_STATS_TOP_HOUR",
+          "column": "LOCK_LATENCY_DISTRIBUTION_JSON_STRING",
+          "ordinal": 29
+        },
+        {
+          "table": "TXN_STATS_TOP_MINUTE",
+          "column": "LOCK_LATENCY_DISTRIBUTION",
+          "ordinal": 28
+        },
+        {
+          "table": "TXN_STATS_TOP_MINUTE",
+          "column": "LOCK_LATENCY_DISTRIBUTION_JSON_STRING",
+          "ordinal": 29
+        }
+      ],
+      "observed_at": "2026-11-24T17:24:32.718046Z"
+    },
+    "TestCanonicalDDL_RealSpanner": {
+      "result": "pass",
+      "administrative_definitions": 0,
+      "reconstructed_definitions": 0
+    },
+    "TestDrift_RealTableMetas": {
+      "result": "fail",
+      "cause": "The six already recorded TXN_STATS_TOP columns above. No unknown tables or ordinal or type mismatches."
+    }
+  },
+  "catalog_targets": {
+    "managed": {
+      "catalogs": {
+        "information_schema": {
+          "tables": 48,
+          "columns": 310,
+          "surface_sha256": "89b4ab9e231d7d61bf417669b6f5d29d1715c3999058b905f60698bc1047c6b0"
+        },
+        "spanner_sys": {
+          "tables": 52,
+          "columns": 630,
+          "surface_sha256": "8576197c6f20f69c15f4beeaa37c5b1739a0fbe6c71d3cea994fac33043790a8"
+        }
+      },
+      "optimizer": {
+        "advertised_columns": 3,
+        "versions": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "default": [
+          9
+        ]
+      },
+      "discovery_observed_utc": "2026-11-24T17:23:29.505212Z"
+    },
+    "2026.r4-lts.3": {
+      "catalogs": {
+        "information_schema": {
+          "tables": 48,
+          "columns": 310,
+          "surface_sha256": "89b4ab9e231d7d61bf417669b6f5d29d1715c3999058b905f60698bc1047c6b0",
+          "observed_utc": "2026-11-24T17:21:23.202024Z"
+        },
+        "spanner_sys": {
+          "tables": 51,
+          "columns": 598,
+          "surface_sha256": "9bb70c640b69e4929e4b44ed834d69e1dfcd5fc17cc53e017f541b9f58f9ec8f",
+          "observed_utc": "2026-11-24T17:21:42.905448Z"
+        }
+      },
+      "optimizer": {
+        "advertised_columns": 3,
+        "versions": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "default": [
+          9
+        ]
+      },
+      "discovery_observed_utc": "2026-11-24T17:23:39.249918Z",
+      "image": {
+        "index_digest": "sha256:952455576a4c52aeafbb3136d43de8778dc35e3e38fa86b58297d3f4a8e2468a",
+        "manifest_digest": "sha256:e1ee15b1b1f9e2f32ce9b9935998ce96f584ef60d3abe550d67dbc2a5eca521b",
+        "platform": "linux/arm64"
+      }
+    },
+    "2026.r5.2": {
+      "catalogs": {
+        "information_schema": {
+          "tables": 48,
+          "columns": 310,
+          "surface_sha256": "89b4ab9e231d7d61bf417669b6f5d29d1715c3999058b905f60698bc1047c6b0",
+          "observed_utc": "2026-11-24T17:22:03.316443Z"
+        },
+        "spanner_sys": {
+          "tables": 51,
+          "columns": 598,
+          "surface_sha256": "9bb70c640b69e4929e4b44ed834d69e1dfcd5fc17cc53e017f541b9f58f9ec8f",
+          "observed_utc": "2026-11-24T17:22:22.9242Z"
+        }
+      },
+      "optimizer": {
+        "advertised_columns": 3,
+        "versions": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "default": [
+          9
+        ]
+      },
+      "discovery_observed_utc": "2026-11-24T17:23:56.088987Z",
+      "image": {
+        "index_digest": "sha256:09fbca681b5185bb223cae2b0d87276b47b7541f2a4901c4f28522f7ff27ce05",
+        "manifest_digest": "sha256:7b8bcc80c16693536016fb75ea5d9a344119f3709364e06161ecbdd6f255bf21",
+        "platform": "linux/arm64"
+      }
+    },
+    "1.5.59": {
+      "catalogs": {
+        "information_schema": {
+          "tables": 30,
+          "columns": 204,
+          "surface_sha256": "e082c284708ced140f9e1e522ec8d99e51573af6771cc7148407e7ca5f3bfeb9",
+          "observed_utc": "2026-11-24T17:20:51.788197Z"
+        },
+        "spanner_sys": {
+          "tables": 0,
+          "columns": 0
+        }
+      },
+      "optimizer": {
+        "advertised_columns": 0,
+        "versions": [
+          42
+        ],
+        "default": [
+          42
+        ]
+      },
+      "discovery_observed_utc": "2026-11-24T17:23:30.019562Z",
+      "image": {
+        "index_digest": "sha256:5f71fecd6330211789b75065ade9587d67b3a6b4678e7e5408e42c22f778c63e",
+        "manifest_digest": "sha256:969af6a9349948fbfb4a826c18e160e258a4005f7c759f8e7f2dcec369cccba8",
+        "platform": "linux/arm64"
+      }
+    }
+  },
+  "spanner_sys_comparison": {
+    "equal_omni_columns": 598,
+    "shared_type_or_ordinal_mismatches": 0,
+    "omni_only_columns": 0,
+    "managed_only_by_table": {
+      "BATCH_OPERATIONS": [
+        "LAST_UPDATE_TIMESTAMP",
+        "NUM_PARTITIONS_COMPLETE",
+        "NUM_PARTITIONS_TOTAL",
+        "NUM_TRIVIAL_PARTITIONS_COMPLETE",
+        "PROGRESS",
+        "QUERY_ID",
+        "RESULT",
+        "ROWS_PROCESSED",
+        "START_TIMESTAMP",
+        "STATUS",
+        "TEXT"
+      ],
+      "LOCK_STATS_TOP_10MINUTE": [
+        "LOCK_WAIT_DISTRIBUTION",
+        "LOCK_WAIT_DISTRIBUTION_JSON_STRING"
+      ],
+      "LOCK_STATS_TOP_HOUR": [
+        "LOCK_WAIT_DISTRIBUTION",
+        "LOCK_WAIT_DISTRIBUTION_JSON_STRING"
+      ],
+      "LOCK_STATS_TOP_MINUTE": [
+        "LOCK_WAIT_DISTRIBUTION",
+        "LOCK_WAIT_DISTRIBUTION_JSON_STRING"
+      ],
+      "LOCK_STATS_TOTAL_10MINUTE": [
+        "LOCK_WAIT_DISTRIBUTION",
+        "LOCK_WAIT_DISTRIBUTION_JSON_STRING"
+      ],
+      "LOCK_STATS_TOTAL_HOUR": [
+        "LOCK_WAIT_DISTRIBUTION",
+        "LOCK_WAIT_DISTRIBUTION_JSON_STRING"
+      ],
+      "LOCK_STATS_TOTAL_MINUTE": [
+        "LOCK_WAIT_DISTRIBUTION",
+        "LOCK_WAIT_DISTRIBUTION_JSON_STRING"
+      ],
+      "SPLIT_STATS_TOP_10MINUTE": [
+        "LATENCY_IMPACT_CORRELATION_SCORE"
+      ],
+      "SPLIT_STATS_TOP_HOUR": [
+        "LATENCY_IMPACT_CORRELATION_SCORE"
+      ],
+      "SPLIT_STATS_TOP_MINUTE": [
+        "LATENCY_IMPACT_CORRELATION_SCORE"
+      ],
+      "TXN_STATS_TOP_10MINUTE": [
+        "LOCK_LATENCY_DISTRIBUTION",
+        "LOCK_LATENCY_DISTRIBUTION_JSON_STRING"
+      ],
+      "TXN_STATS_TOP_HOUR": [
+        "LOCK_LATENCY_DISTRIBUTION",
+        "LOCK_LATENCY_DISTRIBUTION_JSON_STRING"
+      ],
+      "TXN_STATS_TOP_MINUTE": [
+        "LOCK_LATENCY_DISTRIBUTION",
+        "LOCK_LATENCY_DISTRIBUTION_JSON_STRING"
+      ]
+    }
+  },
+  "publication": {
+    "mirror_head": "5f1eee77499cc8cffa5759c87ce72d575b3de319",
+    "mirror_commits_since_previous_check": 0,
+    "managed_atom": {
+      "latest": "November 18, 2026",
+      "entry_id": "tag:google.com,2016:spanner-release-notes#November_18_2026",
+      "feed_byte_identical_to_previous": true
+    },
+    "bigquery": {
+      "table": "bigquery-public-data.google_cloud_release_notes.release_notes",
+      "product_filter": "LOWER(product_name) LIKE '%spanner%'",
+      "products": [
+        {
+          "latest": "2026-11-18",
+          "product_name": "Spanner",
+          "row_count": "533"
+        }
+      ],
+      "latest_subject": "QueryData for Spanner Graph (Preview)"
+    },
+    "managed_html_latest": "November_10_2026",
+    "managed_developer_knowledge": {
+      "heading": "November 10, 2026",
+      "update_time": "2026-11-10T22:01:48Z",
+      "body_matched_previous_check": true
+    },
+    "omni_html_latest": "October_29_2026",
+    "omni_developer_knowledge": {
+      "heading": "October 29, 2026",
+      "update_time": "2026-10-31T21:40:02Z",
+      "body_matched_previous_check": true
+    },
+    "registries": {
+      "Omni": {
+        "latest": {
+          "lts": "2026.r4-lts.3",
+          "regular": "2026.r5.2"
+        },
+        "new_tags": [],
+        "matching_nov24_index_and_platform_digests": true
+      },
+      "Emulator": {
+        "latest": {
+          "stable": "1.5.59"
+        },
+        "new_tags": [],
+        "matching_nov24_index_and_platform_digests": true
+      }
+    },
+    "emulator_github_release": "https://github.com/GoogleCloudPlatform/cloud-spanner-emulator/releases/tag/v1.5.59",
+    "spanemuboost_github_release": "https://github.com/apstndb/spanemuboost/releases/tag/v0.4.11",
+    "mirror_rechecked_utc": "2026-11-24T17:31Z",
+    "mirror_evening_recheck": {
+      "checked_utc": "2026-11-25T13:58Z",
+      "head": "53b1cf924b4243d286afaeb9ae6d0a76b3d12fd2",
+      "commits_since_morning": 1,
+      "changed_paths": [
+        "metadata.yaml"
+      ]
+    }
+  },
+  "parser_followup": {
+    "memefish_release": "v0.9.0",
+    "upstream_main": "da2ddfdd6277527f9dc2a54b87221579a9b18abe",
+    "historical_managed_sql": {
+      "distinct": 619,
+      "stable_round_trips": 588,
+      "rejections": 31,
+      "matches_nov22_output_bytes": true,
+      "output_sha256": "0e5545cd376066af4a7e84ae9f7cee45aa7cef0e2a185b9a2ee7ccb03e7b8aa8"
+    },
+    "additional_distinct_successful_managed_sql": {
+      "statements": 13,
+      "stable_round_trips": 13
+    },
+    "original_draft_examples": {
+      "statements": 8,
+      "rejected_by_both_entry_points": 8
+    },
+    "tracker_scope": {
+      "issues": 184,
+      "pullRequests": 316,
+      "all_states": true,
+      "default_schema": {
+        "url": "https://github.com/cloudspannerecosystem/memefish/issues/502",
+        "state": "open"
+      },
+      "other_candidates": "No dedicated Issue or PR identified for schema-wide EXECUTE on functions or scalar EXECUTE ON FUNCTION."
+    }
+  }
+}

@@ -80,6 +80,8 @@ observation date.
 | 2026-11-24 UTC, GoogleSQL | Recheck | Both catalog hashes matched November 21. Of 272 repeated inputs, 271 kept their gRPC status and result fields. | [November 21](../managed-queue-search-upsert-20261121.md), [November 24](../managed-placements-and-omni-privileges-20261124.md) |
 | 2026-11-24 UTC, GoogleSQL | Change | The rolling latency percentile changed from OK on November 21 to InvalidArgument, then succeeded as histograms became available. Empty and populated controls reproduced the two outcomes. | [November 21](../managed-queue-search-upsert-20261121.md), [November 24](../managed-placements-and-omni-privileges-20261124.md) |
 | 2026-11-24 UTC, GoogleSQL | First coverage | The database had only the default placement on the default instance partition. Its database options listed no routing metadata setting. | [November 24](../managed-placements-and-omni-privileges-20261124.md) |
+| 2026-11-24 17:16–17:24 UTC (November 25 JST), GoogleSQL | Recheck | All 272 first-pass statuses and field lists matched November 24. The rolling p99 again changed with the histogram window. Both catalog hashes matched the previous capture. | [Previous replay](../managed-placements-and-omni-privileges-20261124.md), [two passes and controls](../managed-omni-emulator-catalogs-20261125.md) |
+| 2026-11-25 13:56–14:13 UTC, GoogleSQL | First coverage | Casting an integer field to JSON inside a struct succeeded. Converting an integer array to an array of JSON values failed. Mapping TO_JSON over its elements succeeded. | [Upstream comparisons and managed measurements](../googlesql-release-deltas-20261125.md) |
 
 ## Publication and source context
 

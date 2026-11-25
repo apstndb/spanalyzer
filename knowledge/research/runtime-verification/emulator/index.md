@@ -47,6 +47,7 @@ without exact times have no claimed internal order.
 | 2026-11-16 JST, 1.5.59 arm64 | Composite FK validation | The consistency read found one child without a matching parent in the three-column fixture. The separate indexed control retained one valid row. | [Results by engine](../evidence/fk-validation-20261116/summary.json) |
 | 2026-11-18 UTC, 1.5.59 arm64 | FK catalog correction and hint comparison | Both dialects rejected the FK name as a hint and accepted the managed-generated physical name. The catalog paired reordered references incorrectly and repeated parent key rows when two FKs shared a parent unique index. DDL export preserved the declared pairs. | [FK backing-index resolution](../fk-backing-index-resolution-20261118.md) |
 | 2026-11-24 UTC, 1.5.59 arm64 | First coverage | All 24 bulk privilege statements failed during DDL parsing. With the setup statements executed separately, the role returned 42 before the grant, after it and after the revoke. | [November 24](../managed-placements-and-omni-privileges-20261124.md) |
+| 2026-11-24 17:20–17:23 UTC (November 25 JST), 1.5.59 arm64 | Recheck | IS had 204 columns. Discovery reported zero SYS columns, while a direct read of SUPPORTED_OPTIMIZER_VERSIONS returned version 42 as the default. | [Earlier 1.5.58 probe](../cross-engine-comparison-20261005.md), [1.5.59 measurements](../managed-omni-emulator-catalogs-20261125.md) |
 
 ## Publication and source context
 
